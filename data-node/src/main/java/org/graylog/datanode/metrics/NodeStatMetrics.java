@@ -24,6 +24,7 @@ import java.util.function.Function;
 
 public enum NodeStatMetrics {
     CPU_LOAD("float", new RollupAction.IsmRollup.AvgMetric(), "$.os.cpu.load_average.1m"),
+    CPU_PERCENT("integer", new RollupAction.IsmRollup.AvgMetric(), "$.os.cpu.percent"),
     MEM_FREE("float", new RollupAction.IsmRollup.AvgMetric(), "$.os.mem.free_in_bytes", NodeStatMetrics::bytesToMb),
     MEM_TOTAL("float", new RollupAction.IsmRollup.AvgMetric(), "$.os.mem.total_in_bytes", NodeStatMetrics::bytesToGb),
     MEM_TOTAL_USED_BYTES("float", new RollupAction.IsmRollup.AvgMetric(), "$.os.mem.used_in_bytes", NodeStatMetrics::bytesToGb),

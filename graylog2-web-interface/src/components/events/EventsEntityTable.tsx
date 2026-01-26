@@ -25,7 +25,7 @@ import fetchEvents, { keyFn } from 'components/events/fetchEvents';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import useQuery from 'routing/useQuery';
-import useColumnRenderers from 'components/events/events/ColumnRenderers';
+import CustomColumnRenderers from 'components/events/events/ColumnRenderers';
 import EventsRefreshControls from 'components/events/events/EventsRefreshControls';
 import QueryHelper from 'components/common/QueryHelper';
 import EventsWidgets from 'components/events/EventsWidgets';
@@ -37,8 +37,6 @@ const additionalSearchFields = {
 
 const EventsEntityTable = () => {
   const { stream_id: streamId } = useQuery();
-
-  const columnRenderers = useColumnRenderers();
   const _fetchEvents = useCallback(
     (searchParams: SearchParams) => fetchEvents(searchParams, streamId as string),
     [streamId],
@@ -56,11 +54,10 @@ const EventsEntityTable = () => {
         tableLayout={eventsTableElements.defaultLayout}
         fetchEntities={_fetchEvents}
         keyFn={keyFn}
-        actionsCellWidth={110}
         expandedSectionRenderers={expandedSections}
         entityAttributesAreCamelCase={false}
         filterValueRenderers={FilterValueRenderers}
-        columnRenderers={columnRenderers}
+        columnRenderers={CustomColumnRenderers}
         bulkSelection={bulkSelection}
         topRightCol={<EventsRefreshControls />}
         middleSection={EventsWidgets}

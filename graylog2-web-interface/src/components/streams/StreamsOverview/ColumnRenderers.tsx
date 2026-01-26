@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import type Immutable from 'immutable';
-import type { ColumnRenderersByAttribute } from 'src/components/common/EntityDataTable/types';
 
+import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import type { Output } from 'stores/outputs/OutputsStore';
 import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
@@ -37,7 +37,7 @@ const getStreamDataLakeTableElements = PluginStore.exports('dataLake')?.[0]?.get
 const pipelineRenderer = {
   pipelines: {
     renderCell: (_pipeline: any[], stream) => <PipelinesCell stream={stream} />,
-    staticWidth: 100,
+    staticWidth: 'matchHeader' as const,
   },
 };
 const customColumnRenderers = (
@@ -57,24 +57,24 @@ const customColumnRenderers = (
     },
     throughput: {
       renderCell: (_throughput: string, stream) => <ThroughputCell stream={stream} />,
-      staticWidth: 130,
+      staticWidth: 'matchHeader' as const,
     },
     disabled: {
       renderCell: (_disabled: string, stream) => <StatusCell stream={stream} />,
-      staticWidth: 130,
+      staticWidth: 'matchHeader' as const,
     },
     rules: {
       renderCell: (_rules: StreamRule[], stream) => <StreamRulesCell stream={stream} />,
-      staticWidth: 100,
+      staticWidth: 'matchHeader' as const,
     },
     ...(isPipelineColumnPermitted ? pipelineRenderer : {}),
     outputs: {
       renderCell: (_outputs: Output[], stream) => <OutputsCell stream={stream} />,
-      staticWidth: 100,
+      staticWidth: 'matchHeader' as const,
     },
     archiving: {
       renderCell: (_archiving: boolean, stream) => <ArchivingsCell stream={stream} indexSets={indexSets} />,
-      staticWidth: 100,
+      staticWidth: 'matchHeader' as const,
     },
     ...(getStreamDataLakeTableElements?.(permissions)?.columnRenderer || {}),
     ...(pluggableColumnRenderers || {}),

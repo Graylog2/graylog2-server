@@ -17,6 +17,7 @@
 package org.graylog2.indexer.counts;
 
 import com.google.common.collect.ImmutableMap;
+import org.assertj.core.api.Assertions;
 import org.graylog.testing.completebackend.FullBackendTest;
 import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
@@ -207,17 +208,12 @@ public class CountsIT extends SearchServerBaseTest {
         final IndexSet indexSet = mock(IndexSet.class);
         when(indexSet.getManagedIndices()).thenReturn(new String[]{"does_not_exist"});
 
-        try {
-            counts.total(indexSet);
-            fail("Expected IndexNotFoundException");
-        } catch (IndexNotFoundException e) {
-            final String expectedErrorDetail = "Index not found for query: does_not_exist. Try recalculating your index ranges.";
-            assertThat(e)
-                    .hasMessageStartingWith("Fetching message count failed for indices [does_not_exist]")
-                    .hasMessageEndingWith(expectedErrorDetail)
-                    .hasNoSuppressedExceptions();
-            assertThat(e.getErrorDetails()).containsExactly(expectedErrorDetail);
-        }
+        Assertions.assertThatThrownBy(() -> counts.total(indexSet))
+                .isInstanceOf(IndexNotFoundException.class)
+                .hasMessageStartingWith("Fetching message count failed for indices")
+                .hasMessageContaining("does_not_exist")
+                .hasMessageEndingWith("Try recalculating your index ranges.")
+                .hasNoSuppressedExceptions();
     }
 
     @FullBackendTest

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 import styled from 'styled-components';
 import DOMPurify from 'dompurify';
 
@@ -51,7 +52,7 @@ function MDBaseEditor({
   width = '100%',
   onBlur = undefined,
 }: Props) {
-  const handleOnBlur = React.useCallback(() => {
+  const handleOnBlur = useCallback(() => {
     // Remove dangerous markdown
     const sanitizedValue = DOMPurify.sanitize(
       // Remove dangerous HTML

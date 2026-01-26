@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo, useState } from 'react';
 import { useFormikContext } from 'formik';
 
 import { Spinner } from 'components/common';
@@ -31,10 +32,10 @@ function DataAdapterFormStep() {
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(values);
   const { allDataAdapters, loadingAllDataAdapters } = useFetchAllDataAdapters();
   const { dataAdapter, loadingDataAdapter } = useFetchDataAdapter(values.data_adapter_id);
-  const [showForm, setShowForm] = React.useState<boolean>(false);
-  const showAdapter = React.useMemo(() => !!dataAdapter, [dataAdapter]);
+  const [showForm, setShowForm] = useState<boolean>(false);
+  const showAdapter = useMemo(() => !!dataAdapter, [dataAdapter]);
 
-  const canModify = React.useMemo(
+  const canModify = useMemo(
     () => !values.id || (!loadingScopePermissions && scopePermissions?.is_mutable),
     [values.id, loadingScopePermissions, scopePermissions?.is_mutable],
   );

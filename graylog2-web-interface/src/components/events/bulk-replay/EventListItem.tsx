@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
 import IconButton from 'components/common/IconButton';
@@ -74,22 +73,16 @@ const CompletedButton = styled(IconButton)<{ $done: boolean }>(
 );
 
 const EventListItem = ({ done, event, onClick, selected, removeItem, markItemAsDone }: EventListItemProps) => {
-  const _removeItem = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.stopPropagation();
+  const _removeItem = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
 
-      return removeItem(event.id);
-    },
-    [event?.id, removeItem],
-  );
-  const _markItemAsDone = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.stopPropagation();
+    return removeItem(event.id);
+  };
+  const _markItemAsDone = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
 
-      return markItemAsDone(event.id);
-    },
-    [event?.id, markItemAsDone],
-  );
+    return markItemAsDone(event.id);
+  };
 
   return (
     <StyledItem key={`event-replay-list-${event?.id}`} $selected={selected} onClick={onClick}>

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import CreatableSelect from 'react-select/creatable';
 import type { CreatableProps } from 'react-select/creatable';
 
@@ -58,11 +59,11 @@ const InputList = ({
   ...rest
 }: Props) => {
   const { inputListTheme, styles } = useInputListStyles(size);
-  const inputRef = React.useRef(null);
-  const [inputValue, setInputValue] = React.useState<string>('');
-  const [value, setValue] = React.useState<readonly Option[]>(values.map((val: string | number) => createOption(val)));
+  const inputRef = useRef(null);
+  const [inputValue, setInputValue] = useState<string>('');
+  const [value, setValue] = useState<readonly Option[]>(values.map((val: string | number) => createOption(val)));
 
-  React.useLayoutEffect(() => setValue(values.map((val: string | number) => createOption(val))), [values]);
+  useLayoutEffect(() => setValue(values.map((val: string | number) => createOption(val))), [values]);
 
   const dispatchOnChange = (newValue: Option[]) => {
     const newList = newValue.map((item: Option) => item.value);

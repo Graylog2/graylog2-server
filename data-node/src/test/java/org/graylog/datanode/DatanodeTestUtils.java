@@ -35,6 +35,9 @@ import java.util.List;
 import java.util.Map;
 
 public class DatanodeTestUtils {
+
+    private static final CertificateGenerator CERTIFICATE_GENERATOR = new CertificateGenerator(1024);
+
     public static Configuration datanodeConfiguration(Map<String, String> properties, Path tempDir) throws RepositoryException, ValidationException {
         final Configuration configuration = new Configuration();
         final InMemoryRepository mandatoryProps = new InMemoryRepository(Map.of(
@@ -65,6 +68,6 @@ public class DatanodeTestUtils {
         final CertRequest certRequest = CertRequest.selfSigned(RandomStringUtils.secure().nextAlphanumeric(10))
                 .isCA(false)
                 .validity(validity);
-        return CertificateGenerator.generate(certRequest);
+        return CERTIFICATE_GENERATOR.generateKeyPair(certRequest);
     }
 }

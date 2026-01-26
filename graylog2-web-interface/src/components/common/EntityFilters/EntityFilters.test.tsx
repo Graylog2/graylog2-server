@@ -348,7 +348,7 @@ describe('<EntityFilters />', () => {
       const timeRangeForm = await screen.findByTestId('time-range-form');
 
       const fromPicker = await screen.findByTestId('date-picker-from');
-      userEvent.click(await within(fromPicker).findByRole('gridcell', { name: /Jan 13 2020/i }));
+      userEvent.click(await within(fromPicker).findByRole('button', { name: /Monday, January 13th, 2020/i }));
       userEvent.type(await screen.findByRole('spinbutton', { name: /from hour/i }), '{selectall}13');
       userEvent.type(await screen.findByRole('spinbutton', { name: /from minutes/i }), '{selectall}42');
       userEvent.type(await screen.findByRole('spinbutton', { name: /from seconds/i }), '{selectall}23');
@@ -404,7 +404,7 @@ describe('<EntityFilters />', () => {
       userEvent.click(toggleFilterButton);
 
       const fromPicker = await screen.findByTestId('date-picker-from');
-      userEvent.click(await within(fromPicker).findByRole('gridcell', { name: /Jan 13 2020/i }));
+      userEvent.click(await within(fromPicker).findByRole('button', { name: /Monday, January 13th, 2020/i }));
       userEvent.type(await screen.findByRole('spinbutton', { name: /from hour/i }), '{selectall}13');
       userEvent.type(await screen.findByRole('spinbutton', { name: /from minutes/i }), '{selectall}42');
       userEvent.type(await screen.findByRole('spinbutton', { name: /from seconds/i }), '{selectall}23');

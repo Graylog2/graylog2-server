@@ -18,6 +18,7 @@ package org.graylog.integrations.pagerduty.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +41,7 @@ public class PagerDutyMessage {
     @JsonProperty("links")
     private final List<Link> links;
     @JsonProperty("payload")
-    private final Map<String, String> payload;
+    private final Map<String, Object> payload;
 
     public PagerDutyMessage(
             String routingKey,
@@ -49,7 +50,7 @@ public class PagerDutyMessage {
             String client,
             String clientUrl,
             List<Link> links,
-            Map<String, String> payload) {
+            Map<String, Object> payload) {
         this.routingKey = routingKey;
         this.eventAction = eventAction;
         this.dedupKey = dedupKey;
@@ -83,7 +84,7 @@ public class PagerDutyMessage {
         return links;
     }
 
-    public Map<String, String> getPayload() {
+    public Map<String, Object> getPayload() {
         return payload;
     }
 }

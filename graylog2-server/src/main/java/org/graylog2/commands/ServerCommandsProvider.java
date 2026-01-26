@@ -18,13 +18,14 @@ package org.graylog2.commands;
 
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.api.GenerateOpenApiDescriptionCommand;
 import org.graylog2.bootstrap.CliCommand;
 import org.graylog2.bootstrap.CliCommandsProvider;
 import org.graylog2.bootstrap.commands.MigrateCmd;
-import org.graylog2.commands.token.AutomationTokenCommand;
 import org.graylog2.commands.journal.JournalDecode;
 import org.graylog2.commands.journal.JournalShow;
 import org.graylog2.commands.journal.JournalTruncate;
+import org.graylog2.commands.token.AutomationTokenCommand;
 
 public class ServerCommandsProvider implements CliCommandsProvider {
     @Override
@@ -43,6 +44,6 @@ public class ServerCommandsProvider implements CliCommandsProvider {
                                 JournalDecode.class
                         ));
         builder.withCommand(AutomationTokenCommand.class);
-
+        builder.withCommand(GenerateOpenApiDescriptionCommand.class);
     }
 }

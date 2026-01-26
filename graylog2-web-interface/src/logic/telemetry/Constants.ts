@@ -18,7 +18,6 @@
 // Please note, each project has its own collection of telemetry event types.
 // Only maintain event types related to core features in this file.
 
-// eslint-disable-next-line import/prefer-default-export
 export const TELEMETRY_EVENT_TYPE = {
   SEARCH_TIMERANGE_PRESET_SELECTED: 'Search TimeRange Preset Selected',
   SEARCH_TIMERANGE_PICKER_TOGGLED: 'Search TimeRange Picker Toggled',
@@ -259,6 +258,7 @@ export const TELEMETRY_EVENT_TYPE = {
     DECORATORS_UPDATED: 'Configurations Decorators Updated',
     GEOLOCATION_CONFIGURATION_UPDATED: 'Configurations Geolocation Configuration Updated',
     MARKDOWN_UPDATED: 'Configurations Markdown Updated',
+    PASSWORD_COMPLEXITY_UPDATED: 'Configurations Password Complexity Updated',
   },
   INPUTS: {
     INPUT_SELECTED: 'Inputs Input Selected',

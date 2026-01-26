@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
@@ -46,7 +47,7 @@ const Title = styled.div`
 const TitleCol = ({ cache, children }: { cache: CacheEntity; children: string }) => {
   const navigate = useNavigate();
 
-  const onClick = React.useCallback(() => {
+  const onClick = useCallback(() => {
     navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.show(cache.name));
   }, [navigate, cache.name]);
 
@@ -129,11 +130,11 @@ const columnRenderers: ColumnRenderers<CacheEntity> = {
       renderCell: (name: string) => <span>{name}</span>,
     },
     entries: {
-      staticWidth: 150,
+      staticWidth: 'matchHeader',
       renderCell: (_arg: unknown, cache: CacheEntity) => <EntriesCol cache={cache} />,
     },
     hit_rate: {
-      staticWidth: 150,
+      staticWidth: 'matchHeader',
       renderCell: (_arg: unknown, cache: CacheEntity) => <HitRateCol cache={cache} />,
     },
     throughput: {

@@ -15,8 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PermissionsMixin from './PermissionsMixin';
-
 const { isPermitted, isAnyPermitted } = PermissionsMixin;
+
+declare module 'graylog-web-plugin/plugin' {
+  interface EntityActions {
+    foo: 'read';
+    bar: 'read';
+    baz: 'read';
+  }
+}
 
 describe('PermissionsMixin', () => {
   describe('isPermitted', () => {
@@ -29,36 +36,36 @@ describe('PermissionsMixin', () => {
     });
 
     it('returns `false` when possessed permissions are `undefined` and required permissions are empty', () => {
-      expect(isPermitted(undefined, ['foo'])).toBeFalsy();
+      expect(isPermitted(undefined, ['foo:read'])).toBeFalsy();
     });
 
     it('returns `false` when possessed permissions are `undefined`', () => {
-      expect(isPermitted(undefined, ['foo'])).toBeFalsy();
+      expect(isPermitted(undefined, ['foo:read'])).toBeFalsy();
     });
 
     it('returns `true` when wildcard permission is possessed', () => {
       expect(isPermitted(['*'], undefined)).toBeTruthy();
       expect(isPermitted(['*'], [])).toBeTruthy();
-      expect(isPermitted(['*'], ['foo'])).toBeTruthy();
-      expect(isPermitted(['*'], ['foo', 'bar'])).toBeTruthy();
+      expect(isPermitted(['*'], ['foo:read'])).toBeTruthy();
+      expect(isPermitted(['*'], ['foo:read', 'bar:read'])).toBeTruthy();
     });
 
     it('returns `true` when possessed are identical to required permissions', () => {
-      expect(isPermitted(['foo'], ['foo'])).toBeTruthy();
-      expect(isPermitted(['foo', 'bar'], ['foo', 'bar'])).toBeTruthy();
-      expect(isPermitted(['bar', 'foo'], ['foo', 'bar'])).toBeTruthy();
+      expect(isPermitted(['foo:read'], ['foo:read'])).toBeTruthy();
+      expect(isPermitted(['foo:read', 'bar:read'], ['foo:read', 'bar:read'])).toBeTruthy();
+      expect(isPermitted(['bar:read', 'foo:read'], ['foo:read', 'bar:read'])).toBeTruthy();
     });
 
     it('returns `true` when possessed contain all required permissions', () => {
-      expect(isPermitted(['foo', 'bar'], ['foo'])).toBeTruthy();
-      expect(isPermitted(['foo', 'bar', 'baz'], ['foo', 'bar'])).toBeTruthy();
-      expect(isPermitted(['bar', 'baz', 'foo'], ['foo', 'bar'])).toBeTruthy();
+      expect(isPermitted(['foo:read', 'bar:read'], ['foo:read'])).toBeTruthy();
+      expect(isPermitted(['foo:read', 'bar:read', 'baz:read'], ['foo:read', 'bar:read'])).toBeTruthy();
+      expect(isPermitted(['bar:read', 'baz:read', 'foo:read'], ['foo:read', 'bar:read'])).toBeTruthy();
     });
 
     it('returns `false` when possessed do not contain all required permissions', () => {
-      expect(isPermitted(['foo'], ['foo', 'bar'])).toBeFalsy();
-      expect(isPermitted(['foo', 'bar'], ['foo', 'bar', 'baz'])).toBeFalsy();
-      expect(isPermitted(['bar', 'foo'], ['foo', 'bar', 'baz'])).toBeFalsy();
+      expect(isPermitted(['foo:read'], ['foo:read', 'bar:read'])).toBeFalsy();
+      expect(isPermitted(['foo:read', 'bar:read'], ['foo:read', 'bar:read', 'baz:read'])).toBeFalsy();
+      expect(isPermitted(['bar:read', 'foo:read'], ['foo:read', 'bar:read', 'baz:read'])).toBeFalsy();
     });
   });
 
@@ -72,36 +79,36 @@ describe('PermissionsMixin', () => {
     });
 
     it('returns `false` when possessed permissions are `undefined` and required permissions are empty', () => {
-      expect(isAnyPermitted(undefined, ['foo'])).toBeFalsy();
+      expect(isAnyPermitted(undefined, ['foo:read'])).toBeFalsy();
     });
 
     it('returns `false` when possessed permissions are `undefined`', () => {
-      expect(isAnyPermitted(undefined, ['foo'])).toBeFalsy();
+      expect(isAnyPermitted(undefined, ['foo:read'])).toBeFalsy();
     });
 
     it('returns `true` when wildcard permission is possessed', () => {
       expect(isAnyPermitted(['*'], undefined)).toBeTruthy();
       expect(isAnyPermitted(['*'], [])).toBeTruthy();
-      expect(isAnyPermitted(['*'], ['foo'])).toBeTruthy();
-      expect(isAnyPermitted(['*'], ['foo', 'bar'])).toBeTruthy();
+      expect(isAnyPermitted(['*'], ['foo:read'])).toBeTruthy();
+      expect(isAnyPermitted(['*'], ['foo:read', 'bar:read'])).toBeTruthy();
     });
 
     it('returns `true` when possessed are identical to required permissions', () => {
-      expect(isAnyPermitted(['foo'], ['foo'])).toBeTruthy();
-      expect(isAnyPermitted(['foo', 'bar'], ['foo', 'bar'])).toBeTruthy();
-      expect(isAnyPermitted(['bar', 'foo'], ['foo', 'bar'])).toBeTruthy();
+      expect(isAnyPermitted(['foo:read'], ['foo:read'])).toBeTruthy();
+      expect(isAnyPermitted(['foo:read', 'bar:read'], ['foo:read', 'bar:read'])).toBeTruthy();
+      expect(isAnyPermitted(['bar:read', 'foo:read'], ['foo:read', 'bar:read'])).toBeTruthy();
     });
 
     it('returns `true` when possessed contain all required permissions', () => {
-      expect(isAnyPermitted(['foo', 'bar'], ['foo'])).toBeTruthy();
-      expect(isAnyPermitted(['foo', 'bar', 'baz'], ['foo', 'bar'])).toBeTruthy();
-      expect(isAnyPermitted(['bar', 'baz', 'foo'], ['foo', 'bar'])).toBeTruthy();
+      expect(isAnyPermitted(['foo:read', 'bar:read'], ['foo:read'])).toBeTruthy();
+      expect(isAnyPermitted(['foo:read', 'bar:read', 'baz:read'], ['foo:read', 'bar:read'])).toBeTruthy();
+      expect(isAnyPermitted(['bar:read', 'baz:read', 'foo:read'], ['foo:read', 'bar:read'])).toBeTruthy();
     });
 
     it('returns `false` when possessed do not contain all required permissions', () => {
-      expect(isAnyPermitted(['foo'], ['foo', 'bar'])).toBeTruthy();
-      expect(isAnyPermitted(['foo', 'bar'], ['foo', 'bar', 'baz'])).toBeTruthy();
-      expect(isAnyPermitted(['bar', 'foo'], ['foo', 'bar', 'baz'])).toBeTruthy();
+      expect(isAnyPermitted(['foo:read'], ['foo:read', 'bar:read'])).toBeTruthy();
+      expect(isAnyPermitted(['foo:read', 'bar:read'], ['foo:read', 'bar:read', 'baz:read'])).toBeTruthy();
+      expect(isAnyPermitted(['bar:read', 'foo:read'], ['foo:read', 'bar:read', 'baz:read'])).toBeTruthy();
     });
   });
 });

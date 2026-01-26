@@ -18,7 +18,7 @@ import React from 'react';
 
 import type { ColumnRenderers, ColumnSchema } from 'components/common/EntityDataTable';
 
-import type { GraylogNode } from './useClusterGraylogNodes';
+import type { ClusterGraylogNode as GraylogNode } from './fetchClusterGraylogNodes';
 import BuffersMetricsCell from './cells/BuffersMetricsCell';
 import HostnameCell from './cells/HostnameCell';
 import LifecycleCell from './cells/LifecycleCell';
@@ -26,16 +26,20 @@ import LoadBalancerStatusCell from './cells/LoadBalancerStatusCell';
 import ProcessingStateCell from './cells/ProcessingStateCell';
 import ThroughputMetricsCell from './cells/ThroughputMetricsCell';
 
+import CpuMetricsCell from '../shared-components/CpuMetricsCell';
 import SizeAndRatioMetric from '../shared-components/SizeAndRatioMetric';
 
 const JOURNAL_WARNING_THRESHOLD = 0.1;
 const JOURNAL_DANGER_THRESHOLD = 0.4;
 const BUFFER_WARNING_THRESHOLD = 0.95;
 const JVM_WARNING_THRESHOLD = 0.95;
+const CPU_WARNING_THRESHOLD = 0.7;
+const CPU_DANGER_THRESHOLD = 0.9;
 
 export const DEFAULT_VISIBLE_COLUMNS = [
   'hostname',
   'lifecycle',
+  'cpu',
   'jvm',
   'buffers',
   'journal',
@@ -43,33 +47,44 @@ export const DEFAULT_VISIBLE_COLUMNS = [
   'throughput',
   'is_processing',
   'lb_status',
-] as const;
+];
 
 export const createColumnDefinitions = (): Array<ColumnSchema> => [
-  { id: 'hostname', title: 'Node', sortable: true },
-  { id: 'lifecycle', title: 'State', sortable: true },
+  { id: 'cpu', title: 'CPU', isDerived: true, sortable: false },
   { id: 'jvm', title: 'JVM', isDerived: true, sortable: false },
   { id: 'buffers', title: 'Buffers', isDerived: true, sortable: false },
   { id: 'journal', title: 'Journal', isDerived: true, sortable: false },
   { id: 'dataLakeJournal', title: 'Data Lake Journal', isDerived: true, sortable: false },
   { id: 'throughput', title: 'Throughput', isDerived: true, sortable: false },
-  { id: 'is_processing', title: 'Message Processing', sortable: true },
-  { id: 'lb_status', title: 'Load Balancer', sortable: true },
 ];
 
 export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
   attributes: {
     hostname: {
       renderCell: (_value, entity) => <HostnameCell node={entity} />,
+      minWidth: 300,
     },
     lifecycle: {
       renderCell: (_value, entity) => <LifecycleCell node={entity} />,
+      staticWidth: 130,
     },
     is_processing: {
       renderCell: (_value, entity) => <ProcessingStateCell node={entity} />,
+      staticWidth: 'matchHeader',
     },
     lb_status: {
       renderCell: (_value, entity) => <LoadBalancerStatusCell node={entity} />,
+      staticWidth: 'matchHeader',
+    },
+    cpu: {
+      renderCell: (_value, entity) => (
+        <CpuMetricsCell
+          cpuPercent={entity.metrics?.cpuPercent}
+          warningThreshold={CPU_WARNING_THRESHOLD}
+          dangerThreshold={CPU_DANGER_THRESHOLD}
+        />
+      ),
+      staticWidth: 130,
     },
     journal: {
       renderCell: (_value, entity) => (
@@ -81,6 +96,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
           dangerThreshold={JOURNAL_DANGER_THRESHOLD}
         />
       ),
+      staticWidth: 130,
     },
     dataLakeJournal: {
       renderCell: (_value, entity) => (
@@ -91,6 +107,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
           dangerThreshold={JOURNAL_DANGER_THRESHOLD}
         />
       ),
+      staticWidth: 'matchHeader',
     },
     jvm: {
       renderCell: (_value, entity) => (
@@ -100,12 +117,15 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
           warningThreshold={JVM_WARNING_THRESHOLD}
         />
       ),
+      staticWidth: 130,
     },
     buffers: {
       renderCell: (_value, entity) => <BuffersMetricsCell node={entity} warningThreshold={BUFFER_WARNING_THRESHOLD} />,
+      staticWidth: 130,
     },
     throughput: {
       renderCell: (_value, entity) => <ThroughputMetricsCell node={entity} />,
+      staticWidth: 'matchHeader',
     },
   },
 });

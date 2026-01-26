@@ -18,6 +18,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import { paginatedUsers } from 'fixtures/userOverviews';
 import { asMock } from 'helpers/mocking';
@@ -73,7 +74,7 @@ describe('ActionsCell', () => {
       asMock(useCurrentUser).mockReturnValue(
         adminUser
           .toBuilder()
-          .permissions(Immutable.List([`roles:edit:${customRoleName}`, `roles:delete:${customRoleName}`]))
+          .permissions(Immutable.List<Permission>([`roles:edit:${customRoleName}`, `roles:delete:${customRoleName}`]))
           .build(),
       );
 
@@ -97,7 +98,7 @@ describe('ActionsCell', () => {
       asMock(useCurrentUser).mockReturnValue(
         adminUser
           .toBuilder()
-          .permissions(Immutable.List([`roles:edit:${customRoleName}`, `roles:delete:${customRoleName}`]))
+          .permissions(Immutable.List<Permission>([`roles:edit:${customRoleName}`, `roles:delete:${customRoleName}`]))
           .build(),
       );
 
@@ -118,7 +119,7 @@ describe('ActionsCell', () => {
       asMock(useCurrentUser).mockReturnValue(
         adminUser
           .toBuilder()
-          .permissions(Immutable.List([`roles:edit:${builtInRoleName}`, `roles:delete:${builtInRoleName}`]))
+          .permissions(Immutable.List<Permission>([`roles:edit:${builtInRoleName}`, `roles:delete:${builtInRoleName}`]))
           .build(),
       );
 

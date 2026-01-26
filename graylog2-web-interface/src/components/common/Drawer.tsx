@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { Drawer as MantineDrawer } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -118,9 +119,9 @@ const Drawer = ({
 }: Props) => {
   const [opened, { open, close }] = useDisclosure(false);
 
-  const closeTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     setTimeout(() => open(), DRAWER_OPEN_DELAY_MS);
 
     return () => {

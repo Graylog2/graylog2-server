@@ -119,6 +119,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveMultipleFi
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveSingleField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveStringFieldsByValue;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RenameField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RenameFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
@@ -244,6 +245,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(SetField.NAME, new SetField());
         functions.put(SetFields.NAME, new SetFields());
         functions.put(RenameField.NAME, new RenameField());
+        functions.put(RenameFields.NAME, new RenameFields());
         functions.put(RemoveField.NAME, new RemoveField());
         functions.put(RemoveSingleField.NAME, new RemoveSingleField());
         functions.put(RemoveMultipleFields.NAME, new RemoveMultipleFields());
@@ -573,6 +575,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(evaluatedMessage.getField("array")).isEqualTo(Arrays.asList(1, 2, 3));
         assertThat(evaluatedMessage.getField("store")).isInstanceOf(Map.class);
         assertThat(evaluatedMessage.getField("expensive")).isEqualTo(10);
+        assertThat(evaluatedMessage.getField("escaped")).isEqualTo("a \t +");
     }
 
     @Test
@@ -1026,6 +1029,28 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.hasField("field_1")).isFalse();
         assertThat(message.hasField("field_2")).isTrue();
         assertThat(message.hasField("field_b")).isTrue();
+    }
+
+    @Test
+    void renameFields() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+
+        final Message in = messageFactory.createMessage("bulk rename", "bulk-source", Tools.nowUTC());
+        in.addField("old_field_one", "value-1");
+        in.addField("old_field_two", 42);
+        in.addField("present", "value");
+        in.addField("unchanged_field", "still-here");
+
+        final Message message = evaluateRule(rule, in);
+
+        assertThat(message.hasField("old_field_one")).isFalse();
+        assertThat(message.hasField("old_field_two")).isFalse();
+        assertThat(message.getField("new_field_one")).isEqualTo("value-1");
+        assertThat(message.getField("new_field_two")).isEqualTo(42);
+        assertThat(message.getField("unchanged_field")).isEqualTo("still-here");
+        assertThat(message.hasField("present")).isFalse();
+        assertThat(message.getField("renamed")).isEqualTo("value");
+        assertThat(message.hasField("ignored_new_name")).isFalse();
     }
 
     @Test

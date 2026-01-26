@@ -16,8 +16,8 @@
  */
 package org.graylog.security.rest;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -46,7 +46,7 @@ import java.util.Map;
 @Path("/certificates")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
-@Api(value = "Certificates", description = "Information about certificates used")
+@Tag(name = "Certificates", description = "Information about certificates used")
 public class CertificatesResource {
     private final Logger log = LoggerFactory.getLogger(CertificatesResource.class);
 
@@ -64,7 +64,7 @@ public class CertificatesResource {
     }
 
     @GET
-    @ApiOperation("Returns the certificates used by this node")
+    @Operation(summary = "Returns the certificates used by this node")
     @RequiresPermissions(RestPermissions.GRAYLOG_CA_READ)
     public Map<Store, KeyStoreDto> getCertificates() {
         Map<Store, KeyStoreDto> certificates = new HashMap<>();

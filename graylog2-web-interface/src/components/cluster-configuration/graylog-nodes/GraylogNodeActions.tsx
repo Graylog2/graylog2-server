@@ -15,17 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import URI from 'urijs';
 
 import { LinkContainer } from 'components/common/router';
-import { ConfirmDialog, ExternalLink, IfPermitted } from 'components/common';
-import { DropdownButton, MenuItem } from 'components/bootstrap';
+import { ConfirmDialog, IfPermitted } from 'components/common';
+import { MoreActions } from 'components/common/EntityDataTable';
+import { MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { SystemLoadBalancerStore } from 'stores/load-balancer/SystemLoadBalancerStore';
 import { SystemProcessingStore } from 'stores/system-processing/SystemProcessingStore';
 
-import type { GraylogNode } from './useClusterGraylogNodes';
+import type { ClusterGraylogNode as GraylogNode } from './fetchClusterGraylogNodes';
 
 type Props = {
   node: GraylogNode;
@@ -37,7 +37,6 @@ const GraylogNodeActions = ({ node }: Props) => {
     undefined,
   );
 
-  const apiBrowserURI = new URI(`${node.transport_address}/api-browser/`).normalizePathname().toString();
   const nodeName = `${node.short_node_id} / ${node.hostname}`;
 
   const toggleMessageProcessing = () => {
@@ -56,7 +55,7 @@ const GraylogNodeActions = ({ node }: Props) => {
 
   return (
     <>
-      <DropdownButton bsSize="xs" title="More" id={`more-actions-dropdown-${node.node_id}`} pullRight>
+      <MoreActions>
         <IfPermitted permissions="processing:changestate">
           <MenuItem onSelect={() => setShowMessageProcessingModal(true)}>
             {node.is_processing ? 'Pause' : 'Resume'} message processing
@@ -103,12 +102,7 @@ const GraylogNodeActions = ({ node }: Props) => {
             <MenuItem>Get recent system log messages</MenuItem>
           </LinkContainer>
         </IfPermitted>
-        <IfPermitted permissions="api_browser:read">
-          <MenuItem href={apiBrowserURI} target="_blank">
-            <ExternalLink>API Browser</ExternalLink>
-          </MenuItem>
-        </IfPermitted>
-      </DropdownButton>
+      </MoreActions>
       {showMessageProcessingModal && (
         <ConfirmDialog
           show

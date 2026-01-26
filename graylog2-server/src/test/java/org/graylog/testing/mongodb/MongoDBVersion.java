@@ -27,12 +27,6 @@ public abstract class MongoDBVersion {
     public abstract String version();
 
     public static MongoDBVersion of(String version) {
-        final var value = requireNonBlank(version, "version can't be blank");
-
-        if (version.matches("^(\\d+)\\.(\\d+)$")) {
-            return new AutoValue_MongoDBVersion(value);
-        }
-
-        throw new IllegalArgumentException("MongoDB version must be in the format 'X.Y' where X and Y are integers (e.g., '7.0')");
+        return new AutoValue_MongoDBVersion(requireNonBlank(version, "version can't be blank"));
     }
 }

@@ -29,20 +29,22 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class CATest {
 
+    private static final CertificateGenerator CERTIFICATE_GENERATOR = new CertificateGenerator(1024);
+
     public static final Duration CERTIFICATE_VALIDITY = Duration.ofDays(365);
 
-    final KeyPair rootCA = CertificateGenerator.generate(
+    final KeyPair rootCA = CERTIFICATE_GENERATOR.generateKeyPair(
             CertRequest.selfSigned("Graylog, Inc.")
                     .isCA(true)
                     .validity(CERTIFICATE_VALIDITY));
 
-    final KeyPair intermediateCA = CertificateGenerator.generate(
+    final KeyPair intermediateCA = CERTIFICATE_GENERATOR.generateKeyPair(
             CertRequest.signed("Intermediate", rootCA)
                     .isCA(true)
                     .validity(CERTIFICATE_VALIDITY)
     );
 
-    final KeyPair ca = CertificateGenerator.generate(
+    final KeyPair ca = CERTIFICATE_GENERATOR.generateKeyPair(
             CertRequest.signed("CA", intermediateCA)
                     .isCA(true)
                     .validity(CERTIFICATE_VALIDITY)
@@ -85,7 +87,7 @@ public class CATest {
 
     @Test
     void throwsExceptionIfCertificateNotACA() throws Exception {
-        final KeyPair rootCA = CertificateGenerator.generate(
+        final KeyPair rootCA = CERTIFICATE_GENERATOR.generateKeyPair(
                 CertRequest.selfSigned("Graylog, Inc.")
                         .isCA(false)
                         .validity(CERTIFICATE_VALIDITY)
@@ -106,7 +108,7 @@ public class CATest {
 
     @Test
     void throwsExceptionIfCertChainBranches() throws Exception {
-        final KeyPair intermediateCA2 = CertificateGenerator.generate(
+        final KeyPair intermediateCA2 = CERTIFICATE_GENERATOR.generateKeyPair(
                 CertRequest.signed("Intermediate", rootCA)
                         .isCA(true)
                         .validity(CERTIFICATE_VALIDITY)

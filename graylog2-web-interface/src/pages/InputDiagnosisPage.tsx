@@ -33,6 +33,7 @@ import NetworkStats from 'components/inputs/InputDiagnosis/NetworkStats';
 import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';
 import type { InputState } from 'stores/inputs/InputStatesStore';
+import type { Input } from 'components/messageloaders/Types';
 import SectionGrid from 'components/common/Section/SectionGrid';
 import StatusColorIndicator from 'components/common/StatusColorIndicator';
 import DiagnosisMessageErrors from 'components/inputs/InputDiagnosis/DiagnosisMessageErrors';
@@ -221,11 +222,24 @@ const StateListItem = ({ inputNodeStates, state }: { inputNodeStates: InputNodeS
   );
 };
 
+const getListeningProtocol = (input?: Input) => {
+  if (!input) {
+    return undefined;
+  }
+
+  const protocolHints = `${input.name ?? ''} ${input.type ?? ''}`.toLowerCase();
+
+  if (protocolHints.includes('udp')) return 'UDP Traffic.';
+
+  return 'TCP Traffic.';
+};
+
 const InputDiagnosisPage = () => {
   const { inputId } = useParams();
   const { input, inputNodeStates, inputMetrics } = useInputDiagnosis(inputId);
   const navigate = useNavigate();
   const productName = useProductName();
+  const listeningProtocol = getListeningProtocol(input);
 
   const isInputStateDown =
     inputNodeStates.total === 0 ||
@@ -281,10 +295,12 @@ const InputDiagnosisPage = () => {
                       <StyledTitle>This Input is listening on:</StyledTitle>Bind address{' '}
                       {input.attributes?.bind_address}, Port {input.attributes?.port}.
                     </StyledListGroupItem>
-                    <StyledListGroupItem>
-                      <StyledTitle>This Input is listening for:</StyledTitle>
-                      {'tcp_keepalive' in (input.attributes || {}) ? 'TCP Traffic.' : 'UDP Traffic.'}
-                    </StyledListGroupItem>
+                    {listeningProtocol && (
+                      <StyledListGroupItem>
+                        <StyledTitle>This Input is listening for:</StyledTitle>
+                        {listeningProtocol}
+                      </StyledListGroupItem>
+                    )}
                   </>
                 )}
               </StyledListGroup>

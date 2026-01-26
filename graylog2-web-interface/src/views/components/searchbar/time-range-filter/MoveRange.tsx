@@ -19,7 +19,6 @@ import * as React from 'react';
 import isEqual from 'lodash/isEqual';
 import { useFormikContext } from 'formik';
 import styled from 'styled-components';
-import { useCallback } from 'react';
 
 import type { TimeRange, AbsoluteTimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import useUserDateTime from 'hooks/useUserDateTime';
@@ -102,28 +101,23 @@ const MoveRangeInner = ({
     readableDifference(effectiveTimerange.from, effectiveTimerange.to);
   }
 
-  const onMoveRange = useCallback(
-    (direction: Direction) => {
-      // Todo: Add telemetry event
-      const currentFrom = new Date(effectiveTimerange.from);
-      const currentTo = new Date(effectiveTimerange.to);
+  const onMoveRange = (direction: Direction) => {
+    // Todo: Add telemetry event
+    const currentFrom = new Date(effectiveTimerange.from);
+    const currentTo = new Date(effectiveTimerange.to);
 
-      const currentDurationMs = currentTo.getTime() - currentFrom.getTime();
+    const currentDurationMs = currentTo.getTime() - currentFrom.getTime();
 
-      const isBackwardDirection = direction === DIRECTIONS.backward;
+    const isBackwardDirection = direction === DIRECTIONS.backward;
 
-      const newFrom = (
-        isBackwardDirection ? new Date(currentFrom.getTime() - currentDurationMs) : currentTo
-      ).toISOString();
-      const newTo = (
-        isBackwardDirection ? currentFrom : new Date(currentTo.getTime() + currentDurationMs)
-      ).toISOString();
+    const newFrom = (
+      isBackwardDirection ? new Date(currentFrom.getTime() - currentDurationMs) : currentTo
+    ).toISOString();
+    const newTo = (isBackwardDirection ? currentFrom : new Date(currentTo.getTime() + currentDurationMs)).toISOString();
 
-      setCurrentTimeRange(onInitializingTimerange({ type: 'absolute', from: newFrom, to: newTo }, formatTime));
-      submitForm();
-    },
-    [effectiveTimerange?.from, effectiveTimerange?.to, formatTime, setCurrentTimeRange, submitForm],
-  );
+    setCurrentTimeRange(onInitializingTimerange({ type: 'absolute', from: newFrom, to: newTo }, formatTime));
+    submitForm();
+  };
 
   const disableButton =
     !effectiveTimerange ||

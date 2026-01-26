@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import styled from 'styled-components';
+import * as React from 'react';
+import { useCallback } from 'react';
 
 import { DataTable, Icon } from 'components/common';
 import { Link } from 'components/common/router';
@@ -23,72 +23,100 @@ import Routes from 'routing/Routes';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import type { PipelineType, StageType } from 'components/pipelines/types';
 import type { RuleType } from 'stores/rules/RulesStore';
-
-const TitleTd = styled.td`
-  width: 400px;
-`;
+import RuleDeprecationInfo from 'components/rules/RuleDeprecationInfo';
 
 type Props = {
   pipeline: PipelineType;
   stage: StageType;
-  rules?: RuleType[];
+  rules?: Array<RuleType>;
 };
+
+type InvalidRule = {
+  id: string;
+  title: string;
+  description: string;
+  isInvalid: true;
+};
+
+type RuleData = RuleType | InvalidRule;
 
 const StageRules = ({ pipeline, stage, rules = [] }: Props) => {
   const headers = ['Title', 'Description', 'Throughput', 'Errors'];
 
-  const _ruleRowFormatter = (ruleArg, ruleIdx) => {
-    let rule = ruleArg;
+  const headerCellFormatter = useCallback((header: string) => <th>{header}</th>, []);
 
-    let ruleTitle;
+  const getMetricName = useCallback(
+    (ruleId: string, metricType: 'executed' | 'failed'): string =>
+      `org.graylog.plugins.pipelineprocessor.ast.Rule.${ruleId}.${pipeline.id}.${stage.stage}.${metricType}`,
+    [pipeline.id, stage.stage],
+  );
 
-    // this can happen when a rule has been renamed, but not all references are updated
-    if (!rule) {
-      rule = {
+  const getRuleData = useCallback(
+    (ruleArg: RuleType | undefined, ruleIdx: number): RuleData => {
+      if (ruleArg) return ruleArg;
+
+      const invalidRuleName = stage.rules?.[ruleIdx] ?? 'unknown';
+
+      return {
         id: `invalid-${ruleIdx}`,
-        description: `Rule ${stage.rules[ruleIdx]} has been renamed or removed. This rule will be skipped.`,
+        title: invalidRuleName,
+        description: `Rule ${invalidRuleName} has been renamed or removed. This rule will be skipped.`,
+        isInvalid: true,
       };
+    },
+    [stage.rules],
+  );
 
-      ruleTitle = (
-        <span>
-          <Icon name="warning" className="text-danger" /> {stage.rules[ruleIdx]}
-        </span>
+  const ruleRowFormatter = useCallback(
+    (ruleArg: RuleType | undefined, ruleIdx: number) => {
+      const rule = getRuleData(ruleArg, ruleIdx);
+      const isInvalid = 'isInvalid' in rule && rule.isInvalid;
+
+      const ruleTitle = (() => {
+        if (isInvalid) {
+          return (
+            <span>
+              <Icon name="warning" className="text-danger" /> {rule.title}
+            </span>
+          );
+        }
+
+        const queryParam = 'rule_builder' in rule && rule.rule_builder ? '?rule_builder=true' : '';
+
+        return <Link to={`${Routes.SYSTEM.PIPELINES.RULE(rule.id)}${queryParam}`}>{rule.title}</Link>;
+      })();
+
+      return (
+        <tr key={rule.id}>
+          <td>
+            {ruleTitle}
+            {!isInvalid && <RuleDeprecationInfo ruleId={rule.id} />}
+          </td>
+          <td>{rule.description}</td>
+          <td>
+            <MetricContainer name={getMetricName(rule.id, 'executed')}>
+              <CounterRate suffix="msg/s" />
+            </MetricContainer>
+          </td>
+          <td>
+            <MetricContainer name={getMetricName(rule.id, 'failed')}>
+              <CounterRate showTotal suffix="errors/s" />
+            </MetricContainer>
+          </td>
+        </tr>
       );
-    } else {
-      const isRuleBuilder = rule.rule_builder ? '?rule_builder=true' : '';
-
-      ruleTitle = <Link to={`${Routes.SYSTEM.PIPELINES.RULE(rule.id)}${isRuleBuilder}`}>{rule.title}</Link>;
-    }
-
-    return (
-      <tr key={rule.id}>
-        <TitleTd>{ruleTitle}</TitleTd>
-        <td>{rule.description}</td>
-        <td>
-          <MetricContainer
-            name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.${pipeline.id}.${stage.stage}.executed`}>
-            <CounterRate suffix="msg/s" />
-          </MetricContainer>
-        </td>
-        <td>
-          <MetricContainer
-            name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.${pipeline.id}.${stage.stage}.failed`}>
-            <CounterRate showTotal suffix="errors/s" />
-          </MetricContainer>
-        </td>
-      </tr>
-    );
-  };
+    },
+    [getRuleData, getMetricName],
+  );
 
   return (
     <DataTable
-      id="processing-timeline"
+      id={`stage-rules-${pipeline.id}-${stage.stage}`}
       className="table-hover"
       headers={headers}
-      // eslint-disable-next-line react/no-unstable-nested-components
-      headerCellFormatter={(header) => <th>{header}</th>}
+      headerCellFormatter={headerCellFormatter}
       rows={rules}
-      dataRowFormatter={_ruleRowFormatter}
+      dataRowFormatter={ruleRowFormatter}
       noDataText="This stage has no rules yet. Click on edit to add some."
       filterLabel=""
       filterKeys={[]}

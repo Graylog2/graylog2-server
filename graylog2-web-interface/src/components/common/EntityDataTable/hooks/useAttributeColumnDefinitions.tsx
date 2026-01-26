@@ -14,10 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
+import * as React from 'react';
+import { useCallback, useMemo, useContext, useLayoutEffect } from 'react';
 import type { createColumnHelper, Row, Column, HeaderContext, CellContext } from '@tanstack/react-table';
-import { useCallback, useMemo } from 'react';
 import camelCase from 'lodash/camelCase';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { styled } from 'styled-components';
 
 import type {
   EntityBase,
@@ -25,14 +28,97 @@ import type {
   ColumnMetaContext,
 } from 'components/common/EntityDataTable/types';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
+import DragHandle from 'components/common/SortableList/DragHandle';
+import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
+import useHeaderSectionObserver from 'components/common/EntityDataTable/hooks/useHeaderSectionObserver';
+import ResizeHandle from 'components/common/EntityDataTable/ResizeHandle';
 
-const AttributeHeader = <Entity extends EntityBase>(ctx: HeaderContext<Entity, unknown>) => {
-  if (!ctx) {
-    return null;
-  }
-  const columnDefMeta = ctx.column.columnDef.meta as ColumnMetaContext<Entity>;
+import SortIcon from '../SortIcon';
 
-  return columnDefMeta?.columnRenderer?.renderHeader?.(columnDefMeta.label) ?? columnDefMeta.label;
+export const ThInner = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+`;
+
+export const LeftCol = styled.div`
+  display: flex;
+  align-items: center;
+  height: 100%;
+`;
+
+const RightCol = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const useSortableCol = (colId: string, disabled: boolean) => {
+  const { setColumnTransform } = useContext(DndStylesContext);
+  const { attributes, isDragging, listeners, setNodeRef, transform, setActivatorNodeRef } = useSortable({
+    id: colId,
+    disabled,
+  });
+  const cssTransform = CSS.Translate.toString(transform);
+
+  useLayoutEffect(() => {
+    setColumnTransform((cur) => ({
+      ...cur,
+      [colId]: cssTransform,
+    }));
+  }, [colId, setColumnTransform, cssTransform]);
+
+  return {
+    attributes,
+    isDragging,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+  };
+};
+
+const AttributeHeader = <Entity extends EntityBase>({
+  ctx,
+  onHeaderSectionResize,
+}: {
+  ctx: HeaderContext<Entity, unknown>;
+  onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
+}) => {
+  const columnMeta = ctx.column.columnDef.meta as ColumnMetaContext<Entity>;
+  const { attributes, isDragging, listeners, setNodeRef, setActivatorNodeRef } = useSortableCol(
+    ctx.header.column.id,
+    !columnMeta?.enableColumnOrdering,
+  );
+  const leftRef = useHeaderSectionObserver(ctx.header.column.id, 'left', onHeaderSectionResize);
+  const rightRef = useHeaderSectionObserver(ctx.header.column.id, 'right', onHeaderSectionResize);
+
+  return (
+    <ThInner ref={setNodeRef}>
+      <LeftCol ref={leftRef}>
+        {columnMeta?.enableColumnOrdering && (
+          <DragHandle
+            ref={setActivatorNodeRef}
+            index={ctx.header.index}
+            dragHandleProps={{ ...attributes, ...listeners }}
+            isDragging={isDragging}
+            itemTitle={columnMeta.label}
+          />
+        )}
+        {columnMeta?.columnRenderer?.renderHeader?.(columnMeta.label) ?? columnMeta.label}
+        {ctx.header.column.getCanSort() && <SortIcon<Entity> column={ctx.header.column} />}
+      </LeftCol>
+      <RightCol ref={rightRef}>
+        {ctx.header.column.getCanResize() && (
+          <ResizeHandle
+            onMouseDown={ctx.header.getResizeHandler()}
+            onTouchStart={ctx.header.getResizeHandler()}
+            colTitle={columnMeta.label}
+          />
+        )}
+      </RightCol>
+    </ThInner>
+  );
 };
 
 const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
@@ -42,6 +128,7 @@ const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
   entityAttributesAreCamelCase,
   meta,
   columnHelper,
+  onHeaderSectionResize,
 }: {
   columnSchemas: Array<ColumnSchema>;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
@@ -49,6 +136,7 @@ const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
   entityAttributesAreCamelCase: boolean;
   meta: Meta;
   columnHelper: ReturnType<typeof createColumnHelper<Entity>>;
+  onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
 }) => {
   const cell = useCallback(
     ({
@@ -67,13 +155,18 @@ const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
     [meta],
   );
 
+  const header = useCallback(
+    (ctx) => <AttributeHeader<Entity> ctx={ctx} onHeaderSectionResize={onHeaderSectionResize} />,
+    [onHeaderSectionResize],
+  );
+
   return useMemo(
     () =>
       columnSchemas.map((col) => {
         const baseColDef = {
           id: col.id,
           cell,
-          header: AttributeHeader<Entity>,
+          header,
           size: columnWidths[col.id],
           enableHiding: true,
           enableResizing: !columnRenderersByAttribute[col.id].staticWidth,
@@ -95,7 +188,7 @@ const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
           ...baseColDef,
         });
       }),
-    [columnSchemas, columnRenderersByAttribute, cell, columnWidths, entityAttributesAreCamelCase, columnHelper],
+    [columnSchemas, cell, header, columnWidths, columnRenderersByAttribute, entityAttributesAreCamelCase, columnHelper],
   );
 };
 
