@@ -16,9 +16,7 @@
  */
 package org.graylog.events.processor.aggregation;
 
-import com.floreysoft.jmte.Engine;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -53,12 +51,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static org.graylog.events.event.EventDto.FIELD_AGGREGATION_CONDITIONS;
-import static org.graylog.events.event.EventDto.FIELD_EVENT_DEFINITION_ID;
-import static org.graylog.events.notifications.EventNotificationModelData.FIELD_EVENT_DEFINITION_DESCRIPTION;
-import static org.graylog.events.notifications.EventNotificationModelData.FIELD_EVENT_DEFINITION_TITLE;
-import static org.graylog.events.notifications.EventNotificationModelData.FIELD_EVENT_DEFINITION_TYPE;
-
 public class AggregationSearchUtils {
     private final Logger LOG = LoggerFactory.getLogger(AggregationSearchUtils.class);
 
@@ -69,7 +61,6 @@ public class AggregationSearchUtils {
     private final EventStreamService eventStreamService;
     private final MessageFactory messageFactory;
     private final PermittedStreams permittedStreams;
-    private final Engine templateEngine;
 
     public AggregationSearchUtils(EventDefinition eventDefinition,
                                   AggregationEventProcessorConfig config,
@@ -77,8 +68,7 @@ public class AggregationSearchUtils {
                                   AggregationSearch.Factory aggregationSearchFactory,
                                   EventStreamService eventStreamService,
                                   MessageFactory messageFactory,
-                                  PermittedStreams permittedStreams,
-                                  Engine templateEngine) {
+                                  PermittedStreams permittedStreams) {
         this.eventDefinition = eventDefinition;
         this.config = config;
         this.eventQueryModifiers = eventQueryModifiers;
@@ -86,7 +76,6 @@ public class AggregationSearchUtils {
         this.eventStreamService = eventStreamService;
         this.messageFactory = messageFactory;
         this.permittedStreams = permittedStreams;
-        this.templateEngine = templateEngine;
     }
 
     public void aggregatedSearch(EventFactory eventFactory, AggregationEventProcessorParameters parameters,
@@ -207,18 +196,6 @@ public class AggregationSearchUtils {
             eventDecorator.accept(event);
 
             LOG.debug("Creating event {}/{} - {} {} ({})", eventDefinition.title(), eventDefinition.id(), keyResult.key(), seriesString(keyResult), fields);
-
-            // If the event definition has a custom event summary, transform and apply it to the event.
-            final String customEventSummary = eventDefinition.eventSummaryTemplate();
-            if (!Strings.isNullOrEmpty(customEventSummary)) {
-                final Map<String, Object> templateFields = Maps.newHashMap(fields);
-                templateFields.put(FIELD_AGGREGATION_CONDITIONS, event.getAggregationConditions());
-                templateFields.put(FIELD_EVENT_DEFINITION_ID, eventDefinition.id());
-                templateFields.put(FIELD_EVENT_DEFINITION_TITLE, eventDefinition.title());
-                templateFields.put(FIELD_EVENT_DEFINITION_TYPE, eventDefinition.config().type());
-                templateFields.put(FIELD_EVENT_DEFINITION_DESCRIPTION, eventDefinition.description());
-                event.setMessage(templateEngine.transform(customEventSummary, templateFields));
-            }
 
             // TODO: Can we find a useful source value?
             final Message message = messageFactory.createMessage(event.getMessage(), "", result.effectiveTimerange().to());

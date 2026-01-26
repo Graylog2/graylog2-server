@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.joschi.jadconfig.util.Duration;
 import jakarta.inject.Inject;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.graylog.storage.opensearch3.blocks.BlockSettingsParser;
 import org.graylog.storage.opensearch3.cluster.ClusterStateApi;
@@ -35,6 +36,7 @@ import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
+import org.graylog2.indexer.indices.IndexStatus;
 import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
@@ -78,6 +80,7 @@ import org.opensearch.client.opensearch.indices.GetIndexResponse;
 import org.opensearch.client.opensearch.indices.GetIndicesSettingsRequest;
 import org.opensearch.client.opensearch.indices.GetIndicesSettingsResponse;
 import org.opensearch.client.opensearch.indices.GetMappingResponse;
+import org.opensearch.client.opensearch.indices.IndexState;
 import org.opensearch.client.opensearch.indices.OpenSearchIndicesClient;
 import org.opensearch.client.opensearch.indices.PutIndicesSettingsRequest;
 import org.opensearch.client.opensearch.indices.RefreshRequest;
@@ -85,6 +88,7 @@ import org.opensearch.client.opensearch.indices.get_mapping.IndexMappingRecord;
 import org.opensearch.client.opensearch.indices.stats.IndicesStats;
 import org.opensearch.client.opensearch.indices.update_aliases.AddAction;
 import org.opensearch.client.opensearch.indices.update_aliases.RemoveAction;
+import org.opensearch.client.transport.httpclient5.ResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -300,15 +304,22 @@ public class IndicesAdapterOS implements IndicesAdapter {
      * @return Map of settings
      */
     public static Map<String, Object> toIndexSettings(GetIndicesSettingsResponse response, String index) {
-        org.opensearch.client.opensearch.indices.IndexSettings indexSettings = response.get(index).settings();
+        IndexState r = response.get(index);
+        if (r == null) {
+            LOG.warn("Couldn't read settings for index {}", index);
+            return null;
+        }
+        org.opensearch.client.opensearch.indices.IndexSettings indexSettings = r.settings();
         if (indexSettings == null) {
-            throw new RuntimeException("Couldn't read settings for index " + index);
+            LOG.warn("Couldn't read settings for index {}", index);
+            return null;
         }
         Map<String, Object> settings;
         try {
             settings = new ObjectMapperProvider().get().readValue(indexSettings.toJsonString(), new TypeReference<>() {});
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Couldn't read settings for index " + index, e);
+            LOG.warn("Couldn't read settings for index {}", index);
+            return null;
         }
         return settings.entrySet().stream().collect(
                 Collectors.toMap(
@@ -356,7 +367,9 @@ public class IndicesAdapterOS implements IndicesAdapter {
     @Override
     public Optional<DateTime> indexCreationDate(String index) {
         Map<String, Object> settings = getFlatIndexSettings(index);
-        Optional<String> creationDate = Optional.ofNullable(settings.get("index.creation_date")).map(String::valueOf);
+        Optional<String> creationDate = Optional.ofNullable(settings)
+                .map(s -> s.get("index.creation_date"))
+                .map(String::valueOf);
         return creationDate
                 .map(Long::valueOf)
                 .map(instant -> new DateTime(instant, DateTimeZone.UTC));
@@ -422,7 +435,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
         GetAliasRequest request = GetAliasRequest.of(r -> r
                 .index(indexPattern)
                 .ignoreUnavailable(false)
-                .allowNoIndices(false)
+                .allowNoIndices(true)
                 .expandWildcards(ExpandWildcard.Open)
         );
         return c.execute(() -> {
@@ -504,7 +517,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public List<ShardsInfo> getShardsInfo(String indexName) {
-        return c.execute(() -> catClient.shards().valueBody().stream()
+        return c.execute(() -> catClient.shards(r -> r.index(indexName)).valueBody().stream()
                 .map(shardsRecord -> new ShardsInfo(
                         shardsRecord.index(), Integer.parseInt(getIfNull(shardsRecord.shard(), "0")),
                         ShardsInfo.ShardType.fromString(getIfNull(shardsRecord.prirep(), "UNKNOWN")),
@@ -541,8 +554,13 @@ public class IndicesAdapterOS implements IndicesAdapter {
     @Override
     public boolean exists(String index) {
         try {
-            indicesClient.get(r -> r.index(index).flatSettings(true).ignoreUnavailable(false));
-            return true;
+            GetIndicesSettingsResponse result = indicesClient.getSettings(b -> b.index(index)
+                    .ignoreUnavailable(true)
+                    .allowNoIndices(true)
+                    .expandWildcards(ExpandWildcard.Open)
+                    .flatSettings(true)
+            );
+            return result.result() != null && result.result().size() == 1 && result.result().containsKey(index);
         } catch (IOException | OpenSearchException e) {
             if (e instanceof OpenSearchException && e.getMessage().contains("no such index")) {
                 return false;
@@ -558,22 +576,23 @@ public class IndicesAdapterOS implements IndicesAdapter {
     }
 
     @Override
-    public Set<String> indices(String indexWildcard, List<String> status, String indexSetId) {
+    public Set<String> indices(String indexWildcard, List<IndexStatus> status, String indexSetId) {
+        final List<ExpandWildcard> ewc = (status.isEmpty()) ? List.of(ExpandWildcard.All) : status.stream().map(this::statusToEwc).toList();
         return c.execute(() -> {
             GetIndexResponse result = indicesClient.get(GetIndexRequest.of(b -> b
                     .index(indexWildcard)
                     .flatSettings(true)
-                    .expandWildcards(status.stream().map(this::resolveWildcard).collect(Collectors.toList()))
+                    .expandWildcards(ewc)
                     .ignoreUnavailable(true)));
             return result.result().keySet();
         }, "Couldn't get index list for index set <" + indexSetId + ">");
     }
 
-    private ExpandWildcard resolveWildcard(String s) {
-        return Arrays.stream(ExpandWildcard.values())
-                .filter(w -> w.name().equalsIgnoreCase(s))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Unknown wildcard " + s));
+    private ExpandWildcard statusToEwc(IndexStatus status) {
+        return switch (status) {
+            case OPEN -> ExpandWildcard.Open;
+            case CLOSED -> ExpandWildcard.Closed;
+        };
     }
 
     @Override
@@ -684,12 +703,20 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public HealthStatus waitForRecovery(String index, int timeout) {
-        return c.execute(() -> HealthStatus.fromString(
-                c.sync().cluster().health(r -> r
-                        .index(index)
-                        .timeout(t -> t.time(timeout + "s"))
-                        .waitForStatus(org.opensearch.client.opensearch._types.HealthStatus.Green)
-                ).status().jsonValue()), "Error waiting for index recovery");
+        try {
+            return c.execute(() ->
+                    HealthStatus.fromString(c.sync().cluster().health(r -> r
+                            .index(index)
+                            .timeout(t -> t.time(timeout + "s"))
+                            .waitForStatus(org.opensearch.client.opensearch._types.HealthStatus.Green)
+                    ).status().jsonValue()), "Error waiting for index recovery");
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof ResponseException ex) {
+                String status = StringUtils.substringBetween(ex.getMessage(), "\"status\":\"", "\"");
+                return HealthStatus.fromString(status);
+            }
+            throw e;
+        }
     }
 
     @Override

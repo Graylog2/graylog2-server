@@ -16,28 +16,29 @@
  */
 package org.graylog2.bindings.providers;
 
-import org.graylog2.indexer.healing.FixDeflectorByDeleteJob;
-import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
-import org.graylog2.system.jobs.SystemJobFactory;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
+import org.graylog.scheduler.system.SystemJob;
+import org.graylog2.indexer.healing.FixDeflectorByDeleteJob;
+import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
+import org.graylog2.system.jobs.LegacySystemJobFactory;
 
 /**
- * @author Dennis Oelkers <dennis@torch.sh>
+ * Deprecated: Use {@link SystemJob.Factory} and related classes instead.
  */
-public class SystemJobFactoryProvider implements Provider<SystemJobFactory> {
-    private static SystemJobFactory systemJobFactory = null;
+@Deprecated(since = "7.1", forRemoval = true)
+public class LegacySystemJobFactoryProvider implements Provider<LegacySystemJobFactory> {
+    private static LegacySystemJobFactory systemJobFactory = null;
 
     @Inject
-    public SystemJobFactoryProvider(FixDeflectorByDeleteJob.Factory deleteJobFactory,
-                                    FixDeflectorByMoveJob.Factory moveJobFactory) {
+    public LegacySystemJobFactoryProvider(FixDeflectorByDeleteJob.Factory deleteJobFactory,
+                                          FixDeflectorByMoveJob.Factory moveJobFactory) {
         if (systemJobFactory == null)
-            systemJobFactory = new SystemJobFactory(moveJobFactory, deleteJobFactory);
+            systemJobFactory = new LegacySystemJobFactory(moveJobFactory, deleteJobFactory);
     }
 
     @Override
-    public SystemJobFactory get() {
+    public LegacySystemJobFactory get() {
         return systemJobFactory;
     }
 }
