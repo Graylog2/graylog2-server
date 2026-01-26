@@ -23,4 +23,6 @@ export {
   useSources,
   fetchPaginatedInstances,
   instancesKeyFn,
+  fetchPaginatedFleets,
+  fleetsKeyFn,
 } from './useCollectors';

@@ -15,21 +15,31 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Button, Group } from '@mantine/core';
 
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { FleetList, FleetFormModal } from 'components/collectors/fleets';
-import { useFleets } from 'components/collectors/hooks';
+import { DocumentTitle, PageHeader } from 'components/common';
+import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
+import type { SearchParams } from 'stores/PaginationTypes';
+
 import { CollectorsPageNavigation } from 'components/collectors/common';
+import { FleetFormModal } from 'components/collectors/fleets';
+import { fetchPaginatedFleets, fleetsKeyFn } from 'components/collectors/hooks';
 import type { Fleet } from 'components/collectors/types';
+import customColumnRenderers from 'components/collectors/fleets/ColumnRenderers';
+import { DEFAULT_LAYOUT, ADDITIONAL_ATTRIBUTES } from 'components/collectors/fleets/Constants';
 
 const CollectorsFleetsPage = () => {
-  const { data: fleets, isLoading } = useFleets();
   const [showFleetModal, setShowFleetModal] = useState(false);
 
+  const columnRenderers = useMemo(() => customColumnRenderers(), []);
+
+  const fetchEntities = useCallback(
+    (searchParams: SearchParams) => fetchPaginatedFleets(searchParams),
+    [],
+  );
+
   const handleSaveFleet = (fleet: Omit<Fleet, 'id' | 'created_at' | 'updated_at'>) => {
-    // Mock save - in real implementation this would call an API
     // eslint-disable-next-line no-console
     console.log('Saving fleet:', fleet);
   };
@@ -37,15 +47,27 @@ const CollectorsFleetsPage = () => {
   return (
     <DocumentTitle title="Collector Fleets">
       <CollectorsPageNavigation />
-      <PageHeader title="Fleets"
+      <PageHeader
+        title="Fleets"
         actions={(
           <Group>
             <Button onClick={() => setShowFleetModal(true)}>Add Fleet</Button>
           </Group>
-        )}>
+        )}
+      >
         <span>Manage collector fleets and their configurations.</span>
       </PageHeader>
-      {isLoading ? <Spinner /> : <FleetList fleets={fleets || []} />}
+
+      <PaginatedEntityTable<Fleet>
+        humanName="fleets"
+        tableLayout={DEFAULT_LAYOUT}
+        additionalAttributes={ADDITIONAL_ATTRIBUTES}
+        fetchEntities={fetchEntities}
+        keyFn={fleetsKeyFn}
+        entityAttributesAreCamelCase={false}
+        columnRenderers={columnRenderers}
+        entityActions={() => null}
+      />
 
       {showFleetModal && (
         <FleetFormModal
