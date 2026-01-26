@@ -73,7 +73,7 @@ export const SystemJobsStore = singletonStore('core.SystemJobs', () =>
     acknowledgeJob(jobId) {
       const url = URLUtils.qualifyUrl(ApiRoutes.SystemJobsApiController.acknowledgeJob(jobId).url);
       const promise = fetch('DELETE', url).then((response) => {
-        delete this.jobsById[response.id];
+        delete this.jobsById[jobId];
       });
 
       SystemJobsActions.acknowledgeJob.promise(promise);
