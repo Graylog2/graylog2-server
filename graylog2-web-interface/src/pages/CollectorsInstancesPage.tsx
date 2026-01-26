@@ -15,23 +15,62 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState, useMemo } from 'react';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { InstanceList } from 'components/collectors/instances';
 import { useInstances, useFleets, useSources } from 'components/collectors/hooks';
-import { CollectorsPageNavigation } from 'components/collectors/common';
+import { CollectorsPageNavigation, FilterBar } from 'components/collectors/common';
+
+type StatusFilter = 'all' | 'online' | 'offline';
 
 const CollectorsInstancesPage = () => {
   const { data: instances, isLoading: instancesLoading } = useInstances();
   const { data: fleets, isLoading: fleetsLoading } = useFleets();
   const { data: sources, isLoading: sourcesLoading } = useSources();
 
+  const [searchValue, setSearchValue] = useState('');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [fleetFilter, setFleetFilter] = useState<string | null>(null);
+
   const isLoading = instancesLoading || fleetsLoading || sourcesLoading;
 
-  const fleetNames = (fleets || []).reduce(
-    (acc, fleet) => ({ ...acc, [fleet.id]: fleet.name }),
-    {} as Record<string, string>,
+  const fleetNames = useMemo(
+    () =>
+      (fleets || []).reduce(
+        (acc, fleet) => ({ ...acc, [fleet.id]: fleet.name }),
+        {} as Record<string, string>,
+      ),
+    [fleets],
   );
+
+  const fleetOptions = useMemo(
+    () => (fleets || []).map((fleet) => ({ value: fleet.id, label: fleet.name })),
+    [fleets],
+  );
+
+  const filteredInstances = useMemo(() => {
+    let result = instances || [];
+
+    if (searchValue) {
+      const search = searchValue.toLowerCase();
+      result = result.filter(
+        (i) =>
+          i.hostname?.toLowerCase().includes(search) ||
+          i.agent_id.toLowerCase().includes(search),
+      );
+    }
+
+    if (statusFilter !== 'all') {
+      result = result.filter((i) => i.status === statusFilter);
+    }
+
+    if (fleetFilter) {
+      result = result.filter((i) => i.fleet_id === fleetFilter);
+    }
+
+    return result;
+  }, [instances, searchValue, statusFilter, fleetFilter]);
 
   return (
     <DocumentTitle title="Collector Instances">
@@ -42,7 +81,22 @@ const CollectorsInstancesPage = () => {
       {isLoading ? (
         <Spinner />
       ) : (
-        <InstanceList instances={instances || []} fleetNames={fleetNames} sources={sources || []} />
+        <>
+          <FilterBar
+            searchValue={searchValue}
+            onSearchChange={setSearchValue}
+            statusFilter={statusFilter}
+            onStatusFilterChange={setStatusFilter}
+            fleetFilter={fleetFilter}
+            onFleetFilterChange={setFleetFilter}
+            fleetOptions={fleetOptions}
+          />
+          <InstanceList
+            instances={filteredInstances}
+            fleetNames={fleetNames}
+            sources={sources || []}
+          />
+        </>
       )}
     </DocumentTitle>
   );
