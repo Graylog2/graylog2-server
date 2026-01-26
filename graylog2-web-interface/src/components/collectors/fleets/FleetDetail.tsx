@@ -21,6 +21,8 @@ import { Tabs, Flex, Badge, Group, Button } from '@mantine/core';
 
 import { Spinner } from 'components/common';
 
+import FleetSettings from './FleetSettings';
+
 import { useFleet, useFleetStats, useInstances, useSources } from '../hooks';
 import StatCard from '../common/StatCard';
 import SourcesTable from '../overview/SourcesTable';
@@ -103,7 +105,14 @@ const FleetDetail = ({ fleetId }: Props) => {
         </Tabs.Panel>
 
         <Tabs.Panel value="settings" pt="md">
-          <p>Fleet settings coming soon...</p>
+          <FleetSettings
+            fleet={fleet}
+            onSave={(updates) => {
+              // Mock save - in real implementation this would call an API
+              // eslint-disable-next-line no-console
+              console.log('Saving fleet updates:', updates);
+            }}
+          />
         </Tabs.Panel>
       </Tabs>
       {showSourceModal && (
