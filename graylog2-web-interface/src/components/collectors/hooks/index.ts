@@ -21,4 +21,6 @@ export {
   useFleetStats,
   useInstances,
   useSources,
+  fetchPaginatedInstances,
+  instancesKeyFn,
 } from './useCollectors';

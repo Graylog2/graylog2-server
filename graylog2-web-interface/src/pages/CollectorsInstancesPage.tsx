@@ -15,25 +15,29 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { InstanceList } from 'components/collectors/instances';
-import { useInstances, useFleets, useSources } from 'components/collectors/hooks';
-import { CollectorsPageNavigation, FilterBar } from 'components/collectors/common';
+import { DocumentTitle, PageHeader } from 'components/common';
+import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
+import type { SearchParams } from 'stores/PaginationTypes';
 
-type StatusFilter = 'all' | 'online' | 'offline';
+import { CollectorsPageNavigation } from 'components/collectors/common';
+import { InstanceDetailDrawer } from 'components/collectors/instances';
+import {
+  fetchPaginatedInstances,
+  instancesKeyFn,
+  useFleets,
+  useSources,
+} from 'components/collectors/hooks';
+import type { CollectorInstanceView } from 'components/collectors/types';
+import customColumnRenderers from 'components/collectors/instances/ColumnRenderers';
+import useTableElements from 'components/collectors/instances/useTableElements';
+import { DEFAULT_LAYOUT, ADDITIONAL_ATTRIBUTES } from 'components/collectors/instances/Constants';
 
 const CollectorsInstancesPage = () => {
-  const { data: instances, isLoading: instancesLoading } = useInstances();
-  const { data: fleets, isLoading: fleetsLoading } = useFleets();
-  const { data: sources, isLoading: sourcesLoading } = useSources();
-
-  const [searchValue, setSearchValue] = useState('');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
-  const [fleetFilter, setFleetFilter] = useState<string | null>(null);
-
-  const isLoading = instancesLoading || fleetsLoading || sourcesLoading;
+  const [selectedInstance, setSelectedInstance] = useState<CollectorInstanceView | null>(null);
+  const { data: fleets } = useFleets();
+  const { data: sources } = useSources();
 
   const fleetNames = useMemo(
     () =>
@@ -44,33 +48,22 @@ const CollectorsInstancesPage = () => {
     [fleets],
   );
 
-  const fleetOptions = useMemo(
-    () => (fleets || []).map((fleet) => ({ value: fleet.id, label: fleet.name })),
-    [fleets],
+  const columnRenderers = useMemo(
+    () => customColumnRenderers({ fleetNames }),
+    [fleetNames],
   );
 
-  const filteredInstances = useMemo(() => {
-    let result = instances || [];
+  const { entityActions } = useTableElements({
+    onInstanceClick: setSelectedInstance,
+  });
 
-    if (searchValue) {
-      const search = searchValue.toLowerCase();
-      result = result.filter(
-        (i) =>
-          i.hostname?.toLowerCase().includes(search) ||
-          i.agent_id.toLowerCase().includes(search),
-      );
-    }
+  const fetchEntities = useCallback(
+    (searchParams: SearchParams) => fetchPaginatedInstances(searchParams),
+    [],
+  );
 
-    if (statusFilter !== 'all') {
-      result = result.filter((i) => i.status === statusFilter);
-    }
-
-    if (fleetFilter) {
-      result = result.filter((i) => i.fleet_id === fleetFilter);
-    }
-
-    return result;
-  }, [instances, searchValue, statusFilter, fleetFilter]);
+  const getSourcesForInstance = (instance: CollectorInstanceView) =>
+    (sources || []).filter((s) => s.fleet_id === instance.fleet_id);
 
   return (
     <DocumentTitle title="Collector Instances">
@@ -78,25 +71,25 @@ const CollectorsInstancesPage = () => {
       <PageHeader title="Instances">
         <span>View all collector instances across fleets.</span>
       </PageHeader>
-      {isLoading ? (
-        <Spinner />
-      ) : (
-        <>
-          <FilterBar
-            searchValue={searchValue}
-            onSearchChange={setSearchValue}
-            statusFilter={statusFilter}
-            onStatusFilterChange={setStatusFilter}
-            fleetFilter={fleetFilter}
-            onFleetFilterChange={setFleetFilter}
-            fleetOptions={fleetOptions}
-          />
-          <InstanceList
-            instances={filteredInstances}
-            fleetNames={fleetNames}
-            sources={sources || []}
-          />
-        </>
+
+      <PaginatedEntityTable<CollectorInstanceView>
+        humanName="instances"
+        entityActions={entityActions}
+        tableLayout={DEFAULT_LAYOUT}
+        additionalAttributes={ADDITIONAL_ATTRIBUTES}
+        fetchEntities={fetchEntities}
+        keyFn={instancesKeyFn}
+        entityAttributesAreCamelCase={false}
+        columnRenderers={columnRenderers}
+      />
+
+      {selectedInstance && (
+        <InstanceDetailDrawer
+          instance={selectedInstance}
+          sources={getSourcesForInstance(selectedInstance)}
+          fleetName={fleetNames[selectedInstance.fleet_id] || selectedInstance.fleet_id}
+          onClose={() => setSelectedInstance(null)}
+        />
       )}
     </DocumentTitle>
   );
