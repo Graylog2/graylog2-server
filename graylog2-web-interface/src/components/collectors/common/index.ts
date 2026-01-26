@@ -16,3 +16,4 @@
  */
 export { default as StatCard } from './StatCard';
 export { default as CollectorsPageNavigation } from './CollectorsPageNavigation';
+export { default as FilterBar } from './FilterBar';
