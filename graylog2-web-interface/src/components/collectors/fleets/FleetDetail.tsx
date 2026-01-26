@@ -23,6 +23,8 @@ import { Spinner } from 'components/common';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import type { SearchParams } from 'stores/PaginationTypes';
 
+import FleetSettings from './FleetSettings';
+
 import { useFleet, useFleetStats, useSources, fetchPaginatedSources, sourcesKeyFn, fetchPaginatedInstances, instancesKeyFn } from '../hooks';
 import StatCard from '../common/StatCard';
 import { InstanceDetailDrawer } from '../instances';
@@ -31,7 +33,6 @@ import { DEFAULT_LAYOUT as INSTANCES_LAYOUT, ADDITIONAL_ATTRIBUTES as INSTANCES_
 import sourceColumnRenderers from '../sources/ColumnRenderers';
 import { DEFAULT_LAYOUT as SOURCES_LAYOUT, ADDITIONAL_ATTRIBUTES as SOURCES_ATTRS } from '../sources/Constants';
 import { SourceFormModal } from '../sources';
-import FleetSettings from './FleetSettings';
 import type { CollectorInstanceView, Source } from '../types';
 
 type Props = {

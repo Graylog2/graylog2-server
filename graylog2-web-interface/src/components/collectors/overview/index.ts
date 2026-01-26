@@ -15,4 +15,3 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 export { default as CollectorsOverview } from './CollectorsOverview';
-export { default as SourcesTable } from './SourcesTable';

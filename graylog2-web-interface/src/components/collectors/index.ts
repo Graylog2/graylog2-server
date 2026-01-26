@@ -29,7 +29,6 @@ export { default as CollectorsPageNavigation } from './common/CollectorsPageNavi
 
 // Overview components
 export { default as CollectorsOverview } from './overview/CollectorsOverview';
-export { default as SourcesTable } from './overview/SourcesTable';
 
 // Fleets components
 export { default as FleetList } from './fleets/FleetList';

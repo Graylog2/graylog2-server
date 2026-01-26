@@ -15,16 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import { Flex, Title } from '@mantine/core';
 
 import { Spinner } from 'components/common';
+import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
+import type { SearchParams } from 'stores/PaginationTypes';
 
-import SourcesTable from './SourcesTable';
-
-import { useCollectorStats, useFleets, useSources } from '../hooks';
+import { useCollectorStats, fetchPaginatedSources, sourcesKeyFn } from '../hooks';
 import StatCard from '../common/StatCard';
-
+import sourceColumnRenderers from '../sources/ColumnRenderers';
+import { DEFAULT_LAYOUT as SOURCES_LAYOUT, ADDITIONAL_ATTRIBUTES as SOURCES_ATTRS } from '../sources/Constants';
+import type { Source } from '../types';
 
 const StatsRow = styled(Flex)(
   ({ theme }) => css`
@@ -42,19 +45,17 @@ const Section = styled.div(
 
 const CollectorsOverview = () => {
   const { data: stats, isLoading: statsLoading } = useCollectorStats();
-  const { data: fleets, isLoading: fleetsLoading } = useFleets();
-  const { data: sources, isLoading: sourcesLoading } = useSources();
 
-  const isLoading = statsLoading || fleetsLoading || sourcesLoading;
+  const sourceRenderers = useMemo(() => sourceColumnRenderers(), []);
 
-  if (isLoading) {
+  const fetchSources = useCallback(
+    (searchParams: SearchParams) => fetchPaginatedSources(searchParams),
+    [],
+  );
+
+  if (statsLoading) {
     return <Spinner />;
   }
-
-  const fleetNames = (fleets || []).reduce(
-    (acc, fleet) => ({ ...acc, [fleet.id]: fleet.name }),
-    {} as Record<string, string>,
-  );
 
   return (
     <div>
@@ -67,8 +68,17 @@ const CollectorsOverview = () => {
       </StatsRow>
 
       <Section>
-        <Title order={4}>Active Sources</Title>
-        <SourcesTable sources={sources || []} fleetNames={fleetNames} />
+        <Title order={4} mb="md">Active Sources</Title>
+        <PaginatedEntityTable<Source>
+          humanName="sources"
+          tableLayout={SOURCES_LAYOUT}
+          additionalAttributes={SOURCES_ATTRS}
+          fetchEntities={fetchSources}
+          keyFn={sourcesKeyFn}
+          entityAttributesAreCamelCase={false}
+          columnRenderers={sourceRenderers}
+          entityActions={() => null}
+        />
       </Section>
     </div>
   );

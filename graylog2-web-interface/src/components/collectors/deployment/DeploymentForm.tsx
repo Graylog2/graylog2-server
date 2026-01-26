@@ -20,7 +20,6 @@ import styled, { css } from 'styled-components';
 import {
   SegmentedControl,
   Select,
-  Radio,
   Button,
   Code,
   CopyButton,
@@ -123,14 +122,16 @@ const DeploymentForm = () => {
 
       <Section>
         <Label>Token Expiry</Label>
-        <Radio.Group value={expiry} onChange={(v) => setExpiry(v as TokenExpiry)}>
-          <Group>
-            <Radio value="24h" label="24 hours" />
-            <Radio value="7d" label="7 days" />
-            <Radio value="30d" label="30 days" />
-            <Radio value="never" label="No expiry" />
-          </Group>
-        </Radio.Group>
+        <SegmentedControl
+          value={expiry}
+          onChange={(v) => setExpiry(v as TokenExpiry)}
+          data={[
+            { value: '24h', label: '24 hours' },
+            { value: '7d', label: '7 days' },
+            { value: '30d', label: '30 days' },
+            { value: 'never', label: 'No expiry' },
+          ]}
+        />
       </Section>
 
       <Section>
