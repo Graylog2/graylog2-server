@@ -18,8 +18,11 @@ package org.graylog2.cluster.lock;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 import java.time.Duration;
 import java.time.ZoneOffset;
@@ -33,9 +36,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class RefreshingLockServiceTest {
 
     @Mock
@@ -45,28 +51,26 @@ public class RefreshingLockServiceTest {
     private ScheduledExecutorService scheduler;
 
     private RefreshingLockService refreshingLockService;
+    private Lock firstLock;
+    private Lock secondLock;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
         refreshingLockService = new RefreshingLockService(
                 lockService,
                 scheduler,
                 Duration.ofMinutes(5)
         );
-    }
 
-    @Test
-    void throwsIllegalStateExceptionWhenAcquiringLockWhileAlreadyHoldingOne() throws AlreadyLockedException {
-        // Create a mock lock
-        Lock firstLock = Lock.builder()
+        // Create mock locks
+        firstLock = Lock.builder()
                 .resource("first-resource")
                 .lockedBy("node-123")
                 .createdAt(ZonedDateTime.now(ZoneOffset.UTC))
                 .updatedAt(ZonedDateTime.now(ZoneOffset.UTC))
                 .build();
 
-        Lock secondLock = Lock.builder()
+        secondLock = Lock.builder()
                 .resource("second-resource")
                 .lockedBy("node-123")
                 .createdAt(ZonedDateTime.now(ZoneOffset.UTC))
@@ -78,7 +82,14 @@ public class RefreshingLockServiceTest {
                 .thenReturn(Optional.of(firstLock));
         when(lockService.lock(eq("second-resource"), anyString()))
                 .thenReturn(Optional.of(secondLock));
+        when(lockService.lock(eq("first-resource"), eq(1)))
+                .thenReturn(Optional.of(firstLock));
+        when(lockService.lock(eq("second-resource"), eq(1)))
+                .thenReturn(Optional.of(secondLock));
+    }
 
+    @Test
+    void throwsIllegalStateExceptionWhenAcquiringLockWhileAlreadyHoldingOne() throws AlreadyLockedException {
         // Acquire first lock successfully
         refreshingLockService.acquireAndKeepLock("first-resource", "context-1");
 
@@ -90,27 +101,6 @@ public class RefreshingLockServiceTest {
 
     @Test
     void throwsIllegalStateExceptionWhenAcquiringLockWithMaxConcurrencyWhileAlreadyHoldingOne() throws AlreadyLockedException {
-        // Create mock locks
-        Lock firstLock = Lock.builder()
-                .resource("first-resource")
-                .lockedBy("node-123")
-                .createdAt(ZonedDateTime.now(ZoneOffset.UTC))
-                .updatedAt(ZonedDateTime.now(ZoneOffset.UTC))
-                .build();
-
-        Lock secondLock = Lock.builder()
-                .resource("second-resource")
-                .lockedBy("node-123")
-                .createdAt(ZonedDateTime.now(ZoneOffset.UTC))
-                .updatedAt(ZonedDateTime.now(ZoneOffset.UTC))
-                .build();
-
-        // Mock the lock service to return locks
-        when(lockService.lock(eq("first-resource"), eq(1)))
-                .thenReturn(Optional.of(firstLock));
-        when(lockService.lock(eq("second-resource"), eq(1)))
-                .thenReturn(Optional.of(secondLock));
-
         // Acquire first lock successfully
         refreshingLockService.acquireAndKeepLock("first-resource", 1);
 
