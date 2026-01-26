@@ -86,7 +86,7 @@ const FleetDetail = ({ fleetId }: Props) => {
         </Tabs.Panel>
 
         <Tabs.Panel value="instances" pt="md">
-          <InstanceList instances={instances || []} fleetNames={fleetNames} showStats={false} />
+          <InstanceList instances={instances || []} fleetNames={fleetNames} sources={sources || []} showStats={false} />
         </Tabs.Panel>
 
         <Tabs.Panel value="settings" pt="md">

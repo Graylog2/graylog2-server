@@ -18,14 +18,15 @@ import * as React from 'react';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { InstanceList } from 'components/collectors/instances';
-import { useInstances, useFleets } from 'components/collectors/hooks';
+import { useInstances, useFleets, useSources } from 'components/collectors/hooks';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 
 const CollectorsInstancesPage = () => {
   const { data: instances, isLoading: instancesLoading } = useInstances();
   const { data: fleets, isLoading: fleetsLoading } = useFleets();
+  const { data: sources, isLoading: sourcesLoading } = useSources();
 
-  const isLoading = instancesLoading || fleetsLoading;
+  const isLoading = instancesLoading || fleetsLoading || sourcesLoading;
 
   const fleetNames = (fleets || []).reduce(
     (acc, fleet) => ({ ...acc, [fleet.id]: fleet.name }),
@@ -41,7 +42,7 @@ const CollectorsInstancesPage = () => {
       {isLoading ? (
         <Spinner />
       ) : (
-        <InstanceList instances={instances || []} fleetNames={fleetNames} />
+        <InstanceList instances={instances || []} fleetNames={fleetNames} sources={sources || []} />
       )}
     </DocumentTitle>
   );

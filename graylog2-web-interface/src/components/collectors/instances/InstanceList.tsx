@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { Table, Badge, Flex } from '@mantine/core';
 
@@ -22,12 +23,15 @@ import { Link } from 'components/common/router';
 import { RelativeTime } from 'components/common';
 import Routes from 'routing/Routes';
 
-import type { CollectorInstanceView } from '../types';
+import InstanceDetailDrawer from './InstanceDetailDrawer';
+
+import type { CollectorInstanceView, Source } from '../types';
 import StatCard from '../common/StatCard';
 
 type Props = {
   instances: CollectorInstanceView[];
   fleetNames: Record<string, string>;
+  sources?: Source[];
   showStats?: boolean;
 };
 
@@ -42,6 +46,14 @@ const StatsRow = styled(Flex)`
   gap: 0.5rem;
 `;
 
+const ClickableRow = styled(Table.Tr)`
+  cursor: pointer;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.gray[90]};
+  }
+`;
+
 const OsIcon = ({ os }: { os: string | null }) => {
   if (os === 'linux') return <span title="Linux">🐧</span>;
   if (os === 'windows') return <span title="Windows">🪟</span>;
@@ -50,7 +62,9 @@ const OsIcon = ({ os }: { os: string | null }) => {
   return <span>❓</span>;
 };
 
-const InstanceList = ({ instances, fleetNames, showStats = true }: Props) => {
+const InstanceList = ({ instances, fleetNames, sources = [], showStats = true }: Props) => {
+  const [selectedInstance, setSelectedInstance] = useState<CollectorInstanceView | null>(null);
+
   if (instances.length === 0) {
     return <EmptyState>No instances registered yet.</EmptyState>;
   }
@@ -58,6 +72,9 @@ const InstanceList = ({ instances, fleetNames, showStats = true }: Props) => {
   const online = instances.filter((i) => i.status === 'online').length;
   const offline = instances.length - online;
   const versions = new Set(instances.map((i) => i.version)).size;
+
+  const getSourcesForInstance = (instance: CollectorInstanceView) =>
+    sources.filter((s) => s.fleet_id === instance.fleet_id);
 
   return (
     <div>
@@ -83,7 +100,7 @@ const InstanceList = ({ instances, fleetNames, showStats = true }: Props) => {
         </Table.Thead>
         <Table.Tbody>
           {instances.map((instance) => (
-            <Table.Tr key={instance.id}>
+            <ClickableRow key={instance.id} onClick={() => setSelectedInstance(instance)}>
               <Table.Td>
                 <Badge color={instance.status === 'online' ? 'green' : 'gray'}>
                   {instance.status === 'online' ? 'Online' : 'Offline'}
@@ -94,7 +111,7 @@ const InstanceList = ({ instances, fleetNames, showStats = true }: Props) => {
                 <OsIcon os={instance.os} />
               </Table.Td>
               <Table.Td>
-                <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>
+                <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)} onClick={(e) => e.stopPropagation()}>
                   {fleetNames[instance.fleet_id] || instance.fleet_id}
                 </Link>
               </Table.Td>
@@ -102,10 +119,19 @@ const InstanceList = ({ instances, fleetNames, showStats = true }: Props) => {
                 <RelativeTime dateTime={instance.last_seen} />
               </Table.Td>
               <Table.Td>{instance.version}</Table.Td>
-            </Table.Tr>
+            </ClickableRow>
           ))}
         </Table.Tbody>
       </Table>
+
+      {selectedInstance && (
+        <InstanceDetailDrawer
+          instance={selectedInstance}
+          sources={getSourcesForInstance(selectedInstance)}
+          fleetName={fleetNames[selectedInstance.fleet_id] || selectedInstance.fleet_id}
+          onClose={() => setSelectedInstance(null)}
+        />
+      )}
     </div>
   );
 };
