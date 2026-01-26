@@ -41,3 +41,4 @@ dependency-reduced-pom.xml
 **/hs_err_pid*.log
 
 data-node/bin/*
+test_output.log
