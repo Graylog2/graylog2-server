@@ -35,6 +35,9 @@ const DEFAULT_SETTINGS = {
   sqsMessageBatchSize: {
     value: 5,
   },
+  includeFullMessageJson: {
+    value: false,
+  },
 };
 
 export default DEFAULT_SETTINGS;

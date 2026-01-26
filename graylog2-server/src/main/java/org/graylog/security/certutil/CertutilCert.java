@@ -81,7 +81,9 @@ public class CertutilCert implements CliCommand {
         try {
             char[] password = console.readPassword(PROMPT_ENTER_CA_PASSWORD);
             KeyStore caKeystore = KeyStore.getInstance(PKCS12);
-            caKeystore.load(new FileInputStream(caKeystorePath.toFile()), password);
+            try (FileInputStream fis = new FileInputStream(caKeystorePath.toFile())) {
+                caKeystore.load(fis, password);
+            }
 
             final Key caPrivateKey = caKeystore.getKey(CA_KEY_ALIAS, password);
 
