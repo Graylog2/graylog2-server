@@ -88,7 +88,7 @@ class AzureGeoIpFileServiceTest {
     void testDownloadCityFile() throws Exception {
         uploadBlob(CITY_BLOB, FAKE_CITY_DB_CONTENT);
         Path cityFile = tempDir.resolve(CITY_BLOB);
-        GeoIpResolverConfig config = createConfig(azuriteContainer.getAccountName(), azuriteContainer.getAccountKey(), CONTAINER_NAME, CITY_BLOB, "");
+        GeoIpResolverConfig config = createConfig(AzuriteContainer.ACCOUNT_NAME, AzuriteContainer.ACCOUNT_KEY, CONTAINER_NAME, CITY_BLOB, "");
 
         assertThat(classUnderTest.downloadCityFile(config, cityFile)).isPresent();
         assertThat(Files.readString(cityFile)).isEqualTo(FAKE_CITY_DB_CONTENT);
@@ -98,7 +98,7 @@ class AzureGeoIpFileServiceTest {
     void testDownloadAsnFile() throws Exception {
         uploadBlob(ASN_BLOB, FAKE_ASN_DB_CONTENT);
         Path asnFile = tempDir.resolve(ASN_BLOB);
-        GeoIpResolverConfig config = createConfig(azuriteContainer.getAccountName(), azuriteContainer.getAccountKey(), CONTAINER_NAME, "", ASN_BLOB);
+        GeoIpResolverConfig config = createConfig(AzuriteContainer.ACCOUNT_NAME, AzuriteContainer.ACCOUNT_KEY, CONTAINER_NAME, "", ASN_BLOB);
 
         assertThat(classUnderTest.downloadAsnFile(config, asnFile)).isPresent();
         assertThat(Files.readString(asnFile)).isEqualTo(FAKE_ASN_DB_CONTENT);
@@ -107,7 +107,7 @@ class AzureGeoIpFileServiceTest {
     @Test
     void testGetCityFileServerTimestamp() throws Exception {
         uploadBlob(CITY_BLOB, FAKE_CITY_DB_CONTENT);
-        GeoIpResolverConfig config = createConfig(azuriteContainer.getAccountName(), azuriteContainer.getAccountKey(), CONTAINER_NAME, CITY_BLOB, "");
+        GeoIpResolverConfig config = createConfig(AzuriteContainer.ACCOUNT_NAME, AzuriteContainer.ACCOUNT_KEY, CONTAINER_NAME, CITY_BLOB, "");
 
         assertThat(classUnderTest.getCityFileServerTimestamp(config)).isPresent();
     }
@@ -115,7 +115,7 @@ class AzureGeoIpFileServiceTest {
     @Test
     void testGetAsnFileServerTimestamp() throws Exception {
         uploadBlob(ASN_BLOB, FAKE_ASN_DB_CONTENT);
-        GeoIpResolverConfig config = createConfig(azuriteContainer.getAccountName(), azuriteContainer.getAccountKey(), CONTAINER_NAME, "", ASN_BLOB);
+        GeoIpResolverConfig config = createConfig(AzuriteContainer.ACCOUNT_NAME, AzuriteContainer.ACCOUNT_KEY, CONTAINER_NAME, "", ASN_BLOB);
 
         assertThat(classUnderTest.getAsnFileServerTimestamp(config)).isPresent();
     }
