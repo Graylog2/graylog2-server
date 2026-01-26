@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.datanode;
 
+@Deprecated(forRemoval = true)
 public class DatanodeMigrationLockException extends RuntimeException {
     public DatanodeMigrationLockException(String message) {
         super(message);

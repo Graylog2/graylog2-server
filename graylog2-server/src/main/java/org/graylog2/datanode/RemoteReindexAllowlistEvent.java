@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Deprecated(forRemoval = true)
 public record RemoteReindexAllowlistEvent(List<String> allowlist, ACTION action,
                                           List<String> pemEncodedTrustedCertificates) {
 
