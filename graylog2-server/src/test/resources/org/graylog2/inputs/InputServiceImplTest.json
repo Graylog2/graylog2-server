@@ -101,6 +101,12 @@
       "created_at": {
         "$date": "2018-03-28T13:03:00.000Z"
       },
+      "static_fields": [
+        {
+          "key": "static_field",
+          "value": "foo"
+        }
+      ],
       "global": true,
       "type": "org.graylog2.inputs.gelf.tcp.GELFTCPInput",
       "title": "GELF TCP"

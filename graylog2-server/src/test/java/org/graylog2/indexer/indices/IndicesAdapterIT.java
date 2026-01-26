@@ -18,6 +18,7 @@
 package org.graylog2.indexer.indices;
 
 import com.github.joschi.jadconfig.util.Duration;
+import org.assertj.core.api.Assertions;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.joda.time.DateTime;
@@ -63,6 +64,12 @@ public abstract class IndicesAdapterIT extends ElasticsearchBaseTest {
     public void testDelete() throws IOException {
         indicesAdapter.delete(TEST_INDEX);
         assertThat(indicesAdapter.exists(TEST_INDEX)).isFalse();
+    }
+
+    @Test
+    void testNonexistentAlias() {
+        final Map<String, Set<String>> result = indicesAdapter.aliases("nonexistent_*");
+        Assertions.assertThat(result).isEmpty();
     }
 
     @Test

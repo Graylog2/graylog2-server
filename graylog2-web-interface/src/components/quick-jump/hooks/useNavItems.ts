@@ -150,6 +150,14 @@ const useHelpMenuItems = () => {
         };
       }
 
+      if ('path' in item) {
+        return {
+          type: PAGE_TYPE,
+          title: item.description,
+          link: prefixUrl(item.path),
+        };
+      }
+
       throw Error('Help menu item must have either external link or action defined');
     });
 };

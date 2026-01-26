@@ -38,7 +38,7 @@ class JobExecutionEngineTest {
     @Mock
     private DBJobTriggerService jobTriggerService;
     @Mock
-    private DBJobDefinitionService jobDefinitionService;
+    private JobDefinitionLookup jobDefinitionLookup;
     @Mock
     private JobSchedulerEventBus eventBus;
     @Mock
@@ -48,7 +48,7 @@ class JobExecutionEngineTest {
     @Mock
     private RefreshingLockService.Factory refreshingLockServiceFactory;
     @Mock
-    private Map<String, Job.Factory> jobFactory;
+    private Map<String, Job.Factory<? extends Job>> jobFactory;
     @Mock
     private JobSchedulerConfig jobSchedulerConfig;
     @Mock
@@ -58,8 +58,8 @@ class JobExecutionEngineTest {
 
     @Test
     void updateLockedJobsOnlyIfSomeJobWorkersRun() {
-        JobExecutionEngine underTest = new JobExecutionEngine(jobTriggerService, jobDefinitionService, eventBus, scheduleStrategies, jobTriggerUpdatesFactory,
-                refreshingLockServiceFactory, jobFactory, workerPool, jobSchedulerConfig, metricRegistry);
+        JobExecutionEngine underTest = new JobExecutionEngine(jobTriggerService, jobDefinitionLookup, eventBus, scheduleStrategies, jobTriggerUpdatesFactory,
+                refreshingLockServiceFactory, jobFactory, workerPool, "test", jobSchedulerConfig, metricRegistry);
 
         underTest.updateLockedJobs();
         given(workerPool.anySlotsUsed()).willReturn(true);
