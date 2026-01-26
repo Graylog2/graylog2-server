@@ -50,7 +50,7 @@ import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.models.system.config.ClusterConfigList;
 import org.graylog2.security.RestrictedChainingClassLoader;
 import org.graylog2.security.UnsafeClassLoadingAttemptException;
-import org.graylog2.security.encryption.EncryptedConfigUpdatePreparation;
+import org.graylog2.security.encryption.ConfigUpdatePreparation;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
@@ -133,7 +133,7 @@ public class ClusterConfigResource extends RestResource {
         final Object updatedConfigObject = parseConfigObject(configClass, body, cls);
         final Object preparedConfig;
         final Object existingConfig = clusterConfigService.get(cls);
-        if (existingConfig != null && updatedConfigObject instanceof EncryptedConfigUpdatePreparation encryptedConfig) {
+        if (existingConfig != null && updatedConfigObject instanceof ConfigUpdatePreparation encryptedConfig) {
             preparedConfig = encryptedConfig.prepareConfigUpdate(existingConfig);
         } else {
             preparedConfig = updatedConfigObject;

@@ -16,6 +16,6 @@
  */
 package org.graylog2.security.encryption;
 
-public interface EncryptedConfigUpdatePreparation {
+public interface ConfigUpdatePreparation {
     Object prepareConfigUpdate(Object existingConfig);
 }

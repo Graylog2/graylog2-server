@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog2.security.encryption.EncryptedConfigUpdatePreparation;
+import org.graylog2.security.encryption.ConfigUpdatePreparation;
 import org.graylog2.security.encryption.EncryptedValue;
 
 import javax.annotation.Nullable;
@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
 @AutoValue
-public abstract class GeoIpResolverConfig implements EncryptedConfigUpdatePreparation {
+public abstract class GeoIpResolverConfig implements ConfigUpdatePreparation {
 
     private static final Long DEFAULT_INTERVAL = 10L;
     public static final String FIELD_REFRESH_INTERVAL_UNIT = "refresh_interval_unit";
