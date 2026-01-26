@@ -29,9 +29,9 @@ import { useFleet, useFleetStats, useSources, fetchPaginatedSources, sourcesKeyF
 import StatCard from '../common/StatCard';
 import { InstanceDetailDrawer } from '../instances';
 import instanceColumnRenderers from '../instances/ColumnRenderers';
-import { DEFAULT_LAYOUT as INSTANCES_LAYOUT, ADDITIONAL_ATTRIBUTES as INSTANCES_ATTRS } from '../instances/Constants';
+import { DEFAULT_LAYOUT as INSTANCES_LAYOUT } from '../instances/Constants';
 import sourceColumnRenderers from '../sources/ColumnRenderers';
-import { DEFAULT_LAYOUT as SOURCES_LAYOUT, ADDITIONAL_ATTRIBUTES as SOURCES_ATTRS } from '../sources/Constants';
+import { DEFAULT_LAYOUT as SOURCES_LAYOUT } from '../sources/Constants';
 import { SourceFormModal } from '../sources';
 import type { CollectorInstanceView, Source } from '../types';
 
@@ -133,7 +133,6 @@ const FleetDetail = ({ fleetId }: Props) => {
           <PaginatedEntityTable<Source>
             humanName="sources"
             tableLayout={SOURCES_LAYOUT}
-            additionalAttributes={SOURCES_ATTRS}
             fetchEntities={fetchSources}
             keyFn={(params) => [...sourcesKeyFn(params), fleetId]}
             entityAttributesAreCamelCase={false}
@@ -147,7 +146,6 @@ const FleetDetail = ({ fleetId }: Props) => {
             humanName="instances"
             entityActions={instanceActions}
             tableLayout={INSTANCES_LAYOUT}
-            additionalAttributes={INSTANCES_ATTRS}
             fetchEntities={fetchInstances}
             keyFn={(params) => [...instancesKeyFn(params), fleetId]}
             entityAttributesAreCamelCase={false}

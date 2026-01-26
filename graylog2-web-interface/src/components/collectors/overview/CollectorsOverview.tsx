@@ -26,7 +26,7 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import { useCollectorStats, fetchPaginatedSources, sourcesKeyFn } from '../hooks';
 import StatCard from '../common/StatCard';
 import sourceColumnRenderers from '../sources/ColumnRenderers';
-import { DEFAULT_LAYOUT as SOURCES_LAYOUT, ADDITIONAL_ATTRIBUTES as SOURCES_ATTRS } from '../sources/Constants';
+import { DEFAULT_LAYOUT as SOURCES_LAYOUT } from '../sources/Constants';
 import type { Source } from '../types';
 
 const StatsRow = styled(Flex)(
@@ -72,7 +72,6 @@ const CollectorsOverview = () => {
         <PaginatedEntityTable<Source>
           humanName="sources"
           tableLayout={SOURCES_LAYOUT}
-          additionalAttributes={SOURCES_ATTRS}
           fetchEntities={fetchSources}
           keyFn={sourcesKeyFn}
           entityAttributesAreCamelCase={false}

@@ -26,6 +26,3 @@ export const DEFAULT_LAYOUT = {
   defaultColumnOrder: ['name', 'description', 'target_version', 'created_at'],
 };
 
-export const ADDITIONAL_ATTRIBUTES = [
-  { id: 'target_version', title: 'Target Version' },
-];

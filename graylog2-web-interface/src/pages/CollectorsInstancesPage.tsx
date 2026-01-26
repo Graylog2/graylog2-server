@@ -33,7 +33,7 @@ import {
 import type { CollectorInstanceView } from 'components/collectors/types';
 import customColumnRenderers from 'components/collectors/instances/ColumnRenderers';
 import useTableElements from 'components/collectors/instances/useTableElements';
-import { DEFAULT_LAYOUT, ADDITIONAL_ATTRIBUTES } from 'components/collectors/instances/Constants';
+import { DEFAULT_LAYOUT } from 'components/collectors/instances/Constants';
 
 const CollectorsInstancesPage = () => {
   const [selectedInstance, setSelectedInstance] = useState<CollectorInstanceView | null>(null);
@@ -79,7 +79,6 @@ const CollectorsInstancesPage = () => {
             humanName="instances"
             entityActions={entityActions}
             tableLayout={DEFAULT_LAYOUT}
-            additionalAttributes={ADDITIONAL_ATTRIBUTES}
             fetchEntities={fetchEntities}
             keyFn={instancesKeyFn}
             entityAttributesAreCamelCase={false}

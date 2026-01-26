@@ -28,7 +28,7 @@ import { FleetFormModal } from 'components/collectors/fleets';
 import { fetchPaginatedFleets, fleetsKeyFn } from 'components/collectors/hooks';
 import type { Fleet } from 'components/collectors/types';
 import customColumnRenderers from 'components/collectors/fleets/ColumnRenderers';
-import { DEFAULT_LAYOUT, ADDITIONAL_ATTRIBUTES } from 'components/collectors/fleets/Constants';
+import { DEFAULT_LAYOUT } from 'components/collectors/fleets/Constants';
 
 const CollectorsFleetsPage = () => {
   const [showFleetModal, setShowFleetModal] = useState(false);
@@ -64,7 +64,6 @@ const CollectorsFleetsPage = () => {
           <PaginatedEntityTable<Fleet>
             humanName="fleets"
             tableLayout={DEFAULT_LAYOUT}
-            additionalAttributes={ADDITIONAL_ATTRIBUTES}
             fetchEntities={fetchEntities}
             keyFn={fleetsKeyFn}
             entityAttributesAreCamelCase={false}

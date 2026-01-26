@@ -26,8 +26,3 @@ export const DEFAULT_LAYOUT = {
   defaultColumnOrder: ['status', 'hostname', 'os', 'fleet_id', 'last_seen', 'version'],
 };
 
-export const ADDITIONAL_ATTRIBUTES = [
-  { id: 'status', title: 'Status' },
-  { id: 'os', title: 'OS' },
-  { id: 'fleet_id', title: 'Fleet' },
-];
