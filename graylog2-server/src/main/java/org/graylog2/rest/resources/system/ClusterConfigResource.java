@@ -134,7 +134,7 @@ public class ClusterConfigResource extends RestResource {
         final Object preparedConfig;
         final Object existingConfig = clusterConfigService.get(cls);
         if (existingConfig != null && updatedConfigObject instanceof EncryptedConfigUpdatePreparation encryptedConfig) {
-            preparedConfig = encryptedConfig.prepareConfigUpdate(existingConfig, updatedConfigObject);
+            preparedConfig = encryptedConfig.prepareConfigUpdate(existingConfig);
         } else {
             preparedConfig = updatedConfigObject;
         }

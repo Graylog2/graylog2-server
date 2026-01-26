@@ -160,7 +160,7 @@ public abstract class GeoIpResolverConfig implements EncryptedConfigUpdatePrepar
     }
 
     @Override
-    public Object prepareConfigUpdate(Object existingConfig, Object newConfig) {
+    public Object prepareConfigUpdate(Object existingConfig) {
         if (this.azureAccountKey() == null) {
             return this;
         }
