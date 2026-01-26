@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @ts-nocheck
+
 import * as React from 'react';
 import { useState, useCallback, useMemo } from 'react';
 import styled, { css } from 'styled-components';
@@ -27,12 +27,11 @@ import EventListItem from 'components/events/bulk-replay/EventListItem';
 import useSelectedEvents from 'components/events/bulk-replay/useSelectedEvents';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 import type { RemainingBulkActionsProps } from 'components/events/bulk-replay/types';
-import { Icon } from 'components/common';
+import { Icon, IconButton } from 'components/common';
 import useEventBulkActions from 'components/events/events/hooks/useEventBulkActions';
 import Popover from 'components/common/Popover';
 import { REPLAY_SESSION_ID_PARAM } from 'components/events/Constants';
 import useRoutingQuery from 'routing/useQuery';
-import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 
 import DropdownButton from '../../bootstrap/DropdownButton';
@@ -66,7 +65,7 @@ const ActionsBar = styled(ButtonToolbar)`
 `;
 
 type Props = {
-  BulkActions?: React.ComponentType<RemainingBulkActionsProps>;
+  onClose: () => void;
 };
 
 const useEventsById = (eventIds: Array<string>) =>
@@ -93,12 +92,12 @@ const RemainingBulkActions = ({ completed, events }: RemainingBulkActionsProps) 
   );
 };
 
-const CurentContainer = styled.div(
-  () => css`
+const CurrentContainer = styled.div(
+  ({ theme }) => css`
     display: flex;
-    gap: 0;
     align-items: center;
     justify-content: space-between;
+    padding-right: ${theme.spacings.md};
   `,
 );
 
@@ -110,14 +109,22 @@ const ArrowButton = styled(Button)`
 const TargetContainer = styled.div`
   flex-grow: 1;
 `;
-const InfoBarBulkEventReplay = ({ BulkActions = RemainingBulkActions }: Props) => {
+
+const CollapseButton = styled(IconButton)(
+  () => css`
+    position: absolute;
+    right: 0;
+    align-self: flex-start;
+  `,
+);
+const SidebarBulkEventReplay = ({ onClose }: Props) => {
   const params = useRoutingQuery();
   const replaySessionId = params[REPLAY_SESSION_ID_PARAM];
   const initialEventIds: Array<string> = Store.sessionGet(replaySessionId);
   const { data: _events } = useEventsById(initialEventIds);
 
   const [events] = useState(_events);
-  const { eventIds, selectedId, removeItem, selectItem, markItemAsDone } = useSelectedEvents(initialEventIds);
+  const { eventIds, selectedId, removeItem, selectItem, markItemAsDone } = useSelectedEvents();
   const total = eventIds.length;
   const completed = eventIds.filter((event) => event.status === 'DONE').length;
   const remainingEvents = eventIds.map((eventId) => events[eventId.id]?.event);
@@ -135,7 +142,7 @@ const InfoBarBulkEventReplay = ({ BulkActions = RemainingBulkActions }: Props) =
   const status = eventIds?.find((state) => state.id === selectedId)?.status;
 
   return (
-    <CurentContainer>
+    <CurrentContainer>
       <ArrowButton onClick={onGoBack} disabled={curIndex === 0}>
         <Icon name="keyboard_arrow_left" />
       </ArrowButton>
@@ -179,7 +186,7 @@ const InfoBarBulkEventReplay = ({ BulkActions = RemainingBulkActions }: Props) =
                 ))}
               </StyledList>
               <ActionsBar>
-                <BulkActions events={remainingEvents} completed={total > 0 && total === completed} />
+                <RemainingBulkActions events={remainingEvents} completed={total > 0 && total === completed} />
               </ActionsBar>
             </EventsListSidebar>
           </Container>
@@ -188,16 +195,9 @@ const InfoBarBulkEventReplay = ({ BulkActions = RemainingBulkActions }: Props) =
       <ArrowButton onClick={onGoForward} disabled={curIndex === eventIds.length - 1}>
         <Icon name="keyboard_arrow_right" />
       </ArrowButton>
-    </CurentContainer>
+      <CollapseButton name="keyboard_tab_rtl" title="Collapse sidebar" onClick={onClose} />
+    </CurrentContainer>
   );
 };
 
-const ReplayEventIdRenderer = ({ eventId = null }: { eventId?: string }) => {
-  const isFromBulkAction = location.pathname === Routes.ALERTS.BULK_REPLAY_SEARCH;
-
-  if (isFromBulkAction) return <InfoBarBulkEventReplay />;
-
-  return eventId;
-};
-
-export default ReplayEventIdRenderer;
+export default SidebarBulkEventReplay;

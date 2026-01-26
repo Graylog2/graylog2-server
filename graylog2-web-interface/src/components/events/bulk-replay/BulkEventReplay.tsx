@@ -91,7 +91,7 @@ const replaySection: SidebarSection = {
 const searchPageLayout = {
   sidebar: {
     isShown: true,
-    title: <ReplayEventIdRenderer />,
+    title: ReplayEventIdRenderer,
     sections: [replaySection, ...sidebarSections],
     contentColumnWidth: 350,
   },
