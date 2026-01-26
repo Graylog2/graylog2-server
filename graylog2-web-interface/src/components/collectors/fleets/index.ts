@@ -16,3 +16,4 @@
  */
 export { default as FleetList } from './FleetList';
 export { default as FleetDetail } from './FleetDetail';
+export { default as FleetFormModal } from './FleetFormModal';
