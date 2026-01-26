@@ -36,74 +36,45 @@ describe('useSendFavoriteFieldTelemetry', () => {
   });
 
   it('should send telemetry with widget type when widget context exists', () => {
-    const mockWidget = Widget.builder()
-      .id('widget-id')
-      .type('MESSAGES')
-      .config({})
-      .build();
+    const mockWidget = Widget.builder().id('widget-id').type('MESSAGES').config({}).build();
 
-    const wrapper = ({ children }) => (
-      <WidgetContext.Provider value={mockWidget}>
-        {children}
-      </WidgetContext.Provider>
-    );
+    const wrapper = ({ children }) => <WidgetContext.Provider value={mockWidget}>{children}</WidgetContext.Provider>;
 
     const { result } = renderHook(() => useSendFavoriteFieldTelemetry(), { wrapper });
 
     result.current('TOGGLED', { app_action_value: 'add' });
 
-    expect(mockSendTelemetry).toHaveBeenCalledWith(
-      TELEMETRY_EVENT_TYPE.FAVORITE_FIELDS.TOGGLED,
-      {
-        app_section: 'MESSAGES',
-        app_action_value: 'add',
-      },
-    );
+    expect(mockSendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.FAVORITE_FIELDS.TOGGLED, {
+      app_section: 'MESSAGES',
+      app_action_value: 'add',
+    });
   });
 
   it('should send telemetry without widget type when widget context is permalink', () => {
-    const wrapper = ({ children }) => (
-      <WidgetContext.Provider value={undefined}>
-        {children}
-      </WidgetContext.Provider>
-    );
+    const wrapper = ({ children }) => <WidgetContext.Provider value={undefined}>{children}</WidgetContext.Provider>;
 
     const { result } = renderHook(() => useSendFavoriteFieldTelemetry(), { wrapper });
 
     result.current('TOGGLED', { app_action_value: 'remove' });
 
-    expect(mockSendTelemetry).toHaveBeenCalledWith(
-      TELEMETRY_EVENT_TYPE.FAVORITE_FIELDS.TOGGLED,
-      {
-        app_section: 'permalink',
-        app_action_value: 'remove',
-      },
-    );
+    expect(mockSendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.FAVORITE_FIELDS.TOGGLED, {
+      app_section: 'permalink',
+      app_action_value: 'remove',
+    });
   });
 
   it('should send telemetry without extra parameters when not provided', () => {
-    const mockWidget = Widget.builder()
-      .id('widget-id')
-      .type('AGGREGATION')
-      .config({})
-      .build();
+    const mockWidget = Widget.builder().id('widget-id').type('AGGREGATION').config({}).build();
 
-    const wrapper = ({ children }) => (
-      <WidgetContext.Provider value={mockWidget}>
-        {children}
-      </WidgetContext.Provider>
-    );
+    const wrapper = ({ children }) => <WidgetContext.Provider value={mockWidget}>{children}</WidgetContext.Provider>;
 
     const { result } = renderHook(() => useSendFavoriteFieldTelemetry(), { wrapper });
 
     result.current('EDIT_SAVED');
 
-    expect(mockSendTelemetry).toHaveBeenCalledWith(
-      TELEMETRY_EVENT_TYPE.FAVORITE_FIELDS.EDIT_SAVED,
-      {
-        app_section: 'AGGREGATION',
-      },
-    );
+    expect(mockSendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.FAVORITE_FIELDS.EDIT_SAVED, {
+      app_section: 'AGGREGATION',
+    });
   });
 
   it('should handle missing widget context gracefully (permalink scenario)', () => {
@@ -115,12 +86,9 @@ describe('useSendFavoriteFieldTelemetry', () => {
       result.current('TOGGLED', { app_action_value: 'add' });
     }).not.toThrow();
 
-    expect(mockSendTelemetry).toHaveBeenCalledWith(
-      TELEMETRY_EVENT_TYPE.FAVORITE_FIELDS.TOGGLED,
-      {
-        app_section: 'permalink',
-        app_action_value: 'add',
-      },
-    );
+    expect(mockSendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.FAVORITE_FIELDS.TOGGLED, {
+      app_section: 'permalink',
+      app_action_value: 'add',
+    });
   });
 });

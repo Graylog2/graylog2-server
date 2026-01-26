@@ -25,17 +25,46 @@ import org.joda.time.DateTimeZone;
 
 import java.time.Duration;
 
-public record SystemJobResult(JobTriggerStatus status, Duration delay) {
+/**
+ * Result of a system job execution.
+ */
+public record SystemJobResult(JobTriggerStatus status, Duration delay, int maxRetries) {
+    /**
+     * Creates a successful job result indicating that the job has completed.
+     *
+     * @return a SystemJobResult representing a successful completion
+     */
     public static SystemJobResult success() {
-        return new SystemJobResult(JobTriggerStatus.COMPLETE, Duration.ZERO);
+        return new SystemJobResult(JobTriggerStatus.COMPLETE, Duration.ZERO, 0);
     }
 
-    public static SystemJobResult withRetry(Duration delay) {
-        return new SystemJobResult(JobTriggerStatus.RUNNABLE, delay);
+    /**
+     * Creates a job result indicating that the job should be retried after a specified delay.
+     * <p>
+     * <b>CAVEAT:</b> The current scheduler implementation only supports unlimited retries for system jobs until we
+     * implement retry tracking. Therefore, the {@code maxRetries} parameter must be set to {@code Integer.MAX_VALUE}.
+     *
+     * @param delay      the delay before retrying the job
+     * @param maxRetries the maximum number of retries allowed
+     * @return a SystemJobResult representing a retry instruction
+     */
+    public static SystemJobResult withRetry(Duration delay, int maxRetries) {
+        // Our scheduler doesn't have retry tracking for system jobs yet, so using retries other than "unlimited" is not
+        // safe at the moment.
+        // TODO: Remove this check once we have retry tracking for the scheduler in place
+        if (maxRetries != Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("Scheduler currently only supports unlimited retries for system jobs.");
+        }
+        return new SystemJobResult(JobTriggerStatus.RUNNABLE, delay, maxRetries);
     }
 
+    /**
+     * Creates a job result indicating that the job has failed with an error.
+     *
+     * @return a SystemJobResult representing an error state
+     */
     public static SystemJobResult withError() {
-        return new SystemJobResult(JobTriggerStatus.ERROR, Duration.ZERO);
+        return new SystemJobResult(JobTriggerStatus.ERROR, Duration.ZERO, 0);
     }
 
     // We made #toJobTriggerUpdate a static method inside Converter class to avoid exposing scheduler details
