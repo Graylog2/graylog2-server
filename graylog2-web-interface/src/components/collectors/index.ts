@@ -26,7 +26,6 @@ export * from './hooks';
 // Common components
 export { default as StatCard } from './common/StatCard';
 export { default as CollectorsPageNavigation } from './common/CollectorsPageNavigation';
-export { default as FilterBar } from './common/FilterBar';
 
 // Overview components
 export { default as CollectorsOverview } from './overview/CollectorsOverview';
