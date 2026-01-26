@@ -650,9 +650,10 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
             } else if (rootCause instanceof AccessDeniedException) {
                 LOG.error(UI.wallString("Unable to access file " + rootCause.getMessage()));
                 System.exit(-2);
-            } else if (rootCause instanceof UnsupportedSearchException) {
-                final SearchVersion search = ((UnsupportedSearchException) rootCause).getSearchMajorVersion();
-                LOG.error(UI.wallString("Unsupported search version: " + search, DocsHelper.PAGE_ES_VERSIONS.toString()));
+            } else if (rootCause instanceof final UnsupportedSearchException searchException) {
+                final SearchVersion search = searchException.getSearchMajorVersion();
+                final String component = searchException.getMessage();
+                LOG.error(UI.wallString("Unsupported search version: " + search + "(component: " + component + ")", DocsHelper.PAGE_ES_VERSIONS.toString()));
                 System.exit(-3);
             } else if (rootCause instanceof ElasticsearchProbeException) {
                 LOG.error(UI.wallString(rootCause.getMessage(), DocsHelper.PAGE_ES_CONFIGURATION.toString()));

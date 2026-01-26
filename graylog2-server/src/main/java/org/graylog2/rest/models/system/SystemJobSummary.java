@@ -18,6 +18,7 @@ package org.graylog2.rest.models.system;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.scheduler.JobTriggerStatus;
@@ -64,6 +65,11 @@ public abstract class SystemJobSummary {
 
     @JsonProperty("job_status")
     public abstract JobTriggerStatus jobStatus();
+
+    @JsonIgnore
+    public String jobType() {
+        return name();
+    }
 
     public static SystemJobSummary create(@JsonProperty("id") String id,
                                           @JsonProperty("description") String description,

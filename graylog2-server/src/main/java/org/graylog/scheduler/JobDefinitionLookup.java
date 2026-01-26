@@ -14,18 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2.testing;
+package org.graylog.scheduler;
 
-import org.graylog.testing.completebackend.SearchServerBuilder;
-import org.graylog.testing.completebackend.SearchServerInterfaceProvider;
-import org.graylog2.storage.SearchVersion;
+import jakarta.annotation.Nonnull;
 
-public class DatanodeInstanceProvider implements SearchServerInterfaceProvider {
-    @Override
-    public SearchServerBuilder<?> getBuilderFor(final SearchVersion version) {
-        if (version.isDataNode()) {
-            return new DatanodeInstanceBuilder(version);
-        }
-        return null;
-    }
+import java.util.Optional;
+
+/**
+ * Lookup service for job definitions.
+ */
+public interface JobDefinitionLookup {
+    /**
+     * Lookup a job definition by its ID.
+     *
+     * @param jobDefinitionId ID of the job definition to look up.
+     * @return An Optional containing the job definition if found, or empty if not found.
+     */
+    Optional<JobDefinitionDto> lookup(@Nonnull String jobDefinitionId);
 }
