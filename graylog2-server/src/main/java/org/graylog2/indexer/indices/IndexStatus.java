@@ -14,18 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2.testing;
+package org.graylog2.indexer.indices;
 
-import org.graylog.testing.completebackend.SearchServerBuilder;
-import org.graylog.testing.completebackend.SearchServerInterfaceProvider;
-import org.graylog2.storage.SearchVersion;
-
-public class DatanodeInstanceProvider implements SearchServerInterfaceProvider {
-    @Override
-    public SearchServerBuilder<?> getBuilderFor(final SearchVersion version) {
-        if (version.isDataNode()) {
-            return new DatanodeInstanceBuilder(version);
-        }
-        return null;
-    }
+public enum IndexStatus {
+    OPEN,
+    CLOSED // for ES/OS1/OS2 the status is called "close", for ES3 it's called "closed". Let's leave the decision to the storage module
 }

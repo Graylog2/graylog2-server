@@ -82,5 +82,10 @@
             <artifactId>graylog-storage-opensearch2</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.graylog</groupId>
+            <artifactId>graylog-storage-opensearch3</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>
