@@ -47,8 +47,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static org.graylog.plugins.views.search.engine.IndexerGeneratedQueryContext.CONTEXT_KEY_ROW_BUCKET;
-
 public class ESPivot implements ESSearchTypeHandler<Pivot> {
     private static final Logger LOG = LoggerFactory.getLogger(ESPivot.class);
     private static final String AGG_NAME = "agg";
@@ -201,7 +199,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                         processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), rowBucket, true, "row-leaf");
                     }
                     if (!pivot.columnGroups().isEmpty()) {
-                        queryContext.contextMap().put(CONTEXT_KEY_ROW_BUCKET, rowBucket);
+                        queryContext.storeCurrentRowBucket(rowBucket);
                         try {
                             retrieveBuckets(pivot, pivot.columnGroups(), rowBucket)
                                     .forEach(columnBucketTuple -> {
@@ -213,7 +211,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                                         processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
                                     });
                         } finally {
-                            queryContext.contextMap().remove(CONTEXT_KEY_ROW_BUCKET);
+                            queryContext.removeCurrentRowBucket();
                         }
                     }
                     resultBuilder.addRow(rowBuilder.build());

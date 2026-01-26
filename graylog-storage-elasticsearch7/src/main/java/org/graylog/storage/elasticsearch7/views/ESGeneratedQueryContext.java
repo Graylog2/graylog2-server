@@ -24,6 +24,7 @@ import org.graylog.plugins.views.search.engine.IndexerGeneratedQueryContext;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.joda.time.DateTimeZone;
 
@@ -31,7 +32,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class ESGeneratedQueryContext extends IndexerGeneratedQueryContext<SearchSourceBuilder> {
+public class ESGeneratedQueryContext extends IndexerGeneratedQueryContext<SearchSourceBuilder, MultiBucketsAggregation.Bucket> {
 
     private final ElasticsearchBackend elasticsearchBackend;
 

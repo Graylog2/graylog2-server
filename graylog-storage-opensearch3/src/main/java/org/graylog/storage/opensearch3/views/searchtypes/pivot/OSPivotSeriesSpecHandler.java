@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 public abstract class OSPivotSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGGREGATION_RESULT extends Aggregation>
         implements SeriesSpecHandler<SPEC_TYPE, SeriesAggregationBuilder, SearchResponse, AGGREGATION_RESULT, OSGeneratedQueryContext> {
 
-    public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations currentAggregationOrBucket, IndexerGeneratedQueryContext<?> queryContext) {
+    public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations currentAggregationOrBucket, IndexerGeneratedQueryContext<?, ?> queryContext) {
         final String aggName = queryContext.getAggNameForPivotSpecFromContext(pivot, spec);
         return currentAggregationOrBucket.getAggregations().get(aggName);
     }

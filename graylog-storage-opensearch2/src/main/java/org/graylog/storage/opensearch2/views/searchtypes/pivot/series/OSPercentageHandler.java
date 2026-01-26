@@ -43,8 +43,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static org.graylog.plugins.views.search.engine.IndexerGeneratedQueryContext.CONTEXT_KEY_ROW_BUCKET;
-
 public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage, ValueCount> {
     private static final Logger LOG = LoggerFactory.getLogger(OSCountHandler.class);
     private final OSCountHandler osCountHandler;
@@ -122,7 +120,7 @@ public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage, Va
             value = valueCount.getValue();
         }
 
-        var initialBucket = (HasAggregations) osGeneratedQueryContext.contextMap().getOrDefault(CONTEXT_KEY_ROW_BUCKET, InitialBucket.create(searchResult));
+        var initialBucket = osGeneratedQueryContext.getCurrentRowBucket().orElse(InitialBucket.create(searchResult));
         var rootResult = extractNestedSeriesAggregation(pivot, percentage, initialBucket, osGeneratedQueryContext);
         var nestedSeriesResult = handleNestedSeriesResults(pivot, percentage, searchResult, rootResult, osGeneratedQueryContext);
 
@@ -133,7 +131,7 @@ public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage, Va
                 .map(bucketPercentage -> Value.create(percentage.id(), Percentage.NAME, bucketPercentage));
     }
 
-    private Aggregation extractNestedSeriesAggregation(Pivot pivot, Percentage percentage, HasAggregations aggregations, IndexerGeneratedQueryContext<?> queryContext) {
+    private Aggregation extractNestedSeriesAggregation(Pivot pivot, Percentage percentage, HasAggregations aggregations, IndexerGeneratedQueryContext<?, ?> queryContext) {
         return switch (percentage.strategy().orElse(Percentage.Strategy.COUNT)) {
             case SUM -> {
                 var seriesSpecBuilder = Sum.builder().id(percentage.id());
@@ -151,7 +149,7 @@ public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage, Va
     }
 
     @Override
-    public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, IndexerGeneratedQueryContext<?> queryContext) {
+    public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, IndexerGeneratedQueryContext<?, ?> queryContext) {
         var result = extractNestedSeriesAggregation(pivot, (Percentage) spec, aggregations, queryContext);
         if (result instanceof ValueCount) {
             return result;

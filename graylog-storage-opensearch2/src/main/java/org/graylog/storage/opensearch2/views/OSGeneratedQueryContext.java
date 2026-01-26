@@ -24,6 +24,7 @@ import org.graylog.plugins.views.search.engine.IndexerGeneratedQueryContext;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.joda.time.DateTimeZone;
 
@@ -31,7 +32,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class OSGeneratedQueryContext extends IndexerGeneratedQueryContext<SearchSourceBuilder> {
+public class OSGeneratedQueryContext extends IndexerGeneratedQueryContext<SearchSourceBuilder, MultiBucketsAggregation.Bucket> {
     private final OpenSearchBackend openSearchBackend;
 
     @AssistedInject

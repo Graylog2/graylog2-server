@@ -29,9 +29,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public abstract class IndexerGeneratedQueryContext<S> implements GeneratedQueryContext {
+public abstract class IndexerGeneratedQueryContext<S, H> implements GeneratedQueryContext {
 
-    public static final String CONTEXT_KEY_ROW_BUCKET = "currentRowBucket";
+    private static final String CONTEXT_KEY_ROW_BUCKET = "currentRowBucket";
 
     protected final Map<Object, Object> contextMap;
     protected final Set<SearchError> errors;
@@ -56,6 +56,18 @@ public abstract class IndexerGeneratedQueryContext<S> implements GeneratedQueryC
 
     public Optional<String> fieldType(final Set<String> streamIds, final String field) {
         return fieldTypes.getType(streamIds, field);
+    }
+
+    public Optional<H> getCurrentRowBucket() {
+        return Optional.ofNullable((H) contextMap.get(CONTEXT_KEY_ROW_BUCKET));
+    }
+
+    public void storeCurrentRowBucket(final H bucket) {
+        contextMap.put(CONTEXT_KEY_ROW_BUCKET, bucket);
+    }
+
+    public void removeCurrentRowBucket() {
+        contextMap.remove(CONTEXT_KEY_ROW_BUCKET);
     }
 
     public Map<String, S> searchTypeQueries() {

@@ -47,7 +47,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static org.graylog.plugins.views.search.engine.IndexerGeneratedQueryContext.CONTEXT_KEY_ROW_BUCKET;
 
 public class OSPivot implements OSSearchTypeHandler<Pivot> {
     private static final Logger LOG = LoggerFactory.getLogger(OSPivot.class);
@@ -204,7 +203,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
                         processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), rowBucket, true, "row-leaf");
                     }
                     if (!pivot.columnGroups().isEmpty()) {
-                        queryContext.contextMap().put(CONTEXT_KEY_ROW_BUCKET, rowBucket);
+                        queryContext.storeCurrentRowBucket(rowBucket);
                         try {
                             retrieveBuckets(pivot, pivot.columnGroups(), rowBucket)
                                     .forEach(columnBucketTuple -> {
@@ -216,7 +215,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
                                         processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
                                     });
                         } finally {
-                            queryContext.contextMap().remove(CONTEXT_KEY_ROW_BUCKET);
+                            queryContext.removeCurrentRowBucket();
                         }
                     }
                     resultBuilder.addRow(rowBuilder.build());
