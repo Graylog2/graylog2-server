@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Tabs, Flex, Badge } from '@mantine/core';
+import { Tabs, Flex, Badge, Group, Button } from '@mantine/core';
 
 import { Spinner } from 'components/common';
 
@@ -24,6 +25,8 @@ import { useFleet, useFleetStats, useInstances, useSources } from '../hooks';
 import StatCard from '../common/StatCard';
 import SourcesTable from '../overview/SourcesTable';
 import InstanceList from '../instances/InstanceList';
+import { SourceFormModal } from '../sources';
+import type { Source } from '../types';
 
 type Props = {
   fleetId: string;
@@ -49,6 +52,13 @@ const FleetDetail = ({ fleetId }: Props) => {
   const { data: stats, isLoading: statsLoading } = useFleetStats(fleetId);
   const { data: instances } = useInstances(fleetId);
   const { data: sources } = useSources(fleetId);
+  const [showSourceModal, setShowSourceModal] = useState(false);
+
+  const handleSaveSource = (source: Omit<Source, 'id'>) => {
+    // Mock save - in real implementation this would call an API
+    // eslint-disable-next-line no-console
+    console.log('Saving source:', source);
+  };
 
   if (fleetLoading || statsLoading) {
     return <Spinner />;
@@ -82,6 +92,9 @@ const FleetDetail = ({ fleetId }: Props) => {
         </Tabs.List>
 
         <Tabs.Panel value="sources" pt="md">
+          <Group justify="flex-end" mb="md">
+            <Button onClick={() => setShowSourceModal(true)}>Add Source</Button>
+          </Group>
           <SourcesTable sources={sources || []} fleetNames={fleetNames} />
         </Tabs.Panel>
 
@@ -93,6 +106,13 @@ const FleetDetail = ({ fleetId }: Props) => {
           <p>Fleet settings coming soon...</p>
         </Tabs.Panel>
       </Tabs>
+      {showSourceModal && (
+        <SourceFormModal
+          fleetId={fleetId}
+          onClose={() => setShowSourceModal(false)}
+          onSave={handleSaveSource}
+        />
+      )}
     </div>
   );
 };
