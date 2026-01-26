@@ -15,22 +15,44 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
+import { Button, Group } from '@mantine/core';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { FleetList } from 'components/collectors/fleets';
+import { FleetList, FleetFormModal } from 'components/collectors/fleets';
 import { useFleets } from 'components/collectors/hooks';
 import { CollectorsPageNavigation } from 'components/collectors/common';
+import type { Fleet } from 'components/collectors/types';
 
 const CollectorsFleetsPage = () => {
   const { data: fleets, isLoading } = useFleets();
+  const [showFleetModal, setShowFleetModal] = useState(false);
+
+  const handleSaveFleet = (fleet: Omit<Fleet, 'id' | 'created_at' | 'updated_at'>) => {
+    // Mock save - in real implementation this would call an API
+    // eslint-disable-next-line no-console
+    console.log('Saving fleet:', fleet);
+  };
 
   return (
     <DocumentTitle title="Collector Fleets">
       <CollectorsPageNavigation />
-      <PageHeader title="Fleets">
+      <PageHeader title="Fleets"
+        actions={(
+          <Group>
+            <Button onClick={() => setShowFleetModal(true)}>Add Fleet</Button>
+          </Group>
+        )}>
         <span>Manage collector fleets and their configurations.</span>
       </PageHeader>
       {isLoading ? <Spinner /> : <FleetList fleets={fleets || []} />}
+
+      {showFleetModal && (
+        <FleetFormModal
+          onClose={() => setShowFleetModal(false)}
+          onSave={handleSaveFleet}
+        />
+      )}
     </DocumentTitle>
   );
 };
