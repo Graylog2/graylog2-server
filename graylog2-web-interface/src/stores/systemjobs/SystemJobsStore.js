@@ -61,7 +61,7 @@ export const SystemJobsStore = singletonStore('core.SystemJobs', () =>
         },
         () => {
           // If we get an error (probably 404 because the job is gone), remove the job from the cache and trigger an update.
-          const { [jobId]: currentJob, ...rest } = this.jobsById;
+          const { [jobId]: _, ...rest } = this.jobsById;
 
           this.jobsById = rest;
           this.trigger({ jobsById: this.jobsById });
@@ -72,7 +72,7 @@ export const SystemJobsStore = singletonStore('core.SystemJobs', () =>
     },
     acknowledgeJob(jobId) {
       const url = URLUtils.qualifyUrl(ApiRoutes.SystemJobsApiController.acknowledgeJob(jobId).url);
-      const promise = fetch('DELETE', url).then((response) => {
+      const promise = fetch('DELETE', url).then(() => {
         delete this.jobsById[jobId];
       });
 
