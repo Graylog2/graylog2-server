@@ -24,10 +24,13 @@ import org.testcontainers.containers.Network;
 
 public class AzuriteContainer extends GenericContainer<AzuriteContainer> {
 
-    private static final String IMAGE_NAME = "mcr.microsoft.com/azure-storage/azurite";
-    private static final int PORT = 10000;
+    private static final String IMAGE_NAME = "mcr.microsoft.com/azure-storage/azurite:3.35.0";
+    public static final int PORT = 10000;
     private final Network network;
 
+    public static final String ACCOUNT_NAME = "devstoreaccount1";
+    public static final String ACCOUNT_KEY = "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==";
+    public static final String BLOB_HOST = ACCOUNT_NAME + ".blob.localhost";
 
     public AzuriteContainer() {
         super(IMAGE_NAME);
@@ -40,9 +43,9 @@ public class AzuriteContainer extends GenericContainer<AzuriteContainer> {
 
     private String createConnectionString() {
         return "DefaultEndpointsProtocol=http;"
-                + "AccountName=devstoreaccount1;"
-                + "AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;"
-                + "BlobEndpoint=http://%s:%d/devstoreaccount1;".formatted(getHost(), getMappedPort(PORT));
+                + "AccountName=" + ACCOUNT_NAME + ";"
+                + "AccountKey=" + ACCOUNT_KEY + ";"
+                + "BlobEndpoint=http://" + BLOB_HOST + ":" + getMappedPort(PORT) + ";";
     }
 
     public BlobServiceClient createBlobServiceClient() {
