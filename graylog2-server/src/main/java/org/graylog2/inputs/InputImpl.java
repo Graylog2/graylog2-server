@@ -92,7 +92,7 @@ public abstract class InputImpl implements Input, MongoEntity {
             return Map.of();
         }
 
-        final Map<String, String> result = new LinkedHashMap<>();
+        final Map<String, String> result = new LinkedHashMap<>(embeddedStaticFields.size());
 
         for (Map<String, String> map : embeddedStaticFields) {
             final String key = map.get(FIELD_STATIC_FIELD_KEY);
