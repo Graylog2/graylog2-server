@@ -16,8 +16,10 @@
  */
 package org.graylog2.opamp.transport;
 
+import com.github.joschi.jadconfig.util.Size;
 import com.google.protobuf.InvalidProtocolBufferException;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import opamp.proto.Opamp.AgentToServer;
 import opamp.proto.Opamp.ServerErrorResponse;
@@ -43,20 +45,16 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class OpAmpHttpHandler extends HttpHandler {
     private static final Logger LOG = LoggerFactory.getLogger(OpAmpHttpHandler.class);
     private static final String CONTENT_TYPE_PROTOBUF = "application/x-protobuf";
-    static final int DEFAULT_MAX_MESSAGE_SIZE = 10 * 1024 * 1024; // 10 MB
 
     private final OpAmpService opAmpService;
     private final ExecutorService executor;
     private final int maxMessageSize;
 
     @Inject
-    public OpAmpHttpHandler(OpAmpService opAmpService) {
-        this(opAmpService, DEFAULT_MAX_MESSAGE_SIZE);
-    }
-
-    OpAmpHttpHandler(OpAmpService opAmpService, int maxMessageSize) {
+    public OpAmpHttpHandler(OpAmpService opAmpService,
+                            @Named("opamp_max_request_body_size") Size maxRequestBodySize) {
         this.opAmpService = opAmpService;
-        this.maxMessageSize = maxMessageSize;
+        this.maxMessageSize = (int) maxRequestBodySize.toBytes();
         this.executor = Executors.newVirtualThreadPerTaskExecutor();
     }
 

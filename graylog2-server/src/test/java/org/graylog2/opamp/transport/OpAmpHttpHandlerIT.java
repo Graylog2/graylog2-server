@@ -16,6 +16,7 @@
  */
 package org.graylog2.opamp.transport;
 
+import com.github.joschi.jadconfig.util.Size;
 import com.google.protobuf.ByteString;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -57,7 +58,7 @@ class OpAmpHttpHandlerIT {
         httpServer = HttpServer.createSimpleServer(null, port);
 
         opAmpService = mock(OpAmpService.class);
-        final OpAmpHttpHandler handler = new OpAmpHttpHandler(opAmpService, TEST_MAX_MESSAGE_SIZE);
+        final OpAmpHttpHandler handler = new OpAmpHttpHandler(opAmpService, Size.bytes(TEST_MAX_MESSAGE_SIZE));
         httpServer.getServerConfiguration().addHttpHandler(handler, "/opamp");
 
         httpServer.start();
