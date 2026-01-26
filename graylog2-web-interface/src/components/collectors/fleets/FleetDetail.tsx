@@ -15,20 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import styled, { css } from 'styled-components';
-import { Tabs, Flex, Badge, Group, Button } from '@mantine/core';
+import { Tabs, Flex, Badge, Button, Group } from '@mantine/core';
 
 import { Spinner } from 'components/common';
+import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
+import type { SearchParams } from 'stores/PaginationTypes';
 
-import FleetSettings from './FleetSettings';
-
-import { useFleet, useFleetStats, useInstances, useSources } from '../hooks';
+import { useFleet, useFleetStats, useSources, fetchPaginatedSources, sourcesKeyFn, fetchPaginatedInstances, instancesKeyFn } from '../hooks';
 import StatCard from '../common/StatCard';
-import SourcesTable from '../overview/SourcesTable';
-import InstanceList from '../instances/InstanceList';
+import { InstanceDetailDrawer } from '../instances';
+import instanceColumnRenderers from '../instances/ColumnRenderers';
+import { DEFAULT_LAYOUT as INSTANCES_LAYOUT, ADDITIONAL_ATTRIBUTES as INSTANCES_ATTRS } from '../instances/Constants';
+import sourceColumnRenderers from '../sources/ColumnRenderers';
+import { DEFAULT_LAYOUT as SOURCES_LAYOUT, ADDITIONAL_ATTRIBUTES as SOURCES_ATTRS } from '../sources/Constants';
 import { SourceFormModal } from '../sources';
-import type { Source } from '../types';
+import FleetSettings from './FleetSettings';
+import type { CollectorInstanceView, Source } from '../types';
 
 type Props = {
   fleetId: string;
@@ -52,15 +56,40 @@ const StatsRow = styled(Flex)(
 const FleetDetail = ({ fleetId }: Props) => {
   const { data: fleet, isLoading: fleetLoading } = useFleet(fleetId);
   const { data: stats, isLoading: statsLoading } = useFleetStats(fleetId);
-  const { data: instances } = useInstances(fleetId);
   const { data: sources } = useSources(fleetId);
   const [showSourceModal, setShowSourceModal] = useState(false);
+  const [selectedInstance, setSelectedInstance] = useState<CollectorInstanceView | null>(null);
 
-  const handleSaveSource = (source: Omit<Source, 'id'>) => {
-    // Mock save - in real implementation this would call an API
-    // eslint-disable-next-line no-console
-    console.log('Saving source:', source);
-  };
+  const fleetNames = useMemo(() => (fleet ? { [fleet.id]: fleet.name } : {}), [fleet]);
+
+  const instanceRenderers = useMemo(
+    () => instanceColumnRenderers({ fleetNames }),
+    [fleetNames],
+  );
+
+  const sourceRenderers = useMemo(() => sourceColumnRenderers(), []);
+
+  const fetchInstances = useCallback(
+    (searchParams: SearchParams) => fetchPaginatedInstances(searchParams, fleetId),
+    [fleetId],
+  );
+
+  const fetchSources = useCallback(
+    (searchParams: SearchParams) => fetchPaginatedSources(searchParams, fleetId),
+    [fleetId],
+  );
+
+  const instanceActions = useCallback(
+    (instance: CollectorInstanceView) => (
+      <Button variant="subtle" size="xs" onClick={() => setSelectedInstance(instance)}>
+        Details
+      </Button>
+    ),
+    [],
+  );
+
+  const getSourcesForInstance = (instance: CollectorInstanceView) =>
+    (sources || []).filter((s) => s.fleet_id === instance.fleet_id);
 
   if (fleetLoading || statsLoading) {
     return <Spinner />;
@@ -70,7 +99,10 @@ const FleetDetail = ({ fleetId }: Props) => {
     return <div>Fleet not found</div>;
   }
 
-  const fleetNames = { [fleet.id]: fleet.name };
+  const handleSaveSource = (source: Omit<Source, 'id'>) => {
+    // eslint-disable-next-line no-console
+    console.log('Saving source:', source);
+  };
 
   return (
     <div>
@@ -89,7 +121,7 @@ const FleetDetail = ({ fleetId }: Props) => {
       <Tabs defaultValue="sources">
         <Tabs.List>
           <Tabs.Tab value="sources">Sources</Tabs.Tab>
-          <Tabs.Tab value="instances">Instances ({instances?.length || 0})</Tabs.Tab>
+          <Tabs.Tab value="instances">Instances</Tabs.Tab>
           <Tabs.Tab value="settings">Settings</Tabs.Tab>
         </Tabs.List>
 
@@ -97,29 +129,56 @@ const FleetDetail = ({ fleetId }: Props) => {
           <Group justify="flex-end" mb="md">
             <Button onClick={() => setShowSourceModal(true)}>Add Source</Button>
           </Group>
-          <SourcesTable sources={sources || []} fleetNames={fleetNames} />
+          <PaginatedEntityTable<Source>
+            humanName="sources"
+            tableLayout={SOURCES_LAYOUT}
+            additionalAttributes={SOURCES_ATTRS}
+            fetchEntities={fetchSources}
+            keyFn={(params) => [...sourcesKeyFn(params), fleetId]}
+            entityAttributesAreCamelCase={false}
+            columnRenderers={sourceRenderers}
+            entityActions={() => null}
+          />
         </Tabs.Panel>
 
         <Tabs.Panel value="instances" pt="md">
-          <InstanceList instances={instances || []} fleetNames={fleetNames} sources={sources || []} showStats={false} />
+          <PaginatedEntityTable<CollectorInstanceView>
+            humanName="instances"
+            entityActions={instanceActions}
+            tableLayout={INSTANCES_LAYOUT}
+            additionalAttributes={INSTANCES_ATTRS}
+            fetchEntities={fetchInstances}
+            keyFn={(params) => [...instancesKeyFn(params), fleetId]}
+            entityAttributesAreCamelCase={false}
+            columnRenderers={instanceRenderers}
+          />
         </Tabs.Panel>
 
         <Tabs.Panel value="settings" pt="md">
           <FleetSettings
             fleet={fleet}
             onSave={(updates) => {
-              // Mock save - in real implementation this would call an API
               // eslint-disable-next-line no-console
               console.log('Saving fleet updates:', updates);
             }}
           />
         </Tabs.Panel>
       </Tabs>
+
       {showSourceModal && (
         <SourceFormModal
           fleetId={fleetId}
           onClose={() => setShowSourceModal(false)}
           onSave={handleSaveSource}
+        />
+      )}
+
+      {selectedInstance && (
+        <InstanceDetailDrawer
+          instance={selectedInstance}
+          sources={getSourcesForInstance(selectedInstance)}
+          fleetName={fleetNames[selectedInstance.fleet_id] || selectedInstance.fleet_id}
+          onClose={() => setSelectedInstance(null)}
         />
       )}
     </div>
