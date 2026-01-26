@@ -22,11 +22,11 @@ import {
   TextInput,
   Textarea,
   Switch,
-  Radio,
   Group,
   Stack,
   Button,
   NumberInput,
+  Text,
 } from '@mantine/core';
 
 import Modal from 'components/bootstrap/Modal';
@@ -124,16 +124,15 @@ const SourceFormModal = ({ fleetId, source, onClose, onSave }: Props) => {
           />
         </FormSection>
         <FormSection>
-          <Radio.Group
-            label="Read Mode"
+          <Text size="sm" fw={500} mb="xs">Read Mode</Text>
+          <SegmentedControl
             value={fileConfig.read_mode}
             onChange={(v) => updateFileConfig({ read_mode: v as 'beginning' | 'end' })}
-          >
-            <Group mt="xs">
-              <Radio value="end" label="From end (tail)" />
-              <Radio value="beginning" label="From beginning" />
-            </Group>
-          </Radio.Group>
+            data={[
+              { value: 'end', label: 'From end (tail)' },
+              { value: 'beginning', label: 'From beginning' },
+            ]}
+          />
         </FormSection>
       </>
     );
@@ -190,16 +189,15 @@ const SourceFormModal = ({ fleetId, source, onClose, onSave }: Props) => {
           />
         </FormSection>
         <FormSection>
-          <Radio.Group
-            label="Framing"
+          <Text size="sm" fw={500} mb="xs">Framing</Text>
+          <SegmentedControl
             value={tcpConfig.framing}
             onChange={(v) => updateTcpConfig({ framing: v as 'newline' | 'octet_counting' })}
-          >
-            <Group mt="xs">
-              <Radio value="newline" label="Newline" />
-              <Radio value="octet_counting" label="Octet Counting" />
-            </Group>
-          </Radio.Group>
+            data={[
+              { value: 'newline', label: 'Newline' },
+              { value: 'octet_counting', label: 'Octet Counting' },
+            ]}
+          />
         </FormSection>
       </>
     );
@@ -247,28 +245,26 @@ const SourceFormModal = ({ fleetId, source, onClose, onSave }: Props) => {
           />
         </FormSection>
         <FormSection>
-          <Radio.Group
-            label="Read Mode"
+          <Text size="sm" fw={500} mb="xs">Read Mode</Text>
+          <SegmentedControl
             value={winConfig.read_mode}
             onChange={(v) => updateWindowsEventLogConfig({ read_mode: v as 'beginning' | 'end' })}
-          >
-            <Group mt="xs">
-              <Radio value="end" label="From end (tail)" />
-              <Radio value="beginning" label="From beginning" />
-            </Group>
-          </Radio.Group>
+            data={[
+              { value: 'end', label: 'From end (tail)' },
+              { value: 'beginning', label: 'From beginning' },
+            ]}
+          />
         </FormSection>
         <FormSection>
-          <Radio.Group
-            label="Event Format"
+          <Text size="sm" fw={500} mb="xs">Event Format</Text>
+          <SegmentedControl
             value={winConfig.event_format}
             onChange={(v) => updateWindowsEventLogConfig({ event_format: v as 'json' | 'xml' })}
-          >
-            <Group mt="xs">
-              <Radio value="json" label="JSON" />
-              <Radio value="xml" label="XML" />
-            </Group>
-          </Radio.Group>
+            data={[
+              { value: 'json', label: 'JSON' },
+              { value: 'xml', label: 'XML' },
+            ]}
+          />
         </FormSection>
       </>
     );
