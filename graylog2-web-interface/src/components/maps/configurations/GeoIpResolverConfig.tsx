@@ -54,7 +54,6 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
 
   const sendTelemetry = useSendTelemetry();
 
-
   const resetConfig = () => {
     setShowModal(false);
   };
@@ -67,9 +66,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
     const normalizedValues = {
       ...values,
       azure_endpoint:
-      values.azure_endpoint && values.azure_endpoint.trim() !== ''
-        ? values.azure_endpoint.trim()
-        : null,
+        values.azure_endpoint && values.azure_endpoint.trim() !== '' ? values.azure_endpoint.trim() : null,
     };
 
     return updateConfig(normalizedValues).then((value: GeoIpConfigType) => {
@@ -240,12 +237,8 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                   )}
                 </Field>
 
-                {values.pull_from_cloud === CLOUD_STORAGE_OPTION.GCS && (
-                  <GCSGeoIpFormGroup />
-                )}
-                {values.pull_from_cloud === CLOUD_STORAGE_OPTION.ABS && (
-                  <ABSGeoIpFormGroup />
-                )}
+                {values.pull_from_cloud === CLOUD_STORAGE_OPTION.GCS && <GCSGeoIpFormGroup />}
+                {values.pull_from_cloud === CLOUD_STORAGE_OPTION.ABS && <ABSGeoIpFormGroup />}
               </Modal.Body>
               <Modal.Footer>
                 <ModalSubmit

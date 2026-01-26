@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react';
 import { useFormikContext } from 'formik';
 
 import { FormikFormGroup } from 'components/common';
@@ -107,7 +107,7 @@ const ABSGeoIpFormGroup = () => {
         />
       )}
     </>
-  )
-}
+  );
+};
 
-export default ABSGeoIpFormGroup
+export default ABSGeoIpFormGroup;
