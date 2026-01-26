@@ -17,35 +17,16 @@
 import * as React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import { useFormikContext, Field } from 'formik';
-import styled from 'styled-components';
 
-import { FormikFormGroup, Select, Icon } from 'components/common';
+import { FormikFormGroup, Select } from 'components/common';
 import type { GeoIpConfigType, AzureAuthType, EncryptedValue } from 'components/maps/configurations/types';
-import { Button, Input, Table } from 'components/bootstrap';
+import { Button, Input } from 'components/bootstrap';
+import ABSAutomaticAuthInfo from 'components/maps/configurations/ABSAutomaticAuthInfo';
 
 const AZURE_AUTH_TYPE_OPTIONS = [
   { value: 'automatic', label: 'Automatic' },
   { value: 'keysecret', label: 'Key & Secret' },
 ];
-
-const SectionTitle = styled.p`
-  font-weight: bold;
-  font-size: 1.2em;
-  margin: 0 0 12px;
-`;
-
-const SectionNote = styled.p`
-  font-style: italic;
-  margin: 3px 0 0;
-`;
-
-const StyledTable = styled(Table)`
-  margin: 0;
-`;
-
-const EnvVarList = styled.div`
-  margin-top: 4px;
-`;
 
 const ABSGeoIpFormGroup = () => {
   const { values, setFieldValue } = useFormikContext<GeoIpConfigType>();
@@ -128,70 +109,7 @@ const ABSGeoIpFormGroup = () => {
           </Input>
         )}
       </Field>
-      {authType === 'automatic' && (
-        <StyledTable condensed>
-          <thead>
-            <tr>
-              <td colSpan={2}>
-                <SectionTitle>Automatic authentication will attempt each of the following in the listed order.</SectionTitle>
-              </td>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr>
-              <th>Environment</th>
-              <td>
-                Authenticates via environment variables.
-                <EnvVarList>
-                  The required environment variables for service principal authentication using client secret are as follows:{' '}
-                  <code>AZURE_CLIENT_ID</code>, <code>AZURE_CLIENT_SECRET</code>, <code>AZURE_TENANT_ID</code>
-                </EnvVarList>
-                <EnvVarList>
-                  The required environment variables for service principal authentication using client certificate are as
-                  follows: <code>AZURE_CLIENT_ID</code>, <code>AZURE_CLIENT_CERTIFICATE_PATH</code>,{' '}
-                  <code>AZURE_CLIENT_CERTIFICATE_PASSWORD</code>, <code>AZURE_TENANT_ID</code>
-                </EnvVarList>
-              </td>
-            </tr>
-            <tr>
-              <th>Workload Identity</th>
-              <td>For use on an Azure host with Workload Identity enabled.</td>
-            </tr>
-            <tr>
-              <th>Managed Identity</th>
-              <td>For use on an Azure host with Managed Identity enabled.</td>
-            </tr>
-            <tr>
-              <th>Azure CLI</th>
-              <td>Uses current Azure CLI account.</td>
-            </tr>
-            <tr>
-              <th>Broker</th>
-              <td>
-                Use the default account logged into the OS via a broker. Requires that the{' '}
-                <code>azure-identity-broker</code> package is installed.
-              </td>
-            </tr>
-          </tbody>
-
-          <tfoot>
-            <tr>
-              <td colSpan={2}>
-                <SectionNote>
-                  For more information, check out the{' '}
-                  <a
-                    href="https://learn.microsoft.com/en-us/java/api/overview/azure/identity-readme?view=azure-java-stable#defaultazurecredential"
-                    target="_blank"
-                    rel="noopener noreferrer">
-                    Azure DefaultAzureCredential Documentation <Icon name="open_in_new" />
-                  </a>
-                </SectionNote>
-              </td>
-            </tr>
-          </tfoot>
-        </StyledTable>
-      )}
+      {authType === 'automatic' && <ABSAutomaticAuthInfo />}
       {authType === 'keysecret' && (
         <>
           <FormikFormGroup

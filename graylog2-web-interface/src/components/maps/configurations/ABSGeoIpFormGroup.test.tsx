@@ -182,6 +182,7 @@ describe('ABSGeoIpFormGroup', () => {
         expect(screen.getByTestId('key-value').textContent).toContain('delete_value');
       });
 
+      await userEvent.click(screen.getByRole('button', { name: /undo reset/i }));
 
       await waitFor(() => {
         expect(screen.getByTestId('key-value').textContent).toContain('keep_value');
