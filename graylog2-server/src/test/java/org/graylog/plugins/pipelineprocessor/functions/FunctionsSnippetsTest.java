@@ -575,6 +575,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(evaluatedMessage.getField("array")).isEqualTo(Arrays.asList(1, 2, 3));
         assertThat(evaluatedMessage.getField("store")).isInstanceOf(Map.class);
         assertThat(evaluatedMessage.getField("expensive")).isEqualTo(10);
+        assertThat(evaluatedMessage.getField("escaped")).isEqualTo("a \t +");
     }
 
     @Test

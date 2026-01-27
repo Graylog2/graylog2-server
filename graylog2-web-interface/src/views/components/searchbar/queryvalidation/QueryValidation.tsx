@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useState, useRef, useCallback, useEffect, useMemo } from 'react';
+import { useContext, useState, useRef, useCallback, useEffect } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import delay from 'lodash/delay';
 import { useFormikContext } from 'formik';
@@ -204,7 +204,7 @@ const QueryValidation = ({ validationExplanations = [] }: Props) => {
   const validationState = (queryStringErrors ?? warnings?.queryString) as QueryValidationState;
 
   const { status, explanations = [] } = validationState ?? { explanations: [] };
-  const deduplicatedExplanations = useMemo(() => [...deduplicateExplanations(explanations)], [explanations]);
+  const deduplicatedExplanations = [...deduplicateExplanations(explanations)];
   const hasExplanations = validationState && validationState?.status !== 'OK';
   const isInfo = validationState && validationState.status === 'INFO';
 

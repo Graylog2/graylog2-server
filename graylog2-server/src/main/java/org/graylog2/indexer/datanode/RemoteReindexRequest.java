@@ -21,6 +21,7 @@ import jakarta.annotation.Nullable;
 import java.net.URI;
 import java.util.List;
 
+@Deprecated(forRemoval = true)
 public record RemoteReindexRequest(@Nullable String allowlist,
                                    URI uri,
                                    String username,

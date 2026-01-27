@@ -69,7 +69,7 @@ const FilterComponent = ({
         filterValueRenderer={filterValueRenderer}
         onSubmit={onSubmit}
         allActiveFilters={allActiveFilters}
-        filter={filter}
+        multiSelect={!filter}
       />
     );
   }

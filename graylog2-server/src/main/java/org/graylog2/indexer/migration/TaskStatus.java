@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 
+@Deprecated(forRemoval = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record TaskStatus(
         @JsonProperty("total") long total,

@@ -14,26 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.scheduler.eventbus;
-
-import com.codahale.metrics.MetricRegistry;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-
-/**
- * Creates a {@link JobSchedulerEventBus} instance.
- */
-public class JobSchedulerEventBusProvider implements Provider<JobSchedulerEventBus> {
-    private final MetricRegistry metricRegistry;
-
-    @Inject
-    public JobSchedulerEventBusProvider(MetricRegistry metricRegistry) {
-        this.metricRegistry = metricRegistry;
-    }
-
-    @Override
-    public JobSchedulerEventBus get() {
-        return new JobSchedulerEventBus("system", metricRegistry);
-    }
-}
+export type StreamConnectedPipeline = {
+  id: string;
+  pipeline: string;
+  pipeline_id: string;
+  rule: string;
+  rule_id: string;
+  connected_streams: Array<{
+    id: string;
+    title: string;
+  }>;
+};

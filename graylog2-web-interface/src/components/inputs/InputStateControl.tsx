@@ -77,10 +77,7 @@ const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
     openWizard();
   };
 
-  if (
-    inputSetupFeatureFlagIsEnabled &&
-    (isInputInSetupMode(inputStates, input.id) || isInitialUnknownState)
-  ) {
+  if (inputSetupFeatureFlagIsEnabled && (isInputInSetupMode(inputStates, input.id) || isInitialUnknownState)) {
     return (
       <Button bsStyle="warning" bsSize="xsmall" onClick={setupInput}>
         Set-up Input

@@ -75,6 +75,11 @@ public class MongoDbPipelineMetadataService {
                 .collect(Collectors.toMap(PipelineRulesMetadataDao::pipelineId, dao -> dao));
     }
 
+    public Set<PipelineRulesMetadataDao> getRoutingPipelines(String streamId) {
+        return collection.find(Filters.exists(PipelineRulesMetadataDao.FIELD_ROUTED_STREAMS + "." + streamId, true))
+                .into(new HashSet<>());
+    }
+
     public Set<String> getPipelinesByRule(final String ruleId) {
         return collection.find(eq(PipelineRulesMetadataDao.FIELD_RULES, ruleId))
                 .map(PipelineRulesMetadataDao::pipelineId)

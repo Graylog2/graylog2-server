@@ -35,6 +35,7 @@ import static org.graylog2.indexer.datanode.IndexMigrationConfiguration.FIELD_TA
 import static org.graylog2.indexer.datanode.MigrationConfiguration.FIELD_INDICES;
 import static org.graylog2.indexer.datanode.MigrationConfiguration.FIELD_LOGS;
 
+@Deprecated(forRemoval = true)
 public class RemoteReindexMigrationServiceImpl implements RemoteReindexMigrationService {
 
     public static final String COLLECTION_NAME = "remote_reindex_migrations";

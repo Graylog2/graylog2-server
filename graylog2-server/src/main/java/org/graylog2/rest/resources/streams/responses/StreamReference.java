@@ -14,18 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2.testing;
+package org.graylog2.rest.resources.streams.responses;
 
-import org.graylog.testing.completebackend.SearchServerBuilder;
-import org.graylog.testing.completebackend.SearchServerInterfaceProvider;
-import org.graylog2.storage.SearchVersion;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class DatanodeInstanceProvider implements SearchServerInterfaceProvider {
-    @Override
-    public SearchServerBuilder<?> getBuilderFor(final SearchVersion version) {
-        if (version.isDataNode()) {
-            return new DatanodeInstanceBuilder(version);
-        }
-        return null;
-    }
-}
+public record StreamReference(
+        @JsonProperty("id") String id,
+        @JsonProperty("title") String title
+) {}

@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Deprecated(forRemoval = true)
 public class MigrationShutdownService extends AbstractIdleService {
 
     private final Logger log = LoggerFactory.getLogger(AbstractIdleService.class);
