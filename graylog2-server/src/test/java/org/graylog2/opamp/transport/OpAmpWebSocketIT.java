@@ -34,9 +34,11 @@ import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.nio.ByteBuffer;
 import java.time.Duration;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -118,6 +120,8 @@ class OpAmpWebSocketIT {
     @Test
     void acceptsConnectionWithValidAuth() throws Exception {
         when(opAmpService.validateToken("Bearer valid")).thenReturn(true);
+        when(opAmpService.handleMessage(AgentToServer.getDefaultInstance()))
+                .thenReturn(ServerToAgent.getDefaultInstance());
 
         final var closeFuture = new CompletableFuture<Integer>();
         final var listener = new TestWebSocketListener(closeFuture);
@@ -127,8 +131,9 @@ class OpAmpWebSocketIT {
                 .buildAsync(wsUri(), listener)
                 .get(5, TimeUnit.SECONDS);
 
-        // Give time for auth check on virtual thread
-        Thread.sleep(100);
+        // Send probe and wait for response - proves auth passed
+        ws.sendBinary(ByteBuffer.wrap(probeMessage()), true).join();
+        assertThat(listener.messages.poll(2, TimeUnit.SECONDS)).isNotNull();
 
         // Connection should remain open
         assertThat(ws.isInputClosed()).isFalse();
@@ -150,24 +155,27 @@ class OpAmpWebSocketIT {
                 .setInstanceUid(agentMsg.getInstanceUid())
                 .build();
 
+        when(opAmpService.handleMessage(AgentToServer.getDefaultInstance()))
+                .thenReturn(ServerToAgent.getDefaultInstance());
         when(opAmpService.handleMessage(agentMsg)).thenReturn(expectedReply);
 
-        final var responseFuture = new CompletableFuture<byte[]>();
-        final var listener = new TestWebSocketListener(new CompletableFuture<>(), responseFuture);
+        final var closeFuture = new CompletableFuture<Integer>();
+        final var listener = new TestWebSocketListener(closeFuture);
 
         final var ws = httpClient.newWebSocketBuilder()
                 .header("Authorization", "Bearer valid")
                 .buildAsync(wsUri(), listener)
                 .get(5, TimeUnit.SECONDS);
 
-        // Give time for auth check
-        Thread.sleep(100);
+        // Send probe and wait - proves auth passed
+        ws.sendBinary(ByteBuffer.wrap(probeMessage()), true).join();
+        listener.messages.poll(2, TimeUnit.SECONDS);  // discard probe response
 
-        // Send message
+        // Send real message
         ws.sendBinary(ByteBuffer.wrap(frameMessage(agentMsg)), true).join();
 
         // Wait for response
-        final var responseBytes = responseFuture.get(5, TimeUnit.SECONDS);
+        final var responseBytes = listener.messages.poll(2, TimeUnit.SECONDS);
         final var reply = parseFramedResponse(responseBytes);
 
         assertThat(reply.getInstanceUid()).isEqualTo(expectedReply.getInstanceUid());
@@ -178,6 +186,8 @@ class OpAmpWebSocketIT {
     @Test
     void handlesInvalidProtobufGracefully() throws Exception {
         when(opAmpService.validateToken("Bearer valid")).thenReturn(true);
+        when(opAmpService.handleMessage(AgentToServer.getDefaultInstance()))
+                .thenReturn(ServerToAgent.getDefaultInstance());
 
         final var closeFuture = new CompletableFuture<Integer>();
         final var listener = new TestWebSocketListener(closeFuture);
@@ -187,14 +197,12 @@ class OpAmpWebSocketIT {
                 .buildAsync(wsUri(), listener)
                 .get(5, TimeUnit.SECONDS);
 
-        // Give time for auth check
-        Thread.sleep(100);
-
-        // Send valid header + invalid protobuf
+        // Send valid header + invalid protobuf (server logs error but keeps connection)
         ws.sendBinary(ByteBuffer.wrap(new byte[]{0x00, 0x01, 0x02, 0x03}), true).join();
 
-        // Give time for processing
-        Thread.sleep(200);
+        // Send probe and wait - proves connection still works after invalid message
+        ws.sendBinary(ByteBuffer.wrap(probeMessage()), true).join();
+        assertThat(listener.messages.poll(2, TimeUnit.SECONDS)).isNotNull();
 
         // Connection should remain open (graceful handling)
         assertThat(ws.isOutputClosed()).isFalse();
@@ -205,6 +213,8 @@ class OpAmpWebSocketIT {
     @Test
     void rejectsMessageWithInvalidHeader() throws Exception {
         when(opAmpService.validateToken("Bearer valid")).thenReturn(true);
+        when(opAmpService.handleMessage(AgentToServer.getDefaultInstance()))
+                .thenReturn(ServerToAgent.getDefaultInstance());
 
         final var closeFuture = new CompletableFuture<Integer>();
         final var listener = new TestWebSocketListener(closeFuture);
@@ -214,8 +224,9 @@ class OpAmpWebSocketIT {
                 .buildAsync(wsUri(), listener)
                 .get(5, TimeUnit.SECONDS);
 
-        // Give time for auth check
-        Thread.sleep(100);
+        // Send probe and wait - proves auth passed
+        ws.sendBinary(ByteBuffer.wrap(probeMessage()), true).join();
+        listener.messages.poll(2, TimeUnit.SECONDS);  // discard probe response
 
         // Send message with invalid header (1 instead of 0)
         final var invalidMessage = AgentToServer.newBuilder()
@@ -249,6 +260,13 @@ class OpAmpWebSocketIT {
         return out.toByteArray();
     }
 
+    private static byte[] probeMessage() throws IOException {
+        var out = new ByteArrayOutputStream();
+        out.write(0);  // header
+        AgentToServer.getDefaultInstance().writeTo(out);
+        return out.toByteArray();
+    }
+
     private static ServerToAgent parseFramedResponse(byte[] data) throws Exception {
         assertThat(data.length).isGreaterThan(0);
         assertThat(data[0]).isEqualTo((byte) 0);  // verify header
@@ -259,25 +277,11 @@ class OpAmpWebSocketIT {
 
     private static class TestWebSocketListener implements WebSocket.Listener {
         private final CompletableFuture<Integer> closeFuture;
-        private final CompletableFuture<byte[]> messageFuture;
-        private final CompletableFuture<Throwable> errorFuture;
+        private final BlockingQueue<byte[]> messages = new LinkedBlockingQueue<>();
         private ByteBuffer messageBuffer = ByteBuffer.allocate(0);
 
         TestWebSocketListener(CompletableFuture<Integer> closeFuture) {
-            this(closeFuture, new CompletableFuture<>(), new CompletableFuture<>());
-        }
-
-        TestWebSocketListener(CompletableFuture<Integer> closeFuture,
-                              CompletableFuture<byte[]> messageFuture) {
-            this(closeFuture, messageFuture, new CompletableFuture<>());
-        }
-
-        TestWebSocketListener(CompletableFuture<Integer> closeFuture,
-                              CompletableFuture<byte[]> messageFuture,
-                              CompletableFuture<Throwable> errorFuture) {
             this.closeFuture = closeFuture;
-            this.messageFuture = messageFuture;
-            this.errorFuture = errorFuture;
         }
 
         @Override
@@ -292,7 +296,7 @@ class OpAmpWebSocketIT {
             if (last) {
                 final var bytes = new byte[messageBuffer.remaining()];
                 messageBuffer.get(bytes);
-                messageFuture.complete(bytes);
+                messages.offer(bytes);
                 messageBuffer = ByteBuffer.allocate(0);
             }
 
@@ -309,8 +313,6 @@ class OpAmpWebSocketIT {
         @Override
         public void onError(WebSocket webSocket, Throwable error) {
             closeFuture.completeExceptionally(error);
-            messageFuture.completeExceptionally(error);
-            errorFuture.complete(error);
         }
     }
 }
