@@ -27,7 +27,7 @@ public class SlidingWindowCounter extends Counter {
 
     private final long windowMillis;
     private final Clock clock;
-    private final ArrayDeque<MinuteBucket> buckets = new ArrayDeque<>();
+    private final ArrayDeque<MinuteBucket> buckets = new ArrayDeque<>(2);
     private long totalCount = 0L;
 
     public SlidingWindowCounter(Duration window) {
