@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Stack } from '@mantine/core';
 
 import { Button, SegmentedControl } from 'components/bootstrap';
 import { Card, ClipboardButton, Select } from 'components/common';
@@ -171,7 +170,7 @@ const DeploymentForm = () => {
       </Section>
 
       {token && (
-        <Stack gap="md">
+        <>
           <Card>
             <Label>Enrollment Token</Label>
             <TokenRow>
@@ -191,7 +190,7 @@ const DeploymentForm = () => {
             </HeaderRow>
             <ScriptBlock>{getInstallScript()}</ScriptBlock>
           </Card>
-        </Stack>
+        </>
       )}
     </div>
   );

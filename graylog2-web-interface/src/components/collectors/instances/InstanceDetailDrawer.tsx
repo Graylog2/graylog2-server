@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import { Stack } from '@mantine/core';
 import type { ColorVariant } from '@graylog/sawmill';
 
 import { Badge, Table } from 'components/bootstrap';
@@ -63,6 +62,12 @@ const Label = styled.span`
   font-size: 0.875rem;
 `;
 
+const SourceList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacings.xs};
+`;
+
 const configStatusStyles: Record<string, ColorVariant> = {
   APPLIED: 'success',
   APPLYING: 'info',
@@ -77,97 +82,95 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
 
   return (
     <Drawer title={instance.hostname || instance.agent_id} onClose={onClose} size="md">
-      <Stack gap="md">
-        <Section>
-          <DetailRow>
-            <Label>Status:</Label>
-            <Badge bsStyle={instance.status === 'online' ? 'success' : 'default'}>
-              {instance.status === 'online' ? 'Online' : 'Offline'}
+      <Section>
+        <DetailRow>
+          <Label>Status:</Label>
+          <Badge bsStyle={instance.status === 'online' ? 'success' : 'default'}>
+            {instance.status === 'online' ? 'Online' : 'Offline'}
+          </Badge>
+        </DetailRow>
+
+        <DetailRow>
+          <Label>Fleet:</Label>
+          <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>{fleetName}</Link>
+        </DetailRow>
+
+        <DetailRow>
+          <Label>OS:</Label>
+          <span>{osDescription || instance.os || 'Unknown'}</span>
+        </DetailRow>
+
+        <DetailRow>
+          <Label>Last Seen:</Label>
+          <RelativeTime dateTime={instance.last_seen} />
+        </DetailRow>
+
+        <DetailRow>
+          <Label>Version:</Label>
+          <span>{instance.version}</span>
+        </DetailRow>
+
+        <DetailRow>
+          <Label>Config:</Label>
+          <span style={{ display: 'inline-flex', gap: '0.25rem', alignItems: 'center' }}>
+            <code>{instance.remote_config_status.last_remote_config_hash.slice(0, 7)}</code>
+            <Badge bsStyle={configStatusStyles[instance.remote_config_status.status]}>
+              {instance.remote_config_status.status}
             </Badge>
-          </DetailRow>
+          </span>
+        </DetailRow>
 
+        {instance.remote_config_status.error_message && (
           <DetailRow>
-            <Label>Fleet:</Label>
-            <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>{fleetName}</Link>
+            <Label>Error:</Label>
+            <span style={{ color: 'red' }}>{instance.remote_config_status.error_message}</span>
           </DetailRow>
+        )}
+      </Section>
 
-          <DetailRow>
-            <Label>OS:</Label>
-            <span>{osDescription || instance.os || 'Unknown'}</span>
-          </DetailRow>
-
-          <DetailRow>
-            <Label>Last Seen:</Label>
-            <RelativeTime dateTime={instance.last_seen} />
-          </DetailRow>
-
-          <DetailRow>
-            <Label>Version:</Label>
-            <span>{instance.version}</span>
-          </DetailRow>
-
-          <DetailRow>
-            <Label>Config:</Label>
-            <span style={{ display: 'inline-flex', gap: '0.25rem', alignItems: 'center' }}>
-              <code>{instance.remote_config_status.last_remote_config_hash.slice(0, 7)}</code>
-              <Badge bsStyle={configStatusStyles[instance.remote_config_status.status]}>
-                {instance.remote_config_status.status}
-              </Badge>
-            </span>
-          </DetailRow>
-
-          {instance.remote_config_status.error_message && (
-            <DetailRow>
-              <Label>Error:</Label>
-              <span style={{ color: 'red' }}>{instance.remote_config_status.error_message}</span>
-            </DetailRow>
-          )}
-        </Section>
-
-        <Section>
-          <SectionTitle>System Details</SectionTitle>
-          <Table striped>
-            <tbody>
-              {instance.agent_description.identifying_attributes.map((attr) => (
-                <tr key={attr.key}>
-                  <td>{attr.key}</td>
-                  <td>{attr.value}</td>
-                </tr>
-              ))}
-              {instance.agent_description.non_identifying_attributes.map((attr) => (
-                <tr key={attr.key}>
-                  <td>{attr.key}</td>
-                  <td>{attr.value}</td>
-                </tr>
-              ))}
-              <tr>
-                <td>connection_type</td>
-                <td>{instance.connection_type}</td>
+      <Section>
+        <SectionTitle>System Details</SectionTitle>
+        <Table striped>
+          <tbody>
+            {instance.agent_description.identifying_attributes.map((attr) => (
+              <tr key={attr.key}>
+                <td>{attr.key}</td>
+                <td>{attr.value}</td>
               </tr>
-              <tr>
-                <td>first_seen</td>
-                <td><RelativeTime dateTime={instance.first_seen} /></td>
+            ))}
+            {instance.agent_description.non_identifying_attributes.map((attr) => (
+              <tr key={attr.key}>
+                <td>{attr.key}</td>
+                <td>{attr.value}</td>
               </tr>
-            </tbody>
-          </Table>
-        </Section>
+            ))}
+            <tr>
+              <td>connection_type</td>
+              <td>{instance.connection_type}</td>
+            </tr>
+            <tr>
+              <td>first_seen</td>
+              <td><RelativeTime dateTime={instance.first_seen} /></td>
+            </tr>
+          </tbody>
+        </Table>
+      </Section>
 
-        <Section>
-          <SectionTitle>Active Sources ({sources.length})</SectionTitle>
-          {sources.length === 0 ? (
-            <span style={{ color: '#666' }}>No sources configured for this fleet.</span>
-          ) : (
-            <Stack gap="xs">
-              {sources.map((source) => (
-                <span key={source.id} style={{ display: 'inline-flex', gap: '0.25rem', alignItems: 'center' }}>
-                  <span>• {source.name}</span>
-                  <Badge bsStyle="info">{source.type}</Badge>
-                </span>
-              ))}
-            </Stack>
-          )}
-        </Section>
-      </Stack>
+      <Section>
+        <SectionTitle>Active Sources ({sources.length})</SectionTitle>
+        {sources.length === 0 ? (
+          <span style={{ color: '#666' }}>No sources configured for this fleet.</span>
+        ) : (
+          <SourceList>
+            {sources.map((source) => (
+              <span key={source.id} style={{ display: 'inline-flex', gap: '0.25rem', alignItems: 'center' }}>
+                <span>• {source.name}</span>
+                <Badge bsStyle="info">{source.type}</Badge>
+              </span>
+            ))}
+          </SourceList>
+        )}
+      </Section>
     </Drawer>
   );
 };

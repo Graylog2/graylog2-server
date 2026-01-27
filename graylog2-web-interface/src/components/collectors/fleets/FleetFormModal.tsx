@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import { Stack } from '@mantine/core';
 
 import { Button, Input } from 'components/bootstrap';
 import Modal from 'components/bootstrap/Modal';
@@ -50,36 +49,32 @@ const FleetFormModal = ({ fleet = undefined, onClose, onSave, isLoading = false 
         <Modal.Title>{isEdit ? 'Edit Fleet' : 'New Fleet'}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Stack gap="md">
-          <Input
-            id="fleet-name"
-            type="text"
-            label="Name"
-            help="A unique name for this fleet"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-
-          <Input
-            id="fleet-description"
-            type="textarea"
-            label="Description"
-            help="Optional description of this fleet's purpose"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-
-          <Input
-            id="fleet-target-version"
-            type="text"
-            label="Target Version"
-            help="Optional collector version for this fleet"
-            placeholder="e.g., 1.2.0"
-            value={targetVersion}
-            onChange={(e) => setTargetVersion(e.target.value)}
-          />
-        </Stack>
+        <Input
+          id="fleet-name"
+          type="text"
+          label="Name"
+          help="A unique name for this fleet"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+        <Input
+          id="fleet-description"
+          type="textarea"
+          label="Description"
+          help="Optional description of this fleet's purpose"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+        <Input
+          id="fleet-target-version"
+          type="text"
+          label="Target Version"
+          help="Optional collector version for this fleet"
+          placeholder="e.g., 1.2.0"
+          value={targetVersion}
+          onChange={(e) => setTargetVersion(e.target.value)}
+        />
       </Modal.Body>
       <Modal.Footer>
         <Button bsStyle="default" onClick={onClose}>Cancel</Button>

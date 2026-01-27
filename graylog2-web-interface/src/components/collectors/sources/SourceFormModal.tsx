@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import { Stack } from '@mantine/core';
 
 import { Button, Input, SegmentedControl } from 'components/bootstrap';
 import Modal from 'components/bootstrap/Modal';
@@ -277,44 +276,38 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
         <Modal.Title>{isEdit ? 'Edit Source' : 'New Source'}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Stack gap="md">
-          <div>
-            <label htmlFor="source-type">Source Type</label>
-            <SegmentedControl
-              value={sourceType}
-              onChange={handleTypeChange}
-              data={Object.entries(sourceTypeLabels).map(([value, label]) => ({ value, label }))}
-              disabled={isEdit}
-            />
-          </div>
-
-          <Input
-            id="source-name"
-            type="text"
-            label="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
+        <div>
+          <label htmlFor="source-type">Source Type</label>
+          <SegmentedControl
+            value={sourceType}
+            onChange={handleTypeChange}
+            data={Object.entries(sourceTypeLabels).map(([value, label]) => ({ value, label }))}
+            disabled={isEdit}
           />
-
-          <Input
-            id="source-description"
-            type="textarea"
-            label="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-
-          <Input
-            id="source-enabled"
-            type="checkbox"
-            label="Enabled"
-            checked={enabled}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEnabled(e.target.checked)}
-          />
-
-          {renderConfigSection()}
-        </Stack>
+        </div>
+        <Input
+          id="source-name"
+          type="text"
+          label="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+        <Input
+          id="source-description"
+          type="textarea"
+          label="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+        <Input
+          id="source-enabled"
+          type="checkbox"
+          label="Enabled"
+          checked={enabled}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEnabled(e.target.checked)}
+        />
+        {renderConfigSection()}
       </Modal.Body>
       <Modal.Footer>
         <Button bsStyle="default" onClick={onClose}>Cancel</Button>

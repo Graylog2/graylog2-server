@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Stack } from '@mantine/core';
 
 import { Button, Input } from 'components/bootstrap';
 import { Card, RelativeTime } from 'components/common';
@@ -101,34 +100,31 @@ const FleetSettings = ({ fleet, onSave, onDelete = undefined, isLoading = false 
   };
 
   return (
-    <Stack gap="md">
+    <div>
       <Section>
         <SectionTitle>General Settings</SectionTitle>
-        <Stack gap="sm">
-          <Input
-            id="fleet-name"
-            label="Fleet Name"
-            value={name}
-            onChange={(e) => handleChange(setName, e.target.value)}
-            required
-          />
-          <Input
-            id="fleet-description"
-            type="textarea"
-            label="Description"
-            value={description}
-            onChange={(e) => handleChange(setDescription, e.target.value)}
-          />
-          <Input
-            id="fleet-target-version"
-            label="Target Version"
-            help="Collector version to deploy to this fleet"
-            placeholder="e.g., 1.2.0"
-            value={targetVersion}
-            onChange={(e) => handleChange(setTargetVersion, e.target.value)}
-          />
-        </Stack>
-
+        <Input
+          id="fleet-name"
+          label="Fleet Name"
+          value={name}
+          onChange={(e) => handleChange(setName, e.target.value)}
+          required
+        />
+        <Input
+          id="fleet-description"
+          type="textarea"
+          label="Description"
+          value={description}
+          onChange={(e) => handleChange(setDescription, e.target.value)}
+        />
+        <Input
+          id="fleet-target-version"
+          label="Target Version"
+          help="Collector version to deploy to this fleet"
+          placeholder="e.g., 1.2.0"
+          value={targetVersion}
+          onChange={(e) => handleChange(setTargetVersion, e.target.value)}
+        />
         <ButtonGroup>
           <Button bsStyle="default" onClick={handleReset} disabled={!isDirty || isLoading}>
             Reset
@@ -164,7 +160,7 @@ const FleetSettings = ({ fleet, onSave, onDelete = undefined, isLoading = false 
         </WarningText>
         <Button bsStyle="danger" onClick={onDelete} disabled={!onDelete}>Delete Fleet</Button>
       </Section>
-    </Stack>
+    </div>
   );
 };
 
