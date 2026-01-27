@@ -17,17 +17,10 @@
 import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
-import {
-  SegmentedControl,
-  Select,
-  Button,
-  Code,
-  CopyButton,
-  Group,
-  Stack,
-  Card,
-  Text,
-} from '@mantine/core';
+import { Stack } from '@mantine/core';
+
+import { Button, SegmentedControl } from 'components/bootstrap';
+import { Card, ClipboardButton, Select } from 'components/common';
 
 import { useFleets } from '../hooks';
 
@@ -48,14 +41,51 @@ const Label = styled.label(
   `,
 );
 
-const ScriptBlock = styled(Code)(
+const ScriptBlock = styled.pre(
   ({ theme }) => css`
     display: block;
     padding: ${theme.spacings.md};
+    background: ${theme.colors.global.contentBackground};
+    border: 1px solid ${theme.colors.gray[80]};
+    border-radius: 4px;
     white-space: pre-wrap;
     word-break: break-all;
+    font-family: ${theme.fonts.family.monospace};
+    font-size: ${theme.fonts.size.small};
   `,
 );
+
+const CodeInline = styled.code(
+  ({ theme }) => css`
+    padding: 2px 6px;
+    background: ${theme.colors.global.contentBackground};
+    border: 1px solid ${theme.colors.gray[80]};
+    border-radius: 4px;
+    font-family: ${theme.fonts.family.monospace};
+  `,
+);
+
+const TokenRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const InfoText = styled.span(
+  ({ theme }) => css`
+    font-size: ${theme.fonts.size.small};
+    color: ${theme.colors.gray[60]};
+    margin-top: ${theme.spacings.xs};
+    display: block;
+  `,
+);
+
+const HeaderRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+`;
 
 const generateMockToken = () =>
   `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify({ fleet: 'test', exp: Date.now() + 86400000 }))}.mock-signature`;
@@ -113,10 +143,10 @@ const DeploymentForm = () => {
         <Label>Fleet *</Label>
         <Select
           placeholder="Select a fleet"
-          data={fleetOptions}
+          options={fleetOptions}
           value={fleetId}
-          onChange={setFleetId}
-          searchable
+          onChange={(selected) => setFleetId(selected as string)}
+          clearable={false}
         />
       </Section>
 
@@ -135,42 +165,30 @@ const DeploymentForm = () => {
       </Section>
 
       <Section>
-        <Button onClick={handleGenerate} disabled={!fleetId}>
+        <Button bsStyle="primary" onClick={handleGenerate} disabled={!fleetId}>
           Generate Enrollment Token
         </Button>
       </Section>
 
       {token && (
         <Stack gap="md">
-          <Card withBorder>
+          <Card>
             <Label>Enrollment Token</Label>
-            <Group>
-              <Code style={{ flex: 1 }}>{token.slice(0, 50)}...</Code>
-              <CopyButton value={token}>
-                {({ copied, copy }) => (
-                  <Button variant="light" size="xs" onClick={copy}>
-                    {copied ? 'Copied!' : 'Copy'}
-                  </Button>
-                )}
-              </CopyButton>
-            </Group>
-            <Text size="sm" c="dimmed" mt="xs">
+            <TokenRow>
+              <CodeInline style={{ flex: 1 }}>{token.slice(0, 50)}...</CodeInline>
+              <ClipboardButton text={token} title="Copy" bsSize="xs" />
+            </TokenRow>
+            <InfoText>
               Fleet: {fleets?.find((f) => f.id === fleetId)?.name} | Expires:{' '}
               {expiry === 'never' ? 'Never' : expiry}
-            </Text>
+            </InfoText>
           </Card>
 
-          <Card withBorder>
-            <Group justify="space-between" mb="sm">
+          <Card>
+            <HeaderRow>
               <Label>Installation Script</Label>
-              <CopyButton value={getInstallScript()}>
-                {({ copied, copy }) => (
-                  <Button variant="light" size="xs" onClick={copy}>
-                    {copied ? 'Copied!' : 'Copy Script'}
-                  </Button>
-                )}
-              </CopyButton>
-            </Group>
+              <ClipboardButton text={getInstallScript()} title="Copy Script" bsSize="xs" />
+            </HeaderRow>
             <ScriptBlock>{getInstallScript()}</ScriptBlock>
           </Card>
         </Stack>
