@@ -33,7 +33,7 @@ const useCollectorsMutations = () => {
   const queryClient = useQueryClient();
 
   const invalidateCollectorsQueries = () =>
-    queryClient.refetchQueries({ queryKey: COLLECTORS_QUERY_KEY, type: 'active' });
+    queryClient.invalidateQueries({ queryKey: COLLECTORS_QUERY_KEY });
 
   // Fleet mutations
   const createFleetMutation = useMutation({
