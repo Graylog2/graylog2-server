@@ -23,7 +23,7 @@ import Menu from 'components/bootstrap/Menu';
 import Icon from 'components/common/Icon';
 import DocsHelper from 'util/DocsHelper';
 import useResourceCustomization from 'brand-customization/useResourceCustomization';
-import { MenuItem } from 'components/bootstrap';
+import MenuItem from 'components/bootstrap/menuitem/MenuItem';
 
 const StyledButton = styled(Button)(
   ({ theme }) => css`
