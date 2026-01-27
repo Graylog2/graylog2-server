@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
-import { Button } from '@mantine/core';
+
+import { Button } from 'components/bootstrap';
 
 import type { CollectorInstanceView } from '../types';
 
@@ -27,7 +28,7 @@ type Props = {
 const useTableElements = ({ onInstanceClick }: Props) => {
   const entityActions = useCallback(
     (instance: CollectorInstanceView) => (
-      <Button variant="subtle" size="xs" onClick={() => onInstanceClick(instance)}>
+      <Button bsStyle="link" bsSize="xs" onClick={() => onInstanceClick(instance)}>
         Details
       </Button>
     ),
