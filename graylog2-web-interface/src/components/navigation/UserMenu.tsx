@@ -18,8 +18,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { LinkContainer } from 'components/common/router';
-import { NavDropdown } from 'components/bootstrap';
-import { Icon } from 'components/common';
+import { NavDropdown, MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import useCurrentUser from 'hooks/useCurrentUser';
 import Menu from 'components/bootstrap/Menu';
@@ -51,11 +50,11 @@ const UserMenu = () => {
       </Menu.Label>
       <Menu.Divider />
       <LinkContainer to={route}>
-        <Menu.Item>{label}</Menu.Item>
+        <MenuItem>{label}</MenuItem>
       </LinkContainer>
-      <Menu.Item onClick={onLogoutClicked} leftSection={<Icon name="logout" />}>
+      <MenuItem onClick={onLogoutClicked} icon="logout">
         Log out
-      </Menu.Item>
+      </MenuItem>
     </NavDropdown>
   );
 };
