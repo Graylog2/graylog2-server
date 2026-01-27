@@ -38,6 +38,7 @@ type Props = {
   source?: Source;
   onClose: () => void;
   onSave: (source: Omit<Source, 'id'>) => void;
+  isLoading?: boolean;
 };
 
 const FormSection = styled.div(
@@ -62,7 +63,7 @@ const defaultConfigs: Record<SourceType, FileSourceConfig | JournaldSourceConfig
   udp: { bind_address: '0.0.0.0', port: 5514 },
 };
 
-const SourceFormModal = ({ fleetId, source, onClose, onSave }: Props) => {
+const SourceFormModal = ({ fleetId, source, onClose, onSave, isLoading = false }: Props) => {
   const isEdit = !!source;
   const [sourceType, setSourceType] = useState<SourceType>(source?.type || 'file');
   const [name, setName] = useState(source?.name || '');
@@ -86,7 +87,6 @@ const SourceFormModal = ({ fleetId, source, onClose, onSave }: Props) => {
       type: sourceType,
       config,
     } as Omit<Source, 'id'>);
-    onClose();
   };
 
   const updateFileConfig = (updates: Partial<FileSourceConfig>) => {
@@ -335,7 +335,7 @@ const SourceFormModal = ({ fleetId, source, onClose, onSave }: Props) => {
       <Modal.Footer>
         <Group justify="flex-end">
           <Button variant="default" onClick={onClose}>Cancel</Button>
-          <Button onClick={handleSave} disabled={!name}>Save Source</Button>
+          <Button onClick={handleSave} disabled={!name || isLoading} loading={isLoading}>Save Source</Button>
         </Group>
       </Modal.Footer>
     </Modal>

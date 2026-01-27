@@ -25,7 +25,7 @@ import type { SearchParams } from 'stores/PaginationTypes';
 
 import FleetSettings from './FleetSettings';
 
-import { useFleet, useFleetStats, useSources, fetchPaginatedSources, sourcesKeyFn, fetchPaginatedInstances, instancesKeyFn } from '../hooks';
+import { useFleet, useFleetStats, useSources, fetchPaginatedSources, sourcesKeyFn, fetchPaginatedInstances, instancesKeyFn, useCollectorsMutations } from '../hooks';
 import StatCard from '../common/StatCard';
 import { InstanceDetailDrawer } from '../instances';
 import instanceColumnRenderers from '../instances/ColumnRenderers';
@@ -58,6 +58,7 @@ const FleetDetail = ({ fleetId }: Props) => {
   const { data: fleet, isLoading: fleetLoading } = useFleet(fleetId);
   const { data: stats, isLoading: statsLoading } = useFleetStats(fleetId);
   const { data: sources } = useSources(fleetId);
+  const { createSource, isCreatingSource, updateFleet, isUpdatingFleet } = useCollectorsMutations();
   const [showSourceModal, setShowSourceModal] = useState(false);
   const [selectedInstance, setSelectedInstance] = useState<CollectorInstanceView | null>(null);
 
@@ -100,9 +101,9 @@ const FleetDetail = ({ fleetId }: Props) => {
     return <div>Fleet not found</div>;
   }
 
-  const handleSaveSource = (source: Omit<Source, 'id'>) => {
-    // eslint-disable-next-line no-console
-    console.log('Saving source:', source);
+  const handleSaveSource = async (source: Omit<Source, 'id'>) => {
+    await createSource(source);
+    setShowSourceModal(false);
   };
 
   return (
@@ -156,10 +157,10 @@ const FleetDetail = ({ fleetId }: Props) => {
         <Tabs.Panel value="settings" pt="md">
           <FleetSettings
             fleet={fleet}
-            onSave={(updates) => {
-              // eslint-disable-next-line no-console
-              console.log('Saving fleet updates:', updates);
+            onSave={async (updates) => {
+              await updateFleet({ fleetId: fleet.id, updates });
             }}
+            isLoading={isUpdatingFleet}
           />
         </Tabs.Panel>
       </Tabs>
@@ -169,6 +170,7 @@ const FleetDetail = ({ fleetId }: Props) => {
           fleetId={fleetId}
           onClose={() => setShowSourceModal(false)}
           onSave={handleSaveSource}
+          isLoading={isCreatingSource}
         />
       )}
 

@@ -26,6 +26,7 @@ import type { Fleet } from '../types';
 type Props = {
   fleet: Fleet;
   onSave: (updates: Partial<Fleet>) => void;
+  isLoading?: boolean;
 };
 
 const Section = styled(Card)(
@@ -42,7 +43,7 @@ const SectionTitle = styled.h4(
   `,
 );
 
-const FleetSettings = ({ fleet, onSave }: Props) => {
+const FleetSettings = ({ fleet, onSave, isLoading = false }: Props) => {
   const [name, setName] = useState(fleet.name);
   const [description, setDescription] = useState(fleet.description);
   const [targetVersion, setTargetVersion] = useState(fleet.target_version || '');
@@ -95,10 +96,10 @@ const FleetSettings = ({ fleet, onSave }: Props) => {
         </Stack>
 
         <Group justify="flex-end" mt="md">
-          <Button variant="default" onClick={handleReset} disabled={!isDirty}>
+          <Button variant="default" onClick={handleReset} disabled={!isDirty || isLoading}>
             Reset
           </Button>
-          <Button onClick={handleSave} disabled={!isDirty || !name}>
+          <Button onClick={handleSave} disabled={!isDirty || !name || isLoading} loading={isLoading}>
             Save Changes
           </Button>
         </Group>
