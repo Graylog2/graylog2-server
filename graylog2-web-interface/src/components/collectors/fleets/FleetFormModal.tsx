@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import styled, { css } from 'styled-components';
-import { TextInput, Textarea, Stack, Button, Group } from '@mantine/core';
+import { Stack } from '@mantine/core';
 
+import { Button, Input } from 'components/bootstrap';
 import Modal from 'components/bootstrap/Modal';
 
 import type { Fleet } from '../types';
@@ -29,12 +29,6 @@ type Props = {
   onSave: (fleet: Omit<Fleet, 'id' | 'created_at' | 'updated_at'>) => void;
   isLoading?: boolean;
 };
-
-const FormSection = styled.div(
-  ({ theme }) => css`
-    margin-bottom: ${theme.spacings.md};
-  `,
-);
 
 const FleetFormModal = ({ fleet = undefined, onClose, onSave, isLoading = false }: Props) => {
   const isEdit = !!fleet;
@@ -57,43 +51,42 @@ const FleetFormModal = ({ fleet = undefined, onClose, onSave, isLoading = false 
       </Modal.Header>
       <Modal.Body>
         <Stack gap="md">
-          <FormSection>
-            <TextInput
-              label="Name"
-              description="A unique name for this fleet"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </FormSection>
+          <Input
+            id="fleet-name"
+            type="text"
+            label="Name"
+            help="A unique name for this fleet"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
 
-          <FormSection>
-            <Textarea
-              label="Description"
-              description="Optional description of this fleet's purpose"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </FormSection>
+          <Input
+            id="fleet-description"
+            type="textarea"
+            label="Description"
+            help="Optional description of this fleet's purpose"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
 
-          <FormSection>
-            <TextInput
-              label="Target Version"
-              description="Optional collector version for this fleet"
-              placeholder="e.g., 1.2.0"
-              value={targetVersion}
-              onChange={(e) => setTargetVersion(e.target.value)}
-            />
-          </FormSection>
+          <Input
+            id="fleet-target-version"
+            type="text"
+            label="Target Version"
+            help="Optional collector version for this fleet"
+            placeholder="e.g., 1.2.0"
+            value={targetVersion}
+            onChange={(e) => setTargetVersion(e.target.value)}
+          />
         </Stack>
       </Modal.Body>
       <Modal.Footer>
-        <Group justify="flex-end">
-          <Button variant="default" onClick={onClose}>Cancel</Button>
-          <Button onClick={handleSave} disabled={!name || isLoading} loading={isLoading}>
-            {isEdit ? 'Save Changes' : 'Create Fleet'}
-          </Button>
-        </Group>
+        <Button bsStyle="default" onClick={onClose}>Cancel</Button>
+        {' '}
+        <Button bsStyle="primary" onClick={handleSave} disabled={!name || isLoading}>
+          {isEdit ? 'Save Changes' : 'Create Fleet'}
+        </Button>
       </Modal.Footer>
     </Modal>
   );
