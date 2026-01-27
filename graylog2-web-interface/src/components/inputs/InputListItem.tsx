@@ -190,7 +190,7 @@ const InputListItem = ({ input, currentNode }: Props) => {
         </LinkContainer>
       </IfPermitted>
     </HideOnCloud>,
-    <IfPermitted permissions={[`inputs:edit:${input.id}`, `input_types:create:${input.type}`]}>
+    <IfPermitted permissions={`inputs:changestate:${input.id}`}>
       <InputStateControl key={`input-state-control-${input.id}`} input={input} openWizard={openWizard} />
     </IfPermitted>,
     <DropdownButton
