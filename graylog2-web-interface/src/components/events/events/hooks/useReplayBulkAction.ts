@@ -22,9 +22,9 @@ import type { Event } from 'components/events/events/types';
 import Routes from 'routing/Routes';
 import Store from 'logic/local-storage/Store';
 import generateId from 'logic/generateId';
-import { REPLAY_SESSION_ID_PARAM, REPLAY_IS_SECURITY_PARAM } from 'components/events/Constants';
+import { REPLAY_SESSION_ID_PARAM } from 'components/events/Constants';
 
-const useReplayBulkAction = (replayableEvents: Array<Event>, isSecurity: boolean) => {
+const useReplayBulkAction = (replayableEvents: Array<Event>) => {
   const sendEventActionTelemetry = useSendEventActionTelemetry();
   const eventIds = useMemo(() => replayableEvents.map((event) => event.id), [replayableEvents]);
 
@@ -33,13 +33,12 @@ const useReplayBulkAction = (replayableEvents: Array<Event>, isSecurity: boolean
     const url = new URI(Routes.ALERTS.BULK_REPLAY_SEARCH)
       .search({
         [REPLAY_SESSION_ID_PARAM]: sessionId,
-        [REPLAY_IS_SECURITY_PARAM]: isSecurity,
       })
       .toString();
     sendEventActionTelemetry('REPLAY_SEARCH', true, { events_length: eventIds.length });
     Store.sessionSet(sessionId, eventIds);
     window.open(url, '_blank');
-  }, [eventIds, isSecurity, sendEventActionTelemetry]);
+  }, [eventIds, sendEventActionTelemetry]);
 };
 
 export default useReplayBulkAction;
