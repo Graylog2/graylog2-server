@@ -58,8 +58,9 @@ const FleetDetail = ({ fleetId }: Props) => {
   const { data: fleet, isLoading: fleetLoading } = useFleet(fleetId);
   const { data: stats, isLoading: statsLoading } = useFleetStats(fleetId);
   const { data: sources } = useSources(fleetId);
-  const { createSource, isCreatingSource, updateFleet, isUpdatingFleet, deleteFleet, isDeletingFleet } = useCollectorsMutations();
+  const { createSource, isCreatingSource, updateSource, isUpdatingSource, updateFleet, isUpdatingFleet, deleteFleet, isDeletingFleet } = useCollectorsMutations();
   const [showSourceModal, setShowSourceModal] = useState(false);
+  const [editingSource, setEditingSource] = useState<Source | null>(null);
   const [selectedInstance, setSelectedInstance] = useState<CollectorInstanceView | null>(null);
 
   const fleetNames = useMemo(() => (fleet ? { [fleet.id]: fleet.name } : {}), [fleet]);
@@ -90,6 +91,15 @@ const FleetDetail = ({ fleetId }: Props) => {
     [],
   );
 
+  const sourceActions = useCallback(
+    (source: Source) => (
+      <Button variant="subtle" size="xs" onClick={() => setEditingSource(source)}>
+        Edit
+      </Button>
+    ),
+    [],
+  );
+
   const getSourcesForInstance = (instance: CollectorInstanceView) =>
     (sources || []).filter((s) => s.fleet_id === instance.fleet_id);
 
@@ -102,8 +112,13 @@ const FleetDetail = ({ fleetId }: Props) => {
   }
 
   const handleSaveSource = async (source: Omit<Source, 'id'>) => {
-    await createSource(source);
-    setShowSourceModal(false);
+    if (editingSource) {
+      await updateSource({ sourceId: editingSource.id, updates: source as Partial<Source> });
+      setEditingSource(null);
+    } else {
+      await createSource(source);
+      setShowSourceModal(false);
+    }
   };
 
   return (
@@ -138,7 +153,7 @@ const FleetDetail = ({ fleetId }: Props) => {
             keyFn={(params) => [...sourcesKeyFn(params), fleetId]}
             entityAttributesAreCamelCase={false}
             columnRenderers={sourceRenderers}
-            entityActions={() => null}
+            entityActions={sourceActions}
           />
         </Tabs.Panel>
 
@@ -175,6 +190,16 @@ const FleetDetail = ({ fleetId }: Props) => {
           onClose={() => setShowSourceModal(false)}
           onSave={handleSaveSource}
           isLoading={isCreatingSource}
+        />
+      )}
+
+      {editingSource && (
+        <SourceFormModal
+          fleetId={fleetId}
+          source={editingSource}
+          onClose={() => setEditingSource(null)}
+          onSave={handleSaveSource}
+          isLoading={isUpdatingSource}
         />
       )}
 

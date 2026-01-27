@@ -21,7 +21,6 @@ import {
   SegmentedControl,
   TextInput,
   Textarea,
-  Switch,
   Group,
   Stack,
   Button,
@@ -29,6 +28,7 @@ import {
   Text,
 } from '@mantine/core';
 
+import { Input } from 'components/bootstrap';
 import Modal from 'components/bootstrap/Modal';
 
 import type { Source, SourceType, FileSourceConfig, JournaldSourceConfig, TcpSourceConfig, UdpSourceConfig, WindowsEventLogSourceConfig } from '../types';
@@ -322,10 +322,12 @@ const SourceFormModal = ({ fleetId, source, onClose, onSave, isLoading = false }
           </FormSection>
 
           <FormSection>
-            <Switch
+            <Input
+              id="source-enabled"
+              type="checkbox"
               label="Enabled"
               checked={enabled}
-              onChange={(e) => setEnabled(e.currentTarget.checked)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEnabled(e.target.checked)}
             />
           </FormSection>
 
