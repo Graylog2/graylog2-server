@@ -35,15 +35,15 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 
 @Singleton
-public class OpAmpWebSocketAuthFilter extends BaseFilter {
-    private static final Logger LOG = LoggerFactory.getLogger(OpAmpWebSocketAuthFilter.class);
+public class OpAmpAuthFilter extends BaseFilter {
+    private static final Logger LOG = LoggerFactory.getLogger(OpAmpAuthFilter.class);
 
     private final OpAmpService opAmpService;
     private final ExecutorService executor;
 
     @Inject
-    public OpAmpWebSocketAuthFilter(OpAmpService opAmpService,
-                                    @OpAmpExecutor ExecutorService executor) {
+    public OpAmpAuthFilter(OpAmpService opAmpService,
+                           @OpAmpExecutor ExecutorService executor) {
         this.opAmpService = opAmpService;
         this.executor = executor;
     }
@@ -55,7 +55,7 @@ public class OpAmpWebSocketAuthFilter extends BaseFilter {
         }
 
         final HttpRequestPacket request = (HttpRequestPacket) httpContent.getHttpHeader();
-        if (!OpAmpConstants.WEBSOCKET_PATH.equals(request.getRequestURI())) {
+        if (!OpAmpConstants.PATH.equals(request.getRequestURI())) {
             return ctx.getInvokeAction();
         }
 
@@ -65,7 +65,7 @@ public class OpAmpWebSocketAuthFilter extends BaseFilter {
         executor.submit(() -> {
             try {
                 if (!opAmpService.validateToken(authHeader)) {
-                    LOG.debug("OpAMP WebSocket auth failed, rejecting upgrade");
+                    LOG.debug("OpAMP auth failed");
                     send401(ctx, request);
                 } else {
                     request.setAttribute(OpAmpAuthContext.REQUEST_ATTRIBUTE,
@@ -73,7 +73,7 @@ public class OpAmpWebSocketAuthFilter extends BaseFilter {
                     ctx.resume(ctx.getInvokeAction());
                 }
             } catch (Exception e) {
-                LOG.warn("OpAMP WebSocket auth error", e);
+                LOG.warn("OpAMP auth error", e);
                 send401(ctx, request);
             }
         });

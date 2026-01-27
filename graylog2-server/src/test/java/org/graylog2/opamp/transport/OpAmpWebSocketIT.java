@@ -65,12 +65,12 @@ class OpAmpWebSocketIT {
         final var executor = Executors.newVirtualThreadPerTaskExecutor();
 
         // Enable WebSocket addon with auth filter (matches production setup)
-        listener.registerAddOn(new OpAmpWebSocketAddOn(new OpAmpWebSocketAuthFilter(opAmpService, executor)));
+        listener.registerAddOn(new OpAmpAddOn(new OpAmpAuthFilter(opAmpService, executor)));
 
         final var wsApp = new OpAmpWebSocketApplication(opAmpService, executor);
 
         // Register WebSocket application (auth handled in createSocket)
-        WebSocketEngine.getEngine().register("", "/opamp/ws", wsApp);
+        WebSocketEngine.getEngine().register("", "/v1/opamp", wsApp);
 
         httpServer.start();
 
@@ -233,7 +233,7 @@ class OpAmpWebSocketIT {
     }
 
     private URI wsUri() {
-        return URI.create("ws://localhost:" + port + "/opamp/ws");
+        return URI.create("ws://localhost:" + port + "/v1/opamp");
     }
 
     private static int findFreePort() throws IOException {

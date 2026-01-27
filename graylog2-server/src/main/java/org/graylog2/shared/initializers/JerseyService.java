@@ -52,10 +52,10 @@ import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.jersey.PrefixAddingModelProcessor;
 import org.graylog2.opamp.OpAmpConstants;
+import org.graylog2.opamp.transport.OpAmpAddOn;
+import org.graylog2.opamp.transport.OpAmpAuthFilter;
 import org.graylog2.opamp.transport.OpAmpHttpHandler;
-import org.graylog2.opamp.transport.OpAmpWebSocketAddOn;
 import org.graylog2.opamp.transport.OpAmpWebSocketApplication;
-import org.graylog2.opamp.transport.OpAmpWebSocketAuthFilter;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
@@ -129,7 +129,7 @@ public class JerseyService extends AbstractIdleService {
     private final int shutdownTimeoutMs;
     private final OpAmpHttpHandler opAmpHttpHandler;
     private final OpAmpWebSocketApplication opAmpWebSocketApplication;
-    private final OpAmpWebSocketAuthFilter opAmpWebSocketAuthFilter;
+    private final OpAmpAuthFilter opAmpAuthFilter;
 
     private HttpServer httpServer = null;
 
@@ -149,7 +149,7 @@ public class JerseyService extends AbstractIdleService {
                          @Named("shutdown_timeout") int shutdownTimeoutMs,
                          OpAmpHttpHandler opAmpHttpHandler,
                          OpAmpWebSocketApplication opAmpWebSocketApplication,
-                         OpAmpWebSocketAuthFilter opAmpWebSocketAuthFilter) {
+                         OpAmpAuthFilter opAmpAuthFilter) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.dynamicFeatures = requireNonNull(dynamicFeatures, "dynamicFeatures");
         this.containerResponseFilters = requireNonNull(containerResponseFilters, "containerResponseFilters");
@@ -165,7 +165,7 @@ public class JerseyService extends AbstractIdleService {
         this.shutdownTimeoutMs = shutdownTimeoutMs;
         this.opAmpHttpHandler = requireNonNull(opAmpHttpHandler, "opAmpHttpHandler");
         this.opAmpWebSocketApplication = requireNonNull(opAmpWebSocketApplication, "opAmpWebSocketApplication");
-        this.opAmpWebSocketAuthFilter = requireNonNull(opAmpWebSocketAuthFilter, "opAmpWebSocketAuthFilter");
+        this.opAmpAuthFilter = requireNonNull(opAmpAuthFilter, "opAmpAuthFilter");
     }
 
     @Override
@@ -241,19 +241,24 @@ public class JerseyService extends AbstractIdleService {
         LOG.info("Started REST API at <{}>", configuration.getHttpBindAddress());
     }
 
+    /**
+     * Configure OpAMP endpoint at /v1/opamp for both HTTP and WebSocket transports.
+     *
+     * <p>Request flow:
+     * <ol>
+     *   <li>All requests hit the filter chain</li>
+     *   <li>OpAmpAuthFilter checks path - skips non-OpAMP requests, validates auth and
+     *       stores OpAmpAuthContext for /v1/opamp requests</li>
+     *   <li>WebSocketFilter routes upgrade requests to OpAmpWebSocketApplication</li>
+     *   <li>Regular HTTP requests (POST, etc.) reach OpAmpHttpHandler</li>
+     * </ol>
+     */
     private void configureOpAmp(HttpServer httpServer) {
-        // HTTP handler (auth handled inline in the handler)
-        httpServer.getServerConfiguration().addHttpHandler(opAmpHttpHandler, OpAmpConstants.HTTP_PATH);
+        httpServer.getListener("grizzly").registerAddOn(new OpAmpAddOn(opAmpAuthFilter));
+        WebSocketEngine.getEngine().register("", OpAmpConstants.PATH, opAmpWebSocketApplication);
+        httpServer.getServerConfiguration().addHttpHandler(opAmpHttpHandler, OpAmpConstants.PATH);
 
-        // WebSocket: enable addon on listener
-        final var listener = httpServer.getListener("grizzly");
-        listener.registerAddOn(new OpAmpWebSocketAddOn(opAmpWebSocketAuthFilter));
-
-        // Register WebSocket application (auth handled by OpAmpWebSocketAuthFilter)
-        WebSocketEngine.getEngine().register("", OpAmpConstants.WEBSOCKET_PATH, opAmpWebSocketApplication);
-
-        LOG.info("OpAMP endpoints enabled at {} (HTTP) and {} (WebSocket)",
-                OpAmpConstants.HTTP_PATH, OpAmpConstants.WEBSOCKET_PATH);
+        LOG.info("OpAMP endpoint enabled at {} (HTTP and WebSocket)", OpAmpConstants.PATH);
     }
 
     private Set<Resource> prefixPluginResources(String pluginPrefix, Map<String, Set<Class<? extends PluginRestResource>>> pluginResourceMap) {

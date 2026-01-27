@@ -17,8 +17,7 @@
 package org.graylog2.opamp;
 
 public final class OpAmpConstants {
-    public static final String HTTP_PATH = "/opamp";
-    public static final String WEBSOCKET_PATH = "/opamp/ws";
+    public static final String PATH = "/v1/opamp";
 
     private OpAmpConstants() {}
 }

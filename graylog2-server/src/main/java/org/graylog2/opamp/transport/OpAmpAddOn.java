@@ -25,14 +25,15 @@ import org.glassfish.grizzly.websockets.WebSocketFilter;
 import java.util.Objects;
 
 /**
- * Custom AddOn that wraps Grizzly's WebSocketAddOn and positions the auth filter
- * before the WebSocketFilter so auth can reject requests with HTTP 401 before upgrade.
+ * Custom AddOn that enables WebSocket support and positions the auth filter in the
+ * filter chain. The auth filter handles authentication for both HTTP and WebSocket
+ * requests to the OpAMP endpoint.
  */
-public class OpAmpWebSocketAddOn implements AddOn {
+public class OpAmpAddOn implements AddOn {
     private final WebSocketAddOn delegate = new WebSocketAddOn();
-    private final OpAmpWebSocketAuthFilter authFilter;
+    private final OpAmpAuthFilter authFilter;
 
-    public OpAmpWebSocketAddOn(OpAmpWebSocketAuthFilter authFilter) {
+    public OpAmpAddOn(OpAmpAuthFilter authFilter) {
         this.authFilter = Objects.requireNonNull(authFilter, "authFilter must not be null");
     }
 

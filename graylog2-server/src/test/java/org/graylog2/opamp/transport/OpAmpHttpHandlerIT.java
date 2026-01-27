@@ -28,6 +28,7 @@ import opamp.proto.Opamp.ServerErrorResponse;
 import opamp.proto.Opamp.ServerErrorResponseType;
 import opamp.proto.Opamp.ServerToAgent;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.graylog2.opamp.OpAmpConstants;
 import org.graylog2.opamp.OpAmpService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,9 +62,13 @@ class OpAmpHttpHandlerIT {
         opAmpService = mock(OpAmpService.class);
         final var executor = Executors.newVirtualThreadPerTaskExecutor();
 
+        // Register auth filter via addon (handles auth for HTTP requests too)
+        final var listener = httpServer.getListener("grizzly");
+        listener.registerAddOn(new OpAmpAddOn(new OpAmpAuthFilter(opAmpService, executor)));
+
         final OpAmpHttpHandler handler = new OpAmpHttpHandler(opAmpService, executor,
                 Size.bytes(TEST_MAX_MESSAGE_SIZE));
-        httpServer.getServerConfiguration().addHttpHandler(handler, "/opamp");
+        httpServer.getServerConfiguration().addHttpHandler(handler, OpAmpConstants.PATH);
 
         httpServer.start();
 
@@ -81,8 +86,11 @@ class OpAmpHttpHandlerIT {
 
     @Test
     void rejectsGetRequest() throws Exception {
+        when(opAmpService.validateToken("Bearer valid")).thenReturn(true);
+
         final Request request = new Request.Builder()
                 .url(opampUrl())
+                .header("Authorization", "Bearer valid")
                 .get()
                 .build();
 
@@ -232,7 +240,7 @@ class OpAmpHttpHandlerIT {
     }
 
     private String opampUrl() {
-        return "http://localhost:" + port + "/opamp";
+        return "http://localhost:" + port + OpAmpConstants.PATH;
     }
 
     private static int findFreePort() throws IOException {

@@ -81,10 +81,10 @@ public class OpAmpHttpHandler extends HttpHandler {
             return;
         }
 
-        // Validate auth token
-        final String authHeader = request.getHeader("Authorization");
-        if (!opAmpService.validateToken(authHeader)) {
-            LOG.debug("OpAMP auth failed");
+        // Read auth context set by OpAmpAuthFilter
+        final var authContext = OpAmpAuthContext.fromRequest(request.getRequest());
+        if (authContext.isEmpty() || !authContext.get().authenticated()) {
+            LOG.debug("OpAMP auth failed or missing");
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             response.finish();
             return;
