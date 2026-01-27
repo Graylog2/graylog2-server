@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as InstanceList } from './InstanceList';
 export { default as InstanceDetailDrawer } from './InstanceDetailDrawer';
 export { default as customColumnRenderers } from './ColumnRenderers';
 export { default as useTableElements } from './useTableElements';

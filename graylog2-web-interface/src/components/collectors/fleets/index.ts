@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as FleetList } from './FleetList';
 export { default as FleetDetail } from './FleetDetail';
 export { default as FleetFormModal } from './FleetFormModal';
 export { default as FleetSettings } from './FleetSettings';

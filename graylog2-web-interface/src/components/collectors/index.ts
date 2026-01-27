@@ -31,13 +31,11 @@ export { default as CollectorsPageNavigation } from './common/CollectorsPageNavi
 export { default as CollectorsOverview } from './overview/CollectorsOverview';
 
 // Fleets components
-export { default as FleetList } from './fleets/FleetList';
 export { default as FleetDetail } from './fleets/FleetDetail';
 export { default as FleetFormModal } from './fleets/FleetFormModal';
 export { default as FleetSettings } from './fleets/FleetSettings';
 
 // Instances components
-export { default as InstanceList } from './instances/InstanceList';
 export { default as InstanceDetailDrawer } from './instances/InstanceDetailDrawer';
 
 // Sources components
