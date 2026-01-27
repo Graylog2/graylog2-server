@@ -16,7 +16,6 @@
  */
 package org.graylog2.database.pagination;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNDescriptor;
 import org.graylog.security.Capability;
@@ -77,18 +76,27 @@ public class EntityPaginationHelper {
     }
 
     /**
+     * Creates a predicate that filters entities based on the provided list of entity filters.
+     *
+     * @return a Predicate that filters objects of type T
+     */
+    public static <T> Predicate<T> entityFiltersPredicate(List<String> filters, Function<String, Predicate<T>> filterPredicateFactory) {
+        if (filters == null || filters.isEmpty()) {
+            return t -> true;
+        }
+        return filters.stream()
+                .map(filterPredicateFactory)
+                .reduce(t -> false, Predicate::or); // Combine all predicates with OR
+    }
+
+    /**
      * Creates a predicate that filters GRN objects based on the provided list of entity filters.
      *
      * @param filters the list of entity filters
      * @return a Predicate that filters GRN objects
      */
     public static Predicate<GRN> entityFiltersGRNPredicate(List<String> filters) {
-        if (filters == null || filters.isEmpty()) {
-            return grn -> true;
-        }
-        return filters.stream()
-                .map(EntityPaginationHelper::entityFilterGRNPredicate)
-                .reduce(grn -> false, Predicate::or); // Combine all predicates with OR
+        return entityFiltersPredicate(filters, EntityPaginationHelper::entityFilterGRNPredicate);
     }
 
     /**
@@ -98,15 +106,9 @@ public class EntityPaginationHelper {
      * @return a Predicate that filters GRNDescriptor objects
      */
     public static Predicate<GRNDescriptor> entityFiltersDescriptorPredicate(List<String> filters) {
-        if (filters == null || filters.isEmpty()) {
-            return descriptor -> true;
-        }
-        return filters.stream()
-                .map(EntityPaginationHelper::entityFilterDescriptorPredicate)
-                .reduce(descriptor -> false, Predicate::or); // Combine all predicates with OR
+        return entityFiltersPredicate(filters, EntityPaginationHelper::entityFilterDescriptorPredicate);
     }
 
-    @VisibleForTesting
     public static <T> Predicate<T> buildPredicate(String filter, Map<String, Function<T, String>> fieldExtractors) {
         if (isNullOrEmpty(filter) || fieldExtractors.isEmpty()) {
             return t -> true;

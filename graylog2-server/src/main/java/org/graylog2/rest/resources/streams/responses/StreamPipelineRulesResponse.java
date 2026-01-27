@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.streams.responses;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public record StreamPipelineRulesResponse(
         @JsonProperty("id") String id,
@@ -27,4 +28,16 @@ public record StreamPipelineRulesResponse(
         @JsonProperty("rule_id") String ruleId,
         @JsonProperty("rule") String rule,
         @JsonProperty("connected_streams") List<StreamReference> connectedStreams
-) {}
+) {
+    public String pipelineTitle() {
+        return pipeline;
+    }
+
+    public String ruleName() {
+        return rule;
+    }
+
+    public String connectedStreamTitles() {
+        return connectedStreams.stream().map(StreamReference::title).collect(Collectors.joining(", "));
+    }
+}

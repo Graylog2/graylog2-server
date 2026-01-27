@@ -41,6 +41,7 @@ package org.graylog2.rest.resources.streams;
     import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
     import org.graylog2.database.NotFoundException;
     import org.graylog2.database.PaginatedList;
+    import org.graylog2.database.pagination.EntityPaginationHelper;
     import org.graylog2.rest.models.SortOrder;
     import org.graylog2.rest.models.tools.responses.PageListResponse;
     import org.graylog2.rest.resources.entities.EntityAttribute;
@@ -55,10 +56,13 @@ package org.graylog2.rest.resources.streams;
 
     import java.util.List;
     import java.util.Locale;
+    import java.util.Map;
     import java.util.Objects;
+    import java.util.function.Function;
+    import java.util.function.Predicate;
     import java.util.stream.Stream;
 
-@RequiresAuthentication
+    @RequiresAuthentication
 @PublicCloudAPI
 @Tag(name = "Stream/RoutingRules", description = "Stream routing with pipeline rules")
 @Path("/routing_rules")
@@ -69,12 +73,12 @@ public class StreamPipelineRulesResource extends RestResource {
     private static final String DEFAULT_SORT_FIELD = ATTRIBUTE_PIPELINE_RULE;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
-            EntityAttribute.builder().id("id").title("id").type(SearchQueryField.Type.OBJECT_ID).hidden(true).searchable(true).build(),
+            EntityAttribute.builder().id("id").title("id").type(SearchQueryField.Type.OBJECT_ID).searchable(false).hidden(true).build(),
             EntityAttribute.builder().id("rule_id").title("Pipeline Rule ID").searchable(false).hidden(true).build(),
-            EntityAttribute.builder().id(ATTRIBUTE_PIPELINE_RULE).title("Pipeline Rule").searchable(false).build(),
+            EntityAttribute.builder().id(ATTRIBUTE_PIPELINE_RULE).title("Pipeline Rule").searchable(true).build(),
             EntityAttribute.builder().id("pipeline_id").title("Pipeline ID").searchable(false).hidden(true).build(),
-            EntityAttribute.builder().id(ATTRIBUTE_PIPELINE).title("Pipeline").searchable(false).build(),
-            EntityAttribute.builder().id(ATTRIBUTE_CONNECTED_STREAM).title("Connected Streams").searchable(false).build()
+            EntityAttribute.builder().id(ATTRIBUTE_PIPELINE).title("Pipeline").searchable(true).build(),
+            EntityAttribute.builder().id(ATTRIBUTE_CONNECTED_STREAM).title("Connected Streams").searchable(true).build()
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT)))).build();
@@ -108,7 +112,7 @@ public class StreamPipelineRulesResource extends RestResource {
             @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
             @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
             @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
-            @Parameter(name = "filters") @QueryParam("filters") List<String> filters, // currently unused
+            @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
             @Parameter(name = "sort",
                        description = "The field to sort the result on",
                        required = true,
@@ -122,7 +126,9 @@ public class StreamPipelineRulesResource extends RestResource {
         List<StreamPipelineRulesResponse> responseList =
                 mongoDbPipelineMetadataService.getRoutingPipelines(streamId).stream()
                         .flatMap(dao -> buildResponse(dao, streamId))
+                        .filter(rulesResponsePredicate(filters))
                         .toList();
+
         final PaginatedList<StreamPipelineRulesResponse> paginatedList =
                 new PaginatedList<>(responseList, responseList.size(), page, perPage);
 
@@ -130,6 +136,20 @@ public class StreamPipelineRulesResource extends RestResource {
                 query, paginatedList.pagination(),
                 paginatedList.grandTotal().orElse(0L), sort, order, paginatedList.delegate(), attributes, settings);
     }
+
+        private Predicate<StreamPipelineRulesResponse> rulesResponsePredicate(List<String> filters) {
+            if (filters == null || filters.isEmpty()) {
+                return descriptor -> true;
+            }
+            Map<String, Function<StreamPipelineRulesResponse, String>> fieldExtractors = Map.of(
+                    ATTRIBUTE_PIPELINE_RULE, StreamPipelineRulesResponse::ruleName,
+                    ATTRIBUTE_PIPELINE, StreamPipelineRulesResponse::pipelineTitle,
+                    ATTRIBUTE_CONNECTED_STREAM, StreamPipelineRulesResponse::connectedStreamTitles
+            );
+            return filters.stream()
+                    .map(entityFilter -> EntityPaginationHelper.buildPredicate(entityFilter, fieldExtractors))
+                    .reduce(descriptor -> false, Predicate::or);
+        }
 
     private Stream<StreamPipelineRulesResponse> buildResponse(PipelineRulesMetadataDao dao, String streamId) {
         List<StreamPipelineRulesResponse> responseList = new java.util.ArrayList<>();
