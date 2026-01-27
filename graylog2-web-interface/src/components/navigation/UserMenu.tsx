@@ -44,11 +44,11 @@ const UserMenu = () => {
       <Menu.Label>
         <FullName>{fullName}</FullName>
       </Menu.Label>
-      <Menu.Divider />
+      <MenuItem divider />
       <Menu.Label>
         <ThemeModeToggle />
       </Menu.Label>
-      <Menu.Divider />
+      <MenuItem divider />
       <LinkContainer to={route}>
         <MenuItem>{label}</MenuItem>
       </LinkContainer>
