@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useMemo, useCallback } from 'react';
 import styled, { css } from 'styled-components';
-import { Flex, Title } from '@mantine/core';
 
 import { Spinner } from 'components/common';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
@@ -29,8 +28,9 @@ import sourceColumnRenderers from '../sources/ColumnRenderers';
 import { DEFAULT_LAYOUT as SOURCES_LAYOUT } from '../sources/Constants';
 import type { Source } from '../types';
 
-const StatsRow = styled(Flex)(
+const StatsRow = styled.div(
   ({ theme }) => css`
+    display: flex;
     margin-bottom: ${theme.spacings.lg};
     gap: ${theme.spacings.md};
     flex-wrap: wrap;
@@ -68,7 +68,7 @@ const CollectorsOverview = () => {
       </StatsRow>
 
       <Section>
-        <Title order={4} mb="md">Active Sources</Title>
+        <h4 style={{ marginBottom: '1rem' }}>Active Sources</h4>
         <PaginatedEntityTable<Source>
           humanName="sources"
           tableLayout={SOURCES_LAYOUT}
