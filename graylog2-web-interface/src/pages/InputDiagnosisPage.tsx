@@ -145,13 +145,10 @@ const NodeListItemContent = styled.div(
   `,
 );
 
-const NodeDetailsRow = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    align-items: flex-start;
-    gap: ${theme.spacings.xs};
-  `,
-);
+const NodeDetailsRow = styled.div`
+  display: flex;
+  align-items: flex-start;
+`;
 
 const TroubleshootingContainer = styled.div`
   max-height: 400px;
@@ -347,7 +344,7 @@ const InputDiagnosisPage = () => {
                 {inputMetrics.failedStarts15mCount !== undefined && (
                   <StyledListGroupItem>
                     <StyledTitle>Failed starts (last 15min):</StyledTitle>
-                    <StyledSpan>{inputMetrics.failedStarts15mCount}</StyledSpan>
+                    {inputMetrics.failedStarts15mCount}
                   </StyledListGroupItem>
                 )}
                 {Object.keys(inputNodeStates.states).map((state: InputState) => (
