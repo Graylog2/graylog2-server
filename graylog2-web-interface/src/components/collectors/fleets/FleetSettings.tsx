@@ -17,9 +17,10 @@
 import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { TextInput, Textarea, Button, Group, Stack, Card, Text } from '@mantine/core';
+import { Stack } from '@mantine/core';
 
-import { RelativeTime } from 'components/common';
+import { Button, Input } from 'components/bootstrap';
+import { Card, RelativeTime } from 'components/common';
 
 import type { Fleet } from '../types';
 
@@ -30,11 +31,39 @@ type Props = {
   isLoading?: boolean;
 };
 
-const Section = styled(Card)(
-  ({ theme }) => css`
-    margin-bottom: ${theme.spacings.md};
-  `,
-);
+const Section = styled(Card)`
+  margin-bottom: ${({ theme }) => theme.spacings.md};
+`;
+
+const InfoRow = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: ${({ theme }) => theme.spacings.xs};
+`;
+
+const InfoLabel = styled.span`
+  font-size: ${({ theme }) => theme.fonts.size.small};
+  font-weight: 500;
+  min-width: 100px;
+`;
+
+const InfoValue = styled.span`
+  font-size: ${({ theme }) => theme.fonts.size.small};
+  font-family: ${({ theme }) => theme.fonts.family.monospace};
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: ${({ theme }) => theme.spacings.sm};
+  margin-top: ${({ theme }) => theme.spacings.md};
+`;
+
+const WarningText = styled.p`
+  font-size: ${({ theme }) => theme.fonts.size.small};
+  color: ${({ theme }) => theme.colors.gray[60]};
+  margin-bottom: ${({ theme }) => theme.spacings.sm};
+`;
 
 const SectionTitle = styled.h4(
   ({ theme }) => css`
@@ -73,63 +102,67 @@ const FleetSettings = ({ fleet, onSave, onDelete = undefined, isLoading = false 
 
   return (
     <Stack gap="md">
-      <Section withBorder>
+      <Section>
         <SectionTitle>General Settings</SectionTitle>
         <Stack gap="sm">
-          <TextInput
+          <Input
+            id="fleet-name"
             label="Fleet Name"
             value={name}
             onChange={(e) => handleChange(setName, e.target.value)}
             required
           />
-          <Textarea
+          <Input
+            id="fleet-description"
+            type="textarea"
             label="Description"
             value={description}
             onChange={(e) => handleChange(setDescription, e.target.value)}
           />
-          <TextInput
+          <Input
+            id="fleet-target-version"
             label="Target Version"
-            description="Collector version to deploy to this fleet"
+            help="Collector version to deploy to this fleet"
             placeholder="e.g., 1.2.0"
             value={targetVersion}
             onChange={(e) => handleChange(setTargetVersion, e.target.value)}
           />
         </Stack>
 
-        <Group justify="flex-end" mt="md">
-          <Button variant="default" onClick={handleReset} disabled={!isDirty || isLoading}>
+        <ButtonGroup>
+          <Button bsStyle="default" onClick={handleReset} disabled={!isDirty || isLoading}>
             Reset
           </Button>
-          <Button onClick={handleSave} disabled={!isDirty || !name || isLoading} loading={isLoading}>
+          <Button bsStyle="primary" onClick={handleSave} disabled={!isDirty || !name || isLoading}>
             Save Changes
           </Button>
-        </Group>
+        </ButtonGroup>
       </Section>
 
-      <Section withBorder>
+      <Section>
         <SectionTitle>Fleet Information</SectionTitle>
-        <Stack gap="xs">
-          <Group>
-            <Text size="sm" fw={500} style={{ minWidth: 100 }}>Fleet ID:</Text>
-            <Text size="sm" ff="monospace">{fleet.id}</Text>
-          </Group>
-          <Group>
-            <Text size="sm" fw={500} style={{ minWidth: 100 }}>Created:</Text>
+        <div>
+          <InfoRow>
+            <InfoLabel>Fleet ID:</InfoLabel>
+            <InfoValue>{fleet.id}</InfoValue>
+          </InfoRow>
+          <InfoRow>
+            <InfoLabel>Created:</InfoLabel>
             <RelativeTime dateTime={fleet.created_at} />
-          </Group>
-          <Group>
-            <Text size="sm" fw={500} style={{ minWidth: 100 }}>Updated:</Text>
+          </InfoRow>
+          <InfoRow>
+            <InfoLabel>Updated:</InfoLabel>
             <RelativeTime dateTime={fleet.updated_at} />
-          </Group>
-        </Stack>
+          </InfoRow>
+        </div>
       </Section>
 
-      <Section withBorder>
+      <Section>
         <SectionTitle>Danger Zone</SectionTitle>
-        <Text size="sm" c="dimmed" mb="sm">
+        <WarningText>
           Deleting a fleet will remove all configuration. Instances will need to be re-enrolled.
-        </Text>
-        <Button color="red" variant="outline" onClick={onDelete} disabled={!onDelete}>Delete Fleet</Button>
+        </WarningText>
+        <Button bsStyle="danger" onClick={onDelete} disabled={!onDelete}>Delete Fleet</Button>
       </Section>
     </Stack>
   );
