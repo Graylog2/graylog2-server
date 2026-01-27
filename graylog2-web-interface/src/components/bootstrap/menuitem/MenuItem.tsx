@@ -39,6 +39,12 @@ const StyledMenuItem = styled(MantineMenu.Item)(
   `,
 );
 
+const StyledMenuDivider = styled(MantineMenu.Divider)(
+  ({ theme }) => css`
+    border-color: ${theme.colors.variant.lighter.default};
+  `,
+);
+
 type Callback<T> = T extends undefined ? () => void : (eventKey: T) => void;
 
 type Props<T = undefined> = React.PropsWithChildren<{
@@ -84,7 +90,7 @@ const CustomMenuItem = <T,>({
   const _onClick = useCallback(() => callback?.(eventKey), [callback, eventKey]);
 
   if (divider) {
-    return <Menu.Divider role="separator" className={className} id={id} />;
+    return <StyledMenuDivider role="separator" className={className} id={id} />;
   }
 
   if (header) {
