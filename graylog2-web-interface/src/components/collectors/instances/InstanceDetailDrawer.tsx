@@ -16,8 +16,10 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import { Badge, Table, Stack, Text, Group } from '@mantine/core';
+import { Stack } from '@mantine/core';
+import type { ColorVariant } from '@graylog/sawmill';
 
+import { Badge, Table } from 'components/bootstrap';
 import Drawer from 'components/common/Drawer';
 import { RelativeTime } from 'components/common';
 import { Link } from 'components/common/router';
@@ -48,20 +50,24 @@ const SectionTitle = styled.h4(
   `,
 );
 
-const DetailRow = styled(Group)`
+const DetailRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   margin-bottom: 0.5rem;
 `;
 
-const Label = styled(Text)`
+const Label = styled.span`
   font-weight: 500;
   min-width: 120px;
+  font-size: 0.875rem;
 `;
 
-const configStatusColors: Record<string, string> = {
-  APPLIED: 'green',
-  APPLYING: 'blue',
-  FAILED: 'red',
-  UNSET: 'gray',
+const configStatusStyles: Record<string, ColorVariant> = {
+  APPLIED: 'success',
+  APPLYING: 'info',
+  FAILED: 'danger',
+  UNSET: 'default',
 };
 
 const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) => {
@@ -74,46 +80,46 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
       <Stack gap="md">
         <Section>
           <DetailRow>
-            <Label size="sm">Status:</Label>
-            <Badge color={instance.status === 'online' ? 'green' : 'gray'}>
+            <Label>Status:</Label>
+            <Badge bsStyle={instance.status === 'online' ? 'success' : 'default'}>
               {instance.status === 'online' ? 'Online' : 'Offline'}
             </Badge>
           </DetailRow>
 
           <DetailRow>
-            <Label size="sm">Fleet:</Label>
+            <Label>Fleet:</Label>
             <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>{fleetName}</Link>
           </DetailRow>
 
           <DetailRow>
-            <Label size="sm">OS:</Label>
-            <Text size="sm">{osDescription || instance.os || 'Unknown'}</Text>
+            <Label>OS:</Label>
+            <span>{osDescription || instance.os || 'Unknown'}</span>
           </DetailRow>
 
           <DetailRow>
-            <Label size="sm">Last Seen:</Label>
+            <Label>Last Seen:</Label>
             <RelativeTime dateTime={instance.last_seen} />
           </DetailRow>
 
           <DetailRow>
-            <Label size="sm">Version:</Label>
-            <Text size="sm">{instance.version}</Text>
+            <Label>Version:</Label>
+            <span>{instance.version}</span>
           </DetailRow>
 
           <DetailRow>
-            <Label size="sm">Config:</Label>
-            <Group gap="xs">
-              <Text size="sm" ff="monospace">{instance.remote_config_status.last_remote_config_hash.slice(0, 7)}</Text>
-              <Badge color={configStatusColors[instance.remote_config_status.status]} size="sm">
+            <Label>Config:</Label>
+            <span style={{ display: 'inline-flex', gap: '0.25rem', alignItems: 'center' }}>
+              <code>{instance.remote_config_status.last_remote_config_hash.slice(0, 7)}</code>
+              <Badge bsStyle={configStatusStyles[instance.remote_config_status.status]}>
                 {instance.remote_config_status.status}
               </Badge>
-            </Group>
+            </span>
           </DetailRow>
 
           {instance.remote_config_status.error_message && (
             <DetailRow>
-              <Label size="sm">Error:</Label>
-              <Text size="sm" c="red">{instance.remote_config_status.error_message}</Text>
+              <Label>Error:</Label>
+              <span style={{ color: 'red' }}>{instance.remote_config_status.error_message}</span>
             </DetailRow>
           )}
         </Section>
@@ -121,42 +127,42 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
         <Section>
           <SectionTitle>System Details</SectionTitle>
           <Table striped>
-            <Table.Tbody>
+            <tbody>
               {instance.agent_description.identifying_attributes.map((attr) => (
-                <Table.Tr key={attr.key}>
-                  <Table.Td>{attr.key}</Table.Td>
-                  <Table.Td>{attr.value}</Table.Td>
-                </Table.Tr>
+                <tr key={attr.key}>
+                  <td>{attr.key}</td>
+                  <td>{attr.value}</td>
+                </tr>
               ))}
               {instance.agent_description.non_identifying_attributes.map((attr) => (
-                <Table.Tr key={attr.key}>
-                  <Table.Td>{attr.key}</Table.Td>
-                  <Table.Td>{attr.value}</Table.Td>
-                </Table.Tr>
+                <tr key={attr.key}>
+                  <td>{attr.key}</td>
+                  <td>{attr.value}</td>
+                </tr>
               ))}
-              <Table.Tr>
-                <Table.Td>connection_type</Table.Td>
-                <Table.Td>{instance.connection_type}</Table.Td>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Td>first_seen</Table.Td>
-                <Table.Td><RelativeTime dateTime={instance.first_seen} /></Table.Td>
-              </Table.Tr>
-            </Table.Tbody>
+              <tr>
+                <td>connection_type</td>
+                <td>{instance.connection_type}</td>
+              </tr>
+              <tr>
+                <td>first_seen</td>
+                <td><RelativeTime dateTime={instance.first_seen} /></td>
+              </tr>
+            </tbody>
           </Table>
         </Section>
 
         <Section>
           <SectionTitle>Active Sources ({sources.length})</SectionTitle>
           {sources.length === 0 ? (
-            <Text size="sm" c="dimmed">No sources configured for this fleet.</Text>
+            <span style={{ color: '#666' }}>No sources configured for this fleet.</span>
           ) : (
             <Stack gap="xs">
               {sources.map((source) => (
-                <Group key={source.id} gap="xs">
-                  <Text size="sm">• {source.name}</Text>
-                  <Badge size="xs" variant="light">{source.type}</Badge>
-                </Group>
+                <span key={source.id} style={{ display: 'inline-flex', gap: '0.25rem', alignItems: 'center' }}>
+                  <span>• {source.name}</span>
+                  <Badge bsStyle="info">{source.type}</Badge>
+                </span>
               ))}
             </Stack>
           )}
