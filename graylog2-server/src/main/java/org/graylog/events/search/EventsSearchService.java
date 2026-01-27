@@ -22,8 +22,15 @@ import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
+import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiService;
+import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedException;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.Grouping;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
@@ -39,22 +46,25 @@ import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
 public class EventsSearchService extends AbstractEventsSearchService {
     private final MoreSearch moreSearch;
     private final StreamService streamService;
+    private final ScriptingApiService scriptingApiService;
 
     @Inject
     public EventsSearchService(MoreSearch moreSearch,
                                StreamService streamService,
                                DBEventDefinitionService eventDefinitionService,
+                               ScriptingApiService scriptingApiService,
                                ObjectMapper objectMapper) {
         super(eventDefinitionService, streamService, objectMapper);
         this.moreSearch = moreSearch;
         this.streamService = streamService;
+        this.scriptingApiService = scriptingApiService;
     }
 
     private String buildFilter(EventsSearchParameters parameters) {
         return new EventsFilterBuilder(parameters).build();
     }
 
-    private Set<String> allowedEventStreams(Subject subject) {
+    public Set<String> allowedEventStreams(Subject subject) {
         final var eventStreams = defaultEventStreams();
         if (subject.isPermitted(RestPermissions.STREAMS_READ)) {
             return eventStreams;
@@ -76,6 +86,26 @@ public class EventsSearchService extends AbstractEventsSearchService {
         final MoreSearch.Result result = moreSearch.eventSearch(parameters, filter, eventStreams, forbiddenSourceStreams(subject));
 
         return buildResultForSubject(parameters, result, subject);
+    }
+
+    public SlicesResult slices(final EventsSlicesRequest request, final Subject subject, final SearchUser searchUser) {
+        // we cover two use cases, if you only want the slices from the resultset that will also be shown in the entity table, we re-use query and timerange for that. Otherwise, we query "all"
+        final var query = request.includeAll() ? "" : request.parameters().query();
+        final var timeRange = request.includeAll() ? RelativeRange.allTime() : request.parameters().timerange();
+
+        return slices(query, timeRange, subject, searchUser, request.sliceColumn());
+    }
+
+    public SlicesResult slices(String query, TimeRange timeRange, Subject subject, SearchUser searchUser, String slicingColumn) {
+        try {
+            return new SlicesResult(scriptingApiService.executeAggregation(
+                            new AggregationRequestSpec(query, allowedEventStreams(subject), Set.of(), timeRange, List.of(new Grouping(slicingColumn, Integer.MAX_VALUE)), List.of(new Metric("count", slicingColumn))),
+                            searchUser
+                    )
+                    .datarows().stream().map(r -> new Slice(null, r.getFirst().toString(), Integer.valueOf(r.getLast().toString()), null)).toList());
+        } catch (QueryFailedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public EventsHistogramResult histogram(EventsSearchParameters parameters, Subject subject, ZoneId timeZone) {

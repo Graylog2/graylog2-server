@@ -83,6 +83,7 @@ describe('<EntityDataTable />', () => {
     entityAttributesAreCamelCase: true,
     columnSchemas,
     onResetLayoutPreferences: () => Promise.resolve(),
+    onChangeSlicing: () => {},
   };
 
   it('should render selected columns and table headers', async () => {
