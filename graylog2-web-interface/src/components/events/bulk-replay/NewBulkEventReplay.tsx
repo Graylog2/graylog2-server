@@ -46,7 +46,6 @@ const EventsListSidebar = styled.div(
     flex-direction: column;
     gap: ${theme.spacings.xs};
     width: 300px;
-    // max-width: 500px;
   `,
 );
 
