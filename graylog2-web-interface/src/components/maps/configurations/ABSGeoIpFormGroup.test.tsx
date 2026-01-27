@@ -38,11 +38,12 @@ describe('ABSGeoIpFormGroup', () => {
     azure_account_key: { is_set: true },
   } as Partial<GeoIpConfigType>;
 
-  const renderComponent = (initialValues: Partial<GeoIpConfigType> = newConfig) => render(
-    <Formik initialValues={initialValues as GeoIpConfigType} onSubmit={jest.fn()}>
-      <ABSGeoIpFormGroup />
-    </Formik>,
-  );
+  const renderComponent = (initialValues: Partial<GeoIpConfigType> = newConfig) =>
+    render(
+      <Formik initialValues={initialValues as GeoIpConfigType} onSubmit={jest.fn()}>
+        <ABSGeoIpFormGroup />
+      </Formik>,
+    );
 
   it('renders all form fields for new configuration', async () => {
     renderComponent();

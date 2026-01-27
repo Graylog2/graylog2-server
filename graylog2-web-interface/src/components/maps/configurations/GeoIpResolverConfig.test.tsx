@@ -51,7 +51,9 @@ describe('GeoIpResolverConfig', () => {
     const editButton = screen.getByRole('button', { name: /edit configuration/i });
     userEvent.click(editButton);
 
-    expect(await screen.findByRole('heading', { name: /update geo-location processor configuration/i })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: /update geo-location processor configuration/i }),
+    ).toBeInTheDocument();
   });
 
   it('should submit configuration changes and close modal', async () => {
@@ -68,7 +70,9 @@ describe('GeoIpResolverConfig', () => {
 
     await waitFor(() => {
       expect(mockUpdateConfig).toHaveBeenCalledWith(expect.objectContaining({ enabled: true }));
-      expect(screen.queryByRole('heading', { name: /update geo-location processor configuration/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('heading', { name: /update geo-location processor configuration/i }),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -79,14 +83,15 @@ describe('GeoIpResolverConfig', () => {
 
     await selectEvent.chooseOption('select cloud storage', 'Google Cloud Storage');
 
-    expect(screen.getByRole('textbox', {
-      name: /googe cloud storage project id \(opt\.\)/i
-    })).toBeInTheDocument();
+    expect(
+      screen.getByRole('textbox', {
+        name: /googe cloud storage project id \(opt\.\)/i,
+      }),
+    ).toBeInTheDocument();
 
     await selectEvent.chooseOption('select cloud storage', 'Azure Blob Storage');
 
     expect(await screen.findByLabelText(/azure blob container name/i)).toBeInTheDocument();
-
   });
   it('should disable form fields when processor is disabled', async () => {
     render(<GeoIpResolverConfig config={defaultConfig} updateConfig={mockUpdateConfig} />);

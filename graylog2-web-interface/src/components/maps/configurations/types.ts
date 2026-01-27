@@ -20,7 +20,7 @@ export type TimeUnit = 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS';
 export const CLOUD_STORAGE_OPTION = {
   GCS: 'gcs',
   S3: 's3',
-  ABS: 'abs'
+  ABS: 'abs',
 } as const;
 
 export type EncryptedValue =
