@@ -110,8 +110,8 @@ const ReplayedSearch = ({
     <>
       <InfoAlert eventIds={eventIds} selectedEvent={selectedEvent} />
       <ReplaySearch
-        key={`replaying-search-for-event-${selectedEvent?.event?.id}`}
         alertId={selectedEvent?.event?.id}
+        eventData={selectedEvent.event}
         definitionId={selectedEvent?.event?.event_definition_id}
         searchPageLayout={searchPageLayout}
         forceSidebarPinned

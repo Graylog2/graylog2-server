@@ -75,6 +75,7 @@ const EventReplaySearchPage = () => {
       definitionId={definitionId}
       searchPageLayout={searchPageLayout}
       forceSidebarPinned
+      eventData={eventData}
     />
   );
 };

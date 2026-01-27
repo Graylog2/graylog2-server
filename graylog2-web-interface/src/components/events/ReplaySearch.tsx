@@ -18,18 +18,17 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import merge from 'lodash/merge';
 
-import useAlertAndEventDefinitionData from 'components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData';
 import useCreateSearch from 'views/hooks/useCreateSearch';
 import EventInfoBar from 'components/event-definitions/replay-search/EventInfoBar';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 import SearchPage from 'views/pages/SearchPage';
 import ReplaySearchContext from 'components/event-definitions/replay-search/ReplaySearchContext';
 import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
-import Spinner from 'components/common/Spinner';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import { isSystemEventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { Event } from 'components/events/events/types';
 import type { EventDefinitionAggregation } from 'hooks/useEventDefinition';
+import useEventDefinition from 'hooks/useEventDefinition';
 import useCreateViewForEvent from 'views/logic/views/UseCreateViewForEvent';
 import Center from 'components/common/Center';
 
@@ -100,6 +99,7 @@ type Props = {
   replayEventDefinition?: boolean;
   searchPageLayout?: Partial<LayoutState>;
   forceSidebarPinned?: boolean;
+  eventData: Event;
 };
 
 const canReplayEvent = (eventDefinition: EventDefinition) => {
@@ -118,13 +118,11 @@ const LoadingBarrier = ({
   replayEventDefinition = false,
   searchPageLayout = defaultSearchPageLayout,
   forceSidebarPinned = false,
+  eventData,
 }: Props) => {
-  const { eventDefinition, aggregations, eventData, isLoading } = useAlertAndEventDefinitionData(alertId, definitionId);
-
-  if (isLoading) {
-    return <Spinner />;
-  }
-
+  const {
+    data: { eventDefinition, aggregations },
+  } = useEventDefinition(definitionId ?? eventData?.event_definition_id);
   const canReplay = canReplayEvent(eventDefinition);
 
   return canReplay === true ? (
