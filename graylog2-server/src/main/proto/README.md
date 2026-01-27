@@ -1,27 +1,35 @@
 # Protobuf files
 
 The `.proto` files in this directory and its subdirectories are used to generate Java source files
-during the maven build process.
+during the Maven build process.
 
 ## OpenTelemetry
 
-Along with our own protobuf specs, we maintain a copy of the protobuf specs from the 
-[OpenTelemetry Protocol (OTLP) Specification](https://github.com/open-telemetry/opentelemetry-proto) repository. 
+We maintain a copy of the protobuf specs from the
+[OpenTelemetry Protocol (OTLP) Specification](https://github.com/open-telemetry/opentelemetry-proto) repository.
 
 These are required as dependencies for the `otel-raw-journal-record.proto` spec.
 
-To update the opentelemetry specs, find the desired version at the [available releases](https://github.com/open-telemetry/opentelemetry-proto/releases)
-page and then run the `update_otel_proto.sh` script.
+## OpAMP
 
-This will download the release archive and extract the `.proto` files into `./opentelemetry`, maintaining the directory
-structure.
+We also maintain a copy of the protobuf specs from the
+[OpAMP Specification](https://github.com/open-telemetry/opamp-spec) repository.
 
->**CAVEAT**: The script requires GNU tar in order to work correctly. On a Mac you might have to install it first. You
-> can specify a different tar command to be used by the script by setting the `TAR_BIN` environment variable.
+These are used for the OpAMP-based sidecar communication.
 
-A typical update process would look like this:
+## Updating the specs
+
+To update the proto specs, edit the version numbers at the top of the `fetch_upstream_protos.sh` script
+and then run it:
 
 ```bash
-rm -r opentelemetry
-./update_otel_proto.sh v1.7.0
+./fetch_upstream_protos.sh
 ```
+
+The script will download the release archives and extract the `.proto` files into `./opentelemetry`
+and `./opamp`, maintaining the directory structure.
+
+> **Note**: The script requires GNU tar. On macOS, install it with `brew install gnu-tar` and run:
+> ```bash
+> TAR_BIN=gtar ./fetch_upstream_protos.sh
+> ```

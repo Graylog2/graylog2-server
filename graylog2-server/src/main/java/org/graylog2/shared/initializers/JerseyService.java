@@ -50,6 +50,7 @@ import org.graylog2.audit.jersey.AuditEventModelProcessor;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.jersey.PrefixAddingModelProcessor;
+import org.graylog2.opamp.transport.OpAmpHttpHandler;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
@@ -121,8 +122,9 @@ public class JerseyService extends AbstractIdleService {
     private final ErrorPageGenerator errorPageGenerator;
     private final TLSProtocolsConfiguration tlsConfiguration;
     private final int shutdownTimeoutMs;
+    private final OpAmpHttpHandler opAmpHttpHandler;
 
-    private HttpServer apiHttpServer = null;
+    private HttpServer httpServer = null;
 
     @Inject
     public JerseyService(final HttpConfiguration configuration,
@@ -137,7 +139,8 @@ public class JerseyService extends AbstractIdleService {
                          MetricRegistry metricRegistry,
                          ErrorPageGenerator errorPageGenerator,
                          TLSProtocolsConfiguration tlsConfiguration,
-                         @Named("shutdown_timeout") int shutdownTimeoutMs) {
+                         @Named("shutdown_timeout") int shutdownTimeoutMs,
+                         OpAmpHttpHandler opAmpHttpHandler) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.dynamicFeatures = requireNonNull(dynamicFeatures, "dynamicFeatures");
         this.containerResponseFilters = requireNonNull(containerResponseFilters, "containerResponseFilters");
@@ -151,6 +154,7 @@ public class JerseyService extends AbstractIdleService {
         this.errorPageGenerator = requireNonNull(errorPageGenerator, "errorPageGenerator");
         this.tlsConfiguration = requireNonNull(tlsConfiguration);
         this.shutdownTimeoutMs = shutdownTimeoutMs;
+        this.opAmpHttpHandler = requireNonNull(opAmpHttpHandler, "opAmpHttpHandler");
     }
 
     @Override
@@ -163,7 +167,7 @@ public class JerseyService extends AbstractIdleService {
 
     @Override
     protected void shutDown() throws Exception {
-        shutdownHttpServer(apiHttpServer, configuration.getHttpBindAddress());
+        shutdownHttpServer(httpServer, configuration.getHttpBindAddress());
     }
 
     private void shutdownHttpServer(HttpServer httpServer, HostAndPort bindAddress) {
@@ -209,7 +213,7 @@ public class JerseyService extends AbstractIdleService {
                 null
         );
 
-        apiHttpServer = setUp(
+        httpServer = setUp(
                 listenUri,
                 sslEngineConfigurator,
                 configuration.getHttpThreadPoolSize(),
@@ -219,7 +223,9 @@ public class JerseyService extends AbstractIdleService {
                 configuration.isHttpEnableCors(),
                 pluginResources);
 
-        apiHttpServer.start();
+        httpServer.getServerConfiguration().addHttpHandler(opAmpHttpHandler, "/opamp");
+
+        httpServer.start();
 
         LOG.info("Started REST API at <{}>", configuration.getHttpBindAddress());
     }

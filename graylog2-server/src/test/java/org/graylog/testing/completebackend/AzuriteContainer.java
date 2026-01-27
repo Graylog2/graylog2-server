@@ -16,6 +16,7 @@
  */
 package org.graylog.testing.completebackend;
 
+import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceAsyncClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
@@ -45,7 +46,11 @@ public class AzuriteContainer extends GenericContainer<AzuriteContainer> {
         return "DefaultEndpointsProtocol=http;"
                 + "AccountName=" + ACCOUNT_NAME + ";"
                 + "AccountKey=" + ACCOUNT_KEY + ";"
-                + "BlobEndpoint=http://" + BLOB_HOST + ":" + getMappedPort(PORT) + ";";
+                + "BlobEndpoint=" + getEndPoint() + ";";
+    }
+
+    public String getEndPoint() {
+        return "http://" + BLOB_HOST + ":" + getMappedPort(PORT) ;
     }
 
     public BlobServiceClient createBlobServiceClient() {
@@ -58,6 +63,12 @@ public class AzuriteContainer extends GenericContainer<AzuriteContainer> {
         return new BlobServiceClientBuilder()
                 .connectionString(createConnectionString())
                 .buildAsyncClient();
+    }
+
+    public BlobContainerClient createBlobContainer(String containerName) {
+        BlobServiceClient client = createBlobServiceClient();
+        client.createBlobContainer(containerName);
+        return client.getBlobContainerClient(containerName);
     }
 
     @Override
