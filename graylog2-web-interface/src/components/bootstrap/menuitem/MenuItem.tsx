@@ -16,20 +16,28 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Link } from 'react-router-dom';
+import { Menu as MantineMenu } from '@mantine/core';
 
 import Icon from 'components/common/Icon';
 
 import Menu from '../Menu';
 
-const IconWrapper = styled.div`
-  display: inline-flex;
-  min-width: 20px;
-  margin-right: 5px;
-  justify-content: center;
-  align-items: center;
-`;
+const StyledMenuItem = styled(MantineMenu.Item)(
+  ({ theme }) => css`
+    color: ${theme.colors.text.primary};
+    font-size: ${theme.fonts.size.body};
+    white-space: nowrap;
+
+    &:hover,
+    &:focus {
+      text-decoration: none;
+      color: inherit;
+      background-color: ${theme.utils.colorLevel(theme.colors.global.contentBackground, 10)};
+    }
+  `,
+);
 
 type Callback<T> = T extends undefined ? () => void : (eventKey: T) => void;
 
@@ -91,11 +99,7 @@ const CustomMenuItem = <T,>({
     className,
     'data-tab-id': dataTabId,
     disabled,
-    icon: icon ? (
-      <IconWrapper>
-        <Icon name={icon} />
-      </IconWrapper>
-    ) : null,
+    leftSection: icon ? <Icon name={icon} /> : null,
     id,
     onClick: _onClick,
     title,
@@ -104,16 +108,16 @@ const CustomMenuItem = <T,>({
 
   if (href) {
     return (
-      <Menu.Item component={Link} to={href} rel={rel} target={target} {...sharedProps}>
+      <StyledMenuItem component={Link} to={href} rel={rel} target={target} {...sharedProps}>
         {children}
-      </Menu.Item>
+      </StyledMenuItem>
     );
   }
 
   return (
-    <Menu.Item component={component} {...sharedProps}>
+    <StyledMenuItem component={component} {...sharedProps}>
       {children}
-    </Menu.Item>
+    </StyledMenuItem>
   );
 };
 
