@@ -23,9 +23,12 @@ import java.time.Duration;
 import java.util.ArrayDeque;
 
 public class SlidingWindowCounter extends Counter {
+    private static final long MINUTE_MILLIS = Duration.ofMinutes(1).toMillis();
+
     private final long windowMillis;
     private final Clock clock;
-    private final ArrayDeque<Long> timestamps = new ArrayDeque<>();
+    private final ArrayDeque<MinuteBucket> buckets = new ArrayDeque<>();
+    private long totalCount = 0L;
 
     public SlidingWindowCounter(Duration window) {
         this(window, Clock.defaultClock());
@@ -47,46 +50,46 @@ public class SlidingWindowCounter extends Counter {
             return;
         }
         final long now = clock.getTime();
-        synchronized (timestamps) {
+        final long nowMinute = floorToMinute(now);
+        synchronized (buckets) {
             purgeExpired(now);
-            for (long i = 0; i < n; i++) {
-                timestamps.addLast(now);
+            final MinuteBucket lastBucket = buckets.peekLast();
+            if (lastBucket != null && lastBucket.minuteStart == nowMinute) {
+                lastBucket.count += n;
+            } else {
+                buckets.addLast(new MinuteBucket(nowMinute, n));
             }
-        }
-    }
-
-    @Override
-    public void dec() {
-        dec(1);
-    }
-
-    @Override
-    public void dec(long n) {
-        if (n <= 0) {
-            return;
-        }
-        final long now = clock.getTime();
-        synchronized (timestamps) {
-            purgeExpired(now);
-            for (long i = 0; i < n && !timestamps.isEmpty(); i++) {
-                timestamps.removeFirst();
-            }
+            totalCount += n;
         }
     }
 
     @Override
     public long getCount() {
         final long now = clock.getTime();
-        synchronized (timestamps) {
+        synchronized (buckets) {
             purgeExpired(now);
-            return timestamps.size();
+            return totalCount;
         }
     }
 
     private void purgeExpired(long now) {
-        final long cutoff = now - windowMillis;
-        while (!timestamps.isEmpty() && timestamps.peekFirst() < cutoff) {
-            timestamps.removeFirst();
+        final long cutoffMinute = floorToMinute(now - windowMillis);
+        while (!buckets.isEmpty() && buckets.peekFirst().minuteStart < cutoffMinute) {
+            totalCount -= buckets.removeFirst().count;
+        }
+    }
+
+    private static long floorToMinute(long timeMillis) {
+        return (timeMillis / MINUTE_MILLIS) * MINUTE_MILLIS;
+    }
+
+    private static final class MinuteBucket {
+        private final long minuteStart;
+        private long count;
+
+        private MinuteBucket(long minuteStart, long count) {
+            this.minuteStart = minuteStart;
+            this.count = count;
         }
     }
 }

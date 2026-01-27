@@ -28,30 +28,19 @@ class SlidingWindowCounterTest {
     @Test
     void countsOnlyWithinWindow() {
         final TestClock clock = new TestClock();
-        final SlidingWindowCounter counter = new SlidingWindowCounter(Duration.ofMillis(1000), clock);
+        final SlidingWindowCounter counter = new SlidingWindowCounter(Duration.ofMinutes(2), clock);
 
         clock.setTime(0L);
         counter.inc(3);
         assertThat(counter.getCount()).isEqualTo(3L);
 
-        clock.setTime(1000L);
+        clock.setTime(Duration.ofMinutes(1).toMillis());
         assertThat(counter.getCount()).isEqualTo(3L);
 
-        clock.setTime(1001L);
-        assertThat(counter.getCount()).isEqualTo(0L);
-    }
+        clock.setTime(Duration.ofMinutes(2).toMillis() + 59_999L);
+        assertThat(counter.getCount()).isEqualTo(3L);
 
-    @Test
-    void decrementsAndDoesNotGoBelowZero() {
-        final TestClock clock = new TestClock();
-        final SlidingWindowCounter counter = new SlidingWindowCounter(Duration.ofSeconds(1), clock);
-
-        clock.setTime(0L);
-        counter.inc(3);
-        counter.dec(1);
-        assertThat(counter.getCount()).isEqualTo(2L);
-
-        counter.dec(5);
+        clock.setTime(Duration.ofMinutes(3).toMillis());
         assertThat(counter.getCount()).isEqualTo(0L);
     }
 
@@ -64,8 +53,6 @@ class SlidingWindowCounterTest {
         counter.inc(1);
         counter.inc(0);
         counter.inc(-2);
-        counter.dec(0);
-        counter.dec(-3);
 
         assertThat(counter.getCount()).isEqualTo(1L);
     }
