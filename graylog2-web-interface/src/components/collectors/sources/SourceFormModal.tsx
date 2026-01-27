@@ -16,19 +16,9 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import styled, { css } from 'styled-components';
-import {
-  SegmentedControl,
-  TextInput,
-  Textarea,
-  Group,
-  Stack,
-  Button,
-  NumberInput,
-  Text,
-} from '@mantine/core';
+import { Stack } from '@mantine/core';
 
-import { Input } from 'components/bootstrap';
+import { Button, Input, SegmentedControl } from 'components/bootstrap';
 import Modal from 'components/bootstrap/Modal';
 
 import type { Source, SourceType, FileSourceConfig, JournaldSourceConfig, TcpSourceConfig, UdpSourceConfig, WindowsEventLogSourceConfig } from '../types';
@@ -40,12 +30,6 @@ type Props = {
   onSave: (source: Omit<Source, 'id'>) => void;
   isLoading?: boolean;
 };
-
-const FormSection = styled.div(
-  ({ theme }) => css`
-    margin-bottom: ${theme.spacings.md};
-  `,
-);
 
 const sourceTypeLabels: Record<SourceType, string> = {
   file: 'File',
@@ -114,17 +98,17 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
 
     return (
       <>
-        <FormSection>
-          <TextInput
-            label="File Path(s)"
-            description="Glob pattern supported (e.g., /var/log/*.log)"
-            value={fileConfig.paths[0] || ''}
-            onChange={(e) => updateFileConfig({ paths: [e.target.value] })}
-            required
-          />
-        </FormSection>
-        <FormSection>
-          <Text size="sm" fw={500} mb="xs">Read Mode</Text>
+        <Input
+          id="file-paths"
+          type="text"
+          label="File Path(s)"
+          help="Glob pattern supported (e.g., /var/log/*.log)"
+          value={fileConfig.paths[0] || ''}
+          onChange={(e) => updateFileConfig({ paths: [e.target.value] })}
+          required
+        />
+        <div>
+          <label htmlFor="file-read-mode">Read Mode</label>
           <SegmentedControl
             value={fileConfig.read_mode}
             onChange={(v) => updateFileConfig({ read_mode: v as 'beginning' | 'end' })}
@@ -133,7 +117,7 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
               { value: 'beginning', label: 'From beginning' },
             ]}
           />
-        </FormSection>
+        </div>
       </>
     );
   };
@@ -143,24 +127,24 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
 
     return (
       <>
-        <FormSection>
-          <TextInput
-            label="Units"
-            description="Comma-separated systemd unit names (leave empty for all)"
-            value={journaldConfig.units.join(', ')}
-            onChange={(e) => updateJournaldConfig({ units: e.target.value.split(',').map((u) => u.trim()).filter(Boolean) })}
-          />
-        </FormSection>
-        <FormSection>
-          <NumberInput
-            label="Priority"
-            description="Log priority level (0-7)"
-            value={journaldConfig.priority}
-            onChange={(v) => updateJournaldConfig({ priority: Number(v) || 6 })}
-            min={0}
-            max={7}
-          />
-        </FormSection>
+        <Input
+          id="journald-units"
+          type="text"
+          label="Units"
+          help="Comma-separated systemd unit names (leave empty for all)"
+          value={journaldConfig.units.join(', ')}
+          onChange={(e) => updateJournaldConfig({ units: e.target.value.split(',').map((u) => u.trim()).filter(Boolean) })}
+        />
+        <Input
+          id="journald-priority"
+          type="number"
+          label="Priority"
+          help="Log priority level (0-7)"
+          value={journaldConfig.priority}
+          onChange={(e) => updateJournaldConfig({ priority: Number(e.target.value) || 6 })}
+          min={0}
+          max={7}
+        />
       </>
     );
   };
@@ -170,26 +154,26 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
 
     return (
       <>
-        <FormSection>
-          <TextInput
-            label="Bind Address"
-            value={tcpConfig.bind_address}
-            onChange={(e) => updateTcpConfig({ bind_address: e.target.value })}
-            required
-          />
-        </FormSection>
-        <FormSection>
-          <NumberInput
-            label="Port"
-            value={tcpConfig.port}
-            onChange={(v) => updateTcpConfig({ port: Number(v) || 5514 })}
-            min={1}
-            max={65535}
-            required
-          />
-        </FormSection>
-        <FormSection>
-          <Text size="sm" fw={500} mb="xs">Framing</Text>
+        <Input
+          id="tcp-bind-address"
+          type="text"
+          label="Bind Address"
+          value={tcpConfig.bind_address}
+          onChange={(e) => updateTcpConfig({ bind_address: e.target.value })}
+          required
+        />
+        <Input
+          id="tcp-port"
+          type="number"
+          label="Port"
+          value={tcpConfig.port}
+          onChange={(e) => updateTcpConfig({ port: Number(e.target.value) || 5514 })}
+          min={1}
+          max={65535}
+          required
+        />
+        <div>
+          <label htmlFor="tcp-framing">Framing</label>
           <SegmentedControl
             value={tcpConfig.framing}
             onChange={(v) => updateTcpConfig({ framing: v as 'newline' | 'octet_counting' })}
@@ -198,7 +182,7 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
               { value: 'octet_counting', label: 'Octet Counting' },
             ]}
           />
-        </FormSection>
+        </div>
       </>
     );
   };
@@ -208,24 +192,24 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
 
     return (
       <>
-        <FormSection>
-          <TextInput
-            label="Bind Address"
-            value={udpConfig.bind_address}
-            onChange={(e) => updateUdpConfig({ bind_address: e.target.value })}
-            required
-          />
-        </FormSection>
-        <FormSection>
-          <NumberInput
-            label="Port"
-            value={udpConfig.port}
-            onChange={(v) => updateUdpConfig({ port: Number(v) || 5514 })}
-            min={1}
-            max={65535}
-            required
-          />
-        </FormSection>
+        <Input
+          id="udp-bind-address"
+          type="text"
+          label="Bind Address"
+          value={udpConfig.bind_address}
+          onChange={(e) => updateUdpConfig({ bind_address: e.target.value })}
+          required
+        />
+        <Input
+          id="udp-port"
+          type="number"
+          label="Port"
+          value={udpConfig.port}
+          onChange={(e) => updateUdpConfig({ port: Number(e.target.value) || 5514 })}
+          min={1}
+          max={65535}
+          required
+        />
       </>
     );
   };
@@ -235,17 +219,17 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
 
     return (
       <>
-        <FormSection>
-          <TextInput
-            label="Channels"
-            description="Comma-separated channel names (e.g., Security, Application)"
-            value={winConfig.channels.join(', ')}
-            onChange={(e) => updateWindowsEventLogConfig({ channels: e.target.value.split(',').map((c) => c.trim()).filter(Boolean) })}
-            required
-          />
-        </FormSection>
-        <FormSection>
-          <Text size="sm" fw={500} mb="xs">Read Mode</Text>
+        <Input
+          id="win-channels"
+          type="text"
+          label="Channels"
+          help="Comma-separated channel names (e.g., Security, Application)"
+          value={winConfig.channels.join(', ')}
+          onChange={(e) => updateWindowsEventLogConfig({ channels: e.target.value.split(',').map((c) => c.trim()).filter(Boolean) })}
+          required
+        />
+        <div>
+          <label htmlFor="win-read-mode">Read Mode</label>
           <SegmentedControl
             value={winConfig.read_mode}
             onChange={(v) => updateWindowsEventLogConfig({ read_mode: v as 'beginning' | 'end' })}
@@ -254,9 +238,9 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
               { value: 'beginning', label: 'From beginning' },
             ]}
           />
-        </FormSection>
-        <FormSection>
-          <Text size="sm" fw={500} mb="xs">Event Format</Text>
+        </div>
+        <div>
+          <label htmlFor="win-event-format">Event Format</label>
           <SegmentedControl
             value={winConfig.event_format}
             onChange={(v) => updateWindowsEventLogConfig({ event_format: v as 'json' | 'xml' })}
@@ -265,7 +249,7 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
               { value: 'xml', label: 'XML' },
             ]}
           />
-        </FormSection>
+        </div>
       </>
     );
   };
@@ -294,51 +278,48 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
       </Modal.Header>
       <Modal.Body>
         <Stack gap="md">
-          <FormSection>
+          <div>
+            <label htmlFor="source-type">Source Type</label>
             <SegmentedControl
               value={sourceType}
               onChange={handleTypeChange}
               data={Object.entries(sourceTypeLabels).map(([value, label]) => ({ value, label }))}
               disabled={isEdit}
-              fullWidth
             />
-          </FormSection>
+          </div>
 
-          <FormSection>
-            <TextInput
-              label="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </FormSection>
+          <Input
+            id="source-name"
+            type="text"
+            label="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
 
-          <FormSection>
-            <Textarea
-              label="Description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </FormSection>
+          <Input
+            id="source-description"
+            type="textarea"
+            label="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
 
-          <FormSection>
-            <Input
-              id="source-enabled"
-              type="checkbox"
-              label="Enabled"
-              checked={enabled}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEnabled(e.target.checked)}
-            />
-          </FormSection>
+          <Input
+            id="source-enabled"
+            type="checkbox"
+            label="Enabled"
+            checked={enabled}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEnabled(e.target.checked)}
+          />
 
           {renderConfigSection()}
         </Stack>
       </Modal.Body>
       <Modal.Footer>
-        <Group justify="flex-end">
-          <Button variant="default" onClick={onClose}>Cancel</Button>
-          <Button onClick={handleSave} disabled={!name || isLoading} loading={isLoading}>Save Source</Button>
-        </Group>
+        <Button bsStyle="default" onClick={onClose}>Cancel</Button>
+        {' '}
+        <Button bsStyle="primary" onClick={handleSave} disabled={!name || isLoading}>Save Source</Button>
       </Modal.Footer>
     </Modal>
   );
