@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useState, useMemo, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Badge, Button, Tab, Tabs } from 'components/bootstrap';
+import {Button, Tab, Tabs, Label} from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import type { SearchParams } from 'stores/PaginationTypes';
@@ -127,7 +127,7 @@ const FleetDetail = ({ fleetId }: Props) => {
     <div>
       <Header>
         <h2>{fleet.name}</h2>
-        {fleet.target_version && <Badge bsStyle="info">v{fleet.target_version}</Badge>}
+        {fleet.target_version && <Label bsStyle="info">v{fleet.target_version}</Label>}
       </Header>
 
       <StatsRow>

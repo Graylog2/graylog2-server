@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 import type { ColorVariant } from '@graylog/sawmill';
 
-import { Badge, Table } from 'components/bootstrap';
+import { Label, Table } from 'components/bootstrap';
 import Drawer from 'components/common/Drawer';
 import { RelativeTime } from 'components/common';
 import { Link } from 'components/common/router';
@@ -56,7 +56,7 @@ const DetailRow = styled.div`
   margin-bottom: 0.5rem;
 `;
 
-const Label = styled.span`
+const Title = styled.span`
   font-weight: 500;
   min-width: 120px;
   font-size: 0.875rem;
@@ -84,45 +84,45 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
     <Drawer title={instance.hostname || instance.agent_id} onClose={onClose} size="md">
       <Section>
         <DetailRow>
-          <Label>Status:</Label>
-          <Badge bsStyle={instance.status === 'online' ? 'success' : 'default'}>
+          <Title>Status:</Title>
+          <Label bsStyle={instance.status === 'online' ? 'success' : 'default'}>
             {instance.status === 'online' ? 'Online' : 'Offline'}
-          </Badge>
+          </Label>
         </DetailRow>
 
         <DetailRow>
-          <Label>Fleet:</Label>
+          <Title>Fleet:</Title>
           <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)}>{fleetName}</Link>
         </DetailRow>
 
         <DetailRow>
-          <Label>OS:</Label>
+          <Title>OS:</Title>
           <span>{osDescription || instance.os || 'Unknown'}</span>
         </DetailRow>
 
         <DetailRow>
-          <Label>Last Seen:</Label>
+          <Title>Last Seen:</Title>
           <RelativeTime dateTime={instance.last_seen} />
         </DetailRow>
 
         <DetailRow>
-          <Label>Version:</Label>
+          <Title>Version:</Title>
           <span>{instance.version}</span>
         </DetailRow>
 
         <DetailRow>
-          <Label>Config:</Label>
+          <Title>Config:</Title>
           <span style={{ display: 'inline-flex', gap: '0.25rem', alignItems: 'center' }}>
             <code>{instance.remote_config_status.last_remote_config_hash.slice(0, 7)}</code>
-            <Badge bsStyle={configStatusStyles[instance.remote_config_status.status]}>
+            <Label bsStyle={configStatusStyles[instance.remote_config_status.status]}>
               {instance.remote_config_status.status}
-            </Badge>
+            </Label>
           </span>
         </DetailRow>
 
         {instance.remote_config_status.error_message && (
           <DetailRow>
-            <Label>Error:</Label>
+            <Title>Error:</Title>
             <span style={{ color: 'red' }}>{instance.remote_config_status.error_message}</span>
           </DetailRow>
         )}
@@ -165,7 +165,7 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
             {sources.map((source) => (
               <span key={source.id} style={{ display: 'inline-flex', gap: '0.25rem', alignItems: 'center' }}>
                 <span>• {source.name}</span>
-                <Badge bsStyle="info">{source.type}</Badge>
+                <Label bsStyle="info">{source.type}</Label>
               </span>
             ))}
           </SourceList>

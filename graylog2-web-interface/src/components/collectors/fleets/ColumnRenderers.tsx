@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 
-import { Badge } from 'components/bootstrap';
 import { RelativeTime } from 'components/common';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
@@ -42,7 +41,7 @@ const customColumnRenderers = (): ColumnRenderers<Fleet> => ({
     },
     target_version: {
       renderCell: (version: string | null) =>
-        version ? <Badge bsStyle="info">v{version}</Badge> : <span>—</span>,
+        <span>{version || '—'}</span>,
       staticWidth: 120,
     },
     created_at: {

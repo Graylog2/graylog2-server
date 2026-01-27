@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import { Badge } from 'components/bootstrap';
+import { Label } from 'components/bootstrap';
 import { RelativeTime } from 'components/common';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
@@ -40,9 +40,9 @@ const customColumnRenderers = ({ fleetNames }: Props): ColumnRenderers<Collector
   attributes: {
     status: {
       renderCell: (_status: string, instance: CollectorInstanceView) => (
-        <Badge bsStyle={instance.status === 'online' ? 'success' : 'default'}>
+        <Label bsStyle={instance.status === 'online' ? 'success' : 'default'}>
           {instance.status === 'online' ? 'Online' : 'Offline'}
-        </Badge>
+        </Label>
       ),
       staticWidth: 100,
     },
