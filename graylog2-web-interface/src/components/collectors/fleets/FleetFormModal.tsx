@@ -27,6 +27,7 @@ type Props = {
   fleet?: Fleet;
   onClose: () => void;
   onSave: (fleet: Omit<Fleet, 'id' | 'created_at' | 'updated_at'>) => void;
+  isLoading?: boolean;
 };
 
 const FormSection = styled.div(
@@ -35,7 +36,7 @@ const FormSection = styled.div(
   `,
 );
 
-const FleetFormModal = ({ fleet = undefined, onClose, onSave }: Props) => {
+const FleetFormModal = ({ fleet = undefined, onClose, onSave, isLoading = false }: Props) => {
   const isEdit = !!fleet;
   const [name, setName] = useState(fleet?.name || '');
   const [description, setDescription] = useState(fleet?.description || '');
@@ -47,7 +48,6 @@ const FleetFormModal = ({ fleet = undefined, onClose, onSave }: Props) => {
       description,
       target_version: targetVersion || null,
     });
-    onClose();
   };
 
   return (
@@ -90,7 +90,7 @@ const FleetFormModal = ({ fleet = undefined, onClose, onSave }: Props) => {
       <Modal.Footer>
         <Group justify="flex-end">
           <Button variant="default" onClick={onClose}>Cancel</Button>
-          <Button onClick={handleSave} disabled={!name}>
+          <Button onClick={handleSave} disabled={!name || isLoading} loading={isLoading}>
             {isEdit ? 'Save Changes' : 'Create Fleet'}
           </Button>
         </Group>

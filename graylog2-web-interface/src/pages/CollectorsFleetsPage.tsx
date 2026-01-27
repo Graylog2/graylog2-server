@@ -25,13 +25,14 @@ import type { SearchParams } from 'stores/PaginationTypes';
 
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import { FleetFormModal } from 'components/collectors/fleets';
-import { fetchPaginatedFleets, fleetsKeyFn } from 'components/collectors/hooks';
+import { fetchPaginatedFleets, fleetsKeyFn, useCollectorsMutations } from 'components/collectors/hooks';
 import type { Fleet } from 'components/collectors/types';
 import customColumnRenderers from 'components/collectors/fleets/ColumnRenderers';
 import { DEFAULT_LAYOUT } from 'components/collectors/fleets/Constants';
 
 const CollectorsFleetsPage = () => {
   const [showFleetModal, setShowFleetModal] = useState(false);
+  const { createFleet, isCreatingFleet } = useCollectorsMutations();
 
   const columnRenderers = useMemo(() => customColumnRenderers(), []);
 
@@ -40,9 +41,9 @@ const CollectorsFleetsPage = () => {
     [],
   );
 
-  const handleSaveFleet = (fleet: Omit<Fleet, 'id' | 'created_at' | 'updated_at'>) => {
-    // eslint-disable-next-line no-console
-    console.log('Saving fleet:', fleet);
+  const handleSaveFleet = async (fleet: Omit<Fleet, 'id' | 'created_at' | 'updated_at'>) => {
+    await createFleet(fleet);
+    setShowFleetModal(false);
   };
 
   return (
@@ -77,6 +78,7 @@ const CollectorsFleetsPage = () => {
         <FleetFormModal
           onClose={() => setShowFleetModal(false)}
           onSave={handleSaveFleet}
+          isLoading={isCreatingFleet}
         />
       )}
     </DocumentTitle>
