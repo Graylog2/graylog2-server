@@ -14,6 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
+// TODO: Consider hoisting NumberCard from enterprise/src/web/security-app/components/Welcome/Grid/NumberCard.tsx
+//       to components/common and using it here instead. NumberCard has more features (icon, sublabel, clickable).
+
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
