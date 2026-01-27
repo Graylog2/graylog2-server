@@ -64,6 +64,16 @@ public class SlidingWindowCounter extends Counter {
     }
 
     @Override
+    public void dec() {
+        throw new UnsupportedOperationException("Decrement without argument is not supported.");
+    }
+
+    @Override
+    public void dec(long n) {
+        throw new UnsupportedOperationException("Decrement is not supported.");
+    }
+
+    @Override
     public long getCount() {
         final long now = clock.getTime();
         synchronized (buckets) {
