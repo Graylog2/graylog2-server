@@ -16,9 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useMemo, useCallback } from 'react';
-import { Button, Group } from '@mantine/core';
-
-import { Row, Col } from 'components/bootstrap';
+import { Button, Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import type { SearchParams } from 'stores/PaginationTypes';
@@ -50,11 +48,7 @@ const CollectorsFleetsPage = () => {
       <CollectorsPageNavigation />
       <PageHeader
         title="Fleets"
-        actions={(
-          <Group>
-            <Button onClick={() => setShowFleetModal(true)}>Add Fleet</Button>
-          </Group>
-        )}
+        actions={<Button bsStyle="success" onClick={() => setShowFleetModal(true)}>Add Fleet</Button>}
       >
         <span>Manage collector fleets and their configurations.</span>
       </PageHeader>
