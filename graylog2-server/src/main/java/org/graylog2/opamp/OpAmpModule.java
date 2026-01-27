@@ -19,11 +19,20 @@ package org.graylog2.opamp;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import org.graylog2.opamp.transport.OpAmpHttpHandler;
+import org.graylog2.opamp.transport.OpAmpWebSocketApplication;
+import org.graylog2.opamp.transport.OpAmpWebSocketAuthFilter;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class OpAmpModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(OpAmpService.class).in(Scopes.SINGLETON);
         bind(OpAmpHttpHandler.class).in(Scopes.SINGLETON);
+        bind(OpAmpWebSocketApplication.class).in(Scopes.SINGLETON);
+        bind(OpAmpWebSocketAuthFilter.class).in(Scopes.SINGLETON);
+        bind(ExecutorService.class).annotatedWith(OpAmpExecutor.class)
+                .toInstance(Executors.newVirtualThreadPerTaskExecutor());
     }
 }

@@ -36,6 +36,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.time.Duration;
+import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,7 +59,10 @@ class OpAmpHttpHandlerIT {
         httpServer = HttpServer.createSimpleServer(null, port);
 
         opAmpService = mock(OpAmpService.class);
-        final OpAmpHttpHandler handler = new OpAmpHttpHandler(opAmpService, Size.bytes(TEST_MAX_MESSAGE_SIZE));
+        final var executor = Executors.newVirtualThreadPerTaskExecutor();
+
+        final OpAmpHttpHandler handler = new OpAmpHttpHandler(opAmpService, executor,
+                Size.bytes(TEST_MAX_MESSAGE_SIZE));
         httpServer.getServerConfiguration().addHttpHandler(handler, "/opamp");
 
         httpServer.start();

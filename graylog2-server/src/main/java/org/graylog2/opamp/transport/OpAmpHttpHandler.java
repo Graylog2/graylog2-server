@@ -21,6 +21,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
+import org.graylog2.opamp.OpAmpExecutor;
 import opamp.proto.Opamp.AgentToServer;
 import opamp.proto.Opamp.ServerErrorResponse;
 import opamp.proto.Opamp.ServerErrorResponseType;
@@ -37,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -52,10 +52,11 @@ public class OpAmpHttpHandler extends HttpHandler {
 
     @Inject
     public OpAmpHttpHandler(OpAmpService opAmpService,
+                            @OpAmpExecutor ExecutorService executor,
                             @Named("opamp_max_request_body_size") Size maxRequestBodySize) {
         this.opAmpService = opAmpService;
         this.maxMessageSize = (int) maxRequestBodySize.toBytes();
-        this.executor = Executors.newVirtualThreadPerTaskExecutor();
+        this.executor = executor;
     }
 
     @Override
@@ -80,9 +81,12 @@ public class OpAmpHttpHandler extends HttpHandler {
             return;
         }
 
-        // Only proceed when authorized
-        if (!opAmpService.validateToken(request.getHeader("Authorization"))) {
+        // Validate auth token
+        final String authHeader = request.getHeader("Authorization");
+        if (!opAmpService.validateToken(authHeader)) {
+            LOG.debug("OpAMP auth failed");
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
+            response.finish();
             return;
         }
 

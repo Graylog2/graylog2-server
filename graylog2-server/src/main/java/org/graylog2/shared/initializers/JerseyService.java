@@ -39,6 +39,7 @@ import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
 import org.glassfish.grizzly.ssl.SSLContextConfigurator;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
+import org.glassfish.grizzly.websockets.WebSocketEngine;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -50,7 +51,11 @@ import org.graylog2.audit.jersey.AuditEventModelProcessor;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.jersey.PrefixAddingModelProcessor;
+import org.graylog2.opamp.OpAmpConstants;
 import org.graylog2.opamp.transport.OpAmpHttpHandler;
+import org.graylog2.opamp.transport.OpAmpWebSocketAddOn;
+import org.graylog2.opamp.transport.OpAmpWebSocketApplication;
+import org.graylog2.opamp.transport.OpAmpWebSocketAuthFilter;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
@@ -123,6 +128,8 @@ public class JerseyService extends AbstractIdleService {
     private final TLSProtocolsConfiguration tlsConfiguration;
     private final int shutdownTimeoutMs;
     private final OpAmpHttpHandler opAmpHttpHandler;
+    private final OpAmpWebSocketApplication opAmpWebSocketApplication;
+    private final OpAmpWebSocketAuthFilter opAmpWebSocketAuthFilter;
 
     private HttpServer httpServer = null;
 
@@ -140,7 +147,9 @@ public class JerseyService extends AbstractIdleService {
                          ErrorPageGenerator errorPageGenerator,
                          TLSProtocolsConfiguration tlsConfiguration,
                          @Named("shutdown_timeout") int shutdownTimeoutMs,
-                         OpAmpHttpHandler opAmpHttpHandler) {
+                         OpAmpHttpHandler opAmpHttpHandler,
+                         OpAmpWebSocketApplication opAmpWebSocketApplication,
+                         OpAmpWebSocketAuthFilter opAmpWebSocketAuthFilter) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.dynamicFeatures = requireNonNull(dynamicFeatures, "dynamicFeatures");
         this.containerResponseFilters = requireNonNull(containerResponseFilters, "containerResponseFilters");
@@ -155,6 +164,8 @@ public class JerseyService extends AbstractIdleService {
         this.tlsConfiguration = requireNonNull(tlsConfiguration);
         this.shutdownTimeoutMs = shutdownTimeoutMs;
         this.opAmpHttpHandler = requireNonNull(opAmpHttpHandler, "opAmpHttpHandler");
+        this.opAmpWebSocketApplication = requireNonNull(opAmpWebSocketApplication, "opAmpWebSocketApplication");
+        this.opAmpWebSocketAuthFilter = requireNonNull(opAmpWebSocketAuthFilter, "opAmpWebSocketAuthFilter");
     }
 
     @Override
@@ -223,11 +234,26 @@ public class JerseyService extends AbstractIdleService {
                 configuration.isHttpEnableCors(),
                 pluginResources);
 
-        httpServer.getServerConfiguration().addHttpHandler(opAmpHttpHandler, "/opamp");
+        configureOpAmp(httpServer);
 
         httpServer.start();
 
         LOG.info("Started REST API at <{}>", configuration.getHttpBindAddress());
+    }
+
+    private void configureOpAmp(HttpServer httpServer) {
+        // HTTP handler (auth handled inline in the handler)
+        httpServer.getServerConfiguration().addHttpHandler(opAmpHttpHandler, OpAmpConstants.HTTP_PATH);
+
+        // WebSocket: enable addon on listener
+        final var listener = httpServer.getListener("grizzly");
+        listener.registerAddOn(new OpAmpWebSocketAddOn(opAmpWebSocketAuthFilter));
+
+        // Register WebSocket application (auth handled by OpAmpWebSocketAuthFilter)
+        WebSocketEngine.getEngine().register("", OpAmpConstants.WEBSOCKET_PATH, opAmpWebSocketApplication);
+
+        LOG.info("OpAMP endpoints enabled at {} (HTTP) and {} (WebSocket)",
+                OpAmpConstants.HTTP_PATH, OpAmpConstants.WEBSOCKET_PATH);
     }
 
     private Set<Resource> prefixPluginResources(String pluginPrefix, Map<String, Set<Class<? extends PluginRestResource>>> pluginResourceMap) {
