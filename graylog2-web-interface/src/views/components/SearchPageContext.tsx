@@ -45,26 +45,26 @@ const SearchPageContext = () => {
       additional: { currentQuery, fields: fieldTypes },
       actions: [
         {
-          name: 'createWidget',
+          type: 'createWidget',
           description: 'Creates widget with specified parameters',
           action: console.log,
-          parameters_schema: {
+          parameters: {
             type: 'string',
             query_string: 'string',
             streams: 'array',
           },
         },
         {
-          name: 'updateSearchQuery',
+          type: 'updateSearchQuery',
           description:
-            'Updates current search query. Suggested parameter should contain a valid query in correct lucene query language syntax.',
+            'Updates current search query. Parameter should be object with single string `query` key, containing the new query in correct lucene query language syntax.',
           action: ({ query }: { query: string }) =>
             dispatch((_dispatch, getState) => {
               const activeQuery = selectActiveQuery(getState());
 
               return _dispatch(updateQueryString(activeQuery, query));
             }),
-          parameters_schema: {
+          parameters: {
             query: 'string',
           },
         },

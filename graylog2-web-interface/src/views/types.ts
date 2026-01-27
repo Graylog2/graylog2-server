@@ -614,9 +614,9 @@ type MarkdownAugmentation = {
 };
 
 type AvailableSuggestedAction<Fn extends () => void> = {
-  name: string;
+  type: string;
   description: string;
-  parameters_schema: JSONSchema;
+  parameters: JSONSchema;
   action: Fn;
 };
 export type PageContext<T = AvailableSuggestedAction<(...args: unknown[]) => void>> = {
