@@ -21,7 +21,6 @@ import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import type { SearchParams } from 'stores/PaginationTypes';
-
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import { InstanceDetailDrawer } from 'components/collectors/instances';
 import {

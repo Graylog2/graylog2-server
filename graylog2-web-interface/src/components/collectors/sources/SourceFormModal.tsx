@@ -63,7 +63,7 @@ const defaultConfigs: Record<SourceType, FileSourceConfig | JournaldSourceConfig
   udp: { bind_address: '0.0.0.0', port: 5514 },
 };
 
-const SourceFormModal = ({ fleetId, source, onClose, onSave, isLoading = false }: Props) => {
+const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoading = false }: Props) => {
   const isEdit = !!source;
   const [sourceType, setSourceType] = useState<SourceType>(source?.type || 'file');
   const [name, setName] = useState(source?.name || '');

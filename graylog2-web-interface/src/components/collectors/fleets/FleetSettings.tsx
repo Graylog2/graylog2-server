@@ -44,7 +44,7 @@ const SectionTitle = styled.h4(
   `,
 );
 
-const FleetSettings = ({ fleet, onSave, onDelete, isLoading = false }: Props) => {
+const FleetSettings = ({ fleet, onSave, onDelete = undefined, isLoading = false }: Props) => {
   const [name, setName] = useState(fleet.name);
   const [description, setDescription] = useState(fleet.description);
   const [targetVersion, setTargetVersion] = useState(fleet.target_version || '');
