@@ -213,8 +213,22 @@ export default class View {
   }
 
   toBuilder(): Builder {
-    const { id, title, summary, description, search, properties, state, createdAt, owner, requires, type, favorite, lastUpdatedAt, entitySource } =
-      this._value;
+    const {
+      id,
+      title,
+      summary,
+      description,
+      search,
+      properties,
+      state,
+      createdAt,
+      owner,
+      requires,
+      type,
+      favorite,
+      lastUpdatedAt,
+      entitySource,
+    } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(

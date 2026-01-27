@@ -39,7 +39,7 @@ const GCSGeoIpFormGroup = () => {
         name="gcs_project_id"
       />
     </>
-  )
-}
+  );
+};
 
-export default GCSGeoIpFormGroup
+export default GCSGeoIpFormGroup;
