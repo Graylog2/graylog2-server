@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useState, useMemo, useCallback } from 'react';
 import styled, { css } from 'styled-components';
-import { Tabs, Flex, Badge, Button, Group } from '@mantine/core';
 
+import { Badge, Button, Tab, Tabs } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import type { SearchParams } from 'stores/PaginationTypes';
@@ -39,16 +39,18 @@ type Props = {
   fleetId: string;
 };
 
-const Header = styled(Flex)(
+const Header = styled.div(
   ({ theme }) => css`
+    display: flex;
     margin-bottom: ${theme.spacings.lg};
     gap: ${theme.spacings.md};
     align-items: center;
   `,
 );
 
-const StatsRow = styled(Flex)(
+const StatsRow = styled.div(
   ({ theme }) => css`
+    display: flex;
     margin-bottom: ${theme.spacings.lg};
     gap: ${theme.spacings.sm};
   `,
@@ -84,7 +86,7 @@ const FleetDetail = ({ fleetId }: Props) => {
 
   const instanceActions = useCallback(
     (instance: CollectorInstanceView) => (
-      <Button variant="subtle" size="xs" onClick={() => setSelectedInstance(instance)}>
+      <Button bsStyle="link" bsSize="xs" onClick={() => setSelectedInstance(instance)}>
         Details
       </Button>
     ),
@@ -93,7 +95,7 @@ const FleetDetail = ({ fleetId }: Props) => {
 
   const sourceActions = useCallback(
     (source: Source) => (
-      <Button variant="subtle" size="xs" onClick={() => setEditingSource(source)}>
+      <Button bsStyle="link" bsSize="xs" onClick={() => setEditingSource(source)}>
         Edit
       </Button>
     ),
@@ -125,7 +127,7 @@ const FleetDetail = ({ fleetId }: Props) => {
     <div>
       <Header>
         <h2>{fleet.name}</h2>
-        {fleet.target_version && <Badge>v{fleet.target_version}</Badge>}
+        {fleet.target_version && <Badge bsStyle="info">v{fleet.target_version}</Badge>}
       </Header>
 
       <StatsRow>
@@ -135,17 +137,11 @@ const FleetDetail = ({ fleetId }: Props) => {
         <StatCard value={stats?.total_sources || 0} label="Sources" />
       </StatsRow>
 
-      <Tabs defaultValue="sources">
-        <Tabs.List>
-          <Tabs.Tab value="sources">Sources</Tabs.Tab>
-          <Tabs.Tab value="instances">Instances</Tabs.Tab>
-          <Tabs.Tab value="settings">Settings</Tabs.Tab>
-        </Tabs.List>
-
-        <Tabs.Panel value="sources" pt="md">
-          <Group justify="flex-end" mb="md">
-            <Button onClick={() => setShowSourceModal(true)}>Add Source</Button>
-          </Group>
+      <Tabs defaultActiveKey="sources" id="fleet-detail-tabs">
+        <Tab eventKey="sources" title="Sources">
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+            <Button bsStyle="success" onClick={() => setShowSourceModal(true)}>Add Source</Button>
+          </div>
           <PaginatedEntityTable<Source>
             humanName="sources"
             tableLayout={SOURCES_LAYOUT}
@@ -155,9 +151,9 @@ const FleetDetail = ({ fleetId }: Props) => {
             columnRenderers={sourceRenderers}
             entityActions={sourceActions}
           />
-        </Tabs.Panel>
+        </Tab>
 
-        <Tabs.Panel value="instances" pt="md">
+        <Tab eventKey="instances" title="Instances">
           <PaginatedEntityTable<CollectorInstanceView>
             humanName="instances"
             entityActions={instanceActions}
@@ -167,9 +163,9 @@ const FleetDetail = ({ fleetId }: Props) => {
             entityAttributesAreCamelCase={false}
             columnRenderers={instanceRenderers}
           />
-        </Tabs.Panel>
+        </Tab>
 
-        <Tabs.Panel value="settings" pt="md">
+        <Tab eventKey="settings" title="Settings">
           <FleetSettings
             fleet={fleet}
             onSave={async (updates) => {
@@ -181,7 +177,7 @@ const FleetDetail = ({ fleetId }: Props) => {
             }}
             isLoading={isUpdatingFleet || isDeletingFleet}
           />
-        </Tabs.Panel>
+        </Tab>
       </Tabs>
 
       {showSourceModal && (
