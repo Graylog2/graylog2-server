@@ -28,3 +28,4 @@ export {
   fetchPaginatedSources,
   sourcesKeyFn,
 } from './useCollectors';
+export { default as useCollectorsMutations } from './useCollectorsMutations';
