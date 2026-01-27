@@ -104,6 +104,8 @@ const CollectorConfigurationModalContainer = ({
   const onSave = (fullyAssignedConfigs: string[], partiallyAssignedConfigs: string[]) => {
     setNextAssignedConfigurations(fullyAssignedConfigs);
     setNextPartiallyAssignedConfigurations(partiallyAssignedConfigs);
+    // Close config modal before showing confirmation to avoid stacking
+    onCancel();
     setShowConfirmModal(true);
   };
 
