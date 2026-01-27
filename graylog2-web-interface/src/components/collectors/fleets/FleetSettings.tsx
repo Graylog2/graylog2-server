@@ -26,6 +26,7 @@ import type { Fleet } from '../types';
 type Props = {
   fleet: Fleet;
   onSave: (updates: Partial<Fleet>) => void;
+  onDelete?: () => void;
   isLoading?: boolean;
 };
 
@@ -43,7 +44,7 @@ const SectionTitle = styled.h4(
   `,
 );
 
-const FleetSettings = ({ fleet, onSave, isLoading = false }: Props) => {
+const FleetSettings = ({ fleet, onSave, onDelete, isLoading = false }: Props) => {
   const [name, setName] = useState(fleet.name);
   const [description, setDescription] = useState(fleet.description);
   const [targetVersion, setTargetVersion] = useState(fleet.target_version || '');
@@ -128,7 +129,7 @@ const FleetSettings = ({ fleet, onSave, isLoading = false }: Props) => {
         <Text size="sm" c="dimmed" mb="sm">
           Deleting a fleet will remove all configuration. Instances will need to be re-enrolled.
         </Text>
-        <Button color="red" variant="outline">Delete Fleet</Button>
+        <Button color="red" variant="outline" onClick={onDelete} disabled={!onDelete}>Delete Fleet</Button>
       </Section>
     </Stack>
   );

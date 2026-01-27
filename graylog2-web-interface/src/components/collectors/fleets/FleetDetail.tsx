@@ -58,7 +58,7 @@ const FleetDetail = ({ fleetId }: Props) => {
   const { data: fleet, isLoading: fleetLoading } = useFleet(fleetId);
   const { data: stats, isLoading: statsLoading } = useFleetStats(fleetId);
   const { data: sources } = useSources(fleetId);
-  const { createSource, isCreatingSource, updateFleet, isUpdatingFleet } = useCollectorsMutations();
+  const { createSource, isCreatingSource, updateFleet, isUpdatingFleet, deleteFleet, isDeletingFleet } = useCollectorsMutations();
   const [showSourceModal, setShowSourceModal] = useState(false);
   const [selectedInstance, setSelectedInstance] = useState<CollectorInstanceView | null>(null);
 
@@ -160,7 +160,11 @@ const FleetDetail = ({ fleetId }: Props) => {
             onSave={async (updates) => {
               await updateFleet({ fleetId: fleet.id, updates });
             }}
-            isLoading={isUpdatingFleet}
+            onDelete={async () => {
+              await deleteFleet(fleet.id);
+              // Navigation back to fleets list will be handled by parent or router
+            }}
+            isLoading={isUpdatingFleet || isDeletingFleet}
           />
         </Tabs.Panel>
       </Tabs>
