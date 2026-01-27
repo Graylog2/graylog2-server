@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Badge } from '@mantine/core';
 
+import { Badge } from 'components/bootstrap';
 import { RelativeTime } from 'components/common';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
@@ -42,7 +42,7 @@ const customColumnRenderers = (): ColumnRenderers<Fleet> => ({
     },
     target_version: {
       renderCell: (version: string | null) =>
-        version ? <Badge variant="light">v{version}</Badge> : <span>—</span>,
+        version ? <Badge bsStyle="info">v{version}</Badge> : <span>—</span>,
       staticWidth: 120,
     },
     created_at: {

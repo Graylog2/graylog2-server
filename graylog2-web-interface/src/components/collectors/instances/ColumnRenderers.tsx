@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Badge } from '@mantine/core';
 
+import { Badge } from 'components/bootstrap';
 import { RelativeTime } from 'components/common';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
@@ -40,7 +40,7 @@ const customColumnRenderers = ({ fleetNames }: Props): ColumnRenderers<Collector
   attributes: {
     status: {
       renderCell: (_status: string, instance: CollectorInstanceView) => (
-        <Badge color={instance.status === 'online' ? 'green' : 'gray'} size="sm">
+        <Badge bsStyle={instance.status === 'online' ? 'success' : 'default'}>
           {instance.status === 'online' ? 'Online' : 'Offline'}
         </Badge>
       ),

@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Badge } from '@mantine/core';
 
+import { Badge } from 'components/bootstrap';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 
 import type { Source } from '../types';
@@ -37,7 +37,7 @@ const customColumnRenderers = (): ColumnRenderers<Source> => ({
     },
     type: {
       renderCell: (type: string) => (
-        <Badge variant="light" size="sm">
+        <Badge bsStyle="info">
           {sourceTypeLabels[type] || type}
         </Badge>
       ),
@@ -45,7 +45,7 @@ const customColumnRenderers = (): ColumnRenderers<Source> => ({
     },
     enabled: {
       renderCell: (_enabled: boolean, source: Source) => (
-        <Badge color={source.enabled ? 'green' : 'gray'} size="sm">
+        <Badge bsStyle={source.enabled ? 'success' : 'default'}>
           {source.enabled ? 'Enabled' : 'Disabled'}
         </Badge>
       ),
