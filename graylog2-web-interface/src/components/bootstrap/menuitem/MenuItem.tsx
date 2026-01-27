@@ -110,7 +110,7 @@ const CustomMenuItem = <T,>({
     onClick: _onClick,
     title,
     closeMenuOnClick,
-  };
+  } satisfies Partial<React.ComponentProps<typeof MantineMenu.Item>>;
 
   if (href) {
     return (
