@@ -14,23 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+package org.graylog2.security.encryption;
 
-import Modal from './Modal';
-import type { ModalSize } from './Modal';
-
-type Props = {
-  backdrop?: boolean;
-  bsSize?: ModalSize;
-  showModal: boolean;
-  onHide: () => void;
-  children: React.ReactNode;
-};
-
-const BootstrapModalWrapper = ({ showModal, children, onHide, bsSize = undefined, backdrop = undefined }: Props) => (
-  <Modal show={showModal} onHide={onHide} bsSize={bsSize} backdrop={backdrop}>
-    {children}
-  </Modal>
-);
-
-export default BootstrapModalWrapper;
+public interface ConfigUpdatePreparation {
+    Object prepareConfigUpdate(Object existingConfig);
+}
