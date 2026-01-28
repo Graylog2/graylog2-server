@@ -36,6 +36,7 @@ public class AzuriteContainer extends GenericContainer<AzuriteContainer> {
         withNetwork(network);
         withNetworkAliases("azurite");
         withExposedPorts(PORT);
+        withCommand("azurite-blob", "--blobHost", "0.0.0.0", "--skipApiVersionCheck");
     }
 
     private String createConnectionString() {
