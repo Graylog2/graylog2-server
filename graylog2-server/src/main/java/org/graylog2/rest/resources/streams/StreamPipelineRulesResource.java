@@ -55,7 +55,6 @@ package org.graylog2.rest.resources.streams;
     import org.graylog2.streams.StreamService;
 
     import java.util.List;
-    import java.util.Locale;
     import java.util.Map;
     import java.util.Objects;
     import java.util.function.Function;
@@ -85,7 +84,7 @@ public class StreamPipelineRulesResource extends RestResource {
                 ATTRIBUTE_CONNECTED_STREAM, StreamPipelineRulesResponse::connectedStreamTitles
         );
         public static final EntityDefaults DEFAULTS = EntityDefaults.builder()
-            .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT)))).build();
+                .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.ASC)).build();
 
     private final MongoDbPipelineMetadataService mongoDbPipelineMetadataService;
     private final PipelineService pipelineService;
@@ -145,9 +144,11 @@ public class StreamPipelineRulesResource extends RestResource {
 
 
     private Stream<StreamPipelineRulesResponse> buildResponse(PipelineRulesMetadataDao dao, String streamId) {
-        List<StreamPipelineRulesResponse> responseList = new java.util.ArrayList<>();
-        final List<String> relevantRules = dao.streamsByRuleId().keySet().stream()
-                .filter(ruleId -> dao.streamsByRuleId().get(ruleId).contains(streamId)).toList();
+        Map<String, ?> streamsByRuleId = dao.streamsByRuleId();
+        final List<String> relevantRules = streamsByRuleId.entrySet().stream()
+                .filter(entry -> ((List<?>) entry.getValue()).contains(streamId))
+                .map(Map.Entry::getKey)
+                .toList();
 
         PipelineDao pipelineDao;
         try {
@@ -168,21 +169,21 @@ public class StreamPipelineRulesResource extends RestResource {
                 .filter(Objects::nonNull)
                 .toList();
 
-        relevantRules.forEach(ruleId -> {
-            try {
-                RuleDao ruleDao = ruleService.load(ruleId);
-                responseList.add(
-                        new StreamPipelineRulesResponse(
+        return relevantRules.stream()
+                .map(ruleId -> {
+                    try {
+                        RuleDao ruleDao = ruleService.load(ruleId);
+                        return new StreamPipelineRulesResponse(
                                 ruleId,
                                 dao.pipelineId(),
                                 pipelineDao.title(),
                                 ruleId,
                                 ruleDao.title(),
-                                connectedStreams));
-            } catch (NotFoundException e) {
-                // Skip pipelines or rules that no longer exist
-            }
-        });
-        return responseList.stream();
+                                connectedStreams);
+                    } catch (NotFoundException e) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull);
     }
 }

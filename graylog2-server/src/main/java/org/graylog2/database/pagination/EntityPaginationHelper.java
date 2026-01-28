@@ -28,12 +28,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -79,6 +77,7 @@ public class EntityPaginationHelper {
 
     /**
      * Creates a predicate that filters entities based on the provided list of entity filters.
+     * Multiple filters are combined with OR logic.
      *
      * @return a Predicate that filters objects of type T
      */
@@ -111,6 +110,11 @@ public class EntityPaginationHelper {
         return entityFiltersPredicate(filters, EntityPaginationHelper::entityFilterDescriptorPredicate);
     }
 
+    /**
+     * Builds a predicate for filtering entities. Supports two query formats:
+     * 1. "field:value" - case-insensitive substring match on specific field
+     * 2. "value" - case-insensitive substring search across all fields
+     */
     public static <T> Predicate<T> buildPredicate(String filter, Map<String, Function<T, String>> fieldExtractors) {
         if (isNullOrEmpty(filter) || fieldExtractors.isEmpty()) {
             return t -> true;
@@ -133,10 +137,11 @@ public class EntityPaginationHelper {
             }
         }
 
-        Set<Predicate<T>> predicates = fieldExtractors.values().stream().map(e ->
-                (Predicate<T>) t -> e.apply(t).toLowerCase(Locale.US).contains(trimmedFilter)).collect(Collectors.toSet());
-
-        return t -> predicates.stream().anyMatch(p -> p.test(t));
+        return t -> fieldExtractors.values().stream()
+                .anyMatch(extractor -> {
+                    String value = extractor.apply(t);
+                    return value != null && value.toLowerCase(Locale.US).contains(trimmedFilter);
+                });
     }
 
     /**
@@ -149,22 +154,7 @@ public class EntityPaginationHelper {
      * @return a Comparator that sorts entities by the specified field
      */
     public static <T> Comparator<T> buildComparator(String sortField, SortOrder order, Map<String, Function<T, String>> fieldExtractors) {
-        return (e1, e2) -> {
-            Function<T, String> extractor = fieldExtractors.get(sortField);
-            if (extractor == null) {
-                return 0;
-            }
-
-            String value1 = extractor.apply(e1);
-            String value2 = extractor.apply(e2);
-
-            if (value1 == null && value2 == null) return 0;
-            if (value1 == null) return order == SortOrder.ASCENDING ? 1 : -1;
-            if (value2 == null) return order == SortOrder.ASCENDING ? -1 : 1;
-
-            int comparison = value1.compareToIgnoreCase(value2);
-            return order == SortOrder.ASCENDING ? comparison : -comparison;
-        };
+        return buildComparatorInternal(sortField, order, fieldExtractors, String::compareToIgnoreCase);
     }
 
     /**
@@ -177,20 +167,26 @@ public class EntityPaginationHelper {
      * @return a Comparator that sorts entities by the specified field using numeric comparison
      */
     public static <T> Comparator<T> buildNumericComparator(String sortField, SortOrder order, Map<String, Function<T, Long>> fieldExtractors) {
+        return buildComparatorInternal(sortField, order, fieldExtractors, Long::compare);
+    }
+
+    private static <T, V> Comparator<T> buildComparatorInternal(String sortField, SortOrder order,
+                                                                  Map<String, Function<T, V>> fieldExtractors,
+                                                                  Comparator<V> valueComparator) {
         return (e1, e2) -> {
-            Function<T, Long> extractor = fieldExtractors.get(sortField);
+            Function<T, V> extractor = fieldExtractors.get(sortField);
             if (extractor == null) {
                 return 0;
             }
 
-            Long value1 = extractor.apply(e1);
-            Long value2 = extractor.apply(e2);
+            V value1 = extractor.apply(e1);
+            V value2 = extractor.apply(e2);
 
             if (value1 == null && value2 == null) return 0;
             if (value1 == null) return order == SortOrder.ASCENDING ? 1 : -1;
             if (value2 == null) return order == SortOrder.ASCENDING ? -1 : 1;
 
-            int comparison = Long.compare(value1, value2);
+            int comparison = valueComparator.compare(value1, value2);
             return order == SortOrder.ASCENDING ? comparison : -comparison;
         };
     }
