@@ -75,6 +75,10 @@ const InputsNotifications = () => {
     };
   }, [inputs, inputStates, isLoading]);
 
+  if (!notifications) {
+    return null;
+  }
+
   const { hasStoppedInputs, hasFailedInputs, hasSetupInputs } = notifications;
 
   if (!hasStoppedInputs && !hasFailedInputs && !hasSetupInputs) {
