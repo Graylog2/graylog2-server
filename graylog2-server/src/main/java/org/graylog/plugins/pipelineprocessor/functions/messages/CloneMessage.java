@@ -35,8 +35,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
-import static org.graylog2.plugin.Message.RESERVED_FIELDS;
-import static org.graylog2.plugin.Message.RESERVED_SETTABLE_FIELDS;
 
 public class CloneMessage extends AbstractFunction<Message> {
     public static final String NAME = "clone_message";
