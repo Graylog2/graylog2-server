@@ -14,16 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import * as React from 'react';
 
-import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
-import StringUtils from 'util/StringUtils';
+import { singleton } from 'logic/singleton';
 
-type Props = {
-  priority: number | string;
-};
-const PriorityName = ({ priority }: Props) => (
-  <>{StringUtils.capitalizeFirstLetter(EventDefinitionPriorityEnum.properties[priority]?.name ?? '')}</>
-);
+type ContextValue = string | undefined;
 
-export default PriorityName;
+const ActiveSliceColContext = React.createContext<ContextValue>(undefined);
+
+export default singleton('contexts.ActiveSliceColContext', () => ActiveSliceColContext);

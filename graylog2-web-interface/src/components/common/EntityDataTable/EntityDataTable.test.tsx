@@ -29,6 +29,7 @@ import { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
 import EntityDataTable from './EntityDataTable';
 
 jest.mock('hooks/useCurrentUser');
+jest.mock('logic/telemetry/useSendTelemetry', () => () => jest.fn());
 
 declare module 'graylog-web-plugin/plugin' {
   interface EntityActions {
@@ -43,7 +44,7 @@ describe('<EntityDataTable />', () => {
 
   const columnSchemas: Array<ColumnSchema> = [
     { id: 'title', title: 'Title', type: 'STRING', sortable: true },
-    { id: 'description', title: 'Description', type: 'STRING', sortable: true },
+    { id: 'description', title: 'Description', type: 'STRING', sortable: true, sliceable: true },
     { id: 'stream', title: 'Stream', type: 'STRING', sortable: true },
     {
       id: 'status',
@@ -83,6 +84,7 @@ describe('<EntityDataTable />', () => {
     entityAttributesAreCamelCase: true,
     columnSchemas,
     onResetLayoutPreferences: () => Promise.resolve(),
+    onChangeSlicing: () => {},
   };
 
   it('should render selected columns and table headers', async () => {
@@ -189,11 +191,41 @@ describe('<EntityDataTable />', () => {
 
     render(<EntityDataTable {...defaultProps} onSortChange={onSortChange} />);
 
-    userEvent.click(await screen.findByTitle(/sort description ascending/i));
+    userEvent.click(await screen.findByRole('button', { name: /toggle description actions/i }));
+    userEvent.click(await screen.findByRole('menuitem', { name: /sort ascending/i }));
 
     await waitFor(() => expect(onSortChange).toHaveBeenCalledTimes(1));
 
     expect(onSortChange).toHaveBeenCalledWith({ attributeId: 'description', direction: 'asc' });
+  });
+
+  it('should slice by column using header action', async () => {
+    const onChangeSlicing = jest.fn();
+
+    render(<EntityDataTable {...defaultProps} columnSchemas={columnSchemas} onChangeSlicing={onChangeSlicing} />);
+
+    userEvent.click(await screen.findByRole('button', { name: /toggle description actions/i }));
+    userEvent.click(await screen.findByRole('menuitem', { name: /slice by values/i }));
+
+    expect(onChangeSlicing).toHaveBeenCalledWith('description');
+  });
+
+  it('should remove slicing using header action', async () => {
+    const onChangeSlicing = jest.fn();
+
+    render(
+      <EntityDataTable
+        {...defaultProps}
+        columnSchemas={columnSchemas}
+        onChangeSlicing={onChangeSlicing}
+        activeSliceCol="description"
+      />,
+    );
+
+    userEvent.click(await screen.findByRole('button', { name: /toggle description actions/i }));
+    userEvent.click(await screen.findByRole('menuitem', { name: /remove slicing/i }));
+
+    expect(onChangeSlicing).toHaveBeenCalledWith(undefined, undefined);
   });
 
   it('bulk actions should update selected items', async () => {

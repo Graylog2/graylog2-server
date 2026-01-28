@@ -52,12 +52,24 @@ const useFetchEntities = <T, M = unknown>({
   data: PaginatedResponse<T, M>;
   refetch: () => void;
 } => {
+  const newSearchParams = { ...searchParams };
+
+  delete newSearchParams.slice;
+  delete newSearchParams.sliceCol;
+
+  if (searchParams.sliceCol && searchParams.slice) {
+    newSearchParams.filters = newSearchParams.filters.set(searchParams.sliceCol, [
+      ...(newSearchParams.filters[searchParams.sliceCol] ?? []),
+      searchParams.slice,
+    ]);
+  }
+
   const { data, isInitialLoading, refetch } = useQuery({
     queryKey: fetchKey,
 
     queryFn: () =>
       defaultOnError(
-        fetchEntities(searchParams),
+        fetchEntities(newSearchParams),
         `Fetching ${humanName} failed with status`,
         `Could not retrieve ${humanName}`,
       ),
