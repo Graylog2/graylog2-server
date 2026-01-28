@@ -20,7 +20,7 @@ import { useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 
-import { DeleteMenuItem, ListGroup, ListGroupItem, Badge, DropdownButton, Button } from 'components/bootstrap';
+import { ListGroup, ListGroupItem, Badge, DropdownButton, Button } from 'components/bootstrap';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import MenuItem from 'components/bootstrap/menuitem/MenuItem';
 import { defaultCompare } from 'logic/DefaultCompare';
@@ -41,20 +41,6 @@ const Container = styled.div(
     }
   `,
 );
-
-const Header = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    gap: ${theme.spacings.xxs};
-    align-items: center;
-  `,
-);
-
-const Headline = styled.h2`
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
 
 const SliceHeader = styled.div(
   ({ theme }) => css`
@@ -90,7 +76,9 @@ const ControlsRow = styled.div<{ $alignRight?: boolean }>(
       flex: 1;
     }
 
-    .query, .input-container, .form-group {
+    .query,
+    .input-container,
+    .form-group {
       width: 100%;
       margin: 0;
     }
@@ -145,7 +133,7 @@ const useSlices = ({
   filters: UrlQueryFilters;
   tmpFetchSlices: any;
 }) => {
-  const { data, isLoading } = useQuery<Array<{ value: unknown; count: number; title?: string }>>({
+  const { data, isLoading } = useQuery<Array<{ value: string | number; count: number; title?: string }>>({
     queryKey: ['slices', column, query, filters],
     queryFn: () => defaultOnError(tmpFetchSlices(column, query, filters), 'Error fetching security events'),
   });
@@ -153,9 +141,7 @@ const useSlices = ({
   return { data, isLoading };
 };
 
-const Slice = styled.li``;
-
-type SliceData = { value: unknown; count: number; title?: string };
+type SliceData = { value: string | number; count: number; title?: string };
 type SortMode = 'alphabetical' | 'count';
 const SORT_OPTIONS: Array<{ value: SortMode; label: string }> = [
   { value: 'alphabetical', label: 'Alphabetical' },
@@ -168,8 +154,8 @@ type Props = {
   appSection: string;
   sliceCol: string;
   columnSchemas: Array<ColumnSchema>;
-  onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
-  sliceRenderers: { [col: string]: (value: unknown) => React.ReactNode } | undefined;
+  onChangeSlicing: (sliceCol: string | undefined, slice?: string | undefined) => void;
+  sliceRenderers?: { [col: string]: (value: string | number) => React.ReactNode } | undefined;
   tmpFetchSlices: any;
   activeSlice: string | undefined;
 };
@@ -182,7 +168,7 @@ const Slicing = ({
   onChangeSlicing,
   query,
   sliceCol,
-  sliceRenderers,
+  sliceRenderers = undefined,
   tmpFetchSlices,
 }: Props) => {
   const [showEmptySlices, setShowEmptySlices] = useState(false);
@@ -203,10 +189,7 @@ const Slicing = ({
       }
       buttonTitle={`Sort by ${sortLabel}`}>
       {SORT_OPTIONS.map((option) => (
-        <MenuItem
-          key={option.value}
-          onClick={() => setSortMode(option.value)}
-          active={sortMode === option.value}>
+        <MenuItem key={option.value} onClick={() => setSortMode(option.value)} active={sortMode === option.value}>
           {option.label}
         </MenuItem>
       ))}
@@ -319,7 +302,7 @@ const Slicing = ({
               {visibleNonEmptySlices.map((slice) => (
                 <StyledListGroupItem
                   key={String(slice.value)}
-                  onClick={() => onChangeSlicing(sliceCol, slice.value)}
+                  onClick={() => onChangeSlicing(sliceCol, String(slice.value))}
                   $active={activeSlice === slice.value}>
                   <SliceInner>
                     {renderSliceLabel(slice)}
@@ -342,21 +325,19 @@ const Slicing = ({
               )}
             </EmptySlicesHeader>
             {showEmptySlices && visibleEmptySlices.length > 0 && (
-              <>
-                <ListGroup>
-                  {visibleEmptySlices.map((slice) => (
-                    <StyledListGroupItem
-                      key={`empty-${String(slice.value)}`}
-                      onClick={() => onChangeSlicing(sliceCol, slice.value)}
-                      $active={activeSlice === slice.value}>
-                      <SliceInner>
-                        {renderSliceLabel(slice)}
-                        <Badge>{slice.count}</Badge>
-                      </SliceInner>
-                    </StyledListGroupItem>
-                  ))}
-                </ListGroup>
-              </>
+              <ListGroup>
+                {visibleEmptySlices.map((slice) => (
+                  <StyledListGroupItem
+                    key={`empty-${String(slice.value)}`}
+                    onClick={() => onChangeSlicing(sliceCol, String(slice.value))}
+                    $active={activeSlice === slice.value}>
+                    <SliceInner>
+                      {renderSliceLabel(slice)}
+                      <Badge>{slice.count}</Badge>
+                    </SliceInner>
+                  </StyledListGroupItem>
+                ))}
+              </ListGroup>
             )}
           </>
         )}

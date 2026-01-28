@@ -64,8 +64,6 @@ const useFetchEntities = <T, M = unknown>({
     ]);
   }
 
-  console.log(newSearchParams);
-
   const { data, isInitialLoading, refetch } = useQuery({
     queryKey: fetchKey,
 
