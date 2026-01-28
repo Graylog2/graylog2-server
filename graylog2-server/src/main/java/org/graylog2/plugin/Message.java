@@ -617,7 +617,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         final String trimmedKey = key.trim();
 
         // Don't accept protected keys. (some are allowed though lol)
-        if ((RESERVED_FIELDS.contains(trimmedKey) && !RESERVED_SETTABLE_FIELDS.contains(trimmedKey)) || !validKey(trimmedKey)) {
+        if (protectedKey(trimmedKey) || !validKey(trimmedKey)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Ignoring invalid or reserved key {} for message {}", trimmedKey, getId());
             } else {
@@ -695,6 +695,10 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     public static boolean validKey(final String key) {
         return VALID_KEY_CHAR_MATCHER.matchesAllOf(key);
+    }
+
+    public static boolean protectedKey(final String key) {
+        return RESERVED_FIELDS.contains(key) && !RESERVED_SETTABLE_FIELDS.contains(key);
     }
 
     public static String cleanKey(final String key) {
