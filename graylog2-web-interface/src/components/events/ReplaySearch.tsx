@@ -22,40 +22,25 @@ import useCreateSearch from 'views/hooks/useCreateSearch';
 import EventInfoBar from 'components/event-definitions/replay-search/EventInfoBar';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 import SearchPage from 'views/pages/SearchPage';
-import ReplaySearchContext from 'components/event-definitions/replay-search/ReplaySearchContext';
 import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import { isSystemEventDefinition } from 'components/event-definitions/event-definitions-types';
-import type { Event } from 'components/events/events/types';
-import type { EventDefinitionAggregation } from 'hooks/useEventDefinition';
-import useEventDefinition from 'hooks/useEventDefinition';
-import useCreateViewForEvent from 'views/logic/views/UseCreateViewForEvent';
 import Center from 'components/common/Center';
+import type View from 'views/logic/views/View';
 
 type ReplaySearchProps = {
-  alertId: string;
-  definitionId: string;
-  eventDefinition: EventDefinition;
-  event: Event;
-  aggregations: EventDefinitionAggregation[];
-  replayEventDefinition: boolean;
-  searchPageLayout: Partial<LayoutState>;
-  forceSidebarPinned: boolean;
+  searchPageLayout?: Partial<LayoutState>;
+  forceSidebarPinned?: boolean;
+  view: Promise<View>;
 };
 
 const defaultSearchPageLayout = {};
 
 const ReplaySearch = ({
-  alertId,
-  definitionId,
-  eventDefinition,
-  aggregations,
-  event: eventData,
-  replayEventDefinition,
-  searchPageLayout,
-  forceSidebarPinned,
+  searchPageLayout = defaultSearchPageLayout,
+  forceSidebarPinned = false,
+  view: _view,
 }: ReplaySearchProps) => {
-  const _view = useCreateViewForEvent({ eventData, eventDefinition, aggregations });
   const view = useCreateSearch(_view);
 
   const _searchPageLayout = useMemo(
@@ -72,34 +57,12 @@ const ReplaySearch = ({
       ),
     [searchPageLayout],
   );
-  const replaySearchContext = useMemo(
-    () =>
-      ({
-        alertId,
-        definitionId,
-
-        // eslint-disable-next-line no-nested-ternary
-        type: replayEventDefinition ? 'event_definition' : eventData?.alert ? 'alert' : 'event',
-      }) as const,
-    [alertId, definitionId, eventData?.alert, replayEventDefinition],
-  );
 
   return (
-    <ReplaySearchContext.Provider value={replaySearchContext}>
-      <SearchPageLayoutProvider value={_searchPageLayout}>
-        <SearchPage view={view} isNew forceSideBarPinned={forceSidebarPinned} />
-      </SearchPageLayoutProvider>
-    </ReplaySearchContext.Provider>
+    <SearchPageLayoutProvider value={_searchPageLayout}>
+      <SearchPage view={view} isNew forceSideBarPinned={forceSidebarPinned} />
+    </SearchPageLayoutProvider>
   );
-};
-
-type Props = {
-  alertId: string;
-  definitionId: string;
-  replayEventDefinition?: boolean;
-  searchPageLayout?: Partial<LayoutState>;
-  forceSidebarPinned?: boolean;
-  eventData: Event;
 };
 
 const canReplayEvent = (eventDefinition: EventDefinition) => {
@@ -112,33 +75,11 @@ const canReplayEvent = (eventDefinition: EventDefinition) => {
   return true;
 };
 
-const LoadingBarrier = ({
-  alertId,
-  definitionId,
-  replayEventDefinition = false,
-  searchPageLayout = defaultSearchPageLayout,
-  forceSidebarPinned = false,
-  eventData,
-}: Props) => {
-  const {
-    data: { eventDefinition, aggregations },
-  } = useEventDefinition(definitionId ?? eventData?.event_definition_id);
+export const LoadingBarrier = ({ children, eventDefinition }) => {
   const canReplay = canReplayEvent(eventDefinition);
+  if (canReplay) return children;
 
-  return canReplay === true ? (
-    <ReplaySearch
-      alertId={alertId}
-      definitionId={definitionId}
-      eventDefinition={eventDefinition}
-      aggregations={aggregations}
-      event={eventData}
-      searchPageLayout={searchPageLayout}
-      replayEventDefinition={replayEventDefinition}
-      forceSidebarPinned={forceSidebarPinned}
-    />
-  ) : (
-    <Center>Cannot replay this event: {canReplay} Please select a different one.</Center>
-  );
+  return <Center>Cannot replay this event: {canReplay} Please select a different one.</Center>;
 };
 
-export default LoadingBarrier;
+export default ReplaySearch;

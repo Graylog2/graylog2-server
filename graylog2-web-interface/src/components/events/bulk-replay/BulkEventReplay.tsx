@@ -19,7 +19,6 @@ import { useState } from 'react';
 import styled from 'styled-components';
 
 import useSelectedEvents from 'components/events/bulk-replay/useSelectedEvents';
-import ReplaySearch from 'components/events/ReplaySearch';
 import type { Event } from 'components/events/events/types';
 import Center from 'components/common/Center';
 import EventReplaySelectedProvider from 'contexts/EventReplaySelectedProvider';
@@ -29,6 +28,8 @@ import type { SidebarSection } from 'views/components/sidebar/sidebarSections';
 import sidebarSections from 'views/components/sidebar/sidebarSections';
 import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
 import ReplayEventIdRenderer from 'components/events/bulk-replay/NewBulkEventReplay';
+import EventReplaySearch from 'components/events/EventReplaySearch';
+import useEventDefinition from 'hooks/useEventDefinition';
 
 const Container = styled.div`
   display: flex;
@@ -105,14 +106,14 @@ const ReplayedSearch = ({
   const [events] = useState<Props['events']>(_events);
   const { eventIds, selectedId } = useSelectedEvents();
   const selectedEvent = events?.[selectedId];
+  const { data: eventDefinitionMappedData } = useEventDefinition(selectedEvent?.event?.event_definition_id);
 
   return (
     <>
       <InfoAlert eventIds={eventIds} selectedEvent={selectedEvent} />
-      <ReplaySearch
-        alertId={selectedEvent?.event?.id}
+      <EventReplaySearch
         eventData={selectedEvent.event}
-        definitionId={selectedEvent?.event?.event_definition_id}
+        eventDefinitionMappedData={eventDefinitionMappedData}
         searchPageLayout={searchPageLayout}
         forceSidebarPinned
       />
