@@ -82,8 +82,7 @@ public class CloneMessage extends AbstractFunction<Message> {
         }
 
         final Message clonedMessage = messageFactory.createMessage(currentMessage.getMessage(), currentMessage.getSource(), currentMessage.getTimestamp());
-        clonedMessage.addFields(Maps.filterKeys(currentMessage.getFields(), key ->
-                !RESERVED_FIELDS.contains(key) || RESERVED_SETTABLE_FIELDS.contains(key)));
+        clonedMessage.addFields(Maps.filterKeys(currentMessage.getFields(), Message.FIELD_ID::equals));
         clonedMessage.addStreams(currentMessage.getStreams());
         if (rule != null) {
             clonedMessage.setMetadata(CLONE_SOURCE, rule);
