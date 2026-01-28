@@ -171,6 +171,10 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
     [additionalAttributes, paginatedEntities?.attributes],
   );
 
+  const onPaginationChange = withoutURLParams
+    ? (currentPage: number, pageSize: number) => paginationState.setPagination({ page: currentPage, pageSize })
+    : undefined;
+
   if (isLoadingLayoutPreferences || isLoadingEntities) {
     return <Spinner />;
   }
@@ -232,12 +236,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
             showPageSizeSelect={false}
             totalItems={total}
             useQueryParameter={!withoutURLParams}
-            onChange={
-              withoutURLParams
-                ? (currentPage: number, pageSize: number) =>
-                    paginationState.setPagination({ page: currentPage, pageSize })
-                : undefined
-            }>
+            onChange={onPaginationChange}>
             {list?.length === 0 ? (
               <NoSearchResult>No {humanName} have been found.</NoSearchResult>
             ) : (

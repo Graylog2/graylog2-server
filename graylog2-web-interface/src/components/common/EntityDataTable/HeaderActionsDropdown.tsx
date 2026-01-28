@@ -50,7 +50,7 @@ type Props = {
   label: string;
   activeSort?: 'asc' | 'desc' | false;
   isSliceActive?: boolean;
-  onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void | undefined;
+  onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
   sliceColumnId?: string;
   appSection?: string;
   onSort?: (desc: boolean) => void;

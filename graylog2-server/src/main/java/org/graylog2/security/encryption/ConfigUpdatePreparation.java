@@ -14,18 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2.testing;
+package org.graylog2.security.encryption;
 
-import org.graylog.testing.completebackend.SearchServerBuilder;
-import org.graylog.testing.completebackend.SearchServerInterfaceProvider;
-import org.graylog2.storage.SearchVersion;
-
-public class DatanodeInstanceProvider implements SearchServerInterfaceProvider {
-    @Override
-    public SearchServerBuilder<?> getBuilderFor(final SearchVersion version) {
-        if (version.isDataNode()) {
-            return new DatanodeInstanceBuilder(version);
-        }
-        return null;
-    }
+public interface ConfigUpdatePreparation {
+    Object prepareConfigUpdate(Object existingConfig);
 }

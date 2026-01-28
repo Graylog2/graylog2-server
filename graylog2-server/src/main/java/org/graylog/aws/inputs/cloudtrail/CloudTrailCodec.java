@@ -27,6 +27,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
@@ -43,6 +44,7 @@ import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.Config.getOverri
 
 public class CloudTrailCodec extends AbstractCodec {
     public static final String NAME = "AWSCloudTrail";
+    public static final String CK_INCLUDE_FULL_MESSAGE_JSON = "include_full_message_json";
 
     private final ObjectMapper objectMapper;
     private final MessageFactory messageFactory;
@@ -64,6 +66,14 @@ public class CloudTrailCodec extends AbstractCodec {
             message.addFields(record.additionalFieldsAsMap());
             message.addField("full_message", record.getFullMessage());
             message.addField(AWS.SOURCE_GROUP_IDENTIFIER, true);
+
+            // Store full CloudTrail event as JSON if configured
+            if (configuration.getBoolean(CK_INCLUDE_FULL_MESSAGE_JSON)) {
+                final String fullMessageJson = record.getFullMessageJson(objectMapper);
+                if (fullMessageJson != null) {
+                    message.addField("full_message_json", fullMessageJson);
+                }
+            }
 
             // Apply override_source if configured
             final String overrideSourceValue = configuration.getString(CK_OVERRIDE_SOURCE);
@@ -98,6 +108,12 @@ public class CloudTrailCodec extends AbstractCodec {
         public ConfigurationRequest getRequestedConfiguration() {
             final ConfigurationRequest r = new ConfigurationRequest();
             r.addField(getOverrideSourceFieldDefinition());
+            r.addField(new BooleanField(
+                    CK_INCLUDE_FULL_MESSAGE_JSON,
+                    "Include full_message_json?",
+                    false,
+                    "Store the complete CloudTrail event as JSON in the full_message_json field?"
+            ));
             return r;
         }
     }

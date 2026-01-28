@@ -97,7 +97,7 @@ export const useWithLocalState = (layoutConfig: LayoutConfig) => {
     }));
   }, []);
 
-  const onChangeSlicing = useCallback((sliceCol: string, slice?: string | undefined) => {
+  const onChangeSlicing = useCallback((sliceCol: string | undefined, slice?: string | undefined) => {
     setTransientFetchOptions((cur) => ({
       ...cur,
       sliceCol,
