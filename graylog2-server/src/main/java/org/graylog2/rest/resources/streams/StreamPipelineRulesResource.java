@@ -57,6 +57,7 @@ package org.graylog2.rest.resources.streams;
     import java.util.List;
     import java.util.Map;
     import java.util.Objects;
+    import java.util.Set;
     import java.util.function.Function;
     import java.util.stream.Stream;
 
@@ -146,7 +147,7 @@ public class StreamPipelineRulesResource extends RestResource {
     private Stream<StreamPipelineRulesResponse> buildResponse(PipelineRulesMetadataDao dao, String streamId) {
         Map<String, ?> streamsByRuleId = dao.streamsByRuleId();
         final List<String> relevantRules = streamsByRuleId.entrySet().stream()
-                .filter(entry -> ((List<?>) entry.getValue()).contains(streamId))
+                .filter(entry -> ((Set<?>) entry.getValue()).contains(streamId))
                 .map(Map.Entry::getKey)
                 .toList();
 
