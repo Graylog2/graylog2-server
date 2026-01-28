@@ -35,6 +35,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
+import static org.graylog2.plugin.Message.RESERVED_FIELDS;
+import static org.graylog2.plugin.Message.RESERVED_SETTABLE_FIELDS;
 
 public class CloneMessage extends AbstractFunction<Message> {
     public static final String NAME = "clone_message";
@@ -80,7 +82,8 @@ public class CloneMessage extends AbstractFunction<Message> {
         }
 
         final Message clonedMessage = messageFactory.createMessage(currentMessage.getMessage(), currentMessage.getSource(), currentMessage.getTimestamp());
-        clonedMessage.addFields(Maps.filterKeys(currentMessage.getFields(), key -> !Message.protectedKey(key)));
+        clonedMessage.addFields(Maps.filterKeys(currentMessage.getFields(), key ->
+                !RESERVED_FIELDS.contains(key) || RESERVED_SETTABLE_FIELDS.contains(key)));
         clonedMessage.addStreams(currentMessage.getStreams());
         if (rule != null) {
             clonedMessage.setMetadata(CLONE_SOURCE, rule);
