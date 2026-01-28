@@ -22,6 +22,7 @@ import Menu from 'components/bootstrap/Menu';
 import Icon from 'components/common/Icon';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { MenuItem } from 'components/bootstrap';
 
 const DropdownTrigger = styled.button(
   ({ theme }) => css`
@@ -102,20 +103,20 @@ const HeaderActionsDropdown = ({
       </Menu.Target>
       <Menu.Dropdown>
         {onSort && (
-          <Menu.Item onClick={() => onSort(false)} leftSection={<Icon name="arrow_upward" />}>
+          <MenuItem onClick={() => onSort(false)} icon="arrow_upward">
             <MenuItemLabel $active={activeSort === 'asc'}>Sort ascending</MenuItemLabel>
-          </Menu.Item>
+          </MenuItem>
         )}
         {onSort && (
-          <Menu.Item onClick={() => onSort(true)} leftSection={<Icon name="arrow_downward" />}>
+          <MenuItem onClick={() => onSort(true)} icon="arrow_downward">
             <MenuItemLabel $active={activeSort === 'desc'}>Sort descending</MenuItemLabel>
-          </Menu.Item>
+          </MenuItem>
         )}
-        {onSort && onChangeSlicing && <Menu.Divider />}
+        {onSort && onChangeSlicing && <MenuItem divider />}
         {onChangeSlicing && (
-          <Menu.Item onClick={onToggleSlicing} leftSection={<Icon name="surgical" />}>
+          <MenuItem onClick={onToggleSlicing} icon="surgical">
             {isSliceActive ? 'Remove slicing' : 'Slice by values'}
-          </Menu.Item>
+          </MenuItem>
         )}
       </Menu.Dropdown>
     </Menu>
