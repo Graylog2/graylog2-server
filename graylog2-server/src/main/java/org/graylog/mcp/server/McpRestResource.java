@@ -18,6 +18,7 @@ package org.graylog.mcp.server;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.modelcontextprotocol.spec.McpError;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -102,62 +103,63 @@ public class McpRestResource extends RestResource {
             return Response.accepted().build();
         }
 
-        // we don't actually use the session id right now, but it's good practice to honor the protocol.
-        // if we later need to store state, we already have a way to find it again.
+        // TODO: manage session ids -> store session ids
         final String sessionId = Optional.ofNullable(mcpSessionIdHeader)
                 .filter(s -> !s.isBlank())
                 .orElse(UUID.randomUUID().toString());
-
-        // According to: https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#protocol-version-header
-        // technically we should ensure that the negotiated version doesn't change over multiple requests, but in
-        // practice we don't mind
-        if (Optional.ofNullable(protocolVersionHeader)
-                .map(version -> !mcpService.supportedVersions.contains(version))
-                .orElse(false)) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(Map.of("error", "Invalid protocol version"))
-                    .build();
-        }
 
         // We only implement non-streaming for now if the client is willing to go one-shot. we might support SSE later.
         final String accept = Optional.ofNullable(acceptHeader).orElse("");
         final boolean stream = accept.contains(MediaType.SERVER_SENT_EVENTS) && !accept.contains(MediaType.APPLICATION_JSON);
         if (!stream) {
             // Simple one-shot JSON reply
-            final McpSchema.JSONRPCRequest request = objectMapper.convertValue(payload, McpSchema.JSONRPCRequest.class);
-            LOG.trace("Received JSONRPCrequest {}", request);
+            Object id = null;
             try {
+                final McpSchema.JSONRPCRequest request = objectMapper.convertValue(payload, McpSchema.JSONRPCRequest.class);
+                LOG.trace("Received JSON-RPC request {}", request);
+                id = request.id();
+
+                if (protocolVersionHeader != null) {
+                    // According to: https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#protocol-version-header
+                    // The protocol version sent by the client SHOULD be the one negotiated during initialization.
+                    // The server is NOT responsible for ensuring that the negotiated version remains the same over multiple requests.
+                    if (!McpService.ALL_SUPPORTED_MCP_VERSIONS.contains(protocolVersionHeader)) {
+                        LOG.warn("Invalid protocol version for request header {}", protocolVersionHeader);
+                        // Example: https://modelcontextprotocol.io/specification/2025-06-18/basic/lifecycle#error-handling
+                        throw McpError.builder(McpSchema.ErrorCodes.INVALID_PARAMS)
+                                .message("Invalid protocol version header " + protocolVersionHeader)
+                                .data(Map.of("supported", McpService.ALL_SUPPORTED_MCP_VERSIONS, "requested", protocolVersionHeader))
+                                .build();
+                    }
+                } else {
+                    // TODO: manage session ids -> retrieve negotiated version as fallback, use "2025-03-26" as default
+                    protocolVersionHeader = McpService.FALLBACK_MCP_VERSION;
+                }
                 final PermissionHelper permissionHelper = new PermissionHelper(getCurrentUser(), securityContext, searchUser);
-                final Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, sessionId);
+                final Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, sessionId, protocolVersionHeader);
 
                 if (result.isPresent() && LOG.isTraceEnabled()) {
-                    LOG.trace("Successfully handled JSONRPCrequest: {}", objectMapper.writeValueAsString(result));
+                    LOG.trace("Successfully handled JSON-RPC request: {}", objectMapper.writeValueAsString(result));
                 }
-                return Response.ok(new McpSchema.JSONRPCResponse("2.0",
-                                request.id(),
-                                result.orElse(null),
-                                null))
+                return Response.ok(new McpSchema.JSONRPCResponse("2.0", id, result.orElse(null), null))
                         .header(HEADER_MCP_SESSION_ID, sessionId)
                         .build();
-            } catch (IllegalArgumentException e) {
-                JsonNode data = objectMapper.nullNode();
-                if (request.method().equals(McpSchema.METHOD_INITIALIZE)) {
-                    // Example: https://modelcontextprotocol.io/specification/2025-06-18/basic/lifecycle#error-handling
-                    data = objectMapper.createObjectNode().set("supported", objectMapper.valueToTree(mcpService.supportedVersions));
-                }
+            } catch (McpError e) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity(new McpSchema.JSONRPCResponse("2.0",
-                                request.id(),
-                                null,
-                                new McpSchema.JSONRPCResponse.JSONRPCError(McpSchema.ErrorCodes.INVALID_PARAMS, e.getMessage(), data)))
+                        .entity(new McpSchema.JSONRPCResponse("2.0", id, null, e.getJsonRpcError()))
                         .header(HEADER_MCP_SESSION_ID, sessionId)
                         .build();
             } catch (Exception e) {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                         .entity(new McpSchema.JSONRPCResponse("2.0",
-                                request.id(),
+                                id,
                                 null,
-                                new McpSchema.JSONRPCResponse.JSONRPCError(McpSchema.ErrorCodes.INTERNAL_ERROR, e.getMessage(), null)))
+                                new McpSchema.JSONRPCResponse.JSONRPCError(
+                                        McpSchema.ErrorCodes.INTERNAL_ERROR,
+                                        e.getMessage(),
+                                        null
+                                )
+                        ))
                         .header(HEADER_MCP_SESSION_ID, sessionId)
                         .build();
             }
@@ -181,6 +183,8 @@ public class McpRestResource extends RestResource {
         }
         return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
     }
+
+    // TODO: manage session ids -> DELETE session ids and return NO_CONTENT
 
     private boolean containsAnyRequests(JsonNode node) {
         if (node == null || node.isMissingNode() || node.isNull()) return false;
