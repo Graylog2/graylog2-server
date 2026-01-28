@@ -133,6 +133,7 @@
         <azure-blob-storage.version>12.32.0</azure-blob-storage.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>5.0.2</geoip2.version>
+        <grizzly-websockets.version>4.0.2</grizzly-websockets.version> <!-- Should match the version used by Jersey -->
         <grok.version>0.1.9-graylog-3</grok.version>
         <grpc.version>1.78.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>

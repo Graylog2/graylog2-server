@@ -304,7 +304,6 @@
         <dependency>
             <groupId>org.glassfish.grizzly</groupId>
             <artifactId>grizzly-websockets</artifactId>
-            <version>4.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.hk2</groupId>
