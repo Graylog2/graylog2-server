@@ -219,7 +219,7 @@
         <restassured.version>6.0.0</restassured.version>
         <testcontainers.version>2.0.3</testcontainers.version>
         <testcontainers.opensearch.version>4.1.0</testcontainers.opensearch.version>
-        <graalvm.version>25.0.1</graalvm.version>
+        <graalvm.version>25.0.2</graalvm.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v24.13.0</nodejs.version>
