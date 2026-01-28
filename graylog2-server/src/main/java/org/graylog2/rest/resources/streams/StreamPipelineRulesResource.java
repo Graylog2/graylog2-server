@@ -145,9 +145,9 @@ public class StreamPipelineRulesResource extends RestResource {
 
 
     private Stream<StreamPipelineRulesResponse> buildResponse(PipelineRulesMetadataDao dao, String streamId) {
-        Map<String, ?> streamsByRuleId = dao.streamsByRuleId();
+        Map<String, Set<String>> streamsByRuleId = dao.streamsByRuleId();
         final List<String> relevantRules = streamsByRuleId.entrySet().stream()
-                .filter(entry -> ((Set<?>) entry.getValue()).contains(streamId))
+                .filter(entry -> (entry.getValue()).contains(streamId))
                 .map(Map.Entry::getKey)
                 .toList();
 
