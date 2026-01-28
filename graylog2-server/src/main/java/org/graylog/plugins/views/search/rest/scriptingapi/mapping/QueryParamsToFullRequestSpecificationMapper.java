@@ -90,7 +90,8 @@ public class QueryParamsToFullRequestSpecificationMapper {
                 streamCategories,
                 timerangeParser.parseTimeRange(timerangeKeyword),
                 groupings,
-                metrics.stream().map(Metric::fromStringRepresentation).flatMap(Optional::stream).collect(Collectors.toList())
+                metrics.stream().map(Metric::fromStringRepresentation).flatMap(Optional::stream).collect(Collectors.toList()),
+                null
         );
     }
 
