@@ -61,6 +61,7 @@ export const SystemJobsStore = singletonStore('core.SystemJobs', () =>
         },
         () => {
           // If we get an error (probably 404 because the job is gone), remove the job from the cache and trigger an update.
+          // eslint-disable-next-line no-unused-vars
           const { [jobId]: _, ...rest } = this.jobsById;
 
           this.jobsById = rest;
