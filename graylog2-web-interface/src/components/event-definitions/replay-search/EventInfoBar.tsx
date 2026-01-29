@@ -16,15 +16,13 @@
  */
 
 import type { SyntheticEvent } from 'react';
-import React, { useCallback, useMemo, useState } from 'react';
-import styled from 'styled-components';
+import React, { useCallback, useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
 import { FlatContentRow, Icon } from 'components/common';
 import useAttributeComponents from 'components/event-definitions/replay-search/hooks/useAttributeComponents';
-import NoAttributeProvided from 'components/event-definitions/replay-search/NoAttributeProvided';
-import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
-import assertUnreachable from 'logic/assertUnreachable';
+import EventAttribute from 'components/event-definitions/replay-search/EventAttribute';
 
 const Header = styled.div`
   display: flex;
@@ -33,30 +31,22 @@ const Header = styled.div`
   gap: 5px;
 `;
 
-const Item = styled.div`
-  display: flex;
-  gap: 5px;
-  align-items: flex-end;
-`;
-
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 5px;
 `;
 
-const Row = styled.div`
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-`;
-
-const Value = styled.div`
-  display: flex;
-`;
+const Row = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    flex-wrap: wrap;
+    gap: ${theme.spacings.xs};
+    justify-content: stretch;
+  `,
+);
 
 const EventInfoBar = () => {
-  const { type } = useReplaySearchContext();
   const [open, setOpen] = useState<boolean>(true);
 
   const toggleOpen = useCallback((e: SyntheticEvent) => {
@@ -66,26 +56,13 @@ const EventInfoBar = () => {
 
   const infoAttributes = useAttributeComponents();
 
-  const currentTypeText = useMemo(() => {
-    switch (type) {
-      case 'alert':
-        return 'alert';
-      case 'event':
-        return 'event';
-      case 'event_definition':
-        return 'event definition';
-      default:
-        return assertUnreachable(type, `Invalid replay type: ${type}`);
-    }
-  }, [type]);
-
   return (
     <FlatContentRow>
       <Header>
         <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleOpen}>
           <Icon name={`arrow_${open ? 'drop_down' : 'right'}`} />
           &nbsp;
-          {open ? `Hide ${currentTypeText} details` : `Show ${currentTypeText} details`}
+          {open ? `Hide event definition details` : `Show event definition details`}
         </Button>
       </Header>
       {open && (
@@ -94,10 +71,9 @@ const EventInfoBar = () => {
             {infoAttributes.map(
               ({ title, content, show }) =>
                 show !== false && (
-                  <Item key={title}>
-                    <b>{title}: </b>
-                    <Value title={title}>{content || <NoAttributeProvided name={title} />}</Value>
-                  </Item>
+                  <EventAttribute key={title} title={title}>
+                    {content}
+                  </EventAttribute>
                 ),
             )}
           </Row>

@@ -129,8 +129,8 @@
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.46.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
-        <gcs.version>2.61.0</gcs.version>
-        <azure-blob-storage.version>12.32.0</azure-blob-storage.version>
+        <gcs.version>2.62.0</gcs.version>
+        <azure-blob-storage.version>12.33.0</azure-blob-storage.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>5.0.2</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
@@ -142,8 +142,8 @@
         <hamcrest.version>3.0</hamcrest.version>
         <hibernate-validator.version>9.1.0.Final</hibernate-validator.version>
         <hk2.version>3.1.1</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
-        <jackson.version>2.20.1</jackson.version>
-        <jadconfig.version>1.0.0</jadconfig.version>
+        <jackson.version>2.21.0</jackson.version>
+        <jadconfig.version>1.1.0</jadconfig.version>
         <java-semver.version>0.10.2</java-semver.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
         <jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
@@ -165,7 +165,7 @@
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.25.3</log4j.version>
         <lucene.version>9.12.3</lucene.version>
-        <lz4.version>1.10.2</lz4.version>
+        <lz4.version>1.10.3</lz4.version>
         <metrics.version>4.2.37</metrics.version>
         <mongodb-driver.version>5.6.2</mongodb-driver.version>
         <mongojack.version>5.0.3</mongojack.version>
@@ -175,7 +175,7 @@
         <okhttp.version>5.3.2</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.58.0</opentelemetry.version>
-        <opentelemetry-instrumentation.version>2.23.0</opentelemetry-instrumentation.version>
+        <opentelemetry-instrumentation.version>2.24.0</opentelemetry-instrumentation.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
@@ -190,7 +190,7 @@
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.17</slf4j.version>
         <streamex.version>0.8.4</streamex.version>
-        <swagger.version>2.2.37</swagger.version>
+        <swagger.version>2.2.42</swagger.version>
         <swagger-parser.version>2.1.37</swagger-parser.version>
         <syslog4j.version>0.9.61</syslog4j.version>
         <threeten-extra.version>1.8.0</threeten-extra.version>
@@ -219,7 +219,7 @@
         <restassured.version>6.0.0</restassured.version>
         <testcontainers.version>2.0.3</testcontainers.version>
         <testcontainers.opensearch.version>4.1.0</testcontainers.opensearch.version>
-        <graalvm.version>25.0.1</graalvm.version>
+        <graalvm.version>25.0.2</graalvm.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v24.13.0</nodejs.version>
@@ -716,7 +716,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.20.1</version>
+                    <version>2.21.0</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
@@ -766,7 +766,7 @@
                 <plugin>
                     <groupId>org.openrewrite.maven</groupId>
                     <artifactId>rewrite-maven-plugin</artifactId>
-                    <version>6.27.0</version>
+                    <version>6.28.0</version>
                     <configuration>
                         <!-- do not set <configLocation> here, otherwise it cannot be overridden by a system property later -->
                         <exclusions>
@@ -783,27 +783,27 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.71.0</version>
+                            <version>8.72.1</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-testing-frameworks</artifactId>
-                            <version>3.25.0</version>
+                            <version>3.26.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-migrate-java</artifactId>
-                            <version>3.25.0</version>
+                            <version>3.26.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-static-analysis</artifactId>
-                            <version>2.25.0</version>
+                            <version>2.26.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-joda</artifactId>
-                            <version>0.5.2</version>
+                            <version>0.6.0</version>
                         </dependency>
                     </dependencies>
                 </plugin>
@@ -1222,6 +1222,12 @@
                             <artifactId>auto-value</artifactId>
                             <version>${auto-value.version}</version>
                         </path>
+                        <path>
+                            <groupId>org.graylog</groupId>
+                            <artifactId>jadconfig</artifactId>
+                            <version>${jadconfig.version}</version>
+                        </path>
+
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
