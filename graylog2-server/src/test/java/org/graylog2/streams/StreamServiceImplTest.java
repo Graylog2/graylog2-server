@@ -35,6 +35,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -124,5 +125,16 @@ public class StreamServiceImplTest {
         assertThat(stream.getOutputs())
                 .anySatisfy(output -> assertThat(output.getId()).isEqualTo(output1Id.toHexString()))
                 .anySatisfy(output -> assertThat(output.getId()).isEqualTo(output2Id.toHexString()));
+    }
+
+    @Test
+    @MongoDBFixtures("userIlluminateStreams.json")
+    public void testCountBySource() {
+        Map<String, Long> count = streamService.countBySource();
+
+        assertThat(count).isEqualTo(Map.of(
+                "illuminate_streams", 2L,
+                "user_streams", 1L
+        ));
     }
 }
