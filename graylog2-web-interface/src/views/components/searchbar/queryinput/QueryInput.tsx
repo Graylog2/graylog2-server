@@ -223,7 +223,7 @@ type Props = BaseProps & {
   completer: any;
 };
 
-const QueryInputInner = (
+const QueryInput = (
   {
     className = '',
     commands = [],
@@ -345,4 +345,4 @@ const QueryInputInner = (
   );
 };
 
-export default React.forwardRef(QueryInputInner);
+export default React.forwardRef(QueryInput);

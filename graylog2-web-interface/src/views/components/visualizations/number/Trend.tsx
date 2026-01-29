@@ -139,7 +139,7 @@ type Props = {
   unit?: FieldUnit;
 };
 
-const TrendInner = (
+const Trend = (
   { current, previous, trendPreference, unit = undefined }: Props,
   ref: React.ForwardedRef<HTMLSpanElement>,
 ) => {
@@ -171,6 +171,6 @@ const TrendInner = (
   );
 };
 
-TrendInner.displayName = 'Trend';
+Trend.displayName = 'Trend';
 
-export default React.forwardRef(TrendInner);
+export default React.forwardRef(Trend);
