@@ -29,6 +29,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 import com.mongodb.WriteResult;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
@@ -75,6 +76,7 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Projections.excludeId;
 import static com.mongodb.client.model.Projections.fields;
 import static com.mongodb.client.model.Projections.include;
+import static org.graylog2.plugin.streams.Stream.ALL_SYSTEM_STREAM_IDS;
 import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.graylog2.streams.StreamImpl.FIELD_ID;
 import static org.graylog2.streams.StreamImpl.FIELD_INDEX_SET_ID;
@@ -366,6 +368,28 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     @Override
     public long count() {
         return totalCount(StreamImpl.class);
+    }
+
+    @Override
+    public Map<String, Long> countBySource() {
+        List<ObjectId> excludedIds = ALL_SYSTEM_STREAM_IDS.stream()
+                .map(ObjectId::new)
+                .toList();
+
+        long illuminateStreamCount = mongoCollection(StreamImpl.class).countDocuments(
+                Filters.and(
+                        Filters.regex(FIELD_TITLE, "^Illuminate:")
+                )
+        );
+
+        long userStreamCount = mongoCollection(StreamImpl.class).countDocuments(
+                Filters.nin("_id", excludedIds)
+        ) - illuminateStreamCount;
+
+        return Map.of(
+                "illuminate_streams", illuminateStreamCount,
+                "user_streams", userStreamCount
+        );
     }
 
     @Override
