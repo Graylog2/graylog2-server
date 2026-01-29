@@ -19,7 +19,6 @@ import * as React from 'react';
 import { useState, useCallback, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
-import Store from 'logic/local-storage/Store';
 import EventListItem from 'components/events/bulk-replay/EventListItem';
 import useSelectedEvents from 'components/events/bulk-replay/useSelectedEvents';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
@@ -27,11 +26,10 @@ import type { RemainingBulkActionsProps } from 'components/events/bulk-replay/ty
 import { Icon, IconButton } from 'components/common';
 import useEventBulkActions from 'components/events/events/hooks/useEventBulkActions';
 import Popover from 'components/common/Popover';
-import { REPLAY_SESSION_ID_PARAM } from 'components/events/Constants';
-import useRoutingQuery from 'routing/useQuery';
-import { Button } from 'components/bootstrap';
+import { Button, Alert } from 'components/bootstrap';
 import useEventsById from 'components/events/bulk-replay/hooks/useEventsById';
 import DropdownButton from 'components/bootstrap/DropdownButton';
+import useSessionInitialEventIds from 'components/events/bulk-replay/hooks/useSessionInitialEventIds';
 
 const Container = styled.div`
   display: flex;
@@ -64,23 +62,15 @@ type Props = {
   onClose: () => void;
 };
 
-const RemainingBulkActions = ({ completed, events }: RemainingBulkActionsProps) => {
-  const { actions, pluggableActionModals } = useEventBulkActions(events);
-
-  return (
-    <>
-      <DropdownButton
-        title="Bulk actions"
-        bsStyle={completed ? 'success' : 'default'}
-        id="bulk-actions-dropdown"
-        disabled={!events?.length}
-        bsSize="xs">
-        {actions}
-      </DropdownButton>
-      {pluggableActionModals}
-    </>
-  );
-};
+const RemainingBulkActions = ({ completed, actions }: RemainingBulkActionsProps) => (
+  <DropdownButton
+    title="Bulk actions"
+    bsStyle={completed ? 'success' : 'default'}
+    id="bulk-actions-dropdown"
+    bsSize="xs">
+    {actions}
+  </DropdownButton>
+);
 
 const CurrentContainer = styled.div(
   ({ theme }) => css`
@@ -108,9 +98,7 @@ const CollapseButton = styled(IconButton)(
   `,
 );
 const SidebarBulkEventReplay = ({ onClose }: Props) => {
-  const params = useRoutingQuery();
-  const replaySessionId = params[REPLAY_SESSION_ID_PARAM];
-  const initialEventIds: Array<string> = Store.sessionGet(replaySessionId);
+  const initialEventIds: Array<string> = useSessionInitialEventIds();
   const { data: _events } = useEventsById(initialEventIds);
 
   const [events] = useState(_events);
@@ -119,6 +107,7 @@ const SidebarBulkEventReplay = ({ onClose }: Props) => {
   const completed = eventIds.filter((event) => event.status === 'DONE').length;
   const remainingEvents = eventIds.map((eventId) => events[eventId.id]?.event);
   const curIndex = useMemo(() => eventIds.findIndex((item) => item.id === selectedId), [eventIds, selectedId]);
+  const { actions, pluggableActionModals } = useEventBulkActions(remainingEvents);
 
   const onGoBack = useCallback(() => {
     selectItem(eventIds[curIndex - 1].id);
@@ -145,7 +134,6 @@ const SidebarBulkEventReplay = ({ onClose }: Props) => {
               selected={false}
               done={status === 'DONE'}
               removeItem={removeItem}
-              onClick={() => {}}
               markItemAsDone={markItemAsDone}
               isDropdown
             />
@@ -162,21 +150,27 @@ const SidebarBulkEventReplay = ({ onClose }: Props) => {
               <i>
                 Review of {completed}/{total} events completed.
               </i>
+              {total === completed && (
+                <Alert bsStyle="info">
+                  You are done reviewing all events. You can now select a bulk action to apply to all remaining events.
+                </Alert>
+              )}
               <StyledList>
                 {eventIds.map(({ id: eventId, status: eventStatus }) => (
-                  <EventListItem
-                    key={`bulk-replay-search-item-${eventId}`}
-                    event={events?.[eventId]?.event}
-                    selected={eventId === selectedId}
-                    done={eventStatus === 'DONE'}
-                    removeItem={removeItem}
-                    onClick={() => selectItem(eventId)}
-                    markItemAsDone={markItemAsDone}
-                  />
+                  <li key={`bulk-replay-search-item-${eventId}`}>
+                    <EventListItem
+                      event={events?.[eventId]?.event}
+                      selected={eventId === selectedId}
+                      done={eventStatus === 'DONE'}
+                      removeItem={removeItem}
+                      onClick={() => selectItem(eventId)}
+                      markItemAsDone={markItemAsDone}
+                    />
+                  </li>
                 ))}
               </StyledList>
               <ActionsBar>
-                <RemainingBulkActions events={remainingEvents} completed={total > 0 && total === completed} />
+                <RemainingBulkActions actions={actions} completed={total > 0 && total === completed} />
               </ActionsBar>
             </EventsListSidebar>
           </Container>
@@ -186,6 +180,7 @@ const SidebarBulkEventReplay = ({ onClose }: Props) => {
         <Icon name="keyboard_arrow_right" title="Next Event" />
       </ArrowButton>
       <CollapseButton name="keyboard_tab_rtl" title="Collapse sidebar" onClick={onClose} />
+      {pluggableActionModals}
     </CurrentContainer>
   );
 };

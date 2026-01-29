@@ -19,12 +19,13 @@ import styled, { css } from 'styled-components';
 
 import IconButton from 'components/common/IconButton';
 import type { Event } from 'components/events/events/types';
+import { Icon } from 'components/common';
 
 type EventListItemProps = {
   event: Event;
   done: boolean;
   selected: boolean;
-  onClick: () => void;
+  onClick?: () => void;
   removeItem: (id: string) => void;
   markItemAsDone: (id: string) => void;
   className?: string;
@@ -78,7 +79,7 @@ const CompletedButton = styled(IconButton)<{ $done: boolean }>(
 const EventListItem = ({
   done,
   event,
-  onClick,
+  onClick = undefined,
   selected,
   removeItem,
   markItemAsDone,
@@ -97,7 +98,11 @@ const EventListItem = ({
   };
 
   return (
-    <StyledItem key={`event-replay-list-${event?.id}`} $selected={selected} onClick={onClick} className={className}>
+    <StyledItem
+      $selected={selected}
+      onClick={onClick}
+      className={className}
+      title={isDropdown ? 'Show Selected Events' : undefined}>
       <CompletedButton
         onClick={_markItemAsDone}
         title={`Mark event "${event?.id}" as ${done ? 'not' : ''} reviewed`}
@@ -109,7 +114,7 @@ const EventListItem = ({
         <Ellipsis>{event?.message ?? <i>Unknown</i>}</Ellipsis>
       </Summary>
       {isDropdown ? (
-        <IconButton name="arrow_drop_down" title="Show Selected Events" />
+        <Icon name="arrow_drop_down" />
       ) : (
         <IconButton onClick={_removeItem} title={`Remove event "${event?.id}" from list`} name="delete" />
       )}

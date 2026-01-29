@@ -14,9 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type React from 'react';
+import useRoutingQuery from 'routing/useQuery';
+import { REPLAY_SESSION_ID_PARAM } from 'components/events/Constants';
+import Store from 'logic/local-storage/Store';
 
-export type RemainingBulkActionsProps = {
-  completed: boolean;
-  actions: React.ReactNode[];
+const useSessionInitialEventIds = (): Array<string> => {
+  const params = useRoutingQuery();
+  const replaySessionId = params[REPLAY_SESSION_ID_PARAM];
+
+  return Store.sessionGet(replaySessionId).initialEventIds;
 };
+
+export default useSessionInitialEventIds;

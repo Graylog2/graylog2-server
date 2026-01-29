@@ -23,10 +23,12 @@ import Routes from 'routing/Routes';
 import Store from 'logic/local-storage/Store';
 import generateId from 'logic/generateId';
 import { REPLAY_SESSION_ID_PARAM } from 'components/events/Constants';
+import useLocation from 'routing/useLocation';
 
 const useReplayBulkAction = (replayableEvents: Array<Event>) => {
   const sendEventActionTelemetry = useSendEventActionTelemetry();
   const eventIds = useMemo(() => replayableEvents.map((event) => event.id), [replayableEvents]);
+  const { pathname, search } = useLocation();
 
   return useCallback(() => {
     const sessionId = generateId();
@@ -36,9 +38,9 @@ const useReplayBulkAction = (replayableEvents: Array<Event>) => {
       })
       .toString();
     sendEventActionTelemetry('REPLAY_SEARCH', true, { events_length: eventIds.length });
-    Store.sessionSet(sessionId, eventIds);
+    Store.sessionSet(sessionId, { initialEventIds: eventIds, returnUrl: `${pathname}${search}` });
     window.open(url, '_blank');
-  }, [eventIds, sendEventActionTelemetry]);
+  }, [eventIds, pathname, search, sendEventActionTelemetry]);
 };
 
 export default useReplayBulkAction;

@@ -22,8 +22,7 @@ import useSelectedEvents from 'components/events/bulk-replay/useSelectedEvents';
 import type { Event } from 'components/events/events/types';
 import Center from 'components/common/Center';
 import EventReplaySelectedProvider from 'contexts/EventReplaySelectedProvider';
-import { Alert } from 'components/bootstrap';
-import type { ResolutionState } from 'contexts/EventReplaySelectedContext';
+import { Alert, Button } from 'components/bootstrap';
 import type { SidebarSection } from 'views/components/sidebar/sidebarSections';
 import sidebarSections from 'views/components/sidebar/sidebarSections';
 import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
@@ -45,6 +44,7 @@ const ReplayedSearchContainer = styled.div`
 type Props = {
   initialEventIds: Array<string>;
   events: { [eventId: string]: { event: Event } };
+  onReturnClick: () => void;
 };
 
 const AlertWrapper = ({ children = null }: React.PropsWithChildren) => (
@@ -52,34 +52,6 @@ const AlertWrapper = ({ children = null }: React.PropsWithChildren) => (
     <Center>{children}</Center>
   </Alert>
 );
-
-const InfoAlert = ({
-  eventIds,
-  selectedEvent,
-}: {
-  eventIds: Array<ResolutionState>;
-  selectedEvent: { event: Event };
-}) => {
-  const total = eventIds.length;
-
-  if (total === 0) {
-    return (
-      <AlertWrapper>
-        You have removed all events from the list. You can now return back by clicking the &ldquo;Close&rdquo; button.
-      </AlertWrapper>
-    );
-  }
-
-  if (!selectedEvent) {
-    return (
-      <AlertWrapper>
-        You have no event selected. Please select an event from the list to replay its search.
-      </AlertWrapper>
-    );
-  }
-
-  return null;
-};
 
 const replaySection: SidebarSection = {
   key: 'eventDescription',
@@ -100,32 +72,44 @@ const searchPageLayout = {
 
 const ReplayedSearch = ({
   events: _events,
+  onReturnClick,
 }: React.PropsWithChildren<{
   events: Props['events'];
+  onReturnClick: () => void;
 }>) => {
   const [events] = useState<Props['events']>(_events);
   const { eventIds, selectedId } = useSelectedEvents();
   const selectedEvent = events?.[selectedId];
   const { data: eventDefinitionMappedData } = useEventDefinition(selectedEvent?.event?.event_definition_id);
+  const total = eventIds.length;
+
+  if (total === 0) {
+    return (
+      <AlertWrapper>
+        You have removed all events from the list. You can now return back by clicking the{' '}
+        <Button bsStyle="link" onClick={onReturnClick}>
+          Back to events
+        </Button>{' '}
+        button.
+      </AlertWrapper>
+    );
+  }
 
   return (
-    <>
-      <InfoAlert eventIds={eventIds} selectedEvent={selectedEvent} />
-      <EventReplaySearch
-        eventData={selectedEvent.event}
-        eventDefinitionMappedData={eventDefinitionMappedData}
-        searchPageLayout={searchPageLayout}
-        forceSidebarPinned
-      />
-    </>
+    <EventReplaySearch
+      eventData={selectedEvent.event}
+      eventDefinitionMappedData={eventDefinitionMappedData}
+      searchPageLayout={searchPageLayout}
+      forceSidebarPinned
+    />
   );
 };
 
-const BulkEventReplay = ({ initialEventIds, events }: Props) => (
+const BulkEventReplay = ({ initialEventIds, onReturnClick, events }: Props) => (
   <EventReplaySelectedProvider initialEventIds={initialEventIds}>
     <Container>
       <ReplayedSearchContainer>
-        <ReplayedSearch events={events} />
+        <ReplayedSearch events={events} onReturnClick={onReturnClick} />
       </ReplayedSearchContainer>
     </Container>
   </EventReplaySelectedProvider>

@@ -22,7 +22,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Events } from '@graylog/server-api';
 
 import Store from 'logic/local-storage/Store';
-import useLocation from 'routing/useLocation';
 import Spinner from 'components/common/Spinner';
 import BulkEventReplay from 'components/events/bulk-replay/BulkEventReplay';
 import useHistory from 'routing/useHistory';
@@ -32,6 +31,7 @@ import RemainingBulkActions from 'components/events/bulk-replay/RemainingBulkAct
 import { singleton } from 'logic/singleton';
 import { REPLAY_SESSION_ID_PARAM } from 'components/events/Constants';
 import useRoutingQuery from 'routing/useQuery';
+import useSessionInitialEventIds from 'components/events/bulk-replay/hooks/useSessionInitialEventIds';
 
 export type BulkEventReplayState = {
   eventIds: Array<string>;
@@ -50,21 +50,24 @@ type Props = {
 };
 
 const BulkEventReplayPage = ({ BulkActions = RemainingBulkActions }: Props) => {
-  const location = useLocation<BulkEventReplayState>();
-  const { returnUrl } = location?.state ?? {};
   const params = useRoutingQuery();
   const replaySessionId = params[REPLAY_SESSION_ID_PARAM];
-
-  const initialEventIds: Array<string> = Store.sessionGet(replaySessionId);
+  const initialEventIds = useSessionInitialEventIds();
+  const returnUrl: string = Store.sessionGet(replaySessionId)?.returnUrl;
   const { data: events, isFetched } = useEventsById(initialEventIds);
 
   const history = useHistory();
-  const onClose = useCallback(() => {
+  const onReturnClick = useCallback(() => {
     history.push(returnUrl ?? Routes.ALERTS.LIST);
   }, [history, returnUrl]);
 
   return initialEventIds && isFetched ? (
-    <BulkEventReplay events={events} initialEventIds={initialEventIds} onClose={onClose} BulkActions={BulkActions} />
+    <BulkEventReplay
+      events={events}
+      initialEventIds={initialEventIds}
+      onReturnClick={onReturnClick}
+      BulkActions={BulkActions}
+    />
   ) : (
     <Spinner />
   );
