@@ -90,15 +90,15 @@ const PaginatedDataTable = ({
   useResponsiveTable = false,
   ...rest
 }: Props) => {
-  const safeRows = useMemo(() => rowsProp ?? [], [rowsProp]);
+  const rows = useMemo(() => rowsProp ?? [], [rowsProp]);
   const [{ perPage, page }, setPagination] = useState<DataTablePagination>(initialPagination);
-  const [filteredRows, setFilteredRows] = useState(safeRows);
+  const [filteredRows, setFilteredRows] = useState(rows);
   const paginatedRows = _paginatedRows(filteredRows, perPage, page);
 
   useEffect(() => {
-    setFilteredRows(safeRows);
+    setFilteredRows(rows);
     setPagination(initialPagination);
-  }, [safeRows, initialPagination]);
+  }, [rows, initialPagination]);
 
   const _onPageChange = (newPage: number, newPerPage: number) => {
     setPagination({ page: newPage, perPage: newPerPage });
@@ -125,7 +125,7 @@ const PaginatedDataTable = ({
             id={id}
             filterKeys={filterKeys}
             setFilteredRows={setFilteredRows}
-            rows={safeRows}
+            rows={rows}
             resetPagination={_resetPagination}
           />
         }
