@@ -21,10 +21,12 @@ import { PluginManifest } from 'graylog-web-plugin/plugin';
 
 import { usePlugin } from 'views/test/testPlugins';
 import MenuItem from 'components/bootstrap/menuitem/MenuItem';
+import SidebarBulkEventReplay from 'components/events/bulk-replay/SidebarBulkEventReplay';
+import EventReplaySelectedProvider from 'contexts/EventReplaySelectedProvider';
+import asMock from 'helpers/mocking/AsMock';
+import useEventsById from 'components/events/bulk-replay/hooks/useEventsById';
 
 import events from './events.fixtures';
-
-import BulkEventReplay from '../BulkEventReplay';
 
 const initialEventIds = ['01JH007XPDF710TPJZT8K2CN3W', '01JH006340WP7HQ5E7P71Q9HHX', '01JH0029TS9PX5ED87TZ1RVRT2'];
 
@@ -54,8 +56,12 @@ const expectReplayingEvent = (eventId: string) =>
 const eventByIndex = (index: number) => events[initialEventIds[index]].event;
 const eventMessage = (index: number) => eventByIndex(index).message;
 
-const SUT = (props: Partial<React.ComponentProps<typeof BulkEventReplay>>) => (
-  <BulkEventReplay events={events} initialEventIds={initialEventIds} {...props} />
+const onClose = jest.fn();
+
+const SUT = () => (
+  <EventReplaySelectedProvider initialEventIds={initialEventIds}>
+    <SidebarBulkEventReplay onClose={onClose} />
+  </EventReplaySelectedProvider>
 );
 
 const bulkAction = jest.fn();
@@ -76,19 +82,15 @@ const testPlugin = new PluginManifest(
 describe('BulkEventReplay', () => {
   usePlugin(testPlugin);
 
-  it('calls `onClose` when close button is clicked', async () => {
-    const onClose = jest.fn();
-    render(<SUT />);
-    const closeButton = await screen.findByRole('button', { name: 'Close' });
-    userEvent.click(closeButton);
-
-    await waitFor(() => {
-      expect(onClose).toHaveBeenCalled();
-    });
+  beforeEach(() => {
+    asMock(useEventsById).mockImplementation(() => ({ data: events }));
   });
 
   it('renders list of selected events', async () => {
     render(<SUT />);
+    const openButton = await screen.findByRole('button', { name: /show selected events/i });
+    userEvent.click(openButton);
+
     await screen.findByText(eventMessage(0));
     await screen.findByText(eventMessage(1));
     await screen.findByText(eventMessage(2));

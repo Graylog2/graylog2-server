@@ -19,7 +19,6 @@ import styled, { css } from 'styled-components';
 
 import IconButton from 'components/common/IconButton';
 import type { Event } from 'components/events/events/types';
-import { Icon } from 'components/common';
 
 type EventListItemProps = {
   event: Event;
@@ -110,7 +109,7 @@ const EventListItem = ({
         <Ellipsis>{event?.message ?? <i>Unknown</i>}</Ellipsis>
       </Summary>
       {isDropdown ? (
-        <Icon name="arrow_drop_down" />
+        <IconButton name="arrow_drop_down" title="Show Selected Events" />
       ) : (
         <IconButton onClick={_removeItem} title={`Remove event "${event?.id}" from list`} name="delete" />
       )}

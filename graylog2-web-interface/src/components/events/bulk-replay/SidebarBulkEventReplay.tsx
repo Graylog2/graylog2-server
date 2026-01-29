@@ -18,9 +18,6 @@
 import * as React from 'react';
 import { useState, useCallback, useMemo } from 'react';
 import styled, { css } from 'styled-components';
-import { useQuery } from '@tanstack/react-query';
-
-import { Events } from '@graylog/server-api';
 
 import Store from 'logic/local-storage/Store';
 import EventListItem from 'components/events/bulk-replay/EventListItem';
@@ -33,8 +30,8 @@ import Popover from 'components/common/Popover';
 import { REPLAY_SESSION_ID_PARAM } from 'components/events/Constants';
 import useRoutingQuery from 'routing/useQuery';
 import { Button } from 'components/bootstrap';
-
-import DropdownButton from '../../bootstrap/DropdownButton';
+import useEventsById from 'components/events/bulk-replay/hooks/useEventsById';
+import DropdownButton from 'components/bootstrap/DropdownButton';
 
 const Container = styled.div`
   display: flex;
@@ -66,12 +63,6 @@ const ActionsBar = styled(ButtonToolbar)`
 type Props = {
   onClose: () => void;
 };
-
-const useEventsById = (eventIds: Array<string>) =>
-  useQuery({
-    queryKey: ['events', eventIds],
-    queryFn: () => Events.getByIds({ event_ids: eventIds }),
-  });
 
 const RemainingBulkActions = ({ completed, events }: RemainingBulkActionsProps) => {
   const { actions, pluggableActionModals } = useEventBulkActions(events);
@@ -143,7 +134,7 @@ const SidebarBulkEventReplay = ({ onClose }: Props) => {
   return (
     <CurrentContainer>
       <ArrowButton onClick={onGoBack} disabled={curIndex === 0}>
-        <Icon name="keyboard_arrow_left" />
+        <Icon name="keyboard_arrow_left" title="Previous Event" />
       </ArrowButton>
       <Popover position="bottom">
         <Popover.Target>
@@ -192,7 +183,7 @@ const SidebarBulkEventReplay = ({ onClose }: Props) => {
         </Popover.Dropdown>
       </Popover>
       <ArrowButton onClick={onGoForward} disabled={curIndex === eventIds.length - 1}>
-        <Icon name="keyboard_arrow_right" />
+        <Icon name="keyboard_arrow_right" title="Next Event" />
       </ArrowButton>
       <CollapseButton name="keyboard_tab_rtl" title="Collapse sidebar" onClick={onClose} />
     </CurrentContainer>

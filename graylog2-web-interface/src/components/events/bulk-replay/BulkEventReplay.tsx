@@ -27,7 +27,7 @@ import type { ResolutionState } from 'contexts/EventReplaySelectedContext';
 import type { SidebarSection } from 'views/components/sidebar/sidebarSections';
 import sidebarSections from 'views/components/sidebar/sidebarSections';
 import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
-import ReplayEventIdRenderer from 'components/events/bulk-replay/NewBulkEventReplay';
+import SidebarBulkEventReplay from 'components/events/bulk-replay/SidebarBulkEventReplay';
 import EventReplaySearch from 'components/events/EventReplaySearch';
 import useEventDefinition from 'hooks/useEventDefinition';
 
@@ -92,7 +92,7 @@ const replaySection: SidebarSection = {
 const searchPageLayout = {
   sidebar: {
     isShown: true,
-    title: ReplayEventIdRenderer,
+    title: SidebarBulkEventReplay,
     sections: [replaySection, ...sidebarSections],
     contentColumnWidth: 350,
   },

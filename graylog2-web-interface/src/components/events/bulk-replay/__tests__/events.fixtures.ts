@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 export default {
   '01JH006340WP7HQ5E7P71Q9HHX': {
     event: {
@@ -37,6 +38,7 @@ export default {
         normalized_risk: 6,
       },
       associated_assets: [],
+      aggregation_conditions: {},
       alert: false,
       fields: {
         mightyalert: 'foo',
@@ -86,6 +88,7 @@ export default {
         normalized_risk: 6,
       },
       associated_assets: [],
+      aggregation_conditions: {},
       alert: false,
       fields: {
         mightyalert: 'foo',
@@ -135,6 +138,7 @@ export default {
         normalized_risk: 6,
       },
       associated_assets: [],
+      aggregation_conditions: {},
       alert: false,
       fields: {
         mightyalert: 'foo',
@@ -162,4 +166,4 @@ export default {
     index_name: 'gl-events_13',
     index_type: 'message',
   },
-};
+}; // as Record<string, { event: Event; index_name: string; index_type: string }>;
