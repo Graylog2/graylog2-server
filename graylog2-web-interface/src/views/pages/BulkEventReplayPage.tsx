@@ -26,8 +26,6 @@ import Spinner from 'components/common/Spinner';
 import BulkEventReplay from 'components/events/bulk-replay/BulkEventReplay';
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
-import type { RemainingBulkActionsProps } from 'components/events/bulk-replay/types';
-import RemainingBulkActions from 'components/events/bulk-replay/RemainingBulkActions';
 import { singleton } from 'logic/singleton';
 import { REPLAY_SESSION_ID_PARAM } from 'components/events/Constants';
 import useRoutingQuery from 'routing/useQuery';
@@ -45,11 +43,7 @@ const useEventsById = (eventIds: Array<string>) =>
     enabled: !!eventIds,
   });
 
-type Props = {
-  BulkActions?: React.ComponentType<RemainingBulkActionsProps>;
-};
-
-const BulkEventReplayPage = ({ BulkActions = RemainingBulkActions }: Props) => {
+const BulkEventReplayPage = () => {
   const params = useRoutingQuery();
   const replaySessionId = params[REPLAY_SESSION_ID_PARAM];
   const initialEventIds = useSessionInitialEventIds();
@@ -62,12 +56,7 @@ const BulkEventReplayPage = ({ BulkActions = RemainingBulkActions }: Props) => {
   }, [history, returnUrl]);
 
   return initialEventIds && isFetched ? (
-    <BulkEventReplay
-      events={events}
-      initialEventIds={initialEventIds}
-      onReturnClick={onReturnClick}
-      BulkActions={BulkActions}
-    />
+    <BulkEventReplay events={events} initialEventIds={initialEventIds} onReturnClick={onReturnClick} />
   ) : (
     <Spinner />
   );
