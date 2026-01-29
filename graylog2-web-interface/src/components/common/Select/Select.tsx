@@ -261,7 +261,6 @@ export type Props<OptionValue> = {
   options: Array<Option>;
   placeholder?: string;
   persistSelection?: boolean;
-  // eslint-disable-next-line react/require-default-props
   ref?: SelectRef;
   size?: 'normal' | 'small';
   styles?: any;
@@ -339,6 +338,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     onMenuClose: undefined,
     optionRenderer: undefined,
     placeholder: undefined,
+    ref: undefined,
     required: false,
     size: 'normal',
     styles: undefined,

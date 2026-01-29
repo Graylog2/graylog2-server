@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 import type { Pagination } from 'stores/PaginationTypes';
 import DataTable from 'components/common/DataTable';
@@ -83,22 +83,22 @@ type DataTablePagination = {
  * If you want to display a lists which gets paginated by the backend, wrap use the DataTable in combination with the PaginatedList.
  */
 const PaginatedDataTable = ({
-  // eslint-disable-next-line react/require-default-props
-  rows = [],
+  rows: rowsProp,
   pagination: initialPagination = DEFAULT_PAGINATION,
   filterKeys = undefined,
   id,
   useResponsiveTable = false,
   ...rest
 }: Props) => {
+  const safeRows = useMemo(() => rowsProp ?? [], [rowsProp]);
   const [{ perPage, page }, setPagination] = useState<DataTablePagination>(initialPagination);
-  const [filteredRows, setFilteredRows] = useState(rows);
+  const [filteredRows, setFilteredRows] = useState(safeRows);
   const paginatedRows = _paginatedRows(filteredRows, perPage, page);
 
   useEffect(() => {
-    setFilteredRows(rows);
+    setFilteredRows(safeRows);
     setPagination(initialPagination);
-  }, [rows, initialPagination]);
+  }, [safeRows, initialPagination]);
 
   const _onPageChange = (newPage: number, newPerPage: number) => {
     setPagination({ page: newPage, perPage: newPerPage });
@@ -125,7 +125,7 @@ const PaginatedDataTable = ({
             id={id}
             filterKeys={filterKeys}
             setFilteredRows={setFilteredRows}
-            rows={rows}
+            rows={safeRows}
             resetPagination={_resetPagination}
           />
         }
