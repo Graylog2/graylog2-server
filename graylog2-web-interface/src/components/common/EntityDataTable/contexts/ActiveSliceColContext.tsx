@@ -14,20 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import * as React from 'react';
 
-import type { AlertType } from 'components/event-definitions/types';
 import { singleton } from 'logic/singleton';
 
-type ReplaySearchContextType = {
-  alertId: string;
-  definitionId: string;
-  type: AlertType;
-};
-const ReplaySearchContext = React.createContext<ReplaySearchContextType>({
-  alertId: undefined,
-  definitionId: undefined,
-  type: undefined,
-});
+type ContextValue = string | undefined;
 
-export default singleton('contexts.ReplaySearchContext', () => ReplaySearchContext);
+const ActiveSliceColContext = React.createContext<ContextValue>(undefined);
+
+export default singleton('contexts.ActiveSliceColContext', () => ActiveSliceColContext);

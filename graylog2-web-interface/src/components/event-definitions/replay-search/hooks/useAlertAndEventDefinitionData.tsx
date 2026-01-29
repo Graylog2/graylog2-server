@@ -28,6 +28,7 @@ const useAlertAndEventDefinitionData = (alertId: string, definitionId?: string) 
   const { data, isLoading: isLoadingEventDefinition } = useEventDefinition(
     definitionId ?? eventData?.event_definition_id,
   );
+
   const eventDefinition = data?.eventDefinition;
   const aggregations = data?.aggregations;
   const isLoading = (alertId && isLoadingEvent) || (definitionId && isLoadingEventDefinition);
