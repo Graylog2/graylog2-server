@@ -57,29 +57,29 @@ const EventInfoBar = () => {
   const infoAttributes = useAttributeComponents();
 
   return (
-      <FlatContentRow>
-        <Header>
-          <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleOpen}>
-            <Icon name={`arrow_${open ? 'drop_down' : 'right'}`} />
-            &nbsp;
-            {open ? `Hide event definition details` : `Show event definition details`}
-          </Button>
-        </Header>
-        {open && (
-          <Container data-testid="info-container">
-            <Row>
-              {infoAttributes.map(
-                ({ title, content, show }) =>
-                  show !== false && (
-                    <EventAttribute key={title} title={title}>
-                      {content}
-                    </EventAttribute>
-                  ),
-              )}
-            </Row>
-          </Container>
-        )}
-      </FlatContentRow>
+    <FlatContentRow>
+      <Header>
+        <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleOpen}>
+          <Icon name={`arrow_${open ? 'drop_down' : 'right'}`} />
+          &nbsp;
+          {open ? `Hide event definition details` : `Show event definition details`}
+        </Button>
+      </Header>
+      {open && (
+        <Container data-testid="info-container">
+          <Row>
+            {infoAttributes.map(
+              ({ title, content, show }) =>
+                show !== false && (
+                  <EventAttribute key={title} title={title}>
+                    {content}
+                  </EventAttribute>
+                ),
+            )}
+          </Row>
+        </Container>
+      )}
+    </FlatContentRow>
   );
 };
 

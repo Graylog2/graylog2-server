@@ -44,6 +44,7 @@ type Props = {
   ) => void;
   show: boolean;
   onCancel: () => void;
+  onSubmitConfigurationModal: () => void;
 };
 
 const CollectorConfigurationModalContainer = ({
@@ -53,6 +54,7 @@ const CollectorConfigurationModalContainer = ({
   onConfigurationSelectionChange,
   show,
   onCancel,
+  onSubmitConfigurationModal,
 }: Props) => {
   const [nextAssignedConfigurations, setNextAssignedConfigurations] = useState<string[]>([]);
   const [nextPartiallyAssignedConfigurations, setNextPartiallyAssignedConfigurations] = useState<string[]>([]);
@@ -105,7 +107,7 @@ const CollectorConfigurationModalContainer = ({
     setNextAssignedConfigurations(fullyAssignedConfigs);
     setNextPartiallyAssignedConfigurations(partiallyAssignedConfigs);
     // Close config modal before showing confirmation to avoid stacking
-    onCancel();
+    onSubmitConfigurationModal();
     setShowConfirmModal(true);
   };
 

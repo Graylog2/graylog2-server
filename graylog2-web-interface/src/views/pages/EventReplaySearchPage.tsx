@@ -33,6 +33,23 @@ export const onErrorHandler = (error: FetchError) => {
   }
 };
 
+const replaySection: SidebarSection = {
+  key: 'eventDescription',
+  hoverTitle: 'Replay Details',
+  title: null,
+  icon: 'play_arrow',
+  content: ReplaySearchSidebar,
+};
+
+const searchPageLayout = {
+  sidebar: {
+    isShown: true,
+    title: 'Replayed Search',
+    sections: [replaySection, ...sidebarSections],
+    contentColumnWidth: 350,
+  },
+};
+
 const EventReplaySearchPage = () => {
   const [isNotificationLoaded, setIsNotificationLoaded] = useState(false);
   const { alertId } = useParams<{ alertId?: string }>();
