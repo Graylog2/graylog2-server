@@ -130,7 +130,7 @@
         <error-prone.version>2.46.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
         <gcs.version>2.62.0</gcs.version>
-        <azure-blob-storage.version>12.32.0</azure-blob-storage.version>
+        <azure-blob-storage.version>12.33.0</azure-blob-storage.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>5.0.2</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
@@ -165,7 +165,7 @@
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.25.3</log4j.version>
         <lucene.version>9.12.3</lucene.version>
-        <lz4.version>1.10.2</lz4.version>
+        <lz4.version>1.10.3</lz4.version>
         <metrics.version>4.2.37</metrics.version>
         <mongodb-driver.version>5.6.2</mongodb-driver.version>
         <mongojack.version>5.0.3</mongojack.version>
