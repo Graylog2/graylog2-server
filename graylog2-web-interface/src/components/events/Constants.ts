@@ -22,13 +22,13 @@ export const EVENTS_ENTITY_TABLE_ID = 'events';
 
 export const commonEventAttributes: Array<Attribute> = [
   {
+    filter_options: Object.keys(EventDefinitionPriorityEnum.properties).map((num) => ({ value: num, title: num })),
+    filterable: true,
     id: 'priority',
+    searchable: false,
+    sortable: true,
     title: 'Priority',
     type: 'STRING',
-    sortable: true,
-    searchable: false,
-    filterable: true,
-    filter_options: Object.keys(EventDefinitionPriorityEnum.properties).map((num) => ({ value: num, title: num })),
   },
   {
     id: 'timestamp',
