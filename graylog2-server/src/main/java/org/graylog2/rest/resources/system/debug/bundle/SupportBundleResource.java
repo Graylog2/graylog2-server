@@ -17,9 +17,13 @@
 package org.graylog2.rest.resources.system.debug.bundle;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -52,7 +56,7 @@ import static org.graylog2.shared.security.RestPermissions.SUPPORTBUNDLE_READ;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 @RequiresAuthentication
-@Api(value = "System/Debug/SupportBundle", description = "For collecting debugging information, e.g. server logs")
+@Tag(name = "System/Debug/SupportBundle", description = "For collecting debugging information, e.g. server logs")
 @Path("/system/debug/support")
 @Produces(MediaType.APPLICATION_JSON)
 @HideOnCloud
@@ -67,7 +71,7 @@ public class SupportBundleResource extends RestResource {
     @GET
     @Path("/manifest")
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Get a nodes' Support Bundle Manifest")
+    @Operation(summary = "Get a nodes' Support Bundle Manifest")
     @RequiresPermissions(SUPPORTBUNDLE_READ)
     public SupportBundleNodeManifest getNodeManifest() {
         return supportBundleService.getManifest();
@@ -75,10 +79,16 @@ public class SupportBundleResource extends RestResource {
 
     @GET
     @Path("/logfile/{id}")
-    @ApiOperation(value = "Retrieve the nodes' server logfile")
+    @Operation(summary = "Retrieve the nodes' server logfile")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success",
+                    content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM,
+                            schema = @Schema(type = "string", format = "binary"))),
+            @ApiResponse(responseCode = "404", description = "Logfile not found")
+    })
     @RequiresPermissions(SUPPORTBUNDLE_READ)
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response getLogFile(@PathParam("id") @ApiParam(name = "id", value = "The id of the logfile as referenced from the Support Bundle Manifest") String id) {
+    public Response getLogFile(@PathParam("id") @Parameter(name = "id", description = "The id of the logfile as referenced from the Support Bundle Manifest") String id) {
 
         final Optional<LogFile> logFileOptional = supportBundleService.getManifest().entries().logfiles().stream().filter(l -> l.id().equals(id)).findFirst();
         var logFile = logFileOptional.orElseThrow(() -> new NotFoundException(f("No logfile found for id <%s>", id)));
@@ -103,7 +113,7 @@ public class SupportBundleResource extends RestResource {
 
     @GET
     @Path("/bundle/list")
-    @ApiOperation(value = "Returns the list of downloadable support bundles")
+    @Operation(summary = "Returns the list of downloadable support bundles")
     @RequiresPermissions(SUPPORTBUNDLE_READ)
     @RestrictToLeader
     public List<BundleFile> listBundles() {
@@ -112,12 +122,17 @@ public class SupportBundleResource extends RestResource {
 
     @GET
     @Path("/bundle/download/{filename}")
-    @ApiOperation(value = "Downloads the requested bundle")
+    @Operation(summary = "Downloads the requested bundle")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success",
+                    content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM,
+                            schema = @Schema(type = "string", format = "binary")))
+    })
     @RequiresPermissions(SUPPORTBUNDLE_READ)
     @RestrictToLeader
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @AuditEvent(type = AuditEventTypes.SUPPORT_BUNDLE_DOWNLOAD)
-    public Response download(@PathParam("filename") @ApiParam("filename") String filename) {
+    public Response download(@PathParam("filename") @Parameter(name = "filename") String filename) {
         var mediaType = MediaType.valueOf(MediaType.APPLICATION_OCTET_STREAM);
         StreamingOutput streamingOutput = outputStream -> supportBundleService.downloadBundle(filename, outputStream);
         return respondWithFile(filename, streamingOutput, mediaType)
@@ -126,11 +141,11 @@ public class SupportBundleResource extends RestResource {
 
     @DELETE
     @Path("/bundle/{filename}")
-    @ApiOperation(value = "Delete a certain support bundle")
+    @Operation(summary = "Delete a certain support bundle")
     @RequiresPermissions(SUPPORTBUNDLE_CREATE)
     @RestrictToLeader
     @AuditEvent(type = AuditEventTypes.SUPPORT_BUNDLE_DELETE)
-    public Response delete(@PathParam("filename") @ApiParam("filename") String filename) throws IOException {
+    public Response delete(@PathParam("filename") @Parameter(name = "filename") String filename) throws IOException {
         try {
             supportBundleService.deleteBundle(filename);
         } catch (NoSuchFileException e) {

@@ -41,9 +41,9 @@ describe('AbsoluteDatePicker', () => {
   });
 
   it('calls onChange upon changing the input', async () => {
-    const { getByLabelText } = render(<AbsoluteDatePicker {...defaultProps} />);
+    render(<AbsoluteDatePicker {...defaultProps} />);
 
-    const input = getByLabelText('Mon Apr 20 2020');
+    const input = await screen.findByRole('button', { name: 'Monday, April 20th, 2020' });
 
     await userEvent.click(input);
 

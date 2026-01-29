@@ -44,6 +44,8 @@ import org.graylog.plugins.views.search.db.InMemorySearchJobService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.db.SearchesCleanUpJob;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
+import org.graylog.plugins.views.search.elasticsearch.IndexLookupImpl;
 import org.graylog.plugins.views.search.engine.EngineBindings;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.plugins.views.search.engine.SearchConfig;
@@ -303,6 +305,8 @@ public class ViewsBindings extends ViewsModule {
         // The Set<StaticReferencedSearch> binder must be explicitly initialized to avoid an initialization error when
         // no values are bound.
         staticReferencedSearchBinder();
+
+        bind(IndexLookup.class).to(IndexLookupImpl.class);
     }
 
     private void registerExportBackendProvider() {

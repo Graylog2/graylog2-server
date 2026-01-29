@@ -17,9 +17,9 @@
 package org.graylog2.rest.resources.datanodes;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -49,7 +49,7 @@ import java.util.function.Predicate;
 import static org.graylog2.audit.AuditEventTypes.DATANODE_API_REQUEST;
 
 @RequiresAuthentication
-@Api(value = "DataNodes/API", description = "Proxy direct access to Data Node's API")
+@Tag(name = "DataNodes/API", description = "Proxy direct access to Data Node's API")
 @Produces(MediaType.APPLICATION_JSON)
 @Timed
 @Path("/datanodes/{hostname}/opensearch/{path: .*}")
@@ -72,44 +72,44 @@ public class DataNodeApiProxyResource extends RestResource {
     }
 
     @GET
-    @ApiOperation(value = "GET request to Data Node's API")
+    @Operation(summary = "GET request to Data Node's API")
     @AuditEvent(type = DATANODE_API_REQUEST)
-    public Response requestGet(@ApiParam(name = "path", required = true)
+    public Response requestGet(@Parameter(name = "path", required = true)
                                        @PathParam("path") String path,
-                                       @ApiParam(name = "hostname", required = true)
+                                       @Parameter(name = "hostname", required = true)
                                        @PathParam("hostname") String hostname,
                                        @Context ContainerRequestContext requestContext) throws IOException {
         return request(requestContext, path, hostname);
     }
 
     @POST
-    @ApiOperation(value = "POST request to Data Node's API")
+    @Operation(summary = "POST request to Data Node's API")
     @AuditEvent(type = DATANODE_API_REQUEST)
-    public Response requestPost(@ApiParam(name = "path", required = true)
+    public Response requestPost(@Parameter(name = "path", required = true)
                                         @PathParam("path") String path,
-                                        @ApiParam(name = "hostname", required = true)
+                                        @Parameter(name = "hostname", required = true)
                                         @PathParam("hostname") String hostname,
                                         @Context ContainerRequestContext requestContext) throws IOException {
         return request(requestContext, path, hostname);
     }
 
     @PUT
-    @ApiOperation(value = "PUT request to Data Node's API")
+    @Operation(summary = "PUT request to Data Node's API")
     @AuditEvent(type = DATANODE_API_REQUEST)
-    public Response requestPut(@ApiParam(name = "path", required = true)
+    public Response requestPut(@Parameter(name = "path", required = true)
                                @PathParam("path") String path,
-                               @ApiParam(name = "hostname", required = true)
+                               @Parameter(name = "hostname", required = true)
                                @PathParam("hostname") String hostname,
                                @Context ContainerRequestContext requestContext) throws IOException {
         return request(requestContext, path, hostname);
     }
 
     @DELETE
-    @ApiOperation(value = "DELETE request to Data Node's API")
+    @Operation(summary = "DELETE request to Data Node's API")
     @AuditEvent(type = DATANODE_API_REQUEST)
-    public Response requestDelete(@ApiParam(name = "path", required = true)
+    public Response requestDelete(@Parameter(name = "path", required = true)
                                   @PathParam("path") String path,
-                                  @ApiParam(name = "hostname", required = true)
+                                  @Parameter(name = "hostname", required = true)
                                   @PathParam("hostname") String hostname,
                                   @Context ContainerRequestContext requestContext) throws IOException {
         return request(requestContext, path, hostname);

@@ -19,9 +19,10 @@ package org.graylog.plugins.views.search.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.DefaultValue;
@@ -48,6 +49,7 @@ import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQueryField;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.List;
@@ -57,10 +59,10 @@ import java.util.function.Predicate;
 import static java.util.Locale.ENGLISH;
 import static org.graylog2.database.entities.source.DBEntitySourceService.FILTER_OPTIONS;
 import static org.graylog2.database.utils.SourcedMongoEntityUtils.FILTERABLE_FIELD;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "Dashboards", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Dashboards")
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/dashboards")
 public class DashboardsResource extends RestResource {
@@ -86,7 +88,7 @@ public class DashboardsResource extends RestResource {
 
     private static final String DEFAULT_SORT_FIELD = ViewDTO.FIELD_TITLE;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
-    private static List<EntityAttribute> attributes = List.of(
+    private static final List<EntityAttribute> attributes = List.of(
             EntityAttribute.builder().id("_id").title("id").type(SearchQueryField.Type.OBJECT_ID).hidden(true).searchable(true).build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_TITLE).title("Title").searchable(true).build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).filterable(true).build(),
@@ -94,7 +96,7 @@ public class DashboardsResource extends RestResource {
             EntityAttribute.builder().id(ViewDTO.FIELD_DESCRIPTION).title("Description").searchable(true).build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_SUMMARY).title("Summary").searchable(true).build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_OWNER).title("Owner").build(),
-            EntityAttribute.builder().id(ViewDTO.FIELD_FAVORITE).title("Favorite").sortable(false).build(),
+            EntityAttribute.builder().id(ViewDTO.FIELD_FAVORITE).title("Favorite").sortable(true).build(),
             EntityAttribute.builder().id(FILTERABLE_FIELD).title("Source")
                     .filterable(true)
                     .sortable(false)
@@ -116,21 +118,25 @@ public class DashboardsResource extends RestResource {
     }
 
     @GET
-    @ApiOperation("Get a list of all dashboards")
+    @Operation(summary = "Get a list of all dashboards")
     @Timed
-    public PageListResponse<ViewSummaryDTO> views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                  @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                  @ApiParam(name = "sort",
-                                                            value = "The field to sort the result on",
+    public PageListResponse<ViewSummaryDTO> views(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                  @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                  @Parameter(name = "sort",
+                                                            description = "The field to sort the result on",
                                                             required = true,
-                                                            allowableValues = "id,title,created_at,description,summary,owner") @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sortField,
-                                                  @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") SortOrder order,
-                                                  @ApiParam(name = "query") @QueryParam("query") String query,
-                                                  @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
-                                                  @ApiParam(name = "scope",
-                                                            value = "The scope of the permissions",
+                                                            schema = @Schema(allowableValues = {"id", "title", "created_at", "last_updated_at", "owner", "description", "summary", "favorite"}))
+                                                  @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sortField,
+                                                  @Parameter(name = "order", description = "The sort direction",
+                                                            schema = @Schema(allowableValues = {"asc", "desc"}))
+                                                  @DefaultValue("asc") @QueryParam("order") SortOrder order,
+                                                  @Parameter(name = "query") @QueryParam("query") String query,
+                                                  @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
+                                                  @Parameter(name = "scope",
+                                                            description = "The scope of the permissions",
                                                             required = true,
-                                                            allowableValues = "read,update") @DefaultValue("read") @QueryParam("scope") Scope scope,
+                                                            schema = @Schema(allowableValues = {"read", "update"}))
+                                                  @DefaultValue("read") @QueryParam("scope") Scope scope,
                                                   @Context SearchUser searchUser) {
 
         Predicate<ViewSummaryDTO> predicate = switch (scope) {

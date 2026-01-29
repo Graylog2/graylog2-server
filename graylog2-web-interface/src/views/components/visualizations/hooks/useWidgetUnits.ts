@@ -42,25 +42,23 @@ const useWidgetUnits = (config: AggregationWidgetConfig) => {
     [usedFieldsInColumnPivots, usedFieldsInRowPivots, usedFieldsInSeries],
   );
 
-  return useMemo(() => {
-    const widgetUnits = config.units;
+  const widgetUnits = config.units;
 
-    const filtratedFields = Object.fromEntries(
-      allFields
-        .filter((field) => {
-          const predefinedUnit = fieldTypesUnits?.[field];
+  const filteredFields = Object.fromEntries(
+    allFields
+      .filter((field) => {
+        const predefinedUnit = fieldTypesUnits?.[field];
 
-          return !widgetUnits?.getFieldUnit(field) && !!predefinedUnit;
-        })
-        .map((field) => {
-          const predefinedUnit = fieldTypesUnits?.[field];
+        return !widgetUnits?.getFieldUnit(field) && !!predefinedUnit;
+      })
+      .map((field) => {
+        const predefinedUnit = fieldTypesUnits?.[field];
 
-          return [field, predefinedUnit];
-        }),
-    );
+        return [field, predefinedUnit];
+      }),
+  );
 
-    return widgetUnits.toBuilder().merge(filtratedFields).build();
-  }, [allFields, config?.units, fieldTypesUnits]);
+  return widgetUnits.toBuilder().merge(filteredFields).build();
 };
 
 export default useWidgetUnits;

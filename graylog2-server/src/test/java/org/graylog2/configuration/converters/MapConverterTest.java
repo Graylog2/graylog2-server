@@ -19,6 +19,7 @@ package org.graylog2.configuration.converters;
 import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ParameterException;
+import com.github.joschi.jadconfig.documentation.Documentation;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,9 +32,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class MapConverterTest {
     @SuppressWarnings({"unused", "FieldMayBeFinal"})
     static class TestConfig {
+        @Documentation(visible = false)
         @Parameter(value = "map_string_integer", converter = MapConverter.StringInteger.class)
         private Map<String, Integer> mapStringInteger = Map.of();
 
+        @Documentation(visible = false)
         @Parameter(value = "map_string_string", converter = MapConverter.StringString.class)
         private Map<String, String> mapStringString = Map.of();
     }

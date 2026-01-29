@@ -16,7 +16,6 @@
  */
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
-// eslint-disable-next-line import/prefer-default-export
 export const eventDefinition: EventDefinition = {
   _scope: 'DEFAULT',
   _entity_source: {

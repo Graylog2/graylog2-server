@@ -500,9 +500,15 @@ export type SaveViewControls = {
   onDashboardDuplication?: (view: View, userPermissions: Immutable.List<string>) => Promise<View>;
 };
 
-export type CustomCommandContextProvider<T extends keyof CustomCommandContext> = {
+export type CustomCommandArgument<T> = {
+  values: T;
+  submitForm: () => void;
+  setFieldValue: <F extends keyof T>(field: F, newValue: T[F]) => void;
+};
+
+export type CustomCommandContextProvider<T extends keyof CustomCommandContext, S> = {
   key: T;
-  provider: () => CustomCommandContext[T];
+  provider: (formik: CustomCommandArgument<S>) => CustomCommandContext[T];
 };
 
 export type CurrentViewType = {
@@ -607,6 +613,16 @@ type MarkdownAugmentation = {
   component: React.ComponentType<{ value: string }>;
 };
 
+export type EventReplaySideBarDetailsProps = {
+  alertId: string;
+};
+
+export type EventReplaySideBarPlugin = {
+  component: React.ComponentType<EventReplaySideBarDetailsProps>;
+  key: string;
+  useCondition?: () => boolean;
+};
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
@@ -629,6 +645,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.components.securityEventsPage'?: Array<SecurityEventsPage>;
     'views.components.dashboardActions'?: Array<DashboardAction<unknown>>;
     'views.components.eventActions'?: Array<EventAction<unknown>>;
+    'views.components.eventReplay.sideBarDetails'?: EventReplaySideBarPlugin;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;
     'views.components.widgets.messageTable.messageRowOverride'?: Array<React.ComponentType<MessageRowOverrideProps>>;
     'views.components.widgets.messageDetails.contextProviders'?: Array<
@@ -673,7 +690,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.reducers'?: Array<ViewsReducer>;
     'views.requires.provided'?: Array<string>;
     'views.queryInput.commands'?: Array<CustomCommand>;
-    'views.queryInput.commandContextProviders'?: Array<CustomCommandContextProvider<any>>;
+    'views.queryInput.commandContextProviders'?: Array<CustomCommandContextProvider<any, any>>;
     visualizationTypes?: Array<VisualizationType<any>>;
     widgetCreators?: Array<WidgetCreator>;
     'licenseCheck'?: Array<LicenseCheck>;

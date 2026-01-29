@@ -166,7 +166,8 @@ public class NodeContainerFactory {
                         ".*Exception while running migrations.*",
                         ".*Graylog startup failed.*",
                         ".*\\[Guice/.+?\\].*",
-                        ".*java.lang.NoClassDefFoundError.*"
+                        ".*java.lang.NoClassDefFoundError.*",
+                        ".*Terminating the server :\\(.*"
                 )));
         if (indexerIsPredefined(env)) { // we have defined an indexer, no preflight will occur, let's wait for the full boot with index ranges
             // To be able to search for data we need the index ranges to be computed. Since this is an async

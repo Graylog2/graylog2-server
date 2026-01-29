@@ -19,7 +19,7 @@ import styled from 'styled-components';
 import { useCallback, useState, useContext, useRef } from 'react';
 
 import { isPermitted } from 'util/PermissionsMixin';
-import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
+import { Button, ButtonGroup, MenuItem } from 'components/bootstrap';
 import { Icon, ShareButton } from 'components/common';
 import UserNotification from 'util/UserNotification';
 import View from 'views/logic/views/View';
@@ -52,6 +52,7 @@ import useHotkey from 'hooks/useHotkey';
 import { createGRN } from 'logic/permissions/GRN';
 import useSelectedStreamsGRN from 'views/hooks/useSelectedStreamsGRN';
 import { createView, deleteView } from 'views/api/views';
+import { MoreActionsMenu } from 'components/common/MoreActions';
 
 import SavedSearchForm from './SavedSearchForm';
 
@@ -251,12 +252,7 @@ const SearchActionsMenu = () => {
         bsStyle="default"
         disabledInfo={isNew && 'Only saved searches can be shared.'}
       />
-      <DropdownButton
-        title={<Icon name="more_horiz" />}
-        aria-label="Open search actions dropdown"
-        id="search-actions-dropdown"
-        pullRight
-        noCaret>
+      <MoreActionsMenu aria-label="Open search actions dropdown" id="search-actions-dropdown" pullRight solid>
         <MenuItem onSelect={toggleMetadataEdit} disabled={!isAllowedToEdit} icon="edit">
           Edit metadata
         </MenuItem>
@@ -277,7 +273,7 @@ const SearchActionsMenu = () => {
             {pluggableActions}
           </>
         ) : null}
-      </DropdownButton>
+      </MoreActionsMenu>
       {showExport && <ExportModal view={view} closeModal={toggleExport} />}
       {showMetadataEdit && (
         <ViewPropertiesModal

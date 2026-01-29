@@ -43,5 +43,5 @@ const validData: { [key: string]: Rows } = {
     },
   ],
 };
-// eslint-disable-next-line import/prefer-default-export
+
 export { validData };

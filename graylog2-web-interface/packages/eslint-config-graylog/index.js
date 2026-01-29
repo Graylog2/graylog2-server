@@ -109,7 +109,7 @@ export default [
       'no-await-in-loop': 'error',
       'no-loop-func': 'error',
 
-      'import/prefer-default-export': 'error',
+      'import/prefer-default-export': 'off',
       'jsx-a11y/control-has-associated-label': 'error',
       'react/no-array-index-key': 'error',
       'react/no-danger': 'error',
