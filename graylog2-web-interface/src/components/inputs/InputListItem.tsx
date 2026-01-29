@@ -154,9 +154,8 @@ const InputListItem = ({ input, currentNode }: Props) => {
       : 'gl2_source_input';
 
   const actions = [
-    <IfPermitted permissions={['searches:relative']}>
+    <IfPermitted key={`received-messages-${input.id}`} permissions={['searches:relative']}>
       <LinkContainer
-        key={`received-messages-${input.id}`}
         to={Routes.search(`${queryField}:${input.id}`, recentMessagesTimeRange())}>
         <Button
           onClick={() => {
@@ -169,10 +168,9 @@ const InputListItem = ({ input, currentNode }: Props) => {
         </Button>
       </LinkContainer>
     </IfPermitted>,
-    <HideOnCloud>
+    <HideOnCloud key={`manage-extractors-${input.id}`}>
       <IfPermitted permissions={[`inputs:edit:${input.id}`, `input_types:create:${input.type}`]}>
         <LinkContainer
-          key={`manage-extractors-${input.id}`}
           to={
             input.global
               ? Routes.global_input_extractors(input.id)
@@ -190,8 +188,8 @@ const InputListItem = ({ input, currentNode }: Props) => {
         </LinkContainer>
       </IfPermitted>
     </HideOnCloud>,
-    <IfPermitted permissions={[`inputs:edit:${input.id}`, `input_types:create:${input.type}`]}>
-      <InputStateControl key={`input-state-control-${input.id}`} input={input} openWizard={openWizard} />
+    <IfPermitted key={`input-state-control-${input.id}`} permissions={`inputs:changestate:${input.id}`}>
+      <InputStateControl input={input} openWizard={openWizard} />
     </IfPermitted>,
     <DropdownButton
       key={`more-actions-${input.id}`}
