@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 
 import Menu from 'components/bootstrap/Menu';
 
-type Placement = 'top' | 'right' | 'bottom' | 'left';
+type Placement = 'top' | 'right' | 'bottom' | 'left' | 'bottom-start';
 
 const ToggleDropdown = styled.span<{ $alwaysShowCaret: boolean }>(
   ({ $alwaysShowCaret }) => css`
