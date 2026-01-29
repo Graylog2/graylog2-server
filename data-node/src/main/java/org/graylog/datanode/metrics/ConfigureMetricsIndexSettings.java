@@ -86,7 +86,7 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer<Opensea
             LOGGER.info("Transition to AVAILABLE and manager process, tracer instance: {}", this);
             process.openSearchClient().ifPresent(client -> {
                 LOGGER.info("Opensearch client available, tracer instance: {}, client: {}", this, client);
-                if (datastreamCreated .compareAndSet(false, true)) {
+                if (datastreamCreated.compareAndSet(false, true)) {
                     LOGGER.info("Initial creation of metric templates and datastreams, tracer instance: {}, client: {}", this, client);
                     createDatastream(client);
                 }
