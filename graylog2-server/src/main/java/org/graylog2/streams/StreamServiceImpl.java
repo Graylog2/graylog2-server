@@ -374,7 +374,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     public Map<String, Long> countBySource() {
         List<ObjectId> excludedIds = ALL_SYSTEM_STREAM_IDS.stream()
                 .map(ObjectId::new)
-                .collect(Collectors.toList());
+                .toList();
 
         long illuminateStreamCount = mongoCollection(StreamImpl.class).countDocuments(
                 Filters.and(
