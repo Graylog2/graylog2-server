@@ -30,6 +30,7 @@ import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.functions.arrays.ArrayContains;
 import org.graylog.plugins.pipelineprocessor.functions.arrays.ArrayRemove;
 import org.graylog.plugins.pipelineprocessor.functions.arrays.StringArrayAdd;
@@ -179,6 +180,7 @@ import org.joda.time.Period;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
@@ -857,6 +859,33 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(clonedMessage.getStreams()).isEqualTo(origMessage.getStreams());
         assertThat(clonedMessage.getTimestamp()).isNotNull();
         assertThat(clonedMessage.getTimestamp()).isEqualTo(origMessage.getTimestamp());
+    }
+
+    @Test
+    void shouldNotCopyIdFieldWhenCloningMessage() {
+        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
+        message.addField("foo", "bar");
+
+        final Message clonedMessage = spy(messageFactory.createMessage("test", "test", Tools.nowUTC()));
+        final MessageFactory messageFactoryMock = mock(MessageFactory.class);
+        when(messageFactoryMock.createMessage(anyString(), anyString(), any(DateTime.class))).thenReturn(clonedMessage);
+
+        final CloneMessage cloneMessageFunction = new CloneMessage(messageFactoryMock);
+        final EvaluationContext context = new EvaluationContext(message);
+        final FunctionArgs args = new FunctionArgs(cloneMessageFunction, Collections.emptyMap());
+
+        final Message evaluatedClone = cloneMessageFunction.evaluate(args, context);
+
+        assertThat(evaluatedClone).isSameAs(clonedMessage);
+
+        final ArgumentCaptor<Map<String, Object>> fieldsCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(clonedMessage).addFields(fieldsCaptor.capture());
+        assertThat(fieldsCaptor.getValue()).doesNotContainKey(Message.FIELD_ID);
+
+        assertThat(clonedMessage.getFieldAs(String.class, "foo")).isEqualTo("bar");
+        assertThat(clonedMessage.getFieldAs(String.class, Message.FIELD_ID))
+                .isNotEqualTo(message.getFieldAs(String.class, Message.FIELD_ID));
+        assertThat(context.createdMessages()).contains(clonedMessage);
     }
 
     @Test
