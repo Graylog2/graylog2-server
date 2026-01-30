@@ -62,7 +62,7 @@ type MarkerProps = {
   radiusSize: number;
   increment: number;
   color: chroma.Color;
-  name: JSX.Element;
+  name: React.JSX.Element;
   keys: { [s: string]: unknown } | ArrayLike<unknown>;
 };
 

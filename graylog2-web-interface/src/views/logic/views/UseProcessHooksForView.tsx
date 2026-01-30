@@ -46,7 +46,7 @@ const LoadViewError = ({ error }: { error: Error }) => {
   );
 };
 
-type HookComponent = JSX.Element;
+type HookComponent = React.JSX.Element;
 
 type Loading = { status: 'loading' };
 type Loaded = { status: 'loaded'; view: View; executionState: SearchExecutionState };

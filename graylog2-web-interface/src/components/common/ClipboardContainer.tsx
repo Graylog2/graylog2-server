@@ -27,7 +27,7 @@ import Tooltip from 'components/common/Tooltip';
  */
 
 type Props = {
-  children: (props: { copy: () => void }) => JSX.Element;
+  children: (props: { copy: () => void }) => React.JSX.Element;
   text: string;
 };
 
