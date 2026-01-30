@@ -72,6 +72,17 @@ type Props = {
 };
 
 class SlackNotificationForm extends React.Component<Props, any> {
+  constructor(props) {
+    super(props);
+
+    const defaultBacklogSize = props.config.backlog_size;
+
+    this.state = {
+      isBacklogSizeEnabled: defaultBacklogSize > 0,
+      backlogSize: defaultBacklogSize,
+    };
+  }
+
   static defaultConfig = {
     color: '#FF0000',
     webhook_url: '',
@@ -115,17 +126,6 @@ class SlackNotificationForm extends React.Component<Props, any> {
     time_zone: 'UTC',
     include_event_procedure: false,
   };
-
-  constructor(props) {
-    super(props);
-
-    const defaultBacklogSize = props.config.backlog_size;
-
-    this.state = {
-      isBacklogSizeEnabled: defaultBacklogSize > 0,
-      backlogSize: defaultBacklogSize,
-    };
-  }
 
   handleBacklogSizeChange = (event) => {
     const { name } = event.target;

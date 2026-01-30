@@ -37,6 +37,17 @@ type TeamsNotificationFormV2Type = {
 };
 
 class TeamsNotificationV2Form extends React.Component<TeamsNotificationFormV2Type, any> {
+  constructor(props: TeamsNotificationFormV2Type | Readonly<TeamsNotificationFormV2Type>) {
+    super(props);
+
+    const defaultBacklogSize = props.config.backlog_size;
+
+    this.state = {
+      isBacklogSizeEnabled: defaultBacklogSize > 0,
+      backlogSize: defaultBacklogSize,
+    };
+  }
+
   static defaultConfig = {
     webhook_url: '',
     /* eslint-disable no-template-curly-in-string */
@@ -150,17 +161,6 @@ class TeamsNotificationV2Form extends React.Component<TeamsNotificationFormV2Typ
     backlog_size: 0,
     time_zone: 'UTC',
   };
-
-  constructor(props: TeamsNotificationFormV2Type | Readonly<TeamsNotificationFormV2Type>) {
-    super(props);
-
-    const defaultBacklogSize = props.config.backlog_size;
-
-    this.state = {
-      isBacklogSizeEnabled: defaultBacklogSize > 0,
-      backlogSize: defaultBacklogSize,
-    };
-  }
 
   handleBacklogSizeChange: SelectCallback = (event: { target: { name: string } }) => {
     const { name } = event.target;

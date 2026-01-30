@@ -36,6 +36,17 @@ type TeamsNotificationFormType = {
 };
 
 class TeamsNotificationForm extends React.Component<TeamsNotificationFormType, any> {
+  constructor(props: TeamsNotificationFormType | Readonly<TeamsNotificationFormType>) {
+    super(props);
+
+    const defaultBacklogSize = props.config.backlog_size;
+
+    this.state = {
+      isBacklogSizeEnabled: defaultBacklogSize > 0,
+      backlogSize: defaultBacklogSize,
+    };
+  }
+
   static defaultConfig = {
     color: '#FF0000',
     webhook_url: '',
@@ -79,17 +90,6 @@ class TeamsNotificationForm extends React.Component<TeamsNotificationFormType, a
     backlog_size: 0,
     time_zone: 'UTC',
   };
-
-  constructor(props: TeamsNotificationFormType | Readonly<TeamsNotificationFormType>) {
-    super(props);
-
-    const defaultBacklogSize = props.config.backlog_size;
-
-    this.state = {
-      isBacklogSizeEnabled: defaultBacklogSize > 0,
-      backlogSize: defaultBacklogSize,
-    };
-  }
 
   handleBacklogSizeChange: SelectCallback = (event: { target: { name: string } }) => {
     const { name } = event.target;

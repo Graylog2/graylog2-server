@@ -55,10 +55,6 @@ class EventDefinitionDescription extends React.Component<
     [key: string]: any;
   }
 > {
-  static defaultProps = {
-    context: {},
-  };
-
   static describeSchedule = (isCron, value) => {
     if (isCron) {
       const cronDescription = describeExpression(value);
@@ -121,6 +117,10 @@ class EventDefinitionDescription extends React.Component<
     if (window.confirm(`Are you sure you want to clear queued notifications for "${definition.title}"?`)) {
       EventDefinitionsActions.clearNotificationQueue(definition);
     }
+  };
+
+  static defaultProps = {
+    context: {},
   };
 
   constructor(props) {

@@ -33,14 +33,14 @@ class GrokPatternInput extends React.Component<
     [key: string]: any;
   }
 > {
-  private patternInput: Input;
-
   static defaultProps = {
     pattern: '',
     patterns: [],
     onPatternChange: () => {},
     className: '',
   };
+
+  private patternInput: Input;
 
   _addToPattern = (name) => {
     const { pattern, onPatternChange } = this.props;
