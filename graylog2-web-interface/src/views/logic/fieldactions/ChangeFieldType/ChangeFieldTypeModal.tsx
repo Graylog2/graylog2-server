@@ -119,7 +119,7 @@ const ChangeFieldTypeModal = ({
     [fieldTypes],
   );
 
-  const [indexSetSelection, setIndexSetSelection] = useState<Array<string>>();
+  const [indexSetSelection, setIndexSetSelection] = useState<Array<string>>(initialSelectedIndexSets);
 
   const { putFieldTypeMutation, isLoading: fieldTypeMutationIsLoading } = usePutFieldTypeMutation();
 
@@ -185,10 +185,6 @@ const ChangeFieldTypeModal = ({
     });
     onClose();
   }, [onClose, sendTelemetry]);
-
-  useEffect(() => {
-    setIndexSetSelection(initialSelectedIndexSets);
-  }, [initialSelectedIndexSets, setIndexSetSelection]);
 
   return (
     <BootstrapModalForm
