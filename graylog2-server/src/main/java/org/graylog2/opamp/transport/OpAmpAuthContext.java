@@ -20,6 +20,7 @@ import org.glassfish.grizzly.http.HttpRequestPacket;
 
 import java.util.Optional;
 
+// TODO: the authenticated field is just a dummy and should be replaced with real auth context info later
 public record OpAmpAuthContext(boolean authenticated) {
 
     static final String REQUEST_ATTRIBUTE = "opamp.auth.context";

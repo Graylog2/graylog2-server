@@ -21,9 +21,12 @@ import jakarta.inject.Singleton;
 import opamp.proto.Opamp.AgentToServer;
 import opamp.proto.Opamp.ServerToAgent;
 import org.apache.commons.lang3.Strings;
+import org.graylog2.opamp.transport.OpAmpAuthContext;
 import org.graylog2.security.AccessTokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
 
 @Singleton
 public class OpAmpService {
@@ -36,14 +39,17 @@ public class OpAmpService {
         this.accessTokenService = accessTokenService;
     }
 
-    public boolean validateToken(String authHeader) {
+    public Optional<OpAmpAuthContext> authenticate(String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return false;
+            return Optional.empty();
         }
         final var token = Strings.CS.removeStart(authHeader, "Bearer ");
 
-        // TODO: permission check
-        return accessTokenService.load(token) != null;
+        // TODO: permission check, populate context with token info
+        if (accessTokenService.load(token) != null) {
+            return Optional.of(new OpAmpAuthContext(true));
+        }
+        return Optional.empty();
     }
 
     public ServerToAgent handleMessage(AgentToServer message) {

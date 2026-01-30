@@ -53,7 +53,7 @@ import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.jersey.PrefixAddingModelProcessor;
 import org.graylog2.opamp.OpAmpConstants;
 import org.graylog2.opamp.transport.OpAmpAddOn;
-import org.graylog2.opamp.transport.OpAmpAuthFilter;
+import org.graylog2.opamp.transport.OpAmpWebSocketAuthFilter;
 import org.graylog2.opamp.transport.OpAmpHttpHandler;
 import org.graylog2.opamp.transport.OpAmpWebSocketApplication;
 import org.graylog2.plugin.inject.Graylog2Module;
@@ -129,7 +129,7 @@ public class JerseyService extends AbstractIdleService {
     private final int shutdownTimeoutMs;
     private final OpAmpHttpHandler opAmpHttpHandler;
     private final OpAmpWebSocketApplication opAmpWebSocketApplication;
-    private final OpAmpAuthFilter opAmpAuthFilter;
+    private final OpAmpWebSocketAuthFilter opAmpAuthFilter;
 
     private HttpServer httpServer = null;
 
@@ -149,7 +149,7 @@ public class JerseyService extends AbstractIdleService {
                          @Named("shutdown_timeout") int shutdownTimeoutMs,
                          OpAmpHttpHandler opAmpHttpHandler,
                          OpAmpWebSocketApplication opAmpWebSocketApplication,
-                         OpAmpAuthFilter opAmpAuthFilter) {
+                         OpAmpWebSocketAuthFilter opAmpAuthFilter) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.dynamicFeatures = requireNonNull(dynamicFeatures, "dynamicFeatures");
         this.containerResponseFilters = requireNonNull(containerResponseFilters, "containerResponseFilters");
@@ -247,7 +247,7 @@ public class JerseyService extends AbstractIdleService {
      * <p>Request flow:
      * <ol>
      *   <li>All requests hit the filter chain</li>
-     *   <li>OpAmpAuthFilter checks path - skips non-OpAMP requests, validates auth and
+     *   <li>OpAmpWebSocketAuthFilter checks path - skips non-OpAMP requests, validates auth and
      *       stores OpAmpAuthContext for /v1/opamp requests</li>
      *   <li>WebSocketFilter routes upgrade requests to OpAmpWebSocketApplication</li>
      *   <li>Regular HTTP requests (POST, etc.) reach OpAmpHttpHandler</li>

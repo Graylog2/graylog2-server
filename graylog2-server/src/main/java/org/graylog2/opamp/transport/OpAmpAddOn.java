@@ -31,9 +31,9 @@ import java.util.Objects;
  */
 public class OpAmpAddOn implements AddOn {
     private final WebSocketAddOn delegate = new WebSocketAddOn();
-    private final OpAmpAuthFilter authFilter;
+    private final OpAmpWebSocketAuthFilter authFilter;
 
-    public OpAmpAddOn(OpAmpAuthFilter authFilter) {
+    public OpAmpAddOn(OpAmpWebSocketAuthFilter authFilter) {
         this.authFilter = Objects.requireNonNull(authFilter, "authFilter must not be null");
     }
 

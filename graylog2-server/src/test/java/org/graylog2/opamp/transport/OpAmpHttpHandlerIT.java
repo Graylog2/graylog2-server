@@ -23,6 +23,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okio.BufferedSink;
 import opamp.proto.Opamp.AgentToServer;
 import opamp.proto.Opamp.ServerErrorResponse;
 import opamp.proto.Opamp.ServerErrorResponseType;
@@ -37,6 +38,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.time.Duration;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,7 +66,7 @@ class OpAmpHttpHandlerIT {
 
         // Register auth filter via addon (handles auth for HTTP requests too)
         final var listener = httpServer.getListener("grizzly");
-        listener.registerAddOn(new OpAmpAddOn(new OpAmpAuthFilter(opAmpService, executor)));
+        listener.registerAddOn(new OpAmpAddOn(new OpAmpWebSocketAuthFilter(opAmpService, executor)));
 
         final OpAmpHttpHandler handler = new OpAmpHttpHandler(opAmpService, executor,
                 Size.bytes(TEST_MAX_MESSAGE_SIZE));
@@ -86,7 +88,7 @@ class OpAmpHttpHandlerIT {
 
     @Test
     void rejectsGetRequest() throws Exception {
-        when(opAmpService.validateToken("Bearer valid")).thenReturn(true);
+        when(opAmpService.authenticate("Bearer valid")).thenReturn(Optional.of(new OpAmpAuthContext(true)));
 
         final Request request = new Request.Builder()
                 .url(opampUrl())
@@ -101,7 +103,7 @@ class OpAmpHttpHandlerIT {
 
     @Test
     void rejectsMissingAuth() throws Exception {
-        when(opAmpService.validateToken(null)).thenReturn(false);
+        when(opAmpService.authenticate(null)).thenReturn(Optional.empty());
 
         final Request request = new Request.Builder()
                 .url(opampUrl())
@@ -115,7 +117,7 @@ class OpAmpHttpHandlerIT {
 
     @Test
     void rejectsInvalidAuth() throws Exception {
-        when(opAmpService.validateToken("Bearer invalid")).thenReturn(false);
+        when(opAmpService.authenticate("Bearer invalid")).thenReturn(Optional.empty());
 
         final Request request = new Request.Builder()
                 .url(opampUrl())
@@ -130,7 +132,7 @@ class OpAmpHttpHandlerIT {
 
     @Test
     void rejectsEmptyBody() throws Exception {
-        when(opAmpService.validateToken("Bearer valid")).thenReturn(true);
+        when(opAmpService.authenticate("Bearer valid")).thenReturn(Optional.of(new OpAmpAuthContext(true)));
 
         final Request request = new Request.Builder()
                 .url(opampUrl())
@@ -146,7 +148,7 @@ class OpAmpHttpHandlerIT {
 
     @Test
     void rejectsInvalidProtobuf() throws Exception {
-        when(opAmpService.validateToken("Bearer valid")).thenReturn(true);
+        when(opAmpService.authenticate("Bearer valid")).thenReturn(Optional.of(new OpAmpAuthContext(true)));
 
         final Request request = new Request.Builder()
                 .url(opampUrl())
@@ -162,7 +164,7 @@ class OpAmpHttpHandlerIT {
 
     @Test
     void processesValidMessage() throws Exception {
-        when(opAmpService.validateToken("Bearer valid")).thenReturn(true);
+        when(opAmpService.authenticate("Bearer valid")).thenReturn(Optional.of(new OpAmpAuthContext(true)));
 
         final AgentToServer agentMsg = AgentToServer.newBuilder()
                 .setInstanceUid(ByteString.copyFromUtf8("test-instance-uid"))
@@ -190,9 +192,40 @@ class OpAmpHttpHandlerIT {
         }
     }
 
+    /**
+     * Verifies HTTP requests with chunked transfer encoding work correctly.
+     */
+    @Test
+    void processesRequestWithChunkedTransferEncoding() throws Exception {
+        when(opAmpService.authenticate("Bearer valid")).thenReturn(Optional.of(new OpAmpAuthContext(true)));
+
+        // Streaming body forces chunked transfer encoding (no Content-Length header)
+        final RequestBody chunkedBody = new RequestBody() {
+            @Override
+            public MediaType contentType() {
+                return PROTOBUF;
+            }
+
+            @Override
+            public void writeTo(BufferedSink sink) throws IOException {
+                sink.write(new byte[]{1, 2, 3});
+            }
+        };
+
+        final Request request = new Request.Builder()
+                .url(opampUrl())
+                .post(chunkedBody)
+                .header("Authorization", "Bearer valid")
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            assertThat(response.code()).isEqualTo(400); // Invalid protobuf, but request was processed
+        }
+    }
+
     @Test
     void returnsServerErrorResponseOnServiceException() throws Exception {
-        when(opAmpService.validateToken("Bearer valid")).thenReturn(true);
+        when(opAmpService.authenticate("Bearer valid")).thenReturn(Optional.of(new OpAmpAuthContext(true)));
 
         final AgentToServer agentMsg = AgentToServer.newBuilder()
                 .setInstanceUid(ByteString.copyFromUtf8("test-instance-uid"))
@@ -222,7 +255,7 @@ class OpAmpHttpHandlerIT {
 
     @Test
     void rejectsOversizedBody() throws Exception {
-        when(opAmpService.validateToken("Bearer valid")).thenReturn(true);
+        when(opAmpService.authenticate("Bearer valid")).thenReturn(Optional.of(new OpAmpAuthContext(true)));
 
         // Create a body larger than TEST_MAX_MESSAGE_SIZE (1 KB)
         final byte[] oversizedBody = new byte[TEST_MAX_MESSAGE_SIZE + 100];

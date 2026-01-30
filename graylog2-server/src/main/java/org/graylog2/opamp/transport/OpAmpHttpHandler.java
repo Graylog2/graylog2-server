@@ -21,7 +21,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import org.graylog2.opamp.OpAmpExecutor;
 import opamp.proto.Opamp.AgentToServer;
 import opamp.proto.Opamp.ServerErrorResponse;
 import opamp.proto.Opamp.ServerErrorResponseType;
@@ -31,6 +30,7 @@ import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.util.HttpStatus;
+import org.graylog2.opamp.OpAmpExecutor;
 import org.graylog2.opamp.OpAmpService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,10 +81,8 @@ public class OpAmpHttpHandler extends HttpHandler {
             return;
         }
 
-        // Read auth context set by OpAmpAuthFilter
-        final var authContext = OpAmpAuthContext.fromRequest(request.getRequest());
-        if (authContext.isEmpty() || !authContext.get().authenticated()) {
-            LOG.debug("OpAMP auth failed or missing");
+        if (opAmpService.authenticate(request.getHeader("Authorization")).isEmpty()) {
+            LOG.debug("OpAMP auth failed");
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
             response.finish();
             return;

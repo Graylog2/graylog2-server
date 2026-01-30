@@ -59,7 +59,7 @@ public class OpAmpWebSocketApplication extends WebSocketApplication {
         final var authContext = OpAmpAuthContext.fromRequest(request)
                 .orElseThrow(() -> new IllegalStateException(
                         f("OpAMP auth context missing - is {} configured?",
-                                OpAmpAuthFilter.class.getSimpleName())));
+                                OpAmpWebSocketAuthFilter.class.getSimpleName())));
 
         return new OpAmpWebSocket(handler, listeners, authContext);
     }

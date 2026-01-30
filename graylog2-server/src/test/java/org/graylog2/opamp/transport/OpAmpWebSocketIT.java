@@ -34,6 +34,8 @@ import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.nio.ByteBuffer;
 import java.time.Duration;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -67,7 +69,7 @@ class OpAmpWebSocketIT {
         final var executor = Executors.newVirtualThreadPerTaskExecutor();
 
         // Enable WebSocket addon with auth filter (matches production setup)
-        listener.registerAddOn(new OpAmpAddOn(new OpAmpAuthFilter(opAmpService, executor)));
+        listener.registerAddOn(new OpAmpAddOn(new OpAmpWebSocketAuthFilter(opAmpService, executor)));
 
         final var wsApp = new OpAmpWebSocketApplication(opAmpService, executor);
 
@@ -90,8 +92,8 @@ class OpAmpWebSocketIT {
     }
 
     @Test
-    void rejectsConnectionWithInvalidAuth() throws Exception {
-        when(opAmpService.validateToken("Bearer invalid")).thenReturn(false);
+    void rejectsConnectionWithInvalidAuth() {
+        when(opAmpService.authenticate("Bearer invalid")).thenReturn(Optional.empty());
 
         final var listener = new TestWebSocketListener(new CompletableFuture<>());
 
@@ -105,8 +107,8 @@ class OpAmpWebSocketIT {
     }
 
     @Test
-    void rejectsConnectionWithMissingAuth() throws Exception {
-        when(opAmpService.validateToken(null)).thenReturn(false);
+    void rejectsConnectionWithMissingAuth() {
+        when(opAmpService.authenticate(null)).thenReturn(Optional.empty());
 
         final var listener = new TestWebSocketListener(new CompletableFuture<>());
 
@@ -119,7 +121,7 @@ class OpAmpWebSocketIT {
 
     @Test
     void acceptsConnectionWithValidAuth() throws Exception {
-        when(opAmpService.validateToken("Bearer valid")).thenReturn(true);
+        when(opAmpService.authenticate("Bearer valid")).thenReturn(Optional.of(new OpAmpAuthContext(true)));
         when(opAmpService.handleMessage(AgentToServer.getDefaultInstance()))
                 .thenReturn(ServerToAgent.getDefaultInstance());
 
@@ -144,7 +146,7 @@ class OpAmpWebSocketIT {
 
     @Test
     void processesValidMessage() throws Exception {
-        when(opAmpService.validateToken("Bearer valid")).thenReturn(true);
+        when(opAmpService.authenticate("Bearer valid")).thenReturn(Optional.of(new OpAmpAuthContext(true)));
 
         final var agentMsg = AgentToServer.newBuilder()
                 .setInstanceUid(ByteString.copyFromUtf8("test-instance-uid"))
@@ -176,7 +178,7 @@ class OpAmpWebSocketIT {
 
         // Wait for response
         final var responseBytes = listener.messages.poll(2, TimeUnit.SECONDS);
-        final var reply = parseFramedResponse(responseBytes);
+        final var reply = parseFramedResponse(Objects.requireNonNull(responseBytes));
 
         assertThat(reply.getInstanceUid()).isEqualTo(expectedReply.getInstanceUid());
 
@@ -185,7 +187,7 @@ class OpAmpWebSocketIT {
 
     @Test
     void handlesInvalidProtobufGracefully() throws Exception {
-        when(opAmpService.validateToken("Bearer valid")).thenReturn(true);
+        when(opAmpService.authenticate("Bearer valid")).thenReturn(Optional.of(new OpAmpAuthContext(true)));
         when(opAmpService.handleMessage(AgentToServer.getDefaultInstance()))
                 .thenReturn(ServerToAgent.getDefaultInstance());
 
@@ -212,7 +214,7 @@ class OpAmpWebSocketIT {
 
     @Test
     void rejectsMessageWithInvalidHeader() throws Exception {
-        when(opAmpService.validateToken("Bearer valid")).thenReturn(true);
+        when(opAmpService.authenticate("Bearer valid")).thenReturn(Optional.of(new OpAmpAuthContext(true)));
         when(opAmpService.handleMessage(AgentToServer.getDefaultInstance()))
                 .thenReturn(ServerToAgent.getDefaultInstance());
 
@@ -296,7 +298,7 @@ class OpAmpWebSocketIT {
             if (last) {
                 final var bytes = new byte[messageBuffer.remaining()];
                 messageBuffer.get(bytes);
-                messages.offer(bytes);
+                messages.add(bytes);
                 messageBuffer = ByteBuffer.allocate(0);
             }
 
