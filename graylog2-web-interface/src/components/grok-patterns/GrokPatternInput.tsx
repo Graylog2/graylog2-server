@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useRef } from 'react';
 
 import { Row, Col, Input } from 'components/bootstrap';
 
@@ -27,61 +27,48 @@ type GrokPatternInputProps = {
   className?: string;
 };
 
-class GrokPatternInput extends React.Component<
-  GrokPatternInputProps,
-  {
-    [key: string]: any;
-  }
-> {
-  static defaultProps = {
-    pattern: '',
-    patterns: [],
-    onPatternChange: () => {},
-    className: '',
-  };
+const GrokPatternInput = ({
+  pattern = '',
+  patterns = [],
+  onPatternChange = () => {},
+  className = '',
+}: GrokPatternInputProps) => {
+  const patternInput = useRef<Input | null>(null);
 
-  private patternInput: Input;
-
-  _addToPattern = (name) => {
-    const { pattern, onPatternChange } = this.props;
-    const index = this.patternInput.getInputDOMNode().selectionStart || pattern.length;
+  const addToPattern = (name) => {
+    const selectionStart = patternInput.current?.getInputDOMNode().selectionStart;
+    const index = selectionStart || pattern.length;
     const newPattern = `${pattern.slice(0, index)}%{${name}}${pattern.slice(index)}`;
 
     onPatternChange(newPattern);
   };
 
-  _onPatternChange = (e) => {
-    const { onPatternChange } = this.props;
-
+  const handlePatternChange = (e) => {
     onPatternChange(e.target.value);
   };
 
-  render() {
-    const { className, patterns, pattern } = this.props;
-
-    return (
-      <Row className={className}>
-        <Col sm={8}>
-          <Input
-            ref={(node) => {
-              this.patternInput = node;
-            }}
-            type="textarea"
-            id="pattern-input"
-            label="Pattern"
-            help="The pattern which will match the log line e.g: '%{IP:client}' or '.*?'"
-            rows={9}
-            onChange={this._onPatternChange}
-            value={pattern}
-            required
-          />
-        </Col>
-        <Col sm={4}>
-          <GrokPatternFilter addToPattern={this._addToPattern} patterns={patterns} />
-        </Col>
-      </Row>
-    );
-  }
-}
+  return (
+    <Row className={className}>
+      <Col sm={8}>
+        <Input
+          ref={(node) => {
+            patternInput.current = node;
+          }}
+          type="textarea"
+          id="pattern-input"
+          label="Pattern"
+          help="The pattern which will match the log line e.g: '%{IP:client}' or '.*?'"
+          rows={9}
+          onChange={handlePatternChange}
+          value={pattern}
+          required
+        />
+      </Col>
+      <Col sm={4}>
+        <GrokPatternFilter addToPattern={addToPattern} patterns={patterns} />
+      </Col>
+    </Row>
+  );
+};
 
 export default GrokPatternInput;
