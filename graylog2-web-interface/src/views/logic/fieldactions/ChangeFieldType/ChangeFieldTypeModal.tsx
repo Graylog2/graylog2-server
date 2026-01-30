@@ -209,7 +209,6 @@ const ChangeFieldTypeModal = ({
           lead to ingestion errors.
           {hasFailureStreamAccess && (
             <>
-              {' '}
               It is recommended to enable{' '}
               <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} displayIcon text="Failure Processing" /> and
               watch the <FailureStreamLink /> stream closely afterwards.
