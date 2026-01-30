@@ -104,6 +104,9 @@ const ChangeFieldTypeModal = ({
   } = useFieldTypesForMappings();
   const sendTelemetry = useSendTelemetry();
   const [rotated, setRotated] = useState(true);
+  const {
+    isError: isErrorFailureStream,
+  } = useStream(failureStreamId);
   const fieldTypeOptions = useMemo(
     () =>
       Object.entries(fieldTypes)
@@ -202,9 +205,15 @@ const ChangeFieldTypeModal = ({
         <Alert bsStyle="warning">
           Changing the type of the field <b>{fieldName}</b> can have a significant impact on the ingestion of future log
           messages. If you declare a field to have a type which is incompatible with the logs you are ingesting, it can
-          lead to ingestion errors. It is recommended to enable{' '}
-          <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} displayIcon text="Failure Processing" /> and watch
-          the <FailureStreamLink /> stream closely afterwards.
+          lead to ingestion errors.
+          {!isErrorFailureStream && (
+            <>
+              {' '}
+              It is recommended to enable{' '}
+              <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} displayIcon text="Failure Processing" /> and
+              watch the <FailureStreamLink /> stream closely afterwards.
+            </>
+          )}
         </Alert>
         <StyledLabel>{`Select Field Type For ${fieldName || 'Field'}`}</StyledLabel>
         <Input id="field_type">
