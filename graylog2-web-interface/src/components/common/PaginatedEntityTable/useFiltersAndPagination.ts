@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { OrderedMap } from 'immutable';
 
 import { useQueryParam, StringParam } from 'routing/QueryParams';
@@ -30,14 +30,20 @@ export const useWithURLParams = (layoutConfig: LayoutConfig, defaultFilters?: Ur
   const [sliceCol, setSliceCol] = useQueryParam('sliceCol', StringParam);
   const [slice, setSlice] = useQueryParam('slice', StringParam);
   const urlPagination = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
+  const hasInitialized = useRef(false);
 
-  const effectiveFilters = useMemo(() => {
-    if (urlQueryFilters && urlQueryFilters.size > 0) {
-      return urlQueryFilters;
+  // Initialize URL with default filters on first mount if URL has no filters
+  useEffect(() => {
+    if (!hasInitialized.current && defaultFilters && defaultFilters.size > 0) {
+      const urlHasNoFilters = !urlQueryFilters || urlQueryFilters.size === 0;
+
+      if (urlHasNoFilters) {
+        setUrlQueryFilters(defaultFilters);
+      }
+
+      hasInitialized.current = true;
     }
-
-    return defaultFilters ?? OrderedMap<string, Array<string>>();
-  }, [urlQueryFilters, defaultFilters]);
+  }, [defaultFilters, setUrlQueryFilters, urlQueryFilters]);
 
   const fetchOptions: SearchParams = useMemo(
     () => ({
@@ -47,9 +53,9 @@ export const useWithURLParams = (layoutConfig: LayoutConfig, defaultFilters?: Ur
       page: urlPagination.page,
       pageSize: layoutConfig.pageSize,
       sort: layoutConfig.sort,
-      filters: effectiveFilters,
+      filters: urlQueryFilters ?? OrderedMap<string, Array<string>>(),
     }),
-    [query, slice, sliceCol, urlPagination.page, layoutConfig.pageSize, layoutConfig.sort, effectiveFilters],
+    [query, slice, sliceCol, urlPagination.page, layoutConfig.pageSize, layoutConfig.sort, urlQueryFilters],
   );
 
   const onChangeFilters = useCallback(

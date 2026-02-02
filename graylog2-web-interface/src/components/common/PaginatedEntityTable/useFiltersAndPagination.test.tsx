@@ -109,5 +109,16 @@ describe('useFiltersAndPagination', () => {
 
       expect(result.current.fetchOptions.filters).toEqual(newFilters);
     });
+
+    it('should allow clearing all filters', () => {
+      const defaultFilters = OrderedMap({ timestamp: ['2025-01-01T00:00:00.000+00:00><'] });
+      const { result } = renderHook(() => useWithURLParams(mockLayoutConfig, defaultFilters), { wrapper });
+
+      act(() => {
+        result.current.onChangeFilters(OrderedMap());
+      });
+
+      expect(result.current.fetchOptions.filters).toEqual(OrderedMap());
+    });
   });
 });
