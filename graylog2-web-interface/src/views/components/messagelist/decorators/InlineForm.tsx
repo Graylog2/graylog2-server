@@ -20,14 +20,16 @@ import { Button } from 'components/bootstrap';
 
 type Props = {
   children: React.ReactElement;
-  // eslint-disable-next-line react/require-default-props
   disabled?: boolean;
   onCancel: () => void;
   onSubmitForm: (arg: any) => void;
 };
 
-const InlineForm = (submitTitle: string = 'Create'): React.ComponentType<Props> =>
-  React.forwardRef<HTMLFormElement, Props>(({ children, disabled = undefined, onCancel, onSubmitForm }: Props, ref) => {
+const InlineForm = (submitTitle: string = 'Create'): React.ComponentType<Props> => {
+  const InlineFormInner = (
+    { children, disabled = false, onCancel, onSubmitForm }: Props,
+    ref: React.ForwardedRef<HTMLFormElement>,
+  ) => {
     const onSubmit = (event) => {
       event.stopPropagation();
       const { target: formDOMNode } = event;
@@ -56,6 +58,9 @@ const InlineForm = (submitTitle: string = 'Create'): React.ComponentType<Props> 
         </Button>
       </form>
     );
-  });
+  };
+
+  return React.forwardRef(InlineFormInner);
+};
 
 export default InlineForm;
