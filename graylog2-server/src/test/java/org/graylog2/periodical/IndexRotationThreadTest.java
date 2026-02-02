@@ -20,13 +20,9 @@ import com.google.common.collect.ImmutableMap;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Provider;
 import org.assertj.core.api.Assertions;
-import org.graylog2.cluster.lock.Lock;
 import org.graylog2.datatiering.DataTieringOrchestrator;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.cluster.Cluster;
-import org.graylog2.indexer.datanode.DatanodeMigrationLockService;
-import org.graylog2.indexer.datanode.DatanodeMigrationLockServiceImpl;
-import org.graylog2.indexer.datanode.DatanodeMigrationLockWaitConfig;
 import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
@@ -95,8 +91,7 @@ public class IndexRotationThreadTest {
                 new NullActivityWriter(),
                 nodeId,
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build(),
-                dataTieringOrchestrator,
-                Mockito.mock(DatanodeMigrationLockServiceImpl.class)
+                dataTieringOrchestrator
         );
         when(indexSetConfig.rotationStrategyClass()).thenReturn("strategy");
 
@@ -117,8 +112,7 @@ public class IndexRotationThreadTest {
                 new NullActivityWriter(),
                 nodeId,
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build(),
-                dataTieringOrchestrator,
-                Mockito.mock(DatanodeMigrationLockService.class)
+                dataTieringOrchestrator
         );
         when(indexSetConfig.rotationStrategyClass()).thenReturn("strategy");
 
@@ -141,36 +135,13 @@ public class IndexRotationThreadTest {
                 new NullActivityWriter(),
                 new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"),
                 testableRotationStrategy.toProviderMap(),
-                Mockito.mock(DataTieringOrchestrator.class),
-                mockMigrationLocks(indexSetMigrated)
+                Mockito.mock(DataTieringOrchestrator.class)
         );
         rotationThread.doRun();
 
         Assertions.assertThat(testableRotationStrategy.getRotatedIndices())
                 .contains(indexSetFinished)
                 .doesNotContain(indexSetMigrated);
-    }
-
-    @Nonnull
-    private DatanodeMigrationLockService mockMigrationLocks(IndexSet lockedIndexSet) {
-        return new DatanodeMigrationLockService() {
-            @Override
-            public Lock acquireLock(IndexSet indexSet, Class<?> caller, String context, DatanodeMigrationLockWaitConfig config) {
-                return null;
-            }
-
-            @Override
-            public void tryRun(IndexSet indexSet, Class<?> caller, Runnable runnable) {
-                if(indexSet != lockedIndexSet) {
-                    runnable.run();
-                }
-            }
-
-            @Override
-            public void release(Lock lock) {
-
-            }
-        };
     }
 
     private IndexSet mockIndexSet(String indexSetTitle, boolean writable, RotationStrategy testableRotationStrategy) {
@@ -210,8 +181,7 @@ public class IndexRotationThreadTest {
                 new NullActivityWriter(),
                 nodeId,
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build(),
-                dataTieringOrchestrator,
-                Mockito.mock(DatanodeMigrationLockServiceImpl.class)
+                dataTieringOrchestrator
         );
         rotationThread.doRun();
 

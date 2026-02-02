@@ -37,22 +37,7 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
-    public void startRemoteReindex() {
-
-    }
-
-    @Override
-    public void requestMigrationStatus() {
-
-    }
-
-    @Override
     public void calculateTrafficEstimate() {
-
-    }
-
-    @Override
-    public void verifyRemoteIndexerConnection() {
 
     }
 
@@ -68,15 +53,6 @@ public class MigrationActionsAdapter implements MigrationActions {
 
     @Override
     public void stopDatanodes() {
-    }
-
-    @Override
-    public void finishRemoteReindexMigration() {
-    }
-
-    @Override
-    public boolean isRemoteReindexMigrationEnabled() {
-        return true;
     }
 
     @Override
@@ -99,22 +75,7 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
-    public void reindexUpgradeSelected() {
-
-    }
-
-    @Override
-    public boolean isRemoteReindexingFinished() {
-        return false;
-    }
-
-    @Override
     public void stopMessageProcessing() {
-
-    }
-
-    @Override
-    public void startMessageProcessing() {
 
     }
 
