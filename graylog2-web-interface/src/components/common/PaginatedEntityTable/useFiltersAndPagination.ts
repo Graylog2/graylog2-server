@@ -24,12 +24,20 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import type { LayoutConfig } from 'components/common/EntityDataTable/hooks/useTableLayout';
 
-export const useWithURLParams = (layoutConfig: LayoutConfig) => {
+export const useWithURLParams = (layoutConfig: LayoutConfig, defaultFilters?: UrlQueryFilters) => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setUrlQuery] = useQueryParam('query', StringParam);
   const [sliceCol, setSliceCol] = useQueryParam('sliceCol', StringParam);
   const [slice, setSlice] = useQueryParam('slice', StringParam);
   const urlPagination = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
+
+  const effectiveFilters = useMemo(() => {
+    if (urlQueryFilters && urlQueryFilters.size > 0) {
+      return urlQueryFilters;
+    }
+
+    return defaultFilters ?? OrderedMap<string, Array<string>>();
+  }, [urlQueryFilters, defaultFilters]);
 
   const fetchOptions: SearchParams = useMemo(
     () => ({
@@ -39,9 +47,9 @@ export const useWithURLParams = (layoutConfig: LayoutConfig) => {
       page: urlPagination.page,
       pageSize: layoutConfig.pageSize,
       sort: layoutConfig.sort,
-      filters: urlQueryFilters,
+      filters: effectiveFilters,
     }),
-    [query, slice, sliceCol, urlPagination.page, layoutConfig.pageSize, layoutConfig.sort, urlQueryFilters],
+    [query, slice, sliceCol, urlPagination.page, layoutConfig.pageSize, layoutConfig.sort, effectiveFilters],
   );
 
   const onChangeFilters = useCallback(
@@ -64,11 +72,11 @@ export const useWithURLParams = (layoutConfig: LayoutConfig) => {
   };
 };
 
-export const useWithLocalState = (layoutConfig: LayoutConfig) => {
+export const useWithLocalState = (layoutConfig: LayoutConfig, defaultFilters?: UrlQueryFilters) => {
   const [transientFetchOptions, setTransientFetchOptions] = useState<any>({
     query: '',
     page: DEFAULT_PAGE,
-    filters: OrderedMap<string, Array<string>>(),
+    filters: defaultFilters ?? OrderedMap<string, Array<string>>(),
     slice: undefined,
     sliceCol: undefined,
   });

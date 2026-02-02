@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
+import moment from 'moment';
+import { OrderedMap } from 'immutable';
 
 import useTableElements from 'components/events/events/hooks/useTableComponents';
 import { eventsTableElements } from 'components/events/Constants';
@@ -30,6 +32,9 @@ import EventsRefreshControls from 'components/events/events/EventsRefreshControl
 import QueryHelper from 'components/common/QueryHelper';
 import EventsWidgets from 'components/events/EventsWidgets';
 import EventsRefreshProvider from 'components/events/EventsRefreshProvider';
+import useUserDateTime from 'hooks/useUserDateTime';
+import { adjustFormat, toUTCFromTz } from 'util/DateTime';
+import { DATE_SEPARATOR } from 'components/common/EntityFilters/helpers/timeRange';
 
 const additionalSearchFields = {
   key: 'The key of the event',
@@ -37,6 +42,8 @@ const additionalSearchFields = {
 
 const EventsEntityTable = () => {
   const { stream_id: streamId } = useQuery();
+  const { userTimezone } = useUserDateTime();
+
   const _fetchEvents = useCallback(
     (searchParams: SearchParams) => fetchEvents(searchParams, streamId as string),
     [streamId],
@@ -44,6 +51,13 @@ const EventsEntityTable = () => {
   const { entityActions, expandedSections, bulkSelection } = useTableElements({
     defaultLayout: eventsTableElements.defaultLayout,
   });
+
+  const defaultFilters = useMemo(() => {
+    const thirtyDaysAgo = moment().subtract(30, 'days').format('YYYY-MM-DD HH:mm:ss');
+    const thirtyDaysAgoUTC = adjustFormat(toUTCFromTz(thirtyDaysAgo, userTimezone), 'internal');
+
+    return OrderedMap({ timestamp: [`${thirtyDaysAgoUTC}${DATE_SEPARATOR}`] });
+  }, [userTimezone]);
 
   return (
     <EventsRefreshProvider>
@@ -61,6 +75,7 @@ const EventsEntityTable = () => {
         bulkSelection={bulkSelection}
         topRightCol={<EventsRefreshControls />}
         middleSection={EventsWidgets}
+        defaultFilters={defaultFilters}
       />
     </EventsRefreshProvider>
   );

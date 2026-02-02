@@ -276,6 +276,7 @@ type WrapperProps<T, M> = PaginatedEntityTableProps<T, M> & {
 const TableWithLocalState = <T extends EntityBase, M = unknown>({ ...props }: WrapperProps<T, M>) => {
   const { fetchOptions, setQuery, onChangeFilters, onChangeSlicing, paginationState } = useWithLocalState(
     props.layoutConfig,
+    props.defaultFilters,
   );
   const effectiveFetchOptions = props.externalSearch
     ? { ...fetchOptions, query: props.externalSearch.query }
@@ -297,6 +298,7 @@ const TableWithLocalState = <T extends EntityBase, M = unknown>({ ...props }: Wr
 const TableWithURLParams = <T extends EntityBase, M = unknown>({ ...props }: WrapperProps<T, M>) => {
   const { fetchOptions, setQuery, onChangeFilters, paginationState, onChangeSlicing } = useWithURLParams(
     props.layoutConfig,
+    props.defaultFilters,
   );
   const effectiveFetchOptions = props.externalSearch
     ? { ...fetchOptions, query: props.externalSearch.query }
@@ -319,6 +321,8 @@ export type PaginatedEntityTableProps<T, M> = {
   additionalAttributes?: Array<Attribute>;
   bulkSelection?: EntityDataTableProps['bulkSelection'];
   columnRenderers: EntityDataTableProps['columnRenderers'];
+  // eslint-disable-next-line react/no-unused-prop-types -- Used in wrapper components via props.defaultFilters
+  defaultFilters?: UrlQueryFilters;
   entityActions: EntityDataTableProps['entityActions'];
   entityAttributesAreCamelCase: boolean;
   expandedSectionRenderers?: ExpandedSectionRenderers<T>;
