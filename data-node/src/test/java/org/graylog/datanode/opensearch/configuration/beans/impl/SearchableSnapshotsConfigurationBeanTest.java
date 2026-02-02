@@ -21,13 +21,14 @@ import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import org.assertj.core.api.Assertions;
-import org.graylog.datanode.Configuration;
 import org.graylog.datanode.DatanodeTestUtils;
 import org.graylog.datanode.configuration.DatanodeDirectories;
-import org.graylog.datanode.configuration.GCSRepositoryConfiguration;
-import org.graylog.datanode.configuration.HdfsRepositoryConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
-import org.graylog.datanode.configuration.S3RepositoryConfiguration;
+import org.graylog.datanode.configuration.snapshots.AzureRepositoryConfiguration;
+import org.graylog.datanode.configuration.snapshots.FsRepositoryConfiguration;
+import org.graylog.datanode.configuration.snapshots.GCSRepositoryConfiguration;
+import org.graylog.datanode.configuration.snapshots.HdfsRepositoryConfiguration;
+import org.graylog.datanode.configuration.snapshots.S3RepositoryConfiguration;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpace;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
@@ -39,8 +40,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 class SearchableSnapshotsConfigurationBeanTest {
 
@@ -58,9 +59,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                         "node_search_cache_size", "10gb"
                 ), tempDir),
                 datanodeDirectories(tempDir),
-                config,
-                new GCSRepositoryConfiguration(),
-                new HdfsRepositoryConfiguration(),
+                Set.of(config),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
@@ -82,8 +81,6 @@ class SearchableSnapshotsConfigurationBeanTest {
 
     @Test
     void testGoogleCloudStorage(@TempDir Path tempDir) throws ValidationException, RepositoryException, IOException {
-        // no s3 repo configuration properties given by the user
-        final S3RepositoryConfiguration config = s3Configuration(Map.of());
 
         final Path credentialsFile = Files.createTempFile(tempDir, "gcs-credentials", ".json");
         // let's use the filename only. This should be automatically resolved against the datanode config source directory
@@ -97,9 +94,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                         "node_search_cache_size", "10gb"
                 ), tempDir),
                 datanodeDirectories(tempDir),
-                config,
-                gcsRepositoryConfiguration,
-                new HdfsRepositoryConfiguration(),
+                Set.of(gcsRepositoryConfiguration),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
@@ -127,9 +122,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                         "node_search_cache_size", "10gb"
                 ), tempDir),
                 datanodeDirectories(tempDir),
-                new S3RepositoryConfiguration(),
-                new GCSRepositoryConfiguration(),
-                hdfsConfiguration,
+                Set.of(hdfsConfiguration),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
@@ -141,27 +134,54 @@ class SearchableSnapshotsConfigurationBeanTest {
                 .containsEntry("node.search.cache.size", "10gb");
     }
 
+    @Test
+    void testAzureBlobStorage(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+
+        final AzureRepositoryConfiguration azureConfiguration = azureConfiguration(Map.of(
+                "azure_client_default_account", "asdfgh",
+                "azure_client_default_key", "12345"
+        ));
+
+        final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
+                DatanodeTestUtils.datanodeConfiguration(Map.of(
+                        "node_search_cache_size", "10gb"
+                ), tempDir),
+                datanodeDirectories(tempDir),
+                Set.of(azureConfiguration),
+                () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
+
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
+
+        Assertions.assertThat(configurationPart.nodeRoles())
+                .contains(OpensearchNodeRole.SEARCH);
+
+        Assertions.assertThat(configurationPart.properties())
+                .containsEntry("node.search.cache.size", "10gb");
+
+        Assertions.assertThat(configurationPart.keystoreItems())
+                .hasSize(2)
+                .extracting(OpensearchKeystoreItem::key)
+                .contains("azure.client.default.account", "azure.client.default.key");
+    }
+
     private OpensearchConfigurationParams emptyBuildParams(Path tempDir) {
         return new OpensearchConfigurationParams(Collections.emptyList(), Collections.emptyMap(), tempDir);
     }
 
     @Test
     void testLocalFilesystemRepo(@TempDir Path tempDir) throws ValidationException, RepositoryException, IOException {
-        // no s3 repo configuration properties given by the user
-        final S3RepositoryConfiguration config = s3Configuration(Map.of());
 
         final String snapshotsPath = Files.createDirectory(tempDir.resolve("snapshots")).toAbsolutePath().toString();
+        final FsRepositoryConfiguration config = fsConfiguration(snapshotsPath);
+
 
         // only path_repo in general datanode configuration
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
                 DatanodeTestUtils.datanodeConfiguration(Map.of(
-                        "path_repo", snapshotsPath,
                         "node_search_cache_size", "10gb"
                 ), tempDir),
                 datanodeDirectories(tempDir),
-                config,
-                new GCSRepositoryConfiguration(),
-                new HdfsRepositoryConfiguration(),
+                Set.of(config),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
@@ -179,8 +199,7 @@ class SearchableSnapshotsConfigurationBeanTest {
 
     @Test
     void testNoSnapshotConfiguration(@TempDir Path tempDir) throws ValidationException, RepositoryException {
-        // no s3 repo configuration properties given by the user
-        final S3RepositoryConfiguration config = s3Configuration(Map.of());
+
 
         // only path_repo in general datanode configuration
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
@@ -188,9 +207,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                         "node_search_cache_size", "10gb"
                 ), tempDir),
                 datanodeDirectories(tempDir),
-                config,
-                new GCSRepositoryConfiguration(),
-                new HdfsRepositoryConfiguration(),
+                Collections.emptySet(),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
@@ -219,9 +236,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                         "node_search_cache_size", "10gb"
                 ), tempDir),
                 datanodeDirectories(tempDir),
-                config,
-                new GCSRepositoryConfiguration(),
-                new HdfsRepositoryConfiguration(),
+                Set.of(config),
                 () -> new OpensearchUsableSpace(tempDir, 8L * 1024 * 1024 * 1024));
 
         // 10GB cache requested on 8GB of free space, needs to throw an exception!
@@ -232,9 +247,9 @@ class SearchableSnapshotsConfigurationBeanTest {
 
     @Test
     void testRepoConfigWithoutSearchRole(@TempDir Path tempDir) throws ValidationException, RepositoryException, IOException {
-        final S3RepositoryConfiguration config = s3Configuration(Map.of());
 
         final String snapshotsPath = Files.createDirectory(tempDir.resolve("snapshots")).toAbsolutePath().toString();
+        final FsRepositoryConfiguration fsRepo = fsConfiguration(snapshotsPath);
 
         // only path_repo in general datanode configuration
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
@@ -244,9 +259,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                         "node_search_cache_size", "10gb"
                 ), tempDir),
                 datanodeDirectories(tempDir),
-                config,
-                new GCSRepositoryConfiguration(),
-                new HdfsRepositoryConfiguration(),
+                Set.of(fsRepo),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
@@ -257,6 +270,18 @@ class SearchableSnapshotsConfigurationBeanTest {
         Assertions.assertThat(configurationPart.properties())
                 .containsEntry("path.repo", snapshotsPath)
                 .doesNotContainEntry("node.search.cache.size", "10gb");
+    }
+
+    private AzureRepositoryConfiguration azureConfiguration(Map<String, String> properties) throws ValidationException, RepositoryException {
+        final AzureRepositoryConfiguration configuration = new AzureRepositoryConfiguration();
+        new JadConfig(new InMemoryRepository(properties), configuration).process();
+        return configuration;
+    }
+
+    private FsRepositoryConfiguration fsConfiguration(String snapshotsPath) throws ValidationException, RepositoryException {
+        final FsRepositoryConfiguration configuration = new FsRepositoryConfiguration();
+        new JadConfig(new InMemoryRepository(Map.of("path_repo", snapshotsPath)), configuration).process();
+        return configuration;
     }
 
     private GCSRepositoryConfiguration gcsConfiguration(Map<String, String> properties) throws ValidationException, RepositoryException {

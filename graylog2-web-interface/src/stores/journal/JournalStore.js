@@ -21,7 +21,6 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore } from 'logic/singleton';
 
-// eslint-disable-next-line import/prefer-default-export
 export const JournalStore = singletonStore('core.Journal', () =>
   Reflux.createStore({
     sourceUrl: (nodeId) => `/cluster/${nodeId}/journal`,

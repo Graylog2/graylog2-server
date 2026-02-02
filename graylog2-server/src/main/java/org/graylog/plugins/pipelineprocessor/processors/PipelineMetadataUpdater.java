@@ -178,7 +178,7 @@ public class PipelineMetadataUpdater {
         for (PipelineDao pipelineDao : pipelineDaos) {
             Pipeline pipeline = state.getCurrentPipelines().get(pipelineDao.id());
             if (pipeline != null) {
-                builder.put(pipelineDao.id(), pipeline);
+                builder.put(Objects.requireNonNull(pipelineDao.id()), pipeline);
             }
         }
         return builder.build();
@@ -203,6 +203,7 @@ public class PipelineMetadataUpdater {
     public void handleInputRename(InputRenamedEvent event) {
         Set<RulesChangedEvent.Reference> updated = pipelineMetadataService.getReferencingPipelines().stream()
                 .flatMap(dao -> dao.rules().stream())
+                .filter(Objects::nonNull)
                 .map(ruleId -> new RulesChangedEvent.Reference(ruleId, ruleId))
                 .collect(Collectors.toSet());
         eventBus.post(new RulesChangedEvent(updated, Set.of()));

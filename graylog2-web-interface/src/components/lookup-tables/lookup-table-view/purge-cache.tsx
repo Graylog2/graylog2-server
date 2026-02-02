@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 
 import { Button, Input } from 'components/bootstrap';
 import { Col, Row } from 'components/lookup-tables/layout-componets';
@@ -30,7 +31,7 @@ type Props = {
 };
 
 function PurgeCache({ table }: Props) {
-  const [purgeKey, setPurgeKey] = React.useState<{ value: string; valid: boolean }>(INIT_INPUT);
+  const [purgeKey, setPurgeKey] = useState<{ value: string; valid: boolean }>(INIT_INPUT);
   const { purgeLookupTableKey } = usePurgeLookupTableKey();
   const { purgeAllLookupTableKey } = usePurgeAllLookupTableKey();
 

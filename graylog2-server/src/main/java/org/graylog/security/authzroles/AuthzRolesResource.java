@@ -19,9 +19,10 @@ package org.graylog.security.authzroles;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -53,6 +54,7 @@ import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
@@ -70,11 +72,11 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.security.RestPermissions.USERS_ROLESEDIT;
 
 @RequiresAuthentication
-@Api(value = "Authorization/Roles", description = "Manage roles", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Authorization/Roles", description = "Manage roles")
 @Path("/authz/roles")
 @Produces(MediaType.APPLICATION_JSON)
 public class AuthzRolesResource extends RestResource {
@@ -116,17 +118,18 @@ public class AuthzRolesResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get a paginated list of all roles")
+    @Operation(summary = "Get a paginated list of all roles")
     public PaginatedResponse<AuthzRoleDTO> getList(
-            @ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-            @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-            @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-            @ApiParam(name = "sort",
-                      value = "The field to sort the result on",
+            @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+            @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+            @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+            @Parameter(name = "sort",
+                      description = "The field to sort the result on",
                       required = true,
-                      allowableValues = "name,description")
+                      schema = @Schema(allowableValues = {"id", "name", "description"}))
             @DefaultValue(AuthzRoleDTO.FIELD_NAME) @QueryParam("sort") String sort,
-            @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+            @Parameter(name = "order", description = "The sort direction",
+                      schema = @Schema(allowableValues = {"asc", "desc"}))
             @DefaultValue("asc") @QueryParam("order") SortOrder order) {
 
         SearchQuery searchQuery;
@@ -143,20 +146,21 @@ public class AuthzRolesResource extends RestResource {
     }
 
     @GET
-    @ApiOperation(value = "Get a paginated list of users for a role")
+    @Operation(summary = "Get a paginated list of users for a role")
     @Path("/{roleId}/assignees")
     @Produces(MediaType.APPLICATION_JSON)
     public PaginatedResponse<UserOverviewDTO> getUsersForRole(
-            @ApiParam(name = "roleId") @PathParam("roleId") @NotEmpty String roleId,
-            @ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-            @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-            @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-            @ApiParam(name = "sort",
-                      value = "The field to sort the result on",
+            @Parameter(name = "roleId") @PathParam("roleId") @NotEmpty String roleId,
+            @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+            @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+            @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+            @Parameter(name = "sort",
+                      description = "The field to sort the result on",
                       required = true,
-                      allowableValues = "username,full_name,email")
+                      schema = @Schema(allowableValues = {"id", "name", "description"}))
             @DefaultValue(AuthzRoleDTO.FIELD_NAME) @QueryParam("sort") String sort,
-            @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+            @Parameter(name = "order", description = "The sort direction",
+                      schema = @Schema(allowableValues = {"asc", "desc"}))
             @DefaultValue("asc") @QueryParam("order") SortOrder order) {
 
         SearchQuery searchQuery;
@@ -189,10 +193,10 @@ public class AuthzRolesResource extends RestResource {
     }
 
     @GET
-    @ApiOperation(value = "Get a single role")
+    @Operation(summary = "Get a single role")
     @Path("{roleId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public AuthzRoleDTO get(@ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId) {
+    public AuthzRoleDTO get(@Parameter(name = "roleId") @PathParam("roleId") @NotBlank String roleId) {
         AuthzRoleDTO authzRoleDTO = authzRolesService.get(roleId).orElseThrow(
                 () -> new NotFoundException("Could not find role with id: " + roleId));
         checkPermission(RestPermissions.ROLES_READ, authzRoleDTO.name());
@@ -200,19 +204,20 @@ public class AuthzRolesResource extends RestResource {
     }
 
     @GET
-    @ApiOperation(value = "Get a paginated list roles for a user")
+    @Operation(summary = "Get a paginated list roles for a user")
     @Path("/user/{username}")
     public PaginatedResponse<AuthzRoleDTO> getListForUser(
-            @ApiParam(name = "username") @PathParam("username") @NotEmpty String username,
-            @ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-            @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-            @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-            @ApiParam(name = "sort",
-                      value = "The field to sort the result on",
+            @Parameter(name = "username") @PathParam("username") @NotEmpty String username,
+            @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+            @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+            @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+            @Parameter(name = "sort",
+                      description = "The field to sort the result on",
                       required = true,
-                      allowableValues = "name,description")
+                      schema = @Schema(allowableValues = {"id", "name", "description"}))
             @DefaultValue(AuthzRoleDTO.FIELD_NAME) @QueryParam("sort") String sort,
-            @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+            @Parameter(name = "order", description = "The sort direction",
+                      schema = @Schema(allowableValues = {"asc", "desc"}))
             @DefaultValue("asc") @QueryParam("order") SortOrder order) {
 
         SearchQuery searchQuery;
@@ -233,23 +238,23 @@ public class AuthzRolesResource extends RestResource {
 
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation("Add user to role")
+    @Operation(summary = "Add user to role")
     @Path("{roleId}/assignees")
     @NoAuditEvent("Has custom audit events")
     public void addUser(
-            @ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
-            @ApiParam(name = "usernames") Set<String> usernames,
+            @Parameter(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
+            @Parameter(name = "usernames") Set<String> usernames,
             @Context UserContext userContext) {
         updateUserRole(userContext, AuditEventTypes.ROLE_AUTHZ_UPDATE, roleId, usernames, Set::add);
     }
 
     @DELETE
-    @ApiOperation("Remove user from role")
+    @Operation(summary = "Remove user from role")
     @Path("{roleId}/assignee/{username}")
     @NoAuditEvent("Has custom audit events")
     public void removeUser(
-            @ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
-            @ApiParam(name = "username") @PathParam("username") @NotBlank String username,
+            @Parameter(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
+            @Parameter(name = "username") @PathParam("username") @NotBlank String username,
             @Context UserContext userContext) {
         updateUserRole(userContext, AuditEventTypes.ROLE_AUTHZ_DELETE, roleId, ImmutableSet.of(username), Set::remove);
     }
@@ -294,8 +299,8 @@ public class AuthzRolesResource extends RestResource {
     @Path("{roleId}")
     @AuditEvent(type = AuditEventTypes.ROLE_DELETE)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation("Delete a role")
-    public void delete(@ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId) {
+    @Operation(summary = "Delete a role")
+    public void delete(@Parameter(name = "roleId") @PathParam("roleId") @NotBlank String roleId) {
         checkPermission(RestPermissions.ROLES_EDIT);
         final AuthzRoleDTO roleDTO = authzRolesService.get(roleId).orElseThrow(
                 () -> new NotFoundException("Could not delete role with id: " + roleId));

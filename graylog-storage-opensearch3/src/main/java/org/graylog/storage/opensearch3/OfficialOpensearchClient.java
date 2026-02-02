@@ -24,6 +24,8 @@ import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.MapperParsingException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
+import org.graylog2.indexer.ParentCircuitBreakingException;
+import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch.OpenSearchAsyncClient;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.ErrorCause;
@@ -123,10 +125,14 @@ public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncCli
 
     public static RuntimeException mapException(Throwable t, String message) {
         if (t instanceof OpenSearchException openSearchException) {
-            if (isIndexNotFoundException(openSearchException)) {
+            if (isIndexNotFoundException(openSearchException) || isIndexClosedException(openSearchException)) {
                 return Optional.ofNullable(openSearchException.response().error())
                         .map(ErrorCause::metadata)
-                        .map(metadata -> IndexNotFoundException.create(message + metadata.get("resource.id").toString(), metadata.get("index").toString()))
+                        .map(metadata -> {
+                            JsonData index = metadata.get("index");
+                            JsonData resourceId = metadata.getOrDefault("resource.id", index);
+                            return IndexNotFoundException.create(message + resourceId.toString(), index.toString());
+                        })
                         .orElse(new IndexNotFoundException(t.getMessage()));
             }
             if (isMasterNotDiscoveredException(openSearchException)) {
@@ -144,6 +150,9 @@ public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncCli
             }
             if (isMapperParsingExceptionException(openSearchException)) {
                 return new MapperParsingException(openSearchException.getMessage());
+            }
+            if (isParentCircuitBreakingException(openSearchException)) {
+                return new ParentCircuitBreakingException(openSearchException.getMessage());
             }
         } else if (t instanceof ResponseException responseException) {
             if (responseException.status() == 429) {
@@ -178,6 +187,10 @@ public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncCli
         return openSearchException.getMessage().contains("index_not_found_exception");
     }
 
+    private static boolean isIndexClosedException(OpenSearchException openSearchException) {
+        return openSearchException.getMessage().contains("index_closed_exception");
+    }
+
     private static boolean isMapperParsingExceptionException(OpenSearchException openSearchException) {
         return openSearchException.getMessage().contains("mapper_parsing_exception");
     }
@@ -188,6 +201,19 @@ public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncCli
             if (parsedException.type().equals("search_phase_execution_exception")) {
                 ParsedOpenSearchException parsedCause = ParsedOpenSearchException.from(openSearchException.getCause().getMessage());
                 return parsedCause.reason().contains("Batch size is too large");
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
+    }
+
+    private static boolean isParentCircuitBreakingException(OpenSearchException openSearchException) {
+        try {
+            final ParsedOpenSearchException parsedException = ParsedOpenSearchException.from(openSearchException.getMessage());
+            if (parsedException.type().equals("circuit_breaking_exception")) {
+                ParsedOpenSearchException parsedCause = ParsedOpenSearchException.from(openSearchException.getCause().getMessage());
+                return parsedCause.reason().contains("[parent] Data too large");
             }
         } catch (Exception e) {
             return false;

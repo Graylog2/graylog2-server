@@ -97,7 +97,7 @@ const SettingsSection = ({
               )}
             </IfPermitted>
             <TimezoneFormGroup />
-            <IfPermitted permissions="user:edit">
+            <IfPermitted permissions="users:edit">
               <ServiceAccountFormGroup />
             </IfPermitted>
             <StartpageFormGroup userId={id} permissions={permissions} />

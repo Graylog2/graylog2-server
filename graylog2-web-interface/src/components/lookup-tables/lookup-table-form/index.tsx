@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 import { Formik } from 'formik';
 import type { FormikErrors } from 'formik';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -68,14 +69,14 @@ const validations = (values: LookupTableType) => {
 function LookupTableWizard() {
   const { lutIdOrName } = useParams<{ lutIdOrName: string }>();
   const { lookupTable, loadingLookupTable } = useFetchLookupTable(lutIdOrName);
-  const initialValues = React.useMemo(() => lookupTable || INIT_TABLE_VALUES, [lookupTable]);
+  const initialValues = useMemo(() => lookupTable || INIT_TABLE_VALUES, [lookupTable]);
   const [steps, { activeStep, setActiveStep }] = useSteps();
   const navigate = useNavigate();
   const sendTelemetry = useSendTelemetry();
   const { createLookupTable, creatingLookupTable } = useCreateLookupTable();
   const { updateLookupTable, updatingLookupTable } = useUpdateLookupTable();
 
-  const isCreate = React.useMemo(() => !lookupTable, [lookupTable]);
+  const isCreate = useMemo(() => !lookupTable, [lookupTable]);
 
   const handleStepChange = (newStepKey: string) => {
     setActiveStep(newStepKey);

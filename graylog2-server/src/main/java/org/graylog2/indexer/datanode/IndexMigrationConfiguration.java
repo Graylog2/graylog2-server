@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
+@Deprecated(forRemoval = true)
 public record IndexMigrationConfiguration(
         @JsonProperty(FIELD_INDEX_NAME) String indexName,
         @Nullable @JsonProperty(FIELD_TASK_ID) String nullableTaskID

@@ -38,6 +38,7 @@ import org.graylog.integrations.inputs.paloalto.PaloAltoCodec;
 import org.graylog.integrations.inputs.paloalto.PaloAltoTCPInput;
 import org.graylog.integrations.inputs.paloalto11.PaloAlto11xCodec;
 import org.graylog.integrations.inputs.paloalto11.PaloAlto11xInput;
+import org.graylog.integrations.inputs.paloalto11.PaloAlto11xUdpInput;
 import org.graylog.integrations.inputs.paloalto9.PaloAlto9xCodec;
 import org.graylog.integrations.inputs.paloalto9.PaloAlto9xInput;
 import org.graylog.integrations.ipfix.codecs.IpfixCodec;
@@ -187,6 +188,8 @@ public class IntegrationsModule extends PluginModule {
         // Palo Alto Networks 11x
         LOG.debug("Registering message input: {}", PaloAlto11xInput.NAME);
         addMessageInput(PaloAlto11xInput.class);
+        LOG.debug("Registering message input: {}", PaloAlto11xUdpInput.NAME);
+        addMessageInput(PaloAlto11xUdpInput.class);
         addCodec(PaloAlto11xCodec.NAME, PaloAlto11xCodec.class);
 
         // CloudTrail

@@ -11,7 +11,7 @@ on:
 jobs:
   test:
     name: "Check Changelog presence"
-    runs-on: "ubuntu-latest"
+    runs-on: "ubuntu-slim"
 
     steps:
       - uses: "Graylog2/actions/changelog-check@main"

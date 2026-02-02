@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
@@ -38,7 +39,7 @@ type Props = {
 function LookupTableDetails({ table, canEdit = false }: Props) {
   const navigate = useNavigate();
 
-  const handleEdit = React.useCallback(() => {
+  const handleEdit = useCallback(() => {
     navigate(Routes.SYSTEM.LOOKUPTABLES.edit(table.name));
   }, [table, navigate]);
 

@@ -16,9 +16,9 @@
  */
 package org.graylog.plugins.pipelineprocessor.rulebuilder.rest;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
@@ -51,15 +51,15 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
-@Api(value = "Pipelines/Rulebuilder", description = "Rules for the pipeline message processor generated using the rulebuilder", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Pipelines/Rulebuilder", description = "Rules for the pipeline message processor generated using the rulebuilder")
 @Path("/system/pipelines/rulebuilder")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -85,11 +85,11 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
         this.pipelineRuleService = pipelineRuleService;
     }
 
-    @ApiOperation(value = "Create a processing rule from rule builder", notes = "")
+    @Operation(summary = "Create a processing rule from rule builder", description = "")
     @POST
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_CREATE)
     @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_CREATE)
-    public RuleBuilderDto createFromBuilder(@ApiParam(name = "rule", required = true) @NotNull RuleBuilderDto ruleBuilderDto) {
+    public RuleBuilderDto createFromBuilder(@Parameter(name = "rule", required = true) @NotNull RuleBuilderDto ruleBuilderDto) {
         try {
             validatorService.validateAndFailFast(ruleBuilderDto);
         } catch (IllegalArgumentException exception) {
@@ -103,13 +103,13 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
                 .build();
     }
 
-    @ApiOperation(value = "Update a processing rule from rule builder", notes = "")
+    @Operation(summary = "Update a processing rule from rule builder", description = "")
     @Path("/{id}")
     @PUT
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_CREATE)
     @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_CREATE)
-    public RuleBuilderDto updateFromBuilder(@ApiParam(name = "id") @PathParam("id") String id,
-                                            @ApiParam(name = "rule", required = true) @NotNull RuleBuilderDto ruleBuilderDto) throws NotFoundException {
+    public RuleBuilderDto updateFromBuilder(@Parameter(name = "id") @PathParam("id") String id,
+                                            @Parameter(name = "rule", required = true) @NotNull RuleBuilderDto ruleBuilderDto) throws NotFoundException {
         RuleSource ruleSource = toRuleSource(ruleBuilderDto, false);
         final RuleSource stored = ruleResource.update(id, ruleSource);
         return ruleBuilderDto.toBuilder()
@@ -117,7 +117,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
                 .build();
     }
 
-    @ApiOperation("Get action descriptors for rule builder")
+    @Operation(summary = "Get action descriptors for rule builder")
     @Path("/actions")
     @GET
     public Collection<Object> actions() {
@@ -128,7 +128,7 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("Get condition descriptors for ruleBuilder")
+    @Operation(summary = "Get condition descriptors for ruleBuilder")
     @Path("/conditions")
     @GET
     public Collection<Object> conditions() {
@@ -139,22 +139,22 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("Validate rule builder")
+    @Operation(summary = "Validate rule builder")
     @Path("/validate")
     @POST
     @NoAuditEvent("Used to validate rule builder")
-    public RuleBuilderDto validate(@ApiParam(name = "rule", required = true) @NotNull RuleBuilderDto ruleBuilderDto) {
+    public RuleBuilderDto validate(@Parameter(name = "rule", required = true) @NotNull RuleBuilderDto ruleBuilderDto) {
         final RuleBuilderDto validated = validatorService.validate(ruleBuilderDto);
         return validated.toBuilder()
                 .ruleBuilder(ruleBuilderParser.generateTitles(validated.ruleBuilder()))
                 .build();
     }
 
-    @ApiOperation("Simulate a single processing rule created by the rule builder")
+    @Operation(summary = "Simulate a single processing rule created by the rule builder")
     @Path("/simulate")
     @POST
     @NoAuditEvent("Only used to simulate a rule builder")
-    public RuleBuilderSimulatorResponse simulate(@ApiParam(name = "rule", required = true) @NotNull SimulateRuleBuilderRequest simulateRuleBuilderRequest) {
+    public RuleBuilderSimulatorResponse simulate(@Parameter(name = "rule", required = true) @NotNull SimulateRuleBuilderRequest simulateRuleBuilderRequest) {
         Message message = ruleSimulator.createMessage(simulateRuleBuilderRequest.message());
 
         RuleSource ruleSourceConditions = RuleSource.builder()

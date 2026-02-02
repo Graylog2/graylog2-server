@@ -53,8 +53,6 @@ type Props<F extends (...args: Array<any>) => any> = {
   notFoundRedirect?: boolean;
 };
 
-type PromiseResult<P extends Promise<any>> = P extends Promise<infer R> ? R : never;
-
 const notifyingAction =
   <F extends (...args: Array<any>) => Promise<any>>({
     action,
@@ -64,7 +62,7 @@ const notifyingAction =
   }: Props<F>) =>
   (...args: Parameters<typeof action>) =>
     action(...args)
-      .then((result: PromiseResult<ReturnType<F>>) => {
+      .then((result: Awaited<ReturnType<F>>) => {
         if (successNotification) _displaySuccessNotification(successNotification, ...args);
 
         return result;

@@ -19,14 +19,14 @@ import React from 'react';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 
-import type { GraylogNode } from '../useClusterGraylogNodes';
+import type { ClusterGraylogNode } from '../fetchClusterGraylogNodes';
 import { NodePrimary, SecondaryText, StyledLabel } from '../../shared-components/NodeMetricsLayout';
 
 type Props = {
-  node: GraylogNode;
+  node: ClusterGraylogNode;
 };
 
-const getNodeDisplayName = (node: GraylogNode) => {
+const getNodeDisplayName = (node: ClusterGraylogNode) => {
   const nodeNameParts = [node.short_node_id, node.hostname].filter(Boolean);
 
   if (nodeNameParts.length) {

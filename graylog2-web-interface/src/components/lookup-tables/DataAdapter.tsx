@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Routes from 'routing/Routes';
@@ -34,8 +35,8 @@ type Props = {
 };
 
 const DataAdapter = ({ dataAdapter, noEdit = false }: Props) => {
-  const [lookupKey, setLookupKey] = React.useState('');
-  const [lookupResult, setLookupResult] = React.useState(null);
+  const [lookupKey, setLookupKey] = useState('');
+  const [lookupResult, setLookupResult] = useState(null);
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(dataAdapter);
   const navigate = useNavigate();
 

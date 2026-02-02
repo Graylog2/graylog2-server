@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import Immutable from 'immutable';
@@ -55,7 +55,7 @@ jest.mock('views/stores/StreamsStore', () => ({
 }));
 
 const Consumer = () => {
-  const contextValue = React.useContext(MessageFavoriteFieldsContext);
+  const contextValue = useContext(MessageFavoriteFieldsContext);
 
   return (
     <div>

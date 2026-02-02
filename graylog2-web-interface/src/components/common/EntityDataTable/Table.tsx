@@ -37,6 +37,7 @@ const StyledTable = styled(BaseTable)(
   ({ theme }) => css`
     table-layout: fixed;
     margin-bottom: 0;
+    height: 100%; // required to be able to use height: 100% in td
 
     thead > tr > th,
     tbody > tr > td {
@@ -65,7 +66,7 @@ const Td = styled.td<{
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, none);
     transition: var(${columnTransition()}, none);
-    height: 0; // required to be able to use height: 100% in child elements
+    height: 100%; // required to be able to use height: 100% in child elements
     ${$pinningPosition
       ? css`
           position: sticky;

@@ -524,7 +524,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>buildnumber-maven-plugin</artifactId>
-                    <version>3.2.1</version>
+                    <version>3.3.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -634,6 +634,23 @@
                             </sha512>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>download-repository-azure-plugin</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>
+                                https://artifacts.opensearch.org/releases/plugins/repository-azure/${opensearch.version}/repository-azure-${opensearch.version}.zip
+                            </url>
+                            <outputFileName>repository-azure-${opensearch.version}.zip</outputFileName>
+                            <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
+                            <sha512>
+                                4f34367bb0949112f0bc73e3cbe84559fe4125f1ba356a219eab37ffe6e3bc634b8176bb2eadc2b3f23c334d68e39269c2be8d9bb442422cda35a7cd8c5c644e
+                            </sha512>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
@@ -735,6 +752,7 @@
                                 <argument>${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.version}.zip</argument>
                                 <argument>${project.build.directory}/opensearch-plugins/repository-gcs-${opensearch.version}.zip</argument>
                                 <argument>${project.build.directory}/opensearch-plugins/repository-hdfs-${opensearch.version}.zip</argument>
+                                <argument>${project.build.directory}/opensearch-plugins/repository-azure-${opensearch.version}.zip</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -751,6 +769,7 @@
                                 <argument>${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.version}.zip</argument>
                                 <argument>${project.build.directory}/opensearch-plugins/repository-gcs-${opensearch.version}.zip</argument>
                                 <argument>${project.build.directory}/opensearch-plugins/repository-hdfs-${opensearch.version}.zip</argument>
+                                <argument>${project.build.directory}/opensearch-plugins/repository-azure-${opensearch.version}.zip</argument>
                             </arguments>
                         </configuration>
                     </execution>

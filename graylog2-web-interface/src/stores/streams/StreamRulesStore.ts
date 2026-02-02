@@ -35,7 +35,6 @@ type Callback = {
   (): void;
 };
 
-// eslint-disable-next-line import/prefer-default-export
 export const StreamRulesStore = singletonStore('core.StreamRules', () =>
   Reflux.createStore({
     callbacks: [],
