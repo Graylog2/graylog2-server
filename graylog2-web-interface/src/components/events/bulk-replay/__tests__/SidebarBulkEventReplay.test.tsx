@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/* eslint-disable jest/expect-expect */
 
 import * as React from 'react';
 import { render, screen, waitFor, within } from 'wrappedTestingLibrary';

@@ -29,7 +29,6 @@ jest.mock('views/hooks/useCreateSearch', () => async (search) => search);
 describe('EventDefinitionReplaySearch', () => {
   useViewsPlugin();
 
-  // eslint-disable-next-line jest/expect-expect
   it('can replay event definitions', async () => {
     render(
       <div>
