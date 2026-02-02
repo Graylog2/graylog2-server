@@ -44,6 +44,7 @@ import useColumnRenderers from 'components/common/EntityDataTable/hooks/useColum
 import useAuthorizedColumnSchemas from 'components/common/EntityDataTable/hooks/useAuthorizedColumnSchemas';
 import useIntersectionObserver from 'hooks/useIntersectionObserver';
 import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
+import ActiveSliceColContext from 'components/common/EntityDataTable/contexts/ActiveSliceColContext';
 
 import type { ColumnRenderers, ColumnSchema, EntityBase, ColumnPreferences, ExpandedSectionRenderers } from './types';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
@@ -110,6 +111,8 @@ const LayoutConfigRow = styled.div`
 type Props<Entity extends EntityBase, Meta = unknown> = {
   /** Currently active sort */
   activeSort?: Sort;
+  /** Currently active slicing column */
+  activeSliceCol?: string;
   /**
    * The column ids are always snake case. By default, entity attributes are camel case.
    * This prop controls if the column ids need to be transformed to camel case to connect them with the entity attributes.
@@ -147,6 +150,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
     attributes?: ColumnPreferences;
     order?: Array<string>;
   }) => Promise<void>;
+  onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
   /** Function to handle sort changes */
   onSortChange: (newSort: Sort) => void;
   /** Function to handle page size changes */
@@ -157,6 +161,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   pageSize?: number;
   /** Required when parent container does not use contentBackground for the background */
   parentBgColor?: string;
+  appSection?: string;
   /** Actions for each row. */
   entityActions?: (entity: Entity) => React.ReactNode;
   /** Meta data. */
@@ -168,6 +173,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
  */
 const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   activeSort = undefined,
+  activeSliceCol = undefined,
   bulkSelection: { actions, onChangeSelection, initialSelection, isEntitySelectable } = {},
   columnRenderers: customColumnRenderers = undefined,
   columnSchemas,
@@ -179,12 +185,14 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   expandedSectionRenderers = undefined,
   layoutPreferences,
   meta = undefined,
+  onChangeSlicing,
   onLayoutPreferencesChange,
   onPageSizeChange = undefined,
   onResetLayoutPreferences,
   onSortChange,
   pageSize = undefined,
   parentBgColor = undefined,
+  appSection = undefined,
 }: Props<Entity, Meta>) => {
   const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection ?? []);
   const hasRowActions = typeof entityActions === 'function';
@@ -244,8 +252,10 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     hasRowActions,
     meta,
     onActionsWidthChange: handleActionsWidthChange,
+    onChangeSlicing,
     onHeaderSectionResize: handleHeaderSectionResize,
     parentBgColor,
+    appSection,
   });
 
   const table = useTable<Entity>({
@@ -286,43 +296,45 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
         selectedEntities={selectedEntities}
         isSomeRowsSelected={table.getIsSomeRowsSelected()}
         isAllRowsSelected={table.getIsAllRowsSelected()}>
-        <ExpandedSectionsProvider>
-          <ActionsRow>
-            <div>{displayBulkAction && <BulkActionsRow bulkActions={actions} />}</div>
-            <LayoutConfigRow>
-              Show
-              <ButtonGroup>
-                {displayPageSizeSelect && (
-                  <PageSizeSelect pageSize={pageSize} showLabel={false} onChange={onPageSizeChange} />
+        <ActiveSliceColContext.Provider value={activeSliceCol}>
+          <ExpandedSectionsProvider>
+            <ActionsRow>
+              <div>{displayBulkAction && <BulkActionsRow bulkActions={actions} />}</div>
+              <LayoutConfigRow>
+                Show
+                <ButtonGroup>
+                  {displayPageSizeSelect && (
+                    <PageSizeSelect pageSize={pageSize} showLabel={false} onChange={onPageSizeChange} />
+                  )}
+                  <ColumnsVisibilitySelect<Entity> table={table} onResetLayoutPreferences={resetLayoutPreferences} />
+                </ButtonGroup>
+              </LayoutConfigRow>
+            </ActionsRow>
+            <TableDndProvider table={table}>
+              <DndStylesContext.Consumer>
+                {({ activeColId, columnTransform }) => (
+                  <ScrollContainer
+                    id="scroll-container"
+                    ref={scrollContainerRef}
+                    $actionsHeaderWidth={actionsColMinWidth}
+                    $activeColId={activeColId}
+                    $columnTransform={columnTransform}
+                    $columnWidths={columnWidths}
+                    $canScrollRight={scrolledToRight && tableIsCompressed}>
+                    <InnerContainer>
+                      <Table<Entity>
+                        expandedSectionRenderers={expandedSectionRenderers}
+                        headerGroups={headerGroups}
+                        rows={table.getRowModel().rows}
+                      />
+                      <ScrollRightIndicator ref={scrolledToRightIndicator} />
+                    </InnerContainer>
+                  </ScrollContainer>
                 )}
-                <ColumnsVisibilitySelect<Entity> table={table} onResetLayoutPreferences={resetLayoutPreferences} />
-              </ButtonGroup>
-            </LayoutConfigRow>
-          </ActionsRow>
-          <TableDndProvider table={table}>
-            <DndStylesContext.Consumer>
-              {({ activeColId, columnTransform }) => (
-                <ScrollContainer
-                  id="scroll-container"
-                  ref={scrollContainerRef}
-                  $actionsHeaderWidth={actionsColMinWidth}
-                  $activeColId={activeColId}
-                  $columnTransform={columnTransform}
-                  $columnWidths={columnWidths}
-                  $canScrollRight={scrolledToRight && tableIsCompressed}>
-                  <InnerContainer>
-                    <Table<Entity>
-                      expandedSectionRenderers={expandedSectionRenderers}
-                      headerGroups={headerGroups}
-                      rows={table.getRowModel().rows}
-                    />
-                    <ScrollRightIndicator ref={scrolledToRightIndicator} />
-                  </InnerContainer>
-                </ScrollContainer>
-              )}
-            </DndStylesContext.Consumer>
-          </TableDndProvider>
-        </ExpandedSectionsProvider>
+              </DndStylesContext.Consumer>
+            </TableDndProvider>
+          </ExpandedSectionsProvider>
+        </ActiveSliceColContext.Provider>
       </SelectedEntitiesProvider>
     </MetaDataProvider>
   );

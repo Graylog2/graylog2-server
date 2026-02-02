@@ -187,6 +187,7 @@ public class InputStatesResource extends AbstractInputsResource {
                 messageInput.getId(),
                 inputState.getState().toString(),
                 inputState.getStartedAt(),
+                inputState.getLastFailedAt(),
                 inputState.getDetailedMessage(),
                 InputSummary.create(
                         messageInput.getTitle(),

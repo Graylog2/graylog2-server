@@ -14,18 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2.testing;
+import React from 'react';
 
-import org.graylog.testing.completebackend.SearchServerBuilder;
-import org.graylog.testing.completebackend.SearchServerInterfaceProvider;
-import org.graylog2.storage.SearchVersion;
+import type { Event, EventsAdditionalData } from 'components/events/events/types';
+import CustomColumnRenderers from 'components/events/events/ColumnRenderers';
 
-public class DatanodeInstanceProvider implements SearchServerInterfaceProvider {
-    @Override
-    public SearchServerBuilder<?> getBuilderFor(final SearchVersion version) {
-        if (version.isDataNode()) {
-            return new DatanodeInstanceBuilder(version);
-        }
-        return null;
-    }
-}
+type Props<M = EventsAdditionalData> = { event: Event; meta: M; eventDefinitionEventProcedureId: string };
+
+const RemediationSteps = ({ event, meta, eventDefinitionEventProcedureId }: Props) => (
+  <>
+    <h2>Event Procedure Summary</h2>
+    {CustomColumnRenderers.attributes.remediation_steps.renderCell(
+      undefined,
+      event,
+      meta,
+      eventDefinitionEventProcedureId,
+    )}
+  </>
+);
+
+export default RemediationSteps;
