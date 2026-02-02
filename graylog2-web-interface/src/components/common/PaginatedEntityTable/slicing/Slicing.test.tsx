@@ -18,7 +18,7 @@ import * as React from 'react';
 import { screen, render } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import Slicing from './Slicing';
+import Slicing from './index';
 
 jest.mock('logic/telemetry/useSendTelemetry', () => () => jest.fn());
 
