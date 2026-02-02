@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useContext, useMemo } from 'react';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import { DEFAULT_PERSPECTIVE } from 'components/perspectives/contexts/PerspectivesProvider';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -149,6 +150,14 @@ const useHelpMenuItems = () => {
         };
       }
 
+      if ('path' in item) {
+        return {
+          type: PAGE_TYPE,
+          title: item.description,
+          link: prefixUrl(item.path),
+        };
+      }
+
       throw Error('Help menu item must have either external link or action defined');
     });
 };
@@ -165,7 +174,7 @@ const isFeatureEnabled = (featureFlag?: string) => {
 type BaseNavigationItem = {
   description: string;
   path: QualifiedUrl<string>;
-  permissions?: string | Array<string>;
+  permissions?: Permission | Array<Permission>;
   perspective?: string;
 };
 

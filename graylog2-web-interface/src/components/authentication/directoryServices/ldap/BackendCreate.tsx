@@ -73,6 +73,7 @@ export const HELP = {
       interface
     </span>
   ),
+  defaultUserTimezone: <span>Choose the default time zone for new users.</span>,
   emailAttributes: (
     <span>
       Which LDAP attribute to use for the user&apos;s email address, e.g. <code>mail</code>.<br />

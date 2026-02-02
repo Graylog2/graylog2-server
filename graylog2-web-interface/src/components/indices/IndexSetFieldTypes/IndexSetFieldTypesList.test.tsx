@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, within } from 'wrappedTestingLibrary';
+import { render, screen, within } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { useQueryParam } from 'routing/QueryParams';
 import { MockStore } from 'helpers/mocking';
@@ -273,7 +274,7 @@ describe('IndexSetFieldTypesList', () => {
       renderIndexSetFieldTypesList();
       const tableRow = await screen.findByTestId('table-row-field-1');
       const resetButton = await within(tableRow).findByRole('button', { name: /reset/i });
-      fireEvent.click(resetButton);
+      await userEvent.click(resetButton);
 
       await screen.findByRole('heading', { name: /Remove field type overrides/i });
       await screen.findByText('Rotate affected indices after change');
@@ -302,7 +303,7 @@ describe('IndexSetFieldTypesList', () => {
       renderIndexSetFieldTypesList();
       const tableRow = await screen.findByTestId('table-row-field-2');
       const resetButton = await within(tableRow).findByRole('button', { name: /reset/i });
-      fireEvent.click(resetButton);
+      await userEvent.click(resetButton);
       await screen.findByRole('heading', { name: /Remove field type overrides/i });
       await screen.findByText('Rotate affected indices after change');
 
@@ -325,7 +326,7 @@ describe('IndexSetFieldTypesList', () => {
       renderIndexSetFieldTypesList();
       const tableRow = await screen.findByTestId('table-row-field');
       const originBadge = await within(tableRow).findByText(/index/i);
-      fireEvent.click(originBadge);
+      await userEvent.click(originBadge);
 
       expect(tableRow).toHaveTextContent(
         'Field type Boolean comes from the search engine index mapping. It could have been created dynamically, set by the system or come from historical profiles and/or custom mappings.',
@@ -349,7 +350,7 @@ describe('IndexSetFieldTypesList', () => {
       renderIndexSetFieldTypesList();
       const tableRow = await screen.findByTestId('table-row-field-3');
       const originBadge = await within(tableRow).findByText(/profile/i);
-      fireEvent.click(originBadge);
+      await userEvent.click(originBadge);
 
       expect(tableRow).toHaveTextContent(
         'Field type String type comes from profile Profile-1. It overrides possible mappings from the search engine index mapping, either immediately (if index was rotated) or during the next rotation',
@@ -366,7 +367,7 @@ describe('IndexSetFieldTypesList', () => {
       renderIndexSetFieldTypesList();
       const tableRow = await screen.findByTestId('table-row-field-1');
       const originBadge = await within(tableRow).findByText(/overridden index/i);
-      fireEvent.click(originBadge);
+      await userEvent.click(originBadge);
 
       expect(tableRow).toHaveTextContent(
         'Field type Boolean comes from the individual, custom field type mapping. It overrides possible mappings from the search engine index mapping, either immediately (if index was rotated) or during the next rotation.',
@@ -390,7 +391,7 @@ describe('IndexSetFieldTypesList', () => {
       renderIndexSetFieldTypesList();
       const tableRow = await screen.findByTestId('table-row-field-2');
       const originBadge = await within(tableRow).findByText(/overridden profile/i);
-      fireEvent.click(originBadge);
+      await userEvent.click(originBadge);
 
       expect(tableRow).toHaveTextContent(
         'Field type Boolean comes from the individual, custom field type mapping. It overrides not only possible mappings from the search engine index mapping, but also mapping field-2: Boolean present in profile Profile-1',
@@ -455,7 +456,7 @@ describe('IndexSetFieldTypesList', () => {
 
       renderIndexSetFieldTypesList();
       const button = await screen.findByTitle('Set field type profile');
-      fireEvent.click(button);
+      await userEvent.click(button);
       const modal = await screen.findByRole('dialog', { name: /Set Profile/i });
       await within(modal).findByRole('button', { name: /Set Profile/i });
     });

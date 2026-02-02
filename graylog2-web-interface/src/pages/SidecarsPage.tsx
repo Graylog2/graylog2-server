@@ -28,9 +28,11 @@ import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavig
 import useBasicSidecarUser from 'components/sidecars/hooks/useBasicSidecarUser';
 
 const SidecarsPage = () => {
-  const { data: sidecarUser } = useBasicSidecarUser();
   const currentUser = useCurrentUser();
   const canCreateSidecarUserTokens = isPermitted(currentUser?.permissions, ['users:tokencreate:graylog-sidecar']);
+  const canReadSidecarUser = isPermitted(currentUser?.permissions, ['users:read:graylog-sidecar']);
+  const shouldFetchSidecarUser = canCreateSidecarUserTokens && canReadSidecarUser;
+  const { data: sidecarUser } = useBasicSidecarUser({ enabled: shouldFetchSidecarUser });
 
   return (
     <DocumentTitle title="Sidecars">

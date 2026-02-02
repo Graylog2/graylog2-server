@@ -27,7 +27,7 @@ import org.apache.shiro.subject.Subject;
 import org.bson.types.ObjectId;
 import org.graylog.security.UserContext;
 import org.graylog.security.authservice.GlobalAuthServiceConfig;
-import org.graylog2.Configuration;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.Tools;
@@ -130,18 +130,24 @@ public class UsersResourceTest {
     private GlobalAuthServiceConfig globalAuthServiceConfig;
     @Mock
     private ClusterConfigService clusterConfigService;
+    @Mock
+    private UserContext userContext;
+    @Mock
+    private User user;
 
     UserImplFactory userImplFactory;
 
     @BeforeEach
-    public void setUp() {
-        userImplFactory = new UserImplFactory(new Configuration(),
-                new Permissions(ImmutableSet.of(new RestPermissions())), clusterConfigService);
+    void setUp() {
+        userImplFactory = new UserImplFactory(new Permissions(ImmutableSet.of(new RestPermissions())), clusterConfigService);
         usersResource = new TestUsersResource(userManagementService, paginatedUserService, accessTokenService,
                 roleService, sessionService, new HttpConfiguration(), subject,
                 sessionTerminationService, securityManager, globalAuthServiceConfig, clusterConfigService, userService);
         lenient().when(clusterConfigService.getOrDefault(PasswordComplexityConfig.class, PasswordComplexityConfig.DEFAULT)).thenReturn(PasswordComplexityConfig.DEFAULT);
         lenient().when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
+        lenient().when(userContext.getUser()).thenReturn(user);
+        lenient().when(user.getName()).thenReturn("username");
+        lenient().when(user.getId()).thenReturn("userId");
     }
 
     /**
@@ -149,7 +155,7 @@ public class UsersResourceTest {
      * This tests the integration between the UsersResource and UserManagementServiceImpl.
      */
     @Test
-    public void createSuccess() throws ValidationException, NotFoundException {
+    void createSuccess() throws ValidationException, NotFoundException {
         Role role = mock(Role.class);
         when(role.getId()).thenReturn(new ObjectId().toHexString());
         when(role.getName()).thenReturn(TestUsersResource.ALLOWED_ROLE);
@@ -162,13 +168,13 @@ public class UsersResourceTest {
         when(userService.loadById("creator")).thenReturn(creator);
         when(subject.getPrincipal()).thenReturn(creator.getName());
 
-        final Response response = usersResource.create(buildCreateUserRequest(List.of(TestUsersResource.ALLOWED_ROLE), PASSWORD));
+        final Response response = usersResource.create(buildCreateUserRequest(List.of(TestUsersResource.ALLOWED_ROLE), PASSWORD), userContext);
         Assertions.assertEquals(201, response.getStatus());
         verify(userManagementService).create(isA(UserImpl.class), eq(creator));
     }
 
     @Test
-    public void failOnUnallowedRoleAssignment() throws NotFoundException {
+    void failOnUnallowedRoleAssignment() throws NotFoundException {
         Role readerRole = mock(Role.class);
         when(readerRole.getId()).thenReturn(new ObjectId().toHexString());
         when(readerRole.getName()).thenReturn(TestUsersResource.ALLOWED_ROLE);
@@ -182,12 +188,12 @@ public class UsersResourceTest {
         when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
 
-        ForbiddenException exception = assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(TestUsersResource.ALLOWED_ROLE, forbiddenRole), PASSWORD)));
+        ForbiddenException exception = assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(TestUsersResource.ALLOWED_ROLE, forbiddenRole), PASSWORD), userContext));
         assertThat(exception.getMessage()).contains("Not authorized to access resource id <admin>");
     }
 
     @Test
-    public void failOnUnallowedRoleUnAssignment() throws NotFoundException {
+    void failOnUnallowedRoleUnAssignment() throws NotFoundException {
         Role readerRole = mock(Role.class);
         ObjectId readerRoleId = new ObjectId();
         when(readerRole.getId()).thenReturn(readerRoleId.toHexString());
@@ -204,44 +210,44 @@ public class UsersResourceTest {
         when(userManagementService.create()).thenReturn(userImplFactory.create(Map.of(UserImpl.ROLES, List.of(readerRoleId, adminRoleId))));
 
         final var creator = userImplFactory.create(Map.of(UserImpl.USERNAME, "creator"));
-        when(userService.loadById("creator")).thenReturn(creator);
+        lenient().when(userService.loadById("creator")).thenReturn(creator);
         when(subject.getPrincipal()).thenReturn(creator.getName());
 
-        ForbiddenException exception = assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(), PASSWORD)));
+        ForbiddenException exception = assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(), PASSWORD), userContext));
         assertThat(exception.getMessage()).contains("Not authorized to access resource id <ADMIN>");
     }
 
     @Test
-    public void createFailureOnWrongRoleAssignPermission() {
+    void createFailureOnWrongRoleAssignPermission() {
         String testRole = "forbiddenRole";
         when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
-        assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(List.of(testRole), PASSWORD)));
+        assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(List.of(testRole), PASSWORD), userContext));
     }
 
     @Test
-    public void createFailurePasswordLength() {
-        assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(Collections.emptyList(), "pW1&")));
+    void createFailurePasswordLength() {
+        assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(Collections.emptyList(), "pW1&"), userContext));
     }
 
     @Test
-    public void createFailurePasswordCasing() {
+    void createFailurePasswordCasing() {
         when(clusterConfigService.getOrDefault(PasswordComplexityConfig.class, PasswordComplexityConfig.DEFAULT)).thenReturn(new PasswordComplexityConfig(
                 6, true, false, false, false
         ));
-        assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(Collections.emptyList(), "lowercase1&")));
+        assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(Collections.emptyList(), "lowercase1&"), userContext));
     }
 
     @Test
-    public void createFailurePasswordSpecialChars() {
+    void createFailurePasswordSpecialChars() {
         when(clusterConfigService.getOrDefault(PasswordComplexityConfig.class, PasswordComplexityConfig.DEFAULT)).thenReturn(new PasswordComplexityConfig(
                 6, false, false, false, true
         ));
-        assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(Collections.emptyList(), "passWORD123")));
+        assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(Collections.emptyList(), "passWORD123"), userContext));
     }
 
     @Test
-    public void savePreferencesSuccess() throws ValidationException {
+    void savePreferencesSuccess() throws ValidationException {
         when(subject.isPermitted(anyString())).thenReturn(true);
         when(userManagementService.load(USERNAME)).thenReturn(userImplFactory.create(new HashMap<>()));
         usersResource.savePreferences(USERNAME, UpdateUserPreferences.create(new HashMap<>()));
@@ -249,7 +255,7 @@ public class UsersResourceTest {
     }
 
     @Test
-    public void createTokenSucceeds() {
+    void createTokenSucceeds() {
         final Map<String, Object> userProps = Map.of(UserImpl.USERNAME, USERNAME);
         final Token expected = createTokenAndPrepareMocks(userProps, true);
 
@@ -264,7 +270,7 @@ public class UsersResourceTest {
     }
 
     @Test
-    public void createTokenForInternalUserWithoutTTLSucceedsAndLoadsConfig() {
+    void createTokenForInternalUserWithoutTTLSucceedsAndLoadsConfig() {
         final Map<String, Object> userProps = Map.of(UserImpl.USERNAME, USERNAME);
         final Token expected = createTokenAndPrepareMocks(userProps, true);
 
@@ -280,7 +286,7 @@ public class UsersResourceTest {
     }
 
     @Test
-    public void createTokenFailsIfCreateNotAllowed() {
+    void createTokenFailsIfCreateNotAllowed() {
         final Map<String, Object> userProps = Map.of(UserImpl.USERNAME, USERNAME);
         createTokenAndPrepareMocks(userProps, false);
 
@@ -294,7 +300,7 @@ public class UsersResourceTest {
     }
 
     @Test
-    public void createTokenSucceedsEvenWithNULLBody() {
+    void createTokenSucceedsEvenWithNULLBody() {
         final Map<String, Object> userProps = Map.of(UserImpl.USERNAME, USERNAME, UserImpl.EXTERNAL_USER, "FALSE");
         final Token expected = createTokenAndPrepareMocks(userProps, true);
 
@@ -310,7 +316,7 @@ public class UsersResourceTest {
     }
 
     @Test
-    public void adminCanCreateTokensForOtherUsers() {
+    void adminCanCreateTokensForOtherUsers() {
         final String adminUserName = "admin";
         final Map<String, Object> owningUser = Map.of(UserImpl.USERNAME, USERNAME);
         final Map<String, Object> callingUser = Map.of(UserImpl.USERNAME, adminUserName);
@@ -328,7 +334,7 @@ public class UsersResourceTest {
     }
 
     @Test
-    public void regularUserCannotCreateTokensForOtherUsers() {
+    void regularUserCannotCreateTokensForOtherUsers() {
         final String otherUserName = "Dee-Dee";
         final Map<String, Object> owningUser = Map.of(UserImpl.USERNAME, USERNAME);
         final Map<String, Object> callingUser = Map.of(UserImpl.USERNAME, otherUserName);
@@ -343,7 +349,7 @@ public class UsersResourceTest {
     }
 
     @Test
-    public void getByIdUserWithAdditionalUserIdPermissions() {
+    void getByIdUserWithAdditionalUserIdPermissions() {
         String alice = "alice";
         String bob = "bob";
         String unknown = "unknown";
@@ -431,7 +437,7 @@ public class UsersResourceTest {
         when(userManagementService.loadById(USERNAME)).thenReturn(user);
         when(subject.isPermitted(USERS_TOKENCREATE + ":" + USERNAME)).thenReturn(allow);
         if (allow) {
-            when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
+            lenient().when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
         }
         if (accessToken != null) {
             when(accessTokenService.create(USERNAME, UsersResourceTest.TOKEN_NAME, PeriodDuration.of(Duration.ofDays(30)))).thenReturn(accessToken);
@@ -454,7 +460,7 @@ public class UsersResourceTest {
                                  DefaultSecurityManager securityManager, GlobalAuthServiceConfig globalAuthServiceConfig,
                                  ClusterConfigService clusterConfigService, UserService userService) {
             super(userManagementService, paginatedUserService, accessTokenService, roleService, sessionService,
-                    sessionTerminationService, securityManager, globalAuthServiceConfig, clusterConfigService);
+                    sessionTerminationService, securityManager, globalAuthServiceConfig, clusterConfigService, mock(AuditEventSender.class));
             this.subject = subject;
             super.configuration = configuration;
             super.userService = userService;
@@ -480,7 +486,7 @@ public class UsersResourceTest {
         private final ClusterConfigService configService;
         private final ObjectMapper objectMapper;
 
-        public UserImplFactory(Configuration configuration, Permissions permissions, ClusterConfigService configService) {
+        public UserImplFactory(Permissions permissions, ClusterConfigService configService) {
             this.permissions = permissions;
             this.configService = configService;
             this.passwordAlgorithmFactory = new PasswordAlgorithmFactory(Collections.emptyMap(),

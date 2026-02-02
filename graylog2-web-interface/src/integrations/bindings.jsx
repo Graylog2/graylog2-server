@@ -23,6 +23,7 @@ import EmbeddedCloudWatchApp from './aws/cloudwatch/EmbeddedCloudWatchApp';
 import CloudTrailInputConfiguration from './aws/cloudtrail/CloudTrailInputConfiguration';
 import EmbeddedCloudTrailApp from './aws/cloudtrail/EmbeddedCloudTrailApp';
 import AWSCloudTrailApp from './aws/cloudtrail/CloudTrailApp';
+import { defaultConfig as PagerDutyDefaultConfig } from './pager-duty/PagerDutyConfig';
 import PagerDutyNotificationDetails from './pager-duty/PagerDutyNotificationDetails';
 import PagerDutyNotificationForm from './pager-duty/PagerDutyNotificationForm';
 import PagerDutyNotificationSummary from './pager-duty/PagerDutyNotificationSummary';
@@ -63,7 +64,7 @@ const bindings = {
       formComponent: PagerDutyNotificationForm,
       summaryComponent: PagerDutyNotificationSummary,
       detailsComponent: PagerDutyNotificationDetails,
-      defaultConfig: PagerDutyNotificationForm.defaultConfig,
+      defaultConfig: PagerDutyDefaultConfig,
     },
     {
       type: 'slack-notification-v1',

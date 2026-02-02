@@ -15,21 +15,29 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { Row, HeaderGroup } from '@tanstack/react-table';
+import type { Row, HeaderGroup, ColumnPinningPosition } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
 import styled, { css } from 'styled-components';
 
 import { Table as BaseTable } from 'components/bootstrap';
 import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
 import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
-import type { EntityBase, ExpandedSectionRenderers } from 'components/common/EntityDataTable/types';
-import { columnOpacityVar, columnTransformVar, columnTransition } from 'components/common/EntityDataTable/CSSVariables';
+import type { EntityBase, ExpandedSectionRenderers, ColumnMetaContext } from 'components/common/EntityDataTable/types';
+import {
+  columnOpacityVar,
+  columnTransformVar,
+  columnTransition,
+  displayScrollRightIndicatorVar,
+} from 'components/common/EntityDataTable/CSSVariables';
+import ScrollShadow from 'theme/box-shadows/ScrollShadow';
 
 import TableHead from './TableHead';
 
 const StyledTable = styled(BaseTable)(
   ({ theme }) => css`
     table-layout: fixed;
+    margin-bottom: 0;
+    height: 100%; // required to be able to use height: 100% in td
 
     thead > tr > th,
     tbody > tr > td {
@@ -48,32 +56,62 @@ const StyledTable = styled(BaseTable)(
   `,
 );
 
-const Td = styled.td<{ $colId: string }>(
-  ({ $colId }) => css`
+const Td = styled.td<{
+  $colId: string;
+  $hidePadding: boolean;
+  $pinningPosition: ColumnPinningPosition;
+}>(
+  ({ $colId, $hidePadding, $pinningPosition }) => css`
     word-break: break-word;
     opacity: var(${columnOpacityVar($colId)}, 1);
-    transform: var(${columnTransformVar($colId)}, translate3d(0, 0, 0));
+    transform: var(${columnTransformVar($colId)}, none);
     transition: var(${columnTransition()}, none);
+    height: 100%; // required to be able to use height: 100% in child elements
+    ${$pinningPosition
+      ? css`
+          position: sticky;
+          ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;
+          ${ScrollShadow('left')}
+          &::before {
+            display: var(${displayScrollRightIndicatorVar}, none);
+          }
+        `
+      : ''}
+
+    ${$hidePadding &&
+    css`
+      && {
+        padding: 0;
+      }
+    `}
   `,
 );
 
 type Props<Entity extends EntityBase> = {
   expandedSectionRenderers: ExpandedSectionRenderers<Entity> | undefined;
-  rows: Array<Row<Entity>>;
   headerGroups: Array<HeaderGroup<Entity>>;
+  rows: Array<Row<Entity>>;
 };
 
-const Table = <Entity extends EntityBase>({ expandedSectionRenderers, rows, headerGroups }: Props<Entity>) => (
+const Table = <Entity extends EntityBase>({ expandedSectionRenderers, headerGroups, rows }: Props<Entity>) => (
   <StyledTable striped condensed hover>
     <TableHead headerGroups={headerGroups} />
     {rows.map((row) => (
       <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
         <tr>
-          {row.getVisibleCells().map((cell) => (
-            <Td key={cell.id} $colId={cell.column.id}>
-              {flexRender(cell.column.columnDef.cell, cell.getContext())}
-            </Td>
-          ))}
+          {row.getVisibleCells().map((cell) => {
+            const columnMeta = cell.column.columnDef.meta as ColumnMetaContext<Entity>;
+
+            return (
+              <Td
+                key={cell.id}
+                $colId={cell.column.id}
+                $pinningPosition={cell.column.getIsPinned()}
+                $hidePadding={columnMeta?.hideCellPadding}>
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </Td>
+            );
+          })}
         </tr>
         <ExpandedSections
           key={`expanded-sections-${row.id}`}

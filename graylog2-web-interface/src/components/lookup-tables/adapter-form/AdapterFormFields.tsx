@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useFormikContext } from 'formik';
 
 import { FormikFormGroup, TimeUnitInput } from 'components/common';
@@ -26,12 +27,12 @@ import AdapterConfigFormFields from './AdapterConfigFormFields';
 function AdapterFormFields() {
   const { errors, values, touched, setFieldValue, setValues, setErrors } = useFormikContext<LookupTableAdapter>();
   const { validateDataAdapter } = useValidateDataAdapter();
-  const configRef = React.useRef(null);
-  const [generateName, setGenerateName] = React.useState<boolean>(!values.title);
+  const configRef = useRef(null);
+  const [generateName, setGenerateName] = useState<boolean>(!values.title);
 
   const _sanitizeName = (inName: string) => inName.trim().replace(/\W+/g, '-').toLocaleLowerCase();
 
-  const _runValidations = React.useCallback(() => {
+  const _runValidations = useCallback(() => {
     validateDataAdapter(values).then((resp: { errors: validationErrorsType }) => {
       const auxErrors = Object.keys(resp.errors).reduce((acc, key) => {
         // eslint-disable-next-line no-param-reassign
@@ -58,7 +59,7 @@ function AdapterFormFields() {
     });
   };
 
-  React.useEffect(() => _runValidations(), [_runValidations, values]);
+  useEffect(() => _runValidations(), [_runValidations, values]);
 
   const updateCustomErrorTTL = (value: number, unit: string, enabled: boolean) => {
     setFieldValue('custom_error_ttl', value);

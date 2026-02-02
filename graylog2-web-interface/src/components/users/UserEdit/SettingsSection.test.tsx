@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
-import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import { List } from 'immutable';
 
 import selectEvent from 'helpers/selectEvent';
@@ -49,7 +50,7 @@ describe('<SettingsSection />', () => {
 
     const submitButton = screen.getByText('Update Settings');
 
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(onSubmitStub).toHaveBeenCalledTimes(1));
 
@@ -71,11 +72,12 @@ describe('<SettingsSection />', () => {
 
     await screen.findByText('Hours');
 
-    fireEvent.change(timeoutAmountInput, { target: { value: '40' } });
+    await userEvent.clear(timeoutAmountInput);
+    await userEvent.type(timeoutAmountInput, '40');
 
     await selectEvent.chooseOption('Timeout unit', 'Days');
     await selectEvent.chooseOption('Time Zone', 'Vancouver');
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(onSubmitStub).toHaveBeenCalledTimes(1));
 

@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series;
 
+import org.graylog.plugins.views.search.engine.IndexerGeneratedQueryContext;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
@@ -30,10 +31,8 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.b
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.ValueCount;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.ValueCountAggregationBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
-import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.SeriesAggregationBuilder;
-import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,12 +47,12 @@ public class ESCountHandler extends ESPivotSeriesSpecHandler<Count, ValueCount> 
 
     @Nonnull
     @Override
-    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Count count, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
+    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Count count, ESGeneratedQueryContext queryContext) {
         return count.field()
                 .map(field -> {
                     // the request was for a field count, we have to add a value_count sub aggregation
                     final ValueCountAggregationBuilder value = AggregationBuilders.count(name).field(field);
-                    record(queryContext, pivot, count, name, ValueCount.class);
+                    queryContext.recordNameForPivotSpec(pivot, count, name);
                     return List.of(SeriesAggregationBuilder.metric(value));
                 })
                 // doc_count is always present in elasticsearch's bucket aggregations, no need to add it
@@ -65,7 +64,6 @@ public class ESCountHandler extends ESPivotSeriesSpecHandler<Count, ValueCount> 
                                         Count count,
                                         SearchResponse searchResult,
                                         ValueCount valueCount,
-                                        ESSearchTypeHandler<Pivot> searchTypeHandler,
                                         ESGeneratedQueryContext esGeneratedQueryContext) {
         final Object value;
         if (valueCount == null) {
@@ -82,9 +80,9 @@ public class ESCountHandler extends ESPivotSeriesSpecHandler<Count, ValueCount> 
     }
 
     @Override
-    public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, ESGeneratedQueryContext queryContext) {
-        final Tuple2<String, Class<? extends Aggregation>> objects = aggTypes(queryContext, pivot).getTypes(spec);
-        if (objects == null) {
+    public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, IndexerGeneratedQueryContext<?> queryContext) {
+        final String agg = queryContext.getAggNameForPivotSpecFromContext(pivot, spec);
+        if (agg == null) {
             if (aggregations instanceof MultiBucketsAggregation.Bucket) {
                 return createValueCount(((MultiBucketsAggregation.Bucket) aggregations).getDocCount());
             } else if (aggregations instanceof Missing) {
@@ -93,7 +91,7 @@ public class ESCountHandler extends ESPivotSeriesSpecHandler<Count, ValueCount> 
         } else {
             // try to saved sub aggregation type. this might fail if we refer to the total result of the entire result instead of a specific
             // value_count aggregation. we'll handle that special case in doHandleResult above
-            return aggregations.getAggregations().get(objects.v1);
+            return aggregations.getAggregations().get(agg);
         }
 
         return null;

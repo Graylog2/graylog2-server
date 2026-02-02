@@ -39,7 +39,7 @@ const ThroughputCell = ({ stream }: Props) => {
   });
 
   if (!metrics) {
-    return <Spinner />;
+    return <Spinner size="xs" />;
   }
 
   const throughput = Object.keys(metrics)

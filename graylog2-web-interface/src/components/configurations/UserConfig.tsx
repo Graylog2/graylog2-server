@@ -18,8 +18,8 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import { Form, Formik } from 'formik';
-import type { UserConfigType } from 'src/stores/configurations/ConfigurationsStore';
 
+import type { UserConfigType } from 'stores/configurations/ConfigurationsStore';
 import { useStore } from 'stores/connect';
 import type { Store } from 'stores/StoreTypes';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';

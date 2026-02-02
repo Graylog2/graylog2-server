@@ -43,7 +43,6 @@ type Props = {
   dataNode: DataNode;
   displayAs?: 'dropdown' | 'buttons';
   refetch?: () => void;
-  onInteractionChange?: (isActive: boolean) => void;
 };
 
 const DIALOG_TYPES = {
@@ -68,12 +67,7 @@ const DIALOG_TEXT = {
   },
 };
 
-const DataNodeActions = ({
-  dataNode,
-  refetch = undefined,
-  displayAs = 'dropdown',
-  onInteractionChange = undefined,
-}: Props) => {
+const DataNodeActions = ({ dataNode, refetch = undefined, displayAs = 'dropdown' }: Props) => {
   const [showLogsDialog, setShowLogsDialog] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);
@@ -94,10 +88,6 @@ const DataNodeActions = ({
     await _refetch();
   };
 
-  const notifyInteractionChange = (isActive: boolean) => {
-    onInteractionChange?.(isActive);
-  };
-
   const handleStartDatanode = async () => {
     await startDataNode(dataNode.node_id);
     await refetchDatanodes();
@@ -106,7 +96,6 @@ const DataNodeActions = ({
   const openConfirmDialog = (type) => {
     setShowConfirmDialog(true);
     setDialogType(type);
-    notifyInteractionChange(true);
   };
 
   const handleAction = (action) => {
@@ -131,7 +120,6 @@ const DataNodeActions = ({
   const handleClearState = async () => {
     setShowConfirmDialog(false);
     setDialogType(null);
-    notifyInteractionChange(false);
     await refetchDatanodes();
   };
 
@@ -178,7 +166,6 @@ const DataNodeActions = ({
           <MenuItem
             onSelect={() => {
               setShowLogsDialog(true);
-              notifyInteractionChange(true);
             }}>
             Show logs
           </MenuItem>
@@ -209,7 +196,6 @@ const DataNodeActions = ({
           <ActionButton
             onClick={() => {
               setShowLogsDialog(true);
-              notifyInteractionChange(true);
             }}
             bsSize="small">
             Show logs
@@ -231,7 +217,6 @@ const DataNodeActions = ({
           hostname={dataNode?.hostname}
           onHide={() => {
             setShowLogsDialog(false);
-            notifyInteractionChange(false);
           }}
         />
       )}

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
@@ -57,7 +57,7 @@ describe('<UndoNavItem />', () => {
   it('Call Undo action on call', async () => {
     render(<RedoNavItemComponent />);
     const undoButton = await screen.findByLabelText('Undo');
-    fireEvent.click(undoButton);
+    await userEvent.click(undoButton);
 
     await waitFor(() => expect(undo).toHaveBeenCalled());
   });

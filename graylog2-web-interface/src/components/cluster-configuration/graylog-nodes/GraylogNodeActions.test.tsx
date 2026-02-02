@@ -18,7 +18,7 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import type { GraylogNode } from '../graylog-nodes/useClusterGraylogNodes';
+import type { ClusterGraylogNode as GraylogNode } from '../graylog-nodes/fetchClusterGraylogNodes';
 import GraylogNodeActions from '../graylog-nodes/GraylogNodeActions';
 
 const nodeMock: GraylogNode = {
@@ -51,7 +51,6 @@ describe('GraylogNodeActions', () => {
     await userEvent.click(button);
 
     await screen.findByRole('menuitem', { name: /Metrics/i });
-    await screen.findByRole('menuitem', { name: /API Browser/i });
   });
 
   it('shows pause message processing menu item when is_processing true', async () => {

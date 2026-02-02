@@ -14,29 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useMemo } from 'react';
-import styled from 'styled-components';
+import React, { useCallback, useMemo, useState } from 'react';
 
-import { EntityDataTable, NoSearchResult, Spinner } from 'components/common';
+import { PaginatedEntityTable } from 'components/common';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
+import type { FetchOptions } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
-import { createColumnDefinitions, createColumnRenderers } from './DataNodesColumnConfiguration';
-import useClusterDataNodesTableLayout from './useClusterDataNodesTableLayout';
-import useClusterDataNodes, { type ClusterDataNode } from './useClusterDataNodes';
+import {
+  createColumnDefinitions,
+  createColumnRenderers,
+  DEFAULT_VISIBLE_COLUMNS,
+} from './DataNodesColumnConfiguration';
+import { clusterDataNodesKeyFn, fetchClusterDataNodesWithMetrics } from './fetchClusterDataNodes';
+import type { ClusterDataNode } from './fetchClusterDataNodes';
 
 import ClusterNodesSectionWrapper from '../shared-components/ClusterNodesSectionWrapper';
-
-const EmptyState = styled(NoSearchResult)`
-  margin-top: ${({ theme }) => theme.spacings.xl};
-`;
 
 type Props = {
   collapsible?: boolean;
   searchQuery?: string;
   onSelectNodeType?: () => void;
   pageSizeLimit?: number;
-  refetchInterval?: number | false;
+  refetchInterval?: number;
 };
 
 const DataNodesExpandable = ({
@@ -46,74 +46,45 @@ const DataNodesExpandable = ({
   pageSizeLimit = undefined,
   refetchInterval = undefined,
 }: Props) => {
-  const {
-    defaultDisplayedColumns,
-    defaultColumnOrder,
-    layoutPreferences,
-    searchParams,
-    isLoadingLayout,
-    handleLayoutPreferencesChange,
-    handleSortChange,
-    resetLayoutPreferences,
-  } = useClusterDataNodesTableLayout(searchQuery, pageSizeLimit);
-  const {
-    nodes: dataNodes,
-    total: totalDataNodes,
-    refetch,
-    isLoading,
-    setPollingEnabled,
-  } = useClusterDataNodes(searchParams, { refetchInterval });
+  const [totalDataNodes, setTotalDataNodes] = useState<number | undefined>(undefined);
 
   const columnSchemas = useMemo<Array<ColumnSchema>>(() => createColumnDefinitions(), []);
   const columnRenderers = useMemo(() => createColumnRenderers(), []);
 
-  const handleActionsInteractionChange = useCallback(
-    (isActive: boolean) => {
-      setPollingEnabled(!isActive);
-    },
-    [setPollingEnabled],
+  const renderActions = useCallback((entity: ClusterDataNode) => <DataNodeActions dataNode={entity} />, []);
+  const tableLayout = useMemo(
+    () => ({
+      entityTableId: 'cluster-data-nodes',
+      defaultSort: { attributeId: 'hostname', direction: 'asc' as const },
+      defaultDisplayedAttributes: [...DEFAULT_VISIBLE_COLUMNS],
+      defaultPageSize: pageSizeLimit ?? 0,
+      defaultColumnOrder: [...DEFAULT_VISIBLE_COLUMNS],
+    }),
+    [pageSizeLimit],
   );
-
-  const renderActions = useCallback(
-    (entity: ClusterDataNode) => (
-      <DataNodeActions dataNode={entity} refetch={refetch} onInteractionChange={handleActionsInteractionChange} />
-    ),
-    [handleActionsInteractionChange, refetch],
-  );
+  const externalSearch = useMemo(() => ({ query: searchQuery }), [searchQuery]);
+  const fetchOptions = useMemo<FetchOptions>(() => ({ refetchInterval }), [refetchInterval]);
 
   return (
     <ClusterNodesSectionWrapper
       title="Data Nodes"
       titleCount={totalDataNodes}
       onTitleCountClick={onSelectNodeType ?? null}
-      headerLeftSection={(isLoading || isLoadingLayout) && <Spinner />}
       collapsible={collapsible}>
-      {(() => {
-        if (isLoading || isLoadingLayout) {
-          return <Spinner />;
-        }
-
-        if (dataNodes.length === 0) {
-          return <EmptyState>No Data Nodes found.</EmptyState>;
-        }
-
-        return (
-          <EntityDataTable<ClusterDataNode>
-            entities={dataNodes}
-            defaultDisplayedColumns={defaultDisplayedColumns}
-            defaultColumnOrder={defaultColumnOrder}
-            layoutPreferences={layoutPreferences}
-            onResetLayoutPreferences={resetLayoutPreferences}
-            onLayoutPreferencesChange={handleLayoutPreferencesChange}
-            onSortChange={handleSortChange}
-            activeSort={searchParams.sort}
-            entityAttributesAreCamelCase
-            entityActions={renderActions}
-            columnSchemas={columnSchemas}
-            columnRenderers={columnRenderers}
-          />
-        );
-      })()}
+      <PaginatedEntityTable<ClusterDataNode>
+        tableLayout={tableLayout}
+        fetchEntities={fetchClusterDataNodesWithMetrics}
+        keyFn={clusterDataNodesKeyFn}
+        additionalAttributes={columnSchemas}
+        columnRenderers={columnRenderers}
+        entityAttributesAreCamelCase
+        entityActions={renderActions}
+        humanName="Data Nodes"
+        externalSearch={externalSearch}
+        fetchOptions={fetchOptions}
+        onDataLoaded={(data) => setTotalDataNodes(data.pagination?.total ?? data.list.length)}
+        withoutURLParams
+      />
     </ClusterNodesSectionWrapper>
   );
 };

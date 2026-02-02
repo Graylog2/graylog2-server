@@ -18,11 +18,23 @@ package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableList;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -54,6 +66,7 @@ import org.graylog2.rest.models.system.indexer.responses.ClosedIndices;
 import org.graylog2.rest.models.system.indexer.responses.IndexInfo;
 import org.graylog2.rest.models.system.indexer.responses.OpenIndicesInfo;
 import org.graylog2.rest.models.system.indexer.responses.ShardRouting;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
@@ -67,10 +80,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
 @RequiresAuthentication
-@Api(value = "Indexer/Indices", description = "Index information", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Indexer/Indices", description = "Index information")
 @Path("/system/indexer/indices")
 public class IndicesResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(IndicesResource.class);
@@ -89,9 +101,9 @@ public class IndicesResource extends RestResource {
     @GET
     @Timed
     @Path("/{index}")
-    @ApiOperation(value = "Get information of an index and its shards.")
+    @Operation(summary = "Get information of an index and its shards.")
     @Produces(MediaType.APPLICATION_JSON)
-    public IndexInfo single(@ApiParam(name = "index") @PathParam("index") String index) {
+    public IndexInfo single(@Parameter(name = "index") @PathParam("index") String index) {
         checkPermission(RestPermissions.INDICES_READ, index);
 
         if (!indexSetRegistry.isManagedIndex(index)) {
@@ -108,10 +120,10 @@ public class IndicesResource extends RestResource {
     @POST
     @Timed
     @Path("/multiple")
-    @ApiOperation(value = "Get information of all specified indices and their shards.")
+    @Operation(summary = "Get information of all specified indices and their shards.")
     @Produces(MediaType.APPLICATION_JSON)
     @NoAuditEvent("only used to request index information")
-    public List<IndexInfo> multiple(@ApiParam(name = "Requested indices", required = true)
+    public List<IndexInfo> multiple(@Parameter(name = "Requested indices", required = true)
                                     @Valid @NotNull IndicesReadRequest request) {
         final List<String> requestedIndices = request.indices().stream()
                 .filter(index -> isPermitted(RestPermissions.INDICES_READ, index))
@@ -128,7 +140,7 @@ public class IndicesResource extends RestResource {
     @GET
     @Path("/open")
     @Timed
-    @ApiOperation(value = "Get information of all open indices managed by Graylog and their shards.")
+    @Operation(summary = "Get information of all open indices managed by Graylog and their shards.")
     @RequiresPermissions(RestPermissions.INDICES_READ)
     @Produces(MediaType.APPLICATION_JSON)
     public OpenIndicesInfo open() {
@@ -144,7 +156,7 @@ public class IndicesResource extends RestResource {
     @GET
     @Timed
     @Path("/closed")
-    @ApiOperation(value = "Get a list of closed indices that can be reopened.")
+    @Operation(summary = "Get a list of closed indices that can be reopened.")
     @Produces(MediaType.APPLICATION_JSON)
     public ClosedIndices closed() {
         final Set<IndexSet> indexSets = indexSetRegistry.getAllIndexSets();
@@ -161,7 +173,7 @@ public class IndicesResource extends RestResource {
     @GET
     @Timed
     @Path("/reopened")
-    @ApiOperation(value = "Get a list of reopened indices, which will not be cleaned by retention cleaning")
+    @Operation(summary = "Get a list of reopened indices, which will not be cleaned by retention cleaning")
     @Produces(MediaType.APPLICATION_JSON)
     public ClosedIndices reopened() {
         final Set<IndexSet> indexSets = indexSetRegistry.getAllIndexSets();
@@ -177,7 +189,7 @@ public class IndicesResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "List all open, closed and reopened indices.")
+    @Operation(summary = "List all open, closed and reopened indices.")
     @Produces(MediaType.APPLICATION_JSON)
     public AllIndices all() {
         return AllIndices.create(this.closed(), this.reopened(), this.open());
@@ -186,10 +198,10 @@ public class IndicesResource extends RestResource {
     @POST
     @Timed
     @Path("/{index}/reopen")
-    @ApiOperation(value = "Reopen a closed index. This will also trigger an index ranges rebuild job.")
+    @Operation(summary = "Reopen a closed index. This will also trigger an index ranges rebuild job.")
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.ES_INDEX_OPEN)
-    public void reopen(@ApiParam(name = "index") @PathParam("index") String index) {
+    public void reopen(@Parameter(name = "index") @PathParam("index") String index) {
         checkPermission(RestPermissions.INDICES_CHANGESTATE, index);
 
         if (!indexSetRegistry.isManagedIndex(index)) {
@@ -204,13 +216,14 @@ public class IndicesResource extends RestResource {
     @POST
     @Timed
     @Path("/{index}/close")
-    @ApiOperation(value = "Close an index. This will also trigger an index ranges rebuild job.")
+    @Operation(summary = "Close an index. This will also trigger an index ranges rebuild job.")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
-            @ApiResponse(code = 403, message = "You cannot close the current deflector target index.")
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "403", description = "You cannot close the current deflector target index.")
     })
     @AuditEvent(type = AuditEventTypes.ES_INDEX_CLOSE)
-    public void close(@ApiParam(name = "index") @PathParam("index") @NotNull String index) throws TooManyAliasesException {
+    public void close(@Parameter(name = "index") @PathParam("index") @NotNull String index) throws TooManyAliasesException {
         checkPermission(RestPermissions.INDICES_CHANGESTATE, index);
 
         if (!indexSetRegistry.isManagedIndex(index)) {
@@ -229,13 +242,14 @@ public class IndicesResource extends RestResource {
     @DELETE
     @Timed
     @Path("/{index}")
-    @ApiOperation(value = "Delete an index. This will also trigger an index ranges rebuild job.")
+    @Operation(summary = "Delete an index. This will also trigger an index ranges rebuild job.")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
-            @ApiResponse(code = 403, message = "You cannot delete the current deflector target index.")
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "403", description = "You cannot delete the current deflector target index.")
     })
     @AuditEvent(type = AuditEventTypes.ES_INDEX_DELETE)
-    public void delete(@ApiParam(name = "index") @PathParam("index") @NotNull String index) throws TooManyAliasesException {
+    public void delete(@Parameter(name = "index") @PathParam("index") @NotNull String index) throws TooManyAliasesException {
         checkPermission(RestPermissions.INDICES_DELETE, index);
 
         if (!indexSetRegistry.isManagedIndex(index)) {
@@ -256,19 +270,19 @@ public class IndicesResource extends RestResource {
     @GET
     @Timed
     @Path("/{indexSetId}/list")
-    @ApiOperation(value = "List all open, closed and reopened indices.")
+    @Operation(summary = "List all open, closed and reopened indices.")
     @Produces(MediaType.APPLICATION_JSON)
-    public AllIndices indexSetList(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId) {
+    public AllIndices indexSetList(@Parameter(name = "indexSetId") @PathParam("indexSetId") String indexSetId) {
         return AllIndices.create(this.indexSetClosed(indexSetId), this.indexSetReopened(indexSetId), this.indexSetOpen(indexSetId));
     }
 
     @GET
     @Path("/{indexSetId}/open")
     @Timed
-    @ApiOperation(value = "Get information of all open indices managed by Graylog and their shards.")
+    @Operation(summary = "Get information of all open indices managed by Graylog and their shards.")
     @RequiresPermissions(RestPermissions.INDICES_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    public OpenIndicesInfo indexSetOpen(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId) {
+    public OpenIndicesInfo indexSetOpen(@Parameter(name = "indexSetId") @PathParam("indexSetId") String indexSetId) {
         final IndexSet indexSet = getIndexSet(indexSetRegistry, indexSetId);
         final Set<IndexStatistics> indicesInfos = indices.getIndicesStats(indexSet).stream()
                 .filter(indexStats -> isPermitted(RestPermissions.INDICES_READ, indexStats.index()))
@@ -280,9 +294,9 @@ public class IndicesResource extends RestResource {
     @GET
     @Timed
     @Path("/{indexSetId}/closed")
-    @ApiOperation(value = "Get a list of closed indices that can be reopened.")
+    @Operation(summary = "Get a list of closed indices that can be reopened.")
     @Produces(MediaType.APPLICATION_JSON)
-    public ClosedIndices indexSetClosed(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId) {
+    public ClosedIndices indexSetClosed(@Parameter(name = "indexSetId") @PathParam("indexSetId") String indexSetId) {
         final IndexSet indexSet = getIndexSet(indexSetRegistry, indexSetId);
 
         final Set<String> closedIndices = indices.getClosedIndices(indexSet).stream()
@@ -295,9 +309,9 @@ public class IndicesResource extends RestResource {
     @GET
     @Timed
     @Path("/{indexSetId}/reopened")
-    @ApiOperation(value = "Get a list of reopened indices, which will not be cleaned by retention cleaning")
+    @Operation(summary = "Get a list of reopened indices, which will not be cleaned by retention cleaning")
     @Produces(MediaType.APPLICATION_JSON)
-    public ClosedIndices indexSetReopened(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId) {
+    public ClosedIndices indexSetReopened(@Parameter(name = "indexSetId") @PathParam("indexSetId") String indexSetId) {
         final IndexSet indexSet = getIndexSet(indexSetRegistry, indexSetId);
 
         final Set<String> reopenedIndices = indices.getReopenedIndices(indexSet).stream()

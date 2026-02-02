@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix compatibility issue with MongoDB >=8.2."
+
+issues = ["24581"]
+pulls = ["24733"]

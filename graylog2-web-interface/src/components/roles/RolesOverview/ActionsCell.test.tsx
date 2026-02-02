@@ -16,7 +16,9 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import { paginatedUsers } from 'fixtures/userOverviews';
 import { asMock } from 'helpers/mocking';
@@ -72,14 +74,14 @@ describe('ActionsCell', () => {
       asMock(useCurrentUser).mockReturnValue(
         adminUser
           .toBuilder()
-          .permissions(Immutable.List([`roles:edit:${customRoleName}`, `roles:delete:${customRoleName}`]))
+          .permissions(Immutable.List<Permission>([`roles:edit:${customRoleName}`, `roles:delete:${customRoleName}`]))
           .build(),
       );
 
       render(<SUT readOnly={false} roleId={customRoleId} roleName={customRoleName} />);
 
       const deleteButton = screen.getByRole('button', { name: `Delete role ${customRoleName}` });
-      fireEvent.click(deleteButton);
+      await userEvent.click(deleteButton);
 
       await waitFor(() =>
         expect(window.confirm).toHaveBeenCalledWith(`Do you really want to delete role "${customRoleName}"?`),
@@ -96,14 +98,14 @@ describe('ActionsCell', () => {
       asMock(useCurrentUser).mockReturnValue(
         adminUser
           .toBuilder()
-          .permissions(Immutable.List([`roles:edit:${customRoleName}`, `roles:delete:${customRoleName}`]))
+          .permissions(Immutable.List<Permission>([`roles:edit:${customRoleName}`, `roles:delete:${customRoleName}`]))
           .build(),
       );
 
       render(<SUT readOnly={false} roleId={customRoleId} roleName={customRoleName} />);
 
       const deleteButton = screen.getByRole('button', { name: `Delete role ${customRoleName}` });
-      fireEvent.click(deleteButton);
+      await userEvent.click(deleteButton);
 
       await waitFor(() => expect(window.confirm).toHaveBeenCalledWith(confirmMessage));
 
@@ -117,7 +119,7 @@ describe('ActionsCell', () => {
       asMock(useCurrentUser).mockReturnValue(
         adminUser
           .toBuilder()
-          .permissions(Immutable.List([`roles:edit:${builtInRoleName}`, `roles:delete:${builtInRoleName}`]))
+          .permissions(Immutable.List<Permission>([`roles:edit:${builtInRoleName}`, `roles:delete:${builtInRoleName}`]))
           .build(),
       );
 

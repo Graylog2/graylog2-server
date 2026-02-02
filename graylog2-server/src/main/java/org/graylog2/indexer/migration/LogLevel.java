@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.migration;
 
+@Deprecated(forRemoval = true)
 public enum LogLevel {
     INFO,
     WARN,

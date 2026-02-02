@@ -19,9 +19,10 @@ package org.graylog.plugins.pipelineprocessor.rest;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
@@ -61,6 +62,7 @@ import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -74,9 +76,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "Pipelines/Rules", description = "Rules for the pipeline message processor", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Pipelines/Rules", description = "Rules for the pipeline message processor")
 @Path("/system/pipelines/rule")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -120,11 +122,11 @@ public class RuleResource extends RestResource implements PluginRestResource {
         this.searchQueryParser = new SearchQueryParser(RuleDao.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
 
-    @ApiOperation(value = "Create a processing rule from source", notes = "")
+    @Operation(summary = "Create a processing rule from source", description = "")
     @POST
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_CREATE)
     @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_CREATE)
-    public RuleSource createFromParser(@ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource) throws ParseException {
+    public RuleSource createFromParser(@Parameter(name = "rule", required = true) @NotNull RuleSource ruleSource) throws ParseException {
         final Rule rule = pipelineRuleService.parseRuleOrThrow(ruleSource.id(), ruleSource.source(), false);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final RuleDao newRuleSource = RuleDao.builder()
@@ -150,11 +152,11 @@ public class RuleResource extends RestResource implements PluginRestResource {
         return pipelineRuleService.createRuleSourceFromRuleDao(save);
     }
 
-    @ApiOperation(value = "Parse a processing rule without saving it", notes = "")
+    @Operation(summary = "Parse a processing rule without saving it", description = "")
     @POST
     @Path("/parse")
     @NoAuditEvent("only used to parse a rule, no changes made in the system")
-    public RuleSource parse(@ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource) throws ParseException {
+    public RuleSource parse(@Parameter(name = "rule", required = true) @NotNull RuleSource ruleSource) throws ParseException {
         final Rule rule = pipelineRuleService.parseRuleOrThrow(ruleSource.id(), ruleSource.source(), true);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         return RuleSource.builder()
@@ -166,20 +168,20 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .build();
     }
 
-    @ApiOperation(value = "Simulate a single processing rule")
+    @Operation(summary = "Simulate a single processing rule")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/simulate")
     @NoAuditEvent("only used to test a rule, no changes made in the system")
     public Message simulate(
-            @ApiParam(name = "request", required = true) @NotNull SimulateRuleRequest request
+            @Parameter(name = "request", required = true) @NotNull SimulateRuleRequest request
     ) {
         final Rule rule = pipelineRuleService.parseRuleOrThrow(request.ruleSource().id(), request.ruleSource().source(), true);
         Message message = ruleSimulator.createMessage(request.message());
         return ruleSimulator.simulate(rule, message);
     }
 
-    @ApiOperation(value = "Get all processing rules")
+    @Operation(summary = "Get all processing rules")
     @GET
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_READ)
     public Collection<RuleSource> getAll() {
@@ -191,18 +193,18 @@ public class RuleResource extends RestResource implements PluginRestResource {
 
     @GET
     @Path("/paginated")
-    @ApiOperation(value = "Get a paginated list of pipeline rules")
+    @Operation(summary = "Get a paginated list of pipeline rules")
     @Produces(MediaType.APPLICATION_JSON)
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_READ)
-    public PaginatedResponse<RuleSource> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                 @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                 @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                                 @ApiParam(name = "sort",
-                                                           value = "The field to sort the result on",
+    public PaginatedResponse<RuleSource> getPage(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                 @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                 @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                 @Parameter(name = "sort",
+                                                           description = "The field to sort the result on",
                                                            required = true,
-                                                           allowableValues = "title,description,id")
+                                                           schema = @Schema(allowableValues = {"title", "description", "id"}))
                                                  @DefaultValue(RuleDao.FIELD_TITLE) @QueryParam("sort") String sort,
-                                                 @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                 @Parameter(name = "order", description = "The sort direction", schema = @Schema(allowableValues = {"asc", "desc"}))
                                                  @DefaultValue("asc") @QueryParam("order") String order) {
         SearchQuery searchQuery;
         try {
@@ -249,19 +251,19 @@ public class RuleResource extends RestResource implements PluginRestResource {
         return Map.of("used_in_pipelines", result);
     }
 
-    @ApiOperation(value = "Get a processing rule", notes = "It can take up to a second until the change is applied")
+    @Operation(summary = "Get a processing rule", description = "It can take up to a second until the change is applied")
     @Path("/{id}")
     @GET
-    public RuleSource get(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
+    public RuleSource get(@Parameter(name = "id") @PathParam("id") String id) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_RULE_READ, id);
         return pipelineRuleService.createRuleSourceFromRuleDao(ruleService.load(id));
     }
 
-    @ApiOperation("Retrieve the named processing rules in bulk")
+    @Operation(summary = "Retrieve the named processing rules in bulk")
     @Path("/multiple")
     @POST
     @NoAuditEvent("only used to get multiple pipeline rules")
-    public Collection<RuleSource> getBulk(@ApiParam("rules") BulkRuleRequest rules) {
+    public Collection<RuleSource> getBulk(@Parameter(name = "rules") BulkRuleRequest rules) {
         Collection<RuleDao> ruleDaos = ruleService.loadNamed(rules.rules());
 
         return ruleDaos.stream()
@@ -270,12 +272,12 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .toList();
     }
 
-    @ApiOperation(value = "Modify a processing rule", notes = "It can take up to a second until the change is applied")
+    @Operation(summary = "Modify a processing rule", description = "It can take up to a second until the change is applied")
     @Path("/{id}")
     @PUT
     @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_UPDATE)
-    public RuleSource update(@ApiParam(name = "id") @PathParam("id") String id,
-                             @ApiParam(name = "rule", required = true) @NotNull RuleSource update) throws NotFoundException {
+    public RuleSource update(@Parameter(name = "id") @PathParam("id") String id,
+                             @Parameter(name = "rule", required = true) @NotNull RuleSource update) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_RULE_EDIT, id);
 
         final RuleDao ruleDao = ruleService.load(id);
@@ -300,17 +302,17 @@ public class RuleResource extends RestResource implements PluginRestResource {
         return pipelineRuleService.createRuleSourceFromRuleDao(savedRule);
     }
 
-    @ApiOperation(value = "Delete a processing rule", notes = "It can take up to a second until the change is applied")
+    @Operation(summary = "Delete a processing rule", description = "It can take up to a second until the change is applied")
     @Path("/{id}")
     @DELETE
     @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_DELETE)
-    public void delete(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
+    public void delete(@Parameter(name = "id") @PathParam("id") String id) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_RULE_DELETE, id);
         ruleService.load(id);
         ruleService.delete(id);
     }
 
-    @ApiOperation("Get function descriptors")
+    @Operation(summary = "Get function descriptors")
     @Path("/functions")
     @GET
     public Collection<Object> functionDescriptors() {
@@ -319,7 +321,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("Get function descriptors for rule builder")
+    @Operation(summary = "Get function descriptors for rule builder")
     @Path("/rulebuilder/functions")
     @GET
     public Collection<Object> rulebuilderFunctions() {
@@ -329,7 +331,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("Get condition descriptors for ruleBuilder")
+    @Operation(summary = "Get condition descriptors for ruleBuilder")
     @Path("/rulebuilder/conditions")
     @GET
     public Collection<Object> rulebuilderConditions() {
@@ -339,14 +341,14 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation("Get rule metrics configuration")
+    @Operation(summary = "Get rule metrics configuration")
     @Path("/config/metrics")
     @GET
     public RuleMetricsConfigDto metricsConfig() {
         return ruleMetricsConfigService.get();
     }
 
-    @ApiOperation("Update rule metrics configuration")
+    @Operation(summary = "Update rule metrics configuration")
     @Path("/config/metrics")
     @PUT
     @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_METRICS_UPDATE)

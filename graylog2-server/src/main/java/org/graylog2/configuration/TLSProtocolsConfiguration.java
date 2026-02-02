@@ -18,6 +18,7 @@ package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.converters.StringSetConverter;
+import com.github.joschi.jadconfig.documentation.Documentation;
 import org.graylog2.shared.security.tls.DefaultTLSProtocolProvider;
 
 import javax.annotation.Nullable;

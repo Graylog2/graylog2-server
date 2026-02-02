@@ -6,6 +6,8 @@ updates:
       interval: daily
       time: "02:00"
       timezone: "Europe/Berlin"
+    cooldown:
+      default-days: 7
     ignore:
       # The AWS SDKs receive patch updates almost every day. Reduce dependabot
       # pull-request noise by ignoring patch updates.

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type * as Immutable from 'immutable';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import type { AdditionalQueries } from 'util/PaginationURL';
 import type { UrlQueryFilters, Filter, Filters } from 'components/common/EntityFilters/types';
@@ -68,6 +69,8 @@ export type SearchParams<T = string> = {
   pageSize: number;
   query: string;
   sort: Sort<T>;
+  sliceCol?: string | undefined;
+  slice?: string;
   filters?: UrlQueryFilters;
 };
 
@@ -92,7 +95,8 @@ export type Attribute = {
   related_collection?: string;
   related_identifier?: string;
   related_property?: string;
-  permissions?: Array<string>;
+  sliceable?: boolean;
+  permissions?: Array<Permission>;
 };
 
 export type Attributes = Array<Attribute>;

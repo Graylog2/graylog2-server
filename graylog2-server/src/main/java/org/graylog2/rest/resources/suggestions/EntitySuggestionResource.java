@@ -17,16 +17,10 @@
 package org.graylog2.rest.resources.suggestions;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.database.suggestions.EntitySuggestionResponse;
-import org.graylog2.database.suggestions.EntitySuggestionService;
-import org.graylog2.shared.rest.resources.RestResource;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -36,9 +30,15 @@ import jakarta.ws.rs.core.MediaType;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.database.suggestions.EntitySuggestionResponse;
+import org.graylog2.database.suggestions.EntitySuggestionService;
+import org.graylog2.shared.rest.PublicCloudAPI;
+import org.graylog2.shared.rest.resources.RestResource;
 
 @RequiresAuthentication
-@Api(value = "EntitySuggestions", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "EntitySuggestions")
 @Path("/entity_suggestions")
 @Produces(MediaType.APPLICATION_JSON)
 public class EntitySuggestionResource extends RestResource {
@@ -52,19 +52,19 @@ public class EntitySuggestionResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get a paginated list of suggested entities")
-    public EntitySuggestionResponse getPage(@ApiParam(name = "collection")
+    @Operation(summary = "Get a paginated list of suggested entities")
+    public EntitySuggestionResponse getPage(@Parameter(name = "collection")
                                             @QueryParam("collection") String collection,
-                                            @ApiParam(name ="identifier")
+                                            @Parameter(name ="identifier")
                                             @QueryParam("identifier") @DefaultValue(ID_FIELD)
                                             String identifier,
-                                            @ApiParam(name = "column")
+                                            @Parameter(name = "column")
                                             @QueryParam("column") @DefaultValue("title") String column,
-                                            @ApiParam(name = "page")
+                                            @Parameter(name = "page")
                                             @QueryParam("page") @DefaultValue("1") int page,
-                                            @ApiParam(name = "per_page")
+                                            @Parameter(name = "per_page")
                                             @QueryParam("per_page") @DefaultValue("10") int perPage,
-                                            @ApiParam(name = "query")
+                                            @Parameter(name = "query")
                                             @QueryParam("query") @DefaultValue("") String query) {
 
         return entitySuggestionService.suggest(collection, identifier, column, query, page, perPage, getSubject());

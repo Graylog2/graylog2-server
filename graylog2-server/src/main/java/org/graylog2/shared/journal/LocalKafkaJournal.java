@@ -59,6 +59,7 @@ import org.graylog.shaded.kafka09.utils.Time;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.ThrottleState;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
 import org.graylog2.shared.metrics.HdrTimer;
 import org.graylog2.shared.utilities.ByteBufferUtils;
@@ -855,7 +856,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
      * @return an {@code Optional<Double>} containing the journal utilization as a percentage.
      */
     private double calculateUtilization(long maxRetentionSize, long kafkaLogSize) {
-        return maxRetentionSize > 0 ? (double) (kafkaLogSize * 100) / maxRetentionSize : 0.0;
+        return Tools.percentageOf(maxRetentionSize, kafkaLogSize);
     }
 
     @Override

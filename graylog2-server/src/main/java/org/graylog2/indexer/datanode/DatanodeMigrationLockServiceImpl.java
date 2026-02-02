@@ -42,6 +42,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+@Deprecated(forRemoval = true)
 public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockService {
 
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeMigrationLockServiceImpl.class);

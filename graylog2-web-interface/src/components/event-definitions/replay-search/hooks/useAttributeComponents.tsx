@@ -55,7 +55,6 @@ const useAttributeComponents = () => {
       !isEventDefinition && moment(eventDefinition.updated_at).diff(eventData?.timestamp) > 0;
 
     return [
-      { title: 'Timestamp', content: <Timestamp dateTime={eventData?.timestamp} />, show: !isEventDefinition },
       {
         title: 'Event definition updated at',
         content: (

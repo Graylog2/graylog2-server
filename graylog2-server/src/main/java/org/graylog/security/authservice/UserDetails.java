@@ -20,6 +20,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 
 import javax.annotation.Nullable;
+import java.time.ZoneId;
 import java.util.Optional;
 import java.util.Set;
 
@@ -45,6 +46,8 @@ public abstract class UserDetails {
     public abstract Optional<String> firstName();
 
     public abstract Optional<String> lastName();
+
+    public abstract Optional<ZoneId> timezone();
 
     /**
      * Some authentication backends only currently support the fullName attribute (and not firstName and lastName),
@@ -98,6 +101,8 @@ public abstract class UserDetails {
 
         public abstract Builder lastName(@Nullable String lastName);
 
+        public abstract Builder timezone(@Nullable ZoneId timezone);
+
         /**
          * Starting in Graylog 4.1, use of this method is deprecated.
          * Prefer use of the {@link #firstName()} and {@link #lastName()} methods instead when possible. This way,
@@ -119,7 +124,7 @@ public abstract class UserDetails {
 
             // Either a fullName, or a firstName/lastName are required.
             final boolean missingFirstOrLast = !userDetails.firstName().isPresent()
-                                               || !userDetails.lastName().isPresent();
+                    || !userDetails.lastName().isPresent();
 
             if (missingFirstOrLast && !userDetails.fullName().isPresent()) {
                 throw new IllegalArgumentException("Either a firstName/lastName or a fullName are required.");

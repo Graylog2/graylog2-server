@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 import userEvent from '@testing-library/user-event';
 import { defaultUser } from 'defaultMockValues';
@@ -82,7 +82,7 @@ describe('TimeRangePicker', () => {
 
     await waitFor(() => expect(applyButton).not.toBeDisabled());
 
-    fireEvent.click(applyButton);
+    await userEvent.click(applyButton);
 
     await waitFor(() => expect(defaultProps.setCurrentTimeRange).toHaveBeenCalled());
 
@@ -130,7 +130,7 @@ describe('TimeRangePicker', () => {
       expect(calendarButton).toBeInTheDocument();
       expect(timestampButton).toBeInTheDocument();
 
-      fireEvent.click(timestampButton);
+      await userEvent.click(timestampButton);
 
       const timestampContent = await screen.findByText(/Date should be formatted as/i);
 

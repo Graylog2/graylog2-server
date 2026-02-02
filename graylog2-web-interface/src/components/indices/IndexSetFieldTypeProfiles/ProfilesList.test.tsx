@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, within } from 'wrappedTestingLibrary';
+import { render, screen, within } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
@@ -120,7 +121,7 @@ describe('IndexSetFieldTypesList', () => {
 
     const customFieldTypeMappingAmount = await within(tableRow2).findByText('3');
 
-    fireEvent.click(customFieldTypeMappingAmount);
+    await userEvent.click(customFieldTypeMappingAmount);
 
     expect(tableRow2.textContent).toContain('Custom Field Mappings');
     expect(tableRow2.textContent).toContain('user_name:String type');

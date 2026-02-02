@@ -346,9 +346,9 @@ public class Indices {
         return getClosedIndices(Collections.singleton(indexSet.getIndexWildcard()));
     }
 
-    public Set<String> getIndices(final IndexSet indexSet, final String... statusFilter) {
+    public Set<String> getIndices(final IndexSet indexSet, final IndexStatus... statusFilter) {
         final String indexWildcard = indexSet.getIndexWildcard();
-        final List<String> status = Arrays.asList(statusFilter);
+        final List<IndexStatus> status = Arrays.asList(statusFilter);
         return indicesAdapter.indices(indexWildcard, status, indexSet.getConfig().id());
     }
 

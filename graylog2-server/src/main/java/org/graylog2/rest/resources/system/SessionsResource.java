@@ -17,9 +17,30 @@
 package org.graylog2.rest.resources.system;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotAuthorizedException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.ServiceUnavailableException;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.validation.constraints.NotNull;
@@ -51,6 +72,7 @@ import org.graylog2.rest.RestTools;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponseFactory;
 import org.graylog2.rest.models.system.sessions.responses.SessionValidationResponse;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.ActorAwareAuthenticationToken;
 import org.graylog2.shared.security.ActorAwareAuthenticationTokenFactory;
@@ -65,10 +87,9 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
 @Path("/system/sessions")
-@Api(value = "System/Sessions", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "System/Sessions")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class SessionsResource extends RestResource {
@@ -102,12 +123,15 @@ public class SessionsResource extends RestResource {
     }
 
     @POST
-    @ApiOperation(value = "Create a new session",
-                  notes = "This request creates a new session for a user or reactivates an existing session: the equivalent of logging in.",
-                  response = SessionResponse.class)
+    @Operation(summary = "Create a new session",
+                  description = "This request creates a new session for a user or reactivates an existing session: the equivalent of logging in.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Session created successfully",
+                    content = @Content(schema = @Schema(implementation = SessionResponse.class)))
+    })
     @NoAuditEvent("dispatches audit events in the method body")
     public Response newSession(@Context ContainerRequestContext requestContext,
-                               @ApiParam(name = "Login request", value = "Credentials. The default " +
+                               @Parameter(name = "Login request", description = "Credentials. The default " +
                                        "implementation requires presence of two properties: 'username' and " +
                                        "'password'. However a plugin may customize which kind of credentials " +
                                        "are accepted and therefore expect different properties.",
@@ -153,11 +177,12 @@ public class SessionsResource extends RestResource {
     }
 
     @GET
-    @ApiOperation(value = "Validate an existing session",
-                  notes = "Checks the session with the given ID: returns http status 204 (No Content) if session is valid.",
-                  code = 204,
-                  response = SessionValidationResponse.class
-    )
+    @Operation(summary = "Validate an existing session",
+                  description = "Checks the session with the given ID: returns http status 204 (No Content) if session is valid.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Session validation result",
+                    content = @Content(schema = @Schema(implementation = SessionValidationResponse.class)))
+    })
     public Response validateSession(@Context ContainerRequestContext requestContext) {
         try {
             this.authenticationFilter.filter(requestContext);
@@ -206,12 +231,12 @@ public class SessionsResource extends RestResource {
     }
 
     @DELETE
-    @ApiOperation(value = "Terminate an existing session", notes = "Destroys the session with the given ID: the equivalent of logging out.")
+    @Operation(summary = "Terminate an existing session", description = "Destroys the session with the given ID: the equivalent of logging out.")
     @Path("/{sessionId}")
     @RequiresAuthentication
     @Deprecated
     @AuditEvent(type = AuditEventTypes.SESSION_DELETE)
-    public Response terminateSessionWithId(@ApiParam(name = "sessionId", required = true) @PathParam("sessionId") String sessionId,
+    public Response terminateSessionWithId(@Parameter(name = "sessionId", required = true) @PathParam("sessionId") String sessionId,
                                            @Context ContainerRequestContext requestContext) {
         final Subject subject = getSubject();
         securityManager.logout(subject);
@@ -222,7 +247,7 @@ public class SessionsResource extends RestResource {
     }
 
     @DELETE
-    @ApiOperation(value = "Terminate an existing session", notes = "Destroys the session with the given ID: the equivalent of logging out.")
+    @Operation(summary = "Terminate an existing session", description = "Destroys the session with the given ID: the equivalent of logging out.")
     @RequiresAuthentication
     @AuditEvent(type = AuditEventTypes.SESSION_DELETE)
     public Response terminateSession(@Context ContainerRequestContext requestContext) {

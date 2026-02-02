@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import View from 'views/logic/views/View';
 import QueryResult from 'views/logic/QueryResult';
@@ -75,7 +76,7 @@ describe('<Sidebar />', () => {
   const queryResult = new QueryResult({ execution_stats: executionStats, query, errors, search_types: searchTypes });
 
   const openDescriptionSection = async () =>
-    fireEvent.click(await screen.findByRole('button', { name: /description/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /description/i }));
 
   const TestComponent = () => <div id="martian">Marc Watney</div>;
 
@@ -181,7 +182,7 @@ describe('<Sidebar />', () => {
     asMock(useViewType).mockReturnValue(View.Type.Dashboard);
     renderSidebar();
 
-    fireEvent.click(await screen.findByRole('button', { name: /description/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /description/i }));
 
     await screen.findByText((_content, node) => node.textContent === 'Effective time rangeVaries per widget');
     await screen.findByText((_content, node) => node.textContent === 'Total resultsVaries per widget');
@@ -199,7 +200,7 @@ describe('<Sidebar />', () => {
 
     renderSidebar();
 
-    fireEvent.click(await screen.findByRole('button', { name: /description/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /description/i }));
 
     await screen.findByText('2018-08-28 16:34:26.192');
     await screen.findByText('2018-08-28 16:39:26.192');
@@ -208,7 +209,7 @@ describe('<Sidebar />', () => {
   it('should render widget create options', async () => {
     renderSidebar();
 
-    fireEvent.click(await screen.findByRole('button', { name: /open create section/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /open create section/i }));
 
     await screen.findByText('Predefined Aggregation');
   });
@@ -216,7 +217,7 @@ describe('<Sidebar />', () => {
   it('should render passed children', async () => {
     renderSidebar();
 
-    fireEvent.click(await screen.findByRole('button', { name: /open fields section/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /open fields section/i }));
 
     await screen.findByText('Marc Watney');
   });
@@ -227,11 +228,11 @@ describe('<Sidebar />', () => {
 
     renderSidebar();
 
-    fireEvent.click(await screen.findByRole('button', { name: /open description section/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /open description section/i }));
 
     await screen.findByText('Execution');
 
-    fireEvent.click(await screen.findByText('Sidebar Title'));
+    await userEvent.click(await screen.findByText('Sidebar Title'));
 
     expect(screen.queryByText('Execution')).toBeNull();
   });
@@ -239,11 +240,11 @@ describe('<Sidebar />', () => {
   it('should close an active section when clicking on its navigation item', async () => {
     renderSidebar();
 
-    fireEvent.click(await screen.findByRole('button', { name: /open fields section/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /open fields section/i }));
 
     await screen.findByText('Marc Watney');
 
-    fireEvent.click(await screen.findByRole('button', { name: /close fields section/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /close fields section/i }));
 
     expect(screen.queryByText('Marc Watney')).toBeNull();
   });

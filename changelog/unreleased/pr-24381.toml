@@ -1,0 +1,4 @@
+type = "c"
+message = "Add auth service config setting for user's default time zone. (see upgrade notes)"
+
+pulls = ["24381", "graylog-plugin-enterprise#12641"]

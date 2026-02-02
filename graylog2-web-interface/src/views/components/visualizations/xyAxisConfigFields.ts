@@ -30,7 +30,7 @@ export const getNumericAxisMetrics = (values: WidgetConfigFormValues) => {
   const metrics = values?.metrics ?? [];
 
   return metrics
-    .filter(({ field }) => !(units?.[field]?.unitType && units?.[field]?.abbrev))
+    .filter(({ field, function: metricFn }) => !(units?.[field]?.unitType && units?.[field]?.abbrev) && metricFn)
     .map((metric) => metric.name || `${metric.function}(${metric.field ?? ''})`);
 };
 
@@ -45,8 +45,8 @@ export const getAxisMetrics = (unitType: FieldUnitType, values: WidgetConfigForm
   );
 
   return metrics
-    .filter(({ field }) => unitTypeFields.has(field))
-    .map((metric) => metric.name ?? `${metric.function}(${metric.field ?? ''})`);
+    .filter(({ field, function: metricFn }) => unitTypeFields.has(field) && metricFn)
+    .map((metric) => metric.name || `${metric.function}(${metric.field ?? ''})`);
 };
 
 const getUnitTypeFields = (): Array<CustomField> =>

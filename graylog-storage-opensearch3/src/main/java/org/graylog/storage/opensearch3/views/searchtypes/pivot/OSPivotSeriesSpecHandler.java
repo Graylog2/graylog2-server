@@ -16,8 +16,7 @@
  */
 package org.graylog.storage.opensearch3.views.searchtypes.pivot;
 
-import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
-import org.graylog.plugins.views.search.engine.SearchTypeHandler;
+import org.graylog.plugins.views.search.engine.IndexerGeneratedQueryContext;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
@@ -26,60 +25,24 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRespons
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.HasAggregations;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
 
 import java.util.stream.Stream;
 
 public abstract class OSPivotSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGGREGATION_RESULT extends Aggregation>
-        implements SeriesSpecHandler<SPEC_TYPE, SeriesAggregationBuilder, SearchResponse, AGGREGATION_RESULT, OSSearchTypeHandler<Pivot>, OSGeneratedQueryContext> {
+        implements SeriesSpecHandler<SPEC_TYPE, SeriesAggregationBuilder, SearchResponse, AGGREGATION_RESULT, OSGeneratedQueryContext> {
 
-    protected AggTypes aggTypes(OSGeneratedQueryContext queryContext, Pivot pivot) {
-        return (AggTypes) queryContext.contextMap().get(pivot.id());
-    }
-
-    protected void record(OSGeneratedQueryContext queryContext, Pivot pivot, PivotSpec spec, String name, Class<? extends Aggregation> aggregationClass) {
-        aggTypes(queryContext, pivot).record(spec, name, aggregationClass);
-    }
-
-    public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, OSGeneratedQueryContext queryContext) {
-        return aggTypes(queryContext, pivot).getSubAggregation(spec, aggregations);
+    public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations currentAggregationOrBucket, IndexerGeneratedQueryContext<?> queryContext) {
+        final String aggName = queryContext.getAggNameForPivotSpecFromContext(pivot, spec);
+        return currentAggregationOrBucket.getAggregations().get(aggName);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public Stream<Value> handleResult(Pivot pivot, SeriesSpec seriesSpec, Object queryResult, Object aggregationResult, SearchTypeHandler searchTypeHandler, GeneratedQueryContext queryContext) {
-        return doHandleResult(pivot, (SPEC_TYPE) seriesSpec, (SearchResponse) queryResult, (AGGREGATION_RESULT) aggregationResult, (OSSearchTypeHandler<Pivot>) searchTypeHandler, (OSGeneratedQueryContext) queryContext);
+    public Stream<Value> handleResult(Pivot pivot, SeriesSpec seriesSpec, SearchResponse queryResult, Aggregation aggregationResult, OSGeneratedQueryContext queryContext) {
+        return doHandleResult(pivot, (SPEC_TYPE) seriesSpec, queryResult, (AGGREGATION_RESULT) aggregationResult, queryContext);
     }
 
     @Override
-    public abstract Stream<Value> doHandleResult(Pivot pivot, SPEC_TYPE seriesSpec, SearchResponse searchResult, AGGREGATION_RESULT aggregation_result, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext);
+    public abstract Stream<Value> doHandleResult(Pivot pivot, SPEC_TYPE seriesSpec, SearchResponse searchResult, AGGREGATION_RESULT aggregation_result, OSGeneratedQueryContext queryContext);
 
-    public static class Value {
-
-        private final String id;
-        private final String key;
-        private final Object value;
-
-        public Value(String id, String key, Object value) {
-            this.id = id;
-            this.key = key;
-            this.value = value;
-        }
-
-        public static Value create(String id, String key, Object value) {
-            return new Value(id, key, value);
-        }
-
-        public String id() {
-            return id;
-        }
-
-        public String key() {
-            return key;
-        }
-
-        public Object value() {
-            return value;
-        }
-    }
 }

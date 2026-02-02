@@ -25,11 +25,13 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.mongodb.MongoException;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
@@ -81,6 +83,7 @@ import org.graylog2.rest.models.system.lookup.LookupTableApi;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -99,13 +102,13 @@ import java.util.stream.Stream;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Collections.singleton;
 import static java.util.Objects.requireNonNull;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
 @Path("/system/lookup")
 @Produces("application/json")
 @Consumes("application/json")
-@Api(value = "System/Lookup", description = "Lookup tables", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "System/Lookup", description = "Lookup tables")
 public class LookupTableResource extends RestResource {
     private static final ImmutableSet<String> LUT_ALLOWABLE_SORT_FIELDS = ImmutableSet.of(
             LookupTableDto.FIELD_ID,
@@ -208,10 +211,10 @@ public class LookupTableResource extends RestResource {
 
     @GET
     @Path("tables/{name}/query")
-    @ApiOperation(value = "Query a lookup table")
+    @Operation(summary = "Query a lookup table")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
-    public LookupResult performLookup(@ApiParam(name = "name") @PathParam("name") @NotEmpty String name,
-                                      @ApiParam(name = "key") @QueryParam("key") @NotEmpty String key) {
+    public LookupResult performLookup(@Parameter(name = "name") @PathParam("name") @NotEmpty String name,
+                                      @Parameter(name = "key") @QueryParam("key") @NotEmpty String key) {
         return lookupTableService.newBuilder().lookupTable(name).build().lookup(key);
     }
 
@@ -222,11 +225,11 @@ public class LookupTableResource extends RestResource {
      */
     @POST
     @Path("tables/{idOrName}/purge")
-    @ApiOperation(value = "Purge lookup table cache")
+    @Operation(summary = "Purge lookup table cache")
     @NoAuditEvent("Cache purge only")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
-    public void performPurge(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
-                             @ApiParam(name = "key") @QueryParam("key") String key) {
+    public void performPurge(@Parameter(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
+                             @Parameter(name = "key") @QueryParam("key") String key) {
         final Optional<LookupTableDto> lookupTableDto = dbTableService.get(idOrName);
         if (lookupTableDto.isEmpty()) {
             throw new NotFoundException("Lookup table <" + idOrName + "> not found");
@@ -246,19 +249,20 @@ public class LookupTableResource extends RestResource {
 
     @GET
     @Path("tables")
-    @ApiOperation(value = "List configured lookup tables")
+    @Operation(summary = "List configured lookup tables")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
-    public LookupTablePage tables(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                  @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                  @ApiParam(name = "sort",
-                                            value = "The field to sort the result on",
+    public LookupTablePage tables(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                  @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                  @Parameter(name = "sort",
+                                            description = "The field to sort the result on",
                                             required = true,
-                                            allowableValues = "title,description,name,id")
+                                            schema = @Schema(allowableValues = {"title", "description", "name"}))
                                   @DefaultValue(LookupTableDto.FIELD_TITLE) @QueryParam("sort") String sort,
-                                  @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                  @Parameter(name = "order", description = "The sort direction",
+                                            schema = @Schema(allowableValues = {"asc", "desc"}))
                                   @DefaultValue("desc") @QueryParam("order") SortOrder order,
-                                  @ApiParam(name = "query") @QueryParam("query") String query,
-                                  @ApiParam(name = "resolve") @QueryParam("resolve") @DefaultValue("false") boolean resolveObjects) {
+                                  @Parameter(name = "query") @QueryParam("query") String query,
+                                  @Parameter(name = "resolve") @QueryParam("resolve") @DefaultValue("false") boolean resolveObjects) {
 
         if (!LUT_ALLOWABLE_SORT_FIELDS.contains(sort.toLowerCase(Locale.ENGLISH))) {
             sort = LookupTableDto.FIELD_TITLE;
@@ -300,9 +304,9 @@ public class LookupTableResource extends RestResource {
 
     @GET
     @Path("tables/{idOrName}")
-    @ApiOperation(value = "Retrieve the named lookup table")
-    public LookupTablePage get(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
-                               @ApiParam(name = "resolve") @QueryParam("resolve") @DefaultValue("false") boolean resolveObjects) {
+    @Operation(summary = "Retrieve the named lookup table")
+    public LookupTablePage get(@Parameter(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
+                               @Parameter(name = "resolve") @QueryParam("resolve") @DefaultValue("false") boolean resolveObjects) {
 
         Optional<LookupTableDto> lookupTableDto = dbTableService.get(idOrName);
         if (lookupTableDto.isEmpty()) {
@@ -335,9 +339,9 @@ public class LookupTableResource extends RestResource {
     @POST
     @Path("tables")
     @AuditEvent(type = AuditEventTypes.LOOKUP_TABLE_CREATE)
-    @ApiOperation(value = "Create a new lookup table")
+    @Operation(summary = "Create a new lookup table")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_CREATE)
-    public LookupTableApi createTable(@ApiParam LookupTableApi lookupTable) {
+    public LookupTableApi createTable(@RequestBody(required = true) LookupTableApi lookupTable) {
         try {
             LookupTableDto saved = dbTableService.saveAndPostEvent(lookupTable.toDto());
 
@@ -353,9 +357,9 @@ public class LookupTableResource extends RestResource {
     @PUT
     @Path("tables/{idOrName}")
     @AuditEvent(type = AuditEventTypes.LOOKUP_TABLE_UPDATE)
-    @ApiOperation(value = "Update the given lookup table")
-    public LookupTableApi updateTable(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
-                                      @Valid @ApiParam LookupTableApi toUpdate) {
+    @Operation(summary = "Update the given lookup table")
+    public LookupTableApi updateTable(@Parameter(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
+                                      @Valid @RequestBody(required = true) LookupTableApi toUpdate) {
         checkLookupTableId(idOrName, toUpdate);
         checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, toUpdate.id());
         LookupTableDto saved = dbTableService.saveAndPostEvent(toUpdate.toDto());
@@ -366,8 +370,8 @@ public class LookupTableResource extends RestResource {
     @DELETE
     @Path("tables/{idOrName}")
     @AuditEvent(type = AuditEventTypes.LOOKUP_TABLE_DELETE)
-    @ApiOperation(value = "Delete the lookup table")
-    public LookupTableApi removeTable(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
+    @Operation(summary = "Delete the lookup table")
+    public LookupTableApi removeTable(@Parameter(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
         // TODO validate that table isn't in use, how?
         Optional<LookupTableDto> lookupTableDto = dbTableService.get(idOrName);
         if (lookupTableDto.isEmpty()) {
@@ -382,9 +386,9 @@ public class LookupTableResource extends RestResource {
     @POST
     @Path("tables/validate")
     @NoAuditEvent("Validation only")
-    @ApiOperation(value = "Validate the lookup table config")
+    @Operation(summary = "Validate the lookup table config")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
-    public ValidationResult validateTable(@ApiParam LookupTableApi toValidate) {
+    public ValidationResult validateTable(@RequestBody(required = true) LookupTableApi toValidate) {
         final ValidationResult validation = new ValidationResult();
 
         validator.validate(toValidate).stream().forEach(v ->
@@ -417,9 +421,9 @@ public class LookupTableResource extends RestResource {
 
     @GET
     @Path("tables/preview/{idOrName}")
-    @ApiOperation(value = "Preview the entries in a lookup table.")
-    public LookupPreview getPreview(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
-                                    @ApiParam(name = "size") @QueryParam("size") @DefaultValue("5") int size) {
+    @Operation(summary = "Preview the entries in a lookup table.")
+    public LookupPreview getPreview(@Parameter(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
+                                    @Parameter(name = "size") @QueryParam("size") @DefaultValue("5") int size) {
         Optional<LookupTableDto> lookupTableDto = dbTableService.get(idOrName);
         if (lookupTableDto.isEmpty()) {
             throw new NotFoundException();
@@ -468,18 +472,19 @@ public class LookupTableResource extends RestResource {
 
     @GET
     @Path("adapters")
-    @ApiOperation(value = "List available data adapters")
+    @Operation(summary = "List available data adapters")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
-    public DataAdapterPage adapters(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                    @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                    @ApiParam(name = "sort",
-                                              value = "The field to sort the result on",
+    public DataAdapterPage adapters(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                    @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                    @Parameter(name = "sort",
+                                              description = "The field to sort the result on",
                                               required = true,
-                                              allowableValues = "title,description,name,id")
+                                              schema = @Schema(allowableValues = {"title", "description", "name"}))
                                     @DefaultValue(DataAdapterDto.FIELD_TITLE) @QueryParam("sort") String sort,
-                                    @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                    @Parameter(name = "order", description = "The sort direction",
+                                              schema = @Schema(allowableValues = {"asc", "desc"}))
                                     @DefaultValue("desc") @QueryParam("order") SortOrder order,
-                                    @ApiParam(name = "query") @QueryParam("query") String query) {
+                                    @Parameter(name = "query") @QueryParam("query") String query) {
 
         if (!ADAPTER_ALLOWABLE_SORT_FIELDS.contains(sort.toLowerCase(Locale.ENGLISH))) {
             sort = DataAdapterDto.FIELD_TITLE;
@@ -500,7 +505,7 @@ public class LookupTableResource extends RestResource {
 
     @GET
     @Path("types/adapters")
-    @ApiOperation(value = "List available data adapter types")
+    @Operation(summary = "List available data adapter types")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
     public Map<String, LookupDataAdapter.Descriptor> availableAdapterTypes() {
 
@@ -518,9 +523,9 @@ public class LookupTableResource extends RestResource {
     @POST
     @NoAuditEvent("Bulk read call")
     @Path("errorstates")
-    @ApiOperation(value = "Retrieve the runtime error states of the given lookup tables, caches and adapters")
+    @Operation(summary = "Retrieve the runtime error states of the given lookup tables, caches and adapters")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
-    public ErrorStates errorStates(@ApiParam(name = "request") @Valid ErrorStatesRequest request) {
+    public ErrorStates errorStates(@Parameter(name = "request") @Valid ErrorStatesRequest request) {
         final ErrorStates.Builder errorStates = ErrorStates.builder();
         if (request.tables() != null) {
             //noinspection ConstantConditions
@@ -547,8 +552,8 @@ public class LookupTableResource extends RestResource {
 
     @GET
     @Path("adapters/{idOrName}")
-    @ApiOperation(value = "List the given data adapter")
-    public DataAdapterApi getAdapter(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
+    @Operation(summary = "List the given data adapter")
+    public DataAdapterApi getAdapter(@Parameter(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
         Optional<DataAdapterDto> dataAdapterDto = dbDataAdapterService.get(idOrName);
         if (dataAdapterDto.isPresent()) {
             checkPermission(RestPermissions.LOOKUP_TABLES_READ, dataAdapterDto.get().id());
@@ -559,13 +564,14 @@ public class LookupTableResource extends RestResource {
 
     @GET
     @Path("adapters/{name}/query")
-    @ApiOperation(value = "Query a lookup table")
+    @Operation(summary = "Query a lookup table")
     @ApiResponses({
-            @ApiResponse(code = 404, message = "If the adapter cannot be found (if it failed or doesn't exist at all)")
+            @ApiResponse(responseCode = "200", description = "Returns lookup result", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "If the adapter cannot be found (if it failed or doesn't exist at all)")
     })
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
-    public LookupResult performAdapterLookup(@ApiParam(name = "name") @PathParam("name") @NotEmpty String name,
-                                             @ApiParam(name = "key") @QueryParam("key") @NotEmpty String key) {
+    public LookupResult performAdapterLookup(@Parameter(name = "name") @PathParam("name") @NotEmpty String name,
+                                             @Parameter(name = "key") @QueryParam("key") @NotEmpty String key) {
         final Collection<LookupDataAdapter> dataAdapters = lookupTableService.getDataAdapters(singleton(name));
         if (!dataAdapters.isEmpty()) {
             return Iterables.getOnlyElement(dataAdapters).get(key);
@@ -577,9 +583,9 @@ public class LookupTableResource extends RestResource {
     @POST
     @Path("adapters")
     @AuditEvent(type = AuditEventTypes.LOOKUP_ADAPTER_CREATE)
-    @ApiOperation(value = "Create a new data adapter")
+    @Operation(summary = "Create a new data adapter")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_CREATE)
-    public DataAdapterApi createAdapter(@Valid @ApiParam DataAdapterApi newAdapter) {
+    public DataAdapterApi createAdapter(@Valid @RequestBody(required = true) DataAdapterApi newAdapter) {
         try {
             DataAdapterDto dto = newAdapter.toDto();
             if (configuration.isCloud() && !dto.config().isCloudCompatible()) {
@@ -600,8 +606,8 @@ public class LookupTableResource extends RestResource {
     @DELETE
     @Path("adapters/{idOrName}")
     @AuditEvent(type = AuditEventTypes.LOOKUP_ADAPTER_DELETE)
-    @ApiOperation(value = "Delete the given data adapter", notes = "The data adapter cannot be in use by any lookup table, otherwise the request will fail.")
-    public DataAdapterApi deleteAdapter(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
+    @Operation(summary = "Delete the given data adapter", description = "The data adapter cannot be in use by any lookup table, otherwise the request will fail.")
+    public DataAdapterApi deleteAdapter(@Parameter(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
         Optional<DataAdapterDto> dataAdapterDto = dbDataAdapterService.get(idOrName);
         if (dataAdapterDto.isEmpty()) {
             throw new NotFoundException();
@@ -623,9 +629,9 @@ public class LookupTableResource extends RestResource {
     @PUT
     @Path("adapters/{idOrName}")
     @AuditEvent(type = AuditEventTypes.LOOKUP_ADAPTER_UPDATE)
-    @ApiOperation(value = "Update the given data adapter settings")
-    public DataAdapterApi updateAdapter(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
-                                        @Valid @ApiParam DataAdapterApi toUpdate) {
+    @Operation(summary = "Update the given data adapter settings")
+    public DataAdapterApi updateAdapter(@Parameter(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
+                                        @Valid @RequestBody(required = true) DataAdapterApi toUpdate) {
         checkLookupAdapterId(idOrName, toUpdate);
         checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, toUpdate.id());
         DataAdapterDto saved = dbDataAdapterService.saveAndPostEvent(toUpdate.toDto());
@@ -636,9 +642,9 @@ public class LookupTableResource extends RestResource {
     @POST
     @Path("adapters/validate")
     @NoAuditEvent("Validation only")
-    @ApiOperation(value = "Validate the data adapter config")
+    @Operation(summary = "Validate the data adapter config")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
-    public ValidationResult validateAdapter(@ApiParam DataAdapterApi toValidate) {
+    public ValidationResult validateAdapter(@RequestBody(required = true) DataAdapterApi toValidate) {
         final ValidationResult validation = new ValidationResult();
 
         validator.validate(toValidate).stream().forEach(v ->
@@ -683,18 +689,19 @@ public class LookupTableResource extends RestResource {
 
     @GET
     @Path("caches")
-    @ApiOperation(value = "List available caches")
+    @Operation(summary = "List available caches")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
-    public CachesPage caches(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                             @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                             @ApiParam(name = "sort",
-                                       value = "The field to sort the result on",
+    public CachesPage caches(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                             @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                             @Parameter(name = "sort",
+                                       description = "The field to sort the result on",
                                        required = true,
-                                       allowableValues = "title,description,name,id")
+                                       schema = @Schema(allowableValues = {"title", "description", "name"}))
                              @DefaultValue(CacheDto.FIELD_TITLE) @QueryParam("sort") String sort,
-                             @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                             @Parameter(name = "order", description = "The sort direction",
+                                       schema = @Schema(allowableValues = {"asc", "desc"}))
                              @DefaultValue("desc") @QueryParam("order") SortOrder order,
-                             @ApiParam(name = "query") @QueryParam("query") String query) {
+                             @Parameter(name = "query") @QueryParam("query") String query) {
         if (!CACHE_ALLOWABLE_SORT_FIELDS.contains(sort.toLowerCase(Locale.ENGLISH))) {
             sort = CacheDto.FIELD_TITLE;
         }
@@ -715,7 +722,7 @@ public class LookupTableResource extends RestResource {
 
     @GET
     @Path("types/caches")
-    @ApiOperation(value = "List available caches types")
+    @Operation(summary = "List available caches types")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
     public Map<String, LookupCache.Descriptor> availableCacheTypes() {
         return cacheTypes.values().stream()
@@ -726,8 +733,8 @@ public class LookupTableResource extends RestResource {
 
     @GET
     @Path("caches/{idOrName}")
-    @ApiOperation(value = "List the given cache")
-    public CacheApi getCache(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
+    @Operation(summary = "List the given cache")
+    public CacheApi getCache(@Parameter(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
         Optional<CacheDto> cacheDto = dbCacheService.get(idOrName);
         if (cacheDto.isPresent()) {
             checkPermission(RestPermissions.LOOKUP_TABLES_READ, cacheDto.get().id());
@@ -739,9 +746,9 @@ public class LookupTableResource extends RestResource {
     @POST
     @Path("caches")
     @AuditEvent(type = AuditEventTypes.LOOKUP_CACHE_CREATE)
-    @ApiOperation(value = "Create a new cache")
+    @Operation(summary = "Create a new cache")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_CREATE)
-    public CacheApi createCache(@ApiParam CacheApi newCache) {
+    public CacheApi createCache(@RequestBody(required = true) CacheApi newCache) {
         try {
             final CacheDto saved = dbCacheService.saveAndPostEvent(newCache.toDto());
             return CacheApi.fromDto(saved);
@@ -756,8 +763,8 @@ public class LookupTableResource extends RestResource {
     @DELETE
     @Path("caches/{idOrName}")
     @AuditEvent(type = AuditEventTypes.LOOKUP_CACHE_DELETE)
-    @ApiOperation(value = "Delete the given cache", notes = "The cache cannot be in use by any lookup table, otherwise the request will fail.")
-    public CacheApi deleteCache(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
+    @Operation(summary = "Delete the given cache", description = "The cache cannot be in use by any lookup table, otherwise the request will fail.")
+    public CacheApi deleteCache(@Parameter(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
         Optional<CacheDto> cacheDto = dbCacheService.get(idOrName);
         if (cacheDto.isEmpty()) {
             throw new NotFoundException();
@@ -779,9 +786,9 @@ public class LookupTableResource extends RestResource {
     @PUT
     @Path("caches/{idOrName}")
     @AuditEvent(type = AuditEventTypes.LOOKUP_CACHE_UPDATE)
-    @ApiOperation(value = "Update the given cache settings")
-    public CacheApi updateCache(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
-                                @ApiParam CacheApi toUpdate) {
+    @Operation(summary = "Update the given cache settings")
+    public CacheApi updateCache(@Parameter(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
+                                @RequestBody(required = true) CacheApi toUpdate) {
         checkLookupCacheId(idOrName, toUpdate);
         checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, toUpdate.id());
         CacheDto saved = dbCacheService.saveAndPostEvent(toUpdate.toDto());
@@ -791,9 +798,9 @@ public class LookupTableResource extends RestResource {
     @POST
     @Path("caches/validate")
     @NoAuditEvent("Validation only")
-    @ApiOperation(value = "Validate the cache config")
+    @Operation(summary = "Validate the cache config")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
-    public ValidationResult validateCache(@ApiParam CacheApi toValidate) {
+    public ValidationResult validateCache(@RequestBody(required = true) CacheApi toValidate) {
         final ValidationResult validation = new ValidationResult();
 
         validator.validate(toValidate).stream().forEach(v ->

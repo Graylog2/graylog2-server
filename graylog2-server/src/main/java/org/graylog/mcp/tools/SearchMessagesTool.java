@@ -33,6 +33,7 @@ import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiService;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedException;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.web.customization.CustomizationConfig;
 import org.slf4j.Logger;
@@ -50,12 +51,12 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
     private final ScriptingApiService scriptingApiService;
 
     @Inject
-    public SearchMessagesTool(ObjectMapper objectMapper,
-                              SchemaGeneratorProvider schemaGeneratorProvider,
-                              CustomizationConfig customizationConfig,
-                              ScriptingApiService scriptingApiService) {
-        super(objectMapper,
-                schemaGeneratorProvider,
+    public SearchMessagesTool(ScriptingApiService scriptingApiService,
+                              final CustomizationConfig customizationConfig,
+                              final ObjectMapper objectMapper,
+                              final ClusterConfigService clusterConfigService,
+                              final SchemaGeneratorProvider schemaGeneratorProvider) {
+        super(
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
@@ -68,7 +69,11 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
                         Pass the timerange as a parameter, never put it into the query itself.
                         List the fields you are interested in, as the default fields are "source" and "timestamp" only, which aren't overly useful by themselves.
                         The query string supports Lucene query language, but be careful about leading wildcards, %1$s might not have them enabled.
-                        """.formatted(customizationConfig.productName()));
+                        """.formatted(customizationConfig.productName()),
+                objectMapper,
+                clusterConfigService,
+                schemaGeneratorProvider
+                );
         this.scriptingApiService = scriptingApiService;
     }
 

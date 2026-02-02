@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import HighlightForm from 'views/components/sidebar/highlighting/HighlightForm';
@@ -49,7 +49,7 @@ describe('HighlightForm', () => {
 
   const triggerSaveButtonClick = async () => {
     const elem = await screen.findByText('Update rule');
-    fireEvent.click(elem);
+    await userEvent.click(elem);
   };
 
   useViewsPlugin();
@@ -75,7 +75,7 @@ describe('HighlightForm', () => {
     const { findByText } = render(<SUT onClose={onClose} />);
     const elem = await findByText('Cancel');
 
-    fireEvent.click(elem);
+    await userEvent.click(elem);
 
     expect(onClose).toHaveBeenCalledTimes(1);
   });

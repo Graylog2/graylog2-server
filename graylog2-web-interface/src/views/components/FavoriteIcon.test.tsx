@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import FavoriteIcon from 'views/components/FavoriteIcon';
 import { asMock } from 'helpers/mocking';
@@ -38,7 +39,7 @@ describe('FavoriteIcon', () => {
     render(<FavoriteIcon isFavorite grn={grn} onChange={onChange} />);
 
     const favIcon = await screen.findByTitle('Remove from favorites');
-    fireEvent.click(favIcon);
+    await userEvent.click(favIcon);
 
     await expect(deleteItem).toHaveBeenCalledWith(grn);
     await expect(onChange).toHaveBeenCalledWith(false);
@@ -48,7 +49,7 @@ describe('FavoriteIcon', () => {
     render(<FavoriteIcon isFavorite={false} grn={grn} onChange={onChange} />);
 
     const favIcon = await screen.findByTitle('Add to favorites');
-    fireEvent.click(favIcon);
+    await userEvent.click(favIcon);
 
     await expect(putItem).toHaveBeenCalledWith(grn);
     await expect(onChange).toHaveBeenCalledWith(true);

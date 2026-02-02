@@ -22,10 +22,10 @@ import DataNodeStatusCell from 'components/datanode/DataNodeList/DataNodeStatusC
 import type { DataNode } from 'components/datanode/Types';
 import Routes from 'routing/Routes';
 
-import type { ClusterDataNode } from './useClusterDataNodes';
-import CpuMetricsCell from './cells/CpuMetricsCell';
+import type { ClusterDataNode } from './fetchClusterDataNodes';
 import IndexingMetricsCell from './cells/IndexingMetricsCell';
 
+import CpuMetricsCell from '../shared-components/CpuMetricsCell';
 import { RoleLabel, SecondaryText } from '../shared-components/NodeMetricsLayout';
 import SizeAndRatioMetric from '../shared-components/SizeAndRatioMetric';
 
@@ -39,18 +39,16 @@ export const DEFAULT_VISIBLE_COLUMNS = [
   'jvm',
   'indexing',
   'storage',
-] as const;
+];
 
 const JVM_WARNING_THRESHOLD = 0.95;
 const MEMORY_WARNING_THRESHOLD = 0.95;
 const STORAGE_WARNING_THRESHOLD = 0.7;
 const STORAGE_DANGER_THRESHOLD = 0.8;
+const CPU_WARNING_THRESHOLD = 0.7;
+const CPU_DANGER_THRESHOLD = 0.9;
 
 export const createColumnDefinitions = (): Array<ColumnSchema> => [
-  { id: 'hostname', title: 'Node', sortable: true },
-  { id: 'opensearch_roles', title: 'Role', sortable: true },
-  { id: 'datanode_version', title: 'Version', sortable: true },
-  { id: 'datanode_status', title: 'State', sortable: true },
   { id: 'cpu', title: 'CPU', sortable: false, isDerived: true },
   { id: 'memory', title: 'Memory', sortable: false, isDerived: true },
   { id: 'jvm', title: 'JVM', sortable: false, isDerived: true },
@@ -84,9 +82,11 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
 
         return <Link to={Routes.SYSTEM.CLUSTER.DATANODE_SHOW(datanodeRouteId)}>{nodeName}</Link>;
       },
+      minWidth: 300,
     },
     datanode_status: {
       renderCell: (_value, entity) => <DataNodeStatusCell dataNode={entity} />,
+      staticWidth: 130,
     },
     memory: {
       renderCell: (_value, entity) => (
@@ -96,6 +96,7 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
           warningThreshold={MEMORY_WARNING_THRESHOLD}
         />
       ),
+      staticWidth: 130,
     },
     jvm: {
       renderCell: (_value, entity) => (
@@ -106,9 +107,18 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
           warningThreshold={JVM_WARNING_THRESHOLD}
         />
       ),
+      staticWidth: 130,
     },
     cpu: {
-      renderCell: (_value, entity) => <CpuMetricsCell loadAverage={entity.metrics?.cpuLoadAverage1m} />,
+      renderCell: (_value, entity) => (
+        <CpuMetricsCell
+          loadAverage={entity.metrics?.cpuLoadAverage1m}
+          cpuPercent={entity.metrics?.cpuPercent}
+          warningThreshold={CPU_WARNING_THRESHOLD}
+          dangerThreshold={CPU_DANGER_THRESHOLD}
+        />
+      ),
+      staticWidth: 130,
     },
     indexing: {
       renderCell: (_value, entity) => (
@@ -117,6 +127,7 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
           indexTimeInMillis={entity.metrics?.indexTimeInMillis}
         />
       ),
+      staticWidth: 130,
     },
     storage: {
       renderCell: (_value, entity) => (
@@ -127,6 +138,7 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
           dangerThreshold={STORAGE_DANGER_THRESHOLD}
         />
       ),
+      staticWidth: 130,
     },
     datanode_version: {
       renderCell: (_value, entity) => (
@@ -134,9 +146,11 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
           <span>{entity.datanode_version ?? 'N/A'}</span>
         </SecondaryText>
       ),
+      minWidth: 200,
     },
     opensearch_roles: {
       renderCell: (_value, entity) => getRoleLabels(getDataNodeRoles(entity)),
+      minWidth: 220,
     },
   },
 });

@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 
 import { Input, ListGroupItem } from 'components/bootstrap';
 import type { Attribute } from 'stores/PaginationTypes';
-import type { Filters, Filter } from 'components/common/EntityFilters/types';
+import type { Filters } from 'components/common/EntityFilters/types';
 import { PaginatedList, NoSearchResult } from 'components/common';
 import useIsKeyHeld from 'hooks/useIsKeyHeld';
 import Spinner from 'components/common/Spinner';
@@ -62,29 +62,29 @@ type Suggestion = {
 type Props = {
   allActiveFilters: Filters | undefined;
   attribute: Attribute;
-  filter: Filter | undefined;
   filterValueRenderer: (value: unknown, title: string) => React.ReactNode | undefined;
-  onSubmit: (filter: { title: string; value: string }, closeDropdown: boolean) => void;
-  suggestions: Array<Suggestion>;
   isLoading: boolean;
-  total: number;
+  multiSelect: boolean;
+  onSubmit: (filter: { title: string; value: string }, closeDropdown: boolean) => void;
   page: number;
   pageSize: number;
   setSearchParams: (updater: (current: SearchParams) => SearchParams) => void;
+  suggestions: Array<Suggestion>;
+  total: number;
 };
 
 const SuggestionsList = ({
+  allActiveFilters,
   attribute,
   filterValueRenderer,
-  onSubmit,
-  allActiveFilters,
-  filter,
   isLoading,
-  suggestions,
-  total,
-  setSearchParams,
+  multiSelect,
+  onSubmit,
   page,
   pageSize,
+  setSearchParams,
+  suggestions,
+  total,
 }: Props) => {
   const isShiftHeld = useIsKeyHeld('Shift');
   const handleSearchChange = useCallback(
@@ -138,7 +138,7 @@ const SuggestionsList = ({
                     value: suggestion.targetId || suggestion.id,
                     title: suggestion.value,
                   },
-                  !isShiftHeld,
+                  !multiSelect ? true : !isShiftHeld,
                 );
               };
 
@@ -154,7 +154,7 @@ const SuggestionsList = ({
 
       {!suggestions?.length && <NoSearchResult>No entities found</NoSearchResult>}
 
-      {!filter && (
+      {multiSelect && (
         <Hint>
           <i>Hold Shift to select multiple</i>
         </Hint>

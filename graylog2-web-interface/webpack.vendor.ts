@@ -111,6 +111,8 @@ if (TARGET === 'start') {
         {
           context: ['/api', '/config.js', '/sso'],
           target: apiUrl,
+          // Skip proxying for /api-browser - it's a frontend route, not an API endpoint
+          bypass: (req) => (req.path.startsWith('/api-browser') ? req.path : null),
           onProxyReq: (proxyReq, req) => {
             const existingHeader = proxyReq.getHeader('X-Graylog-Server-URL');
             if (!existingHeader?.trim()) {

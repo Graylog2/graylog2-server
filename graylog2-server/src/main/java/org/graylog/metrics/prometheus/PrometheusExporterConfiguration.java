@@ -17,6 +17,8 @@
 package org.graylog.metrics.prometheus;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.documentation.Documentation;
+import com.github.joschi.jadconfig.documentation.DocumentationSection;
 import com.github.joschi.jadconfig.guava.converters.HostAndPortConverter;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.FilePathReadableValidator;
@@ -26,6 +28,7 @@ import com.google.common.net.HostAndPort;
 import java.nio.file.Path;
 
 @SuppressWarnings({"FieldMayBeFinal", "unused"})
+@DocumentationSection(heading = "Prometheus Exporter", description = "")
 public class PrometheusExporterConfiguration {
     private static final String PREFIX = "prometheus_exporter_";
 
@@ -40,18 +43,42 @@ public class PrometheusExporterConfiguration {
     // https://github.com/prometheus/prometheus/wiki/Default-port-allocations
     private static int DEFAULT_BIND_ADDRESS_PORT = 9833;
 
+    @Documentation("""
+            Enable Prometheus exporter HTTP server.
+            Default: false
+            """)
     @Parameter(value = ENABLED, required = true)
     private boolean enabled = false;
 
+    @Documentation("""
+            IP address and port for the Prometheus exporter HTTP server.
+            Default: 127.0.0.1:9833
+            """)
     @Parameter(value = BIND_ADDRESS, converter = CustomHostAndPortConverter.class)
     private HostAndPort bindAddress = HostAndPort.fromParts(DEFAULT_BIND_ADDRESS_HOST, DEFAULT_BIND_ADDRESS_PORT);
 
+    @Documentation("""
+            Path to the Prometheus exporter core mapping file. If this option is enabled, the full built-in core mapping is
+            replaced with the mappings in this file.
+            This file is monitored for changes and updates will be applied at runtime.
+            Default: none
+            """)
     @Parameter(value = MAPPING_FILE_PATH_CORE, validators = {FilePathReadableValidator.class})
     private Path mappingFilePathCore;
 
+    @Documentation("""
+            Path to the Prometheus exporter custom mapping file. If this option is enabled, the mappings in this file are
+            configured in addition to the built-in core mappings. The mappings in this file cannot overwrite any core mappings.
+            This file is monitored for changes and updates will be applied at runtime.
+            Default: none
+            """)
     @Parameter(value = MAPPING_FILE_PATH_CUSTOM, validators = {FilePathReadableValidator.class})
     private Path mappingFilePathCustom;
 
+    @Documentation("""
+            Configures the refresh interval for the monitored Prometheus exporter mapping files.
+            Default: 60s
+            """)
     @Parameter(value = MAPPING_FILE_REFRESH_INTERVAL, validators = {PositiveDurationValidator.class})
     private Duration mappingFileRefreshInterval = Duration.seconds(60);
 

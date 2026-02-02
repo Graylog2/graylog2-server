@@ -60,5 +60,7 @@ class V202406260800_MigrateCertificateAuthorityTest {
 
         final Set<String> existingCollections = mongoConnection.getMongoDatabase().listCollectionNames().into(new HashSet<>());
         Assertions.assertThat(existingCollections).doesNotContain(V202406260800_MigrateCertificateAuthority.LEGACY_COLLECTION_NAME);
+
+        Mockito.verify(clusterConfigService, Mockito.times(1)).write(Mockito.any(V202406260800_MigrateCertificateAuthority.MigrationCompleted.class));
     }
 }
