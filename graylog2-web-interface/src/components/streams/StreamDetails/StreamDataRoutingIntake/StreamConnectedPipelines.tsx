@@ -48,8 +48,10 @@ const ListCol = styled(Col)(
   `,
 );
 
+const noOpFunction = () => {};
+
 const StreamConnectedPipelines = ({ stream }: Props) => {
-  const [hasPipelines, setHasPipelines] = useState(false);
+  const [hasPipelines, setHasPipelines] = useState(true);
 
   return (
     <Section title="Pipelines" collapsible>
@@ -65,7 +67,7 @@ const StreamConnectedPipelines = ({ stream }: Props) => {
             columnRenderers={customColumnRenderers}
             entityActions={() => null}
             onDataLoaded={(data) => setHasPipelines(data.pagination.total > 0)}
-            externalSearch={hasPipelines ? undefined : { query: '', onSearch: () => {}, onReset: () => {} }}
+            externalSearch={hasPipelines ? undefined : { query: '', onSearch: noOpFunction, onReset: noOpFunction }}
           />
         </ListCol>
       </Row>
