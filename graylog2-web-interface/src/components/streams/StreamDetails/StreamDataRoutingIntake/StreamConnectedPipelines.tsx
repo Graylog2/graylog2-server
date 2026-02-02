@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Col, Row } from 'components/bootstrap';
@@ -47,23 +48,29 @@ const ListCol = styled(Col)(
   `,
 );
 
-const StreamConnectedPipelines = ({ stream }: Props) => (
-  <Section title="Connected Pipelines" collapsible defaultClosed>
-    <Row>
-      <ListCol md={12}>
-        <PaginatedEntityTable<StreamConnectedPipeline>
-          humanName="pipelines"
-          tableLayout={DEFAULT_LAYOUT}
-          fetchEntities={(searchParams) => fetchStreamConnectedPipelines(stream.id, searchParams)}
-          keyFn={(searchParams) => keyFn(stream.id, searchParams)}
-          entityAttributesAreCamelCase={false}
-          searchPlaceholder="Search for pipeline"
-          columnRenderers={customColumnRenderers}
-          entityActions={() => null}
-        />
-      </ListCol>
-    </Row>
-  </Section>
-);
+const StreamConnectedPipelines = ({ stream }: Props) => {
+  const [hasPipelines, setHasPipelines] = useState(true);
+
+  return (
+    <Section title="Pipelines" collapsible>
+      <Row>
+        <ListCol md={12}>
+          <PaginatedEntityTable<StreamConnectedPipeline>
+            humanName="pipelines"
+            tableLayout={DEFAULT_LAYOUT}
+            fetchEntities={(searchParams) => fetchStreamConnectedPipelines(stream.id, searchParams)}
+            keyFn={(searchParams) => keyFn(stream.id, searchParams)}
+            entityAttributesAreCamelCase={false}
+            searchPlaceholder="Search for pipeline"
+            columnRenderers={customColumnRenderers}
+            entityActions={() => null}
+            onDataLoaded={(data) => setHasPipelines(data.pagination.total > 0)}
+            externalSearch={hasPipelines ? undefined : { query: '', onSearch: () => {}, onReset: () => {} }}
+          />
+        </ListCol>
+      </Row>
+    </Section>
+  );
+};
 
 export default StreamConnectedPipelines;
