@@ -21,6 +21,7 @@ import opamp.proto.Opamp.AgentToServer;
 import opamp.proto.Opamp.ServerToAgent;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.websockets.WebSocketEngine;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.opamp.OpAmpService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,6 +46,8 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -66,10 +69,12 @@ class OpAmpWebSocketIT {
         final var listener = httpServer.getListener("grizzly");
 
         opAmpService = mock(OpAmpService.class);
+        final var httpConfiguration = mock(HttpConfiguration.class);
+        when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("http://localhost:" + port));
         final var executor = Executors.newVirtualThreadPerTaskExecutor();
 
         // Enable WebSocket addon with auth filter (matches production setup)
-        listener.registerAddOn(new OpAmpAddOn(new OpAmpWebSocketAuthFilter(opAmpService, executor)));
+        listener.registerAddOn(new OpAmpAddOn(new OpAmpWebSocketAuthFilter(opAmpService, executor, httpConfiguration)));
 
         final var wsApp = new OpAmpWebSocketApplication(opAmpService, executor);
 
@@ -93,7 +98,7 @@ class OpAmpWebSocketIT {
 
     @Test
     void rejectsConnectionWithInvalidAuth() {
-        when(opAmpService.authenticate("Bearer invalid")).thenReturn(Optional.empty());
+        when(opAmpService.authenticate(eq("Bearer invalid"), any())).thenReturn(Optional.empty());
 
         final var listener = new TestWebSocketListener(new CompletableFuture<>());
 
@@ -108,7 +113,7 @@ class OpAmpWebSocketIT {
 
     @Test
     void rejectsConnectionWithMissingAuth() {
-        when(opAmpService.authenticate(null)).thenReturn(Optional.empty());
+        when(opAmpService.authenticate(any(), any())).thenReturn(Optional.empty());
 
         final var listener = new TestWebSocketListener(new CompletableFuture<>());
 
@@ -121,7 +126,7 @@ class OpAmpWebSocketIT {
 
     @Test
     void acceptsConnectionWithValidAuth() throws Exception {
-        when(opAmpService.authenticate("Bearer valid")).thenReturn(Optional.of(new OpAmpAuthContext(true)));
+        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet")));
         when(opAmpService.handleMessage(AgentToServer.getDefaultInstance()))
                 .thenReturn(ServerToAgent.getDefaultInstance());
 
@@ -146,7 +151,7 @@ class OpAmpWebSocketIT {
 
     @Test
     void processesValidMessage() throws Exception {
-        when(opAmpService.authenticate("Bearer valid")).thenReturn(Optional.of(new OpAmpAuthContext(true)));
+        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet")));
 
         final var agentMsg = AgentToServer.newBuilder()
                 .setInstanceUid(ByteString.copyFromUtf8("test-instance-uid"))
@@ -187,7 +192,7 @@ class OpAmpWebSocketIT {
 
     @Test
     void handlesInvalidProtobufGracefully() throws Exception {
-        when(opAmpService.authenticate("Bearer valid")).thenReturn(Optional.of(new OpAmpAuthContext(true)));
+        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet")));
         when(opAmpService.handleMessage(AgentToServer.getDefaultInstance()))
                 .thenReturn(ServerToAgent.getDefaultInstance());
 
@@ -214,7 +219,7 @@ class OpAmpWebSocketIT {
 
     @Test
     void rejectsMessageWithInvalidHeader() throws Exception {
-        when(opAmpService.authenticate("Bearer valid")).thenReturn(Optional.of(new OpAmpAuthContext(true)));
+        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet")));
         when(opAmpService.handleMessage(AgentToServer.getDefaultInstance()))
                 .thenReturn(ServerToAgent.getDefaultInstance());
 

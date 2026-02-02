@@ -77,12 +77,7 @@ public class OpAmpWebSocketApplication extends WebSocketApplication {
 
         executor.submit(() -> {
             try {
-                if (!authContext.authenticated()) {
-                    LOG.warn("Received message on unauthenticated socket");
-                    socket.close();
-                    return;
-                }
-
+                // Auth context presence indicates authenticated connection (sealed interface pattern)
                 // Read OpAMP header (must be 0 per spec)
                 final var input = CodedInputStream.newInstance(data);
                 final long header = input.readUInt64();

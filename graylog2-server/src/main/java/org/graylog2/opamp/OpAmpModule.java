@@ -16,16 +16,18 @@
  */
 package org.graylog2.opamp;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
-import org.graylog2.opamp.transport.OpAmpWebSocketAuthFilter;
+import org.graylog2.opamp.enrollment.EnrollmentTokenService;
+import org.graylog2.opamp.rest.EnrollmentTokenResource;
 import org.graylog2.opamp.transport.OpAmpHttpHandler;
 import org.graylog2.opamp.transport.OpAmpWebSocketApplication;
+import org.graylog2.opamp.transport.OpAmpWebSocketAuthFilter;
+import org.graylog2.plugin.PluginModule;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class OpAmpModule extends AbstractModule {
+public class OpAmpModule extends PluginModule {
     @Override
     protected void configure() {
         bind(OpAmpService.class).in(Scopes.SINGLETON);
@@ -34,5 +36,9 @@ public class OpAmpModule extends AbstractModule {
         bind(OpAmpWebSocketAuthFilter.class).in(Scopes.SINGLETON);
         bind(ExecutorService.class).annotatedWith(OpAmpExecutor.class)
                 .toInstance(Executors.newVirtualThreadPerTaskExecutor());
+
+        // Certificate enrollment services
+        bind(EnrollmentTokenService.class).in(Scopes.SINGLETON);
+        addSystemRestResource(EnrollmentTokenResource.class);
     }
 }

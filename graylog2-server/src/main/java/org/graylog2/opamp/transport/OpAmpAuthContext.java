@@ -20,12 +20,26 @@ import org.glassfish.grizzly.http.HttpRequestPacket;
 
 import java.util.Optional;
 
-// TODO: the authenticated field is just a dummy and should be replaced with real auth context info later
-public record OpAmpAuthContext(boolean authenticated) {
+/**
+ * Authentication context for OpAMP connections.
+ * <p>
+ * Sealed interface enables type-safe dispatch in message handlers:
+ * <pre>{@code
+ * switch (authContext) {
+ *     case Enrollment e -> handleEnrollment(message, e.fleetId());
+ * }
+ * }</pre>
+ */
+public sealed interface OpAmpAuthContext {
 
-    static final String REQUEST_ATTRIBUTE = "opamp.auth.context";
+    String REQUEST_ATTRIBUTE = "opamp.auth.context";
 
-    public static Optional<OpAmpAuthContext> fromRequest(HttpRequestPacket request) {
+    static Optional<OpAmpAuthContext> fromRequest(HttpRequestPacket request) {
         return Optional.ofNullable((OpAmpAuthContext) request.getAttribute(REQUEST_ATTRIBUTE));
     }
+
+    /**
+     * Context for agents authenticating with enrollment tokens.
+     */
+    record Enrollment(String fleetId) implements OpAmpAuthContext {}
 }

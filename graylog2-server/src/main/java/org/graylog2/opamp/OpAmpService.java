@@ -20,36 +20,32 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import opamp.proto.Opamp.AgentToServer;
 import opamp.proto.Opamp.ServerToAgent;
-import org.apache.commons.lang3.Strings;
+import org.graylog2.opamp.enrollment.EnrollmentTokenService;
 import org.graylog2.opamp.transport.OpAmpAuthContext;
-import org.graylog2.security.AccessTokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URI;
 import java.util.Optional;
 
 @Singleton
 public class OpAmpService {
     private static final Logger LOG = LoggerFactory.getLogger(OpAmpService.class);
 
-    private final AccessTokenService accessTokenService;
+    private final EnrollmentTokenService enrollmentTokenService;
 
     @Inject
-    public OpAmpService(AccessTokenService accessTokenService) {
-        this.accessTokenService = accessTokenService;
+    public OpAmpService(EnrollmentTokenService enrollmentTokenService) {
+        this.enrollmentTokenService = enrollmentTokenService;
     }
 
-    public Optional<OpAmpAuthContext> authenticate(String authHeader) {
+    public Optional<OpAmpAuthContext> authenticate(String authHeader, URI effectiveExternalUri) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return Optional.empty();
         }
-        final var token = Strings.CS.removeStart(authHeader, "Bearer ");
-
-        // TODO: permission check, populate context with token info
-        if (accessTokenService.load(token) != null) {
-            return Optional.of(new OpAmpAuthContext(true));
-        }
-        return Optional.empty();
+        final String token = authHeader.substring(7);
+        return enrollmentTokenService.validateToken(token, effectiveExternalUri)
+                .map(e -> e);  // Upcast Enrollment to OpAmpAuthContext
     }
 
     public ServerToAgent handleMessage(AgentToServer message) {

@@ -1,0 +1,159 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog.security.certificates;
+
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.openssl.PEMKeyPair;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.Security;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.HexFormat;
+
+/**
+ * Utility class for PEM encoding, decoding, and certificate operations.
+ * <p>
+ * This class provides static methods for working with X.509 certificates and private keys
+ * in PEM format, as well as computing certificate fingerprints.
+ * <p>
+ * TODO: Consider consolidating with SAMLCredentialUtils (enterprise plugin) and
+ *       PemCaReader/PemReader (certutil package) to reduce code duplication across
+ *       the codebase. All use the same BouncyCastle patterns for PEM handling.
+ */
+public final class PemUtils {
+
+    static {
+        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+    }
+
+    private PemUtils() {
+        // Utility class - no instantiation
+    }
+
+    /**
+     * Encodes an X.509 certificate as PEM.
+     *
+     * @param certificate the certificate to encode
+     * @return the PEM-encoded certificate
+     * @throws IOException if encoding fails
+     */
+    public static String toPem(X509Certificate certificate) throws IOException {
+        final StringWriter writer = new StringWriter();
+        try (JcaPEMWriter pemWriter = new JcaPEMWriter(writer)) {
+            pemWriter.writeObject(certificate);
+        }
+        return writer.toString();
+    }
+
+    /**
+     * Encodes a private key as PEM.
+     *
+     * @param privateKey the private key to encode
+     * @return the PEM-encoded private key
+     * @throws IOException if encoding fails
+     */
+    public static String toPem(PrivateKey privateKey) throws IOException {
+        final StringWriter writer = new StringWriter();
+        try (JcaPEMWriter pemWriter = new JcaPEMWriter(writer)) {
+            pemWriter.writeObject(privateKey);
+        }
+        return writer.toString();
+    }
+
+    /**
+     * Parses a PEM-encoded X.509 certificate.
+     *
+     * @param pem the PEM-encoded certificate
+     * @return the parsed X509Certificate
+     * @throws IOException if parsing fails
+     * @throws CertificateException if the certificate is invalid
+     */
+    public static X509Certificate parseCertificate(String pem) throws IOException, CertificateException {
+        try (PEMParser pemParser = new PEMParser(new StringReader(pem))) {
+            final Object object = pemParser.readObject();
+            if (object instanceof X509CertificateHolder holder) {
+                return new JcaX509CertificateConverter()
+                        .setProvider("BC")
+                        .getCertificate(holder);
+            }
+            throw new CertificateException("PEM does not contain a valid X.509 certificate");
+        }
+    }
+
+    /**
+     * Parses a PEM-encoded private key.
+     * Supports both PKCS#8 (PrivateKeyInfo) and traditional (PEMKeyPair) formats.
+     *
+     * @param pem the PEM-encoded private key
+     * @return the parsed PrivateKey
+     * @throws IOException if parsing fails or the PEM doesn't contain a valid private key
+     */
+    public static PrivateKey parsePrivateKey(String pem) throws IOException {
+        try (PEMParser pemParser = new PEMParser(new StringReader(pem))) {
+            final Object object = pemParser.readObject();
+            final JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
+            if (object instanceof org.bouncycastle.asn1.pkcs.PrivateKeyInfo privateKeyInfo) {
+                return converter.getPrivateKey(privateKeyInfo);
+            } else if (object instanceof PEMKeyPair pemKeyPair) {
+                return converter.getPrivateKey(pemKeyPair.getPrivateKeyInfo());
+            }
+            throw new IOException("PEM does not contain a valid private key");
+        }
+    }
+
+    /**
+     * Computes the SHA-256 fingerprint of an X.509 certificate.
+     *
+     * @param certificate the certificate to compute the fingerprint for
+     * @return the fingerprint in format "sha256:hexstring"
+     * @throws CertificateEncodingException if the certificate cannot be encoded
+     * @throws NoSuchAlgorithmException if SHA-256 is not available
+     */
+    public static String computeFingerprint(X509Certificate certificate)
+            throws CertificateEncodingException, NoSuchAlgorithmException {
+        final MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        final byte[] hash = digest.digest(certificate.getEncoded());
+        return "sha256:" + HexFormat.of().formatHex(hash);
+    }
+
+    /**
+     * Detects the algorithm used by a certificate based on its public key.
+     *
+     * @param certificate the certificate to analyze
+     * @return the detected Algorithm
+     * @throws IllegalArgumentException if the algorithm is not supported
+     */
+    public static Algorithm detectAlgorithm(X509Certificate certificate) {
+        final String keyAlgorithm = certificate.getPublicKey().getAlgorithm();
+        return switch (keyAlgorithm) {
+            case "Ed25519" -> Algorithm.ED25519;
+            case "RSA" -> Algorithm.RSA_4096;
+            default -> throw new IllegalArgumentException("Unsupported key algorithm: " + keyAlgorithm);
+        };
+    }
+}
