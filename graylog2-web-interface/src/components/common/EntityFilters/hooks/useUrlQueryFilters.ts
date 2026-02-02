@@ -20,7 +20,12 @@ import { OrderedMap } from 'immutable';
 import { useQueryParam, ArrayParam } from 'routing/QueryParams';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
-const useUrlQueryFilters = (): [UrlQueryFilters, (filters: UrlQueryFilters) => void] => {
+type UpdateType = 'push' | 'pushIn' | 'replace' | 'replaceIn';
+
+const useUrlQueryFilters = (): [
+  UrlQueryFilters,
+  (filters: UrlQueryFilters, updateType?: UpdateType) => void,
+] => {
   const [pureUrlQueryFilters, setPureUrlQueryFilters] = useQueryParam('filters', ArrayParam);
 
   const filtersFromQuery = useMemo(
@@ -34,12 +39,12 @@ const useUrlQueryFilters = (): [UrlQueryFilters, (filters: UrlQueryFilters) => v
   );
 
   const setFilterValues = useCallback(
-    (newFilters: UrlQueryFilters) => {
+    (newFilters: UrlQueryFilters, updateType?: UpdateType) => {
       const newPureUrlQueryFilters = newFilters
         .entrySeq()
         .reduce((col, [attributeId, filters]) => [...col, ...filters.map((value) => `${attributeId}=${value}`)], []);
 
-      setPureUrlQueryFilters(newPureUrlQueryFilters);
+      setPureUrlQueryFilters(newPureUrlQueryFilters, updateType);
     },
     [setPureUrlQueryFilters],
   );

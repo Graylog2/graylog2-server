@@ -38,7 +38,7 @@ export const useWithURLParams = (layoutConfig: LayoutConfig, defaultFilters?: Ur
       const urlHasNoFilters = !urlQueryFilters || urlQueryFilters.size === 0;
 
       if (urlHasNoFilters) {
-        setUrlQueryFilters(defaultFilters);
+        setUrlQueryFilters(defaultFilters, 'replaceIn');
       }
 
       hasInitialized.current = true;
@@ -61,7 +61,7 @@ export const useWithURLParams = (layoutConfig: LayoutConfig, defaultFilters?: Ur
   const onChangeFilters = useCallback(
     (newUrlQueryFilters: UrlQueryFilters) => {
       urlPagination.resetPage();
-      setUrlQueryFilters(newUrlQueryFilters);
+      setUrlQueryFilters(newUrlQueryFilters, 'replaceIn');
     },
     [urlPagination, setUrlQueryFilters],
   );
