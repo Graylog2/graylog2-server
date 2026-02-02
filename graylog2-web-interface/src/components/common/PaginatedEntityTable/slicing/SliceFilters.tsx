@@ -21,6 +21,8 @@ import styled, { css } from 'styled-components';
 import { DropdownButton } from 'components/bootstrap';
 import MenuItem from 'components/bootstrap/menuitem/MenuItem';
 import { Icon, SearchForm } from 'components/common';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const Controls = styled.div(
   ({ theme }) => css`
@@ -67,7 +69,9 @@ const SORT_OPTIONS: Array<{ value: SortMode; label: string }> = [
 ];
 
 type Props = {
+  appSection: string;
   activeColumnTitle: string | undefined;
+  sliceCol: string | undefined;
   searchQuery: string;
   onSearchQueryChange: (value: string) => void;
   onSearchReset: () => void;
@@ -76,15 +80,55 @@ type Props = {
 };
 
 const SliceFilters = ({
+  appSection,
   activeColumnTitle,
+  sliceCol,
   searchQuery,
   onSearchQueryChange,
   onSearchReset,
   sortMode,
   onSortModeChange,
 }: Props) => {
+  const sendTelemetry = useSendTelemetry();
   const sortLabel = sortMode === 'count' ? 'Count' : 'A-Z';
   const sortIconName = sortMode === 'count' ? 'arrow_downward' : 'arrow_upward';
+  const handleSearchChange = (value: string) => {
+    onSearchQueryChange(value);
+    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_SEARCH_CHANGED, {
+      app_section: appSection,
+      event_details: {
+        attribute_id: sliceCol,
+        query_length: value.length,
+        has_query: value.length > 0,
+      },
+    });
+  };
+  const handleSearchReset = () => {
+    onSearchReset();
+    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_SEARCH_CHANGED, {
+      app_section: appSection,
+      event_details: {
+        attribute_id: sliceCol,
+        query_length: 0,
+        has_query: false,
+        reset: true,
+      },
+    });
+  };
+  const handleSortChange = (mode: SortMode) => {
+    if (mode === sortMode) {
+      return;
+    }
+
+    onSortModeChange(mode);
+    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_SORT_CHANGED, {
+      app_section: appSection,
+      event_details: {
+        attribute_id: sliceCol,
+        sort_mode: mode,
+      },
+    });
+  };
 
   const sortControl = (
     <DropdownButton
@@ -98,7 +142,7 @@ const SliceFilters = ({
       }
       buttonTitle={`Sort by ${sortLabel}`}>
       {SORT_OPTIONS.map((option) => (
-        <MenuItem key={option.value} onClick={() => onSortModeChange(option.value)} active={sortMode === option.value}>
+        <MenuItem key={option.value} onClick={() => handleSortChange(option.value)} active={sortMode === option.value}>
           {option.label}
         </MenuItem>
       ))}
@@ -109,8 +153,8 @@ const SliceFilters = ({
     <Controls>
       <ControlsRow>
         <SearchForm
-          onQueryChange={onSearchQueryChange}
-          onReset={onSearchReset}
+          onQueryChange={handleSearchChange}
+          onReset={handleSearchReset}
           placeholder={`Filter ${activeColumnTitle ?? 'slices'}`}
           query={searchQuery}
           queryWidth={0}

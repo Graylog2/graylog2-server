@@ -156,6 +156,7 @@ type Props = React.PropsWithChildren<{
   disabled?: boolean;
   header?: React.ReactNode;
   href?: string;
+  listItem?: boolean;
   onClick?: () => void;
   onKeyDown?: React.ComponentProps<typeof StyledListGroupItem>['onKeyDown'];
 }>;
