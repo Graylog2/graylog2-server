@@ -32,8 +32,6 @@ import EventsRefreshControls from 'components/events/events/EventsRefreshControl
 import QueryHelper from 'components/common/QueryHelper';
 import EventsWidgets from 'components/events/EventsWidgets';
 import EventsRefreshProvider from 'components/events/EventsRefreshProvider';
-import useUserDateTime from 'hooks/useUserDateTime';
-import { adjustFormat, toUTCFromTz } from 'util/DateTime';
 import { DATE_SEPARATOR } from 'components/common/EntityFilters/helpers/timeRange';
 
 const additionalSearchFields = {
@@ -42,7 +40,6 @@ const additionalSearchFields = {
 
 const EventsEntityTable = () => {
   const { stream_id: streamId } = useQuery();
-  const { userTimezone } = useUserDateTime();
 
   const _fetchEvents = useCallback(
     (searchParams: SearchParams) => fetchEvents(searchParams, streamId as string),
@@ -53,11 +50,10 @@ const EventsEntityTable = () => {
   });
 
   const defaultFilters = useMemo(() => {
-    const thirtyDaysAgo = moment().subtract(30, 'days').format('YYYY-MM-DD HH:mm:ss');
-    const thirtyDaysAgoUTC = adjustFormat(toUTCFromTz(thirtyDaysAgo, userTimezone), 'internal');
+    const thirtyDaysAgoUTC = moment.utc().subtract(30, 'days').format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 
     return OrderedMap({ timestamp: [`${thirtyDaysAgoUTC}${DATE_SEPARATOR}`] });
-  }, [userTimezone]);
+  }, []);
 
   return (
     <EventsRefreshProvider>
