@@ -49,7 +49,7 @@ const ListCol = styled(Col)(
 );
 
 const StreamConnectedPipelines = ({ stream }: Props) => {
-  const [hasPipelines, setHasPipelines] = useState(true);
+  const [hasPipelines, setHasPipelines] = useState(false);
 
   return (
     <Section title="Pipelines" collapsible>
