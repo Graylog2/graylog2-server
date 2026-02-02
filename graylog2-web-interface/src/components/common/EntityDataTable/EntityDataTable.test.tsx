@@ -223,7 +223,7 @@ describe('<EntityDataTable />', () => {
     );
 
     userEvent.click(await screen.findByRole('button', { name: /toggle description actions/i }));
-    userEvent.click(await screen.findByRole('menuitem', { name: /remove slicing/i }));
+    userEvent.click(await screen.findByRole('menuitem', { name: /no slicing/i }));
 
     expect(onChangeSlicing).toHaveBeenCalledWith(undefined, undefined);
   });

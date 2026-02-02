@@ -123,6 +123,7 @@ export const TELEMETRY_EVENT_TYPE = {
   EVENTDEFINITION_DUPLICATED: 'EventDefinition Duplicated',
   EVENTDEFINITION_NEXT_CLICKED: 'EventDefinition Next Clicked',
   EVENTDEFINITION_PREVIOUS_CLICKED: 'EventDefinition Previous Clicked',
+  EVENTDEFINITION_REPLAY_SEARCH_CLICKED: 'EventDefinition Replay Search Clicked',
   EVENTDEFINITION_DETAILS: {
     STEP_CLICKED: 'EventDefinition Details Step Clicked',
     PRIORITY_CHANGED: 'EventDefinition Details Priority Changed',
