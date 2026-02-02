@@ -212,7 +212,7 @@
         <assertj-core.version>3.27.6</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.3.0</awaitility.version>
-        <equalsverifier.version>4.3</equalsverifier.version>
+        <equalsverifier.version>4.3.1</equalsverifier.version>
         <guice-extension.version>1.2.1</guice-extension.version>
         <junit-jupiter.version>6.0.2</junit-jupiter.version>
         <mockito.version>5.21.0</mockito.version>
