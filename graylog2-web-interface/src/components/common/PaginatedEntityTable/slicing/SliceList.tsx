@@ -22,8 +22,6 @@ import { Badge, ListGroup, ListGroupItem } from 'components/bootstrap';
 
 import type { Slices } from './Slicing';
 
-type Slice = Slices[number];
-
 const StyledListGroup = styled(ListGroup)`
   margin-bottom: 0;
 `;
@@ -46,6 +44,7 @@ type Props = {
   onChangeSlicing: (sliceCol: string | undefined, slice?: string | undefined) => void;
   sliceRenderers?: { [col: string]: (value: string | number) => React.ReactNode } | undefined;
   keyPrefix?: string;
+  listTestId?: string;
 };
 
 const SliceList = ({
@@ -55,8 +54,9 @@ const SliceList = ({
   onChangeSlicing,
   sliceRenderers = undefined,
   keyPrefix = '',
+  listTestId = undefined,
 }: Props) => (
-  <StyledListGroup componentClass="ul">
+  <StyledListGroup componentClass="ul" data-testid={listTestId}>
     {slices.map((slice) => (
       <StyledListGroupItem
         key={`${keyPrefix}${String(slice.value)}`}

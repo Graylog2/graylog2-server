@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { screen, render, waitFor } from 'wrappedTestingLibrary';
+import { screen, render, waitFor, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import type { SearchParams } from 'stores/PaginationTypes';
@@ -132,7 +132,7 @@ describe('Slicing', () => {
 
     await screen.findByText('Alpha');
 
-    const getItems = () => screen.getAllByRole('listitem');
+    const getItems = () => within(screen.getByTestId('slices-list')).getAllByRole('button');
 
     expect(getItems()[0]).toHaveTextContent('Alpha');
     expect(getItems()[1]).toHaveTextContent('Beta');

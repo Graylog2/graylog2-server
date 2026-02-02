@@ -16,7 +16,7 @@
  */
 
 import * as React from 'react';
-import { useState, useEffect, useContext } from 'react';
+import { useState, useContext } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
@@ -69,16 +69,32 @@ type Props = {
   fetchSlices: FetchSlices;
 };
 
-const Slicing = ({ appSection, columnSchemas, onChangeSlicing, sliceRenderers = undefined, fetchSlices }: Props) => {
-  const {
-    searchParams: { sliceCol, slice: activeSlice },
-  } = useContext(TableFetchContext);
+type SliceBodyProps = {
+  appSection: string;
+  sliceCol: string | undefined;
+  activeSlice: string | undefined;
+  activeColumnTitle: string | undefined;
+  onChangeSlicing: (sliceCol: string | undefined, slice?: string | undefined) => void;
+  sliceRenderers?: { [col: string]: (value: string | number) => React.ReactNode } | undefined;
+  fetchSlices: FetchSlices;
+  sortMode: SortMode;
+  onSortModeChange: (mode: SortMode) => void;
+};
+
+const SlicesOverview = ({
+  appSection,
+  sliceCol,
+  activeSlice,
+  activeColumnTitle,
+  onChangeSlicing,
+  sliceRenderers = undefined,
+  fetchSlices,
+  sortMode,
+  onSortModeChange,
+}: SliceBodyProps) => {
   const [showEmptySlices, setShowEmptySlices] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortMode, setSortMode] = useState<SortMode>('alphabetical');
-  const activeColumn = columnSchemas.find(({ id }) => id === sliceCol);
   const sendTelemetry = useSendTelemetry();
-
   const { isLoading, hasEmptySlices, emptySliceCount, visibleNonEmptySlices, visibleEmptySlices } = useSlices({
     fetchSlices,
     searchQuery,
@@ -100,33 +116,20 @@ const Slicing = ({ appSection, columnSchemas, onChangeSlicing, sliceRenderers = 
     });
   };
 
-  useEffect(() => {
-    setSearchQuery('');
-    setShowEmptySlices(false);
-  }, [sliceCol]);
-
   return (
-    <Container>
-      <SliceHeaderControls
-        appSection={appSection}
-        activeColumnTitle={activeColumn?.title}
-        activeSlice={activeSlice}
-        sliceCol={sliceCol}
-        columnSchemas={columnSchemas}
-        onChangeSlicing={onChangeSlicing}
-      />
+    <>
       {isLoading && <Spinner />}
       {!isLoading && (
         <>
           <SliceFilters
             appSection={appSection}
-            activeColumnTitle={activeColumn?.title}
+            activeColumnTitle={activeColumnTitle}
             sliceCol={sliceCol}
             searchQuery={searchQuery}
             onSearchQueryChange={setSearchQuery}
             onSearchReset={() => setSearchQuery('')}
             sortMode={sortMode}
-            onSortModeChange={setSortMode}
+            onSortModeChange={onSortModeChange}
           />
           <SliceList
             slices={visibleNonEmptySlices}
@@ -134,6 +137,7 @@ const Slicing = ({ appSection, columnSchemas, onChangeSlicing, sliceRenderers = 
             sliceCol={sliceCol}
             onChangeSlicing={onChangeSlicing}
             sliceRenderers={sliceRenderers}
+            listTestId="slices-list"
           />
           <EmptySlicesHeader>
             {hasEmptySlices ? (
@@ -156,10 +160,44 @@ const Slicing = ({ appSection, columnSchemas, onChangeSlicing, sliceRenderers = 
               onChangeSlicing={onChangeSlicing}
               sliceRenderers={sliceRenderers}
               keyPrefix="empty-"
+              listTestId="empty-slices-list"
             />
           )}
         </>
       )}
+    </>
+  );
+};
+
+const Slicing = ({ appSection, columnSchemas, onChangeSlicing, sliceRenderers = undefined, fetchSlices }: Props) => {
+  const {
+    searchParams: { sliceCol, slice: activeSlice },
+  } = useContext(TableFetchContext);
+  const [sortMode, setSortMode] = useState<SortMode>('alphabetical');
+  const activeColumn = columnSchemas.find(({ id }) => id === sliceCol);
+
+  return (
+    <Container>
+      <SliceHeaderControls
+        appSection={appSection}
+        activeColumnTitle={activeColumn?.title}
+        activeSlice={activeSlice}
+        sliceCol={sliceCol}
+        columnSchemas={columnSchemas}
+        onChangeSlicing={onChangeSlicing}
+      />
+      <SlicesOverview
+        key={sliceCol ?? 'no-slice'}
+        appSection={appSection}
+        sliceCol={sliceCol}
+        activeSlice={activeSlice}
+        activeColumnTitle={activeColumn?.title}
+        onChangeSlicing={onChangeSlicing}
+        sliceRenderers={sliceRenderers}
+        fetchSlices={fetchSlices}
+        sortMode={sortMode}
+        onSortModeChange={setSortMode}
+      />
     </Container>
   );
 };
