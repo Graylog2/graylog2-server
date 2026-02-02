@@ -67,7 +67,6 @@ const ReplaySearch = ({
 
 const canReplayEvent = (eventDefinition: EventDefinition) => {
   const systemEvent = isSystemEventDefinition(eventDefinition);
-
   if (systemEvent) {
     return 'Event is a system event, these have no query/stream/time range attached.';
   }
@@ -77,7 +76,7 @@ const canReplayEvent = (eventDefinition: EventDefinition) => {
 
 export const LoadingBarrier = ({ children, eventDefinition }) => {
   const canReplay = canReplayEvent(eventDefinition);
-  if (canReplay) return children;
+  if (canReplay === true) return children;
 
   return <Center>Cannot replay this event: {canReplay} Please select a different one.</Center>;
 };
