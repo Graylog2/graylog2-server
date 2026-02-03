@@ -2,4 +2,4 @@ type = "a"
 message = "Add default 30-day time range filter to Security Alerts Entity Table"
 
 pulls = ["graylog2-server#24911", "graylog-plugin-enterprise#13100"]
-issues = ["24887"]
+issues = [ "graylog2-server#24887"]
