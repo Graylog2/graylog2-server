@@ -160,6 +160,13 @@ public class IntegrationsModule extends PluginModule {
 
             // CloudTrail input configuration migration
             addMigration(V20251030000000_CloudTrailInputConfigMigration.class);
+
+            // CloudTrail
+            addCodec(CloudTrailCodec.NAME, CloudTrailCodec.class);
+            addTransport(CloudTrailTransport.NAME, CloudTrailTransport.class);
+            addMessageInput(CloudTrailInput.class);
+            addRestResource(CloudTrailResource.class);
+            bind(ObjectMapper.class).annotatedWith(AWSObjectMapper.class).toInstance(createObjectMapper());
         }
     }
 
@@ -191,13 +198,6 @@ public class IntegrationsModule extends PluginModule {
         LOG.debug("Registering message input: {}", PaloAlto11xUdpInput.NAME);
         addMessageInput(PaloAlto11xUdpInput.class);
         addCodec(PaloAlto11xCodec.NAME, PaloAlto11xCodec.class);
-
-        // CloudTrail
-        addCodec(CloudTrailCodec.NAME, CloudTrailCodec.class);
-        addTransport(CloudTrailTransport.NAME, CloudTrailTransport.class);
-        addMessageInput(CloudTrailInput.class);
-        addRestResource(CloudTrailResource.class);
-        bind(ObjectMapper.class).annotatedWith(AWSObjectMapper.class).toInstance(createObjectMapper());
 
         // AWS
         addCodec(AWSCodec.NAME, AWSCodec.class);
