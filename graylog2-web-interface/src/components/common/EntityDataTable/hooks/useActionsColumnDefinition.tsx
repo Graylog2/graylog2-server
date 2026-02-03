@@ -124,18 +124,20 @@ const useActionsColumnDefinition = <Entity extends EntityBase>({
 
   return useMemo(
     () =>
-      columnHelper.display({
-        id: ACTIONS_COL_ID,
-        size: colWidth,
-        enableHiding: false,
-        enablePinning: true,
-        enableResizing: false,
-        header: hasRowActions ? header : undefined,
-        cell: hasRowActions ? cell : undefined,
-        meta: {
-          hideCellPadding: true,
-        },
-      }),
+      hasRowActions
+        ? columnHelper.display({
+          id: ACTIONS_COL_ID,
+          size: colWidth,
+          enableHiding: false,
+          enablePinning: true,
+          enableResizing: false,
+          header,
+          cell,
+          meta: {
+            hideCellPadding: true,
+          },
+        })
+        : null,
     [colWidth, cell, columnHelper, hasRowActions, header],
   );
 };

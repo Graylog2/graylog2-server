@@ -73,7 +73,6 @@ describe('<PaginatedEntityTable />', () => {
     tableLayout: DEFAULT_LAYOUT,
     entityAttributesAreCamelCase: false,
     columnRenderers: {},
-    entityActions: () => null,
     keyFn: (options) => ['test-key', options],
   };
 
