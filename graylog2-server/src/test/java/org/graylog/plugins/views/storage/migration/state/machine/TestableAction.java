@@ -23,5 +23,6 @@ public enum TestableAction {
     stopMessageProcessing,
     runDirectoryCompatibilityCheck,
     calculateTrafficEstimate,
+    rollingUpgradeSelected,
     setPreflightFinished
 }

@@ -19,6 +19,7 @@ package org.graylog.plugins.views.storage.migration.state.machine;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -35,6 +36,7 @@ public abstract class TestableMigrationActions implements MigrationActions {
     abstract boolean datanodesProvisioned();
     abstract boolean oldClusterStopped();
     abstract boolean allDatanodesStarted();
+    abstract boolean allDatanodesPreparedAndWaiting();
 
     public static Builder initialConfig() {
         return new AutoValue_TestableMigrationActions.Builder()
@@ -45,7 +47,8 @@ public abstract class TestableMigrationActions implements MigrationActions {
                 .someCompatibleDatanodesRunning(false)
                 .datanodesProvisioned(false)
                 .oldClusterStopped(false)
-                .allDatanodesStarted(false);
+                .allDatanodesStarted(false)
+                .allDatanodesPreparedAndWaiting(false);
     }
 
     @AutoValue.Builder
@@ -58,6 +61,7 @@ public abstract class TestableMigrationActions implements MigrationActions {
         public abstract Builder datanodesProvisioned(boolean value);
         public abstract Builder oldClusterStopped(boolean value);
         public abstract Builder allDatanodesStarted(boolean value);
+        public abstract Builder allDatanodesPreparedAndWaiting(boolean value);
 
         public abstract TestableMigrationActions build();
 
@@ -79,7 +83,7 @@ public abstract class TestableMigrationActions implements MigrationActions {
 
     @Override
     public void rollingUpgradeSelected() {
-
+        triggeredActions.add(TestableAction.rollingUpgradeSelected);
     }
 
     @Override
@@ -124,7 +128,7 @@ public abstract class TestableMigrationActions implements MigrationActions {
 
     @Override
     public boolean allDatanodesPrepared() {
-        return false;
+        return allDatanodesPreparedAndWaiting();
     }
 
     @Override
@@ -158,6 +162,6 @@ public abstract class TestableMigrationActions implements MigrationActions {
     }
 
     public Set<TestableAction> getTriggeredActions() {
-        return triggeredActions;
+        return Collections.unmodifiableSet(triggeredActions);
     }
 }

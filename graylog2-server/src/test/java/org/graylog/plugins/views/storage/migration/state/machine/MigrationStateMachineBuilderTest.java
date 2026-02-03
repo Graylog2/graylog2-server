@@ -118,6 +118,7 @@ public class MigrationStateMachineBuilderTest {
                 .someCompatibleDatanodesRunning(true)
                 .bindToStateMachine(MigrationState.MIGRATION_WELCOME_PAGE)
                 .fire(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION)
+                .assertActionTriggered(TestableAction.rollingUpgradeSelected)
                 .assertState(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE)
                 .assertTransition(MigrationStep.RUN_DIRECTORY_COMPATIBILITY_CHECK);
     }
@@ -158,6 +159,18 @@ public class MigrationStateMachineBuilderTest {
 
     @Test
     public void testJournalSizeDowntimeWarning() {
+
+        TestableMigrationActions.initialConfig()
+                .allDatanodesPreparedAndWaiting(false) // some nodes are still provisioning and are not in prepared state
+                .bindToStateMachine(MigrationState.PROVISION_ROLLING_UPGRADE_NODES_RUNNING)
+                .assertEmptyTransitions();
+
+        TestableMigrationActions.initialConfig()
+                .allDatanodesPreparedAndWaiting(true) // all nodes prepared and waiting to opensearch start command
+                .bindToStateMachine(MigrationState.PROVISION_ROLLING_UPGRADE_NODES_RUNNING)
+                .assertTransition(MigrationStep.CALCULATE_JOURNAL_SIZE);
+
+
         // we have compatible dir and already provisioned datanodes, we can jump straight to journal warning
         TestableMigrationActions.initialConfig()
                 .dataDirCompatible(true)
