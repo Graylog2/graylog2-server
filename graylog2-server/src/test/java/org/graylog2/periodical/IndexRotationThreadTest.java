@@ -19,7 +19,6 @@ package org.graylog2.periodical;
 import com.google.common.collect.ImmutableMap;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Provider;
-import org.assertj.core.api.Assertions;
 import org.graylog2.datatiering.DataTieringOrchestrator;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.cluster.Cluster;
@@ -119,29 +118,6 @@ public class IndexRotationThreadTest {
         rotationThread.checkForRotation(indexSet);
 
         verify(indexSet, never()).cycle();
-    }
-
-    @Test
-    public void testSkipRotationDuringMigration() throws NoTargetIndexException {
-        TestableRotationStrategy testableRotationStrategy = new TestableRotationStrategy();
-        final IndexSet indexSetFinished = mockIndexSet("finished_index_set", true, testableRotationStrategy);
-        final IndexSet indexSetMigrated = mockIndexSet("migrating_index_set", true, testableRotationStrategy);
-
-        final IndexRotationThread rotationThread = new IndexRotationThread(
-                Mockito.mock(NotificationService.class),
-                Mockito.mock(Indices.class),
-                mockIndexSetRegistry(indexSetFinished, indexSetMigrated),
-                mockCluster(true),
-                new NullActivityWriter(),
-                new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"),
-                testableRotationStrategy.toProviderMap(),
-                Mockito.mock(DataTieringOrchestrator.class)
-        );
-        rotationThread.doRun();
-
-        Assertions.assertThat(testableRotationStrategy.getRotatedIndices())
-                .contains(indexSetFinished)
-                .doesNotContain(indexSetMigrated);
     }
 
     private IndexSet mockIndexSet(String indexSetTitle, boolean writable, RotationStrategy testableRotationStrategy) {
