@@ -28,7 +28,6 @@ const customColumnRenderers: ColumnRenderers<StreamConnectedPipeline> = {
       renderCell: (pipeline: StreamConnectedPipeline['pipeline'], connectedPipeline: StreamConnectedPipeline) => (
         <ConnectedPipelineLinkedCell title={pipeline} id={connectedPipeline.pipeline_id} type="pipeline" />
       ),
-      renderHeader: () => 'Source pipeline',
     },
     rule: {
       renderCell: (rule: StreamConnectedPipeline['rule'], connectedPipeline: StreamConnectedPipeline) => (
@@ -39,7 +38,6 @@ const customColumnRenderers: ColumnRenderers<StreamConnectedPipeline> = {
       renderCell: (connected_streams: StreamConnectedPipeline['connected_streams']) => (
         <ConnectedPipelineStreamsCell streams={connected_streams} />
       ),
-      renderHeader: () => 'Source stream',
     },
   },
 };
