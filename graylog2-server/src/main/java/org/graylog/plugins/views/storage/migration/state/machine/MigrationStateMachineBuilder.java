@@ -45,9 +45,7 @@ public class MigrationStateMachineBuilder {
                 .permit(MigrationStep.SELECT_MIGRATION, MigrationState.MIGRATION_WELCOME_PAGE, () -> LOG.info("Migration selected in menu, show welcome page"));
 
         config.configure(MigrationState.MIGRATION_WELCOME_PAGE)
-                .permitIf(MigrationStep.SHOW_CA_CREATION, MigrationState.CA_CREATION_PAGE, () ->
-                        (migrationActions.isCompatibleInPlaceMigrationVersion()) && migrationActions.caDoesNotExist()
-                )
+                .permitIf(MigrationStep.SHOW_CA_CREATION, MigrationState.CA_CREATION_PAGE, () -> migrationActions.isCompatibleInPlaceMigrationVersion() && migrationActions.caDoesNotExist())
                 .permitIf(MigrationStep.SHOW_RENEWAL_POLICY_CREATION, MigrationState.RENEWAL_POLICY_CREATION_PAGE, () -> {
                     if (!migrationActions.isCompatibleInPlaceMigrationVersion()) {
                         return false;
