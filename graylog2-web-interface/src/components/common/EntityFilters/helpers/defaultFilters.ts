@@ -17,7 +17,7 @@
 import moment from 'moment';
 import { OrderedMap } from 'immutable';
 
-import type { UrlQueryFilters } from 'components/common/EntityFilters';
+import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
 import { DATE_SEPARATOR } from './timeRange';
 
