@@ -61,6 +61,7 @@ public class MigrationStateMachineBuilderTest {
 
     @Test
     public void testCaCreationPage() {
+        // Test reaching CA_CREATION_PAGE from welcome page
         TestableMigrationActions.initialConfig()
                 .caAvailable(false)
                 .renewalPolicyConfigured(false)
@@ -71,6 +72,13 @@ public class MigrationStateMachineBuilderTest {
                 .assertState(MigrationState.CA_CREATION_PAGE)
                 .assertEmptyTransitions();
 
+        // Test direct transitions FROM CA_CREATION_PAGE when CA is not yet available
+        TestableMigrationActions.initialConfig()
+                .caAvailable(false)
+                .bindToStateMachine(MigrationState.CA_CREATION_PAGE)
+                .assertEmptyTransitions();
+
+        // Test direct transitions FROM CA_CREATION_PAGE when CA is available but renewal policy is not
         TestableMigrationActions.initialConfig()
                 .caAvailable(true)
                 .renewalPolicyConfigured(false)
@@ -79,6 +87,7 @@ public class MigrationStateMachineBuilderTest {
                 .bindToStateMachine(MigrationState.MIGRATION_WELCOME_PAGE)
                 .assertTransition(MigrationStep.SHOW_RENEWAL_POLICY_CREATION);
 
+        // Test direct transitions FROM CA_CREATION_PAGE when both CA and renewal policy are ready
         TestableMigrationActions.initialConfig()
                 .caAvailable(true)
                 .renewalPolicyConfigured(true)
@@ -90,7 +99,7 @@ public class MigrationStateMachineBuilderTest {
 
     @Test
     public void testRenewalPolicyCreationPage() {
-
+        // Test reaching RENEWAL_POLICY_CREATION_PAGE from CA_CREATION_PAGE
         TestableMigrationActions.initialConfig()
                 .caAvailable(true)
                 .renewalPolicyConfigured(false)
@@ -99,10 +108,18 @@ public class MigrationStateMachineBuilderTest {
                 .assertState(MigrationState.RENEWAL_POLICY_CREATION_PAGE)
                 .assertEmptyTransitions();
 
+        // Test direct transitions FROM RENEWAL_POLICY_CREATION_PAGE when renewal policy is not yet configured
+        TestableMigrationActions.initialConfig()
+                .caAvailable(true)
+                .renewalPolicyConfigured(false)
+                .bindToStateMachine(MigrationState.RENEWAL_POLICY_CREATION_PAGE)
+                .assertEmptyTransitions();
+
+        // Test direct transitions FROM RENEWAL_POLICY_CREATION_PAGE when both CA and renewal policy are ready
         TestableMigrationActions.initialConfig()
                 .caAvailable(true)
                 .renewalPolicyConfigured(true)
-                .bindToStateMachine(MigrationState.CA_CREATION_PAGE)
+                .bindToStateMachine(MigrationState.RENEWAL_POLICY_CREATION_PAGE)
                 .assertTransition(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION)
                 .fire(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION)
                 .assertState(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE);
@@ -110,6 +127,7 @@ public class MigrationStateMachineBuilderTest {
 
     @Test
     public void testRollingUpgradeMigrationWelcomePage() {
+        // Test with compatible datanodes running - should allow directory compatibility check
         TestableMigrationActions.initialConfig()
                 .caAvailable(true)
                 .renewalPolicyConfigured(true)
@@ -121,6 +139,14 @@ public class MigrationStateMachineBuilderTest {
                 .assertActionTriggered(TestableAction.rollingUpgradeSelected)
                 .assertState(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE)
                 .assertTransition(MigrationStep.RUN_DIRECTORY_COMPATIBILITY_CHECK);
+
+        // Test without compatible datanodes running - should have no available transitions
+        TestableMigrationActions.initialConfig()
+                .caAvailable(true)
+                .renewalPolicyConfigured(true)
+                .someCompatibleDatanodesRunning(false)
+                .bindToStateMachine(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE)
+                .assertEmptyTransitions();
     }
 
     @Test

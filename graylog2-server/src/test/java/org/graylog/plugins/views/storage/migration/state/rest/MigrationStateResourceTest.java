@@ -81,14 +81,14 @@ public class MigrationStateResourceTest {
     public void requestReturns500OnError() {
         final MigrationStateResource resource = new MigrationStateResource(createStateMachine(), mockHttpHeaders(), journalConfiguration);
         // trigger a step that's not allowed in this state. That should cause and propagate an error
-        try (Response response = resource.trigger(new MigrationStepRequest(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED, Map.of()))) {
+        try (Response response = resource.trigger(new MigrationStepRequest(MigrationStep.PROVISION_DATANODE_CERTIFICATES, Map.of()))) {
             assertThat(response.getStatus()).isEqualTo(500);
             final Object entity = response.getEntity();
             assertThat(entity)
                     .isInstanceOf(CurrentStateInformation.class)
                     .extracting(e -> (CurrentStateInformation) e)
                     .extracting(CurrentStateInformation::errorMessage)
-                    .isEqualTo("No valid leaving transitions are permitted from state 'NEW' for trigger 'CONFIRM_OLD_CLUSTER_STOPPED'. Consider ignoring the trigger.");
+                    .isEqualTo("No valid leaving transitions are permitted from state 'NEW' for trigger 'PROVISION_DATANODE_CERTIFICATES'. Consider ignoring the trigger.");
         }
     }
 
