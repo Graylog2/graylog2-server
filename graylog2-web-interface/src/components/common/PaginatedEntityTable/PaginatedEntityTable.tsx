@@ -330,6 +330,10 @@ export type PaginatedEntityTableProps<T, M> = {
   fetchOptions?: FetchOptions;
   filterValueRenderers?: React.ComponentProps<typeof EntityFilters>['filterValueRenderers'];
   focusSearchAfterMount?: boolean;
+  /**
+   * When true (default), hides the search bar when there are no entries in the table.
+   * Set to false if you want to always show the search bar regardless of table content.
+   */
   hideSearchWhenEmpty?: boolean;
   humanName: string;
   keyFn: (options: SearchParams) => Array<unknown>;
