@@ -31,16 +31,16 @@ type State = {
 };
 
 class ErrorBoundary extends React.Component<Props, State> {
+  static getDerivedStateFromError(error: Error, info: { componentStack: string }) {
+    return { error: createReactError(error, info) };
+  }
+
   constructor(props) {
     super(props);
 
     this.state = {
       error: undefined,
     };
-  }
-
-  static getDerivedStateFromError(error: Error, info: { componentStack: string }) {
-    return { error: createReactError(error, info) };
   }
 
   render() {

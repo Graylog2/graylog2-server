@@ -28,15 +28,21 @@ import PagerDutyNotificationDetails from './pager-duty/PagerDutyNotificationDeta
 import PagerDutyNotificationForm from './pager-duty/PagerDutyNotificationForm';
 import PagerDutyNotificationSummary from './pager-duty/PagerDutyNotificationSummary';
 import SlackNotificationDetails from './event-notifications/event-notification-details/SlackNotificationDetails';
-import SlackNotificationForm from './event-notifications/event-notification-types/SlackNotificationForm';
+import SlackNotificationForm, {
+  defaultConfig as SlackDefaultConfig,
+} from './event-notifications/event-notification-types/SlackNotificationForm';
 import SlackNotificationSummary from './event-notifications/event-notification-types/SlackNotificationSummary';
 import TeamsNotificationDetails from './event-notifications/event-notification-details/TeamsNotificationDetails';
-import TeamsNotificationForm from './event-notifications/event-notification-types/TeamsNotificationForm';
+import TeamsNotificationForm, {
+  defaultConfig as TeamsDefaultConfig,
+} from './event-notifications/event-notification-types/TeamsNotificationForm';
 import TeamsNotificationSummary from './event-notifications/event-notification-types/TeamsNotificationSummary';
 import GreyNoiseAdapterFieldSet from './dataadapters/GreyNoiseAdapterFieldSet';
 import GreyNoiseAdapterSummary from './dataadapters/GreyNoiseAdapterSummary';
 import GreyNoiseAdapterDocumentation from './dataadapters/GreyNoiseAdapterDocumentation';
-import TeamsNotificationV2Form from './event-notifications/event-notification-types/TeamsNotificationV2Form';
+import TeamsNotificationV2Form, {
+  defaultConfig as TeamsV2DefaultConfig,
+} from './event-notifications/event-notification-types/TeamsNotificationV2Form';
 import TeamsNotificationV2Summary from './event-notifications/event-notification-types/TeamsNotificationV2Summary';
 import TeamsNotificationV2Details from './event-notifications/event-notification-details/TeamsNotificationV2Details';
 
@@ -72,7 +78,7 @@ const bindings = {
       formComponent: SlackNotificationForm,
       summaryComponent: SlackNotificationSummary,
       detailsComponent: SlackNotificationDetails,
-      defaultConfig: SlackNotificationForm.defaultConfig,
+      defaultConfig: SlackDefaultConfig,
     },
     {
       type: 'teams-notification-v1',
@@ -80,7 +86,7 @@ const bindings = {
       formComponent: TeamsNotificationForm,
       summaryComponent: TeamsNotificationSummary,
       detailsComponent: TeamsNotificationDetails,
-      defaultConfig: TeamsNotificationForm.defaultConfig,
+      defaultConfig: TeamsDefaultConfig,
     },
     {
       type: 'teams-notification-v2',
@@ -88,7 +94,7 @@ const bindings = {
       formComponent: TeamsNotificationV2Form,
       summaryComponent: TeamsNotificationV2Summary,
       detailsComponent: TeamsNotificationV2Details,
-      defaultConfig: TeamsNotificationV2Form.defaultConfig,
+      defaultConfig: TeamsV2DefaultConfig,
     },
   ],
   lookupTableAdapters: [
