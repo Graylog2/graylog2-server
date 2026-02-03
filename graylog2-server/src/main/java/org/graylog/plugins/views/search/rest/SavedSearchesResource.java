@@ -66,7 +66,7 @@ public class SavedSearchesResource extends RestResource {
             EntityAttribute.builder().id(ViewDTO.FIELD_DESCRIPTION).title("Description").build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_SUMMARY).title("Summary").build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_OWNER).title("Owner").build(),
-            EntityAttribute.builder().id(ViewDTO.FIELD_FAVORITE).title("Favorite").sortable(false).build()
+            EntityAttribute.builder().id(ViewDTO.FIELD_FAVORITE).title("Favorite").sortable(true).build()
     );
 
     private static final EntityDefaults settings = EntityDefaults.builder()
@@ -89,7 +89,7 @@ public class SavedSearchesResource extends RestResource {
                                                   @ApiParam(name = "sort",
                                                             value = "The field to sort the result on",
                                                             required = true,
-                                                            allowableValues = "id,title,created_at,description,summary,owner") @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sortField,
+                                                            allowableValues = "id,title,created_at,description,summary,owner,favorite") @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sortField,
                                                   @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") SortOrder order,
                                                   @ApiParam(name = "query") @QueryParam("query") String query,
                                                   @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,

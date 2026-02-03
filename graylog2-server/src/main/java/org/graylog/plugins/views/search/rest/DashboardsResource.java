@@ -89,8 +89,7 @@ public class DashboardsResource extends RestResource {
             EntityAttribute.builder().id(ViewDTO.FIELD_DESCRIPTION).title("Description").searchable(true).build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_SUMMARY).title("Summary").searchable(true).build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_OWNER).title("Owner").build(),
-            EntityAttribute.builder().id(ViewDTO.FIELD_FAVORITE).title("Favorite").sortable(false).build()
-    );
+            EntityAttribute.builder().id(ViewDTO.FIELD_FAVORITE).title("Favorite").sortable(true).build());
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
             .build();
@@ -111,7 +110,7 @@ public class DashboardsResource extends RestResource {
                                                   @ApiParam(name = "sort",
                                                             value = "The field to sort the result on",
                                                             required = true,
-                                                            allowableValues = "id,title,created_at,description,summary,owner") @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sortField,
+                                                            allowableValues = "id,title,created_at,description,summary,owner,favorite") @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sortField,
                                                   @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") SortOrder order,
                                                   @ApiParam(name = "query") @QueryParam("query") String query,
                                                   @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
