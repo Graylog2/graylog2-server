@@ -28,7 +28,7 @@ import type { WidgetConfigFormValues } from './WidgetConfigForm';
 
 export const UPDATE_WIDGET_PREVIEW_BTN_TEXT = 'Update preview';
 
-const aggregationElementsByKey = Object.fromEntries(aggregationElements.map((element) => ([element.key, element])));
+const aggregationElementsByKey = Object.fromEntries(aggregationElements.map((element) => [element.key, element]));
 
 const StyledButtonToolbar = styled(ButtonToolbar)`
   justify-content: space-between;
@@ -47,10 +47,7 @@ const onCreateElement = (
   } else {
     setValues({
       ...values,
-      [elementKey]: [
-        ...(values[elementKey] ?? []),
-        {},
-      ],
+      [elementKey]: [...(values[elementKey] ?? []), {}],
     });
   }
 };
@@ -60,14 +57,22 @@ const SelectContainer = styled.div`
 `;
 
 const ElementsConfigurationActions = () => {
-  const { dirty, isSubmitting: isUpdatingPreview, isValid, values, setValues } = useFormikContext<WidgetConfigFormValues>();
+  const {
+    dirty,
+    isSubmitting: isUpdatingPreview,
+    isValid,
+    values,
+    setValues,
+  } = useFormikContext<WidgetConfigFormValues>();
 
   return (
     <StyledButtonToolbar>
       <SelectContainer data-testid="add-element-section" className="pull-left">
-        <AggregationElementSelect onSelect={(elementKey) => onCreateElement(elementKey, values, setValues)}
-                                  aggregationElements={aggregationElements}
-                                  formValues={values} />
+        <AggregationElementSelect
+          onSelect={(elementKey) => onCreateElement(elementKey, values, setValues)}
+          aggregationElements={aggregationElements}
+          formValues={values}
+        />
       </SelectContainer>
 
       <Button bsStyle="info" className="pull-right" type="submit" disabled={!isValid || isUpdatingPreview || !dirty}>

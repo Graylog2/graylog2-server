@@ -22,10 +22,8 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore } from 'logic/singleton';
 
-// eslint-disable-next-line import/prefer-default-export
-export const IndexerFailuresStore = singletonStore(
-  'core.IndexerFailures',
-  () => Reflux.createStore({
+export const IndexerFailuresStore = singletonStore('core.IndexerFailures', () =>
+  Reflux.createStore({
     listenables: [],
 
     list(limit, offset) {

@@ -19,6 +19,7 @@ package org.graylog2.bootstrap;
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Ordering;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
@@ -38,6 +39,7 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.ConfigurationModule;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
+import org.graylog2.bootstrap.preflight.PasswordSecretPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
 import org.graylog2.bootstrap.preflight.PreflightWebModule;
@@ -45,9 +47,9 @@ import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
 import org.graylog2.bootstrap.preflight.web.PreflightBoot;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.preflight.GraylogServerProvisioningBindings;
+import org.graylog2.commands.AbstractNodeCommand;
 import org.graylog2.configuration.IndexerDiscoveryModule;
-import org.graylog2.configuration.PathConfiguration;
-import org.graylog2.configuration.TLSProtocolsConfiguration;
+import org.graylog2.indexer.client.IndexerHostsAdapter;
 import org.graylog2.migrations.Migration;
 import org.graylog2.migrations.MigrationType;
 import org.graylog2.plugin.MessageBindings;
@@ -73,6 +75,7 @@ import org.graylog2.shared.security.SecurityBindings;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.shared.system.stats.SystemStatsModule;
+import org.graylog2.storage.versionprobe.VersionProbeModule;
 import org.jsoftbiz.utils.OS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,13 +100,16 @@ import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_COMPLETE;
 import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_INITIATE;
 import static org.graylog2.bootstrap.preflight.PreflightWebModule.FEATURE_FLAG_PREFLIGHT_WEB_ENABLED;
 
-public abstract class ServerBootstrap extends CmdLineTool {
+public abstract class ServerBootstrap extends AbstractNodeCommand {
     private static final Logger LOG = LoggerFactory.getLogger(ServerBootstrap.class);
     private boolean isFreshInstallation;
+
+    private final Configuration configuration;
 
     protected ServerBootstrap(String commandName, Configuration configuration) {
         super(commandName, configuration);
         this.commandName = commandName;
+        this.configuration = configuration;
     }
 
     @Option(name = {"-p", "--pidfile"}, description = "File containing the PID of Graylog")
@@ -131,20 +137,13 @@ public abstract class ServerBootstrap extends CmdLineTool {
     }
 
     @Override
-    protected void beforeStart(TLSProtocolsConfiguration tlsProtocolsConfiguration, PathConfiguration pathConfiguration) {
-        super.beforeStart(tlsProtocolsConfiguration, pathConfiguration);
+    protected void beforeStart() {
+        super.beforeStart();
 
         // Do not use a PID file if the user requested not to
         if (!isNoPidFile()) {
             savePidFile(getPidFile());
         }
-        // This needs to run before the first SSLContext is instantiated,
-        // because it sets up the default SSLAlgorithmConstraints
-        applySecuritySettings(tlsProtocolsConfiguration);
-
-        // Set these early in the startup because netty's NativeLibraryUtil uses a static initializer
-        setNettyNativeDefaults(pathConfiguration);
-
     }
 
     @Override
@@ -191,6 +190,9 @@ public abstract class ServerBootstrap extends CmdLineTool {
         modules.add(new SchedulerBindings());
 
         final Injector preflightInjector = getPreflightInjector(modules);
+        // explicitly call the PasswordSecretPreflightCheck also when showing preflight web to make sure
+        // data node isn't provisioned with the wrong password_secret
+        preflightInjector.getInstance(PasswordSecretPreflightCheck.class).runCheck();
         GuiceInjectorHolder.setInjector(preflightInjector);
         try {
             doRunWithPreflightInjector(preflightInjector);
@@ -285,6 +287,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
     private Injector getPreflightInjector(List<Module> preflightCheckModules) {
         return Guice.createInjector(
+                new VersionProbeModule(),
+                binder -> binder.bind(IndexerHostsAdapter.class).toInstance(List::of),
                 new IsDevelopmentBindings(),
                 new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
                 new ServerStatusBindings(capabilities()),
@@ -295,18 +299,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 new ServerPreflightChecksModule(),
                 new CertificateAuthorityBindings(),
                 (binder) -> binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader),
-                binder -> preflightCheckModules.forEach(binder::install));
-    }
-
-    private void setNettyNativeDefaults(PathConfiguration pathConfiguration) {
-        // Give netty a better spot than /tmp to unpack its tcnative libraries
-        if (System.getProperty("io.netty.native.workdir") == null) {
-            System.setProperty("io.netty.native.workdir", pathConfiguration.getNativeLibDir().toAbsolutePath().toString());
-        }
-        // Don't delete the native lib after unpacking, as this confuses needrestart(1) on some distributions
-        if (System.getProperty("io.netty.native.deleteLibAfterLoading") == null) {
-            System.setProperty("io.netty.native.deleteLibAfterLoading", "false");
-        }
+                binder -> preflightCheckModules.forEach(binder::install),
+                this::featureFlagsBinding);
     }
 
     @Override
@@ -334,6 +328,9 @@ public abstract class ServerBootstrap extends CmdLineTool {
             if (configuration.isLeader() && configuration.runMigrations()) {
                 runMigrations(injector, MigrationType.STANDARD);
             }
+
+            // Migrations that must be executed on all nodes, regardless of their leader status
+            runMigrations(injector, MigrationType.ENFORCED_ON_ALL_NODES);
         } catch (Exception e) {
             LOG.error("Exception while running migrations", e);
             System.exit(1);
@@ -402,22 +399,22 @@ public abstract class ServerBootstrap extends CmdLineTool {
     public void runMigrations(Injector injector, MigrationType migrationType) {
         //noinspection unchecked
         final TypeLiteral<Set<Migration>> typeLiteral = (TypeLiteral<Set<Migration>>) TypeLiteral.get(Types.setOf(Migration.class));
-        Set<Migration> migrations = injector.getInstance(Key.get(typeLiteral));
+        final Set<Migration> migrations = injector.getInstance(Key.get(typeLiteral));
+        final Set<Migration> migrationsToRun = migrations.stream().filter(m -> m.migrationType() == migrationType).collect(ImmutableSortedSet.toImmutableSortedSet(Ordering.natural()));
+        LOG.info("Running {} migrations of type {}...", migrationsToRun.size(), migrationType);
 
-        LOG.info("Running {} migrations...", migrations.size());
-
-        ImmutableSortedSet.copyOf(migrations).stream().filter(m -> m.migrationType() == migrationType).forEach(m -> {
-            LOG.debug("Running migration <{}>", m.getClass().getCanonicalName());
+        for (Migration migration : migrationsToRun) {
+            LOG.debug("Running migration <{}>", migration.getClass().getCanonicalName());
             try {
-                m.upgrade();
+                migration.upgrade();
             } catch (Exception e) {
                 if (configuration.ignoreMigrationFailures()) {
-                    LOG.warn("Ignoring failure of migration <{}>: {}", m.getClass().getCanonicalName(), e.getMessage());
+                    LOG.warn("Ignoring failure of migration <{}>: {}", migration.getClass().getCanonicalName(), e.getMessage());
                 } else {
                     throw e;
                 }
             }
-        });
+        }
     }
 
     protected void savePidFile(final String pidFile) {
@@ -445,10 +442,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
         result.add(new GenericBindings(isMigrationCommand()));
         result.add(new MessageBindings());
         result.add(new SecurityBindings());
-        result.add(new ServerStatusBindings(capabilities()));
         result.add(new ValidatorModule());
         result.add(new SharedPeriodicalBindings());
-        result.add(new SchedulerBindings());
         result.add(new GenericInitializerBindings());
         result.add(new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()));
         result.add(new IndexerDiscoveryModule());

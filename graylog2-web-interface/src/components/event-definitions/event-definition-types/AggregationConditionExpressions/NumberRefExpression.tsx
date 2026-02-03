@@ -15,17 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
+import * as Immutable from 'immutable';
+import styled, { css } from 'styled-components';
 
-import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
+import { defaultCompare as naturalSort, defaultCompare } from 'logic/DefaultCompare';
 import { Select } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import { percentileOptions, percentageStrategyOptions } from 'views/Constants';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type FieldType from 'views/logic/fieldtypes/FieldType';
+import { Properties, type Property } from 'views/logic/fieldtypes/FieldType';
+import FieldTypeIcon from 'views/components/sidebar/fields/FieldTypeIcon';
 
-const formatFunctions = (functions) => functions
-  .sort(naturalSort)
-  .map((fn) => ({ label: `${fn.toLowerCase()}()`, value: fn }));
+const formatFunctions = (functions) =>
+  functions.sort(naturalSort).map((fn) => ({ label: `${fn.toLowerCase()}()`, value: fn }));
 
 const getSeriesId = (currentSeries) => `${currentSeries.type}-${currentSeries.field ?? ''}`;
 
@@ -33,12 +38,49 @@ type NumberRefExpressionProps = {
   aggregationFunctions: any[];
   eventDefinition: any;
   expression: any;
-  formattedFields: any[];
+  formattedFields: FieldTypeMapping[];
   onChange: (...args: any[]) => void;
   renderLabel: boolean;
   validation?: any;
-  parent?: any
 };
+
+// start - copied from FieldSelectBase.tsx
+const FieldName = styled.span`
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+`;
+
+const UnqualifiedOption = styled.span(
+  ({ theme }) => css`
+    color: ${theme.colors.gray[70]};
+  `,
+);
+
+type OptionRendererProps = {
+  label: string;
+  qualified: boolean;
+  type?: FieldType;
+};
+
+const optionRenderer = ({ label, qualified, type = undefined }: OptionRendererProps) => {
+  const children = (
+    <FieldName>
+      {type && (
+        <>
+          <FieldTypeIcon type={type} />{' '}
+        </>
+      )}
+      {label}
+    </FieldName>
+  );
+
+  return qualified ? <span>{children}</span> : <UnqualifiedOption>{children}</UnqualifiedOption>;
+};
+
+const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) =>
+  defaultCompare(label1, label2);
+// end - copied from FieldSelectBase.tsx
 
 const NumberRefExpression = ({
   aggregationFunctions,
@@ -49,60 +91,113 @@ const NumberRefExpression = ({
   renderLabel,
   validation = {},
 }: NumberRefExpressionProps) => {
-  const getSeries = useCallback((seriesId) => eventDefinition?.config?.series?.find((series) => series.id === seriesId), [eventDefinition?.config?.series]);
+  const getSeries = useCallback(
+    (seriesId) => eventDefinition?.config?.series?.find((series) => series.id === seriesId),
+    [eventDefinition?.config?.series],
+  );
 
   const createSeries = useCallback(() => ({ id: expression.ref }), [expression.ref]);
 
   const getOrCreateSeries = useCallback((seriesId) => getSeries(seriesId) || createSeries(), [createSeries, getSeries]);
 
-  const handleFieldChange = useCallback((key, value) => {
-    const series = cloneDeep(eventDefinition?.config?.series);
-    const nextSeries = cloneDeep(getOrCreateSeries(expression.ref));
+  const handleFieldChange = useCallback(
+    (key, value) => {
+      const series = cloneDeep(eventDefinition?.config?.series);
+      const nextSeries = cloneDeep(getOrCreateSeries(expression.ref));
 
-    if (value !== undefined) {
-      nextSeries[key] = value;
-    }
+      if (value !== undefined) {
+        nextSeries[key] = value;
+      }
 
-    if (key === 'type' && value !== 'percentage') {
-      delete nextSeries.strategy;
-    }
+      if (key === 'type' && value !== 'percentage') {
+        delete nextSeries.strategy;
+      }
 
-    if (key === 'type' && value !== 'percentage') {
-      delete nextSeries.percentile;
-    }
+      if (key === 'type' && value !== 'percentage') {
+        delete nextSeries.percentile;
+      }
 
-    const nextSeriesId = getSeriesId(nextSeries);
-    nextSeries.id = nextSeriesId;
+      const nextSeriesId = getSeriesId(nextSeries);
+      nextSeries.id = nextSeriesId;
 
-    const seriesIndex = series.findIndex((s) => s.id === nextSeries.id);
+      const seriesIndex = series.findIndex((s) => s.id === nextSeries.id);
 
-    if (seriesIndex >= 0) {
-      series[seriesIndex] = nextSeries;
-    } else {
-      series.push(nextSeries);
-    }
+      if (seriesIndex >= 0) {
+        series[seriesIndex] = nextSeries;
+      } else {
+        series.push(nextSeries);
+      }
 
-    const nextExpression = cloneDeep(expression);
+      const nextExpression = cloneDeep(expression);
 
-    nextExpression.ref = nextSeriesId;
+      nextExpression.ref = nextSeriesId;
 
-    onChange({
-      series: series,
-      conditions: nextExpression,
-    });
-  }, [eventDefinition?.config?.series, expression, getOrCreateSeries, onChange]);
+      onChange({
+        series: series,
+        conditions: nextExpression,
+      });
+    },
+    [eventDefinition?.config?.series, expression, getOrCreateSeries, onChange],
+  );
 
-  const handleAggregationFunctionChange = useCallback((nextFunction) => {
-    handleFieldChange('type', nextFunction);
-  }, [handleFieldChange]);
+  const handleAggregationFunctionChange = useCallback(
+    (nextFunction) => {
+      handleFieldChange('type', nextFunction);
+    },
+    [handleFieldChange],
+  );
 
-  const handleAggregationFieldChange = useCallback((nextField) => {
-    handleFieldChange('field', nextField);
-  }, [handleFieldChange]);
+  const handleAggregationFieldChange = useCallback(
+    (nextField) => {
+      const normalizedField = nextField === '' ? null : nextField;
+
+      handleFieldChange('field', normalizedField);
+    },
+    [handleFieldChange],
+  );
 
   const series = getSeries(expression.ref) || {};
 
   const elements = ['percentage', 'percentile'].includes(series.type) ? 3 : 2;
+
+  // start - copied from MetricConfiguration.tsx
+  const hasProperty = (fieldType: FieldTypeMapping, properties: Array<Property>) => {
+    const fieldProperties = fieldType?.type?.properties ?? Immutable.Set();
+
+    return (
+      properties.map((property) => fieldProperties.contains(property)).find((result) => result === false) === undefined
+    );
+  };
+
+  const currentFunction = series.type;
+  const isPercentage = currentFunction === 'percentage';
+  const requiresNumericField =
+    (isPercentage && series.strategy === 'SUM') || !['card', 'count', 'latest', 'percentage'].includes(currentFunction);
+
+  const isFieldQualified = useCallback(
+    (field: FieldTypeMapping) => {
+      if (!requiresNumericField) {
+        return true;
+      }
+
+      return hasProperty(field, [Properties.Numeric]);
+    },
+    [requiresNumericField],
+  );
+
+  const fieldOptions = useMemo(
+    () =>
+      formattedFields
+        .map((field) => ({
+          label: `${field.name}`,
+          value: field.name,
+          type: field.value.type,
+          qualified: isFieldQualified(field),
+        }))
+        .sort(sortByLabel),
+    [isFieldQualified, formattedFields],
+  );
+  // end - copied from MetricConfiguration.tsx
 
   return (
     <Col md={6}>
@@ -110,41 +205,47 @@ const NumberRefExpression = ({
         {renderLabel && <ControlLabel>If</ControlLabel>}
         <Row className="row-sm">
           <Col md={12 / elements}>
-            <Select className="aggregation-function"
-                    matchProp="label"
-                    placeholder="Select Function"
-                    onChange={handleAggregationFunctionChange}
-                    options={formatFunctions(aggregationFunctions)}
-                    clearable={false}
-                    value={series.type} />
+            <Select
+              className="aggregation-function"
+              placeholder="Select Function"
+              onChange={handleAggregationFunctionChange}
+              options={formatFunctions(aggregationFunctions)}
+              clearable={false}
+              value={series.type}
+            />
           </Col>
           {series.type === 'percentage' && (
             <Col md={12 / elements}>
-              <Select className="aggregation-function-strategy"
-                      matchProp="label"
-                      placeholder="Select Strategy (Optional)"
-                      onChange={(newValue) => handleFieldChange('strategy', newValue)}
-                      options={percentageStrategyOptions}
-                      value={series.strategy} />
+              <Select
+                className="aggregation-function-strategy"
+                placeholder="Select Strategy (Optional)"
+                onChange={(newValue) => handleFieldChange('strategy', newValue)}
+                options={percentageStrategyOptions}
+                value={series.strategy}
+              />
             </Col>
           )}
           <Col md={12 / elements}>
-            <Select className="aggregation-function-field"
-                    ignoreAccents={false}
-                    matchProp="label"
-                    placeholder="Select Field (Optional)"
-                    onChange={handleAggregationFieldChange}
-                    options={formattedFields}
-                    value={series.field}
-                    allowCreate />
+            <Select
+              className="aggregation-function-field"
+              ignoreAccents={false}
+              placeholder="Select Field (Optional)"
+              onChange={handleAggregationFieldChange}
+              options={fieldOptions}
+              optionRenderer={optionRenderer}
+              value={series.field}
+              allowCreate
+            />
           </Col>
           {series.type === 'percentile' && (
             <Col md={12 / elements}>
-              <Select className="aggregation-function-percentile"
-                      placeholder="Select Percentile"
-                      onChange={(newValue) => handleFieldChange('percentile', newValue)}
-                      options={percentileOptions}
-                      value={series.percentile} />
+              <Select
+                className="aggregation-function-percentile"
+                placeholder="Select Percentile"
+                onChange={(newValue) => handleFieldChange('percentile', newValue)}
+                options={percentileOptions}
+                value={series.percentile}
+              />
             </Col>
           )}
         </Row>

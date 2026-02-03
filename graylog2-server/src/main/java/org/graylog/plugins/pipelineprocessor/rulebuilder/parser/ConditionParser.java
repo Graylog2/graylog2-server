@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.pipelineprocessor.rulebuilder.parser;
 
-import freemarker.template.Configuration;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
@@ -24,7 +23,6 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderRegistry;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
-import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 
 import java.util.List;
 import java.util.Map;
@@ -37,18 +35,16 @@ public class ConditionParser {
 
     public static final String NL = System.lineSeparator();
     private static final String INDENT = "  ";
-    protected final Map<String, RuleFragment> conditions;
 
-    private final Configuration freemarkerConfiguration;
+    private final RuleBuilderRegistry ruleBuilderRegistry;
 
     @Inject
-    public ConditionParser(RuleBuilderRegistry ruleBuilderRegistry, SecureFreemarkerConfigProvider secureFreemarkerConfigProvider) {
-        this.conditions = ruleBuilderRegistry.conditionsWithInternal();
-        freemarkerConfiguration = ParserUtil.initializeFragmentTemplates(secureFreemarkerConfigProvider, conditions);
+    public ConditionParser(RuleBuilderRegistry ruleBuilderRegistry) {
+        this.ruleBuilderRegistry = ruleBuilderRegistry;
     }
 
     public Map<String, RuleFragment> getConditions() {
-        return conditions;
+        return ruleBuilderRegistry.conditions();
     }
 
     public String generate(List<RuleBuilderStep> ruleConditions, RuleBuilderStep.Operator operator, int level) {
@@ -90,14 +86,14 @@ public class ConditionParser {
             syntax += "! ";
         }
 
-        final RuleFragment ruleFragment = conditions.get(step.function());
+        final RuleFragment ruleFragment = getConditions().get(step.function());
         if (Objects.isNull(ruleFragment)) {
             return "";
         }
         FunctionDescriptor<?> function = ruleFragment.descriptor();
 
         if (ruleFragment.isFragment()) {
-            syntax += ParserUtil.generateForFragment(step, freemarkerConfiguration);
+            syntax += ParserUtil.generateForFragment(step, ruleBuilderRegistry.getFreemarkerConfiguration());
         } else {
             syntax += ParserUtil.generateForFunction(step, function, level);
         }
@@ -116,4 +112,5 @@ public class ConditionParser {
         String fieldname = (step.outputvariable() == null) ? Integer.toString(index) : step.outputvariable();
         return "set_field(\"gl2_simulator_condition_" + fieldname + "\", " + condition + ");";
     }
+
 }

@@ -20,16 +20,14 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class StreamRuleTypeResponse {
-    @JsonProperty
+    @JsonProperty("id")
     public abstract int id();
 
-    @JsonProperty
+    @JsonProperty("name")
     public abstract String name();
 
     @JsonProperty("short_desc")

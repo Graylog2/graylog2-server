@@ -20,12 +20,12 @@ import { useTheme } from 'styled-components';
 
 type Props = React.ComponentProps<typeof MantineTooltip>;
 
-const Tooltip = (props: Props) => {
+const Tooltip = ({ ...props }: Props) => {
   const theme = useTheme();
   const styles = () => ({
     tooltip: {
       backgroundColor: theme.colors.global.contentBackground,
-      color: theme.colors.global.textDefault,
+      color: theme.colors.text.primary,
       fontWeight: 400,
       fontSize: theme.fonts.size.root,
     },

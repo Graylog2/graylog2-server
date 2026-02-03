@@ -106,8 +106,8 @@ public class EventProcessorExecutionJob implements Job {
         // We cannot run the event processor if the "to" timestamp of the timerange we want to process is in the future.
         final DateTime now = clock.nowUTC();
         if (now.isBefore(to)) {
-            LOG.error("The end of the timerange to process is in the future, re-scheduling job trigger <{}> to run at <{}>",
-                    ctx.trigger().id(), to);
+            LOG.error("The end of the timerange to process is in the future, re-scheduling job trigger <{}> for event definition <{}> to run at <{}>",
+                    ctx.trigger().id(), config.eventDefinitionId(), to);
             return JobTriggerUpdate.withNextTime(to);
         }
 

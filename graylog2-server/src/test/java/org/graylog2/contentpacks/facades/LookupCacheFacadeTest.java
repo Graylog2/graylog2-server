@@ -20,9 +20,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.graph.Graph;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -44,21 +43,21 @@ import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.lookup.FallbackCacheConfig;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(MongoDBExtension.class)
 public class LookupCacheFacadeTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
@@ -66,10 +65,9 @@ public class LookupCacheFacadeTest {
     private DBCacheService cacheService;
     private Set<PluginMetaData> pluginMetaData;
 
-    @Before
+    @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
-    public void setUp() throws Exception {
-        final MongoCollections mongoCollections = new MongoCollections(new MongoJackObjectMapperProvider(objectMapper), mongodb.mongoConnection());
+    public void setUp(MongoCollections mongoCollections) throws Exception {
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
         cacheService = new DBCacheService(
                 mongoCollections,
@@ -137,7 +135,9 @@ public class LookupCacheFacadeTest {
                         ReferenceMapUtils.toReferenceMap(ImmutableMap.of("type", "none"))
                 ), JsonNode.class))
                 .build();
-        assertThat(cacheService.findAll()).isEmpty();
+        try (Stream<CacheDto> cacheStream = cacheService.streamAll()) {
+            assertThat(cacheStream).isEmpty();
+        }
 
         final NativeEntity<CacheDto> nativeEntity = facade.createNativeEntity(entity, Collections.emptyMap(), Collections.emptyMap(), "username");
         final NativeEntityDescriptor descriptor = nativeEntity.descriptor();
@@ -150,7 +150,9 @@ public class LookupCacheFacadeTest {
         assertThat(cacheDto.description()).isEqualTo("No-op cache");
         assertThat(cacheDto.config().type()).isEqualTo("none");
 
-        assertThat(cacheService.findAll()).hasSize(1);
+        try (Stream<CacheDto> cacheStream = cacheService.streamAll()) {
+            assertThat(cacheStream).hasSize(1);
+        }
     }
 
     @Test
@@ -235,11 +237,15 @@ public class LookupCacheFacadeTest {
     public void delete() {
         final Optional<CacheDto> cacheDto = cacheService.get("5adf24b24b900a0fdb4e52dd");
 
-        assertThat(cacheService.findAll()).hasSize(1);
+        try (Stream<CacheDto> cacheStream = cacheService.streamAll()) {
+            assertThat(cacheStream).hasSize(1);
+        }
         cacheDto.ifPresent(facade::delete);
 
         assertThat(cacheService.get("5adf24b24b900a0fdb4e52dd")).isEmpty();
-        assertThat(cacheService.findAll()).isEmpty();
+        try (Stream<CacheDto> cacheStream = cacheService.streamAll()) {
+            assertThat(cacheStream).isEmpty();
+        }
     }
 
     @Test

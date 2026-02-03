@@ -1,58 +1,55 @@
 Light-themed editor:
-```js
-import createReactClass from 'create-react-class';
 
-const MarkdownSourceEditor = createReactClass({
-  getInitialState() {
-    return {
+```js
+class MarkdownSourceEditor extends React.Component {
+  constructor(props) {
+    this.state = {
       code: `## Markdown text
 
 - This is an example of a source text editor
 - The code we write is written in Markdown
 `,
     };
-  },
+    this.handleChange = this.handleChange.bind(this);
+  }
 
   handleChange(nextValue) {
     this.setState({ code: nextValue });
-  },
+  }
 
   render() {
     const { code } = this.state;
     return (
       <div>
-        <SourceCodeEditor id="editor-1"
-                          mode="markdown"
-                          theme="light"
-                          value={code}
-                          onChange={this.handleChange} />
+        <SourceCodeEditor id="editor-1" mode="markdown" theme="light" value={code} onChange={this.handleChange} />
         <p>Preview:</p>
         <pre>{code}</pre>
       </div>
     );
-  },
-});
+  }
+}
 
-<MarkdownSourceEditor />
+<MarkdownSourceEditor />;
 ```
 
 Read-only dark-themed editor:
-```js
-import createReactClass from 'create-react-class';
 
-const TextSourceEditor = createReactClass({
-  getInitialState() {
-    return {
+```js
+class TextSourceEditor extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       code: `function foobar() {
   console.log('this is some source code!');
 }
 `,
     };
-  },
+    this.handleChange = this.handleChange.bind(this);
+  }
 
   handleChange(nextValue) {
     this.setState({ code: nextValue });
-  },
+  }
 
   render() {
     const { code } = this.state;
@@ -62,26 +59,21 @@ const TextSourceEditor = createReactClass({
       { row: 3, column: -1, text: 'info!', type: 'info' },
     ];
     return (
-        <SourceCodeEditor id="editor-2"
-                          annotations={annotations}
-                          resizable={false}
-                          readOnly
-                          theme="dark"
-                          value={code} />
+      <SourceCodeEditor id="editor-2" annotations={annotations} resizable={false} readOnly theme="dark" value={code} />
     );
-  },
-});
+  }
+}
 
-<TextSourceEditor />
+<TextSourceEditor />;
 ```
 
 Non-resizable editor without toolbar and with custom height and width:
-```js
-import createReactClass from 'create-react-class';
 
-const JsonSourceEditor = createReactClass({
-  getInitialState() {
-    return {
+```js
+class JsonSourceEditor extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
       code: `{
   "key": "value",
   "foo": [
@@ -91,26 +83,29 @@ const JsonSourceEditor = createReactClass({
 }
 `,
     };
-  },
+    this.handleChange = this.handleChange.bind(this);
+  }
 
   handleChange(nextValue) {
     this.setState({ code: nextValue });
-  },
+  }
 
   render() {
     const { code } = this.state;
     return (
-      <SourceCodeEditor id="editor-2"
-                      height={100}
-                      mode="json"
-                      onChange={this.handleChange}
-                      resizable={false}
-                      toolbar={false}
-                      width={400}
-                      value={code} />
-      );
-  },
-});
+      <SourceCodeEditor
+        id="editor-2"
+        height={100}
+        mode="json"
+        onChange={this.handleChange}
+        resizable={false}
+        toolbar={false}
+        width={400}
+        value={code}
+      />
+    );
+  }
+}
 
-<JsonSourceEditor />
+<JsonSourceEditor />;
 ```

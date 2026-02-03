@@ -21,7 +21,7 @@ import debounce from 'lodash/debounce';
 import WindowDimensionsContext from './WindowDimensionsContext';
 
 type Props = {
-  children: React.ReactNode,
+  children: React.ReactNode;
 };
 
 const getWindowDimension = () => {
@@ -48,11 +48,7 @@ const useWindowDimension = () => {
 const WindowDimensionsContextProvider = ({ children }: Props) => {
   const windowDimensions = useWindowDimension();
 
-  return (
-    <WindowDimensionsContext.Provider value={windowDimensions}>
-      {children}
-    </WindowDimensionsContext.Provider>
-  );
+  return <WindowDimensionsContext.Provider value={windowDimensions}>{children}</WindowDimensionsContext.Provider>;
 };
 
 export default WindowDimensionsContextProvider;

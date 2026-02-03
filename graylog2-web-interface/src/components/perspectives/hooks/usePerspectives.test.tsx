@@ -29,11 +29,7 @@ describe('usePerspectives', () => {
     jest.clearAllMocks();
   });
 
-  const wrapper = ({ children }: React.PropsWithChildren) => (
-    <PerspectivesProvider>
-      {children}
-    </PerspectivesProvider>
-  );
+  const wrapper = ({ children }: React.PropsWithChildren) => <PerspectivesProvider>{children}</PerspectivesProvider>;
 
   it('should return available perspectives', async () => {
     const { result } = renderHook(() => usePerspectives(), { wrapper });
@@ -42,8 +38,8 @@ describe('usePerspectives', () => {
   });
 
   it('should throw error when being used outside of PerspectivesContext', async () => {
-    const { result } = renderHook(() => usePerspectives());
-
-    expect(result.error).toEqual(Error('usePerspectives hook needs to be used inside PerspectivesContext.Provider'));
+    expect(() => renderHook(() => usePerspectives())).toThrow(
+      'usePerspectives hook needs to be used inside PerspectivesContext.Provider',
+    );
   });
 });

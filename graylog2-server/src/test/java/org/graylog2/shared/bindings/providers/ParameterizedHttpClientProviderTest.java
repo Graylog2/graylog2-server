@@ -17,11 +17,12 @@
 package org.graylog2.shared.bindings.providers;
 
 import com.github.joschi.jadconfig.util.Duration;
+import mockwebserver3.MockResponse;
+import mockwebserver3.MockWebServer;
+import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.tls.HandshakeCertificates;
 import okhttp3.tls.HeldCertificate;
 import org.junit.jupiter.api.AfterEach;
@@ -62,14 +63,14 @@ public class ParameterizedHttpClientProviderTest {
                 .addTrustedCertificate(localhostCert.certificate())
                 .build();
 
-        server.useHttps(serverCertificates.sslSocketFactory(), false);
+        server.useHttps(serverCertificates.sslSocketFactory());
         server.start();
         server.enqueue(successfulMockResponse());
     }
 
     @AfterEach
     void tearDown() throws IOException {
-        server.shutdown();
+        server.close();
     }
 
     @Test
@@ -142,16 +143,16 @@ public class ParameterizedHttpClientProviderTest {
 
     private OkHttpClientProvider client(URI proxyURI) {
         final OkHttpClientProvider provider = new OkHttpClientProvider(
+                "GraylogTest",
                 Duration.milliseconds(500L),
                 Duration.milliseconds(500L),
                 Duration.milliseconds(500L),
-                proxyURI,
-                null, null);
+                proxyURI, null, null);
 
         return provider;
     }
 
     private MockResponse successfulMockResponse() {
-        return new MockResponse().setResponseCode(200).setBody("Test");
+        return new MockResponse(200, Headers.of(), "Test");
     }
 }

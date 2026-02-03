@@ -1,0 +1,5 @@
+type = "f"
+message = "Improve background color of selected text in search query input."
+
+pulls = ["22964"]
+issues = ["21900"]

@@ -29,9 +29,7 @@ const StreamDetailsPage = () => {
     return <Spinner />;
   }
 
-  return (
-    <StreamDetails stream={stream} />
-  );
+  return <StreamDetails stream={stream} />;
 };
 
 export default StreamDetailsPage;

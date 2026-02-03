@@ -36,6 +36,7 @@ import java.security.PrivateKey;
  import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -61,14 +62,14 @@ public class CaKeystore {
         this.csrSigner = csrSigner;
     }
 
-    public synchronized CertificateChain signCertificateRequest(CertificateSigningRequest request, RenewalPolicy renewalPolicy) throws CaKeystoreException {
+    public synchronized CertificateChain signCertificateRequest(CertificateSigningRequest request, Duration certificateLifetime) throws CaKeystoreException {
         final CaKeystoreWithPassword caKeystore = loadKeystore().orElseThrow(() -> new CaKeystoreException("Can't sign certificates, no CA configured!"));
         try {
             LOG.info("Signing certificate for  node {}, subject: {}", request.nodeId(), request.request().getSubject());
             // TODO: better abstraction to protect the private key and password!
             var caPrivateKey = (PrivateKey) caKeystore.keyStore().getKey(CA_KEY_ALIAS, caKeystore.password().toCharArray());
             var caCertificate = (X509Certificate) caKeystore.keyStore().getCertificate(CA_KEY_ALIAS);
-            var cert = csrSigner.sign(caPrivateKey, caCertificate, request.request(), renewalPolicy);
+            var cert = csrSigner.sign(caPrivateKey, caCertificate, request.request(), certificateLifetime);
             final List<X509Certificate> caCertificates = List.of(caCertificate);
             return new CertificateChain(cert, caCertificates);
         } catch (Exception e) {

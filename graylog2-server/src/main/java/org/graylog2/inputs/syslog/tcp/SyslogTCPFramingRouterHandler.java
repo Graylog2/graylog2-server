@@ -45,8 +45,14 @@ public class SyslogTCPFramingRouterHandler extends SimpleChannelInboundHandler<B
                     handler = new DelimiterBasedFrameDecoder(maxFrameLength, delimiter);
                 }
             }
+            try {
+                handler.channelRead(ctx, ReferenceCountUtil.retain(msg));
+            } catch (Exception e) {
+                // Because we've retained the buffer, we must release it in case of an exception to avoid memory leaks
+                ReferenceCountUtil.release(msg);
+                throw e;
+            }
 
-            handler.channelRead(ctx, ReferenceCountUtil.retain(msg));
         } else {
             ctx.fireChannelRead(msg);
         }

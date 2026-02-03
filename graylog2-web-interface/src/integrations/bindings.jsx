@@ -15,35 +15,52 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Routes from 'integrations/aws/common/Routes';
+import AWSCloudTrailRoutes from 'integrations/aws/cloudtrail/common/Routes';
 
 import AWSInputConfiguration from './aws/AWSInputConfiguration';
 import AWSCloudWatchApp from './aws/cloudwatch/CloudWatchApp';
 import EmbeddedCloudWatchApp from './aws/cloudwatch/EmbeddedCloudWatchApp';
+import CloudTrailInputConfiguration from './aws/cloudtrail/CloudTrailInputConfiguration';
+import EmbeddedCloudTrailApp from './aws/cloudtrail/EmbeddedCloudTrailApp';
+import AWSCloudTrailApp from './aws/cloudtrail/CloudTrailApp';
+import { defaultConfig as PagerDutyDefaultConfig } from './pager-duty/PagerDutyConfig';
 import PagerDutyNotificationDetails from './pager-duty/PagerDutyNotificationDetails';
 import PagerDutyNotificationForm from './pager-duty/PagerDutyNotificationForm';
 import PagerDutyNotificationSummary from './pager-duty/PagerDutyNotificationSummary';
 import SlackNotificationDetails from './event-notifications/event-notification-details/SlackNotificationDetails';
-import SlackNotificationForm from './event-notifications/event-notification-types/SlackNotificationForm';
+import SlackNotificationForm, {
+  defaultConfig as SlackDefaultConfig,
+} from './event-notifications/event-notification-types/SlackNotificationForm';
 import SlackNotificationSummary from './event-notifications/event-notification-types/SlackNotificationSummary';
 import TeamsNotificationDetails from './event-notifications/event-notification-details/TeamsNotificationDetails';
-import TeamsNotificationForm from './event-notifications/event-notification-types/TeamsNotificationForm';
+import TeamsNotificationForm, {
+  defaultConfig as TeamsDefaultConfig,
+} from './event-notifications/event-notification-types/TeamsNotificationForm';
 import TeamsNotificationSummary from './event-notifications/event-notification-types/TeamsNotificationSummary';
 import GreyNoiseAdapterFieldSet from './dataadapters/GreyNoiseAdapterFieldSet';
 import GreyNoiseAdapterSummary from './dataadapters/GreyNoiseAdapterSummary';
 import GreyNoiseAdapterDocumentation from './dataadapters/GreyNoiseAdapterDocumentation';
-import TeamsNotificationV2Form from './event-notifications/event-notification-types/TeamsNotificationV2Form';
+import TeamsNotificationV2Form, {
+  defaultConfig as TeamsV2DefaultConfig,
+} from './event-notifications/event-notification-types/TeamsNotificationV2Form';
 import TeamsNotificationV2Summary from './event-notifications/event-notification-types/TeamsNotificationV2Summary';
 import TeamsNotificationV2Details from './event-notifications/event-notification-details/TeamsNotificationV2Details';
 
 const bindings = {
   routes: [
-    { path: Routes.INTEGRATIONS.AWS.CLOUDWATCH.index, component: AWSCloudWatchApp },
+    { path: Routes.unqualified.INTEGRATIONS.AWS.CLOUDWATCH.index, component: AWSCloudWatchApp },
+    { path: AWSCloudTrailRoutes.unqualified.INTEGRATIONS.AWSCloudTrail.ACTIVITYAPI.index, component: AWSCloudTrailApp },
   ],
   inputConfiguration: [
     {
       type: 'org.graylog.integrations.aws.inputs.AWSInput',
       component: AWSInputConfiguration,
       embeddedComponent: EmbeddedCloudWatchApp,
+    },
+    {
+      type: 'org.graylog.aws.inputs.cloudtrail.CloudTrailInput',
+      component: CloudTrailInputConfiguration,
+      embeddedComponent: EmbeddedCloudTrailApp,
     },
   ],
   eventNotificationTypes: [
@@ -53,7 +70,7 @@ const bindings = {
       formComponent: PagerDutyNotificationForm,
       summaryComponent: PagerDutyNotificationSummary,
       detailsComponent: PagerDutyNotificationDetails,
-      defaultConfig: PagerDutyNotificationForm.defaultConfig,
+      defaultConfig: PagerDutyDefaultConfig,
     },
     {
       type: 'slack-notification-v1',
@@ -61,7 +78,7 @@ const bindings = {
       formComponent: SlackNotificationForm,
       summaryComponent: SlackNotificationSummary,
       detailsComponent: SlackNotificationDetails,
-      defaultConfig: SlackNotificationForm.defaultConfig,
+      defaultConfig: SlackDefaultConfig,
     },
     {
       type: 'teams-notification-v1',
@@ -69,7 +86,7 @@ const bindings = {
       formComponent: TeamsNotificationForm,
       summaryComponent: TeamsNotificationSummary,
       detailsComponent: TeamsNotificationDetails,
-      defaultConfig: TeamsNotificationForm.defaultConfig,
+      defaultConfig: TeamsDefaultConfig,
     },
     {
       type: 'teams-notification-v2',
@@ -77,7 +94,7 @@ const bindings = {
       formComponent: TeamsNotificationV2Form,
       summaryComponent: TeamsNotificationV2Summary,
       detailsComponent: TeamsNotificationV2Details,
-      defaultConfig: TeamsNotificationV2Form.defaultConfig,
+      defaultConfig: TeamsV2DefaultConfig,
     },
   ],
   lookupTableAdapters: [

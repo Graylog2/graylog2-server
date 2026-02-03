@@ -18,7 +18,6 @@
 // Please note, each project has its own collection of telemetry event types.
 // Only maintain event types related to core features in this file.
 
-// eslint-disable-next-line import/prefer-default-export
 export const TELEMETRY_EVENT_TYPE = {
   SEARCH_TIMERANGE_PRESET_SELECTED: 'Search TimeRange Preset Selected',
   SEARCH_TIMERANGE_PICKER_TOGGLED: 'Search TimeRange Picker Toggled',
@@ -28,6 +27,8 @@ export const TELEMETRY_EVENT_TYPE = {
   SEARCH_STREAM_INPUT_CHANGED: 'Search Stream Input Changed',
   SEARCH_REFRESH_CONTROL_PRESET_SELECTED: 'Search Refresh Control Preset Selected',
   SEARCH_REFRESH_CONTROL_TOGGLED: 'Search Refresh Control Toggled',
+  ALERTS_REFRESH_CONTROL_PRESET_SELECTED: 'Alerts Refresh Control Preset Selected',
+  ALERTS_REFRESH_CONTROL_TOGGLED: 'Alerts Refresh Control Toggled',
   SEARCH_BUTTON_CLICKED: 'Search Button Clicked',
   SEARCH_WIDGET_EXPORT_DOWNLOADED: 'Search Widget Export Downloaded',
   SEARCH_TIMERANGE_PRESET_ADD_QUICK_ACCESS: 'Search TimeRange Preset Add Quick Access',
@@ -44,6 +45,14 @@ export const TELEMETRY_EVENT_TYPE = {
     WIDGET_EDIT_CANCEL_CLICKED: 'Search Widget Edit Cancel Clicked',
     WIDGET_CONFIG_UPDATED: 'Search Widget Config Updated',
     EXPORT: 'Search Widget Exported',
+  },
+  FAVORITE_FIELDS: {
+    EDIT_OPEN: 'Favorite Fields Edit Open',
+    EDIT_CANCELED: 'Favorite Fields Edit Canceled',
+    EDIT_SAVED: 'Favorite Fields Edit Saved',
+    TOGGLED: 'Favorite Field Toggled',
+    REORDERED: 'Favorite Field Reordered',
+    NON_FAVORITE_SHOW_TOGGLED: 'Non Favorite Field Show Toggled',
   },
   SEARCH_WIDGET_CREATE: {
     AGGREGATION: 'Search Widget Aggregation Created',
@@ -114,6 +123,7 @@ export const TELEMETRY_EVENT_TYPE = {
   EVENTDEFINITION_DUPLICATED: 'EventDefinition Duplicated',
   EVENTDEFINITION_NEXT_CLICKED: 'EventDefinition Next Clicked',
   EVENTDEFINITION_PREVIOUS_CLICKED: 'EventDefinition Previous Clicked',
+  EVENTDEFINITION_REPLAY_SEARCH_CLICKED: 'EventDefinition Replay Search Clicked',
   EVENTDEFINITION_DETAILS: {
     STEP_CLICKED: 'EventDefinition Details Step Clicked',
     PRIORITY_CHANGED: 'EventDefinition Details Priority Changed',
@@ -186,13 +196,14 @@ export const TELEMETRY_EVENT_TYPE = {
     STREAM_ITEM_DATA_ROUTING_STREAM_INDEXSET_UPDATE_OPENED: 'Stream Item Data Routing Stream IndexSet Update Opened',
     STREAM_ITEM_DATA_ROUTING_INDEXER_FILTER_UPDATE_OPENED: 'Stream Item Data Routing Indexer Filter Update Opened',
     STREAM_ITEM_DATA_ROUTING_INDEXER_FILTER_CREATE_OPENED: 'Stream Item Data Routing Indexer Filter Create Opened',
-    STREAM_ITEM_DATA_ROUTING_DATA_WAREHOUSE_FILTER_CREATE_OPENED: 'Stream Item Data Routing Data Warehouse Filter Create Opened',
-    STREAM_ITEM_DATA_ROUTING_DATA_WAREHOUSE_FILTER_UPDATE_OPENED: 'Stream Item Data Routing Data Warehouse Filter Update Opened',
+    STREAM_ITEM_DATA_ROUTING_DATA_LAKE_FILTER_CREATE_OPENED: 'Stream Item Data Routing Data Lake Filter Create Opened',
+    STREAM_ITEM_DATA_ROUTING_DATA_LAKE_FILTER_UPDATE_OPENED: 'Stream Item Data Routing Data Lake Filter Update Opened',
     STREAM_ITEM_DATA_ROUTING_FILTER_DELETE_OPENED: 'Stream Item Data Routing Filter Delete Opened',
     STREAM_ITEM_DATA_ROUTING_INTAKE_OPENED: 'Stream Item Data Routing Intake Opened',
     STREAM_ITEM_DATA_ROUTING_PROCESSING_OPENED: 'Stream Item Data Routing Processing Opened',
     STREAM_ITEM_DATA_ROUTING_DESTINATIONS_OPENED: 'Stream Item Data Routing Destination Opened',
-    STREAM_ITEM_DATA_ROUTING_DESTINATIONS_OUTPUT_ASSIGN_OPENED: 'Stream Item Data Routing Destination Output Assign Opened',
+    STREAM_ITEM_DATA_ROUTING_DESTINATIONS_OUTPUT_ASSIGN_OPENED:
+      'Stream Item Data Routing Destination Output Assign Opened',
     STREAM_ITEM_DATA_ROUTING_INTAKE_CREATE_RULE_OPENED: 'Stream Item Data Routing Intake Create Rule Opened',
     STREAM_ITEM_DATA_ROUTING_PROCESSING_EDIT_PIPELINES_CONNECTION: 'Stream Item Data Routing Edit Pipelines Connection',
   },
@@ -241,17 +252,18 @@ export const TELEMETRY_EVENT_TYPE = {
     THREATINTEL_CONFIGURATION_UPDATED: 'Configurations Threat Intel Configuration Updated',
     PERMISSIONS_UPDATED: 'Configurations Permissions Updated',
     SEARCHES_UPDATED: 'Configurations Searches Updated',
-    URL_WHITE_LIST_UPDATED: 'Configurations Url White List Updated',
+    URL_ALLOW_LIST_UPDATED: 'Configurations Url Allow List Updated',
     USER_UPDATED: 'Configurations User Updated',
     CERTIFICATE_RENEWAL_UPDATED: 'Configurations Certificate Renewal Updated',
     CERTIFICATE_RENEWAL_POLICY_UPDATED: 'Configurations Certificate Renewal Policy Updated',
     DECORATORS_UPDATED: 'Configurations Decorators Updated',
     GEOLOCATION_CONFIGURATION_UPDATED: 'Configurations Geolocation Configuration Updated',
+    MARKDOWN_UPDATED: 'Configurations Markdown Updated',
+    PASSWORD_COMPLEXITY_UPDATED: 'Configurations Password Complexity Updated',
   },
   INPUTS: {
     INPUT_SELECTED: 'Inputs Input Selected',
     INPUT_CREATED: 'Inputs Input Created',
-    FIND_MORE_CLICKED: 'Inputs Find More Inputs Clicked',
     INPUT_DELETED: 'Inputs Input Deleted',
     INPUT_EDIT_CLICKED: 'Inputs Input Edit Clicked',
     INPUT_UPDATED: 'Inputs Input Updated',
@@ -260,9 +272,13 @@ export const TELEMETRY_EVENT_TYPE = {
     SHOW_RECEIVED_MESSAGES_CLICKED: 'Inputs Show Received Messages Clicked',
     MANAGE_EXTRACTORS_CLICKED: 'Inputs Manage Extractors Clicked',
     SHOW_METRICS_CLICKED: 'Inputs Show Metrics Clicked',
+    INPUT_DIAGNOSIS_CLICKED: 'Inputs Input Diagnosis Clicked',
     INPUT_START_CLICKED: 'Inputs Input Start Clicked',
     INPUT_STOP_CLICKED: 'Inputs Input Stop Clicked',
     INPUT_SETUP_CLICKED: 'Inputs Input Setup Clicked',
+  },
+  INPUT_SETUP_WIZARD: {
+    START_INPUT: 'Input Setup Wizard Start Input Clicked',
   },
   OUTPUTS: {
     OUTPUT_CREATED: 'Outputs Output Created',
@@ -335,7 +351,7 @@ export const TELEMETRY_EVENT_TYPE = {
     LOG_COLLECTOR_DELETED: 'Sidecar Log Collector Deleted',
   },
   TRAFFIC_GRAPH_DAYS_CHANGED: 'Traffic Graph Days Changed',
-  URLWHITELIST_CONFIGURATION_UPDATED: 'Urlwhitelist Configuration Updated',
+  URLALLOWLIST_CONFIGURATION_UPDATED: 'Urlallowlist Configuration Updated',
   CONTENT_PACK: {
     INSTALLED: 'Content Pack Installed',
     DOWNLOADED: 'Content Pack Downloaded',
@@ -369,33 +385,60 @@ export const TELEMETRY_EVENT_TYPE = {
     RESET_MIGRATION_CLICKED: 'Datanode Migration Reset Migration Clicked',
     RESET_MIGRATION_CONFIRM_CLICKED: 'Datanode Migration Reset Migration Confirm Clicked',
     WELCOME_GO_TO_MIGRATION_STEPS_CLICKED: 'Datanode Migration Welcome Go To Migration Steps Clicked',
-    WELCOME_CONFIGURE_CERTIFICATE_RENEWAL_POLICY_CLICKED: 'Datanode Migration Welcome Configure Certificate Renewal Policy Clicked',
+    WELCOME_CONFIGURE_CERTIFICATE_RENEWAL_POLICY_CLICKED:
+      'Datanode Migration Welcome Configure Certificate Renewal Policy Clicked',
     WELCOME_NEXT_CLICKED: 'Datanode Migration Welcome Next Clicked',
     CA_CREATE_TAB_CLICKED: 'Datanode Migration CA Create Tab Clicked',
     CA_UPLOAD_TAB_CLICKED: 'Datanode Migration CA Upload Tab Clicked',
     CA_CREATE_CA_CLICKED: 'Datanode Migration CA Create CA Clicked',
     CA_UPLOAD_CA_CLICKED: 'Datanode Migration CA Upload CA Clicked',
     CA_GO_TO_MIGRATION_STEPS_CLICKED: 'Datanode Migration CA Go To Migration Steps Clicked',
-    CA_CONFIGURE_CERTIFICATE_RENEWAL_POLICY_CLICKED: 'Datanode Migration CA Configure Certificate Renewal Policy Clicked',
+    CA_CONFIGURE_CERTIFICATE_RENEWAL_POLICY_CLICKED:
+      'Datanode Migration CA Configure Certificate Renewal Policy Clicked',
     CA_NEXT_CLICKED: 'Datanode Migration CA Next Clicked',
     CR_EDIT_CONFIGURATION_CLICKED: 'Datanode Migration CR Edit Configuration Clicked',
     CR_UPDATE_CONFIGURATION_CLICKED: 'Datanode Migration CR Update Configuration Clicked',
     CR_GO_TO_MIGRATION_STEPS_CLICKED: 'Datanode Migration CR Go To Migration Steps Clicked',
     CR_NEXT_CLICKED: 'Datanode Migration CR Next Clicked',
     MIGRATION_TYPE_SELECTED: 'Datanode Migration Migration Type Selected',
-    INPLACE_RUN_DIRECTORY_COMPATIBILITY_CHECK_CLICKED: 'Datanode Migration Inplace Run Directory Compatibility Check Clicked',
-    INPLACE_DIRECTORY_COMPATIBILITY_CHECK_NEXT_CLICKED: 'Datanode Migration Inplace Directory Compatibility Check Next Clicked',
-    INPLACE_JOURNAL_SIZE_DOWNTIME_WARNING_NEXT_CLICKED: 'Datanode Migration Inplace Journal Size Downtime Warning Next Clicked',
+    INPLACE_RUN_DIRECTORY_COMPATIBILITY_CHECK_CLICKED:
+      'Datanode Migration Inplace Run Directory Compatibility Check Clicked',
+    INPLACE_DIRECTORY_COMPATIBILITY_CHECK_NEXT_CLICKED:
+      'Datanode Migration Inplace Directory Compatibility Check Next Clicked',
+    INPLACE_JOURNAL_SIZE_DOWNTIME_WARNING_NEXT_CLICKED:
+      'Datanode Migration Inplace Journal Size Downtime Warning Next Clicked',
     INPLACE_STOP_MESSAGE_PROCESSING_NEXT_CLICKED: 'Datanode Migration Inplace Stop Message Processing Next Clicked',
     INPLACE_RESTART_GRAYLOG_NEXT_CLICKED: 'Datanode Migration Inplace Restart Graylog Next Clicked',
     REMOTEREINDEX_WELCOME_NEXT_CLICKED: 'Datanode Migration RemoteReindex Welcome Next Clicked',
-    REMOTEREINDEX_MIGRATE_EXISTING_DATA_QUESTION_NEXT_CLICKED: 'Datanode Migration RemoteReindex Migrate Existing Data Question Next Clicked',
-    REMOTEREINDEX_MIGRATE_EXISTING_DATA_QUESTION_SKIP_CLICKED: 'Datanode Migration RemoteReindex Migrate Existing Data Question Skip Clicked',
-    REMOTEREINDEX_MIGRATE_EXISTING_DATA_CHECK_CONNECTION_CLICKED: 'Datanode Migration RemoteReindex Migrate Existing Data Check Connection Clicked',
-    REMOTEREINDEX_MIGRATE_EXISTING_DATA_START_CLICKED: 'Datanode Migration RemoteReindex Migrate Existing Data Start Clicked',
+    REMOTEREINDEX_MIGRATE_EXISTING_DATA_QUESTION_NEXT_CLICKED:
+      'Datanode Migration RemoteReindex Migrate Existing Data Question Next Clicked',
+    REMOTEREINDEX_MIGRATE_EXISTING_DATA_QUESTION_SKIP_CLICKED:
+      'Datanode Migration RemoteReindex Migrate Existing Data Question Skip Clicked',
+    REMOTEREINDEX_MIGRATE_EXISTING_DATA_CHECK_CONNECTION_CLICKED:
+      'Datanode Migration RemoteReindex Migrate Existing Data Check Connection Clicked',
+    REMOTEREINDEX_MIGRATE_EXISTING_DATA_START_CLICKED:
+      'Datanode Migration RemoteReindex Migrate Existing Data Start Clicked',
     REMOTEREINDEX_RUNNING_LOGVIEW_CLICKED: 'Datanode Migration RemoteReindex Running Logview Clicked',
     REMOTEREINDEX_RUNNING_RETRY_CLICKED: 'Datanode Migration RemoteReindex Running Retry Clicked',
     REMOTEREINDEX_RUNNING_RETRY_CONFIRM_CLICKED: 'Datanode Migration RemoteReindex Running Retry Confirm Clicked',
-    REMOTEREINDEX_SHUTDOWN_OLD_CLUSTER_NEXT_CLICKED: 'Datanode Migration RemoteReindex Shutdown Old Cluster Next Clicked',
+    REMOTEREINDEX_SHUTDOWN_OLD_CLUSTER_NEXT_CLICKED:
+      'Datanode Migration RemoteReindex Shutdown Old Cluster Next Clicked',
+  },
+  ALERTS_AND_EVENTS: {
+    ACTION_RAN: 'Alerts And Events Action Ran',
+  },
+  ENTITY_DATA_TABLE: {
+    COLUMNS_RESET: 'Entity Data Table Columns Reset',
+    COLUMNS_CHANGED: 'Entity Data Table Columns Changed',
+    COLUMN_ORDER_CHANGED: 'Entity Data Table Column Order Changed',
+    SORT_CHANGED: 'Entity Data Table Sort Changed',
+    PAGE_SIZE_CHANGED: 'Entity Data Table Page Size Changed',
+    FILTER_CREATED: 'Entity Data Table Filter Created',
+    FILTER_DELETED: 'Entity Data Table Filter Deleted',
+    FILTER_CHANGED: 'Entity Data Table Filter Changed',
+    SLICE_COLUMN_SELECTED_HEADER: 'Entity Data Table Slice Column Selected (Header)',
+    SLICE_COLUMN_SELECTED_SECTION: 'Entity Data Table Slice Column Selected (Section)',
+    SLICE_REMOVED: 'Entity Data Table Slice Removed',
+    SLICE_VALUE_SELECTED: 'Entity Data Table Slice Value Selected',
   },
 } as const;

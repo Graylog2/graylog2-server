@@ -19,9 +19,8 @@ package org.graylog2.contentpacks.facades;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.ConfigurationVariableService;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
@@ -31,27 +30,27 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.SidecarCollectorConfigurationEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(MongoDBExtension.class)
 public class SidecarCollectorConfigurationFacadeTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private SidecarCollectorConfigurationFacade facade;
 
-    @Before
-    public void setUp() throws Exception {
-        final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        final ConfigurationService configurationService = new ConfigurationService(mongodb.mongoConnection(),
-                mapperProvider, new ConfigurationVariableService(mongodb.mongoConnection(), mapperProvider),
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) throws Exception {
+        final ConfigurationService configurationService = new ConfigurationService(
+                mongoCollections,
+                new ConfigurationVariableService(mongoCollections),
                 new SecureFreemarkerConfigProvider());
 
         facade = new SidecarCollectorConfigurationFacade(objectMapper, configurationService);

@@ -22,44 +22,46 @@ import AdditionalFields from 'integrations/aws/common/AdditionalFields';
 import { renderOptions } from 'integrations/aws/common/Options';
 import ValidatedInput from 'integrations/aws/common/ValidatedInput';
 import { KINESIS_LOG_TYPES } from 'integrations/aws/common/constants';
-import { FormDataContext } from 'integrations/aws/context/FormData';
+import FormDataContext from 'integrations/contexts/FormDataContext';
+
+const StyledFormWrap = styled(FormWrap)`
+  padding-top: 25px;
+`;
 
 type SkipHealthCheckProps = {
   onSubmit: (...args: any[]) => void;
   onChange: (...args: any[]) => void;
 };
 
-const SkipHealthCheck = ({
-  onChange,
-  onSubmit,
-}: SkipHealthCheckProps) => {
+const SkipHealthCheck = ({ onChange, onSubmit }: SkipHealthCheckProps) => {
   const { formData } = useContext(FormDataContext);
 
   return (
     <AdditionalFields title="Skip Health Check">
-      <StyledFormWrap onSubmit={onSubmit}
-                      buttonContent="Confirm"
-                      title="Choose Log Type &amp; Skip Health Check"
-                      disabled={!(formData.awsCloudWatchKinesisInputType && formData.awsCloudWatchKinesisInputType.value)}
-                      description={(
-                        <p>If you&apos;re sure of the data contained within your new <strong>{formData.awsCloudWatchKinesisStream.value}</strong> stream, then choose your option below to skip our automated check.</p>
-                      )}>
-
-        <ValidatedInput id="awsCloudWatchKinesisInputType"
-                        type="select"
-                        fieldData={formData.awsCloudWatchKinesisInputType}
-                        onChange={onChange}
-                        label="Choose AWS Input Type"
-                        required>
+      <StyledFormWrap
+        onSubmit={onSubmit}
+        buttonContent="Confirm"
+        title="Choose Log Type &amp; Skip Health Check"
+        disabled={!(formData.awsCloudWatchKinesisInputType && formData.awsCloudWatchKinesisInputType.value)}
+        description={
+          <p>
+            If you&apos;re sure of the data contained within your new{' '}
+            <strong>{formData.awsCloudWatchKinesisStream.value}</strong> stream, then choose your option below to skip
+            our automated check.
+          </p>
+        }>
+        <ValidatedInput
+          id="awsCloudWatchKinesisInputType"
+          type="select"
+          fieldData={formData.awsCloudWatchKinesisInputType}
+          onChange={onChange}
+          label="Choose AWS Input Type"
+          required>
           {renderOptions(KINESIS_LOG_TYPES, 'Choose Log Type')}
         </ValidatedInput>
       </StyledFormWrap>
     </AdditionalFields>
   );
 };
-
-const StyledFormWrap = styled(FormWrap)`
-  padding-top: 25px;
-`;
 
 export default SkipHealthCheck;

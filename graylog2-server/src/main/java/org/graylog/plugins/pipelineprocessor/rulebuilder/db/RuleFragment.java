@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+import org.graylog2.database.BuildableMongoEntity;
+import org.graylog2.database.MongoEntity;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -30,19 +32,13 @@ import java.util.Objects;
 
 @AutoValue
 @JsonIgnoreProperties(value = {"name"}, allowGetters = true)
-public abstract class RuleFragment {
+public abstract class RuleFragment implements MongoEntity, BuildableMongoEntity<RuleFragment, RuleFragment.Builder> {
 
     public static final String FIELD_NAME = "name";
     public static final String FIELD_FRAGMENT = "fragment";
     public static final String FIELD_FRAGMENT_OUTPUT = "fragment_output_variable";
     public static final String FIELD_CONDITION = "isCondition";
     public static final String FIELD_DESCRIPTOR = "descriptor";
-
-    @JsonIgnore
-    @Nullable
-    @Id
-    @ObjectId
-    public abstract String id();
 
     @JsonProperty(FIELD_NAME)
     public String getName() {
@@ -63,14 +59,12 @@ public abstract class RuleFragment {
     @JsonProperty(FIELD_DESCRIPTOR)
     public abstract FunctionDescriptor descriptor();
 
-
     public static Builder builder() {
         return new AutoValue_RuleFragment.Builder().isCondition(false);
     }
 
-
     @AutoValue.Builder
-    public abstract static class Builder {
+    public abstract static class Builder implements BuildableMongoEntity.Builder<RuleFragment, Builder> {
 
         public abstract Builder id(String id);
 
@@ -102,7 +96,7 @@ public abstract class RuleFragment {
 
     @JsonCreator
     public static RuleFragment create(
-            @Id @ObjectId @JsonProperty("_id") @Nullable String id,
+            @JsonProperty(FIELD_ID) @Id @ObjectId @Nullable String id,
             @JsonProperty(FIELD_FRAGMENT) String fragment,
             @JsonProperty(FIELD_FRAGMENT_OUTPUT) @Nullable String fragmentOutputVariable,
             @JsonProperty(FIELD_CONDITION) boolean isCondition,

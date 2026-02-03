@@ -61,7 +61,7 @@ public class WaitForSuccessOrFailureStrategy extends AbstractWaitStrategy {
                 }
                 return success.stream().anyMatch(s -> outputFrame.getUtf8String().matches("(?s)" + s));
             };
-            waitingConsumer.waitUntil(waitPredicate, startupTimeout.getSeconds(), TimeUnit.SECONDS, 1);
+            waitingConsumer.waitUntil(waitPredicate, startupTimeout.toSeconds(), TimeUnit.SECONDS, 1);
 
         } catch (IOException iox) {
             throw new ContainerLaunchException("Failed with Exception: " + iox.getMessage());

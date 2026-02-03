@@ -19,12 +19,8 @@ import type { BadgeProps } from '@mantine/core';
 import { Badge as MantineBadge } from '@mantine/core';
 
 type Props = BadgeProps & {
-  title: string,
-}
+  title: string;
+};
 
-const Badge = ({ children, ...props }: Props) => (
-  <MantineBadge {...props}>
-    {children}
-  </MantineBadge>
-);
+const Badge = ({ children, ...props }: Props) => <MantineBadge {...props}>{children}</MantineBadge>;
 export default Badge;

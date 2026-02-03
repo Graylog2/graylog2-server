@@ -16,10 +16,20 @@
  */
 package org.graylog.plugins.views.search.rest;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
 import one.util.streamex.StreamEx;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.Parameter;
@@ -29,29 +39,17 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchMetadata;
 import org.graylog.plugins.views.search.engine.QueryEngine;
+import org.graylog.plugins.views.search.engine.validation.DataLakeSearchValidator;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
 
 import java.util.Map;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
-@Api(value = "Search/Metadata", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Search/Metadata")
 @Path("/views/search/metadata")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
@@ -67,9 +65,9 @@ public class SearchMetadataResource extends RestResource implements PluginRestRe
     }
 
     @GET
-    @ApiOperation(value = "Metadata for the given Search object", notes = "Used for already persisted search objects")
+    @Operation(summary = "Metadata for the given Search object", description = "Used for already persisted search objects")
     @Path("{searchId}")
-    public SearchMetadata metadata(@ApiParam("searchId") @PathParam("searchId") String searchId, @Context SearchUser searchUser) {
+    public SearchMetadata metadata(@io.swagger.v3.oas.annotations.Parameter(name = "searchId") @PathParam("searchId") String searchId, @Context SearchUser searchUser) {
         final SearchDTO search = searchDomain.getForUser(searchId, searchUser)
                 .map(SearchDTO::fromSearch)
                 .orElseThrow(() -> new NotFoundException("Search with id " + searchId + " does not exist"));
@@ -77,14 +75,19 @@ public class SearchMetadataResource extends RestResource implements PluginRestRe
     }
 
     @POST
-    @ApiOperation(value = "Metadata for the posted Search object", notes = "Intended for search objects that aren't yet persisted (e.g. for validation or interactive purposes)")
+    @Operation(summary = "Metadata for the posted Search object", description = "Intended for search objects that aren't yet persisted (e.g. for validation or interactive purposes)")
     @NoAuditEvent("Only returning metadata for given search, not changing any data")
-    public SearchMetadata metadataForObject(@ApiParam @NotNull(message = "Search body is mandatory") SearchDTO searchDTO) {
+    public SearchMetadata metadataForObject(@io.swagger.v3.oas.annotations.Parameter @NotNull(message = "Search body is mandatory") SearchDTO searchDTO) {
         if (searchDTO == null) {
             throw new IllegalArgumentException("Search must not be null.");
         }
         final Search search = searchDTO.toSearch();
-        final Map<String, QueryMetadata> queryMetadatas = StreamEx.of(search.queries()).toMap(Query::id, query -> queryEngine.parse(search, query));
-        return SearchMetadata.create(queryMetadatas, Maps.uniqueIndex(search.parameters(), Parameter::name));
+        if (DataLakeSearchValidator.containsDataLakeSearchElements(search)) {
+            //When parsing the query, ElasticsearchQueryString backend is expected... for DataLake just return empty metadata
+            return SearchMetadata.create(Map.of(), ImmutableMap.of());
+        } else {
+            final Map<String, QueryMetadata> queryMetadatas = StreamEx.of(search.queries()).toMap(Query::id, query -> queryEngine.parse(search, query));
+            return SearchMetadata.create(queryMetadatas, Maps.uniqueIndex(search.parameters(), Parameter::name));
+        }
     }
 }

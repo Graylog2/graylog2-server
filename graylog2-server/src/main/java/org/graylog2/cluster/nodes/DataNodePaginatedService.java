@@ -16,35 +16,16 @@
  */
 package org.graylog2.cluster.nodes;
 
-import com.mongodb.client.MongoCollection;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.bson.conversions.Bson;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.database.PaginatedList;
-import org.graylog2.database.pagination.MongoPaginationHelper;
-import org.graylog2.search.SearchQuery;
 
 @Singleton
-public class DataNodePaginatedService {
+public class DataNodePaginatedService extends AbstractPaginatedNodeService<DataNodeDto> {
     private static final String NODE_COLLECTION_NAME = "datanodes";
-
-    private final MongoCollection<DataNodeDto> collection;
-    private final MongoPaginationHelper<DataNodeDto> paginationHelper;
 
     @Inject
     public DataNodePaginatedService(MongoCollections mongoCollections) {
-        this.collection = mongoCollections.collection(NODE_COLLECTION_NAME, DataNodeDto.class);
-        this.paginationHelper = mongoCollections.paginationHelper(collection);
+        super(mongoCollections, NODE_COLLECTION_NAME, DataNodeDto.class);
     }
-
-    public PaginatedList<DataNodeDto> searchPaginated(SearchQuery query,
-                                                      Bson sort, int page, int perPage) {
-        return paginationHelper
-                .filter(query.toBson())
-                .sort(sort)
-                .perPage(perPage)
-                .page(page);
-    }
-
 }

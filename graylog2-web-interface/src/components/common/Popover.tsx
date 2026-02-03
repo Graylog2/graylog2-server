@@ -18,21 +18,24 @@ import * as React from 'react';
 import { Popover as MantinePopover } from '@mantine/core';
 import styled, { css, useTheme } from 'styled-components';
 
-const Popover = (props: React.ComponentProps<typeof MantinePopover>) => {
+import { borderColor } from 'theme/utils/borderStyles';
+
+const Popover = ({ ...props }: React.ComponentProps<typeof MantinePopover>) => {
   const theme = useTheme();
 
-  const arrowBackground = (!props.position || props.position.startsWith('bottom'))
-    ? theme.colors.variant.lightest.default
-    : theme.colors.global.contentBackground;
+  const arrowBackground =
+    !props.position || props.position.startsWith('bottom')
+      ? theme.colors.variant.lightest.default
+      : theme.colors.global.contentBackground;
 
   const styles = () => ({
     dropdown: {
       backgroundColor: theme.colors.global.contentBackground,
-      borderColor: theme.colors.variant.light.default,
+      ...borderColor(theme.colors.variant.light.default),
       padding: 0,
     },
     arrow: {
-      borderColor: theme.colors.variant.light.default,
+      ...borderColor(theme.colors.variant.light.default),
       backgroundColor: arrowBackground,
     },
   });
@@ -41,23 +44,31 @@ const Popover = (props: React.ComponentProps<typeof MantinePopover>) => {
 };
 
 type DropdownProps = Omit<React.ComponentProps<typeof MantinePopover.Dropdown>, 'title'> & {
-  title?: React.ReactNode,
-}
+  title?: React.ReactNode;
+};
 
-const Children = styled.div(({ theme }) => css`
-  padding: ${theme.spacings.sm} ${theme.spacings.md}
-`);
+const Children = styled.div(
+  ({ theme }) => css`
+    padding: ${theme.spacings.sm} ${theme.spacings.md};
+  `,
+);
 
-const Title = styled.h4(({ theme }) => css`
-  background-color: ${theme.colors.variant.lightest.default};
-  color: ${theme.colors.variant.darkest.default};
-  padding: ${theme.spacings.sm} ${theme.spacings.md};
-  font-size: ${theme.fonts.size.body};
-`);
+const Title = styled.h4(
+  ({ theme }) => css`
+    background-color: ${theme.colors.variant.lightest.default};
+    color: ${theme.colors.variant.darkest.default};
+    padding: ${theme.spacings.sm} ${theme.spacings.md};
+    font-size: ${theme.fonts.size.body};
+  `,
+);
 
 const titleId = (id: string) => `${id}-title`;
 
-const dropdownAriaLabelledby = (ariaLabelBy: string | undefined, id: string | undefined, title: React.ReactNode | undefined) => {
+const dropdownAriaLabelledby = (
+  ariaLabelBy: string | undefined,
+  id: string | undefined,
+  title: React.ReactNode | undefined,
+) => {
   if (ariaLabelBy) {
     return ariaLabelBy;
   }
@@ -69,17 +80,11 @@ const dropdownAriaLabelledby = (ariaLabelBy: string | undefined, id: string | un
   return null;
 };
 
-const Dropdown = ({ title, children, ...rest }: DropdownProps) => (
+const Dropdown = ({ title = undefined, children, ...rest }: DropdownProps) => (
   <MantinePopover.Dropdown aria-labelledby={dropdownAriaLabelledby(rest['aria-labelledby'], rest.id, title)} {...rest}>
-    {title && (
-      <Title id={rest.id ? titleId(rest.id) : null}>
-        {title}
-      </Title>
-    )}
+    {title && <Title id={rest.id ? titleId(rest.id) : null}>{title}</Title>}
 
-    <Children>
-      {children}
-    </Children>
+    <Children>{children}</Children>
   </MantinePopover.Dropdown>
 );
 

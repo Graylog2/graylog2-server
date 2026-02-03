@@ -19,15 +19,13 @@ package org.graylog.failure;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -79,7 +77,7 @@ class FailureSubmissionQueue {
         queue.put(batch);
 
         if (queueSize() == configuration.getFailureHandlingQueueCapacity()) {
-            logger.debug("The queue is full! Current capacity: {}", configuration.getFailureHandlingQueueCapacity());
+            logger.warn("The queue is full! Current capacity: {}", configuration.getFailureHandlingQueueCapacity());
         }
 
         submittedFailureBatches.mark();

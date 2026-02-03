@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix exception on message permalink page before streams loaded."
+
+pulls = ["23629"]

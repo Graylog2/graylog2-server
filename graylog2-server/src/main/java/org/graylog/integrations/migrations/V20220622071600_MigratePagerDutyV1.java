@@ -25,7 +25,6 @@ import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.integrations.pagerduty.PagerDutyNotificationConfig;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
@@ -86,7 +85,6 @@ public class V20220622071600_MigratePagerDutyV1 extends Migration {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public abstract static class MigrationCompletion {
         @JsonCreator
         public static V20220622071600_MigratePagerDutyV1.MigrationCompletion create() {

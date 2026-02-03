@@ -15,20 +15,31 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import asMock from 'helpers/mocking/AsMock';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 import mockDispatch from 'views/test/mockDispatch';
 import type { RootState } from 'views/types';
 import type { HistoryFunction } from 'routing/useHistory';
 import { setIsDirty, setIsNew } from 'views/logic/slices/viewSlice';
+import { createEntityShareState } from 'fixtures/entityShareState';
+import { EntityShareStore } from 'stores/permissions/EntityShareStore';
+import { createView } from 'views/api/views';
 
 import View from './View';
 import OriginalOnSaveNewDashboard from './OnSaveNewDashboard';
 import { loadDashboard } from './Actions';
 
-jest.mock('views/stores/ViewManagementStore', () => ({
-  ViewManagementActions: {
-    create: jest.fn((v) => Promise.resolve(v)).mockName('create'),
+jest.mock('views/api/views', () => ({
+  createView: jest.fn((v) => Promise.resolve(v)).mockName('create'),
+}));
+jest.mock('stores/permissions/EntityShareStore', () => ({
+  __esModule: true,
+  EntityShareActions: {
+    prepare: jest.fn(() => Promise.resolve()),
+    update: jest.fn(() => Promise.resolve()),
+  },
+  EntityShareStore: {
+    listen: jest.fn(),
+    getInitialState: jest.fn(),
   },
 }));
 
@@ -45,6 +56,10 @@ const history: HistoryFunction = {
 const OnSaveNewDashboard = (view: View) => OriginalOnSaveNewDashboard(view, history);
 
 describe('OnSaveNewDashboard', () => {
+  beforeEach(() => {
+    asMock(EntityShareStore.getInitialState).mockReturnValue({ state: createEntityShareState });
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -55,8 +70,8 @@ describe('OnSaveNewDashboard', () => {
 
     await dispatch(OnSaveNewDashboard(view));
 
-    expect(ViewManagementActions.create).toHaveBeenCalled();
-    expect(ViewManagementActions.create).toHaveBeenCalledWith(view);
+    expect(createView).toHaveBeenCalled();
+    expect(createView).toHaveBeenCalledWith(view, undefined, undefined);
   });
 
   it('loads saved view', async () => {
@@ -106,7 +121,7 @@ describe('OnSaveNewDashboard', () => {
   });
 
   it('does not do anything if saving fails', async () => {
-    asMock(ViewManagementActions.create).mockImplementation(() => Promise.reject(new Error('Something bad happened!')));
+    asMock(createView).mockImplementation(() => Promise.reject(new Error('Something bad happened!')));
 
     const view = View.create();
     const dispatch = mockDispatch({ view: { view } } as RootState);

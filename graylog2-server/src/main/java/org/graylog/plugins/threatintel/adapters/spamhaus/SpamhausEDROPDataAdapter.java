@@ -27,7 +27,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import com.google.inject.assistedinject.Assisted;
 import org.apache.commons.net.util.SubnetUtils;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.threatintel.PluginConfigService;
 import org.graylog.plugins.threatintel.tools.AdapterDisabledException;
 import org.graylog2.lookup.adapters.dsvhttp.HTTPFileRetriever;
@@ -218,7 +217,6 @@ public class SpamhausEDROPDataAdapter extends LookupDataAdapter {
     }
 
     @AutoValue
-    @WithBeanGetter
     @JsonAutoDetect
     @JsonDeserialize(builder = AutoValue_SpamhausEDROPDataAdapter_Config.Builder.class)
     @JsonTypeName(NAME)

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import AsyncCustomMenuList from './AsyncCustomMenuList';
 
@@ -36,11 +36,7 @@ describe('CustomMenuList', () => {
   };
 
   it('Should render AsyncCustomMenuList', () => {
-    render(
-      <AsyncCustomMenuList selectProps={mockSelectProps}>
-        {getChildrenList(50)}
-      </AsyncCustomMenuList>,
-    );
+    render(<AsyncCustomMenuList selectProps={mockSelectProps}>{getChildrenList(50)}</AsyncCustomMenuList>);
 
     const list = screen.getAllByTestId('react-window-list-item');
 
@@ -48,17 +44,13 @@ describe('CustomMenuList', () => {
   });
 
   it('Should load more items on scrool', async () => {
-    render(
-      <AsyncCustomMenuList selectProps={mockSelectProps}>
-        {getChildrenList(5)}
-      </AsyncCustomMenuList>,
-    );
+    render(<AsyncCustomMenuList selectProps={mockSelectProps}>{getChildrenList(5)}</AsyncCustomMenuList>);
 
     const list = screen.getByTestId('infinite-loader-container').firstChild;
 
     expect(list).toBeInTheDocument();
 
-    fireEvent.scroll(list);
+    await fireEvent.scroll(list);
 
     await waitFor(() => expect(loadOptions).toHaveBeenCalled());
   });

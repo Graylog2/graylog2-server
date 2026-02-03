@@ -19,15 +19,15 @@ package org.graylog2.indexer.messages;
 import com.google.common.base.Strings;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public abstract class MessagesBatchIT extends ElasticsearchBaseTest {
     @Mock
     private FailureSubmissionService failureSubmissionService;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         client().deleteIndices(INDEX_NAME);
         client().createIndex(INDEX_NAME);
@@ -60,13 +60,13 @@ public abstract class MessagesBatchIT extends ElasticsearchBaseTest {
                 failureSubmissionService);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         client().cleanUp();
     }
 
     @Test
-    public void testIfLargeBatchesGetSplitUpOnCircuitBreakerExceptions() throws Exception {
+    public void testIfLargeBatchesGetSplitUpOnCircuitBreakerExceptions() {
         // This test assumes that ES is running with only 256MB heap size.
         // This will trigger the circuit breaker when we are trying to index large batches
         final int MESSAGECOUNT = 50;
@@ -93,7 +93,7 @@ public abstract class MessagesBatchIT extends ElasticsearchBaseTest {
 
         final String message = Strings.repeat("A", size);
         for (int i = 0; i < count; i++) {
-            messageList.add(new MessageWithIndex(ImmutableMessage.wrap(messageFactory.createMessage(i + message, "source", now())), indexSet));
+            messageList.add(new MessageWithIndex(ImmutableMessage.wrap(messageFactory.createMessage(i + message, "source", now())), indexSet.getWriteIndexAlias()));
         }
         return messageList;
     }

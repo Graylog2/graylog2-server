@@ -1,9 +1,7 @@
 #### Default
 
 ```tsx
-<Alert>
-  Default - Lorem ipsum dolor sit amet consectetur adipisicing elit.
-</Alert>
+<Alert>Default - Lorem ipsum dolor sit amet consectetur adipisicing elit.</Alert>
 ```
 
 #### Variants
@@ -16,17 +14,14 @@ styles.map((style, i) => {
     <Alert bsStyle={style.toLowerCase()} key={`button-${style}-${i}`}>
       {style} - Lorem ipsum dolor sit amet consectetur adipisicing elit.
     </Alert>
-  )
-})
+  );
+});
 ```
-
 
 #### With Title
 
 ```tsx
-<Alert title="The Title">
-  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-</Alert>
+<Alert title="The Title">Lorem ipsum dolor sit amet consectetur adipisicing elit.</Alert>
 ```
 
 #### With Close Button
@@ -36,5 +31,5 @@ import Icon from 'components/common/Icon';
 
 <Alert onDismiss={() => window.alert('You clicked on the alert close icon.')}>
   Lorem ipsum dolor sit amet consectetur adipisicing elit.
-</Alert>
+</Alert>;
 ```

@@ -16,17 +16,14 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import type { $PropertyType } from 'utility-types';
 
 import type UserOverview from 'logic/users/UserOverview';
-import { OverlayTrigger, RelativeTime } from 'components/common';
-
-import LoggedInIcon from '../../LoggedInIcon';
+import { OverlayTrigger, RelativeTime, StatusIcon } from 'components/common';
 
 type Props = {
-  lastActivity: $PropertyType<UserOverview, 'lastActivity'>,
-  clientAddress: $PropertyType<UserOverview, 'clientAddress'>,
-  sessionActive: $PropertyType<UserOverview, 'sessionActive'>,
+  lastActivity: UserOverview['lastActivity'];
+  clientAddress: UserOverview['clientAddress'];
+  sessionActive: UserOverview['sessionActive'];
 };
 
 const Td = styled.td`
@@ -37,21 +34,22 @@ const Td = styled.td`
 
 const LoggedInCell = ({ lastActivity, sessionActive, clientAddress }: Props) => (
   <Td>
-    <OverlayTrigger trigger={['hover', 'focus']}
-                    placement="right"
-                    title={sessionActive ? 'Logged in' : undefined}
-                    overlay={sessionActive
-                      ? (
-                        <>
-                          <div>Last activity: {lastActivity
-                            ? <RelativeTime dateTime={lastActivity} /> : '-'}
-                          </div>
-                          <div>Client address: {clientAddress ?? '-'}</div>
-                        </>
-                      )
-                      : <>Not logged in</>}
-                    rootClose>
-      <LoggedInIcon active={sessionActive} />
+    <OverlayTrigger
+      trigger={['hover', 'focus']}
+      placement="right"
+      title={sessionActive ? 'Logged in' : undefined}
+      overlay={
+        sessionActive ? (
+          <>
+            <div>Last activity: {lastActivity ? <RelativeTime dateTime={lastActivity} /> : '-'}</div>
+            <div>Client address: {clientAddress ?? '-'}</div>
+          </>
+        ) : (
+          <>Not logged in</>
+        )
+      }
+      rootClose>
+      <StatusIcon active={sessionActive} />
     </OverlayTrigger>
   </Td>
 );

@@ -14,30 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useRef, useCallback, useEffect } from 'react';
+import React, { useRef, useCallback, useEffect, useState, useMemo } from 'react';
 import { components as Components } from 'react-select';
 import type { MenuListProps } from 'react-select';
-import { VariableSizeList as List } from 'react-window';
+import { List, type RowComponentProps } from 'react-window';
 import styled from 'styled-components';
 
 import useElementDimensions from 'hooks/useElementDimensions';
 
 const REACT_SELECT_MAX_OPTIONS_LENGTH = 1000;
 const MAX_CONTAINER_SIZE = 300;
-const Container = styled.div<{ height: number}>`
+const Container = styled.div<{ height: number }>`
   flex: 1 1 auto;
   height: ${(props) => props?.height || MAX_CONTAINER_SIZE}px;
 `;
 
 type RowProps = {
-  data: Array<React.ReactNode>,
-  index: number,
-  setSize: (index: number, size: number) => void,
-  containerWidth: number
-  style: object
-}
+  data: Array<React.ReactNode>;
+  setSize: (index: number, size: number) => void;
+  containerWidth: number;
+};
 
-const Row = ({ data, index, setSize, style, containerWidth }: RowProps) => {
+const Row = ({ data, index, setSize, style, containerWidth }: RowComponentProps<RowProps>) => {
   const rowRef = useRef(null);
 
   useEffect(() => {
@@ -52,64 +50,80 @@ const Row = ({ data, index, setSize, style, containerWidth }: RowProps) => {
 };
 
 type WindowListProps = Partial<MenuListProps> & {
-  listRef?: any,
-  children: Array<React.ReactNode>,
-  onItemsRendered?: () => void
-}
+  listRef?: any;
+  children: Array<React.ReactNode>;
+  onRowsRendered?: (
+    visibleRows: { startIndex: number; stopIndex: number },
+    allRows: { startIndex: number; stopIndex: number },
+  ) => void;
+};
 
-export const WindowList = ({ children, listRef, ...rest }: WindowListProps) => {
+export const WindowList = ({ children, listRef = undefined, onRowsRendered = undefined, ...rest }: WindowListProps) => {
   const containerRef = useRef(null);
   const vListRef = useRef(null);
-  const sizeMap = useRef({});
+  const [sizeMap, setSizeMap] = useState<Record<number, number>>({});
   const containerDimensions = useElementDimensions(containerRef);
   const { width } = containerDimensions;
 
   const setSize = useCallback((index: number, size: number) => {
-    sizeMap.current = { ...sizeMap.current, [index]: size };
-    const currentRef = listRef || vListRef;
-    currentRef.current?.resetAfterIndex(index);
-  }, [listRef]);
+    setSizeMap((prev) => ({ ...prev, [index]: size }));
+  }, []);
 
-  const totalHeight = Object.entries(children).reduce((sum, [index]) => {
-    if (sizeMap.current[index] && sum < MAX_CONTAINER_SIZE) {
-      return parseInt(sizeMap.current[index], 10) + sum;
+  const totalHeight = useMemo(() => {
+    // Calculate total height based on measured sizes
+    // Only sum heights for items that have been measured
+    let sum = 0;
+
+    for (let i = 0; i < children.length && sum < MAX_CONTAINER_SIZE; i += 1) {
+      const size = sizeMap[i];
+
+      if (size) {
+        sum += parseInt(String(size), 10);
+      } else {
+        // Use default size for unmeasured items
+        sum += 36;
+      }
     }
 
-    return sum;
-  }, 0);
+    return Math.min(sum, MAX_CONTAINER_SIZE);
+  }, [sizeMap, children.length]);
 
-  const getSize = useCallback((index: number) => sizeMap.current[index] || 36, [sizeMap]);
+  const getSize = useCallback((index: number) => sizeMap[index] || 36, [sizeMap]);
 
   return (
     <Container ref={containerRef} height={totalHeight} data-testid="infinite-loader-container">
-      <List ref={listRef || vListRef}
-            height={totalHeight || 300}
-            itemCount={children.length}
-            itemSize={getSize}
-            itemData={children}
-            width={width}
-            {...rest}>
-        {({ data, index, style }) => (
-          <Row data={data}
-               style={style}
-               index={index}
-               setSize={setSize}
-               containerWidth={width} />
-        )}
-      </List>
+      <List
+        listRef={listRef || vListRef}
+        style={{ height: totalHeight || 300, width }}
+        rowCount={children.length}
+        rowHeight={getSize}
+        rowComponent={Row}
+        rowProps={{
+          data: children,
+          setSize,
+          containerWidth: width,
+        }}
+        onRowsRendered={onRowsRendered}
+        {...rest}
+      />
     </Container>
   );
 };
 
-const CustomMenuList = ({ children, innerProps, ...rest }: Partial<MenuListProps> & { children: Array<React.ReactNode> }) => {
-  if (!children?.length || (children.length < REACT_SELECT_MAX_OPTIONS_LENGTH)) {
+const CustomMenuList = ({
+  children,
+  innerProps,
+  ...rest
+}: Partial<MenuListProps> & { children: Array<React.ReactNode> }) => {
+  if (!children?.length || children.length < REACT_SELECT_MAX_OPTIONS_LENGTH) {
     return (
-      <Components.MenuList {...rest}
-                           innerProps={{
-                             ...innerProps,
-                             // @ts-ignore
-                             'data-testid': 'react-select-list',
-                           }}>
+      <Components.MenuList
+        {...rest}
+        innerProps={{
+          ...innerProps,
+          // @ts-ignore
+          'data-testid': 'react-select-list',
+        }}>
         {children}
       </Components.MenuList>
     );

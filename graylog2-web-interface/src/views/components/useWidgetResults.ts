@@ -22,7 +22,7 @@ import type Widget from 'views/logic/widgets/Widget';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type QueryResult from 'views/logic/QueryResult';
 import type SearchError from 'views/logic/SearchError';
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectSearchExecutionResult } from 'views/logic/slices/searchExecutionSelectors';
 import { selectActiveQuery, selectWidget } from 'views/logic/slices/viewSelectors';
 
@@ -30,8 +30,11 @@ const _getDataAndErrors = (widget: Widget, widgetMapping: WidgetMapping, results
   const { searchTypes } = results;
   const widgetType = widgetDefinition(widget.type);
   const dataTransformer = widgetType.searchResultTransformer || ((x) => x);
-  const searchTypeIds = (widgetMapping.get(widget.id, Immutable.Set()));
-  const widgetData = searchTypeIds.map((searchTypeId) => searchTypes[searchTypeId]).filter((result) => result !== undefined).toArray();
+  const searchTypeIds = widgetMapping.get(widget.id, Immutable.Set());
+  const widgetData = searchTypeIds
+    .map((searchTypeId) => searchTypes[searchTypeId])
+    .filter((result) => result !== undefined)
+    .toArray();
   const widgetErrors = results.errors.filter((e) => searchTypeIds.includes(e.searchTypeId));
   let error;
 
@@ -53,8 +56,8 @@ const _getDataAndErrors = (widget: Widget, widgetMapping: WidgetMapping, results
 };
 
 type WidgetResults = {
-  widgetData: unknown | undefined,
-  error: SearchError[],
+  widgetData: unknown | undefined;
+  error: SearchError[];
 };
 
 const _getErrorsForQuery = (currentQueryId: string, currentQueryErrors: SearchError[] | undefined) => {
@@ -63,21 +66,24 @@ const _getErrorsForQuery = (currentQueryId: string, currentQueryErrors: SearchEr
   return { widgetData: undefined, error: queryError ? [queryError] : [] };
 };
 
-const selectWidgetResults = (widgetId: string) => createSelector(
-  selectSearchExecutionResult,
-  selectActiveQuery,
-  selectWidget(widgetId),
-  (searchExecutionResult, currentQueryId, widget) => {
-    const { result, widgetMapping } = searchExecutionResult ?? {};
-    const currentQueryResults = result?.results?.[currentQueryId];
-    const currentQueryErrors = result?.errors;
+const selectWidgetResults = (widgetId: string) =>
+  createSelector(
+    selectSearchExecutionResult,
+    selectActiveQuery,
+    selectWidget(widgetId),
+    (searchExecutionResult, currentQueryId, widget) => {
+      const { result, widgetMapping } = searchExecutionResult ?? {};
+      const currentQueryResults = result?.results?.[currentQueryId];
+      const currentQueryErrors = result?.errors;
 
-    return (currentQueryResults
-      ? _getDataAndErrors(widget, widgetMapping, currentQueryResults)
-      : _getErrorsForQuery(currentQueryId, currentQueryErrors)) as WidgetResults;
-  },
-);
+      return (
+        currentQueryResults
+          ? _getDataAndErrors(widget, widgetMapping, currentQueryResults)
+          : _getErrorsForQuery(currentQueryId, currentQueryErrors)
+      ) as WidgetResults;
+    },
+  );
 
-const useWidgetResults = (widgetId: string) => useAppSelector(selectWidgetResults(widgetId));
+const useWidgetResults = (widgetId: string) => useViewsSelector(selectWidgetResults(widgetId));
 
 export default useWidgetResults;

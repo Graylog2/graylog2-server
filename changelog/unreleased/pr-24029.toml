@@ -1,0 +1,5 @@
+type = "c" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Cluster Configuration Page: Add separate tables for each node type"
+
+issues = ["Graylog2/graylog-plugin-enterprise#12351","Graylog2/graylog-plugin-enterprise#12353","Graylog2/graylog-plugin-enterprise#12354"]
+pulls = ["24029"]

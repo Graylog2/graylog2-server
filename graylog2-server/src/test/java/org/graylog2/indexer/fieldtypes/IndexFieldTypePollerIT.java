@@ -23,11 +23,10 @@ import com.google.common.eventbus.EventBus;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.Configuration;
 import org.graylog2.audit.NullAuditEventSender;
-import org.graylog2.indexer.IndexMappingFactory;
-import org.graylog2.indexer.MessageIndexTemplateProvider;
-import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.cluster.Node;
+import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.TestIndexSet;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
@@ -35,10 +34,12 @@ import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
+import org.graylog2.indexer.template.IndexMappingFactory;
+import org.graylog2.indexer.template.MessageIndexTemplateProvider;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.system.SimpleNodeId;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.indexer.MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
+import static org.graylog2.indexer.template.MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -90,7 +91,7 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
         return searchServer().adapters().indexFieldTypePollerAdapter(configuration);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final Node node = mock(Node.class);
         final Indices indices = new Indices(
@@ -101,7 +102,8 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
                 new NullAuditEventSender(),
                 mock(EventBus.class),
                 createIndicesAdapter(),
-                mock(IndexFieldTypeProfileService.class)
+                mock(IndexFieldTypeProfileService.class),
+                mock(CountsAdapter.class)
         );
         final Configuration withStreamAwarenessOff = spy(new Configuration());
         doReturn(false).when(withStreamAwarenessOff).maintainsStreamAwareFieldTypes();
@@ -252,6 +254,7 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
         return List.of(
                 FieldTypeDTO.builder().fieldName("full_message").physicalType("text").build(),
                 FieldTypeDTO.builder().fieldName("gl2_receive_timestamp").physicalType("date").build(),
+                FieldTypeDTO.builder().fieldName("gl2_original_timestamp").physicalType("date").build(),
                 FieldTypeDTO.builder().fieldName("gl2_processing_timestamp").physicalType("date").build(),
                 FieldTypeDTO.builder().fieldName("gl2_processing_duration_ms").physicalType("integer").build(),
                 FieldTypeDTO.builder().fieldName("gl2_message_id").physicalType("keyword").build(),

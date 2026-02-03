@@ -21,14 +21,11 @@ import RelativeTime from './RelativeTime';
 
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
-jest.useFakeTimers()
-  .setSystemTime(mockedUnixTime);
+jest.useFakeTimers().setSystemTime(mockedUnixTime);
 
 describe('RelativeTime', () => {
   it('should display relative time', () => {
-    render(
-      <RelativeTime dateTime="2019-01-01 10:00:00" />,
-    );
+    render(<RelativeTime dateTime="2019-01-01 10:00:00" />);
 
     expect(screen.getByText('a year ago')).toBeInTheDocument();
   });

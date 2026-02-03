@@ -16,18 +16,16 @@
  */
 package org.graylog.events.indices;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventWithContext;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.messages.IndexingRequest;
 import org.graylog2.indexer.messages.Messages;
-import org.graylog2.plugin.database.Persisted;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 import java.util.AbstractMap;
 import java.util.List;
@@ -73,7 +71,7 @@ public class EventIndexer {
 
     private Map<String, IndexSet> indexSetsForStreams(Set<String> streamIds) {
         return streamService.loadByIds(streamIds).stream()
-                .collect(Collectors.toMap(Persisted::getId, org.graylog2.plugin.streams.Stream::getIndexSet));
+                .collect(Collectors.toMap(org.graylog2.plugin.streams.Stream::getId, org.graylog2.plugin.streams.Stream::getIndexSet));
     }
 
     private Set<String> streamIdsForEvents(List<EventWithContext> eventsWithContext) {
@@ -83,10 +81,10 @@ public class EventIndexer {
                 .collect(Collectors.toSet());
     }
 
-    private Stream<AbstractMap.SimpleEntry<IndexSet, Event>> assignEventsToTargetIndices(Event event, Map<String, IndexSet> streamIndices) {
+    private Stream<AbstractMap.SimpleEntry<String, Event>> assignEventsToTargetIndices(Event event, Map<String, IndexSet> streamIndices) {
         final Set<IndexSet> indices = indicesForEvent(event, streamIndices);
         return indices.stream()
-                .map(index -> new AbstractMap.SimpleEntry<>(index, event));
+                .map(index -> new AbstractMap.SimpleEntry<>(index.getWriteIndexAlias(), event));
     }
 
     private Set<IndexSet> indicesForEvent(Event event, Map<String, IndexSet> streamIndices) {

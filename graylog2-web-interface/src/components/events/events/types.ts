@@ -16,32 +16,55 @@
  */
 
 export type EventReplayInfo = {
-  timerange_start: string,
-  timerange_end: string,
-  query: string,
-  streams: string[],
-  stream_categories?: string[],
+  timerange_start: string;
+  timerange_end: string;
+  query: string;
+  streams: string[];
+  stream_categories?: string[];
 };
 
-export type Event = {
-  id: string,
-  event_definition_id: string,
-  event_definition_type: string,
-  priority: number,
-  timestamp: string,
-  timerange_start: string,
-  timerange_end: string,
-  key: string,
-  fields: Record<string, string>,
-  group_by_fields: { [key: string]: string },
-  source_streams: string[],
-  replay_info: EventReplayInfo | undefined,
-  alert: boolean | undefined,
-};
+export interface Event {
+  timerange_end: string;
+  timestamp_processing?: string;
+  origin_context?: string;
+  scores?: {
+    [_key: string]: number;
+  };
+  replay_info: EventReplayInfo;
+  streams?: string[];
+  source_streams: string[];
+  source?: string;
+  priority: number;
+  message: string;
+  associated_assets?: string[];
+  group_by_fields: {
+    [_key: string]: string;
+  };
+  key_tuple?: string[];
+  alert: boolean;
+  event_definition_type: string;
+  event_definition_id: string;
+  id: string;
+  fields: {
+    [_key: string]: string;
+  };
+  key: string;
+  aggregation_conditions?: {
+    [_key: string]: number;
+  };
+  timestamp: string;
+  timerange_start: string;
+}
 
 export type EventDefinitionContext = {
-  id: string,
-  title: string,
-  remediation_steps?: string,
-  description?: string,
+  id: string;
+  title: string;
+  remediation_steps?: string;
+  event_procedure?: string;
+  description?: string;
+};
+
+export type EventDefinitionContexts = { [eventDefinitionId: string]: EventDefinitionContext };
+export type EventsAdditionalData = {
+  context: { event_definitions?: EventDefinitionContexts; streams?: EventDefinitionContexts };
 };

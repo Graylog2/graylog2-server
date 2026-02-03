@@ -39,11 +39,12 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.List;
@@ -53,14 +54,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.storage.elasticsearch7.views.ViewsUtils.indicesOf;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBackendGeneratedRequestTestBase {
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     private SearchJob searchJob;
     private Query query;
 
-    @Before
+    @BeforeEach
     public void setUpFixtures() throws InvalidRangeParametersException {
         final Set<SearchType> searchTypes = Set.of(
                 Pivot.builder()

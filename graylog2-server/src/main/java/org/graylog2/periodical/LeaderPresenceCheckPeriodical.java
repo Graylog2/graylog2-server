@@ -17,6 +17,8 @@
 package org.graylog2.periodical;
 
 import com.google.common.base.Stopwatch;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog2.Configuration;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.leader.LeaderElectionMode;
@@ -31,10 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
 import java.time.Duration;
 
 /**
@@ -102,15 +100,19 @@ public class LeaderPresenceCheckPeriodical extends Periodical {
     }
 
     private boolean shouldWarnForNoLeader() {
-        if (configuration.getLeaderElectionMode() != LeaderElectionMode.AUTOMATIC) {
-            return true;
+        Duration gracePeriod;
+        if (configuration.getLeaderElectionMode() == LeaderElectionMode.AUTOMATIC) {
+            // In automatic leader election mode, there is an expected time window between a node giving up the leader lock
+            // and another node claiming the lock, where there is no leader in the cluster. This time window should not
+            // exceed the configured polling interval of the leader lock in a healthy cluster. So if a cluster is still
+            // without a leader after consecutive checks, we'll consider this an erroneous condition. This doesn't cover
+            // cases of rapid thrashing of the leader status, but it's hopefully good enough.
+            gracePeriod = configuration.getLeaderElectionLockPollingInterval().plusSeconds(1);
+        } else {
+            // Manual leader election mode: leader assignment is static, but leader may be temporarily unavailable
+            // due to e.g. network issues or high CPU. We don't want to spam notifications in this case.
+            gracePeriod = configuration.getStaticLeaderTimeout();
         }
-        // In automatic leader election mode, there is an expected time window between a node giving up the leader lock
-        // and another node claiming the lock, where there is no leader in the cluster. This time window should not
-        // exceed the configured polling interval of the leader lock in a healthy cluster. So if a cluster is still
-        // without a leader after consecutive checks, we'll consider this an erroneous condition. This doesn't cover
-        // cases of rapid thrashing of the leader status, but it's hopefully good enough.
-        final Duration gracePeriod = configuration.getLeaderElectionLockPollingInterval().plusSeconds(1);
         return timeWithoutLeader.elapsed().compareTo(gracePeriod) > 0;
     }
 

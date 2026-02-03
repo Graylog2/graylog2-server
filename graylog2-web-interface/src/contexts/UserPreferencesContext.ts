@@ -22,11 +22,13 @@ import type { PREFERENCES_THEME_MODE } from 'theme/constants';
 import { singleton } from '../logic/singleton';
 
 export type UserPreferences = {
-  enableSmartSearch: boolean,
-  updateUnfocussed: boolean,
-  searchSidebarIsPinned?: boolean,
-  dashboardSidebarIsPinned?: boolean,
-  [PREFERENCES_THEME_MODE]?: ColorScheme,
+  enableSmartSearch: boolean;
+  updateUnfocussed: boolean;
+  searchSidebarIsPinned?: boolean;
+  dashboardSidebarIsPinned?: boolean;
+  'views.widgetSummary.doNotAskAgain'?: boolean;
+  perspective?: string;
+  [PREFERENCES_THEME_MODE]?: ColorScheme;
 };
 
 export const defaultUserPreferences = {

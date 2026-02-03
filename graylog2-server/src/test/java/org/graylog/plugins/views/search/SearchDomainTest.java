@@ -23,14 +23,14 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewService;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import jakarta.ws.rs.ForbiddenException;
 
 import java.util.ArrayList;
@@ -54,9 +54,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class SearchDomainTest {
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     private SearchDomain sut;
 
@@ -71,7 +71,7 @@ public class SearchDomainTest {
     @Mock
     private ViewService viewService;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         allSearchesInDb.clear();
         when(dbService.streamAll()).thenReturn(allSearchesInDb.stream());

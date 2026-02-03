@@ -43,16 +43,16 @@ describe('<ContentPackParameterList />', () => {
   });
 
   it('should render with parameters with readOnly', async () => {
-    const parameters = [{
-      name: 'PARAM',
-      title: 'A parameter title',
-      description: 'A parameter descriptions',
-      type: 'string',
-      default_value: 'test',
-    }];
-    const contentPack = ContentPack.builder()
-      .parameters(parameters)
-      .build();
+    const parameters = [
+      {
+        name: 'PARAM',
+        title: 'A parameter title',
+        description: 'A parameter descriptions',
+        type: 'string',
+        default_value: 'test',
+      },
+    ];
+    const contentPack = ContentPack.builder().parameters(parameters).build();
     render(<ContentPackParameterList contentPack={contentPack} readOnly />);
 
     await screen.findByText('Parameters list');
@@ -66,16 +66,16 @@ describe('<ContentPackParameterList />', () => {
   });
 
   it('should render with parameters without readOnly', async () => {
-    const parameters = [{
-      name: 'PARAM',
-      title: 'A parameter title',
-      description: 'A parameter descriptions',
-      type: 'string',
-      default_value: 'test',
-    }];
-    const contentPack = ContentPack.builder()
-      .parameters(parameters)
-      .build();
+    const parameters = [
+      {
+        name: 'PARAM',
+        title: 'A parameter title',
+        description: 'A parameter descriptions',
+        type: 'string',
+        default_value: 'test',
+      },
+    ];
+    const contentPack = ContentPack.builder().parameters(parameters).build();
     render(<ContentPackParameterList contentPack={contentPack} />);
 
     await screen.findByText('Parameters list');
@@ -83,19 +83,18 @@ describe('<ContentPackParameterList />', () => {
 
   it('should delete a parameter', async () => {
     const deleteFn = jest.fn();
-    const parameters = [{
-      name: 'PARAM',
-      title: 'A parameter title',
-      description: 'A parameter descriptions',
-      type: 'string',
-      default_value: 'test',
-    }];
-    const contentPack = ContentPack.builder()
-      .parameters(parameters)
-      .build();
+    const parameters = [
+      {
+        name: 'PARAM',
+        title: 'A parameter title',
+        description: 'A parameter descriptions',
+        type: 'string',
+        default_value: 'test',
+      },
+    ];
+    const contentPack = ContentPack.builder().parameters(parameters).build();
 
-    render(<ContentPackParameterList contentPack={contentPack}
-                                     onDeleteParameter={deleteFn} />);
+    render(<ContentPackParameterList contentPack={contentPack} onDeleteParameter={deleteFn} />);
 
     (await screen.findByRole('button', { name: 'Delete Parameter' })).click();
 
@@ -112,24 +111,27 @@ describe('<ContentPackParameterList />', () => {
       .data({ title: { '@type': 'parameter', '@value': 'PARAM' } })
       .build();
     const deleteFn = jest.fn();
-    const parameters = [{
-      name: 'PARAM',
-      title: 'A parameter title',
-      description: 'A parameter descriptions',
-      type: 'string',
-      default_value: 'test',
-    }];
+    const parameters = [
+      {
+        name: 'PARAM',
+        title: 'A parameter title',
+        description: 'A parameter descriptions',
+        type: 'string',
+        default_value: 'test',
+      },
+    ];
     const appliedParameter = {
       'dead-beef': [{ paramName: 'PARAM', configKey: 'title' }],
     };
-    const contentPack = ContentPack.builder()
-      .parameters(parameters)
-      .entities([entity])
-      .build();
+    const contentPack = ContentPack.builder().parameters(parameters).entities([entity]).build();
 
-    render(<ContentPackParameterList contentPack={contentPack}
-                                     onDeleteParameter={deleteFn}
-                                     appliedParameter={appliedParameter} />);
+    render(
+      <ContentPackParameterList
+        contentPack={contentPack}
+        onDeleteParameter={deleteFn}
+        appliedParameter={appliedParameter}
+      />,
+    );
 
     const deleteButton = await screen.findByRole('button', { name: 'Still in use' });
 
@@ -141,22 +143,23 @@ describe('<ContentPackParameterList />', () => {
   });
 
   it('should filter parameters', async () => {
-    const parameters = [{
-      name: 'PARAM',
-      title: 'A parameter title',
-      description: 'A parameter descriptions',
-      type: 'string',
-      default_value: 'test',
-    }, {
-      name: 'BAD_PARAM',
-      title: 'real bad',
-      description: 'The dark ones own parameter',
-      type: 'string',
-      default_value: 'test',
-    }];
-    const contentPack = ContentPack.builder()
-      .parameters(parameters)
-      .build();
+    const parameters = [
+      {
+        name: 'PARAM',
+        title: 'A parameter title',
+        description: 'A parameter descriptions',
+        type: 'string',
+        default_value: 'test',
+      },
+      {
+        name: 'BAD_PARAM',
+        title: 'real bad',
+        description: 'The dark ones own parameter',
+        type: 'string',
+        default_value: 'test',
+      },
+    ];
+    const contentPack = ContentPack.builder().parameters(parameters).build();
     render(<ContentPackParameterList contentPack={contentPack} />);
 
     await screen.findByText('PARAM');

@@ -16,22 +16,26 @@
  */
 import React, { useEffect } from 'react';
 
+import { Row, Col } from 'components/bootstrap';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { Link } from 'components/common/router';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { InputsList } from 'components/inputs';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import useParams from 'routing/useParams';
 import { useStore } from 'stores/connect';
-
-import useCurrentUser from '../hooks/useCurrentUser';
+import useProductName from 'brand-customization/useProductName';
+import { InputsOverview } from 'components/inputs/InputsOveriew';
+import useInputTypes from 'hooks/useInputTypes';
+import useInputTypesDescriptions from 'hooks/useInputTypesDescriptions';
 
 const NodeInputsPage = () => {
+  const productName = useProductName();
   const { nodeId } = useParams();
+  const { data: inputTypes, isLoading: isLoadingInputTypes } = useInputTypes();
+  const { data: inputTypeDescriptions, isLoading: isLoadingInputTypesDescriptions } = useInputTypesDescriptions();
 
-  const currentUser = useCurrentUser();
   const { nodes } = useStore(NodesStore);
   const node = nodes?.[nodeId];
 
@@ -43,22 +47,32 @@ const NodeInputsPage = () => {
     };
   }, []);
 
-  if (!node) {
+  if (!node || isLoadingInputTypes || isLoadingInputTypesDescriptions) {
     return <Spinner />;
   }
 
-  const title = <span>Inputs of node {node.short_node_id} / {node.hostname}</span>;
+  const title = (
+    <span>
+      Inputs of node {node.short_node_id} / {node.hostname}
+    </span>
+  );
 
   return (
     <DocumentTitle title={`Inputs of node ${node.short_node_id} / ${node.hostname}`}>
       <div>
         <PageHeader title={title}>
           <span>
-            Graylog nodes accept data via inputs. On this page you can see which inputs are running on this specific node.<br />
+            {productName} nodes accept data via inputs. On this page you can see which inputs are running on this
+            specific node.
+            <br />
             You can launch and terminate inputs on your cluster <Link to={Routes.SYSTEM.INPUTS}>here</Link>.
           </span>
         </PageHeader>
-        <InputsList permissions={currentUser.permissions} node={node} />
+        <Row className="content">
+          <Col md={12}>
+            <InputsOverview node={node} inputTypes={inputTypes} inputTypeDescriptions={inputTypeDescriptions} />
+          </Col>
+        </Row>
       </div>
     </DocumentTitle>
   );

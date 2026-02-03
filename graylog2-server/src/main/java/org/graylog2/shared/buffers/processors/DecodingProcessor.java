@@ -20,12 +20,12 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.net.InetAddresses;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.lmax.disruptor.EventHandler;
+import org.graylog.failure.FailureSubmissionService;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
@@ -33,19 +33,19 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.codecs.MultiMessageCodec;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
-import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.concurrent.ExecutionException;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -63,23 +63,23 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
     private final Map<String, Codec.Factory<? extends Codec>> codecFactory;
     private final ServerStatus serverStatus;
     private final MetricRegistry metricRegistry;
-    private final Journal journal;
     private final MessageQueueAcknowledger acknowledger;
+    private final FailureSubmissionService failureSubmissionService;
     private final Timer parseTime;
 
     @AssistedInject
     public DecodingProcessor(Map<String, Codec.Factory<? extends Codec>> codecFactory,
                              final ServerStatus serverStatus,
                              final MetricRegistry metricRegistry,
-                             final Journal journal,
                              MessageQueueAcknowledger acknowledger,
+                             FailureSubmissionService failureSubmissionService,
                              @Assisted("decodeTime") Timer decodeTime,
                              @Assisted("parseTime") Timer parseTime) {
         this.codecFactory = codecFactory;
         this.serverStatus = serverStatus;
         this.metricRegistry = metricRegistry;
-        this.journal = journal;
         this.acknowledger = acknowledger;
+        this.failureSubmissionService = failureSubmissionService;
 
         // these metrics are global to all processors, thus they are passed in directly to avoid relying on the class name
         this.parseTime = parseTime;
@@ -118,19 +118,15 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         }
     }
 
-    private void processMessage(final MessageEvent event) throws ExecutionException {
+    private void processMessage(final MessageEvent event) {
         final RawMessage raw = event.getRaw();
 
         // for backwards compatibility: the last source node should contain the input we use.
         // this means that extractors etc defined on the prior inputs are silently ignored.
         // TODO fix the above
-        String inputIdOnCurrentNode;
-        try {
-            // .inputId checked during raw message decode!
-            inputIdOnCurrentNode = Iterables.getLast(raw.getSourceNodes()).inputId;
-        } catch (NoSuchElementException e) {
-            inputIdOnCurrentNode = null;
-        }
+
+        //.inputId checked during raw message decode!
+        final String inputIdOnCurrentNode = raw.getInputIdOnCurrentNode().orElse(null);
 
         final Codec.Factory<? extends Codec> factory = codecFactory.get(raw.getCodecName());
         if (factory == null) {
@@ -142,7 +138,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         final Codec codec = factory.create(raw.getCodecConfig());
         final String baseMetricName = name(codec.getClass(), inputIdOnCurrentNode);
 
-        Message message = null;
+        Optional<Message> message = Optional.empty();
         Collection<Message> messages = null;
 
         final Timer.Context decodeTimeCtx = parseTime.time();
@@ -153,18 +149,30 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             if (codec instanceof MultiMessageCodec) {
                 messages = ((MultiMessageCodec) codec).decodeMessages(raw);
             } else {
-                message = codec.decode(raw);
+                message = codec.decodeSafe(raw);
             }
+        } catch (InputProcessingException e) {
+            if (LOG.isTraceEnabled() && e.inputMessage().isPresent()) {
+                LOG.error("{} - input message: {}", e.getMessage(), e.inputMessage().get(), e.getCause());
+            } else {
+                LOG.error(e.getMessage(), e.getCause());
+            }
+            metricRegistry.meter(name(baseMetricName, "failures")).mark();
+            failureSubmissionService.submitInputFailure(e, inputIdOnCurrentNode);
+            throw e;
         } catch (RuntimeException e) {
             LOG.error("Unable to decode raw message {} on input <{}>.", raw, inputIdOnCurrentNode);
             metricRegistry.meter(name(baseMetricName, "failures")).mark();
+            failureSubmissionService.submitInputFailure(
+                    InputProcessingException.create(
+                            "Unable to decode raw message due to an unexpected error.", e, raw), inputIdOnCurrentNode);
             throw e;
         } finally {
             decodeTime = decodeTimeCtx.stop();
         }
 
-        if (message != null) {
-            event.setMessage(postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, message, decodeTime));
+        if (message.isPresent()) {
+            event.setMessage(postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, message.get(), decodeTime));
         } else if (messages != null && !messages.isEmpty()) {
             final List<Message> processedMessages = Lists.newArrayListWithCapacity(messages.size());
 
@@ -181,11 +189,12 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
     }
 
     @Nullable
-    private Message postProcessMessage(RawMessage raw, Codec codec, String inputIdOnCurrentNode, String baseMetricName, Message message, long decodeTime) {
-        if (message == null) {
-            metricRegistry.meter(name(baseMetricName, "failures")).mark();
-            return null;
-        }
+    private Message postProcessMessage(RawMessage raw,
+                                       Codec codec,
+                                       String inputIdOnCurrentNode,
+                                       String baseMetricName,
+                                       @Nonnull Message message,
+                                       long decodeTime) {
         if (!message.isComplete()) {
             metricRegistry.meter(name(baseMetricName, "incomplete")).mark();
             if (LOG.isDebugEnabled()) {

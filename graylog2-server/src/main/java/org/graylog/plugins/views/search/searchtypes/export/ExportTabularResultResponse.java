@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public record ExportTabularResultResponse(@JsonProperty List<String> header,
                                           @JsonProperty @JacksonXmlElementWrapper(useWrapping = false) List<DataRow> dataRows) {
@@ -38,12 +40,9 @@ public record ExportTabularResultResponse(@JsonProperty List<String> header,
 
     public static ExportTabularResultResponse fromPivotResult(final PivotResult pivotResult) {
 
-        final Collection<PivotResult.Row> rows = pivotResult.rows();
+        final var header = pivotResult.columnNames();
 
-        final int longestRowKey = rows.stream()
-                .mapToInt(row -> row.key().size())
-                .max()
-                .orElse(0);
+        final Collection<PivotResult.Row> rows = pivotResult.rows();
 
         final List<ImmutableList<String>> columns = rows.stream()
                 .flatMap(row -> row.values()
@@ -53,10 +52,6 @@ public record ExportTabularResultResponse(@JsonProperty List<String> header,
                 .distinct()
                 .sorted(new ListOfStringsComparator())
                 .toList();
-
-        final List<String> header = new ArrayList<>(longestRowKey + columns.size());
-        header.addAll(Collections.nCopies(longestRowKey, ""));
-        columns.forEach(column -> header.add(column.toString()));
 
         final List<DataRow> dataRows = rows.stream()
                 .filter(row -> "leaf".equals(row.source()))
@@ -82,14 +77,13 @@ public record ExportTabularResultResponse(@JsonProperty List<String> header,
         return new ExportTabularResultResponse(header, dataRows);
     }
 
-    public static ExportTabularResultResponse fromMessageListResult(final MessageList.Result m) {
+    public static ExportTabularResultResponse fromMessageListResult(final List<String> fields, final MessageList.Result m) {
         if(m.messages().isEmpty()) {
             return new ExportTabularResultResponse(List.of(), List.of());
         }
 
-        final var first = m.messages().get(0);
-
-        final var header = first.message().keySet().stream().toList();
+        // iterating over all messages for the header to make sure that we collect all headers from all messages
+        final var header = (fields != null && !fields.isEmpty()) ? fields : m.messages().stream().flatMap(s -> s.message().keySet().stream()).distinct().toList();
         final var rows = m.messages()
                             .stream()
                             .map(message ->

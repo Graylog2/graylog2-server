@@ -19,11 +19,28 @@ package org.graylog2.rest.resources.system.inputs;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.ConfigurationException;
 import org.graylog2.audit.AuditEventTypes;
@@ -53,30 +70,13 @@ import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 @RequiresAuthentication
-@Api(value = "Extractors", description = "Extractors of an input")
+@Tag(name = "Extractors", description = "Extractors of an input")
 @Path("/system/inputs/{inputId}/extractors")
 public class ExtractorsResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(ExtractorsResource.class);
@@ -107,22 +107,24 @@ public class ExtractorsResource extends RestResource {
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Add an extractor to an input",
-                  response = ExtractorCreated.class)
+    @Operation(summary = "Add an extractor to an input")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input on this node."),
-            @ApiResponse(code = 400, message = "No such extractor type."),
-            @ApiResponse(code = 400, message = "Field the extractor should write on is reserved."),
-            @ApiResponse(code = 400, message = "Missing or invalid configuration.")
+            @ApiResponse(responseCode = "201", description = "Extractor created successfully",
+                    content = @Content(schema = @Schema(implementation = ExtractorCreated.class))),
+            @ApiResponse(responseCode = "404", description = "No such input on this node."),
+            @ApiResponse(responseCode = "400", description = "No such extractor type."),
+            @ApiResponse(responseCode = "400", description = "Field the extractor should write on is reserved."),
+            @ApiResponse(responseCode = "400", description = "Missing or invalid configuration.")
     })
     @AuditEvent(type = AuditEventTypes.EXTRACTOR_CREATE)
-    public Response create(@ApiParam(name = "inputId", required = true)
+    public Response create(@Parameter(name = "inputId", required = true)
                            @PathParam("inputId") String inputId,
-                           @ApiParam(name = "JSON body", required = true)
+                           @RequestBody(required = true)
                            @Valid @NotNull CreateExtractorRequest cer) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
         final Input mongoInput = inputService.find(inputId);
+        checkPermission(RestPermissions.INPUT_TYPES_CREATE, mongoInput.getType()); // remove after sharing inputs implemented
         final String id = new com.eaio.uuid.UUID().toString();
         final Extractor extractor = buildExtractorFromRequest(cer, id);
 
@@ -150,25 +152,28 @@ public class ExtractorsResource extends RestResource {
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Update an extractor")
+    @Operation(summary = "Update an extractor")
     @Path("/{extractorId}")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input on this node."),
-            @ApiResponse(code = 404, message = "No such extractor on this input."),
-            @ApiResponse(code = 400, message = "No such extractor type."),
-            @ApiResponse(code = 400, message = "Field the extractor should write on is reserved."),
-            @ApiResponse(code = 400, message = "Missing or invalid configuration.")
+            @ApiResponse(responseCode = "200", description = "Returns updated extractor", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "No such input on this node."),
+            @ApiResponse(responseCode = "404", description = "No such extractor on this input."),
+            @ApiResponse(responseCode = "400", description = "No such extractor type."),
+            @ApiResponse(responseCode = "400", description = "Field the extractor should write on is reserved."),
+            @ApiResponse(responseCode = "400", description = "Missing or invalid configuration.")
     })
     @AuditEvent(type = AuditEventTypes.EXTRACTOR_UPDATE)
-    public ExtractorSummary update(@ApiParam(name = "inputId", required = true)
+    public ExtractorSummary update(@Parameter(name = "inputId", required = true)
                                    @PathParam("inputId") String inputId,
-                                   @ApiParam(name = "extractorId", required = true)
+                                   @Parameter(name = "extractorId", required = true)
                                    @PathParam("extractorId") String extractorId,
-                                   @ApiParam(name = "JSON body", required = true)
+                                   @RequestBody(required = true)
                                    @Valid @NotNull CreateExtractorRequest cer) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
         final Input mongoInput = inputService.find(inputId);
+        checkPermission(RestPermissions.INPUT_TYPES_CREATE, mongoInput.getType()); // remove after sharing inputs implemented
+
         final Extractor originalExtractor = inputService.getExtractor(mongoInput, extractorId);
         final Extractor extractor = buildExtractorFromRequest(cer, originalExtractor.getId());
 
@@ -188,18 +193,19 @@ public class ExtractorsResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "List all extractors of an input")
+    @Operation(summary = "List all extractors of an input")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input on this node.")
+            @ApiResponse(responseCode = "200", description = "Returns extractors", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "No such input on this node.")
     })
     @Produces(MediaType.APPLICATION_JSON)
-    public ExtractorSummaryList list(@ApiParam(name = "inputId", required = true)
+    public ExtractorSummaryList list(@Parameter(name = "inputId", required = true)
                                      @PathParam("inputId") String inputId) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
 
         final Input input = inputService.find(inputId);
         final List<ExtractorSummary> extractors = Lists.newArrayList();
-        for (Extractor extractor : inputService.getExtractors(input)) {
+        for (Extractor extractor : inputService.getExtractors(input.getId())) {
             extractors.add(toSummary(extractor));
         }
 
@@ -208,17 +214,18 @@ public class ExtractorsResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get information of a single extractor of an input")
+    @Operation(summary = "Get information of a single extractor of an input")
     @Path("/{extractorId}")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input on this node."),
-            @ApiResponse(code = 404, message = "No such extractor on this input.")
+            @ApiResponse(responseCode = "200", description = "Returns extractor information", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "No such input on this node."),
+            @ApiResponse(responseCode = "404", description = "No such extractor on this input.")
     })
     @Produces(MediaType.APPLICATION_JSON)
     public ExtractorSummary single(
-            @ApiParam(name = "inputId", required = true)
+            @Parameter(name = "inputId", required = true)
             @PathParam("inputId") String inputId,
-            @ApiParam(name = "extractorId", required = true)
+            @Parameter(name = "extractorId", required = true)
             @PathParam("extractorId") final String extractorId) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
 
@@ -236,23 +243,26 @@ public class ExtractorsResource extends RestResource {
 
     @DELETE
     @Timed
-    @ApiOperation(value = "Delete an extractor")
+    @Operation(summary = "Delete an extractor")
     @Path("/{extractorId}")
     @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Invalid request."),
-            @ApiResponse(code = 404, message = "Input not found."),
-            @ApiResponse(code = 404, message = "Extractor not found.")
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "400", description = "Invalid request."),
+            @ApiResponse(responseCode = "404", description = "Input not found."),
+            @ApiResponse(responseCode = "404", description = "Extractor not found.")
     })
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.EXTRACTOR_DELETE)
     public void terminate(
-            @ApiParam(name = "inputId", required = true)
+            @Parameter(name = "inputId", required = true)
             @PathParam("inputId") String inputId,
-            @ApiParam(name = "extractorId", required = true)
+            @Parameter(name = "extractorId", required = true)
             @PathParam("extractorId") String extractorId) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
         final MessageInput input = persistedInputs.get(inputId);
+        checkPermission(RestPermissions.INPUT_TYPES_CREATE, input.getType()); // remove after sharing inputs implemented
+
         if (input == null) {
             LOG.error("Input <{}> not found.", inputId);
             throw new jakarta.ws.rs.NotFoundException("Couldn't find input " + inputId);
@@ -272,20 +282,22 @@ public class ExtractorsResource extends RestResource {
     @POST
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Update extractor order of an input")
+    @Operation(summary = "Update extractor order of an input")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input on this node.")
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "404", description = "No such input on this node.")
     })
     @Path("order")
     @AuditEvent(type = AuditEventTypes.EXTRACTOR_ORDER_UPDATE)
-    public void order(@ApiParam(name = "inputId", value = "Persist ID (!) of input.", required = true)
+    public void order(@Parameter(name = "inputId", description = "Persist ID (!) of input.", required = true)
                       @PathParam("inputId") String inputPersistId,
-                      @ApiParam(name = "JSON body", required = true) OrderExtractorsRequest oer) throws NotFoundException {
+                      @RequestBody(required = true) OrderExtractorsRequest oer) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputPersistId);
 
         final Input mongoInput = inputService.find(inputPersistId);
+        checkPermission(RestPermissions.INPUT_TYPES_CREATE, mongoInput.getType()); // remove after sharing inputs implemented
 
-        for (Extractor extractor : inputService.getExtractors(mongoInput)) {
+        for (Extractor extractor : inputService.getExtractors(mongoInput.getId())) {
             if (oer.order().containsValue(extractor.getId())) {
                 extractor.setOrder(Tools.getKeyByValue(oer.order(), extractor.getId()));
             }

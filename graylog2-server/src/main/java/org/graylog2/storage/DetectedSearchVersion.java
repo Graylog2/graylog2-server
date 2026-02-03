@@ -17,6 +17,7 @@
 package org.graylog2.storage;
 
 import com.google.inject.BindingAnnotation;
+import org.graylog2.storage.versionprobe.VersionProbe;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -25,7 +26,7 @@ import java.lang.annotation.Target;
 
 /**
  * @see org.graylog2.storage.providers.ElasticsearchVersionProvider
- * @see org.graylog2.storage.versionprobe.VersionProbe
+ * @see VersionProbe
  */
 @Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)

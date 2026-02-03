@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen, act, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
+import { render, screen, act, waitFor } from 'wrappedTestingLibrary';
 
 import { HTTPHeaderAuthConfigActions } from 'stores/authentication/HTTPHeaderAuthConfigStore';
 import HTTPHeaderAuthConfig from 'logic/authentication/HTTPHeaderAuthConfig';
@@ -23,10 +24,7 @@ import asMock from 'helpers/mocking/AsMock';
 
 import HTTPHeaderAuthConfigSection from './HTTPHeaderAuthConfigSection';
 
-const mockHTTPHeaderAuthConfig = HTTPHeaderAuthConfig.builder()
-  .usernameHeader('Remote-User')
-  .enabled(true)
-  .build();
+const mockHTTPHeaderAuthConfig = HTTPHeaderAuthConfig.builder().usernameHeader('Remote-User').enabled(true).build();
 
 jest.mock('stores/authentication/HTTPHeaderAuthConfigStore', () => ({
   HTTPHeaderAuthConfigActions: {
@@ -55,7 +53,7 @@ describe('<HTTPHeaderAuthConfigSection />', () => {
     render(<HTTPHeaderAuthConfigSection />);
 
     const submitButton = await screen.findByText('Update Config');
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(HTTPHeaderAuthConfigActions.update).toHaveBeenCalledTimes(1));
 
@@ -69,9 +67,10 @@ describe('<HTTPHeaderAuthConfigSection />', () => {
     const enabledHeaderCheckbox = screen.getByLabelText('Enable single sign-on via HTTP header');
     const usernameHeaderInput = screen.getByLabelText('Username header');
 
-    fireEvent.click(enabledHeaderCheckbox);
-    fireEvent.change(usernameHeaderInput, { target: { value: 'New-Header' } });
-    fireEvent.click(submitButton);
+    await userEvent.click(enabledHeaderCheckbox);
+    await userEvent.clear(usernameHeaderInput);
+    await userEvent.type(usernameHeaderInput, 'New-Header');
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(HTTPHeaderAuthConfigActions.update).toHaveBeenCalledTimes(1));
 

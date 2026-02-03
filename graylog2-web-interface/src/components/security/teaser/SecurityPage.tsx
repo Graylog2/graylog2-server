@@ -20,13 +20,7 @@ import React from 'react';
 
 import TeaserPageLayout from 'components/security/teaser/TeaserPageLayout';
 import AppRoutes, { SECURITY_PATH } from 'routing/Routes';
-import {
-  Overview,
-  UserActivity,
-  HostActivity,
-  NetworkActivity,
-  Anomalies,
-} from 'components/security/pages';
+import { Overview, UserActivity, HostActivity, NetworkActivity, Anomalies } from 'components/security/pages';
 
 const subRoutes = [
   { path: AppRoutes.SECURITY.OVERVIEW, element: <Overview /> },

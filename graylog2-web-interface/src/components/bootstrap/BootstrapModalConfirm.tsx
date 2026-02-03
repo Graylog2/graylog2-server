@@ -18,18 +18,23 @@ import React from 'react';
 
 import ModalSubmit from 'components/common/ModalSubmit';
 
+import type { ModalSize } from './Modal';
 import Modal from './Modal';
 import BootstrapModalWrapper from './BootstrapModalWrapper';
 
 type Props = {
-  showModal: boolean,
-  title: string | React.ReactNode,
-  confirmButtonText?: string
-  cancelButtonDisabled?: boolean
-  confirmButtonDisabled?: boolean
-  onConfirm: (e: React.BaseSyntheticEvent) => void,
-  onCancel: () => void,
-  children: React.ReactNode,
+  cancelButtonDisabled?: boolean;
+  children: React.ReactNode;
+  confirmButtonDisabled?: boolean;
+  confirmButtonText?: string;
+  isAsyncSubmit?: boolean;
+  isSubmitting?: boolean;
+  onCancel: () => void;
+  onConfirm: (e: React.BaseSyntheticEvent) => void;
+  showModal: boolean;
+  size?: ModalSize;
+  submitLoadingText?: string;
+  title: string | React.ReactNode;
 };
 
 /**
@@ -37,35 +42,38 @@ type Props = {
  * cancel or confirm.
  */
 const BootstrapModalConfirm = ({
-  showModal,
-  title,
-  children,
   cancelButtonDisabled = false,
+  children,
   confirmButtonDisabled = false,
   confirmButtonText = 'Confirm',
+  isAsyncSubmit = undefined,
+  isSubmitting = undefined,
   onCancel,
   onConfirm,
+  showModal,
+  submitLoadingText = undefined,
+  title,
   ...restProps
 }: Props) => (
-  <BootstrapModalWrapper showModal={showModal}
-                         onHide={onCancel}
-                         role="alertdialog"
-                         {...restProps}>
-    <Modal.Header closeButton>
+  <BootstrapModalWrapper showModal={showModal} onHide={onCancel} {...restProps}>
+    <Modal.Header>
       <Modal.Title>{title}</Modal.Title>
     </Modal.Header>
 
-    <Modal.Body>
-      {children}
-    </Modal.Body>
+    <Modal.Body>{children}</Modal.Body>
 
     <Modal.Footer>
-      <ModalSubmit disabledCancel={cancelButtonDisabled}
-                   disabledSubmit={confirmButtonDisabled}
-                   onCancel={onCancel}
-                   onSubmit={onConfirm}
-                   submitButtonText={confirmButtonText}
-                   submitButtonType="button" />
+      <ModalSubmit
+        disabledCancel={cancelButtonDisabled}
+        disabledSubmit={confirmButtonDisabled}
+        isAsyncSubmit={isAsyncSubmit}
+        submitLoadingText={submitLoadingText}
+        onCancel={onCancel}
+        onSubmit={onConfirm}
+        isSubmitting={isSubmitting}
+        submitButtonText={confirmButtonText}
+        submitButtonType="button"
+      />
     </Modal.Footer>
   </BootstrapModalWrapper>
 );

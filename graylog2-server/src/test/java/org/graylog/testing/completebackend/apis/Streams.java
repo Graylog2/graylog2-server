@@ -22,6 +22,7 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import io.restassured.response.ValidatableResponse;
+import org.graylog.security.shares.CreateEntityRequest;
 import org.graylog2.plugin.streams.StreamRuleType;
 
 import java.util.Collection;
@@ -65,15 +66,20 @@ public final class Streams implements GraylogRestApi {
     }
 
     public String createStream(String title, String indexSetId, DefaultStreamMatches defaultStreamMatches, StreamRule... streamRules) {
-        return waitForStreamRouterRefresh(() -> createStream(title, indexSetId, true, defaultStreamMatches, streamRules));
+        return createStream(title, indexSetId, true, defaultStreamMatches, streamRules);
     }
 
     public String createStream(String title, String indexSetId, boolean started, DefaultStreamMatches defaultStreamMatches, StreamRule... streamRules) {
+        Supplier<String> creationOperation = () -> doCreateStream(title, indexSetId, started, defaultStreamMatches, streamRules);
+        return started ? waitForStreamRouterRefresh(creationOperation) : creationOperation.get();
+    }
+
+    private String doCreateStream(String title, String indexSetId, boolean started, DefaultStreamMatches defaultStreamMatches, StreamRule[] streamRules) {
         final CreateStreamRequest body = new CreateStreamRequest(title, List.of(streamRules), indexSetId, defaultStreamMatches == DefaultStreamMatches.REMOVE);
         final String streamId = given()
                 .spec(api.requestSpecification())
                 .when()
-                .body(body)
+                .body(CreateEntityRequest.create(body, null))
                 .post("/streams")
                 .then()
                 .log().ifError()
@@ -90,18 +96,27 @@ public final class Streams implements GraylogRestApi {
                     .log().ifError()
                     .statusCode(204);
         }
-
         return streamId;
     }
 
     public void deleteStream(String streamId) {
-        waitForStreamRouterRefresh(() -> given()
+        final var streamRules = api.streams().getStream(streamId)
+                .extract().body().jsonPath().getList("rules");
+        if (streamRules.isEmpty()) {
+            doDeleteStream(streamId);
+        } else {
+            waitForStreamRouterRefresh(() -> doDeleteStream(streamId));
+        }
+    }
+
+    private ValidatableResponse doDeleteStream(String streamId) {
+        return given()
                 .spec(api.requestSpecification())
                 .when()
                 .delete("/streams/" + streamId)
                 .then()
                 .log().ifError()
-                .statusCode(204));
+                .statusCode(204);
     }
 
     public ValidatableResponse getStream(String streamId) {
@@ -144,7 +159,7 @@ public final class Streams implements GraylogRestApi {
             RetryerBuilder.<String>newBuilder()
                     .withWaitStrategy(WaitStrategies.fixedWait(100, TimeUnit.MILLISECONDS))
                     .withStopStrategy(StopStrategies.stopAfterDelay(10, TimeUnit.SECONDS))
-                    .retryIfResult(r -> r.equals(existingEngineFingerprint))
+                    .retryIfResult(r -> r != null && r.equals(existingEngineFingerprint))
                     .build()
                     .call(this::getStreamRouterEngineFingerprint);
         } catch (ExecutionException | RetryException e) {

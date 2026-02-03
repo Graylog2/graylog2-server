@@ -20,16 +20,9 @@ import type {
   ResultsWrapperComponentProps,
   OverrideItemComponentProps,
 } from './PaginatedItemOverview';
-import PaginatedItemOverview, {
-  DEFAULT_PAGINATION,
-} from './PaginatedItemOverview';
+import PaginatedItemOverview, { DEFAULT_PAGINATION } from './PaginatedItemOverview';
 
-export type {
-  PaginatedListType,
-  DescriptiveItem,
-  ResultsWrapperComponentProps,
-  OverrideItemComponentProps,
-};
+export type { PaginatedListType, DescriptiveItem, ResultsWrapperComponentProps, OverrideItemComponentProps };
 
 export { DEFAULT_PAGINATION };
 

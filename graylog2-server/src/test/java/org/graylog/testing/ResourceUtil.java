@@ -37,8 +37,18 @@ public class ResourceUtil {
         return resourceURLToTmpFile(resource).toFile();
     }
 
+    public static File resourceToTmpFile(String resourceName, Path tempDir) {
+        final URL resource = ResourceUtil.class.getClassLoader().getResource(resourceName);
+
+        if (resource == null) {
+            throw new RuntimeException("Couldn't load resource " + resourceName);
+        }
+
+        return resourceURLToTmpFile(resource, tempDir).toFile();
+    }
+
     public static Path resourceURLToTmpFile(URL resourceUrl) {
-        final Path path = createTempFile(resourceUrl);
+        final Path path = createTempFile(resourceUrl, null);
 
         try {
             FileUtils.copyInputStreamToFile(resourceUrl.openStream(), path.toFile());
@@ -49,9 +59,24 @@ public class ResourceUtil {
         return path;
     }
 
-    private static Path createTempFile(URL resourceUrl) {
+    public static Path resourceURLToTmpFile(URL resourceUrl, Path tempDir) {
+        final Path path = createTempFile(resourceUrl, tempDir);
+
         try {
-            final Path tmpDir = Paths.get(System.getProperty("java.io.tmpdir"));
+            FileUtils.copyInputStreamToFile(resourceUrl.openStream(), path.toFile());
+        } catch (IOException e) {
+            throw new UncheckedIOException("Error copying resource to file: " + resourceUrl, e);
+        }
+
+        return path;
+    }
+
+    private static Path createTempFile(URL resourceUrl, Path tmpDir) {
+        try {
+            if (tmpDir == null) {
+                tmpDir = Paths.get(System.getProperty("java.io.tmpdir"));
+            }
+
             final Path path = Files.createTempFile(tmpDir, "graylog-test-resource-file-", null);
 
             // Temp files should automatically be deleted on exit of the JVM

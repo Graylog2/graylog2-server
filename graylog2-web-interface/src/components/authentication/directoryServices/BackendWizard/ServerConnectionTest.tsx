@@ -41,30 +41,43 @@ const _addRequiredRequestPayload = (formValues) => {
 };
 
 type Props = {
-  prepareSubmitPayload: (fromValues: WizardFormValues | null | undefined) => WizardSubmitPayload,
+  prepareSubmitPayload: (fromValues: WizardFormValues | null | undefined) => WizardSubmitPayload;
 };
 
 const ServerConnectionTest = ({ prepareSubmitPayload }: Props) => {
   const { authBackendMeta } = useContext(BackendWizardContext);
-  const [{ loading, success, message, errors }, setConnectionStatus] = useState({ loading: false, success: false, message: undefined, errors: undefined });
+  const [{ loading, success, message, errors }, setConnectionStatus] = useState({
+    loading: false,
+    success: false,
+    message: undefined,
+    errors: undefined,
+  });
 
   const _handleConnectionCheck = () => {
     const payload = _addRequiredRequestPayload(prepareSubmitPayload(undefined));
 
     setConnectionStatus({ loading: true, message: undefined, errors: undefined, success: false });
 
-    AuthenticationDomain.testConnection({ backend_configuration: payload, backend_id: authBackendMeta.backendId }).then((response) => {
-      setConnectionStatus({ loading: false, message: response?.message, success: response?.success, errors: response?.errors });
-    }).catch((error) => {
-      const requestErrors = [error?.message, error?.additional?.res?.text];
-      setConnectionStatus({ loading: false, message: undefined, errors: requestErrors, success: false });
-    });
+    AuthenticationDomain.testConnection({ backend_configuration: payload, backend_id: authBackendMeta.backendId })
+      .then((response) => {
+        setConnectionStatus({
+          loading: false,
+          message: response?.message,
+          success: response?.success,
+          errors: response?.errors,
+        });
+      })
+      .catch((error) => {
+        const requestErrors = [error?.message, error?.additional?.res?.text];
+        setConnectionStatus({ loading: false, message: undefined, errors: requestErrors, success: false });
+      });
   };
 
   return (
     <>
       <p>
-        Performs a background connection check with the address and credentials defined in the step &quot;Server Configuration&quot;.
+        Performs a background connection check with the address and credentials defined in the step &quot;Server
+        Configuration&quot;.
       </p>
       <Button onClick={_handleConnectionCheck} type="button">
         {loading ? <Spinner delay={0} text="Test Server Connection" /> : 'Test Server Connection'}
@@ -74,9 +87,7 @@ const ServerConnectionTest = ({ prepareSubmitPayload }: Props) => {
           <b>{message}</b>
         </NotificationContainer>
       )}
-      {(errors && errors.length >= 1) && (
-        <ConnectionErrors errors={errors} message={message} />
-      )}
+      {errors && errors.length >= 1 && <ConnectionErrors errors={errors} message={message} />}
     </>
   );
 };

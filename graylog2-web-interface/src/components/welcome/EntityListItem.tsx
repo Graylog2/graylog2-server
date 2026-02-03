@@ -39,31 +39,35 @@ export const StyledLabel = styled(Label)`
   display: block;
 `;
 
-const LastOpenedTime = styled.i(({ theme }: { theme: DefaultTheme }) => css`
-  color: ${theme.colors.gray[60]};
-`);
+const LastOpenedTime = styled.i(
+  ({ theme }: { theme: DefaultTheme }) => css`
+    color: ${theme.colors.gray[60]};
+  `,
+);
 
 type Props = {
-  title: string,
-  timestamp?: string,
-  grn: string,
-}
+  title: string;
+  timestamp?: string;
+  grn: string;
+};
 
-const EntityItem = ({ title, grn, timestamp }: Props) => {
+const EntityItem = ({ title, grn, timestamp = undefined }: Props) => {
   const { id, type } = getValuesFromGRN(grn);
   const hasReadPermission = useHasEntityPermissionByGRN(grn, 'read');
   const entityTypeTitle = useMemo(() => getTitleForEntityType(type, false) ?? 'unknown', [type]);
   const entityLink = useShowRouteFromGRN(grn);
-  const entityTitle = title || id;
+  const entityTitle = title ?? id;
   const showLink = !!entityLink && hasReadPermission;
 
   return (
     <StyledListGroupItem>
       <StyledLabel bsStyle="info">{entityTypeTitle}</StyledLabel>
-      {!showLink
-        ? <i>{entityTitle}</i>
-        : <Link to={entityLink}>{entityTitle}</Link>}
-      {timestamp ? <LastOpenedTime><RelativeTime dateTime={timestamp} /></LastOpenedTime> : null}
+      {!showLink ? <i>{entityTitle}</i> : <Link to={entityLink}>{entityTitle}</Link>}
+      {timestamp ? (
+        <LastOpenedTime>
+          <RelativeTime dateTime={timestamp} />
+        </LastOpenedTime>
+      ) : null}
     </StyledListGroupItem>
   );
 };

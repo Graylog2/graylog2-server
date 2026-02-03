@@ -15,53 +15,81 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Field, useFormikContext, getIn } from 'formik';
+import { Field, useFormikContext, getIn, FieldArray } from 'formik';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import * as Immutable from 'immutable';
+import random from 'lodash/random';
 
 import { defaultCompare } from 'logic/DefaultCompare';
 import { Col, Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
-import { InputOptionalInfo as Opt, FormikInput } from 'components/common';
+import { InputOptionalInfo as Opt, FormikInput, IconButton } from 'components/common';
 import type { Property } from 'views/logic/fieldtypes/FieldType';
 import { Properties } from 'views/logic/fieldtypes/FieldType';
 import useAggregationFunctions from 'views/hooks/useAggregationFunctions';
-import { percentileOptions, percentageStrategyOptions } from 'views/Constants';
+import { percentileOptions, percentageStrategyOptions, thresholdsSupportedVisualizations } from 'views/Constants';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import isFunctionAllowsUnit from 'views/logic/isFunctionAllowsUnit';
 import FieldUnit from 'views/components/aggregationwizard/units/FieldUnit';
 import useFeature from 'hooks/useFeature';
 import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
+import ThresholdFormItem from 'views/components/aggregationwizard/metric/ThresholdFormItem';
+import { colors } from 'views/components/visualizations/Colors';
 
 import FieldSelect from '../FieldSelect';
 
 type Props = {
-  index: number,
-}
+  index: number;
+};
 
 const Wrapper = styled.div``;
 
-const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
+export const ActionWrapper = styled.div`
+  width: 25px;
+  height: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const ThresholdsContainer = styled.div(
+  ({ theme }) => `
+  padding-bottom: ${theme.spacings.sm};
+`,
+);
+
+const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) =>
+  defaultCompare(label1, label2);
 
 const hasProperty = (fieldType: FieldTypeMapping, properties: Array<Property>) => {
   const fieldProperties = fieldType?.type?.properties ?? Immutable.Set();
 
-  return properties
-    .map((property) => fieldProperties.contains(property))
-    .find((result) => result === false) === undefined;
+  return (
+    properties.map((property) => fieldProperties.contains(property)).find((result) => result === false) === undefined
+  );
 };
 
 const Metric = ({ index }: Props) => {
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const metricFieldSelectRef = useRef(null);
   const { data: functions, isLoading } = useAggregationFunctions();
-  const functionOptions = useMemo(() => (isLoading ? [] : Object.values(functions)
-    .map(({ type, description }) => ({ label: description, value: type }))
-    .sort(sortByLabel)), [functions, isLoading]);
+  const functionOptions = useMemo(
+    () =>
+      isLoading
+        ? []
+        : Object.values(functions)
+            .map(({ type, description }) => ({ label: description, value: type }))
+            .sort(sortByLabel),
+    [functions, isLoading],
+  );
 
-  const { values: { metrics }, errors: { metrics: metricsError }, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
+  const {
+    values: { metrics, visualization },
+    errors: { metrics: metricsError },
+    setFieldValue,
+  } = useFormikContext<WidgetConfigFormValues>();
   const currentMetric = metrics[index];
   const currentFunction = currentMetric.function;
 
@@ -70,21 +98,29 @@ const Metric = ({ index }: Props) => {
 
   const isPercentile = currentFunction === 'percentile';
   const isPercentage = currentFunction === 'percentage';
-  const requiresNumericField = (isPercentage && currentMetric.strategy === 'SUM') || !['card', 'count', 'latest', 'percentage'].includes(currentFunction);
+  const requiresNumericField =
+    (isPercentage && currentMetric.strategy === 'SUM') ||
+    !['card', 'count', 'latest', 'percentage'].includes(currentFunction);
 
-  const isFieldQualified = useCallback((field: FieldTypeMapping) => {
-    if (!requiresNumericField) {
-      return true;
-    }
+  const isFieldQualified = useCallback(
+    (field: FieldTypeMapping) => {
+      if (!requiresNumericField) {
+        return true;
+      }
 
-    return hasProperty(field, [Properties.Numeric]);
-  }, [requiresNumericField]);
+      return hasProperty(field, [Properties.Numeric]);
+    },
+    [requiresNumericField],
+  );
 
   const [functionIsSettled, setFunctionIsSettled] = useState<boolean>(false);
-  const onFunctionChange = useCallback((newValue: string) => {
-    setFieldValue(`metrics.${index}.function`, newValue);
-    setFunctionIsSettled(true);
-  }, [setFieldValue, index]);
+  const onFunctionChange = useCallback(
+    (newValue: string) => {
+      setFieldValue(`metrics.${index}.function`, newValue);
+      setFunctionIsSettled(true);
+    },
+    [setFieldValue, index],
+  );
 
   useEffect(() => {
     const metricError = getIn(metricsError?.[index], 'field');
@@ -96,24 +132,53 @@ const Metric = ({ index }: Props) => {
 
   const showUnitType = unitFeatureEnabled && isFunctionAllowsUnit(currentFunction);
 
+  const createThreshold = () => {
+    const palette = colors[random(0, colors.length - 1)];
+    const randomColor = palette[random(0, palette.length - 1)];
+
+    return {
+      color: randomColor,
+      name: '',
+      value: 0,
+    };
+  };
+
+  const addThresholds = () => {
+    setFieldValue(`metrics.${index}.thresholds`, [...currentMetric.thresholds, createThreshold()]);
+  };
+
+  const showThresholdSettings = thresholdsSupportedVisualizations.includes(visualization?.type);
+
+  const onRemoveThreshold = useCallback(
+    (thresholdIndex: number) => {
+      setFieldValue(
+        `metrics.${index}.thresholds`,
+        metrics[index].thresholds.filter((_, i) => i !== thresholdIndex),
+      );
+    },
+    [index, metrics, setFieldValue],
+  );
+
   return (
     <Wrapper data-testid={`metric-${index}`}>
       <Col sm={11}>
         <Field name={`metrics.${index}.function`}>
           {({ field: { name, value }, meta: { error } }) => (
-            <Input id="metric-function-select"
-                   label="Function"
-                   error={error}
-                   labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9">
-              <Select options={functionOptions}
-                      clearable={false}
-                      name={name}
-                      value={value}
-                      aria-label="Select a function"
-                      size="small"
-                      menuPortalTarget={document.body}
-                      onChange={onFunctionChange} />
+            <Input
+              id="metric-function-select"
+              label="Function"
+              error={error}
+              labelClassName="col-sm-3"
+              wrapperClassName="col-sm-9">
+              <Select
+                options={functionOptions}
+                clearable={false}
+                name={name}
+                value={value}
+                placeholder="Select a function"
+                size="small"
+                onChange={onFunctionChange}
+              />
             </Input>
           )}
         </Field>
@@ -123,28 +188,31 @@ const Metric = ({ index }: Props) => {
           <Col sm={11}>
             <Field name={`metrics.${index}.field`}>
               {({ field: { name, value, onChange }, meta: { error } }) => (
-                <Input id="metric-field"
-                       label="Field"
-                       error={error}
-                       labelClassName="col-sm-3"
-                       wrapperClassName="col-sm-9">
-                  <FieldSelect id="metric-field-select"
-                               selectRef={metricFieldSelectRef}
-                               menuPortalTarget={document.body}
-                               onChange={(fieldName) => {
-                                 onChange({ target: { name, value: fieldName } });
-                               }}
-                               clearable={!isFieldRequired}
-                               isFieldQualified={isFieldQualified}
-                               name={name}
-                               value={value}
-                               ariaLabel="Select a field" />
+                <Input
+                  id="metric-field"
+                  label="Field"
+                  error={error}
+                  labelClassName="col-sm-3"
+                  wrapperClassName="col-sm-9">
+                  <FieldSelect
+                    id="metric-field-select"
+                    selectRef={metricFieldSelectRef}
+                    onChange={(fieldName) => {
+                      onChange({ target: { name, value: fieldName } });
+                    }}
+                    clearable={!isFieldRequired}
+                    isFieldQualified={isFieldQualified}
+                    name={name}
+                    value={value}
+                    ariaLabel="Select a field"
+                  />
                 </Input>
               )}
             </Field>
           </Col>
           {showUnitType && (
-            <div className="col-sm-1"><FieldUnit field={metrics?.[index].field} />
+            <div className="col-sm-1">
+              <FieldUnit field={metrics?.[index].field} />
             </div>
           )}
         </>
@@ -153,19 +221,21 @@ const Metric = ({ index }: Props) => {
         <Col sm={11}>
           <Field name={`metrics.${index}.percentile`}>
             {({ field: { name, value, onChange }, meta: { error } }) => (
-              <Input id="metric-percentile-select"
-                     label="Percentile"
-                     error={error}
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9">
-                <Select options={percentileOptions}
-                        clearable={false}
-                        name={name}
-                        value={value}
-                        aria-label="Select percentile"
-                        size="small"
-                        menuPortalTarget={document.body}
-                        onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
+              <Input
+                id="metric-percentile-select"
+                label="Percentile"
+                error={error}
+                labelClassName="col-sm-3"
+                wrapperClassName="col-sm-9">
+                <Select
+                  options={percentileOptions}
+                  clearable={false}
+                  name={name}
+                  value={value}
+                  aria-label="Select percentile"
+                  size="small"
+                  onChange={(newValue) => onChange({ target: { name, value: newValue } })}
+                />
               </Input>
             )}
           </Field>
@@ -176,19 +246,21 @@ const Metric = ({ index }: Props) => {
           <Col sm={11}>
             <Field name={`metrics.${index}.strategy`}>
               {({ field: { name, value, onChange }, meta: { error } }) => (
-                <Input id="metric-percentage-strategy-select"
-                       label="Strategy"
-                       error={error}
-                       labelClassName="col-sm-3"
-                       wrapperClassName="col-sm-9">
-                  <Select options={percentageStrategyOptions}
-                          clearable={false}
-                          name={name}
-                          value={value ?? 'COUNT'}
-                          aria-label="Select strategy"
-                          size="small"
-                          menuPortalTarget={document.body}
-                          onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
+                <Input
+                  id="metric-percentage-strategy-select"
+                  label="Strategy"
+                  error={error}
+                  labelClassName="col-sm-3"
+                  wrapperClassName="col-sm-9">
+                  <Select
+                    options={percentageStrategyOptions}
+                    clearable={false}
+                    name={name}
+                    value={value ?? 'COUNT'}
+                    aria-label="Select strategy"
+                    size="small"
+                    onChange={(newValue) => onChange({ target: { name, value: newValue } })}
+                  />
                 </Input>
               )}
             </Field>
@@ -196,20 +268,22 @@ const Metric = ({ index }: Props) => {
           <Col sm={11}>
             <Field name={`metrics.${index}.field`}>
               {({ field: { name, value, onChange }, meta: { error } }) => (
-                <Input id="metric-field"
-                       label="Field"
-                       error={error}
-                       labelClassName="col-sm-3"
-                       wrapperClassName="col-sm-9">
-                  <FieldSelect id="metric-field-select"
-                               selectRef={metricFieldSelectRef}
-                               onChange={(fieldName) => onChange({ target: { name, value: fieldName } })}
-                               clearable={!isFieldRequired}
-                               isFieldQualified={isFieldQualified}
-                               name={name}
-                               value={value}
-                               menuPortalTarget={document.body}
-                               ariaLabel="Select a field" />
+                <Input
+                  id="metric-field"
+                  label="Field"
+                  error={error}
+                  labelClassName="col-sm-3"
+                  wrapperClassName="col-sm-9">
+                  <FieldSelect
+                    id="metric-field-select"
+                    selectRef={metricFieldSelectRef}
+                    onChange={(fieldName) => onChange({ target: { name, value: fieldName } })}
+                    clearable={!isFieldRequired}
+                    isFieldQualified={isFieldQualified}
+                    name={name}
+                    value={value}
+                    ariaLabel="Select a field"
+                  />
                 </Input>
               )}
             </Field>
@@ -217,14 +291,68 @@ const Metric = ({ index }: Props) => {
         </>
       )}
       <Col sm={11}>
-        <FormikInput id="name"
-                     label={<>Name <Opt /></>}
-                     bsSize="small"
-                     placeholder="Specify display name"
-                     name={`metrics.${index}.name`}
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9" />
+        <FormikInput
+          id="name"
+          label={
+            <>
+              Name <Opt />
+            </>
+          }
+          bsSize="small"
+          placeholder="Specify display name"
+          name={`metrics.${index}.name`}
+          labelClassName="col-sm-3"
+          wrapperClassName="col-sm-9"
+        />
       </Col>
+      {showThresholdSettings && (
+        <>
+          <Col sm={11}>
+            <Field name={`metrics.${index}.showThresholds`}>
+              {({ field: { name, value = false } }) => (
+                <FormikInput
+                  type="checkbox"
+                  wrapperClassName="col-sm-12"
+                  label="Show line thresholds"
+                  id={`${name}-input`}
+                  name={name}
+                  onChange={() => {
+                    const newVal = !value;
+                    setFieldValue(name, newVal);
+                    if (newVal && !currentMetric.thresholds?.length) {
+                      setFieldValue(`metrics.${index}.thresholds`, [createThreshold()]);
+                    }
+                  }}
+                />
+              )}
+            </Field>
+          </Col>
+          {currentMetric.showThresholds && (
+            <Col sm={1}>
+              <IconButton onClick={addThresholds} size="sm" name="add" title="Add a threshold" />
+            </Col>
+          )}
+          {currentMetric.showThresholds && (
+            <FieldArray
+              name={`metrics.${index}.thresholds`}
+              validateOnChange={false}
+              render={() => (
+                <ThresholdsContainer>
+                  {metrics?.[index]?.thresholds?.map((_, tIndex) => (
+                    <ThresholdFormItem
+                      // eslint-disable-next-line react/no-array-index-key
+                      key={`${index}-${tIndex}`}
+                      thresholdIndex={tIndex}
+                      metricIndex={index}
+                      onRemove={() => onRemoveThreshold(tIndex)}
+                    />
+                  ))}
+                </ThresholdsContainer>
+              )}
+            />
+          )}
+        </>
+      )}
     </Wrapper>
   );
 };

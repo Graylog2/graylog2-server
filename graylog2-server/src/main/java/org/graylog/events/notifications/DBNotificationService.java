@@ -16,10 +16,11 @@
  */
 package org.graylog.events.notifications;
 
-import com.mongodb.client.MongoCollection;
+import com.google.errorprone.annotations.MustBeClosed;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityRegistrar;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.pagination.MongoPaginationHelper;
@@ -27,6 +28,7 @@ import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -36,20 +38,20 @@ import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 import static org.graylog2.database.utils.MongoUtils.stream;
 
 public class DBNotificationService {
-    private static final String NOTIFICATION_COLLECTION_NAME = "event_notifications";
+    public static final String NOTIFICATION_COLLECTION_NAME = "event_notifications";
 
-    private final EntityOwnershipService entityOwnerShipService;
+    private final EntityRegistrar entityRegistrar;
     private final MongoCollection<NotificationDto> collection;
     private final MongoUtils<NotificationDto> mongoUtils;
     private final MongoPaginationHelper<NotificationDto> paginationHelper;
 
     @Inject
     public DBNotificationService(MongoCollections mongoCollections,
-                                 EntityOwnershipService entityOwnerShipService) {
+                                 EntityRegistrar entityRegistrar) {
         this.collection = mongoCollections.collection(NOTIFICATION_COLLECTION_NAME, NotificationDto.class);
         this.mongoUtils = mongoCollections.utils(collection);
         this.paginationHelper = mongoCollections.paginationHelper(collection);
-        this.entityOwnerShipService = entityOwnerShipService;
+        this.entityRegistrar = entityRegistrar;
     }
 
     public PaginatedList<NotificationDto> searchPaginated(SearchQuery query, Predicate<NotificationDto> filter,
@@ -63,7 +65,7 @@ public class DBNotificationService {
 
     public NotificationDto saveWithOwnership(NotificationDto notificationDto, User user) {
         final NotificationDto dto = save(notificationDto);
-        entityOwnerShipService.registerNewEventNotification(dto.id(), user);
+        entityRegistrar.registerNewEventNotification(dto.id(), user);
         return dto;
     }
 
@@ -78,7 +80,7 @@ public class DBNotificationService {
     }
 
     public int delete(String id) {
-        entityOwnerShipService.unregisterEventNotification(id);
+        entityRegistrar.unregisterEventNotification(id);
         return (int) collection.deleteOne(idEq(id)).getDeletedCount();
     }
 
@@ -86,7 +88,12 @@ public class DBNotificationService {
         return mongoUtils.getById(id);
     }
 
+    @MustBeClosed
     public Stream<NotificationDto> streamAll() {
         return stream(collection.find());
+    }
+
+    public Map<String, Long> countByType() {
+        return mongoUtils.countByField("config.type");
     }
 }

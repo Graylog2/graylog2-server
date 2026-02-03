@@ -18,11 +18,12 @@ package org.graylog.events.notifications.types;
 
 import com.floreysoft.jmte.Engine;
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.apache.commons.mail.SimpleEmail;
-import org.graylog2.alerts.EmailRecipients;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
@@ -31,10 +32,11 @@ import org.graylog2.shared.email.EmailFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -92,30 +94,74 @@ public class EmailSender {
         return htmlTemplateEngine.transform(config.htmlBodyTemplate(), model);
     }
 
-    private void sendEmail(EmailEventNotificationConfig config, String emailAddress, String sender, String replyTo, Map<String, Object> model) throws TransportConfigurationException, EmailException {
-        LOG.debug("Sending mail to " + emailAddress);
+    private void sendEmails(EmailEventNotificationConfig config, Set<String> recipients, Set<String> ccEmails,
+                            Set<String> bccEmails, String sender, String replyTo, Map<String, Object> model,
+                            String notificationId) throws TransportConfigurationException, EmailException {
         if (!emailFactory.isEmailTransportEnabled()) {
             throw new TransportConfigurationException("Email transport is not enabled in server configuration file!");
         }
 
+        final List<InternetAddress> recipientAddresses = stringsToInternetAddresses(recipients, "TO", notificationId);
+        if (config.singleEmail()) {
+            LOG.debug("Sending mail to {}",
+                    String.join(", ", recipientAddresses.stream().map(InternetAddress::getAddress).toList()));
+            final Email email = createEmailWithoutRecipients(config, model, sender, replyTo, ccEmails, bccEmails, notificationId);
+            email.setTo(recipientAddresses);
+            email.send();
+        } else {
+            for (InternetAddress recipient : recipientAddresses) {
+                LOG.debug("Sending mail to {}", recipient.getAddress());
+                final Email email = createEmailWithoutRecipients(config, model, sender, replyTo, ccEmails, bccEmails, notificationId);
+                email.setTo(List.of(recipient));
+                email.send();
+            }
+        }
+    }
+
+    private Email createEmailWithoutRecipients(EmailEventNotificationConfig config, Map<String, Object> model, String sender,
+                                               String replyTo, Set<String> ccEmails, Set<String> bccEmails,
+                                               String notificationId) throws EmailException, TransportConfigurationException {
         final Email email = createEmailWithBody(config, model);
 
         if (!isNullOrEmpty(sender)) {
             email.setFrom(sender);
         }
 
-        if (!isNullOrEmpty(replyTo)) {
-            email.addReplyTo(replyTo);
-        }
-
         if (email.getFromAddress() == null) {
             throw new TransportConfigurationException("No from address specified for email transport.");
         }
 
-        email.setSubject(buildSubject(config, model));
-        email.addTo(emailAddress);
+        if (!isNullOrEmpty(replyTo)) {
+            email.addReplyTo(replyTo);
+        }
 
-        email.send();
+        if (!ccEmails.isEmpty()) {
+            email.setCc(stringsToInternetAddresses(ccEmails, "CC", notificationId));
+        }
+
+        if (!bccEmails.isEmpty()) {
+            email.setBcc(stringsToInternetAddresses(bccEmails, "BCC", notificationId));
+        }
+
+        email.setSubject(buildSubject(config, model));
+
+        return email;
+    }
+
+    private List<InternetAddress> stringsToInternetAddresses(Set<String> addresses, String line, String notificationId) {
+        return addresses.stream()
+                .map(address -> {
+                    try {
+                        LOG.debug("Converting email {} to InternetAddress.", address);
+                        return new InternetAddress(address);
+                    } catch (AddressException e) {
+                        LOG.error("Unable to add {} to the {} line in email notification {}.",
+                                address, line, notificationId, e);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     Email createEmailWithBody(EmailEventNotificationConfig config, Map<String, Object> model) throws EmailException {
@@ -131,8 +177,7 @@ public class EmailSender {
         }
     }
 
-    // TODO: move EmailRecipients class to events code
-    void sendEmails(EmailRecipients emailRecipients, String sender, String replyTo, EmailEventNotificationConfig config,
+    void sendEmails(Set<String> emailRecipients, Set<String> ccEmails, Set<String> bccEmails, String sender, String replyTo, EmailEventNotificationConfig config,
                     String notificationId, Map<String, Object> model) throws TransportConfigurationException, EmailException {
         if (!emailFactory.isEmailTransportEnabled()) {
             throw new TransportConfigurationException("Email transport is not enabled in server configuration file!");
@@ -140,11 +185,6 @@ public class EmailSender {
 
         if (emailRecipients.isEmpty()) {
             LOG.debug("Cannot send emails: empty recipient list.");
-            return;
-        }
-
-        final Set<String> recipientsSet = emailRecipients.getEmailRecipients();
-        if (recipientsSet.isEmpty()) {
             final Notification notification = notificationService.buildNow()
                     .addNode(nodeId.getNodeId())
                     .addType(Notification.Type.GENERIC)
@@ -152,12 +192,10 @@ public class EmailSender {
                     .addDetail("title", f("No recipients have been defined for notification with ID [%s]!", notificationId))
                     .addDetail("description", "To fix this, go to the notification configuration and add at least one alert recipient.");
             notificationService.publishIfFirst(notification);
+            return;
         }
 
-
-        for (String email : recipientsSet) {
-            sendEmail(config, email, sender, replyTo, model);
-        }
+        sendEmails(config, emailRecipients, ccEmails, bccEmails, sender, replyTo, model, notificationId);
     }
 
 }

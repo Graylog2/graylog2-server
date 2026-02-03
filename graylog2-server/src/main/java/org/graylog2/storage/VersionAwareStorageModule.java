@@ -19,6 +19,7 @@ package org.graylog2.storage;
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 import org.graylog.events.search.MoreSearchAdapter;
+import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.views.search.engine.QueryBackend;
@@ -28,14 +29,17 @@ import org.graylog.plugins.views.search.engine.monitoring.collection.NoOpStatsCo
 import org.graylog.plugins.views.search.engine.monitoring.collection.StatsCollector;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexToolsAdapter;
+import org.graylog2.indexer.client.IndexerHostsAdapter;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
-import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
+import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
+import org.graylog2.indexer.indices.IndexTemplateAdapterProvider;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
@@ -45,9 +49,11 @@ import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.storage.providers.ClusterAdapterProvider;
 import org.graylog2.storage.providers.CountsAdapterProvider;
 import org.graylog2.storage.providers.DataStreamAdapterProvider;
+import org.graylog2.storage.providers.DatanodeUpgradeAdapterProvider;
 import org.graylog2.storage.providers.ElasticsearchBackendProvider;
 import org.graylog2.storage.providers.IndexFieldTypePollerAdapterProvider;
 import org.graylog2.storage.providers.IndexToolsAdapterProvider;
+import org.graylog2.storage.providers.IndexerHostsAdapterProvider;
 import org.graylog2.storage.providers.IndicesAdapterProvider;
 import org.graylog2.storage.providers.MessagesAdapterProvider;
 import org.graylog2.storage.providers.MoreSearchAdapterProvider;
@@ -85,12 +91,16 @@ public class VersionAwareStorageModule extends AbstractModule {
         bind(NodeAdapter.class).toProvider(NodeAdapterProvider.class);
         bind(IndexFieldTypePollerAdapter.class).toProvider(IndexFieldTypePollerAdapterProvider.class);
         bind(IndexToolsAdapter.class).toProvider(IndexToolsAdapterProvider.class);
+        bind(IndexTemplateAdapter.class).toProvider(IndexTemplateAdapterProvider.class);
         bind(V20170607164210_MigrateReopenedIndicesToAliases.ClusterState.class)
                 .toProvider(V20170607164210_MigrateReopenedIndicesToAliasesClusterStateAdapterProvider.class);
         bind(V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter.class)
                 .toProvider(V20200730000000_AddGl2MessageIdFieldAliasForEventsElasticsearchAdapterProvider.class);
         bind(ProxyRequestAdapter.class).toProvider(ProxyRequestAdapterProvider.class);
         bind(RemoteReindexingMigrationAdapter.class).toProvider(RemoteReindexingMigrationAdapterProvider.class);
+        bind(DatanodeUpgradeServiceAdapter.class).toProvider(DatanodeUpgradeAdapterProvider.class);
+
+        bind(IndexerHostsAdapter.class).toProvider(IndexerHostsAdapterProvider.class);
 
         bindQueryBackend();
     }

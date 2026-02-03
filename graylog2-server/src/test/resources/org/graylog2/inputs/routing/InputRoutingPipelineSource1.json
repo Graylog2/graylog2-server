@@ -1,0 +1,13 @@
+{
+  "id":"pipelineSourceId1",
+  "title": "Default Routing",
+  "description": "System generated pipeline",
+  "source": "pipeline \"Default Routing\"\nstage 0 match EITHER\nrule \"gl_route_inputName[inputId]_to_streamName\"\nend",
+  "stages": [
+    {
+      "stage": 0,
+      "match": "EITHER",
+      "rules": ["gl_route_inputName[inputId]_to_streamName"]
+    }
+  ]
+}

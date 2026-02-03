@@ -1,0 +1,5 @@
+type = "a"
+message = "Create metrics supplier for shards."
+
+pulls = ["24035"]
+issues = ["Graylog2/graylog-plugin-enterprise#12221", "Graylog2/graylog-plugin-enterprise#12223"]

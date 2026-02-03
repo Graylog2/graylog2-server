@@ -19,13 +19,13 @@ import * as Immutable from 'immutable';
 import type { FieldUnitType } from 'views/types';
 
 export type FieldUnitJson = {
-  abbrev: string,
-  unit_type: FieldUnitType,
+  abbrev: string;
+  unit_type: FieldUnitType;
 };
 
 export type FieldUnitState = {
-  abbrev: string,
-  unitType: FieldUnitType,
+  abbrev: string;
+  unitType: FieldUnitType;
 };
 
 export default class FieldUnit {

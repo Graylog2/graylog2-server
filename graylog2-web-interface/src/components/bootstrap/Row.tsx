@@ -18,12 +18,14 @@
 import { Row as BootstrapRow } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
-export const RowContentStyles = css(({ theme }) => css`
-  background-color: ${theme.colors.global.contentBackground};
-  margin-bottom: ${theme.spacings.xs};
-  border-radius: 6px;
-  box-shadow: rgb(0 0 0 / 4%) 0 3px 5px;
-`);
+export const RowContentStyles = css(
+  ({ theme }) => css`
+    background-color: ${theme.colors.global.contentBackground};
+    margin-bottom: ${theme.spacings.xs};
+    border-radius: 6px;
+    box-shadow: rgb(0 0 0 / 4%) 0 3px 5px;
+  `,
+);
 
 type RowProps = React.ComponentProps<typeof BootstrapRow>;
 const Row: React.ComponentType<RowProps> = styled(BootstrapRow)`

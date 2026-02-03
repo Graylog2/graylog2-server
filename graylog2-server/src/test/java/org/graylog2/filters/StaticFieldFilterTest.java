@@ -26,22 +26,23 @@ import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.shared.SuppressForbidden;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.concurrent.Executors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class StaticFieldFilterTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
     private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Mock
@@ -58,7 +59,7 @@ public class StaticFieldFilterTest {
         when(input.getId()).thenReturn("someid");
         when(inputService.all()).thenReturn(Collections.singletonList(input));
         when(inputService.find(eq("someid"))).thenReturn(input);
-        when(inputService.getStaticFields(eq(input)))
+        when(inputService.getStaticFields(eq(input.getId())))
                 .thenReturn(Collections.singletonList(Maps.immutableEntry("foo", "bar")));
 
         final StaticFieldFilter filter = new StaticFieldFilter(inputService, new EventBus(), Executors.newSingleThreadScheduledExecutor());

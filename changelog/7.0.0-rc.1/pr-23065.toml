@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixing issue with query validation popover for search filter form in event definition wizard."
+
+issues = ["graylog-plugin-enterprise#11200"]
+pulls = ["23065"]

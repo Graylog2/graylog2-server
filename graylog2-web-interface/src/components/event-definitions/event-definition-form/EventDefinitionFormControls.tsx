@@ -32,22 +32,21 @@ const EventDefinitionFormControls = ({
 }: EventDefinitionFormControlsProps) => {
   if (activeStepIndex === steps.length - 1) {
     return (
-      <ModalSubmit onCancel={onCancel}
-                   onSubmit={onSubmit}
-                   submitButtonText={`${action === 'edit' ? 'Update' : 'Create'} event definition`} />
+      <ModalSubmit
+        onCancel={onCancel}
+        onSubmit={onSubmit}
+        submitButtonText={`${action === 'edit' ? 'Update' : 'Create'} event definition`}
+      />
     );
   }
 
   return (
     <div>
-      <Button bsStyle="info"
-              onClick={onOpenPrevPage}
-              disabled={activeStepIndex === 0}>
+      <Button bsStyle="info" onClick={onOpenPrevPage} disabled={activeStepIndex === 0}>
         Previous
       </Button>
       <div className="pull-right">
-        <Button bsStyle="info"
-                onClick={onOpenNextPage}>
+        <Button bsStyle="info" onClick={onOpenNextPage}>
           Next
         </Button>
       </div>

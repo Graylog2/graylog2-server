@@ -34,9 +34,10 @@ import org.graylog.events.processor.DBEventProcessorStateService;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.JobDefinitionDto;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityRegistrar;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
@@ -56,12 +57,13 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.UserImpl;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Optional;
 import java.util.Set;
@@ -71,10 +73,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class NotificationFacadeTest {
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private ObjectMapper objectMapper;
 
@@ -98,14 +100,11 @@ public class NotificationFacadeTest {
     @Mock
     private UserService userService;
 
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
     private MongoJackObjectMapperProvider mapperProvider;
 
-    @Before
+    @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
-    public void setUp() throws Exception {
+    public void setUp(MongoDBTestService dbTestService) throws Exception {
         objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(
                 EmailEventNotificationConfig.class,
@@ -117,10 +116,11 @@ public class NotificationFacadeTest {
 
         jobDefinitionService = mock(DBJobDefinitionService.class);
         stateService = mock(DBEventProcessorStateService.class);
-        MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
-        eventDefinitionService = new DBEventDefinitionService(mongoCollections, stateService, mock(EntityOwnershipService.class), null, new IgnoreSearchFilters());
 
-        notificationService = new DBNotificationService(mongoCollections, mock(EntityOwnershipService.class));
+        final var mongoCollections = new MongoCollections(mapperProvider, dbTestService.mongoConnection());
+        eventDefinitionService = new DBEventDefinitionService(mongoCollections, stateService, mock(EntityRegistrar.class), null, new IgnoreSearchFilters());
+
+        notificationService = new DBNotificationService(mongoCollections, mock(EntityRegistrar.class));
         notificationResourceHandler = new NotificationResourceHandler(notificationService, jobDefinitionService, eventDefinitionService, Maps.newHashMap());
         facade = new NotificationFacade(objectMapper, notificationResourceHandler, notificationService, userService);
     }
@@ -168,7 +168,7 @@ public class NotificationFacadeTest {
         when(jobDefinitionService.save(any(JobDefinitionDto.class))).thenReturn(jobDefinitionDto);
         final UserImpl kmerzUser = new UserImpl(
                 mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),
-                mock(ClusterConfigService.class), ImmutableMap.of("username", "kmerz"));
+                mock(ClusterConfigService.class), objectMapper, ImmutableMap.of("username", "kmerz"));
         when(userService.load("kmerz")).thenReturn(kmerzUser);
 
         final NativeEntity<NotificationDto> nativeEntity = facade.createNativeEntity(
@@ -225,6 +225,7 @@ public class NotificationFacadeTest {
 
     @Test
     @MongoDBFixtures("NotificationFacadeTest.json")
+    @SuppressWarnings("MustBeClosedChecker")
     public void delete() {
         long countBefore = notificationService.streamAll().count();
         assertThat(countBefore).isEqualTo(1);

@@ -23,6 +23,7 @@ import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.cluster.nodes.DataNodeClusterService;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodePaginatedService;
+import org.graylog2.cluster.nodes.ServerNodePaginatedService;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.nodes.ServerNodeClusterService;
 import org.graylog2.cluster.nodes.ServerNodeDto;
@@ -49,12 +50,14 @@ import org.graylog2.rest.resources.system.contentpacks.titles.EntityTitleService
 import org.graylog2.rest.resources.system.contentpacks.titles.EntityTitleServiceImpl;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.AccessTokenServiceImpl;
-import org.graylog2.security.MongoDBSessionService;
-import org.graylog2.security.MongoDBSessionServiceImpl;
+import org.graylog2.security.sessions.MongoDbSessionService;
+import org.graylog2.security.sessions.SessionService;
+import org.graylog2.shared.tokenusage.TokenUsageService;
 import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.system.activities.SystemMessageService;
 import org.graylog2.system.activities.SystemMessageServiceImpl;
+import org.graylog2.tokenusage.TokenUsageServiceImpl;
 import org.graylog2.users.UserManagementServiceImpl;
 import org.graylog2.users.UserServiceImpl;
 
@@ -69,13 +72,15 @@ public class PersistenceServicesBindings extends AbstractModule {
         bind(new TypeLiteral<NodeService<ServerNodeDto>>() {}).to(ServerNodeClusterService.class);
         bind(new TypeLiteral<NodeService<DataNodeDto>>() {}).to(DataNodeClusterService.class);
         bind(DataNodePaginatedService.class).asEagerSingleton();
+        bind(ServerNodePaginatedService.class).asEagerSingleton();
         bind(IndexRangeService.class).to(MongoIndexRangeService.class).asEagerSingleton();
         bind(InputService.class).to(InputServiceImpl.class);
         bind(UserService.class).to(UserServiceImpl.class).asEagerSingleton();
         OptionalBinder.newOptionalBinder(binder(), UserManagementService.class)
                 .setDefault().to(UserManagementServiceImpl.class);
         bind(AccessTokenService.class).to(AccessTokenServiceImpl.class).asEagerSingleton();
-        bind(MongoDBSessionService.class).to(MongoDBSessionServiceImpl.class).asEagerSingleton();
+        bind(TokenUsageService.class).to(TokenUsageServiceImpl.class).asEagerSingleton();
+        bind(SessionService.class).to(MongoDbSessionService.class).asEagerSingleton();
         bind(InputStatusService.class).to(MongoInputStatusService.class).asEagerSingleton();
         bind(EntityListPreferencesService.class).to(EntityListPreferencesServiceImpl.class);
         bind(EntitySuggestionService.class).to(MongoEntitySuggestionService.class);

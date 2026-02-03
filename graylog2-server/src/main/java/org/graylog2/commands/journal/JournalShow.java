@@ -38,7 +38,7 @@ public class JournalShow extends AbstractJournalCommand {
     protected void runCommand() {
         long sizeInBytes = journal.size();
         int numSegments = journal.numberOfSegments();
-        long committedReadOffset = journal.getCommittedReadOffset();
+        long committedReadOffset = journal.getCommittedOffset();
         final StringBuilder sb = new StringBuilder();
 
         final long startOffset = journal.getLogStartOffset();

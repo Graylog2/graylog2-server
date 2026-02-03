@@ -48,7 +48,7 @@ describe('GlobalContextProviders', () => {
 
     render(
       <GlobalContextProviders>
-        <>The children</>
+        <span>The children</span>
       </GlobalContextProviders>,
     );
 
@@ -60,7 +60,7 @@ describe('GlobalContextProviders', () => {
 
     render(
       <GlobalContextProviders>
-        <>The children</>
+        <span>The children</span>
       </GlobalContextProviders>,
     );
 
@@ -76,7 +76,7 @@ describe('GlobalContextProviders', () => {
 
     render(
       <GlobalContextProviders>
-        <>The children</>
+        <span>The children</span>
       </GlobalContextProviders>,
     );
 
@@ -95,7 +95,7 @@ describe('GlobalContextProviders', () => {
     await suppressConsole(() => {
       render(
         <GlobalContextProviders>
-          <>The children</>
+          <span>The children</span>
         </GlobalContextProviders>,
       );
     });

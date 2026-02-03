@@ -30,8 +30,10 @@ public interface UserManagementService extends UserService {
     /**
      * Additional method allows explicit create operation to be carried out
      * (as opposed to calling .save)
+     * @param user    the user that is to be created and persisted
+     * @param creator the user that is initiating user creation, typically originating from RestResource#getCurrentUser
      */
-    String create(User user) throws ValidationException;
+    String create(User user, User creator) throws ValidationException;
 
     /**
      * Additional method allows explicit update operations to be carried out

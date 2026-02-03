@@ -39,6 +39,7 @@ import org.graylog2.rest.resources.search.responses.SearchResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog.tracing.GraylogSemanticAttributes.LOOKUP_CACHE_NAME;
@@ -78,8 +79,10 @@ public class LookupTableDecorator implements SearchResponseDecorator {
 
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
-            final Map<String, String> lookupTables = lookupTableService.findAll().stream()
-                    .collect(Collectors.toMap(LookupTableDto::name, LookupTableDto::title));
+            final Map<String, String> lookupTables;
+            try (Stream<LookupTableDto> lookupTableStream = lookupTableService.streamAll()) {
+                lookupTables = lookupTableStream.collect(Collectors.toMap(LookupTableDto::name, LookupTableDto::title));
+            }
 
             return new ConfigurationRequest() {
                 {

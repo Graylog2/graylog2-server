@@ -24,8 +24,5 @@ import java.util.Set;
  * Returns streams that are used in documents where certain field is present/existing.
  */
 public interface StreamsForFieldRetriever {
-
-    Set<String> getStreams(final String fieldName, final String indexName);
-
     Map<String, Set<String>> getStreams(final List<String> fieldNames, final String indexName);
 }

@@ -17,31 +17,31 @@
 package org.graylog.events.processor;
 
 import com.google.common.collect.ImmutableSet;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.system.processing.DBProcessingStatusService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.system.processing.DBProcessingStatusService.ProcessingNodesState;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class EventProcessorDependencyCheckTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private DBProcessingStatusService dbProcessingStatusService;
@@ -50,9 +50,9 @@ public class EventProcessorDependencyCheckTest {
     private DBEventProcessorStateService stateService;
     private EventProcessorDependencyCheck dependencyCheck;
 
-    @Before
-    public void setUp() throws Exception {
-        stateService = new DBEventProcessorStateService(mongodb.mongoConnection(), objectMapperProvider);
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) throws Exception {
+        stateService = new DBEventProcessorStateService(mongoCollections);
         dependencyCheck = new EventProcessorDependencyCheck(stateService, dbProcessingStatusService);
     }
 

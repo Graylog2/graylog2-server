@@ -1,0 +1,5 @@
+type = "f"
+message = "Support timeline charts for alternative timestamp fields (e.g. `@timestamp`)."
+
+issues = ["23863"]
+pulls = ["23909"]

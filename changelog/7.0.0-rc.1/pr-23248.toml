@@ -1,0 +1,5 @@
+type = "a"
+message = "Change default visibility of Cluster Configuration page to users with new role Cluster Configuration Reader."
+
+issues = ["graylog-plugin-enterprise#10605"]
+pulls = ["23248"]

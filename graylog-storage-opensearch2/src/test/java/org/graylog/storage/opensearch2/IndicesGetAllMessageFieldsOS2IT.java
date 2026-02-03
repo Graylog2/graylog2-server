@@ -16,19 +16,13 @@
  */
 package org.graylog.storage.opensearch2;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog.storage.opensearch2.cat.CatApi;
-import org.graylog.storage.opensearch2.cluster.ClusterStateApi;
-import org.graylog.storage.opensearch2.stats.StatsApi;
 import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
+import org.graylog.testing.elasticsearch.SearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.indices.IndicesGetAllMessageFieldsIT;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Rule;
 
 public class IndicesGetAllMessageFieldsOS2IT extends IndicesGetAllMessageFieldsIT {
-    @Rule
+    @SearchInstance
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
     @Override

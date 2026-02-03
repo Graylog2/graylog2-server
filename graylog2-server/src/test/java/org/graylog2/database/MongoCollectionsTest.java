@@ -19,7 +19,6 @@ package org.graylog2.database;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mongodb.BasicDBObject;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.InsertOneResult;
@@ -29,9 +28,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.views.MongoIgnore;
 import org.graylog.testing.mongodb.MongoDBExtension;
-import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.joda.time.DateTime;
@@ -79,8 +76,8 @@ class MongoCollectionsTest {
                          @JsonProperty("timestamp") DateTime timestamp) implements MongoEntity {}
 
     @BeforeEach
-    void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider mongoJackObjectMapperProvider) {
-        collections = new MongoCollections(mongoJackObjectMapperProvider, mongoDBTestService.mongoConnection());
+    void setUp(MongoCollections mongoCollections) {
+        collections = mongoCollections;
         encryptedValueService = new EncryptedValueService(UUID.randomUUID().toString());
     }
 
@@ -116,7 +113,7 @@ class MongoCollectionsTest {
 
     @Test
     void testEncryptedValue() {
-        final MongoCollection<Secret> collection = collections.nonEntityCollection("secrets", Secret.class);
+        final com.mongodb.client.MongoCollection<Secret> collection = collections.nonEntityCollection("secrets", Secret.class);
         final EncryptedValue encryptedValue = encryptedValueService.encrypt("gary");
         collection.insertOne(new Secret(encryptedValue));
         assertThat(collection.find().first()).isNotNull().satisfies(secret -> {
@@ -130,16 +127,16 @@ class MongoCollectionsTest {
     void testMongoIgnore() {
         // @MongoIgnore should prevent a property from being written to Mongo. But if it's returned from Mongo,
         // e.g. because it was calculated by an aggregation, it should be populated in the returned object.
-        final MongoCollection<IgnoreTest> collection = collections.nonEntityCollection("ignoreTest", IgnoreTest.class);
+        final com.mongodb.client.MongoCollection<IgnoreTest> collection = collections.nonEntityCollection("ignoreTest", IgnoreTest.class);
         collection.insertOne(new IgnoreTest("I should be present", "I should be gone"));
         assertThat(collection.find().first()).isEqualTo(new IgnoreTest("I should be present", null));
 
-        final MongoCollection<Document> rawCollection = collections.nonEntityCollection("alsoIgnoreTest", Document.class);
+        final com.mongodb.client.MongoCollection<Document> rawCollection = collections.nonEntityCollection("alsoIgnoreTest", Document.class);
         rawCollection.insertOne(new Document(Map.of(
                 "ignore_me_not", "I should be present",
                 "ignore_me", "I sneaked in")));
 
-        final MongoCollection<IgnoreTest> collection2 = collections.nonEntityCollection("alsoIgnoreTest", IgnoreTest.class);
+        final com.mongodb.client.MongoCollection<IgnoreTest> collection2 = collections.nonEntityCollection("alsoIgnoreTest", IgnoreTest.class);
         assertThat(collection2.find().first()).isEqualTo(new IgnoreTest("I should be present", "I sneaked in"));
     }
 

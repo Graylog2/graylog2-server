@@ -45,9 +45,12 @@ type NotificationsFormProps = {
   location: any;
 };
 
-class NotificationsForm extends React.Component<NotificationsFormProps, {
-  [key: string]: any;
-}> {
+class NotificationsForm extends React.Component<
+  NotificationsFormProps,
+  {
+    [key: string]: any;
+  }
+> {
   constructor(props) {
     super(props);
 
@@ -93,7 +96,9 @@ class NotificationsForm extends React.Component<NotificationsFormProps, {
     const { showAddNotificationForm } = this.state;
 
     const notificationIds = eventDefinition.notifications.map((n) => n.notification_id);
-    const missingPermissions = notificationIds.filter((id) => !isPermitted(currentUser.permissions, `eventnotifications:read:${id}`));
+    const missingPermissions = notificationIds.filter(
+      (id) => !isPermitted(currentUser.permissions, `eventnotifications:read:${id}`),
+    );
 
     if (missingPermissions.length > 0) {
       return (
@@ -109,12 +114,12 @@ class NotificationsForm extends React.Component<NotificationsFormProps, {
 
     if (showAddNotificationForm) {
       return (
-        <AddNotificationForm notifications={notifications}
-                             onChange={this.handleAssignNotification}
-                             onCancel={this.toggleAddNotificationForm}
-                             hasCreationPermissions={
-                               isPermitted(currentUser.permissions, 'eventnotifications:create')
-                             } />
+        <AddNotificationForm
+          notifications={notifications}
+          onChange={this.handleAssignNotification}
+          onCancel={this.toggleAddNotificationForm}
+          hasCreationPermissions={isPermitted(currentUser.permissions, 'eventnotifications:create')}
+        />
       );
     }
 
@@ -123,21 +128,25 @@ class NotificationsForm extends React.Component<NotificationsFormProps, {
         <Col md={6} lg={5}>
           <span className={styles.manageNotifications}>
             <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST} target="_blank">
-              <Button bsStyle="link" bsSize="small">Manage Notifications <Icon name="open_in_new" /></Button>
+              <Button bsStyle="link" bsSize="small">
+                Manage Notifications <Icon name="open_in_new" />
+              </Button>
             </LinkContainer>
           </span>
-          <h2 className={commonStyles.title}>Notifications <small>(optional)</small></h2>
+          <h2 className={commonStyles.title}>
+            Notifications <small>(optional)</small>
+          </h2>
           <p>
             Is this Event important enough that requires your attention? Make it an Alert by adding Notifications to it.
           </p>
 
-          <NotificationList eventDefinition={eventDefinition}
-                            notifications={notifications}
-                            onAddNotificationClick={this.toggleAddNotificationForm}
-                            onRemoveNotificationClick={this.handleRemoveNotification} />
-          <NotificationSettingsForm eventDefinition={eventDefinition}
-                                    defaults={defaults}
-                                    onSettingsChange={onChange} />
+          <NotificationList
+            eventDefinition={eventDefinition}
+            notifications={notifications}
+            onAddNotificationClick={this.toggleAddNotificationForm}
+            onRemoveNotificationClick={this.handleRemoveNotification}
+          />
+          <NotificationSettingsForm eventDefinition={eventDefinition} defaults={defaults} onSettingsChange={onChange} />
         </Col>
       </Row>
     );

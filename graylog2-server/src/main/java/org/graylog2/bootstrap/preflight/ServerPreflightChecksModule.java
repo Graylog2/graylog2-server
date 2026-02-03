@@ -53,5 +53,6 @@ public class ServerPreflightChecksModule extends Graylog2Module {
         // The MongoDBPreflightCheck is not registered here, because it is called separately from ServerBootstrap
         addPreflightCheck(SearchDbPreflightCheck.class);
         addPreflightCheck(DiskJournalPreflightCheck.class);
+        addPreflightCheck(PasswordSecretPreflightCheck.class);
     }
 }

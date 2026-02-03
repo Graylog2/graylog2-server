@@ -18,40 +18,40 @@ import * as React from 'react';
 
 import { createGRN } from 'logic/permissions/GRN';
 import useCurrentUser from 'hooks/useCurrentUser';
+import { hasAdminPermission } from 'util/PermissionsMixin';
 
 type ChildFun = (props: { disabled: boolean }) => React.ReactElement;
 
 type Props = {
-  children: React.ReactNode | ChildFun,
-  id?: string
-  type: string,
-  hideChildren?: boolean
+  children: ChildFun;
+  id?: string;
+  type: string;
+  hideChildren?: boolean;
 };
 
-const HasOwnership = ({ children, id, type, hideChildren = false }: Props) => {
+const HasOwnership = ({ children, id = undefined, type, hideChildren = false }: Props) => {
   const currentUser = useCurrentUser();
-  const entity = createGRN(type, id);
-  const ownership = `entity:own:${entity}`;
-  const adminPermission = '*';
+
+  if (typeof children !== 'function') {
+    throw new Error('Invalid prop: "children" must be a function.');
+  }
+
+  if (hideChildren) {
+    return null;
+  }
 
   if (currentUser) {
     const { grnPermissions = [], permissions } = currentUser;
-    const isAdmin = permissions.includes(adminPermission);
+    const isAdmin = hasAdminPermission(permissions);
+    const entity = createGRN(type, id);
+    const ownership = `entity:own:${entity}`;
 
     if (grnPermissions.includes(ownership) || isAdmin) {
-      if (!hideChildren && typeof children === 'function') {
-        return <>{children({ disabled: false })} </>;
-      }
-
-      return <>children</>;
+      return <>{children({ disabled: false })} </>;
     }
   }
 
-  if (!hideChildren && typeof children === 'function') {
-    return <>{children({ disabled: true })} </>;
-  }
-
-  return null;
+  return <>{children({ disabled: true })} </>;
 };
 
 export default HasOwnership;

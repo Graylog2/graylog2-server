@@ -19,3 +19,4 @@ import type { Attribute } from 'stores/PaginationTypes';
 export const isDateAttribute = ({ type }: Attribute) => type === 'DATE';
 export const isAttributeWithFilterOptions = ({ filter_options }: Attribute) => !!filter_options?.length;
 export const isAttributeWithRelatedCollection = ({ related_collection }: Attribute) => !!related_collection;
+export const isCustomComponentFilter = ({ filter_component }: Attribute) => !!filter_component;

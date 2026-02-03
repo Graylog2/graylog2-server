@@ -50,7 +50,7 @@ describe('MessageDetailProviders', () => {
 
     render(
       <MessageDetailProviders message={message}>
-        <>The children</>
+        <span>The children</span>
       </MessageDetailProviders>,
     );
 
@@ -62,7 +62,7 @@ describe('MessageDetailProviders', () => {
 
     render(
       <MessageDetailProviders message={message}>
-        <>The children</>
+        <span>The children</span>
       </MessageDetailProviders>,
     );
 
@@ -78,7 +78,7 @@ describe('MessageDetailProviders', () => {
 
     render(
       <MessageDetailProviders message={message}>
-        <>The children</>
+        <span>The children</span>
       </MessageDetailProviders>,
     );
 
@@ -97,7 +97,7 @@ describe('MessageDetailProviders', () => {
     await suppressConsole(() => {
       render(
         <MessageDetailProviders message={message}>
-          <>The children</>
+          <span>The children</span>
         </MessageDetailProviders>,
       );
     });

@@ -26,19 +26,21 @@ export const SearchBarContainer = styled(FlatContentRow)`
   gap: ${SEARCH_BAR_GAP};
 `;
 
-export const SearchQueryRow = styled.div(({ theme }) => css`
-  display: flex;
-  gap: ${SEARCH_BAR_GAP};
-  align-items: flex-start;
+export const SearchQueryRow = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    gap: ${SEARCH_BAR_GAP};
+    align-items: flex-start;
 
-  @media (max-width: ${theme.breakpoints.max.sm}) {
-    flex-direction: column;
-  
-    > div {
-      width: 100%;
+    @media (max-width: ${theme.breakpoints.max.sm}) {
+      flex-direction: column;
+
+      > div {
+        width: 100%;
+      }
     }
-  }
-`);
+  `,
+);
 
 export const SearchButtonAndQuery = styled.div`
   flex: 1;
@@ -52,16 +54,18 @@ export const SearchInputAndValidationContainer = styled.div`
   flex: 1;
 `;
 
-export const TimeRangeRow = styled.div(({ theme }) => css`
-  display: flex;
-  gap: ${SEARCH_BAR_GAP};
-  align-items: flex-start;
+export const TimeRangeRow = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    gap: ${SEARCH_BAR_GAP};
+    align-items: flex-start;
 
-  @media (max-width: ${theme.breakpoints.max.md}) {
-    flex-direction: column;
+    @media (max-width: ${theme.breakpoints.max.md}) {
+      flex-direction: column;
 
-    > div {
-      width: 100%;
+      > div {
+        width: 100%;
+      }
     }
-  }
-`);
+  `,
+);

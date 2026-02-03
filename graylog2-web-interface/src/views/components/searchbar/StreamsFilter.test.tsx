@@ -15,28 +15,27 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
+import { render } from 'wrappedTestingLibrary';
+
+import selectEvent from 'helpers/selectEvent';
 
 import StreamsFilter from './StreamsFilter';
 
 describe('StreamsFilter', () => {
   it('sorts stream names', async () => {
     const streams = [
-      { key: 'One Stream', value: 'streamId1' },
-      { key: 'another Stream', value: 'streamId2' },
+      { key: 'First Stream', value: 'streamId1' },
+      { key: 'Second Stream', value: 'streamId2' },
       { key: 'Yet another Stream', value: 'streamId3' },
       { key: '101 Stream', value: 'streamId4' },
     ];
     render(<StreamsFilter streams={streams} onChange={() => {}} />);
 
-    const select = await screen.findByLabelText(/select streams/i);
-
-    selectEvent.openMenu(select);
-
-    await screen.findByText('101 Stream');
-    await screen.findByText('another Stream');
-    await screen.findByText('One Stream');
-    await screen.findByText('Yet another Stream');
+    await selectEvent.assertOptionExists('select streams', [
+      '101 Stream',
+      'Second Stream',
+      'First Stream',
+      'Yet another Stream',
+    ]);
   });
 });

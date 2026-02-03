@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixing output class name for prometheus exporter."
+
+issues = ["20790"]
+pulls = ["20844"]

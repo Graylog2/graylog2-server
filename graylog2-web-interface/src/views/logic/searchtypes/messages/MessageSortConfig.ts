@@ -17,13 +17,13 @@
 import Direction from 'views/logic/aggregationbuilder/Direction';
 
 type MessageSortConfigJson = {
-  field: string,
-  order: 'ASC' | 'DESC',
+  field: string;
+  order: 'ASC' | 'DESC';
 };
 
 type InternalState = {
-  field: string,
-  direction: Direction,
+  field: string;
+  direction: Direction;
 };
 
 export default class MessageSortConfig {

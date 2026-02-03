@@ -18,6 +18,7 @@ package org.graylog2.plugin.journal;
 
 import com.eaio.uuid.UUID;
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.UninitializedMessageException;
@@ -40,6 +41,8 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -66,7 +69,7 @@ public class RawMessage implements Serializable {
 
     private transient final JournalMessage.Builder msgBuilder;
     private final UUID id;
-    private Object messageQueueId;
+    private final Object messageQueueId;
     private int sequenceNr;
     private Configuration codecConfig;
 
@@ -273,6 +276,20 @@ public class RawMessage implements Serializable {
 
     public int getSequenceNr() {
         return sequenceNr;
+    }
+
+    public Optional<String> getInputIdOnCurrentNode() {
+        return getLastSourceNode().map(sourceNode -> sourceNode.inputId);
+    }
+
+    public Optional<SourceNode> getLastSourceNode() {
+        SourceNode lastNode;
+        try {
+            lastNode = Iterables.getLast(getSourceNodes());
+        } catch (NoSuchElementException e) {
+            lastNode = null;
+        }
+        return Optional.ofNullable(lastNode);
     }
 
     @Override

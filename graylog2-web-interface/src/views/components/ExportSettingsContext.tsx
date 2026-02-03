@@ -21,7 +21,7 @@ import { singleton } from 'logic/singleton';
 type ExportSettingsContextType = {
   settings: ExportSettings;
   setSettings: (settings: ExportSettings) => void;
-}
+};
 
 export interface ExportSettings {}
 

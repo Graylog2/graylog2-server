@@ -24,52 +24,57 @@ import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/type
 import { prepareDataTieringInitialValues, DataTieringVisualisation } from 'components/indices/data-tiering';
 
 type Props = {
-  template: IndexSetTemplate,
-  handleCardClick: (template: IndexSetTemplate) => void,
-  isSelected: boolean
-}
+  template: IndexSetTemplate;
+  handleCardClick: (template: IndexSetTemplate) => void;
+  isSelected: boolean;
+};
 
 const ButtonWrapper = styled.div`
   display: flex;
   justify-content: end;
 `;
 
-const StyledCard = styled(Card)<{ $selected: boolean, $disabled: boolean }>(({ $selected, $disabled, theme }) => css`
-  display: flex;
-  gap: ${theme.spacings.sm};
-  ${$disabled && (`color: ${theme.colors.global.textSecondary};`)}
+const StyledCard = styled(Card)<{ $selected: boolean; $disabled: boolean }>(
+  ({ $selected, $disabled, theme }) => css`
+    display: flex;
+    gap: ${theme.spacings.sm};
+    ${$disabled && `color: ${theme.colors.text.secondary};`}
 
-  ${$selected && (`
+    ${$selected &&
+    `
     background-color: ${theme.colors.global.background};
     border: 2px solid ${theme.colors.contrast.default};
-  `)}
-`);
+  `}
+  `,
+);
 
-const Title = styled.h3<{ $disabled: boolean }>(({ $disabled, theme }) => css`
-  ${$disabled && (`color: ${theme.colors.global.textSecondary};`)}
-`);
+const Title = styled.h3<{ $disabled: boolean }>(
+  ({ $disabled, theme }) => css`
+    ${$disabled && `color: ${theme.colors.text.secondary};`}
+  `,
+);
 
 const Description = styled.p`
   margin-bottom: 0;
 `;
 
 const IndexSetTemplateCard = ({ template, handleCardClick, isSelected }: Props) => {
-  const dataTieringConfig = prepareDataTieringInitialValues(template.index_set_config.data_tiering, PluginStore);
+  const dataTieringConfig = prepareDataTieringInitialValues(template.index_set_config.data_tiering, PluginStore, false);
 
   return (
     <StyledCard $selected={isSelected} $disabled={!template.enabled}>
       <Title $disabled={!template.enabled}>{template.title}</Title>
-      {template.index_set_config.use_legacy_rotation && (
-        <Description>{template.description}</Description>
-      )}
+      {template.index_set_config.use_legacy_rotation && <Description>{template.description}</Description>}
       {!template.index_set_config.use_legacy_rotation && (
         <Row>
           <Col md={8}>
-            <DataTieringVisualisation minDays={dataTieringConfig.index_lifetime_min}
-                                      maxDays={dataTieringConfig.index_lifetime_max}
-                                      minDaysInHot={dataTieringConfig.index_hot_lifetime_min}
-                                      warmTierEnabled={dataTieringConfig.warm_tier_enabled}
-                                      archiveData={dataTieringConfig.archive_before_deletion} />
+            <DataTieringVisualisation
+              minDays={dataTieringConfig.index_lifetime_min}
+              maxDays={dataTieringConfig.index_lifetime_max}
+              minDaysInHot={dataTieringConfig.index_hot_lifetime_min}
+              warmTierEnabled={dataTieringConfig.warm_tier_enabled}
+              archiveData={dataTieringConfig.archive_before_deletion}
+            />
           </Col>
           <Col md={4}>
             <Description>{template.description}</Description>
@@ -78,7 +83,9 @@ const IndexSetTemplateCard = ({ template, handleCardClick, isSelected }: Props) 
       )}
       {template.enabled && (
         <ButtonWrapper>
-          <Button onClick={() => handleCardClick(template)} disabled={isSelected}>{isSelected ? 'Selected' : 'Select'}</Button>
+          <Button onClick={() => handleCardClick(template)} disabled={isSelected}>
+            {isSelected ? 'Selected' : 'Select'}
+          </Button>
         </ButtonWrapper>
       )}
     </StyledCard>

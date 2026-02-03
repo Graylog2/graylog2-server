@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 
 import LoadingIndicator from 'components/common/LoadingIndicator';
 
@@ -38,7 +38,13 @@ describe('<LoadingIndicator />', () => {
   });
 
   it('Use passed props to change loading text after timeout', async () => {
-    render(<LoadingIndicator text="Loading data..." longWaitText="It takes some time. Please wait a bit more..." longWaitTimeout={30000} />);
+    render(
+      <LoadingIndicator
+        text="Loading data..."
+        longWaitText="It takes some time. Please wait a bit more..."
+        longWaitTimeout={30000}
+      />,
+    );
 
     await screen.findByText('Loading data...');
 

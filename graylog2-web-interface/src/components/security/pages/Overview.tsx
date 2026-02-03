@@ -22,6 +22,7 @@ import TeaserSearch from 'components/security/teaser/TeaserSearch';
 import viewJson from 'components/security/teaser/sample-dashboards/overview_view.json';
 import searchJson from 'components/security/teaser/sample-dashboards/overview_search.json';
 import resultJson from 'components/security/teaser/sample-dashboards/overview_results.json';
+import type { SearchJson } from 'views/logic/search/Search';
 
 const hotspots = [
   {
@@ -42,7 +43,12 @@ const hotspots = [
 ];
 const Overview = () => (
   <DocumentTitle title="Overview">
-    <TeaserSearch viewJson={viewJson} searchJson={searchJson} searchJobResult={resultJson} hotspots={hotspots} />
+    <TeaserSearch
+      viewJson={viewJson}
+      searchJson={searchJson as SearchJson}
+      searchJobResult={resultJson}
+      hotspots={hotspots}
+    />
   </DocumentTitle>
 );
 

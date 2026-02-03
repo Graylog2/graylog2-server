@@ -16,16 +16,14 @@
  */
 package org.graylog2.rest.resources.entities.preferences.service;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
+import com.google.common.primitives.Ints;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.ReplaceOptions;
+import jakarta.inject.Inject;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId;
-import org.mongojack.JacksonDBCollection;
-import org.mongojack.WriteResult;
-
-import jakarta.inject.Inject;
 
 import static org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId.USER_ID_SUB_FIELD;
 
@@ -33,34 +31,33 @@ public class EntityListPreferencesServiceImpl implements EntityListPreferencesSe
 
     public static final String ENTITY_LIST_PREFERENCES_MONGO_COLLECTION_NAME = "entity_list_preferences";
 
-    private final JacksonDBCollection<StoredEntityListPreferences, StoredEntityListPreferencesId> db;
+    private final MongoCollection<StoredEntityListPreferences> collection;
 
     @Inject
-    public EntityListPreferencesServiceImpl(final MongoConnection mongoConnection,
-                                            final MongoJackObjectMapperProvider mapper) {
-        this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(ENTITY_LIST_PREFERENCES_MONGO_COLLECTION_NAME),
-                StoredEntityListPreferences.class,
-                StoredEntityListPreferencesId.class,
-                mapper.get());
-
+    public EntityListPreferencesServiceImpl(MongoCollections mongoCollections) {
+        collection = mongoCollections.nonEntityCollection(ENTITY_LIST_PREFERENCES_MONGO_COLLECTION_NAME,
+                StoredEntityListPreferences.class);
     }
 
     @Override
     public StoredEntityListPreferences get(final StoredEntityListPreferencesId preferencesId) {
-        return this.db.findOneById(preferencesId);
+        return collection.find(Filters.eq("_id", preferencesId)).first();
     }
 
     @Override
     public boolean save(final StoredEntityListPreferences preferences) {
-        final WriteResult<StoredEntityListPreferences, StoredEntityListPreferencesId> save = db.save(preferences);
-        return save.getN() > 0;
+        if (preferences.preferencesId() == null) {
+            collection.insertOne(preferences);
+        } else {
+            collection.replaceOne(Filters.eq("_id", preferences.preferencesId()), preferences,
+                    new ReplaceOptions().upsert(true));
+        }
+        return true; // ¯\_(ツ)_/¯
     }
 
     @Override
     public int deleteAllForUser(String userId) {
-        DBObject query = new BasicDBObject();
-        query.put("_id." + USER_ID_SUB_FIELD, userId);
-        final WriteResult<StoredEntityListPreferences, StoredEntityListPreferencesId> result = this.db.remove(query);
-        return result.getN();
+        return Ints.saturatedCast(collection.deleteMany(Filters.eq("_id." + USER_ID_SUB_FIELD, userId))
+                .getDeletedCount());
     }
 }

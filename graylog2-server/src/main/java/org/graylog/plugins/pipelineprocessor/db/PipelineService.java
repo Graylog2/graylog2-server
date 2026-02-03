@@ -19,15 +19,42 @@ package org.graylog.plugins.pipelineprocessor.db;
 import org.graylog2.database.NotFoundException;
 
 import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public interface PipelineService {
-    PipelineDao save(PipelineDao pipeline);
+    default PipelineDao save(PipelineDao pipeline) {
+        return save(pipeline, true);
+    }
+
+    PipelineDao save(PipelineDao pipeline, boolean checkMutability);
 
     PipelineDao load(String id) throws NotFoundException;
 
     PipelineDao loadByName(String name) throws NotFoundException;
 
+    /**
+     * Returns all pipelines that include rules with the given source pattern, ignoring pipelines
+     * that are not connected to any streams.
+     *
+     * This method is only implemented in the MongoDB implementation.
+     */
+    default Collection<PipelineDao> loadBySourcePattern(String sourcePattern) {
+        throw new UnsupportedOperationException("loadBySourcePattern is not implemented");
+    }
+
     Collection<PipelineDao> loadAll();
 
     void delete(String id);
+
+    default Set<PipelineDao> loadByIds(Set<String> pipelineIds) {
+        return pipelineIds.stream().flatMap(id -> {
+            try {
+                return Stream.of(load(id));
+            } catch (NotFoundException e) {
+                return Stream.empty();
+            }
+        }).collect(Collectors.toSet());
+    }
 }

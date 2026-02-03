@@ -36,9 +36,7 @@ type RestApiOverviewProps = {
   node: any;
 };
 
-const RestApiOverview = ({
-  node,
-}: RestApiOverviewProps) => {
+const RestApiOverview = ({ node }: RestApiOverviewProps) => {
   const { transport_address, last_seen } = node;
 
   return (
@@ -46,7 +44,9 @@ const RestApiOverview = ({
       <dt>Transport address:</dt>
       <dd>{transport_address}</dd>
       <dt>Last seen:</dt>
-      <dd><RelativeTime dateTime={last_seen} /></dd>
+      <dd>
+        <RelativeTime dateTime={last_seen} />
+      </dd>
     </StyledDl>
   );
 };

@@ -18,10 +18,10 @@ package org.graylog2.lookup;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.Streams;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupCacheKey;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
+import org.graylog2.plugin.lookup.LookupPreview;
 import org.graylog2.plugin.lookup.LookupResult;
 
 import javax.annotation.Nonnull;
@@ -37,7 +37,6 @@ import static com.google.common.collect.Streams.stream;
  * Multiple lookup tables can use the same caches and adapters.
  */
 @AutoValue
-@WithBeanGetter
 public abstract class LookupTable {
 
     @Nullable
@@ -131,6 +130,14 @@ public abstract class LookupTable {
         final LookupResult result = dataAdapter().assignTtl(key, ttlSec);
         cache().purge(LookupCacheKey.create(dataAdapter(), key));
         return result;
+    }
+
+    public boolean supportsPreview() {
+        return dataAdapter().supportsPreview();
+    }
+
+    public LookupPreview getPreview(int size) {
+        return dataAdapter().getPreview(size);
     }
 
     @AutoValue.Builder

@@ -19,11 +19,13 @@ import * as React from 'react';
 import EmailNotificationForm from './EmailNotificationForm';
 
 type EmailNotificationFormContainerProps = {
- config: any;
- validation: any;
- onChange: (...args: any[]) => void;
+  config: any;
+  validation: any;
+  onChange: (...args: any[]) => void;
 };
 
-const EmailNotificationFormContainer = (props: EmailNotificationFormContainerProps) => <EmailNotificationForm {...props} />;
+const EmailNotificationFormContainer = (props: EmailNotificationFormContainerProps) => (
+  <EmailNotificationForm {...props} />
+);
 
 export default EmailNotificationFormContainer;

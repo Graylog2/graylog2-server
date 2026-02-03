@@ -19,7 +19,7 @@ import * as React from 'react';
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 
 type Props = {
-  rule: StreamOutputFilterRule,
+  rule: StreamOutputFilterRule;
 };
 
 const FilterRuleItem = ({ rule }: Props) => (

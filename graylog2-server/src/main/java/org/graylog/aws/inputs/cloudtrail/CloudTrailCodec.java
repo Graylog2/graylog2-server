@@ -19,24 +19,32 @@ package org.graylog.aws.inputs.cloudtrail;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog.aws.AWS;
 import org.graylog.aws.AWSObjectMapper;
 import org.graylog.aws.inputs.cloudtrail.json.CloudTrailRecord;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.Codec;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.Optional;
+
+import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_OVERRIDE_SOURCE;
+import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.Config.getOverrideSourceFieldDefinition;
 
 public class CloudTrailCodec extends AbstractCodec {
     public static final String NAME = "AWSCloudTrail";
+    public static final String CK_INCLUDE_FULL_MESSAGE_JSON = "include_full_message_json";
 
     private final ObjectMapper objectMapper;
     private final MessageFactory messageFactory;
@@ -49,21 +57,34 @@ public class CloudTrailCodec extends AbstractCodec {
         this.messageFactory = messageFactory;
     }
 
-    @Nullable
     @Override
-    public Message decode(@Nonnull RawMessage rawMessage) {
+    public Optional<Message> decodeSafe(@Nonnull RawMessage rawMessage) {
         try {
             final CloudTrailRecord record = objectMapper.readValue(rawMessage.getPayload(), CloudTrailRecord.class);
-            final String source = configuration.getString(Config.CK_OVERRIDE_SOURCE, "aws-cloudtrail");
-            final Message message = messageFactory.createMessage(record.getConstructedMessage(), source, DateTime.parse(record.eventTime));
+            final Message message = messageFactory.createMessage(record.getConstructedMessage(), "aws-cloudtrail", DateTime.parse(record.eventTime));
 
             message.addFields(record.additionalFieldsAsMap());
             message.addField("full_message", record.getFullMessage());
             message.addField(AWS.SOURCE_GROUP_IDENTIFIER, true);
 
-            return message;
+            // Store full CloudTrail event as JSON if configured
+            if (configuration.getBoolean(CK_INCLUDE_FULL_MESSAGE_JSON)) {
+                final String fullMessageJson = record.getFullMessageJson(objectMapper);
+                if (fullMessageJson != null) {
+                    message.addField("full_message_json", fullMessageJson);
+                }
+            }
+
+            // Apply override_source if configured
+            final String overrideSourceValue = configuration.getString(CK_OVERRIDE_SOURCE);
+            if (StringUtils.isNotBlank(overrideSourceValue)) {
+                message.setSource(overrideSourceValue);
+            }
+
+            return Optional.of(message);
         } catch (Exception e) {
-            throw new RuntimeException("Could not deserialize CloudTrail record.", e);
+            throw InputProcessingException.create("Could not deserialize CloudTrail record.",
+                    e, rawMessage, new String(rawMessage.getPayload(), charset));
         }
     }
 
@@ -83,5 +104,17 @@ public class CloudTrailCodec extends AbstractCodec {
 
     @ConfigClass
     public static class Config extends AbstractCodec.Config {
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            final ConfigurationRequest r = new ConfigurationRequest();
+            r.addField(getOverrideSourceFieldDefinition());
+            r.addField(new BooleanField(
+                    CK_INCLUDE_FULL_MESSAGE_JSON,
+                    "Include full_message_json?",
+                    false,
+                    "Store the complete CloudTrail event as JSON in the full_message_json field?"
+            ));
+            return r;
+        }
     }
 }

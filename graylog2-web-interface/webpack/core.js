@@ -17,12 +17,15 @@
 const path = require('path');
 
 const webpack = require('webpack');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const { EsbuildPlugin } = require('esbuild-loader');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const { CycloneDxWebpackPlugin } = require('@cyclonedx/webpack-plugin');
+const { defineReactCompilerLoaderOption, reactCompilerLoader } = require('react-compiler-webpack');
 
 const UniqueChunkIdPlugin = require('./UniqueChunkIdPlugin');
+
+const disableTsc = process.env.disable_tsc === 'true';
 
 const getCssLoaderOptions = (target) => {
   // Development
@@ -63,15 +66,24 @@ const sortChunks = (c1, c2) => {
   return 0;
 };
 
+const esbuildLoader = (supportedBrowsers) => ({
+  loader: 'esbuild-loader',
+  options: {
+    target: supportedBrowsers,
+  },
+});
+
+const reactCompiler = {
+  loader: reactCompilerLoader,
+  options: defineReactCompilerLoaderOption({
+    target: '18',
+  }),
+};
+
 const rules = (target, supportedBrowsers) => [
   {
     test: /\.[jt]s(x)?$/,
-    use: {
-      loader: 'esbuild-loader',
-      options: {
-        target: supportedBrowsers,
-      },
-    },
+    use: [reactCompiler, esbuildLoader(supportedBrowsers)],
     exclude: /node_modules\/(?!(@react-hook|uuid|@?react-leaflet|graylog-web-plugin))|\.node_cache/,
   },
   {
@@ -160,7 +172,15 @@ const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) 
         new webpack.DefinePlugin({
           DEVELOPMENT: true,
         }),
-        new ForkTsCheckerWebpackPlugin(),
+        ...(disableTsc
+          ? []
+          : [
+              new ForkTsCheckerWebpackPlugin({
+                typescript: {
+                  memoryLimit: 4096,
+                },
+              }),
+            ]),
       ],
     });
   }
@@ -192,9 +212,11 @@ const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) 
           },
         },
         moduleIds: 'deterministic',
-        minimizer: [new EsbuildPlugin({
-          target: supportedBrowsers,
-        })],
+        minimizer: [
+          new EsbuildPlugin({
+            target: supportedBrowsers,
+          }),
+        ],
       },
       plugins: [
         new webpack.DefinePlugin({

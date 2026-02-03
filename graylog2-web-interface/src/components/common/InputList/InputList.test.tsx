@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { components } from 'react-select';
 import type { InputProps, MultiValueRemoveProps, ClearIndicatorProps } from 'react-select';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import InputList from './InputList';
@@ -37,17 +37,21 @@ const renderComponent = (onChange: (e: React.BaseSyntheticEvent) => void, values
     } = props;
 
     return (
-      <div {...restInnerProps} ref={ref}><div>{children}</div></div>
+      <div {...restInnerProps} ref={ref}>
+        <div>{children}</div>
+      </div>
     );
   };
 
   return render(
-    <InputList id="testList"
-               name="testList"
-               values={values}
-               isClearable
-               onChange={onChange}
-               components={{ Input, MultiValueRemove, ClearIndicator }} />,
+    <InputList
+      id="testList"
+      name="testList"
+      values={values}
+      isClearable
+      onChange={onChange}
+      components={{ Input, MultiValueRemove, ClearIndicator }}
+    />,
   );
 };
 
@@ -59,41 +63,42 @@ describe('InputList Component', () => {
     expect(screen.getByText(/dir2/i)).toBeVisible();
   });
 
-  it('should add a value when input has value and [TAB] or [Enter] is pressed', () => {
+  it('should add a value when input has value and [TAB] or [Enter] is pressed', async () => {
     renderComponent(() => {});
     const rawInput = screen.getByTitle(/testListInput/i);
 
-    fireEvent.change(rawInput, { target: { value: 'dir3' } });
-    fireEvent.keyDown(rawInput, { key: 'Tab' });
+    await userEvent.type(rawInput, 'dir3');
+    await userEvent.keyboard('{Tab}');
 
-    fireEvent.change(rawInput, { target: { value: 'dir4' } });
-    fireEvent.keyDown(rawInput, { key: 'Enter' });
+    await userEvent.type(rawInput, 'dir4');
+    await userEvent.keyboard('{Enter}');
 
     expect(screen.getByText(/dir3/i)).toBeVisible();
     expect(screen.getByText(/dir4/i)).toBeVisible();
   });
 
-  it('should remove the last value added when [Backspace] is pressed', () => {
+  it('should remove the last value added when [Backspace] is pressed', async () => {
     renderComponent(() => {}, ['dir3', 'dir4']);
     const rawInput = screen.getByTitle(/testListInput/i);
 
     expect(screen.getByText(/dir3/i)).toBeVisible();
     expect(screen.getByText(/dir4/i)).toBeVisible();
 
-    fireEvent.keyDown(rawInput, { key: 'Backspace' });
+    await userEvent.click(rawInput);
+    await userEvent.keyboard('{Backspace}');
 
     expect(screen.getByText(/dir3/i)).toBeVisible();
-    expect(screen.queryByText(/dir4/i)).not.toBeInTheDocument();
+    await screen.findByText(/option dir4, deselected/i);
   });
 
-  it('should remove a value when clicking the "X" on the value bubble', () => {
+  it('should remove a value when clicking the "X" on the value bubble', async () => {
     renderComponent(() => {}, ['dir3', 'dir4']);
     let removers = screen.getAllByText(/value\s*remover/i);
 
     expect(screen.getByText(/dir3/i)).toBeVisible();
     expect(screen.getByText(/dir4/i)).toBeVisible();
 
-    fireEvent.click(removers[0]);
+    await userEvent.click(removers[0]);
 
     removers = screen.getAllByText(/value\s*remover/i);
 
@@ -101,7 +106,7 @@ describe('InputList Component', () => {
     expect(screen.getByText(/option dir4, selected/i)).toBeVisible();
   });
 
-  it('should clear all values when clicking the clear trigger "X"', () => {
+  it('should clear all values when clicking the clear trigger "X"', async () => {
     renderComponent(() => {}, ['dir5', 'dir6', 'dir7']);
     const clearAll = screen.getByText(/clear\s*all/i);
 
@@ -109,14 +114,14 @@ describe('InputList Component', () => {
     expect(screen.getByText(/dir6/i)).toBeVisible();
     expect(screen.getByText(/dir7/i)).toBeVisible();
 
-    userEvent.click(clearAll);
+    await userEvent.click(clearAll);
 
     expect(screen.queryByText(/dir5/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/dir6/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/dir7/i)).not.toBeInTheDocument();
   });
 
-  it('should return an event with a target an a list of values of the requested type', () => {
+  it('should return an event with a target an a list of values of the requested type', async () => {
     const checkOnChange = jest.fn((e: React.BaseSyntheticEvent) => {
       expect(e.target.name).toEqual('testList');
       expect(e.target.value).toEqual(['dir1', 'dir2', 'dir3']);
@@ -125,7 +130,7 @@ describe('InputList Component', () => {
     renderComponent(checkOnChange, ['dir1', 'dir2']);
 
     const rawInput = screen.getByTitle(/testListInput/i);
-    fireEvent.change(rawInput, { target: { value: 'dir3' } });
-    fireEvent.keyDown(rawInput, { key: 'Tab' });
+    await userEvent.type(rawInput, 'dir3');
+    await userEvent.keyboard('{Tab}');
   });
 });

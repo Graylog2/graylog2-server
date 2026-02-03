@@ -16,7 +16,11 @@
  */
 package org.graylog.datanode.opensearch.cli;
 
+import jakarta.annotation.Nonnull;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
+import org.graylog.datanode.process.Environment;
+
+import java.nio.file.Path;
 
 /**
  * Collection of opensearch CLI tools. All of them need to have OPENSEARCH_PATH_CONF preconfigured, so they operate
@@ -25,13 +29,27 @@ import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 public class OpensearchCli {
 
     private final OpensearchKeystoreCli keystore;
+    private final OpensearchPluginCli plugin;
 
     public OpensearchCli(OpensearchConfiguration config) {
-        this.keystore = new OpensearchKeystoreCli(config);
+        this(config.getEnv(), getBinDir(config));
+    }
+
+    public OpensearchCli(Environment env, Path binDir) {
+        this.keystore = new OpensearchKeystoreCli(binDir, env);
+        this.plugin = new OpensearchPluginCli(binDir, env);
+    }
+
+    @Nonnull
+    private static Path getBinDir(OpensearchConfiguration config) {
+        return config.getOpensearchDistribution().getOpensearchBinDirPath();
     }
 
     public OpensearchKeystoreCli keystore() {
         return keystore;
     }
 
+    public OpensearchPluginCli plugin() {
+        return plugin;
+    }
 }

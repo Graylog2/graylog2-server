@@ -21,28 +21,34 @@ import { Select, Spinner, Icon } from 'components/common';
 import { Row, Col, Button, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
-import FormUtils from 'util/FormsUtils';
 import ToolsStore from 'stores/tools/ToolsStore';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 
-type LookupTableExtractorConfigurationProps = {
+type Props = {
   configuration: any;
   exampleMessage?: string;
   onChange: (...args: any[]) => void;
   onExtractorPreviewLoad: (...args: any[]) => void;
 };
 
-class LookupTableExtractorConfiguration extends React.Component<LookupTableExtractorConfigurationProps, {
-  [key: string]: any;
-}> {
+class LookupTableExtractorConfiguration extends React.Component<
+  Props,
+  {
+    trying: boolean;
+    lookupTables: any;
+  }
+> {
   static defaultProps = {
     exampleMessage: '',
   };
 
-  state = {
-    trying: false,
-    lookupTables: undefined,
-  };
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      trying: false,
+      lookupTables: undefined,
+    };
+  }
 
   componentDidMount() {
     // TODO the 10k items is bad. we need a searchable/scrollable long list select box
@@ -58,8 +64,6 @@ class LookupTableExtractorConfiguration extends React.Component<LookupTableExtra
     newConfig[key] = value;
     this.props.onChange(newConfig);
   };
-
-  _onChange = (key) => (event) => this._updateConfigValue(key, FormUtils.getValueFromInput(event.target));
 
   _onSelect = (key) => (value) => this._updateConfigValue(key, value);
 
@@ -85,7 +89,8 @@ class LookupTableExtractorConfiguration extends React.Component<LookupTableExtra
     promise.finally(() => this.setState({ trying: false }));
   };
 
-  _isTryButtonDisabled = () => this.state.trying || !this.props.configuration.lookup_table_name || !this.props.exampleMessage;
+  _isTryButtonDisabled = () =>
+    this.state.trying || !this.props.configuration.lookup_table_name || !this.props.exampleMessage;
 
   render() {
     if (!this.state.lookupTables) {
@@ -102,19 +107,21 @@ class LookupTableExtractorConfiguration extends React.Component<LookupTableExtra
 
     return (
       <div>
-        <Input id="lookup_table_name"
-               label="Lookup Table"
-               labelClassName="col-md-2"
-               wrapperClassName="col-md-10"
-               help={helpMessage}>
+        <Input
+          id="lookup_table_name"
+          label="Lookup Table"
+          labelClassName="col-md-2"
+          wrapperClassName="col-md-10"
+          help={helpMessage}>
           <Row className="row-sm">
             <Col md={11}>
-              <Select placeholder="Select a lookup table"
-                      clearable={false}
-                      options={lookupTables}
-                      matchProp="label"
-                      onChange={this._onSelect('lookup_table_name')}
-                      value={this.props.configuration.lookup_table_name} />
+              <Select
+                placeholder="Select a lookup table"
+                clearable={false}
+                options={lookupTables}
+                onChange={this._onSelect('lookup_table_name')}
+                value={this.props.configuration.lookup_table_name}
+              />
             </Col>
             <Col md={1} className="text-right">
               <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>

@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixed bug preventing Search Filters on Aggregation event defintions from working."
+
+issues = ["21726", "graylog-plugin-enterprise#8852"]
+pulls = ["22100"]

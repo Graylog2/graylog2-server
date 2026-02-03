@@ -15,3 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 export type ValidationState = 'error' | 'success' | 'warning';
+export type TimeUnit = 'NANOSECONDS' | 'MICROSECONDS' | 'MILLISECONDS' | 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS';
+
+export type MarkdownConfigType = {
+  allow_all_image_sources: boolean;
+  allowed_image_sources: string;
+};

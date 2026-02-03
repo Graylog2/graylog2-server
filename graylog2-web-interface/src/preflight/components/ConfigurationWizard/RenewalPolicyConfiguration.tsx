@@ -20,18 +20,19 @@ import styled from 'styled-components';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import moment from 'moment';
 
-import { Title, Space, Button, Group, NumberInput, Input } from 'preflight/components/common';
-import UserNotification from 'preflight/util/UserNotification';
+import { Title, Space, Group, NumberInput, Input } from 'preflight/components/common';
+import Button from 'components/bootstrap/Button';
+import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import Select from 'preflight/components/common/Select';
 import { QUERY_KEY as RENEWAL_POLICY_QUERY_KEY } from 'preflight/hooks/useRenewalPolicy';
 
 type FormValues = {
-  renewal_policy: 'Automatic' | 'Manual',
-  lifetime_value: number,
-  lifetime_unit: 'hours' | 'days' | 'months' | 'years',
-}
+  renewal_policy: 'Automatic' | 'Manual';
+  lifetime_value: number;
+  lifetime_unit: 'hours' | 'days' | 'months' | 'years';
+};
 
 const createPolicy = ({ renewal_policy, lifetime_unit, lifetime_value }: FormValues) => {
   const lifetime = moment.duration(lifetime_value, lifetime_unit);
@@ -40,12 +41,7 @@ const createPolicy = ({ renewal_policy, lifetime_unit, lifetime_value }: FormVal
     certificate_lifetime: lifetime.toISOString(),
   };
 
-  return fetch(
-    'POST',
-    qualifyUrl('/api/renewal_policy'),
-    payload,
-    false,
-  );
+  return fetch('POST', qualifyUrl('/api/renewal_policy'), payload, false);
 };
 
 const StyledForm = styled(Form)`
@@ -80,11 +76,14 @@ const defaultFormValues = {
 const RenewalPolicyConfiguration = () => {
   const queryClient = useQueryClient();
 
-  const { mutateAsync: onCreateRenewalPolicy } = useMutation(createPolicy, {
+  const { mutateAsync: onCreateRenewalPolicy } = useMutation({
+    mutationFn: createPolicy,
+
     onSuccess: () => {
       UserNotification.success('Renewal policy created successfully');
-      queryClient.invalidateQueries(RENEWAL_POLICY_QUERY_KEY);
+      queryClient.invalidateQueries({ queryKey: RENEWAL_POLICY_QUERY_KEY });
     },
+
     onError: (error) => {
       UserNotification.error(`Renewal policy creation failed with error: ${error}`);
     },
@@ -96,41 +95,52 @@ const RenewalPolicyConfiguration = () => {
     <>
       <Title order={3}>Configure Renewal Policy</Title>
       <p>
-        In this step you can configure if certificates which are close to expiration should be renewed automatically.<br />
-        If you choose manual renewal, a system notification will show up when the expiration date is near, requiring you to confirm renewal.
+        In this step you can configure if certificates which are close to expiration should be renewed automatically.
+        <br />
+        If you choose manual renewal, a system notification will show up when the expiration date is near, requiring you
+        to confirm renewal.
       </p>
       <Space h="md" />
-      <Formik initialValues={defaultFormValues} onSubmit={(formValues: FormValues) => onSubmit(formValues)} validate={validateForm}>
+      <Formik
+        initialValues={defaultFormValues}
+        onSubmit={(formValues: FormValues) => onSubmit(formValues)}
+        validate={validateForm}>
         {({ isSubmitting, isValid, setFieldValue, errors }) => (
           <StyledForm>
             <Field name="renewal_policy">
               {({ field: { value, name } }) => (
-                <Select placeholder="Select Renewal Policy"
-                        data={['Automatic', 'Manual']}
-                        required
-                        value={value}
-                        onChange={(newPolicy) => setFieldValue(name, newPolicy)}
-                        label="Renewal Policy" />
+                <Select
+                  placeholder="Select Renewal Policy"
+                  data={['Automatic', 'Manual']}
+                  required
+                  value={value}
+                  onChange={(newPolicy) => setFieldValue(name, newPolicy)}
+                  label="Renewal Policy"
+                />
               )}
             </Field>
             <Input.Label required>Certificate lifetime</Input.Label>
             <Group>
               <Field name="lifetime_value">
                 {({ field: { name, value } }) => (
-                  <NumberInput value={value}
-                               onChange={(newValue) => setFieldValue(name, newValue)}
-                               required
-                               placeholder="Enter lifetime"
-                               step={1} />
+                  <NumberInput
+                    value={value}
+                    onChange={(newValue) => setFieldValue(name, newValue)}
+                    required
+                    placeholder="Enter lifetime"
+                    step={1}
+                  />
                 )}
               </Field>
               <Field name="lifetime_unit">
                 {({ field: { name, value } }) => (
-                  <Select placeholder="Select Unit"
-                          data={unitOptions}
-                          required
-                          value={value}
-                          onChange={(unit) => setFieldValue(name, unit)} />
+                  <Select
+                    placeholder="Select Unit"
+                    data={unitOptions}
+                    required
+                    value={value}
+                    onChange={(unit) => setFieldValue(name, unit)}
+                  />
                 )}
               </Field>
             </Group>
@@ -142,7 +152,6 @@ const RenewalPolicyConfiguration = () => {
         )}
       </Formik>
     </>
-
   );
 };
 

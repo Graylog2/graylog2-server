@@ -24,10 +24,18 @@ import java.util.function.Function;
 
 public enum NodeStatMetrics {
     CPU_LOAD("float", new RollupAction.IsmRollup.AvgMetric(), "$.os.cpu.load_average.1m"),
+    CPU_PERCENT("integer", new RollupAction.IsmRollup.AvgMetric(), "$.os.cpu.percent"),
     MEM_FREE("float", new RollupAction.IsmRollup.AvgMetric(), "$.os.mem.free_in_bytes", NodeStatMetrics::bytesToMb),
+    MEM_TOTAL("float", new RollupAction.IsmRollup.AvgMetric(), "$.os.mem.total_in_bytes", NodeStatMetrics::bytesToGb),
+    MEM_TOTAL_USED_BYTES("float", new RollupAction.IsmRollup.AvgMetric(), "$.os.mem.used_in_bytes", NodeStatMetrics::bytesToGb),
     MEM_TOTAL_USED("integer", new RollupAction.IsmRollup.AvgMetric(), "$.os.mem.used_percent"),
+    MEM_HEAP_USED_BYTES("integer", new RollupAction.IsmRollup.AvgMetric(), "$.jvm.mem.heap_used_in_bytes", NodeStatMetrics::bytesToGb),
     MEM_HEAP_USED("integer", new RollupAction.IsmRollup.AvgMetric(), "$.jvm.mem.heap_used_percent"),
+    MEM_HEAP_MAX("integer", new RollupAction.IsmRollup.AvgMetric(), "$.jvm.mem.heap_max_in_bytes", NodeStatMetrics::bytesToGb),
     DISK_FREE("float", new RollupAction.IsmRollup.AvgMetric(), "$.fs.total.available_in_bytes", NodeStatMetrics::bytesToGb),
+    DISK_USED("float", new RollupAction.IsmRollup.AvgMetric(), "$.fs.total.total_in_bytes", NodeStatMetrics::bytesToGb),
+    INDEX_TOTAL("integer", new RollupAction.IsmRollup.AvgMetric(), "$.indices.indexing.index_total"),
+    INDEX_TOTAL_TIME("integer", new RollupAction.IsmRollup.AvgMetric(), "$.indices.indexing.index_time_in_millis"),
     THREAD_POOL_WRITE_THREADS("integer", new RollupAction.IsmRollup.AvgMetric(), "$.thread_pool.write.threads"),
     THREAD_POOL_WRITE_QUEUE("integer", new RollupAction.IsmRollup.AvgMetric(), "$.thread_pool.write.queue"),
     THREAD_POOL_WRITE_REJECTED("integer", new RollupAction.IsmRollup.AvgMetric(), "$.thread_pool.write.rejected"),
@@ -86,6 +94,15 @@ public enum NodeStatMetrics {
             return value;
         }
         return mappingFunction.apply(value);
+    }
+
+    public static String getMetricRegistryName(String fieldName) {
+        NodeStatMetrics metric = valueOf(fieldName.toUpperCase(Locale.ROOT));
+        return metric.getMetricRegistryName();
+    }
+
+    public String getMetricRegistryName() {
+        return "opensearch" + nodeStat.substring(1);
     }
 
 }

@@ -16,8 +16,9 @@
  */
 package org.graylog2.database.utils;
 
-import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.ReplaceOptions;
 import org.bson.types.ObjectId;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.ScopedEntity;
 
@@ -27,7 +28,7 @@ import java.util.Optional;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 
-public class ScopedEntityMongoUtils<T extends ScopedEntity> {
+public class ScopedEntityMongoUtils<T extends ScopedEntity<?>> {
     private final MongoCollection<T> collection;
     private final EntityScopeService entityScopeService;
 
@@ -52,6 +53,20 @@ public class ScopedEntityMongoUtils<T extends ScopedEntity> {
     }
 
     /**
+     * Performs a valid scope and mutability check before updating an existing entity or inserting it if it doesn't
+     * already exist.
+     *
+     * @param entity ScopedEntity to be updated
+     * @return the newly updated entity
+     */
+    public T upsert(T entity) {
+        ensureValidScope(entity);
+        ensureMutability(entity);
+        collection.replaceOne(idEq(Objects.requireNonNull(entity.id())), entity, new ReplaceOptions().upsert(true));
+        return entity;
+    }
+
+    /**
      * Performs a valid scope check before inserting the entity into the DB.
      *
      * @param entity ScopedEntity to be created
@@ -69,7 +84,11 @@ public class ScopedEntityMongoUtils<T extends ScopedEntity> {
      * @return true if a document was deleted, false otherwise.
      */
     public boolean deleteById(String id) {
-        return deleteById(new ObjectId(id));
+        return deleteById(new ObjectId(id), true);
+    }
+
+    public boolean deleteById(String id, boolean checkMutability) {
+        return deleteById(new ObjectId(id), checkMutability);
     }
 
     /**
@@ -78,11 +97,13 @@ public class ScopedEntityMongoUtils<T extends ScopedEntity> {
      * @param id the document's id.
      * @return true if a document was deleted, false otherwise.
      */
-    public boolean deleteById(ObjectId id) {
+    public boolean deleteById(ObjectId id, boolean checkMutability) {
         final T entity = Optional.ofNullable(collection.find(idEq(id)).first())
                 .orElseThrow(() -> new IllegalArgumentException("Entity not found"));
         ensureDeletability(entity);
-        ensureMutability(entity);
+        if (checkMutability) {
+            ensureMutability(entity);
+        }
         return collection.deleteOne(idEq(id)).getDeletedCount() > 0;
     }
 
@@ -97,6 +118,20 @@ public class ScopedEntityMongoUtils<T extends ScopedEntity> {
         return collection.deleteOne(idEq(id)).getDeletedCount();
     }
 
+    /**
+     * Updates an existing entity without checking for mutability. Do not call this method for API requests for the user
+     * interface.
+     *
+     * @param entity ScopedEntity to be updated
+     * @return the newly updated entity
+     */
+    public T forceUpdate(T entity) {
+        Objects.requireNonNull(entity.id());
+        ensureValidScope(entity);
+        collection.replaceOne(idEq(Objects.requireNonNull(entity.id())), entity);
+        return entity;
+    }
+
     public final boolean isMutable(T scopedEntity) {
         Objects.requireNonNull(scopedEntity, "Entity must not be null");
 
@@ -104,9 +139,14 @@ public class ScopedEntityMongoUtils<T extends ScopedEntity> {
         // Else, the entity does not exist in the database, This could be a new entity--check it
         Optional<T> current = scopedEntity.id() == null ? Optional.empty()
                 : Optional.ofNullable(collection.find(idEq(scopedEntity.id())).first());
+        if (current.isPresent() && (!current.get().scope().equals(scopedEntity.scope()))) {
+            throw new IllegalArgumentException("Entity scope cannot be modified.");
+        }
         return current
                 .map(t -> entityScopeService.isMutable(t, scopedEntity))
-                .orElseGet(() -> entityScopeService.isMutable(scopedEntity));
+                // If no current entity exists, this isn't a mutation it's a creation so we just confirm
+                // the scope is valid.
+                .orElseGet(() -> entityScopeService.hasValidScope(scopedEntity));
     }
 
     public final boolean isDeletable(T scopedEntity) {

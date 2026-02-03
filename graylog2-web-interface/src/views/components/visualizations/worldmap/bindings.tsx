@@ -20,9 +20,9 @@ import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualiz
 import WorldMapVisualization from 'views/components/visualizations/worldmap/WorldMapVisualization';
 
 export type WorldMapVisualizationConfigFormValues = {
-  zoom: number,
-  centerX: number,
-  centerY: number,
+  zoom: number;
+  centerX: number;
+  centerY: number;
 };
 
 const DEFAULT_FORM_VALUES = {
@@ -48,7 +48,8 @@ const worldMap: VisualizationType<typeof WorldMapVisualization.type> = {
         centerY: config.viewport.center[1],
       };
     },
-    toConfig: (formValues: WorldMapVisualizationConfigFormValues) => WorldMapVisualizationConfig.create(Viewport.create([formValues.centerX, formValues.centerY], formValues.zoom)),
+    toConfig: (formValues: WorldMapVisualizationConfigFormValues) =>
+      WorldMapVisualizationConfig.create(Viewport.create([formValues.centerX, formValues.centerY], formValues.zoom)),
     fields: [
       {
         name: 'zoom',
@@ -72,7 +73,6 @@ const worldMap: VisualizationType<typeof WorldMapVisualization.type> = {
       },
     ],
   },
-
 };
 
 export default worldMap;

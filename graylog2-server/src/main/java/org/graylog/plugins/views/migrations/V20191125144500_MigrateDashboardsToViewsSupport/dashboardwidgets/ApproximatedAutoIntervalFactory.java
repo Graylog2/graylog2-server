@@ -63,7 +63,7 @@ public class ApproximatedAutoIntervalFactory {
 
     private static Double scalingForAutoTimeRange(long durationOfTimeRangeInSeconds, Duration durationOfTimeRange) {
         final Duration autoIntervalDuration = boundaries.get(Duration.ofSeconds(durationOfTimeRangeInSeconds));
-        return (double) autoIntervalDuration.getSeconds() / (double) durationOfTimeRange.getSeconds();
+        return (double) autoIntervalDuration.toSeconds() / (double) durationOfTimeRange.toSeconds();
     }
 
     private static Duration parseInterval(String interval) {

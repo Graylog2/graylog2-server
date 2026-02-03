@@ -39,7 +39,6 @@ import jakarta.inject.Named;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.map.config.DatabaseType;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
@@ -360,7 +359,6 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
     }
 
     @AutoValue
-    @WithBeanGetter
     @JsonAutoDetect
     @JsonDeserialize(builder = AutoValue_MaxmindDataAdapter_Config.Builder.class)
     @JsonTypeName(NAME)

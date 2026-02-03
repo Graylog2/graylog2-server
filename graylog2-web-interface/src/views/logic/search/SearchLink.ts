@@ -18,24 +18,26 @@ import * as Immutable from 'immutable';
 import URI from 'urijs';
 
 import Routes from 'routing/Routes';
-import type { QueryString, TimeRange } from 'views/logic/queries/Query';
+import type { TimeRange } from 'views/logic/queries/Query';
 import { timeRangeToQueryParameter } from 'views/logic/TimeRange';
 import { addToQuery, escape } from 'views/logic/queries/QueryHelper';
+import type { QueryString } from 'views/logic/queries/types';
 
 type InternalState = {
-  id: string,
-  timerange: TimeRange,
-  query: QueryString,
-  streams: Array<string>,
-  streamCategories: Array<string>,
-  highlightedMessage: string,
-  filterFields: { [key: string]: unknown },
+  id: string;
+  timerange: TimeRange;
+  query: QueryString;
+  streams: Array<string>;
+  streamCategories: Array<string>;
+  highlightedMessage: string;
+  filterFields: { [key: string]: unknown };
 };
 
-const _mergeFilterFieldsToQuery = (query: QueryString, filterFields: { [key: string]: unknown } = {}) => Object.keys(filterFields)
-  .filter((key) => (filterFields[key] !== null && filterFields[key] !== undefined))
-  .map((key) => `${key}:"${escape(String(filterFields[key]))}"`)
-  .reduce((prev, cur) => addToQuery(prev, cur), query ? query.query_string : '');
+const _mergeFilterFieldsToQuery = (query: QueryString, filterFields: { [key: string]: unknown } = {}) =>
+  Object.keys(filterFields)
+    .filter((key) => filterFields[key] !== null && filterFields[key] !== undefined)
+    .map((key) => `${key}:"${escape(String(filterFields[key]))}"`)
+    .reduce((prev, cur) => addToQuery(prev, cur), query ? query.query_string : '');
 
 export default class SearchLink {
   _value: InternalState;
@@ -105,18 +107,16 @@ export default class SearchLink {
       highlightMessage: highlightedMessage,
     };
 
-    const paramsWithStreams = streams && streams.length > 0
-      ? { ...params, streams: streams.join(',') }
-      : params;
+    const paramsWithStreams = streams && streams.length > 0 ? { ...params, streams: streams.join(',') } : params;
 
-    const paramsWithStreamsAndCategories = streamCategories && streamCategories.length > 0
-      ? { ...params, stream_categories: streamCategories.join(',') }
-      : paramsWithStreams;
+    const paramsWithStreamsAndCategories =
+      streamCategories && streamCategories.length > 0
+        ? { ...params, stream_categories: streamCategories.join(',') }
+        : paramsWithStreams;
 
     const urlPrefix = id ? `${Routes.SEARCH}/${id}` : Routes.SEARCH;
 
-    const uri = new URI(urlPrefix)
-      .setSearch(paramsWithStreamsAndCategories);
+    const uri = new URI(urlPrefix).setSearch(paramsWithStreamsAndCategories);
 
     return uri.toString();
   }
@@ -160,15 +160,7 @@ class Builder {
   }
 
   build() {
-    const {
-      id,
-      timerange,
-      query,
-      streams,
-      streamCategories,
-      highlightedMessage,
-      filterFields,
-    } = this.value.toObject();
+    const { id, timerange, query, streams, streamCategories, highlightedMessage, filterFields } = this.value.toObject();
 
     return new SearchLink(id, timerange, query, streams, streamCategories, highlightedMessage, filterFields);
   }

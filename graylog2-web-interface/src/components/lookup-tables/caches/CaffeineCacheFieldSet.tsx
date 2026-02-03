@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useEffect, useImperativeHandle, useState } from 'react';
 import { useFormikContext } from 'formik';
 
 import { Input } from 'components/bootstrap';
@@ -23,14 +24,15 @@ import type { LookupTableCache, LookupTableCacheConfig } from 'logic/lookup-tabl
 import { getValueFromInput } from 'util/FormsUtils';
 
 type Props = {
-  config: LookupTableCacheConfig,
+  config: LookupTableCacheConfig;
 };
 
 const CaffeineCacheFieldSet = ({ config }: Props, ref: any) => {
-  const { values, setValues, errors }: { values: Partial<LookupTableCache>, setValues: any, errors: any } = useFormikContext();
-  const [stateConfig, setStateConfig] = React.useState<LookupTableCacheConfig>({ ...config });
+  const { values, setValues, errors }: { values: Partial<LookupTableCache>; setValues: any; errors: any } =
+    useFormikContext();
+  const [stateConfig, setStateConfig] = useState<LookupTableCacheConfig>({ ...config });
 
-  React.useEffect(() => setStateConfig({ ...config }), [config]);
+  useEffect(() => setStateConfig({ ...config }), [config]);
 
   const validateConfig = () => {
     const configErrors: any = {};
@@ -41,8 +43,8 @@ const CaffeineCacheFieldSet = ({ config }: Props, ref: any) => {
     return configErrors;
   };
 
-  React.useImperativeHandle(ref, () => ({
-    validate: () => (validateConfig()),
+  useImperativeHandle(ref, () => ({
+    validate: () => validateConfig(),
   }));
 
   const handleIgnoreNullChange = (event) => {
@@ -68,52 +70,62 @@ const CaffeineCacheFieldSet = ({ config }: Props, ref: any) => {
 
   return (
     <fieldset ref={ref}>
-      <FormikFormGroup type="text"
-                       name="config.max_size"
-                       label="* Maximum entries"
-                       required
-                       help={errors.config?.max_size ? null : 'The limit of the number of entries the cache keeps in memory.'}
-                       labelClassName="col-sm-3"
-                       wrapperClassName="col-sm-9" />
-      <TimeUnitInput label="Expire after access"
-                     help="If enabled, entries are removed from the cache after the specified time from when they were last used."
-                     update={handleUpdate('expire_after_access')}
-                     name="config.expire_after_access"
-                     unitName="config.expire_after_access_unit"
-                     value={stateConfig.expire_after_access}
-                     unit={stateConfig.expire_after_access_unit || 'SECONDS'}
-                     defaultEnabled={config.expire_after_access > 0}
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9" />
-      <TimeUnitInput label="Expire after write"
-                     help="If enabled, entries are removed from the cache after the specified time from when they were first used."
-                     update={handleUpdate('expire_after_write')}
-                     name="config.expire_after_write"
-                     unitName="config.expire_after_write_unit"
-                     value={stateConfig.expire_after_write}
-                     unit={stateConfig.expire_after_write_unit || 'SECONDS'}
-                     defaultEnabled={config.expire_after_write > 0}
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9" />
-      <Input type="checkbox"
-             id="ignore_null"
-             name="ignore_null"
-             label="Ignore empty results"
-             checked={stateConfig.ignore_null}
-             onChange={handleIgnoreNullChange}
-             help="When enabled, empty lookup results will be ignored and not cached."
-             wrapperClassName="col-md-offset-3 col-md-9" />
-      <TimeUnitInput label="TTL for empty results"
-                     help="Empty results are removed from the cache after the specified time."
-                     update={handleUpdate('ttl_empty')}
-                     name="config.ttl_empty"
-                     unitName="config.ttl_empty_unit"
-                     value={stateConfig.ttl_empty}
-                     unit={stateConfig.ttl_empty_unit || 'SECONDS'}
-                     enabled={!stateConfig.ignore_null}
-                     hideCheckbox
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9" />
+      <FormikFormGroup
+        type="text"
+        name="config.max_size"
+        label="* Maximum entries"
+        required
+        help={errors.config?.max_size ? null : 'The limit of the number of entries the cache keeps in memory.'}
+        labelClassName="col-sm-3"
+        wrapperClassName="col-sm-9"
+      />
+      <TimeUnitInput
+        label="Expire after access"
+        help="If enabled, entries are removed from the cache after the specified time from when they were last used."
+        update={handleUpdate('expire_after_access')}
+        name="config.expire_after_access"
+        unitName="config.expire_after_access_unit"
+        value={stateConfig.expire_after_access}
+        unit={stateConfig.expire_after_access_unit || 'SECONDS'}
+        defaultEnabled={config.expire_after_access > 0}
+        labelClassName="col-sm-3"
+        wrapperClassName="col-sm-9"
+      />
+      <TimeUnitInput
+        label="Expire after write"
+        help="If enabled, entries are removed from the cache after the specified time from when they were first used."
+        update={handleUpdate('expire_after_write')}
+        name="config.expire_after_write"
+        unitName="config.expire_after_write_unit"
+        value={stateConfig.expire_after_write}
+        unit={stateConfig.expire_after_write_unit || 'SECONDS'}
+        defaultEnabled={config.expire_after_write > 0}
+        labelClassName="col-sm-3"
+        wrapperClassName="col-sm-9"
+      />
+      <Input
+        type="checkbox"
+        id="ignore_null"
+        name="ignore_null"
+        label="Ignore empty results"
+        checked={stateConfig.ignore_null}
+        onChange={handleIgnoreNullChange}
+        help="When enabled, empty lookup results will be ignored and not cached."
+        wrapperClassName="col-md-offset-3 col-md-9"
+      />
+      <TimeUnitInput
+        label="TTL for empty results"
+        help="Empty results are removed from the cache after the specified time."
+        update={handleUpdate('ttl_empty')}
+        name="config.ttl_empty"
+        unitName="config.ttl_empty_unit"
+        value={stateConfig.ttl_empty}
+        unit={stateConfig.ttl_empty_unit || 'SECONDS'}
+        enabled={!stateConfig.ignore_null}
+        hideCheckbox
+        labelClassName="col-sm-3"
+        wrapperClassName="col-sm-9"
+      />
     </fieldset>
   );
 };

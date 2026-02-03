@@ -123,7 +123,9 @@ describe('<TimeUnitInput />', () => {
   });
 
   it('should use required and enabled when hideCheckbox is set', async () => {
-    const { rerender } = render(<TimeUnitInput update={() => {}} required enabled={false} defaultEnabled={false} hideCheckbox />);
+    const { rerender } = render(
+      <TimeUnitInput update={() => {}} required enabled={false} defaultEnabled={false} hideCheckbox />,
+    );
 
     expect(queryCheckbox()).not.toBeInTheDocument();
     expect(await findTimeInput()).toBeEnabled();
@@ -159,9 +161,7 @@ describe('<TimeUnitInput />', () => {
     it('should use undefined when clearing input', async () => {
       const onUpdate = jest.fn();
 
-      render(
-        <TimeUnitInput update={onUpdate} defaultEnabled clearable value={9} defaultValue={42} />,
-      );
+      render(<TimeUnitInput update={onUpdate} defaultEnabled clearable value={9} defaultValue={42} />);
 
       userEvent.type(await findTimeInput(), '{backspace}');
       await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(undefined, 'SECONDS', true));
@@ -170,18 +170,14 @@ describe('<TimeUnitInput />', () => {
     it('should use undefined when input receives some text', async () => {
       const onUpdate = jest.fn();
 
-      render(
-        <TimeUnitInput update={onUpdate} defaultEnabled clearable value={9} defaultValue={42} />,
-      );
+      render(<TimeUnitInput update={onUpdate} defaultEnabled clearable value={9} defaultValue={42} />);
 
       userEvent.type(await findTimeInput(), '{backspace}adasd');
       await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(undefined, 'SECONDS', true));
     });
 
     it('should render empty string when value is undefined', async () => {
-      render(
-        <TimeUnitInput update={() => {}} defaultEnabled clearable value={undefined} defaultValue={42} />,
-      );
+      render(<TimeUnitInput update={() => {}} defaultEnabled clearable value={undefined} defaultValue={42} />);
 
       expect(await findTimeInput()).toHaveValue(null);
     });

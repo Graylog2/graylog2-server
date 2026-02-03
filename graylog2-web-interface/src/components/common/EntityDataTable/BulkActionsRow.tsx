@@ -31,14 +31,15 @@ const SelectedEntitiesAmount = styled.div`
 `;
 
 type Props = {
-  bulkActions: React.ReactNode,
+  bulkActions: React.ReactNode;
+  className?: string;
 };
 
-const BulkActionsRow = ({ bulkActions }: Props) => {
+const BulkActionsRow = ({ bulkActions, className = undefined }: Props) => {
   const { selectedEntities } = useSelectedEntities();
 
   return (
-    <Container>
+    <Container className={className}>
       {bulkActions}
       {!!selectedEntities.length && (
         <SelectedEntitiesAmount>

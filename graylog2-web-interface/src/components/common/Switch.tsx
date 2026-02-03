@@ -19,45 +19,49 @@ import type { MantineStyleProp } from '@mantine/core';
 import { Switch as MantineSwitch } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
-const StyledSwitch = styled(MantineSwitch)(({ theme }) => css`
-  .mantine-Switch-label {
-    font-weight: normal;
-    font-size: ${theme.fonts.size.body};
-  }
-`);
+const StyledSwitch = styled(MantineSwitch)(
+  ({ theme }) => css`
+    .mantine-Switch-label {
+      font-weight: normal;
+      font-size: ${theme.fonts.size.body};
+    }
+  `,
+);
 
 type Props = {
-  'aria-label'?: string,
-  checked: boolean,
-  className?: string,
-  disabled?: boolean,
-  id?: string,
-  label?: string
-  name?: string,
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
-  style?: MantineStyleProp,
-}
+  'aria-label'?: string;
+  checked: boolean;
+  className?: string;
+  disabled?: boolean;
+  id?: string;
+  label?: string;
+  name?: string;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  style?: MantineStyleProp;
+};
 
 const Switch = ({
-  'aria-label': ariaLabel,
+  'aria-label': ariaLabel = undefined,
   checked,
-  className,
-  disabled,
-  id,
-  label,
-  name,
+  className = undefined,
+  disabled = undefined,
+  id = undefined,
+  label = undefined,
+  name = undefined,
   onChange,
-  style,
+  style = undefined,
 }: Props) => (
-  <StyledSwitch aria-label={ariaLabel}
-                className={className}
-                checked={checked}
-                disabled={disabled}
-                id={id}
-                label={label}
-                name={name}
-                onChange={onChange}
-                style={style} />
+  <StyledSwitch
+    aria-label={ariaLabel}
+    className={className}
+    checked={checked}
+    disabled={disabled}
+    id={id}
+    label={label}
+    name={name}
+    onChange={onChange}
+    style={style}
+  />
 );
 
 export default Switch;

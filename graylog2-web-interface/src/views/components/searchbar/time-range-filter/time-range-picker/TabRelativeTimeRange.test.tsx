@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
+import userEvent from '@testing-library/user-event';
 
 import MockStore from 'helpers/mocking/StoreMock';
 import MockAction from 'helpers/mocking/MockAction';
@@ -51,15 +52,14 @@ const initialValues = {
   activeTab: 'relative',
 };
 
-const renderSUT = (allProps = defaultProps, initialFormValues = initialValues) => render(
-  <Formik initialValues={initialFormValues}
-          onSubmit={() => {}}
-          validateOnMount>
-    <Form>
-      <TabRelativeTimeRange {...allProps} />
-    </Form>
-  </Formik>,
-);
+const renderSUT = (allProps = defaultProps, initialFormValues = initialValues) =>
+  render(
+    <Formik initialValues={initialFormValues} onSubmit={() => {}} validateOnMount>
+      <Form>
+        <TabRelativeTimeRange {...allProps} />
+      </Form>
+    </Formik>,
+  );
 
 const fromRangeValue = () => screen.findByRole('spinbutton', { name: /set the from value/i });
 const toRangeValue = () => screen.findByRole('spinbutton', { name: /set the to value/i });
@@ -112,7 +112,9 @@ describe('TabRelativeTimeRange', () => {
 
     renderSUT(undefined, initialFormValues);
 
-    expect((await screen.findByRole('spinbutton', { name: /Set the from value/i }) as HTMLInputElement).value).toBe('5');
+    expect(((await screen.findByRole('spinbutton', { name: /Set the from value/i })) as HTMLInputElement).value).toBe(
+      '5',
+    );
     expect((screen.getByRole('spinbutton', { name: /Set the to value/i }) as HTMLInputElement).value).toBe('4');
   });
 
@@ -123,7 +125,7 @@ describe('TabRelativeTimeRange', () => {
 
     expect(await fromRangeValue()).not.toBeDisabled();
 
-    fireEvent.click(allTimeCheckbox);
+    await userEvent.click(allTimeCheckbox);
 
     expect(await fromRangeValue()).toBeDisabled();
   });
@@ -135,7 +137,7 @@ describe('TabRelativeTimeRange', () => {
 
     expect(await toRangeValue()).toBeDisabled();
 
-    fireEvent.click(nowCheckbox);
+    await userEvent.click(nowCheckbox);
 
     expect(await toRangeValue()).not.toBeDisabled();
   });

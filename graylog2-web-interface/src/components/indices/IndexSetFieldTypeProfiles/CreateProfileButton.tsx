@@ -23,7 +23,7 @@ import { LinkContainer } from 'components/common/router';
 
 const CreateProfileButton = () => (
   <LinkContainer to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.CREATE}>
-    <Button bsStyle="success">Create profile</Button>
+    <Button bsStyle="primary">Create profile</Button>
   </LinkContainer>
 );
 

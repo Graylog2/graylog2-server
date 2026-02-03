@@ -19,7 +19,7 @@ import * as React from 'react';
 import usePluginEntities from 'hooks/usePluginEntities';
 
 type Props = {
-  children: React.ReactElement,
+  children: React.ReactElement;
 };
 
 const PageContextProviders = ({ children }: Props) => {
@@ -29,11 +29,10 @@ const PageContextProviders = ({ children }: Props) => {
     return children;
   }
 
-  return contextProviders.reduce((nestedChildren, PageContextProvider) => (
-    <PageContextProvider>
-      {nestedChildren}
-    </PageContextProvider>
-  ), children);
+  return contextProviders.reduce(
+    (nestedChildren, PageContextProvider) => <PageContextProvider>{nestedChildren}</PageContextProvider>,
+    children,
+  );
 };
 
 export default PageContextProviders;

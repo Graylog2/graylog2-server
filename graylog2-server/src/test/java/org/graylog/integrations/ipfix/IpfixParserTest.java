@@ -19,10 +19,10 @@ package org.graylog.integrations.ipfix;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.Resources;
 import io.netty.buffer.ByteBuf;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -37,8 +37,8 @@ public class IpfixParserTest {
             Resources.getResource("ipfix-iana-elements.json")
     );
 
-    @Rule
-    public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    public File temporaryFolder;
 
     @Test
     public void shallowParsePacket() throws IOException {

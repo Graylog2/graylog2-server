@@ -23,7 +23,6 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.bson.types.ObjectId;
-import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
@@ -72,11 +71,12 @@ public abstract class ContentPackInstallation {
         return new AutoValue_ContentPackInstallation.Builder();
     }
 
+    public abstract Builder toBuilder();
+
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty(FIELD_ID)
-        @Nullable
-        abstract Builder id(ObjectId id);
+        public abstract Builder id(ObjectId id);
 
         @JsonProperty(FIELD_CONTENT_PACK_ID)
         public abstract Builder contentPackId(ModelId contentPackId);

@@ -26,9 +26,12 @@ type ContentPackEntityConfigProps = {
   parameters?: any[];
 };
 
-class ContentPackEntityConfig extends React.Component<ContentPackEntityConfigProps, {
-  [key: string]: any;
-}> {
+class ContentPackEntityConfig extends React.Component<
+  ContentPackEntityConfigProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     appliedParameter: [],
     parameters: [],
@@ -50,8 +53,8 @@ class ContentPackEntityConfig extends React.Component<ContentPackEntityConfigPro
   _configKeyRowFormatter = (paths) => (configKey) => {
     const path = paths[configKey];
     const parameter = this._getParameterForConfigKey(configKey);
-    const type = parameter ? (<b>{`parameter (${parameter.type})`}</b>) : path.getValueType();
-    const value = parameter ? (<b>{parameter.name}</b>) : path.getValue();
+    const type = parameter ? <b>{`parameter (${parameter.type})`}</b> : path.getValueType();
+    const value = parameter ? <b>{parameter.name}</b> : path.getValue();
 
     return (
       <tr key={configKey}>
@@ -69,11 +72,13 @@ class ContentPackEntityConfig extends React.Component<ContentPackEntityConfigPro
 
     return (
       <div>
-        <DataTable id="entiy-config-list"
-                   headers={['Config Key', 'Type', 'Value']}
-                   filterKeys={[]}
-                   rows={configKeys}
-                   dataRowFormatter={this._configKeyRowFormatter(configPaths)} />
+        <DataTable
+          id="entiy-config-list"
+          headers={['Config Key', 'Type', 'Value']}
+          filterKeys={[]}
+          rows={configKeys}
+          dataRowFormatter={this._configKeyRowFormatter(configPaths)}
+        />
       </div>
     );
   }

@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.grok.GrokPattern;
 
@@ -28,29 +27,28 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class GrokPatternPageList {
     @Nullable
-    @JsonProperty
+    @JsonProperty("query")
     public abstract String query();
 
 
     @JsonProperty("pagination")
     public abstract PaginatedList.PaginationInfo paginationInfo();
 
-    @JsonProperty
+    @JsonProperty("total")
     public abstract long total();
 
     @Nullable
-    @JsonProperty
+    @JsonProperty("sort")
     public abstract String sort();
 
     @Nullable
-    @JsonProperty
+    @JsonProperty("order")
     public abstract String order();
 
-    @JsonProperty
+    @JsonProperty("patterns")
     public abstract Collection<GrokPattern> patterns();
 
 

@@ -18,8 +18,10 @@ import type { DefaultTheme } from 'styled-components';
 
 import { ROOT_FONT_SIZE } from 'theme/constants';
 
+export const getDefaultLabelColor = (theme: DefaultTheme) => theme.colors.text.primary;
+
 const getDefaultPlotFontSettings = (theme: DefaultTheme) => ({
-  color: theme.colors.global.textDefault,
+  color: getDefaultLabelColor(theme),
   size: ROOT_FONT_SIZE * Number(theme.fonts.size.small.replace(/rem|em/i, '')),
   family: theme.fonts.family.body,
 });

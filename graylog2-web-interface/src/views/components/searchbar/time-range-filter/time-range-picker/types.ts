@@ -16,13 +16,13 @@
  */
 
 export type RangeClassified = {
-  value: number,
-  unit: 'minutes' | 'seconds' | 'hours' | 'days',
-  isAllTime: boolean,
-}
+  value: number;
+  unit: 'minutes' | 'seconds' | 'hours' | 'days';
+  isAllTime: boolean;
+};
 
 export type RelativeTimeRangeClassified = {
-  type: 'relative',
-  from: RangeClassified,
-  to: RangeClassified,
-}
+  type: 'relative';
+  from: RangeClassified;
+  to: RangeClassified;
+};

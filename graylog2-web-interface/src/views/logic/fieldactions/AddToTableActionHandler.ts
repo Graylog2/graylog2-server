@@ -17,22 +17,19 @@
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import type Widget from 'views/logic/widgets/Widget';
 import type { ActionHandlerCondition, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
 
 type Contexts = { widget: Widget };
 
-const AddToTableActionHandler = ({
-  field,
-  contexts: { widget },
-}: ActionHandlerArguments<{ widget?: Widget }>) => (dispatch: AppDispatch) => {
-  const newFields = [].concat(widget.config.fields, [field]);
-  const newConfig = widget.config.toBuilder()
-    .fields(newFields)
-    .build();
+const AddToTableActionHandler =
+  ({ field, contexts: { widget } }: ActionHandlerArguments<{ widget?: Widget }>) =>
+  (dispatch: ViewsDispatch) => {
+    const newFields = [].concat(widget.config.fields, [field]);
+    const newConfig = widget.config.toBuilder().fields(newFields).build();
 
-  return dispatch(updateWidgetConfig(widget.id, newConfig));
-};
+    return dispatch(updateWidgetConfig(widget.id, newConfig));
+  };
 
 const isEnabled: ActionHandlerCondition<Contexts> = ({ contexts: { widget }, field }) => {
   if (MessagesWidget.isMessagesWidget(widget) && widget.config) {

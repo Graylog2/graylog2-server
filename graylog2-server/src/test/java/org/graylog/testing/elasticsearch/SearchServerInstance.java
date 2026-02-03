@@ -16,7 +16,6 @@
  */
 package org.graylog.testing.elasticsearch;
 
-import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog2.storage.SearchVersion;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
@@ -27,8 +26,6 @@ import java.util.Map;
 public interface SearchServerInstance extends Closeable {
     Client client();
 
-    SearchServer searchServer();
-
     FixtureImporter fixtureImporter();
 
     GenericContainer<?> createContainer(SearchVersion version, Network network, String heapSize, Map<String, String> env);
@@ -38,6 +35,8 @@ public interface SearchServerInstance extends Closeable {
     String internalUri();
 
     SearchVersion version();
+
+    String instanceId();
 
     void importFixtureResource(String resourcePath, Class<?> testClass);
 

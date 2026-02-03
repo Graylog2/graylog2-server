@@ -1,0 +1,6 @@
+type = "c"
+message = "Make default settings for creating new tokens more secure."
+
+pulls = ["23333"]
+issues = ["21856"]
+

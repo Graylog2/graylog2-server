@@ -19,15 +19,18 @@ package org.graylog.storage.elasticsearch7;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import org.graylog.events.search.MoreSearchAdapter;
+import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.shaded.elasticsearch7.org.apache.http.client.CredentialsProvider;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog.storage.elasticsearch7.client.ESCredentialsProvider;
+import org.graylog.storage.elasticsearch7.client.IndexerHostsAdapterES7;
 import org.graylog.storage.elasticsearch7.fieldtypes.streams.StreamsForFieldRetrieverES7;
 import org.graylog.storage.elasticsearch7.migrations.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateES7;
 import org.graylog.storage.elasticsearch7.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEventsES7;
 import org.graylog2.indexer.IndexToolsAdapter;
+import org.graylog2.indexer.client.IndexerHostsAdapter;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
@@ -36,10 +39,12 @@ import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.searches.SearchesAdapter;
+import org.graylog2.indexer.security.SecurityAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.VersionAwareModule;
 import org.graylog2.storage.SearchVersion;
@@ -61,9 +66,9 @@ public class Elasticsearch7Module extends VersionAwareModule {
         bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterES7.class);
         bindForSupportedVersion(DataStreamAdapter.class).to(DataStreamAdapterES7.class);
         if (useComposableIndexTemplates) {
-            bind(IndexTemplateAdapter.class).to(ComposableIndexTemplateAdapter.class);
+            bindForSupportedVersion(IndexTemplateAdapter.class).to(ComposableIndexTemplateAdapter.class);
         } else {
-            bind(IndexTemplateAdapter.class).to(LegacyIndexTemplateAdapter.class);
+            bindForSupportedVersion(IndexTemplateAdapter.class).to(LegacyIndexTemplateAdapter.class);
         }
 
         bindForSupportedVersion(IndexFieldTypePollerAdapter.class).to(IndexFieldTypePollerAdapterES7.class);
@@ -87,6 +92,10 @@ public class Elasticsearch7Module extends VersionAwareModule {
         bind(CredentialsProvider.class).toProvider(ESCredentialsProvider.class);
 
         bindForSupportedVersion(RemoteReindexingMigrationAdapter.class).to(UnsupportedRemoteReindexingMigrationAdapterES7.class);
+        bindForSupportedVersion(DatanodeUpgradeServiceAdapter.class).to(DatanodeUpgradeServiceAdapterES7.class);
+
+        bindForSupportedVersion(IndexerHostsAdapter.class).to(IndexerHostsAdapterES7.class);
+        bindForSupportedVersion(SecurityAdapter.class).to(SecurityAdapterES7.class);
     }
 
     private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass) {

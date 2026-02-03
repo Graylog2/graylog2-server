@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
 import {
   ControlLabel,
@@ -50,9 +51,16 @@ type JSONValueInputProps = {
   wrapperClassName?: string;
 };
 
-class JSONValueInput extends React.Component<JSONValueInputProps, {
-  [key: string]: any;
-}> {
+const StyledFormGroup = styled(FormGroup)`
+  padding: 0 15px;
+`;
+
+class JSONValueInput extends React.Component<
+  JSONValueInputProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     value: '',
     valueType: 'STRING',
@@ -95,23 +103,36 @@ class JSONValueInput extends React.Component<JSONValueInputProps, {
   };
 
   render() {
-    const options = OPTIONS.filter((o) => this.props.allowedTypes.indexOf(o.value) > -1).map((o) => <MenuItem key={o.value} onSelect={() => this._onValueTypeSelect(o.value)}>{o.label}</MenuItem>);
+    const options = OPTIONS.filter((o) => this.props.allowedTypes.indexOf(o.value) > -1).map((o) => (
+      <MenuItem key={o.value} onSelect={() => this._onValueTypeSelect(o.value)}>
+        {o.label}
+      </MenuItem>
+    ));
 
     return (
-      <FormGroup validationState={this.props.validationState}>
+      <StyledFormGroup validationState={this.props.validationState}>
         {this.props.label && <ControlLabel className={this.props.labelClassName}>{this.props.label}</ControlLabel>}
         <InputWrapper className={this.props.wrapperClassName}>
           <InputGroup>
-            <FormControl type="text" onChange={this._onUpdate} onBlur={this.props.onBlur} value={this.state.value} required={this.props.required} />
-            <DropdownButton id="input-dropdown-addon"
-                            bsStyle={this.props.validationState === 'error' ? 'danger' : 'default'}
-                            title={OPTIONS.filter((o) => o.value === this.props.valueType)[0].label}>
-              {options}
-            </DropdownButton>
+            <FormControl
+              type="text"
+              onChange={this._onUpdate}
+              onBlur={this.props.onBlur}
+              value={this.state.value}
+              required={this.props.required}
+            />
+            <InputGroup.Button>
+              <DropdownButton
+                id="input-dropdown-addon"
+                bsStyle={this.props.validationState === 'error' ? 'danger' : 'default'}
+                title={OPTIONS.filter((o) => o.value === this.props.valueType)[0].label}>
+                {options}
+              </DropdownButton>
+            </InputGroup.Button>
           </InputGroup>
           {this.props.help && <HelpBlock>{this.props.help}</HelpBlock>}
         </InputWrapper>
-      </FormGroup>
+      </StyledFormGroup>
     );
   }
 }

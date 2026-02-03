@@ -28,9 +28,7 @@ type CurrentUserProviderProps = {
   children: React.ReactNode;
 };
 
-const CurrentUserProvider = ({
-  children,
-}: CurrentUserProviderProps) => {
+const CurrentUserProvider = ({ children }: CurrentUserProviderProps) => {
   const currentUserJSON = useStore(CurrentUserStore, (state) => get(state, 'currentUser'));
   const currentUser = currentUserJSON ? User.fromJSON(currentUserJSON) : undefined;
 
@@ -38,11 +36,7 @@ const CurrentUserProvider = ({
     return <Spinner />;
   }
 
-  return (
-    <CurrentUserContext.Provider value={currentUser}>
-      {children}
-    </CurrentUserContext.Provider>
-  );
+  return <CurrentUserContext.Provider value={currentUser}>{children}</CurrentUserContext.Provider>;
 };
 
 export default CurrentUserProvider;

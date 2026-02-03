@@ -22,6 +22,9 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
+import java.util.Optional;
+
 @AutoValue
 @JsonTypeName(AreaVisualizationConfigDTO.NAME)
 @JsonDeserialize(builder = AreaVisualizationConfigDTO.Builder.class)
@@ -35,6 +38,9 @@ public abstract class AreaVisualizationConfigDTO implements VisualizationConfigD
     @JsonProperty(FIELD_AXIS_TYPE)
     public abstract AxisType axisType();
 
+    @JsonProperty(FIELD_AXIS_CONFIG)
+    public abstract Optional<AxisConfig> axisConfig();
+
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty(FIELD_INTERPOLATION)
@@ -42,6 +48,9 @@ public abstract class AreaVisualizationConfigDTO implements VisualizationConfigD
 
         @JsonProperty(FIELD_AXIS_TYPE)
         public abstract Builder axisType(AxisType axisType);
+
+        @JsonProperty(FIELD_AXIS_CONFIG)
+        public abstract Builder axisConfig(@Nullable AxisConfig axisConfig);
 
         public abstract AreaVisualizationConfigDTO build();
 

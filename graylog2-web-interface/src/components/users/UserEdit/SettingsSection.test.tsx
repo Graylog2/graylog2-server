@@ -14,24 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
-import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import { List } from 'immutable';
 
+import selectEvent from 'helpers/selectEvent';
 import { alice } from 'fixtures/users';
 import SharedEntity from 'logic/permissions/SharedEntity';
 import Grantee from 'logic/permissions/Grantee';
 
 import SettingsSection from './SettingsSection';
 
-const sharedEntity = SharedEntity
-  .builder()
+const sharedEntity = SharedEntity.builder()
   .id('grn::::dashboard:57bc9188e62a2373778d9e03')
   .type('dashboard')
   .title('Security Data')
-  .owners(List([Grantee.builder().id('foo-id').title('alice').type('user')
-    .build()]))
+  .owners(List([Grantee.builder().id('foo-id').title('alice').type('user').build()]))
   .build();
 
 const mockList = Promise.resolve({ list: List.of(sharedEntity) });
@@ -42,10 +41,7 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
   },
 }));
 
-const exampleUser = alice.toBuilder()
-  .sessionTimeoutMs(36000000)
-  .timezone('Europe/Berlin')
-  .build();
+const exampleUser = alice.toBuilder().sessionTimeoutMs(36000000).timezone('Europe/Berlin').build();
 
 describe('<SettingsSection />', () => {
   it('should use user settings as initial values', async () => {
@@ -54,7 +50,7 @@ describe('<SettingsSection />', () => {
 
     const submitButton = screen.getByText('Update Settings');
 
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(onSubmitStub).toHaveBeenCalledTimes(1));
 
@@ -70,20 +66,18 @@ describe('<SettingsSection />', () => {
     render(<SettingsSection user={exampleUser} onSubmit={(data) => onSubmitStub(data)} />);
 
     const timeoutAmountInput = await screen.findByPlaceholderText('Timeout amount');
-    const timeoutUnitSelect = screen.getByLabelText('Timeout unit');
-    const timezoneSelect = screen.getByLabelText('Time Zone');
     const submitButton = screen.getByText('Update Settings');
 
     expect(timeoutAmountInput).toHaveValue(10);
 
     await screen.findByText('Hours');
 
-    fireEvent.change(timeoutAmountInput, { target: { value: '40' } });
+    await userEvent.clear(timeoutAmountInput);
+    await userEvent.type(timeoutAmountInput, '40');
 
-    await selectEvent.select(timeoutUnitSelect, 'Days');
-
-    await selectEvent.select(timezoneSelect, 'Vancouver');
-    fireEvent.click(submitButton);
+    await selectEvent.chooseOption('Timeout unit', 'Days');
+    await selectEvent.chooseOption('Time Zone', 'Vancouver');
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(onSubmitStub).toHaveBeenCalledTimes(1));
 

@@ -19,22 +19,20 @@ package org.graylog2.system.stats.elasticsearch;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class IndicesStats {
-    @JsonProperty
+    @JsonProperty("index_count")
     public abstract int indexCount();
 
-    @JsonProperty
+    @JsonProperty("store_size")
     public abstract long storeSize();
 
-    @JsonProperty
+    @JsonProperty("field_data_size")
     public abstract long fieldDataSize();
 
-    @JsonProperty
+    @JsonProperty("id_cache_size")
     public abstract long idCacheSize();
 
     @Deprecated

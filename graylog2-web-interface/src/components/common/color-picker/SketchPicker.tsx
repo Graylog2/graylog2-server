@@ -17,21 +17,25 @@
 import { SketchPicker } from 'react-color';
 import styled, { css } from 'styled-components';
 
-export default styled(SketchPicker)(({ theme }) => css`
-  background-color: ${theme.colors.global.background} !important;
-  box-shadow: ${theme.colors.global.navigationBoxShadow} 0 0 2px 1px, ${theme.colors.global.navigationBoxShadow} 0 5px 5px !important;
-  
-  &::after {
-    border-right-color: ${theme.colors.global.background} !important;
-  }
+export default styled(SketchPicker)(
+  ({ theme }) => css`
+    background-color: ${theme.colors.global.background} !important;
+    box-shadow:
+      ${theme.colors.global.navigationBoxShadow} 0 0 2px 1px,
+      ${theme.colors.global.navigationBoxShadow} 0 5px 5px !important;
 
-  input {
-    color: ${theme.colors.input.color} !important;
-    background: ${theme.colors.input.background} !important;
-    border-color: ${theme.colors.input.border} !important;
-    
-    + span {
-      color: ${theme.colors.input.color} !important;
+    &::after {
+      border-right-color: ${theme.colors.global.background} !important;
     }
-  }
-`);
+
+    input {
+      color: ${theme.colors.input.color} !important;
+      background: ${theme.colors.input.background} !important;
+      border-color: ${theme.colors.input.border} !important;
+
+      + span {
+        color: ${theme.colors.input.color} !important;
+      }
+    }
+  `,
+);

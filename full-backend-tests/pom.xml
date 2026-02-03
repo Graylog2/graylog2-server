@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-project-parent</artifactId>
-        <version>6.2.0-SNAPSHOT</version>
+        <version>7.1.0-SNAPSHOT</version>
         <relativePath>../graylog-project-parent</relativePath>
     </parent>
 
@@ -77,6 +77,19 @@
         <dependency>
             <groupId>org.graylog</groupId>
             <artifactId>graylog-storage-opensearch2</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.graylog</groupId>
+            <artifactId>graylog-storage-opensearch3</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.graylog</groupId>
+            <artifactId>graylog-storage-opensearch3</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
@@ -177,7 +190,7 @@
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>elasticsearch</artifactId>
+            <artifactId>testcontainers-elasticsearch</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -185,6 +198,23 @@
             <artifactId>opensearch-testcontainers</artifactId>
             <version>${testcontainers.opensearch.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.polyglot</groupId>
+            <artifactId>polyglot</artifactId>
+            <version>${graalvm.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js</artifactId>
+            <version>${graalvm.version}</version>
+            <type>pom</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
         </dependency>
     </dependencies>
 
@@ -202,6 +232,26 @@
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>de.thetaphi</groupId>
+                <artifactId>forbiddenapis</artifactId>
+                <executions>
+                    <execution>
+                        <id>forbidden-apis-full-backend-test</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCheck</goal>
+                        </goals>
+                        <configuration>
+                            <signatures>
+                                <![CDATA[
+                                    org.junit.jupiter.api.Test @ full-backend-tests must use the @FullBackendTest annotation instead of @Test
+                                ]]>
+                            </signatures>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

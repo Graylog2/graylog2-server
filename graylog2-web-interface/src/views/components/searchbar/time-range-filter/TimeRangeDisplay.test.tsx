@@ -14,19 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import * as React from 'react';
+import userEvent from '@testing-library/user-event';
 
 import TimeRangeDisplay from './TimeRangeDisplay';
 
 describe('TimeRangeDisplay', () => {
-  it('opens the date time range picker on click', () => {
+  it('opens the date time range picker on click', async () => {
     const toggleShow = jest.fn();
     render(<TimeRangeDisplay toggleDropdownShow={toggleShow} timerange={{ type: 'relative', from: 300 }} />);
 
-    const timeRangeDisplay = screen.getByRole('button', { name: 'Search Time Range, Opens Time Range Selector On Click' });
+    const timeRangeDisplay = screen.getByRole('button', {
+      name: 'Search Time Range, Opens Time Range Selector On Click',
+    });
 
-    fireEvent.click(timeRangeDisplay);
+    await userEvent.click(timeRangeDisplay);
 
     expect(toggleShow).toHaveBeenCalled();
   });

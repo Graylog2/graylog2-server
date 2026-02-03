@@ -22,10 +22,10 @@ import useLocation from 'routing/useLocation';
 import type { Pagination } from 'stores/PaginationTypes';
 
 type UseLocationSearchPaginationType = {
-  isInitialized: boolean,
-  pagination: Pagination,
-  setPagination: (nextPagination: Pagination) => void,
-}
+  isInitialized: boolean;
+  pagination: Pagination;
+  setPagination: (nextPagination: Pagination) => void;
+};
 
 const useLocationSearchPagination = (defaultPagination: Pagination): UseLocationSearchPaginationType => {
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ const useLocationSearchPagination = (defaultPagination: Pagination): UseLocation
     const convertToSafePositiveInteger = (maybeNumber: any): number | undefined => {
       const parsedNumber = Number.parseInt(maybeNumber, 10);
 
-      return (Number.isSafeInteger(parsedNumber) && parsedNumber > 0) ? parsedNumber : undefined;
+      return Number.isSafeInteger(parsedNumber) && parsedNumber > 0 ? parsedNumber : undefined;
     };
 
     const parsePaginationFromSearch = (search: string): Pagination => {

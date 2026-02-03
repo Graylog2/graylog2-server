@@ -23,7 +23,5 @@ public interface CertConstants {
     String KEY_GENERATION_ALGORITHM = "RSA";
     String SIGNING_ALGORITHM = "SHA256withRSA";
     String PKCS12 = "PKCS12";
-    @Deprecated
-    String DATANODE_KEY_ALIAS = "datanode";
     String CA_KEY_ALIAS = "ca";
 }

@@ -16,22 +16,24 @@
  */
 package org.graylog.grn;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog2.plugin.database.users.User;
-
-import jakarta.inject.Singleton;
 
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Consumer;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
- * The global {@link GRN} registry.
+ * The global {@link GRNType} registry.
  */
 @Singleton
 public class GRNRegistry {
@@ -40,8 +42,11 @@ public class GRNRegistry {
 
     private final ConcurrentMap<String, GRNType> REGISTRY = new ConcurrentHashMap<>();
 
-    // Don't allow direct instantiation
-    private GRNRegistry() {
+    @Inject
+    public GRNRegistry(Set<GRNTypeProvider> providers) {
+        providers.stream()
+                .flatMap(provider -> provider.getTypes().stream())
+                .forEach(this::registerType);
     }
 
     /**
@@ -50,7 +55,7 @@ public class GRNRegistry {
      * @return the registry
      */
     public static GRNRegistry createEmpty() {
-        return new GRNRegistry();
+        return new GRNRegistry(Set.of());
     }
 
     /**
@@ -69,10 +74,8 @@ public class GRNRegistry {
      * @return the registry
      */
     public static GRNRegistry createWithTypes(Collection<GRNType> types) {
-        final GRNRegistry grnRegistry = new GRNRegistry();
-
+        final GRNRegistry grnRegistry = new GRNRegistry(Set.of());
         types.forEach(grnRegistry::registerType);
-
         return grnRegistry;
     }
 
@@ -159,7 +162,7 @@ public class GRNRegistry {
     /**
      * Registers the given GRN type.
      *
-     * @param type the typt to register
+     * @param type the type to register
      * @throws IllegalStateException when given type is already registered
      */
     public void registerType(GRNType type) {
@@ -170,10 +173,28 @@ public class GRNRegistry {
         }
     }
 
+    /**
+     * Performs the given action for each registered GRN type.
+     *
+     * @param action the action to perform for each GRN type
+     */
+    public void forEach(Consumer<GRNType> action) {
+        REGISTRY.values().forEach(action);
+    }
+
     private String toKey(String type) {
         checkArgument(type != null, "type cannot be null");
         checkArgument(!type.trim().isEmpty(), "type name cannot be empty");
 
         return type.trim().toLowerCase(Locale.US);
+    }
+
+    /**
+     * Checks if a given type is  supported by this registry.
+     *
+     * @param type the type to check for support
+     */
+    public boolean supportsType(String type) {
+        return REGISTRY.containsKey(toKey(type));
     }
 }

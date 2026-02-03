@@ -25,16 +25,17 @@ import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
-import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
 import org.graylog.plugins.pipelineprocessor.simulator.RuleSimulator;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.List;
 import java.util.Map;
@@ -46,7 +47,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class RuleResourceTest {
 
     @Mock
@@ -74,16 +76,13 @@ public class RuleResourceTest {
     RuleSimulator ruleSimulator;
     @Mock
     PipelineRuleService pipelineRuleService;
-    @Mock
-    RuleBuilderService ruleBuilderService;
 
     RuleResource underTest;
 
-    @Before
+    @BeforeEach
     public void setup() {
         underTest = new RuleResource(ruleService, ruleSimulator, pipelineService, ruleMetricsConfigService,
-                pipelineRuleService, paginatedRuleService, functionRegistry,
-                pipelineServiceHelper, streamService, ruleBuilderService);
+                pipelineRuleService, paginatedRuleService, functionRegistry, pipelineServiceHelper);
     }
 
     @Test
@@ -141,7 +140,7 @@ public class RuleResourceTest {
     }
 
     public RuleDao ruleDao(String id, String title) {
-        return RuleDao.create(id, title, null, f("""
+        return RuleDao.create(id, null, title, null, f("""
                 rule "%s"
                 when true
                 then

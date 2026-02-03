@@ -32,29 +32,17 @@ const DescriptionCell = styled.td`
 `;
 
 type Props = {
-  role: Role,
-  users: UserContext[],
+  role: Role;
+  users: UserContext[];
 };
 
-const RolesOverviewItem = ({
-  role: {
-    id,
-    name,
-    description,
-    readOnly,
-  },
-  users,
-}: Props) => (
+const RolesOverviewItem = ({ role: { id, name, description, readOnly }, users }: Props) => (
   <tr key={id}>
     <td className="limited">
-      <Link to={Routes.SYSTEM.AUTHZROLES.show(id)}>
-        {name}
-      </Link>
+      <Link to={Routes.SYSTEM.AUTHZROLES.show(id)}>{name}</Link>
     </td>
     <DescriptionCell>
-      <TextOverflowEllipsis>
-        {description}
-      </TextOverflowEllipsis>
+      <TextOverflowEllipsis>{description}</TextOverflowEllipsis>
     </DescriptionCell>
     <UsersCell users={Immutable.Set(users)} />
     <ActionsCell roleId={id} roleName={name} readOnly={readOnly} />

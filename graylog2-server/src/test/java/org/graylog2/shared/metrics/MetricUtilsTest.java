@@ -25,15 +25,15 @@ import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.UniformReservoir;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class MetricUtilsTest {
 
@@ -50,7 +50,7 @@ public class MetricUtilsTest {
         };
         final Gauge<Long> newGauge = MetricUtils.safelyRegister(metricRegistry, "somename", longGauge);
 
-        assertSame("metric objects are identical", longGauge, newGauge);
+        assertSame(longGauge, newGauge, "metric objects are identical");
 
         try {
             MetricUtils.safelyRegister(metricRegistry, "somename", longGauge);

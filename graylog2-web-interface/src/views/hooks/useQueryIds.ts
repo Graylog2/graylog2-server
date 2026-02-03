@@ -16,10 +16,10 @@
  */
 import { createSelector } from '@reduxjs/toolkit';
 
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectSearchQueries } from 'views/logic/slices/viewSelectors';
 
 const selectQueryIds = createSelector(selectSearchQueries, (queries) => queries.map((q) => q.id).toOrderedSet());
-const useQueryIds = () => useAppSelector(selectQueryIds);
+const useQueryIds = () => useViewsSelector(selectQueryIds);
 
 export default useQueryIds;

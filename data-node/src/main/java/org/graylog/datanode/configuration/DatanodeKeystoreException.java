@@ -16,8 +16,18 @@
  */
 package org.graylog.datanode.configuration;
 
+import java.security.KeyStoreException;
+
 public class DatanodeKeystoreException extends Exception {
     public DatanodeKeystoreException(Throwable cause) {
         super(cause);
+    }
+
+    public DatanodeKeystoreException(String cause) {
+        super(cause);
+    }
+
+    public DatanodeKeystoreException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

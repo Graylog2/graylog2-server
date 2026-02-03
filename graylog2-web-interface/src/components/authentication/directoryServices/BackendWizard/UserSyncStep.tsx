@@ -15,15 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type * as Immutable from 'immutable';
 import { useContext } from 'react';
+import type * as Immutable from 'immutable';
 import type { FormikProps } from 'formik';
 import { Formik, Form, Field } from 'formik';
 import styled from 'styled-components';
 
 import type Role from 'logic/roles/Role';
 import { validateField, formHasErrors } from 'util/FormsUtils';
-import { FormikFormGroup, Select, InputList } from 'components/common';
+import { FormikFormGroup, Select, InputList, TimezoneSelect } from 'components/common';
 import { Alert, Button, ButtonToolbar, Row, Col, Panel, Input } from 'components/bootstrap';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -38,6 +38,7 @@ export const STEP_KEY = 'user-synchronization';
 // to be able to associate backend validation errors with the form
 export const FORM_VALIDATION = {
   defaultRoles: { required: true },
+  defaultUserTimezone: {},
   userFullNameAttribute: { required: true },
   userNameAttribute: { required: true },
   emailAttributes: {},
@@ -47,14 +48,14 @@ export const FORM_VALIDATION = {
 };
 
 type Props = {
-  formRef: React.Ref<FormikProps<WizardFormValues>>,
-  help: { [inputName: string]: React.ReactElement | string | null | undefined },
-  excludedFields: { [inputName: string]: boolean },
-  roles: Immutable.List<Role>,
-  onSubmit: () => void,
-  onSubmitAll: () => Promise<void>,
-  submitAllError: React.ReactNode | null | undefined,
-  validateOnMount: boolean,
+  formRef: React.Ref<FormikProps<WizardFormValues>>;
+  help?: { [inputName: string]: React.ReactElement | string | null | undefined };
+  excludedFields?: { [inputName: string]: boolean };
+  roles: Immutable.List<Role>;
+  onSubmit: () => void;
+  onSubmitAll: () => Promise<void>;
+  submitAllError: React.ReactNode | null | undefined;
+  validateOnMount: boolean;
 };
 const StyledInputList = styled(InputList)`
   margin: auto 15px;
@@ -91,101 +92,136 @@ const UserSyncStep = ({
     });
   };
 
-  const getInitalFormValues = (values: WizardFormValues) => ({ ...values, ...(!excludedFields.emailAttributes && { emailAttributes: values.emailAttributes || [] }) });
+  const getInitalFormValues = (values: WizardFormValues) => ({
+    ...values,
+    ...(!excludedFields.emailAttributes && { emailAttributes: values.emailAttributes || [] }),
+  });
 
   return (
-    <Formik initialValues={getInitalFormValues(stepsState.formValues)}
-            initialErrors={backendValidationErrors}
-            innerRef={formRef}
-            onSubmit={onSubmit}
-            validateOnBlur={false}
-            validateOnChange={false}
-            validateOnMount={validateOnMount}>
+    <Formik
+      initialValues={getInitalFormValues(stepsState.formValues)}
+      initialErrors={backendValidationErrors}
+      innerRef={formRef}
+      onSubmit={onSubmit}
+      validateOnBlur={false}
+      validateOnChange={false}
+      validateOnMount={validateOnMount}>
       {({ isSubmitting, validateForm }) => (
         <Form className="form form-horizontal">
-          <FormikFormGroup help={help.userSearchBase}
-                           label="Search Base DN"
-                           error={backendValidationErrors?.userSearchBase}
-                           name="userSearchBase"
-                           placeholder="Search Base DN"
-                           validate={validateField(FORM_VALIDATION.userSearchBase)} />
+          <FormikFormGroup
+            help={help.userSearchBase}
+            label="Search Base DN"
+            error={backendValidationErrors?.userSearchBase}
+            name="userSearchBase"
+            placeholder="Search Base DN"
+            validate={validateField(FORM_VALIDATION.userSearchBase)}
+          />
 
-          <FormikFormGroup help={help.userSearchPattern}
-                           label="Search Pattern"
-                           name="userSearchPattern"
-                           error={backendValidationErrors?.userSearchPattern}
-                           placeholder="Search Pattern"
-                           validate={validateField(FORM_VALIDATION.userSearchPattern)} />
+          <FormikFormGroup
+            help={help.userSearchPattern}
+            label="Search Pattern"
+            name="userSearchPattern"
+            error={backendValidationErrors?.userSearchPattern}
+            placeholder="Search Pattern"
+            validate={validateField(FORM_VALIDATION.userSearchPattern)}
+          />
 
-          <FormikFormGroup help={help.userNameAttribute}
-                           label="Name Attribute"
-                           name="userNameAttribute"
-                           error={backendValidationErrors?.userNameAttribute}
-                           placeholder="Name Attribute"
-                           validate={validateField(FORM_VALIDATION.userNameAttribute)} />
+          <FormikFormGroup
+            help={help.userNameAttribute}
+            label="Name Attribute"
+            name="userNameAttribute"
+            error={backendValidationErrors?.userNameAttribute}
+            placeholder="Name Attribute"
+            validate={validateField(FORM_VALIDATION.userNameAttribute)}
+          />
 
           {!excludedFields.emailAttributes && (
             <Field name="emailAttributes" validate={validateField(FORM_VALIDATION.emailAttributes)}>
               {({ field: { name, value, onChange }, meta: { error } }) => (
-                <Input bsStyle={error ? 'error' : undefined}
-                       help={help.emailAttributes}
-                       error={error ?? backendValidationErrors?.emailAttributes}
-                       id="email-attributes-input"
-                       label="Email Attributes"
-                       labelClassName="col-sm-3"
-                       wrapperClassName="col-sm-9">
-                  <StyledInputList id="userEmailAttributes"
-                                   placeholder="Email Attributes"
-                                   name={name}
-                                   values={value}
-                                   isClearable
-                                   onChange={onChange} />
+                <Input
+                  bsStyle={error ? 'error' : undefined}
+                  help={help.emailAttributes}
+                  error={error ?? backendValidationErrors?.emailAttributes}
+                  id="email-attributes-input"
+                  label="Email Attributes"
+                  labelClassName="col-sm-3"
+                  wrapperClassName="col-sm-9">
+                  <StyledInputList
+                    id="userEmailAttributes"
+                    placeholder="Email Attributes"
+                    name={name}
+                    values={value}
+                    isClearable
+                    onChange={onChange}
+                  />
                 </Input>
               )}
             </Field>
           )}
-          <FormikFormGroup help={help.userFullNameAttribute}
-                           label="Full Name Attribute"
-                           name="userFullNameAttribute"
-                           placeholder="Full Name Attribute"
-                           error={backendValidationErrors?.userFullNameAttribute}
-                           validate={validateField(FORM_VALIDATION.userFullNameAttribute)} />
+          <FormikFormGroup
+            help={help.userFullNameAttribute}
+            label="Full Name Attribute"
+            name="userFullNameAttribute"
+            placeholder="Full Name Attribute"
+            error={backendValidationErrors?.userFullNameAttribute}
+            validate={validateField(FORM_VALIDATION.userFullNameAttribute)}
+          />
 
           {!excludedFields.userUniqueIdAttribute && (
-            <FormikFormGroup help={help.userUniqueIdAttribute}
-                             label="ID Attribute"
-                             name="userUniqueIdAttribute"
-                             placeholder="ID Attribute"
-                             error={backendValidationErrors?.userUniqueIdAttribute}
-                             validate={validateField(FORM_VALIDATION.userUniqueIdAttribute)} />
+            <FormikFormGroup
+              help={help.userUniqueIdAttribute}
+              label="ID Attribute"
+              name="userUniqueIdAttribute"
+              placeholder="ID Attribute"
+              error={backendValidationErrors?.userUniqueIdAttribute}
+              validate={validateField(FORM_VALIDATION.userUniqueIdAttribute)}
+            />
           )}
 
           <Row>
             <Col sm={9} smOffset={3}>
               <Panel bsStyle="info">
-                Changing the static role assignment will only affect new users created
-                via {stepsState.authBackendMeta.serviceTitle}!
-                Existing user accounts will be updated on their next login, or if you edit their roles manually.
+                Changing the default role and time zone assignments will only affect new users created via{' '}
+                {stepsState.authBackendMeta.serviceTitle}!
               </Panel>
             </Col>
           </Row>
 
           <Field name="defaultRoles" validate={validateField(FORM_VALIDATION.defaultRoles)}>
             {({ field: { name, value, onChange, onBlur }, meta: { error } }) => (
-              <Input bsStyle={error ? 'error' : undefined}
-                     help={help.defaultRoles}
-                     error={error ?? backendValidationErrors?.defaultRoles}
-                     id="default-roles-select"
-                     label="Default Roles"
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9">
-                <Select inputProps={{ 'aria-label': 'Search for roles' }}
-                        multi
-                        onBlur={onBlur}
-                        onChange={(selectedRoles) => onChange({ target: { value: selectedRoles, name } })}
-                        options={rolesOptions}
-                        placeholder="Search for roles"
-                        value={value} />
+              <Input
+                bsStyle={error ? 'error' : undefined}
+                help={help.defaultRoles}
+                error={error ?? backendValidationErrors?.defaultRoles}
+                id="default-roles-select"
+                label="Default Roles"
+                labelClassName="col-sm-3"
+                wrapperClassName="col-sm-9">
+                <Select
+                  multi
+                  onBlur={onBlur}
+                  onChange={(selectedRoles) => onChange({ target: { value: selectedRoles, name } })}
+                  options={rolesOptions}
+                  placeholder="Search for roles"
+                  value={value}
+                />
+              </Input>
+            )}
+          </Field>
+
+          <Field name="defaultUserTimezone">
+            {({ field: { name, value, onChange } }) => (
+              <Input
+                id="default-user-timezone-select"
+                help={help.defaultUserTimezone}
+                label="Default User Time Zone"
+                labelClassName="col-sm-3"
+                wrapperClassName="col-sm-9">
+                <TimezoneSelect
+                  value={value || "Browser's time zone"}
+                  name="timezone"
+                  onChange={(newValue) => onChange({ target: { name, value: newValue } })}
+                />
               </Input>
             )}
           </Field>
@@ -201,21 +237,20 @@ const UserSyncStep = ({
           {submitAllError}
 
           <ButtonToolbar className="pull-right">
-            <Button disabled={isSubmitting}
-                    onClick={() => _onSubmitAll(validateForm)}
-                    type="button">
+            <Button disabled={isSubmitting} onClick={() => _onSubmitAll(validateForm)} type="button">
               Finish & Save Identity Service
             </Button>
-            <Button bsStyle="success"
-                    disabled={isSubmitting}
-                    onClick={() => {
-                      sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.DIRECTORY_NEXT_GROUP_SYNC_CLICKED, {
-                        app_pathname: getPathnameWithoutId(pathname),
-                        app_section: 'directory-service',
-                        app_action_value: 'groupsync-button',
-                      });
-                    }}
-                    type="submit">
+            <Button
+              bsStyle="primary"
+              disabled={isSubmitting}
+              onClick={() => {
+                sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.DIRECTORY_NEXT_GROUP_SYNC_CLICKED, {
+                  app_pathname: getPathnameWithoutId(pathname),
+                  app_section: 'directory-service',
+                  app_action_value: 'groupsync-button',
+                });
+              }}
+              type="submit">
               Next: Group Synchronization
             </Button>
           </ButtonToolbar>

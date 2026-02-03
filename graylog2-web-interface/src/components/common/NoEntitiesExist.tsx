@@ -19,15 +19,13 @@ import * as React from 'react';
 import { Alert } from 'components/bootstrap';
 
 type Props = {
-  children?: React.ReactNode
+  children?: React.ReactNode;
 };
 
 /**
  * Component used to display a simple alert message for an empty entity in Graylog. For more complex messages that
  * explain what that entity is and a link to create a new one please use the EmptyEntity component.
-*/
-const NoEntitiesExist = ({ children = 'No entities exist.' }: Props) => (
-  <Alert className="no-bm">{children}</Alert>
-);
+ */
+const NoEntitiesExist = ({ children = 'No entities exist.' }: Props) => <Alert className="no-bm">{children}</Alert>;
 
 export default NoEntitiesExist;

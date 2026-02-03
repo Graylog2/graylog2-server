@@ -17,9 +17,8 @@
 package org.graylog.testing.fullbackend;
 
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.util.List;
@@ -28,26 +27,23 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.completebackend.Lifecycle.VM;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = VM)
+@GraylogBackendConfiguration(serverLifecycle = VM)
 class MongoDBFixturesWithVMLifecycleIT {
-    private final GraylogApis api;
-
-    public MongoDBFixturesWithVMLifecycleIT(GraylogApis api) {
-        this.api = api;
-    }
+    private static GraylogApis api;
 
     @BeforeAll
-    public void importMongoFixtures() {
-        this.api.backend().importMongoDBFixture("access-token.json", MongoDBFixturesWithVMLifecycleIT.class);
+    static void importMongoFixtures(GraylogApis graylogApis) {
+        api = graylogApis;
+        api.backend().importMongoDBFixture("access-token.json", MongoDBFixturesWithVMLifecycleIT.class);
     }
 
-    @ContainerMatrixTest
-    void oneTokenPresentWithTestMethodA() {
+    @FullBackendTest
+    void tokensPresentWithTestMethodA() {
         assertTokenPresent();
     }
 
-    @ContainerMatrixTest
-    void oneTokenPresentWithTestMethodB() {
+    @FullBackendTest
+    void tokensPresentWithTestMethodB() {
         assertTokenPresent();
     }
 
@@ -63,7 +59,7 @@ class MongoDBFixturesWithVMLifecycleIT {
                 .jsonPath()
                 .getList("tokens");
 
-        assertThat(tokens).hasSize(1);
+        assertThat(tokens).hasSize(2);
     }
 
 }

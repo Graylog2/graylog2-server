@@ -49,6 +49,7 @@ public class MapLiteralExpression extends BaseExpression {
         // evaluate all values for each key and return the resulting map
         return Seq.seq(map)
                 .map(entry -> entry.map2(value -> value.evaluateUnsafe(context)))
+                .filter(entry -> entry.v2 != null) // filter out null values, which would throw exceptions.
                 .toMap(Tuple2::v1, Tuple2::v2);
     }
 

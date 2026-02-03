@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Improve performance of close and delete actions when working with a lot of index sets."
+
+issues = ["18563"]
+pulls = ["21195"]

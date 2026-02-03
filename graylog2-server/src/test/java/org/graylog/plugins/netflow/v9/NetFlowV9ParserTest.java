@@ -20,27 +20,27 @@ import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 import io.netty.buffer.Unpooled;
 import org.graylog.plugins.netflow.flows.EmptyTemplateException;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class NetFlowV9ParserTest {
-    @Rule
-    public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    public File temporaryFolder;
 
     private NetFlowV9FieldTypeRegistry typeRegistry;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         typeRegistry = NetFlowV9FieldTypeRegistry.create();
 

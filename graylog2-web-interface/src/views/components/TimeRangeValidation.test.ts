@@ -26,12 +26,14 @@ jest.mock('stores/tools/ToolsStore', () => ({
 describe('TimeRangeValidation', () => {
   describe('keyword', () => {
     beforeEach(() => {
-      asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.resolve({
-        type: 'absolute',
-        from: '2018-11-14 13:52:38',
-        to: '2018-11-14 13:57:38',
-        timezone: 'Europe/Berlin',
-      }));
+      asMock(ToolsStore.testNaturalDate).mockImplementation(() =>
+        Promise.resolve({
+          type: 'absolute',
+          from: '2018-11-14 13:52:38',
+          to: '2018-11-14 13:57:38',
+          timezone: 'Europe/Berlin',
+        }),
+      );
     });
 
     it('should error on empty keyword', async () => {
@@ -59,12 +61,14 @@ describe('TimeRangeValidation', () => {
     });
 
     it('should error when keyword exceeds limit', async () => {
-      asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.resolve({
-        type: 'absolute',
-        from: '2018-11-14 13:52:38',
-        to: '2018-11-14 13:57:38',
-        timezone: 'Europe/Berlin',
-      }));
+      asMock(ToolsStore.testNaturalDate).mockImplementation(() =>
+        Promise.resolve({
+          type: 'absolute',
+          from: '2018-11-14 13:52:38',
+          to: '2018-11-14 13:57:38',
+          timezone: 'Europe/Berlin',
+        }),
+      );
 
       const errors = await TimeRangeValidation(
         { type: 'keyword', keyword: 'Last ten days' },

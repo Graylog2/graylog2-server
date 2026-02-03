@@ -24,7 +24,8 @@ interface WidgetLike {
   config: Widget['config'];
 }
 
-const defaultTitleGenerator = ({ type }: WidgetLike) => `Untitled ${type.replace('_', ' ').split(' ').map(capitalize).join(' ')}`;
+const defaultTitleGenerator = ({ type }: WidgetLike) =>
+  `Untitled ${type.replace('_', ' ').split(' ').map(capitalize).join(' ')}`;
 
 const defaultTitle = (widget: WidgetLike) => {
   const widgetDef = widgetDefinition(widget.type);

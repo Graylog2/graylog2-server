@@ -19,7 +19,7 @@ package org.graylog.storage.elasticsearch7.testing;
 import org.graylog.testing.completebackend.SearchServerBuilder;
 import org.graylog2.storage.SearchVersion;
 
-public class Elasticsearch7InstanceBuilder  extends SearchServerBuilder<ElasticsearchInstanceES7> {
+public class Elasticsearch7InstanceBuilder extends SearchServerBuilder<ElasticsearchInstanceES7> {
     public Elasticsearch7InstanceBuilder(SearchVersion version) {
         super(version);
     }
@@ -30,6 +30,6 @@ public class Elasticsearch7InstanceBuilder  extends SearchServerBuilder<Elastics
 
     @Override
     protected ElasticsearchInstanceES7 instantiate() {
-        return new ElasticsearchInstanceES7(getVersion(), getHostname(), getNetwork(), getHeapSize(), getFeatureFlags()).init();
+        return new ElasticsearchInstanceES7(getCachedInstance(), getVersion(), getHostname(), getNetwork(), getHeapSize(), getFeatureFlags()).init();
     }
 }

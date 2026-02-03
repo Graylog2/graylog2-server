@@ -19,26 +19,14 @@ import { Set } from 'immutable';
 import Constraint from './Constraint';
 
 describe('Constraint', () => {
-  const constraint1 = Constraint.builder()
-    .type('server')
-    .version('3.0.0')
-    .build();
+  const constraint1 = Constraint.builder().type('server').version('3.0.0').build();
 
-  const constraint2 = Constraint.builder()
-    .type('server')
-    .version('3.0.0')
-    .build();
+  const constraint2 = Constraint.builder().type('server').version('3.0.0').build();
 
-  const constraint3 = Constraint.builder()
-    .type('plugin')
-    .version('3.0.0')
-    .plugin('graylog.plugin.foo')
-    .build();
+  const constraint3 = Constraint.builder().type('plugin').version('3.0.0').plugin('graylog.plugin.foo').build();
 
   it('should be add to a Set without duplication', () => {
-    const set = Set().add(constraint1)
-      .add(constraint2)
-      .add(constraint3);
+    const set = Set().add(constraint1).add(constraint2).add(constraint3);
 
     expect(set.size).toBe(2);
   });

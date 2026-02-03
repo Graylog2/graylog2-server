@@ -16,7 +16,7 @@
  */
 package org.graylog2.rest.models.system.indices;
 
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.rest.resources.system.indexer.responses.DataTieringStatus;
 

@@ -20,26 +20,28 @@ import * as React from 'react';
 import ErrorPage from 'components/errors/ErrorPage';
 import usePluginEntities from 'hooks/usePluginEntities';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import useProductName from 'brand-customization/useProductName';
 
 import type View from './View';
 import processHooks from './processHooks';
 
 const LoadViewError = ({ error }: { error: Error }) => {
+  const productName = useProductName();
   useEffect(() => {
     // eslint-disable-next-line no-console
     console.log(error);
   }, [error]);
 
   return (
-    <ErrorPage title="Something went wrong"
-               description={(
-                 <p>An unknown error has occurred. Please have a look at the following message and the
-                   graylog server log for more information.
-                 </p>
-)}>
-      <pre>
-        {error?.message}
-      </pre>
+    <ErrorPage
+      title="Something went wrong"
+      description={
+        <p>
+          An unknown error has occurred. Please have a look at the following message and the {productName} server log
+          for more information.
+        </p>
+      }>
+      <pre>{error?.message}</pre>
     </ErrorPage>
   );
 };
@@ -47,41 +49,38 @@ const LoadViewError = ({ error }: { error: Error }) => {
 type HookComponent = JSX.Element;
 
 type Loading = { status: 'loading' };
-type Loaded = { status: 'loaded', view: View, executionState: SearchExecutionState };
-type Interrupted = { status: 'interrupted', component: HookComponent };
+type Loaded = { status: 'loaded'; view: View; executionState: SearchExecutionState };
+type Interrupted = { status: 'interrupted'; component: HookComponent };
 type ResultType = Loading | Loaded | Interrupted;
 
-const useProcessHooksForView = (view: Promise<View>, executionState: SearchExecutionState, query: { [key: string]: any }): ResultType => {
+const useProcessHooksForView = (
+  view: Promise<View>,
+  executionState: SearchExecutionState,
+  query: { [key: string]: any },
+): ResultType => {
   const loadingViewHooks = usePluginEntities('views.hooks.loadingView');
   const executingViewHooks = usePluginEntities('views.hooks.executingView');
 
   const [result, setResult] = useState<ResultType>({ status: 'loading' });
 
-  useEffect(() => {
-    processHooks(
-      view,
-      executionState,
-      loadingViewHooks,
-      executingViewHooks,
-      query,
-      (v, e) => {
+  useEffect(
+    () => {
+      processHooks(view, executionState, loadingViewHooks, executingViewHooks, query, (v, e) => {
         setResult({ status: 'loaded', view: v, executionState: e });
-      },
-    ).catch((e: Error | HookComponent) => {
-      if (e instanceof Error) {
-        // eslint-disable-next-line no-console
-        console.error(e);
-      }
+      }).catch((e: Error | HookComponent) => {
+        if (e instanceof Error) {
+          // eslint-disable-next-line no-console
+          console.error(e);
+        }
 
-      const component = e instanceof Error
-        ? <LoadViewError error={e} />
-        : e;
+        const component = e instanceof Error ? <LoadViewError error={e} /> : e;
 
-      setResult({ status: 'interrupted', component });
-    });
-  },
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  [executingViewHooks, loadingViewHooks, view]);
+        setResult({ status: 'interrupted', component });
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [executingViewHooks, loadingViewHooks, view],
+  );
 
   return result;
 };

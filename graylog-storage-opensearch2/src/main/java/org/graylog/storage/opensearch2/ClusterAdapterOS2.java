@@ -23,6 +23,8 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -39,6 +41,7 @@ import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.PendingTasksStats;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettingsFactory;
+import org.graylog2.indexer.cluster.health.ClusterShardAllocation;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
 import org.graylog2.indexer.indices.HealthStatus;
@@ -46,13 +49,11 @@ import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.graylog2.system.stats.elasticsearch.ClusterStats;
 import org.graylog2.system.stats.elasticsearch.IndicesStats;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
+import org.graylog2.system.stats.elasticsearch.NodeOSInfo;
 import org.graylog2.system.stats.elasticsearch.NodesStats;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -121,6 +122,20 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
     }
 
     @Override
+    public ClusterShardAllocation clusterShardAllocation() {
+        final ClusterGetSettingsRequest settingsRequest = new ClusterGetSettingsRequest();
+        settingsRequest.includeDefaults(true);
+        final ClusterGetSettingsResponse response = client.execute((c, requestOptions) -> c.cluster().getSettings(settingsRequest, requestOptions));
+        int maxShardsPerNode = Integer.MAX_VALUE;
+        try {
+            maxShardsPerNode = Integer.parseInt(response.getSetting("cluster.max_shards_per_node"));
+        } catch (Exception e) {
+            LOG.warn("Could not retrieve max_shards_per_node setting from cluster settings. Threshold warnings disabled.", e);
+        }
+        return new ClusterShardAllocation(maxShardsPerNode, catApi.getNodeShardAllocations());
+    }
+
+    @Override
     public Set<NodeDiskUsageStats> diskUsageStats() {
         final List<NodeResponse> result = nodes();
         return result.stream()
@@ -175,7 +190,7 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
             final ClusterHealthResponse result = client.execute((c, requestOptions) -> c.cluster().health(request, requestOptions));
             return result.getNumberOfDataNodes() > 0;
         } catch (OpenSearchException e) {
-            LOG.error("Check for connectivity failed with exception '{}' - enable debug level for this class to see the stack trace.", e.getMessage());
+            LOG.error("Check for connectivity failed with exception '{}' - enable debug level for this class to see the stack trace.", e.toString());
             if (LOG.isDebugEnabled()) {
                 LOG.error(e.getMessage(), e);
             }
@@ -270,8 +285,9 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
         final Request request = new Request("GET", "/_nodes");
         final JsonNode nodesJson = jsonApi.perform(request, "Couldn't read Opensearch nodes data!");
 
-        return toStream(nodesJson.at("/nodes").fields())
-                .collect(Collectors.toMap(Map.Entry::getKey, o -> createNodeInfo(o.getValue())));
+        final JsonNode nodes = nodesJson.at("/nodes");
+        return toStream(nodes.fieldNames())
+                .collect(Collectors.toMap(name -> name, name -> createNodeInfo(nodes.get(name))));
     }
 
     private NodeInfo createNodeInfo(JsonNode nodesJson) {
@@ -281,6 +297,23 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
                 .roles(toStream(nodesJson.at("/roles").elements()).map(JsonNode::asText).toList())
                 .jvmMemHeapMaxInBytes(nodesJson.at("/jvm/mem/heap_max_in_bytes").asLong())
                 .build();
+    }
+
+    @Override
+    public Map<String, NodeOSInfo> nodesHostInfo() {
+        final Request request = new Request("GET", "/_nodes/stats/os");
+        final JsonNode nodesJson = jsonApi.perform(request, "Couldn't read Opensearch nodes os data!");
+
+        final JsonNode nodes = nodesJson.at("/nodes");
+        return toStream(nodes.fieldNames())
+                .collect(Collectors.toMap(name -> name, name -> createNodeHostInfo(nodes.get(name))));
+    }
+
+    private NodeOSInfo createNodeHostInfo(JsonNode nodesOsJson) {
+        return new NodeOSInfo(
+                nodesOsJson.at("/os/mem/total_in_bytes").asLong(),
+                toStream(nodesOsJson.at("/roles").elements()).map(JsonNode::asText).toList()
+        );
     }
 
     public <T> Stream<T> toStream(Iterator<T> iterator) {

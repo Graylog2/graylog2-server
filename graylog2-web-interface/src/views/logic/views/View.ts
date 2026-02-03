@@ -16,14 +16,14 @@
  */
 import * as Immutable from 'immutable';
 import flatten from 'lodash/flatten';
-import ObjectID from 'bson-objectid';
 
 import type Widget from 'views/logic/widgets/Widget';
 import defaultTitle from 'views/components/defaultTitle';
+import generateObjectId from 'logic/generateObjectId';
 
+import type { ViewStateJson } from './ViewState';
 import ViewState from './ViewState';
 import type { WidgetMapping } from './types';
-import type { ViewStateJson } from './ViewState';
 
 import type Search from '../search/Search';
 import type { SearchType as QuerySearchType } from '../queries/SearchType';
@@ -32,8 +32,8 @@ import type { QueryId } from '../queries/Query';
 export type Properties = Immutable.List<any>;
 
 export type PluginMetadata = {
-  name: string,
-  url: string,
+  name: string;
+  url: string;
 };
 export type Requirements = { [key: string]: PluginMetadata } | {};
 export type ViewStateMap = Immutable.Map<QueryId, ViewState>;
@@ -43,35 +43,43 @@ export type DashboardType = 'DASHBOARD';
 export type ViewType = SearchType | DashboardType;
 
 type InternalState = {
-  id: string,
-  type: ViewType,
-  title: string,
-  summary: string,
-  description: string,
-  search: Search,
-  properties: Properties,
-  state: ViewStateMap,
-  createdAt: Date,
-  owner: string,
-  requires: Requirements,
-  favorite: boolean,
-  lastUpdatedAt: Date,
+  id: string;
+  type: ViewType;
+  title: string;
+  summary: string;
+  description: string;
+  search: Search;
+  properties: Properties;
+  state: ViewStateMap;
+  createdAt: Date;
+  owner: string;
+  requires: Requirements;
+  favorite: boolean;
+  lastUpdatedAt: Date;
+  entitySource?: EntitySource;
+};
+
+type EntitySource = {
+  source: string;
+  entityType: string;
+  parentId?: string;
 };
 
 export type ViewJson = {
-  id: string,
-  type: ViewType,
-  title: string,
-  summary: string,
-  description: string,
-  search_id: string,
-  properties: Properties,
-  state: { [key: string]: ViewStateJson },
-  created_at: string,
-  owner: string,
-  requires: Requirements,
-  favorite: boolean,
-  last_updated_at: string,
+  id: string;
+  type: ViewType;
+  title: string;
+  summary: string;
+  description: string;
+  search_id: string;
+  properties: Properties;
+  state: { [key: string]: ViewStateJson };
+  created_at: string;
+  owner: string;
+  requires: Requirements;
+  favorite: boolean;
+  last_updated_at: string;
+  _entity_source?: string;
 };
 
 export default class View {
@@ -82,7 +90,8 @@ export default class View {
 
   _value: InternalState;
 
-  constructor(id: string,
+  constructor(
+    id: string,
     type: ViewType,
     title: string,
     summary: string,
@@ -95,6 +104,7 @@ export default class View {
     requires: Requirements,
     favorite: boolean,
     lastUpdatedAt: Date,
+    entitySource: EntitySource,
   ) {
     this._value = {
       id,
@@ -110,6 +120,7 @@ export default class View {
       requires,
       favorite,
       lastUpdatedAt,
+      entitySource,
     };
   }
 
@@ -155,7 +166,10 @@ export default class View {
   }
 
   get widgetMapping(): WidgetMapping {
-    return (this.state || Immutable.Map()).valueSeq().map((s) => s.widgetMapping).reduce((prev, cur) => Immutable.fromJS(prev).merge(Immutable.fromJS(cur)));
+    return (this.state || Immutable.Map())
+      .valueSeq()
+      .map((s) => s.widgetMapping)
+      .reduce((prev, cur) => Immutable.fromJS(prev).merge(Immutable.fromJS(cur)));
   }
 
   get owner(): string {
@@ -172,6 +186,10 @@ export default class View {
 
   get lastUpdatedAt(): Date {
     return this._value.lastUpdatedAt;
+  }
+
+  get entitySource(): EntitySource {
+    return this._value.entitySource;
   }
 
   getSearchTypeByWidgetId(widgetId: string): QuerySearchType | undefined | null {
@@ -195,10 +213,7 @@ export default class View {
   }
 
   toBuilder(): Builder {
-    const { id, title, summary, description, search, properties, state, createdAt, owner, requires, type, favorite } = this._value;
-
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Immutable.Map({
+    const {
       id,
       title,
       summary,
@@ -211,7 +226,29 @@ export default class View {
       requires,
       type,
       favorite,
-    }));
+      lastUpdatedAt,
+      entitySource,
+    } = this._value;
+
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    return new Builder(
+      Immutable.Map({
+        id,
+        title,
+        summary,
+        description,
+        search,
+        properties,
+        state,
+        createdAt,
+        owner,
+        requires,
+        type,
+        favorite,
+        lastUpdatedAt,
+        entitySource,
+      }),
+    );
   }
 
   toJSON() {
@@ -232,10 +269,24 @@ export default class View {
   }
 
   static fromJSON(value: ViewJson): View {
-    const { id, type, title, summary, description, properties, state, created_at, owner, requires, favorite, last_updated_at } = value;
+    const {
+      id,
+      type,
+      title,
+      summary,
+      description,
+      properties,
+      state,
+      created_at,
+      owner,
+      requires,
+      favorite,
+      last_updated_at,
+      _entity_source,
+    } = value;
     const viewState: ViewStateMap = Immutable.Map(state).map(ViewState.fromJSON).toMap();
     const createdAtDate = new Date(created_at);
-    const lastUpdatedAtDate = new Date(last_updated_at);
+    const lastUpdatedAtDate = last_updated_at ? new Date(last_updated_at) : undefined;
 
     return View.create()
       .toBuilder()
@@ -251,6 +302,7 @@ export default class View {
       .requires(requires)
       .favorite(favorite)
       .lastUpdatedAt(lastUpdatedAtDate)
+      .entitySource(_entity_source)
       .build();
   }
 
@@ -282,7 +334,7 @@ class Builder {
   }
 
   newId(): Builder {
-    return this.id(new ObjectID().toString());
+    return this.id(generateObjectId());
   }
 
   title(value: string): Builder {
@@ -305,7 +357,7 @@ class Builder {
     return new Builder(this.value.set('properties', value));
   }
 
-  state(value: (ViewStateMap | { [key: string]: ViewState })): Builder {
+  state(value: ViewStateMap | { [key: string]: ViewState }): Builder {
     return new Builder(this.value.set('state', Immutable.Map(value)));
   }
 
@@ -315,6 +367,10 @@ class Builder {
 
   lastUpdatedAt(value: Date): Builder {
     return new Builder(this.value.set('lastUpdatedAt', value));
+  }
+
+  entitySource(value: string): Builder {
+    return new Builder(this.value.set('entitySource', value));
   }
 
   owner(value: string): Builder {
@@ -330,8 +386,38 @@ class Builder {
   }
 
   build(): View {
-    const { id, type, title, summary, description, search, properties, state, createdAt, owner, requires, favorite, lastUpdatedAt } = this.value.toObject();
+    const {
+      id,
+      type,
+      title,
+      summary,
+      description,
+      search,
+      properties,
+      state,
+      createdAt,
+      owner,
+      requires,
+      favorite,
+      lastUpdatedAt,
+      entitySource,
+    } = this.value.toObject();
 
-    return new View(id, type, title, summary, description, search, properties, state, createdAt, owner, requires, favorite, lastUpdatedAt);
+    return new View(
+      id,
+      type,
+      title,
+      summary,
+      description,
+      search,
+      properties,
+      state,
+      createdAt,
+      owner,
+      requires,
+      favorite,
+      lastUpdatedAt,
+      entitySource,
+    );
   }
 }

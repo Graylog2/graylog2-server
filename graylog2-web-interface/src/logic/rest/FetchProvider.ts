@@ -21,8 +21,9 @@ import ErrorsActions from 'actions/errors/ErrorsActions';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import CancellablePromise from 'logic/rest/CancellablePromise';
 import { ServerAvailabilityActions } from 'stores/sessions/ServerAvailabilityStore';
+import type { Method } from 'routing/types';
 
-// eslint-disable-next-line global-require
+// eslint-disable-next-line global-require,@typescript-eslint/no-require-imports
 const importSessionStore = memoize(() => require('stores/sessions/SessionStore'));
 
 const reportServerSuccess = () => {
@@ -35,7 +36,9 @@ const emptyToUndefined = (s: any) => (s && s !== '' ? s : undefined);
 
 const onServerError = async (error: Response | undefined, onUnauthorized = defaultOnUnauthorizedError) => {
   const contentType = error.headers?.get('Content-Type');
-  const response = await (contentType?.startsWith('application/json') ? error.json().then((body) => body) : error?.text?.());
+  const response = await (contentType?.startsWith('application/json')
+    ? error.json().then((body) => body)
+    : error?.text?.());
   const { SessionStore, SessionActions } = importSessionStore();
   const fetchError = new FetchError(error.statusText, error.status, emptyToUndefined(response));
 
@@ -58,8 +61,8 @@ const onServerError = async (error: Response | undefined, onUnauthorized = defau
 const maybeStringify = (body: any) => (body && typeof body !== 'string' ? JSON.stringify(body) : body);
 
 type RequestHeaders = {
-  Accept?: string,
-  'Content-Type'?: string,
+  Accept?: string;
+  'Content-Type'?: string;
 };
 
 const defaultResponseHandler = (resp: Response) => {
@@ -93,7 +96,7 @@ export class Builder {
 
   private readonly method: string;
 
-  private body: { body: any, mimeType?: string };
+  private body: { body: any; mimeType?: string };
 
   private accept: string;
 
@@ -149,7 +152,7 @@ export class Builder {
     this.body = { body: maybeStringify(body), mimeType: 'application/json' };
     this.accept = mimeType;
 
-    this.responseHandler = (resp: { ok: boolean, text: () => string }) => {
+    this.responseHandler = (resp: { ok: boolean; text: () => string }) => {
       if (resp.ok) {
         reportServerSuccess();
 
@@ -168,7 +171,7 @@ export class Builder {
     this.body = { body: maybeStringify(body), mimeType: 'application/json' };
     this.accept = mimeType;
 
-    this.responseHandler = (resp: { ok: boolean, blob: () => Blob }) => {
+    this.responseHandler = (resp: { ok: boolean; blob: () => Blob }) => {
       if (resp.ok) {
         reportServerSuccess();
 
@@ -205,8 +208,7 @@ export class Builder {
   }
 
   ignoreUnauthorized() {
-    this.errorHandler = (error: Response) => onServerError(error, () => {
-    });
+    this.errorHandler = (error: Response) => onServerError(error, () => {});
 
     return this;
   }
@@ -221,19 +223,21 @@ export class Builder {
   }
 
   build(): Promise<any> {
-    const headers: RequestHeaders = this.body && this.body.mimeType
-      ? { ...this.options, 'Content-Type': this.body.mimeType }
-      : this.options;
+    const headers: RequestHeaders =
+      this.body && this.body.mimeType ? { ...this.options, 'Content-Type': this.body.mimeType } : this.options;
 
     if (this.accept) {
       headers.Accept = this.accept;
     }
 
-    return CancellablePromise.of<unknown>(window.fetch(this.url, {
-      method: this.method,
-      headers,
-      body: this.body ? this.body.body : undefined,
-    })).then(this.responseHandler, this.errorHandler)
+    return CancellablePromise.of<unknown>(
+      window.fetch(this.url, {
+        method: this.method,
+        headers,
+        body: this.body ? this.body.body : undefined,
+      }),
+    )
+      .then(this.responseHandler, this.errorHandler)
       .catch(this.errorHandler);
   }
 }
@@ -242,22 +246,26 @@ function queuePromiseIfNotLoggedin<T>(promise: () => Promise<T>): () => Promise<
   const { SessionStore, SessionActions } = importSessionStore();
 
   if (!SessionStore.isLoggedIn()) {
-    return () => CancellablePromise.of(new Promise((resolve, reject) => {
-      SessionActions.login.completed.listen(() => {
-        promise().then(resolve, reject);
-      });
-    }));
+    return () =>
+      CancellablePromise.of(
+        new Promise((resolve, reject) => {
+          SessionActions.login.completed.listen(() => {
+            promise().then(resolve, reject);
+          });
+        }),
+      );
   }
 
   return promise;
 }
 
-type Method = 'GET' | 'PUT' | 'POST' | 'DELETE';
-
-export default function fetch<T = any>(method: Method, url: string, body?: any, requireSession: boolean = true): Promise<T> {
-  const promise = () => new Builder(method, url)
-    .json(body)
-    .build();
+export default function fetch<T = any>(
+  method: Method,
+  url: string,
+  body?: any,
+  requireSession: boolean = true,
+): Promise<T> {
+  const promise = () => new Builder(method, url).json(body).build();
 
   if (requireSession) {
     return queuePromiseIfNotLoggedin(promise)();
@@ -267,9 +275,7 @@ export default function fetch<T = any>(method: Method, url: string, body?: any, 
 }
 
 export function fetchMultiPartFormData<T = any>(url: string, body?: any, requireSession: boolean = true): Promise<T> {
-  const promise = () => new Builder('POST', url)
-    .formData(body)
-    .build();
+  const promise = () => new Builder('POST', url).formData(body).build();
 
   if (requireSession) {
     return queuePromiseIfNotLoggedin(promise)();
@@ -279,42 +285,31 @@ export function fetchMultiPartFormData<T = any>(url: string, body?: any, require
 }
 
 export function fetchPlainText(method: Method, url: string, body?: any) {
-  const promise = () => new Builder(method, url)
-    .plaintext(body)
-    .build();
+  const promise = () => new Builder(method, url).plaintext(body).build();
 
   return queuePromiseIfNotLoggedin(promise)();
 }
 
 export function fetchStreamingPlainText(method: Method, url: string, body?: any) {
-  const promise = () => new Builder(method, url)
-    .streamingplaintext(body)
-    .build();
+  const promise = () => new Builder(method, url).streamingplaintext(body).build();
 
   return queuePromiseIfNotLoggedin(promise)();
 }
 
 export function fetchPeriodically<T = unknown>(method: Method, url: string, body?: any): Promise<T> {
-  const promise = () => new Builder(method, url)
-    .noSessionExtension()
-    .json(body)
-    .build();
+  const promise = () => new Builder(method, url).noSessionExtension().json(body).build();
 
   return queuePromiseIfNotLoggedin(promise)();
 }
 
 export function fetchFile(method, url, body, mimeType = 'text/csv') {
-  const promise = () => new Builder(method, url)
-    .file(body, mimeType)
-    .build();
+  const promise = () => new Builder(method, url).file(body, mimeType).build();
 
   return queuePromiseIfNotLoggedin(promise)();
 }
 
 export function fetchBlobFile(method, url, body, mimeType = 'text/csv') {
-  const promise = () => new Builder(method, url)
-    .blobFile(body, mimeType)
-    .build();
+  const promise = () => new Builder(method, url).blobFile(body, mimeType).build();
 
   return queuePromiseIfNotLoggedin(promise)();
 }

@@ -18,26 +18,12 @@ package org.graylog.plugins.pipelineprocessor.rest;
 
 import com.google.common.collect.Sets;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
-import org.graylog.plugins.pipelineprocessor.db.PipelineService;
-import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
-import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.rest.PluginRestResource;
-import org.graylog2.plugin.streams.Stream;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.streams.StreamService;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-
 import jakarta.validation.constraints.NotNull;
-
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -46,76 +32,98 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
+import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
+import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.rest.PublicCloudAPI;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.streams.StreamService;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
-@Api(value = "Pipelines/Connections", description = "Stream connections of processing pipelines", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Pipelines/Connections", description = "Stream connections of processing pipelines")
 @Path("/system/pipelines/connections")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class PipelineConnectionsResource extends RestResource implements PluginRestResource {
-    private static final RateLimitedLog LOG = getRateLimitedLog(PipelineConnectionsResource.class);
+    private static final RateLimitedLog LOG = createDefaultRateLimitedLog(PipelineConnectionsResource.class);
 
     private final PipelineStreamConnectionsService connectionsService;
     private final PipelineService pipelineService;
     private final StreamService streamService;
+    private final EntityScopeService entityScopeService;
 
     @Inject
     public PipelineConnectionsResource(PipelineStreamConnectionsService connectionsService,
                                        PipelineService pipelineService,
-                                       StreamService streamService) {
+                                       StreamService streamService,
+                                       EntityScopeService entityScopeService) {
         this.connectionsService = connectionsService;
         this.pipelineService = pipelineService;
         this.streamService = streamService;
+        this.entityScopeService = entityScopeService;
     }
 
-    @ApiOperation(value = "Connect processing pipelines to a stream", notes = "")
+    @Operation(summary = "Connect processing pipelines to a stream")
     @POST
     @Path("/to_stream")
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_CONNECTION_EDIT)
     @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_CONNECTION_UPDATE)
-    public PipelineConnections connectPipelines(@ApiParam(name = "Json body", required = true) @NotNull PipelineConnections connection) throws NotFoundException {
+    public PipelineConnections connectPipelines(@RequestBody(required = true) @NotNull PipelineConnections connection) throws NotFoundException {
         final String streamId = connection.streamId();
 
-        checkNotEditable(streamId, "Cannot connect pipeline to non editable stream");
-        // verify the stream exists
+        // verify the stream exists and is readable
         checkPermission(RestPermissions.STREAMS_READ, streamId);
-        streamService.load(streamId);
+        final Stream stream = streamService.load(streamId);
+        checkNotEditable(stream, "Cannot connect pipeline to non editable stream");
 
         // verify the pipelines exist
         for (String s : connection.pipelineIds()) {
             checkPermission(PipelineRestPermissions.PIPELINE_READ, s);
-            pipelineService.load(s);
+            checkScope(pipelineService.load(s));
         }
         return connectionsService.save(connection);
     }
 
-    @ApiOperation(value = "Connect streams to a processing pipeline", notes = "")
+    @Operation(summary = "Connect streams to a processing pipeline")
     @POST
     @Path("/to_pipeline")
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_CONNECTION_EDIT)
     @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_CONNECTION_UPDATE)
-    public Set<PipelineConnections> connectStreams(@ApiParam(name = "Json body", required = true) @NotNull PipelineReverseConnections connection) throws NotFoundException {
+    public Set<PipelineConnections> connectStreams(@RequestBody(required = true) @NotNull PipelineReverseConnections connection) throws NotFoundException {
         final String pipelineId = connection.pipelineId();
         final Set<PipelineConnections> updatedConnections = Sets.newHashSet();
 
-        // verify the pipeline exists
+        // verify the pipeline exists and is editable
         checkPermission(PipelineRestPermissions.PIPELINE_READ, pipelineId);
-        pipelineService.load(pipelineId);
+        checkScope(pipelineService.load(pipelineId));
 
         // get all connections where the pipeline was present
         final Set<PipelineConnections> pipelineConnections = connectionsService.loadAll().stream()
                 .filter(p -> p.pipelineIds().contains(pipelineId))
                 .collect(Collectors.toSet());
 
-        connection.streamIds().forEach(streamId ->
-                checkNotEditable(streamId, "Cannot connect pipeline to non editable stream")
-        );
+        // verify the streams exist and the user has permission to read them
+        final Set<Stream> connectedStreams = streamService.loadByIds(connection.streamIds());
+        connectedStreams.forEach(stream -> {
+            checkPermission(RestPermissions.STREAMS_READ, stream.getId());
+            checkNotEditable(stream, "Cannot connect pipeline to non editable stream");
+        });
+
         // remove deleted pipeline connections
         for (PipelineConnections pipelineConnection : pipelineConnections) {
             if (!connection.streamIds().contains(pipelineConnection.streamId())) {
@@ -129,11 +137,8 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         }
 
         // update pipeline connections
-        for (String streamId : connection.streamIds()) {
-            // verify the stream exist
-            checkPermission(RestPermissions.STREAMS_READ, streamId);
-            streamService.load(streamId);
-
+        for (Stream stream : connectedStreams) {
+            final String streamId = stream.getId();
             PipelineConnections updatedConnection;
             try {
                 updatedConnection = connectionsService.load(streamId);
@@ -152,11 +157,11 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         return updatedConnections;
     }
 
-    @ApiOperation("Get pipeline connections for the given stream")
+    @Operation(summary = "Get pipeline connections for the given stream")
     @GET
     @Path("/{streamId}")
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_CONNECTION_READ)
-    public PipelineConnections getPipelinesForStream(@ApiParam(name = "streamId") @PathParam("streamId") String streamId) throws NotFoundException {
+    public PipelineConnections getPipelinesForStream(@Parameter(name = "streamId") @PathParam("streamId") String streamId) throws NotFoundException {
         // the user needs to at least be able to read the stream
         checkPermission(RestPermissions.STREAMS_READ, streamId);
 
@@ -172,7 +177,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         );
     }
 
-    @ApiOperation("Get all pipeline connections")
+    @Operation(summary = "Get all pipeline connections")
     @GET
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_CONNECTION_READ)
     public Set<PipelineConnections> getAll() throws NotFoundException {
@@ -197,10 +202,15 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         return filteredConnections;
     }
 
-    private void checkNotEditable(String streamId, String message) {
-        if (!Stream.streamIsEditable(streamId)) {
+    private void checkNotEditable(Stream stream, String message) {
+        if (!stream.isEditable()) {
             throw new BadRequestException(message);
         }
     }
 
+    private void checkScope(PipelineDao pipelineDao) {
+        if (!entityScopeService.isMutable(pipelineDao)) {
+            throw new BadRequestException("Cannot modify connections for immutable pipeline");
+        }
+    }
 }

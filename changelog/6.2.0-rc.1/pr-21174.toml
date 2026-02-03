@@ -1,0 +1,5 @@
+type = "c"
+message = "Prevent accidental deletion of the default system index set. "
+
+pulls = ["21174"]
+issues = ["Graylog2/graylog-plugin-enterprise#5904"]

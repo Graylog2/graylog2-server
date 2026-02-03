@@ -17,46 +17,47 @@
 package org.graylog.integrations.notifications.types;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import mockwebserver3.MockResponse;
+import mockwebserver3.MockWebServer;
+import mockwebserver3.RecordedRequest;
+import okhttp3.Headers;
 import okhttp3.OkHttpClient;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
 import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.Timeout;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@Timeout(value = 10, unit = TimeUnit.SECONDS)
 public class SlackClientTest {
-    @Rule
-    public Timeout timout = Timeout.seconds(10);
 
     private final MockWebServer server = new MockWebServer();
     private final OkHttpClient httpClient = new OkHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         server.start();
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws IOException {
-        server.shutdown();
+        server.close();
     }
 
     @Test
     public void sendsHttpRequestAsExpected_whenInputIsGood() throws Exception {
-        server.enqueue(new MockResponse().setResponseCode(200));
+        server.enqueue(new MockResponse(200, Headers.of(), ""));
 
         SlackClient slackClient = new SlackClient(httpClient, objectMapper);
         slackClient.send(getMessage(), server.url("/").toString());
@@ -65,31 +66,34 @@ public class SlackClientTest {
 
         assertThat(recordedRequest.getMethod()).isEqualTo("POST");
         assertThat(recordedRequest.getBody()).isNotNull();
-        assertThat(recordedRequest.getBody().readUtf8()).isEqualTo(objectMapper.writeValueAsString(getMessage()));
+        assertThat(recordedRequest.getBody().string(StandardCharsets.UTF_8)).isEqualTo(objectMapper.writeValueAsString(getMessage()));
     }
 
-    @Test(expected = TemporaryEventNotificationException.class)
+    @Test
     public void sendThrowsTempNotifException_whenHttpClientThrowsIOException() throws Exception {
-        final OkHttpClient httpClient =
-                this.httpClient.newBuilder().readTimeout(1, TimeUnit.MILLISECONDS).build();
+        assertThrows(TemporaryEventNotificationException.class, () -> {
+            final OkHttpClient httpClient =
+                    this.httpClient.newBuilder().readTimeout(1, TimeUnit.MILLISECONDS).build();
 
-        SlackClient slackClient = new SlackClient(httpClient, objectMapper);
-        slackClient.send(getMessage(), server.url("/").toString());
+            SlackClient slackClient = new SlackClient(httpClient, objectMapper);
+            slackClient.send(getMessage(), server.url("/").toString());
+        });
     }
 
-    @Test(expected = PermanentEventNotificationException.class)
+    @Test
     public void sendThrowsPermNotifException_whenPostReturnsHttp402() throws Exception {
-        server.enqueue(new MockResponse().setResponseCode(402));
+        assertThrows(PermanentEventNotificationException.class, () -> {
+            server.enqueue(new MockResponse(402, Headers.of(), ""));
 
-        SlackClient slackClient = new SlackClient(httpClient, objectMapper);
-        slackClient.send(getMessage(), server.url("/").toString());
+            SlackClient slackClient = new SlackClient(httpClient, objectMapper);
+            slackClient.send(getMessage(), server.url("/").toString());
+        });
     }
 
     @Test
     public void doesNotFollowRedirects() {
-        server.enqueue(new MockResponse().setResponseCode(302)
-                .setHeader("Location", server.url("/redirected")));
-        server.enqueue(new MockResponse().setResponseCode(200));
+        server.enqueue(new MockResponse(302, Headers.of("Location", server.url("/redirected").toString()), ""));
+        server.enqueue(new MockResponse(200, Headers.of(), ""));
 
         SlackClient slackClient = new SlackClient(httpClient, objectMapper);
         assertThatThrownBy(() -> slackClient.send(getMessage(), server.url("/").toString()))

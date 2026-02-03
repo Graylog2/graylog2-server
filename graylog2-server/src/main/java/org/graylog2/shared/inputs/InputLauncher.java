@@ -19,18 +19,21 @@ package org.graylog2.shared.inputs;
 import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import jakarta.inject.Inject;
 import org.graylog2.Configuration;
 import org.graylog2.cluster.leader.LeaderElectionService;
+import org.graylog2.featureflag.FeatureFlags;
+import org.graylog2.inputs.Input;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.shared.metrics.SlidingWindowCounter;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
+import java.time.Duration;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -40,6 +43,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class InputLauncher {
     private static final Logger LOG = LoggerFactory.getLogger(InputLauncher.class);
+    public static final String FAILED_STARTS_METRIC = "failed_starts";
+    private static final Duration FAILED_STARTS_WINDOW = Duration.ofMinutes(15);
+
     private final IOState.Factory<MessageInput> inputStateFactory;
     private final InputBuffer inputBuffer;
     private final PersistedInputs persistedInputs;
@@ -47,10 +53,13 @@ public class InputLauncher {
     private final ExecutorService executor;
     private final Configuration configuration;
     private final LeaderElectionService leaderElectionService;
+    private final FeatureFlags featureFlags;
+    private final MetricRegistry metricRegistry;
 
     @Inject
     public InputLauncher(IOState.Factory<MessageInput> inputStateFactory, InputBuffer inputBuffer, PersistedInputs persistedInputs,
-                         InputRegistry inputRegistry, MetricRegistry metricRegistry, Configuration configuration, LeaderElectionService leaderElectionService) {
+                         InputRegistry inputRegistry, MetricRegistry metricRegistry, Configuration configuration, LeaderElectionService leaderElectionService,
+                         FeatureFlags featureFlags) {
         this.inputStateFactory = inputStateFactory;
         this.inputBuffer = inputBuffer;
         this.persistedInputs = persistedInputs;
@@ -58,6 +67,8 @@ public class InputLauncher {
         this.executor = executorService(metricRegistry);
         this.configuration = configuration;
         this.leaderElectionService = leaderElectionService;
+        this.featureFlags = featureFlags;
+        this.metricRegistry = metricRegistry;
     }
 
     private ExecutorService executorService(final MetricRegistry metricRegistry) {
@@ -73,7 +84,11 @@ public class InputLauncher {
 
         final IOState<MessageInput> inputState;
         if (inputRegistry.getInputState(input.getId()) == null) {
-            inputState = inputStateFactory.create(input);
+            if (featureFlags.isOn("SETUP_MODE") && input.getDesiredState() == IOState.Type.SETUP) {
+                inputState = inputStateFactory.create(input, IOState.Type.SETUP);
+            } else {
+                inputState = inputStateFactory.create(input);
+            }
             inputRegistry.add(inputState);
         } else {
             inputState = inputRegistry.getInputState(input.getId());
@@ -83,6 +98,11 @@ public class InputLauncher {
                 }
             }
             inputState.setStoppable(input);
+        }
+
+        // Do not launch if currently in setup mode
+        if (inputState.getState() == IOState.Type.SETUP) {
+            return inputState;
         }
 
         executor.submit(new Runnable() {
@@ -107,18 +127,25 @@ public class InputLauncher {
 
     protected void handleLaunchException(Throwable e, IOState<MessageInput> inputState) {
         final MessageInput input = inputState.getStoppable();
+        failedStartsCounter(input).inc();
         StringBuilder msg = new StringBuilder("The [" + input.getClass().getCanonicalName() + "] input " + input.toIdentifier() + " misfired. Reason: ");
 
         String causeMsg = ExceptionUtils.getRootCauseMessage(e);
-
         msg.append(causeMsg);
-
         LOG.error(msg.toString(), e);
-
-        // Clean up.
-        //cleanInput(input);
-
         inputState.setState(IOState.Type.FAILED, causeMsg);
+    }
+
+    private SlidingWindowCounter failedStartsCounter(MessageInput input) {
+        final String metricName = name(Input.class, FAILED_STARTS_METRIC, input.getId());
+        final var existing = metricRegistry.getMetrics().get(metricName);
+        if (existing instanceof SlidingWindowCounter counter) {
+            return counter;
+        }
+        if (existing != null) {
+            metricRegistry.remove(metricName);
+        }
+        return metricRegistry.register(metricName, new SlidingWindowCounter(FAILED_STARTS_WINDOW));
     }
 
     public void launchAllPersisted() {
@@ -132,6 +159,8 @@ public class InputLauncher {
                 LOG.info("Launching input {} - desired state is {}",
                         input.toIdentifier(), input.getDesiredState());
                 input.initialize();
+                launch(input);
+            } else if (input.getDesiredState().equals(IOState.Type.SETUP)) {
                 launch(input);
             } else {
                 LOG.info("Not auto-starting input {} - desired state is {}",

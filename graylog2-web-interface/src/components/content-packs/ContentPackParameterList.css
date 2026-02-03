@@ -1,16 +1,17 @@
 :local(.scrollable) tbody {
-    max-height: 300px;
-    overflow: hidden;
-    overflow-y: auto;
-    display:block;
+  max-height: 300px;
+  overflow: hidden;
+  overflow-y: auto;
+  display: block;
 }
 
-:local(.scrollable) thead, :local(.scrollable) tbody tr {
-    display:table;
-    width:100%;
-    table-layout:fixed;
+:local(.scrollable) thead,
+:local(.scrollable) tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
 }
 
 :local(.bigColumns) {
-    word-wrap: break-word;
+  word-wrap: break-word;
 }

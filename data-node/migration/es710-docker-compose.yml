@@ -8,7 +8,7 @@ version: "3.8"
 services:
   mongodb:
     hostname: "mongodb"
-    image: "mongo:5.0"
+    image: "mongo:7.0"
     ports:
       - "27017:27017"
     volumes:

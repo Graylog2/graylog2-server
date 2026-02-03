@@ -19,9 +19,9 @@ import React from 'react';
 import { Alert, Row, Col } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import Notification from 'components/notifications/Notification';
-import type { NotificationType } from 'stores/notifications/NotificationsStore';
-import { NotificationsStore } from 'stores/notifications/NotificationsStore';
-import { useStore } from 'stores/connect';
+import type { NotificationType } from 'components/notifications/types';
+
+import useNotifications from './useNotifications';
 
 const _formatNotificationCount = (count: number) => {
   if (count === 1) {
@@ -31,33 +31,44 @@ const _formatNotificationCount = (count: number) => {
   return `are ${count} notifications`;
 };
 
-const getTitle = (count) => (count === 0 ? 'No notifications' : `There ${_formatNotificationCount(count)}`);
+const Title = ({ count }: { count: number }) =>
+  count === 0 ? 'No notifications' : `There ${_formatNotificationCount(count)}`;
 
-const getContent = (count: number, notificationsList: Array<NotificationType>) => (count === 0 ? (
-  <Alert bsStyle="success" className="notifications-none">
-    No notifications
-  </Alert>
-) : (
-  notificationsList?.map((notification) => <Notification key={`${notification.type}-${notification?.key}-${notification.timestamp}`} notification={notification} />)
-));
+const Notifications = ({ count, notifications }: { count: number; notifications: Array<NotificationType> }) =>
+  count === 0 ? (
+    <Alert bsStyle="success" className="notifications-none">
+      No notifications
+    </Alert>
+  ) : (
+    notifications?.map((notification) => (
+      <Notification
+        key={`${notification.type}-${notification?.key}-${notification.timestamp}`}
+        notification={notification}
+      />
+    ))
+  );
 
 const NotificationsList = () => {
-  const { notifications, total } = useStore(NotificationsStore);
+  const { data, isLoading } = useNotifications();
 
-  if (!notifications) {
+  if (isLoading) {
     return <Spinner />;
   }
+
+  const { total, notifications } = data;
 
   return (
     <Row className="content">
       <Col md={12}>
-        <h2>{getTitle(total)}</h2>
+        <h2>
+          <Title count={total} />
+        </h2>
         <p className="description">
-          Notifications are triggered by Graylog and indicate a situation you should act upon. Many notification
-          types will also provide a link to the Graylog documentation if you need more information or assistance.
+          Notifications indicate a situation you should act upon. Many notification types will also provide a link to
+          the documentation if you need more information or assistance.
         </p>
 
-        {getContent(total, notifications)}
+        <Notifications count={total} notifications={notifications} />
       </Col>
     </Row>
   );

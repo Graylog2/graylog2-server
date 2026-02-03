@@ -14,5 +14,5 @@ import CarouselProvider from './CarouselProvider';
     <Carousel.Slide>Slide 6</Carousel.Slide>
     <Carousel.Slide>Slide 7</Carousel.Slide>
   </Carousel>
-</CarouselProvider>  
+</CarouselProvider>;
 ```

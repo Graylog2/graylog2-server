@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableList;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 

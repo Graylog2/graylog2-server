@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -29,13 +30,7 @@ import java.util.List;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class CollectorActions {
-    @JsonProperty("id")
-    @Nullable
-    @Id
-    @ObjectId
-    public abstract String id();
-
+public abstract class CollectorActions implements MongoEntity {
     @JsonProperty("sidecar_id")
     public abstract String sidecarId();
 
@@ -46,7 +41,7 @@ public abstract class CollectorActions {
     public abstract List<CollectorAction> action();
 
     @JsonCreator
-    public static CollectorActions create(@JsonProperty("id") @Id @ObjectId String id,
+    public static CollectorActions create(@JsonProperty(FIELD_ID) @Id @ObjectId String id,
                                           @JsonProperty("sidecar_id") String sidecarId,
                                           @JsonProperty("created") DateTime created,
                                           @JsonProperty("action") List<CollectorAction> action) {

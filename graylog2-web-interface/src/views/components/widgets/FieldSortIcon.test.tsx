@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
@@ -30,11 +31,18 @@ describe('FieldSortIcon', () => {
   it('should set descending sort on click, if field sort is not defined', async () => {
     const onSortChangeStub = jest.fn(() => Promise.resolve());
     const setLoadingState = jest.fn();
-    const { getByTitle } = render(<FieldSortIcon config={config} fieldName="source" onSortChange={onSortChangeStub} setLoadingState={setLoadingState} />);
+    const { getByTitle } = render(
+      <FieldSortIcon
+        config={config}
+        fieldName="source"
+        onSortChange={onSortChangeStub}
+        setLoadingState={setLoadingState}
+      />,
+    );
 
     const sortIcon = getByTitle('Sort source Descending');
 
-    fireEvent.click(sortIcon);
+    await userEvent.click(sortIcon);
 
     const expectedSort = [new SortConfig(SortConfig.PIVOT_TYPE, 'source', Direction.Descending)];
 
@@ -46,13 +54,20 @@ describe('FieldSortIcon', () => {
     });
   });
 
-  it('should set ascending sort on click, if field sort is descending', () => {
+  it('should set ascending sort on click, if field sort is descending', async () => {
     const onSortChangeStub = jest.fn(() => Promise.resolve());
-    const { getByTitle } = render(<FieldSortIcon config={config} fieldName="timestamp" onSortChange={onSortChangeStub} setLoadingState={() => {}} />);
+    const { getByTitle } = render(
+      <FieldSortIcon
+        config={config}
+        fieldName="timestamp"
+        onSortChange={onSortChangeStub}
+        setLoadingState={() => {}}
+      />,
+    );
 
     const sortIcon = getByTitle('Sort timestamp Ascending');
 
-    fireEvent.click(sortIcon);
+    await userEvent.click(sortIcon);
 
     const expectedSort = [new SortConfig(SortConfig.PIVOT_TYPE, 'timestamp', Direction.Ascending)];
 
@@ -66,11 +81,18 @@ describe('FieldSortIcon', () => {
     const onSortChangeStub = jest.fn(() => Promise.resolve());
     const setLoadingState = jest.fn();
 
-    const { getByTitle } = render(<FieldSortIcon config={initialConfig} fieldName="source" onSortChange={onSortChangeStub} setLoadingState={setLoadingState} />);
+    const { getByTitle } = render(
+      <FieldSortIcon
+        config={initialConfig}
+        fieldName="source"
+        onSortChange={onSortChangeStub}
+        setLoadingState={setLoadingState}
+      />,
+    );
 
     const sortIcon = getByTitle('Sort source Descending');
 
-    fireEvent.click(sortIcon);
+    await userEvent.click(sortIcon);
 
     const expectedSort = [new SortConfig(SortConfig.PIVOT_TYPE, 'source', Direction.Descending)];
 
@@ -85,17 +107,21 @@ describe('FieldSortIcon', () => {
   it('should set loading state while changing sort', async () => {
     const onSortChangeStub = jest.fn(() => Promise.resolve());
     const setLoadingStateStub = jest.fn();
-    const { getByTitle } = render(<FieldSortIcon config={config} fieldName="source" onSortChange={onSortChangeStub} setLoadingState={setLoadingStateStub} />);
+    const { getByTitle } = render(
+      <FieldSortIcon
+        config={config}
+        fieldName="source"
+        onSortChange={onSortChangeStub}
+        setLoadingState={setLoadingStateStub}
+      />,
+    );
 
     const sortIcon = getByTitle('Sort source Descending');
 
-    fireEvent.click(sortIcon);
+    await userEvent.click(sortIcon);
 
-    expect(setLoadingStateStub).toHaveBeenCalledTimes(1);
-    expect(setLoadingStateStub).toHaveBeenCalledWith(true);
+    expect(setLoadingStateStub).toHaveBeenNthCalledWith(1, true);
 
-    await waitFor(() => expect(setLoadingStateStub).toHaveBeenCalledWith(false));
-
-    expect(setLoadingStateStub).toHaveBeenCalledTimes(2);
+    await waitFor(() => expect(setLoadingStateStub).toHaveBeenNthCalledWith(2, false));
   });
 });

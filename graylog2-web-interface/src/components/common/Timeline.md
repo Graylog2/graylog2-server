@@ -11,14 +11,10 @@ const Example = () => (
     <Timeline.Item title="Step 2" bullet={<Icon name="check" />}>
       A description of step 2
     </Timeline.Item>
-    <Timeline.Item title="Step 3">
-      A description of step 3
-    </Timeline.Item>
-    <Timeline.Item title="Step 4">
-      A description of step 4
-    </Timeline.Item>
+    <Timeline.Item title="Step 3">A description of step 3</Timeline.Item>
+    <Timeline.Item title="Step 4">A description of step 4</Timeline.Item>
   </Timeline>
 );
 
-<Example />
+<Example />;
 ```

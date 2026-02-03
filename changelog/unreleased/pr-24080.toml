@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixing recent activity for non-admins: Including update events to accessible entities."
+
+pulls = ["24080"]
+issues = ["Graylog2/graylog-plugin-enterprise#12427"]

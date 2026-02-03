@@ -17,6 +17,8 @@
 package org.graylog.aws.inputs.cloudtrail.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 
 import java.io.Serializable;
@@ -111,7 +113,24 @@ public class CloudTrailRecord implements Serializable {
 
     public String getConstructedMessage() {
         return eventSource + ":" + eventName + " in " + awsRegion + " by " + sourceIPAddress + " / " +
-                Optional.ofNullable(userIdentity).map(i -> i.userName).orElse("<unknown user_name>");
+                Optional.ofNullable(userIdentity)
+                        .flatMap(CloudTrailUserIdentity::resolveUserName)
+                        .orElse("<unknown user_name>");
+    }
+
+    /**
+     * Serializes the entire CloudTrail record as a JSON string for storage in the full_message_json field.
+     *
+     * @param objectMapper the ObjectMapper to use for JSON serialization
+     * @return JSON string of the entire CloudTrail record, or null if serialization fails
+     */
+    public String getFullMessageJson(ObjectMapper objectMapper) {
+        try {
+            return objectMapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            // If serialization fails, return null rather than throw
+            return null;
+        }
     }
 
 }

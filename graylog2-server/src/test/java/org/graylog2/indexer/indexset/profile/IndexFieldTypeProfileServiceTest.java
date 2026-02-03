@@ -16,11 +16,11 @@
  */
 package org.graylog2.indexer.indexset.profile;
 
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
@@ -31,12 +31,11 @@ import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.streams.StreamService;
 import org.joda.time.Duration;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -44,16 +43,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
+@ExtendWith(MongoDBExtension.class)
 public class IndexFieldTypeProfileServiceTest {
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private IndexFieldTypeProfileService toTest;
 
@@ -61,20 +58,19 @@ public class IndexFieldTypeProfileServiceTest {
 
     private MongoIndexSetService mongoIndexSetService;
 
-    @Before
-    public void setUp() {
-        final MongoConnection mongoConnection = mongodb.mongoConnection();
-        final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
-        mongoIndexSetService = new MongoIndexSetService(mongoConnection,
-                objectMapperProvider,
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) {
+        final MongoConnection mongoConnection = mongoCollections.mongoConnection();
+        final EntityScopeService entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope()));
+        mongoIndexSetService = new MongoIndexSetService(mongoCollections,
                 mock(StreamService.class),
                 mock(ClusterConfigService.class),
-                mock(ClusterEventBus.class)
+                mock(ClusterEventBus.class),
+                entityScopeService
         );
         indexFieldTypeProfileUsagesService = new IndexFieldTypeProfileUsagesService(mongoConnection);
-        toTest = new IndexFieldTypeProfileService(mongoConnection,
-                objectMapperProvider,
-                new MongoCollections(new CommonMongoJackObjectMapperProvider(objectMapperProvider), mongoConnection),
+        toTest = new IndexFieldTypeProfileService(
+                mongoCollections,
                 indexFieldTypeProfileUsagesService,
                 mongoIndexSetService);
     }
@@ -268,7 +264,9 @@ public class IndexFieldTypeProfileServiceTest {
 
     private IndexSetConfig createIndexSetConfigForTest(final String id, final String description, final String profileId) {
         return IndexSetConfig.create(
-                id, "title", description,
+                id,
+                null,
+                "title", description,
                 true,
                 true, "prefix_" + id, null, null,
                 1, 0,
@@ -282,6 +280,7 @@ public class IndexFieldTypeProfileServiceTest {
                 Duration.standardSeconds(5),
                 new CustomFieldMappings(),
                 profileId,
+                null,
                 null);
     }
 

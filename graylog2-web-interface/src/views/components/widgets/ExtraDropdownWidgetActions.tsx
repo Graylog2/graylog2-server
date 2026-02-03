@@ -20,48 +20,87 @@ import { useContext, useMemo } from 'react';
 import type Widget from 'views/logic/widgets/Widget';
 import { MenuItem } from 'components/bootstrap';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import useWidgetActions from 'views/components/widgets/useWidgetActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
+import type { ActionComponents } from 'views/components/actions/ActionHandler';
+import type { WidgetActionType, WidgetAction } from 'views/components/widgets/Types';
+import generateId from 'logic/generateId';
 
+type SetComponents = (value: ((prevState: ActionComponents) => ActionComponents) | ActionComponents) => void;
 type Props = {
-  widget: Widget,
+  widget: Widget;
+  setComponents: SetComponents;
 };
 
-const ExtraDropdownWidgetActions = ({ widget }: Props) => {
+const createHandler = (action: WidgetActionType, setComponents: SetComponents): WidgetAction => {
+  if (action.action) {
+    return action.action;
+  }
+  if (action.component) {
+    const ActionComponent = action.component;
+
+    return (widget, contexts) => () => {
+      const id = generateId();
+
+      const onClose = () => setComponents(({ [id]: _, ...rest }) => rest);
+      const renderedComponent = (
+        <ActionComponent key={action.type} widget={widget} contexts={contexts} onClose={onClose} />
+      );
+
+      setComponents((actionComponents) => ({
+        [id]: renderedComponent,
+        ...actionComponents,
+      }));
+
+      return Promise.resolve();
+    };
+  }
+
+  return () => () => Promise.resolve();
+};
+
+const ExtraDropdownWidgetActions = ({ widget, setComponents }: Props) => {
   const widgetFocusContext = useContext(WidgetFocusContext);
   const pluginWidgetActions = useWidgetActions();
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
-  const extraWidgetActions = useMemo(() => pluginWidgetActions
-    .filter(({ isHidden = () => false, position }) => !isHidden(widget) && (position === 'dropdown' || position === undefined))
-    .map(({ title, action, type, disabled = () => false }) => {
-      const _onSelect = () => {
-        sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.SEARCH_WIDGET_EXTRA_ACTION, {
-          app_pathname: getPathnameWithoutId(pathname),
-          app_section: 'search-widget',
-          app_action_value: type,
-        });
 
-        dispatch(action(widget, { widgetFocusContext }));
-      };
+  const extraWidgetActions = useMemo(
+    () =>
+      pluginWidgetActions
+        .filter(
+          ({ isHidden = () => false, position }) =>
+            !isHidden(widget) && (position === 'dropdown' || position === undefined),
+        )
+        .map((action) => {
+          const handler = createHandler(action, setComponents);
+          const _onSelect = () => {
+            sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.SEARCH_WIDGET_EXTRA_ACTION, {
+              app_section: 'search-widget',
+              app_action_value: action.type,
+            });
 
-      return (
-        <MenuItem key={`${type}-${widget.id}`} disabled={disabled()} onSelect={_onSelect}>{title(widget)}</MenuItem>);
-    }), [dispatch, pathname, pluginWidgetActions, sendTelemetry, widget, widgetFocusContext]);
+            dispatch(handler(widget, { widgetFocusContext }));
+          };
+          const disabled = action.disabled?.() ?? false;
 
-  return extraWidgetActions.length > 0
-    ? (
-      <>
-        <MenuItem divider />
-        {extraWidgetActions}
-      </>
-    )
-    : null;
+          return (
+            <MenuItem key={`${action.type}-${widget.id}`} disabled={disabled} onSelect={_onSelect}>
+              {action.title(widget)}
+            </MenuItem>
+          );
+        }),
+    [dispatch, pluginWidgetActions, sendTelemetry, setComponents, widget, widgetFocusContext],
+  );
+
+  return extraWidgetActions.length > 0 ? (
+    <>
+      <MenuItem divider />
+      {extraWidgetActions}
+    </>
+  ) : null;
 };
 
 export default ExtraDropdownWidgetActions;

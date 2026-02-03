@@ -22,22 +22,21 @@ import { useStore } from 'stores/connect';
 import InputsContext from 'contexts/InputsContext';
 import { InputsStore, InputsActions } from 'stores/inputs/InputsStore';
 
-const mapInputs = (state: ExtractStoreState<typeof InputsStore>) => Object.fromEntries(state?.inputs?.map((input) => [input.id, input]) ?? []);
+const mapInputs = (state: ExtractStoreState<typeof InputsStore>) =>
+  Object.fromEntries(state?.inputs?.map((input) => [input.id, input]) ?? []);
 
 const useInputs = () => {
-  useEffect(() => { InputsActions.list(); }, []);
+  useEffect(() => {
+    InputsActions.list();
+  }, []);
 
   return useStore(InputsStore, mapInputs);
 };
 
-const InputsProvider = ({ children }: React.PropsWithChildren<{}>) => {
+const InputsProvider = ({ children = undefined }: React.PropsWithChildren<{}>) => {
   const value = useInputs();
 
-  return (
-    <InputsContext.Provider value={value}>
-      {children}
-    </InputsContext.Provider>
-  );
+  return <InputsContext.Provider value={value}>{children}</InputsContext.Provider>;
 };
 
 export default InputsProvider;

@@ -25,7 +25,11 @@ import { AvailableEventDefinitionTypesStore } from 'stores/event-definitions/Ava
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
-import type { EventDefinition, EventDefinitionFormControlsProps } from 'components/event-definitions/event-definitions-types';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import type {
+  EventDefinition,
+  EventDefinitionFormControlsProps,
+} from 'components/event-definitions/event-definitions-types';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useEventDefinitionConfigFromLocalStorage from 'components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -33,30 +37,37 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useScopePermissions from 'hooks/useScopePermissions';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
-import EventDefinitionForm, { STEP_KEYS } from './EventDefinitionForm';
+import EventDefinitionForm, { getStepKeys } from './EventDefinitionForm';
+
+import useEventDefinitionMutations from '../hooks/useEventDefinitionMutations';
 
 const fetchNotifications = () => {
   EventNotificationsActions.listAll();
 };
 
 type Props = {
-  action?: 'edit' | 'create'
-  eventDefinition?: EventDefinition
-  formControls?: React.ComponentType<EventDefinitionFormControlsProps>,
-  initialStep?: string,
-  onCancel?: () => void
-  onChangeStep?: (step: string) => void,
-  onEventDefinitionChange?: (nextEventDefinition: EventDefinition) => void
-  onSubmit?: () => void,
-}
+  action?: 'edit' | 'create';
+  eventDefinition?: EventDefinition & {
+    share_request?: EntitySharePayload;
+  };
+  formControls?: React.ComponentType<EventDefinitionFormControlsProps>;
+  initialStep?: string;
+  onCancel?: () => void;
+  onChangeStep?: (step: string) => void;
+  onEventDefinitionChange?: (nextEventDefinition: EventDefinition) => void;
+  onSubmit?: () => void;
+};
 
 const getConditionPlugin = (edType): any => {
   if (edType === undefined) {
     return {};
   }
 
-  return PluginStore.exports('eventDefinitionTypes').find((eventDefinitionType) => eventDefinitionType.type === edType) || {};
+  return (
+    PluginStore.exports('eventDefinitionTypes').find((eventDefinitionType) => eventDefinitionType.type === edType) || {}
+  );
 };
 
 const EventDefinitionFormContainer = ({
@@ -64,7 +75,7 @@ const EventDefinitionFormContainer = ({
   eventDefinition: eventDefinitionInitial = {
     title: '',
     description: '',
-    priority: EventDefinitionPriorityEnum.NORMAL,
+    priority: EventDefinitionPriorityEnum.MEDIUM,
     // @ts-ignore
     config: {},
     field_spec: {},
@@ -77,12 +88,12 @@ const EventDefinitionFormContainer = ({
     notifications: [],
     alert: false,
   },
-  formControls,
-  initialStep = STEP_KEYS[0],
-  onCancel,
-  onChangeStep,
+  formControls = undefined,
+  initialStep = 'event-details',
+  onCancel = undefined,
+  onChangeStep = undefined,
   onEventDefinitionChange = () => {},
-  onSubmit,
+  onSubmit = undefined,
 }: Props) => {
   const [activeStep, setActiveStep] = useState(initialStep);
   const [eventDefinition, setEventDefinition] = useState(eventDefinitionInitial);
@@ -91,12 +102,14 @@ const EventDefinitionFormContainer = ({
   const [isDirty, setIsDirty] = useState(false);
   const { configFromLocalStorage, hasLocalStorageConfig } = useEventDefinitionConfigFromLocalStorage();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(eventDefinition);
-
+  const { createEventDefinition } = useEventDefinitionMutations();
   const entityTypes = useStore(AvailableEventDefinitionTypesStore);
   const notifications = useStore(EventNotificationsStore);
   const currentUser = useCurrentUser();
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
+  const isNew = action === 'create';
+  const currentStepKeys = getStepKeys(isNew);
 
   const isLoading = !entityTypes || !notifications.all || !eventsClusterConfig;
   const defaults = { default_backlog_size: eventsClusterConfig?.events_notification_default_backlog };
@@ -105,11 +118,14 @@ const EventDefinitionFormContainer = ({
     ConfigurationsActions.listEventsClusterConfig().then((config) => setEventsClusterConfig(config));
   }, []);
 
-  const handleChange = useCallback((key: string, value: unknown) => {
-    setEventDefinition((prev) => ({ ...prev, [key]: value }));
-    onEventDefinitionChange({ ...eventDefinition, [key]: value });
-    setIsDirty(true);
-  }, [eventDefinition, onEventDefinitionChange, setEventDefinition, setIsDirty]);
+  const handleChange = useCallback(
+    (key: string, value: unknown) => {
+      setEventDefinition((prev) => ({ ...prev, [key]: value }));
+      onEventDefinitionChange({ ...eventDefinition, [key]: value });
+      setIsDirty(true);
+    },
+    [eventDefinition, onEventDefinitionChange, setEventDefinition, setIsDirty],
+  );
 
   useEffect(() => {
     fetchClusterConfig();
@@ -117,32 +133,33 @@ const EventDefinitionFormContainer = ({
 
     if (hasLocalStorageConfig) {
       const conditionPlugin = getConditionPlugin(configFromLocalStorage.type);
-      const defaultConfig = conditionPlugin?.defaultConfig || {} as EventDefinition['config'];
+      const defaultConfig = conditionPlugin?.defaultConfig || ({} as EventDefinition['config']);
 
       setEventDefinition((cur) => {
         const cloned = cloneDeep(cur);
 
-        return ({
+        return {
           ...cloned,
           config: {
             ...defaultConfig,
             ...cloned.config,
             ...configFromLocalStorage,
           },
-        });
+        };
       });
     }
   }, [configFromLocalStorage, fetchClusterConfig, hasLocalStorageConfig]);
 
   const handleSubmitSuccessResponse = () => {
     setIsDirty(false);
+    CurrentUserStore.update(currentUser.username);
 
     onSubmit();
   };
 
   const showValidationErrors = (errors: { errors: unknown }) => {
     setValidation(errors);
-    setActiveStep(STEP_KEYS[STEP_KEYS.length - 1]);
+    setActiveStep(currentStepKeys[currentStepKeys.length - 1]);
   };
 
   const handleSubmitFailureResponse = (errorResponse) => {
@@ -156,9 +173,11 @@ const EventDefinitionFormContainer = ({
       }
 
       if (body.type && body.type === 'ApiError') {
-        if (body.message.includes('org.graylog.events.conditions.Expression')
-          || body.message.includes('org.graylog.events.conditions.Expr')
-          || body.message.includes('org.graylog.events.processor.aggregation.AggregationSeries')) {
+        if (
+          body.message.includes('org.graylog.events.conditions.Expression') ||
+          body.message.includes('org.graylog.events.conditions.Expr') ||
+          body.message.includes('org.graylog.events.processor.aggregation.AggregationSeries')
+        ) {
           showValidationErrors({
             errors: { conditions: ['Aggregation condition is not valid'] },
           });
@@ -185,8 +204,7 @@ const EventDefinitionFormContainer = ({
         app_action_value: 'create-event-definition-button',
       });
 
-      EventDefinitionsActions.create(eventDefinition)
-        .then(handleSubmitSuccessResponse, handleSubmitFailureResponse);
+      createEventDefinition(eventDefinition).then(handleSubmitSuccessResponse, handleSubmitFailureResponse);
     } else {
       sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.UPDATE_CLICKED, {
         app_pathname: getPathnameWithoutId(pathname),
@@ -194,15 +212,17 @@ const EventDefinitionFormContainer = ({
         app_action_value: 'update-event-definition-button',
       });
 
-      EventDefinitionsActions.update(eventDefinition.id, eventDefinition)
-        .then(handleSubmitSuccessResponse, handleSubmitFailureResponse);
+      EventDefinitionsActions.update(eventDefinition.id, eventDefinition).then(
+        handleSubmitSuccessResponse,
+        handleSubmitFailureResponse,
+      );
     }
   };
 
   const handleCancel = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.CANCEL_CLICKED, {
       app_pathname: getPathnameWithoutId(pathname),
-      app_section: (action === 'create') ? 'new-event-definition' : 'edit-event-definition',
+      app_section: action === 'create' ? 'new-event-definition' : 'edit-event-definition',
       app_action_value: 'cancel-button',
     });
 
@@ -223,20 +243,22 @@ const EventDefinitionFormContainer = ({
       {isDirty && (
         <ConfirmLeaveDialog question="Do you really want to abandon this page and lose your changes? This action cannot be undone." />
       )}
-      <EventDefinitionForm action={action}
-                           canEdit={scopePermissions.is_mutable}
-                           currentUser={currentUser}
-                           defaults={defaults}
-                           activeStep={activeStep}
-                           entityTypes={entityTypes}
-                           eventDefinition={eventDefinition}
-                           formControls={formControls}
-                           notifications={notifications.all}
-                           onCancel={handleCancel}
-                           onChange={handleChange}
-                           onChangeStep={changeStep}
-                           onSubmit={handleSubmit}
-                           validation={validation} />
+      <EventDefinitionForm
+        action={action}
+        canEdit={scopePermissions.is_mutable}
+        currentUser={currentUser}
+        defaults={defaults}
+        activeStep={activeStep}
+        entityTypes={entityTypes}
+        eventDefinition={eventDefinition}
+        formControls={formControls}
+        notifications={notifications.all}
+        onCancel={handleCancel}
+        onChange={handleChange}
+        onChangeStep={changeStep}
+        onSubmit={handleSubmit}
+        validation={validation}
+      />
     </>
   );
 };

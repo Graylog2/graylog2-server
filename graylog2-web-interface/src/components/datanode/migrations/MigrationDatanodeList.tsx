@@ -21,39 +21,47 @@ import { Icon, Spinner, Timestamp } from 'components/common';
 import { Alert, Table } from 'components/bootstrap';
 import { DocumentationLink } from 'components/support';
 import useDataNodes from 'components/datanode/hooks/useDataNodes';
+import useProductName from 'brand-customization/useProductName';
 
 type Props = {
-  showProvisioningState?: boolean
-}
+  showProvisioningState?: boolean;
+};
 
 const StyledIcon = styled(Icon)`
   margin-right: 0.5em;
 `;
 
 const MigrationDatanodeList = ({ showProvisioningState = true }: Props) => {
-  const { data: dataNodes, isInitialLoading } = useDataNodes();
+  const { data: dataNodes, isLoading } = useDataNodes();
+  const productName = useProductName();
 
-  if (isInitialLoading) {
+  if (isLoading) {
     return <Spinner text="Loading Data Nodes" />;
   }
 
   return (
     <div>
-      {(!dataNodes || dataNodes?.list.length === 0) ? (
+      {!dataNodes || dataNodes?.list.length === 0 ? (
         <>
-          <p><StyledIcon name="info" />There are no Data Nodes found.</p>
+          <p>
+            <StyledIcon name="info" />
+            There are no Data Nodes found.
+          </p>
           <Alert bsStyle="warning" title="No Data Nodes found">
-            Please start at least a Data Node to continue the migration process. You can find more information on how to start a Data Nodes in our <DocumentationLink page="graylog-data-node" text="documentation" />.
+            Please start at least a Data Node to continue the migration process. You can find more information on how to
+            start a Data Nodes in our <DocumentationLink page="graylog-data-node" text="documentation" />.
           </Alert>
-          <p><Spinner text="Looking for Data Nodes..." /></p>
+          <p>
+            <Spinner text="Looking for Data Nodes..." />
+          </p>
         </>
       ) : (
         <>
           <h4>Data Nodes found: {dataNodes?.list.length}</h4>
           {dataNodes.list.find((datanode) => !datanode.version_compatible) && (
             <Alert bsStyle="warning" title="Incompatible Data Nodes found">
-              There are Data Nodes running with versions incompatible to your current Graylog version.
-              Please make sure to use the same version for both Graylog and Data Node.
+              There are Data Nodes running with versions incompatible to your current {productName} version. Please make
+              sure to use the same version for both {productName} and Data Node.
             </Alert>
           )}
           <br />
@@ -72,12 +80,16 @@ const MigrationDatanodeList = ({ showProvisioningState = true }: Props) => {
                 <tr key={datanode.id}>
                   <td>{datanode.hostname}</td>
                   <td>{datanode.transport_address}</td>
-                  <td>{showProvisioningState ? datanode.status : datanode.data_node_status}</td>
-                  <td>{datanode.cert_valid_until ? <Timestamp dateTime={datanode.cert_valid_until} /> : 'No certificate'}</td>
+                  <td>{showProvisioningState ? datanode.status : datanode.datanode_status}</td>
+                  <td>
+                    {datanode.cert_valid_until ? <Timestamp dateTime={datanode.cert_valid_until} /> : 'No certificate'}
+                  </td>
                   <td>
                     {!datanode.version_compatible && (
-                      <Icon name="warning"
-                            title="This version is incompatible with your current Graylog version." />
+                      <Icon
+                        name="warning"
+                        title={`This version is incompatible with your current ${productName} version.`}
+                      />
                     )}
                     {datanode.datanode_version}
                   </td>

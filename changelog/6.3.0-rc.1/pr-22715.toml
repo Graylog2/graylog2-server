@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix issue with message journal recovery on server shutdown."
+
+pulls = ["22715"]

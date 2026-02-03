@@ -19,14 +19,15 @@ import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { PluginStore, PluginManifest } from 'graylog-web-plugin/plugin';
 
 import useShowRouteForEntity from 'routing/hooks/useShowRouteForEntity';
+import type { QualifiedUrl } from 'routing/Routes';
 import Routes from 'routing/Routes';
 
 describe('getShowRouteFromGRN', () => {
   describe('should return correct route', () => {
     it.each`
-      id              | type               | entityShowURL
-      ${'user-id'}    | ${'user'}          | ${Routes.SYSTEM.USERS.show('user-id')}
-      ${'stream-id'}  | ${'stream'}        | ${Routes.stream_search('stream-id')}
+      id             | type        | entityShowURL
+      ${'user-id'}   | ${'user'}   | ${Routes.SYSTEM.USERS.show('user-id')}
+      ${'stream-id'} | ${'stream'} | ${Routes.stream_search('stream-id')}
     `('for $type with id $id', ({ id, type, entityShowURL }) => {
       const { result } = renderHook(() => useShowRouteForEntity(id, type));
 
@@ -35,11 +36,15 @@ describe('getShowRouteFromGRN', () => {
   });
 
   describe('with plugin data', () => {
-    const plugin = new PluginManifest({}, {
-      entityRoutes: [
-        (id, type) => (type === 'dashboard' && id === 'special-id' ? '/plugin-entity-route' : null),
-      ],
-    });
+    const plugin = new PluginManifest(
+      {},
+      {
+        entityRoutes: [
+          (id, type) =>
+            (type === 'dashboard' && id === 'special-id' ? '/plugin-entity-route' : null) as QualifiedUrl<string>,
+        ],
+      },
+    );
 
     beforeAll(() => PluginStore.register(plugin));
 

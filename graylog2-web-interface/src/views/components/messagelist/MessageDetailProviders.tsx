@@ -22,8 +22,8 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import type { Message } from './Types';
 
 type Props = {
-  children: React.ReactElement,
-  message: Message
+  children: React.ReactElement;
+  message: Message;
 };
 
 const MessageDetailProviders = ({ children, message }: Props) => {
@@ -33,13 +33,14 @@ const MessageDetailProviders = ({ children, message }: Props) => {
     return children;
   }
 
-  return contextProviders.reduce((nestedChildren, MessageDetailContextProvider) => (
-    <ErrorBoundary FallbackComponent={() => nestedChildren}>
-      <MessageDetailContextProvider message={message}>
-        {nestedChildren}
-      </MessageDetailContextProvider>
-    </ErrorBoundary>
-  ), children);
+  return contextProviders.reduce(
+    (nestedChildren, MessageDetailContextProvider) => (
+      <ErrorBoundary FallbackComponent={() => nestedChildren}>
+        <MessageDetailContextProvider message={message}>{nestedChildren}</MessageDetailContextProvider>
+      </ErrorBoundary>
+    ),
+    children,
+  );
 };
 
 export default MessageDetailProviders;

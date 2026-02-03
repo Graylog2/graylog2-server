@@ -30,6 +30,7 @@ import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.DropdownField;
+import org.graylog2.plugin.inputs.DefinesEventSourceProduct;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.Codec;
@@ -44,8 +45,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
-public class PaloAlto11xCodec implements Codec {
+public class PaloAlto11xCodec implements Codec, DefinesEventSourceProduct {
     private static final Logger LOG = LoggerFactory.getLogger(PaloAlto11xCodec.class);
     static final String CK_STORE_FULL_MESSAGE = "store_full_message";
     static final String CK_TIMEZONE = "timezone";
@@ -71,9 +73,8 @@ public class PaloAlto11xCodec implements Codec {
         this.rawMessageParser = rawMessageParser;
     }
 
-    @Nullable
     @Override
-    public Message decode(@Nonnull RawMessage rawMessage) {
+    public Optional<Message> decodeSafe(@Nonnull RawMessage rawMessage) {
         String rawMessageString = new String(rawMessage.getPayload(), StandardCharsets.UTF_8);
         LOG.trace("Received raw message: {}", rawMessageString);
 
@@ -104,14 +105,14 @@ public class PaloAlto11xCodec implements Codec {
         }
 
         Message message = messageFactory.createMessage(payload, source, timestamp);
-        message.addField(EventFields.EVENT_SOURCE_PRODUCT, EVENT_SOURCE_PRODUCT_NAME);
+        message.addField(EventFields.EVENT_SOURCE_PRODUCT, getEventSourceProduct());
         message.addField(VendorFields.VENDOR_SUBTYPE, panType);
         // Store full message if configured.
         if (configuration.getBoolean(CK_STORE_FULL_MESSAGE)) {
             message.addField(Message.FIELD_FULL_MESSAGE, new String(rawMessage.getPayload(), StandardCharsets.UTF_8));
         }
         LOG.trace("Successfully processed [{}] message with [{}] fields.", panType, message.getFieldCount());
-        return message;
+        return Optional.of(message);
     }
 
     private String getRawMessageSource(RawMessage rawMessage) {
@@ -135,6 +136,11 @@ public class PaloAlto11xCodec implements Codec {
     @Override
     public Configuration getConfiguration() {
         return this.configuration;
+    }
+
+    @Override
+    public String getEventSourceProduct() {
+        return EVENT_SOURCE_PRODUCT_NAME;
     }
 
     @FactoryClass

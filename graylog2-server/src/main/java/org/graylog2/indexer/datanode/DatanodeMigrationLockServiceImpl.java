@@ -27,7 +27,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.graylog2.cluster.lock.Lock;
 import org.graylog2.cluster.lock.LockService;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +42,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+@Deprecated(forRemoval = true)
 public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockService {
 
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeMigrationLockServiceImpl.class);
@@ -135,7 +136,7 @@ public class DatanodeMigrationLockServiceImpl implements DatanodeMigrationLockSe
         try {
             return RetryerBuilder.<Optional<Lock>>newBuilder()
                     .withRetryListener(loggingRetryListener(caller, indexSet, waitConfig))
-                    .withStopStrategy(StopStrategies.stopAfterDelay(waitConfig.lockAcquireTimeout().getSeconds(), TimeUnit.SECONDS))
+                    .withStopStrategy(StopStrategies.stopAfterDelay(waitConfig.lockAcquireTimeout().toSeconds(), TimeUnit.SECONDS))
                     .withWaitStrategy(WaitStrategies.fixedWait(waitConfig.delayBetweenAttempts().toMillis(), TimeUnit.MILLISECONDS))
                     .retryIfResult(Optional::isEmpty)
                     .build()

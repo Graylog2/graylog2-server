@@ -24,32 +24,36 @@ import UserNotification from 'util/UserNotification';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
 type PreferencesActionsType = {
-  saveUserPreferences: (userName: string, preferences: PreferencesUpdateMap, callback?: (preferences: PreferencesUpdateMap) => void, displaySuccessNotification?: boolean) => Promise<unknown>,
-}
-export const PreferencesActions = singletonActions(
-  'core.Preferences',
-  () => Reflux.createActions<PreferencesActionsType>({
+  saveUserPreferences: (
+    userName: string,
+    preferences: PreferencesUpdateMap,
+    callback?: (preferences: PreferencesUpdateMap) => void,
+    displaySuccessNotification?: boolean,
+  ) => Promise<unknown>;
+};
+export const PreferencesActions = singletonActions('core.Preferences', () =>
+  Reflux.createActions<PreferencesActionsType>({
     loadUserPreferences: { asyncResult: true },
     saveUserPreferences: { asyncResult: true },
   }),
 );
 
-type BooleanString = 'true' | 'false'
+type BooleanString = 'true' | 'false';
 
 export type PreferencesUpdateMap = {
-  enableSmartSearch: boolean | BooleanString,
-  updateUnfocussed: boolean | BooleanString,
-  dashboardSidebarIsPinned?: boolean | BooleanString,
-  searchSidebarIsPinned?: boolean | BooleanString,
-  [PREFERENCES_THEME_MODE]?: ColorScheme,
+  enableSmartSearch: boolean | BooleanString;
+  updateUnfocussed: boolean | BooleanString;
+  dashboardSidebarIsPinned?: boolean | BooleanString;
+  searchSidebarIsPinned?: boolean | BooleanString;
+  [PREFERENCES_THEME_MODE]?: ColorScheme;
 };
 
 export type PreferencesMap = {
-  enableSmartSearch: boolean,
-  updateUnfocussed: boolean,
-  dashboardSidebarIsPinned?: boolean,
-  searchSidebarIsPinned?: boolean,
-  [PREFERENCES_THEME_MODE]: ColorScheme,
+  enableSmartSearch: boolean;
+  updateUnfocussed: boolean;
+  dashboardSidebarIsPinned?: boolean;
+  searchSidebarIsPinned?: boolean;
+  [PREFERENCES_THEME_MODE]: ColorScheme;
 };
 
 const convertPreferences = (preferences: PreferencesUpdateMap): PreferencesMap => {
@@ -69,26 +73,34 @@ const convertPreferences = (preferences: PreferencesUpdateMap): PreferencesMap =
   return convertedPreferences;
 };
 
-export const PreferencesStore = singletonStore(
-  'core.Preferences',
-  () => Reflux.createStore({
+export const PreferencesStore = singletonStore('core.Preferences', () =>
+  Reflux.createStore({
     listenables: [PreferencesActions],
     URL: qualifyUrl('/users/'),
 
-    saveUserPreferences(userName: string, preferences: PreferencesUpdateMap, callback: (preferences: PreferencesUpdateMap) => void = () => {}, displaySuccessNotification = true) {
+    saveUserPreferences(
+      userName: string,
+      preferences: PreferencesUpdateMap,
+      callback: (preferences: PreferencesUpdateMap) => void = () => {},
+      displaySuccessNotification = true,
+    ) {
       const convertedPreferences = convertPreferences(preferences);
       const url = `${this.URL + encodeURIComponent(userName)}/preferences`;
-      const promise = fetch('PUT', url, { preferences: convertedPreferences })
-        .then(() => {
+      const promise = fetch('PUT', url, { preferences: convertedPreferences }).then(
+        () => {
           if (displaySuccessNotification) {
             UserNotification.success('User preferences successfully saved');
           }
 
           callback(preferences);
-        }, (errorThrown) => {
-          UserNotification.error(`Saving of preferences for "${userName}" failed with status: ${errorThrown}`,
-            'Could not save user preferences');
-        });
+        },
+        (errorThrown) => {
+          UserNotification.error(
+            `Saving of preferences for "${userName}" failed with status: ${errorThrown}`,
+            'Could not save user preferences',
+          );
+        },
+      );
 
       PreferencesActions.saveUserPreferences.promise(promise);
 

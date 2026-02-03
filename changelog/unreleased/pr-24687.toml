@@ -1,0 +1,4 @@
+type = "s"
+message = "Update lz4-java library to 1.10.2 to fix CVE-2025-12183."
+
+pulls = ["24687", "graylog-plugin-enterprise#12940"]

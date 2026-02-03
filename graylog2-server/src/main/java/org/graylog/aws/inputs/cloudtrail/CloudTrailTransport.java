@@ -16,91 +16,93 @@
  */
 package org.graylog.aws.inputs.cloudtrail;
 
-import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.codahale.metrics.MetricSet;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import com.google.inject.assistedinject.Assisted;
-import okhttp3.HttpUrl;
-import org.graylog.aws.AWS;
-import org.graylog.aws.AWSObjectMapper;
-import org.graylog.aws.auth.AWSAuthProvider;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog.aws.config.AWSPluginConfiguration;
+import org.graylog.aws.inputs.cloudtrail.external.CloudTrailClientFactory;
+import org.graylog.aws.inputs.cloudtrail.external.CloudTrailS3Client;
+import org.graylog.aws.notifications.SQSClient;
+import org.graylog.aws.sqs.SQSClientFactory;
+import org.graylog.integrations.aws.AWSClientBuilderUtil;
+import org.graylog.integrations.aws.resources.requests.AWSRequest;
+import org.graylog.integrations.aws.resources.requests.AWSRequestImpl;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.LocalMetricRegistry;
-import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.configuration.fields.ConfigurationField;
-import org.graylog2.plugin.configuration.fields.DropdownField;
-import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
-import org.graylog2.plugin.inputs.transports.ThrottleableTransport;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.inputs.transports.Transport;
-import org.graylog2.plugin.lifecycles.Lifecycle;
+import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 
-import javax.annotation.Nullable;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
-import java.net.URI;
-import java.util.Map;
+import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_ASSUME_ROLE_ARN;
+import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_ACCESS_KEY;
+import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_SECRET_KEY;
+import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_S3_REGION;
+import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_SQS_QUEUE_NAME;
+import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_SQS_REGION;
+import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_POLLING_INTERVAL;
 
 public class CloudTrailTransport extends ThrottleableTransport2 {
     private static final Logger LOG = LoggerFactory.getLogger(CloudTrailTransport.class);
-    public static final String NAME = "cloudtrail";
-
-    private static final String CK_LEGACY_AWS_REGION = "aws_region";
-    private static final String CK_AWS_SQS_REGION = "aws_sqs_region";
-    private static final String CK_AWS_S3_REGION = "aws_s3_region";
-    private static final String CK_SQS_NAME = "aws_sqs_queue_name";
-    private static final String CK_ACCESS_KEY = "aws_access_key";
-    private static final String CK_SECRET_KEY = "aws_secret_key";
-    private static final String CK_ASSUME_ROLE_ARN = "aws_assume_role_arn";
-
+    public static final String NAME = "AWSCloudTrail";
     private static final Regions DEFAULT_REGION = Regions.US_EAST_1;
-
-    private final ServerStatus serverStatus;
-    private final URI httpProxyUri;
     private final LocalMetricRegistry localRegistry;
-    private final org.graylog2.Configuration systemConfiguration;
-    private final ClusterConfigService clusterConfigService;
+    private final ScheduledExecutorService executorService;
+    private final SQSClientFactory sqsClientFactory;
+    private final CloudTrailClientFactory cloudTrailClientFactory;
+    private final AWSClientBuilderUtil awsUtils;
     private final ObjectMapper objectMapper;
+    private ScheduledFuture runningTask = null;
+    private final AtomicBoolean interrupt;
+    private final ClusterConfigService clusterConfigService;
     private final EncryptedValueService encryptedValueService;
-
-    private CloudTrailSubscriber subscriber;
+    private final org.graylog2.Configuration systemConfiguration;
 
     @Inject
-    public CloudTrailTransport(@Assisted final Configuration configuration,
-                               final org.graylog2.Configuration systemConfiguration,
-                               final ClusterConfigService clusterConfigService,
-                               final EventBus serverEventBus,
-                               final ServerStatus serverStatus,
-                               @AWSObjectMapper ObjectMapper objectMapper,
-                               @Named("http_proxy_uri") @Nullable URI httpProxyUri,
-                               LocalMetricRegistry localRegistry,
-                               EncryptedValueService encryptedValueService) {
-        super(serverEventBus, configuration);
-        this.systemConfiguration = systemConfiguration;
-
-        this.clusterConfigService = clusterConfigService;
-        this.serverStatus = serverStatus;
-        this.objectMapper = objectMapper;
-        this.httpProxyUri = httpProxyUri;
+    public CloudTrailTransport(@Assisted Configuration configuration,
+            EventBus eventBus,
+            LocalMetricRegistry localRegistry,
+            CloudTrailClientFactory cloudTrailClientFactory,
+            SQSClientFactory sqsClientFactory,
+            AWSClientBuilderUtil awsUtils,
+            @Named("daemonScheduler") ScheduledExecutorService executorService,
+            ClusterConfigService clusterConfigService,
+            EncryptedValueService encryptedValueService,
+            org.graylog2.Configuration systemConfiguration) {
+        super(eventBus, configuration);
         this.localRegistry = localRegistry;
+        this.sqsClientFactory = sqsClientFactory;
+        this.awsUtils = awsUtils;
+        this.executorService = executorService;
+        this.interrupt = new AtomicBoolean(false);
+        this.objectMapper = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        this.cloudTrailClientFactory = cloudTrailClientFactory;
+        this.clusterConfigService = clusterConfigService;
         this.encryptedValueService = encryptedValueService;
+        this.systemConfiguration = systemConfiguration;
     }
 
     @Override
@@ -108,67 +110,73 @@ public class CloudTrailTransport extends ThrottleableTransport2 {
         // Not supported.
     }
 
-    @Subscribe
-    public void lifecycleStateChange(Lifecycle lifecycle) {
-        LOG.debug("Lifecycle changed to {}", lifecycle);
-        switch (lifecycle) {
-            case PAUSED:
-            case FAILED:
-            case HALTING:
-                if (subscriber != null) {
-                    subscriber.pause();
-                }
-                break;
-            default:
-                if (subscriber != null) {
-                    subscriber.unpause();
-                }
-                break;
-        }
-    }
-
     @Override
     public void doLaunch(MessageInput input, InputFailureRecorder inputFailureRecorder) throws MisfireException {
-        serverStatus.awaitRunning(() -> lifecycleStateChange(Lifecycle.RUNNING));
+        LOG.debug("Launching CloudTrailTransport");
 
-        final AWSPluginConfiguration config = clusterConfigService.getOrDefault(AWSPluginConfiguration.class,
+        // Get AWS Plugin configuration for fallback
+        final AWSPluginConfiguration pluginConfig = clusterConfigService.getOrDefault(
+                AWSPluginConfiguration.class,
                 AWSPluginConfiguration.createDefault());
 
-        LOG.info("Starting cloud trail subscriber");
+        // Get input-specific configuration with fallback to plugin configuration
+        String awsAccessKey = input.getConfiguration().getString(CK_AWS_ACCESS_KEY);
+        EncryptedValue secretAccessKey = input.getConfiguration().getEncryptedValue(CK_AWS_SECRET_KEY);
 
-        final String legacyRegionName = input.getConfiguration().getString(CK_LEGACY_AWS_REGION, DEFAULT_REGION.getName());
-        final String sqsRegionName = input.getConfiguration().getString(CK_AWS_SQS_REGION, legacyRegionName);
-        final String s3RegionName = input.getConfiguration().getString(CK_AWS_S3_REGION, legacyRegionName);
+        // Fallback to AWS Plugin configuration if access key/secret not provided
+        if (isNullOrEmpty(awsAccessKey) && !isNullOrEmpty(pluginConfig.accessKey())) {
+            LOG.debug("Using AWS access key from plugin configuration");
+            awsAccessKey = pluginConfig.accessKey();
+        }
 
-        final HttpUrl proxyUrl = config.proxyEnabled() && httpProxyUri != null ? HttpUrl.get(httpProxyUri) : null;
+        if ((secretAccessKey == null || !secretAccessKey.isSet()) &&
+                !isNullOrEmpty(pluginConfig.encryptedSecretKey())) {
+            LOG.debug("Using AWS secret key from plugin configuration");
+            String decryptedPluginSecret = pluginConfig.secretKey(systemConfiguration.getPasswordSecret());
+            secretAccessKey = encryptedValueService.encrypt(decryptedPluginSecret);
+        }
 
-        final AWSAuthProvider authProvider = new AWSAuthProvider(
-                systemConfiguration,
-                config,
-                input.getConfiguration().getString(CK_ACCESS_KEY),
-                encryptedValueService.decrypt(input.getConfiguration().getEncryptedValue(CK_SECRET_KEY)),
-                input.getConfiguration().getString(CK_AWS_SQS_REGION),
-                input.getConfiguration().getString(CK_ASSUME_ROLE_ARN)
-        );
+        final String assumeRoleArn = input.getConfiguration().getString(CK_ASSUME_ROLE_ARN);
+        final String sqsRegionName = input.getConfiguration().getString(CK_AWS_SQS_REGION, DEFAULT_REGION.getName());
+        final String s3RegionName = input.getConfiguration().getString(CK_AWS_S3_REGION, DEFAULT_REGION.getName());
 
-        subscriber = new CloudTrailSubscriber(
-                Region.getRegion(Regions.fromName(sqsRegionName)),
-                Region.getRegion(Regions.fromName(s3RegionName)),
-                input.getConfiguration().getString(CK_SQS_NAME),
-                input,
-                authProvider,
-                proxyUrl,
-                objectMapper,
+        LOG.debug("Using SQS region: {}, S3 region: {}", sqsRegionName, s3RegionName);
+
+        final String sqsQueueName = input.getConfiguration().getString(CK_AWS_SQS_QUEUE_NAME);
+        long pollingInterval = input.getConfiguration().getInt(CK_POLLING_INTERVAL, 1);
+
+        // Use SQS region for authentication
+        final AWSRequest awsRequest = AWSRequestImpl.builder()
+                .region(sqsRegionName)
+                .awsAccessKeyId(awsAccessKey)
+                .awsSecretAccessKey(secretAccessKey)
+                .assumeRoleArn(assumeRoleArn).build();
+        final AwsCredentialsProvider credentialsProvider = awsUtils.createCredentialsProvider(awsRequest);
+
+        SQSClient sqsClient = sqsClientFactory.create(sqsQueueName, sqsRegionName, credentialsProvider, inputFailureRecorder);
+        CloudTrailS3Client cloudTrailS3Client = cloudTrailClientFactory.getS3Client(s3RegionName, credentialsProvider,
                 inputFailureRecorder);
+        LOG.debug("Constructing poller task");
 
-        subscriber.start();
+        CloudTrailPollerTask pollerTask = new CloudTrailPollerTask(input,
+                sqsClient,
+                cloudTrailS3Client,
+                this,
+                inputFailureRecorder,
+                objectMapper,
+                interrupt);
+
+        LOG.debug("Submitting poller task to executor");
+        runningTask = executorService.scheduleWithFixedDelay(pollerTask, 0L, pollingInterval, TimeUnit.MINUTES);
     }
 
     @Override
     public void doStop() {
-        LOG.info("Stopping cloud trail subscriber");
-        if (subscriber != null) {
-            subscriber.terminate();
+        LOG.debug("Stopping CloudTrailTransport");
+        if (null != runningTask) {
+            LOG.debug("Cancelling scheduled task");
+            interrupt.set(true);
+            runningTask.cancel(false);
         }
     }
 
@@ -187,70 +195,10 @@ public class CloudTrailTransport extends ThrottleableTransport2 {
     }
 
     @ConfigClass
-    public static class Config extends ThrottleableTransport.Config {
-        private final boolean isCloud;
-
-        @Inject
-        public Config(org.graylog2.Configuration configuration) {
-            isCloud = configuration.isCloud();
-        }
-
+    public static class Config extends ThrottleableTransport2.Config {
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
-            final ConfigurationRequest r = super.getRequestedConfiguration();
-
-            Map<String, String> regionChoices = AWS.buildRegionChoices();
-            r.addField(new DropdownField(
-                    CK_AWS_SQS_REGION,
-                    "AWS SQS Region",
-                    DEFAULT_REGION.getName(),
-                    regionChoices,
-                    "The AWS region the SQS queue is in.",
-                    ConfigurationField.Optional.NOT_OPTIONAL
-            ));
-
-            r.addField(new DropdownField(
-                    CK_AWS_S3_REGION,
-                    "AWS S3 Region",
-                    DEFAULT_REGION.getName(),
-                    regionChoices,
-                    "The AWS region the S3 bucket containing CloudTrail logs is in.",
-                    ConfigurationField.Optional.NOT_OPTIONAL
-            ));
-
-            r.addField(new TextField(
-                    CK_SQS_NAME,
-                    "SQS queue name",
-                    "cloudtrail-notifications",
-                    "The SQS queue that SNS is writing CloudTrail notifications to.",
-                    ConfigurationField.Optional.NOT_OPTIONAL
-            ));
-
-            r.addField(new TextField(
-                    CK_ACCESS_KEY,
-                    "AWS access key",
-                    "",
-                    "Access key of an AWS user with sufficient permissions. (See documentation)",
-                    isCloud ? ConfigurationField.Optional.NOT_OPTIONAL : ConfigurationField.Optional.OPTIONAL
-            ));
-            r.addField(new TextField(
-                    CK_SECRET_KEY,
-                    "AWS secret key",
-                    "",
-                    "Secret key of an AWS user with sufficient permissions. (See documentation)",
-                    isCloud ? ConfigurationField.Optional.NOT_OPTIONAL : ConfigurationField.Optional.OPTIONAL, true,
-                    TextField.Attribute.IS_PASSWORD
-            ));
-
-            r.addField(new TextField(
-                    CK_ASSUME_ROLE_ARN,
-                    "AWS assume role ARN",
-                    "",
-                    "The role ARN with required permissions (cross account access)",
-                    ConfigurationField.Optional.OPTIONAL
-            ));
-
-            return r;
+            return super.getRequestedConfiguration();
         }
     }
 }

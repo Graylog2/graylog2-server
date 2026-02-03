@@ -1,0 +1,5 @@
+type = "a"
+message = "Add option to customize axis labels."
+
+pulls = ["24306"]
+issues = ["24289"]

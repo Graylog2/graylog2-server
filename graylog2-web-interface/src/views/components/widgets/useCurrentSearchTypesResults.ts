@@ -17,10 +17,10 @@
 import { createSelector } from '@reduxjs/toolkit';
 
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 
 const selectCurrentSearchTypeResults = createSelector(selectCurrentQueryResults, (result) => result?.searchTypes);
 
-const useCurrentSearchTypesResults = () => useAppSelector(selectCurrentSearchTypeResults);
+const useCurrentSearchTypesResults = () => useViewsSelector(selectCurrentSearchTypeResults);
 
 export default useCurrentSearchTypesResults;

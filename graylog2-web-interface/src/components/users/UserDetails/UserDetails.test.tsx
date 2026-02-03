@@ -17,6 +17,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { paginatedShares } from 'fixtures/sharedEntities';
 import { reader as assignedRole } from 'fixtures/roles';
@@ -24,7 +25,10 @@ import User from 'logic/users/User';
 
 import UserDetails from './UserDetails';
 
-const mockAuthzRolesPromise = Promise.resolve({ list: Immutable.List([assignedRole]), pagination: { page: 1, perPage: 10, total: 1 } });
+const mockAuthzRolesPromise = Promise.resolve({
+  list: Immutable.List([assignedRole]),
+  pagination: { page: 1, perPage: 10, total: 1 },
+});
 const mockPaginatedUserShares = paginatedShares({ page: 1, perPage: 10, query: '' });
 
 jest.mock('stores/roles/AuthzRolesStore', () => ({
@@ -40,8 +44,7 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
   },
 }));
 
-const user = User
-  .builder()
+const user = User.builder()
   .fullName('The full name')
   .firstName('The first name')
   .lastName('The last name')
@@ -76,7 +79,8 @@ describe('UserDetails', () => {
   describe('user settings', () => {
     it('should display timezone', async () => {
       render(<UserDetails user={user} />);
-
+      const tab = await screen.findByLabelText(/Preferences/i);
+      userEvent.click(tab);
       await waitFor(() => {
         if (!user.timezone) throw Error('timezone must be defined for provided user');
 
@@ -89,11 +93,17 @@ describe('UserDetails', () => {
         const exampleUser = user.toBuilder().sessionTimeoutMs(10000).build();
         render(<UserDetails user={exampleUser} />);
 
+        const tab = await screen.findByLabelText(/Preferences/i);
+        userEvent.click(tab);
+
         await screen.findByText('10 Seconds');
       });
 
       it('for minutes', async () => {
         render(<UserDetails user={user.toBuilder().sessionTimeoutMs(600000).build()} />);
+
+        const tab = await screen.findByLabelText(/Preferences/i);
+        userEvent.click(tab);
 
         await screen.findByText('10 Minutes');
       });
@@ -101,11 +111,17 @@ describe('UserDetails', () => {
       it('for hours', async () => {
         render(<UserDetails user={user.toBuilder().sessionTimeoutMs(36000000).build()} />);
 
+        const tab = await screen.findByLabelText(/Preferences/i);
+        userEvent.click(tab);
+
         await screen.findByText('10 Hours');
       });
 
       it('for days', async () => {
         render(<UserDetails user={user.toBuilder().sessionTimeoutMs(864000000).build()} />);
+
+        const tab = await screen.findByLabelText(/Preferences/i);
+        userEvent.click(tab);
 
         await screen.findByText('10 Days');
       });
@@ -116,6 +132,9 @@ describe('UserDetails', () => {
     it('should display assigned roles', async () => {
       render(<UserDetails user={user} />);
 
+      const tab = await screen.findByLabelText(/Teams & Roles/i);
+      userEvent.click(tab);
+
       await screen.findByText(assignedRole.name);
     });
   });
@@ -124,7 +143,10 @@ describe('UserDetails', () => {
     it('should display info if license is not present', async () => {
       render(<UserDetails user={user} />);
 
-      await screen.findByText(/Enterprise Feature/);
+      const tab = await screen.findByLabelText(/Teams & Roles/i);
+      userEvent.click(tab);
+
+      await screen.findAllByText(/Enterprise Feature/);
     });
   });
 });

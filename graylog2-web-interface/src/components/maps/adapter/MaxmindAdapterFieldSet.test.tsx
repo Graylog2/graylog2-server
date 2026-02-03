@@ -36,11 +36,15 @@ describe('MaxmindAdapterFieldSet', () => {
     });
 
     it('renders MaxmindAdapterFieldSet without path input', async () => {
-      render(<MaxmindAdapterFieldSet config={{} as Config}
-                                     updateConfig={() => {}}
-                                     handleFormEvent={() => {}}
-                                     validationState={() => undefined}
-                                     validationMessage={() => undefined} />);
+      render(
+        <MaxmindAdapterFieldSet
+          config={{} as Config}
+          updateConfig={() => {}}
+          handleFormEvent={() => {}}
+          validationState={() => undefined}
+          validationMessage={() => undefined}
+        />,
+      );
 
       expect(screen.getByText(/select the type of the database file/i)).toBeInTheDocument();
 
@@ -54,11 +58,15 @@ describe('MaxmindAdapterFieldSet', () => {
     });
 
     it('renders MaxmindAdapterFieldSet with path input', async () => {
-      render(<MaxmindAdapterFieldSet config={{} as Config}
-                                     updateConfig={() => {}}
-                                     handleFormEvent={() => {}}
-                                     validationState={() => undefined}
-                                     validationMessage={() => undefined} />);
+      render(
+        <MaxmindAdapterFieldSet
+          config={{} as Config}
+          updateConfig={() => {}}
+          handleFormEvent={() => {}}
+          validationState={() => undefined}
+          validationMessage={() => undefined}
+        />,
+      );
 
       expect(screen.getByText(/Select the type of the database file/i)).toBeInTheDocument();
 

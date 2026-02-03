@@ -26,6 +26,8 @@ import org.graylog2.Configuration;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.shared.messageq.Acknowledgeable;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -209,26 +211,29 @@ public class FailureHandlingServiceTest {
                 .until(() -> failureSubmissionQueue.queueSize() == 0);
 
         // then
-        verify(acknowledger, times(1)).acknowledge(argThat((List<Message> arg) ->
-                arg.size() == 1 && arg.get(0) == processingFailureWithAck.failedMessage()));
+        verify(acknowledger, times(1)).acknowledge(argThat((List<? extends Acknowledgeable> arg) ->
+                arg.size() == 1 && arg.get(0) == processingFailureWithAck));
     }
 
     @Test
-    public void run_doesNotAcknowledgeIndexingErrors() throws InterruptedException {
+    public void run_doesNotAcknowledgeIndexingAndInputErrors() throws InterruptedException {
         // given
         final FailureHandler fallbackFailureHandler = enabledFailureHandler();
 
         final FailureBatch indexingFailureBatch = indexingFailureBatch(createIndexingFailure());
-        final FailureHandler customFailureHandler = enabledFailureHandler(indexingFailureBatch);
+        final FailureHandler indexingFailureHandler = enabledFailureHandler(indexingFailureBatch);
+        final FailureBatch inputFailureBatch = FailureBatch.inputFailureBatch(List.of(createInputFailure()));
+        final FailureHandler inputFailureHandler = enabledFailureHandler(inputFailureBatch);
 
         final FailureHandlingService underTest = new FailureHandlingService(fallbackFailureHandler,
-                ImmutableSet.of(customFailureHandler), failureSubmissionQueue, configuration, acknowledger);
+                ImmutableSet.of(indexingFailureHandler, inputFailureHandler), failureSubmissionQueue, configuration, acknowledger);
 
         // when
         underTest.startAsync();
         underTest.awaitRunning();
 
         failureSubmissionQueue.submitBlocking(indexingFailureBatch);
+        failureSubmissionQueue.submitBlocking(inputFailureBatch);
 
         Awaitility.waitAtMost(Durations.ONE_SECOND)
                 .until(() -> failureSubmissionQueue.queueSize() == 0);
@@ -273,9 +278,16 @@ public class FailureHandlingServiceTest {
     }
 
     private ProcessingFailure createProcessingFailure(boolean ack) {
+        Message message = messageFactory.createMessage(ImmutableMap.of("_id", "1234"));
+        message.setMessageQueueId("message-queue-id");
         return new ProcessingFailure(
                 ProcessingFailureCause.UNKNOWN, "Failure Message", "Failure Details",
-                Tools.nowUTC(), messageFactory.createMessage(ImmutableMap.of("_id", "1234")), ack);
+                Tools.nowUTC(), message, ack);
+    }
+
+    private InputFailure createInputFailure() {
+        return new InputFailure(InputFailureCause.INPUT_PARSE, "Failure Message", "Failure Details",
+                Tools.nowUTC(), new RawMessage(new byte[]{}), "pyload");
     }
 
     private FailureBatch indexingFailureBatch(IndexingFailure indexingFailure) {

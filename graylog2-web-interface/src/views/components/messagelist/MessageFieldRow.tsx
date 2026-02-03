@@ -33,18 +33,19 @@ export const MessageWrapper = styled.div`
 `;
 
 type Props = {
-  message: Message,
-  messageFieldType: FieldType,
+  message: Message;
+  messageFieldType: FieldType;
 };
 
 const MessageFieldRow = ({ message, messageFieldType }: Props) => (
   <MessageWrapper>
-    <CustomHighlighting field="message"
-                        value={message.fields[MESSAGE_FIELD]}>
-      <TypeSpecificValue field="message"
-                         value={message.fields[MESSAGE_FIELD]}
-                         type={messageFieldType}
-                         render={DecoratedValue} />
+    <CustomHighlighting field="message" value={message.fields[MESSAGE_FIELD]}>
+      <TypeSpecificValue
+        field="message"
+        value={message.fields[MESSAGE_FIELD]}
+        type={messageFieldType}
+        render={DecoratedValue}
+      />
     </CustomHighlighting>
   </MessageWrapper>
 );

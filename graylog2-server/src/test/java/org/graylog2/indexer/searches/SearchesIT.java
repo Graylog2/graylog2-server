@@ -23,10 +23,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.buffers.processors.fakestreams.FakeStream;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
-import org.graylog2.indexer.TestIndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.TestIndexSet;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeComparator;
@@ -50,12 +50,13 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -68,8 +69,8 @@ import java.util.SortedSet;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 import static org.graylog2.indexer.searches.ChunkCommand.NO_BATCHSIZE;
+import static org.graylog2.indexer.template.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 import static org.joda.time.DateTimeZone.UTC;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
@@ -78,12 +79,11 @@ import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public abstract class SearchesIT extends ElasticsearchBaseTest {
     private static final String REQUEST_TIMER_NAME = "org.graylog2.indexer.searches.Searches.elasticsearch.requests";
     private static final String RANGES_HISTOGRAM_NAME = "org.graylog2.indexer.searches.Searches.elasticsearch.ranges";
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private static final String INDEX_NAME = "graylog_0";
     private static final String STREAM_ID = "000000000000000000000001";
@@ -154,7 +154,7 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
     protected MetricRegistry metricRegistry;
     protected Searches searches;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(INDEX_RANGES);
         when(indices.getAllMessageFieldsForIndices(any(String[].class))).thenReturn(ImmutableMap.of(INDEX_NAME, Collections.singleton("n")));
@@ -169,7 +169,8 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
                 streamService,
                 indices,
                 indexSetRegistry,
-                createSearchesAdapter()
+                createSearchesAdapter(),
+                searchServer().adapters().countsAdapter()
         );
     }
 
@@ -183,7 +184,8 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
 
         CountResult result = searches.count("*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
-                new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)));
+                        new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)),
+                null);
 
         assertThat(result.count()).isEqualTo(10L);
     }
@@ -220,7 +222,7 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
                         new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)),
                 "streams:" + STREAM_ID);
 
-        assertThat(result.count()).isEqualTo(5L);
+        assertThat(result.count()).isEqualTo(4L);
     }
 
     @Test
@@ -241,7 +243,8 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
 
         CountResult result = searches.count("*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
-                new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)));
+                        new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)),
+                null);
 
         assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);
         assertThat(metricRegistry.getHistograms()).containsKey(RANGES_HISTOGRAM_NAME);
@@ -508,7 +511,7 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
 
         when(indexSetRegistry.getForIndices(Collections.singleton("graylog_0"))).thenReturn(Collections.singleton(indexSet));
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
-        final ChunkedResult scrollResult = searches.scroll("*", range, 5, 0, Collections.singletonList("source"), null, NO_BATCHSIZE);
+        final ChunkedResult scrollResult = searches.scroll("*", range, 5, 0, Collections.singletonList("source"), null, Set.of(), NO_BATCHSIZE);
 
         assertThat(scrollResult).isNotNull();
         assertThat(scrollResult.getQueryHash()).isNotEmpty();
@@ -527,7 +530,7 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
 
         when(indexSetRegistry.getForIndices(Collections.singleton("graylog_0"))).thenReturn(Collections.singleton(indexSet));
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
-        final ChunkedResult scrollResult = searches.scroll("*", range, -1, 0, Collections.singletonList("source"), null, 2);
+        final ChunkedResult scrollResult = searches.scroll("*", range, -1, 0, Collections.singletonList("source"), null, Set.of(), 2);
 
         assertThat(scrollResult).isNotNull();
         assertThat(scrollResult.totalHits()).isEqualTo(10L);
@@ -573,7 +576,7 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
 
         when(indexSetRegistry.getForIndices(Collections.singleton("graylog_0"))).thenReturn(Collections.singleton(indexSet));
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
-        final ChunkedResult scrollResult = searches.scroll("*", range, 5, 0, Collections.singletonList("source"), null, 2);
+        final ChunkedResult scrollResult = searches.scroll("*", range, 5, 0, Collections.singletonList("source"), null, Set.of(), 2);
 
         assertThat(scrollResult).isNotNull();
         assertThat(scrollResult.totalHits()).isEqualTo(10L);
@@ -588,5 +591,29 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
         }
 
         assertThat(resultMessages).hasSize(5);
+    }
+
+    @Test
+    public void scrollReturnsMultipleChunksRespectingLimitOnStream() throws Exception {
+        // Works like the test one up, but should generate other numbers because of the stream filter
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
+
+        when(indexSetRegistry.getForIndices(Collections.singleton("graylog_0"))).thenReturn(Collections.singleton(indexSet));
+        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
+        final ChunkedResult scrollResult = searches.scroll("*", range, 5, 0, Collections.singletonList("source"), null, Set.of("000000000000000000000002"), 2);
+
+        assertThat(scrollResult).isNotNull();
+        assertThat(scrollResult.totalHits()).isEqualTo(1L);
+
+        ResultChunk scrollChunk = scrollResult.nextChunk();
+        assertThat(scrollChunk.isFirstChunk()).isTrue();
+
+        final Set<ResultMessage> resultMessages = new HashSet<>(5);
+        while (scrollChunk != null && !scrollChunk.messages().isEmpty()) {
+            resultMessages.addAll(scrollChunk.messages());
+            scrollChunk = scrollResult.nextChunk();
+        }
+
+        assertThat(resultMessages).hasSize(1);
     }
 }

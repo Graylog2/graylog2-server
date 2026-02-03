@@ -43,9 +43,11 @@ const useParametersFromStore = () => {
       if (searchData?.parameters) {
         return {
           parameters: searchData.parameters.map((param) => Parameter.fromJSON(param)),
-          parameterBindings: Immutable.Map<string, ParameterBinding>(Object.entries<ParameterBindingJsonRepresentation>(searchData.parameterBindings ?? {}).map(
-            ([paramName, paramBinding]) => ([paramName, ParameterBinding.fromJSON(paramBinding)]),
-          )),
+          parameterBindings: Immutable.Map<string, ParameterBinding>(
+            Object.entries<ParameterBindingJsonRepresentation>(searchData.parameterBindings ?? {}).map(
+              ([paramName, paramBinding]) => [paramName, ParameterBinding.fromJSON(paramBinding)],
+            ),
+          ),
         };
       }
     }

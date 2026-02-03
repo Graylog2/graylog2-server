@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fixed issue that could cause some AWS inputs to fail when used with used with temporary STS credentials."
+
+pulls = ["24155"]

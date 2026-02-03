@@ -24,7 +24,9 @@ import { EnterpriseActions } from 'stores/enterprise/EnterpriseStore';
 import IndexerFailuresComponent from './IndexerFailuresComponent';
 
 const IndexerSystemOverviewComponent = () => {
-  const [loadIndexerFailuresComponent, setLoadIndexerFailuresComponent] = useState(<Spinner text="Looking for Index Failures..." />);
+  const [loadIndexerFailuresComponent, setLoadIndexerFailuresComponent] = useState(
+    <Spinner text="Looking for Index Failures..." />,
+  );
 
   const pluginSystemOverview = usePluginEntities('systemOverview');
   const EnterpriseIndexerFailures = pluginSystemOverview?.[0]?.component;
@@ -32,7 +34,13 @@ const IndexerSystemOverviewComponent = () => {
   useEffect(() => {
     if (EnterpriseIndexerFailures) {
       EnterpriseActions.getLicenseInfo().then((response) => {
-        setLoadIndexerFailuresComponent(response.license_info.license_status === 'installed' ? <EnterpriseIndexerFailures /> : <IndexerFailuresComponent />);
+        setLoadIndexerFailuresComponent(
+          response.license_info.license_status === 'installed' ? (
+            <EnterpriseIndexerFailures />
+          ) : (
+            <IndexerFailuresComponent />
+          ),
+        );
       });
     } else {
       setLoadIndexerFailuresComponent(<IndexerFailuresComponent />);

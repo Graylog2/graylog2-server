@@ -22,10 +22,10 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
 import java.util.Collections;
 
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 public class VarRefExpression extends BaseExpression {
-    private static final RateLimitedLog log = getRateLimitedLog(VarRefExpression.class);
+    private static final RateLimitedLog log = createDefaultRateLimitedLog(VarRefExpression.class);
 
     private final String identifier;
     private final Expression varExpr;

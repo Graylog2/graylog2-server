@@ -17,6 +17,8 @@
 package org.graylog2.featureflag;
 
 import com.codahale.metrics.MetricRegistry;
+import org.graylog2.CommonNodeConfiguration;
+import org.graylog2.GraylogNodeConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,6 +43,8 @@ public class ImmutableFeatureFlagsMetricsTest {
     @Mock
     FeatureFlagsResources resources;
     MetricRegistry metricRegistry;
+    GraylogNodeConfiguration nodeConfiguration = new CommonNodeConfiguration() {
+    };
 
     @BeforeEach
     void setUp() {
@@ -98,7 +102,7 @@ public class ImmutableFeatureFlagsMetricsTest {
 
     private FeatureFlags createFeatureFlags(Map<String, String> flags) throws IOException {
         given(resources.defaultProperties(any())).willReturn(flags);
-        return new FeatureFlagsFactory().createImmutableFeatureFlags(resources, "file", "file", metricRegistry);
+        return new FeatureFlagsFactory().createImmutableFeatureFlags(resources, "file", "file", metricRegistry, nodeConfiguration);
     }
 
     private long getFeatureFlagUsedCount() {

@@ -16,37 +16,33 @@
  */
 package org.graylog2.lookup.adapters.dsvhttp;
 
+import mockwebserver3.MockResponse;
+import mockwebserver3.MockWebServer;
+import mockwebserver3.RecordedRequest;
+import okhttp3.Headers;
 import okhttp3.OkHttpClient;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class HTTPFileRetrieverTest {
     private MockWebServer server;
 
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
-
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         server = new MockWebServer();
     }
 
     @Test
     public void successfulRetrieve() throws Exception {
-        this.server.enqueue(new MockResponse()
-                .setResponseCode(200)
-                .setBody("foobar"));
+        this.server.enqueue(new MockResponse(200, Headers.of(), "foobar"));
         server.start();
 
         final HTTPFileRetriever httpFileRetriever = new HTTPFileRetriever(new OkHttpClient());
@@ -55,7 +51,7 @@ public class HTTPFileRetrieverTest {
         final RecordedRequest request = server.takeRequest();
 
         assertThat(request).isNotNull();
-        assertThat(request.getPath()).isEqualTo("/");
+        assertThat(request.getUrl().encodedPath()).isEqualTo("/");
 
         assertThat(body).isNotNull()
                 .isPresent()
@@ -64,13 +60,14 @@ public class HTTPFileRetrieverTest {
 
     @Test
     public void doNotRetrieveIfNotModified() throws Exception {
-        this.server.enqueue(new MockResponse()
-                .setResponseCode(200)
-                .setBody("foobar")
-                .setHeader("Last-Modified", "Fri, 18 Aug 2017 15:02:41 GMT"));
-        this.server.enqueue(new MockResponse()
-                .setResponseCode(304)
-                .setHeader("Last-Modified", "Fri, 18 Aug 2017 15:02:41 GMT"));
+        this.server.enqueue(new MockResponse(
+                200,
+                Headers.of("Last-Modified", "Fri, 18 Aug 2017 15:02:41 GMT"),
+                "foobar"));
+        this.server.enqueue(new MockResponse(
+                304,
+                Headers.of("Last-Modified", "Fri, 18 Aug 2017 15:02:41 GMT"),
+                ""));
         server.start();
 
         final HTTPFileRetriever httpFileRetriever = new HTTPFileRetriever(new OkHttpClient());
@@ -79,7 +76,7 @@ public class HTTPFileRetrieverTest {
         final RecordedRequest request = server.takeRequest();
 
         assertThat(request).isNotNull();
-        assertThat(request.getPath()).isEqualTo("/");
+        assertThat(request.getUrl().encodedPath()).isEqualTo("/");
 
         assertThat(body).isNotNull()
                 .isPresent()
@@ -89,8 +86,8 @@ public class HTTPFileRetrieverTest {
         final RecordedRequest secondRequest = server.takeRequest();
 
         assertThat(secondRequest).isNotNull();
-        assertThat(secondRequest.getPath()).isEqualTo("/");
-        assertThat(secondRequest.getHeader("If-Modified-Since")).isEqualTo("Fri, 18 Aug 2017 15:02:41 GMT");
+        assertThat(secondRequest.getUrl().encodedPath()).isEqualTo("/");
+        assertThat(secondRequest.getHeaders().get("If-Modified-Since")).isEqualTo("Fri, 18 Aug 2017 15:02:41 GMT");
 
         assertThat(secondBody).isNotNull()
                 .isEmpty();
@@ -98,9 +95,9 @@ public class HTTPFileRetrieverTest {
 
     @Test
     public void fetchFileDoesNotSendIfModifiedSinceHeader() throws Exception {
-        final MockResponse response = new MockResponse().setResponseCode(200)
-                .setBody("foobar")
-                .setHeader("Last-Modified", "Fri, 18 Aug 2017 15:02:41 GMT");
+        final MockResponse response = new MockResponse(200,
+                Headers.of("Last-Modified", "Fri, 18 Aug 2017 15:02:41 GMT"),
+                "foobar");
         this.server.enqueue(response);
         this.server.enqueue(response);
         server.start();
@@ -112,35 +109,37 @@ public class HTTPFileRetrieverTest {
                 .isPresent()
                 .contains("foobar");
         assertThat(server.takeRequest()
-                .getHeader("If-Modified-Since")).isNull();
+                .getHeaders().get("If-Modified-Since")).isNull();
 
         assertThat(httpFileRetriever.fetchFile(server.url("/").toString()))
                 .isNotNull()
                 .isPresent()
                 .contains("foobar");
         assertThat(server.takeRequest()
-                .getHeader("If-Modified-Since")).isNull();
+                .getHeaders().get("If-Modified-Since")).isNull();
     }
 
     @Test
     public void unsuccessfulRetrieve() throws Exception {
-        this.server.enqueue(new MockResponse()
-                .setResponseCode(500)
-                .setBody("Error!"));
+        this.server.enqueue(new MockResponse(
+                500,
+                Headers.of(),
+                "Error!"));
         server.start();
 
         final HTTPFileRetriever httpFileRetriever = new HTTPFileRetriever(new OkHttpClient());
 
-        expectedException.expect(IOException.class);
-        expectedException.expectMessage("Request failed: Server Error");
+        Throwable exception = assertThrows(IOException.class, () -> {
 
-        final Optional<String> ignored = httpFileRetriever.fetchFileIfNotModified(server.url("/").toString());
+            final Optional<String> ignored = httpFileRetriever.fetchFileIfNotModified(server.url("/").toString());
+        });
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Request failed: Server Error"));
     }
 
-    @After
+    @AfterEach
     public void shutDown() throws IOException {
         if (server != null) {
-            server.shutdown();
+            server.close();
         }
     }
 }

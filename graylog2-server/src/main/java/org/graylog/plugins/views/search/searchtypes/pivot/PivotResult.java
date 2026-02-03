@@ -28,6 +28,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.List;
 
 @AutoValue
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -45,6 +46,10 @@ public abstract class PivotResult implements SearchType.Result {
 
     @JsonProperty
     public abstract ImmutableList<Row> rows();
+
+    @JsonProperty
+    @Nullable
+    public abstract List<String> columnNames();
 
     @JsonProperty
     public abstract long total();
@@ -79,6 +84,10 @@ public abstract class PivotResult implements SearchType.Result {
 
         @JsonProperty
         public abstract Builder rows(ImmutableList<Row> rows);
+
+        @JsonProperty
+        @Nullable
+        public abstract Builder columnNames(List<String> columnNames);
 
         abstract ImmutableList.Builder<Row> rowsBuilder();
         public Builder addRow(Row row) {

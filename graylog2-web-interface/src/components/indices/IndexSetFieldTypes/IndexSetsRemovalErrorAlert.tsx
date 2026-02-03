@@ -16,51 +16,66 @@
  */
 import React from 'react';
 
-import type { RemovalResponse, IndexSetResponse } from 'components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation';
+import type {
+  RemovalResponse,
+  IndexSetResponse,
+} from 'components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation';
 import { Alert } from 'components/bootstrap';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
-const IndexSetRemovalErrors = ({ errors, failures, title }: {
-  errors: IndexSetResponse['errors'],
-  failures: IndexSetResponse['failures'],
-  title: string
+const IndexSetRemovalErrors = ({
+  errors,
+  failures,
+  title,
+}: {
+  errors: IndexSetResponse['errors'];
+  failures: IndexSetResponse['failures'];
+  title: string;
 }) => (
   <div>
-    <h4><b>{title}:</b></h4>
+    <h4>
+      <b>{title}:</b>
+    </h4>
     <ul>
-      {
-      !!errors.length && (
+      {!!errors.length && (
         <li>
-          <h5><b>General errors:</b></h5>
+          <h5>
+            <b>General errors:</b>
+          </h5>
           <ul>
-            {
-             errors.map((error) => <li key={error}><i>{error}</i></li>)
-            }
+            {errors.map((error) => (
+              <li key={error}>
+                <i>{error}</i>
+              </li>
+            ))}
           </ul>
         </li>
-      )
-    }
-      {
-      !!failures.length && (
+      )}
+      {!!failures.length && (
         <li>
-          <h4><b>Field errors:</b></h4>
+          <h4>
+            <b>Field errors:</b>
+          </h4>
           <ul>
-            {
-              failures.map(({ entityId, failureExplanation }) => (
-                <li key={entityId}>
-                  <b>{entityId}</b> - <i>{failureExplanation}</i>
-                </li>
-              ))
-            }
+            {failures.map(({ entityId, failureExplanation }) => (
+              <li key={entityId}>
+                <b>{entityId}</b> - <i>{failureExplanation}</i>
+              </li>
+            ))}
           </ul>
         </li>
-      )
-    }
+      )}
     </ul>
   </div>
 );
 
-const IndexSetsRemovalErrorAlert = ({ removalResponse, indexSets }: { removalResponse: RemovalResponse, indexSets: Record<string, IndexSet> }) => (
+const IndexSetsRemovalErrorAlert = ({
+  removalResponse,
+  indexSets,
+}: {
+  removalResponse: RemovalResponse;
+  indexSets: Record<string, IndexSet>;
+}) => (
   <Alert bsStyle="danger" title="Removing some of field type overrides failed">
     {Object.values(removalResponse).map(({ indexSetId, failures, errors }) => (
       <IndexSetRemovalErrors key={indexSetId} failures={failures} errors={errors} title={indexSets[indexSetId].title} />

@@ -24,12 +24,7 @@ type CountdownProps = {
   paused?: boolean;
 };
 
-function Countdown({
-  callback = () => {},
-  className = '',
-  timeInSeconds,
-  paused = false,
-}: CountdownProps) {
+function Countdown({ callback = () => {}, className = '', timeInSeconds, paused = false }: CountdownProps) {
   let tickTock = timeInSeconds;
   let logInterval;
 
@@ -65,9 +60,7 @@ function Countdown({
     };
   }, [paused]);
 
-  return (
-    <span className={className}>{currentTime}</span>
-  );
+  return <span className={className}>{currentTime}</span>;
 }
 
 export default Countdown;

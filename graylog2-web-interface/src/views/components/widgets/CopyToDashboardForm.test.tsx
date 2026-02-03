@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
-import { render, fireEvent, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
@@ -24,12 +25,8 @@ import { asMock } from 'helpers/mocking';
 
 import CopyToDashboardForm from './CopyToDashboardForm';
 
-const view1 = View.builder().type(View.Type.Dashboard).id('view-1').title('view 1')
-  .search(Search.create())
-  .build();
-const view2 = View.builder().type(View.Type.Dashboard).id('view-2').title('view 2')
-  .search(Search.create())
-  .build();
+const view1 = View.builder().type(View.Type.Dashboard).id('view-1').title('view 1').search(Search.create()).build();
+const view2 = View.builder().type(View.Type.Dashboard).id('view-2').title('view 2').search(Search.create()).build();
 const dashboardList = [view1, view2];
 
 jest.mock('views/components/dashboard/hooks/useDashboards');
@@ -61,17 +58,19 @@ describe('CopyToDashboardForm', () => {
   });
 
   const SUT = (props: Partial<React.ComponentProps<typeof CopyToDashboardForm>>) => (
-    <CopyToDashboardForm onCancel={() => {}}
-                         onCopyToDashboard={() => Promise.resolve()}
-                         onCreateNewDashboard={() => Promise.resolve()}
-                         submitButtonText="Submit"
-                         submitLoadingText="Submitting..."
-                         {...props} />
+    <CopyToDashboardForm
+      onCancel={() => {}}
+      onCopyToDashboard={() => Promise.resolve()}
+      onCreateNewDashboard={() => Promise.resolve()}
+      submitButtonText="Submit"
+      submitLoadingText="Submitting..."
+      {...props}
+    />
   );
 
-  const submitModal = () => {
-    const submitButton = screen.getByRole('button', { name: /submit/i, hidden: true });
-    fireEvent.click(submitButton);
+  const submitModal = async () => {
+    const submitButton = await screen.findByRole('button', { name: /submit/i });
+    await userEvent.click(submitButton);
   };
 
   it('should render the modal minimal', async () => {
@@ -113,7 +112,7 @@ describe('CopyToDashboardForm', () => {
     const { getByText } = render(<SUT onCancel={onCancel} />);
     const cancelButton = getByText('Cancel');
 
-    fireEvent.click(cancelButton);
+    await userEvent.click(cancelButton);
 
     await waitFor(() => {
       expect(onCancel).toHaveBeenCalledTimes(1);
@@ -125,7 +124,7 @@ describe('CopyToDashboardForm', () => {
 
     render(<SUT />);
 
-    const submitButton = await screen.findByRole('button', { name: /submit/i, hidden: true });
+    const submitButton = await screen.findByRole('button', { name: /submit/i });
 
     await waitFor(() => {
       expect(submitButton).toBeDisabled();
@@ -139,10 +138,10 @@ describe('CopyToDashboardForm', () => {
     const { getByText } = render(<SUT onCopyToDashboard={onSubmit} />);
     const firstView = getByText('view 1');
 
-    fireEvent.click(firstView);
-    submitModal();
+    await userEvent.click(firstView);
+    await submitModal();
 
-    await screen.findByRole('button', { name: /submit/i, hidden: true });
+    await screen.findByRole('button', { name: /submit/i });
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
     expect(onSubmit).toHaveBeenCalledWith('view-1');
@@ -154,10 +153,10 @@ describe('CopyToDashboardForm', () => {
 
     const checkBox = await findByLabelText(/create a new dashboard/i);
 
-    fireEvent.click(checkBox);
-    submitModal();
+    await userEvent.click(checkBox);
+    await submitModal();
 
-    await screen.findByRole('button', { name: /submit/i, hidden: true });
+    await screen.findByRole('button', { name: /submit/i });
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
     expect(onSubmit).toHaveBeenCalledWith();
@@ -170,17 +169,19 @@ describe('CopyToDashboardForm', () => {
 
     const searchInput = screen.getByPlaceholderText('Enter search query...');
 
-    fireEvent.change(searchInput, { target: { value: 'view 1' } });
+    await userEvent.type(searchInput, 'view 1');
 
-    await waitFor(() => expect(useDashboards).toHaveBeenCalledWith({
-      query: 'view 1',
-      page: 1,
-      pageSize: 5,
-      sort: {
-        attributeId: 'title',
-        direction: 'asc',
-      },
-      scope: 'update',
-    }));
+    await waitFor(() =>
+      expect(useDashboards).toHaveBeenCalledWith({
+        query: 'view 1',
+        page: 1,
+        pageSize: 5,
+        sort: {
+          attributeId: 'title',
+          direction: 'asc',
+        },
+        scope: 'update',
+      }),
+    );
   });
 });

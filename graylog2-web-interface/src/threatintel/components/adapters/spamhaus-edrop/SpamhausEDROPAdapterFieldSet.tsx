@@ -16,8 +16,6 @@
  */
 import React from 'react';
 
-const SpamhausEDROPAdapterFieldSet = () => (
-  <fieldset />
-);
+const SpamhausEDROPAdapterFieldSet = () => <fieldset />;
 
 export default SpamhausEDROPAdapterFieldSet;

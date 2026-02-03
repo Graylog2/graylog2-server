@@ -15,23 +15,26 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useCallback } from 'react';
-import { useQueryParam, StringParam } from 'use-query-params';
-import styled from 'styled-components';
+import { useMemo, useEffect } from 'react';
+import styled, { css } from 'styled-components';
 
+import type { LayoutConfig } from 'components/common/EntityDataTable/hooks/useTableLayout';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
-import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import { useTableEventHandlers } from 'components/common/EntityDataTable';
 import { Spinner, PaginatedList, SearchForm, NoSearchResult, EntityDataTable } from 'components/common';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
-import type { EntityBase } from 'components/common/EntityDataTable/types';
+import type { EntityBase, DefaultLayout, ExpandedSectionRenderers } from 'components/common/EntityDataTable/types';
 import EntityFilters from 'components/common/EntityFilters';
-import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import TableFetchContextProvider from 'components/common/PaginatedEntityTable/TableFetchContextProvider';
 import type { PaginatedResponse, FetchOptions } from 'components/common/PaginatedEntityTable/useFetchEntities';
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
+import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
+import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
+import Slicing from 'components/common/PaginatedEntityTable/Slicing';
+
+import { useWithLocalState, useWithURLParams } from './useFiltersAndPagination';
 
 const SearchRow = styled.div`
   margin-bottom: 5px;
@@ -41,138 +44,321 @@ const SearchRow = styled.div`
   align-items: center;
 `;
 
-type EntityDataTableProps = React.ComponentProps<typeof EntityDataTable>;
+const Container = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    flex-direction: row;
+    gap: ${theme.spacings.sm};
+    width: 100%;
+  `,
+);
 
-type Props<T> = {
-  actionsCellWidth?: EntityDataTableProps['actionsCellWidth'],
-  additionalAttributes?: Array<Attribute>,
-  bulkSelection?: EntityDataTableProps['bulkSelection'],
-  columnRenderers: EntityDataTableProps['columnRenderers'],
-  columnsOrder: EntityDataTableProps['columnsOrder'],
-  entityActions: EntityDataTableProps['entityActions'],
-  entityAttributesAreCamelCase: boolean,
-  expandedSectionsRenderer?: EntityDataTableProps['expandedSectionsRenderer'],
-  fetchEntities: (options: SearchParams) => Promise<PaginatedResponse<T>>,
-  fetchOptions?: FetchOptions,
-  filterValueRenderers?: React.ComponentProps<typeof EntityFilters>['filterValueRenderers'],
-  humanName: string,
-  keyFn: (options: SearchParams) => Array<unknown>,
-  queryHelpComponent?: React.ReactNode,
-  searchPlaceholder?: string,
-  tableLayout: Parameters<typeof useTableLayout>[0],
-  topRightCol?: React.ReactNode,
-}
+const TableWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  overflow-x: auto;
+  width: 100%;
+`;
+
+type EntityDataTableProps = React.ComponentProps<typeof EntityDataTable>;
+type ExternalSearch = {
+  query: string;
+  onSearch?: (query: string) => void;
+  onReset?: () => void;
+};
+export type MiddleSectionProps = {
+  searchParams: SearchParams;
+  setFilters: (newFilters: UrlQueryFilters) => void;
+};
 
 const INITIAL_DATA = {
   pagination: { total: 0 },
   list: [],
   attributes: [],
+  meta: null,
 };
 
-/*
- * This component is a wrapper for the EntityDataTable.
- * It should be used whenever you want to render the table on a page.
- * It contains all the required logic to e.g. sync the URL query params.
- * It should not be used when there are multiple entity tables on the page or when the table is rendered in a modal.
- */
-const PaginatedEntityTable = <T extends EntityBase>({
-  actionsCellWidth = 160, columnsOrder, entityActions, tableLayout, fetchEntities, keyFn,
-  humanName, columnRenderers, queryHelpComponent, filterValueRenderers,
-  expandedSectionsRenderer, bulkSelection, additionalAttributes = [],
-  entityAttributesAreCamelCase, topRightCol, searchPlaceholder, fetchOptions: reactQueryOptions,
-}: Props<T>) => {
-  const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
-  const [query, setQuery] = useQueryParam('query', StringParam);
-  const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout(tableLayout);
-  const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
-  const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(tableLayout.entityTableId);
-  const fetchOptions = useMemo(() => ({
-    query,
-    page: paginationQueryParameter.page,
-    pageSize: layoutConfig.pageSize,
-    sort: layoutConfig.sort,
-    filters: urlQueryFilters,
-  }), [layoutConfig.pageSize, layoutConfig.sort, paginationQueryParameter.page, query, urlQueryFilters]);
+type InnerProps = {
+  fetchOptions: SearchParams;
+  isLoadingLayoutPreferences: boolean;
+  layoutConfig: LayoutConfig;
+  onDataLoaded?: (data: PaginatedResponse<unknown, unknown>) => void;
+  onChangeFilters: (newFilters: UrlQueryFilters) => void;
+  onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
+  paginationState: PaginationQueryParameterResult;
+  reactQueryOptions: FetchOptions;
+  setQuery: (newQuery: string) => void;
+};
+
+const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
+  additionalAttributes = [],
+  bulkSelection = undefined,
+  columnRenderers,
+  entityActions,
+  entityAttributesAreCamelCase,
+  expandedSectionRenderers = undefined,
+  externalSearch = undefined,
+  fetchEntities,
+  fetchOptions,
+  filterValueRenderers = undefined,
+  focusSearchAfterMount = false,
+  humanName,
+  isLoadingLayoutPreferences,
+  keyFn,
+  layoutConfig,
+  middleSection: MiddleSection = undefined,
+  onChangeFilters,
+  onChangeSlicing,
+  onDataLoaded = undefined,
+  paginationState,
+  queryHelpComponent = undefined,
+  reactQueryOptions,
+  searchPlaceholder = undefined,
+  setQuery,
+  tableLayout,
+  topRightCol = undefined,
+  withoutURLParams = false,
+}: PaginatedEntityTableProps<T, M> & InnerProps) => {
+  const { mutateAsync: updateTableLayout } = useUpdateUserLayoutPreferences(tableLayout.entityTableId);
   const fetchKey = useMemo(() => keyFn(fetchOptions), [fetchOptions, keyFn]);
 
   const {
     data: paginatedEntities = INITIAL_DATA,
     isInitialLoading: isLoadingEntities,
     refetch,
-  } = useFetchEntities<T>({ fetchKey, searchParams: fetchOptions, enabled: !isLoadingLayoutPreferences, fetchEntities, humanName, fetchOptions: reactQueryOptions });
+  } = useFetchEntities<T, M>({
+    fetchKey,
+    searchParams: fetchOptions,
+    enabled: !isLoadingLayoutPreferences,
+    fetchEntities,
+    humanName,
+    fetchOptions: reactQueryOptions,
+  });
 
-  const onChangeFilters = useCallback((newUrlQueryFilters: UrlQueryFilters) => {
-    paginationQueryParameter.resetPage();
-    setUrlQueryFilters(newUrlQueryFilters);
-  }, [paginationQueryParameter, setUrlQueryFilters]);
+  useOnRefresh(refetch);
+
+  useEffect(() => {
+    if (!onDataLoaded || isLoadingEntities) {
+      return;
+    }
+
+    onDataLoaded(paginatedEntities);
+  }, [isLoadingEntities, onDataLoaded, paginatedEntities]);
+
+  const appSection = `${tableLayout.entityTableId}-list`;
 
   const {
+    onLayoutPreferencesChange,
     onPageSizeChange,
+    onResetLayoutPreferences,
     onSearch,
     onSearchReset,
-    onColumnsChange,
     onSortChange,
   } = useTableEventHandlers({
-    appSection: `${tableLayout.entityTableId}-list`,
-    paginationQueryParameter,
+    appSection,
+    paginationQueryParameter: paginationState,
     updateTableLayout,
     setQuery,
   });
 
-  const columnDefinitions = useMemo(
-    () => ([...(paginatedEntities?.attributes ?? []), ...additionalAttributes]),
+  const columnSchemas = useMemo(
+    () => [
+      ...(paginatedEntities?.attributes ?? []),
+      ...additionalAttributes.map((attribute) => ({ isDerived: true, ...attribute })),
+    ],
     [additionalAttributes, paginatedEntities?.attributes],
   );
+
+  const onPaginationChange = withoutURLParams
+    ? (currentPage: number, pageSize: number) => paginationState.setPagination({ page: currentPage, pageSize })
+    : undefined;
 
   if (isLoadingLayoutPreferences || isLoadingEntities) {
     return <Spinner />;
   }
 
-  const { list, pagination: { total }, attributes } = paginatedEntities;
+  const {
+    list,
+    meta,
+    pagination: { total },
+    attributes,
+  } = paginatedEntities;
 
   return (
-    <TableFetchContextProvider refetch={refetch} searchParams={fetchOptions} attributes={attributes}>
-      <PaginatedList pageSize={layoutConfig.pageSize}
-                     showPageSizeSelect={false}
-                     totalItems={total}>
-        <SearchRow>
-          <SearchForm onSearch={onSearch}
-                      onReset={onSearchReset}
-                      query={query}
-                      placeholder={searchPlaceholder ?? `Search for ${humanName}`}
-                      queryHelpComponent={queryHelpComponent}>
-            <div style={{ marginBottom: 5 }}>
-              <EntityFilters attributes={attributes}
-                             urlQueryFilters={urlQueryFilters}
-                             setUrlQueryFilters={onChangeFilters}
-                             filterValueRenderers={filterValueRenderers} />
-            </div>
-          </SearchForm>
-          {topRightCol}
-        </SearchRow>
-        <div>
-          {list?.length === 0 ? (
-            <NoSearchResult>No {humanName} have been found.</NoSearchResult>
-          ) : (
-            <EntityDataTable<T> entities={list}
-                                visibleColumns={layoutConfig.displayedAttributes}
-                                columnsOrder={columnsOrder}
-                                expandedSectionsRenderer={expandedSectionsRenderer}
-                                bulkSelection={bulkSelection}
-                                onColumnsChange={onColumnsChange}
-                                onSortChange={onSortChange}
-                                onPageSizeChange={onPageSizeChange}
-                                pageSize={layoutConfig.pageSize}
-                                activeSort={layoutConfig.sort}
-                                entityActions={entityActions}
-                                actionsCellWidth={actionsCellWidth}
-                                columnRenderers={columnRenderers}
-                                columnDefinitions={columnDefinitions}
-                                entityAttributesAreCamelCase={entityAttributesAreCamelCase} />
+    <TableFetchContextProvider
+      refetch={refetch}
+      searchParams={fetchOptions}
+      attributes={attributes}
+      entityTableId={tableLayout.entityTableId}>
+      <Container>
+        {fetchOptions.sliceCol && (
+          <Slicing
+            appSection={appSection}
+            sliceCol={fetchOptions.sliceCol}
+            columnSchemas={columnSchemas}
+            onChangeSlicing={onChangeSlicing}
+          />
+        )}
+        <TableWrapper>
+          {!externalSearch && (
+            <SearchRow>
+              <SearchForm
+                focusAfterMount={focusSearchAfterMount}
+                onSearch={onSearch}
+                onReset={onSearchReset}
+                query={fetchOptions.query}
+                placeholder={searchPlaceholder ?? `Search for ${humanName}`}
+                queryHelpComponent={queryHelpComponent}>
+                <div style={{ marginBottom: 5 }}>
+                  <EntityFilters
+                    attributes={attributes}
+                    urlQueryFilters={fetchOptions.filters}
+                    setUrlQueryFilters={onChangeFilters}
+                    filterValueRenderers={filterValueRenderers}
+                    appSection={appSection}
+                  />
+                </div>
+              </SearchForm>
+              {topRightCol}
+            </SearchRow>
           )}
-        </div>
-      </PaginatedList>
+          {MiddleSection ? <MiddleSection searchParams={fetchOptions} setFilters={onChangeFilters} /> : null}
+
+          <PaginatedList
+            pageSize={layoutConfig.pageSize}
+            showPageSizeSelect={false}
+            totalItems={total}
+            useQueryParameter={!withoutURLParams}
+            onChange={onPaginationChange}>
+            {list?.length === 0 ? (
+              <NoSearchResult>No {humanName} have been found.</NoSearchResult>
+            ) : (
+              <EntityDataTable<T, M>
+                entities={list}
+                defaultDisplayedColumns={tableLayout.defaultDisplayedAttributes}
+                layoutPreferences={{
+                  attributes: layoutConfig.attributes,
+                  order: layoutConfig.order,
+                }}
+                defaultColumnOrder={tableLayout.defaultColumnOrder}
+                onResetLayoutPreferences={onResetLayoutPreferences}
+                onLayoutPreferencesChange={onLayoutPreferencesChange}
+                onChangeSlicing={onChangeSlicing}
+                expandedSectionRenderers={expandedSectionRenderers}
+                bulkSelection={bulkSelection}
+                onSortChange={onSortChange}
+                onPageSizeChange={onPageSizeChange}
+                pageSize={layoutConfig.pageSize}
+                activeSort={layoutConfig.sort}
+                activeSliceCol={fetchOptions.sliceCol}
+                appSection={appSection}
+                entityActions={entityActions}
+                columnRenderers={columnRenderers}
+                columnSchemas={columnSchemas}
+                entityAttributesAreCamelCase={entityAttributesAreCamelCase}
+                meta={meta}
+              />
+            )}
+          </PaginatedList>
+        </TableWrapper>
+      </Container>
     </TableFetchContextProvider>
+  );
+};
+
+type WrapperProps<T, M> = PaginatedEntityTableProps<T, M> & {
+  isLoadingLayoutPreferences: boolean;
+  layoutConfig: LayoutConfig;
+  reactQueryOptions: FetchOptions;
+  onDataLoaded?: (data: PaginatedResponse<T, M>) => void;
+};
+
+const TableWithLocalState = <T extends EntityBase, M = unknown>({ ...props }: WrapperProps<T, M>) => {
+  const { fetchOptions, setQuery, onChangeFilters, onChangeSlicing, paginationState } = useWithLocalState(
+    props.layoutConfig,
+  );
+  const effectiveFetchOptions = props.externalSearch
+    ? { ...fetchOptions, query: props.externalSearch.query }
+    : fetchOptions;
+
+  return (
+    <PaginatedEntityTableInner<T, M>
+      {...props}
+      fetchOptions={effectiveFetchOptions}
+      setQuery={props.externalSearch ? () => {} : setQuery}
+      onChangeSlicing={onChangeSlicing}
+      onChangeFilters={onChangeFilters}
+      paginationState={paginationState}
+      onDataLoaded={props.onDataLoaded}
+    />
+  );
+};
+
+const TableWithURLParams = <T extends EntityBase, M = unknown>({ ...props }: WrapperProps<T, M>) => {
+  const { fetchOptions, setQuery, onChangeFilters, paginationState, onChangeSlicing } = useWithURLParams(
+    props.layoutConfig,
+  );
+  const effectiveFetchOptions = props.externalSearch
+    ? { ...fetchOptions, query: props.externalSearch.query }
+    : fetchOptions;
+
+  return (
+    <PaginatedEntityTableInner<T, M>
+      {...props}
+      fetchOptions={effectiveFetchOptions}
+      setQuery={props.externalSearch ? () => {} : setQuery}
+      onChangeFilters={onChangeFilters}
+      onChangeSlicing={onChangeSlicing}
+      paginationState={paginationState}
+      onDataLoaded={props.onDataLoaded}
+    />
+  );
+};
+
+export type PaginatedEntityTableProps<T, M> = {
+  additionalAttributes?: Array<Attribute>;
+  bulkSelection?: EntityDataTableProps['bulkSelection'];
+  columnRenderers: EntityDataTableProps['columnRenderers'];
+  entityActions: EntityDataTableProps['entityActions'];
+  entityAttributesAreCamelCase: boolean;
+  expandedSectionRenderers?: ExpandedSectionRenderers<T>;
+  externalSearch?: ExternalSearch;
+  fetchEntities: (options: SearchParams) => Promise<PaginatedResponse<T, M>>;
+  fetchOptions?: FetchOptions;
+  filterValueRenderers?: React.ComponentProps<typeof EntityFilters>['filterValueRenderers'];
+  focusSearchAfterMount?: boolean;
+  humanName: string;
+  keyFn: (options: SearchParams) => Array<unknown>;
+  middleSection?: React.ComponentType<MiddleSectionProps>;
+  onDataLoaded?: (data: PaginatedResponse<T, M>) => void;
+  queryHelpComponent?: React.ReactNode;
+  searchPlaceholder?: string;
+  tableLayout: DefaultLayout;
+  topRightCol?: React.ReactNode;
+  withoutURLParams?: boolean;
+};
+
+/*
+ * This component is a wrapper for the EntityDataTable.
+ * It contains all the required logic to either sync the URL query params or, alternatively, use local state for filters and pagination.
+ * It should not be used when there are multiple entity tables on the page or when the table is rendered in a modal.
+ */
+const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
+  fetchOptions: reactQueryOptions = undefined,
+  ...props
+}: PaginatedEntityTableProps<T, M>) => {
+  const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout(props.tableLayout);
+
+  const Wrapper = props.withoutURLParams ? TableWithLocalState : TableWithURLParams;
+
+  return (
+    <Wrapper<T, M>
+      {...props}
+      layoutConfig={layoutConfig}
+      isLoadingLayoutPreferences={isLoadingLayoutPreferences}
+      reactQueryOptions={reactQueryOptions}
+      onDataLoaded={props.onDataLoaded}
+    />
   );
 };
 

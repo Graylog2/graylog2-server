@@ -18,8 +18,8 @@ package org.graylog.storage.elasticsearch7.views.searchtypes.pivot;
 
 import com.google.common.collect.ImmutableList;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
@@ -30,7 +30,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchR
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregations;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.HasAggregations;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.MaxAggregationBuilder;
@@ -41,8 +40,6 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -71,10 +68,6 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     public void doGenerateQueryPart(Query query, Pivot pivot, ESGeneratedQueryContext queryContext) {
         LOG.debug("Generating aggregation for {}", pivot);
         final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(pivot);
-
-        final Map<Object, Object> contextMap = queryContext.contextMap();
-        final AggTypes aggTypes = new AggTypes();
-        contextMap.put(pivot.id(), aggTypes);
 
         var generateRollups = pivot.rollup() || (pivot.rowGroups().isEmpty() && pivot.columnGroups().isEmpty());
 
@@ -172,14 +165,19 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                     if (esPivotSeriesSpecHandler == null) {
                         throw new IllegalArgumentException("No series handler registered for: " + seriesSpec.type());
                     }
-                    return esPivotSeriesSpecHandler.createAggregation(seriesName, pivot, seriesSpec, this, queryContext).stream();
+                    return esPivotSeriesSpecHandler.createAggregation(seriesName, pivot, seriesSpec, queryContext).stream();
                 });
     }
 
     @WithSpan
     @Override
-    public SearchType.Result doExtractResult(SearchJob job, Query query, Pivot pivot, SearchResponse queryResult, Aggregations aggregations, ESGeneratedQueryContext queryContext) {
+    public SearchType.Result doExtractResult(Query query, Pivot pivot, SearchResponse queryResult, ESGeneratedQueryContext queryContext) {
         final AbsoluteRange effectiveTimerange = this.effectiveTimeRangeExtractor.extract(queryResult, query, pivot);
+
+        final var fieldsNames = pivot.rowGroups().stream().flatMap(bs -> bs.fields().stream());
+        final var seriesNames = pivot.series().stream().map(SeriesSpec::id).toList();
+
+        final List<String> colGroupNames = pivot.columnGroups().isEmpty() ? seriesNames : new ArrayList<>();
 
         final PivotResult.Builder resultBuilder = PivotResult.builder()
                 .id(pivot.id())
@@ -205,6 +203,8 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                         retrieveBuckets(pivot, pivot.columnGroups(), rowBucket)
                                 .forEach(columnBucketTuple -> {
                                     final ImmutableList<String> columnKeys = columnBucketTuple.keys();
+                                    colGroupNames.add(String.join(", ", Stream.concat(columnKeys.stream(), seriesNames.stream()).toList()));
+
                                     final MultiBucketsAggregation.Bucket columnBucket = columnBucketTuple.bucket();
 
                                     processSeries(rowBuilder, queryResult, contextWithRowBucket, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
@@ -219,7 +219,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
             resultBuilder.addRow(rowBuilder.source("non-leaf").build());
         }
 
-        return resultBuilder.build();
+        return resultBuilder.columnNames(Stream.concat(fieldsNames, colGroupNames.stream().distinct().sorted()).toList()).build();
     }
 
     private Stream<PivotBucket> retrieveBuckets(Pivot pivot, List<BucketSpec> pivots, MultiBucketsAggregation.Bucket initialBucket) {
@@ -250,7 +250,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         pivot.series().forEach(seriesSpec -> {
             final ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> seriesHandler = this.seriesHandlers.get(seriesSpec.type());
             final Aggregation series = seriesHandler.extractAggregationFromResult(pivot, seriesSpec, aggregation, queryContext);
-            seriesHandler.handleResult(pivot, seriesSpec, searchResult, series, this, queryContext)
+            seriesHandler.handleResult(pivot, seriesSpec, searchResult, series, queryContext)
                     .map(value -> {
                         columnKeys.addLast(value.id());
                         final PivotResult.Value v = PivotResult.Value.create(columnKeys, value.value(), rollup, source);

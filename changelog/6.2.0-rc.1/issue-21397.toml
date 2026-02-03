@@ -1,0 +1,5 @@
+type = "added"
+message = "Adds token management page in the 'Users and Teams' section."
+
+issues = ["21397"]
+pulls = ["21737"]

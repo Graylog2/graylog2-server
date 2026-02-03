@@ -21,17 +21,16 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
-import org.graylog.autovalue.WithBeanGetter;
+import jakarta.inject.Inject;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -79,9 +78,9 @@ public class V20161122174500_AssignIndexSetsToStreamsMigration extends Migration
             if (isNullOrEmpty(stream.getIndexSetId())) {
                 LOG.info("Assigning index set <{}> ({}) to stream <{}> ({})", indexSetConfig.id(),
                         indexSetConfig.title(), stream.getId(), stream.getTitle());
-                stream.setIndexSetId(indexSetConfig.id());
+                StreamImpl dto = (StreamImpl) stream;
                 try {
-                    streamService.save(stream);
+                    streamService.save(dto.toBuilder().indexSetId(indexSetConfig.id()).build());
                     completedStreamIds.add(stream.getId());
                 } catch (ValidationException e) {
                     LOG.error("Unable to save stream <{}>", stream.getId(), e);
@@ -109,7 +108,6 @@ public class V20161122174500_AssignIndexSetsToStreamsMigration extends Migration
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public static abstract class MigrationCompleted {
         @JsonProperty("index_set_id")
         public abstract String indexSetId();

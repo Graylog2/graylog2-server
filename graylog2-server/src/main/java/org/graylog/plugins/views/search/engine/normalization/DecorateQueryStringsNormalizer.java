@@ -38,6 +38,10 @@ public class DecorateQueryStringsNormalizer implements SearchNormalizer {
 
     @Override
     public Query normalizeQuery(final Query query, final ParameterProvider parameterProvider) {
+        // this only makes sense for ElasticsearchQueryString instances, don't touch any other type
+        if (!(query.query() instanceof ElasticsearchQueryString)) {
+            return query;
+        }
         return query.toBuilder()
                 .query(ElasticsearchQueryString.of(this.queryStringDecorators.decorate(query.query().queryString(), parameterProvider, query)))
                 .filter(normalizeFilter(query.filter(), query, parameterProvider))

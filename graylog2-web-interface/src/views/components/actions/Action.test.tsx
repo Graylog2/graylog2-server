@@ -24,7 +24,7 @@ import type { ActionContexts, RootState } from 'views/types';
 import asMock from 'helpers/mocking/AsMock';
 import usePluginEntities from 'hooks/usePluginEntities';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import mockDispatch from 'views/test/mockDispatch';
 import { createSearch } from 'fixtures/searches';
 import useExternalValueActions from 'views/hooks/useExternalValueActions';
@@ -32,7 +32,7 @@ import useExternalValueActions from 'views/hooks/useExternalValueActions';
 import Action from './Action';
 
 jest.mock('hooks/usePluginEntities', () => jest.fn(() => []));
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
 
 jest.mock('views/hooks/useExternalValueActions');
 
@@ -40,7 +40,7 @@ describe('Action', () => {
   beforeEach(() => {
     const view = createSearch();
     const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
 
     asMock(useExternalValueActions).mockReturnValue({
       isLoading: false,
@@ -63,7 +63,7 @@ describe('Action', () => {
 
   type Props = Partial<React.ComponentProps<typeof Action>>;
 
-  const OpenActionsMenu = () => (<div>Open Actions Menu</div>);
+  const OpenActionsMenu = () => <div>Open Actions Menu</div>;
 
   const SimpleAction = ({
     children = 'The dropdown header',
@@ -71,10 +71,7 @@ describe('Action', () => {
     menuContainer = undefined,
     type = 'field',
   }: Props) => (
-    <Action element={OpenActionsMenu}
-            handlerArgs={handlerArgs}
-            menuContainer={menuContainer}
-            type={type}>
+    <Action element={OpenActionsMenu} handlerArgs={handlerArgs} menuContainer={menuContainer} type={type}>
       {children}
     </Action>
   );
@@ -104,7 +101,7 @@ describe('Action', () => {
       },
     ];
 
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({ fieldActions }[entityKey]));
+    asMock(usePluginEntities).mockImplementation((entityKey) => ({ fieldActions })[entityKey]);
 
     render(<SimpleAction type="field" />);
 
@@ -117,7 +114,7 @@ describe('Action', () => {
   });
 
   it('does not fail when plugin is not present for external actions', async () => {
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({ wrongKey: noop }[entityKey]));
+    asMock(usePluginEntities).mockImplementation((entityKey) => ({ wrongKey: noop })[entityKey]);
 
     render(<SimpleAction>The dropdown header</SimpleAction>);
     await openDropdown('The dropdown header');
@@ -136,13 +133,13 @@ describe('Action', () => {
       isError: false,
     });
 
-    render(
-      <SimpleAction type="value" />,
-    );
+    render(<SimpleAction type="value" />);
 
     await openDropdown();
 
-    const actionMenuItem = await screen.findByRole('menuitem', { name: /external value action/i }) as HTMLAnchorElement;
+    const actionMenuItem = (await screen.findByRole('menuitem', {
+      name: /external value action/i,
+    })) as HTMLAnchorElement;
 
     expect(actionMenuItem.href).toContain('the-link-to-field1');
   });

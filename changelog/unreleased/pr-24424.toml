@@ -1,0 +1,5 @@
+type = "c"
+message = "JadConfig updated to 1.0.0, adapted paths validation"
+
+issues = []
+pulls = ["24424", "Graylog2/graylog-plugin-enterprise#12679"]

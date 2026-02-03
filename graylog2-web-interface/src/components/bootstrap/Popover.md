@@ -1,12 +1,6 @@
 ```js
 <div style={{ height: 200, position: 'relative' }}>
-  <Popover
-    id="popover-basic"
-    placement="right"
-    positionLeft={200}
-    positionTop={50}
-    title="Popover right"
-  >
+  <Popover id="popover-basic" placement="right" positionLeft={200} positionTop={50} title="Popover right">
     And here's some <strong>amazing</strong> content. It's very engaging. right?
   </Popover>
 </div>
@@ -53,5 +47,5 @@ const popoverRight = (
   <OverlayTrigger trigger="click" placement="right" overlay={popoverRight}>
     <Button>Holy guacamole!</Button>
   </OverlayTrigger>
-</ButtonToolbar>
+</ButtonToolbar>;
 ```

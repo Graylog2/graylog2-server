@@ -26,8 +26,8 @@ import { Button, ButtonToolbar } from 'components/bootstrap';
 import RolesCell from 'components/permissions/RolesCell';
 
 type Props = {
-  user: UserOverview,
-  roles: Immutable.List<Role>,
+  user: UserOverview;
+  roles: Immutable.List<Role>;
 };
 
 const ActionsWrapper = styled(ButtonToolbar)`
@@ -35,23 +35,15 @@ const ActionsWrapper = styled(ButtonToolbar)`
   justify-content: flex-end;
 `;
 
-const SyncedUsersOverviewItem = ({
-  user: {
-    fullName,
-    id,
-    roles: userRolesIds,
-    username,
-  },
-  roles,
-}: Props) => {
-  const userRolesNames = userRolesIds.map((roleId) => roles.find((role) => role.id === roleId)?.name ?? 'Role not found').toSet();
+const SyncedUsersOverviewItem = ({ user: { fullName, id, roles: userRolesIds, username }, roles }: Props) => {
+  const userRolesNames = userRolesIds
+    .map((roleId) => roles.find((role) => role.id === roleId)?.name ?? 'Role not found')
+    .toSet();
 
   return (
     <tr key={id}>
       <td className="limited">
-        <Link to={Routes.SYSTEM.USERS.show(id)}>
-          {username}
-        </Link>
+        <Link to={Routes.SYSTEM.USERS.show(id)}>{username}</Link>
       </td>
       <td className="limited">{fullName}</td>
       <RolesCell roles={userRolesNames} />

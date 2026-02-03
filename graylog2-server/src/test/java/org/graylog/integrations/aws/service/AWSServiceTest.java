@@ -21,8 +21,6 @@ import org.graylog.integrations.aws.codecs.AWSCodec;
 import org.graylog.integrations.aws.inputs.AWSInput;
 import org.graylog.integrations.aws.resources.requests.AWSInputCreateRequest;
 import org.graylog.integrations.aws.resources.responses.AWSRegion;
-import org.graylog.integrations.aws.resources.responses.AvailableServiceResponse;
-import org.graylog.integrations.aws.resources.responses.KinesisPermissionsResponse;
 import org.graylog.integrations.aws.transports.KinesisTransport;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputServiceImpl;
@@ -32,32 +30,33 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
 import org.graylog2.security.encryption.EncryptedValue;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.MessageInputFactory;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import software.amazon.awssdk.regions.Region;
 
 import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class AWSServiceTest {
-
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
 
@@ -74,10 +73,10 @@ public class AWSServiceTest {
     @Mock
     EncryptedValue encryptedValue;
 
-    @Before
+    @BeforeEach
     public void setUp() {
 
-        awsService = new AWSService(inputService, messageInputFactory, nodeId, new ObjectMapperProvider().get());
+        awsService = new AWSService(inputService, messageInputFactory, nodeId);
     }
 
     @Test
@@ -85,24 +84,30 @@ public class AWSServiceTest {
         when(inputService.create(isA(HashMap.class))).thenCallRealMethod();
         when(inputService.save(isA(Input.class))).thenReturn("input-id");
         when(user.getName()).thenReturn("a-user-name");
-        when(messageInputFactory.create(isA(InputCreateRequest.class), isA(String.class), isA(String.class))).thenReturn(messageInput);
-
+        when(messageInputFactory.create(isA(InputCreateRequest.class), isA(String.class), isA(String.class), anyBoolean())).thenReturn(messageInput);
+        when(inputService.create(isA(HashMap.class))).thenReturn(mock(Input.class));
+        
         AWSInputCreateRequest request =
                 AWSInputCreateRequest.builder().region(Region.US_EAST_1.id())
                         .awsAccessKeyId("a-key")
                         .awsSecretAccessKey(encryptedValue)
-                                     .name("AWS Input")
-                                     .awsMessageType(AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS.toString())
-                                     .streamName("a-stream")
-                                     .batchSize(10000)
-                                     .addFlowLogPrefix(true)
-                                     .throttlingAllowed(true)
-                                     .build();
+                        .name("AWS Input")
+                        .awsMessageType(AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS.toString())
+                        .streamName("a-stream")
+                        .batchSize(10000)
+                        .addFlowLogPrefix(true)
+                        .throttlingAllowed(true)
+                        .streamArn("test-arn")
+                        .overrideSource("test-source")
+                        .build();
         awsService.saveInput(request, user);
 
         // Verify that inputService received a valid input to save.
         final ArgumentCaptor<InputCreateRequest> argumentCaptor = ArgumentCaptor.forClass(InputCreateRequest.class);
-        verify(messageInputFactory, times(1)).create(argumentCaptor.capture(), eq("a-user-name"), eq("5ca1ab1e-0000-4000-a000-000000000000"));
+        verify(messageInputFactory, times(1)).create(argumentCaptor.capture(),
+                eq("a-user-name"),
+                eq("5ca1ab1e-0000-4000-a000-000000000000"),
+                eq(false));
 
         // Just verify that the input create request was prepared correctly. This verifies the important argument
         // transposition logic.
@@ -122,7 +127,6 @@ public class AWSServiceTest {
 
     @Test
     public void regionTest() {
-
         List<AWSRegion> regions = awsService.getAvailableRegions().regions();
 
         // Use a loop presence check.
@@ -137,46 +141,6 @@ public class AWSServiceTest {
         assertTrue(foundEuWestRegion);
         assertTrue(regions.stream().anyMatch(r -> r.displayValue().equals("Europe (Stockholm): eu-north-1")));
         // AWS periodically adds regions. The number should generally only increase. No need to check exact number.
-        assertTrue("There should be at least 34 total regions.", regions.size() >= 34);
-    }
-
-    @Test
-    public void testAvailableServices() {
-
-        AvailableServiceResponse services = awsService.getAvailableServices();
-
-        // There should be one service.
-        assertEquals(1, services.total());
-        assertEquals(1, services.services().size());
-
-        // CloudWatch should be in the list of available services.
-        assertTrue(services.services().stream().anyMatch(s -> s.name().equals("CloudWatch")));
-
-        // Verify that some of the needed actions are present.
-        String policy = services.services().get(0).policy();
-        assertTrue(policy.contains("cloudwatch"));
-        assertTrue(policy.contains("dynamodb"));
-        assertTrue(policy.contains("ec2"));
-        assertTrue(policy.contains("elasticloadbalancing"));
-        assertTrue(policy.contains("kinesis"));
-    }
-
-    @Test
-    public void testPermissions() {
-
-        final KinesisPermissionsResponse permissions = awsService.getPermissions();
-
-        // Verify that the setup policy contains some needed permissions.
-        assertTrue(permissions.setupPolicy().contains("cloudwatch"));
-        assertTrue(permissions.setupPolicy().contains("dynamodb"));
-        assertTrue(permissions.setupPolicy().contains("ec2"));
-        assertTrue(permissions.setupPolicy().contains("elasticloadbalancing"));
-        assertTrue(permissions.setupPolicy().contains("kinesis"));
-
-        // Verify that the auto-setup policy contains some needed permissions.
-        assertTrue(permissions.autoSetupPolicy().contains("CreateStream"));
-        assertTrue(permissions.autoSetupPolicy().contains("DescribeSubscriptionFilters"));
-        assertTrue(permissions.autoSetupPolicy().contains("PutRecord"));
-        assertTrue(permissions.autoSetupPolicy().contains("RegisterStreamConsumer"));
+        assertTrue(regions.size() >= 34, "There should be at least 34 total regions.");
     }
 }

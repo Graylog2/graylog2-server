@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.db;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.util.concurrent.Uninterruptibles;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.ForbiddenException;
@@ -25,11 +26,14 @@ import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.SearchJobDTO;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.utilities.StringUtils;
 
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 // TODO dummy that only holds everything in memory for now
 @Singleton
@@ -59,15 +63,48 @@ public class InMemorySearchJobService implements SearchJobService {
     }
 
     @Override
-    public Optional<SearchJob> load(final String id,
-                                    final SearchUser searchUser) throws ForbiddenException {
-        final SearchJob searchJob = cache.getIfPresent(id);
+    public Optional<SearchJobDTO> load(final String id,
+                                       final SearchUser searchUser) {
+        final SearchJob searchJob = getFromCache(id, searchUser);
         if (searchJob == null) {
             return Optional.empty();
-        } else if (searchJob.getOwner().equals(searchUser.username()) || searchUser.isAdmin()) {
-            return Optional.of(searchJob);
         } else {
-            throw new ForbiddenException(StringUtils.f("User %s cannot load search job %s that belongs to different user!", searchUser.username(), id));
+            if (searchJob.getResultFuture() != null) {
+                try {
+                    // force a "conditional join", to catch fast responses without having to poll
+                    Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), 5, TimeUnit.MILLISECONDS);
+                } catch (ExecutionException | TimeoutException ignore) {
+                }
+            }
+            return Optional.of(SearchJobDTO.fromSearchJob(searchJob));
         }
+    }
+
+    @Override
+    public boolean cancel(final String id, final SearchUser searchUser) {
+        final SearchJob searchJob = getFromCache(id, searchUser);
+        if (searchJob == null) {
+            return false;
+        } else {
+            searchJob.cancel();
+            return true;
+        }
+    }
+
+    public SearchJob getFromCache(final String id, final SearchUser searchUser) {
+        final SearchJob job = cache.getIfPresent(id);
+        if (job != null) {
+            if (hasPermissionToAccessJob(searchUser, job.getOwner())) {
+                return job;
+            } else {
+                throw new ForbiddenException(StringUtils.f("User %s cannot load search job %s that belongs to different user!", searchUser.username(), id));
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean isInCache(String jobId) {
+        return cache.getIfPresent(jobId) != null;
     }
 }

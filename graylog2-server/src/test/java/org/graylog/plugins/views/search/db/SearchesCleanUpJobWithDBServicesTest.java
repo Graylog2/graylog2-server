@@ -16,27 +16,26 @@
  */
 package org.graylog.plugins.views.search.db;
 
+import name.falgout.jeffrey.testing.junit.guice.GuiceExtension;
+import name.falgout.jeffrey.testing.junit.guice.IncludeModule;
+import name.falgout.jeffrey.testing.junit.guice.IncludeModules;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
+import org.graylog.testing.inject.InputConfigurationModule;
 import org.graylog.testing.inject.TestPasswordSecretModule;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.database.MongoConnection;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.ValidatorModule;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.Duration;
-import org.jukito.JukitoRunner;
-import org.jukito.UseModules;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 import java.util.Collections;
@@ -50,36 +49,34 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@RunWith(JukitoRunner.class)
-@UseModules({ObjectMapperModule.class, ValidatorModule.class, TestPasswordSecretModule.class})
+@ExtendWith(MongoDBExtension.class)
+@ExtendWith(GuiceExtension.class)
+@IncludeModules({
+        @IncludeModule(InputConfigurationModule.class),
+        @IncludeModule(ObjectMapperModule.class),
+        @IncludeModule(ValidatorModule.class),
+        @IncludeModule(TestPasswordSecretModule.class)
+})
 public class SearchesCleanUpJobWithDBServicesTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private SearchesCleanUpJob searchesCleanUpJob;
     private SearchDbService searchDbService;
 
     static class TestViewService extends ViewSummaryService {
-        TestViewService(MongoConnection mongoConnection,
-                        MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-                        MongoCollections mongoCollections) {
-            super(mongoConnection, mongoJackObjectMapperProvider, mongoCollections);
+        TestViewService(MongoCollections mongoCollections) {
+            super(mongoCollections);
         }
     }
 
-    @Before
-    public void setup(MongoJackObjectMapperProvider mapperProvider) {
+    @BeforeEach
+    public void setup(MongoCollections mongoCollections) {
         DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2018-07-03T13:37:42.000Z").getMillis());
 
 
-        final ViewSummaryService viewService = new TestViewService(
-                mongodb.mongoConnection(),
-                mapperProvider,
-                new MongoCollections(mapperProvider, mongodb.mongoConnection())
-        );
+        final ViewSummaryService viewService = new TestViewService(mongoCollections);
         this.searchDbService = spy(
                 new SearchDbService(
-                        new MongoCollections(mapperProvider, mongodb.mongoConnection()),
+                        mongoCollections,
                         dto -> new SearchRequirements(Collections.emptySet(), dto),
                         new IgnoreSearchFilters()
                 )
@@ -88,8 +85,8 @@ public class SearchesCleanUpJobWithDBServicesTest {
                 new HashMap<>(), new HashSet<>());
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterEach
+    public void cleanup() throws Exception {
         DateTimeUtils.setCurrentMillisSystem();
     }
 

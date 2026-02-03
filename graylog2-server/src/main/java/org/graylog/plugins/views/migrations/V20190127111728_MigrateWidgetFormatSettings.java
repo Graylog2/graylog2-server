@@ -24,7 +24,6 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -122,7 +121,6 @@ public class V20190127111728_MigrateWidgetFormatSettings extends Migration {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public static abstract class MigrationCompleted {
         @JsonProperty("modified_views_count")
         public abstract long modifiedViewsCount();

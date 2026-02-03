@@ -16,6 +16,7 @@
  */
 import type { Moment } from 'moment';
 import moment from 'moment-timezone';
+import 'moment-precise-range-plugin';
 
 export type DateTime = string | number | Moment | Date;
 
@@ -53,15 +54,16 @@ const validateDateTime = (dateTime: Moment, originalDateTime: DateTime, addition
   return dateTime;
 };
 
-const getFormatStringsForDateTimeFormats = (dateTimeFormats: Array<DateTimeFormats>) => dateTimeFormats?.map((dateTimeFormat) => {
-  const format = DATE_TIME_FORMATS[dateTimeFormat];
+const getFormatStringsForDateTimeFormats = (dateTimeFormats: Array<DateTimeFormats>) =>
+  dateTimeFormats?.map((dateTimeFormat) => {
+    const format = DATE_TIME_FORMATS[dateTimeFormat];
 
-  if (!format) {
-    throw new Error(`Provided date time format "${dateTimeFormat}" is not supported.`);
-  }
+    if (!format) {
+      throw new Error(`Provided date time format "${dateTimeFormat}" is not supported.`);
+    }
 
-  return format;
-});
+    return format;
+  });
 
 /**
  * Takes a date and returns it as a moment object. Optionally you can define a time zone, which will be considered when displaying the date.
@@ -78,7 +80,8 @@ export const toDateObject = (dateTime: DateTime, acceptedFormats?: Array<DateTim
 /**
  * Transforms an ISO 8601 date time to a moment date object. It throws an error if the provided date time is not expressed according to ISO 8601.
  */
-export const parseFromIsoString = (dateTimeString: string, tz = DEFAULT_OUTPUT_TZ) => toDateObject(dateTimeString, ['internal'], tz);
+export const parseFromIsoString = (dateTimeString: string, tz = DEFAULT_OUTPUT_TZ) =>
+  toDateObject(dateTimeString, ['internal'], tz);
 
 /**
  * Returns the estimated browser time zone.
@@ -88,12 +91,14 @@ export const getBrowserTimezone = () => moment.tz.guess();
 /**
  * Returns the provided date time as a string, based on the targeted format and timezone.
  */
-export const adjustFormat = (dateTime: DateTime, format: DateTimeFormats = 'default', tz = DEFAULT_OUTPUT_TZ) => toDateObject(dateTime, undefined, tz).format(DATE_TIME_FORMATS[format]);
+export const adjustFormat = (dateTime: DateTime, format: DateTimeFormats = 'default', tz = DEFAULT_OUTPUT_TZ) =>
+  toDateObject(dateTime, undefined, tz).format(DATE_TIME_FORMATS[format]);
 
 /**
  * Returns the provided date time as a string, based on the targeted format and the browser timezone.
  */
-export const formatAsBrowserTime = (time: DateTime, format: DateTimeFormats = 'default') => adjustFormat(time, format, getBrowserTimezone());
+export const formatAsBrowserTime = (time: DateTime, format: DateTimeFormats = 'default') =>
+  adjustFormat(time, format, getBrowserTimezone());
 
 /**
  * Returns the time in a human-readable format, relative to the provided date time.
@@ -103,6 +108,22 @@ export const relativeDifference = (dateTime: DateTime) => {
   const dateObject = toDateObject(dateTime);
 
   return validateDateTime(dateObject, dateTime).fromNow();
+};
+
+/**
+ * Returns the difference between two dates in a human-readable format.
+ */
+export const readableDifference = (from: DateTime, to: DateTime) => {
+  const fromObject = toDateObject(from);
+  const toObject = toDateObject(to);
+  const differenceMS = toObject.diff(fromObject);
+
+  // preciseDiff does not support ms
+  if (differenceMS < 1000) {
+    return `${differenceMS} milliseconds`;
+  }
+
+  return moment.preciseDiff(fromObject, toObject);
 };
 
 /**
@@ -152,3 +173,7 @@ export const durationInSeconds = (duration: string | number) => moment.duration(
  * Takes a duration (e.g. in milliseconds or seconds, or as a ISO8601 duration) and returns it in minutes.
  */
 export const durationInMinutes = (duration: string | number) => moment.duration(duration).asMinutes();
+/**
+ * Takes a duration (e.g. in minutes or seconds, or as a ISO8601 duration) and returns it in milliseconds.
+ */
+export const durationToMS = (duration: string) => moment.duration(duration).asMilliseconds();

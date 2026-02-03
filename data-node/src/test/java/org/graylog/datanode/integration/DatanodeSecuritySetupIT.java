@@ -99,7 +99,7 @@ public class DatanodeSecuritySetupIT {
         waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), trustStore);
 
         try {
-            given().header("Authorization", DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER.get())
+            given().header("Authorization", DatanodeContainerizedBackend.JWT_AUTH_TOKEN.headerValue().get())
                     .trustStore(trustStore)
                     .get("https://localhost:" + backend.getOpensearchRestPort())
                     .then().assertThat()
@@ -118,7 +118,7 @@ public class DatanodeSecuritySetupIT {
                     RestOperationParameters.builder()
                             .port(datanodeRestPort)
                             .truststore(trustStore)
-                            .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
+                            .jwtAuthToken(DatanodeContainerizedBackend.JWT_AUTH_TOKEN)
                             .build())
                     .waitForAvailableStatus();
         } catch (Exception ex) {

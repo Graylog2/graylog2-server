@@ -91,7 +91,7 @@ public abstract class RestOperation {
     }
 
     String formatUrl(RestOperationParameters params, String url) {
-        final boolean securedConnection = params.truststore() != null;
+        final boolean securedConnection = params.truststore() != null || params.relaxedHTTPSValidation();
         String procotol = securedConnection ? "https" : "http";
         return procotol + "://localhost:" + params.port() + url;
     }

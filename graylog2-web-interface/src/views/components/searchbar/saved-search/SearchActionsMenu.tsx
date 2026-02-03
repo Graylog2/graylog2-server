@@ -19,9 +19,8 @@ import styled from 'styled-components';
 import { useCallback, useState, useContext, useRef } from 'react';
 
 import { isPermitted } from 'util/PermissionsMixin';
-import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
+import { Button, ButtonGroup, MenuItem } from 'components/bootstrap';
 import { Icon, ShareButton } from 'components/common';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 import View from 'views/logic/views/View';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
@@ -35,21 +34,25 @@ import type User from 'logic/users/User';
 import ViewPropertiesModal from 'views/components/dashboard/DashboardPropertiesModal';
 import { loadAsDashboard, loadNewSearch } from 'views/logic/views/Actions';
 import IfPermitted from 'components/common/IfPermitted';
-import {
-  executePluggableSearchDuplicationHandler as executePluggableDuplicationHandler,
-} from 'views/logic/views/pluggableSaveViewFormHandler';
+import { executePluggableSearchDuplicationHandler as executePluggableDuplicationHandler } from 'views/logic/views/pluggableSaveViewFormHandler';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useIsDirty from 'views/hooks/useIsDirty';
 import useIsNew from 'views/hooks/useIsNew';
 import useView from 'views/hooks/useView';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { loadView, updateView } from 'views/logic/slices/viewSlice';
 import type FetchError from 'logic/errors/FetchError';
 import useHistory from 'routing/useHistory';
 import usePluginEntities from 'hooks/usePluginEntities';
 import SavedSearchesModal from 'views/components/searchbar/saved-search/SavedSearchesModal';
 import SaveViewButton from 'views/components/searchbar/SaveViewButton';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import useHotkey from 'hooks/useHotkey';
+import { createGRN } from 'logic/permissions/GRN';
+import useSelectedStreamsGRN from 'views/hooks/useSelectedStreamsGRN';
+import { createView, deleteView } from 'views/api/views';
+import { MoreActionsMenu } from 'components/common/MoreActions';
 
 import SavedSearchForm from './SavedSearchForm';
 
@@ -58,15 +61,13 @@ const Container = styled(ButtonGroup)`
   justify-content: flex-end;
 `;
 
-const _isAllowedToEdit = (view: View, currentUser: User | undefined | null) => (
-  view.owner === currentUser?.username
-  || isPermitted(currentUser?.permissions, [ViewsPermissions.View.Edit(view.id)])
-);
+const _isAllowedToEdit = (view: View, currentUser: User | undefined | null) =>
+  view.owner === currentUser?.username || isPermitted(currentUser?.permissions, [ViewsPermissions.View.Edit(view.id)]);
 
-const _extractErrorMessage = (error: FetchError) => ((error
-    && error.additional
-    && error.additional.body
-    && error.additional.body.message) ? error.additional.body.message : error);
+const _extractErrorMessage = (error: FetchError) =>
+  error && error.additional && error.additional.body && error.additional.body.message
+    ? error.additional.body.message
+    : error;
 
 const usePluggableSearchAction = (loaded: boolean, view: View) => {
   const modalRefs = useRef({});
@@ -76,20 +77,11 @@ const usePluggableSearchAction = (loaded: boolean, view: View) => {
     .filter((perspective) => (perspective.useCondition ? !!perspective.useCondition() : true))
     .map(({ component: PluggableSearchAction, key, modals }) => {
       if (modals) {
-        const refs = modals
-          .map(({ key: modalKey }) => modalKey)
-          .reduce((acc, mKey: string) => {
-            acc[mKey] = () => modalRefs.current[mKey];
-
-            return acc;
-          }, {});
-
-        return (
-          <PluggableSearchAction key={key}
-                                 loaded={loaded}
-                                 search={view}
-                                 modalRefs={refs} />
+        const refs = Object.fromEntries(
+          modals.map(({ key: modalKey }) => modalKey).map((mKey) => [mKey, () => modalRefs.current[mKey]]),
         );
+
+        return <PluggableSearchAction key={key} loaded={loaded} search={view} modalRefs={refs} />;
       }
 
       return <PluggableSearchAction key={key} loaded={loaded} search={view} />;
@@ -99,10 +91,16 @@ const usePluggableSearchAction = (loaded: boolean, view: View) => {
     .filter(({ modals }) => !!modals)
     .flatMap(({ modals }) => modals)
     .map(({ key, component: ActionModal }) => (
-      <ActionModal key={key} search={view} ref={(r) => { modalRefs.current[key] = r; }} />
+      <ActionModal
+        key={key}
+        search={view}
+        ref={(r) => {
+          modalRefs.current[key] = r;
+        }}
+      />
     ));
 
-  return ({ actions, actionModals });
+  return { actions, actionModals };
 };
 
 const SearchActionsMenu = () => {
@@ -112,7 +110,7 @@ const SearchActionsMenu = () => {
   const viewLoaderFunc = useContext(ViewLoaderContext);
   const currentUser = useCurrentUser();
   const loadNewView = useContext(NewViewLoaderContext);
-  const isAllowedToEdit = (view && view.id) && _isAllowedToEdit(view, currentUser);
+  const isAllowedToEdit = view && view.id && _isAllowedToEdit(view, currentUser);
   const formTarget = useRef();
   const [showForm, setShowForm] = useState(false);
   const [showList, setShowList] = useState(false);
@@ -120,8 +118,9 @@ const SearchActionsMenu = () => {
   const [showMetadataEdit, setShowMetadataEdit] = useState(false);
   const [showShareSearch, setShowShareSearch] = useState(false);
   const currentTitle = view?.title ?? '';
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const onUpdateView = useCallback((newView: View) => dispatch(updateView(newView)), [dispatch]);
+  const { selectedStreamsGRN } = useSelectedStreamsGRN();
 
   const loaded = isNew === false;
   const disableReset = !(dirty || loaded);
@@ -139,57 +138,71 @@ const SearchActionsMenu = () => {
   const toggleShareSearch = useCallback(() => setShowShareSearch((cur) => !cur), []);
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableSearchAction(loaded, view);
 
-  const saveSearch = useCallback(async (newTitle: string) => {
-    if (!view.id) {
-      return;
-    }
+  const saveSearch = useCallback(
+    async (newTitle: string, entityShare?: EntitySharePayload) => {
+      if (!view.id) {
+        return;
+      }
+      const newView = view.toBuilder().title(newTitle).type(View.Type.Search).build();
 
-    const newView = view.toBuilder()
-      .title(newTitle)
-      .type(View.Type.Search)
-      .build();
+      await dispatch(onSaveView(newView, entityShare));
 
-    await dispatch(onSaveView(newView));
-    closeFormModal();
-    await dispatch(loadView(newView));
-  }, [closeFormModal, dispatch, view]);
-
-  const saveAsSearch = useCallback(async (newTitle: string) => {
-    if (!newTitle || newTitle === '') {
-      return;
-    }
-
-    const viewWithPluginData = await executePluggableDuplicationHandler(view, currentUser.permissions, pluggableSaveViewControls);
-
-    const newView = viewWithPluginData.toBuilder()
-      .newId()
-      .title(newTitle)
-      .type(View.Type.Search)
-      .build();
-
-    ViewManagementActions.create(newView)
-      .then((createdView) => {
-        toggleFormModal();
-
-        return createdView;
-      })
-      .then((createdView) => {
-        viewLoaderFunc(createdView.id);
-      })
-      .then(() => UserNotification.success(`Saving view "${newView.title}" was successful!`, 'Success!'))
-      .catch((error) => UserNotification.error(`Saving view failed: ${_extractErrorMessage(error)}`, 'Error!'));
-  }, [currentUser.permissions, pluggableSaveViewControls, toggleFormModal, view, viewLoaderFunc]);
-
-  const deleteSavedSearch = useCallback((deletedView: View) => ViewManagementActions.delete(deletedView)
-    .then(() => UserNotification.success(`Deleting saved search "${deletedView.title}" was successful!`, 'Success!'))
-    .then(() => {
-      if (deletedView.id === view.id) {
-        loadNewSearch(history);
+      if (entityShare) {
+        await EntityShareDomain.update('search', title, createGRN('search', view.id), entityShare);
       }
 
-      return Promise.resolve();
-    })
-    .catch((error) => UserNotification.error(`Deleting saved search failed: ${_extractErrorMessage(error)}`, 'Error!')), [history, view.id]);
+      closeFormModal();
+      await dispatch(loadView(newView));
+    },
+    [closeFormModal, dispatch, view, title],
+  );
+
+  const saveAsSearch = useCallback(
+    async (newTitle: string, entityShare?: EntitySharePayload) => {
+      if (!newTitle || newTitle === '') {
+        return;
+      }
+      const viewWithPluginData = await executePluggableDuplicationHandler(
+        view,
+        currentUser.permissions,
+        pluggableSaveViewControls,
+      );
+
+      const newView = viewWithPluginData.toBuilder().newId().title(newTitle).type(View.Type.Search).build();
+
+      createView(newView, entityShare, view.id)
+        .then((createdView) => {
+          toggleFormModal();
+
+          return createdView;
+        })
+        .then((createdView) => {
+          viewLoaderFunc(createdView.id);
+        })
+        .then(() => UserNotification.success(`Saving view "${newView.title}" was successful!`, 'Success!'))
+        .catch((error) => UserNotification.error(`Saving view failed: ${_extractErrorMessage(error)}`, 'Error!'));
+    },
+    [currentUser.permissions, pluggableSaveViewControls, toggleFormModal, view, viewLoaderFunc],
+  );
+
+  const deleteSavedSearch = useCallback(
+    (deletedView: View) =>
+      deleteView(deletedView)
+        .then(() =>
+          UserNotification.success(`Deleting saved search "${deletedView.title}" was successful!`, 'Success!'),
+        )
+        .then(() => {
+          if (deletedView.id === view.id) {
+            loadNewSearch(history);
+          }
+
+          return Promise.resolve();
+        })
+        .catch((error) =>
+          UserNotification.error(`Deleting saved search failed: ${_extractErrorMessage(error)}`, 'Error!'),
+        ),
+    [history, view.id],
+  );
 
   const _loadAsDashboard = useCallback(() => {
     loadAsDashboard(history, view);
@@ -210,43 +223,47 @@ const SearchActionsMenu = () => {
 
   return (
     <Container aria-label="Search Meta Buttons">
-      <SavedSearchForm key={currentTitle}
-                       show={showForm}
-                       saveSearch={saveSearch}
-                       saveAsSearch={saveAsSearch}
-                       isCreateNew={isNew || !isAllowedToEdit}
-                       toggleModal={toggleFormModal}
-                       value={currentTitle}>
-        <SaveViewButton title={title}
-                        ref={formTarget}
-                        onClick={toggleFormModal} />
+      <SavedSearchForm
+        key={currentTitle}
+        show={showForm}
+        saveSearch={saveSearch}
+        saveAsSearch={saveAsSearch}
+        isCreateNew={isNew || !isAllowedToEdit}
+        toggleModal={toggleFormModal}
+        value={currentTitle}
+        selectedStreamGRN={selectedStreamsGRN}
+        viewId={!isNew && view.id}>
+        <SaveViewButton title={title} ref={formTarget} onClick={toggleFormModal} />
       </SavedSearchForm>
-      <Button title="Load a previously saved search"
-              onClick={toggleListModal}>
+      <Button title="Load a previously saved search" onClick={toggleListModal}>
         <Icon name="folder" type="regular" /> Load
       </Button>
       {showList && (
-        <SavedSearchesModal deleteSavedSearch={deleteSavedSearch}
-                            toggleModal={toggleListModal}
-                            activeSavedSearchId={view.id} />
+        <SavedSearchesModal
+          deleteSavedSearch={deleteSavedSearch}
+          toggleModal={toggleListModal}
+          activeSavedSearchId={view.id}
+        />
       )}
-      <ShareButton entityType="search"
-                   entityId={view.id}
-                   onClick={toggleShareSearch}
-                   bsStyle="default"
-                   disabledInfo={isNew && 'Only saved searches can be shared.'} />
-      <DropdownButton title={<Icon name="more_horiz" />}
-                      aria-label="Open search actions dropdown"
-                      id="search-actions-dropdown"
-                      pullRight
-                      noCaret>
+      <ShareButton
+        entityType="search"
+        entityId={view.id}
+        onClick={toggleShareSearch}
+        bsStyle="default"
+        disabledInfo={isNew && 'Only saved searches can be shared.'}
+      />
+      <MoreActionsMenu aria-label="Open search actions dropdown" id="search-actions-dropdown" pullRight solid>
         <MenuItem onSelect={toggleMetadataEdit} disabled={!isAllowedToEdit} icon="edit">
           Edit metadata
         </MenuItem>
         <IfPermitted permissions="dashboards:create">
-          <MenuItem onSelect={_loadAsDashboard} icon="dashboard">Export to dashboard</MenuItem>
+          <MenuItem onSelect={_loadAsDashboard} icon="dashboard">
+            Export to dashboard
+          </MenuItem>
         </IfPermitted>
-        <MenuItem onSelect={toggleExport} icon="download">Export</MenuItem>
+        <MenuItem onSelect={toggleExport} icon="download">
+          Export
+        </MenuItem>
         <MenuItem disabled={disableReset} onSelect={loadNewView} icon="restart_alt">
           Reset search
         </MenuItem>
@@ -256,22 +273,26 @@ const SearchActionsMenu = () => {
             {pluggableActions}
           </>
         ) : null}
-      </DropdownButton>
-      {showExport && (<ExportModal view={view} closeModal={toggleExport} />)}
+      </MoreActionsMenu>
+      {showExport && <ExportModal view={view} closeModal={toggleExport} />}
       {showMetadataEdit && (
-        <ViewPropertiesModal show
-                             view={view}
-                             title="Editing saved search"
-                             submitButtonText="Update search"
-                             onClose={toggleMetadataEdit}
-                             onSave={onUpdateView} />
+        <ViewPropertiesModal
+          show
+          view={view}
+          title="Editing saved search"
+          submitButtonText="Update search"
+          onClose={toggleMetadataEdit}
+          onSave={onUpdateView}
+        />
       )}
       {showShareSearch && (
-        <EntityShareModal entityId={view.id}
-                          entityType="search"
-                          entityTitle={view.title}
-                          description="Search for a User or Team to add as collaborator on this saved search."
-                          onClose={toggleShareSearch} />
+        <EntityShareModal
+          entityId={view.id}
+          entityType="search"
+          entityTitle={view.title}
+          description="Search for a User or Team to add as collaborator on this saved search."
+          onClose={toggleShareSearch}
+        />
       )}
       {pluggableActionModals}
     </Container>

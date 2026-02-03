@@ -15,22 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useContext, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import sortBy from 'lodash/sortBy';
 import upperCase from 'lodash/upperCase';
-import { useState } from 'react';
+import groupBy from 'lodash/groupBy';
 
-import useLocation from 'routing/useLocation';
 import { Button } from 'components/bootstrap';
 import type View from 'views/logic/views/View';
 import generateId from 'logic/generateId';
-import type { AppDispatch } from 'stores/useAppDispatch';
-import useAppDispatch from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import type { GetState } from 'views/types';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 import SectionInfo from '../SectionInfo';
 import SectionSubheadline from '../SectionSubheadline';
@@ -50,63 +50,72 @@ const CreateButton = styled(Button)`
 `;
 
 export type CreatorProps = {
-  view: View,
+  view: View;
 };
 type CreatorType = 'preset' | 'generic' | 'investigations' | 'events';
-type CreatorFunction = () => (dispatch: AppDispatch, getState: GetState) => unknown;
+type CreatorFunction = () => (dispatch: ViewsDispatch, getState: GetState) => Promise<string>;
 
 type FunctionalCreator = {
-  func: CreatorFunction,
-  title: string,
-  type: CreatorType,
-  useCondition?: () => boolean,
+  func: CreatorFunction;
+  title: string;
+  type: CreatorType;
+  useCondition?: () => boolean;
 };
 
 type CreatorComponentProps = {
-  onClose: () => void,
+  onClose: () => void;
 };
 
 type ComponentCreator = {
-  component: React.ComponentType<CreatorComponentProps>,
-  useCondition?: () => boolean,
-  title: string,
-  type: CreatorType,
+  component: React.ComponentType<CreatorComponentProps>;
+  useCondition?: () => boolean;
+  title: string;
+  type: CreatorType;
 };
 
 export type Creator = ComponentCreator | FunctionalCreator;
 
-type OverflowingComponents = { [key: string]: React.ReactNode }
+type OverflowingComponents = { [key: string]: React.ReactNode };
 
-export const isCreatorFunc = (creator: Creator): creator is FunctionalCreator => ('func' in creator);
+export const isCreatorFunc = (creator: Creator): creator is FunctionalCreator => 'func' in creator;
 
 const CreateMenuItem = ({
   creator,
   onClick,
   setOverflowingComponents,
 }: {
-  creator: Creator,
-  onClick: () => void,
-  setOverflowingComponents: React.Dispatch<React.SetStateAction<OverflowingComponents>>
+  creator: Creator;
+  onClick: () => void;
+  setOverflowingComponents: React.Dispatch<React.SetStateAction<OverflowingComponents>>;
 }) => {
-  const location = useLocation();
   const sendTelemetry = useSendTelemetry();
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
   const disabled = creator.useCondition?.() === false;
+  const { setWidgetEditing } = useContext(WidgetFocusContext);
 
   const createHandlerFor = () => {
-    if (isCreatorFunc(creator)) {
-      return () => {
-        sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_CREATE[upperCase(creator.title).replace(/ /g, '_')], {
-          app_pathname: getPathnameWithoutId(location.pathname),
+    const telemetry = () =>
+      sendTelemetry(
+        TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_CREATE[upperCase(creator.title).replace(/ /g, '_')] ??
+          `Search Widget ${creator.title} Created`,
+        {
           app_section: 'search-sidebar',
           event_details: {
             widgetType: creator.type,
+            widgetTitle: creator.title,
           },
-        });
+        },
+      );
+
+    if (isCreatorFunc(creator)) {
+      return () => {
+        telemetry();
 
         onClick();
 
-        dispatch(creator.func());
+        dispatch(creator.func()).then((widgetId) => {
+          setWidgetEditing(widgetId);
+        });
       };
     }
 
@@ -114,6 +123,8 @@ const CreateMenuItem = ({
       const CreatorComponent = creator.component;
 
       return () => {
+        telemetry();
+
         const id = generateId();
 
         const onClose = () => {
@@ -144,9 +155,7 @@ const CreateMenuItem = ({
   };
 
   return (
-    <CreateButton key={creator.title}
-                  onClick={createHandlerFor()}
-                  disabled={disabled}>
+    <CreateButton key={creator.title} onClick={createHandlerFor()} disabled={disabled}>
       {creator.title}
     </CreateButton>
   );
@@ -157,66 +166,77 @@ const GroupCreateMenuItems = ({
   onClick,
   setOverflowingComponents,
 }: {
-  creators: Array<Creator>,
-  onClick: () => void,
-  setOverflowingComponents: React.Dispatch<React.SetStateAction<OverflowingComponents>>
+  creators: Array<Creator>;
+  onClick: () => void;
+  setOverflowingComponents: React.Dispatch<React.SetStateAction<OverflowingComponents>>;
 }) => (
   <>
     {sortBy(creators, 'title').map((creator) => (
-      <CreateMenuItem creator={creator}
-                      key={creator.title}
-                      onClick={onClick}
-                      setOverflowingComponents={setOverflowingComponents} />
+      <CreateMenuItem
+        creator={creator}
+        key={creator.title}
+        onClick={onClick}
+        setOverflowingComponents={setOverflowingComponents}
+      />
     ))}
   </>
 );
 
-const createGroup = (creators: Array<Creator>, type: CreatorType) => creators.filter((c) => (c.type === type));
-
 type Props = {
-  onClick: () => void,
+  onClick: () => void;
 };
 
 const AddWidgetButton = ({ onClick }: Props) => {
   const [overflowingComponents, setOverflowingComponents] = useState<OverflowingComponents>({});
   const creators = usePluginEntities('creators');
-  const presets = createGroup(creators, 'preset');
-  const generic = createGroup(creators, 'generic');
-  const investigationsCreator = createGroup(creators, 'investigations');
-  const eventsCreator = createGroup(creators, 'events');
+  const {
+    preset: presets,
+    generic,
+    events: eventsCreator,
+    investigations: investigationsCreator,
+  } = useMemo(() => groupBy(creators, (creator) => creator.type), [creators]);
   const components: Array<React.ReactNode> = Object.values(overflowingComponents);
 
   return (
     <>
-      <SectionInfo>Use the following options to add an aggregation, log view (enterprise feature) or parameters
-        (enterprise feature) to your search.
+      <SectionInfo>
+        Use the following options to add an aggregation, log view (enterprise feature) or parameters (enterprise
+        feature) to your search.
       </SectionInfo>
       <Group>
         <SectionSubheadline>Generic</SectionSubheadline>
-        <GroupCreateMenuItems creators={generic}
-                              onClick={onClick}
-                              setOverflowingComponents={setOverflowingComponents} />
+        <GroupCreateMenuItems
+          creators={generic}
+          onClick={onClick}
+          setOverflowingComponents={setOverflowingComponents}
+        />
       </Group>
       <Group>
         <SectionSubheadline>Predefined Aggregation</SectionSubheadline>
-        <GroupCreateMenuItems creators={presets}
-                              onClick={onClick}
-                              setOverflowingComponents={setOverflowingComponents} />
+        <GroupCreateMenuItems
+          creators={presets}
+          onClick={onClick}
+          setOverflowingComponents={setOverflowingComponents}
+        />
       </Group>
       {!!investigationsCreator?.length && (
         <Group>
           <SectionSubheadline>Investigations</SectionSubheadline>
-          <GroupCreateMenuItems creators={investigationsCreator}
-                                onClick={onClick}
-                                setOverflowingComponents={setOverflowingComponents} />
+          <GroupCreateMenuItems
+            creators={investigationsCreator}
+            onClick={onClick}
+            setOverflowingComponents={setOverflowingComponents}
+          />
         </Group>
       )}
       {!!eventsCreator?.length && (
         <Group>
           <SectionSubheadline>Events</SectionSubheadline>
-          <GroupCreateMenuItems creators={eventsCreator}
-                                onClick={onClick}
-                                setOverflowingComponents={setOverflowingComponents} />
+          <GroupCreateMenuItems
+            creators={eventsCreator}
+            onClick={onClick}
+            setOverflowingComponents={setOverflowingComponents}
+          />
         </Group>
       )}
       {components}

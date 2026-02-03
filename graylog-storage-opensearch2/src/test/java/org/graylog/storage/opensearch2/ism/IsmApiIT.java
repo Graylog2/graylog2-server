@@ -17,11 +17,11 @@
 package org.graylog.storage.opensearch2.ism;
 
 import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
+import org.graylog.testing.elasticsearch.SearchInstance;
 import org.graylog2.indexer.datastream.policy.IsmPolicy;
 import org.graylog2.indexer.datastream.policy.IsmPolicyTest;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class IsmApiIT {
 
-    @Rule
+    @SearchInstance
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
     IsmApi ismApi = new IsmApi(openSearchInstance.openSearchClient(), new ObjectMapperProvider().get());

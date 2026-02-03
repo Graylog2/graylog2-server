@@ -19,7 +19,6 @@ package org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearche
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.search.SearchType;
 
 import javax.annotation.Nullable;
@@ -31,7 +30,6 @@ import static org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedS
 import static org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.search.Pivot.builder;
 
 @AutoValue
-@WithBeanGetter
 public abstract class AggregationWidget implements ViewWidget {
     private static final String TYPE = "aggregation";
 

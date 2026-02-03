@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import moment from 'moment';
+import userEvent from '@testing-library/user-event';
 
 import AbsoluteDatePicker from './AbsoluteDatePicker';
 
@@ -39,12 +40,12 @@ describe('AbsoluteDatePicker', () => {
     expect(screen).not.toBeNull();
   });
 
-  it('calls onChange upon changing the input', () => {
-    const { getByLabelText } = render(<AbsoluteDatePicker {...defaultProps} />);
+  it('calls onChange upon changing the input', async () => {
+    render(<AbsoluteDatePicker {...defaultProps} />);
 
-    const input = getByLabelText('Mon Apr 20 2020');
+    const input = await screen.findByRole('button', { name: 'Monday, April 20th, 2020' });
 
-    fireEvent.click(input);
+    await userEvent.click(input);
 
     expect(defaultProps.onChange).toHaveBeenCalledWith('2020-04-20 13:22:46');
   });

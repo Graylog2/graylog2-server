@@ -31,10 +31,12 @@ export const arrayOfMaps = (): Array<Map<string, number>> => [Map({ foo: 23 }), 
 export const mixedMapsAndObjects = (): MixedMapsAndObjects => ({ foo: Map({ bar: { baz: Map({ qux: 42 }) } }) });
 
 export class AlwaysEqual {
+  // eslint-disable-next-line class-methods-use-this
   equals = () => true;
 }
 
 export class NeverEqual {
+  // eslint-disable-next-line class-methods-use-this
   equals = () => false;
 }
 
@@ -46,20 +48,24 @@ export class NonValueClass {
   }
 }
 
-export const numericVisualizationWithTrend = () => AggregationWidgetConfig.builder()
-  .visualization(NumberVisualization.type)
-  .visualizationConfig(NumberVisualizationConfig.create(true))
-  .build();
-export const numericVisualizationWithoutTrend = () => AggregationWidgetConfig.builder()
-  .visualization(NumberVisualization.type)
-  .visualizationConfig(NumberVisualizationConfig.create())
-  .build();
+export const numericVisualizationWithTrend = () =>
+  AggregationWidgetConfig.builder()
+    .visualization(NumberVisualization.type)
+    .visualizationConfig(NumberVisualizationConfig.create(true))
+    .build();
+export const numericVisualizationWithoutTrend = () =>
+  AggregationWidgetConfig.builder()
+    .visualization(NumberVisualization.type)
+    .visualizationConfig(NumberVisualizationConfig.create())
+    .build();
 
-export const barChartWithGrouping = () => AggregationWidgetConfig.builder()
-  .visualization(BarVisualization.type)
-  .visualizationConfig(BarVisualizationConfig.create('group'))
-  .build();
-export const barChartWithStacking = () => AggregationWidgetConfig.builder()
-  .visualization(BarVisualization.type)
-  .visualizationConfig(BarVisualizationConfig.create('stack'))
-  .build();
+export const barChartWithGrouping = () =>
+  AggregationWidgetConfig.builder()
+    .visualization(BarVisualization.type)
+    .visualizationConfig(BarVisualizationConfig.create('group'))
+    .build();
+export const barChartWithStacking = () =>
+  AggregationWidgetConfig.builder()
+    .visualization(BarVisualization.type)
+    .visualizationConfig(BarVisualizationConfig.create('stack'))
+    .build();

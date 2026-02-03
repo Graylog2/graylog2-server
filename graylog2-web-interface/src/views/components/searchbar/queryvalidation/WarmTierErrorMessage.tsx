@@ -21,16 +21,16 @@ import type { IndexRange } from 'views/components/searchbar/queryvalidation/type
 import { isSearchingWarmTier } from 'views/components/searchbar/queryvalidation/warmTierValidation';
 
 type Props = {
-  warmTierIndices: IndexRange[]
-}
+  warmTierIndices: IndexRange[];
+};
 
-const WarmTierErrorMessage = ({ warmTierIndices } : Props) => {
+const WarmTierErrorMessage = ({ warmTierIndices }: Props) => {
   if (!isSearchingWarmTier(warmTierIndices)) return null;
 
-  const formatTimestamp = (timestamp: number) : string => `${adjustFormat(new Date((timestamp)), 'default')}`;
+  const formatTimestamp = (timestamp: number): string => `${adjustFormat(new Date(timestamp), 'default')}`;
 
-  const streamsWithTimestamp = () : Array<{name: string, timestamp: number}> => {
-    const streamTimestampsList: {[key: string]: Array<number>} = {};
+  const streamsWithTimestamp = (): Array<{ name: string; timestamp: number }> => {
+    const streamTimestampsList: { [key: string]: Array<number> } = {};
 
     warmTierIndices.forEach((index) => {
       index.stream_names.forEach((streamName) => {
@@ -56,9 +56,14 @@ const WarmTierErrorMessage = ({ warmTierIndices } : Props) => {
 
   return (
     <span>
-      The selected time range includes data stored in the Warm Tier, which can be slow to retrieve. Data older than the listed timestamp falls within the Warm Tier for that stream:<br />
+      The selected time range includes data stored in the Warm Tier, which can be slow to retrieve. Data older than the
+      listed timestamp falls within the Warm Tier for that stream:
+      <br />
       {streamsWithTimestampMap.map((streamWithTimestamp) => (
-        <><strong>{streamWithTimestamp.name}:</strong> {formatTimestamp(streamWithTimestamp.timestamp)}<br /></>
+        <>
+          <strong>{streamWithTimestamp.name}:</strong> {formatTimestamp(streamWithTimestamp.timestamp)}
+          <br />
+        </>
       ))}
     </span>
   );

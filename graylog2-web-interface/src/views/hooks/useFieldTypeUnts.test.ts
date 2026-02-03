@@ -32,27 +32,23 @@ describe('useFieldTypeUnits', () => {
   const size = FieldUnit.fromJSON({ abbrev: 'b', unit_type: 'size' });
   const percent = FieldUnit.fromJSON({ abbrev: '%', unit_type: 'percent' });
   const fieldTypes = [
-    FieldTypeMapping.create('fieldTime',
-      FieldType.create('number', [Properties.Numeric]),
-      time),
+    FieldTypeMapping.create('fieldTime', FieldType.create('number', [Properties.Numeric]), time),
 
-    FieldTypeMapping.create('fieldSize',
-      FieldType.create('number', [Properties.Numeric]),
-      size),
+    FieldTypeMapping.create('fieldSize', FieldType.create('number', [Properties.Numeric]), size),
 
-    FieldTypeMapping.create('fieldPercent',
-      FieldType.create('number', [Properties.Numeric]),
-      percent),
+    FieldTypeMapping.create('fieldPercent', FieldType.create('number', [Properties.Numeric]), percent),
 
-    FieldTypeMapping.create('noUnitField',
-      FieldType.create('number', [Properties.Numeric])),
+    FieldTypeMapping.create('noUnitField', FieldType.create('number', [Properties.Numeric])),
   ];
 
   beforeEach(() => {
     asMock(useFeature).mockReturnValue(true);
 
     asMock(useFieldTypes).mockImplementation(() => ({
-      data: fieldTypes, isLoading: false, isFetching: false, refetch: () => {},
+      data: fieldTypes,
+      isLoading: false,
+      isFetching: false,
+      refetch: () => {},
     }));
   });
 

@@ -17,14 +17,13 @@
 import { createSelector } from '@reduxjs/toolkit';
 import * as Immutable from 'immutable';
 
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import type Parameter from 'views/logic/parameters/Parameter';
 import { selectParameters } from 'views/logic/slices/viewSelectors';
 
-const selectParametersMap = createSelector(
-  selectParameters,
-  (parameters = Immutable.Set()) => Immutable.Map<string, Parameter>(parameters.map((p) => [p.name, p])),
+const selectParametersMap = createSelector(selectParameters, (parameters = Immutable.Set()) =>
+  Immutable.Map<string, Parameter>(parameters.map((p) => [p.name, p])),
 );
 
-const useParametersMap = () => useAppSelector(selectParametersMap);
+const useParametersMap = () => useViewsSelector(selectParametersMap);
 export default useParametersMap;

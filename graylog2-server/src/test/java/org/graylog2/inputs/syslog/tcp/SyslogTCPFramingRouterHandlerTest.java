@@ -19,11 +19,12 @@ package org.graylog2.inputs.syslog.tcp;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
+import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.TooLongFrameException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 
@@ -33,12 +34,12 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 public class SyslogTCPFramingRouterHandlerTest {
     private EmbeddedChannel channel;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         channel = new EmbeddedChannel(new SyslogTCPFramingRouterHandler(32, Delimiters.lineDelimiter()));
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         assertThat(channel.finish()).isFalse();
     }
@@ -113,5 +114,19 @@ public class SyslogTCPFramingRouterHandlerTest {
         assertThat(channel.writeInbound(emptyBuffer)).isTrue();
         assertThat((ByteBuf) channel.readInbound()).isEqualTo(emptyBuffer);
         assertThat((ByteBuf) channel.readInbound()).isNull();
+    }
+
+    @Test
+    public void testRetainedBufferReleasedDuringException() {
+        // Creates an initial reference count of 1
+        final ByteBuf buf = Unpooled.copiedBuffer("2025-07-29 12:34:56 myhost myapp: This is a test syslog message\n", StandardCharsets.US_ASCII);
+        assertThat(buf.refCnt()).isNotZero();
+
+        // Trying to decode aboves msg throws an exception
+        assertThatExceptionOfType(DecoderException.class)
+                .isThrownBy(() -> channel.writeInbound(buf));
+
+        // Buffer is properly released even after running into an exception
+        assertThat(buf.refCnt()).isZero();
     }
 }

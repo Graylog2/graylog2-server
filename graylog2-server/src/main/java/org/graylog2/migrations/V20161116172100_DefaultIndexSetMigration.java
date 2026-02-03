@@ -16,6 +16,8 @@
  */
 package org.graylog2.migrations;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.indexer.indexset.DefaultIndexSetCreated;
@@ -27,9 +29,6 @@ import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
 
 import java.time.ZonedDateTime;
 import java.util.Map;
@@ -78,7 +77,7 @@ public class V20161116172100_DefaultIndexSetMigration extends Migration {
 
         final IndexSetConfig config = indexSetConfigFactory.createDefault()
                 .title("Default index set")
-                .description("The Graylog default index set")
+                .description("The default index set")
                 .isRegular(true)
                 .indexPrefix(elasticsearchConfiguration.getDefaultIndexPrefix())
                 .indexTemplateName(elasticsearchConfiguration.getDefaultIndexTemplateName())

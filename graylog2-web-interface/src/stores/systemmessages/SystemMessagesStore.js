@@ -21,10 +21,8 @@ import ApiRoutes from 'routing/ApiRoutes';
 import { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { singletonStore } from 'logic/singleton';
 
-// eslint-disable-next-line import/prefer-default-export
-export const SystemMessagesStore = singletonStore(
-  'core.SystemMessages',
-  () => Reflux.createStore({
+export const SystemMessagesStore = singletonStore('core.SystemMessages', () =>
+  Reflux.createStore({
     listenables: [],
 
     all(page) {

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-const asMock = <Fn extends ((...args: any[]) => any)>(fn: Fn) => fn as unknown as jest.Mock<ReturnType<Fn>, Parameters<Fn>>;
+const asMock = <Fn extends (...args: any[]) => any>(fn: Fn) =>
+  fn as unknown as jest.Mock<ReturnType<Fn>, Parameters<Fn>>;
 
 export default asMock;

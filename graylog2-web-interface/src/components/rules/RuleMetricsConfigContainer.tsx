@@ -28,9 +28,12 @@ type RuleMetricsConfigContainerProps = {
   onClose?: (...args: any[]) => void;
 };
 
-class RuleMetricsConfigContainer extends React.Component<RuleMetricsConfigContainerProps, {
-  [key: string]: any;
-}> {
+class RuleMetricsConfigContainer extends React.Component<
+  RuleMetricsConfigContainerProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     metricsConfig: undefined,
     onClose: () => {},
@@ -47,12 +50,10 @@ class RuleMetricsConfigContainer extends React.Component<RuleMetricsConfigContai
       return null;
     }
 
-    return (
-      <RuleMetricsConfig config={metricsConfig}
-                         onChange={handleChange}
-                         onClose={onClose} />
-    );
+    return <RuleMetricsConfig config={metricsConfig} onChange={handleChange} onClose={onClose} />;
   }
 }
 
-export default connect(RuleMetricsConfigContainer, { rules: RulesStore }, ({ rules }) => ({ metricsConfig: rules ? rules.metricsConfig : rules }));
+export default connect(RuleMetricsConfigContainer, { rules: RulesStore }, ({ rules }) => ({
+  metricsConfig: rules ? rules.metricsConfig : rules,
+}));

@@ -26,18 +26,15 @@ const Container = styled.div`
 `;
 
 type Props = React.PropsWithChildren<{
-  isFocused: boolean,
-  className?: string,
-  style?: React.CSSProperties,
-}>
+  isFocused: boolean;
+  className?: string;
+  style?: React.CSSProperties;
+}>;
 
-const WidgetContainer = React.forwardRef<HTMLDivElement, Props>(({
-  children,
-  className,
-  isFocused,
-  style = {},
-  ...rest
-}: Props, ref) => {
+const WidgetContainer = (
+  { children = undefined, className = undefined, isFocused, style = {}, ...rest }: Props,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) => {
   let containerStyle = {
     ...style,
     transition: 'none',
@@ -59,6 +56,6 @@ const WidgetContainer = React.forwardRef<HTMLDivElement, Props>(({
       {children}
     </Container>
   );
-});
+};
 
-export default WidgetContainer;
+export default React.forwardRef(WidgetContainer);

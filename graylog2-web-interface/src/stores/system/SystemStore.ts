@@ -22,16 +22,29 @@ import fetch from 'logic/rest/FetchProvider';
 import { singletonStore } from 'logic/singleton';
 
 export type Locales = {
-  language_tag: string,
-  display_name: string,
-}
+  language_tag: string;
+  display_name: string;
+};
 type SystemStoreState = {
-  system: {},
-  locales: Array<Locales>,
-}
-export const SystemStore = singletonStore(
-  'core.System',
-  () => Reflux.createStore<SystemStoreState>({
+  system: {
+    cluster_id: string;
+    codename: string;
+    facility: string;
+    hostname: string;
+    is_leader: boolean;
+    is_processing: boolean;
+    lb_status: string;
+    lifecycle: string;
+    node_id: string;
+    operating_system: string;
+    started_at: string;
+    timezone: string;
+    version: string;
+  };
+  locales: Array<Locales>;
+};
+export const SystemStore = singletonStore('core.System', () =>
+  Reflux.createStore<SystemStoreState>({
     system: undefined,
     locales: undefined,
     init() {
@@ -67,11 +80,13 @@ export const SystemStore = singletonStore(
       const url = URLUtils.qualifyUrl(ApiRoutes.ClusterApiResource.elasticsearchStats().url);
 
       const promise = new Promise((resolve, reject) => {
-        fetch('GET', url).then((response) => {
-          const splitVersion = response.cluster_version.split('.');
+        fetch('GET', url)
+          .then((response) => {
+            const splitVersion = response.cluster_version.split('.');
 
-          resolve({ major: splitVersion[0], minor: splitVersion[1], patch: splitVersion[2] });
-        }).catch(reject);
+            resolve({ major: splitVersion[0], minor: splitVersion[1], patch: splitVersion[2] });
+          })
+          .catch(reject);
       });
 
       return promise;

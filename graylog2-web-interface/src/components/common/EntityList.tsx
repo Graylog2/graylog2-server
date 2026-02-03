@@ -25,30 +25,22 @@ const StyledList = styled.ul`
 `;
 
 type Props = {
-  bsNoItemsStyle?: 'info' | 'success' | 'warning',
-  noItemsText?: string | React.ReactNode,
-  items: Array<React.ReactNode>,
-}
+  bsNoItemsStyle?: 'info' | 'success' | 'warning';
+  noItemsText?: string | React.ReactNode;
+  items: Array<React.ReactNode>;
+};
 
 /**
  * Component used to represent list of entities in Graylog, where each entity will have a title, description,
  * action buttons, etc. You need to use this component alongside `EntityListItem` in order to get a similar
  * look and feel among different entities.
  */
-const EntityList = ({ bsNoItemsStyle, items, noItemsText = 'No items available' }: Props) => {
+const EntityList = ({ bsNoItemsStyle = undefined, items, noItemsText = 'No items available' }: Props) => {
   if (items.length === 0) {
-    return (
-      <Alert bsStyle={bsNoItemsStyle}>
-        {noItemsText}
-      </Alert>
-    );
+    return <Alert bsStyle={bsNoItemsStyle}>{noItemsText}</Alert>;
   }
 
-  return (
-    <StyledList>
-      {items}
-    </StyledList>
-  );
+  return <StyledList>{items}</StyledList>;
 };
 
 export default EntityList;

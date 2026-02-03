@@ -21,12 +21,13 @@ import DataNodesOverview from 'preflight/components/Setup/DataNodesOverview';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import { asMock } from 'helpers/mocking';
 import { dataNodes } from 'fixtures/dataNodes';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 jest.mock('preflight/hooks/useDataNodes');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 describe('DataNodesOverview', () => {
-  let oldConfirm;
+  useWindowConfirmMock();
 
   beforeEach(() => {
     asMock(useDataNodes).mockReturnValue({
@@ -35,13 +36,6 @@ describe('DataNodesOverview', () => {
       isInitialLoading: false,
       error: undefined,
     });
-
-    oldConfirm = window.confirm;
-    window.confirm = jest.fn(() => true);
-  });
-
-  afterEach(() => {
-    window.confirm = oldConfirm;
   });
 
   it('should list available data nodes', async () => {

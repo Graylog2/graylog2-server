@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.database.BuildableMongoEntity;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -29,7 +30,7 @@ import java.util.Optional;
 
 @AutoValue
 @JsonDeserialize(builder = EventNotificationStatus.Builder.class)
-public abstract class EventNotificationStatus {
+public abstract class EventNotificationStatus implements BuildableMongoEntity<EventNotificationStatus, EventNotificationStatus.Builder> {
     public static final String FIELD_ID = "id";
     public static final String FIELD_NOTIFICATION_ID = "notification_id";
     public static final String FIELD_EVENT_DEFINITION_ID = "event_definition_id";
@@ -68,7 +69,7 @@ public abstract class EventNotificationStatus {
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public static abstract class Builder {
+    public static abstract class Builder implements BuildableMongoEntity.Builder<EventNotificationStatus, Builder> {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_EventNotificationStatus.Builder();

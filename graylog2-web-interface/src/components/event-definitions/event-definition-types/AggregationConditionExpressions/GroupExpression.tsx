@@ -60,15 +60,21 @@ const GroupExpression = ({
 
   return (
     <>
-      <BooleanOperatorSelector operator={expression.operator} onOperatorChange={handleOperatorChange} />
+      <BooleanOperatorSelector
+        operator={expression.operator}
+        onOperatorChange={handleOperatorChange}
+        placeholder={`Boolean operator group ${level + 1}`}
+      />
       <Clearfix />
       <Group>
-        <AggregationConditionExpression {...props}
-                                        expression={expression.child}
-                                        validation={validation.child}
-                                        parent={expression}
-                                        onChange={onChildChange('child')}
-                                        level={level + 1} />
+        <AggregationConditionExpression
+          {...props}
+          expression={expression.child}
+          validation={validation.child}
+          parent={expression}
+          onChange={onChildChange('child')}
+          level={level + 1}
+        />
       </Group>
     </>
   );

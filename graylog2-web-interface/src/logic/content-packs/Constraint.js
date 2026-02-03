@@ -66,9 +66,7 @@ export default class Constraint {
       return false;
     }
 
-    return other.version === this.version
-      && other.type === this.type
-      && other.plugin === this.plugin;
+    return other.version === this.version && other.type === this.type && other.plugin === this.plugin;
   }
 
   static fromJSON(value) {
@@ -79,8 +77,7 @@ export default class Constraint {
 
   static builder() {
     // eslint-disable-next-line no-use-before-define
-    return new Builder()
-      .plugin('server');
+    return new Builder().plugin('server');
   }
 }
 

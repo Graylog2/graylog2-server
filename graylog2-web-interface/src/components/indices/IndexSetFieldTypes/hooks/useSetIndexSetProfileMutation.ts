@@ -26,11 +26,7 @@ import type {
 
 export const urlPrefix = '/system/indices/mappings/set_profile';
 
-const putProfile = async ({
-  indexSetId,
-  profileId,
-  rotated,
-}: SetIndexSetFieldTypeProfileBody) => {
+const putProfile = async ({ indexSetId, profileId, rotated }: SetIndexSetFieldTypeProfileBody) => {
   const url = qualifyUrl(urlPrefix);
   const body: SetIndexSetFieldTypeProfileBodyJson = {
     index_sets: [indexSetId],
@@ -44,11 +40,16 @@ const putProfile = async ({
 const useSetIndexSetProfileMutation = () => {
   const queryClient = useQueryClient();
 
-  const put = useMutation(putProfile, {
+  const put = useMutation({
+    mutationFn: putProfile,
+
     onError: (errorThrown) => {
-      UserNotification.error(`Setting index set profile failed with status: ${errorThrown}`,
-        'Could not set index set profile');
+      UserNotification.error(
+        `Setting index set profile failed with status: ${errorThrown}`,
+        'Could not set index set profile',
+      );
     },
+
     onSuccess: () => {
       UserNotification.success('Set index set profile successfully', 'Success!');
 
@@ -56,7 +57,7 @@ const useSetIndexSetProfileMutation = () => {
     },
   });
 
-  return { setIndexSetFieldTypeProfile: put.mutateAsync, isLoading: put.isLoading };
+  return { setIndexSetFieldTypeProfile: put.mutateAsync, isLoading: put.isPending };
 };
 
 export default useSetIndexSetProfileMutation;

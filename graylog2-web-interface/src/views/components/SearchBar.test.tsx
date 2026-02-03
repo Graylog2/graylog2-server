@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
+import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import MockQuery from 'views/logic/queries/Query';
@@ -26,7 +27,7 @@ import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import OriginalSearchBar from './SearchBar';
@@ -34,25 +35,28 @@ import OriginalSearchBar from './SearchBar';
 jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 
-jest.mock('stores/streams/StreamsStore', () => MockStore(
-  ['listStreams', () => ({ then: jest.fn() })],
-  'availableStreams',
-));
+jest.mock('stores/streams/StreamsStore', () =>
+  MockStore(['listStreams', () => ({ then: jest.fn() })], 'availableStreams'),
+);
 
 jest.mock('hooks/useSearchConfiguration');
 
-jest.mock('views/components/searchbar/saved-search/SearchActionsMenu', () => jest.fn(() => (
-  <div>Saved Search Controls</div>
-)));
+jest.mock('views/components/searchbar/saved-search/SearchActionsMenu', () =>
+  jest.fn(() => <div>Saved Search Controls</div>),
+);
 
-jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest.fn(() => Promise.resolve({
-  status: 'OK',
-  explanations: [],
-})));
+jest.mock('views/components/searchbar/queryvalidation/validateQuery', () =>
+  jest.fn(() =>
+    Promise.resolve({
+      status: 'OK',
+      explanations: [],
+    }),
+  ),
+);
 
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 jest.mock('views/logic/queries/useCurrentQuery');
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
 jest.mock('views/hooks/useAutoRefresh');
 
 const query = MockQuery.builder()
@@ -63,7 +67,7 @@ const query = MockQuery.builder()
 
 const SearchBar = () => (
   <TestStoreProvider>
-    <OriginalSearchBar />
+    <OriginalSearchBar scrollContainer={{ current: null }} />
   </TestStoreProvider>
 );
 
@@ -88,7 +92,7 @@ describe('SearchBar', () => {
 
   it('should refresh search, when search is performed and there are no changes.', async () => {
     const dispatch = jest.fn();
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
 
     render(<SearchBar />);
 
@@ -98,13 +102,16 @@ describe('SearchBar', () => {
 
     asMock(dispatch).mockClear();
 
-    fireEvent.click(searchButton);
+    await userEvent.click(searchButton);
 
     await waitFor(() => expect(dispatch).toHaveBeenCalled());
   });
 
   it('date exceeding limitDuration should render with error Icon & search button disabled', async () => {
-    asMock(useSearchConfiguration).mockReturnValue({ config: { ...mockSearchesClusterConfig, query_time_range_limit: 'PT1M' }, refresh: () => {} });
+    asMock(useSearchConfiguration).mockReturnValue({
+      config: { ...mockSearchesClusterConfig, query_time_range_limit: 'PT1M' },
+      refresh: () => {},
+    });
     render(<SearchBar />);
 
     const timeRangePickerButton = await screen.findByLabelText('Open Time Range Selector');

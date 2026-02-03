@@ -16,34 +16,47 @@
  */
 import { useMemo } from 'react';
 
-import type { Sort } from 'stores/PaginationTypes';
+import type { DefaultLayout, ColumnPreferences } from 'components/common/EntityDataTable/types';
 
 import useUserLayoutPreferences from './useUserLayoutPreferences';
 
-const useTableLayout = ({ entityTableId, defaultSort, defaultPageSize, defaultDisplayedAttributes }: {
-  entityTableId: string,
-  defaultSort: Sort,
-  defaultDisplayedAttributes: Array<string>
-  defaultPageSize: number,
-}) => {
+export type LayoutConfig = {
+  attributes: ColumnPreferences;
+  order: Array<string>;
+  pageSize: number;
+  sort: DefaultLayout['defaultSort'];
+};
+
+const useTableLayout = ({
+  entityTableId,
+  defaultSort,
+  defaultPageSize,
+}: DefaultLayout): {
+  isInitialLoading: boolean;
+  layoutConfig: LayoutConfig;
+} => {
   const { data: userLayoutPreferences = {}, isInitialLoading } = useUserLayoutPreferences(entityTableId);
 
-  return useMemo(() => ({
-    layoutConfig: {
-      pageSize: userLayoutPreferences.perPage ?? defaultPageSize,
-      sort: userLayoutPreferences.sort ?? defaultSort,
-      displayedAttributes: userLayoutPreferences?.displayedAttributes ?? defaultDisplayedAttributes,
-    },
-    isInitialLoading,
-  }), [
-    defaultDisplayedAttributes,
-    defaultPageSize,
-    defaultSort,
-    isInitialLoading,
-    userLayoutPreferences?.displayedAttributes,
-    userLayoutPreferences.perPage,
-    userLayoutPreferences.sort,
-  ]);
+  return useMemo(
+    () => ({
+      layoutConfig: {
+        attributes: userLayoutPreferences?.attributes,
+        order: userLayoutPreferences.order,
+        pageSize: userLayoutPreferences.perPage ?? defaultPageSize,
+        sort: userLayoutPreferences.sort ?? defaultSort,
+      },
+      isInitialLoading,
+    }),
+    [
+      defaultPageSize,
+      defaultSort,
+      isInitialLoading,
+      userLayoutPreferences?.attributes,
+      userLayoutPreferences.order,
+      userLayoutPreferences.perPage,
+      userLayoutPreferences.sort,
+    ],
+  );
 };
 
 export default useTableLayout;

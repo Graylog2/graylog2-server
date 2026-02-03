@@ -33,7 +33,9 @@ import javax.security.auth.x500.X500Principal;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 
@@ -57,7 +59,8 @@ public class CsrGenerator {
                     keystore.getCertificate(alias).getPublicKey()
             );
 
-            final var names = new ArrayList<>(List.of(principalName));
+            final Set<String> names = new LinkedHashSet<>();
+            names.add(principalName);
             if (altNames != null) {
                 names.addAll(altNames);
             }

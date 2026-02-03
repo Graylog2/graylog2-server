@@ -24,4 +24,8 @@ public class OpensearchConfigurationException extends RuntimeException {
     public OpensearchConfigurationException(Exception cause) {
         super(cause);
     }
+
+    public OpensearchConfigurationException(String message, Exception cause) {
+        super(message, cause);
+    }
 }

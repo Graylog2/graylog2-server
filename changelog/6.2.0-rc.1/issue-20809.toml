@@ -1,0 +1,5 @@
+type = "a"
+message = "Added new config options to Email Notifications for send as single email, CC emails/users, and BCC emails/users."
+
+issues = ["20809"]
+pulls = ["20836"]

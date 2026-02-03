@@ -34,8 +34,8 @@ package org.graylog.plugins.views.storage.migration.state.machine;
 
 import com.google.common.util.concurrent.AbstractIdleService;
 import jakarta.inject.Inject;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.datanode.CurrentWriteIndices;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.slf4j.Logger;
@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Deprecated(forRemoval = true)
 public class MigrationShutdownService extends AbstractIdleService {
 
     private final Logger log = LoggerFactory.getLogger(AbstractIdleService.class);
@@ -71,7 +72,7 @@ public class MigrationShutdownService extends AbstractIdleService {
                 MigrationState.REMOTE_REINDEX_RUNNING).contains(migrationStateMachine.getState())) {
             log.info("Storing active write indices for data node migration");
             Map<String, String> indices =
-                    indexSetRegistry.getAll().stream()
+                    indexSetRegistry.getAllIndexSets().stream()
                             .filter(indexSet -> indexSet.isUp() && indexSet.getConfig().isWritable() && Objects.nonNull(indexSet.getActiveWriteIndex()))
                             .collect(Collectors.toMap(is -> is.getConfig().id(), IndexSet::getActiveWriteIndex));
             migrationStateMachine.getContext().addExtendedState(RemoteReindexingMigrationAdapter.EXISTING_INDEX_SET_WRITE_INDICES,

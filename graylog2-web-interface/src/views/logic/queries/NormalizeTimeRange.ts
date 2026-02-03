@@ -14,13 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import isAllMessagesRange from 'views/logic/queries/IsAllMessagesRange';
 import { NO_TIMERANGE_OVERRIDE, RELATIVE_ALL_TIME } from 'views/Constants';
+import { normalizeIfClassifiedRelativeTimeRange } from 'views/components/searchbar/time-range-filter/time-range-picker/RelativeTimeRangeClassifiedHelper';
 import {
-  normalizeIfClassifiedRelativeTimeRange,
-} from 'views/components/searchbar/time-range-filter/time-range-picker/RelativeTimeRangeClassifiedHelper';
-import { isTypeKeyword, isTypeRelativeWithEnd, isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
+  isTypeKeyword,
+  isTypeRelativeWithEnd,
+  isTypeRelativeWithStartOnly,
+  isTimeRange,
+} from 'views/typeGuards/timeRange';
 import { adjustFormat, toUTCFromTz } from 'util/DateTime';
 import type { TimeRangePickerTimeRange } from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangePicker';
 
@@ -54,27 +56,30 @@ export const normalizeFromPickerForSearchBar = (timeRange: TimeRangePickerTimeRa
     return tr;
   };
 
-  return normalizeIfKeywordTimeRange(
-    normalizeIfAllMessagesRange(
-      normalizeIfClassifiedRelativeTimeRange(timeRange),
-    ),
-  );
+  return normalizeIfKeywordTimeRange(normalizeIfAllMessagesRange(normalizeIfClassifiedRelativeTimeRange(timeRange)));
 };
 
-export const normalizeFromSearchBarForBackend = (timerange: TimeRange, userTz: string): TimeRange => {
-  const { type } = timerange;
+export const normalizeFromSearchBarForBackend = (
+  timerange: TimeRange | NoTimeRangeOverride,
+  userTz: string,
+  absoluteTimeFormat: 'internal' | 'internalIndexer' = 'internal',
+): TimeRange | undefined => {
+  if (!isTimeRange(timerange)) {
+    return undefined;
+  }
 
-  switch (timerange.type) {
+  const { type } = timerange;
+  switch (type) {
     case 'absolute':
       return {
-        type: timerange.type,
-        from: adjustFormat(toUTCFromTz(timerange.from, userTz), 'internal'),
-        to: adjustFormat(toUTCFromTz(timerange.to, userTz), 'internal'),
+        type,
+        from: adjustFormat(toUTCFromTz(timerange.from, userTz), absoluteTimeFormat),
+        to: adjustFormat(toUTCFromTz(timerange.to, userTz), absoluteTimeFormat),
       };
     case 'relative':
       if (isTypeRelativeWithStartOnly(timerange)) {
         return {
-          type: timerange.type,
+          type,
           range: timerange.range,
         };
       }
@@ -82,14 +87,14 @@ export const normalizeFromSearchBarForBackend = (timerange: TimeRange, userTz: s
       if (isTypeRelativeWithEnd(timerange)) {
         if ('to' in timerange) {
           return {
-            type: timerange.type,
+            type,
             from: timerange.from,
             to: timerange.to,
           };
         }
 
         return {
-          type: timerange.type,
+          type,
           from: timerange.from,
         };
       }
@@ -97,6 +102,7 @@ export const normalizeFromSearchBarForBackend = (timerange: TimeRange, userTz: s
       throw new Error('Invalid relative time range');
     case 'keyword':
       return timerange;
-    default: throw new Error(`Invalid time range type: ${type}`);
+    default:
+      throw new Error(`Invalid time range type: ${type}`);
   }
 };

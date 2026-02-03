@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import userEvent from '@testing-library/user-event';
 // eslint-disable-next-line no-restricted-imports
 import type { DebouncedFunc } from 'lodash';
-import { fireEvent, render, screen, within, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, within, waitFor } from 'wrappedTestingLibrary';
 import debounce from 'lodash/debounce';
 import Immutable from 'immutable';
 import { Formik } from 'formik';
@@ -35,14 +36,18 @@ jest.mock('hooks/useHotkey', () => jest.fn());
 
 const mockOnUpdate = jest.fn();
 
-const renderForm = () => render(
-  <Formik initialValues={{ selectedFields: [] }} onSubmit={() => {}}>
-    <TimeRangePresetForm options={Immutable.List([
-      { description: 'TimeRange1', id: 'tr-id-1', timerange: { from: 300, type: 'relative' } },
-      { description: 'TimeRange2', id: 'tr-id-2', timerange: { from: 600, type: 'relative' } },
-    ])}
-                         onUpdate={mockOnUpdate} />
-  </Formik>);
+const renderForm = () =>
+  render(
+    <Formik initialValues={{ selectedFields: [] }} onSubmit={() => {}}>
+      <TimeRangePresetForm
+        options={Immutable.List([
+          { description: 'TimeRange1', id: 'tr-id-1', timerange: { from: 300, type: 'relative' } },
+          { description: 'TimeRange2', id: 'tr-id-2', timerange: { from: 600, type: 'relative' } },
+        ])}
+        onUpdate={mockOnUpdate}
+      />
+    </Formik>,
+  );
 
 describe('TimeRangePresetForm', () => {
   beforeEach(() => {
@@ -67,24 +72,26 @@ describe('TimeRangePresetForm', () => {
     const timerangeItem = await screen.findByTestId('time-range-preset-tr-id-1');
     const removeButton = await within(timerangeItem).findByTitle('Remove preset');
 
-    fireEvent.click(removeButton);
+    await userEvent.click(removeButton);
 
-    expect(mockOnUpdate).toHaveBeenCalledWith(Immutable.List([
-      { description: 'TimeRange2', id: 'tr-id-2', timerange: { from: 600, type: 'relative' } },
-    ]));
+    expect(mockOnUpdate).toHaveBeenCalledWith(
+      Immutable.List([{ description: 'TimeRange2', id: 'tr-id-2', timerange: { from: 600, type: 'relative' } }]),
+    );
   });
 
   it('add action trigger onUpdate', async () => {
     renderForm();
     const addItemButton = await screen.findByLabelText('Add new search time range preset');
 
-    fireEvent.click(addItemButton);
+    await userEvent.click(addItemButton);
 
-    expect(mockOnUpdate).toHaveBeenCalledWith(Immutable.List([
-      { description: 'TimeRange1', id: 'tr-id-1', timerange: { from: 300, type: 'relative' } },
-      { description: 'TimeRange2', id: 'tr-id-2', timerange: { from: 600, type: 'relative' } },
-      { description: '', id: 'tr-id-3', timerange: { from: 300, type: 'relative' } },
-    ]));
+    expect(mockOnUpdate).toHaveBeenCalledWith(
+      Immutable.List([
+        { description: 'TimeRange1', id: 'tr-id-1', timerange: { from: 300, type: 'relative' } },
+        { description: 'TimeRange2', id: 'tr-id-2', timerange: { from: 600, type: 'relative' } },
+        { description: '', id: 'tr-id-3', timerange: { from: 300, type: 'relative' } },
+      ]),
+    );
   });
 
   it('edit description action trigger onUpdate', async () => {
@@ -92,29 +99,37 @@ describe('TimeRangePresetForm', () => {
     const timerangeItem = await screen.findByTestId('time-range-preset-tr-id-1');
     const descriptionInput = await within(timerangeItem).findByTitle('Time range preset description');
 
-    fireEvent.change(descriptionInput, { target: { value: 'TimeRange1 changed' } });
+    await userEvent.clear(descriptionInput);
+    await userEvent.type(descriptionInput, 'TimeRange1 changed');
 
-    expect(mockOnUpdate).toHaveBeenCalledWith(Immutable.List([
-      { description: 'TimeRange1 changed', id: 'tr-id-1', timerange: { from: 300, type: 'relative' } },
-      { description: 'TimeRange2', id: 'tr-id-2', timerange: { from: 600, type: 'relative' } },
-    ]));
+    expect(mockOnUpdate).toHaveBeenCalledWith(
+      Immutable.List([
+        { description: 'TimeRange1 changed', id: 'tr-id-1', timerange: { from: 300, type: 'relative' } },
+        { description: 'TimeRange2', id: 'tr-id-2', timerange: { from: 600, type: 'relative' } },
+      ]),
+    );
   });
 
   it('edit time range action triggers onUpdate', async () => {
     renderForm();
     const timerangeItem = await screen.findByTestId('time-range-preset-tr-id-1');
     const timerangeFilter = await within(timerangeItem).findByText('5 minutes ago');
-    fireEvent.click(timerangeFilter);
+    await userEvent.click(timerangeFilter);
     const fromInput = await screen.findByTitle('Set the from value');
-    fireEvent.change(fromInput, { target: { value: 15 } });
+    await userEvent.clear(fromInput);
+    await userEvent.type(fromInput, '15');
     const submitButton = await screen.findByRole('button', { name: /update time range/i });
 
     await waitFor(() => expect(submitButton).toBeEnabled());
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
-    await waitFor(() => expect(mockOnUpdate).toHaveBeenCalledWith(Immutable.List([
-      { description: 'TimeRange1', id: 'tr-id-1', timerange: { from: 900, type: 'relative' } },
-      { description: 'TimeRange2', id: 'tr-id-2', timerange: { from: 600, type: 'relative' } },
-    ])));
+    await waitFor(() =>
+      expect(mockOnUpdate).toHaveBeenCalledWith(
+        Immutable.List([
+          { description: 'TimeRange1', id: 'tr-id-1', timerange: { from: 900, type: 'relative' } },
+          { description: 'TimeRange2', id: 'tr-id-2', timerange: { from: 600, type: 'relative' } },
+        ]),
+      ),
+    );
   });
 });

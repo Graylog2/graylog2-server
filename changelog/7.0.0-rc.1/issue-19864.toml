@@ -1,0 +1,5 @@
+type = "added"
+message = "Added the ability to include Remediation Steps in notification templates."
+
+issues = ["19864"]
+pulls = ["23421"]

@@ -19,12 +19,10 @@ import * as React from 'react';
 import InteractiveContext from '../contexts/InteractiveContext';
 
 type Props = {
-  children: React.ReactElement | React.ReactElement[],
+  children: React.ReactElement | React.ReactElement[];
 };
 const IfInteractive = ({ children }: Props) => (
-  <InteractiveContext.Consumer>
-    {(interactive) => (interactive ? children : null)}
-  </InteractiveContext.Consumer>
+  <InteractiveContext.Consumer>{(interactive) => (interactive ? children : null)}</InteractiveContext.Consumer>
 );
 
 export default IfInteractive;

@@ -24,7 +24,7 @@ import InputDropdown from 'components/inputs/InputDropdown';
 import UserNotification from 'util/UserNotification';
 import type { Message } from 'views/components/messagelist/Types';
 import useForwarderMessageLoaders from 'components/messageloaders/useForwarderMessageLoaders';
-import { UniversalSearchStore } from 'stores/search/UniversalSearchStore';
+import universalSearch from 'stores/search/UniversalSearch';
 
 import type { Input as InputType } from './Types';
 
@@ -41,10 +41,10 @@ const StyledSelect = styled(Input)`
 `;
 
 type ServerInputSelectProps = {
-  inputs: Immutable.Map<string, InputType>,
-  onChange: (inputId: string) => void,
-  selectedInputId: string | undefined,
-  isLoading: boolean,
+  inputs: Immutable.Map<string, InputType>;
+  onChange: (inputId: string) => void;
+  selectedInputId: string | undefined;
+  isLoading: boolean;
 };
 
 const ServerInputSelect = ({ selectedInputId, inputs, onChange, isLoading }: ServerInputSelectProps) => (
@@ -54,18 +54,20 @@ const ServerInputSelect = ({ selectedInputId, inputs, onChange, isLoading }: Ser
         ? 'Click on "Load Message" to load the most recent message received by this input within the last hour.'
         : 'Select an Input from the list below and click "Load Message" to load the most recent message received by this input within the last hour.'}
     </Description>
-    <InputDropdown inputs={inputs}
-                   preselectedInputId={selectedInputId}
-                   onLoadMessage={onChange}
-                   title={isLoading ? 'Loading message...' : 'Load Message'}
-                   disabled={isLoading} />
+    <InputDropdown
+      inputs={inputs}
+      preselectedInputId={selectedInputId}
+      onLoadMessage={onChange}
+      title={isLoading ? 'Loading message...' : 'Load Message'}
+      disabled={isLoading}
+    />
   </fieldset>
 );
 
 type ForwaderInputSelectProps = {
-  onChange: (inputId: string) => void,
-  selectedInputId: string | undefined,
-  isLoading: boolean,
+  onChange: (inputId: string) => void;
+  selectedInputId: string | undefined;
+  isLoading: boolean;
 };
 
 const ForwarderInputSelect = ({ selectedInputId, onChange, isLoading }: ForwaderInputSelectProps) => {
@@ -74,15 +76,17 @@ const ForwarderInputSelect = ({ selectedInputId, onChange, isLoading }: Forwader
   return (
     <fieldset>
       <Description>
-        Select an Input profile from the list below then select an then select an Input and click
-        on &quot;Load message&quot; to load most recent message received by this input within the last hour.
+        Select an Input profile from the list below then select an then select an Input and click on &quot;Load
+        message&quot; to load most recent message received by this input within the last hour.
       </Description>
       <Row>
         <Col md={8}>
-          <ForwarderInputDropdown onLoadMessage={onChange}
-                                  title={isLoading ? 'Loading message...' : 'Load Message'}
-                                  preselectedInputId={selectedInputId}
-                                  loadButtonDisabled={isLoading} />
+          <ForwarderInputDropdown
+            onLoadMessage={onChange}
+            title={isLoading ? 'Loading message...' : 'Load Message'}
+            preselectedInputId={selectedInputId}
+            loadButtonDisabled={isLoading}
+          />
         </Col>
       </Row>
     </fieldset>
@@ -90,16 +94,18 @@ const ForwarderInputSelect = ({ selectedInputId, onChange, isLoading }: Forwader
 };
 
 type Props = {
-  inputs?: Immutable.Map<string, InputType>,
-  onMessageLoaded: (message?: Message) => void,
-  selectedInputId?: string,
+  inputs?: Immutable.Map<string, InputType>;
+  onMessageLoaded: (message?: Message) => void;
+  selectedInputId?: string;
 };
 
-const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props) => {
+const RecentMessageLoader = ({ inputs = undefined, onMessageLoaded, selectedInputId = undefined }: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
   const { ForwarderInputDropdown } = useForwarderMessageLoaders();
 
-  const [selectedInputType, setSelectedInputType] = useState<'forwarder' | 'server'>(ForwarderInputDropdown ? undefined : 'server');
+  const [selectedInputType, setSelectedInputType] = useState<'forwarder' | 'server'>(
+    ForwarderInputDropdown ? undefined : 'server',
+  );
   const isCloud = AppConfig.isCloud();
 
   useEffect(() => {
@@ -108,29 +114,41 @@ const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props
     }
   }, [inputs, selectedInputId]);
 
-  const onClick = (inputId: string) => {
+  const onClick = async (inputId: string) => {
     const input = inputs && inputs.get(inputId);
 
     if (selectedInputType === 'server' && !input) {
-      UserNotification.error(`Invalid input selected: ${inputId}`,
-        `Could not load message from invalid Input ${inputId}`);
+      UserNotification.error(
+        `Invalid input selected: ${inputId}`,
+        `Could not load message from invalid Input ${inputId}`,
+      );
 
       return;
     }
 
-    setLoading(true);
-    const promise = UniversalSearchStore.search('relative', `gl2_source_input:${inputId} OR gl2_source_radio_input:${inputId}`, { range: 3600 }, undefined, 1, undefined, undefined, undefined, false);
+    try {
+      setLoading(true);
+      const response = await universalSearch(
+        'relative',
+        `gl2_source_input:${inputId} OR gl2_source_radio_input:${inputId}`,
+        { type: 'relative', range: 3600 },
+        undefined,
+        1,
+        undefined,
+        undefined,
+        undefined,
+        false,
+      );
 
-    promise.then((response) => {
       if (response.total_results > 0) {
         onMessageLoaded(response.messages[0]);
       } else {
         UserNotification.error('Input did not return a recent message.');
         onMessageLoaded(undefined);
       }
-    });
-
-    promise.finally(() => setLoading(false));
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (isCloud) {
@@ -143,38 +161,40 @@ const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props
 
   return (
     <LoaderContainer>
-      {ForwarderInputDropdown
-        ? (
-          <>
-            <fieldset>
-              <Description>
-                Select the Input type you want to load the message from.
-              </Description>
-              <StyledSelect id="inputTypeSelect"
-                            aria-label="input type select"
-                            type="select"
-                            value={selectedInputType ?? 'placeholder'}
-                            disabled={!!selectedInputId}
-                            onChange={(e) => setSelectedInputType(e.target.value as 'forwarder' | 'server')}>
-                <option value="placeholder" disabled>Select an Input type</option>
-                <option value="server">Server Input</option>
-                <option value="forwarder">Forwarder Input</option>
-              </StyledSelect>
-            </fieldset>
+      {ForwarderInputDropdown ? (
+        <>
+          <fieldset>
+            <Description>Select the Input type you want to load the message from.</Description>
+            <StyledSelect
+              id="inputTypeSelect"
+              aria-label="input type select"
+              type="select"
+              value={selectedInputType ?? 'placeholder'}
+              disabled={!!selectedInputId}
+              onChange={(e) => setSelectedInputType(e.target.value as 'forwarder' | 'server')}>
+              <option value="placeholder" disabled>
+                Select an Input type
+              </option>
+              <option value="server">Server Input</option>
+              <option value="forwarder">Forwarder Input</option>
+            </StyledSelect>
+          </fieldset>
 
-            {selectedInputType === 'server' && (
-              <ServerInputSelect selectedInputId={selectedInputId}
-                                 inputs={inputs}
-                                 onChange={onClick}
-                                 isLoading={loading} />
-            )}
-            {selectedInputType === 'forwarder' && (
-              <ForwarderInputSelect selectedInputId={selectedInputId} onChange={onClick} isLoading={loading} />
-            )}
-          </>
-        ) : (
-          <ServerInputSelect selectedInputId={selectedInputId} inputs={inputs} onChange={onClick} isLoading={loading} />
-        )}
+          {selectedInputType === 'server' && (
+            <ServerInputSelect
+              selectedInputId={selectedInputId}
+              inputs={inputs}
+              onChange={onClick}
+              isLoading={loading}
+            />
+          )}
+          {selectedInputType === 'forwarder' && (
+            <ForwarderInputSelect selectedInputId={selectedInputId} onChange={onClick} isLoading={loading} />
+          )}
+        </>
+      ) : (
+        <ServerInputSelect selectedInputId={selectedInputId} inputs={inputs} onChange={onClick} isLoading={loading} />
+      )}
     </LoaderContainer>
   );
 };

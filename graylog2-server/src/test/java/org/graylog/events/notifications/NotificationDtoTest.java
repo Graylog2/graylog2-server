@@ -22,7 +22,7 @@ import org.graylog.events.notifications.types.EmailEventNotificationConfig;
 import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.security.encryption.EncryptedValue;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 

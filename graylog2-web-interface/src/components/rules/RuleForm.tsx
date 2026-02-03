@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useState } from 'react';
-import styled from 'styled-components';
 
 import { Button, Col, ControlLabel, FormControl, FormGroup, Row, Input } from 'components/bootstrap';
 import { ConfirmLeaveDialog, SourceCodeEditor, FormSubmit } from 'components/common';
@@ -27,28 +26,11 @@ import PipelinesUsingRule from './PipelinesUsingRule';
 import RuleSimulation from './RuleSimulation';
 
 type Props = {
-  create?: boolean
+  create?: boolean;
+  isManaged?: boolean;
 };
 
-const StyledContainer = styled.div`
-  & .source-code-editor div {
-    border-color: ${({ theme }) => theme.colors.input.border};
-    border-radius: 0;
-
-    & .ace_editor {
-      border-radius: 0;
-    }
-  }
-
-  & .ace_tooltip.ace-graylog {
-    background-color: ${({ theme }) => theme.colors.global.background};
-    padding: 4px;
-    padding-left: 0;
-    line-height: 1.5;
-  }
-`;
-
-const RuleForm = ({ create = false }: Props) => {
+const RuleForm = ({ create = false, isManaged = false }: Props) => {
   const {
     description,
     handleDescription,
@@ -107,35 +89,41 @@ const RuleForm = ({ create = false }: Props) => {
       <fieldset>
         <FormGroup id="ruleTitleInformation">
           <ControlLabel>Title</ControlLabel>
-          <FormControl.Static>You can set the rule title in the rule source. See the quick reference for more information.</FormControl.Static>
+          <FormControl.Static>
+            You can set the rule title in the rule source. See the quick reference for more information.
+          </FormControl.Static>
         </FormGroup>
 
         {isDirty && (
           <ConfirmLeaveDialog question="Do you really want to abandon this page and lose your changes? This action cannot be undone." />
         )}
 
-        <Input type="textarea"
-               id="description"
-               label="Description"
-               value={description}
-               onChange={handleDescriptionChange}
-               autoFocus
-               rows={1}
-               help="Rule description (optional)." />
+        <Input
+          type="textarea"
+          id="description"
+          label="Description"
+          value={description}
+          onChange={handleDescriptionChange}
+          autoFocus
+          rows={1}
+          help="Rule description (optional)."
+        />
 
         <PipelinesUsingRule create={create} />
 
-        <Input id="rule-source-editor" label="Rule source" help="Rule source, see quick reference for more information." error={errorMessage}>
-          {/* TODO: Figure out issue with props */}
-          {/* @ts-ignore */}
-          <StyledContainer>
-            <SourceCodeEditor id={`source${create ? '-create' : '-edit'}`}
-                              mode="pipeline"
-                              onLoad={onAceLoaded}
-                              onChange={handleSourceChange}
-                              value={ruleSource}
-                              innerRef={ruleSourceRef} />
-          </StyledContainer>
+        <Input
+          id="rule-source-editor"
+          label="Rule source"
+          help="Rule source, see quick reference for more information."
+          error={errorMessage}>
+          <SourceCodeEditor
+            id={`source${create ? '-create' : '-edit'}`}
+            mode="pipeline"
+            onLoad={onAceLoaded}
+            onChange={handleSourceChange}
+            value={ruleSource}
+            innerRef={ruleSourceRef}
+          />
         </Input>
 
         <RuleSimulation />
@@ -143,13 +131,18 @@ const RuleForm = ({ create = false }: Props) => {
 
       <Row>
         <Col md={12}>
-          <FormSubmit submitButtonText={create ? 'Create rule' : 'Update rule & close'}
-                      centerCol={!create && (
-                        <Button type="button" bsStyle="info" onClick={handleApply}>
-                          Update rule
-                        </Button>
-                      )}
-                      onCancel={handleCancel} />
+          <FormSubmit
+            submitButtonText={create ? 'Create rule' : 'Update rule & close'}
+            disabledSubmit={isManaged}
+            centerCol={
+              !create && (
+                <Button type="button" bsStyle="info" disabled={isManaged} onClick={handleApply}>
+                  Update rule
+                </Button>
+              )
+            }
+            onCancel={handleCancel}
+          />
         </Col>
       </Row>
     </form>

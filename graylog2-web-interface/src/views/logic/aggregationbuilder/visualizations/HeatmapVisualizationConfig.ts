@@ -18,30 +18,48 @@ import * as Immutable from 'immutable';
 
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
-export const COLORSCALES = ['Greys', 'YlGnBu', 'Greens', 'YlOrRd', 'Bluered', 'RdBu', 'Reds', 'Blues', 'Picnic',
-  'Rainbow', 'Portland', 'Jet', 'Hot', 'Blackbody', 'Earth', 'Electric', 'Viridis', 'Cividis'] as const;
+export const COLORSCALES = [
+  'Greys',
+  'YlGnBu',
+  'Greens',
+  'YlOrRd',
+  'Bluered',
+  'RdBu',
+  'Reds',
+  'Blues',
+  'Picnic',
+  'Rainbow',
+  'Portland',
+  'Jet',
+  'Hot',
+  'Blackbody',
+  'Earth',
+  'Electric',
+  'Viridis',
+  'Cividis',
+] as const;
 
-type ColorScale = typeof COLORSCALES[number];
+type ColorScale = (typeof COLORSCALES)[number];
 
 type InternalState = {
   colorScale: ColorScale;
   reverseScale: boolean;
-  autoScale: boolean,
-  zMin: number | undefined | null,
-  zMax: number | undefined | null,
-  useSmallestAsDefault: boolean,
-  defaultValue: number | undefined | null,
+  autoScale: boolean;
+  zMin: number | undefined | null;
+  zMax: number | undefined | null;
+  useSmallestAsDefault: boolean;
+  defaultValue: number | undefined | null;
 };
 
 export type HeatmapVisualizationConfigJSON = {
   color_scale: ColorScale;
   reverse_scale: boolean;
-  auto_scale: boolean,
-  z_min: number | undefined | null,
-  z_max: number | undefined | null,
-  use_smallest_as_default: boolean,
-  default_value: number | undefined | null,
-}
+  auto_scale: boolean;
+  z_min: number | undefined | null;
+  z_max: number | undefined | null;
+  use_smallest_as_default: boolean;
+  default_value: number | undefined | null;
+};
 
 export default class HeatmapVisualizationConfig extends VisualizationConfig {
   private readonly _value: InternalState;
@@ -122,15 +140,7 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
   }
 
   static empty() {
-    return new HeatmapVisualizationConfig(
-      'Viridis',
-      false,
-      true,
-      undefined,
-      undefined,
-      false,
-      undefined,
-    );
+    return new HeatmapVisualizationConfig('Viridis', false, true, undefined, undefined, false, undefined);
   }
 
   toJSON(): HeatmapVisualizationConfigJSON {
@@ -155,15 +165,18 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
     };
   }
 
-  static fromJSON(_type: string, value: HeatmapVisualizationConfigJSON = {
-    color_scale: 'Viridis',
-    reverse_scale: false,
-    auto_scale: true,
-    z_min: undefined,
-    z_max: undefined,
-    use_smallest_as_default: false,
-    default_value: undefined,
-  }) {
+  static fromJSON(
+    _type: string,
+    value: HeatmapVisualizationConfigJSON = {
+      color_scale: 'Viridis',
+      reverse_scale: false,
+      auto_scale: true,
+      z_min: undefined,
+      z_max: undefined,
+      use_smallest_as_default: false,
+      default_value: undefined,
+    },
+  ) {
     const {
       color_scale: colorScale,
       reverse_scale: reverseScale,
@@ -174,7 +187,15 @@ export default class HeatmapVisualizationConfig extends VisualizationConfig {
       default_value: defaultValue,
     } = value;
 
-    return HeatmapVisualizationConfig.create(colorScale, reverseScale, autoScale, zMin, zMax, useSmallestAsDefault, defaultValue);
+    return HeatmapVisualizationConfig.create(
+      colorScale,
+      reverseScale,
+      autoScale,
+      zMin,
+      zMax,
+      useSmallestAsDefault,
+      defaultValue,
+    );
   }
 }
 
@@ -216,7 +237,10 @@ export class Builder {
   }
 
   build() {
-    const {
+    const { colorScale, reverseScale, autoScale, zMin, zMax, useSmallestAsDefault, defaultValue } =
+      this.value.toObject();
+
+    return new HeatmapVisualizationConfig(
       colorScale,
       reverseScale,
       autoScale,
@@ -224,8 +248,6 @@ export class Builder {
       zMax,
       useSmallestAsDefault,
       defaultValue,
-    } = this.value.toObject();
-
-    return new HeatmapVisualizationConfig(colorScale, reverseScale, autoScale, zMin, zMax, useSmallestAsDefault, defaultValue);
+    );
   }
 }

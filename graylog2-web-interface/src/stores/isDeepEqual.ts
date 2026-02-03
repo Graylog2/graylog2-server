@@ -19,7 +19,7 @@ import isFunction from 'lodash/isFunction';
 import { isValidElement } from 'react';
 import isEqual from 'react-fast-compare';
 
-const hasFn = (obj, fn) => (obj && obj[fn] && isFunction(obj[fn]));
+const hasFn = (obj, fn) => obj && obj[fn] && isFunction(obj[fn]);
 const hasEquals = (obj) => hasFn(obj, 'equals');
 const isImmutable = (obj) => hasFn(obj, 'toJS');
 

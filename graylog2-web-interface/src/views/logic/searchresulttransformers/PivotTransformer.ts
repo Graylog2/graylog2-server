@@ -14,5 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export default (data) => data.map((result) => [result.name || result.id, result])
-  .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
+export default (data) =>
+  data
+    .map((result) => [result.name || result.id, result])
+    .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});

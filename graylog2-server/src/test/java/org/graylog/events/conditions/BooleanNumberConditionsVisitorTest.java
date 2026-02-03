@@ -16,14 +16,13 @@
  */
 package org.graylog.events.conditions;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Resources;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import org.graylog.testing.jsonpath.JsonPathAssert;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -338,9 +337,8 @@ public class BooleanNumberConditionsVisitorTest {
         at.jsonPathAsString("$.right.ref").isEqualTo(right.ref());
     }
 
-    private Expression<Boolean> loadCondition(String filename) throws IOException {
+    private BooleanExpression loadCondition(String filename) throws IOException {
         final URL resource = Resources.getResource(getClass(), filename);
-        return objectMapper.readValue(resource, new TypeReference<Expression<Boolean>>() {
-        });
+        return objectMapper.readValue(resource, BooleanExpression.class);
     }
 }

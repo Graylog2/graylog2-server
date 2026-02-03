@@ -24,23 +24,28 @@ import org.graylog.plugins.sidecar.rest.models.Sidecar;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.ConfigurationVariableService;
 import org.graylog.plugins.sidecar.template.RenderTemplateException;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class ConfigurationServiceTest {
     private final String FILEBEAT_CONF_ID = "5b8fe5f97ad37b17a44e2a34";
 
@@ -49,11 +54,6 @@ public class ConfigurationServiceTest {
 
     @Mock
     private NodeDetails nodeDetails;
-
-    @Rule public MockitoRule mockitoRule = MockitoJUnit.rule();
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private ConfigurationService configurationService;
     private ConfigurationVariableService configurationVariableService;
@@ -64,8 +64,8 @@ public class ConfigurationServiceTest {
         return Configuration.create(FILEBEAT_CONF_ID, "collId", "filebeat", "#ffffff", template, Set.of());
     }
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) throws Exception {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         when(nodeDetails.operatingSystem()).thenReturn("DummyOS");
@@ -74,8 +74,11 @@ public class ConfigurationServiceTest {
         when(sidecar.nodeName()).thenReturn("mockymock");
         when(sidecar.nodeDetails()).thenReturn(nodeDetails);
 
-        this.configurationVariableService = new ConfigurationVariableService(mongodb.mongoConnection(), mongoJackObjectMapperProvider);
-        this.configurationService = new ConfigurationService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, configurationVariableService, new SecureFreemarkerConfigProvider());
+        this.configurationVariableService = new ConfigurationVariableService(mongoCollections);
+        this.configurationService = new ConfigurationService(
+                mongoCollections,
+                configurationVariableService,
+                new SecureFreemarkerConfigProvider());
     }
 
     @Test
@@ -94,11 +97,11 @@ public class ConfigurationServiceTest {
     public void testTemplateRenderUsingForbiddenFeatures() throws Exception {
         final String TEMPLATE = "<#assign ex=\"freemarker.template.utility.Execute\"?new()> ${ex(\"date\")}\n nodename: ${sidecar.nodeName}\n";
 
-        assertThrows("Template should not allow insecure features", RenderTemplateException.class, () -> {
+        assertThrows(RenderTemplateException.class, () -> {
             configuration = buildTestConfig(TEMPLATE);
             this.configurationService.save(configuration);
             this.configurationService.renderConfigurationForCollector(sidecar, configuration);
-        });
+        }, "Template should not allow insecure features");
     }
 
     @Test

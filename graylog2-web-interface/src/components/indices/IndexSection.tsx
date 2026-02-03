@@ -23,23 +23,30 @@ import type { IndexSummary as IndexSummaryType } from 'stores/indexers/IndexerOv
 import { ClosedIndexDetails, IndexDetails, IndexSummary } from 'components/indices';
 import NumberUtils from 'util/NumberUtils';
 
-const Index = ({ index, indexDetails, indexSetId }: { index: IndexSummaryType, indexDetails: Array<IndexInfo>, indexSetId: string }) => {
+const Index = ({
+  index,
+  indexDetails,
+  indexSetId = undefined,
+}: {
+  index: IndexSummaryType;
+  indexDetails: Array<IndexInfo>;
+  indexSetId?: string;
+}) => {
   const indexRange = index && index.range ? index.range : null;
   const details = indexDetails.find(({ index_name }) => index_name === index.index_name);
 
   return (
     <Row className="content index-description">
       <Col md={12}>
-        <IndexSummary index={index}
-                      name={index.index_name}
-                      indexRange={indexRange}
-                      isDeflector={index.is_deflector}>
+        <IndexSummary index={index} name={index.index_name} indexRange={indexRange} isDeflector={index.is_deflector}>
           <span>
-            <IndexDetails index={details}
-                          indexName={index.index_name}
-                          indexRange={indexRange}
-                          indexSetId={indexSetId}
-                          isDeflector={index.is_deflector} />
+            <IndexDetails
+              index={details}
+              indexName={index.index_name}
+              indexRange={indexRange}
+              indexSetId={indexSetId}
+              isDeflector={index.is_deflector}
+            />
           </span>
         </IndexSummary>
       </Col>
@@ -63,28 +70,46 @@ const ClosedIndex = ({ index }: { index: IndexSummaryType }) => {
   );
 };
 
-const IndexListItem = ({ indexDetails, index, indexSetId } : {indexDetails: Array<IndexInfo>, index: IndexSummaryType, indexSetId: string}) => (
-  !index.is_closed
-    ? <Index index={index} indexDetails={indexDetails} indexSetId={indexSetId} key={`index-summary-${index.index_name}`} />
-    : <ClosedIndex index={index} key={`index-summary-${index.index_name}`} />
-);
+const IndexListItem = ({
+  indexDetails,
+  index,
+  indexSetId = undefined,
+}: {
+  indexDetails: Array<IndexInfo>;
+  index: IndexSummaryType;
+  indexSetId?: string;
+}) =>
+  !index.is_closed ? (
+    <Index
+      index={index}
+      indexDetails={indexDetails}
+      indexSetId={indexSetId}
+      key={`index-summary-${index.index_name}`}
+    />
+  ) : (
+    <ClosedIndex index={index} key={`index-summary-${index.index_name}`} />
+  );
 
 type Props = {
-  headline: string,
-  subheading: string,
-  indices: Array<IndexSummaryType>,
-  indexDetails: Array<IndexInfo>,
-  indexSetId: string
-}
+  headline: string;
+  subheading: string;
+  indices: Array<IndexSummaryType>;
+  indexDetails: Array<IndexInfo>;
+  indexSetId?: string;
+};
 
-const SectionHeader = styled(Row)(({ theme }) => css`
-  margin-top: ${theme.spacings.lg};
-  margin-bottom: ${theme.spacings.lg};
-`);
+const SectionHeader = styled(Row)(
+  ({ theme }) => css`
+    margin-top: ${theme.spacings.lg};
+    margin-bottom: ${theme.spacings.lg};
+  `,
+);
 
-const SectionHeadline = styled.h2(({ theme }) => css`
-  margin-bottom: ${theme.spacings.xs};
-`);
+const SectionHeadline = styled.h2(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.xs};
+  `,
+);
 
 const SectionSubheading = styled.p`
   margin-bottom: 0;
@@ -108,7 +133,7 @@ const StatList = styled.dl`
   }
 `;
 
-const IndexSection = ({ headline, subheading, indices, indexDetails, indexSetId }: Props) => {
+const IndexSection = ({ headline, subheading, indices, indexDetails, indexSetId = undefined }: Props) => {
   const size = indices.map((index) => index.size?.bytes || 0).reduce((partialSum, a) => partialSum + a, 0) || 0;
   const shards = indices.map((index) => index.shard_count).reduce((partialSum, a) => partialSum + a, 0) || 0;
 
@@ -130,7 +155,9 @@ const IndexSection = ({ headline, subheading, indices, indexDetails, indexSetId 
           </StatList>
         </Col>
       </SectionHeader>
-      {indices.map((index) => <IndexListItem indexDetails={indexDetails} index={index} indexSetId={indexSetId} />)}
+      {indices.map((index) => (
+        <IndexListItem key={index.index_name} indexDetails={indexDetails} index={index} indexSetId={indexSetId} />
+      ))}
     </>
   );
 };

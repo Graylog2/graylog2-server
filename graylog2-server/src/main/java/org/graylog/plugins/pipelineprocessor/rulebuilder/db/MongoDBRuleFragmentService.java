@@ -16,92 +16,71 @@
  */
 package org.graylog.plugins.pipelineprocessor.rulebuilder.db;
 
-import com.google.common.collect.ImmutableSet;
-import com.mongodb.BasicDBObject;
-import com.mongodb.MongoException;
-import com.swrve.ratelimitedlogger.RateLimitedLog;
-import org.bson.types.ObjectId;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
-import org.mongojack.DBCursor;
-import org.mongojack.DBQuery;
-import org.mongojack.DBSort;
-import org.mongojack.JacksonDBCollection;
-
+import com.google.common.collect.ImmutableList;
+import org.graylog2.database.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Sorts;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleFragmentUpdateEvent;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.events.ClusterEventBus;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
 import java.util.Optional;
 
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static com.mongodb.client.model.Filters.eq;
 
 @Singleton
 public class MongoDBRuleFragmentService implements RuleFragmentService {
-
-    private static final RateLimitedLog log = getRateLimitedLog(MongoDBRuleFragmentService.class);
-
     public static final String COLLECTION_NAME = "rule_fragments";
 
-    private final JacksonDBCollection<RuleFragment, ObjectId> dbCollection;
+    private final MongoCollection<RuleFragment> collection;
+    private final MongoUtils<RuleFragment> mongoUtils;
+    private final ClusterEventBus clusterEventBus;
 
     @Inject
-    public MongoDBRuleFragmentService(
-            final MongoJackObjectMapperProvider objectMapperProvider,
-            final MongoConnection mongoConnection
-    ) {
-        this(JacksonDBCollection.wrap(
-                mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
-                RuleFragment.class,
-                ObjectId.class,
-                objectMapperProvider.get())
-        );
-    }
-
-
-    public MongoDBRuleFragmentService(JacksonDBCollection<RuleFragment, ObjectId> dbCollection) {
-        this.dbCollection = Objects.requireNonNull(dbCollection);
-
-        this.dbCollection.createIndex(new BasicDBObject("name", 1), new BasicDBObject("unique", true));
+    public MongoDBRuleFragmentService(MongoCollections mongoCollections, ClusterEventBus clusterEventBus) {
+        collection = mongoCollections.collection(COLLECTION_NAME, RuleFragment.class);
+        mongoUtils = mongoCollections.utils(collection);
+        collection.createIndex(Indexes.ascending("name"), new IndexOptions().unique(true));
+        this.clusterEventBus = clusterEventBus;
     }
 
     @Override
     public RuleFragment save(RuleFragment ruleFragment) {
-        return dbCollection.save(ruleFragment).getSavedObject();
+        RuleFragment fragment = mongoUtils.save(ruleFragment);
+        clusterEventBus.post(new RuleFragmentUpdateEvent());
+        return fragment;
     }
 
     @Override
     public void delete(String name) {
-        dbCollection.remove(DBQuery.is("name", name));
+        collection.deleteOne(eq("name", name));
+        clusterEventBus.post(new RuleFragmentUpdateEvent());
     }
 
     @Override
     public void deleteAll() {
-        dbCollection.remove(DBQuery.empty());
+        collection.deleteMany(Filters.empty());
+        clusterEventBus.post(new RuleFragmentUpdateEvent());
     }
-
 
     @Override
     public long count(String name) {
-        return dbCollection.getCount(DBQuery.is("name", name));
+        return collection.countDocuments(eq("name", name));
     }
 
     @Override
     public Optional<RuleFragment> get(String name) {
-        return Optional.ofNullable(dbCollection.findOne(DBQuery.is("name", name)));
+        return Optional.ofNullable(collection.find(eq("name", name)).first());
     }
 
     @Override
     public Collection<RuleFragment> all() {
-        try (DBCursor<RuleFragment> ruleDaos = dbCollection.find().sort(DBSort.asc("title"))) {
-            return ImmutableSet.copyOf((Iterable<RuleFragment>) ruleDaos);
-        } catch (MongoException e) {
-            log.error("Unable to load rule fragments", e);
-            return Collections.emptySet();
-        }
+        return ImmutableList.copyOf(collection.find().sort(Sorts.ascending("title")));
     }
-
-
 }

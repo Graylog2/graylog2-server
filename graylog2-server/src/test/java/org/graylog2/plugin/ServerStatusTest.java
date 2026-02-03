@@ -17,18 +17,20 @@
 package org.graylog2.plugin;
 
 import com.google.common.eventbus.EventBus;
+import org.graylog2.GraylogNodeConfiguration;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.FilePersistedNodeIdProvider;
 import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -38,30 +40,31 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class ServerStatusTest {
-    @Rule
-    public final TemporaryFolder temporaryFolder = new TemporaryFolder();
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
+    @TempDir
+    public File temporaryFolder;
 
-    @Mock private BaseConfiguration config;
+    @Mock
+    private GraylogNodeConfiguration config;
     @Mock private EventBus eventBus;
 
     private ServerStatus status;
     private File tempFile;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        tempFile = temporaryFolder.newFile();
+        tempFile = File.createTempFile("junit", null, temporaryFolder);
 
         var nodeId = new FilePersistedNodeIdProvider(tempFile.getPath()).get();
 
@@ -216,10 +219,12 @@ public class ServerStatusTest {
         assertEquals(Lifecycle.RUNNING, status.getLifecycle());
     }
 
-    @Test(expected = ProcessingPauseLockedException.class)
+    @Test
     public void testResumeMessageProcessingWithLock() throws Exception {
-        status.pauseMessageProcessing(true);
-        status.resumeMessageProcessing();
+        assertThrows(ProcessingPauseLockedException.class, () -> {
+            status.pauseMessageProcessing(true);
+            status.resumeMessageProcessing();
+        });
     }
 
     @Test

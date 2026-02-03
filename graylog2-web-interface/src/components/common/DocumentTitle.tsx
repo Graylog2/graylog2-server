@@ -17,10 +17,12 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 
+import useProductName from 'brand-customization/useProductName';
+
 type Props = {
-  title: React.ReactNode,
-  children: React.ReactNode,
-}
+  title: React.ReactNode;
+  children: React.ReactNode;
+};
 
 /**
  * React component that modifies the page `document.title` dynamically. When the component is unmounted, it
@@ -35,13 +37,15 @@ type Props = {
  * ```
  */
 const DocumentTitle = ({ children, title }: Props) => {
-  const DEFAULT_TITLE = 'Graylog';
+  const productName = useProductName();
 
   useEffect(() => {
     document.title = `${document.title} - ${title}`;
 
-    return () => { document.title = DEFAULT_TITLE; };
-  }, [title]);
+    return () => {
+      document.title = productName;
+    };
+  }, [productName, title]);
 
   return <>{children}</>;
 };

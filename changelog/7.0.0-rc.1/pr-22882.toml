@@ -1,0 +1,4 @@
+type = "a"
+message = "Adding Text/Markdown widget to available search/dashboard widgets."
+
+pulls = ["22882"]

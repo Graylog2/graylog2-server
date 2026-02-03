@@ -19,40 +19,46 @@ import styled, { css } from 'styled-components';
 
 import Menu from 'components/bootstrap/Menu';
 
-type Placement = 'top' | 'right' | 'bottom' | 'left';
+type Placement = 'top' | 'right' | 'bottom' | 'left' | 'bottom-start';
 
-const ToggleDropdown = styled.span<{ $alwaysShowCaret: boolean }>(({ $alwaysShowCaret }) => css`
-  cursor: pointer;
+const ToggleDropdown = styled.span<{ $alwaysShowCaret: boolean }>(
+  ({ $alwaysShowCaret }) => css`
+    cursor: pointer;
 
-  ${$alwaysShowCaret ? '' : css`
-    .caret {
-      visibility: hidden;
-    }
+    ${$alwaysShowCaret
+      ? ''
+      : css`
+          .caret {
+            visibility: hidden;
+          }
 
-    &:hover .caret {
-      visibility: visible;
-    }
-  `}
-`);
+          &:hover .caret {
+            visibility: visible;
+          }
+        `}
+  `,
+);
 
 type Props = {
-  alwaysShowCaret?: boolean,
-  children: React.ReactNode,
-  closeOnSelect?: boolean,
-  dropdownZIndex?: number,
-  menuContainer?: HTMLElement,
-  onToggle: () => void,
-  placement?: Placement,
-  show: boolean,
-  toggleChild?: React.ReactNode,
-}
+  alwaysShowCaret?: boolean;
+  children: React.ReactNode;
+  closeOnSelect?: boolean;
+  dropdownZIndex?: number;
+  menuContainer?: HTMLElement;
+  onClose: () => void;
+  onToggle: () => void;
+  placement?: Placement;
+  show: boolean;
+  toggleChild?: React.ReactNode;
+};
 
 const OverlayDropdown = ({
   alwaysShowCaret = false,
   children,
   closeOnSelect = true,
-  dropdownZIndex,
+  dropdownZIndex = undefined,
   menuContainer = document.body,
+  onClose,
   onToggle,
   placement = 'bottom',
   show,
@@ -61,24 +67,20 @@ const OverlayDropdown = ({
   const toggleTarget = useRef<HTMLButtonElement>();
 
   return (
-    <Menu opened={show}
-          withinPortal
-          position={placement}
-          closeOnItemClick={closeOnSelect}
-          onClose={onToggle}
-          portalProps={{ target: menuContainer }}
-          zIndex={dropdownZIndex}>
+    <Menu
+      opened={show}
+      withinPortal
+      position={placement}
+      closeOnItemClick={closeOnSelect}
+      onClose={onClose}
+      portalProps={{ target: menuContainer }}
+      zIndex={dropdownZIndex}>
       <Menu.Target>
-        <ToggleDropdown $alwaysShowCaret={alwaysShowCaret}
-                        onClick={onToggle}
-                        ref={toggleTarget}
-                        role="presentation">
+        <ToggleDropdown $alwaysShowCaret={alwaysShowCaret} onClick={onToggle} ref={toggleTarget} role="presentation">
           {toggleChild}
         </ToggleDropdown>
       </Menu.Target>
-      <Menu.Dropdown>
-        {children}
-      </Menu.Dropdown>
+      <Menu.Dropdown>{children}</Menu.Dropdown>
     </Menu>
   );
 };

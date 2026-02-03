@@ -22,11 +22,11 @@ import type { IconName } from 'components/common/Icon';
 import Icon from './Icon';
 
 type Props = {
-  href?: string,
-  children: React.ReactNode,
-  target?: string,
-  iconName?: IconName,
-  className?: string,
+  href?: string;
+  children: React.ReactNode;
+  target?: string;
+  iconName?: IconName;
+  className?: string;
 };
 
 /**

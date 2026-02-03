@@ -28,9 +28,12 @@ type ContentPackPreviewProps = {
   onSave?: (...args: any[]) => void;
 };
 
-class ContentPackPreview extends React.Component<ContentPackPreviewProps, {
-  [key: string]: any;
-}> {
+class ContentPackPreview extends React.Component<
+  ContentPackPreviewProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     onSave: () => {},
   };
@@ -64,7 +67,10 @@ class ContentPackPreview extends React.Component<ContentPackPreviewProps, {
         </Row>
         <Row>
           <Col sm={6}>
-            <Button id="create" bsStyle="primary" onClick={this.props.onSave}>Create</Button>&nbsp;
+            <Button id="create" bsStyle="primary" onClick={this.props.onSave}>
+              Create
+            </Button>
+            &nbsp;
             {this._renderDownload()}
           </Col>
         </Row>

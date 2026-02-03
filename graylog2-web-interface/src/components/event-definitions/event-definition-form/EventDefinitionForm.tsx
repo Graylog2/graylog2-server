@@ -16,7 +16,7 @@
  */
 import type { SyntheticEvent } from 'react';
 import * as React from 'react';
-import defaultTo from 'lodash/defaultTo';
+import { useMemo } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
 
@@ -24,23 +24,35 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import { Col, Row } from 'components/bootstrap';
 import { Wizard } from 'components/common';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
-import type { EventDefinition, EventDefinitionFormControlsProps } from 'components/event-definitions/event-definitions-types';
+import type {
+  EventDefinition,
+  EventDefinitionFormControlsProps,
+} from 'components/event-definitions/event-definitions-types';
 import type User from 'logic/users/User';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import EventDefinitionFormControls from 'components/event-definitions/event-definition-form/EventDefinitionFormControls';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import EventDetailsForm from './EventDetailsForm';
 import EventConditionForm from './EventConditionForm';
 import FieldsForm from './FieldsForm';
 import NotificationsForm from './NotificationsForm';
 import EventDefinitionSummary from './EventDefinitionSummary';
+import ShareForm from './ShareForm';
 
 const WizardContainer = styled.div`
   margin-bottom: 10px;
 `;
-export const STEP_KEYS = ['event-details', 'condition', 'fields', 'notifications', 'summary'];
+export const getStepKeys = (isNew: boolean) => [
+  'event-details',
+  'condition',
+  'fields',
+  'notifications',
+  ...(isNew ? ['Share'] : []),
+  'summary',
+];
 const STEP_TELEMETRY_KEYS = [
   TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DETAILS.STEP_CLICKED,
   TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.STEP_CLICKED,
@@ -58,26 +70,28 @@ const getConditionPlugin = (type: string | undefined) => {
 };
 
 type Props = {
-  activeStep: string,
-  action?: 'edit' | 'create'
-  eventDefinition: EventDefinition,
-  currentUser: User,
+  activeStep: string;
+  action?: 'edit' | 'create';
+  eventDefinition: EventDefinition & {
+    share_request?: EntitySharePayload;
+  };
+  currentUser: User;
   validation: {
     errors: {
-      config?: unknown,
-      title?: string,
-    }
-  },
-  entityTypes: {},
-  notifications: Array<EventNotification>,
-  defaults: { default_backlog_size: number },
-  onChange: (key: string, value: unknown) => void,
-  onChangeStep: (step: string) => void,
-  onCancel: () => void,
-  onSubmit: () => void
-  canEdit: boolean,
-  formControls?: React.ComponentType<EventDefinitionFormControlsProps>
-}
+      config?: unknown;
+      title?: string;
+    };
+  };
+  entityTypes: {};
+  notifications: Array<EventNotification>;
+  defaults: { default_backlog_size: number };
+  onChange: (key: string, value: unknown) => void;
+  onChangeStep: (step: string) => void;
+  onCancel: () => void;
+  onSubmit: () => void;
+  canEdit: boolean;
+  formControls?: React.ComponentType<EventDefinitionFormControlsProps>;
+};
 
 const EventDefinitionForm = ({
   action = 'edit',
@@ -98,8 +112,6 @@ const EventDefinitionForm = ({
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
-  const activeStepIndex = STEP_KEYS.indexOf(activeStep);
-
   const handleSubmit = (event: SyntheticEvent) => {
     if (event) {
       event.preventDefault();
@@ -118,51 +130,69 @@ const EventDefinitionForm = ({
     currentUser,
   };
 
-  const canEditCondition = React.useMemo(() => (
-    canEdit || eventDefinition._scope.toUpperCase() === 'ILLUMINATE'
-  ), [canEdit, eventDefinition._scope]);
+  const canEditCondition = useMemo(
+    () => canEdit || eventDefinition._scope.toUpperCase() === 'ILLUMINATE',
+    [canEdit, eventDefinition._scope],
+  );
+
+  const eventProcedureId = eventDefinition?.event_procedure || undefined;
 
   const eventDefinitionType = getConditionPlugin(eventDefinition.config.type);
-
+  const isNew = action === 'create';
+  const currentStepKeys = getStepKeys(isNew);
+  const activeStepIndex = currentStepKeys.indexOf(activeStep);
   const steps = [
     {
-      key: STEP_KEYS[0],
+      key: currentStepKeys[0],
       title: 'Event Details',
-      component: <EventDetailsForm {...defaultStepProps} canEdit={canEdit} />,
+      component: (
+        <EventDetailsForm {...defaultStepProps} eventDefinitionEventProcedure={eventProcedureId} canEdit={canEdit} />
+      ),
     },
     {
-      key: STEP_KEYS[1],
-      title: defaultTo(eventDefinitionType.displayName, 'Condition'),
+      key: currentStepKeys[1],
+      title: eventDefinitionType?.displayName ?? 'Condition',
       component: <EventConditionForm {...defaultStepProps} canEdit={canEditCondition} />,
     },
     {
-      key: STEP_KEYS[2],
+      key: currentStepKeys[2],
       title: 'Fields',
       component: <FieldsForm {...defaultStepProps} canEdit={canEdit} />,
     },
     {
-      key: STEP_KEYS[3],
+      key: currentStepKeys[3],
       title: 'Notifications',
       component: <NotificationsForm {...defaultStepProps} notifications={notifications} defaults={defaults} />,
     },
+    ...(isNew
+      ? [
+          {
+            key: currentStepKeys[4],
+            title: 'Share',
+            component: <ShareForm {...defaultStepProps} />,
+          },
+        ]
+      : []),
     {
-      key: STEP_KEYS[4],
+      key: currentStepKeys[currentStepKeys.length - 1],
       title: 'Summary',
       component: (
-        <EventDefinitionSummary eventDefinition={eventDefinition}
-                                currentUser={currentUser}
-                                notifications={notifications}
-                                validation={validation} />
+        <EventDefinitionSummary
+          eventDefinition={eventDefinition}
+          currentUser={currentUser}
+          notifications={notifications}
+          validation={validation}
+        />
       ),
     },
   ];
 
   const handleStepChange = (nextStep: string) => {
-    sendTelemetry(STEP_TELEMETRY_KEYS[STEP_KEYS.indexOf(nextStep)], {
+    sendTelemetry(STEP_TELEMETRY_KEYS[currentStepKeys.indexOf(nextStep)], {
       app_pathname: getPathnameWithoutId(pathname),
-      app_section: (action === 'create') ? 'new-event-definition' : 'edit-event-definition',
+      app_section: action === 'create' ? 'new-event-definition' : 'edit-event-definition',
       app_action_value: 'event-definition-step',
-      current_step: steps[STEP_KEYS.indexOf(activeStep)].title,
+      current_step: steps[activeStepIndex]?.title,
     });
 
     onChangeStep(nextStep);
@@ -171,24 +201,24 @@ const EventDefinitionForm = ({
   const openPrevPage = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_PREVIOUS_CLICKED, {
       app_pathname: getPathnameWithoutId(pathname),
-      app_section: (action === 'create') ? 'new-event-definition' : 'edit-event-definition',
+      app_section: action === 'create' ? 'new-event-definition' : 'edit-event-definition',
       app_action_value: 'previous-button',
-      current_step: steps[activeStepIndex].title,
+      current_step: steps[activeStepIndex]?.title,
     });
 
-    const previousStep = activeStepIndex > 0 ? STEP_KEYS[activeStepIndex - 1] : undefined;
+    const previousStep = activeStepIndex > 0 ? currentStepKeys[activeStepIndex - 1] : undefined;
     onChangeStep(previousStep);
   };
 
   const openNextPage = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NEXT_CLICKED, {
       app_pathname: getPathnameWithoutId(pathname),
-      app_section: (action === 'create') ? 'new-event-definition' : 'edit-event-definition',
+      app_section: action === 'create' ? 'new-event-definition' : 'edit-event-definition',
       app_action_value: 'next-button',
-      current_step: steps[activeStepIndex].title,
+      current_step: steps[activeStepIndex]?.title,
     });
 
-    const nextStep = STEP_KEYS[activeStepIndex + 1];
+    const nextStep = currentStepKeys[activeStepIndex + 1];
     onChangeStep(nextStep);
   };
 
@@ -196,21 +226,25 @@ const EventDefinitionForm = ({
     <Row>
       <Col md={12}>
         <WizardContainer>
-          <Wizard steps={steps}
-                  activeStep={activeStep}
-                  onStepChange={handleStepChange}
-                  horizontal
-                  justified
-                  containerClassName=""
-                  hidePreviousNextButtons />
+          <Wizard
+            steps={steps}
+            activeStep={activeStep}
+            onStepChange={handleStepChange}
+            horizontal
+            justified
+            containerClassName=""
+            hidePreviousNextButtons
+          />
         </WizardContainer>
-        <FormControls activeStepIndex={activeStepIndex}
-                      action={action}
-                      onOpenPrevPage={openPrevPage}
-                      onOpenNextPage={openNextPage}
-                      steps={steps}
-                      onSubmit={handleSubmit}
-                      onCancel={onCancel} />
+        <FormControls
+          activeStepIndex={activeStepIndex}
+          action={action}
+          onOpenPrevPage={openPrevPage}
+          onOpenNextPage={openNextPage}
+          steps={steps}
+          onSubmit={handleSubmit}
+          onCancel={onCancel}
+        />
       </Col>
     </Row>
   );

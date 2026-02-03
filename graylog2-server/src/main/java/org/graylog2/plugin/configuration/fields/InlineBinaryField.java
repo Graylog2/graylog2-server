@@ -35,6 +35,12 @@ public class InlineBinaryField extends AbstractConfigurationField {
         super(FIELD_TYPE, name, humanName, description, isOptional, DEFAULT_POSITION, isEncrypted);
     }
 
+    public InlineBinaryField(String name, String humanName, String description,
+                             Optional isOptional, boolean isEncrypted, String defaultValue) {
+        super(FIELD_TYPE, name, humanName, description, isOptional, DEFAULT_POSITION, isEncrypted);
+        this.defaultValue = defaultValue;
+    }
+
     @Override
     public String getDefaultValue() {
         return defaultValue;

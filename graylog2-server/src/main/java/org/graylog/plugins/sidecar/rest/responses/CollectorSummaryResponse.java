@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.sidecar.rest.models.CollectorSummary;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.rest.models.SortOrder;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -43,7 +44,7 @@ public abstract class CollectorSummaryResponse {
 
     @Nullable
     @JsonProperty
-    public abstract String order();
+    public abstract SortOrder order();
 
     @JsonProperty
     public abstract Collection<CollectorSummary> collectors();
@@ -53,7 +54,7 @@ public abstract class CollectorSummaryResponse {
                                                   @JsonProperty("pagination") PaginatedList.PaginationInfo paginationInfo,
                                                   @JsonProperty("total") long total,
                                                   @JsonProperty("sort") String sort,
-                                                  @JsonProperty("order") String order,
+                                                  @JsonProperty("order") SortOrder order,
                                                   @JsonProperty("collectors") Collection<CollectorSummary> collectors) {
         return new AutoValue_CollectorSummaryResponse(query, paginationInfo, total, sort, order, collectors);
     }

@@ -16,15 +16,15 @@
  */
 package org.graylog2.bootstrap.preflight;
 
-import org.graylog2.plugin.database.ValidationException;
-
-import java.util.Optional;
-
 public interface PreflightConfigService {
-    PreflightConfig setConfigResult(PreflightConfigResult result);
+    ConfigResultState setConfigResult(PreflightConfigResult result);
 
     PreflightConfigResult getPreflightConfigResult();
 
     String getPreflightPassword();
 
+    enum ConfigResultState {
+        CREATED,
+        UPDATED
+    }
 }

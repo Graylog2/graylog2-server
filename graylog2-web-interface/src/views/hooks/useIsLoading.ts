@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 
-const useIsLoading = () => useAppSelector((state) => state.searchExecution.isLoading);
+const useIsLoading = () => useViewsSelector((state) => state.searchExecution.isLoading);
 
 export default useIsLoading;

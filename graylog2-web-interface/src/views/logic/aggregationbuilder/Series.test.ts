@@ -53,18 +53,18 @@ describe('Series.ts', () => {
 
   describe('isFunction', () => {
     it.each`
-    func                    | result
-    ${'count()'}            | ${true}
-    ${'count(foo)'}         | ${true}
-    ${'sum(send-q)'}        | ${true}
-    ${'sum(send q)'}        | ${true}
-    ${'percentile(send,99)'}| ${true}
-    ${'foob(,)'}            | ${true}
-    ${'count-foo'}          | ${false}
-    ${'foob('}              | ${false}
-    ${'foob)'}              | ${false}
-    ${'(foob)'}             | ${false}
-  `('returns type of field for "$func(field)"', ({ func, result }) => {
+      func                     | result
+      ${'count()'}             | ${true}
+      ${'count(foo)'}          | ${true}
+      ${'sum(send-q)'}         | ${true}
+      ${'sum(send q)'}         | ${true}
+      ${'percentile(send,99)'} | ${true}
+      ${'foob(,)'}             | ${true}
+      ${'count-foo'}           | ${false}
+      ${'foob('}               | ${false}
+      ${'foob)'}               | ${false}
+      ${'(foob)'}              | ${false}
+    `('returns type of field for "$func(field)"', ({ func, result }) => {
       expect(isFunction(func)).toBe(result);
     });
   });

@@ -25,9 +25,9 @@ jest.mock('stores/decorators/DecoratorsStore', () => ({
 }));
 
 describe('NewQueryActionHandler', () => {
-  it('does not add widgets for dashboard', () => NewQueryActionHandler(View.Type.Dashboard)
-    .then(([_query, state]) => expect(state.widgets.size).toBe(0)));
+  it('does not add widgets for dashboard', () =>
+    NewQueryActionHandler(View.Type.Dashboard).then(([_query, state]) => expect(state.widgets.size).toBe(0)));
 
-  it('adds widgets for search', () => NewQueryActionHandler(View.Type.Search)
-    .then(([_query, state]) => expect(state.widgets.size).toBe(2)));
+  it('adds widgets for search', () =>
+    NewQueryActionHandler(View.Type.Search).then(([_query, state]) => expect(state.widgets.size).toBe(2)));
 });

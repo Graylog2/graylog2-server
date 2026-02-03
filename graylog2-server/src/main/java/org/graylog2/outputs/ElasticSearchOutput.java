@@ -21,6 +21,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.messages.ImmutableMessage;
 import org.graylog2.indexer.messages.IndexingResults;
 import org.graylog2.indexer.messages.MessageWithIndex;
@@ -38,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -80,7 +82,6 @@ public class ElasticSearchOutput implements MessageOutput, FilteredMessageOutput
                 .filter(message -> !message.destinations().get(FILTER_KEY).isEmpty())
                 .toList();
 
-        writes.mark(messages.size());
         ignores.mark(filteredMessages.size() - messages.size());
 
         writeMessageEntries(messages);
@@ -110,7 +111,9 @@ public class ElasticSearchOutput implements MessageOutput, FilteredMessageOutput
                 .flatMap(message -> message.destinations()
                         .get(FILTER_KEY)
                         .stream()
-                        .map(stream -> new MessageWithIndex(message.message(), stream.getIndexSet())))
+                        .map(stream -> new MessageWithIndex(message.message(), Optional.ofNullable(stream)
+                                .map(Stream::getIndexSet)
+                                .map(IndexSet::getWriteIndexAlias).orElse(null))))
                 .toList();
 
         if (LOG.isTraceEnabled()) {

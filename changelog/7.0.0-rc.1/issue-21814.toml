@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Display field value suggestions in search query input, for values which include a dot, after mistyping."
+
+issues = ["21814"]
+pulls = ["23061"]

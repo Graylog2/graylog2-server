@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Adding missing API descriptions on method parameters for Simple Scripting API."
+
+pulls = ["21367"]
+issues = ["20821"]

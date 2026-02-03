@@ -56,17 +56,13 @@ describe('Query', () => {
     });
 
     it('returns set of stream ids from simple filter', () => {
-      expect(filtersToStreamSet(singleFilter)).toEqual(Set([
-        '000000000000000000000001',
-      ]));
+      expect(filtersToStreamSet(singleFilter)).toEqual(Set(['000000000000000000000001']));
     });
 
     it('returns set of stream ids from two-level filter', () => {
-      expect(filtersToStreamSet(filter)).toEqual(Set([
-        '000000000000000000000001',
-        '5c2e07eeba33a9681ad6070a',
-        '5d2d9649e117dc4df84cf83c',
-      ]));
+      expect(filtersToStreamSet(filter)).toEqual(
+        Set(['000000000000000000000001', '5c2e07eeba33a9681ad6070a', '5d2d9649e117dc4df84cf83c']),
+      );
     });
   });
 

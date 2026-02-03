@@ -15,86 +15,72 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import { useMemo } from 'react';
+import type { PluginNavigation } from 'graylog-web-plugin';
 
-import { Button, ButtonToolbar } from 'components/bootstrap';
-import { LinkContainer } from 'components/common/router';
-import { IfPermitted } from 'components/common';
-import NavItemStateIndicator, {
-  hoverIndicatorStyles,
-  activeIndicatorStyles,
-} from 'components/common/NavItemStateIndicator';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
+import sortNavigationItems from 'components/navigation/util/sortNavigationItems';
+import usePluginEntities from 'hooks/usePluginEntities';
+import mergeNavigationItems from 'components/navigation/util/mergeNavigationItems';
+import AppConfig from 'util/AppConfig';
+import { DEFAULT_PERSPECTIVE } from 'components/perspectives/contexts/PerspectivesProvider';
+import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
+import NavTabs from 'components/common/NavTabs';
 
-const Container = styled(ButtonToolbar)`
-  margin-bottom: 10px;
-`;
+type PageNavItem = {
+  description: string;
+  path: string;
+  permissions?: string | Array<string>;
+  exactPathMatch?: boolean;
+  useCondition?: () => boolean;
+  position?: PluginNavigation['position'];
+};
 
-const StyledButton = styled(Button)(({ theme }) => css`
-  font-family: ${theme.fonts.family.navigation};
-  font-size: ${theme.fonts.size.navigation};
-  color: ${theme.colors.variant.darker.default};
-  
-  &:hover,
-  &:focus {
-    background: inherit;
-    text-decoration: none;
-  }
+const matchesPerspective = (activePerspective: string, itemPerspective: string) =>
+  activePerspective === DEFAULT_PERSPECTIVE ? !itemPerspective : itemPerspective === activePerspective;
 
-  &:hover {
-    color: inherit;
-    ${hoverIndicatorStyles(theme)}
-  }
+const usePageNavigationItems = (page: string, items: Array<PageNavItem>) => {
+  const { activePerspective } = useActivePerspective();
+  const allPageNavigationItems = usePluginEntities('pageNavigation');
 
-  &.active {
-    color: ${theme.colors.global.textDefault};
-
-    ${activeIndicatorStyles(theme)}
-
-    &:hover,
-    &:focus {
-      ${activeIndicatorStyles(theme)}
+  return useMemo(() => {
+    if (items) {
+      return items;
     }
-`);
+    const perspectiveNavItems = allPageNavigationItems.filter((group) =>
+      matchesPerspective(activePerspective.id, group.perspective),
+    );
 
-StyledButton.displayName = 'Button';
+    return mergeNavigationItems(perspectiveNavItems).find((item) => item.description === page)?.children ?? [];
+  }, [items, allPageNavigationItems, activePerspective.id, page]);
+};
 
-type Props = {
-  /**
-   * List of nav items. Define permissions, if the item should only be displayed for users with specific permissions.
-   * By default, an item is active if the current URL starts with the item URL.
-   * If you only want to display an item as active only when its path matches exactly, set `exactPathMatch` to true.
-   */
-  items: Array<{
-    title: string,
-    path: string,
-    permissions?: string | Array<string>
-    exactPathMatch?: boolean,
-  }>
-}
+// Please provide items by via the plugin system instead of the items prop where possible.
+type Props = { page?: string; items?: Array<PageNavItem> };
 
 /**
  * Simple tab navigation to allow navigating to subareas of a page.
  */
-const PageNavigation = ({ items }: Props) => (
-  <Container>
-    {items.map(({ path, title, permissions, exactPathMatch }) => {
-      if (!path) {
-        return null;
-      }
+const PageNavigation = ({ page = undefined, items: itemsProp = undefined }: Props) => {
+  const currentUser = useCurrentUser();
+  const items = usePageNavigationItems(page, itemsProp);
 
-      return (
-        <IfPermitted permissions={permissions ?? []} key={path}>
-          <LinkContainer to={path} relativeActive={!exactPathMatch}>
-            <StyledButton bsStyle="transparent">
-              <NavItemStateIndicator>
-                {title}
-              </NavItemStateIndicator>
-            </StyledButton>
-          </LinkContainer>
-        </IfPermitted>
-      );
-    })}
-  </Container>
-);
+  const availableItems = items.filter(
+    (item) =>
+      (item.requiredFeatureFlag ? AppConfig.isFeatureEnabled(item.requiredFeatureFlag) : true) &&
+      (typeof item.useCondition === 'function' ? item.useCondition() : true) &&
+      isPermitted(currentUser.permissions, item.permissions) &&
+      !!item.path,
+  );
+
+  const formatedItems = sortNavigationItems<PageNavItem>(availableItems);
+
+  if (formatedItems.length === 0) {
+    return null;
+  }
+
+  return <NavTabs items={formatedItems} />;
+};
 
 export default PageNavigation;

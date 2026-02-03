@@ -20,8 +20,10 @@ import QueryHelper from 'components/common/QueryHelper';
 
 const queryExample = (
   <p>
-    Find shared entities with a title containing security:<br />
-    <kbd>title:security</kbd><br />
+    Find shared entities with a title containing security:
+    <br />
+    <kbd>title:security</kbd>
+    <br />
   </p>
 );
 const SharedEntitiesQueryHelper = () => (

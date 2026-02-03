@@ -1,0 +1,5 @@
+type = "a"
+message = "Added Data Node Upgrade Tab in Cluster Configuration Page"
+
+issues = ["21948", "Graylog2/graylog-plugin-enterprise#9962"]
+pulls = ["21847"]

@@ -17,12 +17,13 @@
 package org.graylog2.inputs;
 
 import org.graylog2.plugin.IOState;
-import org.graylog2.plugin.database.Persisted;
 import org.joda.time.DateTime;
 
 import java.util.Map;
 
-public interface Input extends Persisted {
+public interface Input {
+    String getId();
+
     String getTitle();
 
     DateTime getCreatedAt();
@@ -35,7 +36,7 @@ public interface Input extends Persisted {
 
     String getCreatorUserId();
 
-    Boolean isGlobal();
+    boolean isGlobal();
 
     String getContentPack();
 
@@ -43,10 +44,11 @@ public interface Input extends Persisted {
 
     IOState.Type getDesiredState();
 
-    void setDesiredState(IOState.Type desiredState);
+    Input withDesiredState(IOState.Type desiredState);
 
     default String toIdentifier() {
         return "[" + getType() + "/" + getTitle() + "/" + getId() + "]";
     }
 
+    Map<String, Object> getFields();
 }

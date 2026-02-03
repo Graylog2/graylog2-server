@@ -1,0 +1,4 @@
+type = "d"
+message = "Deprecated Palo Alto Networks version 8.x and 9.x inputs"
+
+pulls = ["21579"]

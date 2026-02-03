@@ -28,21 +28,17 @@ const Wrapper = styled.div`
   grid-column: 1;
 `;
 
-type Dimensions = { height: number; width: number; };
+type Dimensions = { height: number; width: number };
 
 type Props = {
-  children: (dimensions: Dimensions) => React.ReactElement,
+  children: (dimensions: Dimensions) => React.ReactElement;
 };
 
 const FullSizeContainer = ({ children }: Props) => {
   const element = useRef<HTMLDivElement>(null);
   const { width, height } = useElementDimensions(element);
 
-  return (
-    <Wrapper ref={element}>
-      {children({ height, width })}
-    </Wrapper>
-  );
+  return <Wrapper ref={element}>{children({ height, width })}</Wrapper>;
 };
 
 export default FullSizeContainer;

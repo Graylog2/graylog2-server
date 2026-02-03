@@ -42,7 +42,7 @@ import static com.mongodb.client.model.Projections.include;
  * Bypasses all the checks, removes even read-only roles.
  * Because of that it is placed in migrations module, instead of being added to {@link org.graylog2.users.RoleService}
  */
-class RoleRemover {
+public class RoleRemover {
 
     private static final Logger LOG = LoggerFactory.getLogger(RoleRemover.class);
 

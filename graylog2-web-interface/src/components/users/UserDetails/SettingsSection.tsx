@@ -24,24 +24,32 @@ import { IfPermitted, ReadOnlyFormGroup } from 'components/common';
 import type User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import { StreamsActions } from 'stores/streams/StreamsStore';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import useIsGlobalTimeoutEnabled from 'hooks/useIsGlobalTimeoutEnabled';
+import { getView } from 'views/api/views';
 
 type Props = {
-  user: User,
+  user: User;
 };
 
-const _sessionTimeout = (sessionTimeout: { value: number, unitString: string }, isGlobalTimeoutEnabled: boolean) => {
+const _sessionTimeout = (sessionTimeout: { value: number; unitString: string }, isGlobalTimeoutEnabled: boolean) => {
   if (sessionTimeout) {
-    const globalTimeoutLink = <IfPermitted permissions={['clusterconfigentry:read']}>(<Link to={Routes.SYSTEM.CONFIGURATIONS}>globally set</Link>)</IfPermitted>;
+    const globalTimeoutLink = (
+      <IfPermitted permissions={['clusterconfigentry:read']}>
+        (<Link to={Routes.SYSTEM.CONFIGURATIONS}>globally set</Link>)
+      </IfPermitted>
+    );
 
-    return <>{sessionTimeout.value} {sessionTimeout.unitString} {isGlobalTimeoutEnabled && globalTimeoutLink}</>;
+    return (
+      <>
+        {sessionTimeout.value} {sessionTimeout.unitString} {isGlobalTimeoutEnabled && globalTimeoutLink}
+      </>
+    );
   }
 
   return 'Sessions do not timeout';
 };
 
-const StartpageValue = ({ type, id }: { type: string | null | undefined, id: string | null | undefined }) => {
+const StartpageValue = ({ type, id }: { type: string | null | undefined; id: string | null | undefined }) => {
   const [title, setTitle] = useState<string | undefined>();
 
   useEffect(() => {
@@ -52,7 +60,7 @@ const StartpageValue = ({ type, id }: { type: string | null | undefined, id: str
     if (type === 'stream') {
       StreamsActions.get(id).then(({ title: streamTitle }) => setTitle(streamTitle));
     } else {
-      ViewManagementActions.get(id).then(({ title: viewTitle }) => setTitle(viewTitle));
+      getView(id).then(({ title: viewTitle }) => setTitle(viewTitle));
     }
   }, [id, type]);
 
@@ -63,18 +71,13 @@ const StartpageValue = ({ type, id }: { type: string | null | undefined, id: str
   const route = type === 'stream' ? Routes.stream_search(id) : Routes.dashboard_show(id);
 
   return (
-    <Link to={route}><b>{upperFirst(type)}</b>:  {title}</Link>
+    <Link to={route}>
+      <b>{upperFirst(type)}</b>: {title}
+    </Link>
   );
 };
 
-const SettingsSection = ({
-  user: {
-    timezone,
-    serviceAccount,
-    sessionTimeout,
-    startpage,
-  },
-}: Props) => {
+const SettingsSection = ({ user: { timezone, serviceAccount, sessionTimeout, startpage } }: Props) => {
   const isGlobalTimeoutEnabled = useIsGlobalTimeoutEnabled();
 
   return (

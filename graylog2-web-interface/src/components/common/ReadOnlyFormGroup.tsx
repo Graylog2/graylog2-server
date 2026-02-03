@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Col, Row, HelpBlock } from 'components/bootstrap';
-import Icon from 'components/common/Icon';
+import { StatusIcon } from 'components/common';
 
 const StyledRow = styled(Row)`
   &:not(:last-child) {
@@ -27,31 +27,25 @@ const StyledRow = styled(Row)`
 `;
 
 type Props = {
-  label: React.ReactElement | string,
-  value: React.ReactNode,
-  help?: string,
-  className?: string,
+  label: React.ReactElement | string;
+  value: React.ReactNode;
+  help?: string;
+  className?: string;
 };
 
-const LabelCol = styled(Col)(({ theme }) => css`
-  font-weight: bold;
+const LabelCol = styled(Col)(
+  ({ theme }) => css`
+    font-weight: bold;
 
-  @media (min-width: ${theme.breakpoints.min.md}) {
-    text-align: right;
-  }
-`);
-
-const BooleanIcon = styled(Icon)<{ value: Props['value'] }>(({ theme, value }) => css`
-  color: ${value ? theme.colors.variant.success : theme.colors.variant.danger};
-`);
-
-const BooleanValue = ({ value }: { value: boolean }) => (
-  <><BooleanIcon name={value ? 'check_circle' : 'cancel'} value={value} /> {value ? 'yes' : 'no'}</>
+    @media (min-width: ${theme.breakpoints.min.md}) {
+      text-align: right;
+    }
+  `,
 );
 
 const readableValue = (value: Props['value']): React.ReactNode => {
   if (typeof value === 'boolean') {
-    return <BooleanValue value={value} />;
+    return <StatusIcon active={value} />;
   }
 
   if (value) {
@@ -62,11 +56,9 @@ const readableValue = (value: Props['value']): React.ReactNode => {
 };
 
 /** Displays the provided label and value with the same layout like the FormikFormGroup */
-const ReadOnlyFormGroup = ({ label, value, help, className }: Props) => (
+const ReadOnlyFormGroup = ({ label, value, help = undefined, className = undefined }: Props) => (
   <StyledRow className={className}>
-    <LabelCol sm={3}>
-      {label}
-    </LabelCol>
+    <LabelCol sm={3}>{label}</LabelCol>
     <Col sm={9} className="read-only-value-col">
       {readableValue(value)}
       {help && <HelpBlock>{help}</HelpBlock>}

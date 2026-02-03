@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableList;
+import jakarta.inject.Provider;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.TestEventProcessorParameters;
@@ -34,27 +35,34 @@ import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityRegistrar;
+import org.graylog.security.shares.EntitySharesService;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScope;
 import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.source.EntitySource;
+import org.graylog2.database.entities.source.EntitySourceService;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Optional;
 import java.util.Set;
@@ -68,16 +76,15 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class EventDefinitionHandlerTest {
     public final Set<EntityScope> ENTITY_SCOPES = Set.of(new DefaultEntityScope(), new TestEntityScope());
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private DBEventProcessorStateService stateService;
@@ -85,6 +92,13 @@ public class EventDefinitionHandlerTest {
 
     @Mock
     private SchedulerCapabilitiesService schedulerCapabilitiesService;
+    @Mock
+    private ClusterEventBus clusterEventBus;
+    @Mock
+    private EntitySourceService entitySourceService;
+
+    @Mock
+    Provider<EntitySharesService> entitySharesServiceProvider;
 
     private EventDefinitionHandler handler;
     private JobSchedulerTestClock clock;
@@ -92,8 +106,8 @@ public class EventDefinitionHandlerTest {
     private DBJobDefinitionService jobDefinitionService;
     private DBJobTriggerService jobTriggerService;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp(MongoDBTestService dbTestService) throws Exception {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(new NamedType(TestEventProcessorConfig.class, TestEventProcessorConfig.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(TestEventProcessorParameters.class, TestEventProcessorParameters.TYPE_NAME));
@@ -105,14 +119,13 @@ public class EventDefinitionHandlerTest {
         objectMapper.registerSubtypes(new NamedType(PersistToStreamsStorageHandler.Config.class, PersistToStreamsStorageHandler.Config.TYPE_NAME));
 
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-
+        final var mongoCollections = new MongoCollections(mapperProvider, dbTestService.mongoConnection());
         this.clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
-        final MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
-        this.eventDefinitionService = spy(new DBEventDefinitionService(mongoCollections, stateService, mock(EntityOwnershipService.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters()));
-        this.jobDefinitionService = spy(new DBJobDefinitionService(mongodb.mongoConnection(), mapperProvider));
+        this.eventDefinitionService = spy(new DBEventDefinitionService(mongoCollections, stateService, mock(EntityRegistrar.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters()));
+        this.jobDefinitionService = spy(new DBJobDefinitionService(mongoCollections, mapperProvider));
         this.jobTriggerService = spy(new DBJobTriggerService(mongoCollections, nodeId, clock, schedulerCapabilitiesService, Duration.minutes(5)));
 
-        this.handler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, clock);
+        this.handler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, entitySharesServiceProvider, clock, clusterEventBus, entitySourceService);
     }
 
     @Test
@@ -168,6 +181,8 @@ public class EventDefinitionHandlerTest {
 
     @Test
     public void duplicate() {
+        EntitySharesService entitySharesService = mock(EntitySharesService.class);
+        when(entitySharesServiceProvider.get()).thenReturn(entitySharesService);
         final EventDefinitionDto newDto = EventDefinitionDto.builder()
                 .title("Test")
                 .description("A test event definition")
@@ -186,7 +201,7 @@ public class EventDefinitionHandlerTest {
                 .build();
 
         final var existingEvent = eventDefinitionService.save(newDto);
-        final var duplicated = handler.duplicate(existingEvent, Optional.empty());
+        final var duplicated = handler.duplicate(existingEvent, mock(User.class));
         final var saved = eventDefinitionService.get(duplicated.id()).get();
 
         assertThat(saved.title()).startsWith("COPY-");
@@ -194,6 +209,14 @@ public class EventDefinitionHandlerTest {
         assertThat(saved.state()).isEqualTo(EventDefinition.State.DISABLED);
 
         assertThat(jobDefinitionService.getByConfigField("event_definition_id", saved.id())).isNotPresent();
+
+        // Validate that the source information with the parentId is saved.
+        ArgumentCaptor<EntitySource> captor = ArgumentCaptor.forClass(EntitySource.class);
+        verify(entitySourceService, times(1)).create(captor.capture());
+        EntitySource captured = captor.getValue();
+        assertThat(captured.entityType()).isEqualTo(EntitySource.EVENT_DEFINITION_TYPE);
+        assertThat(captured.entityId()).isEqualTo(duplicated.id());
+        assertThat(captured.parentId()).contains(existingEvent.id());
     }
 
     @Test
@@ -226,10 +249,36 @@ public class EventDefinitionHandlerTest {
     }
 
     @Test
+    public void testEventSummaryTemplateHandling() {
+        EventDefinitionDto dtoToSave = EventDefinitionDto.builder()
+                .title("Test")
+                .eventSummaryTemplate(" ")
+                .description("A test event definition")
+                .config(TestEventProcessorConfig.builder()
+                        .message("This is a test event processor")
+                        .searchWithinMs(300000)
+                        .executeEveryMs(60001)
+                        .build())
+                .priority(3)
+                .alert(false)
+                .notificationSettings(EventNotificationSettings.withGracePeriod(60000))
+                .keySpec(ImmutableList.of("a", "b"))
+                .notifications(ImmutableList.of())
+                .build();
+
+        EventDefinitionDto savedDto = handler.create(dtoToSave, Optional.empty());
+        assertThat(savedDto.eventSummaryTemplate()).isNull();
+
+        dtoToSave = dtoToSave.toBuilder().eventSummaryTemplate("\tTitle with whitespace   ").build();
+        savedDto = handler.create(dtoToSave, Optional.empty());
+        assertThat(savedDto.eventSummaryTemplate()).isEqualTo("Title with whitespace");
+    }
+
+    @Test
     @MongoDBFixtures("event-processors.json")
     public void update() {
-        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC).toString();
-        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC).toString();
+        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC);
+        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC);
 
         final EventDefinitionDto existingDto = eventDefinitionService.get("54e3deadbeefdeadbeef0000").orElse(null);
         final JobDefinitionDto existingJobDefinition = jobDefinitionService.get("54e3deadbeefdeadbeef0001").orElse(null);
@@ -239,7 +288,6 @@ public class EventDefinitionHandlerTest {
                 .executeEveryMs(550000)
                 .searchWithinMs(800000)
                 .build();
-        final EventProcessorExecutionJob.Data existingTriggerData = (EventProcessorExecutionJob.Data) existingTrigger.data().orElseThrow(AssertionError::new);
 
         assertThat(existingDto).isNotNull();
         assertThat(existingJobDefinition).isNotNull();
@@ -277,13 +325,14 @@ public class EventDefinitionHandlerTest {
             assertThat(trigger.data()).isEmpty();
             assertThat(trigger.nextTime()).isEqualTo(clock.nowUTC());
         });
+        verify(clusterEventBus, times(1)).post(new EventDefinitionUpdated(existingDto.id()));
     }
 
     @Test
     @MongoDBFixtures("event-processors.json")
     public void updateWithSchedulingDisabled() {
-        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC).toString();
-        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC).toString();
+        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC);
+        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC);
 
         final EventDefinitionDto existingDto = eventDefinitionService.get("54e3deadbeefdeadbeef0000").orElse(null);
         final JobDefinitionDto existingJobDefinition = jobDefinitionService.get("54e3deadbeefdeadbeef0001").orElse(null);
@@ -319,8 +368,8 @@ public class EventDefinitionHandlerTest {
     @Test
     @MongoDBFixtures("event-processors-without-schedule.json")
     public void updateWithSchedulingReEnabled() {
-        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC).toString();
-        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC).toString();
+        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC);
+        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC);
 
         final EventDefinitionDto existingDto = eventDefinitionService.get("54e3deadbeefdeadbeef0000").orElse(null);
         final TestEventProcessorConfig existingConfig = (TestEventProcessorConfig) existingDto.config();
@@ -362,8 +411,8 @@ public class EventDefinitionHandlerTest {
     @Test
     @MongoDBFixtures("event-processors.json")
     public void updateWithErrors() {
-        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC).toString();
-        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC).toString();
+        final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC);
+        final String newDescription = "A NEW DESCRIPTION " + DateTime.now(DateTimeZone.UTC);
 
         final EventDefinitionDto existingDto = eventDefinitionService.get("54e3deadbeefdeadbeef0000").orElse(null);
         final JobDefinitionDto existingJobDefinition = jobDefinitionService.get("54e3deadbeefdeadbeef0001").orElse(null);
@@ -422,6 +471,7 @@ public class EventDefinitionHandlerTest {
             assertThat(definition.title()).isEqualTo(existingJobDefinition.title());
             assertThat(definition.description()).isEqualTo(existingJobDefinition.description());
         });
+        verify(clusterEventBus, times(0)).post(new EventDefinitionUpdated(existingDto.id()));
     }
 
     @Test
@@ -432,6 +482,8 @@ public class EventDefinitionHandlerTest {
         assertThat(jobTriggerService.get("54e3deadbeefdeadbeef0002")).isPresent();
 
         assertThat(handler.delete("54e3deadbeefdeadbeef0000")).isTrue();
+        verify(clusterEventBus, times(1)).post(new EventDefinitionDeleted("54e3deadbeefdeadbeef0000"));
+        verify(entitySourceService, times(1)).deleteByEntityId("54e3deadbeefdeadbeef0000");
 
         assertThat(eventDefinitionService.get("54e3deadbeefdeadbeef0000")).isNotPresent();
         assertThat(jobDefinitionService.get("54e3deadbeefdeadbeef0001")).isNotPresent();
@@ -440,10 +492,13 @@ public class EventDefinitionHandlerTest {
 
     @Test
     @MongoDBFixtures("event-processors-without-schedule.json")
+    @SuppressWarnings("MustBeClosedChecker")
     public void schedule() {
         assertThat(eventDefinitionService.get("54e3deadbeefdeadbeef0000")).isPresent();
         assertThat(jobDefinitionService.streamAll().count()).isEqualTo(0);
-        assertThat(jobTriggerService.all()).isEmpty();
+        try (var stream = jobTriggerService.streamAll()) {
+            assertThat(stream).isEmpty();
+        }
 
         handler.schedule("54e3deadbeefdeadbeef0000");
 
@@ -533,6 +588,7 @@ public class EventDefinitionHandlerTest {
         assertThat(jobTriggerService.get("61fbcca5b2507945cc120002")).isPresent();
     }
 
+    @ExtendWith(MongoDBExtension.class)
     static class TestEntityScope extends EntityScope {
         public static final String NAME = "TESTSCOPE";
 

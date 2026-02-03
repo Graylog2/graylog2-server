@@ -29,7 +29,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.threatintel.PluginConfigService;
 import org.graylog.plugins.threatintel.tools.AdapterDisabledException;
 import org.graylog2.plugin.lookup.LookupCachePurge;
@@ -153,7 +152,6 @@ public class TorExitNodeDataAdapter extends LookupDataAdapter {
     }
 
     @AutoValue
-    @WithBeanGetter
     @JsonAutoDetect
     @JsonDeserialize(builder = AutoValue_TorExitNodeDataAdapter_Config.Builder.class)
     @JsonTypeName(NAME)

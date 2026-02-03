@@ -20,37 +20,65 @@ import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizatio
 import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
 import type { InterpolationType } from 'views/Constants';
 import { DEFAULT_INTERPOLATION, interpolationTypes } from 'views/Constants';
-import type { AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
-import { axisTypes, DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import type { AxisType, ChartAxisConfig } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import {
+  DEFAULT_AXIS_CONFIG,
+  axisTypes,
+  DEFAULT_AXIS_TYPE,
+} from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import xyAxisConfigFields, { fromAxisConfig } from 'views/components/visualizations/xyAxisConfigFields';
 
 type AreaVisualizationConfigFormValues = {
   interpolation: InterpolationType;
-  axisType: AxisType,
+  axisType: AxisType;
+  axisConfig: ChartAxisConfig;
+  showAxisLabels: boolean;
 };
 
 const validate = hasAtLeastOneMetric('Area chart');
 
-const areaChart: VisualizationType<typeof AreaVisualization.type, AreaVisualizationConfig, AreaVisualizationConfigFormValues> = {
+const areaChart: VisualizationType<
+  typeof AreaVisualization.type,
+  AreaVisualizationConfig,
+  AreaVisualizationConfigFormValues
+> = {
   type: AreaVisualization.type,
   displayName: 'Area Chart',
   component: AreaVisualization,
   config: {
-    createConfig: () => ({ interpolation: DEFAULT_INTERPOLATION, axisType: DEFAULT_AXIS_TYPE }),
-    fromConfig: (config: AreaVisualizationConfig) => ({ interpolation: config?.interpolation, axisType: config?.axisType }),
-    toConfig: (formValues: AreaVisualizationConfigFormValues) => AreaVisualizationConfig.create(formValues.interpolation, formValues.axisType),
-    fields: [{
-      name: 'interpolation',
-      title: 'Interpolation',
-      type: 'select',
-      options: interpolationTypes,
-      required: true,
-    }, {
-      name: 'axisType',
-      title: 'Axis Type',
-      type: 'select',
-      options: axisTypes,
-      required: true,
-    }],
+    createConfig: () => ({
+      interpolation: DEFAULT_INTERPOLATION,
+      axisType: DEFAULT_AXIS_TYPE,
+      axisConfig: DEFAULT_AXIS_CONFIG,
+    }),
+    fromConfig: (config: AreaVisualizationConfig) => ({
+      interpolation: config?.interpolation,
+      axisType: config?.axisType,
+      ...fromAxisConfig(config),
+    }),
+    toConfig: (formValues: AreaVisualizationConfigFormValues) =>
+      AreaVisualizationConfig.create(
+        formValues.interpolation,
+        formValues.axisType,
+        formValues.showAxisLabels ? formValues.axisConfig : DEFAULT_AXIS_CONFIG,
+      ),
+    fields: [
+      {
+        name: 'interpolation',
+        title: 'Interpolation',
+        type: 'select',
+        options: interpolationTypes,
+        required: true,
+      },
+      {
+        name: 'axisType',
+        title: 'Axis Type',
+        type: 'select',
+        options: axisTypes,
+        required: true,
+      },
+      ...xyAxisConfigFields,
+    ],
   },
   capabilities: ['event-annotations'],
   validate,

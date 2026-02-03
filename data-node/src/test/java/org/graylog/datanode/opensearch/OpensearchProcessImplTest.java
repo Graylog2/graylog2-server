@@ -18,6 +18,7 @@ package org.graylog.datanode.opensearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
+import org.assertj.core.api.Assertions;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
@@ -29,33 +30,42 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.ClusterClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
-import org.graylog2.cluster.nodes.DataNodeDto;
-import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.datanode.DataNodeNotficationEvent;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import oshi.hardware.GlobalMemory;
+import oshi.hardware.PhysicalMemory;
+import oshi.hardware.VirtualMemory;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class OpensearchProcessImplTest {
 
     OpensearchProcessImpl opensearchProcess;
@@ -65,8 +75,6 @@ public class OpensearchProcessImplTest {
     private CustomCAX509TrustManager trustmManager;
     @Mock
     private Configuration configuration;
-    @Mock
-    private NodeService<DataNodeDto> nodeService;
     @Mock
     private ObjectMapper objectMapper;
     @Mock
@@ -80,13 +88,15 @@ public class OpensearchProcessImplTest {
     RestHighLevelClient restClient;
     @Mock
     ClusterClient clusterClient;
+    @Mock
+    ClusterEventBus clusterEventBus;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         when(datanodeConfiguration.processLogsBufferSize()).thenReturn(100);
         when(configuration.getDatanodeNodeName()).thenReturn(nodeName);
         this.opensearchProcess = spy(new OpensearchProcessImpl(datanodeConfiguration, trustmManager, configuration,
-                nodeService, objectMapper, processState, nodeId, eventBus));
+                objectMapper, processState, nodeId, eventBus, clusterEventBus));
         when(opensearchProcess.restClient()).thenReturn(Optional.of(restClient));
         when(restClient.cluster()).thenReturn(clusterClient);
     }
@@ -134,4 +144,63 @@ public class OpensearchProcessImplTest {
         verify(executor).shutdown();
     }
 
+    @Test
+    public void testHeapThresholdWarning() {
+        when(configuration.getHostname()).thenReturn("datanode");
+        when(configuration.getOpensearchHeap()).thenReturn("1g");
+        when(opensearchProcess.getGlobalMemory()).thenReturn(mockMemory(gigabytes(8), gigabytes(16)));
+        opensearchProcess.checkConfiguredHeap();
+        verify(clusterEventBus, times(1)).post(any(DataNodeNotficationEvent.class));
+    }
+
+    @Test
+    public void testNoHeapThresholdWarning() {
+        when(configuration.getOpensearchHeap()).thenReturn("1g");
+        when(opensearchProcess.getGlobalMemory()).thenReturn(mockMemory(gigabytes(2), gigabytes(3)));
+        opensearchProcess.checkConfiguredHeap();
+        verifyNoInteractions(clusterEventBus);
+    }
+
+    private GlobalMemory mockMemory(long availableMemory, long totalMemory) {
+        return new GlobalMemory() {
+
+            @Override
+            public long getTotal() {
+                return totalMemory;
+            }
+
+            @Override
+            public long getAvailable() {
+                return availableMemory;
+            }
+
+            @Override
+            public long getPageSize() {
+                throw new UnsupportedOperationException("Not supported here");
+            }
+
+            @Override
+            public VirtualMemory getVirtualMemory() {
+                throw new UnsupportedOperationException("Not supported here");
+            }
+
+            @Override
+            public List<PhysicalMemory> getPhysicalMemory() {
+                throw new UnsupportedOperationException("Not supported here");
+            }
+        };
+    }
+
+    private static long gigabytes(int i) {
+        return i * 1024 * 1024 * 1024L;
+    }
+
+    @Test
+    public void recommendedMemorySettingValue() {
+        Assertions.assertThat(OpensearchProcessImpl.recommendedMemorySetting("7 GB"))
+                .isEqualTo("7g");
+
+        Assertions.assertThat(OpensearchProcessImpl.recommendedMemorySetting("512 MB"))
+                .isEqualTo("512m");
+    }
 }

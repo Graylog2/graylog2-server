@@ -18,39 +18,26 @@ package org.graylog2.indexer.datanode;
 
 import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.cluster.lock.Lock;
 import org.graylog2.cluster.lock.MongoLockService;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.database.MongoConnection;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.system.SimpleNodeId;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@ExtendWith(MongoDBExtension.class)
 class DatanodeMigrationLockServiceImplTest {
 
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @BeforeEach
-    void setUp() {
-        mongodb.start();
-    }
-
-    @AfterEach
-    void tearDown() {
-        mongodb.close();
-    }
-
-
-
     @Test
-    void testLockingTwoCallers() {
-        final MongoLockService lockService = new MongoLockService(new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"), mongodb.mongoConnection(), Duration.ofSeconds(5));
+    void testLockingTwoCallers(MongoConnection mongoConnection) throws InterruptedException {
+        final MongoLockService lockService = new MongoLockService(new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"), mongoConnection, Duration.ofSeconds(5));
         final DatanodeMigrationLockServiceImpl datanodeMigrationLockService = new DatanodeMigrationLockServiceImpl(lockService);
 
         final IndexSet indexSet = mockIndexSet("set-A");
@@ -69,8 +56,8 @@ class DatanodeMigrationLockServiceImplTest {
     }
 
     @Test
-    void testOneCallerTwoTasks() {
-        final MongoLockService lockService = new MongoLockService(new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"), mongodb.mongoConnection(), Duration.ofSeconds(5));
+    void testOneCallerTwoTasks(MongoConnection mongoConnection) throws InterruptedException {
+        final MongoLockService lockService = new MongoLockService(new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"), mongoConnection, Duration.ofSeconds(5));
         final DatanodeMigrationLockServiceImpl datanodeMigrationLockService = new DatanodeMigrationLockServiceImpl(lockService);
 
         final IndexSet indexSet = mockIndexSet("set-A");

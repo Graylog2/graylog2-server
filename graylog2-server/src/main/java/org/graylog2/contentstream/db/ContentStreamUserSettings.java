@@ -19,6 +19,7 @@ package org.graylog2.contentstream.db;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.database.MongoEntity;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -27,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @AutoValue
-public abstract class ContentStreamUserSettings {
+public abstract class ContentStreamUserSettings implements MongoEntity {
 
     public static final String FIELD_USER_ID = "user_id";
     public static final String FIELD_CONTENT_ENABLED = "content_stream_enabled";
@@ -39,7 +40,7 @@ public abstract class ContentStreamUserSettings {
     }
 
     @JsonCreator
-    public static ContentStreamUserSettings create(@JsonProperty("id") @Id @ObjectId String id,
+    public static ContentStreamUserSettings create(@JsonProperty(FIELD_ID) @Id @ObjectId String id,
                                                    @JsonProperty(FIELD_USER_ID) String userId,
                                                    @JsonProperty(FIELD_CONTENT_ENABLED) Boolean contentStreamEnabled,
                                                    @JsonProperty(FIELD_RELEASES_ENABLED) Boolean releasesEnabled,
@@ -57,7 +58,7 @@ public abstract class ContentStreamUserSettings {
     @Id
     @ObjectId
     @Nullable
-    @JsonProperty
+    @JsonProperty(FIELD_ID)
     public abstract String id();
 
     @JsonProperty(FIELD_USER_ID)

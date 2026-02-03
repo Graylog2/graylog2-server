@@ -18,24 +18,25 @@ import styled, { css } from 'styled-components';
 
 import { Switch } from 'components/common';
 
-const DestinationSwitch = styled(Switch)(({ theme }) => css`
-  > label {
-    margin-bottom: 0;
-  }
-
-  .mantine-Switch-input[disabled] + .mantine-Switch-track {
-    background: ${theme.colors.gray[90]};
-
-    .mantine-Switch-thumb {
-      background: ${theme.colors.gray[40]};
-      border-color: ${theme.colors.gray[40]};
+const DestinationSwitch = styled(Switch)(
+  ({ theme }) => css`
+    > label {
+      margin-bottom: 0;
     }
-  }
 
+    .mantine-Switch-input[disabled] + .mantine-Switch-track {
+      background: ${theme.colors.gray[90]};
 
-  .mantine-Switch-label[data-disabled] { 
-    color: ${theme.colors.text.primary};
-  }
-`);
+      .mantine-Switch-thumb {
+        background: ${theme.colors.gray[40]};
+        border-color: ${theme.colors.gray[40]};
+      }
+    }
+
+    .mantine-Switch-label[data-disabled] {
+      color: ${theme.colors.text.primary};
+    }
+  `,
+);
 
 export default DestinationSwitch;

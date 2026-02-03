@@ -30,14 +30,18 @@ import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import useStreams from 'components/streams/hooks/useStreams';
 import useSavedSearches from 'views/hooks/useSavedSearches';
 import type { SettingsFormValues } from 'components/users/UserEdit/SettingsSection';
+import { hasAdminPermission } from 'util/PermissionsMixin';
+import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 
 const Container = styled.div`
   display: flex;
   align-items: center;
+  justify-content: space-between;
 `;
 
 const TypeSelect = styled(Select)`
-  width: 200px;
+  flex: 1;
+  min-width: 200px;
   margin-right: 3px;
 `;
 
@@ -52,12 +56,12 @@ const ResetBtn = styled(Button)`
 type Props = {
   userId: string;
   permissions: Immutable.List<string>;
-}
+};
 
 type Option = {
   value: string;
   label: string;
-}
+};
 
 // We cannot ask for all since the backend did not implement something like this. So for now its 10000.
 const UNLIMITED_ENTITY_SHARE_REQ = { page: 1, perPage: 10000, query: '' };
@@ -70,19 +74,28 @@ const typeOptions = [
   { value: 'search', label: 'Search' },
 ];
 
-const ADMIN_PERMISSION = '*';
-
 const useStartPageOptions = (userId, permissions) => {
-  const { values: { startpage } } = useFormikContext<SettingsFormValues>();
-  const selectedUserIsAdmin = permissions.includes(ADMIN_PERMISSION);
+  const {
+    values: { startpage },
+  } = useFormikContext<SettingsFormValues>();
+  const selectedUserIsAdmin = hasAdminPermission(permissions);
   const [userDashboards, setUserDashboards] = useState<Option[]>([]);
   const [userStreams, setUserStreams] = useState<Option[]>([]);
   const [userSearches, setUserSearches] = useState<Option[]>([]);
   const [isLoadingUserEntities, setIsLoadingUserEntities] = useState(false);
 
-  const { data: allDashboards, isInitialLoading: isLoadingAllDashboards } = useDashboards({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' }, scope: 'read' }, { enabled: selectedUserIsAdmin });
-  const { data: allStreams, isInitialLoading: isLoadingAllStreams } = useStreams({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
-  const { data: allSearches, isInitialLoading: isLoadingAllSearches } = useSavedSearches({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
+  const { data: allDashboards, isInitialLoading: isLoadingAllDashboards } = useDashboards(
+    { query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' }, scope: 'read' },
+    { enabled: selectedUserIsAdmin },
+  );
+  const { data: allStreams, isInitialLoading: isLoadingAllStreams } = useStreams(
+    { query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } },
+    { enabled: selectedUserIsAdmin },
+  );
+  const { data: allSearches, isInitialLoading: isLoadingAllSearches } = useSavedSearches(
+    { query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } },
+    { enabled: selectedUserIsAdmin },
+  );
   const allDashboardsOptions = (allDashboards?.list ?? []).map(({ id, title }) => ({ value: id, label: title }));
   const allStreamsOptions = (allStreams?.list ?? []).map(({ id, title }) => ({ value: id, label: title }));
   const allSearchesOptions = (allSearches?.list ?? []).map(({ id, title }) => ({ value: id, label: title }));
@@ -94,23 +107,31 @@ const useStartPageOptions = (userId, permissions) => {
       EntityShareDomain.loadUserSharesPaginated(userId, {
         ...UNLIMITED_ENTITY_SHARE_REQ,
         additionalQueries: { entity_type: 'dashboard' },
-      }).then(({ list }) => setUserDashboards(list.map(_grnOptionFormatter).toArray()))
-        .then(() => EntityShareDomain.loadUserSharesPaginated(userId, {
-          ...UNLIMITED_ENTITY_SHARE_REQ,
-          additionalQueries: { entity_type: 'stream' },
-        }).then(({ list }) => {
-          setUserStreams(list.map(_grnOptionFormatter).toArray());
-        })).then(() => EntityShareDomain.loadUserSharesPaginated(userId, {
-          ...UNLIMITED_ENTITY_SHARE_REQ,
-          additionalQueries: { entity_type: 'search' },
-        }).then(({ list }) => {
-          setIsLoadingUserEntities(false);
-          setUserSearches(list.map(_grnOptionFormatter).toArray());
-        }));
+      })
+        .then(({ list }) => setUserDashboards(list.map(_grnOptionFormatter).toArray()))
+        .then(() =>
+          EntityShareDomain.loadUserSharesPaginated(userId, {
+            ...UNLIMITED_ENTITY_SHARE_REQ,
+            additionalQueries: { entity_type: 'stream' },
+          }).then(({ list }) => {
+            setUserStreams(list.map(_grnOptionFormatter).toArray());
+          }),
+        )
+        .then(() =>
+          EntityShareDomain.loadUserSharesPaginated(userId, {
+            ...UNLIMITED_ENTITY_SHARE_REQ,
+            additionalQueries: { entity_type: 'search' },
+          }).then(({ list }) => {
+            setIsLoadingUserEntities(false);
+            setUserSearches(list.map(_grnOptionFormatter).toArray());
+          }),
+        );
     }
   }, [selectedUserIsAdmin, userId]);
 
   const prepareOptions = () => {
+    if (!startpage) return [];
+
     switch (startpage?.type) {
       case 'dashboard':
         return [...userDashboards, ...allDashboardsOptions];
@@ -130,7 +151,11 @@ const useStartPageOptions = (userId, permissions) => {
 };
 
 const StartpageFormGroup = ({ userId, permissions }: Props) => {
+  const {
+    data: { valid: validSecurityLicense },
+  } = usePluggableLicenseCheck('/license/security');
   const { options, isLoading } = useStartPageOptions(userId, permissions);
+  const securityOverviewOption = { value: 'graylog_security_welcome', label: 'Security Overview' };
 
   if (isLoading) {
     return <Spinner />;
@@ -139,37 +164,47 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
   return (
     <Field name="startpage">
       {({ field: { name, value, onChange }, meta }) => {
-        const type = value?.type ?? 'dashboard';
+        const type = value?.type;
 
-        const error = value?.id && options.findIndex(({ value: v }) => v === value.id) < 0
-          ? <Alert bsStyle="warning">User is missing permission for the configured page</Alert>
-          : null;
+        const error =
+          value?.id && options.findIndex(({ value: v }) => v === value.id) < 0 ? (
+            <Alert bsStyle="warning">User is missing permission for the configured page</Alert>
+          ) : null;
 
-        const resetBtn = value?.type
-          ? (
-            <ResetBtn onClick={() => onChange({ target: { name, value: {} } })}>
-              Reset
-            </ResetBtn>
-          )
-          : null;
+        const resetBtn = value?.type ? (
+          <ResetBtn onClick={() => onChange({ target: { name, value: null } })}>Reset</ResetBtn>
+        ) : null;
 
         return (
-          <Input id="startpage"
-                 label="Start page"
-                 help="Select the page the user sees right after log in. Only entities are selectable which the user has permissions for."
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-9"
-                 error={meta?.error}>
+          <Input
+            id="startpage"
+            label="Start page"
+            help="Select the page the user sees right after log in. Only entities are selectable which the user has permissions for."
+            labelClassName="col-sm-3"
+            wrapperClassName="col-sm-9"
+            error={meta?.error}>
             <>
               <Container>
-                <TypeSelect options={typeOptions}
-                            placeholder="Select type"
-                            onChange={(newType) => onChange({ target: { name, value: { type: newType, id: undefined } } })}
-                            value={value?.type} />
-                <ValueSelect options={options}
-                             placeholder={`Select ${value?.type ?? 'entity'}`}
-                             onChange={(newId) => onChange({ target: { name, value: { type: type, id: newId } } })}
-                             value={value?.id} />
+                <TypeSelect
+                  options={validSecurityLicense ? [...typeOptions, securityOverviewOption] : typeOptions}
+                  placeholder="Select type"
+                  onChange={(newType) => {
+                    if (!newType) {
+                      onChange({ target: { name, value: null } });
+                    } else {
+                      onChange({ target: { name, value: { type: newType, id: undefined } } });
+                    }
+                  }}
+                  value={value?.type}
+                />
+                {value?.type !== 'graylog_security_welcome' && (
+                  <ValueSelect
+                    options={options}
+                    placeholder={`Select ${value?.type ?? 'entity'}`}
+                    onChange={(newId) => onChange({ target: { name, value: { type: type, id: newId } } })}
+                    value={value?.id}
+                  />
+                )}
                 {resetBtn}
               </Container>
               {error}

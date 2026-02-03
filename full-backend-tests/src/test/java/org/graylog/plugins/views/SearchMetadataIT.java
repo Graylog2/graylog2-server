@@ -18,8 +18,8 @@ package org.graylog.plugins.views;
 
 import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.io.InputStream;
@@ -30,20 +30,17 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ContainerMatrixTestsConfiguration
+@GraylogBackendConfiguration
 public class SearchMetadataIT {
-    private final GraylogApis api;
-
-    public SearchMetadataIT(GraylogApis api) {
-        this.api = api;
-    }
+    private static GraylogApis api;
 
     @BeforeAll
-    public void importMongoFixtures() {
-        this.api.backend().importMongoDBFixture("mongodb-stored-searches-for-metadata-endpoint.json", SearchMetadataIT.class);
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
+        api.backend().importMongoDBFixture("mongodb-stored-searches-for-metadata-endpoint.json", SearchMetadataIT.class);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testEmptyRequest() {
         given()
                 .spec(api.requestSpecification())
@@ -54,7 +51,7 @@ public class SearchMetadataIT {
                 .assertThat().body("message[0]", equalTo("Search body is mandatory"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testMinimalRequestWithoutParameter() {
         final ValidatableResponse response = given()
                 .spec(api.requestSpecification())
@@ -68,7 +65,7 @@ public class SearchMetadataIT {
         response.assertThat().body("declared_parameters", anEmptyMap());
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testMinimalRequestWithSingleParameter() {
         final ValidatableResponse response = given()
                 .spec(api.requestSpecification())
@@ -82,7 +79,7 @@ public class SearchMetadataIT {
         response.assertThat().body("declared_parameters", anEmptyMap());
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testRetrievingMetadataForStoredSearchWithoutParameter() {
         final ValidatableResponse response = given()
                 .spec(api.requestSpecification())
@@ -95,7 +92,7 @@ public class SearchMetadataIT {
         response.assertThat().body("declared_parameters", anEmptyMap());
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testRetrievingMetadataForStoredSearchWithParameter() {
         final ValidatableResponse response = given()
                 .spec(api.requestSpecification())

@@ -33,12 +33,14 @@ const CopyPageToDashboard = (queryId: string, sourceDashboard: View, targetDashb
   const newQueries = targetDashboard.search.queries.add(newQuery);
   const newSearch = targetDashboard.search.toBuilder().queries(newQueries).build();
 
-  const updatedDashboard = UpdateSearchForWidgets(targetDashboard.toBuilder()
-    .state(newState)
-    .search(newSearch)
-    .build());
+  const updatedDashboard = UpdateSearchForWidgets(
+    targetDashboard.toBuilder().state(newState).search(newSearch).build(),
+  );
 
-  return copyHooks.reduce((previousDashboard, copyHook) => copyHook(sourceDashboard, previousDashboard), updatedDashboard);
+  return copyHooks.reduce(
+    (previousDashboard, copyHook) => copyHook(sourceDashboard, previousDashboard),
+    updatedDashboard,
+  );
 };
 
 export default CopyPageToDashboard;

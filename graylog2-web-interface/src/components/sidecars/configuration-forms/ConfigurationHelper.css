@@ -1,33 +1,33 @@
 :local(.marginQuickReferenceText) {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
 :local(.marginTab) {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 :local(.exampleFunction) {
-    white-space: pre-wrap;
+  white-space: pre-wrap;
 }
 
 .panel-body h3 {
-    margin-bottom: 5px;
+  margin-bottom: 5px;
 }
 
 :local(.tableMaxHeight) {
-	max-height: 400px;
+  max-height: 400px;
 }
 
 :local(.monoSpaceFont) {
-    font-family: "Roboto Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-family: 'Roboto Mono', Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 :local(.ulStyle) {
-    list-style-type: disc;
-    padding-left: 20px;
-    padding-top: 20px;
+  list-style-type: disc;
+  padding-left: 20px;
+  padding-top: 20px;
 }
 
 :local(.actionsColumn) {
-    width: 120px;
+  width: 120px;
 }

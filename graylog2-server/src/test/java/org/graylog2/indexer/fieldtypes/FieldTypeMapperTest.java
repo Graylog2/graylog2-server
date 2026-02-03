@@ -16,8 +16,8 @@
  */
 package org.graylog2.indexer.fieldtypes;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
@@ -33,7 +33,7 @@ public class FieldTypeMapperTest {
             .properties(Collections.singleton(FieldTypeDTO.Properties.FIELDDATA))
             .build();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.mapper = new FieldTypeMapper();
     }

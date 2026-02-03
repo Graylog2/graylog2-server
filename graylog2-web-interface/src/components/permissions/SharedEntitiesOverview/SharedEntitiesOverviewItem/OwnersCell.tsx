@@ -16,21 +16,33 @@
  */
 
 import * as React from 'react';
+import styled from 'styled-components';
 
-import { isPermitted } from 'util/PermissionsMixin';
 import type Grantee from 'logic/permissions/Grantee';
 import { Link } from 'components/common/router';
+import { RestrictedAccessTooltip } from 'components/common';
 import { defaultCompare } from 'logic/DefaultCompare';
-import useCurrentUser from 'hooks/useCurrentUser';
 import type { GranteesList } from 'logic/permissions/EntityShareState';
 import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
+import { isPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { getValuesFromGRN } from 'logic/permissions/GRN';
 
 type Props = {
-  owners: GranteesList,
+  owners: GranteesList;
 };
 
-const TitleWithLink = ({ title, entityId }: { title: string, entityId: string }) => {
-  const entityRoute = useShowRouteFromGRN(entityId);
+const OwnerList = styled.div`
+  display: flex;
+`;
+
+const OwnerTitleWrapper = styled.span`
+  display: flex;
+  align-items: center;
+`;
+
+const TitleWithLink = ({ title, entityGrn }: { title: string; entityGrn: string }) => {
+  const entityRoute = useShowRouteFromGRN(entityGrn);
 
   return <Link to={entityRoute}>{title}</Link>;
 };
@@ -40,21 +52,32 @@ const assertUnreachable = (type: 'error'): never => {
 };
 
 type OwnerTitleProps = {
-  owner: Grantee
-}
+  owner: Grantee;
+};
 
-const OwnerTitle = ({ owner: { type, id, title } }: OwnerTitleProps) => {
+const OwnerTitle = ({ owner: { type, id: grn, title } }: OwnerTitleProps) => {
   const currentUser = useCurrentUser();
+  const { id: ownerId } = getValuesFromGRN(grn);
 
   switch (type) {
     case 'user':
-      if (!isPermitted(currentUser.permissions, 'users:list')) return <span>{title}</span>;
+      if (!isPermitted(currentUser.permissions, `users:edit:${ownerId}`))
+        return (
+          <OwnerTitleWrapper>
+            {title} <RestrictedAccessTooltip entityName={type} capabilityName="view" />
+          </OwnerTitleWrapper>
+        );
 
-      return <TitleWithLink entityId={id} title={title} />;
+      return <TitleWithLink title={title} entityGrn={grn} />;
     case 'team':
-      if (!isPermitted(currentUser.permissions, 'teams:list')) return <span>{title}</span>;
+      if (!isPermitted(currentUser.permissions, `team:edit:${ownerId}`))
+        return (
+          <OwnerTitleWrapper>
+            {title} <RestrictedAccessTooltip entityName={type} capabilityName="view" />
+          </OwnerTitleWrapper>
+        );
 
-      return <TitleWithLink entityId={id} title={title} />;
+      return <TitleWithLink title={title} entityGrn={grn} />;
     case 'global':
       return <span>Everyone</span>;
     default:
@@ -67,16 +90,20 @@ const OwnersCell = ({ owners }: Props) => {
 
   return (
     <td className="limited">
-      {sortedOwners.map((owner, index) => {
-        const isLast = index >= owners.size - 1;
+      <OwnerList>
+        {sortedOwners
+          .map((owner, index) => {
+            const isLast = index >= owners.size - 1;
 
-        return (
-          <React.Fragment key={owner.id}>
-            <OwnerTitle owner={owner} />
-            {!isLast && ', '}
-          </React.Fragment>
-        );
-      }).toArray()}
+            return (
+              <React.Fragment key={owner.id}>
+                <OwnerTitle owner={owner} />
+                {!isLast && <>, &nbsp;</>}
+              </React.Fragment>
+            );
+          })
+          .toArray()}
+      </OwnerList>
     </td>
   );
 };

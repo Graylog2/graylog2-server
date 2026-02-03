@@ -14,44 +14,46 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import type {
-  IndexSetTemplate,
-} from 'components/indices/IndexSetTemplates/types';
+import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
+import { defaultOnError } from 'util/conditional/onError';
 
 const fetchBuiltInIndexSetTemplates = async (warmTierEnabled: boolean) => {
   const url = qualifyUrl(`/system/indices/index_sets/templates/built-in?warm_tier_enabled=${warmTierEnabled}`);
 
-  return fetch('GET', url).then((data: Readonly<Array<IndexSetTemplate>>) => (data));
+  return fetch('GET', url).then((data: Readonly<Array<IndexSetTemplate>>) => data);
 };
 
-const useBuiltInTemplates = (warmTierEnabled: boolean, { enabled } = { enabled: true }): {
-  data: Readonly<Array<IndexSetTemplate>>,
-  isLoading: boolean,
-  refetch: () => void,
+const useBuiltInTemplates = (
+  warmTierEnabled: boolean,
+  { enabled } = { enabled: true },
+): {
+  data: Readonly<Array<IndexSetTemplate>>;
+  isLoading: boolean;
+  refetch: () => void;
 } => {
-  const { data, isLoading, refetch } = useQuery(
-    ['indexSetTemplatesBuiltIn', warmTierEnabled],
-    () => fetchBuiltInIndexSetTemplates(warmTierEnabled),
-    {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading built in index set templates failed with status: ${errorThrown}`,
-          'Could not load built in index set templates');
-      },
-      keepPreviousData: true,
-      enabled,
-    },
-  );
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['indexSetTemplatesBuiltIn', warmTierEnabled],
 
-  return ({
+    queryFn: () =>
+      defaultOnError(
+        fetchBuiltInIndexSetTemplates(warmTierEnabled),
+        'Loading built in index set templates failed with status',
+        'Could not load built in index set templates',
+      ),
+
+    placeholderData: keepPreviousData,
+    enabled,
+  });
+
+  return {
     data: data ?? [],
     isLoading,
     refetch,
-  });
+  };
 };
 
 export default useBuiltInTemplates;

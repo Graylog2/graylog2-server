@@ -17,11 +17,9 @@
 import React from 'react';
 
 type TooltipProps = {
- children: any;
+  children: any;
 };
 
-const Tooltip = ({
-  children,
-}: TooltipProps) => <>{children}</>;
+const Tooltip = ({ children }: TooltipProps) => <>{children}</>;
 
 export default Tooltip;

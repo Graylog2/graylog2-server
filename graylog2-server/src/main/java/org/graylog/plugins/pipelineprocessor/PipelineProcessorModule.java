@@ -18,6 +18,8 @@ package org.graylog.plugins.pipelineprocessor;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineService;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
 import org.graylog.plugins.pipelineprocessor.functions.ProcessorFunctionsModule;
 import org.graylog.plugins.pipelineprocessor.periodical.LegacyDefaultStreamMigration;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
@@ -29,6 +31,7 @@ import org.graylog.plugins.pipelineprocessor.rest.RuleResource;
 import org.graylog.plugins.pipelineprocessor.rest.SimulatorResource;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderModule;
 import org.graylog2.plugin.PluginModule;
+import org.graylog2.plugin.quickjump.QuickJumpProvider;
 
 public class PipelineProcessorModule extends PluginModule {
     @Override
@@ -54,5 +57,10 @@ public class PipelineProcessorModule extends PluginModule {
         install(new FactoryModuleBuilder().build(PipelineResolver.Factory.class));
 
         addAuditEventTypes(PipelineProcessorAuditEventTypes.class);
+
+        addQuickJumpProvider(QuickJumpProvider.create("pipeline", MongoDbPipelineService.COLLECTION,
+                (id, user) -> user.isPermitted(PipelineRestPermissions.PIPELINE_READ, id)));
+        addQuickJumpProvider(QuickJumpProvider.create("pipeline_rule", MongoDbRuleService.COLLECTION,
+                (id, user) -> user.isPermitted(PipelineRestPermissions.PIPELINE_RULE_READ, id)));
     }
 }

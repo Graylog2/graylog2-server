@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
@@ -24,12 +24,12 @@ import { testView2, undoRedoTestStore } from 'fixtures/undoRedo';
 import UndoNavItem from 'views/components/sidebar/undo/UndoNavItem';
 import mockDispatch from 'views/test/mockDispatch';
 import type { RootState } from 'views/types';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { undo } from 'views/logic/slices/undoRedoActions';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
 
 jest.mock('views/logic/slices/undoRedoActions', () => ({
   ...jest.requireActual('views/logic/slices/undoRedoActions'),
@@ -48,7 +48,7 @@ describe('<UndoNavItem />', () => {
   const dispatch = mockDispatch({ view: { view: testView2, activeQuery: 'query-id-1' } } as RootState);
 
   beforeEach(() => {
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
     jest.clearAllMocks();
   });
 
@@ -57,7 +57,7 @@ describe('<UndoNavItem />', () => {
   it('Call Undo action on call', async () => {
     render(<RedoNavItemComponent />);
     const undoButton = await screen.findByLabelText('Undo');
-    fireEvent.click(undoButton);
+    await userEvent.click(undoButton);
 
     await waitFor(() => expect(undo).toHaveBeenCalled());
   });

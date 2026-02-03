@@ -22,10 +22,4 @@ const HostActivity = loadAsync(() => import('./HostActivity'));
 const NetworkActivity = loadAsync(() => import('./NetworkActivity'));
 const Anomalies = loadAsync(() => import('./Anomalies'));
 
-export {
-  Overview,
-  UserActivity,
-  HostActivity,
-  NetworkActivity,
-  Anomalies,
-};
+export { Overview, UserActivity, HostActivity, NetworkActivity, Anomalies };

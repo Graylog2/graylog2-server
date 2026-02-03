@@ -23,6 +23,8 @@ import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import type { StartPage } from 'logic/users/User';
 import ContentStreamContainer from 'components/content-stream/ContentStreamContainer';
+import useProductName from 'brand-customization/useProductName';
+import { hasAdminPermission } from 'util/PermissionsMixin';
 
 import LastOpenList from './LastOpenList';
 import FavoriteItemsList from './FavoriteItemsList';
@@ -35,39 +37,37 @@ const StyledSectionComponent = styled(SectionComponent)`
   flex-grow: 1;
 `;
 
-type HelperProps = { readOnly: boolean, userId: string, startpage: StartPage }
+type HelperProps = { readOnly: boolean; userId: string; startpage: StartPage };
 
 const ChangeStartPageHelper = ({ readOnly, userId, startpage }: HelperProps) => {
   const defaultPageIsDefined = startpage !== null;
 
   if (defaultPageIsDefined || readOnly) {
-    return (
-      <span>
-        This is your personal page, allowing easy access to the content most relevant for you.
-      </span>
-    );
+    return <span>This is your personal page, allowing easy access to the content most relevant for you.</span>;
   }
 
   return (
     <>
-      <span>
-        This is your personal start page, allowing easy access to the content most relevant for you.
-      </span>
+      <span>This is your personal start page, allowing easy access to the content most relevant for you.</span>
       <span>
         {' '}
-        You can change your personal start page on the <Link to={Routes.SYSTEM.USERS.edit(userId)}>edit profile</Link> page.
+        You can change your personal start page on the <Link to={Routes.SYSTEM.USERS.edit(userId)}>
+          edit profile
+        </Link>{' '}
+        page.
       </span>
     </>
   );
 };
 
 const Welcome = () => {
+  const productName = useProductName();
   const { permissions, readOnly, id: userId, startpage } = useCurrentUser();
-  const isAdmin = permissions.includes('*');
+  const isAdmin = hasAdminPermission(permissions);
 
   return (
     <>
-      <PageHeader title="Welcome to Graylog!">
+      <PageHeader title={`Welcome to ${productName}!`}>
         <ChangeStartPageHelper userId={userId} readOnly={readOnly} startpage={startpage} />
       </PageHeader>
       <SectionGrid>
@@ -83,7 +83,7 @@ const Welcome = () => {
       <StyledSectionComponent title="Recent Activity">
         <p className="description">
           {isAdmin
-            ? 'This list includes all actions Graylog users performed, like creating or sharing an entity.'
+            ? 'This list includes all actions users performed, like creating or sharing an entity.'
             : 'Overview of actions you made with entities or somebody else made with entities which relates to you, like creating or sharing an entity.'}
         </p>
         <RecentActivityList />

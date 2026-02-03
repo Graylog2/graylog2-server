@@ -26,7 +26,10 @@ class CancellablePromise<T> implements Promise<T> {
 
   [Symbol.toStringTag]: string;
 
-  then<TResult1 = T, TResult2 = never>(onfulfilled?: (value: T) => TResult1 | PromiseLike<TResult1>, onrejected?: (reason: any) => TResult2 | PromiseLike<TResult2>) {
+  then<TResult1 = T, TResult2 = never>(
+    onfulfilled?: (value: T) => TResult1 | PromiseLike<TResult1>,
+    onrejected?: (reason: any) => TResult2 | PromiseLike<TResult2>,
+  ) {
     return new CancellablePromise(this._promise.then(onfulfilled, onrejected), this._isCanceled);
   }
 

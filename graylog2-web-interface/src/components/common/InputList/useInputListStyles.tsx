@@ -58,7 +58,7 @@ const useInputListStyles = (size: 'small' | 'normal') => {
       ...(size === 'small' ? { minHeight: 29, height: 29 } : { minHeight: 34 }),
       borderRadius: INPUT_BORDER_RADIUS,
       alignItems: 'center',
-      borderColor: isValid ? provided.borderColor : inputListTheme.colors.brand.primary,
+      borderColor: isValid ? provided.borderColor : inputListTheme.colors.variant.danger,
     }),
     placeHolder: (provided: any) => ({
       ...provided,
@@ -79,7 +79,7 @@ const useInputListStyles = (size: 'small' | 'normal') => {
     }),
     multiValueLabel: (provided: any) => ({
       ...provided,
-      color: isValid ? provided.color : inputListTheme.colors.brand.primary,
+      color: isValid ? provided.color : inputListTheme.colors.variant.danger,
       padding: '2px 5px',
       fontSize: inputListTheme.fonts.size.small,
     }),

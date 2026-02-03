@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQueryClient, useMutation } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
@@ -22,38 +22,37 @@ import type { TableLayoutPreferences, TableLayoutPreferencesJSON } from 'compone
 import UserNotification from 'util/UserNotification';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 
-const preferencesToJSON = ({
-  displayedAttributes,
+const preferencesToJSON = <T>({
+  attributes,
   sort,
   perPage,
-}: TableLayoutPreferences): TableLayoutPreferencesJSON => ({
-  displayed_attributes: displayedAttributes,
+  customPreferences,
+  order,
+}: TableLayoutPreferences<T>): TableLayoutPreferencesJSON<T> => ({
+  attributes,
   sort: sort ? { order: sort.direction, field: sort.attributeId } : undefined,
   per_page: perPage,
+  custom_preferences: customPreferences,
+  order,
 });
 
-const useUpdateUserLayoutPreferences = (entityTableId: string) => {
-  const queryClient = useQueryClient();
-  const { data: userLayoutPreferences = {} } = useUserLayoutPreferences(entityTableId);
-  const action = (newPreferences: TableLayoutPreferences) => fetch(
-    'POST',
-    qualifyUrl(`/entitylists/preferences/${entityTableId}`),
-    preferencesToJSON({ ...userLayoutPreferences, ...newPreferences }),
-  );
-  const { mutate } = useMutation({
-    mutationFn: action,
+const useUpdateUserLayoutPreferences = <T>(entityTableId: string) => {
+  const { data: userLayoutPreferences = {}, refetch } = useUserLayoutPreferences(entityTableId);
+  const mutationFn = (newPreferences: TableLayoutPreferences<T>) =>
+    fetch(
+      'POST',
+      qualifyUrl(`/entitylists/preferences/${entityTableId}`),
+      preferencesToJSON({ ...userLayoutPreferences, ...newPreferences }),
+    );
+  const { mutateAsync } = useMutation({
+    mutationFn,
     onError: (error) => {
       UserNotification.error(`Updating table layout preferences failed with error: ${error}`);
     },
-    onMutate: (newTableLayout: TableLayoutPreferences) => {
-      queryClient.setQueriesData(['table-layout', entityTableId], (cur: TableLayoutPreferences) => ({
-        ...(cur ?? {}),
-        ...newTableLayout,
-      }));
-    },
+    onSuccess: () => refetch(),
   });
 
-  return { mutate };
+  return { mutateAsync };
 };
 
 export default useUpdateUserLayoutPreferences;

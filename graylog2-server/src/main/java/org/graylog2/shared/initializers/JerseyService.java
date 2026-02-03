@@ -106,7 +106,6 @@ import static java.util.Objects.requireNonNull;
 public class JerseyService extends AbstractIdleService {
     public static final String PLUGIN_PREFIX = "/plugins";
     private static final Logger LOG = LoggerFactory.getLogger(JerseyService.class);
-    private static final String RESOURCE_PACKAGE_WEB = "org.graylog2.web.resources";
 
     private final HttpConfiguration configuration;
     private final Set<Class<?>> systemRestResources;
@@ -253,16 +252,11 @@ public class JerseyService extends AbstractIdleService {
 
     private ResourceConfig buildResourceConfig(final boolean enableCors,
                                                final Set<Resource> additionalResources) {
-        final Map<String, String> packagePrefixes = ImmutableMap.of(
-                RESOURCE_PACKAGE_WEB, HttpConfiguration.PATH_WEB,
-                "", HttpConfiguration.PATH_API
-        );
-
         final ResourceConfig rc = new ResourceConfig()
                 .property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true)
                 .property(ServerProperties.WADL_FEATURE_DISABLE, true)
                 .property(ServerProperties.MEDIA_TYPE_MAPPINGS, mediaTypeMappings())
-                .register(new PrefixAddingModelProcessor(packagePrefixes))
+                .register(new PrefixAddingModelProcessor())
                 .register(new AuditEventModelProcessor(pluginAuditEventTypes))
                 .registerClasses(
                         ShiroSecurityContextFilter.class,

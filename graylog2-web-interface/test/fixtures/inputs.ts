@@ -1,0 +1,245 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+
+import type { InputStates } from 'hooks/useInputsStates';
+
+// eslint-disable-next-line import/prefer-default-export
+export const mockInputStates: InputStates = {
+  input1: {
+    node1: {
+      id: 'input1',
+      state: 'RUNNING',
+      detailed_message: null,
+      message_input: {
+        title: 'CEF UDP',
+        global: true,
+        name: 'CEF UDP',
+        content_pack: null,
+        id: 'input1',
+        created_at: '2025-10-16T12:29:53.157Z',
+        type: 'org.graylog.plugins.cef.input.CEFUDPInput',
+        creator_user_id: 'admin',
+        attributes: {
+          recv_buffer_size: 262144,
+          port: 5555,
+          number_worker_threads: 10,
+          timezone: 'Europe/Berlin',
+          locale: '',
+          bind_address: '0.0.0.0',
+          use_full_names: false,
+        },
+        static_fields: {},
+        node: null,
+      },
+    },
+    node2: {
+      id: 'input1',
+      state: 'FAILED',
+      detailed_message: null,
+      message_input: {
+        title: 'CEF UDP',
+        global: true,
+        name: 'CEF UDP',
+        content_pack: null,
+        id: 'input1',
+        created_at: '2025-10-16T12:29:53.157Z',
+        type: 'org.graylog.plugins.cef.input.CEFUDPInput',
+        creator_user_id: 'admin',
+        attributes: {
+          recv_buffer_size: 262144,
+          port: 5555,
+          number_worker_threads: 10,
+          timezone: 'Europe/Berlin',
+          locale: '',
+          bind_address: '0.0.0.0',
+          use_full_names: false,
+        },
+        static_fields: {},
+        node: null,
+      },
+    },
+  },
+  input2: {
+    node1: {
+      id: 'input2',
+      state: 'STOPPED',
+      detailed_message: null,
+      message_input: {
+        title: 'Test Beats',
+        global: true,
+        name: 'Beats',
+        content_pack: null,
+        id: 'input2',
+        created_at: '2025-10-16T12:24:57.370Z',
+        type: 'org.graylog.plugins.beats.Beats2Input',
+        creator_user_id: 'admin',
+        attributes: {
+          recv_buffer_size: 1048576,
+          tcp_keepalive: false,
+          number_worker_threads: 10,
+          tls_client_auth_cert_file: '',
+          bind_address: '0.0.0.0',
+          tls_cert_file: '',
+          port: 5044,
+          tls_key_file: '',
+          tls_enable: false,
+          tls_key_password: '',
+          tls_client_auth: 'disabled',
+          override_source: null,
+          charset_name: 'UTF-8',
+          no_beats_prefix: false,
+        },
+        static_fields: {},
+        node: null,
+      },
+    },
+    node2: {
+      id: 'input2',
+      state: 'SETUP',
+      detailed_message: null,
+      message_input: {
+        title: 'Test Beats',
+        global: true,
+        name: 'Beats',
+        content_pack: null,
+        id: 'input2',
+        created_at: '2025-10-16T12:24:57.370Z',
+        type: 'org.graylog.plugins.beats.Beats2Input',
+        creator_user_id: 'admin',
+        attributes: {
+          recv_buffer_size: 1048576,
+          tcp_keepalive: false,
+          number_worker_threads: 10,
+          tls_client_auth_cert_file: '',
+          bind_address: '0.0.0.0',
+          tls_cert_file: '',
+          port: 5044,
+          tls_key_file: '',
+          tls_enable: false,
+          tls_key_password: '',
+          tls_client_auth: 'disabled',
+          override_source: null,
+          charset_name: 'UTF-8',
+          no_beats_prefix: false,
+        },
+        static_fields: {},
+        node: null,
+      },
+    },
+  },
+  input3: {
+    node1: {
+      id: 'input3',
+      state: 'SETUP',
+      detailed_message: null,
+      message_input: {
+        title: 'Test AWS Security Lake Integrations',
+        global: true,
+        name: 'AWS Security Lake',
+        content_pack: null,
+        id: 'input3',
+        created_at: '2025-10-16T12:23:19.786Z',
+        type: 'org.graylog.enterprise.integrations.awssecuritylake.SecurityLakeInput',
+        creator_user_id: 'admin',
+        attributes: {
+          AWSSecurityLakeCodec: 'Test AWS Security Lake Integrations',
+          security_lake_queue_name: 'gl-security-lake',
+          polling_time_unit: 'MINUTES',
+          aws_region: 'us-east-1',
+          throttling_allowed: false,
+          aws_access_key: 'AKIAW4PN4Y76SJS3ISVQ',
+          assume_role_arn: 'arn:aws:iam::473482184701:role/s3-assume-role',
+          aws_secret_key: {
+            is_set: true,
+          },
+          store_full_message: true,
+          polling_interval: 1,
+        },
+        static_fields: {},
+        node: null,
+      },
+    },
+    node2: {
+      id: 'input3',
+      state: 'SETUP',
+      detailed_message: null,
+      message_input: {
+        title: 'Test AWS Security Lake Integrations',
+        global: true,
+        name: 'AWS Security Lake',
+        content_pack: null,
+        id: 'input3',
+        created_at: '2025-10-16T12:23:19.786Z',
+        type: 'org.graylog.enterprise.integrations.awssecuritylake.SecurityLakeInput',
+        creator_user_id: 'admin',
+        attributes: {
+          AWSSecurityLakeCodec: 'Test AWS Security Lake Integrations',
+          security_lake_queue_name: 'gl-security-lake',
+          polling_time_unit: 'MINUTES',
+          aws_region: 'us-east-1',
+          throttling_allowed: false,
+          aws_access_key: 'AKIAW4PN4Y76SJS3ISVQ',
+          assume_role_arn: 'arn:aws:iam::473482184701:role/s3-assume-role',
+          aws_secret_key: {
+            is_set: true,
+          },
+          store_full_message: true,
+          polling_interval: 1,
+        },
+        static_fields: {},
+        node: null,
+      },
+    },
+  },
+  input4: {
+    node1: {
+      id: 'input4',
+      state: 'STOPPED',
+      detailed_message: null,
+      message_input: {
+        title: 'SON path value from HTTP API',
+        global: true,
+        name: 'JSON path value from HTTP API',
+        content_pack: null,
+        id: 'input4',
+        created_at: '2025-10-16T12:35:22.217Z',
+        type: 'org.graylog2.inputs.misc.jsonpath.JsonPathInput',
+        creator_user_id: 'admin',
+        attributes: {
+          headers: '',
+          target_url: 'http://example.org/api',
+          encrypted_headers: {
+            is_set: false,
+          },
+          enable_flattening: false,
+          source: 'yourapi',
+          timeunit: 'MINUTES',
+          path: '$.store.book[1].number_of_orders',
+          http_method: 'GET',
+          content_type: '',
+          throttling_allowed: false,
+          http_body: '',
+          interval: 1,
+          override_source: null,
+          charset_name: 'UTF-8',
+        },
+        static_fields: {},
+        node: null,
+      },
+    },
+  },
+};

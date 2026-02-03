@@ -23,8 +23,8 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -38,7 +38,7 @@ public class JobScheduleStrategiesTest {
     private JobSchedulerTestClock clock;
     private JobScheduleStrategies strategies;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         DateTime dateTime = DateTime.parse("13/06/2022 15:13:59", DATE_FORMAT);
         DateTime dateTimeWithZone = dateTime.withZone(DateTimeZone.forID("UTC"));

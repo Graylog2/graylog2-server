@@ -17,24 +17,28 @@
 package org.graylog2.rest.resources.streams;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
@@ -56,22 +60,24 @@ import org.graylog.plugins.pipelineprocessor.rest.PipelineCompactSource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog.security.shares.CreateEntityRequest;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.DefaultFailureContextCreator;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.audit.jersey.SuccessContextCreator;
+import org.graylog2.database.MongoEntity;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
@@ -81,6 +87,7 @@ import org.graylog2.rest.bulk.BulkExecutor;
 import org.graylog2.rest.bulk.SequentialBulkExecutor;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.rest.bulk.model.BulkOperationResponse;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
@@ -91,14 +98,15 @@ import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.streams.requests.CloneStreamRequest;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import org.graylog2.rest.resources.streams.responses.StreamCreatedResponse;
+import org.graylog2.rest.resources.streams.responses.StreamDTOResponse;
 import org.graylog2.rest.resources.streams.responses.StreamListResponse;
 import org.graylog2.rest.resources.streams.responses.StreamResponse;
 import org.graylog2.rest.resources.streams.responses.TestMatchResponse;
 import org.graylog2.search.SearchQueryField;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.PaginatedStreamService;
-import org.graylog2.streams.StreamDTO;
 import org.graylog2.streams.StreamGuardException;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRouterEngine;
@@ -110,7 +118,6 @@ import org.joda.time.format.ISODateTimeFormat;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -118,6 +125,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -125,20 +133,20 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "Streams", description = "Manage streams", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Streams", description = "Manage streams")
 @Path("/streams")
 public class StreamResource extends RestResource {
-    private static final String DEFAULT_SORT_FIELD = StreamDTO.FIELD_TITLE;
+    private static final String DEFAULT_SORT_FIELD = StreamImpl.FIELD_TITLE;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
-            EntityAttribute.builder().id(StreamDTO.FIELD_ID).title("id").type(SearchQueryField.Type.OBJECT_ID).hidden(true).searchable(true).build(),
-            EntityAttribute.builder().id(StreamDTO.FIELD_TITLE).title("Title").searchable(true).build(),
-            EntityAttribute.builder().id(StreamDTO.FIELD_DESCRIPTION).title("Description").searchable(true).build(),
-            EntityAttribute.builder().id(StreamDTO.FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).filterable(true).build(),
-            EntityAttribute.builder().id(StreamDTO.FIELD_INDEX_SET_ID).title("Index set")
+            EntityAttribute.builder().id(StreamImpl.FIELD_ID).title("id").type(SearchQueryField.Type.OBJECT_ID).hidden(true).searchable(true).build(),
+            EntityAttribute.builder().id(StreamImpl.FIELD_TITLE).title("Title").searchable(true).build(),
+            EntityAttribute.builder().id(StreamImpl.FIELD_DESCRIPTION).title("Description").searchable(true).build(),
+            EntityAttribute.builder().id(StreamImpl.FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).filterable(true).build(),
+            EntityAttribute.builder().id(StreamImpl.FIELD_INDEX_SET_ID).title("Index set")
                     .relatedCollection(MongoIndexSetService.COLLECTION_NAME)
                     .hidden(true)
                     .filterable(true)
@@ -163,6 +171,7 @@ public class StreamResource extends RestResource {
     private final BulkExecutor<Stream, UserContext> bulkStreamStopExecutor;
     private final PipelineStreamConnectionsService pipelineStreamConnectionsService;
     private final PipelineService pipelineService;
+    private final EntitySharesService entitySharesService;
 
     private final DbQueryCreator dbQueryCreator;
 
@@ -176,7 +185,8 @@ public class StreamResource extends RestResource {
                           AuditEventSender auditEventSender,
                           MessageFactory messageFactory,
                           PipelineStreamConnectionsService pipelineStreamConnectionsService,
-                          PipelineService pipelineService) {
+                          PipelineService pipelineService,
+                          EntitySharesService entitySharesService) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.streamRouterEngineFactory = streamRouterEngineFactory;
@@ -185,6 +195,7 @@ public class StreamResource extends RestResource {
         this.messageFactory = messageFactory;
         this.pipelineStreamConnectionsService = pipelineStreamConnectionsService;
         this.pipelineService = pipelineService;
+        this.entitySharesService = entitySharesService;
         this.dbQueryCreator = new DbQueryCreator(StreamImpl.FIELD_TITLE, attributes);
         this.recentActivityService = recentActivityService;
         final SuccessContextCreator<Stream> successAuditLogContextCreator = (entity, entityClass) ->
@@ -200,16 +211,20 @@ public class StreamResource extends RestResource {
 
     @POST
     @Timed
-    @ApiOperation(value = "Create a stream", response = StreamCreatedResponse.class)
+    @Operation(summary = "Create a stream")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Create a stream successful",
+                    content = @Content(schema = @Schema(implementation = StreamCreatedResponse.class)))
+    })
     @RequiresPermissions(RestPermissions.STREAMS_CREATE)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.STREAM_CREATE)
-    public Response create(@ApiParam(name = "JSON body", required = true) final CreateStreamRequest cr,
+    public Response create(@RequestBody(required = true) final CreateEntityRequest<CreateStreamRequest> createEntityRequest,
                            @Context UserContext userContext) throws ValidationException {
+        final CreateStreamRequest cr = createEntityRequest.entity();
         // Create stream.
         final Stream stream = streamService.create(cr, getCurrentUser().getName());
-        stream.setDisabled(true);
 
         final IndexSet indexSet = stream.getIndexSet();
         checkIndexSet(indexSet);
@@ -219,40 +234,44 @@ public class StreamResource extends RestResource {
                 .collect(Collectors.toSet());
         final String id = streamService.saveWithRulesAndOwnership(stream, streamRules, userContext.getUser());
 
-        var result = new StreamCreatedResponse(id);
+        final StreamCreatedResponse result = new StreamCreatedResponse(id);
         final URI streamUri = getUriBuilderToSelf().path(StreamResource.class)
                 .path("{streamId}")
                 .build(id);
 
         recentActivityService.create(id, GRNTypes.STREAM, userContext.getUser());
+        createEntityRequest.shareRequest().ifPresent(shareRequest ->
+                entitySharesService.updateEntityShares(GRNTypes.STREAM, result.streamId(), shareRequest, userContext.getUser()));
+
         return Response.created(streamUri).entity(result).build();
     }
 
     @GET
     @Timed
     @Path("/paginated")
-    @ApiOperation(value = "Get a paginated list of streams")
+    @Operation(summary = "Get a paginated list of streams")
     @Produces(MediaType.APPLICATION_JSON)
-    public PageListResponse<StreamDTO> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                               @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                               @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                               @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
-                                               @ApiParam(name = "sort",
-                                                         value = "The field to sort the result on",
+    public PageListResponse<StreamDTOResponse> getPage(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                               @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                               @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                               @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
+                                               @Parameter(name = "sort",
+                                                         description = "The field to sort the result on",
                                                          required = true,
-                                                         allowableValues = "title,description,created_at,updated_at,status")
+                                                         schema = @Schema(allowableValues = {"id", "title", "description", "created_at"}))
                                                @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
-                                               @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                               @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") String order) {
+                                               @Parameter(name = "order", description = "The sort direction",
+                                                         schema = @Schema(allowableValues = {"asc", "desc"}))
+                                               @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
 
-        final Predicate<StreamDTO> permissionFilter = streamDTO -> isPermitted(RestPermissions.STREAMS_READ, streamDTO.id());
-        final PaginatedList<StreamDTO> result = paginatedStreamService
+        final Predicate<StreamImpl> permissionFilter = stream -> isPermitted(RestPermissions.STREAMS_READ, stream.id());
+        final PaginatedList<StreamImpl> result = paginatedStreamService
                 .findPaginated(dbQueryCreator.createDbQuery(filters, query), permissionFilter, page, perPage, sort, order);
 
-        final List<String> streamIds = result.stream().map(StreamDTO::id).toList();
+        final List<String> streamIds = result.stream().map(StreamImpl::id).toList();
         final Map<String, List<StreamRule>> streamRuleMap = streamRuleService.loadForStreamIds(streamIds);
 
-        final List<StreamDTO> streams = result
+        final List<StreamImpl> streams = result
                 .stream()
                 .map(streamDTO -> {
                     final List<StreamRule> rules = streamRuleMap.getOrDefault(streamDTO.id(), Collections.emptyList());
@@ -260,15 +279,15 @@ public class StreamResource extends RestResource {
                 })
                 .toList();
         final long total = paginatedStreamService.count();
-        final PaginatedList<StreamDTO> streamDTOS = new PaginatedList<>(
-                streams, result.pagination().total(), result.pagination().page(), result.pagination().perPage()
+        final PaginatedList<StreamDTOResponse> streamDTOS = new PaginatedList<>(
+                streams.stream().map(this::dtoToResponse).toList(), result.pagination().total(), result.pagination().page(), result.pagination().perPage()
         );
-        return PageListResponse.create(query, streamDTOS.pagination(), total, sort, order, streams, attributes, settings);
+        return PageListResponse.create(query, streamDTOS.pagination(), total, sort, order, streamDTOS, attributes, settings);
     }
 
     @GET
     @Timed
-    @ApiOperation(value = "Get a list of all streams")
+    @Operation(summary = "Get a list of all streams")
     @Deprecated
     @Produces(MediaType.APPLICATION_JSON)
     public StreamListResponse get() {
@@ -280,10 +299,48 @@ public class StreamResource extends RestResource {
         return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
     }
 
+    //TODO: remove this method when https://github.com/Graylog2/graylog-plugin-enterprise/issues/8610 is resolved!
+    @GET
+    @Path("/no_security")
+    @Timed
+    @Operation(summary = "Get a list of all streams, excluding security streams")
+    @Deprecated
+    @Produces(MediaType.APPLICATION_JSON)
+    public StreamListResponse getNoSecurity() {
+        final List<Stream> streams = streamService.loadAll()
+                .stream()
+                .filter(stream -> isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
+                .filter(stream -> !isSecurityStream(stream.getTitle()))
+                .toList();
+
+        return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
+    }
+
+    private boolean isSecurityStream(String title) {
+        return title.equalsIgnoreCase("All investigation events")
+                || title.equalsIgnoreCase("All investigation messages")
+                || title.startsWith("Illuminate:");
+    }
+
+    @GET
+    @Path("/byIndex/{indexSetId}")
+    @Timed
+    @Operation(summary = "Get a list of all streams connected to a given index set")
+    @Produces(MediaType.APPLICATION_JSON)
+    public StreamListResponse getByIndexSet(@Parameter(name = "indexSetId", required = true)
+                                            @PathParam("indexSetId") @NotEmpty String indexSetId) {
+        checkPermission(RestPermissions.INDEXSETS_READ, indexSetId);
+        final List<Stream> streams = streamService.loadAll().stream()
+                .filter(stream -> stream.getIndexSetId().equals(indexSetId))
+                .toList();
+
+        return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
+    }
+
     @GET
     @Path("/enabled")
     @Timed
-    @ApiOperation(value = "Get a list of all enabled streams")
+    @Operation(summary = "Get a list of all enabled streams")
     @Produces(MediaType.APPLICATION_JSON)
     public StreamListResponse getEnabled() {
         final List<Stream> streams = streamService.loadAllEnabled()
@@ -297,13 +354,14 @@ public class StreamResource extends RestResource {
     @GET
     @Path("/{streamId}")
     @Timed
-    @ApiOperation(value = "Get a single stream")
+    @Operation(summary = "Get a single stream")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Stream not found."),
-            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+            @ApiResponse(responseCode = "200", description = "Returns the stream", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "Stream not found."),
+            @ApiResponse(responseCode = "400", description = "Invalid ObjectId.")
     })
-    public StreamResponse get(@ApiParam(name = "streamId", required = true)
+    public StreamResponse get(@Parameter(name = "streamId", required = true)
                               @PathParam("streamId") @NotEmpty String streamId) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamId);
 
@@ -313,61 +371,24 @@ public class StreamResource extends RestResource {
     @PUT
     @Timed
     @Path("/{streamId}")
-    @ApiOperation(value = "Update a stream")
+    @Operation(summary = "Update a stream")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Stream not found."),
-            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+            @ApiResponse(responseCode = "200", description = "Returns updated stream", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "Stream not found."),
+            @ApiResponse(responseCode = "400", description = "Invalid ObjectId.")
     })
     @AuditEvent(type = AuditEventTypes.STREAM_UPDATE)
-    public StreamResponse update(@ApiParam(name = "streamId", required = true)
+    public StreamResponse update(@Parameter(name = "streamId", required = true)
                                  @PathParam("streamId") String streamId,
-                                 @ApiParam(name = "JSON body", required = true)
-                                 @Valid @NotNull UpdateStreamRequest cr,
+                                 @RequestBody(required = true)
+                                 @Valid @NotNull UpdateStreamRequest request,
                                  @Context UserContext userContext) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkNotEditableStream(streamId, "The stream cannot be edited.");
 
-        final Stream stream = streamService.load(streamId);
-
-        if (!Strings.isNullOrEmpty(cr.title())) {
-            stream.setTitle(cr.title().strip());
-        }
-
-        stream.setDescription(cr.description());
-
-        if (cr.matchingType() != null) {
-            try {
-                stream.setMatchingType(Stream.MatchingType.valueOf(cr.matchingType()));
-            } catch (IllegalArgumentException e) {
-                throw new BadRequestException("Invalid matching type '" + cr.matchingType()
-                        + "' specified. Should be one of: " + Arrays.toString(Stream.MatchingType.values()));
-            }
-        }
-
-        final Boolean removeMatchesFromDefaultStream = cr.removeMatchesFromDefaultStream();
-        if (removeMatchesFromDefaultStream != null) {
-            stream.setRemoveMatchesFromDefaultStream(removeMatchesFromDefaultStream);
-        }
-
-        // Apparently we are sending partial resources sometimes so do not overwrite the index set
-        // id if it's null/empty in the update request.
-        if (!Strings.isNullOrEmpty(cr.indexSetId())) {
-            stream.setIndexSetId(cr.indexSetId());
-        }
-
-        final IndexSet indexSet = indexSetRegistry.get(stream.getIndexSetId())
-                .orElseThrow(() -> new BadRequestException("Index set with ID <" + stream.getIndexSetId() + "> does not exist!"));
-
-        if (!indexSet.getConfig().isWritable()) {
-            throw new BadRequestException("Assigned index set must be writable!");
-        }
-        if (!indexSet.getConfig().isRegularIndex()) {
-            throw new BadRequestException("Assigned index set is not usable");
-        }
-
-        streamService.save(stream);
+        final Stream stream = streamService.update(streamId, request);
 
         recentActivityService.update(streamId, GRNTypes.STREAM, userContext.getUser());
         return streamToResponse(stream);
@@ -376,13 +397,14 @@ public class StreamResource extends RestResource {
     @DELETE
     @Path("/{streamId}")
     @Timed
-    @ApiOperation(value = "Delete a stream")
+    @Operation(summary = "Delete a stream")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Stream not found."),
-            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "404", description = "Stream not found."),
+            @ApiResponse(responseCode = "400", description = "Invalid ObjectId.")
     })
     @AuditEvent(type = AuditEventTypes.STREAM_DELETE)
-    public void delete(@ApiParam(name = "streamId", required = true) @PathParam("streamId") String streamId,
+    public void delete(@Parameter(name = "streamId", required = true) @PathParam("streamId") String streamId,
                        @Context UserContext userContext) throws NotFoundException {
         deleteInner(streamId, userContext);
     }
@@ -407,9 +429,13 @@ public class StreamResource extends RestResource {
     @Path("/bulk_delete")
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
-    @ApiOperation(value = "Delete a bulk of streams", response = BulkOperationResponse.class)
+    @Operation(summary = "Delete a bulk of streams")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Deletion successful",
+                    content = @Content(schema = @Schema(implementation = BulkOperationResponse.class)))
+    })
     @NoAuditEvent("Audit events triggered manually")
-    public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
+    public Response bulkDelete(@Parameter(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
                                @Context final UserContext userContext) {
 
         final BulkOperationResponse response = bulkStreamDeleteExecutor.executeBulkOperation(
@@ -426,9 +452,13 @@ public class StreamResource extends RestResource {
     @Path("/bulk_pause")
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
-    @ApiOperation(value = "Pause a bulk of streams", response = BulkOperationResponse.class)
+    @Operation(summary = "Pause a bulk of streams")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pause a bulk of streams retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = BulkOperationResponse.class)))
+    })
     @NoAuditEvent("Audit events triggered manually")
-    public Response bulkPause(@ApiParam(name = "Streams to pause", required = true) final BulkOperationRequest bulkOperationRequest,
+    public Response bulkPause(@Parameter(name = "Streams to pause", required = true) final BulkOperationRequest bulkOperationRequest,
                               @Context final UserContext userContext) {
 
         final BulkOperationResponse response = bulkStreamStopExecutor.executeBulkOperation(
@@ -445,9 +475,13 @@ public class StreamResource extends RestResource {
     @Path("/bulk_resume")
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
-    @ApiOperation(value = "Resume a bulk of streams", response = BulkOperationResponse.class)
+    @Operation(summary = "Resume a bulk of streams")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Resume a bulk of streams retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = BulkOperationResponse.class)))
+    })
     @NoAuditEvent("Audit events triggered manually")
-    public Response bulkResume(@ApiParam(name = "Streams to resume", required = true) final BulkOperationRequest bulkOperationRequest,
+    public Response bulkResume(@Parameter(name = "Streams to resume", required = true) final BulkOperationRequest bulkOperationRequest,
                                @Context final UserContext userContext) {
 
         final BulkOperationResponse response = bulkStreamStartExecutor.executeBulkOperation(
@@ -463,13 +497,14 @@ public class StreamResource extends RestResource {
     @POST
     @Path("/{streamId}/pause")
     @Timed
-    @ApiOperation(value = "Pause a stream")
+    @Operation(summary = "Pause a stream")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Stream not found."),
-            @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "404", description = "Stream not found."),
+            @ApiResponse(responseCode = "400", description = "Invalid or missing Stream id.")
     })
     @AuditEvent(type = AuditEventTypes.STREAM_STOP)
-    public void pause(@ApiParam(name = "streamId", required = true)
+    public void pause(@Parameter(name = "streamId", required = true)
                       @PathParam("streamId") @NotEmpty String streamId) throws NotFoundException, ValidationException {
         pauseInner(streamId, null);
     }
@@ -486,15 +521,15 @@ public class StreamResource extends RestResource {
     @POST
     @Path("/{streamId}/resume")
     @Timed
-    @ApiOperation(value = "Resume a stream")
+    @Operation(summary = "Resume a stream")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Stream not found."),
-            @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "404", description = "Stream not found."),
+            @ApiResponse(responseCode = "400", description = "Invalid or missing Stream id.")
     })
     @AuditEvent(type = AuditEventTypes.STREAM_START)
-    public void resume(@ApiParam(name = "streamId", required = true)
-                       @PathParam("streamId") @NotEmpty String streamId,
-                       @Context UserContext userContext) throws NotFoundException, ValidationException {
+    public void resume(@Parameter(name = "streamId", required = true)
+                           @PathParam("streamId") @NotEmpty String streamId) throws NotFoundException, ValidationException {
         resumeInner(streamId, null);
     }
 
@@ -510,15 +545,16 @@ public class StreamResource extends RestResource {
     @POST
     @Path("/{streamId}/testMatch")
     @Timed
-    @ApiOperation(value = "Test matching of a stream against a supplied message")
+    @Operation(summary = "Test matching of a stream against a supplied message")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Stream not found."),
-            @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
+            @ApiResponse(responseCode = "200", description = "Returns test result", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "Stream not found."),
+            @ApiResponse(responseCode = "400", description = "Invalid or missing Stream id.")
     })
     @NoAuditEvent("only used for testing stream matches")
-    public TestMatchResponse testMatch(@ApiParam(name = "streamId", required = true)
+    public TestMatchResponse testMatch(@Parameter(name = "streamId", required = true)
                                        @PathParam("streamId") String streamId,
-                                       @ApiParam(name = "JSON body", required = true)
+                                       @RequestBody(required = true)
                                        @NotNull Map<String, Map<String, Object>> serialisedMessage) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamId);
 
@@ -551,16 +587,18 @@ public class StreamResource extends RestResource {
     @POST
     @Path("/{streamId}/clone")
     @Timed
-    @ApiOperation(value = "Clone a stream", response = StreamCreatedResponse.class)
+    @Operation(summary = "Clone a stream")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Stream not found."),
-            @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
+            @ApiResponse(responseCode = "201", description = "Success",
+                    content = @Content(schema = @Schema(implementation = StreamCreatedResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Stream not found."),
+            @ApiResponse(responseCode = "400", description = "Invalid or missing Stream id.")
     })
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.STREAM_CREATE)
-    public Response cloneStream(@ApiParam(name = "streamId", required = true) @PathParam("streamId") String streamId,
-                                @ApiParam(name = "JSON body", required = true) @Valid @NotNull CloneStreamRequest cr,
+    public Response cloneStream(@Parameter(name = "streamId", required = true) @PathParam("streamId") String streamId,
+                                @RequestBody(required = true) @Valid @NotNull CloneStreamRequest cr,
                                 @Context UserContext userContext) throws ValidationException, NotFoundException {
         checkPermission(RestPermissions.STREAMS_CREATE);
         checkPermission(RestPermissions.STREAMS_READ, streamId);
@@ -575,26 +613,24 @@ public class StreamResource extends RestResource {
                 .map(streamRule -> streamRuleService.copy(null, streamRule))
                 .collect(Collectors.toSet());
 
-        final Map<String, Object> streamData = Map.of(
-                StreamImpl.FIELD_TITLE, cr.title().strip(),
-                StreamImpl.FIELD_DESCRIPTION, cr.description(),
-                StreamImpl.FIELD_CREATOR_USER_ID, creatorUser,
-                StreamImpl.FIELD_CREATED_AT, Tools.nowUTC(),
-                StreamImpl.FIELD_MATCHING_TYPE, sourceStream.getMatchingType().toString(),
-                StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, cr.removeMatchesFromDefaultStream(),
-                StreamImpl.FIELD_DISABLED, true,
-                StreamImpl.FIELD_INDEX_SET_ID, cr.indexSetId()
-        );
+        final Stream stream = StreamImpl.builder()
+                .id(new ObjectId().toHexString())
+                .title(cr.title().strip())
+                .description(cr.description())
+                .creatorUserId(creatorUser)
+                .createdAt(Tools.nowUTC())
+                .matchingType(sourceStream.getMatchingType())
+                .removeMatchesFromDefaultStream(cr.removeMatchesFromDefaultStream())
+                .disabled(true)
+                .indexSetId(cr.indexSetId())
+                .build();
 
-        final Stream stream = streamService.create(streamData);
         final String savedStreamId = streamService.saveWithRulesAndOwnership(stream, newStreamRules, userContext.getUser());
         final ObjectId savedStreamObjectId = new ObjectId(savedStreamId);
 
-        final Set<ObjectId> outputIds = sourceStream.getOutputs().stream()
-                .map(Output::getId)
-                .map(ObjectId::new)
-                .collect(Collectors.toSet());
-        streamService.addOutputs(savedStreamObjectId, outputIds);
+        streamService.addOutputs(savedStreamObjectId, sourceStream.getOutputIds());
+
+        entitySharesService.cloneEntityGrants(GRNTypes.STREAM, streamId, savedStreamId, userContext.getUser());
 
         var result = new StreamCreatedResponse(savedStreamId);
         final URI streamUri = getUriBuilderToSelf().path(StreamResource.class)
@@ -606,9 +642,13 @@ public class StreamResource extends RestResource {
 
     @GET
     @Path("/{streamId}/pipelines")
-    @ApiOperation(value = "Get pipelines associated with a stream")
+    @Operation(summary = "Get pipelines associated with a stream")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<PipelineCompactSource> getConnectedPipelines(@ApiParam(name = "streamId", required = true) @PathParam("streamId") String streamId) throws NotFoundException {
+    public List<PipelineCompactSource> getConnectedPipelines(@Parameter(name = "streamId", required = true) @PathParam("streamId") String streamId) throws NotFoundException {
+        if (!isPermitted(RestPermissions.STREAMS_READ, streamId)) {
+            throw new ForbiddenException("Not allowed to read configuration for stream with id: " + streamId);
+        }
+
         PipelineConnections pipelineConnections = pipelineStreamConnectionsService.load(streamId);
         List<PipelineCompactSource> list = new ArrayList<>();
 
@@ -619,28 +659,64 @@ public class StreamResource extends RestResource {
         return list;
     }
 
+    public record GetConnectedPipelinesRequest(List<String> streamIds) {}
+
+    @POST
+    @Path("/pipelines")
+    @Operation(summary = "Get pipelines associated with specified streams")
+    @NoAuditEvent("No data is changed.")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<String, List<PipelineCompactSource>> getConnectedPipelinesForStreams(@Parameter(name = "streamIds", required = true) GetConnectedPipelinesRequest request) {
+        final var streamIds = request.streamIds.stream()
+                .filter(streamId -> {
+                    if (!isPermitted(RestPermissions.STREAMS_READ, streamId)) {
+                        throw new ForbiddenException("Not allowed to read configuration for stream with id: " + streamId);
+                    }
+                    return true;
+                })
+                .collect(Collectors.toSet());
+
+        final var pipelineConnections = pipelineStreamConnectionsService.loadByStreamIds(streamIds);
+        final var pipelineIds = pipelineConnections.values().stream()
+                .flatMap(connection -> connection.pipelineIds().stream())
+                .collect(Collectors.toSet());
+        final var pipelines = pipelineService.loadByIds(pipelineIds).stream()
+                .collect(Collectors.toMap(MongoEntity::id, pipeline -> pipeline));
+        return request.streamIds().stream()
+                .collect(Collectors.toMap(streamId -> streamId, streamId -> {
+                    final var pipelinesForStream = Optional.ofNullable(pipelineConnections.get(streamId))
+                            .map(PipelineConnections::pipelineIds)
+                            .orElse(Set.of());
+                    return pipelinesForStream.stream()
+                            .flatMap(pipeline -> Optional.ofNullable(pipelines.get(pipeline)).stream())
+                            .map(pipeline -> PipelineCompactSource.create(pipeline.id(), pipeline.title()))
+                            .toList();
+                }));
+    }
+
     @PUT
     @Path("/indexSet/{indexSetId}")
     @Timed
-    @ApiOperation(value = "Assign multiple streams to index set")
+    @Operation(summary = "Assign multiple streams to index set")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Index set not found.")
+            @ApiResponse(responseCode = "200", description = "Success"),
+            @ApiResponse(responseCode = "404", description = "Index set not found.")
     })
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.STREAM_UPDATE)
-    public Response assignToIndexSet(@ApiParam(name = "indexSetId", required = true) @PathParam("indexSetId") String indexSetId,
-                                     @ApiParam(name = "JSON body", required = true) @Valid @NotNull List<String> streamIds) {
+    public Response assignToIndexSet(@Parameter(name = "indexSetId", required = true) @PathParam("indexSetId") String indexSetId,
+                                     @RequestBody(required = true) @NotEmpty List<@NotBlank String> streamIds) {
         checkPermission(RestPermissions.INDEXSETS_READ, indexSetId);
         streamIds.forEach(streamId -> {
             checkPermission(RestPermissions.STREAMS_EDIT, streamId);
             checkNotEditableStream(streamId, "The stream with id <" + streamId + "> cannot be edited.");
         });
 
-        final Set<String> existingStreams = streamService.loadByIds(streamIds)
-                .stream()
-                .map(Persisted::getId)
-                .collect(Collectors.toSet());
+        final Set<String> existingStreams;
+        try (var stream = streamService.streamDTOByIds(streamIds)) {
+            existingStreams = stream.map(Stream::getId).collect(Collectors.toSet());
+        }
 
         final Set<String> missingStreams = Sets.difference(new HashSet<>(streamIds), existingStreams);
 
@@ -669,11 +745,11 @@ public class StreamResource extends RestResource {
     private StreamResponse streamToResponse(Stream stream) {
         return StreamResponse.create(
                 stream.getId(),
-                (String) stream.getFields().get(StreamImpl.FIELD_CREATOR_USER_ID),
+                stream.getCreatorUserId(),
                 outputsToSummaries(stream.getOutputs()),
                 stream.getMatchingType().name(),
                 stream.getDescription(),
-                stream.getFields().get(StreamImpl.FIELD_CREATED_AT).toString(),
+                stream.getCreatedAt().toString(),
                 stream.getDisabled(),
                 stream.getStreamRules(),
                 stream.getTitle(),
@@ -681,19 +757,40 @@ public class StreamResource extends RestResource {
                 stream.isDefaultStream(),
                 stream.getRemoveMatchesFromDefaultStream(),
                 stream.getIndexSetId(),
+                stream.getCategories(),
+                stream.isEditable(),
+                stream.getFavoriteFields()
+        );
+    }
+
+    private StreamDTOResponse dtoToResponse(Stream stream) {
+        return new StreamDTOResponse(stream.getId(),
+                stream.getCreatorUserId(),
+                stream.getOutputIds(),
+                stream.getMatchingType(),
+                stream.getDescription(),
+                stream.getCreatedAt(),
+                stream.getStreamRules(),
+                stream.getDisabled(),
+                stream.getTitle(),
+                stream.getContentPack(),
+                firstNonNull(stream.isDefaultStream(), false),
+                stream.getRemoveMatchesFromDefaultStream(),
+                stream.getIndexSetId(),
+                stream.isEditable(),
                 stream.getCategories()
         );
     }
 
     private Collection<OutputSummary> outputsToSummaries(Collection<Output> outputs) {
         return outputs.stream()
-                .map((output) -> OutputSummary.create(output.getId(), output.getTitle(), output.getType(),
+                .map(output -> OutputSummary.create(output.getId(), output.getTitle(), output.getType(),
                         output.getCreatorUserId(), new DateTime(output.getCreatedAt()), output.getConfiguration(), output.getContentPack()))
                 .collect(Collectors.toSet());
     }
 
     private void checkNotEditableStream(String streamId, String message) {
-        if (Stream.DEFAULT_STREAM_ID.equals(streamId) || !Stream.streamIsEditable(streamId)) {
+        if (!streamService.isEditable(streamId)) {
             throw new BadRequestException(message);
         }
     }

@@ -35,7 +35,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
 
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -48,17 +48,16 @@ import static org.mockito.Mockito.verify;
 class MongoDbIndexToolsTest {
     private static final String COLLECTION_NAME = "test";
 
-    private MongoDbIndexTools<Document> toTest;
-    private MongoCollection<Document> db;
+    private MongoDbIndexTools toTest;
+    private com.mongodb.client.MongoCollection<Document> db;
     private MongoCollection<Document> rawdb;
 
     @BeforeEach
-    void setUp(MongoDBTestService mongodb, ObjectMapper objectMapper) {
+    void setUp(MongoDBTestService mongodb, MongoCollections mongoCollections) {
         mongodb.mongoCollection(COLLECTION_NAME).drop();
-        final MongoCollections mongoCollections = new MongoCollections(new MongoJackObjectMapperProvider(objectMapper), mongodb.mongoConnection());
-        this.rawdb = mongoCollections.get(COLLECTION_NAME, Document.class);
+        this.rawdb = mongoCollections.nonEntityCollection(COLLECTION_NAME, Document.class);
         this.db = spy(this.rawdb);
-        toTest = new MongoDbIndexTools<>(db);
+        toTest = new MongoDbIndexTools(db);
     }
 
     @Test

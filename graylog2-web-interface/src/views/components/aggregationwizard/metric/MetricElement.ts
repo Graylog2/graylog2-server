@@ -14,24 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import isNumber from 'lodash/isNumber';
+
 import type { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series, { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
+import { thresholdsSupportedVisualizations } from 'views/Constants';
 
 import MetricsConfiguration from './MetricsConfiguration';
 
 import type { AggregationElement } from '../AggregationElementType';
-import type { WidgetConfigFormValues, MetricFormValues } from '../WidgetConfigForm';
+import type { WidgetConfigFormValues, MetricFormValues, VisualizationFormValues } from '../WidgetConfigForm';
 
-type MetricError = {
-  function?: string,
-  field?: string,
-  percentile?: string,
-  name?: string,
+export type MetricError = {
+  function?: string;
+  field?: string;
+  percentile?: string;
+  name?: string;
+  thresholds?: Array<{ value: string }>;
 };
 
-const hasErrors = <T extends {}> (errors: Array<T>): boolean => errors.filter((error) => Object.keys(error).length > 0).length > 0;
+const hasErrors = <T extends {}>(errors: Array<T>): boolean =>
+  errors.filter((error) => Object.keys(error).length > 0).length > 0;
 
 const validateMetrics = (values: WidgetConfigFormValues) => {
   const errors = {};
@@ -47,7 +52,8 @@ const validateMetrics = (values: WidgetConfigFormValues) => {
       metricError.function = 'Function is required.';
     }
 
-    const isFieldRequired = metric.function !== 'count' && (metric.function !== 'percentage' || metric.strategy === 'SUM');
+    const isFieldRequired =
+      metric.function !== 'count' && (metric.function !== 'percentage' || metric.strategy === 'SUM');
 
     if (isFieldRequired && !metric.field) {
       metricError.field = `Field is required for function ${metric.function}.`;
@@ -61,6 +67,16 @@ const validateMetrics = (values: WidgetConfigFormValues) => {
       metricError.name = 'Name must be unique.';
     }
 
+    const thresholdErrors: MetricError['thresholds'] = metric?.thresholds?.map((threshold) => {
+      if (!isNumber(threshold?.value)) return { value: 'Threshold value is required.' };
+
+      return undefined;
+    });
+
+    if (thresholdErrors?.filter((thresholdError) => !!thresholdError?.value).length) {
+      metricError.thresholds = thresholdErrors;
+    }
+
     return metricError;
   });
 
@@ -69,47 +85,65 @@ const validateMetrics = (values: WidgetConfigFormValues) => {
 
 const parameterForMetric = (metric: MetricFormValues) => {
   switch (metric.function) {
-    case 'percentage': return metric.strategy;
-    case 'percentile': return metric.percentile;
-    default: return undefined;
+    case 'percentage':
+      return metric.strategy;
+    case 'percentile':
+      return metric.percentile;
+    default:
+      return undefined;
   }
 };
 
 const emptyToUndefined = (s: string) => (s?.trim() === '' ? undefined : s);
 
-const metricsToSeries = (formMetrics: Array<MetricFormValues>) => formMetrics
-  .map((metric) => Series.create(metric.function, emptyToUndefined(metric.field), parameterForMetric(metric))
-    .toBuilder()
-    .config(SeriesConfig.empty().toBuilder().name(metric.name).build())
-    .build());
+const metricsToSeries = (formMetrics: Array<MetricFormValues>, visualization: VisualizationFormValues) =>
+  formMetrics.map((metric) =>
+    Series.create(metric.function, emptyToUndefined(metric.field), parameterForMetric(metric))
+      .toBuilder()
+      .config(
+        SeriesConfig.empty()
+          .toBuilder()
+          .name(metric.name)
+          .thresholds(
+            metric?.showThresholds && thresholdsSupportedVisualizations.includes(visualization.type)
+              ? metric.thresholds
+              : null,
+          )
+          .build(),
+      )
+      .build(),
+  );
 
-export const seriesToMetrics = (series: Array<Series>) => series.map((s: Series) => {
-  const { type: func, field, percentile, strategy } = parseSeries(s.function) ?? {};
+export const seriesToMetrics = (series: Array<Series>) =>
+  series.map((s: Series) => {
+    const { type: func, field, percentile, strategy } = parseSeries(s.function) ?? {};
 
-  const metric = {
-    function: func,
-    field,
-    name: s.config?.name,
-  };
-
-  if (percentile) {
-    const parsedPercentile = Number.parseFloat(percentile);
-
-    return {
-      ...metric,
-      percentile: parsedPercentile,
+    const metric = {
+      function: func,
+      field,
+      name: s.config?.name,
+      thresholds: s.config.thresholds,
+      showThresholds: !!s.config.thresholds?.length,
     };
-  }
 
-  if (strategy) {
-    return {
-      ...metric,
-      strategy,
-    };
-  }
+    if (percentile) {
+      const parsedPercentile = Number.parseFloat(percentile);
 
-  return metric;
-});
+      return {
+        ...metric,
+        percentile: parsedPercentile,
+      };
+    }
+
+    if (strategy) {
+      return {
+        ...metric,
+        strategy,
+      };
+    }
+
+    return metric;
+  });
 
 const MetricElement: AggregationElement<'metrics'> = {
   sectionTitle: 'Metrics',
@@ -120,12 +154,12 @@ const MetricElement: AggregationElement<'metrics'> = {
   fromConfig: (config: AggregationWidgetConfig) => ({
     metrics: seriesToMetrics(config.series),
   }),
-  toConfig: (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) => configBuilder
-    .series(metricsToSeries(formValues.metrics)),
-  onRemove: ((index, formValues) => ({
+  toConfig: (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) =>
+    configBuilder.series(metricsToSeries(formValues.metrics, formValues.visualization)),
+  onRemove: (index, formValues) => ({
     ...formValues,
     metrics: formValues.metrics.filter((_value, i) => index !== i),
-  })),
+  }),
   component: MetricsConfiguration,
   validate: validateMetrics,
   isEmpty: (formValues: WidgetConfigFormValues['metrics']) => (formValues ?? []).length === 0,

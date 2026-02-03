@@ -18,7 +18,7 @@ import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
-import { LinkContainer, Link } from 'components/common/router';
+import { LinkContainer } from 'components/common/router';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import {
   EmptyEntity,
@@ -32,8 +32,9 @@ import {
   Icon,
   QueryHelper,
 } from 'components/common';
-import { Col, DropdownButton, MenuItem, Row, Button } from 'components/bootstrap';
+import { Col, DropdownButton, MenuItem, Row, Button, DeleteMenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
+import EventNotificationLink from 'components/event-notifications/event-notifications/EventNotificationLink';
 
 import styles from './EventNotifications.css';
 
@@ -44,12 +45,12 @@ const renderEmptyContent = () => (
     <Col md={4} mdOffset={4}>
       <EmptyEntity>
         <p>
-          Configure Event Notifications that can alert you when an Event occurs. You can also use Notifications
-          to integrate Graylog Alerts with an external alerting system you use.
+          Configure Event Notifications that can alert you when an Event occurs. You can also use Notifications to
+          integrate Alerts with an external alerting system you use.
         </p>
         <IfPermitted permissions="eventnotifications:create">
           <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
-            <Button bsStyle="success">Get Started!</Button>
+            <Button bsStyle="primary">Get Started!</Button>
           </LinkContainer>
         </IfPermitted>
       </EmptyEntity>
@@ -81,9 +82,12 @@ type EventNotificationsProps = {
   onTest: (...args: any[]) => (...args: any[]) => void;
 };
 
-class EventNotifications extends React.Component<EventNotificationsProps, {
-  [key: string]: any;
-}> {
+class EventNotifications extends React.Component<
+  EventNotificationsProps,
+  {
+    [key: string]: any;
+  }
+> {
   constructor(props) {
     super(props);
 
@@ -100,27 +104,28 @@ class EventNotifications extends React.Component<EventNotificationsProps, {
       const actions = this.formatActions(notification, isTestLoading, setNotificationToShare);
 
       const plugin = getNotificationPlugin(notification.config.type);
-      const content = testResult.id === notification.id ? (
-        <Col md={12}>
-          {testResult.isLoading ? (
-            <Spinner text="Testing Notification..." />
-          ) : (
-            <p className={testResult.error ? 'text-danger' : 'text-success'}>
-              <b>{testResult.error ? 'Error' : 'Success'}:</b> {testResult.message}
-            </p>
-          )}
-        </Col>
-      ) : null;
-
-      const title = <Link to={Routes.ALERTS.NOTIFICATIONS.show(notification.id)}>{notification.title}</Link>;
+      const content =
+        testResult.id === notification.id ? (
+          <Col md={12}>
+            {testResult.isLoading ? (
+              <Spinner text="Testing Notification..." />
+            ) : (
+              <p className={testResult.error ? 'text-danger' : 'text-success'}>
+                <b>{testResult.error ? 'Error' : 'Success'}:</b> {testResult.message}
+              </p>
+            )}
+          </Col>
+        ) : null;
 
       return (
-        <EntityListItem key={`event-definition-${notification.id}`}
-                        title={title}
-                        titleSuffix={plugin?.displayName || notification.config.type}
-                        description={notification.description || <em>No description given</em>}
-                        actions={actions}
-                        contentRow={content} />
+        <EntityListItem
+          key={`event-definition-${notification.id}`}
+          title={<EventNotificationLink id={notification.id} title={notification.title} />}
+          titleSuffix={plugin?.displayName || notification.config.type}
+          description={notification.description || <em>No description given</em>}
+          actions={actions}
+          contentRow={content}
+        />
       );
     });
   };
@@ -137,8 +142,14 @@ class EventNotifications extends React.Component<EventNotificationsProps, {
             </Button>
           </IfPermitted>
         </LinkContainer>
-        <ShareButton entityType="notification" entityId={notification.id} onClick={() => setNotificationToShare(notification)} />
-        <IfPermitted permissions={[`eventnotifications:edit:${notification.id}`, `eventnotifications:delete:${notification.id}`]} anyPermissions>
+        <ShareButton
+          entityType="notification"
+          entityId={notification.id}
+          onClick={() => setNotificationToShare(notification)}
+        />
+        <IfPermitted
+          permissions={[`eventnotifications:edit:${notification.id}`, `eventnotifications:delete:${notification.id}`]}
+          anyPermissions>
           <DropdownButton id={`more-dropdown-${notification.id}`} title="More" pullRight>
             <IfPermitted permissions={`eventnotifications:edit:${notification.id}`}>
               <MenuItem disabled={isTestLoading} onClick={onTest(notification)}>
@@ -147,7 +158,7 @@ class EventNotifications extends React.Component<EventNotificationsProps, {
             </IfPermitted>
             <MenuItem divider />
             <IfPermitted permissions={`eventnotifications:delete:${notification.id}`}>
-              <MenuItem onClick={onDelete(notification)} variant="danger">Delete</MenuItem>
+              <DeleteMenuItem onClick={onDelete(notification)} />
             </IfPermitted>
           </DropdownButton>
         </IfPermitted>
@@ -169,18 +180,18 @@ class EventNotifications extends React.Component<EventNotificationsProps, {
       <>
         <Row>
           <Col md={12}>
-            <SearchForm query={query}
-                        onSearch={onQueryChange}
-                        onReset={onQueryChange}
-                        placeholder="Find Notifications"
-                        wrapperClass={styles.inline}
-                        queryHelpComponent={<QueryHelper entityName="notification" />}
-                        topMargin={0}
-                        useLoadingState />
+            <SearchForm
+              query={query}
+              onSearch={onQueryChange}
+              onReset={onQueryChange}
+              placeholder="Find Notifications"
+              wrapperClass={styles.inline}
+              queryHelpComponent={<QueryHelper entityName="notification" />}
+              topMargin={0}
+              useLoadingState
+            />
 
-            <PaginatedList pageSizes={PAGE_SIZES}
-                           totalItems={pagination.total}
-                           onChange={onPageChange}>
+            <PaginatedList pageSizes={PAGE_SIZES} totalItems={pagination.total} onChange={onPageChange}>
               <div className={styles.notificationList}>
                 <EntityList items={this.formatNotification(notifications, setNotificationToShare)} />
               </div>
@@ -188,11 +199,13 @@ class EventNotifications extends React.Component<EventNotificationsProps, {
           </Col>
         </Row>
         {notificationToShare && (
-          <EntityShareModal entityId={notificationToShare.id}
-                            entityType="notification"
-                            description="Search for a User or Team to add as collaborator on this notification."
-                            entityTitle={notificationToShare.title}
-                            onClose={() => setNotificationToShare(undefined)} />
+          <EntityShareModal
+            entityId={notificationToShare.id}
+            entityType="notification"
+            description="Search for a User or Team to add as collaborator on this notification."
+            entityTitle={notificationToShare.title}
+            onClose={() => setNotificationToShare(undefined)}
+          />
         )}
       </>
     );

@@ -25,25 +25,27 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Strings;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.assertj.core.api.Assertions;
 import org.graylog.failure.FailureSubmissionService;
+import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.TestIndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.TestIndexSet;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
+import org.graylog2.plugin.Tools;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -82,7 +84,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
     private final FailureSubmissionService failureSubmissionService = mock(FailureSubmissionService.class);
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         client().deleteIndices(INDEX_NAME);
         client().createIndex(INDEX_NAME);
@@ -91,7 +93,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
                 failureSubmissionService);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         client().cleanUp();
     }
@@ -174,8 +176,8 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         message2.addField(fieldName, "fourty-two");
 
         final List<MessageWithIndex> messageBatch = List.of(
-                new MessageWithIndex(wrap(message1), indexSet),
-                new MessageWithIndex(wrap(message2), indexSet)
+                new MessageWithIndex(wrap(message1), indexSet.getWriteIndexAlias()),
+                new MessageWithIndex(wrap(message2), indexSet.getWriteIndexAlias())
         );
 
         var results = this.messages.bulkIndex(messageBatch);
@@ -195,8 +197,8 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         client().waitForGreenStatus("message_it2_deflector");
 
         final List<MessageWithIndex> messageBatch = List.of(
-                new MessageWithIndex(wrap(message1), indexSet),
-                new MessageWithIndex(wrap(message2), indexSet2)
+                new MessageWithIndex(wrap(message1), indexSet.getWriteIndexAlias()),
+                new MessageWithIndex(wrap(message2), indexSet2.getWriteIndexAlias())
         );
         var results = this.messages.bulkIndex(messageBatch);
 
@@ -226,7 +228,6 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         assertThat(messageCount(INDEX_NAME)).isEqualTo(50);
         assertThat(succeeded.get()).isTrue();
     }
-
 
     private void waitForClusterBlockRelease() throws ExecutionException, RetryException {
         RetryerBuilder.<String>newBuilder()
@@ -293,7 +294,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         final Message message = messageFactory.createMessage("Some message", "somesource", now());
         message.addField("custom_object", new TextNode("foo"));
         final List<MessageWithIndex> messageBatch = List.of(
-                new MessageWithIndex(wrap(message), indexSet)
+                new MessageWithIndex(wrap(message), indexSet.getWriteIndexAlias())
         );
 
         var results = this.messages.bulkIndex(messageBatch);
@@ -330,10 +331,6 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         client().resetIndexBlock(index);
     }
 
-    private Map.Entry<IndexSet, Message> entry(IndexSet indexSet, Message message) {
-        return new AbstractMap.SimpleEntry<>(indexSet, message);
-    }
-
     private DateTime now() {
         return DateTime.now(DateTimeZone.UTC);
     }
@@ -343,7 +340,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
         final String message = Strings.repeat("A", size);
         for (int i = 0; i < count; i++) {
-            messageList.add(new MessageWithIndex(wrap(messageFactory.createMessage(i + message, "source", now())), indexSet));
+            messageList.add(new MessageWithIndex(wrap(messageFactory.createMessage(i + message, "source", now())), indexSet.getWriteIndexAlias()));
         }
         return messageList;
     }

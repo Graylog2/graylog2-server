@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.graph.Graph;
-import org.bson.types.ObjectId;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
@@ -32,10 +31,11 @@ import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.buffers.processors.fakestreams.FakeStream;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -49,19 +49,22 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.PipelineEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.streams.StreamService;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.Map;
@@ -71,17 +74,16 @@ import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.graylog.plugins.pipelineprocessor.rest.PipelineResource.GL_INPUT_ROUTING_PIPELINE;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class PipelineFacadeTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
@@ -94,17 +96,18 @@ public class PipelineFacadeTest {
     @Mock
     private StreamService streamService;
 
+    private EntityScopeService entityScopeService;
     private PipelineFacade facade;
 
-    @Before
+    @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
-    public void setUp() throws Exception {
-        final MongoConnection mongoConnection = mongodb.mongoConnection();
-        final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
+    public void setUp(MongoCollections mongoCollections) {
+        entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope()));
 
-        pipelineService = new MongoDbPipelineService(new MongoCollections(mapperProvider, mongoConnection), clusterEventBus);
-        connectionsService = new MongoDbPipelineStreamConnectionsService(mongoConnection, mapperProvider, clusterEventBus);
+        final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
+        pipelineService = new MongoDbPipelineService(
+                mongoCollections, entityScopeService, clusterEventBus, mock(MongoDbRuleService.class), mock(PipelineStreamConnectionsService.class));
+        connectionsService = new MongoDbPipelineStreamConnectionsService(mongoCollections, clusterEventBus);
 
         facade = new PipelineFacade(objectMapper, pipelineService, connectionsService, pipelineRuleParser, ruleService, streamService);
     }
@@ -138,6 +141,27 @@ public class PipelineFacadeTest {
     }
 
     @Test
+    public void exportEntity_descriptionNull() {
+        final PipelineDao pipeline = PipelineDao.builder()
+                .id("pipeline-12345")
+                .title("title")
+                .description(null)
+                .source("pipeline \"Test\"\nstage 0 match either\nrule \"debug\"\nend")
+                .build();
+
+        final EntityDescriptor descriptor = EntityDescriptor.create(pipeline.id(), ModelTypes.PIPELINE_V1);
+        final EntityDescriptor streamDescriptor = EntityDescriptor.create("stream-12345", ModelTypes.STREAM_V1);
+        final Entity entity = facade.exportNativeEntity(pipeline, EntityDescriptorIds.of(descriptor, streamDescriptor));
+
+        assertThat(entity).isInstanceOf(EntityV1.class);
+        assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE_V1);
+
+        final EntityV1 entityV1 = (EntityV1) entity;
+        final PipelineEntity pipelineEntity = objectMapper.convertValue(entityV1.data(), PipelineEntity.class);
+        assertThat(pipelineEntity.description()).isNull();
+    }
+
+    @Test
     @MongoDBFixtures("PipelineFacadeTest/pipelines.json")
     public void exportNativeEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5a85c4854b900afd5d662be3", ModelTypes.PIPELINE_V1);
@@ -162,7 +186,7 @@ public class PipelineFacadeTest {
     public void exportNativeEntityWithDefaultStream() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5a85c4854b900afd5d662be3", ModelTypes.PIPELINE_V1);
         final EntityDescriptor defaultStreamDescriptor = EntityDescriptor.create(Stream.DEFAULT_STREAM_ID, ModelTypes.STREAM_V1);
-        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor, defaultStreamDescriptor);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.withSystemStreams(Stream.ALL_SYSTEM_STREAM_IDS, descriptor, defaultStreamDescriptor);
 
         assertThat(entityDescriptorIds.get(defaultStreamDescriptor)).isEqualTo(Optional.of(Stream.DEFAULT_STREAM_ID));
 
@@ -221,10 +245,11 @@ public class PipelineFacadeTest {
 
         final FakeStream fakeDefaultStream = new FakeStream("All message Fake") {
             @Override
-            protected ObjectId getObjectId() {
-                return new ObjectId(Stream.DEFAULT_STREAM_ID);
+            public String getId() {
+                return Stream.DEFAULT_STREAM_ID;
             }
         };
+        when(streamService.getSystemStreamIds(true)).thenReturn(Stream.ALL_SYSTEM_STREAM_IDS);
         when(streamService.load(Stream.DEFAULT_STREAM_ID)).thenReturn(fakeDefaultStream);
 
         final Map<EntityDescriptor, Object> nativeEntities = Collections.emptyMap();
@@ -239,12 +264,20 @@ public class PipelineFacadeTest {
     public void delete() throws NotFoundException {
         final PipelineDao pipelineDao = pipelineService.load("5a85c4854b900afd5d662be3");
 
-        assertThat(pipelineService.loadAll()).hasSize(1);
+        assertThat(pipelineService.loadAll()).hasSize(2);
         facade.delete(pipelineDao);
-        assertThat(pipelineService.loadAll()).isEmpty();
+        assertThat(pipelineService.loadAll()).hasSize(1);
 
         assertThatThrownBy(() -> pipelineService.load("5a85c4854b900afd5d662be3"))
                 .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    @MongoDBFixtures("PipelineFacadeTest/pipelines.json")
+    public void deleteSystemPipeline() throws NotFoundException {
+        final PipelineDao pipelineDao = pipelineService.load("5a85c4854b900afd5d662be4");
+        assertThatThrownBy(() -> facade.delete(pipelineDao))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -312,14 +345,20 @@ public class PipelineFacadeTest {
     @Test
     @MongoDBFixtures("PipelineFacadeTest/pipelines.json")
     public void listEntityExcerpts() {
-        final EntityExcerpt expectedEntityExcerpt = EntityExcerpt.builder()
+        final EntityExcerpt expectedEntityExcerpt1 = EntityExcerpt.builder()
                 .id(ModelId.of("5a85c4854b900afd5d662be3"))
                 .type(ModelTypes.PIPELINE_V1)
                 .title("Test")
                 .build();
+        final EntityExcerpt expectedEntityExcerpt2 = EntityExcerpt.builder()
+                .id(ModelId.of("5a85c4854b900afd5d662be4"))
+                .type(ModelTypes.PIPELINE_V1)
+                .title(GL_INPUT_ROUTING_PIPELINE)
+                .build();
+        final Set<EntityExcerpt> expected = Set.of(expectedEntityExcerpt1, expectedEntityExcerpt2);
 
         final Set<EntityExcerpt> entityExcerpts = facade.listEntityExcerpts();
-        assertThat(entityExcerpts).containsOnly(expectedEntityExcerpt);
+        assertThat(entityExcerpts).isEqualTo(expected);
     }
 
     @Test

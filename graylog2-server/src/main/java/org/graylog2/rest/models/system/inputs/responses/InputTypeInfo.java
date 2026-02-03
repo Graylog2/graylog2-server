@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
+import jakarta.annotation.Nullable;
 
 import java.util.Map;
 
@@ -29,25 +29,33 @@ import java.util.Map;
  */
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class InputTypeInfo {
-    @JsonProperty
+    @JsonProperty("type")
     public abstract String type();
-    @JsonProperty
+
+    @JsonProperty("name")
     public abstract String name();
+
+    @JsonProperty("description")
+    @Nullable
+    public abstract String description();
+
     @JsonProperty("is_exclusive")
     public abstract boolean isExclusive();
-    @JsonProperty
+
+    @JsonProperty("requested_configuration")
     public abstract Map<String, Map<String, Object>> requestedConfiguration();
-    @JsonProperty
+
+    @JsonProperty("link_to_docs")
     public abstract String linkToDocs();
 
     @JsonCreator
     public static InputTypeInfo create(@JsonProperty("type") String type,
                                        @JsonProperty("name") String name,
+                                       @Nullable @JsonProperty("description") String description,
                                        @JsonProperty("is_exclusive") boolean isExclusive,
                                        @JsonProperty("requested_configuration") Map<String, Map<String, Object>> requestedConfiguration,
                                        @JsonProperty("link_to_docs") String linkToDocs) {
-        return new AutoValue_InputTypeInfo(type, name, isExclusive, requestedConfiguration, linkToDocs);
+        return new AutoValue_InputTypeInfo(type, name, description, isExclusive, requestedConfiguration, linkToDocs);
     }
 }

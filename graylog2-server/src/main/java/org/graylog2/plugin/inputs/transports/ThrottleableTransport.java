@@ -19,6 +19,7 @@ package org.graylog2.plugin.inputs.transports;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.graylog2.plugin.ThrottleState;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
@@ -58,7 +59,7 @@ public abstract class ThrottleableTransport implements Transport {
                     CK_THROTTLING_ALLOWED,
                     "Allow throttling this input.",
                     false,
-                    "If enabled, no new messages will be read from this input until Graylog catches up with its message load. " +
+                    "If enabled, no new messages will be read from this input until processing catches up with its message load. " +
                     "This is typically useful for inputs reading from files or message queue systems like AMQP or Kafka. " +
                     "If you regularly poll an external system, e.g. via HTTP, you normally want to leave this disabled."
 
@@ -200,12 +201,12 @@ public abstract class ThrottleableTransport implements Transport {
             log.debug("[{}] [unthrottled] no incoming messages and nothing read from journal even if we could", transportName);
             return false;
         }
-        if ((state.journalSize / (double) state.journalSizeLimit) * 100.0 > 90) {
+        if (Tools.percentageOf(state.journalSizeLimit, state.journalSize) > 90) {
             // more than 90% of the journal limit is in use, don't read more if possible to avoid throwing away data
             log.debug("[{}] [throttled] journal more than 90% full", transportName);
             return true;
         }
-        if ((state.readEventsPerSec / (double) state.appendEventsPerSec) * 100.0 < 50) {
+        if (Tools.percentageOf(state.appendEventsPerSec, state.readEventsPerSec) < 50) {
             // read rate is less than 50% of what we write to the journal over the last second, let's try to back off
             log.debug("[{}] [throttled] write rate is more than twice as high than read rate", transportName);
             return true;

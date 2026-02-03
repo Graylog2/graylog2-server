@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import { useEffect } from 'react';
 
 import { Spinner } from 'components/common';
@@ -26,7 +26,7 @@ import LegacyNotificationSummary from './LegacyNotificationSummary';
 
 type LegacyNotificationSummaryContainerProps = React.ComponentProps<EventNotificationTypes['summaryComponent']>;
 
-const LegacyNotificationSummaryContainer = (props: LegacyNotificationSummaryContainerProps) => {
+const LegacyNotificationSummaryContainer = ({ ...props }: LegacyNotificationSummaryContainerProps) => {
   const { allLegacyTypes } = useStore(EventNotificationsStore);
 
   useEffect(() => {
@@ -34,7 +34,11 @@ const LegacyNotificationSummaryContainer = (props: LegacyNotificationSummaryCont
   }, []);
 
   if (!allLegacyTypes) {
-    return <p><Spinner text="Loading legacy notification information..." /></p>;
+    return (
+      <p>
+        <Spinner text="Loading legacy notification information..." />
+      </p>
+    );
   }
 
   return <LegacyNotificationSummary {...props} legacyTypes={allLegacyTypes} />;

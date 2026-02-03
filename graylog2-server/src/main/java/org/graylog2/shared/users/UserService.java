@@ -25,6 +25,7 @@ import org.graylog2.plugin.database.users.User;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -47,6 +48,8 @@ public interface UserService extends PersistedService {
      * @return the user or an empty option if no user can be found
      */
     Optional<User> loadByAuthServiceUidOrUsername(String authServiceUid, String username);
+
+    Optional<User> loadByAuthServiceUid(String authServiceUid);
 
     int delete(String username);
 
@@ -71,6 +74,11 @@ public interface UserService extends PersistedService {
     Optional<User> getRootUser();
 
     long count();
+
+    /**
+     * @return The counts of users by privilege category (admin vs non-admin).
+     */
+    Map<String, Long> countByPrivilege();
 
     List<User> loadAllForAuthServiceBackend(String authServiceBackendId);
 

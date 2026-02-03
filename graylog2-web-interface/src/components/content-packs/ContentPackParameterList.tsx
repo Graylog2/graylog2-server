@@ -17,8 +17,8 @@
 import React from 'react';
 import findIndex from 'lodash/findIndex';
 
-import { Badge, Button, Modal, ButtonToolbar } from 'components/bootstrap';
-import { DataTable, SearchForm, Icon, ModalSubmit } from 'components/common';
+import { Button, Modal, ButtonToolbar } from 'components/bootstrap';
+import { DataTable, SearchForm, ModalSubmit, StatusIcon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ContentPackEditParameter from 'components/content-packs/ContentPackEditParameter';
 import ObjectUtils from 'util/ObjectUtils';
@@ -34,15 +34,16 @@ type ContentPackParameterListProps = {
   appliedParameter?: any;
 };
 
-class ContentPackParameterList extends React.Component<ContentPackParameterListProps, {
-  [key: string]: any;
-}> {
+class ContentPackParameterList extends React.Component<
+  ContentPackParameterListProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     readOnly: false,
-    onDeleteParameter: () => {
-    },
-    onAddParameter: () => {
-    },
+    onDeleteParameter: () => {},
+    onAddParameter: () => {},
     appliedParameter: {},
   };
 
@@ -67,7 +68,7 @@ class ContentPackParameterList extends React.Component<ContentPackParameterListP
 
     const entityIds = Object.keys(appliedParameter);
 
-    /* eslint-disable-next-line no-restricted-syntax, guard-for-in */
+    /* eslint-disable-next-line guard-for-in */
     for (const i in entityIds) {
       const params = appliedParameter[entityIds[i]];
 
@@ -83,8 +84,6 @@ class ContentPackParameterList extends React.Component<ContentPackParameterListP
     const { onDeleteParameter, readOnly } = this.props;
     const parameterApplied = this._parameterApplied(parameter.name);
     const buttonTitle = parameterApplied ? 'Still in use' : 'Delete Parameter';
-    const icon = parameterApplied ? 'check_circle' : 'cancel';
-    const bsStyle = parameterApplied ? 'success' : 'failure';
 
     return (
       <tr key={parameter.title}>
@@ -93,23 +92,26 @@ class ContentPackParameterList extends React.Component<ContentPackParameterListP
         <td className={ContentPackParameterListStyle.bigColumns}>{parameter.description}</td>
         <td>{parameter.type}</td>
         <td>{ContentPackUtils.convertToString(parameter)}</td>
-        <td><Badge className={bsStyle}><Icon name={icon} /></Badge></td>
-        {!readOnly
-          && (
-            <td>
-              <ButtonToolbar>
-                <Button bsStyle="primary"
-                        bsSize="xs"
-                        title={buttonTitle}
-                        disabled={parameterApplied}
-                        onClick={() => {
-                          onDeleteParameter(parameter);
-                        }}>
-                  Delete
-                </Button>{this._parameterModal(parameter)}
-              </ButtonToolbar>
-            </td>
-          )}
+        <td>
+          <StatusIcon active={parameterApplied} />
+        </td>
+        {!readOnly && (
+          <td>
+            <ButtonToolbar>
+              <Button
+                bsStyle="danger"
+                bsSize="xs"
+                title={buttonTitle}
+                disabled={parameterApplied}
+                onClick={() => {
+                  onDeleteParameter(parameter);
+                }}>
+                Delete
+              </Button>
+              {this._parameterModal(parameter)}
+            </ButtonToolbar>
+          </td>
+        )}
       </tr>
     );
   };
@@ -125,7 +127,9 @@ class ContentPackParameterList extends React.Component<ContentPackParameterListP
     }
 
     const regexp = RegExp(filter, 'i');
-    const filteredParameters = parameters.filter((parameter) => regexp.test(parameter.title) || regexp.test(parameter.description) || regexp.test(parameter.name));
+    const filteredParameters = parameters.filter(
+      (parameter) => regexp.test(parameter.title) || regexp.test(parameter.description) || regexp.test(parameter.name),
+    );
 
     this.setState({ filteredParameters: filteredParameters, filter: filter });
   };
@@ -153,37 +157,32 @@ class ContentPackParameterList extends React.Component<ContentPackParameterListP
     const triggerButtonName = parameter ? 'Edit' : 'Create parameter';
 
     const modal = (
-      <BootstrapModalWrapper showModal={showModal}
-                             onHide={closeModal}
-                             bsSize="large">
-        <Modal.Header closeButton>
+      <BootstrapModalWrapper showModal={showModal} onHide={closeModal} bsSize="large">
+        <Modal.Header>
           <Modal.Title>Parameter</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <ContentPackEditParameter ref={(node) => {
-            editParameter = node;
-          }}
-                                    parameters={contentPack.parameters}
-                                    onUpdateParameter={(newParameter) => {
-                                      onAddParameter(newParameter, parameter);
-                                      closeModal();
-                                    }}
-                                    parameterToEdit={parameter} />
+          <ContentPackEditParameter
+            ref={(node) => {
+              editParameter = node;
+            }}
+            parameters={contentPack.parameters}
+            onUpdateParameter={(newParameter) => {
+              onAddParameter(newParameter, parameter);
+              closeModal();
+            }}
+            parameterToEdit={parameter}
+          />
         </Modal.Body>
         <Modal.Footer>
-          <ModalSubmit onSubmit={addParameter}
-                       onCancel={closeModal}
-                       submitButtonText={titleName} />
+          <ModalSubmit onSubmit={addParameter} onCancel={closeModal} submitButtonText={titleName} />
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
 
     return (
       <>
-        <Button bsStyle="info"
-                bsSize={size}
-                title="Edit Modal"
-                onClick={openModal}>
+        <Button bsStyle="info" bsSize={size} title="Edit Modal" onClick={openModal}>
           {triggerButtonName}
         </Button>
         {modal}
@@ -204,19 +203,28 @@ class ContentPackParameterList extends React.Component<ContentPackParameterListP
         <h2>Parameters list</h2>
         <br />
         {!readOnly && this._parameterModal()}
-        {!readOnly && (<span><br /><br /></span>)}
-        <SearchForm onSearch={this._filterParameters}
-                    onReset={() => {
-                      this._filterParameters('');
-                    }} />
-        <DataTable id="parameter-list"
-                   headers={headers}
-                   className={ContentPackParameterListStyle.scrollable}
-                   sortByKey="title"
-                   noDataText="To use parameters for content packs, at first a parameter must be created and can then be applied to a entity."
-                   filterKeys={[]}
-                   rows={filteredParameters}
-                   dataRowFormatter={this._parameterRowFormatter} />
+        {!readOnly && (
+          <span>
+            <br />
+            <br />
+          </span>
+        )}
+        <SearchForm
+          onSearch={this._filterParameters}
+          onReset={() => {
+            this._filterParameters('');
+          }}
+        />
+        <DataTable
+          id="parameter-list"
+          headers={headers}
+          className={ContentPackParameterListStyle.scrollable}
+          sortByKey="title"
+          noDataText="To use parameters for content packs, at first a parameter must be created and can then be applied to a entity."
+          filterKeys={[]}
+          rows={filteredParameters}
+          dataRowFormatter={this._parameterRowFormatter}
+        />
       </div>
     );
   }

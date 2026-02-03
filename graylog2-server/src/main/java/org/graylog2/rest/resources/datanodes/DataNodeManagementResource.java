@@ -18,9 +18,13 @@ package org.graylog2.rest.resources.datanodes;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -36,7 +40,6 @@ import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.security.UserContext;
-import org.graylog.security.certutil.CertRenewalService;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -50,6 +53,7 @@ import org.graylog2.rest.bulk.BulkExecutor;
 import org.graylog2.rest.bulk.SequentialBulkExecutor;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.rest.bulk.model.BulkOperationResponse;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -57,17 +61,16 @@ import static org.graylog2.audit.AuditEventTypes.DATANODE_REMOVE;
 import static org.graylog2.audit.AuditEventTypes.DATANODE_RESET;
 import static org.graylog2.audit.AuditEventTypes.DATANODE_START;
 import static org.graylog2.audit.AuditEventTypes.DATANODE_STOP;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "Datanode", description = "Data Node", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Datanode", description = "Data Node")
 @Path("/datanode/")
 @Produces(MediaType.APPLICATION_JSON)
 public class DataNodeManagementResource extends RestResource {
 
     private final DataNodeCommandService dataNodeCommandService;
     private final NodeService<DataNodeDto> nodeService;
-    private final CertRenewalService certRenewalService;
     private final Boolean runsWithDataNode;
     private final BulkExecutor<DataNodeDto, UserContext> bulkRemovalExecutor;
     private final BulkExecutor<DataNodeDto, UserContext> bulkStopExecutor;
@@ -76,12 +79,10 @@ public class DataNodeManagementResource extends RestResource {
     @Inject
     protected DataNodeManagementResource(DataNodeCommandService dataNodeCommandService,
                                          NodeService<DataNodeDto> nodeService,
-                                         CertRenewalService certRenewalService,
                                          @RunsWithDataNode Boolean runsWithDataNode,
                                          AuditEventSender auditEventSender, ObjectMapper objectMapper) {
         this.dataNodeCommandService = dataNodeCommandService;
         this.nodeService = nodeService;
-        this.certRenewalService = certRenewalService;
         this.runsWithDataNode = runsWithDataNode;
         bulkRemovalExecutor = new SequentialBulkExecutor<>(this::removeNode, auditEventSender, objectMapper);
         bulkStopExecutor = new SequentialBulkExecutor<>(this::stopNode, auditEventSender, objectMapper);
@@ -91,7 +92,7 @@ public class DataNodeManagementResource extends RestResource {
 
     @GET
     @Path("configured")
-    @ApiOperation("Returns whether this Graylog is running against a data node search backend")
+    @Operation(summary = "Returns whether this Graylog is running against a data node search backend")
     @RequiresPermissions(RestPermissions.DATANODE_READ)
     public Boolean runsWithDataNode() {
         return runsWithDataNode;
@@ -99,9 +100,9 @@ public class DataNodeManagementResource extends RestResource {
 
     @GET
     @Path("{nodeId}")
-    @ApiOperation("Get data node information")
+    @Operation(summary = "Get data node information")
     @RequiresPermissions(RestPermissions.DATANODE_READ)
-    public DataNodeDto getDataNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
+    public DataNodeDto getDataNode(@Parameter(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
         try {
             return nodeService.byNodeId(nodeId);
         } catch (NodeNotFoundException e) {
@@ -111,10 +112,10 @@ public class DataNodeManagementResource extends RestResource {
 
     @DELETE
     @Path("{nodeId}")
-    @ApiOperation("Remove node from cluster")
+    @Operation(summary = "Remove node from cluster")
     @AuditEvent(type = DATANODE_REMOVE)
     @RequiresPermissions(RestPermissions.DATANODE_REMOVE)
-    public DataNodeDto removeNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId,
+    public DataNodeDto removeNode(@Parameter(name = "nodeId", required = true) @PathParam("nodeId") String nodeId,
                                   @Context UserContext userContext) {
         try {
             return dataNodeCommandService.removeNode(nodeId);
@@ -127,9 +128,13 @@ public class DataNodeManagementResource extends RestResource {
     @Path("/bulk_remove")
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
-    @ApiOperation(value = "Remove multiple nodes from the cluster", response = BulkOperationResponse.class)
+    @Operation(summary = "Remove multiple nodes from the cluster")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Remove multiple nodes from the cluster retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = BulkOperationResponse.class)))
+    })
     @NoAuditEvent("Audit events triggered manually")
-    public Response bulkRemove(@ApiParam(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
+    public Response bulkRemove(@Parameter(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
                                @Context UserContext userContext) {
 
         final BulkOperationResponse response = bulkRemovalExecutor.executeBulkOperation(bulkOperationRequest,
@@ -143,10 +148,10 @@ public class DataNodeManagementResource extends RestResource {
 
     @POST
     @Path("{nodeId}/reset")
-    @ApiOperation("Reset a removed node to rejoin the cluster")
+    @Operation(summary = "Reset a removed node to rejoin the cluster")
     @AuditEvent(type = DATANODE_RESET)
     @RequiresPermissions(RestPermissions.DATANODE_RESET)
-    public DataNodeDto resetNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
+    public DataNodeDto resetNode(@Parameter(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
         try {
             return dataNodeCommandService.resetNode(nodeId);
         } catch (NodeNotFoundException e) {
@@ -156,10 +161,10 @@ public class DataNodeManagementResource extends RestResource {
 
     @POST
     @Path("{nodeId}/stop")
-    @ApiOperation("Stop the OpenSearch process of a data node")
+    @Operation(summary = "Stop the OpenSearch process of a data node")
     @AuditEvent(type = DATANODE_STOP)
     @RequiresPermissions(RestPermissions.DATANODE_STOP)
-    public DataNodeDto stopNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId,
+    public DataNodeDto stopNode(@Parameter(name = "nodeId", required = true) @PathParam("nodeId") String nodeId,
                                 @Context UserContext userContext) {
         try {
             return dataNodeCommandService.stopNode(nodeId);
@@ -173,9 +178,13 @@ public class DataNodeManagementResource extends RestResource {
     @Path("/bulk_stop")
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
-    @ApiOperation(value = "Stop multiple nodes in the cluster", response = BulkOperationResponse.class)
+    @Operation(summary = "Stop multiple nodes in the cluster")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Stop multiple nodes in the cluster retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = BulkOperationResponse.class)))
+    })
     @NoAuditEvent("Audit events triggered manually")
-    public Response bulkStop(@ApiParam(name = "Entities to stop", required = true) final BulkOperationRequest bulkOperationRequest,
+    public Response bulkStop(@Parameter(name = "Entities to stop", required = true) final BulkOperationRequest bulkOperationRequest,
                              @Context UserContext userContext) {
 
         final BulkOperationResponse response = bulkStopExecutor.executeBulkOperation(bulkOperationRequest,
@@ -189,10 +198,10 @@ public class DataNodeManagementResource extends RestResource {
 
     @POST
     @Path("{nodeId}/start")
-    @ApiOperation("Start the OpenSearch process of a data node")
+    @Operation(summary = "Start the OpenSearch process of a data node")
     @AuditEvent(type = DATANODE_START)
     @RequiresPermissions(RestPermissions.DATANODE_START)
-    public DataNodeDto startNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId,
+    public DataNodeDto startNode(@Parameter(name = "nodeId", required = true) @PathParam("nodeId") String nodeId,
                                  @Context UserContext userContext) {
         try {
             return dataNodeCommandService.startNode(nodeId);
@@ -205,9 +214,13 @@ public class DataNodeManagementResource extends RestResource {
     @Path("/bulk_start")
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
-    @ApiOperation(value = "Start multiple nodes in the cluster", response = BulkOperationResponse.class)
+    @Operation(summary = "Start multiple nodes in the cluster")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Start multiple nodes in the cluster retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = BulkOperationResponse.class)))
+    })
     @NoAuditEvent("Audit events triggered manually")
-    public Response bulkStart(@ApiParam(name = "Entities to start", required = true) final BulkOperationRequest bulkOperationRequest,
+    public Response bulkStart(@Parameter(name = "Entities to start", required = true) final BulkOperationRequest bulkOperationRequest,
                               @Context UserContext userContext) {
 
         final BulkOperationResponse response = bulkStartExecutor.executeBulkOperation(bulkOperationRequest,

@@ -16,34 +16,29 @@
  */
 
 import React, { useCallback } from 'react';
-import styled, { css } from 'styled-components';
 
-import { Icon } from 'components/common';
 import useFavoriteItemMutation from 'hooks/useFavoriteItemMutation';
-
-const StyledIcon = styled(Icon)<{ $isFavorite: boolean }>(({ theme, $isFavorite }) => css`
-  color: ${$isFavorite ? theme.colors.variant.info : undefined};
-  cursor: pointer;
-`);
+import CommonFavoriteIcon from 'views/components/common/CommonFavoriteIcon';
 
 type Props = {
-  isFavorite: boolean,
-  grn: string,
-  onChange: (currentState: boolean) => void,
-  className?: string,
-}
+  isFavorite: boolean;
+  grn: string;
+  onChange: (currentState: boolean) => void;
+  className?: string;
+};
 
-const FavoriteIcon = ({ isFavorite, grn, onChange, className }: Props) => {
+const FavoriteIcon = ({ isFavorite, grn, onChange, className = undefined }: Props) => {
   const { putItem, deleteItem } = useFavoriteItemMutation();
   const onClick = useCallback(() => {
     if (isFavorite) {
-      deleteItem(grn)
-        .then(() => onChange(false));
-    } else { putItem(grn).then(() => onChange(true)); }
+      deleteItem(grn).then(() => onChange(false));
+    } else {
+      putItem(grn).then(() => onChange(true));
+    }
   }, [isFavorite, deleteItem, grn, onChange, putItem]);
   const title = isFavorite ? 'Remove from favorites' : 'Add to favorites';
 
-  return <StyledIcon className={className} onClick={onClick} title={title} $isFavorite={isFavorite} name="star" type={isFavorite ? 'solid' : 'regular'} />;
+  return <CommonFavoriteIcon className={className} onClick={onClick} title={title} isFavorite={isFavorite} />;
 };
 
 export default FavoriteIcon;

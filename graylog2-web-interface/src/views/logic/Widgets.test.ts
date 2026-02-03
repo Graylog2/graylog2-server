@@ -48,8 +48,9 @@ describe('Widgets', () => {
     it('throws error if widget type and default type are not present', () => {
       asMock(PluginStore.exports).mockReturnValue([someOtherTypeWidget]);
 
-      expect(() => widgetDefinition('some-type'))
-        .toThrow('Neither a widget of type "some-type" nor a default widget are registered!');
+      expect(() => widgetDefinition('some-type')).toThrow(
+        'Neither a widget of type "some-type" nor a default widget are registered!',
+      );
     });
   });
 });

@@ -1,0 +1,5 @@
+type = "f"
+message = "Rename `whitelist` to `allowlist` in UI, API, and codebase."
+
+pulls = ["22903", "Graylog2/graylog-plugin-enterprise#11590"]
+issues = ["21034"]

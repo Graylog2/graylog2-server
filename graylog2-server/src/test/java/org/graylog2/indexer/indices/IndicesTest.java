@@ -18,15 +18,12 @@ package org.graylog2.indexer.indices;
 
 import com.google.common.eventbus.EventBus;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.indexer.IgnoreIndexTemplate;
-import org.graylog2.indexer.IndexMappingFactory;
-import org.graylog2.indexer.IndexMappingTemplate;
-import org.graylog2.indexer.IndexTemplateNotFoundException;
-import org.graylog2.indexer.TestIndexSet;
+import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
+import org.graylog2.indexer.indexset.TestIndexSet;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
@@ -34,6 +31,10 @@ import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
+import org.graylog2.indexer.template.IgnoreIndexTemplate;
+import org.graylog2.indexer.template.IndexMappingFactory;
+import org.graylog2.indexer.template.IndexMappingTemplate;
+import org.graylog2.indexer.template.IndexTemplateNotFoundException;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,38 +60,37 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class IndicesTest {
 
-    private Indices underTest;
-
+    private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
     @Mock
     private IndexMappingFactory indexMappingFactory;
-
-    private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
-
     @Mock
     private AuditEventSender auditEventSender;
-
     @Mock
     private EventBus eventBus;
-
     @Mock
     private IndicesAdapter indicesAdapter;
     @Mock
     private IndexFieldTypeProfileService profileService;
+    @Mock
+    private CountsAdapter countsAdapter;
+
+    private Indices underTest;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         underTest = new Indices(
                 indexMappingFactory,
                 nodeId,
                 auditEventSender,
                 eventBus,
                 indicesAdapter,
-                profileService
+                profileService,
+                countsAdapter
         );
     }
 
     @Test
-    public void ensureIndexTemplate_IfIndexTemplateExistsOnIgnoreIndexTemplate_thenNoExceptionThrown() {
+    void ensureIndexTemplate_IfIndexTemplateExistsOnIgnoreIndexTemplate_thenNoExceptionThrown() {
         when(indexMappingFactory.createIndexMapping(any()))
                 .thenThrow(new IgnoreIndexTemplate(true,
                         "Reasom", "test", "test-template", null));
@@ -98,12 +98,12 @@ class IndicesTest {
         when(indicesAdapter.indexTemplateExists("test-template")).thenReturn(true);
 
         assertThatCode(() -> underTest.ensureIndexTemplate(
-                indexSetConfig("test", "test-template", "custom")))
+                indexSetConfig("test", "test-template", "custom").indexTemplateConfig()))
                 .doesNotThrowAnyException();
     }
 
     @Test
-    public void ensureIndexTemplate_IfIndexTemplateDoesntExistOnIgnoreIndexTemplateAndFailOnMissingTemplateIsTrue_thenExceptionThrown() {
+    void ensureIndexTemplate_IfIndexTemplateDoesntExistOnIgnoreIndexTemplateAndFailOnMissingTemplateIsTrue_thenExceptionThrown() {
         when(indexMappingFactory.createIndexMapping(any()))
                 .thenThrow(new IgnoreIndexTemplate(true,
                         "Reasom", "test", "test-template", null));
@@ -111,31 +111,31 @@ class IndicesTest {
         when(indicesAdapter.indexTemplateExists("test-template")).thenReturn(false);
 
         assertThatCode(() -> underTest.ensureIndexTemplate(indexSetConfig("test",
-                "test-template", "custom")))
+                "test-template", "custom").indexTemplateConfig()))
                 .isExactlyInstanceOf(IndexTemplateNotFoundException.class)
                 .hasMessage("No index template with name 'test-template' (type - 'custom') found in Elasticsearch");
     }
 
     @Test
-    public void ensureIndexTemplate_IfIndexTemplateDoesntExistOnIgnoreIndexTemplateAndFailOnMissingTemplateIsFalse_thenNoExceptionThrown() {
+    void ensureIndexTemplate_IfIndexTemplateDoesntExistOnIgnoreIndexTemplateAndFailOnMissingTemplateIsFalse_thenNoExceptionThrown() {
         when(indexMappingFactory.createIndexMapping(any()))
                 .thenThrow(new IgnoreIndexTemplate(false,
                         "Reasom", "test", "test-template", null));
 
         assertThatCode(() -> underTest.ensureIndexTemplate(indexSetConfig("test",
-                "test-template", "custom")))
+                "test-template", "custom").indexTemplateConfig()))
                 .doesNotThrowAnyException();
     }
 
     @Test
-    public void testGetIndicesBlocksStatusReturnsNoBlocksOnNullIndicesList() {
+    void testGetIndicesBlocksStatusReturnsNoBlocksOnNullIndicesList() {
         final IndicesBlockStatus indicesBlocksStatus = underTest.getIndicesBlocksStatus(null);
         assertNotNull(indicesBlocksStatus);
         assertEquals(0, indicesBlocksStatus.countBlockedIndices());
     }
 
     @Test
-    public void testGetIndicesBlocksStatusReturnsNoBlocksOnEmptyIndicesList() {
+    void testGetIndicesBlocksStatusReturnsNoBlocksOnEmptyIndicesList() {
         final IndicesBlockStatus indicesBlocksStatus = underTest.getIndicesBlocksStatus(Collections.emptyList());
         assertNotNull(indicesBlocksStatus);
         assertEquals(0, indicesBlocksStatus.countBlockedIndices());
@@ -161,8 +161,8 @@ class IndicesTest {
                 )))
         )).when(profileService).get("000000000000000000000013");
         IndexMappingTemplate indexMappingTemplateMock = mock(IndexMappingTemplate.class);
-        doReturn(indexMappingTemplateMock).when(indexMappingFactory).createIndexMapping(testIndexSet.getConfig());
-        underTest.getIndexTemplate(testIndexSet);
+        doReturn(indexMappingTemplateMock).when(indexMappingFactory).createIndexMapping(testIndexSet.indexTemplateConfig());
+        underTest.getIndexTemplate(testIndexSet.indexTemplateConfig());
 
         verify(indexMappingTemplateMock).toTemplate(
                 new IndexSetMappingTemplate("standard", "test_*",
@@ -192,8 +192,8 @@ class IndicesTest {
                 new CustomFieldMappings(List.of()))
         )).when(profileService).get("000000000000000000000013");
         IndexMappingTemplate indexMappingTemplateMock = mock(IndexMappingTemplate.class);
-        doReturn(indexMappingTemplateMock).when(indexMappingFactory).createIndexMapping(testIndexSet.getConfig());
-        underTest.getIndexTemplate(testIndexSet);
+        doReturn(indexMappingTemplateMock).when(indexMappingFactory).createIndexMapping(testIndexSet.indexTemplateConfig());
+        underTest.getIndexTemplate(testIndexSet.indexTemplateConfig());
 
         verify(indexMappingTemplateMock).toTemplate(
                 new IndexSetMappingTemplate("standard", "test_*",
@@ -213,8 +213,8 @@ class IndicesTest {
                 "000000000000000000000013",
                 individualCustomFieldMappings);
         IndexMappingTemplate indexMappingTemplateMock = mock(IndexMappingTemplate.class);
-        doReturn(indexMappingTemplateMock).when(indexMappingFactory).createIndexMapping(testIndexSet.getConfig());
-        underTest.getIndexTemplate(testIndexSet);
+        doReturn(indexMappingTemplateMock).when(indexMappingFactory).createIndexMapping(testIndexSet.indexTemplateConfig());
+        underTest.getIndexTemplate(testIndexSet.indexTemplateConfig());
 
         verify(indexMappingTemplateMock).toTemplate(
                 new IndexSetMappingTemplate("standard", "test_*",
@@ -242,8 +242,8 @@ class IndicesTest {
                 )))
         )).when(profileService).get("000000000000000000000013");
         IndexMappingTemplate indexMappingTemplateMock = mock(IndexMappingTemplate.class);
-        doReturn(indexMappingTemplateMock).when(indexMappingFactory).createIndexMapping(testIndexSet.getConfig());
-        underTest.buildTemplate(testIndexSet, testIndexSet.getConfig());
+        doReturn(indexMappingTemplateMock).when(indexMappingFactory).createIndexMapping(testIndexSet.indexTemplateConfig());
+        underTest.buildTemplate(testIndexSet.indexTemplateConfig());
 
         verify(indexMappingTemplateMock).toTemplate(
                 new IndexSetMappingTemplate("standard", "test_*",

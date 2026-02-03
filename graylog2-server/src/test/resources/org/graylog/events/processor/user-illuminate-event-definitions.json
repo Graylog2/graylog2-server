@@ -1,0 +1,76 @@
+{
+  "event_definitions": [
+    {
+      "_id": {
+        "$oid": "68e69300ea78fbd8fbb48640"
+      },
+      "_scope": "ILLUMINATE",
+      "title": "Illuminate event definition",
+      "description": "Illuminate event definition",
+      "priority": 2,
+      "alert": true,
+      "notification_settings": {
+        "grace_period_ms": 60000
+      },
+      "config": {
+        "type": "__test_event_processor_config__",
+        "message": "This is a test event processor",
+        "search_within_ms": 300000,
+        "execute_every_ms": 60000
+      },
+      "field_spec": {},
+      "key_spec": [
+        "username"
+      ],
+      "notifications": [],
+      "storage": []
+    },
+    {
+      "_id": {
+        "$oid": "68e692d8ea78fbd8fbb481f6"
+      },
+      "_scope": "DEFAULT",
+      "title": "User event definition",
+      "description": "User event definition",
+      "priority": 2,
+      "alert": true,
+      "notification_settings": {
+        "grace_period_ms": 60000
+      },
+      "config": {
+        "type": "__test_event_processor_config__",
+        "message": "This is a test event processor",
+        "search_within_ms": 300000,
+        "execute_every_ms": 60000
+      },
+      "field_spec": {},
+      "key_spec": [
+        "username"
+      ],
+      "notifications": [],
+      "storage": []
+    },
+    {
+      "_id": {
+        "$oid": "6900c23f91dc3426da7e06b4"
+      },
+      "_scope": "GRAYLOG_NONDELETEABLE_SCOPE",
+      "title": "System notification events",
+      "description": "System notification events",
+      "priority": 2,
+      "alert": true,
+      "notification_settings": {
+        "grace_period_ms": 60000
+      },
+      "config": {
+        "type": "system-notifications-v1"
+      },
+      "field_spec": {},
+      "key_spec": [
+        "username"
+      ],
+      "notifications": [],
+      "storage": []
+    }
+  ]
+}

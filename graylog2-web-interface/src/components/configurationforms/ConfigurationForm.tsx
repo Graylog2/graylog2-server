@@ -22,55 +22,72 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { ConfigurationFormField, TitleField } from 'components/configurationforms';
 
 import { FIELD_TYPES_WITH_ENCRYPTION_SUPPORT } from './types';
-import type { ConfigurationFormData, ConfigurationField, ConfigurationFieldValue, EncryptedFieldValue, FieldValue, ConfigurationFieldWithEncryption } from './types';
+import type {
+  ConfigurationFormData,
+  ConfigurationField,
+  ConfigurationFieldValue,
+  EncryptedFieldValue,
+  FieldValue,
+  ConfigurationFieldWithEncryption,
+} from './types';
 
 type Props<Configuration extends object> = {
-  cancelAction?: () => void,
+  cancelAction?: () => void;
   configFields?: {
-    [key: string]: ConfigurationField,
-  },
-  children?: React.ReactNode,
-  titleHelpText?: string,
-  includeTitleField?: boolean,
-  submitAction: (data: ConfigurationFormData<Configuration>) => void,
-  title?: string | React.ReactNode | null
-  titleValue?: string,
-  typeName?: string,
-  values?: { [key:string]: any },
-  wrapperComponent?: React.ComponentType<React.PropsWithChildren<{
-    show: boolean,
-    title: string | React.ReactNode | null,
-    onCancel: () => void,
-    onSubmitForm: () => void,
-    submitButtonText: string
-  }>>,
-  submitButtonText?: string,
-}
+    [key: string]: ConfigurationField;
+  };
+  children?: React.ReactNode;
+  initialShow?: boolean;
+  titleHelpText?: string;
+  includeTitleField?: boolean;
+  submitAction: (data: ConfigurationFormData<Configuration>) => void;
+  title?: string | React.ReactNode | null;
+  titleValue?: string;
+  typeName?: string;
+  values?: { [key: string]: any };
+  wrapperComponent?: React.ComponentType<
+    React.PropsWithChildren<{
+      show: boolean;
+      title: string | React.ReactNode | null;
+      onCancel: () => void;
+      onSubmitForm: () => void;
+      submitButtonText: string;
+    }>
+  >;
+  submitButtonText?: string;
+};
 
 export type RefType<Configuration extends object> = {
-  open: () => void,
-  getValue: () => ConfigurationFormData<Configuration>,
-}
+  open: () => void;
+  getValue: () => ConfigurationFormData<Configuration>;
+};
 
 const defaultConfigFields = {};
-const ConfigurationForm = forwardRef(<Configuration extends object>({
-  cancelAction = () => {},
-  configFields = defaultConfigFields,
-  children = null,
-  titleHelpText = '',
-  includeTitleField = true,
-  submitAction,
-  title = null,
-  titleValue: initialTitleValue = '',
-  typeName,
-  values: initialValues = {},
-  wrapperComponent: WrapperComponent = BootstrapModalForm as unknown as Props<{ }>['wrapperComponent'],
-  submitButtonText,
-} : Props<Configuration>, ref: React.ForwardedRef<RefType<Configuration>>) => {
-  const [showConfigurationModal, setShowConfigurationModal] = useState(false);
+const defaultCancelAction = () => {};
+const defaultInitialValues = {};
+
+const ConfigurationForm = <Configuration extends object>(
+  {
+    cancelAction = defaultCancelAction,
+    configFields = defaultConfigFields,
+    children = null,
+    titleHelpText = '',
+    initialShow = false,
+    includeTitleField = true,
+    submitAction,
+    title = null,
+    titleValue: initialTitleValue = '',
+    typeName = undefined,
+    values: initialValues = defaultInitialValues,
+    wrapperComponent: WrapperComponent = BootstrapModalForm as Props<Configuration>['wrapperComponent'],
+    submitButtonText = undefined,
+  }: Props<Configuration>,
+  ref: React.ForwardedRef<RefType<Configuration>>,
+) => {
+  const [showConfigurationModal, setShowConfigurationModal] = useState(initialShow);
   const [titleValue, setTitleValue] = useState(undefined);
-  const [values, setValues] = useState<{[key:string]: any} | undefined>(undefined);
-  const [fieldStates, setFieldStates] = useState<{[key:string]: any} | undefined>({});
+  const [values, setValues] = useState<{ [key: string]: any } | undefined>(undefined);
+  const [fieldStates, setFieldStates] = useState<{ [key: string]: any } | undefined>({});
 
   useEffect(() => {
     const defaultValues = {};
@@ -100,7 +117,7 @@ const ConfigurationForm = forwardRef(<Configuration extends object>({
     }
 
     Object.keys(configFields).forEach((fieldName) => {
-      data.configuration[fieldName] = (values[fieldName] === undefined ? null : values[fieldName]);
+      data.configuration[fieldName] = values[fieldName] === undefined ? null : values[fieldName];
     });
 
     return data;
@@ -114,9 +131,10 @@ const ConfigurationForm = forwardRef(<Configuration extends object>({
     let diff = x1pos - x2pos;
 
     if (!diff) {
-      const isOptionalToNumber = (optional: boolean) : number => (optional ? 1 : 0);
+      const isOptionalToNumber = (optional: boolean): number => (optional ? 1 : 0);
 
-      diff = isOptionalToNumber(configFields[x1.name].is_optional) - isOptionalToNumber(configFields[x2.name].is_optional);
+      diff =
+        isOptionalToNumber(configFields[x1.name].is_optional) - isOptionalToNumber(configFields[x2.name].is_optional);
     }
 
     if (!diff) {
@@ -127,9 +145,9 @@ const ConfigurationForm = forwardRef(<Configuration extends object>({
     return diff;
   };
 
-  const fieldIsEncrypted = (configField: ConfigurationField) : boolean => {
+  const fieldIsEncrypted = (configField: ConfigurationField): boolean => {
     const fieldSupportsEncryption = FIELD_TYPES_WITH_ENCRYPTION_SUPPORT.includes(
-      (configField.type as unknown as typeof FIELD_TYPES_WITH_ENCRYPTION_SUPPORT[number]),
+      configField.type as unknown as (typeof FIELD_TYPES_WITH_ENCRYPTION_SUPPORT)[number],
     );
 
     if (!fieldSupportsEncryption) {
@@ -140,16 +158,23 @@ const ConfigurationForm = forwardRef(<Configuration extends object>({
   };
 
   const handleEncryptedFieldsBeforeSubmit = (data): ConfigurationFormData<Configuration> => {
-    const configurationEntries = Object.entries(data.configuration).map(([fieldName, fieldValue] : [string, ConfigurationFieldValue]) => {
-      const configField = configFields[fieldName as string];
-      const fieldState = fieldStates[fieldName as string];
+    const configurationEntries = Object.entries(data.configuration).map(
+      ([fieldName, fieldValue]: [string, ConfigurationFieldValue]) => {
+        const configField = configFields[fieldName as string];
+        const fieldState = fieldStates[fieldName as string];
 
-      if (fieldIsEncrypted(configField) && !fieldState?.dirty && fieldValue && (fieldValue as EncryptedFieldValue<FieldValue>).is_set !== undefined) {
-        return [fieldName, { keep_value: true }];
-      }
+        if (
+          fieldIsEncrypted(configField) &&
+          !fieldState?.dirty &&
+          fieldValue &&
+          (fieldValue as EncryptedFieldValue<FieldValue>).is_set !== undefined
+        ) {
+          return [fieldName, { keep_value: true }];
+        }
 
-      return [fieldName, fieldValue];
-    });
+        return [fieldName, fieldValue];
+      },
+    );
 
     return { ...data, configuration: Object.fromEntries(configurationEntries) };
   };
@@ -193,14 +218,16 @@ const ConfigurationForm = forwardRef(<Configuration extends object>({
     const value = values[key];
 
     return (
-      <ConfigurationFormField key={key}
-                              typeName={typeName}
-                              configField={configField}
-                              configKey={key}
-                              configValue={value}
-                              autoFocus={autoFocus}
-                              dirty={fieldStates[key]?.dirty}
-                              onChange={handleChange} />
+      <ConfigurationFormField
+        key={key}
+        typeName={typeName}
+        configField={configField}
+        configKey={key}
+        configValue={value}
+        autoFocus={autoFocus}
+        dirty={fieldStates[key]?.dirty}
+        onChange={handleChange}
+      />
     );
   };
 
@@ -209,17 +236,21 @@ const ConfigurationForm = forwardRef(<Configuration extends object>({
 
   if (includeTitleField) {
     titleElement = (
-      <TitleField key={`${typeName}-title`}
-                  typeName={typeName}
-                  value={titleValue}
-                  onChange={handleTitleChange}
-                  helpText={titleHelpText} />
+      <TitleField
+        key={`${typeName}-title`}
+        typeName={typeName}
+        value={titleValue}
+        onChange={handleTitleChange}
+        helpText={titleHelpText}
+      />
     );
 
     shouldAutoFocus = false;
   }
 
-  const sortedConfigFieldKeys = Object.keys(configFields).map((name, pos) => ({ name, pos })).sort(sortByPosOrOptionality);
+  const sortedConfigFieldKeys = Object.keys(configFields)
+    .map((name, pos) => ({ name, pos }))
+    .sort(sortByPosOrOptionality);
 
   const renderedConfigFields = sortedConfigFieldKeys.map((key) => {
     const configField = renderConfigField(configFields[key.name], key.name, shouldAutoFocus);
@@ -232,11 +263,12 @@ const ConfigurationForm = forwardRef(<Configuration extends object>({
   });
 
   return (
-    <WrapperComponent show={showConfigurationModal}
-                      title={title}
-                      onCancel={handleCancel}
-                      onSubmitForm={save}
-                      submitButtonText={submitButtonText}>
+    <WrapperComponent
+      show={showConfigurationModal}
+      title={title}
+      onCancel={handleCancel}
+      onSubmitForm={save}
+      submitButtonText={submitButtonText}>
       <fieldset>
         <input type="hidden" name="type" value={typeName} />
         {children}
@@ -245,8 +277,8 @@ const ConfigurationForm = forwardRef(<Configuration extends object>({
       </fieldset>
     </WrapperComponent>
   );
-});
+};
 
-export default ConfigurationForm as <T extends object>(
+export default forwardRef(ConfigurationForm) as <T extends object>(
   props: Props<T> & { ref?: ForwardedRef<RefType<T>> },
 ) => ReturnType<typeof ConfigurationForm>;

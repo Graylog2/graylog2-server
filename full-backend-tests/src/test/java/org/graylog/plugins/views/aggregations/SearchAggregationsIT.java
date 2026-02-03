@@ -18,9 +18,6 @@ package org.graylog.plugins.views.aggregations;
 
 import com.google.common.base.Joiner;
 import io.restassured.response.ValidatableResponse;
-import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.rest.QueryDTO;
-import org.graylog.plugins.views.search.rest.SearchDTO;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
@@ -35,80 +32,44 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Min;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentage;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.testing.containermatrix.SearchServer.ES7;
-import static org.graylog.testing.containermatrix.SearchServer.OS1;
-import static org.graylog.testing.containermatrix.SearchServer.OS2_LATEST;
-import static org.graylog.testing.utils.SerializationUtils.serialize;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
-@ContainerMatrixTestsConfiguration(searchVersions = {ES7, OS1, OS2_LATEST})
+@GraylogBackendConfiguration
 public class SearchAggregationsIT {
     private static final String PIVOT_NAME = "pivotaggregation";
     private static final String PIVOT_PATH = "results.query1.search_types." + PIVOT_NAME;
 
-    private final GraylogApis api;
-
-    public SearchAggregationsIT(GraylogApis api) {
-        this.api = api;
-    }
+    private static GraylogApis api;
 
     @BeforeAll
-    public void setUp() {
-        this.api.backend().importElasticsearchFixture("random-http-logs.json", SearchAggregationsIT.class);
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
+        api.backend().importElasticsearchFixture("random-http-logs.json", SearchAggregationsIT.class);
     }
 
-    private ValidatableResponse execute(Pivot pivot) {
-        final Pivot pivotWithId = pivot.toBuilder()
-                .id(PIVOT_NAME)
-                .build();
-
-        final SearchDTO search = SearchDTO.builder()
-                .queries(QueryDTO.builder()
-                        .timerange(RelativeRange.create(0))
-                        .id("query1")
-                        .query(ElasticsearchQueryString.of("source:pivot-fixtures"))
-                        .searchTypes(Set.of(pivotWithId))
-                        .build())
-                .build();
-
-        return given()
-                .spec(api.requestSpecification())
-                .when()
-                .body(serialize(search))
-                .post("/views/search/sync")
-                .then()
-                .log().ifError()
-                .log().ifValidationFails()
-                .statusCode(200)
-                .body("execution.done", equalTo(true))
-                .body("execution.completed_exceptionally", equalTo(false))
-                .body(PIVOT_PATH + ".total", equalTo(1000));
-    }
-
-    @ContainerMatrixTest
+    @FullBackendTest
     void testZeroPivots() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(1));
@@ -119,14 +80,15 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testZeroPivotsWithLatestMetric() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
                 .series(Latest.builder().field("http_method").build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "latest(http_method)");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(1));
@@ -137,7 +99,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(Collections.emptyList(), List.of("latest(http_method)")), equalTo("GET"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSingleRowPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -145,7 +107,8 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "http_method", "count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(5));
@@ -160,7 +123,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testUnknownFieldsPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -168,7 +131,8 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "http_method", "unknown_field_1", "unknown_field_2", "count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(4));
@@ -182,7 +146,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(List.of("PUT", "(Empty Value)", "(Empty Value)"), List.of("count()")), equalTo(43));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testUnknownFieldsAroundUnknownPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -190,7 +154,8 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "unknown_field_1", "http_method", "unknown_field_2", "count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(4));
@@ -204,7 +169,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(List.of("(Empty Value)", "PUT", "(Empty Value)"), List.of("count()")), equalTo(43));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testUnknownFieldFirstPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -212,7 +177,8 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "unknown_field_1", "http_method", "count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(4));
@@ -227,7 +193,7 @@ public class SearchAggregationsIT {
     }
 
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testAllUnknownFieldsPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -235,7 +201,8 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "unknown_field_1", "unknown_field_2", "unknown_field_3", "count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(1));
@@ -246,7 +213,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(List.of("(Empty Value)", "(Empty Value)", "(Empty Value)"), List.of("count()")), equalTo(1000));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testFindTopPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -255,7 +222,8 @@ public class SearchAggregationsIT {
                 .series(Max.builder().field("took_ms").build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "http_method", "max(took_ms)");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(1));
@@ -266,7 +234,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult("GET", "max(took_ms)"), equalTo(5300.0f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testFindBottomPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -275,7 +243,8 @@ public class SearchAggregationsIT {
                 .series(Max.builder().field("took_ms").build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "http_method", "max(took_ms)");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(1));
@@ -286,7 +255,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult("DELETE", "max(took_ms)"), equalTo(104.0f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSingleRowPivotWithDateField() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -302,7 +271,8 @@ public class SearchAggregationsIT {
                 )
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "timestamp", "avg(took_ms)", "count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(5));
@@ -322,7 +292,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(Collections.emptyList(), List.of("avg(took_ms)")), equalTo(78.74f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSingleRowPivotWithDateFieldAsColumnPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -336,7 +306,8 @@ public class SearchAggregationsIT {
                 .series(Average.builder().field("took_ms").build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "http_method", "2022-09-26T14:12:10.000Z, avg(took_ms)", "2022-09-26T14:12:20.000Z, avg(took_ms)", "2022-09-26T14:12:30.000Z, avg(took_ms)", "2022-09-26T14:12:40.000Z, avg(took_ms)");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(5));
@@ -357,7 +328,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult("GET", "avg(took_ms)"), equalTo(63.14883720930233f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSingleColumnPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -365,7 +336,8 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "DELETE, count()", "GET, count()", "POST, count()", "PUT, count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(1));
@@ -380,7 +352,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testDoesNotReturnRollupWhenDisabled() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -388,7 +360,8 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "DELETE, count()", "GET, count()", "POST, count()", "PUT, count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(1));
@@ -403,7 +376,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), is(nullValue()));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSingleRowAndColumnPivots() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -412,7 +385,8 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "http_method", "200, count()", "201, count()", "204, count()", "500, count()", "504, count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(5));
@@ -450,7 +424,7 @@ public class SearchAggregationsIT {
                 .body(pathToValue(List.of("count()")), equalTo(1000));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testRowAndColumnPivotsWithMissingFields() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -459,7 +433,8 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "missing_row_pivot", "(Empty Value), count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(2));
@@ -471,7 +446,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(List.of("(Empty Value)"), List.of("count()")), equalTo(1000));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTwoNestedRowPivots() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -482,7 +457,8 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "http_method", "http_response_code", "count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000))
@@ -517,7 +493,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTwoTupleRowPivots() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -527,7 +503,8 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "http_method", "http_response_code", "count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000))
@@ -562,7 +539,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTwoNestedRowPivotsWithSorting() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -574,7 +551,8 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "http_method", "http_response_code", "count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000))
@@ -616,7 +594,7 @@ public class SearchAggregationsIT {
         );
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTwoTupleRowPivotsWithSorting() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -627,7 +605,8 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "http_method", "http_response_code", "count()");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000))
@@ -653,7 +632,7 @@ public class SearchAggregationsIT {
         );
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTwoTupleRowPivotsWithMetricsSorting() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -664,7 +643,8 @@ public class SearchAggregationsIT {
                 .sort(SeriesSort.create("min(took_ms)", SortSpec.Direction.Ascending), SeriesSort.create("max(took_ms)", SortSpec.Direction.Descending))
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "action", "controller", "max(took_ms)", "min(took_ms)");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000));
@@ -688,7 +668,7 @@ public class SearchAggregationsIT {
         );
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTwoNestedRowPivotsWithMetricsSorting() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -700,7 +680,8 @@ public class SearchAggregationsIT {
                 .sort(SeriesSort.create("min(took_ms)", SortSpec.Direction.Ascending), SeriesSort.create("max(took_ms)", SortSpec.Direction.Descending))
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "action", "controller", "max(took_ms)", "min(took_ms)");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000));
@@ -724,14 +705,15 @@ public class SearchAggregationsIT {
         );
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTopLevelSeries() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
                 .series(List.of(Max.builder().field("took_ms").build(), Min.builder().field("took_ms").build()))
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "max(took_ms)", "min(took_ms)");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000));
@@ -749,7 +731,7 @@ public class SearchAggregationsIT {
         assertThat(rows).containsExactly(List.of(5300.0f, 36.0f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTwoIdenticalSeries() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -759,7 +741,8 @@ public class SearchAggregationsIT {
                 ))
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "max(took_ms)");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000));
@@ -777,7 +760,7 @@ public class SearchAggregationsIT {
         assertThat(rows).containsExactly(List.of(5300.0f, 5300.0f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTwoIdenticalSeriesOneWithCustomId() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -787,7 +770,8 @@ public class SearchAggregationsIT {
                 ))
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "Maximum Response Time", "max(took_ms)");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("total", equalTo(1000));
@@ -815,7 +799,7 @@ public class SearchAggregationsIT {
     }
 
     // Percentage Metric tests
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSimplestPercentageMetricWithCount() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -823,7 +807,7 @@ public class SearchAggregationsIT {
                 .series(Percentage.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(4));
@@ -837,7 +821,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult("PUT", "percentage(,COUNT)"), equalTo(0.043f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testPercentageMetricWithCountOnField() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -845,7 +829,7 @@ public class SearchAggregationsIT {
                 .series(Percentage.builder().strategy(Percentage.Strategy.COUNT).field("http_method").build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(5));
@@ -859,7 +843,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult("PUT", "percentage(http_method,COUNT)"), equalTo(0.043f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testPercentageMetricWithCountOnFieldForColumnPivotOnly() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -867,7 +851,7 @@ public class SearchAggregationsIT {
                 .series(Percentage.builder().strategy(Percentage.Strategy.COUNT).field("http_method").build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(1));
@@ -881,7 +865,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult(List.of(), List.of("PUT", "percentage(http_method,COUNT)")), equalTo(0.043f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testPercentageMetricWithSumOnField() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -889,7 +873,8 @@ public class SearchAggregationsIT {
                 .series(Percentage.builder().strategy(Percentage.Strategy.SUM).field("took_ms").build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
+        checkColumnNames(validatableResponse, "http_method", "percentage(took_ms,SUM)");
 
         validatableResponse.rootPath(PIVOT_PATH)
                 .body("rows", hasSize(5));
@@ -903,7 +888,7 @@ public class SearchAggregationsIT {
                 .body(pathToMetricResult("PUT", "percentage(took_ms,SUM)"), equalTo(0.11320802641605283f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testBooleanFieldsAreReturnedAsTrueOrFalse() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -911,7 +896,7 @@ public class SearchAggregationsIT {
                 .series(Count.builder().build())
                 .build();
 
-        final ValidatableResponse validatableResponse = execute(pivot);
+        final ValidatableResponse validatableResponse = executePivot(pivot);
 
         final String searchTypeResult = PIVOT_PATH + ".rows";
         validatableResponse
@@ -943,5 +928,15 @@ public class SearchAggregationsIT {
 
     private String pathToMetricResult(Collection<String> keys, Collection<String> metric) {
         return pathToRow(keys) + "." + pathToValue(metric);
+    }
+
+    private ValidatableResponse executePivot(Pivot pivot) {
+        return api.search().executePivot(pivot)
+                .body(".total", equalTo(1000));
+    }
+
+    private void checkColumnNames(final ValidatableResponse validatableResponse, String... names) {
+        validatableResponse.rootPath(PIVOT_PATH).body("column_names", hasSize(names.length));
+        validatableResponse.rootPath(PIVOT_PATH).body("column_names", contains(names));
     }
 }

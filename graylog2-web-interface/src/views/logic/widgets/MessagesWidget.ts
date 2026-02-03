@@ -19,16 +19,40 @@ import { Map } from 'immutable';
 import isDeepEqual from 'stores/isDeepEqual';
 import isEqualForSearch from 'views/stores/isEqualForSearch';
 import type { FiltersType } from 'views/types';
+import type { QueryString } from 'views/logic/queries/types';
 
-import Widget from './Widget';
+import Widget, { widgetAttributesForComparison } from './Widget';
 import MessagesWidgetConfig from './MessagesWidgetConfig';
 import type { WidgetState } from './Widget';
 
-import type { QueryString, TimeRange } from '../queries/Query';
+import type { TimeRange } from '../queries/Query';
 
 export default class MessagesWidget extends Widget {
-  constructor(id: string, config: any, filter: string | undefined | null, timerange: TimeRange | undefined | null, query: QueryString | undefined | null, streams: Array<string>, streamCategories: Array<string>, filters?: FiltersType) {
-    super(id, MessagesWidget.type, config, filter, timerange, query, streams, streamCategories, filters);
+  constructor(
+    id: string,
+    config: MessagesWidgetConfig,
+    filter: string | undefined | null,
+    timerange: TimeRange | undefined | null,
+    query: QueryString | undefined | null,
+    streams: Array<string>,
+    streamCategories: Array<string>,
+    filters?: FiltersType,
+    description?: string,
+    context?: string,
+  ) {
+    super(
+      id,
+      MessagesWidget.type,
+      config,
+      filter,
+      timerange,
+      query,
+      streams,
+      streamCategories,
+      filters,
+      description,
+      context,
+    );
   }
 
   static type = 'messages';
@@ -41,14 +65,25 @@ export default class MessagesWidget extends Widget {
   }
 
   static fromJSON(value: WidgetState) {
-    const { id, config, filter, timerange, query, streams, stream_categories, filters } = value;
+    const { id, config, filter, timerange, query, streams, stream_categories, filters, description, context } = value;
 
-    return new MessagesWidget(id, MessagesWidgetConfig.fromJSON(config), filter, timerange, query, streams, stream_categories, filters);
+    return new MessagesWidget(
+      id,
+      MessagesWidgetConfig.fromJSON(config),
+      filter,
+      timerange,
+      query,
+      streams,
+      stream_categories,
+      filters,
+      description,
+      context,
+    );
   }
 
   equals(other: any) {
     if (other instanceof MessagesWidget) {
-      return ['id', 'config', 'filter', 'timerange', 'query', 'streams', 'stream_categories', 'filters'].every((key) => isDeepEqual(this._value[key], other[key]));
+      return widgetAttributesForComparison.every((key) => isDeepEqual(this[key], other[key]));
     }
 
     return false;
@@ -60,17 +95,20 @@ export default class MessagesWidget extends Widget {
 
   equalsForSearch(other: any) {
     if (other instanceof MessagesWidget) {
-      return ['id', 'config', 'filter', 'timerange', 'query', 'streams', 'stream_categories', 'filters'].every((key) => isEqualForSearch(this._value[key], other[key]));
+      return widgetAttributesForComparison.every((key) => isEqualForSearch(this[key], other[key]));
     }
 
     return false;
   }
 
   toBuilder() {
-    const { id, config, filter, timerange, query, streams, stream_categories, filters } = this._value;
+    const { id, config, filter, timerange, query, streams, stream_categories, filters, description, context } =
+      this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Map({ id, config, filter, timerange, query, streams, stream_categories, filters }));
+    return new Builder(
+      Map({ id, config, filter, timerange, query, streams, stream_categories, filters, description, context }),
+    );
   }
 
   static builder() {
@@ -84,9 +122,21 @@ export default class MessagesWidget extends Widget {
 }
 
 class Builder extends Widget.Builder {
-  build(): MessagesWidget {
-    const { id, config, filter, timerange, query, streams, stream_categories, filters } = this.value.toObject();
+  build() {
+    const { id, config, filter, timerange, query, streams, stream_categories, filters, description, context } =
+      this.value.toObject();
 
-    return new MessagesWidget(id, config, filter, timerange, query, streams, stream_categories, filters);
+    return new MessagesWidget(
+      id,
+      config,
+      filter,
+      timerange,
+      query,
+      streams,
+      stream_categories,
+      filters,
+      description,
+      context,
+    );
   }
 }

@@ -22,21 +22,26 @@ import CaffeineCacheFieldSet from './CaffeineCacheFieldSet';
 import CaffeineCacheSummary from './CaffeineCacheSummary';
 import CaffeineCacheDocumentation from './CaffeineCacheDocumentation';
 
-PluginStore.register(new PluginManifest({}, {
-  lookupTableCaches: [
+PluginStore.register(
+  new PluginManifest(
+    {},
     {
-      type: 'none',
-      displayName: 'Do not cache values',
-      formComponent: NullCacheFieldSet,
-      summaryComponent: NullCacheSummary,
-      documentationComponent: null,
+      lookupTableCaches: [
+        {
+          type: 'none',
+          displayName: 'Do not cache values',
+          formComponent: NullCacheFieldSet,
+          summaryComponent: NullCacheSummary,
+          documentationComponent: null,
+        },
+        {
+          type: 'guava_cache', // old name kept for backwards compatibility
+          displayName: 'Node-local, in-memory cache',
+          formComponent: CaffeineCacheFieldSet,
+          summaryComponent: CaffeineCacheSummary,
+          documentationComponent: CaffeineCacheDocumentation,
+        },
+      ],
     },
-    {
-      type: 'guava_cache', // old name kept for backwards compatibility
-      displayName: 'Node-local, in-memory cache',
-      formComponent: CaffeineCacheFieldSet,
-      summaryComponent: CaffeineCacheSummary,
-      documentationComponent: CaffeineCacheDocumentation,
-    },
-  ],
-}));
+  ),
+);

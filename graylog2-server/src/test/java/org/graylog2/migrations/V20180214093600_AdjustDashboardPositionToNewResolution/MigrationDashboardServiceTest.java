@@ -16,32 +16,32 @@
  */
 package org.graylog2.migrations.V20180214093600_AdjustDashboardPositionToNewResolution;
 
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.shared.SuppressForbidden;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class MigrationDashboardServiceTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private MigrationDashboardService dashboardService;
 
-    @Before
+    @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
-    public void setUpService() {
-        dashboardService = new MigrationDashboardService(mongodb.mongoConnection());
+    public void setUpService(MongoCollections mongoCollections) {
+        dashboardService = new MigrationDashboardService(mongoCollections.mongoConnection());
     }
 
     @Test
@@ -50,7 +50,7 @@ public class MigrationDashboardServiceTest {
         final List<MigrationDashboard> dashboards = dashboardService.all();
         final MigrationDashboard dashboard = dashboards.get(0);
 
-        assertEquals("Should have returned exactly 1 document", 1, dashboards.size());
+        assertEquals(1, dashboards.size(), "Should have returned exactly 1 document");
         assertEquals("Example dashboard", dashboard.getTitle());
     }
 

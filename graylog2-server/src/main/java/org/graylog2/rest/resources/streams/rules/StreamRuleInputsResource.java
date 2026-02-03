@@ -17,30 +17,28 @@
 package org.graylog2.rest.resources.streams.rules;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.database.NotFoundException;
-import org.graylog2.rest.resources.streams.rules.responses.StreamRuleInputsList;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.streams.input.StreamRuleInputsProvider;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.database.NotFoundException;
+import org.graylog2.rest.resources.streams.rules.responses.StreamRuleInputsList;
+import org.graylog2.shared.rest.PublicCloudAPI;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.streams.input.StreamRuleInputsProvider;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
 @RequiresAuthentication
-@Api(value = "StreamRulesInputs", description = "Provide stream rule inputs", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "StreamRulesInputs", description = "Provide stream rule inputs")
 @Path("/streams/rules/inputs")
 public class StreamRuleInputsResource extends RestResource {
 
@@ -54,7 +52,7 @@ public class StreamRuleInputsResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get a list of all inputs for stream rules")
+    @Operation(summary = "Get a list of all inputs for stream rules")
     @Produces(MediaType.APPLICATION_JSON)
     @RequiresPermissions(RestPermissions.INPUTS_READ)
     public StreamRuleInputsList list() throws NotFoundException {

@@ -1,0 +1,4 @@
+type = "f"
+message = "Add error handling for event definition bulk action on general perspective."
+
+pulls = ["21248"]

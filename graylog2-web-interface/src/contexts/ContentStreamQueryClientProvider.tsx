@@ -21,13 +21,13 @@ import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 
 type Props = {
-  children: React.ReactNode,
+  children: React.ReactNode;
 };
 
 const options = {
   defaultOptions: {
     queries: {
-      cacheTime: 1000 * 60 * 60 * 24, // 24 hours
+      gcTime: 1000 * 60 * 60 * 24, // 24 hours
     },
   },
 };

@@ -26,4 +26,5 @@ const fieldType2 = new FieldType('string', ['enumerable'], []);
 const fieldTypeMapping2 = new FieldTypeMapping('http_method', fieldType2);
 
 export const simpleFields = (): List<FieldTypeMapping> => List([fieldTypeMapping1, fieldTypeMapping2]);
-export const simpleQueryFields = (queryId: string): Map<string, List<FieldTypeMapping>> => Map({ [queryId]: List([fieldTypeMapping2]) });
+export const simpleQueryFields = (queryId: string): Map<string, List<FieldTypeMapping>> =>
+  Map({ [queryId]: List([fieldTypeMapping2]) });

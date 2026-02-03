@@ -25,18 +25,16 @@ type EventNotificationActionLinksProps = {
   notificationId: string;
 };
 
-const EventNotificationActionLinks = ({
-  notificationId,
-}: EventNotificationActionLinksProps) => (
+const EventNotificationActionLinks = ({ notificationId }: EventNotificationActionLinksProps) => (
   <ButtonToolbar>
     <IfPermitted permissions={`eventnotifications:read:${notificationId}`}>
       <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.show(notificationId)}>
-        <Button bsStyle="success">View Details</Button>
+        <Button>View Details</Button>
       </LinkContainer>
     </IfPermitted>
     <IfPermitted permissions={`eventnotifications:edit:${notificationId}`}>
       <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.edit(notificationId)}>
-        <Button bsStyle="success">Edit Notification</Button>
+        <Button bsStyle="primary">Edit Notification</Button>
       </LinkContainer>
     </IfPermitted>
   </ButtonToolbar>

@@ -25,17 +25,16 @@ type StepKinesisProps = {
   onSubmit: (...args: any[]) => void;
 };
 
-const StepKinesis = ({
-  hasStreams = false,
-  ...restProps
-}: StepKinesisProps) => {
+const StepKinesis = ({ hasStreams = false, ...restProps }: StepKinesisProps) => {
   const [renderStreams, toggleRenderStreams] = useState(hasStreams);
 
   return (
     <>
-      {renderStreams
-        ? <ExistingStreams {...restProps} toggleSetup={() => toggleRenderStreams(false)} />
-        : <SetupNewStream {...restProps} toggleSetup={hasStreams ? () => toggleRenderStreams(true) : null} />}
+      {renderStreams ? (
+        <ExistingStreams {...restProps} toggleSetup={() => toggleRenderStreams(false)} />
+      ) : (
+        <SetupNewStream {...restProps} toggleSetup={hasStreams ? () => toggleRenderStreams(true) : null} />
+      )}
     </>
   );
 };

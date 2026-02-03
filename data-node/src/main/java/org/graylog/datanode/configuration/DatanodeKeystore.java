@@ -16,18 +16,19 @@
  */
 package org.graylog.datanode.configuration;
 
-import com.google.common.base.Suppliers;
 import com.google.common.eventbus.EventBus;
-import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.KeyPair;
 import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.csr.CsrGenerator;
 import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
 import org.graylog.security.certutil.csr.exceptions.CSRGenerationException;
+import org.graylog.security.certutil.keystore.storage.KeystoreUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,139 +37,144 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.InvalidKeyException;
+import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.Security;
-import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
-import java.time.Duration;
 import java.util.Date;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 
+@Singleton
 public class DatanodeKeystore {
 
     static {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
     }
 
+    private static final RandomStringUtils RANDOM_STRING_UTILS = RandomStringUtils.secure();
+    private static final Path DATANODE_KEYSTORE_FILE = Path.of("keystore.jks");
+    public static String DATANODE_KEY_ALIAS = "datanode";
 
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeKeystore.class);
-    private final DatanodeDirectories datanodeDirectories;
+    private final Path keystoreFile;
     private final String passwordSecret;
 
-    public static final Path DATANODE_KEYSTORE_FILE = Path.of("keystore.jks");
-    public static String DATANODE_KEY_ALIAS = CertConstants.DATANODE_KEY_ALIAS;
     private final EventBus eventBus;
 
-    // TODO: we could be smarter here, caching the results as long as there is no keystore change event. This requires some
-    // additional code, but would perform better.
-    private final Supplier<Date> certValidUntil = Suppliers.memoizeWithExpiration(this::doGetCertificateExpiration, Duration.ofMinutes(1));
-
     @Inject
-    public DatanodeKeystore(DatanodeConfiguration configuration, final @Named("password_secret") String passwordSecret, EventBus eventBus) {
-        this(configuration.datanodeDirectories(), passwordSecret, eventBus);
-    }
-
-    public DatanodeKeystore(DatanodeDirectories datanodeDirectories, String passwordSecret, EventBus eventBus) {
-        this.datanodeDirectories = datanodeDirectories;
+    public DatanodeKeystore(DatanodeDirectories datanodeDirectories, final @Named("password_secret") String passwordSecret, EventBus eventBus) {
+        this.keystoreFile = datanodeDirectories.getConfigurationTargetDir().resolve(DATANODE_KEYSTORE_FILE);
         this.passwordSecret = passwordSecret;
         this.eventBus = eventBus;
     }
 
     public synchronized boolean exists() {
-        return Files.exists(keystorePath());
+        return Files.exists(keystoreFile);
     }
 
     public synchronized boolean hasSignedCertificate() throws DatanodeKeystoreException {
-        return isSignedCertificateChain(loadKeystore());
+        return !isSelfSignedDatanodeCert(loadKeystore());
     }
 
     public synchronized static boolean isSignedCertificateChain(KeyStore keystore) throws DatanodeKeystoreException {
-        try {
-
-            final Certificate[] certificateChain = keystore.getCertificateChain(DATANODE_KEY_ALIAS);
-
-            if (certificateChain.length < 2) {
-                // only one cert, it's a self-signed cert!
-                return false;
-            }
-            try {
-                // let's take first cert, which is the datanode. It should be signed by a private key that belongs
-                // to the public key in the second certificate
-                certificateChain[0].verify(certificateChain[1].getPublicKey());
-                return true;
-            } catch (CertificateException | NoSuchAlgorithmException | InvalidKeyException |
-                     NoSuchProviderException | SignatureException e) {
-                return false;
-            }
-
-        } catch (KeyStoreException e) {
-            throw new DatanodeKeystoreException(e);
-        }
+        return !isSelfSignedDatanodeCert(keystore);
     }
 
-    @Nonnull
-    private Path keystorePath() {
-        return datanodeDirectories.getConfigurationTargetDir().resolve(DATANODE_KEYSTORE_FILE);
+    private static boolean isSelfSignedDatanodeCert(KeyStore keystore) throws DatanodeKeystoreException {
+        try {
+            final Certificate certificate = keystore.getCertificate(DATANODE_KEY_ALIAS);
+            if (certificate instanceof X509Certificate nodeCert) {
+                return nodeCert.getIssuerX500Principal().equals(nodeCert.getSubjectX500Principal());
+            } else {
+                throw new DatanodeKeystoreException("Unsupported type of data node certificate: " + certificate.getClass());
+            }
+        } catch (KeyStoreException e) {
+            throw new DatanodeKeystoreException("Failed to check if datanode certificate is self-signed.", e);
+        }
     }
 
     public synchronized KeyStore create(KeyPair keyPair) throws DatanodeKeystoreException {
         try {
-            return persistKeystore(keyPair.toKeystore(DATANODE_KEY_ALIAS, passwordSecret.toCharArray()));
+            return create(keyPair.toKeystore(DATANODE_KEY_ALIAS, passwordSecret.toCharArray()));
         } catch (Exception e) {
             throw new DatanodeKeystoreException(e);
         }
     }
 
     public synchronized KeyStore create(KeyStore keystore) throws DatanodeKeystoreException {
-        return persistKeystore(keystore);
+        return persistKeystore(keystore, true);
     }
 
     public synchronized void replaceCertificatesInKeystore(CertificateChain certificateChain) throws DatanodeKeystoreException {
         try {
             final KeyStore keystore = loadKeystore();
             Key privateKey = keystore.getKey(DATANODE_KEY_ALIAS, passwordSecret.toCharArray());
+
+            final X509Certificate datanodeCert = (X509Certificate) keystore.getCertificate(DATANODE_KEY_ALIAS);
+            boolean hasIssuerChanged = !isSameIssuer(datanodeCert, certificateChain.signedCertificate());
+
             // replace the existing self-signed certificates chain with the signed chain from the event
             keystore.setKeyEntry(DATANODE_KEY_ALIAS, privateKey, passwordSecret.toCharArray(), certificateChain.toCertificateChainArray());
+            persistKeystore(keystore, hasIssuerChanged);
             LOG.info("Persisting signed certificates to the datanode keystore finished");
-            persistKeystore(keystore);
         } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
             throw new DatanodeKeystoreException(e);
         }
     }
 
-    private synchronized KeyStore persistKeystore(KeyStore keystore) throws DatanodeKeystoreException {
-        try (FileOutputStream fos = new FileOutputStream(keystorePath().toFile())) {
+    private boolean isSameIssuer(X509Certificate currentCert, X509Certificate receivedNewCert) {
+        return currentCert.getIssuerX500Principal().equals(receivedNewCert.getIssuerX500Principal());
+    }
+
+    private synchronized KeyStore persistKeystore(KeyStore keystore, boolean issuerChanged) throws DatanodeKeystoreException {
+        try (FileOutputStream fos = new FileOutputStream(keystoreFile.toFile())) {
             keystore.store(fos, passwordSecret.toCharArray());
         } catch (IOException | CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
             throw new DatanodeKeystoreException(e);
         }
-        triggerChangeEvent(keystore);
+        triggerChangeEvent(keystore, issuerChanged);
         return keystore;
     }
 
-    private void triggerChangeEvent(KeyStore keystore) throws DatanodeKeystoreException {
+    private void triggerChangeEvent(KeyStore keystore, boolean issuerChanged) throws DatanodeKeystoreException {
         if (isSignedCertificateChain(keystore)) {
-            eventBus.post(new DatanodeKeystoreChangedEvent());
+            if(issuerChanged) {
+                LOG.info("Datanode certificate issuer changed, triggering change event");
+                eventBus.post(new DatanodeCertificateChangedEvent());
+            } else {
+                LOG.info("Datanode certificate renewed, triggering renewal event");
+                eventBus.post(new DatanodeCertificateRenewedEvent());
+            }
         }
     }
 
-    public synchronized KeyStore loadKeystore() throws DatanodeKeystoreException {
-        try (FileInputStream fis = new FileInputStream(keystorePath().toFile())) {
+    private synchronized KeyStore loadKeystore() throws DatanodeKeystoreException {
+        try (FileInputStream fis = new FileInputStream(keystoreFile .toFile())) {
             KeyStore keystore = KeyStore.getInstance(PKCS12);
             keystore.load(fis, passwordSecret.toCharArray());
             return keystore;
         } catch (IOException | CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
+            throw new DatanodeKeystoreException(e);
+        }
+    }
+
+    public synchronized InMemoryKeystoreInformation getSafeCopy() throws DatanodeKeystoreException {
+        final char[] randomKeystorePassword = RANDOM_STRING_UTILS.nextAlphanumeric(256).toCharArray();
+        try {
+            final KeyStore reencrypted = KeystoreUtils.newStoreCopyContent(loadKeystore(), passwordSecret.toCharArray(), randomKeystorePassword);
+            return new InMemoryKeystoreInformation(reencrypted, randomKeystorePassword);
+        } catch (GeneralSecurityException | IOException e) {
             throw new DatanodeKeystoreException(e);
         }
     }
@@ -178,11 +184,8 @@ public class DatanodeKeystore {
         return CsrGenerator.generateCSR(keystore, DATANODE_KEY_ALIAS, hostname, altNames);
     }
 
-    public Date getCertificateExpiration() {
-        return doGetCertificateExpiration();
-    }
-
-    private Date doGetCertificateExpiration() {
+    @Nullable
+    public synchronized Date getCertificateExpiration() {
         try {
             final KeyStore keystore = loadKeystore();
             if (isSignedCertificateChain(keystore)) {
@@ -192,6 +195,19 @@ public class DatanodeKeystore {
                 return null;
             }
         } catch (KeyStoreException | DatanodeKeystoreException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public synchronized Set<String> getSubjectAlternativeNames() {
+        try {
+            final Certificate certificate = loadKeystore().getCertificate(DATANODE_KEY_ALIAS);
+            final X509Certificate cert = (X509Certificate) certificate;
+            return cert.getSubjectAlternativeNames().stream()
+                    .map(san -> san.get(1))
+                    .map(Object::toString)
+                    .collect(Collectors.toSet());
+        } catch (KeyStoreException | DatanodeKeystoreException | CertificateParsingException e) {
             throw new RuntimeException(e);
         }
     }

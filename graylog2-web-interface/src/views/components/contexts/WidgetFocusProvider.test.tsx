@@ -15,9 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
+import { useLocation } from 'react-router-dom';
+import Immutable from 'immutable';
+import userEvent from '@testing-library/user-event';
 
-import useLocation from 'routing/useLocation';
 import { asMock } from 'helpers/mocking';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import type { WidgetFocusContextType } from 'views/components/contexts/WidgetFocusContext';
@@ -26,8 +28,12 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { allMessagesTable } from 'views/logic/Widgets';
 import { createViewWithWidgets } from 'fixtures/searches';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { Button } from 'components/bootstrap';
+import useView from 'views/hooks/useView';
+import View from 'views/logic/views/View';
+import ViewState from 'views/logic/views/ViewState';
+import { setNewWidget } from 'views/logic/slices/widgetsSlice';
 
 const mockNavigate = jest.fn();
 
@@ -40,7 +46,11 @@ jest.mock('react-router-dom', () => ({
   })),
 }));
 
-jest.mock('stores/useAppDispatch');
+jest.mock('views/stores/useViewsDispatch');
+jest.mock('views/logic/slices/widgetsSlice', () => ({
+  ...jest.requireActual('views/logic/slices/widgetsSlice'),
+  setNewWidget: jest.fn(),
+}));
 
 const emptyLocation = {
   pathname: '',
@@ -50,24 +60,34 @@ const emptyLocation = {
   key: '',
 };
 
-const ShowFocusedWidget = ({ focusedWidget }: WidgetFocusContextType) => (focusedWidget ? (
-  <span>Focused widget: {JSON.stringify(focusedWidget)}</span>
-) : (
-  <span>No focused widget</span>
-));
+const ShowFocusedWidget = ({ focusedWidget }: WidgetFocusContextType) =>
+  focusedWidget ? <span>Focused widget: {JSON.stringify(focusedWidget)}</span> : <span>No focused widget</span>;
 
 jest.mock('views/logic/slices/searchExecutionSlice', () => ({
   ...jest.requireActual('views/logic/slices/searchExecutionSlice'),
   execute: jest.fn(() => async () => {}),
 }));
 
+jest.mock('views/hooks/useView');
+
 describe('WidgetFocusProvider', () => {
   useViewsPlugin();
 
   beforeEach(() => {
     const dispatch = jest.fn();
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
     asMock(useLocation).mockReturnValue(emptyLocation);
+    asMock(useView).mockReturnValue(
+      View.builder()
+        .type(View.Type.Search)
+        .state({
+          query1: ViewState.create()
+            .toBuilder()
+            .widgetMapping(Immutable.Map({ 'widget-id': Immutable.Set(['search-type-id']) }))
+            .build(),
+        })
+        .build(),
+    );
   });
 
   const renderSUT = (consume: (value: WidgetFocusContextType) => JSX.Element) => {
@@ -77,9 +97,7 @@ describe('WidgetFocusProvider', () => {
     return render(
       <TestStoreProvider view={view}>
         <WidgetFocusProvider>
-          <WidgetFocusContext.Consumer>
-            {consume}
-          </WidgetFocusContext.Consumer>
+          <WidgetFocusContext.Consumer>{consume}</WidgetFocusContext.Consumer>
         </WidgetFocusProvider>
       </TestStoreProvider>,
     );
@@ -94,7 +112,7 @@ describe('WidgetFocusProvider', () => {
 
     const button = await screen.findByRole('button', { name: 'Focus!' });
 
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(mockNavigate).toHaveBeenCalledWith('?focusedId=widget-id&focusing=true', { replace: true });
   });
@@ -112,7 +130,7 @@ describe('WidgetFocusProvider', () => {
     renderSUT(consume);
 
     const button = await screen.findByRole('button', { name: 'Unfocus!' });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(mockNavigate).toHaveBeenLastCalledWith('', { replace: true });
   });
@@ -136,7 +154,7 @@ describe('WidgetFocusProvider', () => {
     renderSUT(consume);
 
     const button = await screen.findByRole('button', { name: 'Edit!' });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(mockNavigate).toHaveBeenCalledWith('?focusedId=widget-id&editing=true', { replace: true });
   });
@@ -154,7 +172,7 @@ describe('WidgetFocusProvider', () => {
     renderSUT(consume);
 
     const button = await screen.findByRole('button', { name: 'Cancel Edit!' });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(mockNavigate).toHaveBeenCalledWith('', { replace: true });
   });
@@ -185,11 +203,11 @@ describe('WidgetFocusProvider', () => {
 
     renderSUT(consume);
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Edit' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Edit' }));
 
     expect(mockNavigate).toHaveBeenCalledWith('?focusedId=widget-id&focusing=true&editing=true', { replace: true });
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Cancel' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Cancel' }));
 
     expect(mockNavigate).toHaveBeenCalledWith('?focusedId=widget-id&focusing=true', { replace: true });
   });
@@ -209,10 +227,52 @@ describe('WidgetFocusProvider', () => {
 
   it('does not trigger setting widgets to search initially', () => {
     const dispatch = jest.fn();
-    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
     asMock(useLocation).mockReturnValue(emptyLocation);
     renderSUT(jest.fn());
 
     expect(dispatch).not.toHaveBeenCalled();
+  });
+
+  it('sets new widget when unfocusing a widget', async () => {
+    const dispatch = jest.fn();
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
+    asMock(useLocation).mockReturnValue({
+      ...emptyLocation,
+      search: '?focusedId=widget-id&focusing=true',
+    });
+
+    const consume = ({ unsetWidgetFocusing }: WidgetFocusContextType) => (
+      <Button onClick={() => unsetWidgetFocusing()}>Unfocus!</Button>
+    );
+
+    renderSUT(consume);
+
+    const button = await screen.findByRole('button', { name: 'Unfocus!' });
+    await userEvent.click(button);
+
+    // setNewWidget should be dispatched with the focused widget id
+    expect(setNewWidget).toHaveBeenCalledWith('widget-id');
+  });
+
+  it('sets new widget when leaving edit mode', async () => {
+    const dispatch = jest.fn();
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
+    asMock(useLocation).mockReturnValue({
+      ...emptyLocation,
+      search: '?focusedId=widget-id&editing=true',
+    });
+
+    const consume = ({ unsetWidgetEditing }: WidgetFocusContextType) => (
+      <Button onClick={() => unsetWidgetEditing()}>Cancel Edit!</Button>
+    );
+
+    renderSUT(consume);
+
+    const button = await screen.findByRole('button', { name: 'Cancel Edit!' });
+    await userEvent.click(button);
+
+    // setNewWidget should be dispatched with the focused widget id
+    expect(setNewWidget).toHaveBeenCalledWith('widget-id');
   });
 });

@@ -16,19 +16,19 @@
  */
 package org.graylog2.lookup;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.TreeSet;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -38,26 +38,26 @@ public class AllowedAuxiliaryPathCheckerTest {
 
     public static final String FILE = "file";
 
-    @Rule
-    public TemporaryFolder permittedTempDir = new TemporaryFolder();
+    @TempDir
+    public File permittedTempDir;
 
-    @Rule
-    public TemporaryFolder forbiddenTempDir = new TemporaryFolder();
+    @TempDir
+    public File forbiddenTempDir;
 
     AllowedAuxiliaryPathChecker pathChecker;
 
     @Test
     public void inAllowedPath() throws IOException {
-        final Path permittedPath = permittedTempDir.getRoot().toPath();
-        final Path filePath = permittedTempDir.newFile(FILE).toPath();
+        final Path permittedPath = permittedTempDir.toPath();
+        final Path filePath = newFile(permittedTempDir, FILE).toPath();
         pathChecker = new AllowedAuxiliaryPathChecker(new TreeSet<>(Collections.singleton(permittedPath)));
         assertTrue(pathChecker.fileIsInAllowedPath(filePath));
     }
 
     @Test
     public void outsideOfAllowedPath() throws IOException {
-        final Path permittedPath = permittedTempDir.getRoot().toPath();
-        final Path filePath = forbiddenTempDir.newFile(FILE).toPath();
+        final Path permittedPath = permittedTempDir.toPath();
+        final Path filePath = newFile(forbiddenTempDir, FILE).toPath();
         pathChecker = new AllowedAuxiliaryPathChecker(new TreeSet<>(Collections.singleton(permittedPath)));
         assertFalse(pathChecker.fileIsInAllowedPath(filePath));
     }
@@ -65,21 +65,21 @@ public class AllowedAuxiliaryPathCheckerTest {
     @Test
     public void noPathsFileLocationOkNoChecksRequired() throws IOException {
         pathChecker = new AllowedAuxiliaryPathChecker(new TreeSet<>(Collections.emptySet()));
-        assertTrue(pathChecker.fileIsInAllowedPath(permittedTempDir.newFile(FILE).toPath()));
+        assertTrue(pathChecker.fileIsInAllowedPath(newFile(permittedTempDir, FILE).toPath()));
     }
 
     @Test
     public void fileDoesNotExist() {
         final Path filePath = Paths.get("non-existent-file");
         pathChecker = new AllowedAuxiliaryPathChecker(
-                new TreeSet<>(Collections.singleton(permittedTempDir.getRoot().toPath())));
+                new TreeSet<>(Collections.singleton(permittedTempDir.toPath())));
         assertFalse(pathChecker.fileIsInAllowedPath(filePath));
     }
 
     @Test
     public void permittedPathDoesNotExist() throws IOException {
         final Path permittedPath = Paths.get("non-existent-file-path");
-        final Path filePath = permittedTempDir.newFile(FILE).toPath();
+        final Path filePath = newFile(permittedTempDir, FILE).toPath();
 
         pathChecker = new AllowedAuxiliaryPathChecker(new TreeSet<>(Collections.singleton(permittedPath)));
         assertFalse(pathChecker.fileIsInAllowedPath(filePath));
@@ -106,5 +106,11 @@ public class AllowedAuxiliaryPathCheckerTest {
         pathChecker.fileIsInAllowedPath(filePath);
         verify(permittedPath, times(1)).toRealPath();
         verify(filePath, times(1)).toRealPath();
+    }
+
+    private static File newFile(File parent, String child) throws IOException {
+        File result = new File(parent, child);
+        result.createNewFile();
+        return result;
     }
 }

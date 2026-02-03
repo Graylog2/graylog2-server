@@ -16,43 +16,43 @@
  */
 
 export type CustomFieldMapping = {
-  field: string,
-  type: string,
-}
+  field: string;
+  type: string;
+};
 export type IndexSetFieldTypeProfileJson = {
-  id: string,
-  name: string,
-  description: string,
-  custom_field_mappings: Array<CustomFieldMapping>,
-  index_set_ids?: Array<string>
-}
+  id: string;
+  name: string;
+  description: string;
+  custom_field_mappings: Array<CustomFieldMapping>;
+  index_set_ids?: Array<string>;
+};
 
 export type IndexSetFieldTypeProfile = {
-  id: string,
-  name: string,
-  description: string,
-  customFieldMappings: Array<CustomFieldMapping>,
-  indexSetIds: Array<string>
-}
+  id: string;
+  name: string;
+  description: string;
+  customFieldMappings: Array<CustomFieldMapping>;
+  indexSetIds: Array<string>;
+};
 
 export type IndexSetFieldTypeProfileForm = {
-  name: string,
-  description: string,
-  customFieldMappings: Array<CustomFieldMapping>,
-}
+  name: string;
+  description: string;
+  customFieldMappings: Array<CustomFieldMapping>;
+};
 
 export type IndexSetFieldTypeProfileRequest = {
-  id?: string,
-  name: string,
-  description: string,
-  customFieldMappings: Array<CustomFieldMapping>,
-}
+  id?: string;
+  name: string;
+  description: string;
+  customFieldMappings: Array<CustomFieldMapping>;
+};
 
 export type IndexSetFieldTypeProfileRequestJson = {
-  id?: string,
-  name: string,
-  description: string,
-  custom_field_mappings: Array<CustomFieldMapping>,
-}
+  id?: string;
+  name: string;
+  description: string;
+  custom_field_mappings: Array<CustomFieldMapping>;
+};
 
-export type ProfileOptions = Array<{ value: string, label: string }>;
+export type ProfileOptions = Array<{ value: string; label: string }>;

@@ -23,70 +23,81 @@ import { makeVisualization, retrieveChartData } from 'views/components/aggregati
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
-import { keySeparator, humanSeparator } from 'views/Constants';
-import useMapKeys from 'views/components/visualizations/useMapKeys';
 import useChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits';
 import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
+import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
 
 import XYPlot from '../XYPlot';
 import type { Generator } from '../ChartData';
 
-const AreaVisualization = makeVisualization(({
-  config,
-  data,
-  effectiveTimerange,
-  height,
-  width,
-}: VisualizationComponentProps) => {
-  const visualizationConfig = (config.visualizationConfig || AreaVisualizationConfig.empty()) as AreaVisualizationConfig;
-  const getChartDataSettingsWithCustomUnits = useChartDataSettingsWithCustomUnits({ config });
-  const { interpolation = 'linear' } = visualizationConfig;
-  const mapKeys = useMapKeys();
-  const rowPivotFields = useMemo(() => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [], [config?.rowPivots]);
-  const _mapKeys = useCallback((labels: string[]) => labels
-    .map((label) => label.split(keySeparator)
-      .map((l, i) => mapKeys(l, rowPivotFields[i]))
-      .join(humanSeparator),
-    ), [mapKeys, rowPivotFields]);
+const AreaVisualization = makeVisualization(
+  ({ config, data, effectiveTimerange, height, width }: VisualizationComponentProps) => {
+    const visualizationConfig = (config.visualizationConfig ||
+      AreaVisualizationConfig.empty()) as AreaVisualizationConfig;
+    const getChartDataSettingsWithCustomUnits = useChartDataSettingsWithCustomUnits({ config });
+    const { interpolation = 'linear' } = visualizationConfig;
 
-  const chartGenerator: Generator = useCallback(({ type, name, labels, values, originalName, fullPath }) => ({
-    type,
-    name,
-    x: _mapKeys(labels),
-    y: values,
-    fill: 'tozeroy',
-    line: { shape: toPlotly(interpolation) },
-    originalName,
-    ...getChartDataSettingsWithCustomUnits({ name, fullPath, values }),
-  }), [_mapKeys, getChartDataSettingsWithCustomUnits, interpolation]);
+    const chartGenerator: Generator = useCallback(
+      ({ type, name, labels, values, originalName, fullPath }) => ({
+        type,
+        name,
+        x: labels,
+        y: values,
+        fill: 'tozeroy',
+        line: { shape: toPlotly(interpolation) },
+        originalName,
+        ...getChartDataSettingsWithCustomUnits({ name, fullPath, values }),
+      }),
+      [getChartDataSettingsWithCustomUnits, interpolation],
+    );
 
-  const rows = useMemo(() => retrieveChartData(data), [data]);
+    const rows = useMemo(() => retrieveChartData(data), [data]);
 
-  const _chartDataResult = useChartData(rows, {
-    widgetConfig: config,
-    chartType: 'scatter',
-    generator: chartGenerator,
-  });
+    const _chartDataResult = useChartData(rows, {
+      widgetConfig: config,
+      chartType: 'scatter',
+      generator: chartGenerator,
+    });
 
-  const { eventChartData, shapes } = useEvents(config, data.events);
+    const { eventChartData, shapes } = useEvents(config, data.events);
 
-  const chartDataResult = useMemo(() => (eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult), [_chartDataResult, eventChartData]);
-  const getChartLayoutSettingsWithCustomUnits = useChartLayoutSettingsWithCustomUnits({ config, chartData: chartDataResult });
-  const layout = useMemo<Partial<Layout>>(() => {
-    const _layouts = shapes ? { shapes } : {};
+    const chartDataResult = useMemo(
+      () => (eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult),
+      [_chartDataResult, eventChartData],
+    );
+    const getChartLayoutSettingsWithCustomUnits = useChartLayoutSettingsWithCustomUnits({
+      config,
+      chartData: chartDataResult,
+    });
+    const layout = useMemo<Partial<Layout>>(() => {
+      const _layouts: Partial<Layout> = getChartLayoutSettingsWithCustomUnits();
+      if (shapes) {
+        _layouts.shapes = [...(_layouts.shapes ?? []), ...shapes];
+      }
 
-    return ({ ..._layouts, ...getChartLayoutSettingsWithCustomUnits() });
-  }, [shapes, getChartLayoutSettingsWithCustomUnits]);
+      return _layouts;
+    }, [shapes, getChartLayoutSettingsWithCustomUnits]);
 
-  return (
-    <XYPlot config={config}
-            axisType={visualizationConfig.axisType}
-            plotLayout={layout}
-            effectiveTimerange={effectiveTimerange}
-            height={height}
-            width={width}
-            chartData={chartDataResult} />
-  );
-}, 'area');
+    const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover('scatter', config);
+
+    return (
+      <>
+        <XYPlot
+          config={config}
+          axisType={visualizationConfig.axisType}
+          plotLayout={layout}
+          effectiveTimerange={effectiveTimerange}
+          height={height}
+          width={width}
+          chartData={chartDataResult}
+          onInitialized={initializeGraphDivRef}
+          onClickMarker={onChartClick}
+        />
+        {popover}
+      </>
+    );
+  },
+  'area',
+);
 
 export default AreaVisualization;

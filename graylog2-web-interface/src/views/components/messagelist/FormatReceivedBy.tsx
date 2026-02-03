@@ -30,7 +30,17 @@ const _inputName = (inputs: Inputs, inputId: string) => {
   return input ? <span style={{ wordBreak: 'break-word' }}>{input.title}</span> : 'deleted input';
 };
 
-const FormatReceivedBy = ({ isLocalNode, inputs, sourceInputId, sourceNodeId }: {isLocalNode: boolean, inputs: Inputs, sourceNodeId: string, sourceInputId: string }) => {
+const FormatReceivedBy = ({
+  isLocalNode,
+  inputs,
+  sourceInputId,
+  sourceNodeId,
+}: {
+  isLocalNode: boolean;
+  inputs: Inputs;
+  sourceNodeId: string;
+  sourceInputId: string;
+}) => {
   const forwarderPlugin = usePluginEntities('forwarder');
   const ForwarderReceivedBy = forwarderPlugin?.[0]?.ForwarderReceivedBy;
 
@@ -50,8 +60,7 @@ const FormatReceivedBy = ({ isLocalNode, inputs, sourceInputId, sourceNodeId }: 
     <div>
       <dt>Received by</dt>
       <dd>
-        <em>{_inputName(inputs, sourceInputId)}</em>{' '}
-        on <NodeName nodeId={sourceNodeId} />
+        <em>{_inputName(inputs, sourceInputId)}</em> on <NodeName nodeId={sourceNodeId} />
       </dd>
     </div>
   );

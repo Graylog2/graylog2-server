@@ -16,7 +16,10 @@
  */
 import * as React from 'react';
 import { useEffect } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
+
+import ErrorsActions from 'actions/errors/ErrorsActions';
+import ErrorBoundary from 'components/errors/ErrorBoundary';
+import { createReactError } from 'logic/errors/ReportedErrors';
 
 type Props = {
   error: Error;
@@ -26,9 +29,10 @@ const ErrorComponent = ({ error }: Props) => {
   useEffect(() => {
     // eslint-disable-next-line no-console
     console.error(error);
+    ErrorsActions.report(createReactError(error, { componentStack: error.stack }));
   }, [error]);
 
-  return <div>Loading component failed: {error.message}</div>;
+  return null;
 };
 
 type ComponentSupplier<TProps> = () => Promise<{ default: React.ComponentType<TProps> }>;
@@ -36,10 +40,10 @@ type ComponentSupplier<TProps> = () => Promise<{ default: React.ComponentType<TP
 // eslint-disable-next-line react/jsx-no-useless-fragment
 const emptyPlaceholder = <></>;
 
-const loadAsync = <TProps, >(factory: ComponentSupplier<TProps>) => {
-  const Component = React.lazy(factory) as React.ForwardRefExoticComponent<TProps>;
+const loadAsync = <TProps,>(factory: ComponentSupplier<TProps>) => {
+  const Component = React.lazy(factory);
 
-  return React.forwardRef((props: TProps, ref) => (
+  return React.forwardRef((props: React.PropsWithoutRef<TProps>, ref) => (
     <ErrorBoundary FallbackComponent={ErrorComponent}>
       <React.Suspense fallback={emptyPlaceholder}>
         <Component {...props} ref={ref} />

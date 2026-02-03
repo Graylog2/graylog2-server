@@ -1,0 +1,5 @@
+type = "f"
+message = "UI Framework for deprecating pipeline functions"
+
+pulls = ["21467"]
+issues = ["19287"]

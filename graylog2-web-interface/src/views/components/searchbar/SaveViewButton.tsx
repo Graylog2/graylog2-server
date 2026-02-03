@@ -22,27 +22,26 @@ import { Icon } from 'components/common';
 import useIsDirty from 'views/hooks/useIsDirty';
 import { Button } from 'components/bootstrap';
 
-const StyledIcon = styled(Icon)<{ $isDirty: boolean }>(({ theme, $isDirty }) => css`
-  color: ${$isDirty ? theme.colors.variant.dark.warning : 'default'};
-`);
+const StyledIcon = styled(Icon)<{ $isDirty: boolean }>(
+  ({ theme, $isDirty }) => css`
+    color: ${$isDirty ? theme.colors.variant.dark.warning : 'default'};
+  `,
+);
 
 type Props = {
-  title: string,
-  onClick: () => void,
-  disabled?: boolean,
-}
+  title: string;
+  onClick: () => void;
+  disabled?: boolean;
+};
 
-const SaveViewButton = forwardRef<HTMLButtonElement, Props>(({ title, onClick, disabled = false }, ref) => {
+const SaveViewButton = ({ title, onClick, disabled = false }: Props, ref: React.ForwardedRef<HTMLButtonElement>) => {
   const isDirty = useIsDirty();
 
   return (
-    <Button title={title}
-            ref={ref}
-            onClick={onClick}
-            disabled={disabled}>
+    <Button title={title} ref={ref} onClick={onClick} disabled={disabled}>
       <StyledIcon name="save" type={isDirty ? 'solid' : 'regular'} $isDirty={!disabled && isDirty} /> Save
     </Button>
   );
-});
+};
 
-export default SaveViewButton;
+export default forwardRef(SaveViewButton);

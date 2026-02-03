@@ -16,59 +16,90 @@
  */
 import type * as React from 'react';
 
-import type { Sort } from 'stores/PaginationTypes';
+import type { Attribute, Sort } from 'stores/PaginationTypes';
+import type { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
 
 export type EntityBase = {
-  id: string,
-}
-
-export type Column = {
-  anyPermissions?: boolean,
-  hidden?: boolean,
-  id: string,
-  permissions?: Array<string>
-  sortable?: boolean,
-  title: string,
-  type?: 'BOOLEAN' | 'STRING' | 'DATE' | 'OBJECT_ID',
+  id: string;
 };
 
+export type ColumnSchema = {
+  anyPermissions?: boolean;
+  // Indicates that a column does not exist as an attribute in table data
+  isDerived?: boolean;
+} & Pick<Attribute, 'id' | 'title' | 'type' | 'sortable' | 'hidden' | 'permissions' | 'sliceable'>;
+
 // A column render should have either a `width` and optionally a `minWidth` or only a `staticWidth`.
-export type ColumnRenderer<Entity extends EntityBase> = {
-  renderCell?: (value: unknown, entity: Entity, column: Column) => React.ReactNode,
-  renderHeader?: (column: Column) => React.ReactNode,
-  textAlign?: string,
-  minWidth?: number, // px
-  width?: number, // fraction of unassigned table width, similar to CSS unit fr.
-  staticWidth?: number, // px
-}
+export type ColumnRenderer<Entity extends EntityBase, Meta = unknown> = {
+  renderCell?: (value: unknown, entity: Entity, meta: Meta, additionalInfo?: unknown) => React.ReactNode;
+  renderHeader?: (title: string) => React.ReactNode;
+  textAlign?: string;
+  minWidth?: number; // px
+  width?: number; // fraction of unassigned table width, similar to CSS unit fr.
+  // Uses the rendered title width as the fixed width; or provide a px value, if the title width is too small.
+  staticWidth?: number | 'matchHeader';
+};
 
-export type ColumnRenderersByAttribute<Entity extends EntityBase> = {
-  [attributeId: string]: ColumnRenderer<Entity>
-}
+export type ColumnRenderersByAttribute<Entity extends EntityBase, Meta = unknown> = {
+  [attributeId: string]: ColumnRenderer<Entity, Meta>;
+};
 
-export type ColumnRenderers<Entity extends EntityBase> = {
-  attributes?: ColumnRenderersByAttribute<Entity>,
-  types?: { [type: string]: ColumnRenderer<Entity> },
-}
+export type ColumnRenderers<Entity extends EntityBase, Meta = unknown> = {
+  attributes?: ColumnRenderersByAttribute<Entity, Meta>;
+  types?: { [type: string]: ColumnRenderer<Entity, Meta> };
+};
 
-export type TableLayoutPreferences = {
-  displayedAttributes?: Array<string>,
-  sort?: Sort,
-  perPage?: number,
-}
+export type ColumnPreferences = {
+  [attributeId: string]: {
+    status: (typeof ATTRIBUTE_STATUS)[keyof typeof ATTRIBUTE_STATUS];
+    width?: number; // px
+  };
+};
 
-export type TableLayoutPreferencesJSON = {
-  displayed_attributes?: Array<string>,
+export type TableLayoutPreferences<T = { [key: string]: unknown }> = {
+  attributes?: ColumnPreferences;
+  sort?: Sort;
+  perPage?: number;
+  order?: Array<string>;
+  customPreferences?: T;
+};
+
+export type TableLayoutPreferencesJSON<T = { [key: string]: unknown }> = {
+  attributes?: ColumnPreferences;
   sort?: {
-    field: string,
-    order: 'asc' | 'desc',
-  },
-  per_page?: number
-}
+    field: string;
+    order: 'asc' | 'desc';
+  };
+  per_page?: number;
+  custom_preferences?: T;
+  order?: Array<string>;
+};
 
 export type ExpandedSectionRenderer<Entity> = {
-  title: string,
-  content: (entity: Entity) => React.ReactNode,
-  actions?: (entity: Entity) => React.ReactNode,
-  disableHeader?: boolean,
-}
+  title: string;
+  content: (entity: Entity) => React.ReactNode;
+  actions?: (entity: Entity) => React.ReactNode;
+  disableHeader?: boolean;
+};
+
+export type ExpandedSectionRenderers<Entity> = {
+  [sectionName: string]: ExpandedSectionRenderer<Entity>;
+};
+
+export type DefaultLayout = {
+  entityTableId: string;
+  defaultSort: Sort;
+  defaultDisplayedAttributes: Array<string>;
+  defaultPageSize: number;
+  defaultColumnOrder: Array<string>;
+};
+
+export type ColumnMetaContext<Entity extends EntityBase> =
+  | {
+      columnRenderer?: ColumnRenderer<Entity>;
+      enableColumnOrdering?: boolean;
+      enableSlicing?: boolean;
+      hideCellPadding?: boolean;
+      label?: string;
+    }
+  | undefined;

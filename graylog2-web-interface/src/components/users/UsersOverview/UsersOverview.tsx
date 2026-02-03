@@ -45,10 +45,12 @@ const Header = styled.div`
   align-items: center;
 `;
 
-const LoadingSpinner = styled(Spinner)(({ theme }) => css`
-  margin-left: 10px;
-  font-size: ${theme.fonts.size.h3};
-`);
+const LoadingSpinner = styled(Spinner)(
+  ({ theme }) => css`
+    margin-left: 10px;
+    font-size: ${theme.fonts.size.h3};
+  `,
+);
 
 const StyledPaginatedList = styled(PaginatedList)`
   .pagination {
@@ -76,16 +78,18 @@ const _loadUsers = (pagination, setLoading, setPaginatedUsers) => {
   });
 };
 
-const _updateListOnUserDelete = (pagination, setLoading, setPaginatedUsers, callback: () => void) => UsersActions.delete.completed.listen(() => {
-  _loadUsers(pagination, setLoading, setPaginatedUsers);
-  callback();
-});
-const _updateListOnUserSetStatus = (pagination, setLoading, setPaginatedUsers) => UsersActions.setStatus.completed.listen(() => _loadUsers(pagination, setLoading, setPaginatedUsers));
+const _updateListOnUserDelete = (pagination, setLoading, setPaginatedUsers, callback: () => void) =>
+  UsersActions.delete.completed.listen(() => {
+    _loadUsers(pagination, setLoading, setPaginatedUsers);
+    callback();
+  });
+const _updateListOnUserSetStatus = (pagination, setLoading, setPaginatedUsers) =>
+  UsersActions.setStatus.completed.listen(() => _loadUsers(pagination, setLoading, setPaginatedUsers));
 
 const buildUsersOverviewItem = (currentUser: any) => (user: UserOverview) => {
   const { id: userId } = user;
 
-  return <UserOverviewItem user={user} isActive={(currentUser?.id === userId)} />;
+  return <UserOverviewItem user={user} isActive={currentUser?.id === userId} />;
 };
 
 const UsersOverview = () => {
@@ -97,8 +101,14 @@ const UsersOverview = () => {
   const { list: users, adminUser, pagination: { total = 0 } = {} } = paginatedUsers || {};
 
   useEffect(() => _loadUsers({ page, perPage, query }, setLoading, setPaginatedUsers), [page, perPage, query]);
-  useEffect(() => _updateListOnUserDelete({ page, perPage, query }, setLoading, setPaginatedUsers, resetPage), [page, perPage, query, resetPage]);
-  useEffect(() => _updateListOnUserSetStatus({ page, perPage, query }, setLoading, setPaginatedUsers), [page, perPage, query]);
+  useEffect(
+    () => _updateListOnUserDelete({ page, perPage, query }, setLoading, setPaginatedUsers, resetPage),
+    [page, perPage, query, resetPage],
+  );
+  useEffect(
+    () => _updateListOnUserSetStatus({ page, perPage, query }, setLoading, setPaginatedUsers),
+    [page, perPage, query],
+  );
 
   if (!users) {
     return <Spinner />;
@@ -114,10 +124,12 @@ const UsersOverview = () => {
   return (
     <Container>
       {adminUser && (
-        <SystemAdministrator adminUser={adminUser}
-                             dataRowFormatter={buildUsersOverviewItem(currentUser)}
-                             headerCellFormatter={_headerCellFormatter}
-                             headers={TABLE_HEADERS} />
+        <SystemAdministrator
+          adminUser={adminUser}
+          dataRowFormatter={buildUsersOverviewItem(currentUser)}
+          headerCellFormatter={_headerCellFormatter}
+          headers={TABLE_HEADERS}
+        />
       )}
       <Row className="content">
         <Col xs={12}>
@@ -125,22 +137,22 @@ const UsersOverview = () => {
             <h2>Users</h2>
             {loading && <LoadingSpinner text="" delay={0} />}
           </Header>
-          <p className="description">
-            Found {total} registered users on the system.
-          </p>
+          <p className="description">Found {total} registered users on the system.</p>
           <StyledPaginatedList totalItems={total}>
-            <DataTable id="users-overview"
-                       className="table-hover"
-                       rowClassName="no-bm"
-                       headers={TABLE_HEADERS}
-                       headerCellFormatter={_headerCellFormatter}
-                       sortByKey="fullName"
-                       noDataText={<NoSearchResult>No users have been found.</NoSearchResult>}
-                       rows={users.toJS()}
-                       customFilter={searchFilter}
-                       dataRowFormatter={buildUsersOverviewItem(currentUser)}
-                       filterKeys={[]}
-                       filterLabel="Filter Users" />
+            <DataTable
+              id="users-overview"
+              className="table-hover"
+              rowClassName="no-bm"
+              headers={TABLE_HEADERS}
+              headerCellFormatter={_headerCellFormatter}
+              sortByKey="fullName"
+              noDataText={<NoSearchResult>No users have been found.</NoSearchResult>}
+              rows={users.toJS()}
+              customFilter={searchFilter}
+              dataRowFormatter={buildUsersOverviewItem(currentUser)}
+              filterKeys={[]}
+              filterLabel="Filter Users"
+            />
           </StyledPaginatedList>
         </Col>
       </Row>

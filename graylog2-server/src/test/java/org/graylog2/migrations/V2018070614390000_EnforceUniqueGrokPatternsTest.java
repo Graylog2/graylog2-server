@@ -24,12 +24,13 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBExtension;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokPatternsDeletedEvent;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -39,18 +40,17 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@ExtendWith(MongoDBExtension.class)
 public class V2018070614390000_EnforceUniqueGrokPatternsTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private MongoCollection<Document> collection;
     private V2018070614390000_EnforceUniqueGrokPatterns migration;
     private ClusterEventBus clusterEventBus;
     private TestSubscriber subscriber;
 
-    @Before
-    public void setUp() {
-        collection = mongodb.mongoConnection().getMongoDatabase().getCollection("grok_patterns");
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) {
+        collection = mongoCollections.mongoConnection().getMongoDatabase().getCollection("grok_patterns");
         subscriber = new TestSubscriber();
         clusterEventBus = new ClusterEventBus(MoreExecutors.newDirectExecutorService());
         clusterEventBus.registerClusterEventSubscriber(subscriber);

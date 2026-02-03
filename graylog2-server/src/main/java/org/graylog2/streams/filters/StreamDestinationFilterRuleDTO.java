@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
 import org.graylog2.database.DbEntity;
 import org.graylog2.database.MongoEntity;
@@ -36,7 +35,6 @@ import java.util.Optional;
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 @JsonDeserialize(builder = StreamDestinationFilterRuleDTO.Builder.class)
 @DbEntity(collection = StreamDestinationFilterService.COLLECTION, readPermission = RestPermissions.STREAM_DESTINATION_FILTERS_READ)

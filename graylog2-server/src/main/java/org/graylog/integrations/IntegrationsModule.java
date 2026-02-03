@@ -16,6 +16,13 @@
  */
 package org.graylog.integrations;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog.aws.AWSObjectMapper;
+import org.graylog.aws.inputs.cloudtrail.CloudTrailCodec;
+import org.graylog.aws.inputs.cloudtrail.CloudTrailInput;
+import org.graylog.aws.inputs.cloudtrail.CloudTrailTransport;
+import org.graylog.aws.inputs.cloudtrail.api.CloudTrailResource;
 import org.graylog.integrations.audit.IntegrationsAuditEventTypes;
 import org.graylog.integrations.aws.AWSPermissions;
 import org.graylog.integrations.aws.codecs.AWSCodec;
@@ -31,6 +38,7 @@ import org.graylog.integrations.inputs.paloalto.PaloAltoCodec;
 import org.graylog.integrations.inputs.paloalto.PaloAltoTCPInput;
 import org.graylog.integrations.inputs.paloalto11.PaloAlto11xCodec;
 import org.graylog.integrations.inputs.paloalto11.PaloAlto11xInput;
+import org.graylog.integrations.inputs.paloalto11.PaloAlto11xUdpInput;
 import org.graylog.integrations.inputs.paloalto9.PaloAlto9xCodec;
 import org.graylog.integrations.inputs.paloalto9.PaloAlto9xInput;
 import org.graylog.integrations.ipfix.codecs.IpfixCodec;
@@ -49,6 +57,7 @@ import org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNot
 import org.graylog.integrations.pagerduty.PagerDutyNotification;
 import org.graylog.integrations.pagerduty.PagerDutyNotificationConfig;
 import org.graylog.integrations.pagerduty.PagerDutyNotificationConfigEntity;
+import org.graylog2.migrations.V20251030000000_CloudTrailInputConfigMigration;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginModule;
 import org.slf4j.Logger;
@@ -148,6 +157,9 @@ public class IntegrationsModule extends PluginModule {
 
             // PagerDuty notification type fix
             addMigration(V20220622071600_MigratePagerDutyV1.class);
+
+            // CloudTrail input configuration migration
+            addMigration(V20251030000000_CloudTrailInputConfigMigration.class);
         }
     }
 
@@ -176,7 +188,16 @@ public class IntegrationsModule extends PluginModule {
         // Palo Alto Networks 11x
         LOG.debug("Registering message input: {}", PaloAlto11xInput.NAME);
         addMessageInput(PaloAlto11xInput.class);
+        LOG.debug("Registering message input: {}", PaloAlto11xUdpInput.NAME);
+        addMessageInput(PaloAlto11xUdpInput.class);
         addCodec(PaloAlto11xCodec.NAME, PaloAlto11xCodec.class);
+
+        // CloudTrail
+        addCodec(CloudTrailCodec.NAME, CloudTrailCodec.class);
+        addTransport(CloudTrailTransport.NAME, CloudTrailTransport.class);
+        addMessageInput(CloudTrailInput.class);
+        addRestResource(CloudTrailResource.class);
+        bind(ObjectMapper.class).annotatedWith(AWSObjectMapper.class).toInstance(createObjectMapper());
 
         // AWS
         addCodec(AWSCodec.NAME, AWSCodec.class);
@@ -203,4 +224,10 @@ public class IntegrationsModule extends PluginModule {
     boolean isForwarder() {
         return Boolean.parseBoolean(System.getProperty("graylog.forwarder"));
     }
+
+    private ObjectMapper createObjectMapper() {
+        return new ObjectMapper()
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    }
+
 }

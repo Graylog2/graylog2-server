@@ -17,6 +17,7 @@
 package org.graylog.security.shares;
 
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.security.GranteeAuthorizer;
@@ -25,8 +26,6 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.UserAndTeamsConfig;
-
-import jakarta.inject.Inject;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -63,8 +62,9 @@ public class DefaultGranteeService implements GranteeService {
     public ImmutableSet<Grantee> getModifiableGrantees(Set<Grantee> availableGrantees, ImmutableSet<EntityShareResponse.ActiveShare> activeShares) {
         final UserAndTeamsConfig config = clusterConfigService.getOrDefault(UserAndTeamsConfig.class, UserAndTeamsConfig.DEFAULT_VALUES);
         return availableGrantees.stream()
-                .filter(grantee -> isAllowedType(config, grantee) || activeShares.stream().
-                        anyMatch(activeShare -> activeShare.grantee().equals(grantee.grn())))
+                .filter(grantee -> isAllowedType(config, grantee) ||
+                        (activeShares != null && activeShares.stream()
+                                .anyMatch(activeShare -> activeShare.grantee().equals(grantee.grn()))))
                 .collect(ImmutableSet.toImmutableSet());
     }
 

@@ -20,7 +20,7 @@ const FontFamilies = () => (
   </ul>
 );
 
-<FontFamilies />
+<FontFamilies />;
 ```
 
 ### Size - _`theme.fonts.size`_
@@ -45,7 +45,7 @@ const FontSizes = () => (
   </ul>
 );
 
-<FontSizes />
+<FontSizes />;
 ```
 
 ### Line height - _`theme.fonts.lineHeight`_
@@ -67,10 +67,12 @@ const { fonts } = useTheme();
 const FontLineHeights = () => (
   <ul>
     {Object.entries(fonts.lineHeight).map(([lineHeightId, lineHeightValue]) => (
-      <li key={lineHeightId}><b>{lineHeightId}</b>: {lineHeightValue}</li>
+      <li key={lineHeightId}>
+        <b>{lineHeightId}</b>: {lineHeightValue}
+      </li>
     ))}
   </ul>
 );
 
-<FontLineHeights />
+<FontLineHeights />;
 ```

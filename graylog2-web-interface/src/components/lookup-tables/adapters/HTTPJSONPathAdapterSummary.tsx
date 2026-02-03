@@ -22,9 +22,7 @@ type HTTPJSONPathAdapterSummaryProps = {
   dataAdapter: any;
 };
 
-const HTTPJSONPathAdapterSummary = ({
-  dataAdapter,
-}: HTTPJSONPathAdapterSummaryProps) => {
+const HTTPJSONPathAdapterSummary = ({ dataAdapter }: HTTPJSONPathAdapterSummaryProps) => {
   const { config } = dataAdapter;
 
   return (
@@ -32,13 +30,19 @@ const HTTPJSONPathAdapterSummary = ({
       <dt>Lookup URL</dt>
       <dd>{config.url}</dd>
       <dt>Single value JSONPath</dt>
-      <dd><code>{config.single_value_jsonpath}</code></dd>
+      <dd>
+        <code>{config.single_value_jsonpath}</code>
+      </dd>
       <dt>Multi value JSONPath</dt>
-      <dd><code>{config.multi_value_jsonpath}</code></dd>
+      <dd>
+        <code>{config.multi_value_jsonpath}</code>
+      </dd>
       <dt>HTTP User-Agent</dt>
       <dd>{config.user_agent}</dd>
       <dt>HTTP Headers</dt>
-      <dd><KeyValueTable pairs={config.headers || {}} /></dd>
+      <dd>
+        <KeyValueTable pairs={config.headers || {}} />
+      </dd>
     </dl>
   );
 };

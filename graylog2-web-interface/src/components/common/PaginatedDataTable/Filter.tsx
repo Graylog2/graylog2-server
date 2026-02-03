@@ -19,18 +19,15 @@ import * as React from 'react';
 import DataTableFilter from 'components/common/DataTable/Filter';
 
 type Props = {
-  setFilteredRows: (row: Array<unknown>) => void,
-  resetPagination: () => void,
-  rows: Array<unknown>,
-  id?: string,
-  filterKeys?: any[],
-  displayKey?: string,
-  filterBy?: string,
-  filterLabel?: unknown,
+  setFilteredRows: (row: Array<unknown>) => void;
+  resetPagination: () => void;
+  rows: Array<unknown>;
+  id?: string;
+  filterKeys?: any[];
 };
 
 const Filter = ({ setFilteredRows, resetPagination, rows, ...filterProps }: Props) => {
-  const onDataFiltered = (newFilteredGroups, filterText) => {
+  const onDataFiltered = (newFilteredGroups: unknown[], filterText: string) => {
     if (filterText && filterText !== '') {
       setFilteredRows(newFilteredGroups);
     } else {
@@ -40,11 +37,7 @@ const Filter = ({ setFilteredRows, resetPagination, rows, ...filterProps }: Prop
     resetPagination();
   };
 
-  return (
-    <DataTableFilter {...filterProps}
-                     rows={rows}
-                     onDataFiltered={onDataFiltered} />
-  );
+  return <DataTableFilter {...filterProps} rows={rows} onDataFiltered={onDataFiltered} />;
 };
 
 export default Filter;

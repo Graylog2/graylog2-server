@@ -59,6 +59,10 @@ public abstract class FunctionDescriptor<T> {
     @JsonProperty
     public abstract boolean ruleBuilderEnabled();
 
+    @JsonProperty
+    @Nullable
+    public abstract Boolean deprecated();
+
     @JsonIgnore
     @Nullable
     public abstract String ruleBuilderName();
@@ -70,10 +74,11 @@ public abstract class FunctionDescriptor<T> {
      */
     @JsonProperty("rule_builder_name")
     public String getRuleBuilderName() {
-        if (ruleBuilderEnabled() && ruleBuilderName() == null) {
-            return name();
+        String name = (ruleBuilderEnabled() && ruleBuilderName() == null) ? name() : ruleBuilderName();
+        if (Boolean.TRUE.equals(deprecated())) {
+            name += " (deprecated)";
         }
-        return ruleBuilderName();
+        return name;
     }
 
     @JsonProperty
@@ -86,11 +91,11 @@ public abstract class FunctionDescriptor<T> {
 
     public static <T> Builder<T> builder() {
         //noinspection unchecked
-        return new AutoValue_FunctionDescriptor.Builder().pure(false).ruleBuilderEnabled(false);
+        return new AutoValue_FunctionDescriptor.Builder().pure(false).ruleBuilderEnabled(false).deprecated(false);
     }
 
     @AutoValue.Builder
-    public static abstract class Builder<T> {
+    public abstract static class Builder<T> {
         abstract FunctionDescriptor<T> autoBuild();
 
         public FunctionDescriptor<T> build() {
@@ -109,6 +114,8 @@ public abstract class FunctionDescriptor<T> {
         public Builder<T> ruleBuilderEnabled() {
             return ruleBuilderEnabled(true);
         }
+
+        public abstract Builder<T> deprecated(boolean deprecated);
 
         public abstract Builder<T> ruleBuilderName(String ruleBuilderName);
 
@@ -137,7 +144,12 @@ public abstract class FunctionDescriptor<T> {
             @JsonProperty("description") @Nullable String description,
             @JsonProperty("rule_builder_name") @Nullable String ruleBuilderName,
             @JsonProperty("rule_builder_title") @Nullable String ruleBuilderTitle,
-            @JsonProperty("rule_builder_group") @Nullable RuleBuilderFunctionGroup ruleBuilderFunctionGroup) {
+            @JsonProperty("rule_builder_group") @Nullable RuleBuilderFunctionGroup ruleBuilderFunctionGroup,
+            @JsonProperty("deprecated") @Nullable Boolean deprecated) {
+        boolean isDeprecated = Boolean.TRUE.equals(deprecated);
+        if (isDeprecated) {
+            ruleBuilderName += " (deprecated)";
+        }
         return FunctionDescriptor.<T>builder()
                 .name(name)
                 .returnType(returnType)
@@ -147,6 +159,7 @@ public abstract class FunctionDescriptor<T> {
                 .ruleBuilderName(ruleBuilderName)
                 .ruleBuilderTitle(ruleBuilderTitle)
                 .ruleBuilderFunctionGroup(ruleBuilderFunctionGroup)
+                .deprecated(isDeprecated)
                 .build();
     }
 

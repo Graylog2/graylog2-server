@@ -39,12 +39,13 @@ import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -59,10 +60,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 @SuppressWarnings("UnnecessaryLocalVariable")
 public class EventProcessorExecutionJobTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private EventProcessorEngine eventProcessorEngine;
@@ -73,7 +74,7 @@ public class EventProcessorExecutionJobTest {
     private JobScheduleStrategies jobScheduleStrategies;
     private JobSchedulerTestClock clock;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         clock = new JobSchedulerTestClock(DateTime.parse("2019-01-01T00:00:00.000Z"));
         jobScheduleStrategies = new JobScheduleStrategies(clock);

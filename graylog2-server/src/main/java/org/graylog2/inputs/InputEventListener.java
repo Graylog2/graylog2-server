@@ -16,8 +16,10 @@
  */
 package org.graylog2.inputs;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import jakarta.inject.Inject;
 import org.graylog2.cluster.leader.LeaderChangedEvent;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.database.NotFoundException;
@@ -28,6 +30,7 @@ import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
+import org.graylog2.rest.models.system.inputs.responses.InputSetup;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
 import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
@@ -36,7 +39,8 @@ import org.graylog2.shared.inputs.PersistedInputs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
+import static com.codahale.metrics.MetricRegistry.name;
+import static org.graylog2.shared.inputs.InputLauncher.FAILED_STARTS_METRIC;
 
 public class InputEventListener {
     private static final Logger LOG = LoggerFactory.getLogger(InputEventListener.class);
@@ -47,6 +51,7 @@ public class InputEventListener {
     private final LeaderElectionService leaderElectionService;
     private final PersistedInputs persistedInputs;
     private final ServerStatus serverStatus;
+    private final MetricRegistry metricRegistry;
 
     @Inject
     public InputEventListener(EventBus eventBus,
@@ -56,7 +61,8 @@ public class InputEventListener {
                               NodeId nodeId,
                               LeaderElectionService leaderElectionService,
                               PersistedInputs persistedInputs,
-                              ServerStatus serverStatus) {
+                              ServerStatus serverStatus,
+                              MetricRegistry metricRegistry) {
         this.inputLauncher = inputLauncher;
         this.inputRegistry = inputRegistry;
         this.inputService = inputService;
@@ -64,6 +70,7 @@ public class InputEventListener {
         this.leaderElectionService = leaderElectionService;
         this.persistedInputs = persistedInputs;
         this.serverStatus = serverStatus;
+        this.metricRegistry = metricRegistry;
         eventBus.register(this);
     }
 
@@ -104,7 +111,7 @@ public class InputEventListener {
         final boolean startInput;
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
         if (inputState != null) {
-            startInput = inputState.getState() == IOState.Type.RUNNING;
+            startInput = inputState.getState() == IOState.Type.RUNNING || inputState.getState() == IOState.Type.SETUP;
             inputRegistry.remove(inputState);
         } else {
             startInput = false;
@@ -141,9 +148,33 @@ public class InputEventListener {
     @Subscribe
     public void inputDeleted(InputDeleted inputDeletedEvent) {
         LOG.debug("Input deleted: {}", inputDeletedEvent.id());
+        metricRegistry.remove(name(Input.class, FAILED_STARTS_METRIC, inputDeletedEvent.id()));
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputDeletedEvent.id());
         if (inputState != null) {
             inputRegistry.remove(inputState);
+        }
+    }
+
+    @Subscribe
+    public void inputSetup(InputSetup inputSetupEvent) {
+        LOG.info("Input setup: {}", inputSetupEvent.id());
+        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputSetupEvent.id());
+        if (inputState != null) {
+            inputRegistry.setup(inputState);
+        } else {
+            final String inputId = inputSetupEvent.id();
+            LOG.debug("Input created for setup: {}", inputId);
+            final Input input;
+            try {
+                input = inputService.find(inputId);
+            } catch (NotFoundException e) {
+                LOG.warn("Received InputSetupEvent event but could not find input {}", inputId, e);
+                return;
+            }
+
+            if (input.isGlobal() || this.nodeId.getNodeId().equals(input.getNodeId())) {
+                startInput(input);
+            }
         }
     }
 

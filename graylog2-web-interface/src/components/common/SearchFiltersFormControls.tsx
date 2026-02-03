@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Formik } from 'formik';
 import { OrderedMap } from 'immutable';
 import { v4 as uuidv4 } from 'uuid';
@@ -24,9 +24,9 @@ import SearchFilterBanner from 'views/components/searchbar/SearchFilterBanner';
 import type { SearchFilter } from 'components/event-definitions/event-definitions-types';
 
 type Props = {
-  filters: SearchFilter[],
-  onChange: (filters: OrderedMap<string, SearchFilter>) => void,
-  hideFiltersPreview?: (val: boolean) => void,
+  filters: SearchFilter[];
+  onChange: (filters: OrderedMap<string, SearchFilter>) => void;
+  hideFiltersPreview?: (val: boolean) => void;
 };
 
 function SearchFiltersFormControls({ filters, onChange, hideFiltersPreview = () => {} }: Props) {
@@ -34,18 +34,18 @@ function SearchFiltersFormControls({ filters, onChange, hideFiltersPreview = () 
   const pluggableControls = searchFiltersPlugin.map((controlFn) => controlFn()).filter((control) => !!control);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  React.useEffect(() => hideFiltersPreview(!pluggableControls.length), []);
+  useEffect(() => hideFiltersPreview(!pluggableControls.length), []);
 
-  const initialFilters = React.useMemo(() => {
-    const searchFilters = OrderedMap(filters.map((filter) => ([
-      filter.id || uuidv4(),
-      { frontendId: filter.id || uuidv4(), ...filter },
-    ])));
+  const initialFilters = useMemo(() => {
+    const searchFilters = OrderedMap(
+      filters.map((filter) => [filter.id || uuidv4(), { frontendId: filter.id || uuidv4(), ...filter }]),
+    );
 
     return { searchFilters };
   }, [filters]);
 
-  if (!pluggableControls.length) return <SearchFilterBanner onHide={() => hideFiltersPreview(true)} pluggableControls={pluggableControls} />;
+  if (!pluggableControls.length)
+    return <SearchFilterBanner onHide={() => hideFiltersPreview(true)} pluggableControls={pluggableControls} />;
 
   const SearchFiltersComponent = pluggableControls[0].component;
 

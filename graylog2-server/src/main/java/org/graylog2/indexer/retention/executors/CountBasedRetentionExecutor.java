@@ -17,7 +17,7 @@
 package org.graylog2.indexer.retention.executors;
 
 import jakarta.inject.Inject;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;

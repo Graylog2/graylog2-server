@@ -20,23 +20,23 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 /**
  * This request is used to save a new Kinesis AWS input. Each type of AWS input will use it's own request
  * object due to typically very unique required fields for each.
  */
 @AutoValue
-@WithBeanGetter
 @JsonDeserialize(builder = AWSInputCreateRequest.Builder.class)
 public abstract class AWSInputCreateRequest implements AWSRequest {
 
     private static final String NAME = "name";
     private static final String AWS_MESSAGE_TYPE = "aws_input_type";
     private static final String STREAM_NAME = "stream_name";
+    private static final String KINESIS_STREAM_ARN = "kinesis_stream_arn";
     private static final String BATCH_SIZE = "batch_size";
     private static final String THROTTLING_ALLOWED = "enable_throttling";
     private static final String ADD_FLOW_LOG_PREFIX = "add_flow_log_prefix";
+    private static final String OVERRIDE_SOURCE = "override_source";
 
     @JsonProperty(NAME)
     public abstract String name();
@@ -47,11 +47,17 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
     @JsonProperty(STREAM_NAME)
     public abstract String streamName();
 
+    @JsonProperty(KINESIS_STREAM_ARN)
+    public abstract String streamArn();
+
     @JsonProperty(BATCH_SIZE)
     public abstract int batchSize();
 
     @JsonProperty(THROTTLING_ALLOWED)
     public abstract boolean throttlingAllowed();
+
+    @JsonProperty(OVERRIDE_SOURCE)
+    public abstract String overrideSource();
 
     @JsonProperty(ADD_FLOW_LOG_PREFIX)
     public abstract boolean addFlowLogPrefix();
@@ -76,11 +82,17 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
         @JsonProperty(STREAM_NAME)
         public abstract Builder streamName(String streamName);
 
+        @JsonProperty(KINESIS_STREAM_ARN)
+        public abstract Builder streamArn(String streamArn);
+
         @JsonProperty(BATCH_SIZE)
         public abstract Builder batchSize(int batchSize);
 
         @JsonProperty(THROTTLING_ALLOWED)
         public abstract Builder throttlingAllowed(boolean throttlingAllowed);
+
+        @JsonProperty(OVERRIDE_SOURCE)
+        public abstract Builder overrideSource(String overrideSource);
 
         @JsonProperty(ADD_FLOW_LOG_PREFIX)
         public abstract Builder addFlowLogPrefix(boolean addFlowLogPrefix);

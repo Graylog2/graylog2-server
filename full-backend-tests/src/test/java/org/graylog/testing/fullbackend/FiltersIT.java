@@ -18,45 +18,35 @@ package org.graylog.testing.fullbackend;
 
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog2.shared.rest.resources.csp.CSP;
 import org.graylog2.shared.rest.resources.csp.CSPResources;
 import org.graylog2.shared.rest.resources.csp.CSPResponseFilter;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeAll;
 
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import static io.restassured.RestAssured.given;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, withMailServerEnabled = true)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class FiltersIT {
     private static final String DEFAULT_CONNECT_SRC = "connect-src 'self' https://graylog.org/post/tag/ https://telemetry.graylog.cloud;";
-    private final GraylogApis api;
-    private final CSPResources cspResources;
-    private final Pattern defaultCSPPattern;
+    private static GraylogApis api;
+    private static CSPResources cspResources;
+    private static Pattern defaultCSPPattern;
 
-    public FiltersIT(GraylogApis api) {
-        this.api = api;
-        this.cspResources = new CSPResources();
-        this.defaultCSPPattern = Pattern.compile(Pattern.quote(DEFAULT_CONNECT_SRC + cspResources.cspString(CSP.DEFAULT))
+    @BeforeAll
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
+        cspResources = new CSPResources(Set.of());
+        defaultCSPPattern = Pattern.compile(Pattern.quote(DEFAULT_CONNECT_SRC + cspResources.cspString(CSP.DEFAULT))
                 .replaceAll("\\{nonce}", "\\\\E[a-zA-Z0-9-]+\\\\Q"));
     }
 
-    @ContainerMatrixTest
-    void cspDocumentationBrowser() {
-        String expected = cspResources.cspString(CSP.SWAGGER);
-        given()
-                .spec(api.requestSpecification())
-                .when()
-                .get("/api-browser")
-                .then()
-                .statusCode(200)
-                .assertThat().header(CSPResponseFilter.CSP_HEADER,
-                        Matchers.containsString(expected));
-    }
-
-    @ContainerMatrixTest
+    @FullBackendTest
     void cspWebInterfaceAssets() {
         given()
                 .spec(api.requestSpecification())
@@ -69,7 +59,7 @@ public class FiltersIT {
                         Matchers.matchesPattern(defaultCSPPattern));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void cspWebAppNotFound() {
         given()
                 .spec(api.requestSpecification())

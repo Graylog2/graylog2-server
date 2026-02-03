@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { DECIMAL_PLACES } from 'views/components/visualizations/Constants';
 import getUnitTextLabel from 'views/components/visualizations/utils/getUnitTextLabel';
+import { formatNumber } from 'util/NumberFormatting';
 
-const formatValueWithUnitLabel = (value: number | string, abbrev: string) => `${Number(value).toFixed(DECIMAL_PLACES)} ${getUnitTextLabel(abbrev)}`;
+const formatValueWithUnitLabel = (value: number | string, abbrev: string, minimumDigits = 1) =>
+  `${formatNumber(Number(value), { minimumDigits })} ${getUnitTextLabel(abbrev)}`;
 
 export default formatValueWithUnitLabel;

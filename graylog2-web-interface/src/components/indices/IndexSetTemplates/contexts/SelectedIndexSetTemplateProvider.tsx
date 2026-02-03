@@ -20,21 +20,19 @@ import { useMemo, useState } from 'react';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
 import SelectedIndexSetTemplateContext from 'components/indices/IndexSetTemplates/contexts/SelectedIndexSetTemplateContext';
 
-const SelectedIndexSetTemplateProvider = ({ children } : { children: React.ReactNode}) => {
+const SelectedIndexSetTemplateProvider = ({ children }: { children: React.ReactNode }) => {
   const [selectedIndexSetTemplate, setSelectedIndexSetTemplate] = useState<IndexSetTemplate>(undefined);
 
-  const contextValue = useMemo(() => ({
-    setSelectedIndexSetTemplate,
-    selectedIndexSetTemplate,
-  }), [
-    setSelectedIndexSetTemplate,
-    selectedIndexSetTemplate,
-  ]);
+  const contextValue = useMemo(
+    () => ({
+      setSelectedIndexSetTemplate,
+      selectedIndexSetTemplate,
+    }),
+    [setSelectedIndexSetTemplate, selectedIndexSetTemplate],
+  );
 
   return (
-    <SelectedIndexSetTemplateContext.Provider value={contextValue}>
-      {children}
-    </SelectedIndexSetTemplateContext.Provider>
+    <SelectedIndexSetTemplateContext.Provider value={contextValue}>{children}</SelectedIndexSetTemplateContext.Provider>
   );
 };
 

@@ -26,19 +26,20 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.graylog.failure.FailureCause;
 import org.graylog.failure.ProcessingFailureCause;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -61,19 +62,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_CATEGORY;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class MessageTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private Message message;
@@ -81,7 +83,7 @@ public class MessageTest {
     private MetricRegistry metricRegistry;
     private Meter invalidTimestampMeter;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         DateTimeUtils.setCurrentMillisFixed(1524139200000L);
 
@@ -92,7 +94,7 @@ public class MessageTest {
 
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         DateTimeUtils.setCurrentMillisSystem();
     }
@@ -196,10 +198,12 @@ public class MessageTest {
         assertEquals(Lists.newArrayList("hello"), message.getFieldAs(List.class, "fields"));
     }
 
-    @Test(expected = ClassCastException.class)
+    @Test
     public void testGetFieldAsWithIncompatibleCast() throws Exception {
-        message.addField("fields", Lists.newArrayList("hello"));
-        message.getFieldAs(Map.class, "fields");
+        assertThrows(ClassCastException.class, () -> {
+            message.addField("fields", Lists.newArrayList("hello"));
+            message.getFieldAs(Map.class, "fields");
+        });
     }
 
     @Test
@@ -320,22 +324,27 @@ public class MessageTest {
         final Map<String, Object> elasticSearchObject = message.toElasticSearchObject(objectMapper, invalidTimestampMeter);
         final Object esTimestampFormatted = elasticSearchObject.get(Message.FIELD_TIMESTAMP);
 
-        assertEquals("Setting message timestamp as java.util.Date results in correct format for elasticsearch",
-                Tools.buildElasticSearchTimeFormat(dateTime), esTimestampFormatted);
+        assertEquals(Tools.buildElasticSearchTimeFormat(dateTime),
+                esTimestampFormatted, "Setting message timestamp as java.util.Date results in correct format for elasticsearch");
     }
 
     @Test
-    public void testProcessingAndReceiveTimestoESObject() {
+    public void testOtherTimestoESObject() {
         final DateTime receiveTime = Tools.nowUTC();
 
         message.setReceiveTime(receiveTime);
         final DateTime processingTime = receiveTime.plusSeconds(1);
         message.setProcessingTime(processingTime);
+        final DateTime originalTime = receiveTime.plusSeconds(2);
+        final DateTime updatedTime = receiveTime.plusSeconds(3);
+        message.updateTimeStamp(originalTime, updatedTime);
         final Map<String, Object> elasticSearchObject = message.toElasticSearchObject(objectMapper, invalidTimestampMeter);
 
         assertThat(elasticSearchObject.get(Message.FIELD_GL2_RECEIVE_TIMESTAMP)).isEqualTo(Tools.buildElasticSearchTimeFormat(receiveTime));
         assertThat(elasticSearchObject.get(Message.FIELD_GL2_PROCESSING_TIMESTAMP)).isEqualTo(Tools.buildElasticSearchTimeFormat(processingTime));
         assertThat(elasticSearchObject.get(Message.FIELD_GL2_PROCESSING_DURATION_MS)).isEqualTo(1000);
+        assertThat(elasticSearchObject.get(Message.FIELD_GL2_ORIGINAL_TIMESTAMP)).isEqualTo(Tools.buildElasticSearchTimeFormat(originalTime));
+        assertThat(elasticSearchObject.get(Message.FIELD_TIMESTAMP)).isEqualTo(Tools.buildElasticSearchTimeFormat(updatedTime));
     }
 
     @Test
@@ -412,8 +421,8 @@ public class MessageTest {
         final Map<String, Object> object = message.toElasticSearchObject(objectMapper, invalidTimestampMeter);
 
         // Elasticsearch >=2.0 does not allow "." in keys. Make sure we replace them before writing the message.
-        assertEquals("#toElasticsearchObject() should replace \".\" in keys with a \"_\"",
-                "dot", object.get("field_3"));
+        assertEquals("dot",
+                object.get("field_3"), "#toElasticsearchObject() should replace \".\" in keys with a \"_\"");
 
         assertEquals("foo", object.get("message"));
         assertEquals("bar", object.get("source"));
@@ -513,27 +522,31 @@ public class MessageTest {
         assertEquals(message.getField("timestamp"), fields.get("timestamp"));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void testGetFieldsReturnsImmutableMap() throws Exception {
-        final Map<String, Object> fields = message.getFields();
+        assertThrows(UnsupportedOperationException.class, () -> {
+            final Map<String, Object> fields = message.getFields();
 
-        fields.put("foo", "bar");
+            fields.put("foo", "bar");
+        });
     }
 
     @Test
     public void testGetFieldNames() throws Exception {
-        assertTrue("Missing fields in set!", symmetricDifference(message.getFieldNames(), Sets.newHashSet("_id", "timestamp", "source", "message")).isEmpty());
+        assertTrue(symmetricDifference(message.getFieldNames(), Sets.newHashSet("_id", "timestamp", "source", "message")).isEmpty(), "Missing fields in set!");
 
         message.addField("testfield", "testvalue");
 
-        assertTrue("Missing fields in set!", symmetricDifference(message.getFieldNames(), Sets.newHashSet("_id", "timestamp", "source", "message", "testfield")).isEmpty());
+        assertTrue(symmetricDifference(message.getFieldNames(), Sets.newHashSet("_id", "timestamp", "source", "message", "testfield")).isEmpty(), "Missing fields in set!");
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void testGetFieldNamesReturnsUnmodifiableSet() throws Exception {
-        final Set<String> fieldNames = message.getFieldNames();
+        assertThrows(UnsupportedOperationException.class, () -> {
+            final Set<String> fieldNames = message.getFieldNames();
 
-        fieldNames.remove("_id");
+            fieldNames.remove("_id");
+        });
     }
 
     @Test
@@ -772,15 +785,7 @@ public class MessageTest {
     @Test
     public void testNullDateGetsReplacesWithCurrentDate() {
         final Message message = new Message("message", "source", null);
-
         assertThat(message.getTimestamp()).isInstanceOf(DateTime.class);
-
-        assertThat(message.processingErrors()).satisfies(e -> {
-            assertThat(e).hasSize(1);
-            assertThat(e.get(0).getCause()).isEqualTo(ProcessingFailureCause.InvalidTimestampException);
-            assertThat(e.get(0).getMessage()).startsWith("Replaced invalid timestamp value in message <");
-            assertThat(e.get(0).getDetails()).startsWith("<null> value provided");
-        });
     }
 
     @Test
@@ -799,5 +804,16 @@ public class MessageTest {
         assertThat(message.getTimestamp()).isEqualTo(expectedLocalDateEquivalent);
 
         assertThat(message.processingErrors()).isEmpty();
+    }
+
+    // Arguably, a message should not allow null values for basic fields, but it is what it is. Here we are checking
+    // that at least basic operations can deal with null values in the 'message' field without failing with e.g. an
+    // NPE.
+    @Test
+    public void emptyMessage() {
+        final var msg = new Message(new UUID().toString(), Map.of());
+        assertThat(msg).isNotEmpty();
+        assertThat(msg.getMessage()).isNull();
+        assertThat(msg.toString()).isNotEmpty();
     }
 }

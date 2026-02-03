@@ -2,7 +2,7 @@ name: Request a dispatched main branch build
 
 on:
   push:
-    branches: [ master, main ]
+    branches: [ master, main, "[0-9]+.[0-9]+" ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -11,7 +11,7 @@ concurrency:
 jobs:
   dispatchedMainBuild:
     name: Dispatch build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
 
     steps:
       # TODO remove later

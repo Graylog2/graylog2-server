@@ -19,44 +19,50 @@ import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import { ListGroupItem } from 'components/bootstrap';
-import { Icon } from 'components/common';
+import DragHandle from 'components/common/SortableList/DragHandle';
 
-import type { DraggableProps, DragHandleProps, ListItemType, CustomListItemRender, CustomContentRender } from './types';
+import type { ListItemType, CustomListItemRender, CustomContentRender, DragHandleProps } from './types';
 
 type Props<ItemType extends ListItemType> = {
-  alignItemContent?: 'flex-start' | 'center'
-  className?: string,
-  customListItemRender?: CustomListItemRender<ItemType>,
-  customContentRender?: CustomContentRender<ItemType>,
-  disableDragging?: boolean,
-  displayOverlayInPortal: boolean,
-  draggableProps: DraggableProps,
-  dragHandleProps: DragHandleProps,
-  index: number,
-  item: ItemType,
+  alignItemContent?: 'flex-start' | 'center';
+  className?: string;
+  customContentRender?: CustomContentRender<ItemType>;
+  customListItemRender?: CustomListItemRender<ItemType>;
+  disableDragging?: boolean;
+  dragHandleProps: DragHandleProps;
+  index: number;
+  isDragging: boolean;
+  item: ItemType;
 };
 
-const StyledListGroupItem = styled(ListGroupItem)<{ $alignItemContent: 'flex-start' | 'center' }>(({ $alignItemContent }) => css`
-  display: flex;
-  align-items: ${$alignItemContent};
-`);
+const StyledListGroupItem = styled(ListGroupItem)<{
+  $alignItemContent: 'flex-start' | 'center';
+}>(
+  ({ $alignItemContent }) => css`
+    display: flex;
+    align-items: ${$alignItemContent};
+  `,
+);
 
-const DragHandle = styled.div`
-  margin-right: 5px;
-`;
-
-const ListItem = forwardRef(<ItemType extends ListItemType>({
-  alignItemContent = 'flex-start',
-  item,
-  index,
-  className,
-  customListItemRender,
-  customContentRender,
-  disableDragging = false,
-  draggableProps,
-  dragHandleProps,
-}: Props<ItemType>, ref) => {
+const ListItem = <ItemType extends ListItemType>(
+  {
+    alignItemContent = 'flex-start',
+    className = undefined,
+    customContentRender = undefined,
+    customListItemRender = undefined,
+    disableDragging = false,
+    dragHandleProps,
+    index,
+    isDragging,
+    item,
+  }: Props<ItemType>,
+  ref: React.ForwardedRef<HTMLLIElement>,
+) => {
   const itemContent = customContentRender ? customContentRender({ item, index }) : item.title;
+
+  const dragHandle = disableDragging ? null : (
+    <DragHandle dragHandleProps={dragHandleProps} itemTitle={item.title} index={index} isDragging={isDragging} />
+  );
 
   if (customListItemRender) {
     return (
@@ -64,8 +70,7 @@ const ListItem = forwardRef(<ItemType extends ListItemType>({
         {customListItemRender({
           className,
           disableDragging,
-          draggableProps: draggableProps,
-          dragHandleProps: dragHandleProps,
+          dragHandle,
           index,
           item,
           ref,
@@ -75,18 +80,11 @@ const ListItem = forwardRef(<ItemType extends ListItemType>({
   }
 
   return (
-    <StyledListGroupItem $alignItemContent={alignItemContent}
-                         ref={ref}
-                         className={className}
-                         containerProps={{ ...draggableProps }}>
-      {!disableDragging && (
-        <DragHandle {...dragHandleProps} data-testid={`sortable-item-${item.id}`}>
-          <Icon name="drag_indicator" />
-        </DragHandle>
-      )}
+    <StyledListGroupItem $alignItemContent={alignItemContent} ref={ref} className={className}>
+      {dragHandle}
       {itemContent}
     </StyledListGroupItem>
   );
-});
+};
 
-export default ListItem;
+export default forwardRef(ListItem);

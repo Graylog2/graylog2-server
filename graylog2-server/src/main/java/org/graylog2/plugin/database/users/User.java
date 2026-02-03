@@ -112,8 +112,6 @@ public interface User extends Persisted {
 
     void setExternal(boolean external);
 
-    void setStartpage(String type, String id);
-
     void setStartpage(Startpage startpage);
 
     boolean isLocalAdmin();

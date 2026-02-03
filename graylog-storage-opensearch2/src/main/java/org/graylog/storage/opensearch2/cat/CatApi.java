@@ -25,6 +25,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 
 import jakarta.inject.Inject;
+import org.graylog2.indexer.cluster.health.NodeShardAllocation;
 import org.graylog2.indexer.indices.ShardsInfo;
 
 import java.io.IOException;
@@ -110,6 +111,12 @@ public class CatApi {
         request.addParameter("s", "index,status");
 
         return perform(request, new TypeReference<JsonNode>() {}, errorMessage);
+    }
+
+    public List<NodeShardAllocation> getNodeShardAllocations() {
+        final Request request = request("GET", "allocation");
+        request.addParameter("h", "node,shards");
+        return perform(request, new TypeReference<>() {}, "Unable to retrieve node shard allocation");
     }
 
     private <R> R perform(Request request, TypeReference<R> responseClass, String errorMessage) {

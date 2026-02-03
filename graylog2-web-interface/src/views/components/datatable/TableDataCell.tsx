@@ -16,9 +16,11 @@
  */
 import styled, { css } from 'styled-components';
 
-const TableDataCell = styled.td<{ $isNumeric: boolean }>(({ $isNumeric, theme }) => css`
-  ${$isNumeric ? `font-family: ${theme.fonts.family.monospace};` : ''}
-  ${$isNumeric ? 'text-align: right' : ''}
-`);
+const TableDataCell = styled.td<{ $isNumeric: boolean }>(
+  ({ $isNumeric, theme }) => css`
+    ${$isNumeric ? `font-family: ${theme.fonts.family.monospace};` : ''}
+    ${$isNumeric ? 'text-align: right' : ''}
+  `,
+);
 
 export default TableDataCell;

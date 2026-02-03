@@ -32,21 +32,21 @@ import type {
   Line,
 } from './queryinput/ace-types';
 
-export type FieldTypes = { all: FieldIndex, query: FieldIndex };
+export type FieldTypes = { all: FieldIndex; query: FieldIndex };
 type FieldIndex = { [fieldName: string]: FieldTypeMapping };
 
 export type CompleterContext = Readonly<{
-  commandArgs?: unknown,
-  currentToken: Token | undefined | null,
-  prevToken: Token | undefined | null,
-  prefix: string,
-  tokens: Array<Token>,
-  currentTokenIdx: number,
-  timeRange?: TimeRange | NoTimeRangeOverride,
-  streams?: Array<string>,
-  fieldTypes?: FieldTypes,
-  userTimezone: string,
-  view: View,
+  commandArgs?: unknown;
+  currentToken: Token | undefined | null;
+  prevToken: Token | undefined | null;
+  prefix: string;
+  tokens: Array<Token>;
+  currentTokenIdx: number;
+  timeRange?: TimeRange | NoTimeRangeOverride;
+  streams?: Array<string>;
+  fieldTypes?: FieldTypes;
+  userTimezone: string;
+  view: View;
 }>;
 
 export interface Completer {
@@ -68,7 +68,7 @@ const getCurrentTokenIdx = (session: Session, pos: Position) => {
 
     if (rowIdx === pos.row) {
       const currentToken = session.getTokenAt(pos.row, pos.column);
-      const idxInActiveLine = row.findIndex((t) => (t === currentToken));
+      const idxInActiveLine = row.findIndex((t) => t === currentToken);
       idx += idxInActiveLine;
     } else {
       idx += row.length;
@@ -125,37 +125,44 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
     this.view = view;
   }
 
-  getCompletions = async (editor: Editor, _session: Session, pos: Position, prefix: string, callback: ResultsCallback) => {
+  getCompletions = async (
+    editor: Editor,
+    _session: Session,
+    pos: Position,
+    prefix: string,
+    callback: ResultsCallback,
+  ) => {
     const { tokens, currentToken, currentTokenIdx, prevToken } = formatTokens(editor.session, pos);
 
     const results = await Promise.all(
-      this.completers
-        .map(async (completer) => {
-          try {
-            return await completer.getCompletions({
-              currentToken,
-              prevToken,
-              prefix,
-              tokens,
-              currentTokenIdx,
-              commandArgs: _session?.curOp?.args,
-              timeRange: this.timeRange,
-              streams: this.streams,
-              fieldTypes: this.fieldTypes,
-              userTimezone: this.userTimezone,
-              view: this.view,
-            });
-          } catch (e) {
-            onCompleterError(e);
-          }
+      this.completers.map(async (completer) => {
+        try {
+          return await completer.getCompletions({
+            currentToken,
+            prevToken,
+            prefix,
+            tokens,
+            currentTokenIdx,
+            commandArgs: _session?.curOp?.args,
+            timeRange: this.timeRange,
+            streams: this.streams,
+            fieldTypes: this.fieldTypes,
+            userTimezone: this.userTimezone,
+            view: this.view,
+          });
+        } catch (e) {
+          onCompleterError(e);
+        }
 
-          return [];
-        }),
+        return [];
+      }),
     );
     const uniqResults = uniqBy(sortBy(results.flat(), ['score', 'name']), 'name');
 
     callback(null, uniqResults);
   };
 
-  get identifierRegexps() { return this.completers.map((completer) => completer.identifierRegexps ?? []).flat(); }
+  get identifierRegexps() {
+    return this.completers.map((completer) => completer.identifierRegexps ?? []).flat();
+  }
 }

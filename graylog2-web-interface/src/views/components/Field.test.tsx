@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
@@ -26,12 +27,10 @@ import InteractiveContext from './contexts/InteractiveContext';
 
 type FieldProps = { interactive: boolean } & React.ComponentProps<typeof OriginalField>;
 
-const Field = ({ children, interactive, ...props }: FieldProps) => (
+const Field = ({ children = undefined, interactive, ...props }: FieldProps) => (
   <InteractiveContext.Provider value={interactive}>
     <TestStoreProvider>
-      <OriginalField {...props}>
-        {children}
-      </OriginalField>
+      <OriginalField {...props}>{children}</OriginalField>
     </TestStoreProvider>
   </InteractiveContext.Provider>
 );
@@ -41,33 +40,27 @@ describe('Field', () => {
 
   describe('handles value action menu depending on interactive context', () => {
     it('does not show value actions if interactive context is `false`', async () => {
-      render((
-        <Field name="foo"
-               interactive={false}
-               queryId="someQueryId"
-               type={FieldType.Unknown}>
+      render(
+        <Field name="foo" interactive={false} queryId="someQueryId" type={FieldType.Unknown}>
           Foo
-        </Field>
-      ));
+        </Field>,
+      );
 
       const title = await screen.findByText('Foo');
-      fireEvent.click(title);
+      await userEvent.click(title);
 
       expect(screen.queryByText('Foo = unknown')).not.toBeInTheDocument();
     });
 
     it('shows value actions if interactive context is `true`', async () => {
-      render((
-        <Field name="foo"
-               interactive
-               queryId="someQueryId"
-               type={FieldType.Unknown}>
+      render(
+        <Field name="foo" interactive queryId="someQueryId" type={FieldType.Unknown}>
           Foo
-        </Field>
-      ));
+        </Field>,
+      );
 
       const title = await screen.findByText('Foo');
-      fireEvent.click(title);
+      await userEvent.click(title);
       await screen.findByText('foo = unknown');
     });
   });

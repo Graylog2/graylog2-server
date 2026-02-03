@@ -17,10 +17,11 @@
 package org.graylog2.shared.system.stats.fs;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.primitives.Shorts;
+import jakarta.inject.Inject;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.KafkaJournalConfiguration;
-
-import jakarta.inject.Inject;
+import org.graylog2.plugin.Tools;
 
 import java.io.File;
 import java.util.HashMap;
@@ -49,7 +50,7 @@ public class JmxFsProbe implements FsProbe {
             final long free = location.getFreeSpace();
             final long available = location.getUsableSpace();
             final long used = total - free;
-            final short usedPercent = (short) ((double) used / total * 100);
+            final short usedPercent = Shorts.saturatedCast(Tools.percentageOfRounded(total, used));
 
             final FsStats.Filesystem filesystem = FsStats.Filesystem.create(
                     path, total, free, available, used, usedPercent);

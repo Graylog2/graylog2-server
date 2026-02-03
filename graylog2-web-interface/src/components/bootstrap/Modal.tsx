@@ -14,92 +14,130 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { Modal as BootstrapModal } from 'react-bootstrap';
+import * as React from 'react';
+import type { ModalRootProps } from '@mantine/core';
+import { Modal as MantineModal } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
-const Dialog = css`
-  margin-top: 55px;
+import zIndices from 'theme/z-indices';
 
-  .modal-content {
-    background-color: ${({ theme }) => theme.colors.global.contentBackground};
-    border-color: ${({ theme }) => theme.colors.variant.light.default};
-    height: 100%;
+export type ModalSize = 'lg' | 'large' | 'sm' | 'small' | 'xl' | 'xlarge';
+
+const XLARGE_MODAL_WIDTH_PX = 1200;
+
+const ModalOverlay = styled(MantineModal.Overlay)<{ $isConfirmDialog: boolean }>(
+  ({ $isConfirmDialog }) => css`
+    z-index: ${$isConfirmDialog ? zIndices.confirmModalOverlay : zIndices.modalOverlay};
+  `,
+);
+
+const ModalContent = styled(MantineModal.Content)<{ $isConfirmDialog: boolean }>(
+  ({ $isConfirmDialog }) => css`
+    z-index: ${$isConfirmDialog ? zIndices.confirmModalBody : zIndices.modalBody};
+    border-radius: 10px;
+  `,
+);
+
+const StyledModalFooter = styled(MantineModal.Body)(
+  ({ theme }) => css`
+    position: sticky;
+    bottom: 0;
+    background-color: ${theme.colors.global.contentBackground};
+    padding: ${theme.spacings.md};
+    z-index: ${zIndices.modalBody};
+  `,
+);
+
+const StyledModalRoot = styled(MantineModal.Root)<{ $scrollInContent: boolean }>(
+  ({ theme, $scrollInContent }) => css`
+    --mantine-color-body: ${theme.colors.global.contentBackground};
+    ${$scrollInContent &&
+    css`
+      .mantine-Modal-content {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .mantine-Modal-body {
+        flex: 1;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+      }
+    `})
+  `,
+);
+
+const sizeForMantine = (size?: ModalSize) => {
+  switch (size) {
+    case 'sm':
+    case 'small':
+      return 'md';
+    case 'lg':
+    case 'large':
+      return 'xl';
+    case 'xl':
+    case 'xlarge':
+      return XLARGE_MODAL_WIDTH_PX;
+    default:
+      return 'lg';
   }
+};
+
+type Props = {
+  onHide: () => void;
+  children: React.ReactNode;
+  show?: boolean;
+  bsSize?: ModalSize;
+  backdrop?: boolean;
+  closable?: boolean;
+  fullScreen?: boolean;
+  scrollInContent?: boolean;
+  className?: string;
+  isConfirmDialog?: boolean;
+  rootProps?: Partial<Omit<ModalRootProps, 'opened' | 'onClose'>>;
+};
+
+const Modal = ({
+  onHide,
+  show = false,
+  children,
+  bsSize = undefined,
+  backdrop = true,
+  closable = true,
+  fullScreen = false,
+  scrollInContent = false,
+  className = undefined,
+  isConfirmDialog = false,
+  rootProps = {},
+}: Props) => (
+  <StyledModalRoot
+    $scrollInContent={scrollInContent}
+    opened={show}
+    onClose={onHide}
+    size={sizeForMantine(bsSize)}
+    trapFocus
+    closeOnEscape={closable}
+    fullScreen={fullScreen}
+    className={className}
+    {...(rootProps || {})}>
+    {backdrop && <ModalOverlay $isConfirmDialog={isConfirmDialog} />}
+    <ModalContent $isConfirmDialog={isConfirmDialog}>{children}</ModalContent>
+  </StyledModalRoot>
+);
+
+Modal.Header = ({ children, showCloseButton = true }: { children: React.ReactNode; showCloseButton?: boolean }) => (
+  <MantineModal.Header>
+    {children}
+    {showCloseButton && <MantineModal.CloseButton />}
+  </MantineModal.Header>
+);
+
+Modal.Title = styled(MantineModal.Title)`
+  font-size: ${({ theme }) => theme.fonts.size.h2};
 `;
 
-const Header = css`
-  border-bottom-color: ${({ theme }) => theme.colors.variant.light.default};
+Modal.Body = MantineModal.Body;
+Modal.Footer = StyledModalFooter;
 
-  button.close {
-    color: currentColor;
-  }
-`;
-
-const Title = css`
-  font-size: ${({ theme }) => theme.fonts.size.h3};
-`;
-
-const Footer = css`
-  border-top-color: ${({ theme }) => theme.colors.variant.light.default};
-`;
-
-const Body = css`
-  .form-group {
-    margin-bottom: 5px;
-  }
-`;
-
-const Modal = styled(BootstrapModal)`
-  .modal-backdrop {
-    height: 100000%; /* yes, really. this fixes the backdrop being cut off when the page is scrolled. */
-    z-index: 1030;
-  }
-
-  form {
-    margin-bottom: 0;
-  }
-
-  .modal-dialog {
-    ${Dialog}
-  }
-
-  .modal-header {
-    ${Header}
-  }
-
-  .modal-footer {
-    ${Footer}
-  }
-
-  .modal-title {
-    ${Title}
-  }
-
-  .modal-body {
-    ${Body}
-  }
-`;
-
-Modal.Dialog = styled(BootstrapModal.Dialog)`
-  ${Dialog}
-`;
-
-Modal.Header = styled(BootstrapModal.Header)`
-  ${Header}
-`;
-
-Modal.Title = styled(BootstrapModal.Title)`
-  ${Title}
-`;
-
-Modal.Body = styled(BootstrapModal.Body)`
-  ${Body}
-`;
-
-Modal.Footer = styled(BootstrapModal.Footer)`
-  ${Footer}
-`;
-
-/** @component */
 export default Modal;

@@ -18,13 +18,13 @@
 import type * as React from 'react';
 
 export type Perspective = {
-  id: string,
-  title: string,
-  welcomeRoute: string,
+  id: string;
+  title: string;
+  welcomeRoute: string;
   brandComponent: React.ComponentType<{
-    className?: string,
-    disabled?: boolean,
-    href?: string,
-  }>,
-  useCondition?: () => boolean
-}
+    className?: string;
+    disabled?: boolean;
+    href?: string;
+  }>;
+  useCondition?: () => boolean;
+};

@@ -1,0 +1,220 @@
+{
+  "resourceLogs": [
+    {
+      "scopeLogs": [
+        {
+          "logRecords": [
+            {
+              "attributes": [
+                {
+                  "key": "string.array",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "stringValue": "a"
+                        },
+                        {
+                          "stringValue": "b"
+                        },
+                        {
+                          "stringValue": "c"
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "key": "bool.array",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "boolValue": true
+                        },
+                        {
+                          "boolValue": false
+                        },
+                        {
+                          "boolValue": true
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "key": "int.array",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "intValue": 1
+                        },
+                        {
+                          "intValue": 2
+                        },
+                        {
+                          "intValue": 3
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "key": "double.array",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "doubleValue": 1.1
+                        },
+                        {
+                          "doubleValue": 2.2
+                        },
+                        {
+                          "doubleValue": 3.3
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "key": "bytes.array",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "bytesValue": "AQID"
+                        },
+                        {
+                          "bytesValue": "BAUG"
+                        },
+                        {
+                          "bytesValue": "BwgJ"
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "key": "array.array",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "arrayValue": {
+                            "values": [
+                              {
+                                "stringValue": "aa"
+                              },
+                              {
+                                "stringValue": "ab"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "arrayValue": {
+                            "values": [
+                              {
+                                "stringValue": "ba"
+                              },
+                              {
+                                "stringValue": "bb"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "key": "map.array",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "kvlistValue": {
+                            "values": [
+                              {
+                                "key": "a",
+                                "value": {
+                                  "stringValue": "b"
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "kvlistValue": {
+                            "values": [
+                              {
+                                "key": "b",
+                                "value": {
+                                  "stringValue": "c"
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "key": "mixed.primitives.array",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "stringValue": "a"
+                        },
+                        {
+                          "boolValue": true
+                        },
+                        {
+                          "intValue": 1
+                        },
+                        {
+                          "doubleValue": 1.1
+                        },
+                        {
+                          "bytesValue": "AQID"
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "key": "mixed.complex.array",
+                  "value": {
+                    "arrayValue": {
+                      "values": [
+                        {
+                          "stringValue": "a"
+                        },
+                        {
+                          "arrayValue": {
+                            "values": [
+                              {
+                                "stringValue": "a"
+                              },
+                              {
+                                "stringValue": "b"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -27,17 +27,15 @@ type SourceViewModalProps = {
   onHide: (...args: any[]) => void;
 };
 
-class SourceViewModal extends React.Component<SourceViewModalProps, {
-  [key: string]: any;
-}> {
+class SourceViewModal extends React.Component<
+  SourceViewModalProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     configurationId: undefined,
     templateString: undefined,
-  };
-
-  static initialState = {
-    source: undefined,
-    name: undefined,
   };
 
   constructor(props) {
@@ -55,6 +53,11 @@ class SourceViewModal extends React.Component<SourceViewModalProps, {
     }
   }
 
+  static initialState = {
+    source: undefined,
+    name: undefined,
+  };
+
   resetState = () => {
     this.setState(SourceViewModal.initialState);
   };
@@ -66,44 +69,47 @@ class SourceViewModal extends React.Component<SourceViewModalProps, {
     }
 
     if (this.props.templateString) {
-      CollectorConfigurationsActions.renderPreview(this.props.templateString)
-        .then(
-          (response) => {
-            this.setState({ source: response.preview, name: 'preview' });
-          },
-          (error) => {
-            this.setState({ source: `Error rendering preview: ${error.responseMessage ? error.responseMessage : error}` });
-          },
-        );
+      CollectorConfigurationsActions.renderPreview(this.props.templateString).then(
+        (response) => {
+          this.setState({ source: response.preview, name: 'preview' });
+        },
+        (error) => {
+          this.setState({
+            source: `Error rendering preview: ${error.responseMessage ? error.responseMessage : error}`,
+          });
+        },
+      );
     } else {
-      CollectorConfigurationsActions.getConfiguration(this.props.configurationId)
-        .then(
-          (configuration) => {
-            this.setState({ source: configuration.template, name: configuration.name });
-          },
-          (error) => {
-            this.setState({ source: `Error fetching configuration: ${error.responseMessage || error}` });
-          },
-        );
+      CollectorConfigurationsActions.getConfiguration(this.props.configurationId).then(
+        (configuration) => {
+          this.setState({ source: configuration.template, name: configuration.name });
+        },
+        (error) => {
+          this.setState({ source: `Error fetching configuration: ${error.responseMessage || error}` });
+        },
+      );
     }
   };
 
   render() {
     return (
-      <BootstrapModalWrapper showModal={this.props.showModal}
-                             onHide={this.props.onHide}>
-        <Modal.Header closeButton>
-          <Modal.Title><span>Configuration <em>{this.state.name}</em></span></Modal.Title>
+      <BootstrapModalWrapper showModal={this.props.showModal} onHide={this.props.onHide}>
+        <Modal.Header>
+          <Modal.Title>
+            <span>
+              Configuration <em>{this.state.name}</em>
+            </span>
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div className="configuration">
-            <pre>
-              {this.state.source || '<empty template>'}
-            </pre>
+            <pre>{this.state.source || '<empty template>'}</pre>
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button type="button" onClick={this.props.onHide}>Close</Button>
+          <Button type="button" onClick={this.props.onHide}>
+            Close
+          </Button>
         </Modal.Footer>
       </BootstrapModalWrapper>
     );

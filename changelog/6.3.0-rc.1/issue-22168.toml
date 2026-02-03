@@ -1,0 +1,5 @@
+type = "f"
+message = "Make deprecated pipeline rule warnings less noisy and more actionable."
+
+pulls = ["22558"]
+issues = ["22168"]

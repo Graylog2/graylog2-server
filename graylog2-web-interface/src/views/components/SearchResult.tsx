@@ -26,11 +26,13 @@ import { Row, Col } from 'components/bootstrap';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import useIsLoading from 'views/hooks/useIsLoading';
 
-const StyledRow = styled(Row)<{ $hasFocusedWidget: boolean }>(({ $hasFocusedWidget }) => css`
-  height: ${$hasFocusedWidget ? '100%' : 'auto'};
-  overflow: ${$hasFocusedWidget ? 'auto' : 'visible'};
-  position: relative;
-`);
+const StyledRow = styled(Row)<{ $hasFocusedWidget: boolean }>(
+  ({ $hasFocusedWidget }) => css`
+    height: ${$hasFocusedWidget ? '100%' : 'auto'};
+    overflow: ${$hasFocusedWidget ? 'auto' : 'visible'};
+    position: relative;
+  `,
+);
 
 const StyledCol = styled(Col)`
   height: 100%;
@@ -39,7 +41,7 @@ const StyledCol = styled(Col)`
 const SearchLoadingIndicator = () => {
   const isLoading = useIsLoading();
 
-  return (isLoading && <LoadingIndicator text="Updating search results..." />);
+  return isLoading && <LoadingIndicator text="Updating search results..." />;
 };
 
 const SearchResult = React.memo(() => {

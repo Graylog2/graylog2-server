@@ -17,57 +17,54 @@
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import usePluginEntities from 'hooks/usePluginEntities';
 import Routes from 'routing/Routes';
-import { Row, Col, Button } from 'components/bootstrap';
+import usePluginEntities from 'hooks/usePluginEntities';
+import { Row, Col, Button, Label } from 'components/bootstrap';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { LookupTableCache } from 'logic/lookup-tables/types';
 
 import type { CachePluginType } from './types';
-import {
-  SummaryContainer,
-  SummaryRow,
-  Title,
-  Value,
-} from './caches/SummaryComponents.styled';
+import { SummaryRow, Title, Value } from './caches/SummaryComponents.styled';
 
 type Props = {
-  cache: LookupTableCache,
+  cache: LookupTableCache;
+  noEdit?: boolean;
 };
 
-const Cache = ({ cache }: Props) => {
-  const navigate = useNavigate();
+const Cache = ({ cache, noEdit = false }: Props) => {
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
   const plugin = usePluginEntities('lookupTableCaches').find((p: CachePluginType) => p.type === cache.config?.type);
+  const navigate = useNavigate();
+
+  const canEdit = !noEdit && !loadingScopePermissions && scopePermissions?.is_mutable;
 
   if (!plugin) {
     return <p>Unknown cache type {cache.config.type}. Is the plugin missing?</p>;
   }
 
-  const handleEdit = (cacheName: string) => () => {
-    navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cacheName));
+  const handleEdit = () => {
+    navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cache.name));
   };
 
   return (
     <Row className="content">
       <Col md={12}>
-        <h2>{cache.title} <small>({plugin.displayName})</small></h2>
-        <SummaryContainer>
-          <SummaryRow>
-            <Title>Description:</Title>
-            <Value>{cache.description || <em>No description.</em>}</Value>
-          </SummaryRow>
-        </SummaryContainer>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Label>{plugin.displayName}</Label>
+          {canEdit && (
+            <Button bsStyle="primary" onClick={handleEdit} role="button" name="edit_square">
+              Edit
+            </Button>
+          )}
+        </div>
+
+        <SummaryRow>
+          <Title>Description:</Title>
+          <Value>{cache.description || <em>No description.</em>}</Value>
+        </SummaryRow>
+
         <h4>Configuration</h4>
         <div>{React.createElement(plugin.summaryComponent, { cache: cache })}</div>
-        {(!loadingScopePermissions && scopePermissions?.is_mutable) && (
-          <Button bsStyle="success"
-                  onClick={handleEdit(cache.name)}
-                  role="button"
-                  name="edit_square">
-            Edit
-          </Button>
-        )}
       </Col>
     </Row>
   );

@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import { Label } from 'components/bootstrap';
-import type { DataNode } from 'preflight/types';
+import type { DataNode } from 'components/datanode/Types';
 
 const StatusLabel = styled(Label)`
   display: inline-flex;
@@ -27,23 +27,23 @@ const StatusLabel = styled(Label)`
 `;
 
 type Props = {
-  dataNode: DataNode,
+  dataNode: DataNode;
 };
 
 const DataNodeStatusCell = ({ dataNode }: Props) => {
-  const datanodeDisabled = dataNode.data_node_status !== 'AVAILABLE';
+  const datanodeDisabled = dataNode.datanode_status !== 'AVAILABLE';
 
   return (
     <>
-      <StatusLabel bsStyle={datanodeDisabled ? 'warning' : 'success'}
-                   title={dataNode.data_node_status}
-                   aria-label={dataNode.data_node_status}>
-        {dataNode.data_node_status}
-      </StatusLabel>&nbsp;
+      <StatusLabel
+        bsStyle={datanodeDisabled ? 'warning' : 'success'}
+        title={dataNode.datanode_status}
+        aria-label={dataNode.datanode_status}>
+        {dataNode.datanode_status}
+      </StatusLabel>
+      &nbsp;
       {dataNode.action_queue && (
-        <StatusLabel bsStyle="warning"
-                     title={dataNode.data_node_status}
-                     aria-label={dataNode.data_node_status}>
+        <StatusLabel bsStyle="warning" title={dataNode.datanode_status} aria-label={dataNode.datanode_status}>
           queued for {dataNode.action_queue}
         </StatusLabel>
       )}

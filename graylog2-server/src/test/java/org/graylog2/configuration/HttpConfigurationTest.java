@@ -23,12 +23,10 @@ import com.github.joschi.jadconfig.guava.GuavaConverterFactory;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.net.HostAndPort;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,17 +34,17 @@ import java.net.URI;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class HttpConfigurationTest {
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
-    @Rule
-    public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    public File temporaryFolder;
 
     private HttpConfiguration configuration;
     private JadConfig jadConfig;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         configuration = new HttpConfiguration();
         jadConfig = new JadConfig().addConverterFactory(new GuavaConverterFactory());
@@ -62,25 +60,25 @@ public class HttpConfigurationTest {
     }
 
     @Test
-    @Ignore("Disabled test due to being unreliable (see https://github.com/Graylog2/graylog2-server/issues/4459)")
-    public void testHttpBindAddressIsIPv6AddressWithoutBrackets() throws RepositoryException, ValidationException {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Possible bracketless IPv6 literal: 2001:db8::1");
+    @Disabled("Disabled test due to being unreliable (see https://github.com/Graylog2/graylog2-server/issues/4459)")
+    public void testHttpBindAddressIsIPv6AddressWithoutBrackets() {
+        Throwable exception = assertThrows(ValidationException.class, () ->
 
-        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_bind_address", "2001:db8::1")))
-                .addConfigurationBean(configuration)
-                .process();
+            jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_bind_address", "2001:db8::1")))
+                    .addConfigurationBean(configuration)
+                    .process());
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Possible bracketless IPv6 literal: 2001:db8::1"));
     }
 
     @Test
-    @Ignore("Disabled test due to being unreliable (see https://github.com/Graylog2/graylog2-server/issues/4459)")
-    public void testHttpBindAddressIsInvalidIPv6Address() throws RepositoryException, ValidationException {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Possible bracketless IPv6 literal: ff$$::1");
+    @Disabled("Disabled test due to being unreliable (see https://github.com/Graylog2/graylog2-server/issues/4459)")
+    public void testHttpBindAddressIsInvalidIPv6Address() {
+        Throwable exception = assertThrows(ValidationException.class, () ->
 
-        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_bind_address", "ff$$::1")))
-                .addConfigurationBean(configuration)
-                .process();
+            jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_bind_address", "ff$$::1")))
+                    .addConfigurationBean(configuration)
+                    .process());
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Possible bracketless IPv6 literal: ff$$::1"));
     }
 
     @Test
@@ -93,25 +91,25 @@ public class HttpConfigurationTest {
     }
 
     @Test
-    @Ignore("Disabled test due to being unreliable (see https://github.com/Graylog2/graylog2-server/issues/4459)")
-    public void testHttpBindAddressIsInvalidIPv4Address() throws RepositoryException, ValidationException {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("1234.5.6.7: ");
+    @Disabled("Disabled test due to being unreliable (see https://github.com/Graylog2/graylog2-server/issues/4459)")
+    public void testHttpBindAddressIsInvalidIPv4Address() {
+        Throwable exception = assertThrows(ValidationException.class, () ->
 
-        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_bind_address", "1234.5.6.7:9000")))
-                .addConfigurationBean(configuration)
-                .process();
+            jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_bind_address", "1234.5.6.7:9000")))
+                    .addConfigurationBean(configuration)
+                    .process());
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("1234.5.6.7: "));
     }
 
     @Test
-    @Ignore("Disabled test due to being unreliable (see https://github.com/Graylog2/graylog2-server/issues/4459)")
-    public void testHttpBindAddressIsInvalidHostName() throws RepositoryException, ValidationException {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("this-does-not-exist-42: ");
+    @Disabled("Disabled test due to being unreliable (see https://github.com/Graylog2/graylog2-server/issues/4459)")
+    public void testHttpBindAddressIsInvalidHostName() {
+        Throwable exception = assertThrows(ValidationException.class, () ->
 
-        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_bind_address", "this-does-not-exist-42")))
-                .addConfigurationBean(configuration)
-                .process();
+            jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_bind_address", "this-does-not-exist-42")))
+                    .addConfigurationBean(configuration)
+                    .process());
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("this-does-not-exist-42: "));
     }
 
     @Test
@@ -232,8 +230,8 @@ public class HttpConfigurationTest {
         final Map<String, String> properties = ImmutableMap.of(
                 "http_bind_address", "127.0.0.1:9000",
                 "http_enable_tls", "true",
-                "http_tls_key_file", temporaryFolder.newFile("graylog.key").getAbsolutePath(),
-                "http_tls_cert_file", temporaryFolder.newFile("graylog.crt").getAbsolutePath());
+                "http_tls_key_file", newFile(temporaryFolder, "graylog.key").getAbsolutePath(),
+                "http_tls_cert_file", newFile(temporaryFolder, "graylog.crt").getAbsolutePath());
         final HttpConfiguration configWithTls = new HttpConfiguration();
         new JadConfig(new InMemoryRepository(properties), configWithTls)
                 .addConverterFactory(new GuavaConverterFactory())
@@ -243,8 +241,8 @@ public class HttpConfigurationTest {
 
     @Test
     public void tlsValidationFailsIfPrivateKeyIsMissing() throws Exception {
-        final File privateKey = temporaryFolder.newFile("graylog.key");
-        final File certificate = temporaryFolder.newFile("graylog.crt");
+        final File privateKey = newFile(temporaryFolder, "graylog.key");
+        final File certificate = newFile(temporaryFolder, "graylog.crt");
 
         final Map<String, String> properties = ImmutableMap.of(
                 "http_enable_tls", "true",
@@ -253,16 +251,16 @@ public class HttpConfigurationTest {
 
         assertThat(privateKey.delete()).isTrue();
 
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Unreadable or missing HTTP private key: ");
+        Throwable exception = assertThrows(ValidationException.class, () ->
 
-        jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process();
+            jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process());
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Unreadable or missing HTTP private key: "));
     }
 
     @Test
     public void tlsValidationFailsIfPrivateKeyIsDirectory() throws Exception {
-        final File privateKey = temporaryFolder.newFolder("graylog.key");
-        final File certificate = temporaryFolder.newFile("graylog.crt");
+        final File privateKey = newFolder(temporaryFolder, "graylog.key");
+        final File certificate = newFile(temporaryFolder, "graylog.crt");
 
         final Map<String, String> properties = ImmutableMap.of(
                 "http_enable_tls", "true",
@@ -271,16 +269,16 @@ public class HttpConfigurationTest {
 
         assertThat(privateKey.isDirectory()).isTrue();
 
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Unreadable or missing HTTP private key: ");
+        Throwable exception = assertThrows(ValidationException.class, () ->
 
-        jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process();
+            jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process());
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Unreadable or missing HTTP private key: "));
     }
 
     @Test
     public void tlsValidationFailsIfPrivateKeyIsUnreadable() throws Exception {
-        final File privateKey = temporaryFolder.newFile("graylog.key");
-        final File certificate = temporaryFolder.newFile("graylog.crt");
+        final File privateKey = newFile(temporaryFolder, "graylog.key");
+        final File certificate = newFile(temporaryFolder, "graylog.crt");
 
         final Map<String, String> properties = ImmutableMap.of(
                 "http_enable_tls", "true",
@@ -289,16 +287,16 @@ public class HttpConfigurationTest {
 
         assertThat(privateKey.setReadable(false, false)).isTrue();
 
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Unreadable or missing HTTP private key: ");
+        Throwable exception = assertThrows(ValidationException.class, () ->
 
-        jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process();
+            jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process());
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Unreadable or missing HTTP private key: "));
     }
 
     @Test
     public void tlsValidationFailsIfCertificateIsMissing() throws Exception {
-        final File privateKey = temporaryFolder.newFile("graylog.key");
-        final File certificate = temporaryFolder.newFile("graylog.crt");
+        final File privateKey = newFile(temporaryFolder, "graylog.key");
+        final File certificate = newFile(temporaryFolder, "graylog.crt");
 
         final Map<String, String> properties = ImmutableMap.of(
                 "http_enable_tls", "true",
@@ -307,16 +305,16 @@ public class HttpConfigurationTest {
 
         assertThat(certificate.delete()).isTrue();
 
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Unreadable or missing HTTP X.509 certificate: ");
+        Throwable exception = assertThrows(ValidationException.class, () ->
 
-        jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process();
+            jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process());
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Unreadable or missing HTTP X.509 certificate: "));
     }
 
     @Test
     public void tlsValidationFailsIfCertificateIsDirectory() throws Exception {
-        final File privateKey = temporaryFolder.newFile("graylog.key");
-        final File certificate = temporaryFolder.newFolder("graylog.crt");
+        final File privateKey = newFile(temporaryFolder, "graylog.key");
+        final File certificate = newFolder(temporaryFolder, "graylog.crt");
 
         final Map<String, String> properties = ImmutableMap.of(
                 "http_enable_tls", "true",
@@ -325,16 +323,16 @@ public class HttpConfigurationTest {
 
         assertThat(certificate.isDirectory()).isTrue();
 
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Unreadable or missing HTTP X.509 certificate: ");
+        Throwable exception = assertThrows(ValidationException.class, () ->
 
-        jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process();
+            jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process());
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Unreadable or missing HTTP X.509 certificate: "));
     }
 
     @Test
     public void tlsValidationFailsIfCertificateIsUnreadable() throws Exception {
-        final File privateKey = temporaryFolder.newFile("graylog.key");
-        final File certificate = temporaryFolder.newFile("graylog.crt");
+        final File privateKey = newFile(temporaryFolder, "graylog.key");
+        final File certificate = newFile(temporaryFolder, "graylog.crt");
 
         final Map<String, String> properties = ImmutableMap.of(
                 "http_enable_tls", "true",
@@ -343,18 +341,18 @@ public class HttpConfigurationTest {
 
         assertThat(certificate.setReadable(false, false)).isTrue();
 
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Unreadable or missing HTTP X.509 certificate: ");
+        Throwable exception = assertThrows(ValidationException.class, () ->
 
-        jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process();
+            jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process());
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Unreadable or missing HTTP X.509 certificate: "));
     }
 
     @Test
-    public void testHttpPublishUriIsRelativeURI() throws RepositoryException, ValidationException {
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Parameter http_publish_uri should be an absolute URI (found /foo)");
+    public void testHttpPublishUriIsRelativeURI() throws Exception {
+        Throwable exception = assertThrows(ValidationException.class, () ->
 
-        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_publish_uri", "/foo"))).addConfigurationBean(configuration).process();
+            jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_publish_uri", "/foo"))).addConfigurationBean(configuration).process());
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Parameter http_publish_uri should be an absolute URI (found /foo)"));
     }
 
     @Test
@@ -408,5 +406,20 @@ public class HttpConfigurationTest {
         jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process();
 
         assertThat(configuration.getHttpPublishUri()).hasScheme("https");
+    }
+
+    private static File newFile(File parent, String child) throws IOException {
+        File result = new File(parent, child);
+        result.createNewFile();
+        return result;
+    }
+
+    private static File newFolder(File root, String... subDirs) throws IOException {
+        String subFolder = String.join("/", subDirs);
+        File result = new File(root, subFolder);
+        if (!result.mkdirs()) {
+            throw new IOException("Couldn't create folders " + root);
+        }
+        return result;
     }
 }

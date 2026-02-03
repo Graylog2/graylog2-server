@@ -23,6 +23,7 @@ import Routes from 'routing/Routes';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 import withHistory from 'routing/withHistory';
 import type CancellablePromise from 'logic/rest/CancellablePromise';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 import EventNotificationForm from './EventNotificationForm';
 
@@ -34,7 +35,7 @@ const initialTestResult: TestResult = {
   isLoading: false,
 };
 
-type TestResult = { isLoading: false, error?: boolean, message?: string };
+type TestResult = { isLoading: false; error?: boolean; message?: string };
 
 type EventNotificationFormContainerProps = {
   action?: 'create' | 'edit';
@@ -47,9 +48,18 @@ type EventNotificationFormContainerProps = {
   history: any;
 };
 
-class EventNotificationFormContainer extends React.Component<EventNotificationFormContainerProps, {
-  [key: string]: any;
-}> {
+class EventNotificationFormContainer extends React.Component<
+  EventNotificationFormContainerProps,
+  {
+    [key: string]: any;
+  }
+> {
+  static scrollToFirstError() {
+    if (document.getElementsByClassName('has-error')[0] !== undefined) {
+      document.getElementsByClassName('has-error')[0].scrollIntoView(true);
+    }
+  }
+
   static defaultProps = {
     action: 'edit',
     notification: {
@@ -61,14 +71,6 @@ class EventNotificationFormContainer extends React.Component<EventNotificationFo
     formId: undefined,
     onSubmit: () => {},
   };
-
-  static scrollToFirstError() {
-    if (document.getElementsByClassName('has-error')[0] !== undefined) {
-      document.getElementsByClassName('has-error')[0].scrollIntoView(true);
-    }
-  }
-
-  private testPromise: CancellablePromise<void>;
 
   constructor(props) {
     super(props);
@@ -88,6 +90,8 @@ class EventNotificationFormContainer extends React.Component<EventNotificationFo
     }
   }
 
+  private testPromise: CancellablePromise<void>;
+
   handleChange = (key, value) => {
     const { notification } = this.state;
     const nextNotification = cloneDeep(notification);
@@ -104,6 +108,7 @@ class EventNotificationFormContainer extends React.Component<EventNotificationFo
   handleSubmit = () => {
     const { action, embedded, onSubmit, history } = this.props;
     const { notification } = this.state;
+    const currentUser = CurrentUserStore.getInitialState();
 
     this.setState({ isDirty: false });
 
@@ -112,21 +117,25 @@ class EventNotificationFormContainer extends React.Component<EventNotificationFo
     if (action === 'create') {
       promise = EventNotificationsActions.create(notification);
 
-      promise.then(
-        () => {
-          if (!embedded) {
-            history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
-          }
-        },
-        (errorResponse) => {
-          const { body } = errorResponse.additional;
+      promise
+        .then(() => {
+          CurrentUserStore.update(currentUser.currentUser.username);
+        })
+        .then(
+          () => {
+            if (!embedded) {
+              history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
+            }
+          },
+          (errorResponse) => {
+            const { body } = errorResponse.additional;
 
-          if (errorResponse.status === 400 && body && body.failed) {
-            this.setState({ validation: body });
-            EventNotificationFormContainer.scrollToFirstError();
-          }
-        },
-      );
+            if (errorResponse.status === 400 && body && body.failed) {
+              this.setState({ validation: body });
+              EventNotificationFormContainer.scrollToFirstError();
+            }
+          },
+        );
     } else {
       promise = EventNotificationsActions.update(notification.id, notification);
 
@@ -174,7 +183,7 @@ class EventNotificationFormContainer extends React.Component<EventNotificationFo
             testResult.message = 'Validation failed, please correct any errors in the form before continuing.';
             this.setState({ validation: body });
           } else {
-            testResult.message = errorResponse.responseMessage || 'Unknown error, please check your Graylog server logs.';
+            testResult.message = errorResponse.responseMessage || 'Unknown error, please check your server logs.';
           }
         },
       )
@@ -193,16 +202,18 @@ class EventNotificationFormContainer extends React.Component<EventNotificationFo
         {!embedded && isDirty && (
           <ConfirmLeaveDialog question="Do you really want to abandon this page and lose your changes? This action cannot be undone." />
         )}
-        <EventNotificationForm action={action}
-                               notification={notification}
-                               validation={validation}
-                               testResult={testResult}
-                               formId={formId}
-                               embedded={embedded}
-                               onChange={this.handleChange}
-                               onCancel={this.handleCancel}
-                               onSubmit={this.handleSubmit}
-                               onTest={this.handleTest} />
+        <EventNotificationForm
+          action={action}
+          notification={notification}
+          validation={validation}
+          testResult={testResult}
+          formId={formId}
+          embedded={embedded}
+          onChange={this.handleChange}
+          onCancel={this.handleCancel}
+          onSubmit={this.handleSubmit}
+          onTest={this.handleTest}
+        />
       </>
     );
   }

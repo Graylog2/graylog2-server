@@ -16,11 +16,10 @@
  */
 package org.graylog2.indexer.counts;
 
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
+import org.graylog2.indexer.indexset.basic.BasicIndexSet;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,7 +39,7 @@ public class Counts {
         return totalCount(indexSetRegistry.getManagedIndices());
     }
 
-    public long total(final IndexSet indexSet) {
+    public long total(final BasicIndexSet indexSet) {
         return totalCount(indexSet.getManagedIndices());
     }
 

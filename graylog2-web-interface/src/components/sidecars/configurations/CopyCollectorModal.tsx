@@ -22,12 +22,15 @@ import CloneMenuModal from '../common/CloneMenuModal';
 type CopyCollectorModalProps = {
   collector: any;
   copyCollector: (...args: any[]) => void;
-  validateCollector: (...args: any[]) => Promise<{ errors: { name: string[] }}>;
+  validateCollector: (...args: any[]) => Promise<{ errors: { name: string[] } }>;
 };
 
-class CopyCollectorModal extends React.Component<CopyCollectorModalProps, {
-  [key: string]: any;
-}> {
+class CopyCollectorModal extends React.Component<
+  CopyCollectorModalProps,
+  {
+    [key: string]: any;
+  }
+> {
   constructor(props) {
     super(props);
 
@@ -89,14 +92,16 @@ class CopyCollectorModal extends React.Component<CopyCollectorModalProps, {
     const { errorMessage, name, showModal } = this.state;
 
     return (
-      <CloneMenuModal onSelect={this.openModal}
-                      onClose={this._closeModal}
-                      onSave={this._save}
-                      id={this._getId('collector-name')}
-                      onChange={this._changeName}
-                      error={errorMessage}
-                      name={name}
-                      showModal={showModal} />
+      <CloneMenuModal
+        onSelect={this.openModal}
+        onClose={this._closeModal}
+        onSave={this._save}
+        id={this._getId('collector-name')}
+        onChange={this._changeName}
+        error={errorMessage}
+        name={name}
+        showModal={showModal}
+      />
     );
   }
 }

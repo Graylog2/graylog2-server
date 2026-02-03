@@ -4,7 +4,7 @@
   "rev": 2,
   "name": "Sources Page Dashboard",
   "summary": "A predefined dashboard showing the statistics of all sources.",
-  "description": "This is a list of all sources that sent in messages to _Graylog_. You can narrow the time range by zooming in on the message histogram, or you can increase the time range by specifying a broader one in the controls at the top. You can also specify filters to limit the results you are seeing. You can also add additional widgets to this dashboard, or adapt the appearance of existing widgets to suit your needs.",
+  "description": "This is a list of all sources that sent in messages. You can narrow the time range by zooming in on the message histogram, or you can increase the time range by specifying a broader one in the controls at the top. You can also specify filters to limit the results you are seeing. You can also add additional widgets to this dashboard, or adapt the appearance of existing widgets to suit your needs.",
   "vendor": "Graylog <hello@graylog.com> ",
   "url": "https://github.com/Graylog2/graylog2-server",
   "parameters": [],
@@ -19,7 +19,7 @@
       "data": {
         "summary": {
           "@type": "string",
-          "@value": "This is a list of all sources that sent in messages to Graylog."
+          "@value": "This is a list of all sources that sent in messages."
         },
         "search": {
           "queries": [
@@ -1166,7 +1166,7 @@
         "type": "DASHBOARD",
         "description": {
           "@type": "string",
-          "@value": "This is a list of all sources that sent in messages to Graylog. You can narrow the timerange by zooming in on the message histogram, or you can increase the time range by specifying a broader one in the controls at the top. You can also specify filters to limit the results you are seeing. You can also add additional widgets to this dashboard, or adapt the appearance of existing widgets to suit your needs."
+          "@value": "This is a list of all sources that sent in messages. You can narrow the timerange by zooming in on the message histogram, or you can increase the time range by specifying a broader one in the controls at the top. You can also specify filters to limit the results you are seeing. You can also add additional widgets to this dashboard, or adapt the appearance of existing widgets to suit your needs."
         }
       },
       "constraints": [

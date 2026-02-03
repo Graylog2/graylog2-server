@@ -44,11 +44,12 @@ jest.mock('views/logic/slices/titlesActions', () => ({
 
 const expectSeries = (func: string) => expect.objectContaining({ function: func });
 
-const expectWidgetWithSeries = (series: Array<string>) => expect.objectContaining({
-  config: expect.objectContaining({
-    series: series.map(expectSeries),
-  }),
-});
+const expectWidgetWithSeries = (series: Array<string>) =>
+  expect.objectContaining({
+    config: expect.objectContaining({
+      series: series.map(expectSeries),
+    }),
+  });
 
 describe('FieldStatisticsHandler', () => {
   beforeEach(() => {
@@ -62,26 +63,25 @@ describe('FieldStatisticsHandler', () => {
   it('creates field statistics widget for given numeric field', async () => {
     await dispatch(handler({ queryId, field: fieldName, type: numericFieldType, contexts: {} }));
 
-    expect(addWidget).toHaveBeenCalledWith(expectWidgetWithSeries([
-      `count(${fieldName})`,
-      `sum(${fieldName})`,
-      `avg(${fieldName})`,
-      `min(${fieldName})`,
-      `max(${fieldName})`,
-      `stddev(${fieldName})`,
-      `variance(${fieldName})`,
-      `card(${fieldName})`,
-      `percentile(${fieldName},95)`,
-    ]));
+    expect(addWidget).toHaveBeenCalledWith(
+      expectWidgetWithSeries([
+        `count(${fieldName})`,
+        `sum(${fieldName})`,
+        `avg(${fieldName})`,
+        `min(${fieldName})`,
+        `max(${fieldName})`,
+        `stddev(${fieldName})`,
+        `variance(${fieldName})`,
+        `card(${fieldName})`,
+        `percentile(${fieldName},95)`,
+      ]),
+    );
   });
 
   it('creates field statistics widget for given non-numeric field', async () => {
     await dispatch(handler({ queryId, field: fieldName, type: nonNumericFieldType, contexts: {} }));
 
-    expect(addWidget).toHaveBeenCalledWith(expectWidgetWithSeries([
-      `count(${fieldName})`,
-      `card(${fieldName})`,
-    ]));
+    expect(addWidget).toHaveBeenCalledWith(expectWidgetWithSeries([`count(${fieldName})`, `card(${fieldName})`]));
   });
 
   it('creates field statistics widget and copies the widget filter of original widget', async () => {
@@ -96,7 +96,12 @@ describe('FieldStatisticsHandler', () => {
   it('adds title to generated widget', async () => {
     await dispatch(handler({ queryId, field: fieldName, type: nonNumericFieldType, contexts: {} }));
 
-    expect(setTitle).toHaveBeenCalledWith('query-id-1', TitleTypes.Widget, expect.any(String), `Field Statistics for ${fieldName}`);
+    expect(setTitle).toHaveBeenCalledWith(
+      'query-id-1',
+      TitleTypes.Widget,
+      expect.any(String),
+      `Field Statistics for ${fieldName}`,
+    );
   });
 
   it('duplicates query/timerange/streams/filter of original widget', async () => {
@@ -107,18 +112,22 @@ describe('FieldStatisticsHandler', () => {
       .timerange({ type: 'relative', range: 3600 })
       .build();
 
-    await dispatch(handler({
-      queryId,
-      field: fieldName,
-      type: nonNumericFieldType,
-      contexts: { widget: origWidget },
-    }));
+    await dispatch(
+      handler({
+        queryId,
+        field: fieldName,
+        type: nonNumericFieldType,
+        contexts: { widget: origWidget },
+      }),
+    );
 
-    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
-      filter: 'author: "Vanth"',
-      query: expect.objectContaining({ query_string: 'foo:42' }),
-      streams: ['stream1', 'stream23'],
-      timerange: { type: 'relative', range: 3600 },
-    }));
+    expect(addWidget).toHaveBeenCalledWith(
+      expect.objectContaining({
+        filter: 'author: "Vanth"',
+        query: expect.objectContaining({ query_string: 'foo:42' }),
+        streams: ['stream1', 'stream23'],
+        timerange: { type: 'relative', range: 3600 },
+      }),
+    );
   });
 });

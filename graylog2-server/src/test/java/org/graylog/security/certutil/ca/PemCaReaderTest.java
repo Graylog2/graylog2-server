@@ -124,8 +124,8 @@ public class PemCaReaderTest {
     @Test
     void readsCombinedPemWithEncryptedPrivateKey() throws Exception {
         final var ca = PemCaReader.readCA(PEM_CERT_WITH_ENCRYPTED_KEY, "foobar");
-        Assertions.assertThat(ca.certificates()).hasSize(1);
-        Assertions.assertThat(ca.privateKey()).isNotNull();
+        Assertions.assertThat(ca.getCertificates()).hasSize(1);
+        Assertions.assertThat(ca.getPrivateKey()).isNotNull();
     }
 
     @Test
@@ -152,8 +152,8 @@ public class PemCaReaderTest {
     @Test
     void readsCombinedPemWithUnencryptedPrivateKey() throws Exception {
         final var ca = PemCaReader.readCA(PEM_CERT_WITH_UNENCRYPTED_KEY, null);
-        Assertions.assertThat(ca.certificates()).hasSize(1);
-        Assertions.assertThat(ca.privateKey()).isNotNull();
+        Assertions.assertThat(ca.getCertificates()).hasSize(1);
+        Assertions.assertThat(ca.getPrivateKey()).isNotNull();
     }
 
     @Test

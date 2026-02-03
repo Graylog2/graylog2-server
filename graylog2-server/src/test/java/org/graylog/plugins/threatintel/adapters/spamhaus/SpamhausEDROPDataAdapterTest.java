@@ -27,12 +27,13 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.lookup.LookupResult;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -53,9 +54,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class SpamhausEDROPDataAdapterTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
     @Mock
     private HTTPFileRetriever httpFileRetriever;
     @Mock
@@ -78,7 +79,7 @@ public class SpamhausEDROPDataAdapterTest {
         return new String(Files.readAllBytes(torExitNodeListPath), StandardCharsets.UTF_8);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         when(clusterConfigService.get(ThreatIntelPluginConfiguration.class))
                 .thenReturn(ThreatIntelPluginConfiguration.create(true, "", true, true, true));

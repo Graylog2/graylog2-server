@@ -24,9 +24,11 @@ import com.google.auto.value.AutoValue;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
+import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.graylog.autovalue.WithBeanGetter;
+import org.graylog.security.shares.EntityShareRequest;
+import org.graylog2.Configuration;
 import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.ContentPackService;
@@ -41,8 +43,6 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.io.IOException;
 import java.net.URL;
@@ -65,6 +65,7 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
     private final MongoCollection<Document> searches;
     private final MongoCollection<Document> contentPackInstallations;
     private final NotificationService notificationService;
+    private final Configuration configuration;
 
     @Inject
     public V20230601104500_AddSourcesPageV2(ContentPackService contentPackService,
@@ -73,7 +74,7 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
                                             ContentPackPersistenceService contentPackPersistenceService,
                                             ContentPackInstallationPersistenceService contentPackInstallationPersistenceService,
                                             MongoConnection mongoConnection,
-                                            NotificationService notificationService) {
+                                            NotificationService notificationService, Configuration configuration) {
         this.contentPackService = contentPackService;
         this.objectMapper = objectMapper;
         this.configService = configService;
@@ -83,6 +84,7 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
         this.searches = mongoConnection.getMongoDatabase().getCollection("searches");
         this.contentPackInstallations = mongoConnection.getMongoDatabase().getCollection("content_packs_installations");
         this.notificationService = notificationService;
+        this.configuration = configuration;
     }
 
     @Override
@@ -135,6 +137,9 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
                             """));
         }
 
+        // This migration installs a system-provided dashboard. The dashboard has an entry added in the entity_source
+        // collection via a different migration (V20250917184400_AddSystemEntitySource). Any future migrations that
+        // install system-provided entities should take care of adding the entity_source entry as well.
         configService.write(MigrationCompleted.create(pack.id().toString(), notPreviouslyInstalled || notLocallyModified, contentPackShouldBeUninstalled.isPresent()));
     }
 
@@ -183,7 +188,7 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
     }
 
     private ContentPackInstallation installContentPack(ContentPack contentPack) {
-        return contentPackService.installContentPack(contentPack, Collections.emptyMap(), "Add Sources Page V2", "admin");
+        return contentPackService.installContentPack(contentPack, Collections.emptyMap(), "Add Sources Page V2", configuration.getRootUsername(), EntityShareRequest.EMPTY);
     }
 
     private Optional<ContentPack> insertContentPack(ContentPack contentPack) {
@@ -206,7 +211,6 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public static abstract class MigrationCompleted {
         @JsonProperty("content_pack_id")
         public abstract String contentPackId();

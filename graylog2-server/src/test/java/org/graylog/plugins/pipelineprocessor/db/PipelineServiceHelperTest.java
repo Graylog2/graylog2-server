@@ -22,8 +22,8 @@ import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +41,7 @@ public class PipelineServiceHelperTest {
 
     private final List<PipelineDao> pipelines = new ArrayList<>();
 
-    @Before
+    @BeforeEach
     public void setup() {
         final Map<String, Function<?>> functions = ImmutableMap.of();
         final PipelineRuleParser pipelineRuleParser = new PipelineRuleParser(new FunctionRegistry(functions));
@@ -69,18 +69,16 @@ public class PipelineServiceHelperTest {
                 "aaaaa"));
 
         // when + then
-        assertThat(underTest.groupByRuleName(() -> pipelines, Set.of("debug#3"))).satisfies(map -> {
-            assertThat(map.get("debug#3")).satisfies(containsPipelines("Pipeline 3", "Pipeline 4"));
-        });
+        assertThat(underTest.groupByRuleName(() -> pipelines, Set.of("debug#3"))).satisfies(map ->
+            assertThat(map.get("debug#3")).satisfies(containsPipelines("Pipeline 3", "Pipeline 4")));
         assertThat(underTest.groupByRuleName(() -> pipelines, Set.of("debug#2", "debug#3", "debug#4"))).satisfies(map -> {
             assertThat(map.get("debug#2")).satisfies(containsPipelines("Pipeline 1", "Pipeline 3"));
             assertThat(map.get("debug#3")).satisfies(containsPipelines("Pipeline 3", "Pipeline 4"));
             assertThat(map.get("debug#4")).isEmpty();
         });
         assertThat(underTest.groupByRuleName(() -> pipelines, Set.of())).isEmpty();
-        assertThat(underTest.groupByRuleName(() -> pipelines, Set.of("debug#4"))).satisfies(map -> {
-            assertThat(map.get("debug#4")).isEmpty();
-        });
+        assertThat(underTest.groupByRuleName(() -> pipelines, Set.of("debug#4"))).satisfies(map ->
+            assertThat(map.get("debug#4")).isEmpty());
     }
 
     private String pipelineSource(String name, String stage0Rules, String stage1Rules) {
@@ -90,9 +88,7 @@ public class PipelineServiceHelperTest {
                         "stage 1 match either\n" +
                         "%s" +
                         "end",
-                name,
-                String.join("", stage0Rules),
-                String.join("", stage1Rules)
+                name, stage0Rules, stage1Rules
         );
     }
 
@@ -111,9 +107,8 @@ public class PipelineServiceHelperTest {
             assertThat(pipelines).hasSize(pipelineTitles.length);
 
             for (String pt : pipelineTitles) {
-                assertThat(pipelines).anySatisfy(p -> {
-                    assertThat(p.title()).isEqualTo(pt);
-                });
+                assertThat(pipelines).anySatisfy(p ->
+                    assertThat(p.title()).isEqualTo(pt));
             }
         };
     }

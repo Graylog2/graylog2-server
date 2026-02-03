@@ -31,14 +31,19 @@ import { EventNotificationsActions } from 'stores/event-notifications/EventNotif
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import type { HistoryContext } from 'routing/withHistory';
 import withHistory from 'routing/withHistory';
+import PageDescription from 'components/event-notifications/PageDescription';
 
-type EditEventDefinitionPageProps = ParamsContext & HistoryContext & {
-  currentUser: any;
-};
+type EditEventDefinitionPageProps = ParamsContext &
+  HistoryContext & {
+    currentUser: any;
+  };
 
-class EditEventDefinitionPage extends React.Component<EditEventDefinitionPageProps, {
-  [key: string]: any;
-}> {
+class EditEventDefinitionPage extends React.Component<
+  EditEventDefinitionPageProps,
+  {
+    [key: string]: any;
+  }
+> {
   constructor(props) {
     super(props);
 
@@ -51,16 +56,15 @@ class EditEventDefinitionPage extends React.Component<EditEventDefinitionPagePro
     const { params, currentUser } = this.props;
 
     if (isPermitted(currentUser.permissions, `eventnotifications:edit:${params.notificationId}`)) {
-      EventNotificationsActions.get(params.notificationId)
-        .then(
-          (notification) => this.setState({ notification: notification }),
-          (error) => {
-            if (error.status === 404) {
-              const { history } = this.props;
-              history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
-            }
-          },
-        );
+      EventNotificationsActions.get(params.notificationId).then(
+        (notification) => this.setState({ notification: notification }),
+        (error) => {
+          if (error.status === 404) {
+            const { history } = this.props;
+            history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
+          }
+        },
+      );
     }
   }
 
@@ -87,16 +91,14 @@ class EditEventDefinitionPage extends React.Component<EditEventDefinitionPagePro
     return (
       <DocumentTitle title={`Edit "${notification.title}" Notification`}>
         <EventsPageNavigation />
-        <PageHeader title={`Edit "${notification.title}" Notification`}
-                    actions={<EventNotificationActionLinks notificationId={notification.id} />}
-                    documentationLink={{
-                      title: 'Alerts documentation',
-                      path: DocsHelper.PAGES.ALERTS,
-                    }}>
-          <span>
-            Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
-            to you or to other systems you use for that purpose.
-          </span>
+        <PageHeader
+          title={`Edit "${notification.title}" Notification`}
+          actions={<EventNotificationActionLinks notificationId={notification.id} />}
+          documentationLink={{
+            title: 'Alerts documentation',
+            path: DocsHelper.PAGES.ALERTS,
+          }}>
+          <PageDescription />
         </PageHeader>
 
         <Row className="content">
@@ -109,6 +111,10 @@ class EditEventDefinitionPage extends React.Component<EditEventDefinitionPagePro
   }
 }
 
-export default connect(withParams(withHistory<EditEventDefinitionPageProps>(EditEventDefinitionPage)), {
-  currentUser: CurrentUserStore,
-}, ({ currentUser }) => ({ currentUser: currentUser.currentUser }));
+export default connect(
+  withParams(withHistory<EditEventDefinitionPageProps>(EditEventDefinitionPage)),
+  {
+    currentUser: CurrentUserStore,
+  },
+  ({ currentUser }) => ({ currentUser: currentUser.currentUser }),
+);

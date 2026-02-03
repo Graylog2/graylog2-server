@@ -79,8 +79,7 @@ public abstract class EventNotificationHandlerConfigEntity implements NativeEnti
 
         if (notification == null) {
             throw new ContentPackException("Missing notification (" + notificationId + ") for event definition");
-        } else if (notification instanceof NotificationDto) {
-            NotificationDto notificationDto = (NotificationDto) notification;
+        } else if (notification instanceof final NotificationDto notificationDto) {
             configBuilder.notificationId(notificationDto.id());
         } else {
             throw new ContentPackException("Invalid type for notification (" + notificationId + ") of event definition: " + notification.getClass());

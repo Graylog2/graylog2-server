@@ -29,78 +29,83 @@ export type UserTelemetrySettings = {
 };
 
 type TelemetrySettingsActionsType = RefluxActions<{
-  update: (settings: Partial<UserTelemetrySettings>) => Promise<unknown>,
-  get: () => Promise<UserTelemetrySettings>,
+  update: (settings: Partial<UserTelemetrySettings>) => Promise<unknown>;
+  get: () => Promise<UserTelemetrySettings>;
 }>;
 
 export type TelemetrySettingsStoreState = {
-  telemetrySetting: UserTelemetrySettings,
+  telemetrySetting: UserTelemetrySettings;
 };
 
 const urlPrefix = ApiRoutes.TelemetryApiController.setting().url;
 
-export const TelemetrySettingsActions: TelemetrySettingsActionsType = singletonActions('telemetry.settings.actions', () => Reflux.createActions({
-  update: { asyncResult: true },
-  get: { asyncResult: true },
-}));
-export const TelemetrySettingsStore = singletonStore('telemetry.settings.store', () => Reflux.createStore<TelemetrySettingsStoreState>({
-  listenables: [TelemetrySettingsActions],
+export const TelemetrySettingsActions: TelemetrySettingsActionsType = singletonActions(
+  'telemetry.settings.actions',
+  () =>
+    Reflux.createActions({
+      update: { asyncResult: true },
+      get: { asyncResult: true },
+    }),
+);
+export const TelemetrySettingsStore = singletonStore('telemetry.settings.store', () =>
+  Reflux.createStore<TelemetrySettingsStoreState>({
+    listenables: [TelemetrySettingsActions],
 
-  telemetrySetting: undefined,
+    telemetrySetting: undefined,
 
-  getInitialState() {
-    return {
-      telemetrySetting: this.telemetrySetting,
-    };
-  },
+    getInitialState() {
+      return {
+        telemetrySetting: this.telemetrySetting,
+      };
+    },
 
-  init() {
-    this.get();
-  },
+    init() {
+      this.get();
+    },
 
-  get() {
-    const promise = fetch('GET', this._url());
+    get() {
+      const promise = fetch('GET', this._url());
 
-    promise.then((response) => {
-      this.telemetrySetting = response;
-      this.propagateChanges();
-
-      return response;
-    });
-
-    TelemetrySettingsActions.get.promise(promise);
-  },
-
-  update(settings: UserTelemetrySettings) {
-    const promise = fetch('PUT', this._url(), settings);
-
-    promise.then(
-      (response) => {
+      promise.then((response) => {
         this.telemetrySetting = response;
         this.propagateChanges();
 
         return response;
-      },
-      (error) => {
-        UserNotification.error(`Update failed: ${error}`, 'Could not update telemetry settings.');
-      },
-    );
+      });
 
-    TelemetrySettingsActions.update.promise(promise);
-  },
+      TelemetrySettingsActions.get.promise(promise);
+    },
 
-  propagateChanges() {
-    this.trigger(this.getState());
-  },
+    update(settings: UserTelemetrySettings) {
+      const promise = fetch('PUT', this._url(), settings);
 
-  getState() {
-    return {
-      telemetrySetting: this.telemetrySetting,
-    };
-  },
+      promise.then(
+        (response) => {
+          this.telemetrySetting = response;
+          this.propagateChanges();
 
-  _url(): string {
-    return qualifyUrl(urlPrefix);
-  },
+          return response;
+        },
+        (error) => {
+          UserNotification.error(`Update failed: ${error}`, 'Could not update telemetry settings.');
+        },
+      );
 
-}));
+      TelemetrySettingsActions.update.promise(promise);
+    },
+
+    propagateChanges() {
+      this.trigger(this.getState());
+    },
+
+    getState() {
+      return {
+        telemetrySetting: this.telemetrySetting,
+      };
+    },
+
+    _url(): string {
+      return qualifyUrl(urlPrefix);
+    },
+  }),
+);

@@ -15,28 +15,27 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import type { $PropertyType } from 'utility-types';
 
 type Color = string;
 type ChartColors = { [key: string]: Color };
 
 type InternalState = {
-  chartColors: ChartColors,
+  chartColors: ChartColors;
 };
 
 type ChartColorSettingJson = {
-  field_name: string,
-  chart_color: Color,
+  field_name: string;
+  chart_color: Color;
 };
 
 export type WidgetFormattingSettingsJSON = {
-  chart_colors: Array<ChartColorSettingJson>,
+  chart_colors: Array<ChartColorSettingJson>;
 };
 
 export default class WidgetFormattingSettings {
   private readonly _value: InternalState;
 
-  constructor(chartColors: $PropertyType<InternalState, 'chartColors'>) {
+  constructor(chartColors: InternalState['chartColors']) {
     this._value = { chartColors };
   }
 
@@ -49,14 +48,13 @@ export default class WidgetFormattingSettings {
     return new Builder(Immutable.Map(this._value));
   }
 
-  static create(chartColors: $PropertyType<InternalState, 'chartColors'>) {
+  static create(chartColors: InternalState['chartColors']) {
     return new WidgetFormattingSettings(chartColors);
   }
 
   static builder() {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder()
-      .chartColors({});
+    return new Builder().chartColors({});
   }
 
   static empty() {
@@ -65,19 +63,24 @@ export default class WidgetFormattingSettings {
 
   toJSON() {
     const { chartColors } = this._value;
-    const chartColorJson = Object.keys(chartColors)
-      .map((fieldName) => ({ field_name: fieldName, chart_color: chartColors[fieldName] }));
+    const chartColorJson = Object.keys(chartColors).map((fieldName) => ({
+      field_name: fieldName,
+      chart_color: chartColors[fieldName],
+    }));
 
     return { chart_colors: chartColorJson };
   }
 
   static fromJSON(value: WidgetFormattingSettingsJSON) {
     const { chart_colors: chartColorJson } = value;
-    const chartColors: ChartColors = chartColorJson.reduce((acc, { field_name: fieldName, chart_color: chartColor }) => {
-      acc[fieldName] = chartColor;
+    const chartColors: ChartColors = chartColorJson.reduce(
+      (acc, { field_name: fieldName, chart_color: chartColor }) => {
+        acc[fieldName] = chartColor;
 
-      return acc;
-    }, {});
+        return acc;
+      },
+      {},
+    );
 
     return WidgetFormattingSettings.create(chartColors);
   }
@@ -92,7 +95,7 @@ class Builder {
     this.value = value;
   }
 
-  chartColors(value: $PropertyType<InternalState, 'chartColors'>) {
+  chartColors(value: InternalState['chartColors']) {
     return new Builder(this.value.set('chartColors', value));
   }
 

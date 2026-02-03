@@ -14,7 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { WidgetConfigFormValues, GroupingValidationErrors } from 'views/components/aggregationwizard/WidgetConfigForm';
+import type {
+  WidgetConfigFormValues,
+  GroupingValidationErrors,
+} from 'views/components/aggregationwizard/WidgetConfigForm';
 
 import GroupingElement from './GroupingElement';
 
@@ -37,13 +40,17 @@ describe('GroupByElement', () => {
           ...valuesGrouping,
           fields: undefined,
         };
-        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as { groupBy: GroupingValidationErrors };
+        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as {
+          groupBy: GroupingValidationErrors;
+        };
 
         expect(result.groupBy.groupings[0].fields).toBe('Field is required.');
       });
 
       it('should not add an error if everything is fine', () => {
-        const result = validate({ groupBy: { ...groupBy, groupings: [valuesGrouping] } }) as { groupBy: GroupingValidationErrors };
+        const result = validate({ groupBy: { ...groupBy, groupings: [valuesGrouping] } }) as {
+          groupBy: GroupingValidationErrors;
+        };
 
         expect(result.groupBy).toBeUndefined();
       });
@@ -53,7 +60,9 @@ describe('GroupByElement', () => {
           ...valuesGrouping,
           limit: undefined,
         };
-        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as { groupBy: GroupingValidationErrors };
+        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as {
+          groupBy: GroupingValidationErrors;
+        };
 
         expect(result.groupBy.groupings[0].limit).toBe('Limit is required.');
       });
@@ -63,7 +72,9 @@ describe('GroupByElement', () => {
           ...valuesGrouping,
           limit: -1,
         };
-        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as { groupBy: GroupingValidationErrors };
+        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as {
+          groupBy: GroupingValidationErrors;
+        };
 
         expect(result.groupBy.groupings[0].limit).toBe('Must be greater than 0.');
       });
@@ -83,7 +94,9 @@ describe('GroupByElement', () => {
           ...timeGrouping,
           fields: undefined,
         };
-        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as { groupBy: GroupingValidationErrors };
+        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as {
+          groupBy: GroupingValidationErrors;
+        };
 
         expect(result.groupBy.groupings[0].fields).toBe('Field is required.');
       });
@@ -99,7 +112,9 @@ describe('GroupByElement', () => {
           ...timeGrouping,
           interval: { type: 'auto', scaling: undefined } as const,
         };
-        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as { groupBy: GroupingValidationErrors };
+        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as {
+          groupBy: GroupingValidationErrors;
+        };
 
         expect(result.groupBy.groupings[0].interval).toBe('Scaling is required.');
       });
@@ -109,7 +124,9 @@ describe('GroupByElement', () => {
           ...timeGrouping,
           interval: { type: 'auto', scaling: -1 } as const,
         };
-        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as { groupBy: GroupingValidationErrors };
+        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as {
+          groupBy: GroupingValidationErrors;
+        };
 
         expect(result.groupBy.groupings[0].interval).toBe('Must be greater than 0 and smaller or equals 10.');
       });
@@ -119,7 +136,9 @@ describe('GroupByElement', () => {
           ...timeGrouping,
           interval: { type: 'timeunit', value: -1, unit: 'seconds' } as const,
         };
-        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as { groupBy: GroupingValidationErrors };
+        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as {
+          groupBy: GroupingValidationErrors;
+        };
 
         expect(result.groupBy.groupings[0].interval).toBe('Must be greater than 0.');
       });
@@ -129,7 +148,9 @@ describe('GroupByElement', () => {
           ...timeGrouping,
           interval: { type: 'timeunit', value: undefined, unit: 'seconds' } as const,
         };
-        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as { groupBy: GroupingValidationErrors };
+        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } }) as {
+          groupBy: GroupingValidationErrors;
+        };
 
         expect(result.groupBy.groupings[0].interval).toBe('Value is required.');
       });

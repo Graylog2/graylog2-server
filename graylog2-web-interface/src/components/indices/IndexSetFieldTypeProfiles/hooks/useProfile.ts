@@ -14,15 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type {
   IndexSetFieldTypeProfileJson,
   IndexSetFieldTypeProfile,
 } from 'components/indices/IndexSetFieldTypeProfiles/types';
+import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA: IndexSetFieldTypeProfile = {
   customFieldMappings: [],
@@ -44,31 +44,34 @@ const fetchIndexSetFieldTypeProfile = async (id: string) => {
   }));
 };
 
-const useProfile = (id: string): {
-  data: IndexSetFieldTypeProfile,
-  isFetched: boolean,
-  isFetching: boolean,
-  refetch: () => void,
+const useProfile = (
+  id: string,
+): {
+  data: IndexSetFieldTypeProfile;
+  isFetched: boolean;
+  isFetching: boolean;
+  refetch: () => void;
 } => {
-  const { data, isFetched, isFetching, refetch } = useQuery(
-    ['indexSetFieldTypeProfile', id],
-    () => fetchIndexSetFieldTypeProfile(id),
-    {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading index field type profile failed with status: ${errorThrown}`,
-          'Could not load index field type profile');
-      },
-      keepPreviousData: true,
-      enabled: !!id,
-    },
-  );
+  const { data, isFetched, isFetching, refetch } = useQuery({
+    queryKey: ['indexSetFieldTypeProfile', id],
 
-  return ({
+    queryFn: () =>
+      defaultOnError(
+        fetchIndexSetFieldTypeProfile(id),
+        'Loading index field type profile failed with status',
+        'Could not load index field type profile',
+      ),
+
+    placeholderData: keepPreviousData,
+    enabled: !!id,
+  });
+
+  return {
     data: data ?? INITIAL_DATA,
     isFetched,
     isFetching,
     refetch,
-  });
+  };
 };
 
 export default useProfile;

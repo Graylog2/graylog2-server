@@ -16,16 +16,18 @@
  */
 package org.graylog.datanode.rest;
 
-import org.graylog.datanode.configuration.DatanodeConfiguration;
-import org.graylog.datanode.opensearch.OpensearchProcess;
-import org.graylog2.plugin.Version;
-
 import jakarta.inject.Inject;
-
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.opensearch.OpensearchProcess;
+import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.plugin.Version;
+import org.graylog2.plugin.system.NodeId;
 
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
@@ -35,19 +37,30 @@ public class StatusController {
 
     private final DatanodeConfiguration datanodeConfiguration;
     private final OpensearchProcess openSearch;
+    private final NodeService<DataNodeDto> nodeService;
+    private final NodeId nodeId;
 
     @Inject
-    public StatusController(DatanodeConfiguration datanodeConfiguration, OpensearchProcess openSearch) {
+    public StatusController(DatanodeConfiguration datanodeConfiguration, OpensearchProcess openSearch, NodeService<DataNodeDto> nodeService, NodeId nodeId) {
         this.datanodeConfiguration = datanodeConfiguration;
         this.openSearch = openSearch;
+        this.nodeService = nodeService;
+        this.nodeId = nodeId;
     }
 
     @GET
     public DataNodeStatus status() {
+        DataNodeDto dto;
+        try {
+            dto = nodeService.byNodeId(nodeId.toString());
+        } catch (NodeNotFoundException e) {
+            dto = null;
+        }
         return new DataNodeStatus(
                 version,
                 new StatusResponse(datanodeConfiguration.opensearchDistributionProvider().get().version(),openSearch.processInfo()),
-                datanodeConfiguration.datanodeDirectories()
+                datanodeConfiguration.datanodeDirectories(),
+                dto
         );
     }
 

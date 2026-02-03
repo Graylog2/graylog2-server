@@ -33,12 +33,10 @@ import Widget from '../widgets/Widget';
 
 const field = 'foo';
 
-const widgetConfig = AggregationWidgetConfig
-  .builder()
-  .rowPivots([
-    PivotGenerator('bar', FieldType.Unknown),
-    PivotGenerator(field, FieldType.Unknown),
-  ]);
+const widgetConfig = AggregationWidgetConfig.builder().rowPivots([
+  PivotGenerator('bar', FieldType.Unknown),
+  PivotGenerator(field, FieldType.Unknown),
+]);
 const widget: Widget = AggregationWidget.builder().newId().config(widgetConfig).build();
 
 jest.mock('views/logic/slices/widgetActions', () => ({
@@ -60,83 +58,114 @@ describe('ShowDocumentsHandler', () => {
   it('adds a new message widget', async () => {
     await dispatch(ShowDocumentsHandler({ contexts: { widget, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] } }));
 
-    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
-      config: expect.objectContaining({ fields: ['timestamp', 'source', 'bar', 'foo'] }),
-      type: MessagesWidget.type,
-      query: expect.objectContaining({
-        query_string: 'bar:42 AND foo:Hello\\!',
+    expect(addWidget).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({ fields: ['timestamp', 'source', 'bar', 'foo'] }),
+        type: MessagesWidget.type,
+        query: expect.objectContaining({
+          query_string: 'bar:42 AND foo:Hello\\!',
+        }),
       }),
-    }));
+    );
 
-    expect(setTitle).toHaveBeenCalledWith('query-id-1', 'widget', expect.any(String), 'Messages for bar:42 AND foo:Hello\\!');
+    expect(setTitle).toHaveBeenCalledWith(
+      'query-id-1',
+      'widget',
+      expect.any(String),
+      'Messages for bar:42 AND foo:Hello\\!',
+    );
   });
 
   it('adds a new message widget for an empty value path', async () => {
     await dispatch(ShowDocumentsHandler({ contexts: { widget, valuePath: [] } }));
 
-    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
-      config: expect.objectContaining({ fields: ['timestamp', 'source'] }),
-      type: MessagesWidget.type,
-      query: expect.objectContaining({
-        query_string: '',
+    expect(addWidget).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({ fields: ['timestamp', 'source'] }),
+        type: MessagesWidget.type,
+        query: expect.objectContaining({
+          query_string: '',
+        }),
       }),
-    }));
+    );
   });
 
   it('adds the given value path as widget filter for new message widget', async () => {
     await dispatch(ShowDocumentsHandler({ contexts: { widget, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] } }));
 
-    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
-      config: expect.objectContaining({ fields: ['timestamp', 'source', 'bar', 'foo'] }),
-      type: MessagesWidget.type,
-      query: expect.objectContaining({
-        query_string: 'bar:42 AND foo:Hello\\!',
+    expect(addWidget).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({ fields: ['timestamp', 'source', 'bar', 'foo'] }),
+        type: MessagesWidget.type,
+        query: expect.objectContaining({
+          query_string: 'bar:42 AND foo:Hello\\!',
+        }),
       }),
-    }));
+    );
   });
 
   it('adds the given value path to an existing widget query', async () => {
     const widgetWithFilter = widget.toBuilder().query(createElasticsearchQueryString('baz:23')).build();
 
-    await dispatch(ShowDocumentsHandler({ contexts: { widget: widgetWithFilter, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] } }));
+    await dispatch(
+      ShowDocumentsHandler({ contexts: { widget: widgetWithFilter, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] } }),
+    );
 
-    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
-      config: expect.objectContaining({ fields: ['timestamp', 'source', 'bar', 'foo'] }),
-      type: MessagesWidget.type,
-      query: expect.objectContaining({
-        query_string: 'baz:23 AND bar:42 AND foo:Hello\\!',
+    expect(addWidget).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({ fields: ['timestamp', 'source', 'bar', 'foo'] }),
+        type: MessagesWidget.type,
+        query: expect.objectContaining({
+          query_string: 'baz:23 AND bar:42 AND foo:Hello\\!',
+        }),
       }),
-    }));
+    );
   });
 
   it('sets title for new messages widget', async () => {
     const widgetWithFilter = widget.toBuilder().query(createElasticsearchQueryString('foo:23')).build();
 
-    await dispatch(ShowDocumentsHandler({ contexts: { widget: widgetWithFilter, valuePath: [{ bar: 42 }, { hello: 'world' }] } }));
+    await dispatch(
+      ShowDocumentsHandler({ contexts: { widget: widgetWithFilter, valuePath: [{ bar: 42 }, { hello: 'world' }] } }),
+    );
 
-    expect(setTitle).toHaveBeenCalledWith('query-id-1', 'widget', expect.any(String), 'Messages for bar:42 AND hello:world');
+    expect(setTitle).toHaveBeenCalledWith(
+      'query-id-1',
+      'widget',
+      expect.any(String),
+      'Messages for bar:42 AND hello:world',
+    );
   });
 
   it('does not include duplicate source/timestamp fields twice', async () => {
     const widgetWithFilter = widget.toBuilder().query(createElasticsearchQueryString('foo:23')).build();
 
-    await dispatch(ShowDocumentsHandler({
-      contexts: { widget: widgetWithFilter, valuePath: [{ timestamp: 'something' }, { source: 'hopper' }, { hello: 'world' }] },
-    }));
+    await dispatch(
+      ShowDocumentsHandler({
+        contexts: {
+          widget: widgetWithFilter,
+          valuePath: [{ timestamp: 'something' }, { source: 'hopper' }, { hello: 'world' }],
+        },
+      }),
+    );
 
-    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
-      config: expect.objectContaining({ fields: ['timestamp', 'source', 'hello'] }),
-    }));
+    expect(addWidget).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({ fields: ['timestamp', 'source', 'hello'] }),
+      }),
+    );
   });
 
   it('creates correct widget query for missing bucket field value', async () => {
     await dispatch(ShowDocumentsHandler({ contexts: { widget, valuePath: [{ foo: MISSING_BUCKET_NAME }] } }));
 
-    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
-      query: expect.objectContaining({
-        query_string: 'NOT _exists_:foo',
+    expect(addWidget).toHaveBeenCalledWith(
+      expect.objectContaining({
+        query: expect.objectContaining({
+          query_string: 'NOT _exists_:foo',
+        }),
       }),
-    }));
+    );
   });
 
   describe('on dashboard', () => {
@@ -151,19 +180,23 @@ describe('ShowDocumentsHandler', () => {
       const dashboardView = createViewWithWidgets([origWidget], {});
       const _dispatch = mockDispatch({ view: { view: dashboardView, activeQuery: 'query-id-1' } } as RootState);
 
-      await _dispatch(ShowDocumentsHandler({
-        contexts: {
-          widget: origWidget,
-          valuePath: [{ bar: 42 }, { hello: 'world' }],
-        },
-      }));
+      await _dispatch(
+        ShowDocumentsHandler({
+          contexts: {
+            widget: origWidget,
+            valuePath: [{ bar: 42 }, { hello: 'world' }],
+          },
+        }),
+      );
 
-      expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
-        filter: 'author: "Vanth"',
-        streams: ['stream1', 'stream23'],
-        timerange: { type: 'relative', range: 3600 },
-        query: expect.objectContaining({ query_string: 'foo:42 AND bar:42 AND hello:world' }),
-      }));
+      expect(addWidget).toHaveBeenCalledWith(
+        expect.objectContaining({
+          filter: 'author: "Vanth"',
+          streams: ['stream1', 'stream23'],
+          timerange: { type: 'relative', range: 3600 },
+          query: expect.objectContaining({ query_string: 'foo:42 AND bar:42 AND hello:world' }),
+        }),
+      );
     });
   });
 });

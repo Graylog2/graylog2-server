@@ -1,0 +1,5 @@
+type = "f"
+message = "Force all requests of search job executions to be routed to the same shards for consistency."
+
+pulls = ["22340"]
+issues = ["22107"]

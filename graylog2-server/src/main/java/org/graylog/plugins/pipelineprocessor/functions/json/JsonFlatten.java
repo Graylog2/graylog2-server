@@ -19,21 +19,20 @@ package org.graylog.plugins.pipelineprocessor.functions.json;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 
-import jakarta.inject.Inject;
-
 import java.io.IOException;
 
 import static com.google.common.collect.ImmutableList.of;
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 public class JsonFlatten extends AbstractFunction<JsonNode> {
-    private static final RateLimitedLog LOG = getRateLimitedLog(JsonFlatten.class);
+    private static final RateLimitedLog LOG = createDefaultRateLimitedLog(JsonFlatten.class);
     public static final String NAME = "flatten_json";
     private static final String OPTION_JSON = "json";
     private static final String OPTION_FLATTEN = "flatten";
@@ -64,7 +63,7 @@ public class JsonFlatten extends AbstractFunction<JsonNode> {
     public JsonFlatten(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
         valueParam = ParameterDescriptor.string("value").description("The string to parse as a JSON tree").build();
-        arrayHandlerParam = ParameterDescriptor.string("array_handler").description("Determines how arrays are processed").build();
+        arrayHandlerParam = ParameterDescriptor.string("array_handler").description("Determines how arrays are processed. Valid arguments: json, flatten, ignore").build();
         stringifyParam = ParameterDescriptor.bool("stringify").optional().description("Convert all extracted values to strings").build();
     }
 

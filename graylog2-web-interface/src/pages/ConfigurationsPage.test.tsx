@@ -15,26 +15,47 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
+import type { PluginExports } from 'graylog-web-plugin/plugin';
+import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
 import suppressConsole from 'helpers/suppressConsole';
 import ConfigurationsPage from 'pages/ConfigurationsPage';
-import SidecarConfig from 'components/configurations/SidecarConfig';
-
-jest.mock('components/configurations/SearchesConfig', () => () => <span>Search Configuration Component</span>);
-jest.mock('components/configurations/MessageProcessorsConfig', () => () => <span>Message Processors Configuration Component</span>);
-jest.mock('components/configurations/SidecarConfig');
+import { usePluginExports } from 'views/test/testPlugins';
+import ConfigurationSection from 'pages/configurations/ConfigurationSection';
 
 const ComponentThrowingError = () => {
   throw new Error('Boom!');
 };
 
-const ComponentWorkingFine = () => (
-  <span>It is all good!</span>
-);
+const ComponentWorkingFine = () => <span>It is all good!</span>;
+
+const SidecarConfig = jest.fn();
+
+const coreConfiglets: PluginExports = {
+  coreSystemConfigurations: [
+    {
+      name: 'General',
+      props: {
+        ConfigurationComponent: () => <span>General</span>,
+        title: 'General',
+      },
+      SectionComponent: ConfigurationSection,
+    },
+    {
+      name: 'Sidecar',
+      props: {
+        ConfigurationComponent: SidecarConfig,
+        title: 'Sidecar',
+      },
+      SectionComponent: ConfigurationSection,
+    },
+  ],
+};
 
 describe('ConfigurationsPage', () => {
+  usePluginExports(coreConfiglets);
   afterEach(() => {
     jest.resetAllMocks();
   });
@@ -49,7 +70,7 @@ describe('ConfigurationsPage', () => {
     });
 
     await suppressConsole(async () => {
-      fireEvent.click(sidecarNavItem);
+      await userEvent.click(sidecarNavItem);
 
       return screen.findByText('Boom!');
     });
@@ -65,7 +86,7 @@ describe('ConfigurationsPage', () => {
     });
 
     await suppressConsole(async () => {
-      fireEvent.click(sidecarNavItem);
+      await userEvent.click(sidecarNavItem);
 
       return screen.findByText('It is all good!');
     });

@@ -18,50 +18,55 @@ import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import {
-  Col,
-  Row,
-} from 'components/bootstrap';
-import {
-  Pagination, PageSizeSelect, NoSearchResult, NoEntitiesExist,
-} from 'components/common';
+import { Col, Row } from 'components/bootstrap';
+import { Pagination, PageSizeSelect, NoSearchResult, NoEntitiesExist } from 'components/common';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import ControlledTableList from 'components/common/ControlledTableList';
 import ContentPackListItem from 'components/content-packs/components/ContentPackListItem';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import type { ContentPackInstallation, ContentPackMetadata } from './Types';
 
 type Props = {
-  contentPacks?: Array<ContentPackInstallation>
-  contentPackMetadata?: ContentPackMetadata
-  onDeletePack?: (id: string) => void
-  onInstall?: (id: string, contentPackRev: string, parameters: unknown) => void
+  contentPacks?: Array<ContentPackInstallation>;
+  contentPackMetadata?: ContentPackMetadata;
+  onDeletePack?: (id: string) => void;
+  onInstall?: (id: string, contentPackRev: number, parameters: unknown, shareRequest: EntitySharePayload) => void;
 };
 
-const StyledPageSizeSelect = styled(PageSizeSelect)(({ theme }) => css`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacings.xs};
-  float: right;
-`);
+const StyledPageSizeSelect = styled(PageSizeSelect)(
+  ({ theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacings.xs};
+    float: right;
+  `,
+);
 
-const ContentPacksList = ({ contentPacks = [], contentPackMetadata = {}, onDeletePack = () => {}, onInstall = () => {} }: Props) => {
+const ContentPacksList = ({
+  contentPacks = [],
+  contentPackMetadata = {},
+  onDeletePack = () => {},
+  onInstall = () => {},
+}: Props) => {
   const [filteredContentPacks, setFilteredContentPacks] = useState(contentPacks);
   const [paginationOption, setPaginationOption] = useState(DEFAULT_PAGINATION);
 
   const formatItems = (items: Array<ContentPackInstallation>) => {
     const { perPage, page } = paginationOption;
-    const begin = (perPage * (page - 1));
+    const begin = perPage * (page - 1);
     const end = begin + perPage;
     const shownItems = items.slice(begin, end);
 
     return shownItems.map((item) => (
-      <ContentPackListItem key={item.id}
-                           pack={item}
-                           contentPackMetadata={contentPackMetadata}
-                           onDeletePack={onDeletePack}
-                           onInstall={onInstall} />
+      <ContentPackListItem
+        key={item.id}
+        pack={item}
+        contentPackMetadata={contentPackMetadata}
+        onDeletePack={onDeletePack}
+        onInstall={onInstall}
+      />
     ));
   };
 
@@ -80,24 +85,28 @@ const ContentPacksList = ({ contentPacks = [], contentPackMetadata = {}, onDelet
   const numberPages = Math.ceil(filteredContentPacks.length / paginationOption.perPage);
 
   const pagination = (
-    <Pagination totalPages={numberPages}
-                currentPage={paginationOption.page}
-                onChange={onChangePage} />
+    <Pagination totalPages={numberPages} currentPage={paginationOption.page} onChange={onChangePage} />
   );
 
   const pageSizeSelect = (
-    <StyledPageSizeSelect onChange={onItemsShownChange}
-                          pageSize={paginationOption.perPage}
-                          pageSizes={[10, 25, 50, 100]} />
+    <StyledPageSizeSelect
+      onChange={onItemsShownChange}
+      pageSize={paginationOption.perPage}
+      pageSizes={[10, 25, 50, 100]}
+    />
   );
 
-  const noContentMessage = contentPacks.length <= 0
-    ? <NoEntitiesExist>No content packs found. Please create or upload one</NoEntitiesExist>
-    : <NoSearchResult>No matching content packs have been found</NoSearchResult>;
+  const noContentMessage =
+    contentPacks.length <= 0 ? (
+      <NoEntitiesExist>No content packs found. Please create or upload one</NoEntitiesExist>
+    ) : (
+      <NoSearchResult>No matching content packs have been found</NoSearchResult>
+    );
 
-  const content = filteredContentPacks.length <= 0
-    ? (<div className="has-bm">{noContentMessage}</div>)
-    : (
+  const content =
+    filteredContentPacks.length <= 0 ? (
+      <div className="has-bm">{noContentMessage}</div>
+    ) : (
       <ControlledTableList>
         <ControlledTableList.Header />
         {formatItems(filteredContentPacks)}
@@ -108,17 +117,15 @@ const ContentPacksList = ({ contentPacks = [], contentPackMetadata = {}, onDelet
     <div>
       <Row className="has-bm">
         <Col md={5}>
-          <TypeAheadDataFilter id="content-packs-filter"
-                               label="Filter"
-                               data={contentPacks}
-                               displayKey="name"
-                               onDataFiltered={filterContentPacks}
-                               searchInKeys={['name', 'summary']}
-                               filterSuggestions={[]} />
+          <TypeAheadDataFilter
+            id="content-packs-filter"
+            label="Filter"
+            data={contentPacks}
+            onDataFiltered={filterContentPacks}
+            searchInKeys={['name', 'summary']}
+          />
         </Col>
-        <Col md={5}>
-          {pagination}
-        </Col>
+        <Col md={5}>{pagination}</Col>
         <Col md={2} className="text-right">
           {pageSizeSelect}
         </Col>
@@ -126,9 +133,7 @@ const ContentPacksList = ({ contentPacks = [], contentPackMetadata = {}, onDelet
       {content}
       <Row className="row-sm">
         <Col md={5} />
-        <Col md={5}>
-          {pagination}
-        </Col>
+        <Col md={5}>{pagination}</Col>
         <Col md={2} className="text-right">
           {pageSizeSelect}
         </Col>

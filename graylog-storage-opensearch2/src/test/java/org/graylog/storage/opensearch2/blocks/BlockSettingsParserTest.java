@@ -19,23 +19,24 @@ package org.graylog.storage.opensearch2.blocks;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.get.GetSettingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BlockSettingsParserTest {
 
     @Test
     public void noBlockedIndicesIdentifiedIfEmptyResponseParsed() {
         GetSettingsResponse emptyResponse = new GetSettingsResponse(Map.of(), Map.of());
-        final IndicesBlockStatus indicesBlockStatus = BlockSettingsParser.parseBlockSettings(emptyResponse);
+        final IndicesBlockStatus indicesBlockStatus = BlockSettingsParser.parseBlockSettings(emptyResponse, Optional.empty());
         assertNotNull(indicesBlockStatus);
         assertEquals(0, indicesBlockStatus.countBlockedIndices());
     }
@@ -44,7 +45,7 @@ public class BlockSettingsParserTest {
     public void noBlockedIndicesIdentifiedIfEmptySettingsPresent() {
         var settingsBuilder = Map.of("index_0", Settings.builder().build());
         GetSettingsResponse emptySettingsResponse = new GetSettingsResponse(settingsBuilder, Map.of());
-        final IndicesBlockStatus indicesBlockStatus = BlockSettingsParser.parseBlockSettings(emptySettingsResponse);
+        final IndicesBlockStatus indicesBlockStatus = BlockSettingsParser.parseBlockSettings(emptySettingsResponse, Optional.empty());
         assertNotNull(indicesBlockStatus);
         assertEquals(0, indicesBlockStatus.countBlockedIndices());
     }
@@ -64,7 +65,7 @@ public class BlockSettingsParserTest {
                         .put("index.blocks.read_only_allow_delete", true)
                         .build());
         GetSettingsResponse settingsResponse = new GetSettingsResponse(settingsBuilder, Map.of());
-        final IndicesBlockStatus indicesBlockStatus = BlockSettingsParser.parseBlockSettings(settingsResponse);
+        final IndicesBlockStatus indicesBlockStatus = BlockSettingsParser.parseBlockSettings(settingsResponse, Optional.empty());
         assertNotNull(indicesBlockStatus);
         assertEquals(3, indicesBlockStatus.countBlockedIndices());
         final Set<String> blockedIndices = indicesBlockStatus.getBlockedIndices();

@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, within } from 'wrappedTestingLibrary';
-import { useQueryParam, QueryParamProvider } from 'use-query-params';
-import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
+import { render, screen, within } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
+import { useQueryParam } from 'routing/QueryParams';
 import { MockStore } from 'helpers/mocking';
 import useParams from 'routing/useParams';
 import asMock from 'helpers/mocking/AsMock';
@@ -34,41 +34,43 @@ import {
   defaultField,
   reservedField,
   attributes,
-  overriddenProfileField, profileField,
+  overriddenProfileField,
+  profileField,
 } from 'fixtures/indexSetFieldTypes';
 import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfile';
-import useIndexProfileWithMappingsByField
-  from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
+import useIndexProfileWithMappingsByField from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
 import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
-const getData = (list = [defaultField]) => (
-  {
-    list,
-    pagination: {
-      total: 1,
-    },
-    attributes,
-  }
-);
+const getData = (list = [defaultField]) => ({
+  list,
+  pagination: {
+    total: 1,
+  },
+  attributes,
+});
 
-const renderIndexSetFieldTypesList = () => render(
-  <QueryParamProvider adapter={ReactRouter6Adapter}>
-    <TestStoreProvider>
-      <IndexSetFieldTypesList />
-    </TestStoreProvider>,
-  </QueryParamProvider>,
-);
+const renderIndexSetFieldTypesList = () =>
+  render(
+    <DefaultQueryParamProvider>
+      <TestStoreProvider>
+        <IndexSetFieldTypesList />
+      </TestStoreProvider>
+      ,
+    </DefaultQueryParamProvider>,
+  );
 
 jest.mock('stores/indices/IndexSetsStore', () => ({
   IndexSetsActions: {
     list: jest.fn(),
   },
-  IndexSetsStore: MockStore(['getInitialState', () => ({
-    indexSets: [
-      { id: '111', title: 'index set title' },
-    ],
-    indexSet: { id: '111', title: 'index set title', field_type_profile: 'profile-id-111' },
-  })]),
+  IndexSetsStore: MockStore([
+    'getInitialState',
+    () => ({
+      indexSets: [{ id: '111', title: 'index set title' }],
+      indexSet: { id: '111', title: 'index set title', field_type_profile: 'profile-id-111' },
+    }),
+  ]),
 }));
 
 jest.mock('routing/useParams', () => jest.fn());
@@ -80,8 +82,8 @@ jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfile');
 jest.mock('components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField');
 jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions');
 
-jest.mock('use-query-params', () => ({
-  ...jest.requireActual('use-query-params'),
+jest.mock('routing/QueryParams', () => ({
+  ...jest.requireActual('routing/QueryParams'),
   useQueryParam: jest.fn(),
 }));
 
@@ -96,12 +98,15 @@ describe('IndexSetFieldTypesList', () => {
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
         ...layoutPreferences,
-        displayedAttributes: ['field_name',
-          'origin',
-          'is_reserved',
-          'type'],
+        attributes: {
+          field_name: { status: 'show' },
+          origin: { status: 'show' },
+          is_reserved: { status: 'show' },
+          type: { status: 'show' },
+        },
       },
       isInitialLoading: false,
+      refetch: () => {},
     });
 
     asMock(useFieldTypesForMappings).mockReturnValue({
@@ -115,7 +120,7 @@ describe('IndexSetFieldTypesList', () => {
       isLoading: false,
     });
 
-    asMock(useQueryParam).mockImplementation(() => ([undefined, () => {}]));
+    asMock(useQueryParam).mockImplementation(() => [undefined, () => {}]);
 
     asMock(useProfile).mockReturnValue({
       data: {
@@ -269,12 +274,16 @@ describe('IndexSetFieldTypesList', () => {
       renderIndexSetFieldTypesList();
       const tableRow = await screen.findByTestId('table-row-field-1');
       const resetButton = await within(tableRow).findByRole('button', { name: /reset/i });
-      fireEvent.click(resetButton);
-      await screen.findByLabelText(/Remove field type overrides/i);
-      const modal = await screen.findByTestId('modal-form');
-      await within(modal).findByText('Rotate affected indices after change');
+      await userEvent.click(resetButton);
 
-      expect(modal).toHaveTextContent('After removing the overridden field type for field-1 in index set title, the settings of your search engine will be applied for fields: field-1');
+      await screen.findByRole('heading', { name: /Remove field type overrides/i });
+      await screen.findByText('Rotate affected indices after change');
+
+      const modal = await screen.findByRole('dialog', { name: /Remove field type overrides/i });
+
+      expect(modal).toHaveTextContent(
+        'After removing the overridden field type for field-1 in index set title, the settings of your search engine will be applied for fields: field-1',
+      );
     });
 
     it('for OVERRIDDEN_PROFILE origin', async () => {
@@ -294,12 +303,15 @@ describe('IndexSetFieldTypesList', () => {
       renderIndexSetFieldTypesList();
       const tableRow = await screen.findByTestId('table-row-field-2');
       const resetButton = await within(tableRow).findByRole('button', { name: /reset/i });
-      fireEvent.click(resetButton);
-      await screen.findByLabelText(/Remove field type overrides/i);
-      const modal = await screen.findByTestId('modal-form');
-      await within(modal).findByText('Rotate affected indices after change');
+      await userEvent.click(resetButton);
+      await screen.findByRole('heading', { name: /Remove field type overrides/i });
+      await screen.findByText('Rotate affected indices after change');
 
-      expect(modal).toHaveTextContent('After removing the overridden field type for field-2 in index set title, the settings from Profile-1 ( namely field-2: Boolean) will be applied');
+      const modal = await screen.findByRole('dialog', { name: /Remove field type overrides/i });
+
+      expect(modal).toHaveTextContent(
+        'After removing the overridden field type for field-2 in index set title, the settings from Profile-1 ( namely field-2: Boolean) will be applied',
+      );
     });
   });
 
@@ -314,9 +326,11 @@ describe('IndexSetFieldTypesList', () => {
       renderIndexSetFieldTypesList();
       const tableRow = await screen.findByTestId('table-row-field');
       const originBadge = await within(tableRow).findByText(/index/i);
-      fireEvent.click(originBadge);
+      await userEvent.click(originBadge);
 
-      expect(tableRow).toHaveTextContent('Field type Boolean comes from the search engine index mapping. It could have been created dynamically, set by Graylog instance or come from historical profiles and/or custom mappings.');
+      expect(tableRow).toHaveTextContent(
+        'Field type Boolean comes from the search engine index mapping. It could have been created dynamically, set by the system or come from historical profiles and/or custom mappings.',
+      );
     });
 
     it('for origin profile', async () => {
@@ -336,9 +350,11 @@ describe('IndexSetFieldTypesList', () => {
       renderIndexSetFieldTypesList();
       const tableRow = await screen.findByTestId('table-row-field-3');
       const originBadge = await within(tableRow).findByText(/profile/i);
-      fireEvent.click(originBadge);
+      await userEvent.click(originBadge);
 
-      expect(tableRow).toHaveTextContent('Field type String type comes from profile Profile-1. It overrides possible mappings from the search engine index mapping, either immediately (if index was rotated) or during the next rotation');
+      expect(tableRow).toHaveTextContent(
+        'Field type String type comes from profile Profile-1. It overrides possible mappings from the search engine index mapping, either immediately (if index was rotated) or during the next rotation',
+      );
     });
 
     it('for origin overridden index', async () => {
@@ -351,9 +367,11 @@ describe('IndexSetFieldTypesList', () => {
       renderIndexSetFieldTypesList();
       const tableRow = await screen.findByTestId('table-row-field-1');
       const originBadge = await within(tableRow).findByText(/overridden index/i);
-      fireEvent.click(originBadge);
+      await userEvent.click(originBadge);
 
-      expect(tableRow).toHaveTextContent('Field type Boolean comes from the individual, custom field type mapping. It overrides possible mappings from the search engine index mapping, either immediately (if index was rotated) or during the next rotation.');
+      expect(tableRow).toHaveTextContent(
+        'Field type Boolean comes from the individual, custom field type mapping. It overrides possible mappings from the search engine index mapping, either immediately (if index was rotated) or during the next rotation.',
+      );
     });
 
     it('for origin overridden profile', async () => {
@@ -373,9 +391,11 @@ describe('IndexSetFieldTypesList', () => {
       renderIndexSetFieldTypesList();
       const tableRow = await screen.findByTestId('table-row-field-2');
       const originBadge = await within(tableRow).findByText(/overridden profile/i);
-      fireEvent.click(originBadge);
+      await userEvent.click(originBadge);
 
-      expect(tableRow).toHaveTextContent('Field type Boolean comes from the individual, custom field type mapping. It overrides not only possible mappings from the search engine index mapping, but also mapping field-2: Boolean present in profile Profile-1');
+      expect(tableRow).toHaveTextContent(
+        'Field type Boolean comes from the individual, custom field type mapping. It overrides not only possible mappings from the search engine index mapping, but also mapping field-2: Boolean present in profile Profile-1',
+      );
     });
   });
 
@@ -436,9 +456,9 @@ describe('IndexSetFieldTypesList', () => {
 
       renderIndexSetFieldTypesList();
       const button = await screen.findByTitle('Set field type profile');
-      fireEvent.click(button);
-      const modal = await screen.findByTestId('modal-form');
-      await within(modal).findByRole('button', { name: /Set Profile/i, hidden: true });
+      await userEvent.click(button);
+      const modal = await screen.findByRole('dialog', { name: /Set Profile/i });
+      await within(modal).findByRole('button', { name: /Set Profile/i });
     });
   });
 });

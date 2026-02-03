@@ -20,20 +20,21 @@ import Direction from 'views/logic/aggregationbuilder/Direction';
 import { SortIcon } from 'components/common';
 
 type Props = {
-  activeDirection: Direction,
-  activeAttribute: string,
-  attribute: string,
-  attributeTitle: string,
-  onSortChange: (attribute: string, nextDirection: Direction) => Promise<unknown>,
-  setLoadingState: (loading: boolean) => void,
+  activeDirection: Direction;
+  activeAttribute: string;
+  attribute: string;
+  attributeTitle: string;
+  onSortChange: (attribute: string, nextDirection: Direction) => Promise<unknown>;
+  setLoadingState: (loading: boolean) => void;
 };
 
 type DirectionStrategy = {
-  handleSortChange: (changeSort: (direction: Direction, activeSort: boolean) => void) => void,
-  tooltip: (attributeTitle: string) => string,
+  handleSortChange: (changeSort: (direction: Direction, activeSort: boolean) => void) => void;
+  tooltip: (attributeTitle: string) => string;
 };
 
-const _tooltip = (attributeTitle: string, newDirection: Direction) => `Sort ${attributeTitle} ${newDirection.direction}`;
+const _tooltip = (attributeTitle: string, newDirection: Direction) =>
+  `Sort ${attributeTitle} ${newDirection.direction}`;
 
 const _changeSort = (
   nextDirection: Direction,
@@ -74,14 +75,25 @@ const directionStrategy = (activeDirection: Direction | undefined) => {
   }
 };
 
-const AttributeSortIcon = ({ attribute, attributeTitle, onSortChange, setLoadingState, activeDirection, activeAttribute }: Props) => {
+const AttributeSortIcon = ({
+  attribute,
+  attributeTitle,
+  onSortChange,
+  setLoadingState,
+  activeDirection,
+  activeAttribute,
+}: Props) => {
   const targetAttributeDirection = activeAttribute === attribute ? activeDirection : undefined;
   const { tooltip, handleSortChange }: DirectionStrategy = directionStrategy(activeDirection);
   const changeSort = (nextDirection: Direction) => _changeSort(nextDirection, attribute, onSortChange, setLoadingState);
   const title = tooltip(attributeTitle);
 
   return (
-    <SortIcon onChange={() => handleSortChange(changeSort)} activeDirection={targetAttributeDirection?.direction} title={title} />
+    <SortIcon
+      onChange={() => handleSortChange(changeSort)}
+      activeDirection={targetAttributeDirection?.direction}
+      title={title}
+    />
   );
 };
 

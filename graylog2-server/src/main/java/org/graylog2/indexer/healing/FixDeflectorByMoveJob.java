@@ -18,15 +18,15 @@ package org.graylog2.indexer.healing;
 
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.buffers.Buffers;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
-import org.graylog2.system.jobs.SystemJob;
+import org.graylog2.system.jobs.LegacySystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ import java.util.EnumSet;
 import static org.graylog2.buffers.Buffers.Type.OUTPUT;
 import static org.graylog2.buffers.Buffers.Type.PROCESS;
 
-public class FixDeflectorByMoveJob extends SystemJob {
+public class FixDeflectorByMoveJob extends LegacySystemJob {
     public interface Factory {
         FixDeflectorByMoveJob create();
     }
@@ -69,7 +69,7 @@ public class FixDeflectorByMoveJob extends SystemJob {
 
     @Override
     public void execute() {
-        indexSetRegistry.forEach(this::doExecute);
+        indexSetRegistry.getAllIndexSets().forEach(this::doExecute);
     }
 
     public void doExecute(IndexSet indexSet) {
@@ -172,6 +172,7 @@ public class FixDeflectorByMoveJob extends SystemJob {
                 "by hand after a notification. This operation can take some time depending on the number of messages " +
                 "that were already written into the deflector index.";
     }
+
     @Override
     public String getClassName() {
         return this.getClass().getCanonicalName();

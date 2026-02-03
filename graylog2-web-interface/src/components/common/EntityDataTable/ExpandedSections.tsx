@@ -21,14 +21,16 @@ import styled, { css } from 'styled-components';
 import IconButton from 'components/common/IconButton';
 import { ButtonToolbar } from 'components/bootstrap';
 
-import type { EntityBase, ExpandedSectionRenderer } from './types';
+import type { EntityBase, ExpandedSectionRenderers } from './types';
 import ExpandedEntitiesSectionsContext from './contexts/ExpandedSectionsContext';
 
-const Container = styled.tr(({ theme }) => css`
-  &&&& {
-    background-color: ${theme.colors.global.contentBackground};
-  }
-`);
+const Container = styled.tr(
+  ({ theme }) => css`
+    &&&& {
+      background-color: ${theme.colors.global.contentBackground};
+    }
+  `,
+);
 
 const Header = styled.div`
   display: flex;
@@ -46,13 +48,11 @@ const HideSectionButton = styled(IconButton)`
 `;
 
 const ExpandedSections = <Entity extends EntityBase>({
-  expandedSectionsRenderer,
+  expandedSectionRenderers,
   entity,
 }: {
-  expandedSectionsRenderer: {
-    [sectionName: string]: ExpandedSectionRenderer<Entity>
-  } | undefined,
-  entity: Entity
+  expandedSectionRenderers: ExpandedSectionRenderers<Entity> | undefined;
+  entity: Entity;
 }) => {
   const { expandedSections, toggleSection } = useContext(ExpandedEntitiesSectionsContext);
   const expandedEntitySections = expandedSections?.[entity.id];
@@ -64,7 +64,7 @@ const ExpandedSections = <Entity extends EntityBase>({
   return (
     <Container>
       <td colSpan={1000}>
-        {Object.entries(expandedSectionsRenderer ?? {})
+        {Object.entries(expandedSectionRenderers ?? {})
           .filter(([sectionName]) => expandedEntitySections.includes(sectionName))
           .map(([sectionName, section]) => {
             const hideSection = () => toggleSection(entity.id, sectionName);
@@ -72,16 +72,15 @@ const ExpandedSections = <Entity extends EntityBase>({
 
             return (
               <div key={`${sectionName}-${entity.id}`}>
-                {section.disableHeader !== true
-                  ? (
-                    <Header>
-                      <h3>{section.title}</h3>
-                      <Actions>
-                        {actions}
-                        <HideSectionButton name="close" onClick={hideSection} title="Hide section" />
-                      </Actions>
-                    </Header>
-                  ) : null}
+                {section.disableHeader !== true ? (
+                  <Header>
+                    <h3>{section.title}</h3>
+                    <Actions>
+                      {actions}
+                      <HideSectionButton name="close" onClick={hideSection} title="Hide section" />
+                    </Actions>
+                  </Header>
+                ) : null}
                 {section.content(entity)}
               </div>
             );

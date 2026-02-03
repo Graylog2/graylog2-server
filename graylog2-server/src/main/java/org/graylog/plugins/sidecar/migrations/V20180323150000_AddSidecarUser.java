@@ -18,13 +18,12 @@ package org.graylog.plugins.sidecar.migrations;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import jakarta.inject.Inject;
 import org.graylog.plugins.sidecar.common.SidecarPluginConfiguration;
 import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
 import org.graylog2.migrations.Migration;
 import org.graylog2.migrations.MigrationHelpers;
 import org.graylog2.users.RoleService;
-
-import jakarta.inject.Inject;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -62,7 +61,7 @@ public class V20180323150000_AddSidecarUser extends Migration {
                 sidecarUser,
                 UUID.randomUUID().toString(),
                 "Sidecar", "System User (built-in)",
-                "sidecar@graylog.local",
+                "<No Mail Address>",
                 Sets.newHashSet(
                         roleId,
                         roleService.getReaderRoleObjectId()),

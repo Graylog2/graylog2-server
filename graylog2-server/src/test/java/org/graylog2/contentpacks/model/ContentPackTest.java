@@ -37,8 +37,8 @@ import org.graylog2.contentpacks.model.parameters.StringParameter;
 import org.graylog2.jackson.AutoValueSubtypeResolver;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URI;
@@ -55,7 +55,7 @@ public class ContentPackTest {
 
     private ObjectMapper objectMapper;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         objectMapper = new ObjectMapperProvider().get();
         objectMapper.setSubtypeResolver(new AutoValueSubtypeResolver());

@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix unescaped double quotes in map and collection typed fields in Custom HTTP Notification JSON body."
+
+issues = ["20955"]
+pulls = ["21167"]

@@ -17,7 +17,7 @@
 package org.graylog2.plugin.inputs.codecs;
 
 import com.google.common.collect.ImmutableMap;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import jakarta.annotation.Nonnull;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
@@ -25,6 +25,7 @@ import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.journal.RawMessage;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 /**
  * This codec always returns a null Message.
@@ -33,10 +34,9 @@ import javax.annotation.Nullable;
 public class NullCodec implements Codec {
     public static final String NAME = "NullCodec";
 
-    @Nullable
     @Override
-    public Message decode(@NonNull RawMessage rawMessage) {
-        return null;
+    public Optional<Message> decodeSafe(@Nonnull RawMessage rawMessage) {
+        return Optional.empty();
     }
 
     @Nullable
@@ -50,7 +50,7 @@ public class NullCodec implements Codec {
         return NAME;
     }
 
-    @NonNull
+    @Nonnull
     @Override
     public Configuration getConfiguration() {
         return new Configuration(ImmutableMap.of());

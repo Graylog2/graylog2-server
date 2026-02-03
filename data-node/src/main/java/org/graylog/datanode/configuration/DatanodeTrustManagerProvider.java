@@ -21,19 +21,13 @@ import com.google.common.eventbus.Subscribe;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
-import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.security.TrustManagerAggregator;
 
 import javax.net.ssl.X509TrustManager;
-import java.io.IOException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.util.List;
-import java.util.Optional;
 
 @Singleton
 public class DatanodeTrustManagerProvider implements Provider<X509TrustManager> {
@@ -49,16 +43,7 @@ public class DatanodeTrustManagerProvider implements Provider<X509TrustManager> 
 
     @Subscribe
     public void onOpensearchConfigurationChange(OpensearchConfigurationChangeEvent e) {
-        Optional.ofNullable(e.config().opensearchSecurityConfiguration())
-                .flatMap(OpensearchSecurityConfiguration::getTruststore)
-                .map(t -> {
-                    try {
-                        return t.loadKeystore();
-                    } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                })
-                .ifPresent(this::setTruststore);
+        setTruststore(e.config().trustStore());
     }
 
     private void setTruststore(KeyStore keyStore) {

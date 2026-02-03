@@ -31,56 +31,91 @@ import InteractiveContext from '../contexts/InteractiveContext';
 const SPECIAL_FIELDS = [FULL_MESSAGE_FIELD, 'level'];
 
 type Props = {
-  fieldName: string,
-  fieldType: FieldType,
-  message: Message,
-  value: any,
+  fieldName: string;
+  fieldType: FieldType;
+  message: Message;
+  value: any;
 };
 
-const DecoratedField = styled.small(({ theme }) => css`
-  color: ${theme.colors.gray[70]};
-  font-weight: normal;
-`);
+const DecoratedField = styled.small(
+  ({ theme }) => css`
+    color: ${theme.colors.gray[70]};
+    font-weight: normal;
+  `,
+);
 
-const DefinitionDescription = styled.dd(({ theme }) => `
+const DefinitionDescription = styled.dd(
+  ({ theme }) => `
   font-family: ${theme.fonts.family.monospace};
-`);
+`,
+);
 
-const MessageField = ({ fieldName, fieldType, message, value }: Props) => {
-  const innerValue = SPECIAL_FIELDS.indexOf(fieldName) !== -1 ? message.fields[fieldName] : value;
+type MessageFieldNamePros = {
+  fieldName: string;
+  fieldType: FieldType;
+  message: Message;
+};
+
+type MessageFieldValueProps = {
+  fieldName: string;
+  fieldType: FieldType;
+  message: Message;
+  value: any;
+};
+
+export const MessageFieldName = ({ fieldName, fieldType, message }: MessageFieldNamePros) => {
   const activeQuery = useActiveQueryId();
+  const isDecoratedField =
+    message?.decoration_stats?.added_fields?.[fieldName] || message?.decoration_stats?.changed_fields?.[fieldName];
 
-  const {
-    decoration_stats: decorationStats = {
-      added_fields: {},
-      changed_fields: {},
-      removed_fields: {},
-    },
-  } = message;
+  return (
+    <Field queryId={activeQuery} name={fieldName} type={isDecoratedField ? FieldType.Decorated : fieldType}>
+      {fieldName}
+    </Field>
+  );
+};
 
-  const isDecoratedField = decorationStats
-    && (decorationStats.added_fields[fieldName] !== undefined || decorationStats.changed_fields[fieldName] !== undefined);
-
-  const ValueContext = isDecoratedField
-    ? ({ children }) => (
+const ValueContext = ({
+  isDecoratedField,
+  children = null,
+}: React.PropsWithChildren<{ isDecoratedField: boolean }>) => {
+  if (isDecoratedField)
+    return (
       <InteractiveContext.Provider value={false}>
         {children} <DecoratedField>(decorated)</DecoratedField>
       </InteractiveContext.Provider>
-    )
-    : ({ children }) => children;
+    );
+
+  return <>{children}</>;
+};
+
+export const MessageFieldValue = ({ message, fieldName, fieldType, value }: MessageFieldValueProps) => {
+  const isDecoratedField =
+    message?.decoration_stats?.added_fields?.[fieldName] || message?.decoration_stats?.changed_fields?.[fieldName];
+
+  const innerValue = SPECIAL_FIELDS.indexOf(fieldName) !== -1 ? message.fields[fieldName] : value;
 
   return (
-    <>
-      <dt data-testid={`message-field-name-${fieldName}`}>
-        <Field queryId={activeQuery} name={fieldName} type={isDecoratedField ? FieldType.Decorated : fieldType}>{fieldName}</Field>
-      </dt>
-      <DefinitionDescription data-testid={`message-field-value-${fieldName}`}>
-        <ValueContext>
-          <Value field={fieldName} value={innerValue} type={isDecoratedField ? FieldType.Decorated : fieldType} render={DecoratedValue} />
-        </ValueContext>
-      </DefinitionDescription>
-    </>
+    <ValueContext isDecoratedField={isDecoratedField}>
+      <Value
+        field={fieldName}
+        value={innerValue}
+        type={isDecoratedField ? FieldType.Decorated : fieldType}
+        render={DecoratedValue}
+      />
+    </ValueContext>
   );
 };
+
+const MessageField = ({ fieldName, fieldType, message, value }: Props) => (
+  <>
+    <dt data-testid={`message-field-name-${fieldName}`}>
+      <MessageFieldName message={message} fieldName={fieldName} fieldType={fieldType} />
+    </dt>
+    <DefinitionDescription data-testid={`message-field-value-${fieldName}`}>
+      <MessageFieldValue value={value} fieldName={fieldName} fieldType={fieldType} message={message} />
+    </DefinitionDescription>
+  </>
+);
 
 export default MessageField;

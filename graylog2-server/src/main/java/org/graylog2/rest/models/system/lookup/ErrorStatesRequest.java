@@ -23,14 +23,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.Set;
 
 import javax.annotation.Nullable;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 @JsonDeserialize(builder = AutoValue_ErrorStatesRequest.Builder.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -38,15 +36,15 @@ public abstract class ErrorStatesRequest {
 
     @Nullable
     @JsonProperty("tables")
-    public abstract Set<String > tables();
+    public abstract Set<String> tables();
 
     @Nullable
     @JsonProperty("data_adapters")
-    public abstract Set<String > dataAdapters();
+    public abstract Set<String> dataAdapters();
 
     @Nullable
     @JsonProperty("caches")
-    public abstract Set<String > caches();
+    public abstract Set<String> caches();
 
     public static Builder builder() {
         return new AutoValue_ErrorStatesRequest.Builder();

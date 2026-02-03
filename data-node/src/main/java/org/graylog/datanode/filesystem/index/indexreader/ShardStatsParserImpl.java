@@ -16,16 +16,14 @@
  */
 package org.graylog.datanode.filesystem.index.indexreader;
 
+import jakarta.inject.Singleton;
+import org.apache.lucene.index.IndexFormatTooOldException;
+import org.apache.lucene.index.StandardDirectoryReader;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.Version;
 import org.graylog.datanode.filesystem.index.IncompatibleIndexVersionException;
 import org.graylog.datanode.filesystem.index.IndexerInformationParserException;
-import org.graylog.shaded.opensearch2.org.apache.lucene.index.DirectoryReader;
-import org.graylog.shaded.opensearch2.org.apache.lucene.index.IndexFormatTooOldException;
-import org.graylog.shaded.opensearch2.org.apache.lucene.index.StandardDirectoryReader;
-import org.graylog.shaded.opensearch2.org.apache.lucene.store.Directory;
-import org.graylog.shaded.opensearch2.org.apache.lucene.store.FSDirectory;
-import org.graylog.shaded.opensearch2.org.apache.lucene.util.Version;
-
-import jakarta.inject.Singleton;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -35,7 +33,7 @@ public class ShardStatsParserImpl implements ShardStatsParser {
     @Override
     public ShardStats read(Path shardPath) throws IncompatibleIndexVersionException {
         try (Directory directory = FSDirectory.open(shardPath.resolve("index"))) {
-            final StandardDirectoryReader reader = (StandardDirectoryReader) DirectoryReader.open(directory);
+            final StandardDirectoryReader reader = (StandardDirectoryReader) org.apache.lucene.index.DirectoryReader.open(directory);
             final int documentsCount = getDocumentsCount(reader);
             final Version minSegmentLuceneVersion = reader.getSegmentInfos().getMinSegmentLuceneVersion();
             return new ShardStats(shardPath, documentsCount, minSegmentLuceneVersion);

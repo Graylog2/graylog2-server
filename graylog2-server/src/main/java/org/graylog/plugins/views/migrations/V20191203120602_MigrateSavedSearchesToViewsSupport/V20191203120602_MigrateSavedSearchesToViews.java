@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.savedsearch.SavedSearch;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.savedsearch.SavedSearchService;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.search.Query;
@@ -41,8 +42,6 @@ import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.time.ZonedDateTime;
 import java.util.AbstractMap;
@@ -92,13 +91,16 @@ public class V20191203120602_MigrateSavedSearchesToViews extends Migration {
 
         final Map<String, String> savedSearchToViewsMap = new HashMap<>();
 
-        final Map<View, Search> newViews = this.savedSearchService.streamAll()
-                .map(savedSearch -> {
-                    final Map.Entry<View, Search> newView = migrateSavedSearch(savedSearch);
-                    savedSearchToViewsMap.put(savedSearch.id(), newView.getKey().id());
-                    return newView;
-                })
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        final Map<View, Search> newViews;
+        try (final var stream = this.savedSearchService.streamAll()) {
+            newViews = stream
+                    .map(savedSearch -> {
+                        final Map.Entry<View, Search> newView = migrateSavedSearch(savedSearch);
+                        savedSearchToViewsMap.put(savedSearch.id(), newView.getKey().id());
+                        return newView;
+                    })
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        }
 
         newViews.forEach((view, search) -> {
             viewService.save(view);

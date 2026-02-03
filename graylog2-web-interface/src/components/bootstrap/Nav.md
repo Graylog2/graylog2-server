@@ -13,14 +13,15 @@ import { NavItem } from 'components/bootstrap';
   <NavItem eventKey={3} disabled>
     NavItem 3 content
   </NavItem>
-</Nav>
+</Nav>;
 ```
+
 ### Tabs w/ Dropdown
 
 ```js
 import { NavItem, NavDropdown, MenuItem } from 'components/bootstrap';
 
-<Nav bsStyle="tabs" activeKey="1" onSelect={k => this.handleSelect(k)}>
+<Nav bsStyle="tabs" activeKey="1" onSelect={(k) => this.handleSelect(k)}>
   <NavItem eventKey="1" href="/home">
     NavItem 1 content
   </NavItem>
@@ -37,7 +38,7 @@ import { NavItem, NavDropdown, MenuItem } from 'components/bootstrap';
     <MenuItem divider />
     <MenuItem eventKey="4.4">Separated link</MenuItem>
   </NavDropdown>
-</Nav>
+</Nav>;
 ```
 
 ### Stacked
@@ -55,7 +56,7 @@ import { NavItem, NavDropdown, MenuItem } from 'components/bootstrap';
   <NavItem eventKey={3} disabled>
     NavItem 3 content
   </NavItem>
-</Nav>
+</Nav>;
 ```
 
 ### Justified
@@ -63,11 +64,7 @@ import { NavItem, NavDropdown, MenuItem } from 'components/bootstrap';
 ```js
 import { NavItem } from 'components/bootstrap';
 
-<Nav
-  bsStyle="tabs"
-  justified
-  activeKey={1}
->
+<Nav bsStyle="tabs" justified activeKey={1}>
   <NavItem eventKey={1} href="/home">
     NavItem 1 content
   </NavItem>
@@ -77,5 +74,5 @@ import { NavItem } from 'components/bootstrap';
   <NavItem eventKey={3} disabled>
     NavItem 3 content
   </NavItem>
-</Nav>
+</Nav>;
 ```

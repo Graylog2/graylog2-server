@@ -139,7 +139,10 @@ describe('NormalizeSearchURLQueryParams', () => {
   });
 
   it('should normalize streams and stream categories filter', async () => {
-    const result = normalizeSearchURLQueryParams({ streams: 'stream-id-1,stream-id-2', stream_categories: 'firewall,graylog' });
+    const result = normalizeSearchURLQueryParams({
+      streams: 'stream-id-1,stream-id-2',
+      stream_categories: 'firewall,graylog',
+    });
 
     expect(result).toEqual({
       queryString: undefined,

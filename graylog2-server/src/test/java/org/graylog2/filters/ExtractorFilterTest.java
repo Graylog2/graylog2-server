@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import org.graylog.failure.ProcessingFailureCause;
 import org.graylog.testing.messages.MessagesExtension;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.Message;
@@ -57,16 +58,17 @@ class ExtractorFilterTest {
     }
 
     @Test
-    void testFailureHandling(MessageFactory messageFactory) {
+    void testFailureHandling(MessageFactory messageFactory) throws NotFoundException {
 
         final Input input = mock(Input.class);
         when(input.getId()).thenReturn("123");
         when(inputService.all()).thenReturn(ImmutableList.of(input));
+        when(inputService.find("123")).thenReturn(input);
 
         final Extractor extractor = buildExceptionalExtractor();
         when(extractor.getTitle()).thenReturn("failing extractor");
         when(extractor.getId()).thenReturn("888");
-        when(inputService.getExtractors(any())).thenReturn(ImmutableList.of(extractor));
+        when(inputService.getExtractors("123")).thenReturn(ImmutableList.of(extractor));
 
         dut = new ExtractorFilter(inputService, eventBus, executorService);
         dut.lifecycleChanged(Lifecycle.STARTING);

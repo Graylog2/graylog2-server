@@ -22,51 +22,58 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import TemplateForm from 'components/indices/IndexSetTemplates/TemplateForm';
-import type {
-  IndexSetTemplate,
-} from 'components/indices/IndexSetTemplates/types';
+import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
 import useTemplateMutation from 'components/indices/IndexSetTemplates/hooks/useTemplateMutation';
 import Routes from 'routing/Routes';
 
 type Props = {
-  template: IndexSetTemplate,
-}
+  template: IndexSetTemplate;
+};
 
-const EditTemplate = ({
-  template,
-}: Props) => {
+const EditTemplate = ({ template }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { updateTemplate } = useTemplateMutation();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
 
-  const onSubmit = useCallback((newTemplate: IndexSetTemplate) => {
-    updateTemplate({ template: newTemplate, id: template.id }).then(() => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.EDIT, {
-        app_pathname: telemetryPathName,
-        app_action_value: 'edit-index-set-template-edited',
-      });
+  const onSubmit = useCallback(
+    (newTemplate: IndexSetTemplate) => {
+      updateTemplate({ template: newTemplate, id: template.id }).then(() => {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.EDIT, {
+          app_pathname: telemetryPathName,
+          app_action_value: 'edit-index-set-template-edited',
+        });
 
-      navigate(Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW);
-    });
-  }, [updateTemplate, navigate, template.id, sendTelemetry, telemetryPathName]);
+        navigate(Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW);
+      });
+    },
+    [updateTemplate, navigate, template.id, sendTelemetry, telemetryPathName],
+  );
 
   useEffect(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.EDIT_OPENED, { app_pathname: telemetryPathName, app_action_value: 'edit-index-set-template-opened' });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.EDIT_OPENED, {
+      app_pathname: telemetryPathName,
+      app_action_value: 'edit-index-set-template-opened',
+    });
   }, [sendTelemetry, telemetryPathName]);
 
   const onCancel = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.EDIT_CANCELLED, { app_pathname: telemetryPathName, app_action_value: 'edit-index-set-template-cancelled' });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.EDIT_CANCELLED, {
+      app_pathname: telemetryPathName,
+      app_action_value: 'edit-index-set-template-cancelled',
+    });
     navigate(Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW);
   }, [navigate, sendTelemetry, telemetryPathName]);
 
   return (
-    <TemplateForm onCancel={onCancel}
-                  submitButtonText="Update template"
-                  submitLoadingText="Updating template..."
-                  onSubmit={onSubmit}
-                  initialValues={template} />
+    <TemplateForm
+      onCancel={onCancel}
+      submitButtonText="Update template"
+      submitLoadingText="Updating template..."
+      onSubmit={onSubmit}
+      initialValues={template}
+    />
   );
 };
 

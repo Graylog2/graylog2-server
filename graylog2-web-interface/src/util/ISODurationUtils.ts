@@ -19,10 +19,23 @@ import moment from 'moment';
 import 'moment-duration-format';
 import type { ValidationState } from 'components/common/types';
 
-export const isValidDuration = <T>(duration: string, validator: (milliseconds: number, duration: string) => T) => validator(moment.duration(duration).asMilliseconds(), duration);
+export const isValidDuration = <T>(duration: string, validator: (milliseconds: number, duration: string) => T) =>
+  validator(moment.duration(duration).asMilliseconds(), duration);
 
-export const durationStyle = (duration: string, validator: (milliseconds: number, duration: string) => boolean, errorClass: ValidationState = 'error'): ValidationState => (isValidDuration(duration, validator) ? null : errorClass);
+export const durationStyle = (
+  duration: string,
+  validator: (milliseconds: number, duration: string) => boolean,
+  errorClass: ValidationState = 'error',
+): ValidationState => (isValidDuration(duration, validator) ? null : errorClass);
 
-export const formatDuration = (duration: string, validator: (milliseconds: number, duration: string) => boolean, errorText: string = 'error') => (isValidDuration(duration, validator) ? moment.duration(duration).format() : errorText);
+export const formatDuration = (
+  duration: string,
+  validator: (milliseconds: number, duration: string) => boolean,
+  errorText: string = 'error',
+) => (isValidDuration(duration, validator) ? moment.duration(duration).format() : errorText);
 
-export const humanizeDuration = (duration: string, validator: (milliseconds: number, duration: string) => boolean, errorText: string = 'error') => (isValidDuration(duration, validator) ? moment.duration(duration).humanize() : errorText);
+export const humanizeDuration = (
+  duration: string,
+  validator: (milliseconds: number, duration: string) => boolean,
+  errorText: string = 'error',
+) => (isValidDuration(duration, validator) ? moment.duration(duration).humanize() : errorText);

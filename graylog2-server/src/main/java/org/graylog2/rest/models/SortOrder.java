@@ -59,8 +59,8 @@ public enum SortOrder {
     @JsonCreator
     public static SortOrder fromString(String order) {
         return switch (order.toLowerCase(Locale.ENGLISH)) {
-            case "asc" -> ASCENDING;
-            case "desc" -> DESCENDING;
+            case "asc", "ascending" -> ASCENDING;
+            case "desc", "descending" -> DESCENDING;
             // throwing an IllegalArgumentException here would have Jersey abort with a 404
             default -> throw new BadRequestException("Unknown sort order: " + order);
         };

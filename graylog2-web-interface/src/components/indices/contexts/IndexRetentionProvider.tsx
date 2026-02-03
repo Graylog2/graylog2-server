@@ -21,19 +21,18 @@ import IndexRetentionContext from './IndexRetentionContext';
 import type { IndexRetentionContextType } from './IndexRetentionContext';
 
 type Props = {
-  children: React.ReactNode,
+  children: React.ReactNode;
 };
 
 const IndexRetentionProvider = ({ children }: Props) => {
   const [maxNumberOfIndices, setMaxNumberOfIndices] = useState<number>(undefined);
 
-  const value: IndexRetentionContextType = useMemo(() => ({ useMaxNumberOfIndices: [maxNumberOfIndices, setMaxNumberOfIndices] }), [maxNumberOfIndices]);
-
-  return (
-    <IndexRetentionContext.Provider value={value}>
-      {children}
-    </IndexRetentionContext.Provider>
+  const value: IndexRetentionContextType = useMemo(
+    () => ({ useMaxNumberOfIndices: [maxNumberOfIndices, setMaxNumberOfIndices] }),
+    [maxNumberOfIndices],
   );
+
+  return <IndexRetentionContext.Provider value={value}>{children}</IndexRetentionContext.Provider>;
 };
 
 export default IndexRetentionProvider;

@@ -19,7 +19,8 @@ package org.graylog2.cluster;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
+import jakarta.validation.constraints.NotEmpty;
+import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
@@ -27,34 +28,26 @@ import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 
-import jakarta.validation.constraints.NotEmpty;
-
 @AutoValue
-@WithBeanGetter
-public abstract class ClusterConfig {
-    @Id
-    @ObjectId
-    @Nullable
-    public abstract String id();
-
-    @JsonProperty
+public abstract class ClusterConfig implements MongoEntity {
+    @JsonProperty("type")
     @Nullable
     public abstract String type();
 
-    @JsonProperty
+    @JsonProperty("payload")
     @Nullable
     public abstract Object payload();
 
-    @JsonProperty
+    @JsonProperty("last_updated")
     @Nullable
     public abstract DateTime lastUpdated();
 
-    @JsonProperty
+    @JsonProperty("last_updated_by")
     @Nullable
     public abstract String lastUpdatedBy();
 
     @JsonCreator
-    public static ClusterConfig create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
+    public static ClusterConfig create(@JsonProperty(FIELD_ID) @Id @ObjectId @Nullable String id,
                                        @JsonProperty("type") @Nullable String type,
                                        @JsonProperty("payload") @Nullable Object payload,
                                        @JsonProperty("last_updated") @Nullable DateTime lastUpdated,

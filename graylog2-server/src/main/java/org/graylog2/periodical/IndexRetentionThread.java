@@ -20,11 +20,11 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.datatiering.DataTieringOrchestrator;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.datanode.DatanodeMigrationLockService;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
@@ -71,15 +71,16 @@ public class IndexRetentionThread extends Periodical {
     @Override
     public void doRun() {
         if (!cluster.isConnected()) {
-            LOG.info("Skipping index retention checks because the Elasticsearch cluster is unreachable");
+            LOG.warn("Skipping index retention checks because the Elasticsearch cluster is unreachable");
             return;
         }
         if (!cluster.isHealthy()) {
-            LOG.info("Skipping index retention checks because the Elasticsearch cluster is unhealthy: {}, Index Registry is up: {}", cluster.health().isPresent() ? cluster.health().get() : "unknown", cluster.indexSetRegistryIsUp());
+            LOG.warn("Skipping index retention checks because the Elasticsearch cluster is unhealthy: {}, Index Registry is up: {}",
+                    cluster.health().isPresent() ? cluster.health().get() : "unknown", cluster.indexSetRegistryIsUp());
             return;
         }
 
-        for (final IndexSet indexSet : indexSetRegistry) {
+        for (final IndexSet indexSet : indexSetRegistry.getAllIndexSets()) {
             if (!indexSet.getConfig().isWritable()) {
                 LOG.debug("Skipping non-writable index set <{}> ({})", indexSet.getConfig().id(), indexSet.getConfig().title());
                 continue;

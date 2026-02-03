@@ -18,20 +18,59 @@ import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
+import selectEvent from 'helpers/selectEvent';
 import { asMock } from 'helpers/mocking';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
+import { createEntityShareState, everyone, viewer } from 'fixtures/entityShareState';
+import { EntityShareStore } from 'stores/permissions/EntityShareStore';
 
 import OriginalSavedSearchForm from './SavedSearchForm';
 
 jest.mock('views/hooks/useSaveViewFormControls');
+jest.mock('stores/permissions/EntityShareStore', () => ({
+  __esModule: true,
+  EntityShareActions: {
+    prepare: jest.fn(() => Promise.resolve()),
+    update: jest.fn(() => Promise.resolve()),
+  },
+  EntityShareStore: {
+    listen: jest.fn(),
+    getInitialState: jest.fn(),
+  },
+}));
+const shareWithCollaborator = async () => {
+  await selectEvent.chooseOption('Search for users and teams', everyone.title);
+  await selectEvent.chooseOption('Select a capability', viewer.title);
 
-const SavedSearchForm = (props: React.ComponentProps<typeof OriginalSavedSearchForm>) => (
+  const addCollaborator = await screen.findByRole('button', {
+    name: /add collaborator/i,
+  });
+
+  userEvent.click(addCollaborator);
+
+  await screen.findByText(/everyone/i);
+};
+
+const SavedSearchForm = ({ ...props }: React.ComponentProps<typeof OriginalSavedSearchForm>) => (
   <OriginalSavedSearchForm {...props}>
     <button type="button">Submit</button>
   </OriginalSavedSearchForm>
 );
+jest.setTimeout(10000);
 
 describe('SavedSearchForm', () => {
+  beforeEach(() => {
+    asMock(EntityShareStore.getInitialState).mockReturnValue({ state: createEntityShareState });
+  });
+
+  beforeAll(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   const props = {
     show: true,
     value: 'new Title',
@@ -50,8 +89,7 @@ describe('SavedSearchForm', () => {
 
   describe('render the SavedSearchForm', () => {
     it('should render create new', async () => {
-      render(<SavedSearchForm {...props}
-                              isCreateNew />);
+      render(<SavedSearchForm {...props} isCreateNew />);
 
       await findByHeadline();
     });
@@ -75,8 +113,7 @@ describe('SavedSearchForm', () => {
     it('should handle toggleModal', async () => {
       const onToggleModal = jest.fn();
 
-      render(<SavedSearchForm {...props}
-                              toggleModal={onToggleModal} />);
+      render(<SavedSearchForm {...props} toggleModal={onToggleModal} />);
 
       const cancelButton = await screen.findByRole('button', { name: /cancel/i });
       userEvent.click(cancelButton);
@@ -87,8 +124,7 @@ describe('SavedSearchForm', () => {
     it('should handle saveSearch', async () => {
       const onSave = jest.fn();
 
-      render(<SavedSearchForm {...props}
-                              saveSearch={onSave} />);
+      render(<SavedSearchForm {...props} saveSearch={onSave} />);
 
       const saveButton = await screen.findByRole('button', { name: /Save search/i });
       userEvent.click(saveButton);
@@ -99,21 +135,19 @@ describe('SavedSearchForm', () => {
     it('should handle saveAsSearch', async () => {
       const onSaveAs = jest.fn();
 
-      render(<SavedSearchForm {...props}
-                              saveAsSearch={onSaveAs} />);
+      render(<SavedSearchForm {...props} saveAsSearch={onSaveAs} />);
 
       userEvent.type(await findTitleInput(), ' and further title');
       const saveAsButton = await screen.findByRole('button', { name: /Save as/i });
       userEvent.click(saveAsButton);
 
-      expect(onSaveAs).toHaveBeenCalledWith('new Title and further title');
+      expect(onSaveAs).toHaveBeenCalledWith('new Title and further title', null);
     });
 
     it('should not handle saveAsSearch if disabled', async () => {
       const onSaveAs = jest.fn();
 
-      render(<SavedSearchForm {...props}
-                              saveAsSearch={onSaveAs} />);
+      render(<SavedSearchForm {...props} saveAsSearch={onSaveAs} />);
 
       const saveAsButton = await screen.findByRole('button', { name: /Save as/i });
       userEvent.click(saveAsButton);
@@ -124,20 +158,33 @@ describe('SavedSearchForm', () => {
     it('should handle create new', async () => {
       const onSaveAs = jest.fn();
 
-      render(<SavedSearchForm {...props}
-                              saveAsSearch={onSaveAs}
-                              isCreateNew />);
+      render(<SavedSearchForm {...props} saveAsSearch={onSaveAs} isCreateNew />);
 
       userEvent.type(await findTitleInput(), ' and further title');
       const createNewButton = await screen.findByRole('button', { name: /create new/i });
       userEvent.click(createNewButton);
 
-      expect(onSaveAs).toHaveBeenCalledWith('new Title and further title');
+      expect(onSaveAs).toHaveBeenCalledWith('new Title and further title', null);
+    });
+
+    it('should handle saveSearch with share settings', async () => {
+      const onSaveAs = jest.fn();
+      render(<SavedSearchForm {...props} saveAsSearch={onSaveAs} isCreateNew />);
+      userEvent.type(await findTitleInput(), ' and further title');
+      const createNewButton = await screen.findByRole('button', { name: /create new/i });
+
+      await shareWithCollaborator();
+
+      userEvent.click(createNewButton);
+
+      expect(onSaveAs).toHaveBeenCalledTimes(1);
     });
   });
 
   it('should render pluggable components', async () => {
-    asMock(useSaveViewFormControls).mockReturnValue([{ component: () => <div>Pluggable component!</div>, id: 'example-plugin-component' }]);
+    asMock(useSaveViewFormControls).mockReturnValue([
+      { component: () => <div>Pluggable component!</div>, id: 'example-plugin-component' },
+    ]);
 
     render(<SavedSearchForm {...props} />);
 

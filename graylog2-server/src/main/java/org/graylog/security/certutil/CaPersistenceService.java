@@ -22,9 +22,11 @@ import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.glassfish.jersey.media.multipart.BodyPart;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.graylog.security.certutil.ca.CA;
 import org.graylog.security.certutil.ca.CAKeyPair;
 import org.graylog.security.certutil.ca.PemCaReader;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
+import org.graylog.security.certutil.ca.exceptions.CaDecodeException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.Configuration;
 import org.graylog2.bootstrap.preflight.web.resources.model.CAType;
@@ -127,9 +129,11 @@ class CaPersistenceService {
                 String pem = new String(bytes, StandardCharsets.UTF_8);
                 // Test, if upload is PEM file, must contain at least a certificate
                 if (pem.contains("-----BEGIN CERTIFICATE")) {
-                    var ca = PemCaReader.readCA(pem, password);
-                    keyStore.setKeyEntry(CA_KEY_ALIAS, ca.privateKey(), providedPassword, ca.certificates().toArray(new Certificate[0]));
+                    LOG.info("Received PEM certificate bundle");
+                    CA ca = PemCaReader.readCA(pem, password);
+                    keyStore.setKeyEntry(CA_KEY_ALIAS, ca.getPrivateKey(), providedPassword, ca.getCertificates().toArray(new Certificate[0]));
                 } else {
+                    LOG.info("Received java keystore bundle");
                     ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
                     keyStore.load(bais, providedPassword);
                 }
@@ -202,9 +206,18 @@ class CaPersistenceService {
         return Optional.ofNullable(clusterConfigService.get(EncryptedCaKeystore.class))
                 .map(EncryptedCaKeystore::keystore)
                 .map(encryptionService::decrypt)
-                .map(Base64.getDecoder()::decode)
+                .map(this::tryDecode)
                 .map(this::parseKEystoreFromString)
                 .map(ks -> new CaKeystoreWithPassword(ks, passwordSecret));
+    }
+
+    private byte[] tryDecode(String val) {
+        try {
+            return Base64.getDecoder().decode(val);
+        } catch (IllegalArgumentException e) {
+            final String message = "Failed to decode CA keystore. This can happen when your password_secret has been recently changed and is not matching encrypted entries in the database.";
+            throw new CaDecodeException(message, e);
+        }
     }
 
     @Nonnull

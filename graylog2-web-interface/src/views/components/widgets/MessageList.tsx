@@ -31,10 +31,11 @@ import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextPro
 import { InputsActions } from 'stores/inputs/InputsStore';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useCurrentSearchTypesResults from 'views/components/widgets/useCurrentSearchTypesResults';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes';
 import useOnSearchExecution from 'views/hooks/useOnSearchExecution';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
+import useSearchResult from 'views/hooks/useSearchResult';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
 
@@ -49,28 +50,23 @@ const Wrapper = styled.div`
   }
 `;
 
-type Pagination = {
-  pageErrors: Array<{ description: string }>,
-  currentPage: number
-}
-
 export type MessageListResult = {
-  messages: Array<BackendMessage>,
-  total: number,
-  id: string,
-  type: 'messages'
+  messages: Array<BackendMessage>;
+  total: number;
+  id: string;
+  type: 'messages';
 };
 
 type Props = WidgetComponentProps<MessagesWidgetConfig, MessageListResult> & {
-  pageSize?: number,
+  pageSize?: number;
 };
 
-const useResetPaginationOnSearchExecution = (setPagination: (pagination: Pagination) => void, currentPage) => {
+const useResetPaginationOnSearchExecution = (setCurrentPage: (pageNr: number) => void, currentPage) => {
   const resetPagination = useCallback(() => {
     if (currentPage !== 1) {
-      setPagination({ currentPage: 1, pageErrors: [] });
+      setCurrentPage(1);
     }
-  }, [currentPage, setPagination]);
+  }, [currentPage, setCurrentPage]);
   useOnSearchExecution(resetPagination);
 };
 
@@ -90,8 +86,15 @@ const useRenderCompletionCallback = () => {
   const renderCompletionCallback = useContext(RenderCompletionCallback);
 
   useEffect(() => {
-    InputsActions.list().then(() => (renderCompletionCallback && renderCompletionCallback()));
+    InputsActions.list().then(() => renderCompletionCallback && renderCompletionCallback());
   }, [renderCompletionCallback]);
+};
+
+const usePageErrors = (searchTypeId: string) => {
+  const searchResult = useSearchResult();
+  const errors = searchResult?.result?.errors ?? [];
+
+  return errors.filter((error) => error.searchTypeId === searchTypeId);
 };
 
 const MessageList = ({
@@ -102,69 +105,75 @@ const MessageList = ({
   pageSize = Messages.DEFAULT_LIMIT,
   setLoadingState,
 }: Props) => {
-  const [{ currentPage, pageErrors }, setPagination] = useState<Pagination>({
-    pageErrors: [],
-    currentPage: 1,
-  });
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const { stopAutoRefresh } = useAutoRefresh();
+
+  const pageErrors = usePageErrors(searchTypeId);
   const activeQueryId = useActiveQueryId();
   const searchTypes = useCurrentSearchTypesResults();
   const scrollContainerRef = useResetScrollPositionOnPageChange(currentPage);
-  const dispatch = useAppDispatch();
-  useResetPaginationOnSearchExecution(setPagination, currentPage);
+  const dispatch = useViewsDispatch();
+  useResetPaginationOnSearchExecution(setCurrentPage, currentPage);
   useRenderCompletionCallback();
 
-  const handlePageChange = useCallback((pageNo: number) => {
-    // execute search with new offset
-    const { effectiveTimerange } = searchTypes[searchTypeId] as MessageResult;
-    const searchTypePayload: SearchTypeOptions<{
-        limit: number,
-        offset: number,
+  const handlePageChange = useCallback(
+    (newCurrentPage: number) => {
+      // execute search with new offset
+      const { effectiveTimerange } = searchTypes[searchTypeId] as MessageResult;
+      const searchTypePayload: SearchTypeOptions<{
+        limit: number;
+        offset: number;
       }> = {
         [searchTypeId]: {
           limit: pageSize,
-          offset: pageSize * (pageNo - 1),
+          offset: pageSize * (newCurrentPage - 1),
         },
       };
 
-    stopAutoRefresh();
-    setLoadingState(true);
+      stopAutoRefresh();
+      setLoadingState(true);
+      setCurrentPage(newCurrentPage);
 
-    dispatch(reexecuteSearchTypes(searchTypePayload, effectiveTimerange)).then((response) => {
-      const { result } = response.payload;
-      setLoadingState(false);
-
-      setPagination({
-        pageErrors: result.errors,
-        currentPage: pageNo,
+      dispatch(reexecuteSearchTypes(searchTypePayload, effectiveTimerange)).then(() => {
+        setLoadingState(false);
       });
-    });
-  }, [dispatch, pageSize, searchTypeId, searchTypes, setLoadingState, stopAutoRefresh]);
+    },
+    [dispatch, pageSize, searchTypeId, searchTypes, setLoadingState, stopAutoRefresh],
+  );
 
-  const onSortChange = useCallback((newSort: SortConfig[]) => {
-    const newConfig = config.toBuilder().sort(newSort).build();
+  const onSortChange = useCallback(
+    (newSort: SortConfig[]) => {
+      const newConfig = config.toBuilder().sort(newSort).build();
 
-    return onConfigChange(newConfig);
-  }, [config, onConfigChange]);
+      return onConfigChange(newConfig);
+    },
+    [config, onConfigChange],
+  );
 
   return (
     <WindowDimensionsContextProvider>
       <Wrapper>
-        <PaginatedList onChange={handlePageChange}
-                       activePage={Number(currentPage)}
-                       showPageSizeSelect={false}
-                       totalItems={totalMessages}
-                       pageSize={pageSize}
-                       useQueryParameter={false}>
-          {!pageErrors?.length ? (
-            <MessageTable activeQueryId={activeQueryId}
-                          config={config}
-                          scrollContainerRef={scrollContainerRef}
-                          fields={fields}
-                          onSortChange={onSortChange}
-                          setLoadingState={setLoadingState}
-                          messages={messages} />
-          ) : <ErrorWidget errors={pageErrors} />}
+        <PaginatedList
+          onChange={handlePageChange}
+          activePage={Number(currentPage)}
+          showPageSizeSelect={false}
+          totalItems={totalMessages}
+          pageSize={pageSize}
+          enforcePageBounds={false}
+          useQueryParameter={false}>
+          {pageErrors.length > 0 ? (
+            <ErrorWidget errors={pageErrors} />
+          ) : (
+            <MessageTable
+              activeQueryId={activeQueryId}
+              config={config}
+              scrollContainerRef={scrollContainerRef}
+              fields={fields}
+              onSortChange={onSortChange}
+              setLoadingState={setLoadingState}
+              messages={messages}
+            />
+          )}
         </PaginatedList>
       </Wrapper>
     </WindowDimensionsContextProvider>

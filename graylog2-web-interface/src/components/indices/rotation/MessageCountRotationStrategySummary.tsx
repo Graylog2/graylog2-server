@@ -20,9 +20,7 @@ type MessageCountRotationStrategySummaryProps = {
   config: any;
 };
 
-const MessageCountRotationStrategySummary = ({
-  config,
-}: MessageCountRotationStrategySummaryProps) => (
+const MessageCountRotationStrategySummary = ({ config }: MessageCountRotationStrategySummaryProps) => (
   <div>
     <dl>
       <dt>Index rotation strategy:</dt>

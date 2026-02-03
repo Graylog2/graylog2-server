@@ -38,7 +38,7 @@ export type Type = ArrayType | TypeLiteral | TypeReference | EnumType;
 
 export type Model = Type & {
   id: string;
-}
+};
 
 export interface Parameter {
   name: string;

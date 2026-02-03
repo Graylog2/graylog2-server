@@ -21,11 +21,11 @@ import Viewport from './Viewport';
 import type { ViewportJson } from './Viewport';
 
 type State = {
-  viewport: Viewport,
+  viewport: Viewport;
 };
 
 type WorldMapVisualizationConfigJson = {
-  viewport: ViewportJson,
+  viewport: ViewportJson;
 };
 
 export default class WorldMapVisualizationConfig extends VisualizationConfig {
@@ -62,9 +62,7 @@ export default class WorldMapVisualizationConfig extends VisualizationConfig {
   static fromJSON(_type: string, value: WorldMapVisualizationConfigJson) {
     const { viewport } = value;
 
-    return WorldMapVisualizationConfig.builder()
-      .viewport(Viewport.fromJSON(viewport))
-      .build();
+    return WorldMapVisualizationConfig.builder().viewport(Viewport.fromJSON(viewport)).build();
   }
 
   static builder(): Builder {

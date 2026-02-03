@@ -19,12 +19,11 @@ package org.graylog2.shared.inputs;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import jakarta.inject.Singleton;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Singleton;
 
 import java.util.Set;
 import java.util.stream.Stream;
@@ -122,6 +121,12 @@ public class InputRegistry {
         }
 
         return inputState;
+    }
+
+    public void setup(IOState<MessageInput> inputState) {
+        remove(inputState);
+        inputState.setState(IOState.Type.SETUP);
+        inputStates.add(inputState);
     }
 
     public boolean add(IOState<MessageInput> messageInputIOState) {

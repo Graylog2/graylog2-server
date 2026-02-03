@@ -19,13 +19,14 @@ import { screen, render, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { exampleFormDataWithKeySecretAuth } from 'fixtures/aws/FormData.fixtures';
-import { FormDataProvider } from 'integrations/aws/context/FormData';
 import { ApiContext } from 'integrations/aws/context/Api';
 import { StepsContext } from 'integrations/aws/context/Steps';
 import { SidebarContext } from 'integrations/aws/context/Sidebar';
 import Routes from 'routing/Routes';
 
 import CloudWatch from './CloudWatch';
+
+import FormDataProvider from '../../contexts/FormDataProvider';
 
 const mockNavigate = jest.fn();
 
@@ -40,19 +41,22 @@ jest.mock('react-router-dom', () => {
 });
 
 const TestCommonProviders = ({ children }) => (
-  <ApiContext.Provider value={{
-    availableStreams: [],
-  }}>
-    <StepsContext.Provider value={{
-      availableSteps: ['review'],
-      currentStep: 'review',
-      isDisabledStep: () => false,
+  <ApiContext.Provider
+    value={{
+      availableStreams: [],
     }}>
+    <StepsContext.Provider
+      value={{
+        availableSteps: ['review'],
+        currentStep: 'review',
+        isDisabledStep: () => false,
+      }}>
       <FormDataProvider initialFormData={exampleFormDataWithKeySecretAuth}>
-        <SidebarContext.Provider value={{
-          sidebar: <></>,
-          clearSidebar: jest.fn(),
-        }}>
+        <SidebarContext.Provider
+          value={{
+            sidebar: <div />,
+            clearSidebar: jest.fn(),
+          }}>
           {children}
         </SidebarContext.Provider>
       </FormDataProvider>

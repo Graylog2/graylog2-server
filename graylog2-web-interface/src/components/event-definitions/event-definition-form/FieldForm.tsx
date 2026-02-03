@@ -16,7 +16,6 @@
  */
 import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import get from 'lodash/get';
 import isNumber from 'lodash/isNumber';
 
 import { Select, HoverForHelp } from 'components/common';
@@ -41,10 +40,7 @@ import withLocation from 'routing/withLocation';
 
 import commonStyles from '../common/commonStyles.css';
 
-const requiredFields = [
-  'fieldName',
-  'config.providers[0].type',
-];
+const requiredFields = ['fieldName'];
 
 const getProviderPlugin = (type) => {
   if (type === undefined) {
@@ -54,10 +50,10 @@ const getProviderPlugin = (type) => {
   return PluginStore.exports('fieldValueProviders').find((edt) => edt.type === type);
 };
 
-const getConfigProviderType = (config, defaultValue?) => get(config, 'providers[0].type', defaultValue);
+const getConfigProviderType = (config, defaultValue?) => config?.providers?.[0]?.type ?? defaultValue;
 
-const formatFieldValueProviders = () => PluginStore.exports('fieldValueProviders')
-  .map((type) => ({ label: type.displayName, value: type.type }));
+const formatFieldValueProviders = () =>
+  PluginStore.exports('fieldValueProviders').map((type) => ({ label: type.displayName, value: type.type }));
 
 type FieldFormProps = {
   fieldName?: string;
@@ -70,9 +66,12 @@ type FieldFormProps = {
   location: any;
 };
 
-class FieldForm extends React.Component<FieldFormProps, {
-  [key: string]: any;
-}> {
+class FieldForm extends React.Component<
+  FieldFormProps,
+  {
+    [key: string]: any;
+  }
+> {
   static defaultProps = {
     fieldName: '',
     config: {},
@@ -105,17 +104,21 @@ class FieldForm extends React.Component<FieldFormProps, {
     }
 
     requiredFields.forEach((requiredField) => {
-      if (!get(this.state, requiredField)) {
+      if (!this.state[requiredField]) {
         errors[requiredField] = 'Field cannot be empty.';
       }
     });
+
+    if (!config.providers[0]?.type) {
+      errors['config.providers[0].type'] = 'Field cannot be empty.';
+    }
 
     if (isKey && (!isNumber(keyPosition) || Number(keyPosition) < 1)) {
       errors.key_position = 'Field must be a positive number.';
     }
 
     pluginRequiredFields.forEach((requiredField) => {
-      if (!get(config, `providers[0].${requiredField}`)) {
+      if (!config?.providers?.[0]?.[requiredField]) {
         errors[requiredField] = 'Field cannot be empty.';
       }
     });
@@ -166,24 +169,28 @@ class FieldForm extends React.Component<FieldFormProps, {
 
   handleProviderTypeChange = (nextProvider) => {
     this.props.sendTelemetry(
-      (nextProvider === 'lookup-v1')
+      nextProvider === 'lookup-v1'
         ? TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS.SET_VALUE_FROM_LOOKUP_TABLE_SELECTED
-        : TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS.SET_VALUE_FROM_TEMPLATE_SELECTED, {
+        : TELEMETRY_EVENT_TYPE.EVENTDEFINITION_FIELDS.SET_VALUE_FROM_TEMPLATE_SELECTED,
+      {
         app_pathname: getPathnameWithoutId(this.props.location.pathname),
         app_section: 'event-definition-fields',
         app_action_value: 'set-value-from-select',
         value_source: nextProvider,
-      });
+      },
+    );
 
     const { config } = this.state;
     const providerPlugin = getProviderPlugin(nextProvider);
     const defaultProviderConfig = providerPlugin.defaultConfig || {};
     const nextConfig = {
       ...config,
-      providers: [{
-        ...defaultProviderConfig,
-        type: nextProvider,
-      }],
+      providers: [
+        {
+          ...defaultProviderConfig,
+          type: nextProvider,
+        },
+      ],
     };
 
     this.handleConfigChange(nextConfig);
@@ -220,15 +227,16 @@ class FieldForm extends React.Component<FieldFormProps, {
 
     const providerPlugin = getProviderPlugin(providerType);
 
-    return (providerPlugin?.formComponent
-      ? React.createElement(providerPlugin.formComponent, {
+    return providerPlugin?.formComponent ? (
+      React.createElement(providerPlugin.formComponent, {
         fieldName: fieldName,
         config: config,
         onChange: this.handleConfigChange,
         validation: validation,
         currentUser: currentUser,
       })
-      : <div>Selected provider is not available.</div>
+    ) : (
+      <div>Selected provider is not available.</div>
     );
   };
 
@@ -239,19 +247,19 @@ class FieldForm extends React.Component<FieldFormProps, {
     return (
       <Row>
         <Col md={7} lg={6}>
-          <h2 className={commonStyles.title}>
-            {prevFieldName ? `Custom Field "${fieldName}"` : 'New Custom Field'}
-          </h2>
+          <h2 className={commonStyles.title}>{prevFieldName ? `Custom Field "${fieldName}"` : 'New Custom Field'}</h2>
 
-          <Input id="field-name"
-                 name="name"
-                 label="Name"
-                 type="text"
-                 value={fieldName}
-                 onChange={this.handleFieldNameChange}
-                 bsStyle={validation.errors.fieldName ? 'error' : null}
-                 help={validation.errors.fieldName || 'Name for this Field.'}
-                 required />
+          <Input
+            id="field-name"
+            name="name"
+            label="Name"
+            type="text"
+            value={fieldName}
+            onChange={this.handleFieldNameChange}
+            bsStyle={validation.errors.fieldName ? 'error' : null}
+            help={validation.errors.fieldName || 'Name for this Field.'}
+            required
+          />
 
           <FormGroup validationState={validation.errors.key_position ? 'error' : null}>
             <ControlLabel>
@@ -264,12 +272,14 @@ class FieldForm extends React.Component<FieldFormProps, {
               <InputGroup.Addon>
                 <input id="is-key" name="is-key" type="checkbox" onChange={this.toggleKey} checked={isKey} />
               </InputGroup.Addon>
-              <FormControl id="field-key"
-                           name="key"
-                           type="number"
-                           value={keyPosition}
-                           onChange={this.handleKeySortChange}
-                           disabled={!isKey} />
+              <FormControl
+                id="field-key"
+                name="key"
+                type="number"
+                value={keyPosition}
+                onChange={this.handleKeySortChange}
+                disabled={!isKey}
+              />
             </InputGroup>
             <HelpBlock>
               {validation.errors.key_position || 'Indicates if this Field should be a Key and its order.'}
@@ -281,30 +291,32 @@ class FieldForm extends React.Component<FieldFormProps, {
             <FormControl.Static>String</FormControl.Static>
           </FormGroup>
 
-          <FormGroup controlId="event-field-provider"
-                     validationState={validation.errors['config.providers[0].type'] ? 'error' : null}>
+          <FormGroup
+            controlId="event-field-provider"
+            validationState={validation.errors['config.providers[0].type'] ? 'error' : null}>
             <ControlLabel>Set Value From</ControlLabel>
-            <Select name="event-field-provider"
-                    ignoreAccents={false}
-                    placeholder="Select Value Source"
-                    onChange={this.handleProviderTypeChange}
-                    options={formatFieldValueProviders()}
-                    value={getConfigProviderType(config, '')}
-                    matchProp="label"
-                    required />
+            <Select
+              name="event-field-provider"
+              ignoreAccents={false}
+              placeholder="Select Value Source"
+              onChange={this.handleProviderTypeChange}
+              options={formatFieldValueProviders()}
+              value={getConfigProviderType(config, '')}
+              required
+            />
             <HelpBlock>
               {validation.errors['config.providers[0].type'] || 'Select a source for the value of this Field.'}
             </HelpBlock>
           </FormGroup>
         </Col>
 
-        <Col md={12}>
-          {this.renderFieldValueProviderForm()}
-        </Col>
+        <Col md={12}>{this.renderFieldValueProviderForm()}</Col>
 
         <Col md={12}>
           <ButtonToolbar>
-            <Button bsStyle="success" onClick={this.handleSubmit}>Add custom field</Button>
+            <Button bsStyle="primary" onClick={this.handleSubmit}>
+              Add custom field
+            </Button>
             <Button onClick={this.handleCancel}>Cancel</Button>
           </ButtonToolbar>
         </Col>

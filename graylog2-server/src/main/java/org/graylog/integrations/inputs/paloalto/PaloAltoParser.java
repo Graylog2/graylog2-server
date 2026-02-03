@@ -18,6 +18,8 @@ package org.graylog.integrations.inputs.paloalto;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import jakarta.annotation.Nonnull;
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -29,10 +31,6 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-
-import jakarta.validation.constraints.NotNull;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -65,7 +63,7 @@ public class PaloAltoParser {
     // Used to remove extra space between month and day, so date parsing works. eg. Apr  8 01:47:32 -> Apr 8 01:47:32
     private static final String DOUBLE_SPACE = "\\s{2}";
 
-    @Nullable
+    @Nonnull
     public PaloAltoMessageBase parse(@NotNull String raw, DateTimeZone timezone) {
 
         /* The message might arrive in one of the following formats:
@@ -99,8 +97,7 @@ public class PaloAltoParser {
 
                 return buildPaloAltoMessageBase(timestamp, fieldsString, source);
             } else {
-                LOG.error("Cannot parse malformed Panorama message: {}", raw);
-                return null;
+                throw new IllegalArgumentException("Cannot parse malformed Panorama message: " + raw);
             }
         } else {
             if (STANDARD_SYSLOG_PARSER.matcher(raw).matches()) {
@@ -120,8 +117,7 @@ public class PaloAltoParser {
 
                     return buildPaloAltoMessageBase(timestamp, panData, source);
                 } else {
-                    LOG.error("Cannot parse malformed Syslog message: {}", raw);
-                    return null;
+                    throw new IllegalArgumentException("Cannot parse malformed Syslog message: " + raw);
                 }
             } else if (STANDARD_SYSLOG_NO_HOST_PARSER.matcher(raw).matches()) {
                 LOG.trace("Message is in structured syslog (with no hostname) format [{}]", raw);
@@ -137,14 +133,11 @@ public class PaloAltoParser {
                     // No source is supplied, so use a blank one
                     return buildPaloAltoMessageBase(timestamp, panData, "");
                 } else {
-                    LOG.error("Cannot parse malformed Syslog message: {}", raw);
-                    return null;
+                    throw new IllegalArgumentException("Cannot parse malformed Syslog message: " + raw);
                 }
             }
         }
-
-        LOG.error("Cannot parse malformed PAN message [unrecognized format]: {}", raw);
-        return null;
+        throw new IllegalArgumentException("Cannot parse malformed PAN message [unrecognized format]");
     }
 
     /**

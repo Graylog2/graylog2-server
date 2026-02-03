@@ -17,12 +17,13 @@
 package org.graylog2.indexer.indexset.template;
 
 import com.google.common.primitives.Ints;
-import com.mongodb.client.MongoCollection;
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Sorts;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
@@ -137,6 +138,7 @@ public class IndexSetTemplateService {
                 DEFAULTS);
     }
 
+    @MustBeClosed
     public Stream<IndexSetTemplate> streamAll() {
         return stream(collection.find());
     }

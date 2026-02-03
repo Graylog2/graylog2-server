@@ -30,12 +30,14 @@ import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.functions.arrays.ArrayContains;
 import org.graylog.plugins.pipelineprocessor.functions.arrays.ArrayRemove;
 import org.graylog.plugins.pipelineprocessor.functions.arrays.StringArrayAdd;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.CsvMapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.HexToDecimalConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsBoolean;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsCollection;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsDouble;
@@ -44,6 +46,7 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.IsLong;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsMap;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsNumber;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsString;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.ListConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.MapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
@@ -115,7 +118,9 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveFromStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveMultipleFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveSingleField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveStringFieldsByValue;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RenameField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RenameFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
@@ -132,6 +137,7 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.Join;
 import org.graylog.plugins.pipelineprocessor.functions.strings.KeyValue;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Length;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
+import org.graylog.plugins.pipelineprocessor.functions.strings.MultiGrokMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexReplace;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Replace;
@@ -175,6 +181,7 @@ import org.joda.time.Period;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
@@ -232,15 +239,19 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(LongConversion.NAME, new LongConversion());
         functions.put(StringConversion.NAME, new StringConversion());
         functions.put(MapConversion.NAME, new MapConversion());
+        functions.put(ListConversion.NAME, new ListConversion());
+        functions.put(HexToDecimalConversion.NAME, new HexToDecimalConversion());
 
         // message related functions
         functions.put(HasField.NAME, new HasField());
         functions.put(SetField.NAME, new SetField());
         functions.put(SetFields.NAME, new SetFields());
         functions.put(RenameField.NAME, new RenameField());
+        functions.put(RenameFields.NAME, new RenameFields());
         functions.put(RemoveField.NAME, new RemoveField());
         functions.put(RemoveSingleField.NAME, new RemoveSingleField());
         functions.put(RemoveMultipleFields.NAME, new RemoveMultipleFields());
+        functions.put(RemoveStringFieldsByValue.NAME, new RemoveStringFieldsByValue());
         functions.put(NormalizeFields.NAME, new NormalizeFields());
 
         functions.put(DropMessage.NAME, new DropMessage());
@@ -393,6 +404,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
                 grokPatternService,
                 Executors.newScheduledThreadPool(1));
         functions.put(GrokMatch.NAME, new GrokMatch(grokPatternRegistry));
+        functions.put(MultiGrokMatch.NAME, new MultiGrokMatch(grokPatternRegistry));
         functions.put(GrokExists.NAME, new GrokExists(grokPatternRegistry));
 
         functions.put(MetricCounterIncrement.NAME, new MetricCounterIncrement(metricRegistry));
@@ -565,6 +577,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(evaluatedMessage.getField("array")).isEqualTo(Arrays.asList(1, 2, 3));
         assertThat(evaluatedMessage.getField("store")).isInstanceOf(Map.class);
         assertThat(evaluatedMessage.getField("expensive")).isEqualTo(10);
+        assertThat(evaluatedMessage.getField("escaped")).isEqualTo("a \t +");
     }
 
     @Test
@@ -853,6 +866,33 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
+    void shouldNotCopyIdFieldWhenCloningMessage() {
+        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
+        message.addField("foo", "bar");
+
+        final Message clonedMessage = spy(messageFactory.createMessage("test", "test", Tools.nowUTC()));
+        final MessageFactory messageFactoryMock = mock(MessageFactory.class);
+        when(messageFactoryMock.createMessage(anyString(), anyString(), any(DateTime.class))).thenReturn(clonedMessage);
+
+        final CloneMessage cloneMessageFunction = new CloneMessage(messageFactoryMock);
+        final EvaluationContext context = new EvaluationContext(message);
+        final FunctionArgs args = new FunctionArgs(cloneMessageFunction, Collections.emptyMap());
+
+        final Message evaluatedClone = cloneMessageFunction.evaluate(args, context);
+
+        assertThat(evaluatedClone).isSameAs(clonedMessage);
+
+        final ArgumentCaptor<Map<String, Object>> fieldsCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(clonedMessage).addFields(fieldsCaptor.capture());
+        assertThat(fieldsCaptor.getValue()).doesNotContainKey(Message.FIELD_ID);
+
+        assertThat(clonedMessage.getFieldAs(String.class, "foo")).isEqualTo("bar");
+        assertThat(clonedMessage.getFieldAs(String.class, Message.FIELD_ID))
+                .isNotEqualTo(message.getFieldAs(String.class, Message.FIELD_ID));
+        assertThat(context.createdMessages()).contains(clonedMessage);
+    }
+
+    @Test
     void grok() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = evaluateRule(rule);
@@ -902,6 +942,20 @@ public class FunctionsSnippetsTest extends BaseParserTest {
                 .isNull();
     }
 
+
+    @Test
+    void multiGrok() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
+
+        assertThat(message).isNotNull();
+        assertThat(message.hasField("abc_message")).isTrue();
+        assertThat(message.hasField("abc_ip")).isTrue();
+        assertThat(message.hasField("abc2_message")).isFalse();
+        assertThat(message.hasField("abc2_ip")).isFalse();
+        assertThat(message.getField("123_ip")).isEqualTo("192.168.0.2");
+    }
+
     @Test
     void urls() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
@@ -922,6 +976,12 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("with_spaces")).isEqualTo("hello graylog");
         assertThat(message.getField("equal")).isEqualTo("can=containanotherone");
         assertThat(message.getField("authority")).isEqualTo("admin:s3cr31@some.host.with.lots.of.subdomains.com:9999");
+        assertThat(message.getField("invalid_default_specified")).isNull();
+        assertThat(message.getField("default_null")).isNull();
+        // When an invalid default URL is specified, an exception should be thrown, since that is a pipeline coding error
+        final EvaluationContext context = contextForRuleEval(rule, messageFactory.createMessage("test", "test", Tools.nowUTC()));
+        assertThat(context.evaluationErrors().size()).isEqualTo(1);
+        assertThat(context.evaluationErrors().get(0).toString()).contains("Could not parse a valid URL from: not-a-url");
     }
 
     @Test
@@ -1001,6 +1061,28 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
+    void renameFields() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+
+        final Message in = messageFactory.createMessage("bulk rename", "bulk-source", Tools.nowUTC());
+        in.addField("old_field_one", "value-1");
+        in.addField("old_field_two", 42);
+        in.addField("present", "value");
+        in.addField("unchanged_field", "still-here");
+
+        final Message message = evaluateRule(rule, in);
+
+        assertThat(message.hasField("old_field_one")).isFalse();
+        assertThat(message.hasField("old_field_two")).isFalse();
+        assertThat(message.getField("new_field_one")).isEqualTo("value-1");
+        assertThat(message.getField("new_field_two")).isEqualTo(42);
+        assertThat(message.getField("unchanged_field")).isEqualTo("still-here");
+        assertThat(message.hasField("present")).isFalse();
+        assertThat(message.getField("renamed")).isEqualTo("value");
+        assertThat(message.hasField("ignored_new_name")).isFalse();
+    }
+
+    @Test
     void normalizeFields() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
 
@@ -1065,6 +1147,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("string_5")).isEqualTo("false");
         assertThat(message.getField("string_6")).isEqualTo("42");
         assertThat(message.getField("string_7")).isEqualTo("23.42");
+        assertThat(message.getField("string_default_null")).isNull();
+        assertThat(message.getField("string_default_null_set_single_field")).isNull();
 
         assertThat(message.getField("long_1")).isEqualTo(1L);
         assertThat(message.getField("long_2")).isEqualTo(2L);
@@ -1077,6 +1161,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("long_min2")).isEqualTo(1L);
         assertThat(message.getField("long_max1")).isEqualTo(Long.MAX_VALUE);
         assertThat(message.getField("long_max2")).isEqualTo(1L);
+        assertThat(message.getField("long_default_null")).isNull();
+        assertThat(message.getField("long_default_null_set_single_field")).isNull();
 
         assertThat(message.getField("double_1")).isEqualTo(1d);
         assertThat(message.getField("double_2")).isEqualTo(2d);
@@ -1092,17 +1178,23 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("double_inf2")).isEqualTo(Double.NEGATIVE_INFINITY);
         assertThat(message.getField("double_inf3")).isEqualTo(Double.POSITIVE_INFINITY);
         assertThat(message.getField("double_inf4")).isEqualTo(Double.NEGATIVE_INFINITY);
+        assertThat(message.getField("double_default_null")).isNull();
+        assertThat(message.getField("double_default_null_set_single_field")).isNull();
 
         assertThat(message.getField("bool_1")).isEqualTo(true);
         assertThat(message.getField("bool_2")).isEqualTo(false);
         assertThat(message.getField("bool_3")).isEqualTo(false);
         assertThat(message.getField("bool_4")).isEqualTo(true);
+        assertThat(message.getField("bool_default_null")).isNull();
+        assertThat(message.getField("bool_default_null_set_single_field")).isNull();
 
         // the is wrapped in our own class for safety in rules
         assertThat(message.getField("ip_1")).isEqualTo(new IpAddress(InetAddresses.forString("127.0.0.1")));
         assertThat(message.getField("ip_2")).isEqualTo(new IpAddress(InetAddresses.forString("127.0.0.1")));
         assertThat(message.getField("ip_3")).isEqualTo(new IpAddress(InetAddresses.forString("0.0.0.0")));
         assertThat(message.getField("ip_4")).isEqualTo(new IpAddress(InetAddresses.forString("::1")));
+        assertThat(message.getField("ip_default_null")).isNull();
+        assertThat(message.getField("ip_default_null_set_single_field")).isNull();
 
         assertThat(message.getField("map_1")).isEqualTo(Collections.singletonMap("foo", "bar"));
         assertThat(message.getField("map_2")).isEqualTo(Collections.emptyMap());
@@ -1110,6 +1202,13 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("map_4")).isEqualTo(Collections.emptyMap());
         assertThat(message.getField("map_5")).isEqualTo(Collections.emptyMap());
         assertThat(message.getField("map_6")).isEqualTo(Collections.emptyMap());
+        assertThat(message.getField("map_default_null")).isNull();
+        assertThat(message.getField("map_default_null_set_single_field")).isNull();
+
+        assertThat(message.getField("list_1")).isEqualTo(List.of("foo"));
+        assertThat(message.getField("list_2")).isEqualTo(Collections.emptyList());
+        assertThat(message.getField("list_3")).isEqualTo(Collections.emptyList());
+        assertThat(message.getField("list_default_null_set_single_field")).isNull();
     }
 
     @Test
@@ -1512,6 +1611,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         Long manilaHour = (Long) message.getField("manilaHour");
         assertThat(utcHour).isEqualTo(10);
         assertThat(manilaHour).isEqualTo(18);
+        assertThat(message.getField("null_value")).isNull();
     }
 
     @Test
@@ -1598,6 +1698,11 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("ignore_extra_field_names_k2")).isEqualTo("v2");
         assertThat(message.getField("ignore_extra_field_names_k3")).isEqualTo("v3");
         assertThat(message.getField("ignore_extra_field_names_k4")).isNull();
+
+        // When extra values are ignored, extra specified values should be permitted (and ignored).
+        assertThat(message.getField("ignore_extra_values_k1")).isEqualTo("v1");
+        assertThat(message.getField("ignore_extra_values_k2")).isEqualTo("v2");
+        assertThat(message.getField("ignore_extra_values_k3")).isEqualTo("v3");
     }
 
     @Test
@@ -1647,6 +1752,27 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("a_1")).isNull();
         assertThat(message.getField("f2")).isNull();
         assertThat(message.getField("f1")).isEqualTo("f1");
+    }
+
+    @Test
+    void removeStringFieldsByValue() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("f1")).isNull(); // match regex
+        assertThat(message.getField("f2")).isNull(); // match regex
+        assertThat(message.getField("f3")).isEqualTo("stay in message");
+        assertThat(message.getField("f4")).isNull(); // match values
+        assertThat(message.getField("f5")).isEqualTo("stay in message");
+        assertThat(message.getField("f6")).isNull(); // match values
+        assertThat(message.getField("f7")).isEqualTo("f-7");
+        assertThat(message.getField("number_field")).isEqualTo(3L);
+        assertThat(message.getField("boolean_field")).isEqualTo(true);
+        assertThat(message.getField("array_field")).satisfies(value -> {
+            assertThat(value instanceof List<?>).isTrue();
+            assertThat(((List<String>) value)).containsAll(List.of("a", "b", "c"));
+        });
     }
 
     @Test
@@ -1758,5 +1884,18 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("remove_missing")).isEqualTo(Arrays.asList(1L, 2L, 3L));
         assertThat(message.getField("remove_only_one")).isEqualTo(Arrays.asList(1L, 2L));
         assertThat(message.getField("remove_all")).isEqualTo(List.of(1L));
+    }
+
+    @Test
+    void hexToDecimalConversion() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
+        assertThat(actionsTriggered.get()).isTrue();
+        assertThat(message).isNotNull();
+        assertThat(message.getField("0x17B90004")).isEqualTo(Arrays.asList(23L, 185L, 0L, 4L));
+        assertThat(message.getField("0x117B90004")).isEqualTo(Arrays.asList(1L, 23L, 185L, 0L, 4L));
+        assertThat(message.getField("17B90004")).isEqualTo(Arrays.asList(23L, 185L, 0L, 4L));
+        assertThat(message.getField("117B90004")).isEqualTo(Arrays.asList(1L, 23L, 185L, 0L, 4L));
+        assertThat(message.getField("not_hex")).isEqualTo(null);
     }
 }

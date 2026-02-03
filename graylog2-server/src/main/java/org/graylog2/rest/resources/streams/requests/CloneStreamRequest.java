@@ -20,16 +20,14 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class CloneStreamRequest {
-    @JsonProperty
+    @JsonProperty("title")
     public abstract String title();
 
-    @JsonProperty
+    @JsonProperty("description")
     public abstract String description();
 
     @JsonProperty("remove_matches_from_default_stream")
