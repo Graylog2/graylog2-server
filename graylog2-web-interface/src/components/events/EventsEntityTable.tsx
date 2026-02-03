@@ -15,9 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo } from 'react';
-import moment from 'moment';
-import { OrderedMap } from 'immutable';
+import { useCallback } from 'react';
 
 import useTableElements from 'components/events/events/hooks/useTableComponents';
 import { eventsTableElements } from 'components/events/Constants';
@@ -32,7 +30,7 @@ import EventsRefreshControls from 'components/events/events/EventsRefreshControl
 import QueryHelper from 'components/common/QueryHelper';
 import EventsWidgets from 'components/events/EventsWidgets';
 import EventsRefreshProvider from 'components/events/EventsRefreshProvider';
-import { DATE_SEPARATOR } from 'components/common/EntityFilters/helpers/timeRange';
+import { createDefaultTimestampFilter } from 'components/common/EntityFilters/helpers/defaultFilters';
 
 const additionalSearchFields = {
   key: 'The key of the event',
@@ -49,11 +47,7 @@ const EventsEntityTable = () => {
     defaultLayout: eventsTableElements.defaultLayout,
   });
 
-  const defaultFilters = useMemo(() => {
-    const thirtyDaysAgoUTC = moment.utc().subtract(30, 'days').format('YYYY-MM-DDTHH:mm:ss.SSSZ');
-
-    return OrderedMap({ timestamp: [`${thirtyDaysAgoUTC}${DATE_SEPARATOR}`] });
-  }, []);
+  const defaultFilters = createDefaultTimestampFilter();
 
   return (
     <EventsRefreshProvider>
