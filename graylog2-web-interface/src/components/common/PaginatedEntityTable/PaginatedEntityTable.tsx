@@ -60,6 +60,12 @@ const TableWrapper = styled.div`
   width: 100%;
 `;
 
+const StyledNoSearchResult = styled(NoSearchResult)<{ $noSearchBar: boolean }>(
+  ({ $noSearchBar }) => css`
+    ${$noSearchBar && 'margin-top: 0'}
+  `,
+);
+
 type EntityDataTableProps = React.ComponentProps<typeof EntityDataTable>;
 type ExternalSearch = {
   query: string;
@@ -234,7 +240,9 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
             useQueryParameter={!withoutURLParams}
             onChange={onPaginationChange}>
             {list?.length === 0 ? (
-              <NoSearchResult>No {humanName} have been found.</NoSearchResult>
+              <StyledNoSearchResult $noSearchBar={!shouldShowSearch}>
+                No {humanName} have been found.
+              </StyledNoSearchResult>
             ) : (
               <EntityDataTable<T, M>
                 entities={list}
