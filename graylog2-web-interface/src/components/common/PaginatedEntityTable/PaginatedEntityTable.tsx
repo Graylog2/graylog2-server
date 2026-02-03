@@ -102,6 +102,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   fetchOptions,
   filterValueRenderers = undefined,
   focusSearchAfterMount = false,
+  hideSearchWhenEmpty = true,
   humanName,
   isLoadingLayoutPreferences,
   keyFn,
@@ -184,6 +185,8 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
     attributes,
   } = paginatedEntities;
 
+  const shouldShowSearch = !externalSearch && (!hideSearchWhenEmpty || list?.length > 0);
+
   return (
     <TableFetchContextProvider
       refetch={refetch}
@@ -200,7 +203,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
           />
         )}
         <TableWrapper>
-          {!externalSearch && (
+          {shouldShowSearch && (
             <SearchRow>
               <SearchForm
                 focusAfterMount={focusSearchAfterMount}
@@ -327,6 +330,7 @@ export type PaginatedEntityTableProps<T, M> = {
   fetchOptions?: FetchOptions;
   filterValueRenderers?: React.ComponentProps<typeof EntityFilters>['filterValueRenderers'];
   focusSearchAfterMount?: boolean;
+  hideSearchWhenEmpty?: boolean;
   humanName: string;
   keyFn: (options: SearchParams) => Array<unknown>;
   middleSection?: React.ComponentType<MiddleSectionProps>;
