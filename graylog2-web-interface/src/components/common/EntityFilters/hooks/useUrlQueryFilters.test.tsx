@@ -57,7 +57,7 @@ describe('useUrlQueryFilters', () => {
     result.current[1](OrderedMap({ index_set_id: ['index_set_id_1', 'index_set_id_2'] }));
 
     await waitFor(() =>
-      expect(updateUrlQueryParams).toHaveBeenCalledWith(['index_set_id=index_set_id_1', 'index_set_id=index_set_id_2']),
+      expect(updateUrlQueryParams).toHaveBeenCalledWith(['index_set_id=index_set_id_1', 'index_set_id=index_set_id_2'], undefined),
     );
   });
 });
