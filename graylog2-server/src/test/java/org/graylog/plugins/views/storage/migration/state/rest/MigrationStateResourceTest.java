@@ -29,6 +29,7 @@ import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateM
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineImpl;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStep;
+import org.graylog.plugins.views.storage.migration.state.machine.TestableMigrationActions;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -122,7 +123,7 @@ public class MigrationStateResourceTest {
     private MigrationStateMachine createStateMachine() {
         final InMemoryStateMachinePersistence persistence = new InMemoryStateMachinePersistence();
         final MigrationStateMachineContext context = new MigrationStateMachineContext();
-        final MigrationActionsAdapter actions = new MigrationActionsAdapter(context);
+        final TestableMigrationActions actions = TestableMigrationActions.initialConfig().build();
         return new MigrationStateMachineImpl(
                 MigrationStateMachineBuilder.buildFromPersistedState(persistence, actions),
                 persistence,
