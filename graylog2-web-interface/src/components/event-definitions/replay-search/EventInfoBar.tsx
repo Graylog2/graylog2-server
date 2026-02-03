@@ -15,71 +15,28 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { SyntheticEvent } from 'react';
-import React, { useCallback, useState } from 'react';
-import styled, { css } from 'styled-components';
+import React from 'react';
 
-import { Button } from 'components/bootstrap';
-import { FlatContentRow, Icon } from 'components/common';
+import { Table } from 'components/bootstrap';
 import useAttributeComponents from 'components/event-definitions/replay-search/hooks/useAttributeComponents';
 import EventAttribute from 'components/event-definitions/replay-search/EventAttribute';
 
-const Header = styled.div`
-  display: flex;
-  align-items: center;
-  user-select: none;
-  gap: 5px;
-`;
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-`;
-
-const Row = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    flex-wrap: wrap;
-    gap: ${theme.spacings.xs};
-    justify-content: stretch;
-  `,
-);
-
 const EventInfoBar = () => {
-  const [open, setOpen] = useState<boolean>(true);
-
-  const toggleOpen = useCallback((e: SyntheticEvent) => {
-    e.stopPropagation();
-    setOpen((cur) => !cur);
-  }, []);
-
   const infoAttributes = useAttributeComponents();
 
   return (
-    <FlatContentRow>
-      <Header>
-        <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleOpen}>
-          <Icon name={`arrow_${open ? 'drop_down' : 'right'}`} />
-          &nbsp;
-          {open ? `Hide event definition details` : `Show event definition details`}
-        </Button>
-      </Header>
-      {open && (
-        <Container data-testid="info-container">
-          <Row>
-            {infoAttributes.map(
-              ({ title, content, show }) =>
-                show !== false && (
-                  <EventAttribute key={title} title={title}>
-                    {content}
-                  </EventAttribute>
-                ),
-            )}
-          </Row>
-        </Container>
-      )}
-    </FlatContentRow>
+    <Table condensed striped>
+      <tbody data-testid="info-container">
+        {infoAttributes.map(
+          ({ title, content, show }) =>
+            show !== false && (
+              <EventAttribute key={title} title={title}>
+                {content}
+              </EventAttribute>
+            ),
+        )}
+      </tbody>
+    </Table>
   );
 };
 

@@ -19,7 +19,6 @@ import { useMemo } from 'react';
 import merge from 'lodash/merge';
 
 import useCreateSearch from 'views/hooks/useCreateSearch';
-import EventInfoBar from 'components/event-definitions/replay-search/EventInfoBar';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 import SearchPage from 'views/pages/SearchPage';
 import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
@@ -47,7 +46,6 @@ const ReplaySearch = ({
     () =>
       merge(
         {
-          infoBar: { component: EventInfoBar },
           sidebar: {
             isShown: true,
             title: 'Replayed Search',
