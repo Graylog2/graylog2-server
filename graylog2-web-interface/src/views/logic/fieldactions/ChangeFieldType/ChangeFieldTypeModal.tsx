@@ -185,6 +185,11 @@ const ChangeFieldTypeModal = ({
     <Formik onSubmit={onSubmit} initialValues={initialValues}>
       {({ values: { field: fieldName, field_type: type } }) => (
         <Form>
+          <Modal.Header>
+            <Modal.Title>
+              <span>Change {fieldName} Field Type</span>
+            </Modal.Title>
+          </Modal.Header>
           <Modal.Body>
             {showFieldSelect && (
               <Field name="field">
@@ -289,11 +294,6 @@ const LoadingBarrier = ({
   initialData = { fieldName: undefined, type: undefined },
 }: Props & { isLoading?: boolean; show: boolean }) => (
   <Modal show={show} bsSize="large" onHide={onClose}>
-    <Modal.Header>
-      <Modal.Title>
-        <span>Change {initialData?.fieldName} Field Type</span>
-      </Modal.Title>
-    </Modal.Header>
     {isLoading ? (
       <Spinner />
     ) : (
