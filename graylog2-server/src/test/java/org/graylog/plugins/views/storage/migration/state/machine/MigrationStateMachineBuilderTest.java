@@ -39,7 +39,7 @@ public class MigrationStateMachineBuilderTest {
 
         TestableMigrationActions.initialConfig()
                 .inplaceMigrationVersionCompatible(true)
-                .caAvailable(false) // compatible version, doesn't have CA, this will be next step
+                .caAvailable(false) // compatible version, doesn't have CA, this will be next possible transition
                 .renewalPolicyConfigured(false)
                 .bindToStateMachine(MigrationState.MIGRATION_WELCOME_PAGE)
                 .assertTransition(MigrationStep.SHOW_CA_CREATION);
@@ -61,7 +61,7 @@ public class MigrationStateMachineBuilderTest {
 
     @Test
     public void testCaCreationPage() {
-        // Test reaching CA_CREATION_PAGE from welcome page
+        // Test reaching CA creation page from welcome page
         TestableMigrationActions.initialConfig()
                 .caAvailable(false)
                 .renewalPolicyConfigured(false)
@@ -72,13 +72,13 @@ public class MigrationStateMachineBuilderTest {
                 .assertState(MigrationState.CA_CREATION_PAGE)
                 .assertEmptyTransitions();
 
-        // Test direct transitions FROM CA_CREATION_PAGE when CA is not yet available
+        // can't leave CA creation page as long as there is no ca available
         TestableMigrationActions.initialConfig()
                 .caAvailable(false)
                 .bindToStateMachine(MigrationState.CA_CREATION_PAGE)
                 .assertEmptyTransitions();
 
-        // Test direct transitions FROM CA_CREATION_PAGE when CA is available but renewal policy is not
+        // skip CA creation page and go straight to renewal policy if CA exists
         TestableMigrationActions.initialConfig()
                 .caAvailable(true)
                 .renewalPolicyConfigured(false)
@@ -87,7 +87,7 @@ public class MigrationStateMachineBuilderTest {
                 .bindToStateMachine(MigrationState.MIGRATION_WELCOME_PAGE)
                 .assertTransition(MigrationStep.SHOW_RENEWAL_POLICY_CREATION);
 
-        // Test direct transitions FROM CA_CREATION_PAGE when both CA and renewal policy are ready
+        // skip both CA and renewal policy if configured
         TestableMigrationActions.initialConfig()
                 .caAvailable(true)
                 .renewalPolicyConfigured(true)
@@ -99,7 +99,7 @@ public class MigrationStateMachineBuilderTest {
 
     @Test
     public void testRenewalPolicyCreationPage() {
-        // Test reaching RENEWAL_POLICY_CREATION_PAGE from CA_CREATION_PAGE
+        // CA configured, renewal policy not yet. Only possible transition is to renewal policy
         TestableMigrationActions.initialConfig()
                 .caAvailable(true)
                 .renewalPolicyConfigured(false)
@@ -108,14 +108,14 @@ public class MigrationStateMachineBuilderTest {
                 .assertState(MigrationState.RENEWAL_POLICY_CREATION_PAGE)
                 .assertEmptyTransitions();
 
-        // Test direct transitions FROM RENEWAL_POLICY_CREATION_PAGE when renewal policy is not yet configured
+        // can't leave renewal policy as long as there is no renewal policy configured
         TestableMigrationActions.initialConfig()
                 .caAvailable(true)
                 .renewalPolicyConfigured(false)
                 .bindToStateMachine(MigrationState.RENEWAL_POLICY_CREATION_PAGE)
                 .assertEmptyTransitions();
 
-        // Test direct transitions FROM RENEWAL_POLICY_CREATION_PAGE when both CA and renewal policy are ready
+        // leave renewal policy possible if already configured
         TestableMigrationActions.initialConfig()
                 .caAvailable(true)
                 .renewalPolicyConfigured(true)
@@ -215,7 +215,7 @@ public class MigrationStateMachineBuilderTest {
         TestableMigrationActions.initialConfig()
                 .bindToStateMachine(MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING)
                 .fire(MigrationStep.SHOW_STOP_PROCESSING_PAGE)
-                .assertActionTriggered(TestableAction.stopMessageProcessing) // <-- this is an transition action
+                .assertActionTriggered(TestableAction.stopMessageProcessing) // <-- this is a transition action
                 .assertState(MigrationState.MESSAGE_PROCESSING_STOP);
 
         TestableMigrationActions.initialConfig()
