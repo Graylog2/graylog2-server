@@ -38,8 +38,6 @@ public interface MigrationActions {
 
     void provisionDataNodes();
 
-    void provisionAndStartDataNodes();
-
     boolean provisioningFinished();
 
     boolean allDatanodesPrepared();
@@ -53,8 +51,6 @@ public interface MigrationActions {
     void calculateTrafficEstimate();
 
     boolean isCompatibleInPlaceMigrationVersion();
-
-    void getElasticsearchHosts();
 
     void stopDatanodes();
 

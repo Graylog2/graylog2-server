@@ -179,14 +179,6 @@ public class MigrationActionsImpl implements MigrationActions {
     }
 
     @Override
-    public void provisionAndStartDataNodes() {
-        final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
-        activeDataNodes.values().stream()
-                .filter(node -> node.getDataNodeStatus() != DataNodeStatus.AVAILABLE)
-                .forEach(nodeDto -> triggerCSR(nodeDto, DatanodeStartType.AUTOMATICALLY));
-    }
-
-    @Override
     public boolean provisioningFinished() {
         return nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE);
     }
@@ -240,13 +232,6 @@ public class MigrationActionsImpl implements MigrationActions {
         return !searchVersionProvider.get().isElasticsearch();
     }
 
-    @Override
-    public void getElasticsearchHosts() {
-        stateMachineContext.setResponse(Map.of(
-                "elasticsearch_hosts", elasticsearchHosts.stream().map(URI::toString).collect(Collectors.joining(",")),
-                "allowlist_hosts", elasticsearchHosts.stream().map(host -> host.getHost() + ":" + host.getPort()).collect(Collectors.joining(","))
-        ));
-    }
 
     @Override
     public void stopDatanodes() {
