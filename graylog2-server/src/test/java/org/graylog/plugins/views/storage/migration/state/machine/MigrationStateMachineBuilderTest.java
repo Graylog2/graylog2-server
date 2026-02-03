@@ -32,29 +32,29 @@ public class MigrationStateMachineBuilderTest {
         TestableMigrationActions.initialConfig()
                 .caAvailable(false)
                 .renewalPolicyConfigured(false)
-                .inplaceMigrationVersionCompatible(false)
+                .inplaceMigrationVersionCompatible(false) // <-- without compatible version, there is no migration type available
                 .bindToStateMachine(MigrationState.MIGRATION_WELCOME_PAGE)
                 .assertState(MigrationState.MIGRATION_WELCOME_PAGE)
                 .assertEmptyTransitions();
 
         TestableMigrationActions.initialConfig()
-                .caAvailable(false)
-                .renewalPolicyConfigured(false)
                 .inplaceMigrationVersionCompatible(true)
+                .caAvailable(false) // compatible version, doesn't have CA, this will be next step
+                .renewalPolicyConfigured(false)
                 .bindToStateMachine(MigrationState.MIGRATION_WELCOME_PAGE)
                 .assertTransition(MigrationStep.SHOW_CA_CREATION);
 
         TestableMigrationActions.initialConfig()
-                .caAvailable(true)
-                .renewalPolicyConfigured(false)
                 .inplaceMigrationVersionCompatible(true)
+                .caAvailable(true)
+                .renewalPolicyConfigured(false) // compatible and CA ready, needs renewal policy
                 .bindToStateMachine(MigrationState.MIGRATION_WELCOME_PAGE)
                 .assertTransition(MigrationStep.SHOW_RENEWAL_POLICY_CREATION);
 
         TestableMigrationActions.initialConfig()
                 .caAvailable(true)
                 .renewalPolicyConfigured(true)
-                .inplaceMigrationVersionCompatible(true)
+                .inplaceMigrationVersionCompatible(true) // compatible, ca + policy ready, let's continue to rolling upgrade
                 .bindToStateMachine(MigrationState.MIGRATION_WELCOME_PAGE)
                 .assertTransition(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION);
     }
