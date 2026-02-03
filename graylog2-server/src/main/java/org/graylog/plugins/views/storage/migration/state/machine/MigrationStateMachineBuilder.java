@@ -45,21 +45,21 @@ public class MigrationStateMachineBuilder {
                 .permit(MigrationStep.SELECT_MIGRATION, MigrationState.MIGRATION_WELCOME_PAGE, () -> LOG.info("Migration selected in menu, show welcome page"));
 
         config.configure(MigrationState.MIGRATION_WELCOME_PAGE)
-                .permitIf(MigrationStep.SHOW_CA_CREATION, MigrationState.CA_CREATION_PAGE, () -> migrationActions.isCompatibleInPlaceMigrationVersion() && migrationActions.caDoesNotExist())
+                .permitIf(MigrationStep.SHOW_CA_CREATION, MigrationState.CA_CREATION_PAGE, () -> migrationActions.isCompatibleInPlaceMigrationVersion() && !migrationActions.caExists())
                 .permitIf(MigrationStep.SHOW_RENEWAL_POLICY_CREATION, MigrationState.RENEWAL_POLICY_CREATION_PAGE, () -> {
                     if (!migrationActions.isCompatibleInPlaceMigrationVersion()) {
                         return false;
                     }
-                    return !migrationActions.caDoesNotExist() && migrationActions.renewalPolicyDoesNotExist();
+                    return migrationActions.caExists() && !migrationActions.renewalPolicyExists();
                 })
-                .permitIf(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION, MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE, migrationActions::caAndRenewalPolicyExist);
+                .permitIf(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION, MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE, () -> migrationActions.caExists() && migrationActions.renewalPolicyExists());
 
         config.configure(MigrationState.CA_CREATION_PAGE)
-                .permitIf(MigrationStep.SHOW_RENEWAL_POLICY_CREATION, MigrationState.RENEWAL_POLICY_CREATION_PAGE, () -> !migrationActions.caDoesNotExist() && migrationActions.renewalPolicyDoesNotExist())
-                .permitIf(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION, MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE, migrationActions::caAndRenewalPolicyExist);
+                .permitIf(MigrationStep.SHOW_RENEWAL_POLICY_CREATION, MigrationState.RENEWAL_POLICY_CREATION_PAGE, () -> migrationActions.caExists() && !migrationActions.renewalPolicyExists())
+                .permitIf(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION, MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE, () -> migrationActions.caExists() && migrationActions.renewalPolicyExists());
 
         config.configure(MigrationState.RENEWAL_POLICY_CREATION_PAGE)
-                .permitIf(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION, MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE, migrationActions::caAndRenewalPolicyExist);
+                .permitIf(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION, MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE, () -> migrationActions.caExists() && migrationActions.renewalPolicyExists());
 
         // in place / rolling upgrade branch of the migration
         config.configure(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE)

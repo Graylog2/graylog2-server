@@ -30,9 +30,8 @@ public interface MigrationActions {
 
     void stopMessageProcessing();
 
-    boolean caDoesNotExist();
-    boolean renewalPolicyDoesNotExist();
-    boolean caAndRenewalPolicyExist();
+    boolean caExists();
+    boolean renewalPolicyExists();
 
     boolean compatibleDatanodesRunning();
 

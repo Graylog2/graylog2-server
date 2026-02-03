@@ -136,19 +136,15 @@ public class MigrationActionsImpl implements MigrationActions {
     }
 
     @Override
-    public boolean caDoesNotExist() {
-        return !caKeystore.exists();
+    public boolean caExists() {
+        return caKeystore.exists();
     }
 
     @Override
-    public boolean renewalPolicyDoesNotExist() {
-        return this.clusterConfigService.get(RenewalPolicy.class) == null;
+    public boolean renewalPolicyExists() {
+        return this.clusterConfigService.get(RenewalPolicy.class) != null;
     }
 
-    @Override
-    public boolean caAndRenewalPolicyExist() {
-        return !caDoesNotExist() && !renewalPolicyDoesNotExist();
-    }
 
     @Override
     public boolean compatibleDatanodesRunning() {

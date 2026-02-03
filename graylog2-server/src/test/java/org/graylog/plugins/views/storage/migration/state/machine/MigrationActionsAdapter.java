@@ -75,19 +75,15 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
-    public boolean caDoesNotExist() {
-        return false;
+    public boolean caExists() {
+        return true;
     }
 
     @Override
-    public boolean renewalPolicyDoesNotExist() {
-        return false;
+    public boolean renewalPolicyExists() {
+        return true;
     }
 
-    @Override
-    public boolean caAndRenewalPolicyExist() {
-        return false;
-    }
 
     @Override
     public boolean compatibleDatanodesRunning() {

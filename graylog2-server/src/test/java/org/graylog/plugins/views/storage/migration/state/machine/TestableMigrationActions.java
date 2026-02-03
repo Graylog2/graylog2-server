@@ -97,18 +97,13 @@ public abstract class TestableMigrationActions implements MigrationActions {
     }
 
     @Override
-    public boolean caDoesNotExist() {
-        return !caAvailable();
+    public boolean caExists() {
+        return caAvailable();
     }
 
     @Override
-    public boolean renewalPolicyDoesNotExist() {
-        return !renewalPolicyConfigured();
-    }
-
-    @Override
-    public boolean caAndRenewalPolicyExist() {
-        return caAvailable() && renewalPolicyConfigured();
+    public boolean renewalPolicyExists() {
+        return renewalPolicyConfigured();
     }
 
     @Override
