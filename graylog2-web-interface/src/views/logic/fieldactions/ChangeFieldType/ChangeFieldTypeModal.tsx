@@ -37,8 +37,6 @@ import type { FieldTypePutResponse, FieldTypePutResponseJson } from 'views/logic
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import type { Stream } from 'logic/streams/types';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
 
 const StyledSelect = styled(Select)`
   width: 400px;
@@ -108,8 +106,6 @@ const ChangeFieldTypeModal = ({
   } = useFieldTypesForMappings();
   const sendTelemetry = useSendTelemetry();
   const [rotated, setRotated] = useState(true);
-  const currentUser = useCurrentUser();
-  const hasFailureStreamAccess = isPermitted(currentUser.permissions, `streams:read:${failureStreamId}`);
   const fieldTypeOptions = useMemo(
     () =>
       Object.entries(fieldTypes)
@@ -121,7 +117,7 @@ const ChangeFieldTypeModal = ({
     [fieldTypes],
   );
 
-  const [indexSetSelection, setIndexSetSelection] = useState<Array<string>>(initialSelectedIndexSets);
+  const [indexSetSelection, setIndexSetSelection] = useState<Array<string>>();
 
   const { putFieldTypeMutation, isLoading: fieldTypeMutationIsLoading } = usePutFieldTypeMutation();
 
@@ -194,6 +190,10 @@ const ChangeFieldTypeModal = ({
     onClose();
   }, [onClose, sendTelemetry, telemetryPathName]);
 
+  useEffect(() => {
+    setIndexSetSelection(initialSelectedIndexSets);
+  }, [initialSelectedIndexSets, setIndexSetSelection]);
+
   return (
     <BootstrapModalForm
       title={<span>Change {fieldName} Field Type</span>}
@@ -210,14 +210,9 @@ const ChangeFieldTypeModal = ({
         <Alert bsStyle="warning">
           Changing the type of the field <b>{fieldName}</b> can have a significant impact on the ingestion of future log
           messages. If you declare a field to have a type which is incompatible with the logs you are ingesting, it can
-          lead to ingestion errors.
-          {hasFailureStreamAccess && (
-            <>
-              It is recommended to enable{' '}
-              <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} displayIcon text="Failure Processing" /> and
-              watch the <FailureStreamLink /> stream closely afterwards.
-            </>
-          )}
+          lead to ingestion errors. It is recommended to enable{' '}
+          <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} displayIcon text="Failure Processing" /> and watch
+          the <FailureStreamLink /> stream closely afterwards.
         </Alert>
         <StyledLabel>{`Select Field Type For ${fieldName || 'Field'}`}</StyledLabel>
         <Input id="field_type">
