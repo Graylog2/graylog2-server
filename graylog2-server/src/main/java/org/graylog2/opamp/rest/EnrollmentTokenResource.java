@@ -32,6 +32,7 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.opamp.enrollment.EnrollmentTokenService;
 import org.graylog2.rest.RestTools;
@@ -56,6 +57,7 @@ public class EnrollmentTokenResource {
     }
 
     // TODO: Add @AuditEvent for security audit logging of token creation
+    @NoAuditEvent("TODO")
     @POST
     @Operation(summary = "Create an enrollment token for OpAMP agents")
     // TODO: Replace with proper OpAMP permissions (e.g., opamp:enrollment_tokens:create)
