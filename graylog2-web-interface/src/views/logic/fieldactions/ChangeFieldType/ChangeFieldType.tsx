@@ -23,6 +23,7 @@ import type User from 'logic/users/User';
 import isReservedField from 'views/logic/IsReservedField';
 import useInitialSelection from 'views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection';
 import { isPermitted } from 'util/PermissionsMixin';
+import { Spinner } from 'components/common';
 
 const ChangeFieldType = ({ field, onClose }: ActionComponentProps) => {
   const [show, setShow] = useState(true);
@@ -32,6 +33,8 @@ const ChangeFieldType = ({ field, onClose }: ActionComponentProps) => {
   }, [onClose]);
 
   const { list, isLoading } = useInitialSelection();
+
+  if (isLoading) return <Spinner />;
 
   return show ? (
     <ChangeFieldTypeModal
