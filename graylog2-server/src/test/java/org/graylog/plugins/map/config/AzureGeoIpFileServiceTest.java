@@ -41,6 +41,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -57,7 +58,7 @@ class AzureGeoIpFileServiceTest {
     private static final String CITY_BLOB = "GeoLite2-City.mmdb";
     private static final String ASN_BLOB = "GeoLite2-ASN.mmdb";
 
-    private  final EncryptedValueService encryptedValueService = new EncryptedValueService("p@55w0rdT3stS3cr!");
+    private final EncryptedValueService encryptedValueService = new EncryptedValueService("p@55w0rdT3stS3cr!");
 
     @Mock
     private GeoIpProcessorConfig processorConfig;
@@ -105,7 +106,7 @@ class AzureGeoIpFileServiceTest {
     }
 
     @Test
-    void testGetCityFileServerTimestamp() throws Exception {
+    void testGetCityFileServerTimestamp() {
         uploadBlob(CITY_BLOB, FAKE_CITY_DB_CONTENT);
         GeoIpResolverConfig config = createConfig(AzuriteContainer.ACCOUNT_NAME, AzuriteContainer.ACCOUNT_KEY, CONTAINER_NAME, CITY_BLOB, "");
 
@@ -113,11 +114,21 @@ class AzureGeoIpFileServiceTest {
     }
 
     @Test
-    void testGetAsnFileServerTimestamp() throws Exception {
+    void testGetAsnFileServerTimestamp() {
         uploadBlob(ASN_BLOB, FAKE_ASN_DB_CONTENT);
         GeoIpResolverConfig config = createConfig(AzuriteContainer.ACCOUNT_NAME, AzuriteContainer.ACCOUNT_KEY, CONTAINER_NAME, "", ASN_BLOB);
 
         assertThat(classUnderTest.getAsnFileServerTimestamp(config)).isPresent();
+    }
+
+    @Test
+    void testFailedFileDownload() {
+        GeoIpResolverConfig config = createConfig(AzuriteContainer.ACCOUNT_NAME, AzuriteContainer.ACCOUNT_KEY, CONTAINER_NAME, "invalid", "invalid");
+        assertThatThrownBy(() -> classUnderTest.downloadCityFile(config, null))
+                .hasMessageContaining("Failed to download blob");
+        assertThatThrownBy(() -> classUnderTest.downloadAsnFile(config, null))
+                .hasMessageContaining("Failed to download blob");
+
     }
 
     private static Stream<Arguments> invalidConfigProvider() {

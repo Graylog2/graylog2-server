@@ -54,20 +54,6 @@ const shouldPopulateTemplate = (currentType: string, currentBody: string): boole
 };
 
 class HttpNotificationFormV2 extends React.Component<Props, any> {
-  static defaultConfig = {
-    url: '',
-    api_key_as_header: false,
-    api_key: '',
-    api_secret: { keep_value: true },
-    basic_auth: { keep_value: true },
-    skip_tls_verification: false,
-    method: 'POST',
-    time_zone: 'UTC',
-    body_template: DEFAULT_JSON_TEMPLATE,
-    content_type: 'JSON',
-    headers: '',
-  };
-
   constructor(props: Props) {
     super(props);
 
@@ -93,6 +79,20 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
     this.setState({ basic_auth: config.basic_auth.is_set ? '******' : '' });
     this.setState({ api_secret: config.api_secret.is_set ? '******' : '' });
   }
+
+  static defaultConfig = {
+    url: '',
+    api_key_as_header: false,
+    api_key: '',
+    api_secret: { keep_value: true },
+    basic_auth: { keep_value: true },
+    skip_tls_verification: false,
+    method: 'POST',
+    time_zone: 'UTC',
+    body_template: DEFAULT_JSON_TEMPLATE,
+    content_type: 'JSON',
+    headers: '',
+  };
 
   propagateChange = (key: string, value: any) => {
     const { config, onChange } = this.props;
