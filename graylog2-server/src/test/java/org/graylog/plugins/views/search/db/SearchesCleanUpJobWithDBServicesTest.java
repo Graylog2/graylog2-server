@@ -36,14 +36,13 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -102,10 +101,8 @@ public class SearchesCleanUpJobWithDBServicesTest {
     public void testMixedExpiredAndNonExpiredSearches() {
         this.searchesCleanUpJob.doRun();
 
-        final ArgumentCaptor<String> idCaptor = ArgumentCaptor.forClass(String.class);
-        verify(searchDbService, times(1)).delete(idCaptor.capture());
-
-        assertThat(idCaptor.getAllValues()).containsExactly("5b3b44ca77196aa4679e4da0");
+        verify(searchDbService, times(1)).delete(anyString());
+        verify(searchDbService).delete("5b3b44ca77196aa4679e4da0");
     }
 
     @Test
@@ -113,9 +110,8 @@ public class SearchesCleanUpJobWithDBServicesTest {
     public void testMixedExpiredNonExpiredReferencedAndNonReferencedSearches() {
         this.searchesCleanUpJob.doRun();
 
-        final ArgumentCaptor<String> idCaptor = ArgumentCaptor.forClass(String.class);
-        verify(searchDbService, times(2)).delete(idCaptor.capture());
-
-        assertThat(idCaptor.getAllValues()).containsExactlyInAnyOrder("5b3b44ca77196aa4679e4da1", "5b3b44ca77196aa4679e4da2");
+        verify(searchDbService, times(2)).delete(anyString());
+        verify(searchDbService).delete("5b3b44ca77196aa4679e4da1");
+        verify(searchDbService).delete("5b3b44ca77196aa4679e4da2");
     }
 }
