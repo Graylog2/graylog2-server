@@ -91,6 +91,6 @@ public class ProxyRequestAdapterOS implements ProxyRequestAdapter {
                 .filter(StringUtils::isNotBlank)
                 .map(URI::create)
                 .orElseThrow(() -> new IllegalStateException("No datanode found matching name " + request.hostname()));
-        return clientProvider.createClient(Collections.singletonList(opensearchAddress));
+        return clientProvider.buildClient(Collections.singletonList(opensearchAddress));
     }
 }

@@ -67,7 +67,7 @@ import java.util.List;
  */
 public class OfficialOpensearchClientProvider implements Provider<OfficialOpensearchClient> {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(OfficialOpensearchClientProvider.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OfficialOpensearchClientProvider.class);
 
     private final Supplier<OfficialOpensearchClient> clientCache;
     private final IndexerJwtAuthToken indexerJwtAuthToken;
@@ -83,7 +83,7 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
         this.indexerJwtAuthToken = indexerJwtAuthToken;
         this.credentialsProvider = credentialsProvider;
         this.clientConfiguration = clientConfiguration;
-        clientCache = Suppliers.memoize(() -> createClient(hosts));
+        clientCache = Suppliers.memoize(() -> buildClient(hosts));
     }
 
     @Override
@@ -91,11 +91,13 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
         return clientCache.get();
     }
 
+    /**
+     * Don't use this method directly if you don't need a client targetting specific opensearch host(s). Use the cached
+     * instance provided by this supplier {@link #get()} method or let the OfficialOpensearchClient inject directly.
+     * If you obtain an instance here, don't forget to close it after the task is finished.
+     */
     @Nonnull
-    public OfficialOpensearchClient createClient(List<URI> uris) {
-
-        LOGGER.info("Initializing OpenSearch client");
-
+    OfficialOpensearchClient buildClient(List<URI> uris) {
         final HttpHost[] hosts = uris.stream().map(uri -> new HttpHost(uri.getScheme(), uri.getHost(), uri.getPort())).toArray(HttpHost[]::new);
 
         final SSLContext sslcontext;
