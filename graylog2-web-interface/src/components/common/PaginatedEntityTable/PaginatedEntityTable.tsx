@@ -101,7 +101,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   externalSearch = undefined,
   fetchEntities,
   fetchOptions,
-  fetchSlices,
+  fetchSlices = undefined,
   filterValueRenderers = undefined,
   focusSearchAfterMount = false,
   humanName,
@@ -329,7 +329,7 @@ export type PaginatedEntityTableProps<T, M> = {
   externalSearch?: ExternalSearch;
   fetchEntities: (options: SearchParams) => Promise<PaginatedResponse<T, M>>;
   fetchOptions?: FetchOptions;
-  fetchSlices: FetchSlices;
+  fetchSlices?: FetchSlices;
   filterValueRenderers?: React.ComponentProps<typeof EntityFilters>['filterValueRenderers'];
   focusSearchAfterMount?: boolean;
   humanName: string;

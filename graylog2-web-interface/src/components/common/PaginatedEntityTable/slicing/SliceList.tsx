@@ -56,11 +56,10 @@ const SliceList = ({
   keyPrefix = '',
   listTestId = undefined,
 }: Props) => (
-  <StyledListGroup componentClass="ul" data-testid={listTestId}>
+  <StyledListGroup data-testid={listTestId}>
     {slices.map((slice) => (
       <StyledListGroupItem
         key={`${keyPrefix}${String(slice.value)}`}
-        listItem
         onClick={() => onChangeSlicing(sliceCol, String(slice.value))}
         $active={activeSlice === slice.value}>
         <SliceInner>
