@@ -26,7 +26,7 @@ const useEventBulkAction = (events: Array<Event>) => {
 
   const actions = useMemo(() => [pluggableActions].filter(Boolean), [pluggableActions]);
 
-  if (isEmpty(flatten(null))) return { actions: null, pluggableActionModals: null };
+  if (isEmpty(flatten(actions))) return { actions: null, pluggableActionModals: null };
 
   return { actions, pluggableActionModals };
 };

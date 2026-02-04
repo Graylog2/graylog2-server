@@ -64,19 +64,15 @@ type Props = {
   onClose: () => void;
 };
 
-const RemainingBulkActions = ({ completed, actions }: RemainingBulkActionsProps) => {
-  if (!actions.length) return null;
-
-  return (
-    <DropdownButton
-      title="Bulk actions"
-      bsStyle={completed ? 'success' : 'default'}
-      id="bulk-actions-dropdown"
-      bsSize="xs">
-      {actions}
-    </DropdownButton>
-  );
-};
+const RemainingBulkActions = ({ completed, actions }: RemainingBulkActionsProps) => (
+  <DropdownButton
+    title="Bulk actions"
+    bsStyle={completed ? 'success' : 'default'}
+    id="bulk-actions-dropdown"
+    bsSize="xs">
+    {actions}
+  </DropdownButton>
+);
 
 const CurrentContainer = styled.div(
   ({ theme }) => css`

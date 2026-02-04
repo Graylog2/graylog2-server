@@ -25,7 +25,6 @@ import MenuItem from 'components/bootstrap/menuitem/MenuItem';
 import SidebarBulkEventReplay from 'components/events/bulk-replay/SidebarBulkEventReplay';
 import EventReplaySelectedProvider from 'contexts/EventReplaySelectedProvider';
 import asMock from 'helpers/mocking/AsMock';
-import useEventsById from 'components/events/bulk-replay/hooks/useEventsById';
 import useSessionInitialEventIds from 'components/events/bulk-replay/hooks/useSessionInitialEventIds';
 import StringUtils from 'util/StringUtils';
 
@@ -89,7 +88,7 @@ const markEventAsReviewedFromHeader = async (eventId: string) => {
 };
 
 const SUT = () => (
-  <EventReplaySelectedProvider initialEventIds={initialEventIds}>
+  <EventReplaySelectedProvider initialEventIds={initialEventIds} eventsData={events}>
     <SidebarBulkEventReplay onClose={onClose} />
   </EventReplaySelectedProvider>
 );
@@ -113,7 +112,6 @@ describe('SidebarBulkEventReplay', () => {
   usePlugin(testPlugin);
 
   beforeEach(() => {
-    asMock(useEventsById).mockReturnValue({ data: events });
     asMock(useSessionInitialEventIds).mockReturnValue(initialEventIds);
   });
 
