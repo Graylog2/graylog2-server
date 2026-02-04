@@ -37,8 +37,6 @@ import org.graylog.storage.opensearch3.client.CustomOpenSearchClient;
 import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
-import org.opensearch.client.opensearch.OpenSearchAsyncClient;
-import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBuilder;
 import org.slf4j.Logger;
@@ -69,9 +67,12 @@ import java.util.List;
  */
 public class OfficialOpensearchClientProvider implements Provider<OfficialOpensearchClient> {
 
-    private static Logger log = LoggerFactory.getLogger(OfficialOpensearchClientProvider.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(OfficialOpensearchClientProvider.class);
 
     private final Supplier<OfficialOpensearchClient> clientCache;
+    private final IndexerJwtAuthToken indexerJwtAuthToken;
+    private final CredentialsProvider credentialsProvider;
+    private final ElasticsearchClientConfiguration clientConfiguration;
 
     @Inject
     public OfficialOpensearchClientProvider(
@@ -79,7 +80,10 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
             IndexerJwtAuthToken indexerJwtAuthToken,
             CredentialsProvider credentialsProvider,
             ElasticsearchClientConfiguration clientConfiguration) {
-        clientCache = Suppliers.memoize(() -> createClient(hosts, indexerJwtAuthToken, credentialsProvider, clientConfiguration));
+        this.indexerJwtAuthToken = indexerJwtAuthToken;
+        this.credentialsProvider = credentialsProvider;
+        this.clientConfiguration = clientConfiguration;
+        clientCache = Suppliers.memoize(() -> createClient(hosts));
     }
 
     @Override
@@ -88,9 +92,9 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
     }
 
     @Nonnull
-    private static OfficialOpensearchClient createClient(List<URI> uris, IndexerJwtAuthToken indexerJwtAuthToken, CredentialsProvider credentialsProvider, ElasticsearchClientConfiguration clientConfiguration) {
+    public OfficialOpensearchClient createClient(List<URI> uris) {
 
-        log.info("Initializing OpenSearch client");
+        LOGGER.info("Initializing OpenSearch client");
 
         final HttpHost[] hosts = uris.stream().map(uri -> new HttpHost(uri.getScheme(), uri.getHost(), uri.getPort())).toArray(HttpHost[]::new);
 
