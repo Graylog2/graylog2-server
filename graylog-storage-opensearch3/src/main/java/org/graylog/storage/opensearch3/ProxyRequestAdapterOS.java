@@ -49,21 +49,14 @@ public class ProxyRequestAdapterOS implements ProxyRequestAdapter {
 
     @Override
     public ProxyResponse request(ProxyRequest request) throws IOException {
-
-        // this will throw exception if there is the same query parameter twice, as opensearch client doesn't support this
-        final Map<String, String> queryParams = request.queryParameters()
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getFirst()));
-
         final Request req = Requests.builder()
                 .method(request.method())
                 .endpoint(request.path())
-                .query(queryParams)
+                .query(queryParams(request))
                 .body(Body.from(request.body(), APPLICATION_JSON))
                 .build();
-
         try (
+                // we want to close the client after this call. It's created only for this single call.
                 OfficialOpensearchClient client = buildClient(request)
         ) {
             return client.sync(c -> {
@@ -74,6 +67,15 @@ public class ProxyRequestAdapterOS implements ProxyRequestAdapter {
                 }
             }, "failed to trigger opensearch request");
         }
+    }
+
+    @Nonnull
+    private static Map<String, String> queryParams(ProxyRequest request) {
+        return request.queryParameters()
+                .entrySet()
+                .stream()
+                .map(entry -> Map.entry(entry.getKey(), String.join(",", entry.getValue())))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @Nonnull
