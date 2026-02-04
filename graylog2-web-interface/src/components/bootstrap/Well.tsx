@@ -37,8 +37,7 @@ const StyledAlert = styled(Alert)<{ $padding: Padding }>(
 type Props = Pick<React.ComponentProps<typeof StyledAlert>, 'children' | 'className' | 'style'> & {
   bsSize?: Padding;
 };
-// eslint-disable-next-line react/require-default-props
-const Well = (props: Props) => <StyledAlert noIcon $padding={props.bsSize} {...props} />;
+const Well = ({ ...props }: Props) => <StyledAlert noIcon $padding={props.bsSize} {...props} />;
 
 /** @component */
 export default Well;

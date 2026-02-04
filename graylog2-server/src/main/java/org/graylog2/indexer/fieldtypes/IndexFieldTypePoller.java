@@ -20,6 +20,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import jakarta.inject.Inject;
 import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indices.IndexStatus;
 import org.graylog2.indexer.indices.Indices;
 
 import java.util.Collection;
@@ -65,7 +66,7 @@ public class IndexFieldTypePoller {
                 .map(IndexFieldTypesDTO::indexName)
                 .collect(Collectors.toSet());
 
-        return indices.getIndices(indexSet, "open").stream()
+        return indices.getIndices(indexSet, IndexStatus.OPEN).stream()
                 // We always poll the active write index because the mapping can change for every ingested message.
                 // Other indices will only be polled if we don't have the mapping data already.
                 .filter(indexName -> indexName.equals(activeWriteIndex) || !existingIndexNames.contains(indexName)

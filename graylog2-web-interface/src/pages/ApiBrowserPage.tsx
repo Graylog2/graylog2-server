@@ -290,6 +290,7 @@ const ApiBrowserPage = () => (
         deepLinking
         requestInterceptor={(req) => {
           req.headers['X-Requested-By'] = 'API Browser';
+
           return req;
         }}
         plugins={[

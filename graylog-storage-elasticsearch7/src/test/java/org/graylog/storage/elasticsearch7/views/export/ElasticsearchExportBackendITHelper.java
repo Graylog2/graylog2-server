@@ -16,13 +16,9 @@
  */
 package org.graylog.storage.elasticsearch7.views.export;
 
-import org.graylog.plugins.views.search.export.ExportMessagesCommand;
-import org.graylog.plugins.views.search.export.SimpleMessageChunk;
 import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.views.export.ExportBackendITHelper;
-
-import java.util.LinkedHashSet;
 
 public class ElasticsearchExportBackendITHelper extends ExportBackendITHelper {
 
@@ -33,13 +29,6 @@ public class ElasticsearchExportBackendITHelper extends ExportBackendITHelper {
     private static RequestStrategy requestStrategy(ElasticsearchClient client) {
         final ExportClient exportClient = new ExportClient(client);
         return new SearchAfter(exportClient);
-    }
-
-    @Override
-    public LinkedHashSet<SimpleMessageChunk> collectChunksFor(final ExportMessagesCommand command) {
-        LinkedHashSet<SimpleMessageChunk> allChunks = new LinkedHashSet<>();
-        exportBackend.run(command, allChunks::add);
-        return allChunks;
     }
 
 }

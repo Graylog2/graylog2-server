@@ -41,8 +41,8 @@ import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory
 public class RouteToStream extends AbstractFunction<Void> {
     private static final RateLimitedLog RATE_LIMITED_LOG = createQuietDefaultRateLimitedLog(RouteToStream.class);
     public static final String NAME = "route_to_stream";
-    private static final String ID_ARG = "id";
-    private static final String NAME_ARG = "name";
+    public static final String ID_ARG = "id";
+    public static final String NAME_ARG = "name";
     private static final String REMOVE_FROM_DEFAULT = "remove_from_default";
     private final StreamCacheService streamCacheService;
     private final Provider<Stream> defaultStreamProvider;

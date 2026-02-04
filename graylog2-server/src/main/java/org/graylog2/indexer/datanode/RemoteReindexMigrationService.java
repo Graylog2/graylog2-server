@@ -20,6 +20,7 @@ import org.graylog2.indexer.migration.LogEntry;
 
 import java.util.Optional;
 
+@Deprecated(forRemoval = true)
 public interface RemoteReindexMigrationService {
 
     Optional<MigrationConfiguration> getMigration(String migrationId);

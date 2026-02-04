@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Better error handling regarding consistency between MongoDB and OpenSearch if errors during index rotation after changing custom type mappings happen."
+
+pulls = ["24474"]

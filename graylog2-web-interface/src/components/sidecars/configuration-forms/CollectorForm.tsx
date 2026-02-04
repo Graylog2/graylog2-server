@@ -84,8 +84,6 @@ class CollectorForm extends React.Component<
     sendTelemetry: () => {},
   };
 
-  private _debouncedValidateFormData: (formData: React.FormEvent) => void;
-
   constructor(props) {
     super(props);
     const { collector } = this.props;
@@ -114,6 +112,8 @@ class CollectorForm extends React.Component<
     CollectorsActions.all();
     CollectorConfigurationsActions.all();
   }
+
+  private _debouncedValidateFormData: (formData: React.FormEvent) => void;
 
   hasErrors = () => {
     const { error } = this.state;

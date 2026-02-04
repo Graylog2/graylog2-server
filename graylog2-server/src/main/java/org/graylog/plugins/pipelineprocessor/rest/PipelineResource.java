@@ -391,6 +391,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     private Set<String> deprecatedFunctionsRule(String ruleId) throws NotFoundException {
         Set<String> superset = metadataService.getPipelinesByRule(ruleId).stream()
                 .flatMap(pipelineId -> metadataService.deprecatedFunctionsPipeline(pipelineId).stream())
+                .filter(func -> func != null && !func.isEmpty())
                 .collect(Collectors.toSet());
         final RuleDao rule = ruleService.load(ruleId);
         return superset.stream().filter(func -> rule.source().contains(func)).collect(Collectors.toSet());

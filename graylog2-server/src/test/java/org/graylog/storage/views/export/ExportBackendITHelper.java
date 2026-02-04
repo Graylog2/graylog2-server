@@ -48,7 +48,11 @@ public abstract class ExportBackendITHelper {
         return exportBackend;
     }
 
-    public abstract LinkedHashSet<SimpleMessageChunk> collectChunksFor(final ExportMessagesCommand command);
+    public LinkedHashSet<SimpleMessageChunk> collectChunksFor(final ExportMessagesCommand command) {
+        LinkedHashSet<SimpleMessageChunk> allChunks = new LinkedHashSet<>();
+        exportBackend.run(command, allChunks::add);
+        return allChunks;
+    }
 
     public ExportMessagesCommand.Builder commandBuilderWithAllTestDefaultStreams() {
         return ExportMessagesCommand.withDefaults()
