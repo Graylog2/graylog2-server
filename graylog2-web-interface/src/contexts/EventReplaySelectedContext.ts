@@ -18,6 +18,7 @@ import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+import type { Event } from 'components/events/events/types';
 
 export type Warnings = {
   queryString?: QueryValidationState;
@@ -32,10 +33,13 @@ export type SelectedState = {
   eventIds: Array<ResolutionState>;
 };
 
+export type SelectedEventsData = { [eventId: string]: { event: Event } };
+
 type EventReplaySelectedContextType = SelectedState & {
   removeItem: SelectCallback;
   markItemAsDone: SelectCallback;
   selectItem: SelectCallback;
+  eventsData: SelectedEventsData;
 };
 
 const EventReplaySelectedContext = React.createContext<EventReplaySelectedContextType | undefined>(undefined);

@@ -15,11 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
 import styled from 'styled-components';
 
 import useSelectedEvents from 'components/events/bulk-replay/useSelectedEvents';
-import type { Event } from 'components/events/events/types';
 import Center from 'components/common/Center';
 import EventReplaySelectedProvider from 'contexts/EventReplaySelectedProvider';
 import { Alert, Button } from 'components/bootstrap';
@@ -29,6 +27,7 @@ import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySea
 import SidebarBulkEventReplay from 'components/events/bulk-replay/SidebarBulkEventReplay';
 import EventReplaySearch from 'components/events/EventReplaySearch';
 import useEventDefinition from 'hooks/useEventDefinition';
+import type { SelectedEventsData } from 'contexts/EventReplaySelectedContext';
 
 const Container = styled.div`
   display: flex;
@@ -43,7 +42,7 @@ const ReplayedSearchContainer = styled.div`
 
 type Props = {
   initialEventIds: Array<string>;
-  events: { [eventId: string]: { event: Event } };
+  events: SelectedEventsData;
   onReturnClick: () => void;
 };
 
@@ -71,15 +70,12 @@ const searchPageLayout = {
 };
 
 const ReplayedSearch = ({
-  events: _events,
   onReturnClick,
 }: React.PropsWithChildren<{
-  events: Props['events'];
   onReturnClick: () => void;
 }>) => {
-  const [events] = useState<Props['events']>(_events);
-  const { eventIds, selectedId } = useSelectedEvents();
-  const selectedEvent = events?.[selectedId];
+  const { eventIds, selectedId, eventsData } = useSelectedEvents();
+  const selectedEvent = eventsData?.[selectedId];
   const { data: eventDefinitionMappedData } = useEventDefinition(selectedEvent?.event?.event_definition_id);
   const total = eventIds.length;
 
@@ -106,10 +102,10 @@ const ReplayedSearch = ({
 };
 
 const BulkEventReplay = ({ initialEventIds, onReturnClick, events }: Props) => (
-  <EventReplaySelectedProvider initialEventIds={initialEventIds}>
+  <EventReplaySelectedProvider initialEventIds={initialEventIds} eventsData={events}>
     <Container>
       <ReplayedSearchContainer>
-        <ReplayedSearch events={events} onReturnClick={onReturnClick} />
+        <ReplayedSearch onReturnClick={onReturnClick} />
       </ReplayedSearchContainer>
     </Container>
   </EventReplaySelectedProvider>

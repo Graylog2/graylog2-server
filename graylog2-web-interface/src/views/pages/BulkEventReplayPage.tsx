@@ -14,12 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @ts-nocheck
 import * as React from 'react';
 import { useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
-
-import { Events } from '@graylog/server-api';
 
 import Store from 'logic/local-storage/Store';
 import Spinner from 'components/common/Spinner';
@@ -30,18 +26,7 @@ import { singleton } from 'logic/singleton';
 import { REPLAY_SESSION_ID_PARAM } from 'components/events/Constants';
 import useRoutingQuery from 'routing/useQuery';
 import useSessionInitialEventIds from 'components/events/bulk-replay/hooks/useSessionInitialEventIds';
-
-export type BulkEventReplayState = {
-  eventIds: Array<string>;
-  returnUrl: string;
-};
-
-const useEventsById = (eventIds: Array<string>) =>
-  useQuery({
-    queryKey: ['events', eventIds],
-    queryFn: () => Events.getByIds({ event_ids: eventIds }),
-    enabled: !!eventIds,
-  });
+import useEventsById from 'components/events/bulk-replay/hooks/useEventsById';
 
 const BulkEventReplayPage = () => {
   const params = useRoutingQuery();

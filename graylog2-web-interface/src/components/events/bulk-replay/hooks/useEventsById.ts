@@ -19,11 +19,12 @@ import { useQuery } from '@tanstack/react-query';
 import { Events } from '@graylog/server-api';
 
 const useEventsById = (eventIds: Array<string>) => {
-  const { data } = useQuery({
+  const { data, isFetched } = useQuery({
     queryKey: ['events', eventIds],
     queryFn: () => Events.getByIds({ event_ids: eventIds }),
+    enabled: !!eventIds,
   });
 
-  return { data };
+  return { data, isFetched };
 };
 export default useEventsById;

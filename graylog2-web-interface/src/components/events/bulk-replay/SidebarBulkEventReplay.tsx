@@ -16,7 +16,7 @@
  */
 
 import * as React from 'react';
-import { useState, useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
 import EventListItem from 'components/events/bulk-replay/EventListItem';
@@ -27,7 +27,6 @@ import { Icon, IconButton } from 'components/common';
 import useEventBulkActions from 'components/events/events/hooks/useEventBulkActions';
 import Popover from 'components/common/Popover';
 import { Button, Alert } from 'components/bootstrap';
-import useEventsById from 'components/events/bulk-replay/hooks/useEventsById';
 import DropdownButton from 'components/bootstrap/DropdownButton';
 import useSessionInitialEventIds from 'components/events/bulk-replay/hooks/useSessionInitialEventIds';
 
@@ -99,10 +98,8 @@ const CollapseButton = styled(IconButton)(
 );
 const SidebarBulkEventReplay = ({ onClose }: Props) => {
   const initialEventIds: Array<string> = useSessionInitialEventIds();
-  const { data: _events } = useEventsById(initialEventIds);
 
-  const [events] = useState(_events);
-  const { eventIds, selectedId, removeItem, selectItem, markItemAsDone } = useSelectedEvents();
+  const { eventIds, eventsData: events, selectedId, removeItem, selectItem, markItemAsDone } = useSelectedEvents();
   const total = eventIds.length;
   const completed = eventIds.filter((event) => event.status === 'DONE').length;
   const remainingEvents = eventIds.map((eventId) => events[eventId.id]?.event);

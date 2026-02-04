@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useReducer } from 'react';
+import React, { useCallback, useReducer, useMemo } from 'react';
 
 import EventReplaySelectedContext from 'contexts/EventReplaySelectedContext';
 import assertUnreachable from 'logic/assertUnreachable';
-import type { ResolutionState, SelectedState } from 'contexts/EventReplaySelectedContext';
+import type { ResolutionState, SelectedState, SelectedEventsData } from 'contexts/EventReplaySelectedContext';
 
 type Action = {
   type: 'remove' | 'done' | 'select';
@@ -93,10 +93,18 @@ const useSelectedEvents = (eventIds: Array<string>) => {
 const EventReplaySelectedProvider = ({
   initialEventIds,
   children = null,
-}: React.PropsWithChildren<{ initialEventIds: Array<string> }>) => {
-  const contextState = useSelectedEvents(initialEventIds);
+  eventsData,
+}: React.PropsWithChildren<{ initialEventIds: Array<string>; eventsData: SelectedEventsData }>) => {
+  const selectedEvents = useSelectedEvents(initialEventIds);
+  const contextValue = useMemo(
+    () => ({
+      ...selectedEvents,
+      eventsData,
+    }),
+    [selectedEvents, eventsData],
+  );
 
-  return <EventReplaySelectedContext.Provider value={contextState}>{children}</EventReplaySelectedContext.Provider>;
+  return <EventReplaySelectedContext.Provider value={contextValue}>{children}</EventReplaySelectedContext.Provider>;
 };
 
 export default EventReplaySelectedProvider;
