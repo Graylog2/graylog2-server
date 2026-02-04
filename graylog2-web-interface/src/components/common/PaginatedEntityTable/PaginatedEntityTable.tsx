@@ -60,12 +60,6 @@ const TableWrapper = styled.div`
   width: 100%;
 `;
 
-const StyledNoSearchResult = styled(NoSearchResult)<{ $noSearchBar: boolean }>(
-  ({ $noSearchBar }) => css`
-    ${$noSearchBar && 'margin-top: 0'}
-  `,
-);
-
 type EntityDataTableProps = React.ComponentProps<typeof EntityDataTable>;
 type ExternalSearch = {
   query: string;
@@ -108,7 +102,6 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   fetchOptions,
   filterValueRenderers = undefined,
   focusSearchAfterMount = false,
-  hideSearchWhenEmpty = true,
   humanName,
   isLoadingLayoutPreferences,
   keyFn,
@@ -191,8 +184,6 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
     attributes,
   } = paginatedEntities;
 
-  const shouldShowSearch = !externalSearch && (!hideSearchWhenEmpty || list?.length > 0);
-
   return (
     <TableFetchContextProvider
       refetch={refetch}
@@ -209,7 +200,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
           />
         )}
         <TableWrapper>
-          {shouldShowSearch && (
+          {!externalSearch && (
             <SearchRow>
               <SearchForm
                 focusAfterMount={focusSearchAfterMount}
@@ -240,9 +231,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
             useQueryParameter={!withoutURLParams}
             onChange={onPaginationChange}>
             {list?.length === 0 ? (
-              <StyledNoSearchResult $noSearchBar={!shouldShowSearch}>
-                No {humanName} have been found.
-              </StyledNoSearchResult>
+              <NoSearchResult>No {humanName} have been found.</NoSearchResult>
             ) : (
               <EntityDataTable<T, M>
                 entities={list}
@@ -338,7 +327,6 @@ export type PaginatedEntityTableProps<T, M> = {
   fetchOptions?: FetchOptions;
   filterValueRenderers?: React.ComponentProps<typeof EntityFilters>['filterValueRenderers'];
   focusSearchAfterMount?: boolean;
-  hideSearchWhenEmpty?: boolean;
   humanName: string;
   keyFn: (options: SearchParams) => Array<unknown>;
   middleSection?: React.ComponentType<MiddleSectionProps>;
