@@ -37,8 +37,10 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   hasRowActions,
   meta,
   onActionsWidthChange,
+  onChangeSlicing,
   onHeaderSectionResize,
   parentBgColor,
+  appSection,
 }: {
   actionsColMinWidth: number;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
@@ -50,8 +52,10 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   hasRowActions: boolean;
   meta: Meta;
   onActionsWidthChange: (colId: string, width: number) => void;
+  onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
   onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
   parentBgColor: string | undefined;
+  appSection?: string;
 }) => {
   const columnHelper = createColumnHelper<Entity>();
   const bulkSelectCol = useBulkSelectColumnDefinition(displayBulkSelectCol, columnWidths[BULK_SELECT_COL_ID]);
@@ -64,13 +68,15 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
     parentBgColor,
   });
   const attributeCols = useAttributeColumnDefinitions<Entity, Meta>({
-    columnSchemas,
+    columnHelper,
     columnRenderersByAttribute,
+    columnSchemas,
     columnWidths,
     entityAttributesAreCamelCase,
     meta,
-    columnHelper,
+    onChangeSlicing,
     onHeaderSectionResize,
+    appSection,
   });
 
   return useMemo(
