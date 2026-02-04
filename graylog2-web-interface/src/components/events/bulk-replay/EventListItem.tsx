@@ -43,7 +43,6 @@ const StyledItem = styled.div<StyledItemProps>(
     height: 30px;
     background-color: ${$selected ? theme.colors.background.secondaryNav : 'transparent'};
     cursor: pointer;
-    max-width: 270px;
     position: relative;
     gap: ${theme.spacings.xs};
 

@@ -33,7 +33,10 @@ import useSessionInitialEventIds from 'components/events/bulk-replay/hooks/useSe
 const Container = styled.div`
   display: flex;
 `;
-
+const Row = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
 const EventsListSidebar = styled.div(
   ({ theme }) => css`
     display: flex;
@@ -61,15 +64,19 @@ type Props = {
   onClose: () => void;
 };
 
-const RemainingBulkActions = ({ completed, actions }: RemainingBulkActionsProps) => (
-  <DropdownButton
-    title="Bulk actions"
-    bsStyle={completed ? 'success' : 'default'}
-    id="bulk-actions-dropdown"
-    bsSize="xs">
-    {actions}
-  </DropdownButton>
-);
+const RemainingBulkActions = ({ completed, actions }: RemainingBulkActionsProps) => {
+  if (!actions.length) return null;
+
+  return (
+    <DropdownButton
+      title="Bulk actions"
+      bsStyle={completed ? 'success' : 'default'}
+      id="bulk-actions-dropdown"
+      bsSize="xs">
+      {actions}
+    </DropdownButton>
+  );
+};
 
 const CurrentContainer = styled.div(
   ({ theme }) => css`
@@ -87,6 +94,7 @@ const ArrowButton = styled(Button)`
 
 const TargetContainer = styled.div`
   flex-grow: 1;
+  max-width: 270px;
 `;
 
 const CollapseButton = styled(IconButton)(
@@ -136,10 +144,19 @@ const SidebarBulkEventReplay = ({ onClose }: Props) => {
             />
           </TargetContainer>
         </Popover.Target>
-        <Popover.Dropdown title="Info">
+        <Popover.Dropdown
+          title={
+            <Row>
+              <span>Selected events</span>
+              {actions && (
+                <ActionsBar>
+                  <RemainingBulkActions actions={actions} completed={total > 0 && total === completed} />
+                </ActionsBar>
+              )}
+            </Row>
+          }>
           <Container>
             <EventsListSidebar>
-              <b>Selected events</b>
               <p>
                 The following list contains all of the events/alerts you selected in the previous step, allowing you to
                 review the replayed search for each of them.
@@ -166,9 +183,6 @@ const SidebarBulkEventReplay = ({ onClose }: Props) => {
                   </li>
                 ))}
               </StyledList>
-              <ActionsBar>
-                <RemainingBulkActions actions={actions} completed={total > 0 && total === completed} />
-              </ActionsBar>
             </EventsListSidebar>
           </Container>
         </Popover.Dropdown>
