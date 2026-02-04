@@ -87,7 +87,7 @@ public class OpAmpHttpHandler extends HttpHandler {
 
         final var overrideHeaderValues = Lists.newArrayList(request.getHeaders(HttpConfiguration.OVERRIDE_HEADER));
         final URI effectiveExternalUri = RestTools.buildExternalUri(overrideHeaderValues, httpExternalUri);
-        final var authContext = opAmpService.authenticate(request.getHeader("Authorization"), effectiveExternalUri);
+        final var authContext = opAmpService.authenticate(request.getHeader("Authorization"), effectiveExternalUri, OpAmpAuthContext.Transport.HTTP);
         if (authContext.isEmpty()) {
             LOG.debug("OpAMP auth failed");
             response.setStatus(HttpStatus.UNAUTHORIZED_401);

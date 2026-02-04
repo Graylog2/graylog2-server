@@ -93,7 +93,7 @@ class OpAmpHttpHandlerIT {
 
     @Test
     void rejectsGetRequest() throws Exception {
-        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet")));
+        when(opAmpService.authenticate(eq("Bearer valid"), any(), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet", OpAmpAuthContext.Transport.HTTP)));
 
         final Request request = new Request.Builder()
                 .url(opampUrl())
@@ -108,7 +108,7 @@ class OpAmpHttpHandlerIT {
 
     @Test
     void rejectsMissingAuth() throws Exception {
-        when(opAmpService.authenticate(any(), any())).thenReturn(Optional.empty());
+        when(opAmpService.authenticate(any(), any(), any())).thenReturn(Optional.empty());
 
         final Request request = new Request.Builder()
                 .url(opampUrl())
@@ -122,7 +122,7 @@ class OpAmpHttpHandlerIT {
 
     @Test
     void rejectsInvalidAuth() throws Exception {
-        when(opAmpService.authenticate(eq("Bearer invalid"), any())).thenReturn(Optional.empty());
+        when(opAmpService.authenticate(eq("Bearer invalid"), any(), any())).thenReturn(Optional.empty());
 
         final Request request = new Request.Builder()
                 .url(opampUrl())
@@ -137,7 +137,7 @@ class OpAmpHttpHandlerIT {
 
     @Test
     void rejectsEmptyBody() throws Exception {
-        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet")));
+        when(opAmpService.authenticate(eq("Bearer valid"), any(), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet", OpAmpAuthContext.Transport.HTTP)));
 
         final Request request = new Request.Builder()
                 .url(opampUrl())
@@ -153,7 +153,7 @@ class OpAmpHttpHandlerIT {
 
     @Test
     void rejectsInvalidProtobuf() throws Exception {
-        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet")));
+        when(opAmpService.authenticate(eq("Bearer valid"), any(), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet", OpAmpAuthContext.Transport.HTTP)));
 
         final Request request = new Request.Builder()
                 .url(opampUrl())
@@ -169,7 +169,7 @@ class OpAmpHttpHandlerIT {
 
     @Test
     void processesValidMessage() throws Exception {
-        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet")));
+        when(opAmpService.authenticate(eq("Bearer valid"), any(), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet", OpAmpAuthContext.Transport.HTTP)));
 
         final AgentToServer agentMsg = AgentToServer.newBuilder()
                 .setInstanceUid(ByteString.copyFromUtf8("test-instance-uid"))
@@ -202,7 +202,7 @@ class OpAmpHttpHandlerIT {
      */
     @Test
     void processesRequestWithChunkedTransferEncoding() throws Exception {
-        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet")));
+        when(opAmpService.authenticate(eq("Bearer valid"), any(), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet", OpAmpAuthContext.Transport.HTTP)));
 
         // Streaming body forces chunked transfer encoding (no Content-Length header)
         final RequestBody chunkedBody = new RequestBody() {
@@ -230,7 +230,7 @@ class OpAmpHttpHandlerIT {
 
     @Test
     void returnsServerErrorResponseOnServiceException() throws Exception {
-        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet")));
+        when(opAmpService.authenticate(eq("Bearer valid"), any(), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet", OpAmpAuthContext.Transport.HTTP)));
 
         final AgentToServer agentMsg = AgentToServer.newBuilder()
                 .setInstanceUid(ByteString.copyFromUtf8("test-instance-uid"))
@@ -260,7 +260,7 @@ class OpAmpHttpHandlerIT {
 
     @Test
     void rejectsOversizedBody() throws Exception {
-        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet")));
+        when(opAmpService.authenticate(eq("Bearer valid"), any(), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet", OpAmpAuthContext.Transport.HTTP)));
 
         // Create a body larger than TEST_MAX_MESSAGE_SIZE (1 KB)
         final byte[] oversizedBody = new byte[TEST_MAX_MESSAGE_SIZE + 100];

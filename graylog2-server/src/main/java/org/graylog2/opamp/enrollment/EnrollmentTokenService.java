@@ -154,7 +154,7 @@ public class EnrollmentTokenService {
      * @param expectedIssuer the expected issuer URI (from request context)
      * @return the enrollment context if valid, empty otherwise
      */
-    public Optional<OpAmpAuthContext.Enrollment> validateToken(String token, URI expectedIssuer) {
+    public Optional<OpAmpAuthContext.Enrollment> validateToken(String token, URI expectedIssuer, OpAmpAuthContext.Transport transport) {
         try {
             final String expectedAudience = expectedIssuer.resolve(TOKEN_AUDIENCE_PATH).toString();
 
@@ -185,7 +185,7 @@ public class EnrollmentTokenService {
                 return Optional.empty();
             }
 
-            return Optional.of(new OpAmpAuthContext.Enrollment(fleetId));
+            return Optional.of(new OpAmpAuthContext.Enrollment(fleetId, transport));
         } catch (Exception e) {
             LOG.warn("Enrollment token validation failed: {}", e.getMessage());
             return Optional.empty();

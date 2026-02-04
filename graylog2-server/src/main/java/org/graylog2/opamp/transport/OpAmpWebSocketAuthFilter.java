@@ -76,7 +76,7 @@ public class OpAmpWebSocketAuthFilter extends BaseFilter {
         executor.submit(() -> {
             try {
                 final URI effectiveExternalUri = RestTools.buildExternalUri(overrideHeaderValues, httpExternalUri);
-                final var authContext = opAmpService.authenticate(authHeader, effectiveExternalUri);
+                final var authContext = opAmpService.authenticate(authHeader, effectiveExternalUri, OpAmpAuthContext.Transport.WEBSOCKET);
                 if (authContext.isEmpty()) {
                     LOG.debug("OpAMP auth failed");
                     send401(ctx, request);

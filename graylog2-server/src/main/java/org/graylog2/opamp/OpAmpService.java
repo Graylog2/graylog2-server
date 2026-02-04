@@ -41,20 +41,20 @@ public class OpAmpService {
         this.enrollmentTokenService = enrollmentTokenService;
     }
 
-    public Optional<OpAmpAuthContext> authenticate(String authHeader, URI effectiveExternalUri) {
+    public Optional<OpAmpAuthContext> authenticate(String authHeader, URI effectiveExternalUri, OpAmpAuthContext.Transport transport) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return Optional.empty();
         }
         final String token = authHeader.substring(7);
-        return enrollmentTokenService.validateToken(token, effectiveExternalUri)
+        return enrollmentTokenService.validateToken(token, effectiveExternalUri, transport)
                 .map(e -> e);  // Upcast Enrollment to OpAmpAuthContext
     }
 
     public ServerToAgent handleMessage(AgentToServer message, OpAmpAuthContext authContext) {
         final UUID instanceUid = bytesToUuid(message.getInstanceUid().toByteArray());
         switch (authContext) {
-            case OpAmpAuthContext.Enrollment e -> LOG.info("Received OpAMP enrollment from agent {} for fleet {}",
-                    instanceUid, e.fleetId());
+            case OpAmpAuthContext.Enrollment e -> LOG.info("Received OpAMP enrollment via {} from agent {} for fleet {}",
+                    e.transport(), instanceUid, e.fleetId());
         }
 
         // Skeleton - just acknowledge

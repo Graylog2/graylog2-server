@@ -279,10 +279,11 @@ class EnrollmentTokenServiceTest {
         final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_ISSUER);
 
         final Optional<OpAmpAuthContext.Enrollment> result = enrollmentTokenService.validateToken(
-                response.token(), TEST_ISSUER);
+                response.token(), TEST_ISSUER, OpAmpAuthContext.Transport.HTTP);
 
         assertThat(result).isPresent();
         assertThat(result.get().fleetId()).isEqualTo("test-fleet");
+        assertThat(result.get().transport()).isEqualTo(OpAmpAuthContext.Transport.HTTP);
     }
 
     @Test
@@ -305,7 +306,7 @@ class EnrollmentTokenServiceTest {
         Thread.sleep(1500);
 
         final Optional<OpAmpAuthContext.Enrollment> result = enrollmentTokenService.validateToken(
-                response.token(), TEST_ISSUER);
+                response.token(), TEST_ISSUER, OpAmpAuthContext.Transport.HTTP);
 
         assertThat(result).isEmpty();
     }
@@ -328,7 +329,7 @@ class EnrollmentTokenServiceTest {
         // Validate with different issuer
         final URI wrongIssuer = URI.create("https://wrong.example.com/");
         final Optional<OpAmpAuthContext.Enrollment> result = enrollmentTokenService.validateToken(
-                response.token(), wrongIssuer);
+                response.token(), wrongIssuer, OpAmpAuthContext.Transport.HTTP);
 
         assertThat(result).isEmpty();
     }
@@ -352,7 +353,7 @@ class EnrollmentTokenServiceTest {
         final String tamperedToken = response.token().substring(0, response.token().lastIndexOf('.') + 1) + "invalid";
 
         final Optional<OpAmpAuthContext.Enrollment> result = enrollmentTokenService.validateToken(
-                tamperedToken, TEST_ISSUER);
+                tamperedToken, TEST_ISSUER, OpAmpAuthContext.Transport.HTTP);
 
         assertThat(result).isEmpty();
     }
@@ -371,7 +372,7 @@ class EnrollmentTokenServiceTest {
         final String fakeToken = "eyJhbGciOiJFZERTQSIsImtpZCI6InNoYTI1Njp1bmtub3duIn0.eyJpc3MiOiJodHRwczovL2dyYXlsb2cuZXhhbXBsZS5jb20vIn0.invalidsig";
 
         final Optional<OpAmpAuthContext.Enrollment> result = enrollmentTokenService.validateToken(
-                fakeToken, TEST_ISSUER);
+                fakeToken, TEST_ISSUER, OpAmpAuthContext.Transport.HTTP);
 
         assertThat(result).isEmpty();
     }

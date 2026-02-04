@@ -38,8 +38,10 @@ public sealed interface OpAmpAuthContext {
         return Optional.ofNullable((OpAmpAuthContext) request.getAttribute(REQUEST_ATTRIBUTE));
     }
 
+    enum Transport { HTTP, WEBSOCKET }
+
     /**
      * Context for agents authenticating with enrollment tokens.
      */
-    record Enrollment(String fleetId) implements OpAmpAuthContext {}
+    record Enrollment(String fleetId, Transport transport) implements OpAmpAuthContext {}
 }

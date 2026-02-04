@@ -98,7 +98,7 @@ class OpAmpWebSocketIT {
 
     @Test
     void rejectsConnectionWithInvalidAuth() {
-        when(opAmpService.authenticate(eq("Bearer invalid"), any())).thenReturn(Optional.empty());
+        when(opAmpService.authenticate(eq("Bearer invalid"), any(), any())).thenReturn(Optional.empty());
 
         final var listener = new TestWebSocketListener(new CompletableFuture<>());
 
@@ -113,7 +113,7 @@ class OpAmpWebSocketIT {
 
     @Test
     void rejectsConnectionWithMissingAuth() {
-        when(opAmpService.authenticate(any(), any())).thenReturn(Optional.empty());
+        when(opAmpService.authenticate(any(), any(), any())).thenReturn(Optional.empty());
 
         final var listener = new TestWebSocketListener(new CompletableFuture<>());
 
@@ -126,7 +126,7 @@ class OpAmpWebSocketIT {
 
     @Test
     void acceptsConnectionWithValidAuth() throws Exception {
-        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet")));
+        when(opAmpService.authenticate(eq("Bearer valid"), any(), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet", OpAmpAuthContext.Transport.WEBSOCKET)));
         when(opAmpService.handleMessage(eq(AgentToServer.getDefaultInstance()), any()))
                 .thenReturn(ServerToAgent.getDefaultInstance());
 
@@ -151,7 +151,7 @@ class OpAmpWebSocketIT {
 
     @Test
     void processesValidMessage() throws Exception {
-        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet")));
+        when(opAmpService.authenticate(eq("Bearer valid"), any(), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet", OpAmpAuthContext.Transport.WEBSOCKET)));
 
         final var agentMsg = AgentToServer.newBuilder()
                 .setInstanceUid(ByteString.copyFromUtf8("test-instance-uid"))
@@ -192,7 +192,7 @@ class OpAmpWebSocketIT {
 
     @Test
     void handlesInvalidProtobufGracefully() throws Exception {
-        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet")));
+        when(opAmpService.authenticate(eq("Bearer valid"), any(), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet", OpAmpAuthContext.Transport.WEBSOCKET)));
         when(opAmpService.handleMessage(eq(AgentToServer.getDefaultInstance()), any()))
                 .thenReturn(ServerToAgent.getDefaultInstance());
 
@@ -219,7 +219,7 @@ class OpAmpWebSocketIT {
 
     @Test
     void rejectsMessageWithInvalidHeader() throws Exception {
-        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet")));
+        when(opAmpService.authenticate(eq("Bearer valid"), any(), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet", OpAmpAuthContext.Transport.WEBSOCKET)));
         when(opAmpService.handleMessage(eq(AgentToServer.getDefaultInstance()), any()))
                 .thenReturn(ServerToAgent.getDefaultInstance());
 
