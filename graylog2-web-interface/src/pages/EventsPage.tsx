@@ -29,7 +29,6 @@ const AlertsPageComponent = () => {
     data: { valid: validSecurityLicense },
   } = usePluggableLicenseCheck('/license/security');
   const pluggableSecurityEventsPage = usePluginEntities('views.components.securityEventsPage');
-
   if (!validSecurityLicense) {
     return (
       <Row className="content">

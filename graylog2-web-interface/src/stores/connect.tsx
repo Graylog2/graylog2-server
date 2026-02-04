@@ -128,11 +128,7 @@ function connect<C extends React.ComponentType<React.ComponentProps<C>>, Stores,
     return mapProps(storeProps as ResultType<Stores>);
   };
 
-  class ConnectStoresWrapper extends React.Component<ConnectedProps<C, MappedProps>> {
-    // eslint-disable-next-line react/state-in-constructor
-    state: ResultType<Stores>;
-
-    unsubscribes: Array<() => void>;
+  class ConnectStoresWrapper extends React.Component<ConnectedProps<C, MappedProps>, ResultType<Stores>> {
 
     constructor(props) {
       super(props);
@@ -187,6 +183,8 @@ function connect<C extends React.ComponentType<React.ComponentProps<C>>, Stores,
     componentWillUnmount() {
       this.unsubscribes.forEach((unsub) => unsub());
     }
+
+    unsubscribes: Array<() => void>;
 
     render() {
       const nextProps = genProps(this.state);
