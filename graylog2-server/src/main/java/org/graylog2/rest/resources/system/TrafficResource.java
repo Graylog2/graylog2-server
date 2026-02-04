@@ -59,4 +59,16 @@ public class TrafficResource extends RestResource {
                 daily ? TrafficCounterService.Interval.DAILY : TrafficCounterService.Interval.HOURLY,
                 includeToday);
     }
+
+    @GET
+    @Path("/detailed")
+    @Operation(summary = "Get the cluster traffic stats with 10-minute granularity")
+    public TrafficCounterService.TrafficHistogram getDetailed(@Parameter(name = "days", description = "For how many days the traffic stats should be returned")
+                                                              @QueryParam("days") @DefaultValue("30") int days,
+                                                              @Parameter(name = "includeToday", description = "Whether the traffic should include up to the current date/time (in UTC).")
+                                                              @QueryParam("includeToday") @DefaultValue("true") boolean includeToday) {
+        return trafficCounterService.clusterTrafficOfLastDays(Duration.standardDays(days),
+                TrafficCounterService.Interval.TEN_MINUTE,
+                includeToday);
+    }
 }
