@@ -90,6 +90,12 @@ public class OpAmpWebSocketApplication extends WebSocketApplication {
                 final var message = AgentToServer.parseFrom(input);
                 final var reply = opAmpService.handleMessage(message, authContext);
 
+                // Check connection before sending - client may have disconnected during processing
+                if (!socket.isConnected()) {
+                    LOG.debug("OpAMP WebSocket disconnected before response could be sent");
+                    return;
+                }
+
                 // Encode response with header
                 final var out = new ByteArrayOutputStream();
                 out.write(0);  // header
