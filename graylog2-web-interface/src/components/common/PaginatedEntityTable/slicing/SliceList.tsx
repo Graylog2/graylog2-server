@@ -61,7 +61,7 @@ const SliceList = ({
       <StyledListGroupItem
         key={`${keyPrefix}${String(slice.value)}`}
         onClick={() => onChangeSlicing(sliceCol, String(slice.value))}
-        $active={activeSlice === slice.value}>
+        $active={String(activeSlice) === String(slice.value)}>
         <SliceInner>
           {sliceRenderers?.[sliceCol]?.(slice.value) ?? slice.title ?? String(slice.value)}
           <Badge>{slice.count}</Badge>
