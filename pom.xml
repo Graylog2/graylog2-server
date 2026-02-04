@@ -118,7 +118,7 @@
         <caffeine.version>3.2.3</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.184</classgraph.version>
-        <commons-codec.version>1.20.0</commons-codec.version>
+        <commons-codec.version>1.21.0</commons-codec.version>
         <commons-csv.version>1.14.1</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
         <commons-exec.version>1.6.0</commons-exec.version>
@@ -166,7 +166,7 @@
         <log4j.version>2.25.3</log4j.version>
         <lucene.version>9.12.3</lucene.version>
         <lz4.version>1.10.3</lz4.version>
-        <metrics.version>4.2.37</metrics.version>
+        <metrics.version>4.2.38</metrics.version>
         <mongodb-driver.version>5.6.2</mongodb-driver.version>
         <mongojack.version>5.0.3</mongojack.version>
         <natty.version>0.13</natty.version>
