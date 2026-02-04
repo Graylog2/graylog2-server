@@ -28,6 +28,10 @@ const StyledDayPicker = styled(DayPicker)(
 
     --rdp-accent-color: ${theme.colors.variant.primary};
     --rdp-disabled-opacity: 0.4;
+    --rdp-day-width: 34px;
+    --rdp-day-height: 34px;
+    --rdp-day_button-width: 34px;
+    --rdp-day_button-height: 34px;
 
     .rdp-chevron {
       fill: ${theme.colors.gray[60]};
