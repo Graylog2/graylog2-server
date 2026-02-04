@@ -20,9 +20,17 @@ import styled, { css } from 'styled-components';
 
 import { DropdownButton } from 'components/bootstrap';
 import MenuItem from 'components/bootstrap/menuitem/MenuItem';
-import { Icon, SearchForm } from 'components/common';
+import { Icon } from 'components/common';
+import SearchForm from 'components/common/SearchForm';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+
+export type SortMode = 'alphabetical' | 'count';
+
+const SORT_OPTIONS: Array<{ value: SortMode; label: string }> = [
+  { value: 'alphabetical', label: 'Alphabetical' },
+  { value: 'count', label: 'Count' },
+];
 
 const Controls = styled.div(
   ({ theme }) => css`
@@ -40,19 +48,19 @@ const ControlsRow = styled.div<{ $alignRight?: boolean }>(
     gap: ${theme.spacings.xs};
     flex-wrap: nowrap;
     justify-content: ${$alignRight ? 'flex-end' : 'flex-start'};
-
-    .search {
-      flex: 1;
-    }
-
-    .query,
-    .input-container,
-    .form-group {
-      width: 100%;
-      margin: 0;
-    }
   `,
 );
+
+const StyledSearchForm = styled(SearchForm)`
+  flex: 1;
+
+  .query,
+  .input-container,
+  .form-group {
+    width: 100%;
+    margin: 0;
+  }
+`;
 
 const SortTrigger = styled.span(
   ({ theme }) => css`
@@ -61,12 +69,6 @@ const SortTrigger = styled.span(
     gap: ${theme.spacings.xxs};
   `,
 );
-
-export type SortMode = 'alphabetical' | 'count';
-const SORT_OPTIONS: Array<{ value: SortMode; label: string }> = [
-  { value: 'alphabetical', label: 'Alphabetical' },
-  { value: 'count', label: 'Count' },
-];
 
 type Props = {
   appSection: string;
@@ -98,7 +100,6 @@ const SliceFilters = ({
       app_section: appSection,
       event_details: {
         attribute_id: sliceCol,
-        query_length: value.length,
         has_query: value.length > 0,
       },
     });
@@ -109,8 +110,6 @@ const SliceFilters = ({
       app_section: appSection,
       event_details: {
         attribute_id: sliceCol,
-        query_length: 0,
-        has_query: false,
         reset: true,
       },
     });
@@ -152,7 +151,7 @@ const SliceFilters = ({
   return (
     <Controls>
       <ControlsRow>
-        <SearchForm
+        <StyledSearchForm
           onQueryChange={handleSearchChange}
           onReset={handleSearchReset}
           placeholder={`Filter ${activeColumnTitle ?? 'slices'}`}

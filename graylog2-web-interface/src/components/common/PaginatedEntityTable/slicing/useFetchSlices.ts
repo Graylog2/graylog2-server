@@ -21,6 +21,7 @@ import { useQuery } from '@tanstack/react-query';
 import { defaultOnError } from 'util/conditional/onError';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import TableFetchContext from 'components/common/PaginatedEntityTable/TableFetchContext';
+
 import type { Slices } from './Slicing';
 
 export type FetchSlices = (column: string, query: string, filters: UrlQueryFilters) => Promise<Slices>;

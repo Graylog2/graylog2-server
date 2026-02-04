@@ -16,4 +16,3 @@
  */
 
 export { default } from './Slicing';
-export type { Slices } from './Slicing';
