@@ -17,6 +17,8 @@
 import uniq from 'lodash/uniq';
 import type { Datum } from 'plotly.js';
 
+import { SearchQueryStrings } from '@graylog/server-api';
+
 import { escape, addToQuery, predicate, not } from 'views/logic/queries/QueryHelper';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { RootState } from 'views/types';
@@ -39,7 +41,7 @@ type Args = {
 
 const ExcludeFromQueryHandler =
   ({ queryId, field, value, contexts }: Args) =>
-  (dispatch: ViewsDispatch, getState: () => RootState) => {
+  async (dispatch: ViewsDispatch, getState: () => RootState) => {
     const oldQuery = selectQueryString(queryId)(getState());
 
     const valuesToAdd = uniq(
@@ -50,6 +52,13 @@ const ExcludeFromQueryHandler =
       (prev, valueToAdd) => formatNewQuery(prev, valueToAdd.field, valueToAdd.value as string | number),
       oldQuery,
     );
+
+    if (newQuery && newQuery !== oldQuery) {
+      SearchQueryStrings.queryStringUsed({ query_string: newQuery }).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.error('Unable to record last used query string: ', error);
+      });
+    }
 
     return dispatch(updateQueryString(queryId, newQuery));
   };

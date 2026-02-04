@@ -16,6 +16,8 @@
  */
 import uniq from 'lodash/uniq';
 
+import { SearchQueryStrings } from '@graylog/server-api';
+
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { escape, addToQuery, formatTimestamp, predicate } from 'views/logic/queries/QueryHelper';
 import { updateQueryString } from 'views/logic/slices/viewSlice';
@@ -58,6 +60,13 @@ const AddToQueryHandler =
         formatNewQuery(prev, valueToAdd.field, valueToAdd.value as string | number, valueToAdd.type),
       oldQuery,
     );
+
+    if (newQuery && newQuery !== oldQuery) {
+      SearchQueryStrings.queryStringUsed({ query_string: newQuery }).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.error('Unable to record last used query string: ', error);
+      });
+    }
 
     return dispatch(updateQueryString(queryId, newQuery));
   };
