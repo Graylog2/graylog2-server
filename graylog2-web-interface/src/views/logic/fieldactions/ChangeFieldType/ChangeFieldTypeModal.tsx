@@ -38,8 +38,7 @@ import Routes from 'routing/Routes';
 import type { Stream } from 'logic/streams/types';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
-
-import ModalSubmit from '../../../../components/common/ModalSubmit';
+import ModalSubmit from 'components/common/ModalSubmit';
 
 const StyledSelect = styled(Select)`
   width: 400px;
