@@ -180,7 +180,7 @@ class OpAmpHttpHandlerIT {
                 .setInstanceUid(agentMsg.getInstanceUid())
                 .build();
 
-        when(opAmpService.handleMessage(agentMsg)).thenReturn(expectedReply);
+        when(opAmpService.handleMessage(eq(agentMsg), any())).thenReturn(expectedReply);
 
         final Request request = new Request.Builder()
                 .url(opampUrl())
@@ -236,7 +236,7 @@ class OpAmpHttpHandlerIT {
                 .setInstanceUid(ByteString.copyFromUtf8("test-instance-uid"))
                 .build();
 
-        when(opAmpService.handleMessage(any())).thenThrow(new RuntimeException("Database unavailable"));
+        when(opAmpService.handleMessage(any(), any())).thenThrow(new RuntimeException("Database unavailable"));
 
         final Request request = new Request.Builder()
                 .url(opampUrl())

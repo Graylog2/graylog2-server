@@ -127,7 +127,7 @@ class OpAmpWebSocketIT {
     @Test
     void acceptsConnectionWithValidAuth() throws Exception {
         when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet")));
-        when(opAmpService.handleMessage(AgentToServer.getDefaultInstance()))
+        when(opAmpService.handleMessage(eq(AgentToServer.getDefaultInstance()), any()))
                 .thenReturn(ServerToAgent.getDefaultInstance());
 
         final var closeFuture = new CompletableFuture<Integer>();
@@ -162,9 +162,9 @@ class OpAmpWebSocketIT {
                 .setInstanceUid(agentMsg.getInstanceUid())
                 .build();
 
-        when(opAmpService.handleMessage(AgentToServer.getDefaultInstance()))
+        when(opAmpService.handleMessage(eq(AgentToServer.getDefaultInstance()), any()))
                 .thenReturn(ServerToAgent.getDefaultInstance());
-        when(opAmpService.handleMessage(agentMsg)).thenReturn(expectedReply);
+        when(opAmpService.handleMessage(eq(agentMsg), any())).thenReturn(expectedReply);
 
         final var closeFuture = new CompletableFuture<Integer>();
         final var listener = new TestWebSocketListener(closeFuture);
@@ -193,7 +193,7 @@ class OpAmpWebSocketIT {
     @Test
     void handlesInvalidProtobufGracefully() throws Exception {
         when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet")));
-        when(opAmpService.handleMessage(AgentToServer.getDefaultInstance()))
+        when(opAmpService.handleMessage(eq(AgentToServer.getDefaultInstance()), any()))
                 .thenReturn(ServerToAgent.getDefaultInstance());
 
         final var closeFuture = new CompletableFuture<Integer>();
@@ -220,7 +220,7 @@ class OpAmpWebSocketIT {
     @Test
     void rejectsMessageWithInvalidHeader() throws Exception {
         when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet")));
-        when(opAmpService.handleMessage(AgentToServer.getDefaultInstance()))
+        when(opAmpService.handleMessage(eq(AgentToServer.getDefaultInstance()), any()))
                 .thenReturn(ServerToAgent.getDefaultInstance());
 
         final var closeFuture = new CompletableFuture<Integer>();

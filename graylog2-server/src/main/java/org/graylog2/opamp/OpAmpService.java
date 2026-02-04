@@ -26,7 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.nio.ByteBuffer;
 import java.util.Optional;
+import java.util.UUID;
 
 @Singleton
 public class OpAmpService {
@@ -48,12 +50,21 @@ public class OpAmpService {
                 .map(e -> e);  // Upcast Enrollment to OpAmpAuthContext
     }
 
-    public ServerToAgent handleMessage(AgentToServer message) {
-        LOG.info("Received OpAMP message from agent: {}", message);
+    public ServerToAgent handleMessage(AgentToServer message, OpAmpAuthContext authContext) {
+        final UUID instanceUid = bytesToUuid(message.getInstanceUid().toByteArray());
+        switch (authContext) {
+            case OpAmpAuthContext.Enrollment e -> LOG.info("Received OpAMP enrollment from agent {} for fleet {}",
+                    instanceUid, e.fleetId());
+        }
 
         // Skeleton - just acknowledge
         return ServerToAgent.newBuilder()
                 .setInstanceUid(message.getInstanceUid())
                 .build();
+    }
+
+    private UUID bytesToUuid(byte[] bytes) {
+        final ByteBuffer bb = ByteBuffer.wrap(bytes);
+        return new UUID(bb.getLong(), bb.getLong());
     }
 }

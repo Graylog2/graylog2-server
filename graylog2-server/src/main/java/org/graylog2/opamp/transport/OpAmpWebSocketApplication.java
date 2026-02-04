@@ -88,7 +88,7 @@ public class OpAmpWebSocketApplication extends WebSocketApplication {
                 }
 
                 final var message = AgentToServer.parseFrom(input);
-                final var reply = opAmpService.handleMessage(message);
+                final var reply = opAmpService.handleMessage(message, authContext);
 
                 // Encode response with header
                 final var out = new ByteArrayOutputStream();
