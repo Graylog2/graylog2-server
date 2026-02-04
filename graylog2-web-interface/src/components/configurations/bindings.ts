@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { PluginExports } from 'graylog-web-plugin/plugin';
+
 import ConfigurationSection from 'pages/configurations/ConfigurationSection';
 import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
@@ -25,8 +27,9 @@ import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import UserConfig from 'components/configurations/UserConfig';
 import MarkdownConfig from 'components/configurations/MarkdownConfig';
 import McpConfig from 'components/configurations/McpConfig';
+import PasswordComplexityConfig from 'components/configurations/PasswordComplexityConfig';
 
-const bindings = {
+const bindings: PluginExports = {
   coreSystemConfigurations: [
     {
       name: 'Search',
@@ -83,6 +86,14 @@ const bindings = {
       props: {
         ConfigurationComponent: PermissionsConfig,
         title: 'Permissions',
+      },
+    },
+    {
+      name: 'Password Policy',
+      SectionComponent: ConfigurationSection,
+      props: {
+        ConfigurationComponent: PasswordComplexityConfig,
+        title: 'Password Policy',
       },
     },
     {

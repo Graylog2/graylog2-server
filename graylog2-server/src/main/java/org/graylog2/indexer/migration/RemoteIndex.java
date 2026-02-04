@@ -16,5 +16,6 @@
  */
 package org.graylog2.indexer.migration;
 
+@Deprecated(forRemoval = true)
 public record RemoteIndex(String name, boolean managed, boolean closed) {
 }

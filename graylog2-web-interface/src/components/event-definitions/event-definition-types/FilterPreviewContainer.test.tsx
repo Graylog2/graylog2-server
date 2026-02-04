@@ -62,6 +62,7 @@ const eventDefinition: EventDefinition = {
   state: 'ENABLED',
   remediation_steps: '',
   event_procedure: '',
+  event_summary_template: null,
   matched_at: '',
   scheduler: {
     data: {

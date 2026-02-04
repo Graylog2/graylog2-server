@@ -29,6 +29,8 @@ import java.util.Optional;
 
 class CaTruststoreImplTest {
 
+    private static final CertificateGenerator CERTIFICATE_GENERATOR = new CertificateGenerator(1024);
+
     @Test
     void testAbsenceOfPrivateKey() throws Exception {
         final KeyPair caKeys = generateCaKeys();
@@ -62,6 +64,6 @@ class CaTruststoreImplTest {
 
     @Nonnull
     private static KeyPair generateCaKeys() throws Exception {
-        return CertificateGenerator.generate(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(999)));
+        return CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(999)));
     }
 }

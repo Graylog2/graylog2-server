@@ -29,6 +29,13 @@ import { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
 import EntityDataTable from './EntityDataTable';
 
 jest.mock('hooks/useCurrentUser');
+jest.mock('logic/telemetry/useSendTelemetry', () => () => jest.fn());
+
+declare module 'graylog-web-plugin/plugin' {
+  interface EntityActions {
+    status: 'read';
+  }
+}
 
 describe('<EntityDataTable />', () => {
   beforeEach(() => {
@@ -37,7 +44,7 @@ describe('<EntityDataTable />', () => {
 
   const columnSchemas: Array<ColumnSchema> = [
     { id: 'title', title: 'Title', type: 'STRING', sortable: true },
-    { id: 'description', title: 'Description', type: 'STRING', sortable: true },
+    { id: 'description', title: 'Description', type: 'STRING', sortable: true, sliceable: true },
     { id: 'stream', title: 'Stream', type: 'STRING', sortable: true },
     {
       id: 'status',
@@ -77,6 +84,7 @@ describe('<EntityDataTable />', () => {
     entityAttributesAreCamelCase: true,
     columnSchemas,
     onResetLayoutPreferences: () => Promise.resolve(),
+    onChangeSlicing: () => {},
   };
 
   it('should render selected columns and table headers', async () => {
@@ -183,11 +191,41 @@ describe('<EntityDataTable />', () => {
 
     render(<EntityDataTable {...defaultProps} onSortChange={onSortChange} />);
 
-    userEvent.click(await screen.findByTitle(/sort description ascending/i));
+    userEvent.click(await screen.findByRole('button', { name: /toggle description actions/i }));
+    userEvent.click(await screen.findByRole('menuitem', { name: /sort ascending/i }));
 
     await waitFor(() => expect(onSortChange).toHaveBeenCalledTimes(1));
 
     expect(onSortChange).toHaveBeenCalledWith({ attributeId: 'description', direction: 'asc' });
+  });
+
+  it('should slice by column using header action', async () => {
+    const onChangeSlicing = jest.fn();
+
+    render(<EntityDataTable {...defaultProps} columnSchemas={columnSchemas} onChangeSlicing={onChangeSlicing} />);
+
+    userEvent.click(await screen.findByRole('button', { name: /toggle description actions/i }));
+    userEvent.click(await screen.findByRole('menuitem', { name: /slice by values/i }));
+
+    expect(onChangeSlicing).toHaveBeenCalledWith('description');
+  });
+
+  it('should remove slicing using header action', async () => {
+    const onChangeSlicing = jest.fn();
+
+    render(
+      <EntityDataTable
+        {...defaultProps}
+        columnSchemas={columnSchemas}
+        onChangeSlicing={onChangeSlicing}
+        activeSliceCol="description"
+      />,
+    );
+
+    userEvent.click(await screen.findByRole('button', { name: /toggle description actions/i }));
+    userEvent.click(await screen.findByRole('menuitem', { name: /no slicing/i }));
+
+    expect(onChangeSlicing).toHaveBeenCalledWith(undefined, undefined);
   });
 
   it('bulk actions should update selected items', async () => {
@@ -240,7 +278,36 @@ describe('<EntityDataTable />', () => {
     expect(rowCheckboxes[0]).not.toBeChecked();
   });
 
-  it('should display default columns, which are not hidden via user column preferences and update visibility correctly', async () => {
+  it('user preferences should include all currently visible columns on preferences update', async () => {
+    const onLayoutPreferencesChange = jest.fn();
+
+    render(
+      <EntityDataTable
+        {...defaultProps}
+        layoutPreferences={{}}
+        defaultDisplayedColumns={['description', 'status', 'title']}
+        defaultColumnOrder={['description', 'status', 'title']}
+        onLayoutPreferencesChange={onLayoutPreferencesChange}
+      />,
+    );
+
+    await screen.findByRole('columnheader', { name: /title/i });
+    await screen.findByRole('columnheader', { name: /status/i });
+    await screen.findByRole('columnheader', { name: /description/i });
+
+    userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
+    userEvent.click(await screen.findByRole('menuitem', { name: /hide title/i }));
+
+    expect(onLayoutPreferencesChange).toHaveBeenCalledWith({
+      attributes: {
+        description: { status: ATTRIBUTE_STATUS.show },
+        status: { status: ATTRIBUTE_STATUS.show },
+        title: { status: 'hide' },
+      },
+    });
+  });
+
+  it('if there are user preferences, only selected columns should be displayed', async () => {
     const onLayoutPreferencesChange = jest.fn();
 
     render(
@@ -259,15 +326,13 @@ describe('<EntityDataTable />', () => {
     );
 
     userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
-    userEvent.click(await screen.findByRole('menuitem', { name: /hide title/i }));
+    await screen.findByRole('menuitem', { name: /show title/i });
 
-    expect(onLayoutPreferencesChange).toHaveBeenCalledWith({
-      attributes: {
-        description: { status: ATTRIBUTE_STATUS.show },
-        status: { status: ATTRIBUTE_STATUS.show },
-        title: { status: 'hide' },
-      },
-    });
+    expect(
+      screen.queryByRole('columnheader', {
+        name: /title/i,
+      }),
+    ).not.toBeInTheDocument();
   });
 
   it('should reset layout preferences via reset all columns action', async () => {

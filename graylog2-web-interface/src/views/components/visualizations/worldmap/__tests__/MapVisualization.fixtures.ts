@@ -57,5 +57,4 @@ const invalidData = [
   },
 ];
 
-// eslint-disable-next-line import/prefer-default-export
 export { invalidData };

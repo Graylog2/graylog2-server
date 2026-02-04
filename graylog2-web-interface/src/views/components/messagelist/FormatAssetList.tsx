@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
@@ -34,10 +35,11 @@ const FormatAssetList = ({ associated_assets, fieldType }: { associated_assets: 
   const queryId = useActiveQueryId();
   const dispatch = useViewsDispatch();
 
-  const assetsList = React.useMemo(
+  const assetsList = useMemo(
     () =>
       pluggableAssetListComponent.map(({ component: PluggableAssetListItem }) => (
         <PluggableAssetListItem
+          key={associated_assets[0]}
           assetIds={associated_assets}
           direction="col"
           addToQuery={(id) => handleAddToQuery(dispatch, queryId, id, fieldType)}
@@ -52,7 +54,6 @@ const FormatAssetList = ({ associated_assets, fieldType }: { associated_assets: 
 
   return (
     <div>
-      <dt>Associated Assets</dt>
       {assetsList.map((assetElement) => (
         <div key={assetElement.props.assetIds[0]}>{assetElement}</div>
       ))}

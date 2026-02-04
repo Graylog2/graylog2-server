@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import { singleton } from 'logic/singleton';
 import standardMapper from 'logic/permissions/StandardEntityPermissionsMapper';
 

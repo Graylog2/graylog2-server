@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import { Button } from 'components/bootstrap';
@@ -36,8 +37,8 @@ type Props = {
 };
 
 const DataAdapterFormView = ({ saved = undefined, onCancel, adapter = undefined, isStep = false }: Props) => {
-  const [dataAdapter, setDataAdapter] = React.useState<LookupTableAdapter>(adapter);
-  const isCreate = React.useMemo(() => !dataAdapter?.id, [dataAdapter]);
+  const [dataAdapter, setDataAdapter] = useState<LookupTableAdapter>(adapter);
+  const isCreate = useMemo(() => !dataAdapter?.id, [dataAdapter]);
 
   return (
     <>

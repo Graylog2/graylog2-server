@@ -61,6 +61,7 @@ public class EventImpl implements Event {
     private boolean alert;
     private Map<String, FieldValue> fields = new HashMap<>();
     private Map<String, FieldValue> groupByFields = new HashMap<>();
+    private Map<String, Double> aggregationConditions = new HashMap<>();
     private final Map<String, Double> scores = new HashMap<>();
     private final Set<String> associatedAssets = new HashSet<>();
     private EventReplayInfo replayInfo;
@@ -304,6 +305,16 @@ public class EventImpl implements Event {
     }
 
     @Override
+    public Map<String, Double> getAggregationConditions() {
+        return this.aggregationConditions;
+    }
+
+    @Override
+    public void setAggregationConditions(Map<String, Double> aggregationConditions) {
+        this.aggregationConditions = ImmutableMap.copyOf(aggregationConditions);
+    }
+
+    @Override
     public EventReplayInfo getReplayInfo() {
         return replayInfo;
     }
@@ -346,6 +357,7 @@ public class EventImpl implements Event {
                 .alert(getAlert())
                 .fields(ImmutableMap.copyOf(fields))
                 .groupByFields(ImmutableMap.copyOf(groupByFields))
+                .aggregationConditions(ImmutableMap.copyOf(aggregationConditions))
                 .replayInfo(getReplayInfo())
                 .build();
     }
@@ -399,6 +411,7 @@ public class EventImpl implements Event {
                 Objects.equals(keyTuple, event.keyTuple) &&
                 Objects.equals(fields, event.fields) &&
                 Objects.equals(groupByFields, event.groupByFields) &&
+                Objects.equals(aggregationConditions, event.aggregationConditions) &&
                 Objects.equals(scores, event.scores) &&
                 Objects.equals(associatedAssets, event.associatedAssets) &&
                 Objects.equals(replayInfo, event.replayInfo);
@@ -408,7 +421,7 @@ public class EventImpl implements Event {
     public int hashCode() {
         return Objects.hash(eventId, eventDefinitionType, eventDefinitionId, originContext, eventTimestamp,
                 processingTimestamp, timerangeStart, timerangeEnd, streams, sourceStreams, message, source,
-                keyTuple, priority, alert, fields, groupByFields, scores, replayInfo);
+                keyTuple, priority, alert, fields, groupByFields, aggregationConditions, scores, replayInfo);
     }
 
     @Override
@@ -431,6 +444,7 @@ public class EventImpl implements Event {
                 .add("alert", alert)
                 .add("fields", fields)
                 .add("groupByFields", groupByFields)
+                .add("aggregationConditions", aggregationConditions)
                 .add("replayInfo", replayInfo)
                 .add("scores", scores)
                 .add("associatedAssets", associatedAssets)

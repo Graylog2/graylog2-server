@@ -17,9 +17,9 @@
 package org.graylog2.rest.resources.cluster;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.cluster.Node;
@@ -57,7 +57,7 @@ import java.util.concurrent.ExecutorService;
 import static jakarta.ws.rs.core.Response.Status.BAD_GATEWAY;
 
 @RequiresAuthentication
-@Api(value = "Cluster", description = "System information of all nodes in the cluster")
+@Tag(name = "Cluster", description = "System information of all nodes in the cluster")
 @Path("/cluster")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterSystemResource extends ProxiedResource {
@@ -73,16 +73,16 @@ public class ClusterSystemResource extends ProxiedResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get system overview of all Graylog nodes")
+    @Operation(summary = "Get system overview of all Graylog nodes")
     public Map<String, Optional<SystemOverviewResponse>> get() {
         return stripCallResult(requestOnAllNodes(RemoteSystemResource.class, RemoteSystemResource::system));
     }
 
     @GET
     @Timed
-    @ApiOperation(value = "Get JVM information of the given node")
+    @Operation(summary = "Get JVM information of the given node")
     @Path("{nodeId}/jvm")
-    public SystemJVMResponse jvm(@ApiParam(name = "nodeId", value = "The id of the node to retrieve JVM information.", required = true)
+    public SystemJVMResponse jvm(@Parameter(name = "nodeId", description = "The id of the node to retrieve JVM information.", required = true)
                                  @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         final Node targetNode = nodeService.byNodeId(nodeId);
 
@@ -100,10 +100,10 @@ public class ClusterSystemResource extends ProxiedResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get a thread dump of the given node")
+    @Operation(summary = "Get a thread dump of the given node")
     @RequiresPermissions(RestPermissions.THREADS_DUMP)
     @Path("{nodeId}/threaddump")
-    public SystemThreadDumpResponse threadDump(@ApiParam(name = "nodeId", value = "The id of the node to get a thread dump.", required = true)
+    public SystemThreadDumpResponse threadDump(@Parameter(name = "nodeId", description = "The id of the node to get a thread dump.", required = true)
                                                @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         final Node targetNode = nodeService.byNodeId(nodeId);
 
@@ -121,10 +121,10 @@ public class ClusterSystemResource extends ProxiedResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get a process buffer dump of the given node")
+    @Operation(summary = "Get a process buffer dump of the given node")
     @RequiresPermissions(RestPermissions.PROCESSBUFFER_DUMP)
     @Path("{nodeId}/processbufferdump")
-    public SystemProcessBufferDumpResponse processBufferDump(@ApiParam(name = "nodeId", value = "The id of the node to get a process buffer dump.", required = true)
+    public SystemProcessBufferDumpResponse processBufferDump(@Parameter(name = "nodeId", description = "The id of the node to get a process buffer dump.", required = true)
                                                              @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         final Node targetNode = nodeService.byNodeId(nodeId);
 
@@ -142,7 +142,7 @@ public class ClusterSystemResource extends ProxiedResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get a process buffer dump of all cluster nodes")
+    @Operation(summary = "Get a process buffer dump of all cluster nodes")
     @RequiresPermissions(RestPermissions.PROCESSBUFFER_DUMP)
     @Path("processbufferdump")
     public Map<String, Optional<SystemProcessBufferDumpResponse>> clusterProcessBufferDump() {

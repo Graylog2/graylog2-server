@@ -23,6 +23,7 @@ import jakarta.inject.Inject;
 import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.mcp.server.Tool;
 import org.graylog2.inputs.InputService;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.TextField;
@@ -45,16 +46,16 @@ public class ListInputsTool extends Tool<ListInputsTool.Parameters, String> {
 
     private final InputService inputService;
     private final Map<String, InputDescription> availableInputs;
-    private final String productName;
+    private final CustomizationConfig customizationConfig;
 
     @Inject
-    public ListInputsTool(ObjectMapper objectMapper,
-                          SchemaGeneratorProvider schemaGeneratorProvider,
-                          InputService inputService,
+    public ListInputsTool(InputService inputService,
                           MessageInputFactory messageInputFactory,
-                          CustomizationConfig customizationConfig) {
-        super(objectMapper,
-                schemaGeneratorProvider,
+                          final CustomizationConfig customizationConfig,
+                          final ObjectMapper objectMapper,
+                          final ClusterConfigService clusterConfigService,
+                          final SchemaGeneratorProvider schemaGeneratorProvider) {
+        super(
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
@@ -63,17 +64,21 @@ public class ListInputsTool extends Tool<ListInputsTool.Parameters, String> {
                         List all configured %s inputs. Returns detailed information about each input including type (syslog, GELF, etc.), current state (running/stopped),
                         configuration parameters, and throughput statistics. Use this to monitor input health, troubleshoot data ingestion issues, or understand what types of
                         logs are being collected. No parameters required.
-                        """, customizationConfig.productName()));
+                        """, customizationConfig.productName()),
+                objectMapper,
+                clusterConfigService,
+                schemaGeneratorProvider
+        );
         this.inputService = inputService;
         this.availableInputs = messageInputFactory.getAvailableInputs();
-        this.productName = customizationConfig.productName();
+        this.customizationConfig = customizationConfig;
     }
 
     @Override
     public String apply(PermissionHelper permissionHelper, ListInputsTool.Parameters unused) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        pw.append(productName).append("Inputs:");
+        pw.append(customizationConfig.productName()).append("Inputs:");
         try (var inputs = inputService.all().stream()) {
             inputs.filter(input -> permissionHelper.isPermitted(RestPermissions.INPUTS_READ, input.getId()))
                     .map(input -> {

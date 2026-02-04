@@ -17,9 +17,9 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
@@ -29,19 +29,19 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.ServiceUnavailableException;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
-import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.rest.models.system.indexer.responses.IndexerOverview;
 import org.graylog2.rest.resources.system.DeflectorResource;
 import org.graylog2.rest.resources.system.IndexRangesResource;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
 @RequiresAuthentication
-@Api(value = "Indexer/Overview", description = "Indexing overview", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Indexer/Overview", description = "Indexing overview")
 @Path("/system/indexer/overview")
 public class IndexerOverviewResource extends RestResource {
 
@@ -66,7 +66,7 @@ public class IndexerOverviewResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get overview of current indexing state, including deflector config, cluster state, index ranges & message counts.")
+    @Operation(summary = "Get overview of current indexing state, including deflector config, cluster state, index ranges & message counts.")
     @Produces(MediaType.APPLICATION_JSON)
     @Deprecated
     public IndexerOverview index() throws TooManyAliasesException {
@@ -85,9 +85,9 @@ public class IndexerOverviewResource extends RestResource {
     @GET
     @Timed
     @Path("/{indexSetId}")
-    @ApiOperation(value = "Get overview of current indexing state for the given index set, including deflector config, cluster state, index ranges & message counts.")
+    @Operation(summary = "Get overview of current indexing state for the given index set, including deflector config, cluster state, index ranges & message counts.")
     @Produces(MediaType.APPLICATION_JSON)
-    public IndexerOverview index(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId) throws TooManyAliasesException {
+    public IndexerOverview index(@Parameter(name = "indexSetId") @PathParam("indexSetId") String indexSetId) throws TooManyAliasesException {
         if (!cluster.isConnected()) {
             throw new ServiceUnavailableException("Opensearch cluster is not available, check your configuration and logs for more information.");
         }

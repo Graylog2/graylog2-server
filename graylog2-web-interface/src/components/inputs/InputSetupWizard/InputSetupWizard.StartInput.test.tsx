@@ -401,6 +401,7 @@ describe('InputSetupWizard Start Input', () => {
             modified_at: '',
             errors: [],
             _scope: undefined,
+            has_deprecated_functions: false,
           }),
         );
       });

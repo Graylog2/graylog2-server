@@ -54,10 +54,10 @@ const getCustomColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByAt
       renderCell: (_status: string, eventDefinition: EventDefinition) => (
         <StatusCell eventDefinition={eventDefinition} />
       ),
-      staticWidth: 100,
+      staticWidth: 110,
     },
     priority: {
-      staticWidth: 100,
+      staticWidth: 'matchHeader' as const,
     },
     '_entity_source.source': {
       renderCell: (_title: string, eventDefinition: EventDefinition) => (

@@ -16,10 +16,12 @@
  */
 package org.graylog.aws.inputs.cloudtrail;
 
+import org.graylog.aws.config.AWSPluginConfiguration;
 import org.graylog.aws.inputs.cloudtrail.external.CloudTrailClientFactory;
 import org.graylog.aws.sqs.SQSClientFactory;
 import org.graylog.integrations.aws.AWSClientBuilderUtil;
 import org.graylog2.plugin.InputFailureRecorder;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.junit.jupiter.api.Test;
@@ -39,7 +41,6 @@ import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_ASSUME_ROLE_A
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_ACCESS_KEY;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_S3_REGION;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_SQS_REGION;
-import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_LEGACY_AWS_REGION;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -54,6 +55,7 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class CloudTrailTransportTest {
+
     // Code Under Test
     @InjectMocks
     CloudTrailTransport cut;
@@ -75,6 +77,11 @@ public class CloudTrailTransportTest {
     ScheduledFuture mockRunningTask;
     @Mock
     InputFailureRecorder mockInputFailureRecorder;
+    @Mock
+    ClusterConfigService clusterConfigService;
+    @Mock
+    AWSPluginConfiguration awsPluginConfiguration;
+
 
     // Test objects
     private static final String TEST_USER_NAME = "username";
@@ -97,18 +104,15 @@ public class CloudTrailTransportTest {
         givenGoodExecutorService();
 
         whenDoLaunchIsCalled();
-
         thenTaskSubmittedToExecutor(0L);
 
         whenDoStopIsCalled();
-
         thenRunningTaskIsCancelled();
     }
 
     @Test
     public void doStop_doesNothing_whenTaskIsNotRunning() {
         whenDoStopIsCalled();
-
         thenRunningTaskIsNotCancelled();
     }
 
@@ -120,12 +124,17 @@ public class CloudTrailTransportTest {
         given(mockConfiguration.getString(eq(CK_AWS_S3_REGION), any())).willReturn(TEST_REGION);
 
         given(mockCloudTrailInput.getConfiguration()).willReturn(mockConfiguration);
+
+        given(clusterConfigService.getOrDefault(eq(AWSPluginConfiguration.class), any()))
+                .willReturn(awsPluginConfiguration);
     }
 
     private void givenGoodExecutorService() {
         given(mockExecutorService.scheduleWithFixedDelay(any(Runnable.class), anyLong(), anyLong(), any(TimeUnit.class)))
                 .willReturn(mockRunningTask);
-        given(clientUtils.createCredentialsProvider(any())).willReturn(mock(AwsCredentialsProvider.class));
+
+        given(clientUtils.createCredentialsProvider(any()))
+                .willReturn(mock(AwsCredentialsProvider.class));
     }
 
     private void thenAwsClientBuilderUtilsCalled() {
@@ -149,9 +158,14 @@ public class CloudTrailTransportTest {
         ArgumentCaptor<TimeUnit> timeUnitCaptor = ArgumentCaptor.forClass(TimeUnit.class);
 
         verify(sqsClientFactory, times(1)).create(any(), eq(TEST_REGION),
-                isA(AwsCredentialsProvider.class), any(), eq(mockInputFailureRecorder));
-        verify(mockExecutorService, times(1)).scheduleWithFixedDelay(taskCaptor.capture(),
-                initialDelayCaptor.capture(), intervalCaptor.capture(), timeUnitCaptor.capture());
+                isA(AwsCredentialsProvider.class), any());
+
+        verify(mockExecutorService, times(1)).scheduleWithFixedDelay(
+                taskCaptor.capture(),
+                initialDelayCaptor.capture(),
+                intervalCaptor.capture(),
+                timeUnitCaptor.capture()
+        );
 
         assertThat(initialDelayCaptor.getValue(), is(0L));
         assertThat(intervalCaptor.getValue(), is(pollingInterval));
@@ -161,12 +175,11 @@ public class CloudTrailTransportTest {
     private void thenRunningTaskIsCancelled() {
         ArgumentCaptor<Boolean> mayInterruptCaptor = ArgumentCaptor.forClass(Boolean.class);
         verify(mockRunningTask, times(1)).cancel(mayInterruptCaptor.capture());
-
         assertThat(mayInterruptCaptor.getValue(), is(false));
     }
 
     private void thenRunningTaskIsNotCancelled() {
         verify(mockRunningTask, times(0)).cancel(anyBoolean());
     }
-
 }
+

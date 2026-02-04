@@ -24,7 +24,7 @@ import URI from 'urijs';
 import upperCase from 'lodash/upperCase';
 
 import Routes from 'routing/Routes';
-import { Button, Col, DropdownButton, MenuItem, Row, SegmentedControl } from 'components/bootstrap';
+import { Button, Col, MenuItem, Row, SegmentedControl } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 import { Icon, IfPermitted } from 'components/common';
 import { StreamsStore, type Stream } from 'stores/streams/StreamsStore';
@@ -35,6 +35,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useQuery from 'routing/useQuery';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useCurrentUser from 'hooks/useCurrentUser';
+import { MoreActionsMenu } from 'components/common/MoreActions';
 
 import StreamDataRoutingIntake from './StreamDataRoutingIntake';
 import StreamDataRoutingProcessing from './StreamDataRoutingProcessing';
@@ -218,9 +219,9 @@ const StreamDetails = ({ stream }: Props) => {
             <h1>Stream: {stream.title}</h1>
 
             <IfPermitted permissions={`streams:edit:${stream.id}`}>
-              <DropdownButton title={<Icon name="more_horiz" />} id="stream-actions" noCaret bsSize="xs">
+              <MoreActionsMenu id="stream-actions">
                 <MenuItem onClick={() => toggleUpdateModal()}>Edit</MenuItem>
-              </DropdownButton>
+              </MoreActionsMenu>
             </IfPermitted>
           </LeftCol>
           <RightCol />

@@ -23,11 +23,13 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -61,6 +63,8 @@ import org.graylog.security.authservice.AuthServiceBackendDTO;
 import org.graylog.security.authservice.GlobalAuthServiceConfig;
 import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 import org.graylog.security.permissions.GRNPermission;
+import org.graylog2.audit.AuditActor;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.PaginatedList;
@@ -89,6 +93,7 @@ import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.UserSessionTerminationService;
 import org.graylog2.security.sessions.SessionDTO;
 import org.graylog2.security.sessions.SessionService;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.ChangeUserRequest;
@@ -125,7 +130,6 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.maxBy;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
 import static org.graylog2.shared.security.RestPermissions.USERS_PERMISSIONSEDIT;
 import static org.graylog2.shared.security.RestPermissions.USERS_READ;
@@ -140,7 +144,8 @@ import static org.graylog2.users.PasswordComplexityConfig.SPECIAL_CHARACTERS_COD
 @Path("/users")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Api(value = "Users", description = "User accounts", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Users", description = "User accounts")
 public class UsersResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(UsersResource.class);
     private static final int USERNAME_PERMISSION_PARTS_LENGTH = 3;
@@ -156,6 +161,7 @@ public class UsersResource extends RestResource {
     private final DefaultSecurityManager securityManager;
     private final GlobalAuthServiceConfig globalAuthServiceConfig;
     private final ClusterConfigService clusterConfigService;
+    private final AuditEventSender auditEventSender;
 
     protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put(UserOverviewDTO.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
@@ -173,7 +179,8 @@ public class UsersResource extends RestResource {
                          UserSessionTerminationService sessionTerminationService,
                          DefaultSecurityManager securityManager,
                          GlobalAuthServiceConfig globalAuthServiceConfig,
-                         ClusterConfigService clusterConfigService) {
+                         ClusterConfigService clusterConfigService,
+                         AuditEventSender auditEventSender) {
         this.userManagementService = userManagementService;
         this.accessTokenService = accessTokenService;
         this.roleService = roleService;
@@ -184,6 +191,7 @@ public class UsersResource extends RestResource {
         this.searchQueryParser = new SearchQueryParser(UserOverviewDTO.FIELD_FULL_NAME, SEARCH_FIELD_MAPPING);
         this.globalAuthServiceConfig = globalAuthServiceConfig;
         this.clusterConfigService = clusterConfigService;
+        this.auditEventSender = auditEventSender;
     }
 
     /**
@@ -192,12 +200,13 @@ public class UsersResource extends RestResource {
     @GET
     @Deprecated
     @Path("{username}")
-    @ApiOperation(value = "Get user details", notes = "The user's permissions are only included if a user asks for his " +
+    @Operation(summary = "Get user details", description = "The user's permissions are only included if a user asks for his " +
             "own account or for users with the necessary permissions to edit permissions.")
     @ApiResponses({
-            @ApiResponse(code = 404, message = "The user could not be found.")
+            @ApiResponse(responseCode = "200", description = "Returns the user", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "The user could not be found.")
     })
-    public UserSummary get(@ApiParam(name = "username", value = "The username to return information for.", required = true)
+    public UserSummary get(@Parameter(name = "username", description = "The username to return information for.", required = true)
                            @PathParam("username") String username,
                            @Context UserContext userContext) {
         // If a user has permissions to edit another user's profile, it should be able to see it.
@@ -215,12 +224,13 @@ public class UsersResource extends RestResource {
 
     @GET
     @Path("id/{userId}")
-    @ApiOperation(value = "Get user details by userId", notes = "The user's permissions are only included if a user asks for his " +
+    @Operation(summary = "Get user details by userId", description = "The user's permissions are only included if a user asks for his " +
             "own account or for users with the necessary permissions to edit permissions.")
     @ApiResponses({
-            @ApiResponse(code = 404, message = "The user could not be found.")
+            @ApiResponse(responseCode = "200", description = "Returns the user", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "The user could not be found.")
     })
-    public UserSummary getbyId(@ApiParam(name = "userId", value = "The userId to return information for.", required = true)
+    public UserSummary getbyId(@Parameter(name = "userId", description = "The userId to return information for.", required = true)
                                @PathParam("userId") String userId,
                                @Context UserContext userContext) {
 
@@ -244,11 +254,12 @@ public class UsersResource extends RestResource {
 
     @GET
     @Path("/basic/id/{userId}")
-    @ApiOperation(value = "Get basic user data by userId")
+    @Operation(summary = "Get basic user data by userId")
     @ApiResponses({
-            @ApiResponse(code = 404, message = "The user could not be found.")
+            @ApiResponse(responseCode = "200", description = "Returns user info", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "The user could not be found.")
     })
-    public BasicUserResponse getBasicUserById(@ApiParam(name = "userId", value = "The userId to return information for.", required = true)
+    public BasicUserResponse getBasicUserById(@Parameter(name = "userId", description = "The userId to return information for.", required = true)
                                               @PathParam("userId") String userId) {
 
         final User user = loadUserById(userId);
@@ -269,10 +280,10 @@ public class UsersResource extends RestResource {
      */
     @GET
     @Deprecated
-    @ApiOperation(value = "List all users", notes = "Permissions and session data included by default")
+    @Operation(summary = "List all users", description = "Permissions and session data included by default")
     public UserList listUsers(
-            @ApiParam(name = "include_permissions") @QueryParam("include_permissions") @DefaultValue("true") boolean includePermissions,
-            @ApiParam(name = "include_sessions") @QueryParam("include_sessions") @DefaultValue("true") boolean includeSessions,
+            @Parameter(name = "include_permissions") @QueryParam("include_permissions") @DefaultValue("true") boolean includePermissions,
+            @Parameter(name = "include_sessions") @QueryParam("include_sessions") @DefaultValue("true") boolean includeSessions,
             @Context SearchUser searchUser) {
         final Optional<AllUserSessions> optSessions = includeSessions ? Optional.of(AllUserSessions.create(sessionService)) : Optional.empty();
         return searchUser.isPermitted(RestPermissions.USERS_LIST) ?
@@ -307,17 +318,18 @@ public class UsersResource extends RestResource {
     @GET
     @Timed
     @Path("/paginated")
-    @ApiOperation(value = "Get paginated list of users")
+    @Operation(summary = "Get paginated list of users")
     @Produces(MediaType.APPLICATION_JSON)
-    public PaginatedResponse<UserOverviewDTO> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                      @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                      @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                                      @ApiParam(name = "sort",
-                                                              value = "The field to sort the result on",
+    public PaginatedResponse<UserOverviewDTO> getPage(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                      @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                      @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                      @Parameter(name = "sort",
+                                                              description = "The field to sort the result on",
                                                               required = true,
-                                                              allowableValues = "title,description")
+                                                              schema = @Schema(allowableValues = {"username", "full_name", "email"}))
                                                       @DefaultValue(UserOverviewDTO.FIELD_FULL_NAME) @QueryParam("sort") String sort,
-                                                      @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                      @Parameter(name = "order", description = "The sort direction",
+                                                              schema = @Schema(allowableValues = {"asc", "desc"}))
                                                       @DefaultValue("asc") @QueryParam("order") SortOrder order) {
 
         SearchQuery searchQuery;
@@ -369,13 +381,15 @@ public class UsersResource extends RestResource {
 
     @POST
     @RequiresPermissions(RestPermissions.USERS_CREATE)
-    @ApiOperation("Create a new user account.")
+    @Operation(summary = "Create a new user account.")
     @ApiResponses({
-            @ApiResponse(code = 400, message = "Missing or invalid user details.")
+            @ApiResponse(responseCode = "201", description = "Created"),
+            @ApiResponse(responseCode = "400", description = "Missing or invalid user details.")
     })
     @AuditEvent(type = AuditEventTypes.USER_CREATE)
-    public Response create(@ApiParam(name = "JSON body", value = "Must contain username, full_name, email, password and a list of permissions.", required = true)
-                           @Valid @NotNull CreateUserRequest cr) throws ValidationException {
+    public Response create(@RequestBody(description = "Must contain username, full_name, email, password and a list of permissions.", required = true)
+                               @Valid @NotNull CreateUserRequest cr,
+                           @Context UserContext userContext) throws ValidationException {
         if (isUserNameInUse(cr.username())) {
             final String msg = "Cannot create user " + cr.username() + ". Username is already taken.";
             LOG.error(msg);
@@ -393,7 +407,7 @@ public class UsersResource extends RestResource {
         user.setFirstLastFullNames(cr.firstName(), cr.lastName());
         user.setEmail(cr.email());
         user.setPermissions(cr.permissions());
-        setUserRoles(cr.roles(), user);
+        setUserRoles(cr.roles(), user, userContext);
         user.setServiceAccount(cr.isServiceAccount());
 
         if (cr.timezone() != null) {
@@ -423,9 +437,9 @@ public class UsersResource extends RestResource {
     @GET
     @RequiresPermissions(RestPermissions.USERS_CREATE)
     @Path("/username_availability")
-    @ApiOperation(value = "Check if a username is still available")
+    @Operation(summary = "Check if a username is still available")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response checkUsernameAvailability(@ApiParam(name = "username") @QueryParam("username") String username) {
+    public Response checkUsernameAvailability(@Parameter(name = "username") @QueryParam("username") String username) {
         return Response.ok(new UsernameAvailabilityResponse(username, !isUserNameInUse(username))).build();
     }
 
@@ -464,7 +478,7 @@ public class UsersResource extends RestResource {
         }
     }
 
-    private void setUserRoles(@Nullable List<String> roles, User user) {
+    private void setUserRoles(@Nullable List<String> roles, User user, UserContext userContext) {
         if (roles == null) {
             return;
         }
@@ -503,6 +517,11 @@ public class UsersResource extends RestResource {
                     .collect(Collectors.toSet());
 
             user.setRoleIds(roleIds);
+            auditEventSender.success(AuditActor.user(userContext.getUser().getName()),
+                    AuditEventTypes.USER_ROLES_UPDATE,
+                    ImmutableMap.of("roles", String.join(",", normalizedRoles),
+                            "userName", user.getName(),
+                            "userId", user.getId()));
 
         } catch (org.graylog2.database.NotFoundException e) {
             throw new InternalServerErrorException(e);
@@ -511,16 +530,18 @@ public class UsersResource extends RestResource {
 
     @PUT
     @Path("{userId}")
-    @ApiOperation("Modify user details.")
+    @Operation(summary = "Modify user details.")
     @ApiResponses({
-            @ApiResponse(code = 400, message = "Attempted to modify a read only user account (e.g. built-in or LDAP users)."),
-            @ApiResponse(code = 400, message = "Missing or invalid user details.")
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "400", description = "Attempted to modify a read only user account (e.g. built-in or LDAP users)."),
+            @ApiResponse(responseCode = "400", description = "Missing or invalid user details.")
     })
     @AuditEvent(type = AuditEventTypes.USER_UPDATE)
-    public void changeUser(@ApiParam(name = "userId", value = "The ID of the user to modify.", required = true)
+    public void changeUser(@Parameter(name = "userId", description = "The ID of the user to modify.", required = true)
                            @PathParam("userId") String userId,
-                           @ApiParam(name = "JSON body", value = "Updated user information.", required = true)
-                           @Valid @NotNull ChangeUserRequest cr) throws ValidationException {
+                           @RequestBody(description = "Updated user information.", required = true)
+                           @Valid @NotNull ChangeUserRequest cr,
+                           @Context UserContext userContext) throws ValidationException {
 
         final User user = loadUserById(userId);
         final String username = user.getName();
@@ -545,7 +566,7 @@ public class UsersResource extends RestResource {
 
         if (isPermitted(USERS_ROLESEDIT, user.getName())) {
             checkAdminRoleForServiceAccount(cr, user);
-            setUserRoles(cr.roles(), user);
+            setUserRoles(cr.roles(), user, userContext);
         }
 
         final String timezone = cr.timezone();
@@ -615,10 +636,13 @@ public class UsersResource extends RestResource {
 
     @DELETE
     @Path("{username}")
-    @ApiOperation("Removes a user account.")
-    @ApiResponses({@ApiResponse(code = 400, message = "When attempting to remove a read only user (e.g. built-in or LDAP user).")})
+    @Operation(summary = "Removes a user account.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "400", description = "When attempting to remove a read only user (e.g. built-in or LDAP user).")
+    })
     @AuditEvent(type = AuditEventTypes.USER_DELETE)
-    public void deleteUser(@ApiParam(name = "username", value = "The name of the user to delete.", required = true)
+    public void deleteUser(@Parameter(name = "username", description = "The name of the user to delete.", required = true)
                            @PathParam("username") String username) {
         checkPermission(USERS_EDIT, username);
 
@@ -629,10 +653,13 @@ public class UsersResource extends RestResource {
 
     @DELETE
     @Path("id/{userId}")
-    @ApiOperation("Removes a user account.")
-    @ApiResponses({@ApiResponse(code = 400, message = "When attempting to remove a read only user (e.g. built-in or LDAP user).")})
+    @Operation(summary = "Removes a user account.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "400", description = "When attempting to remove a read only user (e.g. built-in or LDAP user).")
+    })
     @AuditEvent(type = AuditEventTypes.USER_DELETE)
-    public void deleteUserById(@ApiParam(name = "userId", value = "The id of the user to delete.", required = true)
+    public void deleteUserById(@Parameter(name = "userId", description = "The id of the user to delete.", required = true)
                                @PathParam("userId") String userId) {
         final User user = loadUserById(userId);
         checkPermission(USERS_EDIT, user.getName());
@@ -645,14 +672,15 @@ public class UsersResource extends RestResource {
     @PUT
     @Path("{username}/permissions")
     @RequiresPermissions(RestPermissions.USERS_PERMISSIONSEDIT)
-    @ApiOperation("Update a user's permission set.")
+    @Operation(summary = "Update a user's permission set.")
     @ApiResponses({
-            @ApiResponse(code = 400, message = "Missing or invalid permission data.")
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "400", description = "Missing or invalid permission data.")
     })
     @AuditEvent(type = AuditEventTypes.USER_PERMISSIONS_UPDATE)
-    public void editPermissions(@ApiParam(name = "username", value = "The name of the user to modify.", required = true)
+    public void editPermissions(@Parameter(name = "username", description = "The name of the user to modify.", required = true)
                                 @PathParam("username") String username,
-                                @ApiParam(name = "JSON body", value = "The list of permissions to assign to the user.", required = true)
+                                @RequestBody(description = "The list of permissions to assign to the user.", required = true)
                                 @Valid @NotNull PermissionEditRequest permissionRequest) throws ValidationException {
         final User user = userManagementService.load(username);
         if (user == null) {
@@ -665,14 +693,15 @@ public class UsersResource extends RestResource {
 
     @PUT
     @Path("{username}/preferences")
-    @ApiOperation("Update a user's preferences set.")
+    @Operation(summary = "Update a user's preferences set.")
     @ApiResponses({
-            @ApiResponse(code = 400, message = "Missing or invalid permission data.")
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "400", description = "Missing or invalid permission data.")
     })
     @AuditEvent(type = AuditEventTypes.USER_PREFERENCES_UPDATE)
-    public void savePreferences(@ApiParam(name = "username", value = "The name of the user to modify.", required = true)
+    public void savePreferences(@Parameter(name = "username", description = "The name of the user to modify.", required = true)
                                 @PathParam("username") String username,
-                                @ApiParam(name = "JSON body", value = "The map of preferences to assign to the user.", required = true)
+                                @RequestBody(description = "The map of preferences to assign to the user.", required = true)
                                 UpdateUserPreferences preferencesRequest) throws ValidationException {
         final User user = userManagementService.load(username);
         checkPermission(USERS_EDIT, username);
@@ -688,12 +717,13 @@ public class UsersResource extends RestResource {
     @DELETE
     @Path("{username}/permissions")
     @RequiresPermissions(RestPermissions.USERS_PERMISSIONSEDIT)
-    @ApiOperation("Revoke all permissions for a user without deleting the account.")
+    @Operation(summary = "Revoke all permissions for a user without deleting the account.")
     @ApiResponses({
-            @ApiResponse(code = 500, message = "When saving the user failed.")
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "500", description = "When saving the user failed.")
     })
     @AuditEvent(type = AuditEventTypes.USER_PERMISSIONS_DELETE)
-    public void deletePermissions(@ApiParam(name = "username", value = "The name of the user to modify.", required = true)
+    public void deletePermissions(@Parameter(name = "username", description = "The name of the user to modify.", required = true)
                                   @PathParam("username") String username) throws ValidationException {
         final User user = userManagementService.load(username);
         if (user == null) {
@@ -705,18 +735,18 @@ public class UsersResource extends RestResource {
 
     @PUT
     @Path("{userId}/password")
-    @ApiOperation("Update the password for a user.")
+    @Operation(summary = "Update the password for a user.")
     @ApiResponses({
-            @ApiResponse(code = 204, message = "The password was successfully updated. Subsequent requests must be made with the new password."),
-            @ApiResponse(code = 400, message = "The new password is missing, or the old password is missing or incorrect."),
-            @ApiResponse(code = 403, message = "The requesting user has insufficient privileges to update the password for the given user."),
-            @ApiResponse(code = 404, message = "User does not exist.")
+            @ApiResponse(responseCode = "204", description = "The password was successfully updated. Subsequent requests must be made with the new password."),
+            @ApiResponse(responseCode = "400", description = "The new password is missing, or the old password is missing or incorrect."),
+            @ApiResponse(responseCode = "403", description = "The requesting user has insufficient privileges to update the password for the given user."),
+            @ApiResponse(responseCode = "404", description = "User does not exist.")
     })
     @AuditEvent(type = AuditEventTypes.USER_PASSWORD_UPDATE)
     public void changePassword(
-            @ApiParam(name = "userId", value = "The id of the user whose password to change.", required = true)
+            @Parameter(name = "userId", description = "The id of the user whose password to change.", required = true)
             @PathParam("userId") String userId,
-            @ApiParam(name = "JSON body", value = "The old and new passwords.", required = true)
+            @RequestBody(description = "The old and new passwords.", required = true)
             @Valid ChangePasswordRequest cr) throws ValidationException {
 
         final User user = loadUserById(userId);
@@ -768,13 +798,13 @@ public class UsersResource extends RestResource {
     @PUT
     @Path("{userId}/status/{newStatus}")
     @Consumes(MediaType.WILDCARD)
-    @ApiOperation("Update the account status for a user")
+    @Operation(summary = "Update the account status for a user")
     @AuditEvent(type = AuditEventTypes.USER_UPDATE)
     public Response updateAccountStatus(
-            @ApiParam(name = "userId", value = "The id of the user whose status to change.", required = true)
+            @Parameter(name = "userId", description = "The id of the user whose status to change.", required = true)
             @PathParam("userId") @NotBlank String userId,
-            @ApiParam(name = "newStatus", value = "The account status to be set", required = true,
-                      defaultValue = "enabled", allowableValues = "enabled,disabled,deleted")
+            @Parameter(name = "newStatus", description = "The account status to be set", required = true,
+                      schema = @Schema(allowableValues = {"enabled", "disabled", "deleted"}))
             @PathParam("newStatus") @NotBlank String newStatusString,
             @Context UserContext userContext) throws ValidationException {
 
@@ -797,8 +827,8 @@ public class UsersResource extends RestResource {
 
     @GET
     @Path("{userId}/tokens")
-    @ApiOperation("Retrieves the list of access tokens for a user")
-    public TokenList listTokens(@ApiParam(name = "userId", required = true)
+    @Operation(summary = "Retrieves the list of access tokens for a user")
+    public TokenList listTokens(@Parameter(name = "userId", required = true)
                                 @PathParam("userId") String userId) {
         final User user = loadUserById(userId);
         final String username = user.getName();
@@ -817,12 +847,12 @@ public class UsersResource extends RestResource {
 
     @POST
     @Path("{userId}/tokens/{name}")
-    @ApiOperation("Generates a new access token for a user")
+    @Operation(summary = "Generates a new access token for a user")
     @AuditEvent(type = AuditEventTypes.USER_ACCESS_TOKEN_CREATE)
     public Token generateNewToken(
-            @ApiParam(name = "userId", required = true) @PathParam("userId") String userId,
-            @ApiParam(name = "name", value = "Descriptive name for this token (e.g. 'cronjob') ", required = true) @PathParam("name") String name,
-            @ApiParam(name = "JSON Body", value = "Can optionally contain the token's TTL.", defaultValue = "{\"token_ttl\":null}") GenerateTokenTTL body) {
+            @Parameter(name = "userId", required = true) @PathParam("userId") String userId,
+            @Parameter(name = "name", description = "Descriptive name for this token (e.g. 'cronjob') ", required = true) @PathParam("name") String name,
+            @RequestBody(description = "Can optionally contain the token's TTL.") GenerateTokenTTL body) {
         final User futureOwner = loadUserById(userId);
 
         if (!isPermitted(USERS_TOKENCREATE, futureOwner.getName())) {
@@ -839,11 +869,11 @@ public class UsersResource extends RestResource {
 
     @DELETE
     @Path("{userId}/tokens/{idOrToken}")
-    @ApiOperation("Removes a token for a user")
+    @Operation(summary = "Removes a token for a user")
     @AuditEvent(type = AuditEventTypes.USER_ACCESS_TOKEN_DELETE)
     public void revokeToken(
-            @ApiParam(name = "userId", required = true) @PathParam("userId") String userId,
-            @ApiParam(name = "idOrToken", required = true) @PathParam("idOrToken") String idOrToken) {
+            @Parameter(name = "userId", required = true) @PathParam("userId") String userId,
+            @Parameter(name = "idOrToken", required = true) @PathParam("idOrToken") String idOrToken) {
         final User user = loadUserById(userId);
         final String username = user.getName();
         if (!isPermitted(USERS_TOKENREMOVE, username)) {

@@ -85,4 +85,8 @@ public record Config(
         return new Config(Optional.of(productName), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
     }
+
+    public Config withWelcome(Welcome welcome) {
+        return new Config(productName, favicon, logo, helpUrl, helpPages, login, Optional.of(welcome), navigation, footer, resources, features);
+    }
 }

@@ -68,6 +68,7 @@ type Props = React.PropsWithChildren<{
   defaultClosed?: boolean;
   disableCollapseButton?: boolean;
   collapseButtonPosition?: 'left' | 'right';
+  className?: string;
 }>;
 
 /**
@@ -85,6 +86,7 @@ const Section = ({
   disableCollapseButton = false,
   collapseButtonPosition = 'left',
   children = null,
+  className = undefined,
 }: Props) => {
   const [opened, { toggle }] = useDisclosure(!defaultClosed);
 
@@ -113,7 +115,7 @@ const Section = ({
   );
 
   return (
-    <Container $opened={opened} $collapsible={collapsible}>
+    <Container $opened={opened} $collapsible={collapsible} className={className}>
       <Header $opened={opened} $collapsible={collapsible} onClick={onHeaderClick}>
         <FlexWrapper>
           {collapseButtonPosition === 'left' && collapseButton}

@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix issue when click on pie chart shows in popover NaN instead of value."
+
+issues = ["23853"]
+pulls = ["24413"]

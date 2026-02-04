@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
+import io.modelcontextprotocol.spec.McpError;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.ProtocolVersions;
 import jakarta.inject.Inject;
@@ -53,6 +54,9 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @Singleton
 public class McpService {
     private static final Logger LOG = LoggerFactory.getLogger(McpService.class);
+    private static final String LATEST_SUPPORTED_MCP_VERSION = ProtocolVersions.MCP_2025_06_18;
+    static final String FALLBACK_MCP_VERSION = "2025-03-26";
+    static final List<String> ALL_SUPPORTED_MCP_VERSIONS = List.of(LATEST_SUPPORTED_MCP_VERSION);
 
     private final ObjectMapper objectMapper;
     private final AuditEventSender auditEventSender;
@@ -60,7 +64,6 @@ public class McpService {
     private final GRNRegistry grnRegistry;
     private final Map<String, Tool<?, ?>> tools;
     private final Map<GRNType, ? extends ResourceProvider> resourceProviders;
-    protected final List<String> supportedVersions = List.of(ProtocolVersions.MCP_2025_06_18);
 
     @Inject
     protected McpService(ObjectMapper objectMapper,
@@ -77,22 +80,24 @@ public class McpService {
         this.resourceProviders = resourceProviders;
     }
 
-    public Optional<McpSchema.Result> handle(PermissionHelper permissionHelper, McpSchema.JSONRPCRequest request, String sessionId)
-            throws McpException, IllegalArgumentException {
+    public Optional<McpSchema.Result> handle(PermissionHelper permissionHelper, McpSchema.JSONRPCRequest request, String sessionId) throws McpError {
+        return handle(permissionHelper, request, sessionId, null);
+    }
+
+    public Optional<McpSchema.Result> handle(PermissionHelper permissionHelper, McpSchema.JSONRPCRequest request, String sessionId, String protocolVersion) throws McpError {
         final AuditActor auditActor = AuditActor.user(permissionHelper.getCurrentUser().getName());
         final Map<String, Object> auditContext = Maps.newHashMap();
         auditContext.put("sessionId", sessionId);
+
+        // TODO: support multiple protocol versions -> add different handlers for different protocol versions if required
 
         switch (request.method()) {
             case McpSchema.METHOD_INITIALIZE -> {
                 final McpSchema.InitializeRequest initializeRequest = objectMapper.convertValue(request.params(), new TypeReference<>() {});
                 auditContext.put("request", initializeRequest);
-                if (!supportedVersions.contains(initializeRequest.protocolVersion())) {
-                    LOG.warn("Invalid protocol version {} for request {}", initializeRequest.protocolVersion(), request.params());
-                    throw new IllegalArgumentException("Invalid protocol version " + initializeRequest.protocolVersion());
-                }
                 final McpSchema.InitializeResult result = new McpSchema.InitializeResult(
-                        initializeRequest.protocolVersion(),
+                        // Version negotiation: https://modelcontextprotocol.io/specification/2025-06-18/basic/lifecycle#version-negotiation
+                        ALL_SUPPORTED_MCP_VERSIONS.contains(initializeRequest.protocolVersion()) ? initializeRequest.protocolVersion() : LATEST_SUPPORTED_MCP_VERSION,
                         new McpSchema.ServerCapabilities(
                                 null,
                                 null,
@@ -137,7 +142,10 @@ public class McpService {
                     final var contents = new McpSchema.TextResourceContents(resource.uri(), null, resource.description());
                     return Optional.of(new McpSchema.ReadResourceResult(List.of(contents)));
                 } catch (Exception e) {
-                    throw new McpException("Failed to read resource: " + e.getMessage());
+                    throw McpError.builder(McpSchema.ErrorCodes.RESOURCE_NOT_FOUND)
+                            .message("Failed to read resource")
+                            .data(Map.of("uri", readResourceRequest.uri()))
+                            .build();
                 }
             }
             case McpSchema.METHOD_RESOURCES_TEMPLATES_LIST -> {
@@ -164,7 +172,9 @@ public class McpService {
                             .title(tool.title())
                             .description(tool.description());
                     tool.inputSchema().ifPresent(builder::inputSchema);
-                    tool.outputSchema().ifPresent(builder::outputSchema);
+                    if (tool.isOutputSchemaEnabled()) {
+                        tool.outputSchema().ifPresent(builder::outputSchema);
+                    }
                     return builder.build();
                 }).toList();
                 auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_LIST), auditContext);
@@ -221,12 +231,13 @@ public class McpService {
                 auditContext.put("request", promptRequest);
                 LOG.debug("Getting prompt {}", promptRequest.name());
                 auditEventSender.failure(auditActor, AuditEventType.create(MCP_PROMPT_GET), auditContext);
-                throw new McpException("Unknown prompt name");
 //                return Optional.of(new McpSchema.GetPromptResult(null, List.of()));
             }
-            default -> LOG.warn("Unsupported MCP method: " + request.method());
+            default -> LOG.warn("Unsupported MCP method: {}", request.method());
 
         }
-        throw new McpException("Unsupported request method: " + request.method());
+        throw McpError.builder(McpSchema.ErrorCodes.METHOD_NOT_FOUND)
+                .message("Unsupported method: " + request.method())
+                .build();
     }
 }

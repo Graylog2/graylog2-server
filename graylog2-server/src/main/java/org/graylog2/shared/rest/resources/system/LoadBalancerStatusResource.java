@@ -17,9 +17,13 @@
 package org.graylog2.shared.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
@@ -43,7 +47,7 @@ import jakarta.ws.rs.core.Response;
 
 import java.util.Locale;
 
-@Api(value = "System/LoadBalancers", description = "Status propagation for load balancers")
+@Tag(name = "System/LoadBalancers", description = "Status propagation for load balancers")
 @Path("/system/lbstatus")
 public class LoadBalancerStatusResource extends RestResource {
 
@@ -63,8 +67,19 @@ public class LoadBalancerStatusResource extends RestResource {
     @GET
     @Timed
     @Produces(MediaType.TEXT_PLAIN)
-    @ApiOperation(value = "Get status of this Graylog server node for load balancers. " +
+    @Operation(summary = "Get status of this Graylog server node for load balancers. " +
             "Returns ALIVE with HTTP 200, DEAD with HTTP 503, or THROTTLED with HTTP 429.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "ALIVE",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN,
+                            schema = @Schema(type = "string"))),
+            @ApiResponse(responseCode = "429", description = "THROTTLED",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN,
+                            schema = @Schema(type = "string"))),
+            @ApiResponse(responseCode = "503", description = "DEAD",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN,
+                            schema = @Schema(type = "string")))
+    })
     public Response status() {
         final LoadBalancerStatus lbStatus = serverStatus.getLifecycle().getLoadbalancerStatus();
 
@@ -90,11 +105,11 @@ public class LoadBalancerStatusResource extends RestResource {
     @RequiresAuthentication
     @RequiresPermissions(RestPermissions.LBSTATUS_CHANGE)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Override load balancer status of this Graylog server node. Next lifecycle " +
+    @Operation(summary = "Override load balancer status of this Graylog server node. Next lifecycle " +
             "change will override it again to its default. Set to ALIVE, DEAD, or THROTTLED.")
     @Path("/override/{status}")
     @AuditEvent(type = AuditEventTypes.LOAD_BALANCER_STATUS_UPDATE)
-    public void override(@ApiParam(name = "status") @PathParam("status") String status) {
+    public void override(@Parameter(name = "status") @PathParam("status") String status) {
         final LoadBalancerStatus lbStatus;
         try {
             lbStatus = LoadBalancerStatus.valueOf(status.toUpperCase(Locale.ENGLISH));

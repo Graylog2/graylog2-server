@@ -19,40 +19,6 @@ import styled, { css } from 'styled-components';
 
 import { Section } from 'components/common';
 
-const Container = styled.div(
-  ({ theme }) => css`
-    table thead,
-    table thead tr,
-    table thead th {
-      background-color: ${theme.colors.section.filled} !important;
-    }
-
-    table tbody {
-      background-color: transparent;
-    }
-
-    table tbody tr {
-      background-color: transparent;
-    }
-
-    table tbody tr:first-of-type {
-      background-color: transparent;
-    }
-
-    table tbody:nth-of-type(odd) tr:first-of-type {
-      background-color: ${theme.colors.table.row.background} !important;
-    }
-
-    table tbody:nth-of-type(even) tr:first-of-type {
-      background-color: ${theme.colors.table.row.backgroundStriped} !important;
-    }
-
-    table tbody tr:hover:first-of-type {
-      background-color: ${theme.colors.table.row.backgroundHover} !important;
-    }
-  `,
-);
-
 const TitleWrapper = styled.div`
   display: inline-flex;
   align-items: center;
@@ -79,8 +45,8 @@ const TitleCountButton = styled.button`
 const TableWrapper = styled.div.withConfig({
   shouldForwardProp: (prop) => prop !== 'maxHeight',
 })<{ maxHeight?: string }>(
-  ({ maxHeight, theme }) => css`
-    margin-top: calc(-1 * ${theme.spacings.lg});
+  ({ maxHeight }) => css`
+    margin-top: -12px;
 
     ${maxHeight &&
     css`
@@ -90,14 +56,18 @@ const TableWrapper = styled.div.withConfig({
       }
 
       div#scroll-container table thead {
+        background-color: ${({ theme }) => theme.colors.global.contentBackground};
         position: sticky;
         top: 0;
         z-index: 1;
-        background: ${theme.colors.table.head.background};
       }
     `}
   `,
 );
+
+const PaperSection = styled(Section)`
+  background-color: ${({ theme }) => theme.colors.global.contentBackground};
+`;
 
 const getMaxHeightValue = (maxContentHeight: number | string | null, collapsible: boolean) => {
   if (!collapsible || maxContentHeight === null || maxContentHeight === undefined) {
@@ -115,7 +85,6 @@ type Props = React.PropsWithChildren<{
   title: string;
   titleCount?: number | null;
   onTitleCountClick?: (() => void) | null;
-  headerLeftSection?: React.ReactNode;
   collapsible?: boolean;
   maxContentHeight?: number | string | null;
 }>;
@@ -125,7 +94,6 @@ const ClusterNodesSectionWrapper = ({
   title,
   titleCount = null,
   onTitleCountClick = null,
-  headerLeftSection = undefined,
   collapsible = true,
   maxContentHeight = 400,
 }: Props) => {
@@ -161,16 +129,9 @@ const ClusterNodesSectionWrapper = ({
   };
 
   return (
-    <Container>
-      <Section
-        title={title}
-        header={renderHeader()}
-        collapsible={collapsible}
-        headerLeftSection={headerLeftSection}
-        collapseButtonPosition="left">
-        <TableWrapper maxHeight={getMaxHeightValue(maxContentHeight, collapsible)}>{children}</TableWrapper>
-      </Section>
-    </Container>
+    <PaperSection title={title} header={renderHeader()} collapsible={collapsible}>
+      <TableWrapper maxHeight={getMaxHeightValue(maxContentHeight, collapsible)}>{children}</TableWrapper>
+    </PaperSection>
   );
 };
 

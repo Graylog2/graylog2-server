@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Formik } from 'formik';
 import { OrderedMap } from 'immutable';
 import { v4 as uuidv4 } from 'uuid';
@@ -34,9 +34,9 @@ function SearchFiltersFormControls({ filters, onChange, hideFiltersPreview = () 
   const pluggableControls = searchFiltersPlugin.map((controlFn) => controlFn()).filter((control) => !!control);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  React.useEffect(() => hideFiltersPreview(!pluggableControls.length), []);
+  useEffect(() => hideFiltersPreview(!pluggableControls.length), []);
 
-  const initialFilters = React.useMemo(() => {
+  const initialFilters = useMemo(() => {
     const searchFilters = OrderedMap(
       filters.map((filter) => [filter.id || uuidv4(), { frontendId: filter.id || uuidv4(), ...filter }]),
     );

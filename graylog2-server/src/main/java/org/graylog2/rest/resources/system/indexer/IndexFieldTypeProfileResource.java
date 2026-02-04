@@ -17,9 +17,10 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -42,6 +43,7 @@ import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileIdAndName;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileWithUsages;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -50,10 +52,10 @@ import java.util.List;
 import static org.graylog2.audit.AuditEventTypes.INDEX_FIELD_TYPE_PROFILE_CREATE;
 import static org.graylog2.audit.AuditEventTypes.INDEX_FIELD_TYPE_PROFILE_DELETE;
 import static org.graylog2.audit.AuditEventTypes.INDEX_FIELD_TYPE_PROFILE_UPDATE;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "System/IndexSets/FieldTypeProfiles", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "System/IndexSets/FieldTypeProfiles")
 @Path("/system/indices/index_sets/profiles")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -70,8 +72,8 @@ public class IndexFieldTypeProfileResource extends RestResource {
     @Path("/{profile_id}")
     @Timed
     @NoAuditEvent("No change to the DB")
-    @ApiOperation(value = "Gets profile by id")
-    public IndexFieldTypeProfileWithUsages retrieveById(@ApiParam(name = "profile_id") @PathParam("profile_id") String profileId) {
+    @Operation(summary = "Gets profile by id")
+    public IndexFieldTypeProfileWithUsages retrieveById(@Parameter(name = "profile_id") @PathParam("profile_id") String profileId) {
         checkPermission(RestPermissions.MAPPING_PROFILES_READ, profileId);
         return profileService.getWithUsages(profileId)
                 .orElseThrow(() -> new NotFoundException("No profile with id : " + profileId));
@@ -81,17 +83,18 @@ public class IndexFieldTypeProfileResource extends RestResource {
     @Path("/paginated")
     @Timed
     @NoAuditEvent("No change to the DB")
-    @ApiOperation(value = "Gets profile by id")
-    public PageListResponse<IndexFieldTypeProfileWithUsages> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                                     @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                                     @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                                                     @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
-                                                                     @ApiParam(name = "sort",
-                                                                               value = "The field to sort the result on",
+    @Operation(summary = "Gets profile by id")
+    public PageListResponse<IndexFieldTypeProfileWithUsages> getPage(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                                     @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                                     @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                                     @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
+                                                                     @Parameter(name = "sort",
+                                                                               description = "The field to sort the result on",
                                                                                required = true,
-                                                                               allowableValues = "name")
+                                                                               schema = @Schema(allowableValues = {"id", "name", "description"}))
                                                                      @DefaultValue(IndexFieldTypeProfile.NAME_FIELD_NAME) @QueryParam("sort") String sort,
-                                                                     @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                                     @Parameter(name = "order", description = "The sort direction",
+                                                                               schema = @Schema(allowableValues = {"asc", "desc"}))
                                                                      @DefaultValue("asc") @QueryParam("order") String order) {
         checkPermission(RestPermissions.MAPPING_PROFILES_READ);
         return profileService.getPaginated(query, filters, page, perPage, sort, order);
@@ -101,7 +104,7 @@ public class IndexFieldTypeProfileResource extends RestResource {
     @Path("/all")
     @Timed
     @NoAuditEvent("No change to the DB")
-    @ApiOperation(value = "Gets list of all profiles (their ids and names only)")
+    @Operation(summary = "Gets list of all profiles (their ids and names only)")
     public List<IndexFieldTypeProfileIdAndName> getAll() {
         checkPermission(RestPermissions.MAPPING_PROFILES_READ);
         return profileService.getAll();
@@ -110,8 +113,8 @@ public class IndexFieldTypeProfileResource extends RestResource {
     @POST
     @Timed
     @AuditEvent(type = INDEX_FIELD_TYPE_PROFILE_CREATE)
-    @ApiOperation(value = "Creates a new profile")
-    public IndexFieldTypeProfile create(@ApiParam(name = "profileData") IndexFieldTypeProfileData profileData) {
+    @Operation(summary = "Creates a new profile")
+    public IndexFieldTypeProfile create(@Parameter(name = "profileData") IndexFieldTypeProfileData profileData) {
         checkPermission(RestPermissions.MAPPING_PROFILES_CREATE);
         return profileService.save(new IndexFieldTypeProfile(profileData));
     }
@@ -119,8 +122,8 @@ public class IndexFieldTypeProfileResource extends RestResource {
     @PUT
     @Timed
     @AuditEvent(type = INDEX_FIELD_TYPE_PROFILE_UPDATE)
-    @ApiOperation(value = "Updates existing profile")
-    public void update(@ApiParam(name = "profile") IndexFieldTypeProfile profile) {
+    @Operation(summary = "Updates existing profile")
+    public void update(@Parameter(name = "profile") IndexFieldTypeProfile profile) {
         checkPermission(RestPermissions.MAPPING_PROFILES_EDIT, profile.id());
         final boolean updated = profileService.update(profile.id(), profile);
         if (!updated) {
@@ -132,8 +135,8 @@ public class IndexFieldTypeProfileResource extends RestResource {
     @Path("/{profile_id}")
     @Timed
     @AuditEvent(type = INDEX_FIELD_TYPE_PROFILE_DELETE)
-    @ApiOperation(value = "Removes a profile")
-    public void delete(@ApiParam(name = "profile_id") @PathParam("profile_id") String profileId) {
+    @Operation(summary = "Removes a profile")
+    public void delete(@Parameter(name = "profile_id") @PathParam("profile_id") String profileId) {
         checkPermission(RestPermissions.MAPPING_PROFILES_DELETE, profileId);
         profileService.delete(profileId);
     }

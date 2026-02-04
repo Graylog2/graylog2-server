@@ -16,9 +16,9 @@
  */
 package org.graylog.events.rest;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -35,6 +35,7 @@ import org.graylog.events.search.EventsSearchService;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTimeZone;
 
@@ -46,9 +47,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "Events", description = "Events overview and search", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Events", description = "Events overview and search")
 @Path("/events")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -63,17 +64,17 @@ public class EventsResource extends RestResource implements PluginRestResource {
 
     @POST
     @Path("/search")
-    @ApiOperation("Search events")
+    @Operation(summary = "Search events")
     @NoAuditEvent("Doesn't change any data, only searches for events")
-    public EventsSearchResult search(@ApiParam(name = "JSON body") final EventsSearchParameters request) {
+    public EventsSearchResult search(@Parameter(name = "JSON body") final EventsSearchParameters request) {
         return searchService.search(firstNonNull(request, EventsSearchParameters.empty()), getSubject());
     }
 
     @POST
     @Path("/histogram")
-    @ApiOperation("Build histogram of events over time")
+    @Operation(summary = "Build histogram of events over time")
     @NoAuditEvent("Doesn't change any data, only searches for events")
-    public EventsHistogramResult histogram(@ApiParam(name = "JSON body") final EventsSearchParameters request) {
+    public EventsHistogramResult histogram(@Parameter(name = "JSON body") final EventsSearchParameters request) {
         final var timezone = Optional.ofNullable(getCurrentUser())
                 .map(User::getTimeZone)
                 .map(DateTimeZone::getID)
@@ -84,8 +85,8 @@ public class EventsResource extends RestResource implements PluginRestResource {
 
     @GET
     @Path("{event_id}")
-    @ApiOperation("Get event by ID")
-    public Optional<EventsSearchResult.Event> getById(@ApiParam(name = "event_id") @PathParam("event_id") final String eventId) {
+    @Operation(summary = "Get event by ID")
+    public Optional<EventsSearchResult.Event> getById(@Parameter(name = "event_id") @PathParam("event_id") final String eventId) {
         return searchService.searchByIds(List.of(eventId), getSubject()).events().stream().findFirst();
     }
 
@@ -93,9 +94,9 @@ public class EventsResource extends RestResource implements PluginRestResource {
 
     @POST
     @Path("/byIds")
-    @ApiOperation("Get multiple events by IDs")
+    @Operation(summary = "Get multiple events by IDs")
     @NoAuditEvent("Does not change any data")
-    public Map<String, EventsSearchResult.Event> getByIds(@ApiParam(name = "body") BulkEventsByIds request) {
+    public Map<String, EventsSearchResult.Event> getByIds(@Parameter(name = "body") BulkEventsByIds request) {
         return searchService.searchByIds(request.eventIds(), getSubject()).events().stream()
                 .collect(Collectors.toMap(event -> event.event().id(), event -> event));
     }

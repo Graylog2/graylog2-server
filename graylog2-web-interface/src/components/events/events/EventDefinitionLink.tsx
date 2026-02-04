@@ -28,8 +28,8 @@ const EventDefinitionLink = ({ title, id }: { title: string | undefined; id: str
     return <em>{id}</em>;
   }
 
-  if (isPermitted(permissions, `eventdefinitions:edit:${id}`)) {
-    return <Link to={Routes.ALERTS.DEFINITIONS.edit(id)}>{title}</Link>;
+  if (isPermitted(permissions, `eventdefinitions:read:${id}`)) {
+    return <Link to={Routes.ALERTS.DEFINITIONS.show(id)}>{title}</Link>;
   }
 
   return <>{title}</>;

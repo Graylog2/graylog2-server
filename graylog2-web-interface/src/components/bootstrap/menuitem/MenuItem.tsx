@@ -16,20 +16,34 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Link } from 'react-router-dom';
+import { Menu as MantineMenu } from '@mantine/core';
 
 import Icon from 'components/common/Icon';
 
 import Menu from '../Menu';
 
-const IconWrapper = styled.div`
-  display: inline-flex;
-  min-width: 20px;
-  margin-right: 5px;
-  justify-content: center;
-  align-items: center;
-`;
+const StyledMenuItem = styled(MantineMenu.Item)(
+  ({ theme }) => css`
+    color: ${theme.colors.text.primary};
+    font-size: ${theme.fonts.size.body};
+    white-space: nowrap;
+
+    &:hover,
+    &:focus {
+      text-decoration: none;
+      color: inherit;
+      background-color: ${theme.utils.colorLevel(theme.colors.global.contentBackground, 10)};
+    }
+  `,
+);
+
+const StyledMenuDivider = styled(MantineMenu.Divider)(
+  ({ theme }) => css`
+    border-color: ${theme.colors.variant.lighter.default};
+  `,
+);
 
 type Callback<T> = T extends undefined ? () => void : (eventKey: T) => void;
 
@@ -76,7 +90,7 @@ const CustomMenuItem = <T,>({
   const _onClick = useCallback(() => callback?.(eventKey), [callback, eventKey]);
 
   if (divider) {
-    return <Menu.Divider role="separator" className={className} id={id} />;
+    return <StyledMenuDivider role="separator" className={className} id={id} />;
   }
 
   if (header) {
@@ -91,29 +105,25 @@ const CustomMenuItem = <T,>({
     className,
     'data-tab-id': dataTabId,
     disabled,
-    icon: icon ? (
-      <IconWrapper>
-        <Icon name={icon} />
-      </IconWrapper>
-    ) : null,
+    leftSection: icon ? <Icon name={icon} /> : null,
     id,
     onClick: _onClick,
     title,
     closeMenuOnClick,
-  };
+  } satisfies Partial<React.ComponentProps<typeof MantineMenu.Item>>;
 
   if (href) {
     return (
-      <Menu.Item component={Link} to={href} rel={rel} target={target} {...sharedProps}>
+      <StyledMenuItem component={Link} to={href} rel={rel} target={target} {...sharedProps}>
         {children}
-      </Menu.Item>
+      </StyledMenuItem>
     );
   }
 
   return (
-    <Menu.Item component={component} {...sharedProps}>
+    <StyledMenuItem component={component} {...sharedProps}>
       {children}
-    </Menu.Item>
+    </StyledMenuItem>
   );
 };
 

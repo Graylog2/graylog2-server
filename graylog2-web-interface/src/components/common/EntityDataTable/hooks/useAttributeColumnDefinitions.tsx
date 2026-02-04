@@ -14,10 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
+import * as React from 'react';
+import { useCallback, useMemo, useContext, useLayoutEffect } from 'react';
 import type { createColumnHelper, Row, Column, HeaderContext, CellContext } from '@tanstack/react-table';
-import { useCallback, useMemo } from 'react';
 import camelCase from 'lodash/camelCase';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { styled, css } from 'styled-components';
 
 import type {
   EntityBase,
@@ -25,30 +28,150 @@ import type {
   ColumnMetaContext,
 } from 'components/common/EntityDataTable/types';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
+import DragHandle from 'components/common/SortableList/DragHandle';
+import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
+import useHeaderSectionObserver from 'components/common/EntityDataTable/hooks/useHeaderSectionObserver';
+import ResizeHandle from 'components/common/EntityDataTable/ResizeHandle';
+import HeaderActionsDropdown from 'components/common/EntityDataTable/HeaderActionsDropdown';
+import Icon from 'components/common/Icon';
+import ActiveSliceColContext from 'components/common/EntityDataTable/contexts/ActiveSliceColContext';
 
-const AttributeHeader = <Entity extends EntityBase>(ctx: HeaderContext<Entity, unknown>) => {
-  if (!ctx) {
-    return null;
-  }
-  const columnDefMeta = ctx.column.columnDef.meta as ColumnMetaContext<Entity>;
+import SortIcon from '../SortIcon';
 
-  return columnDefMeta?.columnRenderer?.renderHeader?.(columnDefMeta.label) ?? columnDefMeta.label;
+export const ThInner = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+`;
+
+export const LeftCol = styled.div`
+  display: flex;
+  align-items: center;
+  height: 100%;
+`;
+
+const RightCol = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const ActiveSliceIcon = styled(Icon)(
+  ({ theme }) => css`
+    margin-left: ${theme.spacings.xs};
+    color: ${theme.colors.gray[20]};
+  `,
+);
+
+const useSortableCol = (colId: string, disabled: boolean) => {
+  const { setColumnTransform } = useContext(DndStylesContext);
+  const { attributes, isDragging, listeners, setNodeRef, transform, setActivatorNodeRef } = useSortable({
+    id: colId,
+    disabled,
+  });
+  const cssTransform = CSS.Translate.toString(transform);
+
+  useLayoutEffect(() => {
+    setColumnTransform((cur) => ({
+      ...cur,
+      [colId]: cssTransform,
+    }));
+  }, [colId, setColumnTransform, cssTransform]);
+
+  return {
+    attributes,
+    isDragging,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+  };
+};
+
+const AttributeHeader = <Entity extends EntityBase>({
+  ctx,
+  onHeaderSectionResize,
+  onChangeSlicing,
+  appSection,
+}: {
+  ctx: HeaderContext<Entity, unknown>;
+  onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
+  onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
+  appSection: string;
+}) => {
+  const activeSliceCol = useContext(ActiveSliceColContext);
+  const colId = ctx.header.column.id;
+  const columnMeta = ctx.column.columnDef.meta as ColumnMetaContext<Entity>;
+  const { attributes, isDragging, listeners, setNodeRef, setActivatorNodeRef } = useSortableCol(
+    colId,
+    !columnMeta?.enableColumnOrdering,
+  );
+  const leftRef = useHeaderSectionObserver(colId, 'left', onHeaderSectionResize);
+  const rightRef = useHeaderSectionObserver(colId, 'right', onHeaderSectionResize);
+  const columnLabel = columnMeta?.label ?? colId;
+  const canSlice = columnMeta?.enableSlicing;
+  const isSliceActive = activeSliceCol === colId;
+  const canSort = ctx.header.column.getCanSort();
+  const sortDirection = ctx.header.column.getIsSorted();
+
+  return (
+    <ThInner ref={setNodeRef}>
+      <LeftCol ref={leftRef}>
+        {columnMeta?.enableColumnOrdering && (
+          <DragHandle
+            ref={setActivatorNodeRef}
+            index={ctx.header.index}
+            dragHandleProps={{ ...attributes, ...listeners }}
+            isDragging={isDragging}
+            itemTitle={columnLabel}
+          />
+        )}
+        <HeaderActionsDropdown
+          label={columnLabel}
+          activeSort={sortDirection}
+          isSliceActive={isSliceActive}
+          onChangeSlicing={canSlice ? onChangeSlicing : undefined}
+          sliceColumnId={colId}
+          appSection={appSection}
+          onSort={canSort ? (desc) => ctx.table.setSorting([{ id: colId, desc }]) : undefined}>
+          {columnMeta?.columnRenderer?.renderHeader?.(columnLabel) ?? columnLabel}
+        </HeaderActionsDropdown>
+        {isSliceActive && <ActiveSliceIcon name="surgical" title={`Slicing by ${columnLabel}`} size="xs" />}
+        {sortDirection && <SortIcon<Entity> column={ctx.header.column} />}
+      </LeftCol>
+      <RightCol ref={rightRef}>
+        {ctx.header.column.getCanResize() && (
+          <ResizeHandle
+            onMouseDown={ctx.header.getResizeHandler()}
+            onTouchStart={ctx.header.getResizeHandler()}
+            colTitle={columnLabel}
+          />
+        )}
+      </RightCol>
+    </ThInner>
+  );
 };
 
 const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
-  columnSchemas,
+  columnHelper,
   columnRenderersByAttribute,
+  columnSchemas,
   columnWidths,
   entityAttributesAreCamelCase,
   meta,
-  columnHelper,
+  onChangeSlicing,
+  onHeaderSectionResize,
+  appSection,
 }: {
-  columnSchemas: Array<ColumnSchema>;
+  columnHelper: ReturnType<typeof createColumnHelper<Entity>>;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
+  columnSchemas: Array<ColumnSchema>;
   columnWidths: { [attributeId: string]: number };
   entityAttributesAreCamelCase: boolean;
   meta: Meta;
-  columnHelper: ReturnType<typeof createColumnHelper<Entity>>;
+  onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
+  onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
+  appSection?: string;
 }) => {
   const cell = useCallback(
     ({
@@ -67,18 +190,31 @@ const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
     [meta],
   );
 
+  const header = useCallback(
+    (ctx) => (
+      <AttributeHeader<Entity>
+        ctx={ctx}
+        onHeaderSectionResize={onHeaderSectionResize}
+        onChangeSlicing={onChangeSlicing}
+        appSection={appSection}
+      />
+    ),
+    [appSection, onChangeSlicing, onHeaderSectionResize],
+  );
+
   return useMemo(
     () =>
       columnSchemas.map((col) => {
         const baseColDef = {
           id: col.id,
           cell,
-          header: AttributeHeader<Entity>,
+          header,
           size: columnWidths[col.id],
           enableHiding: true,
           enableResizing: !columnRenderersByAttribute[col.id].staticWidth,
           meta: {
             label: col.title,
+            enableSlicing: col.sliceable,
             columnRenderer: columnRenderersByAttribute[col.id],
             enableColumnOrdering: true,
           },
@@ -95,7 +231,7 @@ const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
           ...baseColDef,
         });
       }),
-    [columnSchemas, columnRenderersByAttribute, cell, columnWidths, entityAttributesAreCamelCase, columnHelper],
+    [columnSchemas, cell, header, columnWidths, columnRenderersByAttribute, entityAttributesAreCamelCase, columnHelper],
   );
 };
 

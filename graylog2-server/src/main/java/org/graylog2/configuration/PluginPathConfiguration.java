@@ -17,14 +17,18 @@
 package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.documentation.Documentation;
+import com.github.joschi.jadconfig.documentation.DocumentationSection;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+@DocumentationSection(heading = "Plugin Path", description = "")
 public class PluginPathConfiguration {
 
     protected static final Path DEFAULT_PLUGIN_DIR = Paths.get("plugin");
 
+    @Documentation("Set plugin directory here (relative or absolute)")
     @Parameter(value = "plugin_dir", required = true)
     private final Path pluginDir = DEFAULT_PLUGIN_DIR;
 

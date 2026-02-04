@@ -58,12 +58,6 @@ class LoaderTabs extends React.Component<
     inputs: undefined,
   };
 
-  TAB_KEYS = {
-    recent: 1,
-    messageId: 2,
-    raw: 3,
-  };
-
   constructor(props: LoaderTabsProps) {
     super(props);
 
@@ -76,6 +70,12 @@ class LoaderTabs extends React.Component<
   componentDidMount() {
     this.loadData();
   }
+
+  TAB_KEYS = {
+    recent: 1,
+    messageId: 2,
+    raw: 3,
+  };
 
   onMessageLoaded = (message: Message) => {
     this.setState({ message });

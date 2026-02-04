@@ -21,7 +21,6 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore } from 'logic/singleton';
 
-// eslint-disable-next-line import/prefer-default-export
 export const SystemLoadBalancerStore = singletonStore('core.SystemLoadBalancer', () =>
   Reflux.createStore({
     sourceUrl: (nodeId) => `/cluster/${nodeId}/lbstatus`,
