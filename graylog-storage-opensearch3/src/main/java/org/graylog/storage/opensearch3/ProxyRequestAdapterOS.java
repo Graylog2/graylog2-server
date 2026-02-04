@@ -50,7 +50,7 @@ public class ProxyRequestAdapterOS implements ProxyRequestAdapter {
     @Override
     public ProxyResponse request(ProxyRequest request) throws IOException {
 
-        // this will throw exception if there is a the same query parameter twice, as opensearch client doesn't support this
+        // this will throw exception if there is the same query parameter twice, as opensearch client doesn't support this
         final Map<String, String> queryParams = request.queryParameters()
                 .entrySet()
                 .stream()
