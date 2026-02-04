@@ -32,9 +32,14 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.shared.security.EntityPermissionsUtils;
 
+import javax.annotation.Nullable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
@@ -62,6 +67,8 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
     public EntitySuggestionResponse suggest(final String collection,
                                             final String targetColumn,
                                             final String valueColumn,
+                                            @Nullable final List<String> displayFields,
+                                            @Nullable final String displayTemplate,
                                             final String query,
                                             final int page,
                                             final int perPage,
@@ -72,13 +79,23 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
         final var isFirstPageAndSpecialCollection = isSpecialCollection && page == 1;
         final var fixNumberOfItemsToReadFromDB = isFirstPageAndSpecialCollection ? 1 : 0;
 
+        // Determine which fields to project
+        final Set<String> fieldsToProject = new HashSet<>();
+        fieldsToProject.add(targetColumn);
+
+        if (displayFields != null && !displayFields.isEmpty()) {
+            fieldsToProject.addAll(displayFields);
+        } else {
+            fieldsToProject.add(valueColumn);
+        }
+
         final var bsonFilter = !filterIsEmpty
                 ? Filters.regex(valueColumn, query, "i")
                 : Filters.empty();
 
         final var resultWithoutPagination = mongoCollection
                 .find(bsonFilter)
-                .projection(Projections.include(targetColumn, valueColumn))
+                .projection(Projections.include(fieldsToProject.toArray(new String[0])))
                 .sort(Sorts.ascending(valueColumn));
 
         final var userCanReadAllEntities = permissionsUtils.hasAllPermission(subject) || permissionsUtils.hasReadPermissionForWholeCollection(subject, collection);
@@ -93,13 +110,29 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
             final List<EntitySuggestion> staticEntry = isFirstPageAndSpecialCollection ? List.of(new EntitySuggestion(LOCAL_ADMIN_ID, null, "admin")) : List.of();
 
             final Stream<EntitySuggestion> suggestionsFromDB = documents
-                    .map(doc ->
-                            new EntitySuggestion(
-                                    doc.getObjectId("_id").toHexString(),
-                                    doc.getString(targetColumn),
-                                    doc.getString(valueColumn)
-                            )
-                    );
+                    .map(doc -> {
+                        String displayValue;
+
+                        if (displayFields != null && !displayFields.isEmpty()) {
+                            displayValue = formatCompositeDisplay(doc, displayFields, displayTemplate);
+                        } else {
+                            displayValue = doc.getString(valueColumn);
+                        }
+
+                        // Handle targetColumn - it could be _id (ObjectId) or a String field
+                        String targetValue;
+                        if ("_id".equals(targetColumn)) {
+                            targetValue = doc.getObjectId("_id").toHexString();
+                        } else {
+                            targetValue = doc.getString(targetColumn);
+                        }
+
+                        return new EntitySuggestion(
+                                doc.getObjectId("_id").toHexString(),
+                                targetValue,
+                                displayValue
+                        );
+                    });
 
             suggestions = Streams.concat(staticEntry.stream(), suggestionsFromDB).toList();
         }
@@ -131,6 +164,52 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
     @MustBeClosed
     private Stream<Document> mongoPaginate(FindIterable<Document> result, int limit, int skip) {
         return MongoUtils.stream(result.limit(limit).skip(skip));
+    }
+
+    @Override
+    public EntitySuggestionResponse suggest(final String collection,
+                                            final String targetColumn,
+                                            final String valueColumn,
+                                            final String query,
+                                            final int page,
+                                            final int perPage,
+                                            final Subject subject) {
+        return suggest(collection, targetColumn, valueColumn, null, null, query, page, perPage, subject);
+    }
+
+    /**
+     * Formats a composite display value using the provided template and fields.
+     * If a template is provided, it replaces {field} placeholders with values from the document.
+     * If no template is provided, it concatenates all field values with spaces.
+     * Missing or null field values are handled gracefully.
+     *
+     * @param doc The MongoDB document containing field values
+     * @param fields List of field names to include in the display
+     * @param template Optional template string with {field} placeholders
+     * @return Formatted display string
+     */
+    private String formatCompositeDisplay(Document doc, List<String> fields, @Nullable String template) {
+        if (template != null && !template.isEmpty()) {
+            // Replace placeholders: "{node_id} ({hostname})" → "abc-123 (webserver1)"
+            String result = template;
+            for (String field : fields) {
+                String value = doc.getString(field);
+                if (value != null) {
+                    result = result.replace("{" + field + "}", value);
+                } else {
+                    // Remove the placeholder if value is missing
+                    result = result.replace("{" + field + "}", "");
+                }
+            }
+            // Clean up any extra spaces or empty parentheses
+            return result.replaceAll("\\s*\\(\\s*\\)", "").replaceAll("\\s+", " ").trim();
+        } else {
+            // No template: simple space-separated concatenation
+            return fields.stream()
+                    .map(doc::getString)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.joining(" "));
+        }
     }
 
 }

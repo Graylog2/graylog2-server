@@ -95,6 +95,8 @@ export type Attribute = {
   related_collection?: string;
   related_identifier?: string;
   related_property?: string;
+  related_display_fields?: Array<string>;
+  related_display_template?: string;
   sliceable?: boolean;
   permissions?: Array<Permission>;
 };
