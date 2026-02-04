@@ -166,4 +166,4 @@ export default {
     index_name: 'gl-events_13',
     index_type: 'message',
   },
-}; // as Record<string, { event: Event; index_name: string; index_type: string }>;
+};
