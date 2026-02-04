@@ -70,7 +70,7 @@ const EventReplaySearch = ({
       definitionId: eventDefinition?.id,
       type: eventData?.alert ? 'alert' : 'event',
     }),
-    [eventData?.alert, eventData.id, eventDefinition.id],
+    [eventData?.alert, eventData?.id, eventDefinition?.id],
   );
 
   return (
