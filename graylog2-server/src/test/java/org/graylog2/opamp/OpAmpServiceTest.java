@@ -64,9 +64,9 @@ class OpAmpServiceTest {
     }
 
     @Test
-    void authenticateDispatchesEnrollmentTokenByTypHeader() {
-        // Create a token with typ: enrollment+jwt
-        final String token = createTokenWithTyp("enrollment+jwt");
+    void authenticateDispatchesEnrollmentTokenByCttHeader() {
+        // Create a token with ctt: enrollment
+        final String token = createTokenWithCtt("enrollment");
         final String authHeader = "Bearer " + token;
         final OpAmpAuthContext.Enrollment expectedContext = new OpAmpAuthContext.Enrollment("test-fleet", TRANSPORT);
 
@@ -82,9 +82,9 @@ class OpAmpServiceTest {
     }
 
     @Test
-    void authenticateDispatchesAgentTokenByTypHeader() {
-        // Create a token with typ: agent+jwt
-        final String token = createTokenWithTyp("agent+jwt");
+    void authenticateDispatchesAgentTokenByCttHeader() {
+        // Create a token with ctt: agent
+        final String token = createTokenWithCtt("agent");
         final String authHeader = "Bearer " + token;
         final OpAmpAgent agent = new OpAmpAgent(
                 "test-id",
@@ -109,9 +109,9 @@ class OpAmpServiceTest {
     }
 
     @Test
-    void authenticateReturnsEmptyForUnknownTypHeader() {
-        // Create a token with unknown typ
-        final String token = createTokenWithTyp("unknown+jwt");
+    void authenticateReturnsEmptyForUnknownCttHeader() {
+        // Create a token with unknown ctt
+        final String token = createTokenWithCtt("unknown");
         final String authHeader = "Bearer " + token;
 
         final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, EXTERNAL_URI, TRANSPORT);
@@ -122,9 +122,9 @@ class OpAmpServiceTest {
     }
 
     @Test
-    void authenticateReturnsEmptyForMissingTypHeader() {
-        // Create a token without typ header
-        final String token = createTokenWithoutTyp();
+    void authenticateReturnsEmptyForMissingCttHeader() {
+        // Create a token without ctt header
+        final String token = createTokenWithoutCtt();
         final String authHeader = "Bearer " + token;
 
         final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, EXTERNAL_URI, TRANSPORT);
@@ -177,11 +177,11 @@ class OpAmpServiceTest {
     }
 
     /**
-     * Creates a JWT-like token with the specified typ header.
+     * Creates a JWT-like token with the specified ctt (custom token type) header.
      * This is not a valid signed JWT, just has the correct structure for header parsing.
      */
-    private String createTokenWithTyp(String typ) {
-        final String header = String.format("{\"alg\":\"EdDSA\",\"typ\":\"%s\",\"kid\":\"fingerprint\"}", typ);
+    private String createTokenWithCtt(String ctt) {
+        final String header = String.format("{\"alg\":\"EdDSA\",\"ctt\":\"%s\",\"kid\":\"fingerprint\"}", ctt);
         final String payload = "{\"sub\":\"test\",\"exp\":9999999999}";
         final String signature = "signature";
 
@@ -191,9 +191,9 @@ class OpAmpServiceTest {
     }
 
     /**
-     * Creates a JWT-like token without a typ header.
+     * Creates a JWT-like token without a ctt header.
      */
-    private String createTokenWithoutTyp() {
+    private String createTokenWithoutCtt() {
         final String header = "{\"alg\":\"EdDSA\",\"kid\":\"fingerprint\"}";
         final String payload = "{\"sub\":\"test\",\"exp\":9999999999}";
         final String signature = "signature";
