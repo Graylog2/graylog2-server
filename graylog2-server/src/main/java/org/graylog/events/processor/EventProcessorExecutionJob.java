@@ -99,7 +99,7 @@ public class EventProcessorExecutionJob implements Job {
             // has been resolved.
             // TODO: Send an event when this happens so admins can get alerted
             final JobTriggerUpdate triggerUpdate = JobTriggerUpdate.withError(ctx.trigger());
-            throw new JobExecutionException("Invalid time range - \"to\" timestamp <" + to.toString() + "> is not after \"from\" timestamp <" + from.toString() + ">",
+            throw new JobExecutionException("Invalid time range - \"to\" timestamp <" + to + "> is not after \"from\" timestamp <" + from + ">",
                     ctx.trigger(), triggerUpdate);
         }
 
@@ -129,8 +129,9 @@ public class EventProcessorExecutionJob implements Job {
             // It's the specific event processors' duty to handle being executed with this larger timerange.
             // If an event processor was configured with a processingHopSize greater than the processingWindowSize
             // we can't use the catchup mode.
+            // Catch-up can be disabled per event processor via the enableCatchup flag.
             final long catchUpSize = configurationProvider.get().eventCatchupWindow();
-            if (!config.isCron() && catchUpSize > 0 && catchUpSize > config.processingWindowSize() && to.plus(catchUpSize).isBefore(now) &&
+            if (config.enableCatchup() && !config.isCron() && catchUpSize > 0 && catchUpSize > config.processingWindowSize() && to.plus(catchUpSize).isBefore(now) &&
                     config.processingHopSize() <= config.processingWindowSize()) {
                 final long chunkCount = catchUpSize / config.processingWindowSize();
 
@@ -152,7 +153,7 @@ public class EventProcessorExecutionJob implements Job {
 
             // The nextTime Optional can be empty if there will be no further executions of the trigger
             if (nextTime.isPresent()) {
-                if (nextTo.isBefore(now)) {
+                if (config.enableCatchup() && nextTo.isBefore(now)) {
                     // If the next "to" timestamp of the timerange to process is in the past, we want to schedule the next
                     // execution of this job as soon as possible to make sure we catch up.
                     LOG.trace("Set nextTime to <{}> to catch up faster - calculated nextTime was <{}>", now, nextTime.get());
@@ -207,12 +208,13 @@ public class EventProcessorExecutionJob implements Job {
     @AutoValue
     @JsonTypeName(EventProcessorExecutionJob.TYPE_NAME)
     @JsonDeserialize(builder = Config.Builder.class)
-    public static abstract class Config implements JobDefinitionConfig {
+    public abstract static class Config implements JobDefinitionConfig {
         public static final String FIELD_EVENT_DEFINITION_ID = "event_definition_id";
         private static final String FIELD_PARAMETERS = "parameters";
         private static final String FIELD_PROCESSING_WINDOW_SIZE = "processing_window_size";
         private static final String FIELD_PROCESSING_HOP_SIZE = "processing_hop_size";
         private static final String FIELD_IS_CRON = "is_cron";
+        private static final String FIELD_ENABLE_CATCHUP = "enable_catchup";
 
         @JsonProperty(FIELD_EVENT_DEFINITION_ID)
         public abstract String eventDefinitionId();
@@ -229,6 +231,9 @@ public class EventProcessorExecutionJob implements Job {
         @JsonProperty(FIELD_IS_CRON)
         public abstract boolean isCron();
 
+        @JsonProperty(FIELD_ENABLE_CATCHUP)
+        public abstract boolean enableCatchup();
+
         public static Builder builder() {
             return Builder.create();
         }
@@ -241,10 +246,13 @@ public class EventProcessorExecutionJob implements Job {
         }
 
         @AutoValue.Builder
-        public static abstract class Builder implements JobDefinitionConfig.Builder<Builder> {
+        public abstract static class Builder implements JobDefinitionConfig.Builder<Builder> {
             @JsonCreator
             public static Builder create() {
-                return new AutoValue_EventProcessorExecutionJob_Config.Builder().type(TYPE_NAME).isCron(false);
+                return new AutoValue_EventProcessorExecutionJob_Config.Builder()
+                        .type(TYPE_NAME)
+                        .isCron(false)
+                        .enableCatchup(true); // Default: catch-up enabled
             }
 
             @JsonProperty(FIELD_EVENT_DEFINITION_ID)
@@ -262,6 +270,9 @@ public class EventProcessorExecutionJob implements Job {
             @JsonProperty(FIELD_IS_CRON)
             public abstract Builder isCron(boolean isCron);
 
+            @JsonProperty(FIELD_ENABLE_CATCHUP)
+            public abstract Builder enableCatchup(boolean enableCatchup);
+
             abstract Config autoBuild();
 
             public Config build() {
@@ -276,7 +287,7 @@ public class EventProcessorExecutionJob implements Job {
     @AutoValue
     @JsonTypeName(EventProcessorExecutionJob.TYPE_NAME)
     @JsonDeserialize(builder = Data.Builder.class)
-    public static abstract class Data implements JobTriggerData {
+    public abstract static class Data implements JobTriggerData {
         private static final String FIELD_TIMERANGE_FROM = "timerange_from";
         private static final String FIELD_TIMERANGE_TO = "timerange_to";
 
@@ -301,7 +312,7 @@ public class EventProcessorExecutionJob implements Job {
         public abstract Builder toBuilder();
 
         @AutoValue.Builder
-        public static abstract class Builder implements JobTriggerData.Builder<Builder> {
+        public abstract static class Builder implements JobTriggerData.Builder<Builder> {
             @JsonCreator
             public static Builder create() {
                 return new AutoValue_EventProcessorExecutionJob_Data.Builder().type(TYPE_NAME);

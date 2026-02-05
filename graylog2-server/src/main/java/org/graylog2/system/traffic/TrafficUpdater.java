@@ -41,14 +41,8 @@ public interface TrafficUpdater {
         return observationTime.withMinuteOfHour(roundedMinute).withSecondOfMinute(0).withMillisOfSecond(0);
     }
 
-    /**
-     * @deprecated Use {@link #getTenMinuteBucketStart(DateTime)} instead.
-     * This method now returns 10-minute buckets for storage efficiency.
-     * Hourly aggregation is done at query time via {@link #aggregateToHourly(Map)}.
-     */
-    @Deprecated
     static DateTime getHourBucketStart(DateTime observationTime) {
-        return getTenMinuteBucketStart(observationTime);
+        return observationTime.withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
     }
 
     static Map<DateTime, Long> aggregateToHourly(Map<DateTime, Long> histogram) {

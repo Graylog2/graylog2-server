@@ -21,6 +21,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.inject.assistedinject.Assisted;
 import com.mongodb.client.AggregateIterable;
+import com.mongodb.client.MongoCollection;
 import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -36,12 +37,10 @@ import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessor;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.processor.EventProcessorParameters;
-import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.MessageSummary;
-import org.graylog2.system.traffic.TrafficDto;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,12 +67,10 @@ public class MongoDBEventProcessor implements EventProcessor {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBEventProcessor.class);
-    private static final String COLLECTION_NAME = "traffic";
-    private static final String DATABASE_NAME = "graylog";
 
     private final EventDefinition eventDefinition;
     private final MongoDBEventProcessorConfig config;
-    private final MongoCollection<TrafficDto> trafficCollection;
+    private final MongoCollection<Document> collection;
     private final DBEventProcessorStateService stateService;
     private final MessageFactory messageFactory;
 
@@ -82,9 +79,19 @@ public class MongoDBEventProcessor implements EventProcessor {
                                  MongoCollections mongoCollections,
                                  DBEventProcessorStateService stateService,
                                  MessageFactory messageFactory) {
+        this(eventDefinition, (MongoDBEventProcessorConfig) eventDefinition.config(),
+                mongoCollections, stateService, messageFactory);
+    }
+
+    // Constructor that allows config override - used by specialized processors
+    protected MongoDBEventProcessor(EventDefinition eventDefinition,
+                                    MongoDBEventProcessorConfig config,
+                                    MongoCollections mongoCollections,
+                                    DBEventProcessorStateService stateService,
+                                    MessageFactory messageFactory) {
         this.eventDefinition = eventDefinition;
-        this.config = (MongoDBEventProcessorConfig) eventDefinition.config();
-        this.trafficCollection = mongoCollections.collection(COLLECTION_NAME, TrafficDto.class);
+        this.config = config;
+        this.collection = mongoCollections.nonEntityCollection(config.collectionName(), Document.class);
         this.stateService = stateService;
         this.messageFactory = messageFactory;
     }
@@ -103,7 +110,7 @@ public class MongoDBEventProcessor implements EventProcessor {
             List<Bson> pipeline = buildAggregationPipeline(parameters);
 
             // Execute aggregation
-            AggregateIterable<Document> aggregateIterable = trafficCollection
+            AggregateIterable<Document> aggregateIterable = collection
                     .aggregate(pipeline, Document.class)
                     .batchSize(parameters.batchSize());
 
@@ -146,7 +153,7 @@ public class MongoDBEventProcessor implements EventProcessor {
         }
     }
 
-    private List<Bson> buildAggregationPipeline(MongoDBEventProcessorParameters parameters) {
+    private List<Bson> buildAggregationPipeline(MongoDBEventProcessorParameters parameters) throws EventProcessorException {
         List<Bson> pipeline = new ArrayList<>();
 
         // Add time range filter as first stage
@@ -166,7 +173,7 @@ public class MongoDBEventProcessor implements EventProcessor {
                 }
             } catch (Exception e) {
                 LOG.error("Failed to parse aggregation pipeline: {}", config.aggregationPipeline(), e);
-                throw new RuntimeException("Invalid aggregation pipeline: " + e.getMessage(), e);
+                throw new EventProcessorException("Invalid aggregation pipeline: " + e.getMessage(), true, eventDefinition, e);
             }
         }
 
@@ -185,8 +192,7 @@ public class MongoDBEventProcessor implements EventProcessor {
 
         // Set origin context - encodes the time range instead of document ID
         event.setOriginContext(EventOriginContext.mongodbAggregation(
-                DATABASE_NAME,
-                COLLECTION_NAME,
+                config.collectionName(),
                 parameters.timerange().getFrom().toString(),
                 parameters.timerange().getTo().toString()
         ));
@@ -217,7 +223,7 @@ public class MongoDBEventProcessor implements EventProcessor {
         DateTime timestamp = parameters.timerange().getTo();
 
         Message message = messageFactory.createMessage(
-                "MongoDB traffic aggregation: " + aggregationResult.toJson(),
+                "MongoDB aggregation from " + config.collectionName() + ": " + aggregationResult.toJson(),
                 "mongodb-event-processor",
                 timestamp
         );
@@ -241,12 +247,12 @@ public class MongoDBEventProcessor implements EventProcessor {
 
     private Object convertMongoValue(Object value) {
         // Handle DateTime (Joda) from TrafficDto
-        if (value instanceof DateTime) {
-            return ((DateTime) value).toString();
+        if (value instanceof DateTime dateTime) {
+            return dateTime.toString();
         }
         // Handle Date from MongoDB
-        else if (value instanceof Date) {
-            return new DateTime(((Date) value).getTime(), org.joda.time.DateTimeZone.UTC).toString();
+        else if (value instanceof Date date) {
+            return new DateTime(date.getTime(), org.joda.time.DateTimeZone.UTC).toString();
         }
         // Handle ObjectId
         else if (value instanceof org.bson.types.ObjectId) {
@@ -269,8 +275,6 @@ public class MongoDBEventProcessor implements EventProcessor {
                                       long limit)
             throws EventProcessorException {
         // Since events are from aggregation (not individual documents), there's no single source message
-        // We return an empty list as aggregated events don't have a single source document
         LOG.debug("sourceMessagesForEvent called for aggregated event, returning empty list");
-        messageConsumer.accept(Collections.emptyList());
     }
 }
