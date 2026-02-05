@@ -16,6 +16,7 @@
  */
 package org.graylog2.opamp;
 
+import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.security.certificates.CertificateService;
 import org.graylog2.opamp.enrollment.EnrollmentTokenService;
 import org.graylog2.opamp.transport.OpAmpAuthContext;
@@ -54,6 +55,9 @@ class OpAmpServiceTest {
     @Mock
     private CertificateService certificateService;
 
+    @Mock
+    private CollectorInstanceService collectorInstanceService;
+
     private OpAmpService opAmpService;
 
     private static final URI EXTERNAL_URI = URI.create("https://graylog.example.com/");
@@ -61,7 +65,7 @@ class OpAmpServiceTest {
 
     @BeforeEach
     void setUp() {
-        opAmpService = new OpAmpService(enrollmentTokenService, agentService, certificateService);
+        opAmpService = new OpAmpService(enrollmentTokenService, agentService, certificateService, collectorInstanceService);
     }
 
     @Test
