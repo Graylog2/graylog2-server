@@ -17,21 +17,23 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.MaxAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.MaxAggregate;
+import org.opensearch.client.opensearch._types.aggregations.MaxAggregation;
 
-public class OSMaxHandler extends OSBasicSeriesSpecHandler<Max, org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Max> {
+public class OSMaxHandler extends OSBasicSeriesSpecHandler<Max> {
 
     @Override
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Max maxSpec) {
-        final MaxAggregationBuilder max = AggregationBuilders.max(name).field(maxSpec.field());
-        return SeriesAggregationBuilder.metric(max);
+        return SeriesAggregationBuilder.metric(name, MaxAggregation.builder().field(maxSpec.field()).build().toAggregation());
+
     }
 
     @Override
-    protected Object getValueFromAggregationResult(final org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Max max,
+    protected Object getValueFromAggregationResult(final Aggregate agg,
                                                    final Max maxSpec) {
-        return max.getValue();
+        MaxAggregate max = agg.isMax() ? agg.max() : null;
+        return max == null ? null : max.value();
     }
 }

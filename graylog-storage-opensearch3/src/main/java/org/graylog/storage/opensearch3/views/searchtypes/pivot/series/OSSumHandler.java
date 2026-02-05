@@ -17,21 +17,24 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.SumAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.SumAggregate;
+import org.opensearch.client.opensearch._types.aggregations.SumAggregation;
 
-public class OSSumHandler extends OSBasicSeriesSpecHandler<Sum, org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Sum> {
+public class OSSumHandler extends OSBasicSeriesSpecHandler<Sum> {
 
     @Override
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Sum sumSpec) {
-        final SumAggregationBuilder sum = AggregationBuilders.sum(name).field(sumSpec.field());
-        return SeriesAggregationBuilder.metric(sum);
+        var aggregation = SumAggregation.builder().field(sumSpec.field()).build();
+        return SeriesAggregationBuilder.metric(name, aggregation.toAggregation());
     }
 
     @Override
-    protected Object getValueFromAggregationResult(final org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Sum sum,
+    protected Object getValueFromAggregationResult(final Aggregate agg,
                                                    final Sum seriesSpec) {
-        return sum.getValue();
+        SumAggregate sum = agg.isSum() ? agg.sum() : null;
+        return sum == null ? null : sum.value();
     }
+
 }

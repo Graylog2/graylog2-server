@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.opensearch3.views.searchtypes;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -24,16 +25,7 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
-import org.graylog.shaded.opensearch2.org.opensearch.core.common.text.Text;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryStringQueryBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
-import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.fetch.subphase.highlight.HighlightBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.fetch.subphase.highlight.HighlightField;
-import org.graylog.shaded.opensearch2.org.opensearch.search.sort.FieldSortBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
+import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ResultMessageFactory;
@@ -42,16 +34,22 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.joda.time.DateTime;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.FieldSort;
+import org.opensearch.client.opensearch._types.SortOrder;
+import org.opensearch.client.opensearch._types.mapping.FieldType;
+import org.opensearch.client.opensearch._types.query_dsl.QueryStringQuery;
+import org.opensearch.client.opensearch.core.SearchRequest;
+import org.opensearch.client.opensearch.core.msearch.MultiSearchItem;
+import org.opensearch.client.opensearch.core.search.Hit;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
@@ -59,33 +57,31 @@ public class OSMessageList implements OSSearchTypeHandler<MessageList> {
     private final LegacyDecoratorProcessor decoratorProcessor;
     private final ResultMessageFactory resultMessageFactory;
     private final boolean allowHighlighting;
+    private final OSSerializationUtils serializationUtils;
 
     @Inject
     public OSMessageList(LegacyDecoratorProcessor decoratorProcessor,
                          ResultMessageFactory resultMessageFactory,
-                         @Named("allow_highlighting") boolean allowHighlighting) {
+                         @Named("allow_highlighting") boolean allowHighlighting, OSSerializationUtils serializationUtils) {
         this.decoratorProcessor = decoratorProcessor;
         this.resultMessageFactory = resultMessageFactory;
         this.allowHighlighting = allowHighlighting;
+        this.serializationUtils = serializationUtils;
     }
 
-    private ResultMessage resultMessageFromSearchHit(SearchHit hit) {
-        final Map<String, List<String>> highlights = hit.getHighlightFields().entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, OSMessageList::highlightsFromFragments));
-        return resultMessageFactory.parseFromSource(hit.getId(), hit.getIndex(), hit.getSourceAsMap(), highlights);
-    }
-
-    private static List<String> highlightsFromFragments(Map.Entry<String, HighlightField> entry) {
-        return Arrays.stream(entry.getValue().fragments())
-                .map(Text::toString)
-                .collect(Collectors.toList());
+    private ResultMessage resultMessageFromSearchHit(Hit<JsonData> hit) {
+        final Map<String, List<String>> highlights = hit.highlight();
+        try {
+            return resultMessageFactory.parseFromSource(hit.id(), hit.index(), serializationUtils.toMap(hit.source()), highlights);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void doGenerateQueryPart(Query query, MessageList messageList, OSGeneratedQueryContext queryContext) {
 
-        final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(messageList)
+        final SearchRequest.Builder searchSourceBuilder = queryContext.searchSourceBuilder(messageList)
                 .size(messageList.limit())
                 .from(messageList.offset());
 
@@ -94,7 +90,9 @@ public class OSMessageList implements OSSearchTypeHandler<MessageList> {
         final Set<String> effectiveStreamIds = query.effectiveStreams(messageList);
 
         if (!messageList.fields().isEmpty()) {
-            searchSourceBuilder.fetchSource(messageList.fields().toArray(new String[0]), new String[0]);
+            searchSourceBuilder.source(s -> s
+                    .filter(f -> f.includes(messageList.fields()))
+            );
         }
 
         List<Sort> sorts = firstNonNull(messageList.sort(), Collections.singletonList(Sort.create(Message.FIELD_TIMESTAMP, Sort.Order.DESC)));
@@ -111,15 +109,16 @@ public class OSMessageList implements OSSearchTypeHandler<MessageList> {
             sorts.add(sorts.indexOf(timeStampSort.get()) + 1, newMsgIdSort);
         }
         sorts.forEach(sort -> {
-            final FieldSortBuilder fieldSort = SortBuilders.fieldSort(sort.field())
-                    .order(toSortOrder(sort.order()));
+
+            FieldSort.Builder fieldSort = new FieldSort.Builder();
+            fieldSort.field(sort.field()).order(toSortOrder(sort.order()));
             if (sort.field().equals(Message.GL2_SECOND_SORT_FIELD)) {
-                fieldSort.unmappedType("keyword"); // old indices might not have a mapping for gl2_second_sort_field
-                searchSourceBuilder.sort(fieldSort);
+                fieldSort.unmappedType(FieldType.Keyword); // old indices might not have a mapping for gl2_second_sort_field
             } else {
                 final Optional<String> fieldType = queryContext.fieldType(effectiveStreamIds, sort.field());
-                searchSourceBuilder.sort(fieldType.map(fieldSort::unmappedType).orElse(fieldSort));
+                fieldType.ifPresent(s -> fieldSort.unmappedType(toFieldType(s)));
             }
+            searchSourceBuilder.sort(fieldSort.build()._toSortOptions());
         });
     }
 
@@ -130,38 +129,44 @@ public class OSMessageList implements OSSearchTypeHandler<MessageList> {
     private SortOrder toSortOrder(Sort.Order sortOrder) {
         switch (sortOrder) {
             case ASC:
-                return SortOrder.ASC;
+                return SortOrder.Asc;
             case DESC:
-                return SortOrder.DESC;
+                return SortOrder.Desc;
             default:
                 throw new IllegalStateException("Invalid sort order: " + sortOrder);
         }
     }
 
-    private void applyHighlightingIfActivated(SearchSourceBuilder searchSourceBuilder, Query query) {
+    private FieldType toFieldType(String fieldType) {
+        return serializationUtils.fromJson(fieldType, FieldType._DESERIALIZER);
+    }
+
+    private void applyHighlightingIfActivated(SearchRequest.Builder searchSourceBuilder, Query query) {
         if (!allowHighlighting) {
             return;
         }
 
-        final QueryStringQueryBuilder highlightQuery = decoratedHighlightQuery(query);
+        final QueryStringQuery highlightQuery = decoratedHighlightQuery(query);
 
-        searchSourceBuilder.highlighter(new HighlightBuilder().requireFieldMatch(false)
-                .highlightQuery(highlightQuery)
-                .field("*")
-                .fragmentSize(0)
-                .numOfFragments(0));
+        searchSourceBuilder
+                .highlight(h -> h
+                        .requireFieldMatch(false)
+                        .highlightQuery(highlightQuery.toQuery())
+                        // .field("*") TODO: NEEDED? How to use this in java client?
+                        .fragmentSize(0)
+                        .numberOfFragments(0)
+                );
     }
 
-    private QueryStringQueryBuilder decoratedHighlightQuery(Query query) {
+    private QueryStringQuery decoratedHighlightQuery(Query query) {
         final String queryString = query.query().queryString();
-
-        return QueryBuilders.queryStringQuery(queryString);
+        return QueryStringQuery.of(b -> b.query(queryString));
     }
 
     @WithSpan
     @Override
-    public SearchType.Result doExtractResult(Query query, MessageList searchType, org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse result, OSGeneratedQueryContext queryContext) {
-        final List<ResultMessageSummary> messages = StreamSupport.stream(result.getHits().spliterator(), false)
+    public SearchType.Result doExtractResult(Query query, MessageList searchType, MultiSearchItem<JsonData> result, OSGeneratedQueryContext queryContext) {
+        final List<ResultMessageSummary> messages = result.hits().hits().stream()
                 .map(this::resultMessageFromSearchHit)
                 .map((resultMessage) -> ResultMessageSummary.create(resultMessage.highlightRanges, resultMessage.getMessage().getFields(), resultMessage.getIndex()))
                 .collect(Collectors.toList());
@@ -178,7 +183,7 @@ public class OSMessageList implements OSSearchTypeHandler<MessageList> {
                 messages,
                 Collections.emptySet(),
                 0,
-                result.getHits().getTotalHits().value,
+                result.hits().total().value(),
                 from,
                 to
         );

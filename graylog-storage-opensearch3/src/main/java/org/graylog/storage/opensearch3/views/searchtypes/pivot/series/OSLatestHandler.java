@@ -16,42 +16,69 @@
  */
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
-import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHits;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.ParsedFilter;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.TopHits;
-import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
+import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
+import org.opensearch.client.opensearch._types.SortOrder;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.SingleBucketAggregateBase;
+import org.opensearch.client.opensearch._types.aggregations.TopHitsAggregate;
+import org.opensearch.client.opensearch.core.search.HitsMetadata;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
-public class OSLatestHandler extends OSBasicSeriesSpecHandler<Latest, ParsedFilter> {
+public class OSLatestHandler extends OSBasicSeriesSpecHandler<Latest> {
     private static final String AGG_NAME = "latest_aggregation";
 
-    @Override
-    protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Latest latestSpec) {
-        final FilterAggregationBuilder latest = AggregationBuilders.filter(name, QueryBuilders.existsQuery(latestSpec.field()))
-                .subAggregation(AggregationBuilders.topHits(AGG_NAME)
-                        .size(1)
-                        .fetchSource(latestSpec.field(), null)
-                        .sort(SortBuilders.fieldSort("timestamp").order(SortOrder.DESC)));
-        return SeriesAggregationBuilder.metric(latest);
+    private final OSSerializationUtils serializationUtils;
+
+    @Inject
+    public OSLatestHandler(OSSerializationUtils serializationUtils) {
+        this.serializationUtils = serializationUtils;
     }
 
     @Override
-    protected Object getValueFromAggregationResult(final ParsedFilter filterAggregation, final Latest seriesSpec) {
-        final TopHits latestAggregation = filterAggregation.getAggregations().get(AGG_NAME);
-        return Optional.ofNullable(latestAggregation)
-                .map(TopHits::getHits)
-                .map(SearchHits::getHits)
-                .filter(hits -> hits.length > 0)
-                .map(hits -> hits[0])
-                .map(SearchHit::getSourceAsMap)
+    protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Latest latestSpec) {
+        Aggregation topHitsSubAgg = Aggregation.of(a -> a
+                .topHits(th -> th
+                        .size(1)
+                        .source(s -> s.filter(f -> f.includes(List.of(latestSpec.field()))))
+                        .sort(sort -> sort
+                                .field(f -> f.field("timestamp").order(SortOrder.Desc))
+                        )
+                )
+        );
+        Aggregation filterAgg = Aggregation.of(a -> a
+                .filter(f -> f.exists(e -> e.field(latestSpec.field())))
+                .aggregations(Map.of(AGG_NAME, topHitsSubAgg))
+        );
+
+        return SeriesAggregationBuilder.metric(name, filterAgg);
+    }
+
+    @Override
+    protected Object getValueFromAggregationResult(final Aggregate agg, final Latest seriesSpec) {
+        return Optional.ofNullable(agg.filter())
+                .map(SingleBucketAggregateBase::aggregations)
+                .map(a -> a.get(AGG_NAME))
+                .map(Aggregate::topHits)
+                .map(TopHitsAggregate::hits)
+                .map(HitsMetadata::hits)
+                .filter(hits -> !hits.isEmpty())
+                .stream().findFirst()
+                .map(List::getFirst)
+                .map(hit -> {
+                    try {
+                        return serializationUtils.toMap(hit.source());
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
                 .map(source -> source.get(seriesSpec.field()))
                 .orElse(null);
     }

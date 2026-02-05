@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.opensearch3.views.searchtypes;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
@@ -25,26 +26,29 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.events.CommonEventSummary;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.events.EventSummary;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
-import org.graylog.shaded.opensearch2.org.opensearch.search.sort.FieldSortBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
+import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.FieldSort;
+import org.opensearch.client.opensearch._types.FieldValue;
+import org.opensearch.client.opensearch._types.SortOrder;
+import org.opensearch.client.opensearch._types.query_dsl.QueryStringQuery;
+import org.opensearch.client.opensearch._types.query_dsl.TermsQuery;
+import org.opensearch.client.opensearch.core.msearch.MultiSearchItem;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 public class OSEventList implements EventListStrategy {
     private final ObjectMapper objectMapper;
+    private final OSSerializationUtils serializationUtils;
 
     @Inject
-    public OSEventList(ObjectMapper objectMapper) {
+    public OSEventList(ObjectMapper objectMapper, OSSerializationUtils serializationUtils) {
         this.objectMapper = objectMapper;
+        this.serializationUtils = serializationUtils;
     }
 
     @Override
@@ -55,19 +59,30 @@ public class OSEventList implements EventListStrategy {
                 : eventList.streams();
 
         final var searchSourceBuilder = queryContext.searchSourceBuilder(eventList);
-        final FieldSortBuilder sortConfig = sortConfig(eventList);
-        searchSourceBuilder.sort(sortConfig);
-        final var queryBuilder = searchSourceBuilder.query();
-        if (!effectiveStreams.isEmpty() && queryBuilder instanceof BoolQueryBuilder boolQueryBuilder) {
-            boolQueryBuilder.must(QueryBuilders.termsQuery(EventDto.FIELD_SOURCE_STREAMS, effectiveStreams));
+        final FieldSort.Builder sortConfig = sortConfig(eventList);
+        searchSourceBuilder.sort(sortConfig.build()._toSortOptions());
+        final var originalQuery = searchSourceBuilder.build().query();
+        if (!effectiveStreams.isEmpty() && originalQuery.isBool()) {
+            searchSourceBuilder.query(
+                    originalQuery.bool().toBuilder().must(TermsQuery.of(t -> t
+                                            .field(EventDto.FIELD_SOURCE_STREAMS)
+                                            .terms(ts -> ts.value(effectiveStreams.stream().map(FieldValue::of).toList()))
+                                    )
+                                    .toQuery()
+                    ).build().toQuery());
         }
-        if (!eventList.attributes().isEmpty() && queryBuilder instanceof BoolQueryBuilder boolQueryBuilder) {
+        if (!eventList.attributes().isEmpty() && originalQuery.isBool()) {
             final var filterQueries = eventList.attributes().stream()
                     .filter(attribute -> EventList.KNOWN_ATTRIBUTES.contains(attribute.field()))
                     .flatMap(attribute -> attribute.toQueryStrings().stream())
                     .toList();
 
-            filterQueries.forEach(filterQuery -> boolQueryBuilder.filter(QueryBuilders.queryStringQuery(filterQuery)));
+            filterQueries.forEach(filterQuery ->
+                    searchSourceBuilder.query(
+                            searchSourceBuilder.build().query().bool().toBuilder()
+                                    .filter(QueryStringQuery.of(q -> q.query(filterQuery)).toQuery())
+                                    .build().toQuery()
+                    ));
         }
 
         eventList.page().ifPresentOrElse(page -> {
@@ -79,27 +94,35 @@ public class OSEventList implements EventListStrategy {
 
     private SortOrder toSortOrder(EventList.Direction direction) {
         return switch (direction) {
-            case ASC -> SortOrder.ASC;
-            case DESC -> SortOrder.DESC;
+            case ASC -> SortOrder.Asc;
+            case DESC -> SortOrder.Desc;
         };
     }
 
-    protected FieldSortBuilder sortConfig(EventList eventList) {
+    protected FieldSort.Builder sortConfig(EventList eventList) {
         final var sortConfig = eventList.sort()
                 .filter(sort -> EventList.KNOWN_ATTRIBUTES.contains(sort.field()))
                 .orElse(EventList.DEFAULT_SORT);
-        return new FieldSortBuilder(sortConfig.field()).order(toSortOrder(sortConfig.direction()));
+        return new FieldSort.Builder()
+                .field(sortConfig.field())
+                .order(toSortOrder(sortConfig.direction()));
     }
 
-    protected List<Map<String, Object>> extractResult(SearchResponse result) {
-        return StreamSupport.stream(result.getHits().spliterator(), false)
-                .map(SearchHit::getSourceAsMap)
-                .collect(Collectors.toList());
+    protected List<Map<String, Object>> extractResult(MultiSearchItem<JsonData> result) {
+        return result.hits().hits().stream()
+                .map(r -> {
+                    try {
+                        return serializationUtils.toMap(r);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .toList();
     }
 
     @WithSpan
     @Override
-    public SearchType.Result doExtractResult(Query query, EventList searchType, SearchResponse result,
+    public SearchType.Result doExtractResult(Query query, EventList searchType, MultiSearchItem<JsonData> result,
                                              OSGeneratedQueryContext queryContext) {
         final List<CommonEventSummary> eventSummaries = extractResult(result).stream()
                 .map(rawEvent -> objectMapper.convertValue(rawEvent, EventDto.class))
@@ -108,7 +131,7 @@ public class OSEventList implements EventListStrategy {
         final EventList.Result.Builder resultBuilder = EventList.Result.builder()
                 .events(eventSummaries)
                 .id(searchType.id())
-                .totalResults(result.getHits().getTotalHits().value);
+                .totalResults(result.hits().total().value());
         searchType.name().ifPresent(resultBuilder::name);
         return resultBuilder.build();
     }

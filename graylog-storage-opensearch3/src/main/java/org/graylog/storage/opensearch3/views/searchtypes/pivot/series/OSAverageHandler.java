@@ -17,21 +17,22 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Avg;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.AvgAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.AverageAggregation;
+import org.opensearch.client.opensearch._types.aggregations.AvgAggregate;
 
-public class OSAverageHandler extends OSBasicSeriesSpecHandler<Average, Avg> {
+public class OSAverageHandler extends OSBasicSeriesSpecHandler<Average> {
 
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Average avgSpec) {
-        final AvgAggregationBuilder avg = AggregationBuilders.avg(name).field(avgSpec.field());
-        return SeriesAggregationBuilder.metric(avg);
+        return SeriesAggregationBuilder.metric(name,
+                AverageAggregation.of(a -> a.field(avgSpec.field())).toAggregation());
     }
 
     @Override
-    protected Object getValueFromAggregationResult(final Avg avg, final Average avgSpec) {
-        double value = avg.getValue();
+    protected Object getValueFromAggregationResult(final Aggregate agg, final Average avgSpec) {
+        AvgAggregate avg = (agg.isAvg()) ? agg.avg() : null;
+        double value = (avg == null || avg.value() == null) ? 0 : avg.value();
         if (avgSpec.wholeNumber()) {
             if (Double.isNaN(value) || Double.isInfinite(value)) {
                 value = 0;

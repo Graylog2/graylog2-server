@@ -17,20 +17,21 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Min;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.MinAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.MinAggregate;
+import org.opensearch.client.opensearch._types.aggregations.MinAggregation;
 
-public class OSMinHandler extends OSBasicSeriesSpecHandler<Min, org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Min> {
+public class OSMinHandler extends OSBasicSeriesSpecHandler<Min> {
 
     @Override
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Min minSpec) {
-        final MinAggregationBuilder min = AggregationBuilders.min(name).field(minSpec.field());
-        return SeriesAggregationBuilder.metric(min);
+        return SeriesAggregationBuilder.metric(name, MinAggregation.builder().field(minSpec.field()).build().toAggregation());
     }
 
     @Override
-    protected Object getValueFromAggregationResult(final org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Min min, final Min minSpec) {
-        return min.getValue();
+    protected Object getValueFromAggregationResult(final Aggregate agg, final Min minSpec) {
+        MinAggregate min = agg.isMin() ? agg.min() : null;
+        return min == null ? null : min.value();
     }
 }

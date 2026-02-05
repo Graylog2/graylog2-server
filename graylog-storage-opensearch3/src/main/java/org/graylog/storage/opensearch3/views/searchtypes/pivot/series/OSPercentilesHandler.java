@@ -17,21 +17,20 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Percentiles;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.PercentilesAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.PercentilesAggregation;
 
-public class OSPercentilesHandler extends OSBasicSeriesSpecHandler<Percentile, Percentiles> {
+public class OSPercentilesHandler extends OSBasicSeriesSpecHandler<Percentile> {
 
     @Override
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Percentile percentileSpec) {
-        final PercentilesAggregationBuilder percentiles = AggregationBuilders.percentiles(name).field(percentileSpec.field()).percentiles(percentileSpec.percentile());
-        return SeriesAggregationBuilder.metric(percentiles);
+        return SeriesAggregationBuilder.metric(name,
+                PercentilesAggregation.builder().field(percentileSpec.field()).percents(percentileSpec.percentile()).build().toAggregation());
     }
 
     @Override
-    protected Object getValueFromAggregationResult(final Percentiles percentiles, final Percentile percentileSpec) {
-        return percentiles.percentile(percentileSpec.percentile());
+    protected Object getValueFromAggregationResult(final Aggregate agg, final Percentile percentileSpec) {
+        return null; // TODO!!!
     }
 }

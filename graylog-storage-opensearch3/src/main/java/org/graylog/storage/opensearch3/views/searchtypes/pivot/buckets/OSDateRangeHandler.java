@@ -17,54 +17,74 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.buckets;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.range.DateRangeAggregationBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.range.ParsedDateRange;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.NamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotBucketSpecHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.PivotBucket;
 import org.joda.time.base.AbstractDateTime;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.DateRangeAggregate;
+import org.opensearch.client.opensearch._types.aggregations.DateRangeAggregation;
+import org.opensearch.client.opensearch._types.aggregations.DateRangeExpression;
+import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
 
 import javax.annotation.Nonnull;
+import java.util.Map;
 import java.util.stream.Stream;
 
 public class OSDateRangeHandler extends OSPivotBucketSpecHandler<DateRangeBucket> {
     private static final String AGG_NAME = "agg";
     @Nonnull
     @Override
-    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, DateRangeBucket dateRangeBucket, OSGeneratedQueryContext queryContext, Query query) {
-        AggregationBuilder root = null;
-        AggregationBuilder leaf = null;
-        for (String field : dateRangeBucket.fields()) {
-            final DateRangeAggregationBuilder builder = AggregationBuilders.dateRange(name).field(field);
+    public CreatedAggregations<NamedAggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, DateRangeBucket dateRangeBucket, OSGeneratedQueryContext queryContext, Query query) {
+        NamedAggregationBuilder root = null;
+        NamedAggregationBuilder leaf = null;
+        // need to iterate through the list reverse to be able to create subaggregations
+        for (String field : Lists.reverse(dateRangeBucket.fields())) {
+            final DateRangeAggregation.Builder dateRangeBuilder = DateRangeAggregation.builder()
+                    .field(field);
             dateRangeBucket.ranges().forEach(r -> {
                 final String from = r.from().map(AbstractDateTime::toString).orElse(null);
                 final String to = r.to().map(AbstractDateTime::toString).orElse(null);
-                if (from != null && to != null) {
-                    builder.addRange(from, to);
-                } else if (to != null) {
-                    builder.addUnboundedTo(to);
-                } else if (from != null) {
-                    builder.addUnboundedFrom(from);
+                DateRangeExpression.Builder range = DateRangeExpression.builder();
+                if (from != null) {
+                    range.from(f -> f.expr(from));
                 }
+                if (to != null) {
+                    range.to(f -> f.expr(to));
+                }
+                dateRangeBuilder.ranges(range.build());
             });
-            builder.format("date_time");
-            builder.keyed(false);
+            dateRangeBuilder.format("date_time");
+            dateRangeBuilder.keyed(false);
 
             queryContext.recordNameForPivotSpec(pivot, dateRangeBucket, name);
 
-            if (root == null && leaf == null) {
+            NamedAggregationBuilder builder = new NamedAggregationBuilder(
+                    name,
+                    Aggregation.builder().dateRange(dateRangeBuilder.build())
+            );
+
+            if (root == null) {
                 root = builder;
-                leaf = builder;
+                leaf = new NamedAggregationBuilder(
+                        name,
+                        Aggregation.builder().dateRange(dateRangeBuilder.build())
+                );
             } else {
-                leaf.subAggregation(builder);
-                leaf = builder;
+                // create new root with old root as nested aggregation
+                root = new NamedAggregationBuilder(
+                        name,
+                        builder.aggregationBuilder().aggregations(Map.of(
+                                root.name(),
+                                root.aggregationBuilder().build()
+                        ))
+                );
             }
         }
 
@@ -74,15 +94,15 @@ public class OSDateRangeHandler extends OSPivotBucketSpecHandler<DateRangeBucket
     @Override
     public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket initialBucket) {
         final ImmutableList<String> previousKeys = initialBucket.keys();
-        final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
-        final ParsedDateRange aggregation = previousBucket.getAggregations().get(AGG_NAME);
+        final MultiBucketBase previousBucket = initialBucket.bucket();
+        final DateRangeAggregate aggregation = previousBucket.aggregations().get(AGG_NAME).dateRange();
         final DateRangeBucket dateRangeBucket = (DateRangeBucket) bucketSpecs;
 
-        return aggregation.getBuckets().stream()
+        return aggregation.buckets().array().stream()
                 .flatMap(bucket -> {
                     final String bucketKey = dateRangeBucket.bucketKey().equals(DateRangeBucket.BucketKey.TO)
-                            ? bucket.getToAsString()
-                            : bucket.getFromAsString();
+                            ? bucket.toAsString()
+                            : bucket.fromAsString();
                     final ImmutableList<String> keys = ImmutableList.<String>builder()
                             .addAll(previousKeys)
                             .add(bucketKey)

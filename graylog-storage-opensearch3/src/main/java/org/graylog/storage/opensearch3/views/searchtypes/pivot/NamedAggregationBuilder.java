@@ -14,13 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 package org.graylog.storage.opensearch3.views.searchtypes.pivot;
 
-import com.google.common.collect.ImmutableList;
-import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 
-public record PivotBucket(ImmutableList<String> keys, MultiBucketBase bucket) {
-    public static PivotBucket create(ImmutableList<String> keys, MultiBucketBase bucket) {
-        return new PivotBucket(keys, bucket);
-    }
+public record NamedAggregationBuilder(String name, Aggregation.Builder.ContainerBuilder aggregationBuilder) {
 }

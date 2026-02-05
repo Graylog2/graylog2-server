@@ -17,22 +17,22 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ExtendedStats;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ExtendedStatsAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.ExtendedStatsAggregation;
 
-public class OSSumOfSquaresHandler extends OSBasicSeriesSpecHandler<SumOfSquares, ExtendedStats> {
+public class OSSumOfSquaresHandler extends OSBasicSeriesSpecHandler<SumOfSquares> {
 
     @Override
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final SumOfSquares sumOfSquaresSpec) {
-        final ExtendedStatsAggregationBuilder sumOfSquares = AggregationBuilders.extendedStats(name).field(sumOfSquaresSpec.field());
-        return SeriesAggregationBuilder.metric(sumOfSquares);
+        return SeriesAggregationBuilder.metric(name,
+                ExtendedStatsAggregation.builder().field(sumOfSquaresSpec.field()).build().toAggregation());
     }
 
     @Override
-    protected Object getValueFromAggregationResult(final ExtendedStats extendedStats, final SumOfSquares seriesSpec) {
-        return extendedStats.getSumOfSquares();
+    protected Object getValueFromAggregationResult(final Aggregate agg, final SumOfSquares seriesSpec) {
+        var extendedStats = agg.isExtendedStats() ? agg.extendedStats() : null;
+        return extendedStats == null ? null : extendedStats.sumOfSquares();
     }
 }
 

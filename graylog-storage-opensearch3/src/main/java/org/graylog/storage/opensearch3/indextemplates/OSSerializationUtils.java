@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import jakarta.json.Json;
 import jakarta.json.stream.JsonParser;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.json.JsonpDeserializer;
@@ -28,7 +29,9 @@ import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.core.msearch.RequestItem;
 
+import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -47,9 +50,34 @@ public class OSSerializationUtils {
     }
 
 
-    public Map<String, Object> toMap(final PlainJsonSerializable openSearchSerializableObject) throws JsonProcessingException {
-        return this.jsonpMapper.objectMapper().readValue(openSearchSerializableObject.toJsonString(), new TypeReference<>() {});
+    public Map<String, Object> toMap(final JsonData openSearchSerializableObject) throws JsonProcessingException {
+        try (StringWriter writer = new StringWriter()) {
+            Json.createWriter(writer).write(openSearchSerializableObject.toJson());
+            String json = writer.toString();
+            return toMap(json);
+        } catch (IOException e) {
+            throw new JsonSerializationException("Error serializing json", e);
+        }
     }
+
+    static class JsonSerializationException extends JsonProcessingException {
+        public JsonSerializationException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
+
+    public Map<String, Object> toMap(final PlainJsonSerializable openSearchSerializableObject) throws JsonProcessingException {
+        return toMap(openSearchSerializableObject.toJsonString());
+    }
+
+    public Map<String, Object> toMap(final String json) throws JsonProcessingException {
+        try {
+            return this.jsonpMapper.objectMapper().readValue(json, new TypeReference<>() {});
+        } catch (IOException e) {
+            throw new JsonSerializationException("Error serializing json", e);
+        }
+    }
+
 
     public Map<String, JsonData> toJsonDataMap(final Map<String, Object> map) {
         return map.entrySet()

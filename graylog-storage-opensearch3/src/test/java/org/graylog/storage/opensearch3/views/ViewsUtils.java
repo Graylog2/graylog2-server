@@ -17,9 +17,8 @@
 package org.graylog.storage.opensearch3.views;
 
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.joda.time.DateTimeZone;
+import org.opensearch.client.opensearch.core.SearchRequest;
 
 import java.util.Collections;
 import java.util.List;
@@ -30,12 +29,12 @@ import static org.mockito.Mockito.mock;
 public class ViewsUtils {
     static List<String> indicesOf(List<SearchRequest> clientRequest) {
         return clientRequest.stream()
-                .map(request -> String.join(",", request.indices()))
+                .map(request -> String.join(",", request.index()))
                 .collect(Collectors.toList());
     }
 
     public static OSGeneratedQueryContext.Factory createTestContextFactory(FieldTypesLookup fieldTypesLookup) {
-        return (elasticsearchBackend, ssb, errors, timezone) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb, errors, timezone, fieldTypesLookup);
+        return (elasticsearchBackend, ssb, errors, timezone) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb.toBuilder(), errors, timezone, fieldTypesLookup);
     }
 
     public static OSGeneratedQueryContext.Factory createTestContextFactory() {
@@ -43,6 +42,6 @@ public class ViewsUtils {
     }
 
     public static OSGeneratedQueryContext createTestContext(OpenSearchBackend backend) {
-        return new OSGeneratedQueryContext(backend, new SearchSourceBuilder(), Collections.emptyList(), DateTimeZone.UTC, mock(FieldTypesLookup.class));
+        return new OSGeneratedQueryContext(backend, new SearchRequest.Builder(), Collections.emptyList(), DateTimeZone.UTC, mock(FieldTypesLookup.class));
     }
 }

@@ -24,8 +24,7 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
-import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHits;
-import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
+import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog.testing.jsonpath.JsonPathAssert;
 import org.graylog2.indexer.results.ResultMessageFactory;
@@ -34,6 +33,9 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.jupiter.api.Test;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch.core.SearchRequest;
+import org.opensearch.client.opensearch.core.msearch.MultiSearchItem;
 
 import java.util.Collections;
 import java.util.List;
@@ -50,13 +52,12 @@ public class OSMessageListTest {
     @Test
     public void includesCustomNameInResultIfPresent() {
         final OSMessageList esMessageList = new OSMessageList(new LegacyDecoratorProcessor.Fake(),
-                new TestResultMessageFactory(), false);
+                new TestResultMessageFactory(), false, new OSSerializationUtils());
         final MessageList messageList = someMessageList().toBuilder().name("customResult").build();
 
-        final org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse result =
-                mock(org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse.class);
-
-        when(result.getHits()).thenReturn(SearchHits.empty());
+        MultiSearchItem<JsonData> result = MultiSearchItem.of(
+                h -> h.hits(m -> m.total(t -> t.value(0)))
+        );
 
         final SearchType.Result searchTypeResult = esMessageList.doExtractResult(someQuery(), messageList, result, null);
 
@@ -69,7 +70,7 @@ public class OSMessageListTest {
 
         OSGeneratedQueryContext context = generateQueryPartWithHighlighting(messageList);
 
-        assertThat(context.searchSourceBuilder(messageList).highlighter()).isNotNull();
+        assertThat(context.searchSourceBuilder(messageList).build().highlight()).isNotNull();
     }
 
     @Test
@@ -78,7 +79,7 @@ public class OSMessageListTest {
 
         OSGeneratedQueryContext context = generateQueryPartWithoutHighlighting(messageList);
 
-        assertThat(context.searchSourceBuilder(messageList).highlighter())
+        assertThat(context.searchSourceBuilder(messageList).build().highlight())
                 .as("there should be no highlighter configured")
                 .isNull();
     }
@@ -219,7 +220,7 @@ public class OSMessageListTest {
     private OSGeneratedQueryContext mockQueryContext(MessageList messageList) {
         OSGeneratedQueryContext context = mock(OSGeneratedQueryContext.class);
 
-        when(context.searchSourceBuilder(messageList)).thenReturn(new SearchSourceBuilder());
+        when(context.searchSourceBuilder(messageList)).thenReturn(new SearchRequest.Builder());
 
         return context;
     }
@@ -230,7 +231,8 @@ public class OSMessageListTest {
         OSMessageList sut = new OSMessageList(
                 new LegacyDecoratorProcessor.Fake(),
                 resultMessageFactory,
-                allowHighlighting);
+                allowHighlighting,
+                new OSSerializationUtils());
 
         sut.doGenerateQueryPart(someQuery(), messageList, context);
 

@@ -16,7 +16,7 @@
  */
 package org.graylog.storage.opensearch3.views.searchtypes.pivot;
 
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 
 enum Placement {
     ROOT,
@@ -25,20 +25,21 @@ enum Placement {
     METRIC
 }
 
-public record SeriesAggregationBuilder(AggregationBuilder aggregationBuilder, Placement placement) {
-    public static SeriesAggregationBuilder root(AggregationBuilder aggregationBuilder) {
-        return new SeriesAggregationBuilder(aggregationBuilder, Placement.ROOT);
+public record SeriesAggregationBuilder(String aggregationName, Aggregation aggregationBuilder,
+                                       Placement placement) {
+    public static SeriesAggregationBuilder root(String aggregationName, Aggregation aggregationBuilder) {
+        return new SeriesAggregationBuilder(aggregationName, aggregationBuilder, Placement.ROOT);
     }
 
-    public static SeriesAggregationBuilder metric(AggregationBuilder aggregationBuilder) {
-        return new SeriesAggregationBuilder(aggregationBuilder, Placement.METRIC);
+    public static SeriesAggregationBuilder metric(String aggregationName, Aggregation aggregationBuilder) {
+        return new SeriesAggregationBuilder(aggregationName, aggregationBuilder, Placement.METRIC);
     }
 
-    public static SeriesAggregationBuilder row(AggregationBuilder aggregationBuilder) {
-        return new SeriesAggregationBuilder(aggregationBuilder, Placement.ROW);
+    public static SeriesAggregationBuilder row(String aggregationName, Aggregation aggregationBuilder) {
+        return new SeriesAggregationBuilder(aggregationName, aggregationBuilder, Placement.ROW);
     }
 
-    public static SeriesAggregationBuilder column(AggregationBuilder aggregationBuilder) {
-        return new SeriesAggregationBuilder(aggregationBuilder, Placement.COLUMN);
+    public static SeriesAggregationBuilder column(String aggregationName, Aggregation aggregationBuilder) {
+        return new SeriesAggregationBuilder(aggregationName, aggregationBuilder, Placement.COLUMN);
     }
 }

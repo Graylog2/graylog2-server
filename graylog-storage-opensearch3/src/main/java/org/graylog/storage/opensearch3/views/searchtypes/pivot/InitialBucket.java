@@ -16,48 +16,57 @@
  */
 package org.graylog.storage.opensearch3.views.searchtypes.pivot;
 
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.XContentBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
+import jakarta.annotation.Nonnull;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
+import org.opensearch.client.opensearch.core.msearch.MultiSearchItem;
+import org.opensearch.client.opensearch.core.search.TotalHits;
 
-import java.io.IOException;
+public class InitialBucket extends MultiBucketBase {
 
-public class InitialBucket implements MultiBucketsAggregation.Bucket {
-    private final long docCount;
-    private final Aggregations aggregations;
-
-    private InitialBucket(long docCount, Aggregations aggregations) {
-        this.docCount = docCount;
-        this.aggregations = aggregations;
+    private InitialBucket(Builder b) {
+        super(b);
     }
 
-    public static InitialBucket create(SearchResponse searchResponse) {
-        return new InitialBucket(searchResponse.getHits().getTotalHits().value, searchResponse.getAggregations());
+    @Nonnull
+    public Builder toBuilder() {
+        return new Builder(this);
     }
 
-    @Override
-    public Object getKey() {
-        throw new IllegalStateException("Not implemented!");
+    @Nonnull
+    public static Builder builder() {
+        return new Builder();
     }
 
-    @Override
-    public String getKeyAsString() {
-        throw new IllegalStateException("Not implemented!");
+    public static class Builder extends MultiBucketBase.AbstractBuilder<Builder> {
+        public Builder() {
+        }
+
+        private Builder(InitialBucket b) {
+            super(b);
+        }
+
+        private Builder(Builder b) {
+            super(b);
+        }
+
+        @Override
+        @Nonnull
+        protected Builder self() {
+            return this;
+        }
+
+        @Nonnull
+        public InitialBucket build() {
+            return new InitialBucket(this);
+        }
+
     }
 
-    @Override
-    public long getDocCount() {
-        return this.docCount;
+    public static InitialBucket create(MultiSearchItem<JsonData> searchResponse) {
+        TotalHits total = searchResponse.hits().total();
+        long value = (total != null) ? total.value() : 0;
+        return InitialBucket.builder().docCount(value).aggregations(searchResponse.aggregations()).build();
     }
 
-    @Override
-    public Aggregations getAggregations() {
-        return this.aggregations;
-    }
-
-    @Override
-    public XContentBuilder toXContent(XContentBuilder xContentBuilder, Params params) throws IOException {
-        throw new IllegalStateException("Not implemented!");
-    }
 }

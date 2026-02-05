@@ -17,21 +17,21 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ExtendedStats;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ExtendedStatsAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.ExtendedStatsAggregation;
 
-public class OSStdDevHandler extends OSBasicSeriesSpecHandler<StdDev, ExtendedStats> {
+public class OSStdDevHandler extends OSBasicSeriesSpecHandler<StdDev> {
 
     @Override
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final StdDev stddevSpec) {
-        final ExtendedStatsAggregationBuilder stddev = AggregationBuilders.extendedStats(name).field(stddevSpec.field());
-        return SeriesAggregationBuilder.metric(stddev);
+        return SeriesAggregationBuilder.metric(name,
+                ExtendedStatsAggregation.builder().field(stddevSpec.field()).build().toAggregation());
     }
 
     @Override
-    protected Object getValueFromAggregationResult(final ExtendedStats extendedStats, final StdDev seriesSpec) {
-        return extendedStats.getStdDeviation();
+    protected Object getValueFromAggregationResult(final Aggregate agg, final StdDev seriesSpec) {
+        var extendedStats = agg.isExtendedStats() ? agg.extendedStats() : null;
+        return extendedStats == null ? null : extendedStats.stdDeviation();
     }
 }

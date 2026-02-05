@@ -23,27 +23,23 @@ import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentage;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.XContentBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.HasAggregations;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ParsedSum;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ValueCount;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.InitialBucket;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
+import org.opensearch.client.opensearch._types.aggregations.ValueCountAggregate;
+import org.opensearch.client.opensearch.core.msearch.MultiSearchItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
-public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage, ValueCount> {
+public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage> {
     private static final Logger LOG = LoggerFactory.getLogger(OSCountHandler.class);
     private final OSCountHandler osCountHandler;
     private final OSSumHandler osSumHandler;
@@ -60,7 +56,7 @@ public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage, Va
         var aggregation = createNestedSeriesAggregation(name, pivot, percentage, queryContext);
         return Stream.concat(
                 aggregation.stream(),
-                aggregation.stream().map(r -> SeriesAggregationBuilder.root(r.aggregationBuilder()))
+                aggregation.stream().map(r -> SeriesAggregationBuilder.root(name, r.aggregationBuilder()))
         ).toList();
     }
 
@@ -83,8 +79,8 @@ public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage, Va
 
     private Stream<Value> handleNestedSeriesResults(Pivot pivot,
                                                     Percentage percentage,
-                                                    SearchResponse searchResult,
-                                                    Aggregation seriesResult,
+                                                    MultiSearchItem<JsonData> searchResult,
+                                                    Aggregate seriesResult,
                                                     OSGeneratedQueryContext esGeneratedQueryContext) {
         return switch (percentage.strategy().orElse(Percentage.Strategy.COUNT)) {
             case SUM -> {
@@ -105,19 +101,22 @@ public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage, Va
     @Override
     public Stream<Value> doHandleResult(Pivot pivot,
                                         Percentage percentage,
-                                        SearchResponse searchResult,
-                                        ValueCount valueCount,
+                                        MultiSearchItem<JsonData> searchResult,
+                                        Aggregate agg,
                                         OSGeneratedQueryContext osGeneratedQueryContext) {
         final long value;
-        if (valueCount == null) {
+        if (agg == null) {
             LOG.error("Unexpected null aggregation result, returning 0 for the count. This is a bug.");
             value = 0;
-        } else if (valueCount instanceof MultiBucketsAggregation.Bucket) {
-            value = ((MultiBucketsAggregation.Bucket) valueCount).getDocCount();
-        } else if (valueCount instanceof Aggregations) {
-            value = searchResult.getHits().getTotalHits().value;
+            // TODO!!!
+//        } else if (valueCount instanceof MultiBucketsAggregation.Bucket) {
+//            value = ((MultiBucketsAggregation.Bucket) valueCount).getDocCount();
+//        } else if (valueCount instanceof Aggregations) {
+//            value = searchResult.hits().total().value();
+        } else if (agg.isValueCount()) {
+            value = (agg.valueCount() == null || agg.valueCount().value() == null) ? 0L : agg.valueCount().value().longValue();
         } else {
-            value = valueCount.getValue();
+            value = 0L; // TODO!!!
         }
 
         var initialBucket = osGeneratedQueryContext.rowBucket().orElseGet(() -> InitialBucket.create(searchResult));
@@ -131,7 +130,7 @@ public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage, Va
                 .map(bucketPercentage -> Value.create(percentage.id(), Percentage.NAME, bucketPercentage));
     }
 
-    private Aggregation extractNestedSeriesAggregation(Pivot pivot, Percentage percentage, HasAggregations aggregations, IndexerGeneratedQueryContext<?> queryContext) {
+    private Aggregate extractNestedSeriesAggregation(Pivot pivot, Percentage percentage, MultiBucketBase aggregations, IndexerGeneratedQueryContext<?> queryContext) {
         return switch (percentage.strategy().orElse(Percentage.Strategy.COUNT)) {
             case SUM -> {
                 var seriesSpecBuilder = Sum.builder().id(percentage.id());
@@ -149,54 +148,17 @@ public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage, Va
     }
 
     @Override
-    public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, IndexerGeneratedQueryContext<?> queryContext) {
+    public Aggregate extractAggregationFromResult(Pivot pivot, PivotSpec spec, MultiBucketBase aggregations, IndexerGeneratedQueryContext<?> queryContext) {
         var result = extractNestedSeriesAggregation(pivot, (Percentage) spec, aggregations, queryContext);
-        if (result instanceof ValueCount) {
-            return result;
-        }
-        if (result instanceof ParsedSum sum) {
-            return createValueCount(sum.getValue());
+
+        if (result.isValueCount())
+            return result.valueCount().toAggregate();
+
+        if (result.isSum()) {
+            return ValueCountAggregate.of(v -> v.value(result.sum().value())).toAggregate();
         }
 
         throw new IllegalStateException("Unable to parse result: " + result);
     }
 
-    private Aggregation createValueCount(final Double value) {
-        return new ValueCount() {
-            @Override
-            public long getValue() {
-                return value.longValue();
-            }
-
-            @Override
-            public double value() {
-                return value;
-            }
-
-            @Override
-            public String getValueAsString() {
-                return value.toString();
-            }
-
-            @Override
-            public String getName() {
-                return null;
-            }
-
-            @Override
-            public String getType() {
-                return null;
-            }
-
-            @Override
-            public Map<String, Object> getMetadata() {
-                return null;
-            }
-
-            @Override
-            public XContentBuilder toXContent(XContentBuilder xContentBuilder, Params params) {
-                return null;
-            }
-        };
-    }
 }
