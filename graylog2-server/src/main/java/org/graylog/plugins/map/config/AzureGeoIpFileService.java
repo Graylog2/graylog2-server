@@ -98,16 +98,10 @@ public class AzureGeoIpFileService extends GeoIpFileService {
                     .getBlobContainerClient(container)
                     .getBlobClient(blobPath);
 
-            if (!blobClient.exists()) {
-                LOG.warn("Blob {} not found in Azure Blob Storage: {}", blobPath, container);
-                return Optional.empty();
-            }
-
             blobClient.downloadToFile(tempPath.toString(), true);
             return Optional.of(blobClient.getProperties().getLastModified().toInstant());
         } catch (Exception e) {
-            LOG.error("Failed to download blob {}: {}", blobPath, e.getMessage());
-            return Optional.empty();
+            throw new AzureCloudDownloadException("Failed to download blob %s: %s".formatted(blobPath, e.getMessage()));
         }
     }
 
@@ -173,5 +167,11 @@ public class AzureGeoIpFileService extends GeoIpFileService {
         );
 
         return builder.buildClient();
+    }
+
+    static class AzureCloudDownloadException extends RuntimeException {
+        public AzureCloudDownloadException(String message) {
+            super(message);
+        }
     }
 }
