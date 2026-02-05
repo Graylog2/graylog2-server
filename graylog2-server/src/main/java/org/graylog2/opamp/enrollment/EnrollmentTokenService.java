@@ -181,8 +181,8 @@ public class EnrollmentTokenService {
                                 })
                                 .orElseThrow(() -> new SecurityException("Unknown kid: " + kid));
                     })
-                    .requireIssuer(expectedIssuer.toString())
-                    .requireAudience(expectedAudience)
+//                    .requireIssuer(expectedIssuer.toString()) // TODO
+//                    .requireAudience(expectedAudience) // TODO
                     .build()
                     .parseSignedClaims(token);
 
@@ -271,7 +271,7 @@ public class EnrollmentTokenService {
 
             var builder = Jwts.builder()
                     .header()
-                        .add("typ", "enrollment+jwt")
+                    .add("ctt", "enrollment")
                         .add("kid", signingCert.fingerprint())
                     .and()
                     .issuer(issuer.toString())

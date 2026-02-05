@@ -68,14 +68,14 @@ public class OpAmpService {
 
         final String typ = extractTypHeader(token);
         if (typ == null) {
-            LOG.warn("Token missing typ header");
+            LOG.warn("Token missing ctt header");
             return Optional.empty();
         }
 
         return switch (typ) {
-            case "enrollment+jwt" -> enrollmentTokenService.validateToken(token, effectiveExternalUri, transport)
+            case "enrollment" -> enrollmentTokenService.validateToken(token, effectiveExternalUri, transport)
                     .map(e -> e);
-            case "agent+jwt" -> enrollmentTokenService.validateAgentToken(token, transport)
+            case "agent" -> enrollmentTokenService.validateAgentToken(token, transport)
                     .map(i -> i);
             default -> {
                 LOG.warn("Unknown token type: {}", typ);
@@ -84,6 +84,7 @@ public class OpAmpService {
         };
     }
 
+    // TODO: Replace with proper JWT library parsing or pull into key locator
     private String extractTypHeader(String token) {
         try {
             final String[] parts = token.split("\\.");
@@ -92,7 +93,7 @@ public class OpAmpService {
             }
             final String headerJson = new String(Base64.getUrlDecoder().decode(parts[0]), StandardCharsets.UTF_8);
             // Simple extraction - find "typ":"value"
-            final int typIndex = headerJson.indexOf("\"typ\"");
+            final int typIndex = headerJson.indexOf("\"ctt\"");
             if (typIndex < 0) {
                 return null;
             }
@@ -164,9 +165,9 @@ public class OpAmpService {
                     .setInstanceUid(message.getInstanceUid())
                     .setConnectionSettings(ConnectionSettingsOffers.newBuilder()
                             .setOpamp(OpAMPConnectionSettings.newBuilder()
+                                    .setHeartbeatIntervalSeconds(30)
                                     .setCertificate(TLSCertificate.newBuilder()
-                                            .setCert(ByteString.copyFromUtf8(certPem))
-                                            .setCaCert(ByteString.copyFromUtf8(enrollmentCa.certificate())))))
+                                            .setCert(ByteString.copyFromUtf8(certPem)))))
                     .build();
         } catch (Exception e) {
             LOG.error("Enrollment failed for agent {}", instanceUid, e);
@@ -175,8 +176,8 @@ public class OpAmpService {
     }
 
     private ServerToAgent handleIdentifiedMessage(AgentToServer message, OpAmpAuthContext.Identified auth) {
-        LOG.info("Received OpAMP message via {} from identified agent {}",
-                auth.transport(), auth.agent().instanceUid());
+        LOG.info("Received OpAMP message via {} from identified agent {}: {}",
+                auth.transport(), auth.agent().instanceUid(), message);
 
         // Acknowledge the message
         return ServerToAgent.newBuilder()
