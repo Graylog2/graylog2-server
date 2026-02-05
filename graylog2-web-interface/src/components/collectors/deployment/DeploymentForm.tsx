@@ -19,12 +19,13 @@ import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Button, SegmentedControl } from 'components/bootstrap';
-import { Card, ClipboardButton, Select } from 'components/common';
+import { ClipboardButton, Select } from 'components/common';
+import SectionGrid from 'components/common/Section/SectionGrid';
 
 import { useFleets, useCollectorsMutations } from '../hooks';
 
 type Platform = 'linux' | 'windows' | 'macos' | 'container';
-type TokenExpiry = '24h' | '7d' | '30d' | 'never';
+type TokenExpiry = 'PT24H' | 'P7D' | 'P30D' | 'never';
 
 const Section = styled.div(
   ({ theme }) => css`
@@ -79,12 +80,24 @@ const InfoText = styled.span(
   `,
 );
 
-const HeaderRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-`;
+const ResultsContainer = styled.div(
+  ({ theme }) => css`
+    margin-top: ${theme.spacings.lg};
+  `,
+);
+
+const ResultSection = styled.div(
+  ({ theme }) => css`
+    h4 {
+      margin: 0 0 ${theme.spacings.sm} 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: ${theme.fonts.size.large};
+      font-weight: 500;
+    }
+  `,
+);
 
 type TokenResponse = {
   token: string;
@@ -96,7 +109,7 @@ const DeploymentForm = () => {
   const { createEnrollmentToken, isCreatingEnrollmentToken } = useCollectorsMutations();
   const [platform, setPlatform] = useState<Platform>('linux');
   const [fleetId, setFleetId] = useState<string | null>(null);
-  const [expiry, setExpiry] = useState<TokenExpiry>('7d');
+  const [expiry, setExpiry] = useState<TokenExpiry>('P7D');
   const [tokenResponse, setTokenResponse] = useState<TokenResponse | null>(null);
 
   const fleetOptions = (fleets || []).map((f) => ({ value: f.id, label: f.name }));
@@ -188,27 +201,31 @@ const DeploymentForm = () => {
       </Section>
 
       {tokenResponse && (
-        <>
-          <Card>
-            <Label>Enrollment Token</Label>
-            <TokenRow>
-              <CodeInline style={{ flex: 1 }}>{tokenResponse.token.slice(0, 50)}...</CodeInline>
-              <ClipboardButton text={tokenResponse.token} title="Copy" bsSize="xs" />
-            </TokenRow>
-            <InfoText>
-              Fleet: {fleets?.find((f) => f.id === fleetId)?.name} | Expires:{' '}
-              {new Date(tokenResponse.expiresAt).toLocaleString()}
-            </InfoText>
-          </Card>
+        <ResultsContainer>
+          <SectionGrid>
+            <ResultSection>
+              <h4>
+                Enrollment Token
+                <ClipboardButton text={tokenResponse.token} title="Copy Token" bsSize="xs" />
+              </h4>
+              <TokenRow>
+                <CodeInline style={{ flex: 1 }}>{tokenResponse.token.slice(0, 50)}...</CodeInline>
+              </TokenRow>
+              <InfoText>
+                Fleet: {fleets?.find((f) => f.id === fleetId)?.name} | Expires:{' '}
+                {new Date(tokenResponse.expiresAt).toLocaleString()}
+              </InfoText>
+            </ResultSection>
 
-          <Card>
-            <HeaderRow>
-              <Label>Installation Script</Label>
-              <ClipboardButton text={getInstallScript()} title="Copy Script" bsSize="xs" />
-            </HeaderRow>
-            <ScriptBlock>{getInstallScript()}</ScriptBlock>
-          </Card>
-        </>
+            <ResultSection>
+              <h4>
+                Installation Script
+                <ClipboardButton text={getInstallScript()} title="Copy Script" bsSize="xs" />
+              </h4>
+              <ScriptBlock>{getInstallScript()}</ScriptBlock>
+            </ResultSection>
+          </SectionGrid>
+        </ResultsContainer>
       )}
     </div>
   );
