@@ -20,23 +20,35 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.PKCSException;
+import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.graylog2.security.encryption.EncryptedValueService;
 
 import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.cert.CertificateException;
@@ -46,6 +58,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * Builder for creating X.509 certificates with BouncyCastle.
@@ -320,5 +334,145 @@ public class CertificateBuilder {
                 certificate.getNotAfter().toInstant(),
                 Instant.now()
         );
+    }
+
+    /**
+     * Creates a Certificate Signing Request (CSR) for a given key pair and common name.
+     * <p>
+     * This method is primarily used for testing; in production, agents generate their own CSRs.
+     *
+     * @param keyPair the key pair to create the CSR for
+     * @param commonName the common name to include in the CSR subject
+     * @return the PEM-encoded CSR as a byte array
+     * @throws IOException if encoding fails
+     * @throws OperatorCreationException if the content signer cannot be created
+     */
+    public byte[] createCsr(KeyPair keyPair, String commonName) throws IOException, OperatorCreationException {
+        final X500Name subject = new X500NameBuilder(BCStyle.INSTANCE)
+                .addRDN(BCStyle.CN, commonName)
+                .build();
+
+        // Detect algorithm from key pair
+        final String keyAlgorithm = keyPair.getPublic().getAlgorithm();
+        final String signatureAlgorithm = "Ed25519".equals(keyAlgorithm) ? "Ed25519" : "SHA256withRSA";
+
+        final ContentSigner signer = new JcaContentSignerBuilder(signatureAlgorithm)
+                .setProvider("BC")
+                .build(keyPair.getPrivate());
+
+        final PKCS10CertificationRequest csr = new JcaPKCS10CertificationRequestBuilder(subject, keyPair.getPublic())
+                .build(signer);
+
+        // Encode CSR as PEM
+        final StringWriter stringWriter = new StringWriter();
+        try (JcaPEMWriter pemWriter = new JcaPEMWriter(stringWriter)) {
+            pemWriter.writeObject(csr);
+        }
+        return stringWriter.toString().getBytes();
+    }
+
+    /**
+     * Signs a Certificate Signing Request (CSR) and produces an X.509 certificate.
+     * <p>
+     * This method:
+     * <ul>
+     *   <li>Parses and verifies the CSR self-signature (proves agent has private key)</li>
+     *   <li>Validates that the public key is Ed25519</li>
+     *   <li>Ignores the CSR subject - uses the provided subjectCn instead</li>
+     *   <li>Sets extensions: BasicConstraints CA:FALSE (critical), KeyUsage digitalSignature (critical),
+     *       ExtendedKeyUsage clientAuth</li>
+     * </ul>
+     *
+     * @param csrPem the PEM-encoded CSR
+     * @param issuer the issuing CA's certificate entry (must contain the private key)
+     * @param subjectCn the common name for the certificate subject (CSR subject is ignored)
+     * @param validity the validity period of the certificate
+     * @return the signed X509Certificate
+     * @throws Exception if signing fails
+     * @throws IllegalArgumentException if the CSR public key is not Ed25519
+     */
+    public X509Certificate signCsr(byte[] csrPem, CertificateEntry issuer, String subjectCn, Duration validity)
+            throws Exception {
+        // Parse the CSR
+        final PKCS10CertificationRequest csr;
+        try (PEMParser pemParser = new PEMParser(new StringReader(new String(csrPem)))) {
+            final Object object = pemParser.readObject();
+            if (!(object instanceof PKCS10CertificationRequest)) {
+                throw new IllegalArgumentException("PEM does not contain a valid CSR");
+            }
+            csr = (PKCS10CertificationRequest) object;
+        }
+
+        // Verify CSR self-signature (proves agent possesses private key)
+        try {
+            final ContentVerifierProvider verifier = new JcaContentVerifierProviderBuilder()
+                    .setProvider("BC")
+                    .build(csr.getSubjectPublicKeyInfo());
+            if (!csr.isSignatureValid(verifier)) {
+                throw new IllegalArgumentException("CSR signature verification failed");
+            }
+        } catch (PKCSException e) {
+            throw new IllegalArgumentException("CSR signature verification failed", e);
+        }
+
+        // Extract and validate public key - must be Ed25519
+        final PublicKey publicKey = new org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter()
+                .setProvider("BC")
+                .getPublicKey(csr.getSubjectPublicKeyInfo());
+
+        if (!"Ed25519".equals(publicKey.getAlgorithm())) {
+            throw new IllegalArgumentException(
+                    f("CSR public key must be Ed25519, but was %s", publicKey.getAlgorithm())
+            );
+        }
+
+        // Parse the issuer's certificate and private key
+        final X509Certificate issuerCert = PemUtils.parseCertificate(issuer.certificate());
+        final PrivateKey issuerPrivateKey = PemUtils.parsePrivateKey(
+                encryptedValueService.decrypt(issuer.privateKey())
+        );
+
+        // Build the subject DN (ignore CSR subject, use provided subjectCn)
+        final X500Name subject = new X500NameBuilder(BCStyle.INSTANCE)
+                .addRDN(BCStyle.CN, subjectCn)
+                .build();
+
+        // Get the issuer DN from the issuer certificate
+        final X500Name issuerDn = new X500Name(issuerCert.getSubjectX500Principal().getName());
+
+        final Instant now = Instant.now();
+        final Instant notAfter = now.plus(validity);
+        final BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
+
+        final JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
+                issuerDn,
+                serialNumber,
+                Date.from(now),
+                Date.from(notAfter),
+                subject,
+                publicKey
+        );
+
+        // Add Basic Constraints: CA:FALSE (critical)
+        certBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(false));
+
+        // Add Key Usage: digitalSignature (critical)
+        certBuilder.addExtension(
+                Extension.keyUsage,
+                true,
+                new KeyUsage(KeyUsage.digitalSignature)
+        );
+
+        // Add Extended Key Usage: clientAuth
+        certBuilder.addExtension(
+                Extension.extendedKeyUsage,
+                false,
+                new ExtendedKeyUsage(KeyPurposeId.id_kp_clientAuth)
+        );
+
+        // Detect algorithm from issuer certificate
+        final Algorithm algorithm = PemUtils.detectAlgorithm(issuerCert);
+
+        return signCertificate(certBuilder, issuerPrivateKey, algorithm);
     }
 }

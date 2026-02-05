@@ -17,6 +17,7 @@
 package org.graylog.security.certificates;
 
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,9 +26,10 @@ import org.junit.jupiter.api.Test;
 import java.security.KeyPair;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
-import java.time.Instant;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Tests for {@link CertificateBuilder} certificate creation operations.
@@ -306,4 +308,7 @@ class CertificateBuilderTest {
         assertThat(intermediateCa.issuerChain()).containsExactly(rootCa.certificate());
         assertThat(tokenSigningCert.issuerChain()).containsExactly(intermediateCa.certificate(), rootCa.certificate());
     }
+
+    // Note: CSR creation and signing tests will be added when the createCsr and signCsr
+    // methods are implemented in CertificateBuilder (Task 4: Add CSR signing to CertificateBuilder)
 }
