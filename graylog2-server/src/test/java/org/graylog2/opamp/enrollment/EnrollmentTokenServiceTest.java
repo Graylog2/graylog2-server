@@ -21,6 +21,14 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import org.graylog.grn.GRNRegistry;
+import io.jsonwebtoken.Jwts;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.graylog.security.certificates.CertificateEntry;
 import org.graylog.security.certificates.CertificateService;
 import org.graylog.security.certificates.PemUtils;
@@ -29,6 +37,8 @@ import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
+import org.graylog2.opamp.OpAmpAgent;
+import org.graylog2.opamp.OpAmpAgentService;
 import org.graylog2.opamp.config.OpAmpCaConfig;
 import org.graylog2.opamp.rest.CreateEnrollmentTokenRequest;
 import org.graylog2.opamp.rest.EnrollmentTokenResponse;
@@ -41,13 +51,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
+import java.io.StringWriter;
 import java.net.URI;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Base64;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -71,6 +87,7 @@ class EnrollmentTokenServiceTest {
 
     private CertificateService certificateService;
     private ClusterConfigService clusterConfigService;
+    private OpAmpAgentService agentService;
     private EnrollmentTokenService enrollmentTokenService;
 
     @BeforeEach
@@ -90,7 +107,8 @@ class EnrollmentTokenServiceTest {
         );
         certificateService = new CertificateService(mongoCollections, encryptedValueService);
         clusterConfigService = mock(ClusterConfigService.class);
-        enrollmentTokenService = new EnrollmentTokenService(certificateService, clusterConfigService);
+        agentService = new OpAmpAgentService(mongoCollections);
+        enrollmentTokenService = new EnrollmentTokenService(certificateService, clusterConfigService, agentService);
     }
 
     @Test
@@ -394,5 +412,179 @@ class EnrollmentTokenServiceTest {
                 fakeToken, TEST_ISSUER, OpAmpAuthContext.Transport.HTTP);
 
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    void validateAgentTokenReturnsIdentifiedForValidToken() throws Exception {
+        final AtomicReference<OpAmpCaConfig> storedConfig = new AtomicReference<>();
+        when(clusterConfigService.get(OpAmpCaConfig.class)).thenAnswer(inv -> storedConfig.get());
+        doAnswer(inv -> {
+            storedConfig.set(inv.getArgument(0));
+            return null;
+        }).when(clusterConfigService).write(any(OpAmpCaConfig.class));
+
+        // Create CA hierarchy
+        final CertificateEntry enrollmentCa = enrollmentTokenService.getEnrollmentCa();
+
+        // Generate agent key pair and CSR (use Ed25519 to match CA)
+        final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        final byte[] csrPem = createCsrPem("CN=test-agent", agentKeyPair, "Ed25519");
+
+        // Sign CSR with enrollment CA - need to create a CertificateEntry from the signed X509Certificate
+        final X509Certificate signedCert = certificateService.builder().signCsr(csrPem, enrollmentCa, "test-agent", Duration.ofDays(365));
+        final String certFingerprint = PemUtils.computeFingerprint(signedCert);
+        final String certPem = PemUtils.toPem(signedCert);
+
+        // Save agent with cert
+        final OpAmpAgent agent = agentService.save(new OpAmpAgent(
+                null,
+                "test-instance-uid",
+                "test-fleet",
+                certFingerprint,
+                certPem,
+                enrollmentCa.id(),
+                Instant.now()
+        ));
+
+        // Create agent JWT with crt_fp header
+        final String agentToken = Jwts.builder()
+                .header()
+                    .add("typ", "agent+jwt")
+                    .add("crt_fp", certFingerprint)
+                .and()
+                .subject(agent.instanceUid())
+                .issuedAt(Date.from(Instant.now()))
+                .expiration(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
+                .signWith(agentKeyPair.getPrivate())
+                .compact();
+
+        // Validate
+        final Optional<OpAmpAuthContext.Identified> result = enrollmentTokenService.validateAgentToken(
+                agentToken, OpAmpAuthContext.Transport.HTTP);
+
+        assertThat(result).isPresent();
+        assertThat(result.get().agent().id()).isEqualTo(agent.id());
+        assertThat(result.get().agent().instanceUid()).isEqualTo("test-instance-uid");
+        assertThat(result.get().transport()).isEqualTo(OpAmpAuthContext.Transport.HTTP);
+    }
+
+    @Test
+    void validateAgentTokenReturnsEmptyForUnknownFingerprint() throws Exception {
+        final AtomicReference<OpAmpCaConfig> storedConfig = new AtomicReference<>();
+        when(clusterConfigService.get(OpAmpCaConfig.class)).thenAnswer(inv -> storedConfig.get());
+        doAnswer(inv -> {
+            storedConfig.set(inv.getArgument(0));
+            return null;
+        }).when(clusterConfigService).write(any(OpAmpCaConfig.class));
+
+        // Generate agent key pair (not enrolled)
+        final KeyPair agentKeyPair = KeyPairGenerator.getInstance("EC").generateKeyPair();
+
+        // Create agent JWT with unknown fingerprint
+        final String agentToken = Jwts.builder()
+                .header()
+                    .add("typ", "agent+jwt")
+                    .add("crt_fp", "sha256:unknown-fingerprint")
+                .and()
+                .subject("unknown-agent")
+                .issuedAt(Date.from(Instant.now()))
+                .expiration(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
+                .signWith(agentKeyPair.getPrivate())
+                .compact();
+
+        // Validate
+        final Optional<OpAmpAuthContext.Identified> result = enrollmentTokenService.validateAgentToken(
+                agentToken, OpAmpAuthContext.Transport.HTTP);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void validateAgentTokenReturnsEmptyForMissingFingerprint() throws Exception {
+        // Generate agent key pair
+        final KeyPair agentKeyPair = KeyPairGenerator.getInstance("EC").generateKeyPair();
+
+        // Create agent JWT without crt_fp header
+        final String agentToken = Jwts.builder()
+                .header()
+                    .add("typ", "agent+jwt")
+                .and()
+                .subject("agent")
+                .issuedAt(Date.from(Instant.now()))
+                .expiration(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
+                .signWith(agentKeyPair.getPrivate())
+                .compact();
+
+        // Validate
+        final Optional<OpAmpAuthContext.Identified> result = enrollmentTokenService.validateAgentToken(
+                agentToken, OpAmpAuthContext.Transport.HTTP);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void validateAgentTokenReturnsEmptyForInvalidSignature() throws Exception {
+        final AtomicReference<OpAmpCaConfig> storedConfig = new AtomicReference<>();
+        when(clusterConfigService.get(OpAmpCaConfig.class)).thenAnswer(inv -> storedConfig.get());
+        doAnswer(inv -> {
+            storedConfig.set(inv.getArgument(0));
+            return null;
+        }).when(clusterConfigService).write(any(OpAmpCaConfig.class));
+
+        // Create CA hierarchy
+        final CertificateEntry enrollmentCa = enrollmentTokenService.getEnrollmentCa();
+
+        // Generate agent key pair and CSR (use Ed25519 to match CA)
+        final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        final byte[] csrPem = createCsrPem("CN=test-agent", agentKeyPair, "Ed25519");
+
+        // Sign CSR with enrollment CA
+        final X509Certificate signedCert = certificateService.builder().signCsr(csrPem, enrollmentCa, "test-agent", Duration.ofDays(365));
+        final String certFingerprint = PemUtils.computeFingerprint(signedCert);
+        final String certPem = PemUtils.toPem(signedCert);
+
+        // Save agent with cert
+        final OpAmpAgent agent = agentService.save(new OpAmpAgent(
+                null,
+                "test-instance-uid-2",
+                "test-fleet",
+                certFingerprint,
+                certPem,
+                enrollmentCa.id(),
+                Instant.now()
+        ));
+
+        // Create JWT signed with a DIFFERENT key
+        final KeyPair differentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
+        final String agentToken = Jwts.builder()
+                .header()
+                    .add("typ", "agent+jwt")
+                    .add("crt_fp", certFingerprint)
+                .and()
+                .subject(agent.instanceUid())
+                .issuedAt(Date.from(Instant.now()))
+                .expiration(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
+                .signWith(differentKeyPair.getPrivate())
+                .compact();
+
+        // Validate - should fail because signature doesn't match certificate's public key
+        final Optional<OpAmpAuthContext.Identified> result = enrollmentTokenService.validateAgentToken(
+                agentToken, OpAmpAuthContext.Transport.HTTP);
+
+        assertThat(result).isEmpty();
+    }
+
+    private byte[] createCsrPem(String subject, KeyPair keyPair, String algorithm) throws Exception {
+        final X500Name x500Name = new X500Name(subject);
+        final ContentSigner signer = new JcaContentSignerBuilder(algorithm)
+                .build(keyPair.getPrivate());
+        final PKCS10CertificationRequest csr = new JcaPKCS10CertificationRequestBuilder(x500Name, keyPair.getPublic())
+                .build(signer);
+
+        final StringWriter writer = new StringWriter();
+        try (JcaPEMWriter pemWriter = new JcaPEMWriter(writer)) {
+            pemWriter.writeObject(csr);
+        }
+        return writer.toString().getBytes();
     }
 }

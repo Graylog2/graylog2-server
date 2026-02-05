@@ -26,6 +26,8 @@ import org.graylog.security.certificates.Algorithm;
 import org.graylog.security.certificates.CertificateEntry;
 import org.graylog.security.certificates.CertificateService;
 import org.graylog.security.certificates.PemUtils;
+import org.graylog2.opamp.OpAmpAgent;
+import org.graylog2.opamp.OpAmpAgentService;
 import org.graylog2.opamp.config.OpAmpCaConfig;
 import org.graylog2.opamp.rest.CreateEnrollmentTokenRequest;
 import org.graylog2.opamp.rest.EnrollmentTokenResponse;
@@ -36,10 +38,12 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -66,12 +70,15 @@ public class EnrollmentTokenService {
 
     private final CertificateService certificateService;
     private final ClusterConfigService clusterConfigService;
+    private final OpAmpAgentService agentService;
 
     @Inject
     public EnrollmentTokenService(CertificateService certificateService,
-                                  ClusterConfigService clusterConfigService) {
+                                  ClusterConfigService clusterConfigService,
+                                  OpAmpAgentService agentService) {
         this.certificateService = certificateService;
         this.clusterConfigService = clusterConfigService;
+        this.agentService = agentService;
     }
 
     /**
@@ -188,6 +195,57 @@ public class EnrollmentTokenService {
             return Optional.of(new OpAmpAuthContext.Enrollment(fleetId, transport));
         } catch (Exception e) {
             LOG.warn("Enrollment token validation failed: {}", e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Validates an agent token and extracts the auth context.
+     * <p>
+     * Agent tokens are JWTs signed by the agent's private key. The JWT header contains
+     * an {@code crt_fp} claim with the certificate fingerprint, which is used to look up
+     * the agent and retrieve its public key for signature verification.
+     * <p>
+     * Validation includes:
+     * <ul>
+     *   <li>Extracting {@code crt_fp} fingerprint from JWT header</li>
+     *   <li>Looking up agent by fingerprint</li>
+     *   <li>Parsing agent's certificate and verifying validity</li>
+     *   <li>Signature verification using the certificate's public key</li>
+     *   <li>Expiration check (handled automatically by JJWT)</li>
+     * </ul>
+     *
+     * @param token the JWT token string
+     * @param transport the transport type (HTTP or WEBSOCKET)
+     * @return the identified context if valid, empty otherwise
+     */
+    public Optional<OpAmpAuthContext.Identified> validateAgentToken(String token, OpAmpAuthContext.Transport transport) {
+        try {
+            final AtomicReference<OpAmpAgent> agentRef = new AtomicReference<>();
+
+            Jwts.parser()
+                    .keyLocator(header -> {
+                        final String fingerprint = (String) header.get("crt_fp");
+                        if (fingerprint == null) {
+                            throw new SecurityException("Missing crt_fp header");
+                        }
+                        final OpAmpAgent agent = agentService.findByFingerprint(fingerprint)
+                                .orElseThrow(() -> new SecurityException("Unknown agent fingerprint"));
+                        agentRef.set(agent);
+                        try {
+                            final X509Certificate cert = PemUtils.parseCertificate(agent.certificatePem());
+                            cert.checkValidity();
+                            return cert.getPublicKey();
+                        } catch (Exception e) {
+                            throw new SecurityException("Failed to parse agent certificate", e);
+                        }
+                    })
+                    .build()
+                    .parseSignedClaims(token);
+
+            return Optional.of(new OpAmpAuthContext.Identified(agentRef.get(), transport));
+        } catch (Exception e) {
+            LOG.warn("Agent token validation failed: {}", e.getMessage());
             return Optional.empty();
         }
     }
