@@ -42,6 +42,7 @@ import org.graylog2.security.encryption.EncryptedValueService;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -368,7 +369,7 @@ public class CertificateBuilder {
         try (JcaPEMWriter pemWriter = new JcaPEMWriter(stringWriter)) {
             pemWriter.writeObject(csr);
         }
-        return stringWriter.toString().getBytes();
+        return stringWriter.toString().getBytes(StandardCharsets.UTF_8);
     }
 
     /**
@@ -395,7 +396,7 @@ public class CertificateBuilder {
             throws Exception {
         // Parse the CSR
         final PKCS10CertificationRequest csr;
-        try (PEMParser pemParser = new PEMParser(new StringReader(new String(csrPem)))) {
+        try (PEMParser pemParser = new PEMParser(new StringReader(new String(csrPem, StandardCharsets.UTF_8)))) {
             final Object object = pemParser.readObject();
             if (!(object instanceof PKCS10CertificationRequest)) {
                 throw new IllegalArgumentException("PEM does not contain a valid CSR");
