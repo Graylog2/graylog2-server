@@ -16,10 +16,18 @@
  */
 package org.graylog2.opamp;
 
+import com.google.protobuf.ByteString;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import opamp.proto.Opamp.AgentToServer;
+import opamp.proto.Opamp.ConnectionSettingsOffers;
+import opamp.proto.Opamp.OpAMPConnectionSettings;
+import opamp.proto.Opamp.ServerErrorResponse;
 import opamp.proto.Opamp.ServerToAgent;
+import opamp.proto.Opamp.TLSCertificate;
+import org.graylog.security.certificates.CertificateEntry;
+import org.graylog.security.certificates.CertificateService;
+import org.graylog.security.certificates.PemUtils;
 import org.graylog2.opamp.enrollment.EnrollmentTokenService;
 import org.graylog2.opamp.transport.OpAmpAuthContext;
 import org.slf4j.Logger;
@@ -28,6 +36,9 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.security.cert.X509Certificate;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,10 +48,16 @@ public class OpAmpService {
     private static final Logger LOG = LoggerFactory.getLogger(OpAmpService.class);
 
     private final EnrollmentTokenService enrollmentTokenService;
+    private final OpAmpAgentService agentService;
+    private final CertificateService certificateService;
 
     @Inject
-    public OpAmpService(EnrollmentTokenService enrollmentTokenService) {
+    public OpAmpService(EnrollmentTokenService enrollmentTokenService,
+                        OpAmpAgentService agentService,
+                        CertificateService certificateService) {
         this.enrollmentTokenService = enrollmentTokenService;
+        this.agentService = agentService;
+        this.certificateService = certificateService;
     }
 
     public Optional<OpAmpAuthContext> authenticate(String authHeader, URI effectiveExternalUri, OpAmpAuthContext.Transport transport) {
@@ -93,17 +110,84 @@ public class OpAmpService {
     }
 
     public ServerToAgent handleMessage(AgentToServer message, OpAmpAuthContext authContext) {
-        final UUID instanceUid = bytesToUuid(message.getInstanceUid().toByteArray());
-        switch (authContext) {
-            case OpAmpAuthContext.Enrollment e -> LOG.info("Received OpAMP enrollment via {} from agent {} for fleet {}",
-                    e.transport(), instanceUid, e.fleetId());
-            case OpAmpAuthContext.Identified i -> LOG.info("Received OpAMP message via {} from identified agent {}",
-                    i.transport(), i.agent().instanceUid());
+        return switch (authContext) {
+            case OpAmpAuthContext.Enrollment e -> handleEnrollment(message, e);
+            case OpAmpAuthContext.Identified i -> handleIdentifiedMessage(message, i);
+        };
+    }
+
+    private ServerToAgent handleEnrollment(AgentToServer message, OpAmpAuthContext.Enrollment auth) {
+        final String instanceUid = bytesToUuid(message.getInstanceUid().toByteArray()).toString();
+
+        // 1. Reject if already enrolled
+        if (agentService.existsByInstanceUid(instanceUid)) {
+            LOG.warn("Rejecting enrollment: agent {} already enrolled", instanceUid);
+            return ServerToAgent.newBuilder()
+                    .setInstanceUid(message.getInstanceUid())
+                    .setErrorResponse(ServerErrorResponse.newBuilder()
+                            .setErrorMessage("Agent already enrolled"))
+                    .build();
         }
 
-        // Skeleton - just acknowledge
+        // 2. Extract CSR
+        if (!message.hasConnectionSettingsRequest() ||
+                !message.getConnectionSettingsRequest().hasOpamp() ||
+                !message.getConnectionSettingsRequest().getOpamp().hasCertificateRequest()) {
+            return errorResponse(message, "Missing CSR in enrollment request");
+        }
+
+        final ByteString csrBytes = message.getConnectionSettingsRequest()
+                .getOpamp().getCertificateRequest().getCsr();
+        if (csrBytes.isEmpty()) {
+            return errorResponse(message, "Empty CSR");
+        }
+
+        try {
+            // 3. Sign CSR with Enrollment CA
+            final CertificateEntry enrollmentCa = enrollmentTokenService.getEnrollmentCa();
+            final X509Certificate agentCert = certificateService.builder().signCsr(
+                    csrBytes.toByteArray(), enrollmentCa, instanceUid, Duration.ofDays(365));
+
+            // 4. Save agent record
+            final String fingerprint = PemUtils.computeFingerprint(agentCert);
+            final String certPem = PemUtils.toPem(agentCert);
+
+            final OpAmpAgent agent = new OpAmpAgent(
+                    null, instanceUid, auth.fleetId(), fingerprint, certPem,
+                    enrollmentCa.id(), Instant.now());
+            agentService.save(agent);
+
+            LOG.info("Enrolled agent {} in fleet {}", instanceUid, auth.fleetId());
+
+            // 5. Return certificate
+            return ServerToAgent.newBuilder()
+                    .setInstanceUid(message.getInstanceUid())
+                    .setConnectionSettings(ConnectionSettingsOffers.newBuilder()
+                            .setOpamp(OpAMPConnectionSettings.newBuilder()
+                                    .setCertificate(TLSCertificate.newBuilder()
+                                            .setCert(ByteString.copyFromUtf8(certPem))
+                                            .setCaCert(ByteString.copyFromUtf8(enrollmentCa.certificate())))))
+                    .build();
+        } catch (Exception e) {
+            LOG.error("Enrollment failed for agent {}", instanceUid, e);
+            return errorResponse(message, "Enrollment failed: " + e.getMessage());
+        }
+    }
+
+    private ServerToAgent handleIdentifiedMessage(AgentToServer message, OpAmpAuthContext.Identified auth) {
+        LOG.info("Received OpAMP message via {} from identified agent {}",
+                auth.transport(), auth.agent().instanceUid());
+
+        // Acknowledge the message
         return ServerToAgent.newBuilder()
                 .setInstanceUid(message.getInstanceUid())
+                .build();
+    }
+
+    private ServerToAgent errorResponse(AgentToServer message, String errorMessage) {
+        return ServerToAgent.newBuilder()
+                .setInstanceUid(message.getInstanceUid())
+                .setErrorResponse(ServerErrorResponse.newBuilder().setErrorMessage(errorMessage))
                 .build();
     }
 

@@ -16,6 +16,7 @@
  */
 package org.graylog2.opamp;
 
+import org.graylog.security.certificates.CertificateService;
 import org.graylog2.opamp.enrollment.EnrollmentTokenService;
 import org.graylog2.opamp.transport.OpAmpAuthContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,6 +47,12 @@ class OpAmpServiceTest {
     @Mock
     private EnrollmentTokenService enrollmentTokenService;
 
+    @Mock
+    private OpAmpAgentService agentService;
+
+    @Mock
+    private CertificateService certificateService;
+
     private OpAmpService opAmpService;
 
     private static final URI EXTERNAL_URI = URI.create("https://graylog.example.com/");
@@ -53,7 +60,7 @@ class OpAmpServiceTest {
 
     @BeforeEach
     void setUp() {
-        opAmpService = new OpAmpService(enrollmentTokenService);
+        opAmpService = new OpAmpService(enrollmentTokenService, agentService, certificateService);
     }
 
     @Test
