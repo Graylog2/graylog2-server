@@ -23,6 +23,7 @@ import Icon from 'components/common/Icon';
 import usePerspectives from 'components/perspectives/hooks/usePerspectives';
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 import useHistory from 'routing/useHistory';
+import { MenuItem } from 'components/bootstrap';
 
 import ActivePerspectiveBrand from './ActivePerspectiveBrand';
 
@@ -88,9 +89,9 @@ const Switcher = () => {
         </ActivePerspectiveBrand>
         <StyledMenuDropdown>
           {perspectives.map(({ title, id }) => (
-            <Menu.Item key={id} onClick={onChangePerspective(id)}>
+            <MenuItem key={id} onClick={onChangePerspective(id)}>
               <ItemContainer>{title}</ItemContainer>
-            </Menu.Item>
+            </MenuItem>
           ))}
         </StyledMenuDropdown>
       </Menu>

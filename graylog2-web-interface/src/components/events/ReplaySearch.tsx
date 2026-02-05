@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
+import merge from 'lodash/merge';
 
 import useAlertAndEventDefinitionData from 'components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData';
 import useCreateSearch from 'views/hooks/useCreateSearch';
@@ -57,11 +58,19 @@ const ReplaySearch = ({
 }: ReplaySearchProps) => {
   const _view = useCreateViewForEvent({ eventData, eventDefinition, aggregations });
   const view = useCreateSearch(_view);
+
   const _searchPageLayout = useMemo(
-    () => ({
-      ...searchPageLayout,
-      infoBar: { component: EventInfoBar },
-    }),
+    () =>
+      merge(
+        {
+          infoBar: { component: EventInfoBar },
+          sidebar: {
+            isShown: true,
+            title: 'Replayed Search',
+          },
+        },
+        searchPageLayout,
+      ),
     [searchPageLayout],
   );
   const replaySearchContext = useMemo(
