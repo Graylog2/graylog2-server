@@ -35,7 +35,7 @@ public record AggregationRequestSpec(@JsonProperty("query") String queryString,
                                      @JsonProperty("timerange") TimeRange timerange,
                                      @JsonProperty("group_by") @Valid @NotEmpty List<Grouping> groupings,
                                      @JsonProperty("metrics") @Valid @NotEmpty List<Metric> metrics,
-                                     @JsonProperty("size") Integer size) implements SearchRequestSpec {
+                                     @JsonProperty("size") Integer allGroupingsSize) implements SearchRequestSpec {
 
 
     public AggregationRequestSpec {
@@ -51,9 +51,10 @@ public record AggregationRequestSpec(@JsonProperty("query") String queryString,
         if (streamCategories == null) {
             streamCategories = Set.of();
         }
-        if (size != null) {
+        // Apply allGroupingsSize to all groupings/buckets if specified
+        if (allGroupingsSize != null) {
             groupings = groupings.stream()
-                    .map(g -> new Grouping(g.fieldName(), size))
+                    .map(g -> new Grouping(g.fieldName(), allGroupingsSize))
                     .collect(Collectors.toList());
         }
     }

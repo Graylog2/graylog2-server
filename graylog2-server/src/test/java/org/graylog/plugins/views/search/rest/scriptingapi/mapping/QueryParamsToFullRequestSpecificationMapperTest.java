@@ -169,15 +169,16 @@ class QueryParamsToFullRequestSpecificationMapperTest {
     }
 
     @Test
-    void appliesSizeToGroupings() {
+    void appliesAllGroupingsSizeToGroupings() {
         doReturn(KeywordRange.create("last 1 day", "UTC")).when(timerangeParser).parseTimeRange("1d");
+        final Integer allGroupingsSize = 25;
         final AggregationRequestSpec aggregationRequestSpec = toTest.simpleQueryParamsToFullRequestSpecification("http_method:GET",
                 Set.of("000000000000000000000001"),
                 Set.of("category1"),
                 "1d",
                 List.of("http_method", "controller"),
                 List.of("avg:took_ms"),
-                25);
+                allGroupingsSize);
 
         assertThat(aggregationRequestSpec).isEqualTo(new AggregationRequestSpec(
                         "http_method:GET",
@@ -186,7 +187,7 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                         KeywordRange.create("last 1 day", "UTC"),
                         List.of(new Grouping("http_method", 25), new Grouping("controller", 25)),
                         List.of(new Metric("avg", "took_ms")),
-                        null
+                        allGroupingsSize
                 )
         );
     }

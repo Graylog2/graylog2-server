@@ -148,7 +148,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                                         @Parameter(name = "timerange", description = "Timeframe to search in. See method description.", required = true) @QueryParam("timerange") String timerangeKeyword,
                                         @Parameter(name = "group_by", description = "Group aggregation by fields/limits.", required = true) @QueryParam("groups") List<String> groups,
                                         @Parameter(name = "metrics", description = "Metrics to be used.", required = true) @QueryParam("metrics") List<String> metrics,
-                                        @Parameter(name = "size", description = "Number of items to return per grouping (default: 15)") @QueryParam("size") Integer size,
+                                        @Parameter(name = "size", description = "Number of items to return for all groupings/buckets (default: 15)") @QueryParam("size") Integer allGroupingsSize,
                                         @Context SearchUser searchUser) {
         try {
             AggregationRequestSpec aggregationRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(
@@ -158,7 +158,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                     timerangeKeyword,
                     splitByComma(groups),
                     splitByComma(metrics),
-                    size
+                    allGroupingsSize
             );
             return service.executeAggregation(aggregationRequestSpec, searchUser);
         } catch (IllegalArgumentException | QueryFailedException ex) {

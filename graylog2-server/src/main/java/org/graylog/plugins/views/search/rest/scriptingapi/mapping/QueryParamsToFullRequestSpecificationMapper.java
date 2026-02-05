@@ -66,7 +66,7 @@ public class QueryParamsToFullRequestSpecificationMapper {
                                                                               final String timerangeKeyword,
                                                                               List<String> groups,
                                                                               List<String> metrics,
-                                                                              final Integer size) {
+                                                                              final Integer allGroupingsSize) {
         if (CollectionUtils.isEmpty(groups)) {
             throw new IllegalArgumentException("At least one grouping has to be provided!");
         }
@@ -80,9 +80,10 @@ public class QueryParamsToFullRequestSpecificationMapper {
             throw new IllegalArgumentException("Percentile metric cannot be used in simplified query format. Please use POST request instead, specifying configuration for percentile metric");
         }
 
-        final List<Grouping> groupings = size != null
-                ? groups.stream().map(group -> new Grouping(group, size)).collect(Collectors.toList())
-                : groups.stream().map(Grouping::new).collect(Collectors.toList());
+        // Create simple groupings without size - let AggregationRequestSpec apply allGroupingsSize to all groupings
+        final List<Grouping> groupings = groups.stream()
+                .map(Grouping::new)
+                .collect(Collectors.toList());
 
         return new AggregationRequestSpec(
                 query,
@@ -91,7 +92,7 @@ public class QueryParamsToFullRequestSpecificationMapper {
                 timerangeParser.parseTimeRange(timerangeKeyword),
                 groupings,
                 metrics.stream().map(Metric::fromStringRepresentation).flatMap(Optional::stream).collect(Collectors.toList()),
-                null
+                allGroupingsSize
         );
     }
 
