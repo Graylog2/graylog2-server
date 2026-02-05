@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -46,8 +48,48 @@ public class OpAmpService {
             return Optional.empty();
         }
         final String token = authHeader.substring(7);
-        return enrollmentTokenService.validateToken(token, effectiveExternalUri, transport)
-                .map(e -> e);  // Upcast Enrollment to OpAmpAuthContext
+
+        final String typ = extractTypHeader(token);
+        if (typ == null) {
+            LOG.warn("Token missing typ header");
+            return Optional.empty();
+        }
+
+        return switch (typ) {
+            case "enrollment+jwt" -> enrollmentTokenService.validateToken(token, effectiveExternalUri, transport)
+                    .map(e -> e);
+            case "agent+jwt" -> enrollmentTokenService.validateAgentToken(token, transport)
+                    .map(i -> i);
+            default -> {
+                LOG.warn("Unknown token type: {}", typ);
+                yield Optional.empty();
+            }
+        };
+    }
+
+    private String extractTypHeader(String token) {
+        try {
+            final String[] parts = token.split("\\.");
+            if (parts.length < 2) {
+                return null;
+            }
+            final String headerJson = new String(Base64.getUrlDecoder().decode(parts[0]), StandardCharsets.UTF_8);
+            // Simple extraction - find "typ":"value"
+            final int typIndex = headerJson.indexOf("\"typ\"");
+            if (typIndex < 0) {
+                return null;
+            }
+            final int colonIndex = headerJson.indexOf(':', typIndex);
+            final int startQuote = headerJson.indexOf('"', colonIndex);
+            final int endQuote = headerJson.indexOf('"', startQuote + 1);
+            if (startQuote < 0 || endQuote < 0) {
+                return null;
+            }
+            return headerJson.substring(startQuote + 1, endQuote);
+        } catch (Exception e) {
+            LOG.warn("Failed to extract typ header: {}", e.getMessage());
+            return null;
+        }
     }
 
     public ServerToAgent handleMessage(AgentToServer message, OpAmpAuthContext authContext) {
@@ -55,6 +97,8 @@ public class OpAmpService {
         switch (authContext) {
             case OpAmpAuthContext.Enrollment e -> LOG.info("Received OpAMP enrollment via {} from agent {} for fleet {}",
                     e.transport(), instanceUid, e.fleetId());
+            case OpAmpAuthContext.Identified i -> LOG.info("Received OpAMP message via {} from identified agent {}",
+                    i.transport(), i.agent().instanceUid());
         }
 
         // Skeleton - just acknowledge
