@@ -176,4 +176,42 @@ class PemUtilsTest {
 
         assertThat(algorithm).isEqualTo(Algorithm.RSA_4096);
     }
+
+    // fingerprintToX5t tests
+
+    @Test
+    void fingerprintToX5tConvertsCorrectly() {
+        // Known conversion: sha256 of empty string
+        // SHA256("") = e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+        // Base64url of those bytes = 47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU
+        final String fingerprint = "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+        final String x5t = PemUtils.fingerprintToX5t(fingerprint);
+        assertThat(x5t).isEqualTo("47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU");
+    }
+
+    @Test
+    void x5tToFingerprintConvertsCorrectly() {
+        final String x5t = "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU";
+        final String fingerprint = PemUtils.x5tToFingerprint(x5t);
+        assertThat(fingerprint).isEqualTo("sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
+    }
+
+    @Test
+    void fingerprintToX5tRoundTrip() throws Exception {
+        // Create a certificate and verify round-trip
+        final CertificateEntry cert = builder.createRootCa("Test", Algorithm.ED25519, Duration.ofDays(1));
+
+        final String fingerprint = cert.fingerprint();
+        final String x5t = PemUtils.fingerprintToX5t(fingerprint);
+        final String roundTrip = PemUtils.x5tToFingerprint(x5t);
+
+        assertThat(roundTrip).isEqualTo(fingerprint);
+    }
+
+    @Test
+    void fingerprintToX5tRejectsInvalidFormat() {
+        assertThatThrownBy(() -> PemUtils.fingerprintToX5t("invalid"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("sha256:");
+    }
 }

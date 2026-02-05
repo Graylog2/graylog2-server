@@ -203,12 +203,13 @@ public class EnrollmentTokenService {
      * Validates an agent token and extracts the auth context.
      * <p>
      * Agent tokens are JWTs signed by the agent's private key. The JWT header contains
-     * an {@code crt_fp} claim with the certificate fingerprint, which is used to look up
-     * the agent and retrieve its public key for signature verification.
+     * an {@code x5t#S256} claim with the certificate thumbprint (RFC 7515 format), which
+     * is used to look up the agent and retrieve its public key for signature verification.
      * <p>
      * Validation includes:
      * <ul>
-     *   <li>Extracting {@code crt_fp} fingerprint from JWT header</li>
+     *   <li>Extracting {@code x5t#S256} thumbprint from JWT header</li>
+     *   <li>Converting from base64url to our fingerprint format for lookup</li>
      *   <li>Looking up agent by fingerprint</li>
      *   <li>Parsing agent's certificate and verifying validity</li>
      *   <li>Signature verification using the certificate's public key</li>
@@ -225,10 +226,19 @@ public class EnrollmentTokenService {
 
             Jwts.parser()
                     .keyLocator(header -> {
-                        final String fingerprint = (String) header.get("crt_fp");
-                        if (fingerprint == null) {
-                            throw new SecurityException("Missing crt_fp header");
+                        final String x5t = (String) header.get("x5t#S256");
+                        if (x5t == null) {
+                            throw new SecurityException("Missing x5t#S256 header");
                         }
+
+                        // Convert from base64url to our fingerprint format for lookup
+                        final String fingerprint;
+                        try {
+                            fingerprint = PemUtils.x5tToFingerprint(x5t);
+                        } catch (Exception e) {
+                            throw new SecurityException("Invalid x5t#S256 format: " + e.getMessage());
+                        }
+
                         final OpAmpAgent agent = agentService.findByFingerprint(fingerprint)
                                 .orElseThrow(() -> new SecurityException("Unknown agent fingerprint"));
                         agentRef.set(agent);

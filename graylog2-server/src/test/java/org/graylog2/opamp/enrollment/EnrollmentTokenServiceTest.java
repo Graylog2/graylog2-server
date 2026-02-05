@@ -446,11 +446,11 @@ class EnrollmentTokenServiceTest {
                 Instant.now()
         ));
 
-        // Create agent JWT with crt_fp header
+        // Create agent JWT with x5t#S256 header (RFC 7515 format)
         final String agentToken = Jwts.builder()
                 .header()
                     .add("typ", "agent+jwt")
-                    .add("crt_fp", certFingerprint)
+                    .add("x5t#S256", PemUtils.fingerprintToX5t(certFingerprint))
                 .and()
                 .subject(agent.instanceUid())
                 .issuedAt(Date.from(Instant.now()))
@@ -480,11 +480,13 @@ class EnrollmentTokenServiceTest {
         // Generate agent key pair (not enrolled)
         final KeyPair agentKeyPair = KeyPairGenerator.getInstance("EC").generateKeyPair();
 
-        // Create agent JWT with unknown fingerprint
+        // Create agent JWT with unknown fingerprint (using x5t#S256 format)
+        // Use a valid base64url-encoded 32-byte value that won't match any agent
+        final String unknownX5t = PemUtils.fingerprintToX5t("sha256:0000000000000000000000000000000000000000000000000000000000000000");
         final String agentToken = Jwts.builder()
                 .header()
                     .add("typ", "agent+jwt")
-                    .add("crt_fp", "sha256:unknown-fingerprint")
+                    .add("x5t#S256", unknownX5t)
                 .and()
                 .subject("unknown-agent")
                 .issuedAt(Date.from(Instant.now()))
@@ -500,11 +502,11 @@ class EnrollmentTokenServiceTest {
     }
 
     @Test
-    void validateAgentTokenReturnsEmptyForMissingFingerprint() throws Exception {
+    void validateAgentTokenReturnsEmptyForMissingX5tHeader() throws Exception {
         // Generate agent key pair
         final KeyPair agentKeyPair = KeyPairGenerator.getInstance("EC").generateKeyPair();
 
-        // Create agent JWT without crt_fp header
+        // Create agent JWT without x5t#S256 header
         final String agentToken = Jwts.builder()
                 .header()
                     .add("typ", "agent+jwt")
@@ -559,7 +561,7 @@ class EnrollmentTokenServiceTest {
         final String agentToken = Jwts.builder()
                 .header()
                     .add("typ", "agent+jwt")
-                    .add("crt_fp", certFingerprint)
+                    .add("x5t#S256", PemUtils.fingerprintToX5t(certFingerprint))
                 .and()
                 .subject(agent.instanceUid())
                 .issuedAt(Date.from(Instant.now()))

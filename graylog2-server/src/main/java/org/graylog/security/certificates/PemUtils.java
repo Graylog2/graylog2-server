@@ -33,6 +33,7 @@ import java.security.Security;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 import java.util.HexFormat;
 
 /**
@@ -139,6 +140,38 @@ public final class PemUtils {
         final MessageDigest digest = MessageDigest.getInstance("SHA-256");
         final byte[] hash = digest.digest(certificate.getEncoded());
         return "sha256:" + HexFormat.of().formatHex(hash);
+    }
+
+    /**
+     * Converts our internal fingerprint format to RFC 7515 x5t#S256 format.
+     * <p>
+     * Our format: "sha256:hexstring" (e.g., "sha256:abc123...")
+     * x5t#S256 format: base64url-encoded raw SHA-256 bytes
+     *
+     * @param fingerprint our internal fingerprint format
+     * @return base64url-encoded thumbprint for use in JWT x5t#S256 header
+     */
+    public static String fingerprintToX5t(String fingerprint) {
+        if (!fingerprint.startsWith("sha256:")) {
+            throw new IllegalArgumentException("Fingerprint must start with 'sha256:'");
+        }
+        final String hex = fingerprint.substring("sha256:".length());
+        final byte[] bytes = HexFormat.of().parseHex(hex);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    /**
+     * Converts RFC 7515 x5t#S256 format to our internal fingerprint format.
+     * <p>
+     * x5t#S256 format: base64url-encoded raw SHA-256 bytes
+     * Our format: "sha256:hexstring" (e.g., "sha256:abc123...")
+     *
+     * @param x5t base64url-encoded thumbprint from JWT x5t#S256 header
+     * @return our internal fingerprint format
+     */
+    public static String x5tToFingerprint(String x5t) {
+        final byte[] bytes = Base64.getUrlDecoder().decode(x5t);
+        return "sha256:" + HexFormat.of().formatHex(bytes);
     }
 
     /**
