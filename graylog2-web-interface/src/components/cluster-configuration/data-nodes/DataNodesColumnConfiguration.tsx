@@ -154,9 +154,9 @@ export const createColumnRenderers = (productName: string): ColumnRenderers<Clus
         const warningMessage = `This data node version is incompatible with your current ${productName} version, so metrics are disabled.`;
 
         return (
-          <SecondaryText>
-            <span title={showWarning ? warningMessage : undefined}>{versionLabel}</span>
-            {showWarning && <VersionWarningIcon name="warning" bsStyle="warning" size="sm" title={warningMessage} />}
+          <SecondaryText title={showWarning ? warningMessage : undefined}>
+            <span>{versionLabel}</span>
+            {showWarning && <VersionWarningIcon name="warning" bsStyle="warning" size="sm" />}
           </SecondaryText>
         );
       },

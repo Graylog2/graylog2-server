@@ -42,7 +42,7 @@ describe('DataNodesColumnConfiguration', () => {
     renderVersionCell(false);
 
     expect(screen.getByText('8.0.0')).toBeInTheDocument();
-    expect(screen.getAllByTitle(warningMessage)).toHaveLength(2);
+    expect(screen.getByTitle(warningMessage)).toBeInTheDocument();
   });
 
   it('omits warning when version is compatible', () => {
