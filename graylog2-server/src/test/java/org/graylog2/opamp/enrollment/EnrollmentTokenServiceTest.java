@@ -359,6 +359,25 @@ class EnrollmentTokenServiceTest {
     }
 
     @Test
+    void createTokenIncludesTypHeader() throws Exception {
+        final AtomicReference<OpAmpCaConfig> storedConfig = new AtomicReference<>();
+        when(clusterConfigService.get(OpAmpCaConfig.class)).thenAnswer(inv -> storedConfig.get());
+        doAnswer(inv -> {
+            storedConfig.set(inv.getArgument(0));
+            return null;
+        }).when(clusterConfigService).write(any(OpAmpCaConfig.class));
+
+        final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest("test-fleet", Duration.ofDays(1));
+        final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_ISSUER);
+
+        // Decode header without verification
+        final String[] parts = response.token().split("\\.");
+        final String headerJson = new String(java.util.Base64.getUrlDecoder().decode(parts[0]));
+
+        assertThat(headerJson).contains("\"typ\":\"enrollment+jwt\"");
+    }
+
+    @Test
     void validateTokenReturnsEmptyForUnknownKid() throws Exception {
         final AtomicReference<OpAmpCaConfig> storedConfig = new AtomicReference<>();
         when(clusterConfigService.get(OpAmpCaConfig.class)).thenAnswer(inv -> storedConfig.get());

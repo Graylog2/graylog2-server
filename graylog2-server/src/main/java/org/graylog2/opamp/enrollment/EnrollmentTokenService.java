@@ -202,7 +202,10 @@ public class EnrollmentTokenService {
             final String audience = issuer.resolve(TOKEN_AUDIENCE_PATH).toString();
 
             var builder = Jwts.builder()
-                    .header().add("kid", signingCert.fingerprint()).and()
+                    .header()
+                        .add("typ", "enrollment+jwt")
+                        .add("kid", signingCert.fingerprint())
+                    .and()
                     .issuer(issuer.toString())
                     .audience().add(audience).and()
                     .issuedAt(Date.from(issuedAt))
