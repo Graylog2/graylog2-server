@@ -92,8 +92,8 @@ public class OpenSearchBackendSearchTypeOverridesTest extends OpenSearchBackendG
 
         final List<SearchRequest> generatedRequest = run(searchJob, query, queryContext);
 
-        final DocumentContext pivot1 = parse(generatedRequest.get(0).source().toString());
-        final DocumentContext pivot2 = parse(generatedRequest.get(1).source().toString());
+        final DocumentContext pivot1 = parse(generatedRequest.get(0).toJsonString());
+        final DocumentContext pivot2 = parse(generatedRequest.get(1).toJsonString());
 
         assertThat(queryStrings(pivot1)).containsExactly("production:true", "global:filter", "local:filter");
         assertThat(timerangeFrom(pivot1)).containsExactly("2019-09-11 10:31:52.819");
@@ -123,11 +123,11 @@ public class OpenSearchBackendSearchTypeOverridesTest extends OpenSearchBackendG
     }
 
     private List<String> timerangeFrom(DocumentContext pivot) {
-        return pivot.read("$..timestamp.from", new TypeRef<>() {});
+        return pivot.read("$..timestamp.gte", new TypeRef<>() {});
     }
 
     private List<String> timerangeTo(DocumentContext pivot) {
-        return pivot.read("$..timestamp.to", new TypeRef<>() {});
+        return pivot.read("$..timestamp.lt", new TypeRef<>() {});
     }
 
     @Test

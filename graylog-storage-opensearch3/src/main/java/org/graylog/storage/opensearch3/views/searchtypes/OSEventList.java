@@ -61,7 +61,7 @@ public class OSEventList implements EventListStrategy {
         final var searchSourceBuilder = queryContext.searchSourceBuilder(eventList);
         final FieldSort.Builder sortConfig = sortConfig(eventList);
         searchSourceBuilder.sort(sortConfig.build()._toSortOptions());
-        final var originalQuery = searchSourceBuilder.build().query();
+        final var originalQuery = searchSourceBuilder.query();
         if (!effectiveStreams.isEmpty() && originalQuery.isBool()) {
             searchSourceBuilder.query(
                     originalQuery.bool().toBuilder().must(TermsQuery.of(t -> t
@@ -79,7 +79,7 @@ public class OSEventList implements EventListStrategy {
 
             filterQueries.forEach(filterQuery ->
                     searchSourceBuilder.query(
-                            searchSourceBuilder.build().query().bool().toBuilder()
+                            searchSourceBuilder.query().bool().toBuilder()
                                     .filter(QueryStringQuery.of(q -> q.query(filterQuery)).toQuery())
                                     .build().toQuery()
                     ));

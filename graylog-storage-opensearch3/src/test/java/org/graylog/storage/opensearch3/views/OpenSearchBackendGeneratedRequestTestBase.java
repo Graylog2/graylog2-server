@@ -54,6 +54,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 public class OpenSearchBackendGeneratedRequestTestBase extends OfficialOpensearchMockedClientTestBase {
@@ -77,7 +78,7 @@ public class OpenSearchBackendGeneratedRequestTestBase extends OfficialOpensearc
         seriesHandlers.put(Max.NAME, new OSMaxHandler());
         elasticSearchTypeHandlers.put(Pivot.NAME, () -> new OSPivot(bucketHandlers, seriesHandlers, new EffectiveTimeRangeExtractor()));
 
-        this.openSearchBackend = new OpenSearchBackend(elasticSearchTypeHandlers,
+        this.openSearchBackend = spy(new OpenSearchBackend(elasticSearchTypeHandlers,
                 client,
                 indexLookup,
                 ViewsUtils.createTestContextFactory(),
@@ -90,7 +91,7 @@ public class OpenSearchBackendGeneratedRequestTestBase extends OfficialOpensearc
                 false,
                 1,
                 1,
-                null);
+                null));
     }
 
     SearchJob searchJobForQuery(Query query) {

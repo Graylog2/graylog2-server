@@ -71,16 +71,17 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
                         .format(DATE_TIME_FORMAT)
                         .timeZone(timeZone);
 
+                AutoDateHistogramAggregation aggregation = aggBuilder.build();
                 NamedAggregationBuilder builder = new NamedAggregationBuilder(
                         name,
-                        Aggregation.builder().autoDateHistogram(aggBuilder.build())
+                        Aggregation.builder().autoDateHistogram(aggregation)
                 );
 
                 if (root == null) {
                     root = builder;
                     leaf = new NamedAggregationBuilder(
                             name,
-                            Aggregation.builder().autoDateHistogram(aggBuilder.build())
+                            Aggregation.builder().autoDateHistogram(aggregation)
                     );
                 } else {
                     // create new root with old root as nested aggregation
@@ -105,16 +106,17 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
                         .timeZone(timeZone);
                 setInterval(aggBuilder, dateHistogramInterval);
 
+                DateHistogramAggregation aggregation = aggBuilder.build();
                 NamedAggregationBuilder builder = new NamedAggregationBuilder(
                         name,
-                        Aggregation.builder().dateHistogram(aggBuilder.build())
+                        Aggregation.builder().dateHistogram(aggregation)
                                 .aggregations(ordering.sortingAggregations())
                 );
                 if (root == null) {
                     root = builder;
                     leaf = new NamedAggregationBuilder(
                             name,
-                            Aggregation.builder().dateHistogram(aggBuilder.build())
+                            Aggregation.builder().dateHistogram(aggregation)
                     );
                 } else {
                     // create new root with old root as nested aggregation

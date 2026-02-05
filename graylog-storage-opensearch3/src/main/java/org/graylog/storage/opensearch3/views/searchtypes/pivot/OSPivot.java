@@ -27,6 +27,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.storage.opensearch3.views.MutableSearchRequestBuilder;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
@@ -34,14 +35,12 @@ import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
-import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.core.msearch.MultiSearchItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -68,18 +67,15 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         LOG.debug("Generating aggregation for {}", pivot);
         var searchSourceBuilder = queryContext.searchSourceBuilder(pivot);
 
-        Map<String, Aggregation> rootAggs = new HashMap<>();
-
         var generateRollups = pivot.rollup() || (pivot.rowGroups().isEmpty() && pivot.columnGroups().isEmpty());
 
         // add global rollup series if those were requested
         if (generateRollups) {
             seriesStream(pivot, queryContext, "global rollup")
                     .filter(result -> Placement.METRIC.equals(result.placement()))
-                    .map(SeriesAggregationBuilder::aggregationBuilder);
-
-            //TODO !!!!
-//                    .forEach(searchSourceBuilder::aggregation);
+                    .forEach(agg -> {
+                        searchSourceBuilder.aggregation(agg.aggregationName(), agg.aggregationBuilder());
+                    });
         }
 
         final BucketSpecHandler.CreatedAggregations<NamedAggregationBuilder> createdAggregations = createPivots(BucketSpecHandler.Direction.Row, query, pivot, pivot.rowGroups(), queryContext);
@@ -95,7 +91,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
                                 rootAggregation.aggregationBuilder().aggregations(result.aggregationName(), result.aggregationBuilder());
                         case ROOT -> {
                             if (!generateRollups) {
-                                searchSourceBuilder.aggregations(result.aggregationName(), result.aggregationBuilder());
+                                searchSourceBuilder.aggregation(result.aggregationName(), result.aggregationBuilder());
                             }
                         }
                     }
@@ -120,22 +116,22 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
             if (leafAggregation != null) {
                 leafAggregation.aggregationBuilder().aggregations(columnsLeafAggregation.name(), columnsRootAggregation.aggregationBuilder().build());
             } else {
-                searchSourceBuilder.aggregations(columnsRootAggregation.name(), columnsRootAggregation.aggregationBuilder().build());
+                searchSourceBuilder.aggregation(columnsRootAggregation.name(), columnsRootAggregation.aggregationBuilder().build());
             }
         }
 
         if (rootAggregation != null) {
-            searchSourceBuilder.aggregations(rootAggregation.name(), rootAggregation.aggregationBuilder().build());
+            searchSourceBuilder.aggregation(rootAggregation.name(), rootAggregation.aggregationBuilder().build());
         }
 
         addTimeStampAggregations(searchSourceBuilder);
     }
 
-    private void addTimeStampAggregations(SearchRequest.Builder searchSourceBuilder) {
+    private void addTimeStampAggregations(MutableSearchRequestBuilder searchSourceBuilder) {
         final Aggregation startTimestamp = Aggregation.builder().min(f -> f.field("timestamp")).build();
         final Aggregation endTimestamp = Aggregation.builder().max(f -> f.field("timestamp")).build();
-        searchSourceBuilder.aggregations("timestamp-min", startTimestamp);
-        searchSourceBuilder.aggregations("timestamp-min", endTimestamp);
+        searchSourceBuilder.aggregation("timestamp-min", startTimestamp);
+        searchSourceBuilder.aggregation("timestamp-min", endTimestamp);
     }
 
     private BucketSpecHandler.CreatedAggregations<NamedAggregationBuilder> createPivots(BucketSpecHandler.Direction direction, Query query, Pivot pivot, List<BucketSpec> pivots, OSGeneratedQueryContext queryContext) {

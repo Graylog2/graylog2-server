@@ -25,7 +25,6 @@ import org.graylog.plugins.views.search.errors.SearchError;
 import org.joda.time.DateTimeZone;
 import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
 import org.opensearch.client.opensearch._types.query_dsl.QueryBuilders;
-import org.opensearch.client.opensearch.core.SearchRequest;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,14 +33,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public class OSGeneratedQueryContext extends IndexerGeneratedQueryContext<SearchRequest.Builder> {
+public class OSGeneratedQueryContext extends IndexerGeneratedQueryContext<MutableSearchRequestBuilder> {
     private final OpenSearchBackend openSearchBackend;
     private final MultiBucketBase rowBucket;
 
     @AssistedInject
     public OSGeneratedQueryContext(
             @Assisted OpenSearchBackend elasticsearchBackend,
-            @Assisted SearchRequest.Builder ssb,
+            @Assisted MutableSearchRequestBuilder ssb,
             @Assisted Collection<SearchError> validationErrors,
             @Assisted DateTimeZone timezone,
             FieldTypesLookup fieldTypes) {
@@ -51,11 +50,11 @@ public class OSGeneratedQueryContext extends IndexerGeneratedQueryContext<Search
     }
 
     private OSGeneratedQueryContext(OpenSearchBackend openSearchBackend,
-                                    SearchRequest.Builder ssb,
+                                    MutableSearchRequestBuilder ssb,
                                     Set<SearchError> errors,
                                     FieldTypesLookup fieldTypes,
                                     MultiBucketBase rowBucket,
-                                    Map<String, SearchRequest.Builder> searchTypeQueries,
+                                    Map<String, MutableSearchRequestBuilder> searchTypeQueries,
                                     Map<Object, Object> contextMap,
                                     DateTimeZone timezone) {
         super(contextMap, new HashSet<>(errors), fieldTypes, timezone, ssb, searchTypeQueries);
@@ -66,22 +65,22 @@ public class OSGeneratedQueryContext extends IndexerGeneratedQueryContext<Search
     public interface Factory {
         OSGeneratedQueryContext create(
                 OpenSearchBackend elasticsearchBackend,
-                SearchRequest ssb,
+                MutableSearchRequestBuilder ssb,
                 Collection<SearchError> validationErrors,
                 DateTimeZone timezone
         );
     }
 
-    public SearchRequest.Builder searchSourceBuilder(SearchType searchType) {
+    public MutableSearchRequestBuilder searchSourceBuilder(SearchType searchType) {
         return this.searchTypeQueries.computeIfAbsent(searchType.id(), ignored ->
-                ssb.query(
+                ssb.copy().query(
                         openSearchBackend.generateFilterQuery(searchType.filter())
                                 .map(filterClause ->
                                         QueryBuilders.bool()
-                                                .must(ssb.build().query())
+                                                .must(ssb.query())
                                                 .must(filterClause)
                                                 .build().toQuery())
-                                .orElse(ssb.build().query())
+                                .orElse(ssb.query())
                 ));
     }
 

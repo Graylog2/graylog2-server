@@ -34,7 +34,7 @@ public class ViewsUtils {
     }
 
     public static OSGeneratedQueryContext.Factory createTestContextFactory(FieldTypesLookup fieldTypesLookup) {
-        return (elasticsearchBackend, ssb, errors, timezone) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb.toBuilder(), errors, timezone, fieldTypesLookup);
+        return (elasticsearchBackend, ssb, errors, timezone) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb, errors, timezone, fieldTypesLookup);
     }
 
     public static OSGeneratedQueryContext.Factory createTestContextFactory() {
@@ -42,6 +42,6 @@ public class ViewsUtils {
     }
 
     public static OSGeneratedQueryContext createTestContext(OpenSearchBackend backend) {
-        return new OSGeneratedQueryContext(backend, new SearchRequest.Builder(), Collections.emptyList(), DateTimeZone.UTC, mock(FieldTypesLookup.class));
+        return new OSGeneratedQueryContext(backend, new MutableSearchRequestBuilder(), Collections.emptyList(), DateTimeZone.UTC, mock(FieldTypesLookup.class));
     }
 }

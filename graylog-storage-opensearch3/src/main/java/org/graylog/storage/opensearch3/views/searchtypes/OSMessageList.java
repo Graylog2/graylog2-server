@@ -26,6 +26,7 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
+import org.graylog.storage.opensearch3.views.MutableSearchRequestBuilder;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ResultMessageFactory;
@@ -39,11 +40,14 @@ import org.opensearch.client.opensearch._types.FieldSort;
 import org.opensearch.client.opensearch._types.SortOrder;
 import org.opensearch.client.opensearch._types.mapping.FieldType;
 import org.opensearch.client.opensearch._types.query_dsl.QueryStringQuery;
-import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.core.msearch.MultiSearchItem;
+import org.opensearch.client.opensearch.core.search.Highlight;
+import org.opensearch.client.opensearch.core.search.HighlightField;
 import org.opensearch.client.opensearch.core.search.Hit;
+import org.opensearch.client.opensearch.core.search.SourceConfig;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +85,7 @@ public class OSMessageList implements OSSearchTypeHandler<MessageList> {
     @Override
     public void doGenerateQueryPart(Query query, MessageList messageList, OSGeneratedQueryContext queryContext) {
 
-        final SearchRequest.Builder searchSourceBuilder = queryContext.searchSourceBuilder(messageList)
+        final var searchSourceBuilder = queryContext.searchSourceBuilder(messageList)
                 .size(messageList.limit())
                 .from(messageList.offset());
 
@@ -90,8 +94,8 @@ public class OSMessageList implements OSSearchTypeHandler<MessageList> {
         final Set<String> effectiveStreamIds = query.effectiveStreams(messageList);
 
         if (!messageList.fields().isEmpty()) {
-            searchSourceBuilder.source(s -> s
-                    .filter(f -> f.includes(messageList.fields()))
+            searchSourceBuilder.source(SourceConfig.of(s -> s
+                    .filter(f -> f.includes(messageList.fields())))
             );
         }
 
@@ -138,10 +142,13 @@ public class OSMessageList implements OSSearchTypeHandler<MessageList> {
     }
 
     private FieldType toFieldType(String fieldType) {
-        return serializationUtils.fromJson(fieldType, FieldType._DESERIALIZER);
+        return Arrays.stream(FieldType.values())
+                .filter(f -> f.jsonValue().equals(fieldType) || f.name().equals(fieldType))
+                .findFirst()
+                .orElseThrow();
     }
 
-    private void applyHighlightingIfActivated(SearchRequest.Builder searchSourceBuilder, Query query) {
+    private void applyHighlightingIfActivated(MutableSearchRequestBuilder searchSourceBuilder, Query query) {
         if (!allowHighlighting) {
             return;
         }
@@ -149,12 +156,12 @@ public class OSMessageList implements OSSearchTypeHandler<MessageList> {
         final QueryStringQuery highlightQuery = decoratedHighlightQuery(query);
 
         searchSourceBuilder
-                .highlight(h -> h
+                .highlight(Highlight.of(h -> h
                         .requireFieldMatch(false)
                         .highlightQuery(highlightQuery.toQuery())
-                        // .field("*") TODO: NEEDED? How to use this in java client?
+                        .fields("*", HighlightField.of(f -> f.matchedFields("*")))
                         .fragmentSize(0)
-                        .numberOfFragments(0)
+                        .numberOfFragments(0))
                 );
     }
 

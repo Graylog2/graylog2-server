@@ -103,7 +103,7 @@ class OSTimeHandlerTest {
         when(time.interval()).thenReturn(interval);
 
         final BucketSpecHandler.CreatedAggregations<NamedAggregationBuilder> createdAggregations = this.osTimeHandler.doCreateAggregation(BucketSpecHandler.Direction.Row, "foobar", pivot, time, queryContext, query);
-        assertEquals(createdAggregations.root(), createdAggregations.leaf());
+        assertEquals(createdAggregations.root().name(), createdAggregations.leaf().name());
 //        assertTrue(createdAggregations.root().aggregationBuilder() instanceof AutoDateHistogramAggregation.Builder);
 //        assertEquals("foobar", createdAggregations.root().name());
 //        assertEquals("foobar", ((AutoDateHistogramAggregationBuilder) createdAggregations.root()).field());

@@ -44,6 +44,7 @@ import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch.core.msearch.MultiSearchItem;
 import org.opensearch.client.opensearch.core.search.HitsMetadata;
 import org.opensearch.client.opensearch.core.search.TotalHits;
+import org.opensearch.client.opensearch.core.search.TotalHitsRelation;
 
 import java.util.Collections;
 import java.util.Date;
@@ -88,7 +89,7 @@ public class OSPivotTest {
 
     private void returnDocumentCount(MultiSearchItem<JsonData> queryResult, long totalCount) {
         HitsMetadata<JsonData> hits = mock(HitsMetadata.class);
-        TotalHits total = TotalHits.builder().value(totalCount).build();
+        TotalHits total = TotalHits.builder().value(totalCount).relation(TotalHitsRelation.Eq).build();
         when(hits.total()).thenReturn(total);
         when(queryResult.hits()).thenReturn(hits);
     }

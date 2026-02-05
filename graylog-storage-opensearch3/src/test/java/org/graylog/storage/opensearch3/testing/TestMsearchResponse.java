@@ -17,13 +17,17 @@
 package org.graylog.storage.opensearch3.testing;
 
 import com.google.common.io.Resources;
+import jakarta.json.stream.JsonParser;
 import org.apache.commons.io.FileUtils;
 import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.json.JsonpDeserializer;
+import org.opensearch.client.json.jackson.JacksonJsonProvider;
+import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.opensearch.core.MsearchResponse;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.UncheckedIOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -39,7 +43,11 @@ public class TestMsearchResponse {
     private static MsearchResponse<JsonData> resultFor(String result) throws IOException {
         OSSerializationUtils utils = new OSSerializationUtils();
         JsonpDeserializer<MsearchResponse<JsonData>> deserializer = MsearchResponse.createMsearchResponseDeserializer(JsonData._DESERIALIZER);
-        return utils.fromJson(result, deserializer);
+        try (StringReader reader = new StringReader(result)) {
+            JsonParser parser = JacksonJsonProvider.provider().createParser(reader);
+            JacksonJsonpMapper mapper = new JacksonJsonpMapper();
+            return deserializer.deserialize(parser, mapper);
+        }
     }
 
     private static String resourceFile(String filename) {

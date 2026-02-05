@@ -59,6 +59,7 @@ import org.opensearch.client.opensearch._types.ErrorCause;
 import org.opensearch.client.opensearch._types.ExpandWildcard;
 import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.ShardFailure;
+import org.opensearch.client.opensearch._types.Time;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
 import org.opensearch.client.opensearch._types.query_dsl.MatchAllQuery;
 import org.opensearch.client.opensearch._types.query_dsl.QueryStringQuery;
@@ -87,6 +88,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearchBackend.class);
@@ -160,11 +163,11 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
         // add the optional root query filters
         generateFilterQuery(query.filter()).ifPresent(boolQuery::filter);
 
-        SearchRequest searchRequest = SearchRequest.of(r -> r
+        MutableSearchRequestBuilder searchRequest = new MutableSearchRequestBuilder()
                 .query(boolQuery.build().toQuery())
                 .from(0)
                 .size(0)
-                .trackTotalHits(TrackHits.builder().enabled(true).build()));
+                .trackTotalHits(TrackHits.builder().enabled(true).build());
 
         final OSGeneratedQueryContext queryContext = queryContextFactory.create(this, searchRequest, validationErrors, timezone);
         searchTypes.stream()
@@ -178,12 +181,12 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                         return;
                     }
 
-                    final SearchRequest.Builder searchTypeSourceBuilder = queryContext.searchSourceBuilder(searchType);
+                    final MutableSearchRequestBuilder searchTypeSourceBuilder = queryContext.searchSourceBuilder(searchType);
 
                     final Set<String> effectiveStreamIds = query.effectiveStreams(searchType);
 
                     final BoolQuery.Builder searchTypeOverrides = BoolQuery.builder()
-                            .must(searchTypeSourceBuilder.build().query())
+                            .must(searchTypeSourceBuilder.query())
                             .must(
                                     Objects.requireNonNull(
                                             TimeRangeQueryFactory.createTimeRangeQuery(
@@ -276,7 +279,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
 
         final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(query.usedStreamIds(), query.timerange());
 
-        final Map<String, SearchRequest.Builder> searchTypeQueries = queryContext.searchTypeQueries();
+        final Map<String, MutableSearchRequestBuilder> searchTypeQueries = queryContext.searchTypeQueries();
         final List<String> searchTypeIds = new ArrayList<>(searchTypeQueries.keySet());
 
         final List<SearchRequest> searches = searchTypeIds
@@ -295,19 +298,19 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                             .orElse(affectedIndices);
 
                     Set<String> indices = affectedIndicesForSearchType.isEmpty() ? Collections.singleton("") : affectedIndicesForSearchType;
-                    final SearchRequest.Builder searchRequest = searchTypeQueries.get(searchTypeId)
+                    final MutableSearchRequestBuilder searchRequest = searchTypeQueries.get(searchTypeId)
                             .index(indices.stream().toList())
                             .allowNoIndices(true)
                             .ignoreUnavailable(true)
                             .expandWildcards(ExpandWildcard.Open);
 
                     if (!SearchJob.NO_CANCELLATION.equals(job.getCancelAfterSeconds())) {
-                        searchRequest.cancelAfterTimeInterval(t -> t.time(job.getCancelAfterSeconds() + "s"));
+                        searchRequest.cancelAfterTimeInterval(Time.of(t -> t.time(job.getCancelAfterSeconds() + "s")));
                     }
                     return searchRequest;
                 })
                 .map(request -> request.preference(job.getId()))
-                .map(SearchRequest.Builder::build)
+                .map(MutableSearchRequestBuilder::build)
                 .toList();
 
         final CompletableFuture<MsearchResponse<JsonData>> mSearchFuture = cancellableMsearch(searches);
@@ -417,7 +420,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
         }
 
         // in case of the default, return the message cut down to a reasonable length so that it's shown appropriately in the FE
-        final var msg = cause.reason();
+        final var msg = f("OpenSearch exception [type=%s, reason=%s].", cause.type(), cause.reason());
         return msg != null && msg.length() > MAX_MSG_LENGTH ?  msg.substring(0, MAX_MSG_LENGTH) + "..." : msg;
     }
 
@@ -433,7 +436,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                     .toList();
             final List<String> nonNumericFieldErrors = shardFailures
                     .stream()
-                    .map(ErrorCause::reason)
+                    .map(this::mapExceptionToErrorMessage)
                     .filter(message -> message.contains("Expected numeric type on field"))
                     .distinct()
                     .toList();

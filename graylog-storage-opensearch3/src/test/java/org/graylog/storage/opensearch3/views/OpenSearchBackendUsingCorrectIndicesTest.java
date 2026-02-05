@@ -62,6 +62,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.storage.opensearch3.views.ViewsUtils.indicesOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -91,7 +92,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest extends OfficialOpensearch
         final MsearchResponse<JsonData> response = TestMsearchResponse.fromFixture("successfulResponseWithSingleQuery.json");
         mockCancellableMSearch(response);
 
-        this.backend = new OpenSearchBackend(handlers,
+        this.backend = spy(new OpenSearchBackend(handlers,
                 client,
                 indexLookup,
                 ViewsUtils.createTestContextFactory(),
@@ -101,7 +102,8 @@ public class OpenSearchBackendUsingCorrectIndicesTest extends OfficialOpensearch
                 false,
                 0,
                 0,
-                serializationUtils);
+                serializationUtils)
+        );
     }
 
     @BeforeEach
