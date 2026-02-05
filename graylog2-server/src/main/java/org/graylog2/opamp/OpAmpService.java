@@ -17,8 +17,12 @@
 package org.graylog2.opamp;
 
 import com.google.protobuf.ByteString;
+import com.google.common.collect.Lists;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import opamp.proto.Anyvalue;
+import opamp.proto.Opamp;
 import opamp.proto.Opamp.AgentToServer;
 import opamp.proto.Opamp.ConnectionSettingsOffers;
 import opamp.proto.Opamp.OpAMPConnectionSettings;
@@ -29,6 +33,10 @@ import org.graylog.security.certificates.CertificateEntry;
 import org.graylog.security.certificates.CertificateService;
 import org.graylog.security.certificates.PemUtils;
 import org.graylog2.opamp.enrollment.EnrollmentTokenService;
+import org.graylog.collectors.CollectorInstanceService;
+import org.graylog.collectors.db.Attribute;
+import org.graylog.collectors.db.CollectorInstanceDTO;
+import org.graylog.collectors.db.CollectorInstanceReport;
 import org.graylog2.opamp.transport.OpAmpAuthContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +50,11 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.List;
+
+import static java.util.stream.Collectors.toCollection;
 
 @Singleton
 public class OpAmpService {
@@ -50,14 +63,17 @@ public class OpAmpService {
     private final EnrollmentTokenService enrollmentTokenService;
     private final OpAmpAgentService agentService;
     private final CertificateService certificateService;
+    private final CollectorInstanceService collectorInstanceService;
 
     @Inject
     public OpAmpService(EnrollmentTokenService enrollmentTokenService,
                         OpAmpAgentService agentService,
-                        CertificateService certificateService) {
+                        CertificateService certificateService,
+                        CollectorInstanceService collectorInstanceService) {
         this.enrollmentTokenService = enrollmentTokenService;
         this.agentService = agentService;
         this.certificateService = certificateService;
+        this.collectorInstanceService = collectorInstanceService;
     }
 
     public Optional<OpAmpAuthContext> authenticate(String authHeader, URI effectiveExternalUri, OpAmpAuthContext.Transport transport) {
@@ -176,13 +192,102 @@ public class OpAmpService {
     }
 
     private ServerToAgent handleIdentifiedMessage(AgentToServer message, OpAmpAuthContext.Identified auth) {
-        LOG.info("Received OpAMP message via {} from identified agent {}: {}",
-                auth.transport(), auth.agent().instanceUid(), message);
+        final UUID instanceUid = UUID.nameUUIDFromBytes(message.getInstanceUid().toByteArray());
+        final long sequenceNum = message.getSequenceNum();
+        LOG.debug("[{}/{}] Handling OpAMP message from agent: {}", instanceUid, sequenceNum, message);
 
-        // Acknowledge the message
-        return ServerToAgent.newBuilder()
-                .setInstanceUid(message.getInstanceUid())
-                .build();
+
+        final CollectorInstanceReport.Builder updateBuilder = CollectorInstanceReport.builder()
+                .instanceUid(instanceUid.toString())
+                .messageSeqNum(sequenceNum)
+                .capabilities(message.getCapabilities());
+
+        final EnumSet<Opamp.AgentCapabilities> agentCapabilities = fromBitmask(message.getCapabilities());
+        for (Opamp.AgentCapabilities cap : agentCapabilities) {
+            switch (cap) {
+                case AgentCapabilities_ReportsStatus -> {
+                    // this capability is always present, but agentDescription is only set when:
+                    // 1. this is the first message this agent sends
+                    // 2. any of its values change
+                    // Otherwise it's "compressed", which means identical values aren't sent again
+                    if (message.hasAgentDescription()) {
+                        final Opamp.AgentDescription agentDescription = message.getAgentDescription();
+                        LOG.debug("[{}/{}] {}", instanceUid, sequenceNum, agentDescription);
+
+                        updateBuilder.identifyingAttributes(extractAttributes(instanceUid, sequenceNum, agentDescription.getIdentifyingAttributesList()));
+                        updateBuilder.nonIdentifyingAttributes(extractAttributes(instanceUid, sequenceNum, agentDescription.getNonIdentifyingAttributesList()));
+                    }
+                }
+                case AgentCapabilities_ReportsHealth -> {
+                    if (message.hasHealth()) {
+                        LOG.debug("[{}/{}] {}", instanceUid, sequenceNum, message.getHealth());
+                    }
+                }
+                case AgentCapabilities_ReportsHeartbeat -> {
+                    // TODO do we care? heartbeats are just normal messages that come at least every x interval unless
+                    // there are other messages that reset the timer
+                }
+                case AgentCapabilities_AcceptsRemoteConfig -> {
+                    // TODO determine whether applicable config has changed for this agent and include updated config in our response
+                }
+                default -> LOG.debug("[{}/{}] Ignoring capability of {}", instanceUid, sequenceNum, cap);
+            }
+        }
+
+        // let's save the report and load the previously known values for the important properties
+        // previousState is not the entire document, but the minimal version to avoid high deserialization cost
+        final Optional<CollectorInstanceDTO> previousState = collectorInstanceService.createOrUpdateFromReport(updateBuilder.build());
+        long previousSeqNum = 0L;
+        if (previousState.isPresent()) {
+            previousSeqNum = previousState.get().messageSeqNum();
+        }
+
+        // determine our response
+        final ServerToAgent.Builder responseBuilder = ServerToAgent.newBuilder()
+                .setInstanceUid(message.getInstanceUid());
+
+        LOG.debug("[{}/{}] previously seen sequence number {}", instanceUid, sequenceNum, previousSeqNum);
+        if ((previousSeqNum == 0L) || ((previousSeqNum + 1) != sequenceNum)) {
+            // either we haven't seen messages from this agent before (which means we've just started)
+            // or the sequence numbers aren't consecutive, which means we have missed one or more messages.
+            // in either case we need to request a full state report
+            responseBuilder.setFlags(Opamp.ServerToAgentFlags.ServerToAgentFlags_ReportFullState_VALUE);
+            LOG.debug("[{}/{}] Non-consecutive sequence detected, requesting full state report from this agent.", instanceUid, sequenceNum);
+        }
+
+        return responseBuilder.build();
+    }
+
+    @Nonnull
+    private static List<Attribute> extractAttributes(UUID instanceUid, long sequenceNum, List<Anyvalue.KeyValue> attributesList) {
+        final List<Attribute> attributes = Lists.newArrayListWithExpectedSize(attributesList.size());
+        for (final Anyvalue.KeyValue keyValue : attributesList) {
+            final Anyvalue.AnyValue value = keyValue.getValue();
+            LOG.debug("[{}/{}] {} = {}", instanceUid, sequenceNum, keyValue.getKey(), value);
+
+            switch (value.getValueCase()) {
+                case STRING_VALUE -> attributes.add(Attribute.of(keyValue.getKey(), value.getStringValue()));
+                case BOOL_VALUE -> attributes.add(Attribute.of(keyValue.getKey(), value.getBoolValue()));
+                case INT_VALUE -> attributes.add(Attribute.of(keyValue.getKey(), value.getIntValue()));
+                case DOUBLE_VALUE -> attributes.add(Attribute.of(keyValue.getKey(), value.getDoubleValue()));
+                case BYTES_VALUE -> // TODO does this make sense for us?
+                        attributes.add(Attribute.of(keyValue.getKey(), value.getBytesValue()));
+                case ARRAY_VALUE, KVLIST_VALUE ->
+                        LOG.error("[{}/{}] Unsupported value type for identifying attributes, must be a scalar type but is {}",
+                                instanceUid, sequenceNum, value.getValueCase());
+                case VALUE_NOT_SET ->
+                        LOG.error("[{}/{}] Unsupported value type for identifying attributes, the value is undefined",
+                                instanceUid, sequenceNum);
+            }
+        }
+        return attributes;
+    }
+
+    private static EnumSet<Opamp.AgentCapabilities> fromBitmask(long capabilities) {
+        return Arrays.stream(Opamp.AgentCapabilities.values())
+                .filter(c -> c != Opamp.AgentCapabilities.UNRECOGNIZED)
+                .filter(c -> (capabilities & c.getNumber()) != 0)
+                .collect(toCollection(() -> EnumSet.noneOf(Opamp.AgentCapabilities.class)));
     }
 
     private ServerToAgent errorResponse(AgentToServer message, String errorMessage) {
