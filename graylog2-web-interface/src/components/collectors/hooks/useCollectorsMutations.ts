@@ -25,6 +25,7 @@ import {
   createSource,
   updateSource,
   deleteSource,
+  createEnrollmentToken,
 } from './collectorsApi';
 
 const COLLECTORS_QUERY_KEY = ['collectors'];
@@ -127,6 +128,17 @@ const useCollectorsMutations = () => {
     },
   });
 
+  // Enrollment token mutation
+  const createEnrollmentTokenMutation = useMutation({
+    mutationFn: createEnrollmentToken,
+    onError: (errorThrown) => {
+      UserNotification.error(
+        `Creating enrollment token failed: ${errorThrown}`,
+        'Could not create token',
+      );
+    },
+  });
+
   return {
     // Fleet operations
     createFleet: createFleetMutation.mutateAsync,
@@ -143,6 +155,10 @@ const useCollectorsMutations = () => {
     isUpdatingSource: updateSourceMutation.isPending,
     deleteSource: deleteSourceMutation.mutateAsync,
     isDeletingSource: deleteSourceMutation.isPending,
+
+    // Enrollment token operations
+    createEnrollmentToken: createEnrollmentTokenMutation.mutateAsync,
+    isCreatingEnrollmentToken: createEnrollmentTokenMutation.isPending,
   };
 };
 

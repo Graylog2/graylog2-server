@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 import { Button, SegmentedControl } from 'components/bootstrap';
 import { Card, ClipboardButton, Select } from 'components/common';
 
-import { useFleets } from '../hooks';
+import { useFleets, useCollectorsMutations } from '../hooks';
 
 type Platform = 'linux' | 'windows' | 'macos' | 'container';
 type TokenExpiry = '24h' | '7d' | '30d' | 'never';
@@ -86,25 +86,39 @@ const HeaderRow = styled.div`
   margin-bottom: 0.5rem;
 `;
 
-const generateMockToken = () =>
-  `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify({ fleet: 'test', exp: Date.now() + 86400000 }))}.mock-signature`;
+type TokenResponse = {
+  token: string;
+  expiresAt: string;
+};
 
 const DeploymentForm = () => {
   const { data: fleets } = useFleets();
+  const { createEnrollmentToken, isCreatingEnrollmentToken } = useCollectorsMutations();
   const [platform, setPlatform] = useState<Platform>('linux');
   const [fleetId, setFleetId] = useState<string | null>(null);
-  const [expiry, setExpiry] = useState<TokenExpiry>('24h');
-  const [token, setToken] = useState<string | null>(null);
+  const [expiry, setExpiry] = useState<TokenExpiry>('7d');
+  const [tokenResponse, setTokenResponse] = useState<TokenResponse | null>(null);
 
   const fleetOptions = (fleets || []).map((f) => ({ value: f.id, label: f.name }));
 
-  const handleGenerate = () => {
-    setToken(generateMockToken());
+  const handleGenerate = async () => {
+    if (!fleetId) return;
+
+    const response = await createEnrollmentToken({
+      fleetId,
+      expiresIn: expiry === 'never' ? null : expiry,
+    });
+
+    setTokenResponse({
+      token: response.token,
+      expiresAt: response.expires_at,
+    });
   };
 
   const getInstallScript = () => {
-    if (!token) return '';
+    if (!tokenResponse) return '';
 
+    const { token } = tokenResponse;
     const scripts: Record<Platform, string> = {
       linux: `curl -sL https://graylog.example.com/collector/install.sh \\
   | sudo bash -s -- \\
@@ -155,31 +169,35 @@ const DeploymentForm = () => {
           value={expiry}
           onChange={(v) => setExpiry(v as TokenExpiry)}
           data={[
-            { value: '24h', label: '24 hours' },
-            { value: '7d', label: '7 days' },
-            { value: '30d', label: '30 days' },
+            { value: 'PT24H', label: '24 hours' },
+            { value: 'P7D', label: '7 days' },
+            { value: 'P30D', label: '30 days' },
             { value: 'never', label: 'No expiry' },
           ]}
         />
       </Section>
 
       <Section>
-        <Button bsStyle="primary" onClick={handleGenerate} disabled={!fleetId}>
-          Generate Enrollment Token
+        <Button
+          bsStyle="primary"
+          onClick={handleGenerate}
+          disabled={!fleetId || isCreatingEnrollmentToken}
+        >
+          {isCreatingEnrollmentToken ? 'Generating...' : 'Generate Enrollment Token'}
         </Button>
       </Section>
 
-      {token && (
+      {tokenResponse && (
         <>
           <Card>
             <Label>Enrollment Token</Label>
             <TokenRow>
-              <CodeInline style={{ flex: 1 }}>{token.slice(0, 50)}...</CodeInline>
-              <ClipboardButton text={token} title="Copy" bsSize="xs" />
+              <CodeInline style={{ flex: 1 }}>{tokenResponse.token.slice(0, 50)}...</CodeInline>
+              <ClipboardButton text={tokenResponse.token} title="Copy" bsSize="xs" />
             </TokenRow>
             <InfoText>
               Fleet: {fleets?.find((f) => f.id === fleetId)?.name} | Expires:{' '}
-              {expiry === 'never' ? 'Never' : expiry}
+              {new Date(tokenResponse.expiresAt).toLocaleString()}
             </InfoText>
           </Card>
 

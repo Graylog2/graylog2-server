@@ -14,6 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { fetchPeriodically } from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
+
 import type { Fleet, Source } from '../types';
 import { mockFleets, mockSources } from '../mockData';
 
@@ -131,4 +134,25 @@ export const deleteSource = async (sourceId: string): Promise<void> => {
   }
 
   mockSources.splice(index, 1);
+};
+
+// Enrollment Token API types
+export type CreateEnrollmentTokenInput = {
+  fleetId: string;
+  expiresIn: string | null; // ISO-8601 duration: "PT24H", "P7D", "P30D", or null for default
+};
+
+export type EnrollmentTokenResponse = {
+  token: string;
+  expires_at: string; // ISO-8601 timestamp
+};
+
+// Enrollment Token API function
+export const createEnrollmentToken = async (
+  input: CreateEnrollmentTokenInput,
+): Promise<EnrollmentTokenResponse> => {
+  return fetchPeriodically('POST', qualifyUrl('/opamp/enrollment-tokens'), {
+    fleet_id: input.fleetId,
+    expires_in: input.expiresIn,
+  });
 };
