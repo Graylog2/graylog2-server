@@ -60,8 +60,8 @@ public class ProxyRequestAdapterOS implements ProxyRequestAdapter {
                 OfficialOpensearchClient client = buildClient(request)
         ) {
             return client.sync(c -> {
-                try (final org.opensearch.client.opensearch.generic.Response response = c.generic().execute(req);) {
-                    final InputStream body = response.getBody().map(Body::body).orElseThrow(() -> new UnsupportedOperationException("No response body received"));
+                try (final org.opensearch.client.opensearch.generic.Response response = c.generic().execute(req)) {
+                    final InputStream body = response.getBody().map(Body::body).orElseGet(InputStream::nullInputStream);
                     final String contentType = getContentType(response);
                     return new ProxyResponse(response.getStatus(), body, contentType);
                 }
