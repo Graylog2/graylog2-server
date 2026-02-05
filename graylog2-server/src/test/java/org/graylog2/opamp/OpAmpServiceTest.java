@@ -32,6 +32,7 @@ import java.util.Base64;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -181,7 +182,7 @@ class OpAmpServiceTest {
      * This is not a valid signed JWT, just has the correct structure for header parsing.
      */
     private String createTokenWithCtt(String ctt) {
-        final String header = String.format("{\"alg\":\"EdDSA\",\"ctt\":\"%s\",\"kid\":\"fingerprint\"}", ctt);
+        final String header = f("{\"alg\":\"EdDSA\",\"ctt\":\"%s\",\"kid\":\"fingerprint\"}", ctt);
         final String payload = "{\"sub\":\"test\",\"exp\":9999999999}";
         final String signature = "signature";
 

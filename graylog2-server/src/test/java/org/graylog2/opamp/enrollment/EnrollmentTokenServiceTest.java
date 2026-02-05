@@ -20,15 +20,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
-import org.graylog.grn.GRNRegistry;
-import io.jsonwebtoken.Jwts;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
+import org.graylog.grn.GRNRegistry;
 import org.graylog.security.certificates.CertificateEntry;
 import org.graylog.security.certificates.CertificateService;
 import org.graylog.security.certificates.PemUtils;
@@ -50,19 +48,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 
 import java.io.StringWriter;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
@@ -392,7 +388,7 @@ class EnrollmentTokenServiceTest {
 
         // Decode header without verification
         final String[] parts = response.token().split("\\.");
-        final String headerJson = new String(java.util.Base64.getUrlDecoder().decode(parts[0]));
+        final String headerJson = new String(java.util.Base64.getUrlDecoder().decode(parts[0]), StandardCharsets.UTF_8);
 
         assertThat(headerJson).contains("\"ctt\":\"enrollment\"");
     }
@@ -589,6 +585,6 @@ class EnrollmentTokenServiceTest {
         try (JcaPEMWriter pemWriter = new JcaPEMWriter(writer)) {
             pemWriter.writeObject(csr);
         }
-        return writer.toString().getBytes();
+        return writer.toString().getBytes(StandardCharsets.UTF_8);
     }
 }
