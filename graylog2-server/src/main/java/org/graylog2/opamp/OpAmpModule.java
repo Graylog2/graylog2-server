@@ -39,6 +39,7 @@ public class OpAmpModule extends PluginModule {
 
         // Certificate enrollment services
         bind(EnrollmentTokenService.class).in(Scopes.SINGLETON);
+        bind(OpAmpAgentService.class).asEagerSingleton();
         addSystemRestResource(EnrollmentTokenResource.class);
     }
 }
