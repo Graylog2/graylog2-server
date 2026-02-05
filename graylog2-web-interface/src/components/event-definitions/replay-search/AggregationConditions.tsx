@@ -35,6 +35,7 @@ import useAlertAndEventDefinitionData from './hooks/useAlertAndEventDefinitionDa
 const List = styled.div`
   display: flex;
   gap: 5px;
+  flex-wrap: wrap;
 `;
 
 const Condition = styled.div`

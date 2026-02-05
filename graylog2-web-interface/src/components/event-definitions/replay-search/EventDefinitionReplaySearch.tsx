@@ -22,9 +22,28 @@ import ReplaySearch, { LoadingBarrier } from 'components/events/ReplaySearch';
 import type { ReplaySearchContextType } from 'components/event-definitions/replay-search/ReplaySearchContext';
 import ReplaySearchContext from 'components/event-definitions/replay-search/ReplaySearchContext';
 import useCreateSearch from 'views/hooks/useCreateSearch';
+import sidebarSections, { type SidebarSection } from 'views/components/sidebar/sidebarSections';
+import EventDefinitionSideBar from 'components/event-definitions/replay-search/EventDefinitionSideBar';
 
 type Props = {
   eventDefinitionMappedData: EventDefinitionMappedData;
+};
+
+const replaySection: SidebarSection = {
+  key: 'eventDescription',
+  hoverTitle: 'Replay Details',
+  title: null,
+  icon: 'play_arrow',
+  content: EventDefinitionSideBar,
+};
+
+const defaultSearchPageLayout = {
+  sidebar: {
+    isShown: true,
+    title: 'Replayed Search',
+    sections: [replaySection, ...sidebarSections],
+    contentColumnWidth: 350,
+  },
 };
 
 const EventDefinitionReplaySearch = ({ eventDefinitionMappedData }: Props) => {
@@ -47,7 +66,7 @@ const EventDefinitionReplaySearch = ({ eventDefinitionMappedData }: Props) => {
 
   return (
     <ReplaySearchContext.Provider value={replaySearchContext}>
-      <ReplaySearch view={view} />
+      <ReplaySearch searchPageLayout={defaultSearchPageLayout} view={view} />
     </ReplaySearchContext.Provider>
   );
 };

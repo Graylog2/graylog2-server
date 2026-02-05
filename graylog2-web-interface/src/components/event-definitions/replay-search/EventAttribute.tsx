@@ -38,7 +38,7 @@ const EventAttribute = ({ children = null, title }: React.PropsWithChildren<{ ti
       <Title>{title}</Title>
     </td>
     <td>
-      <Value title={title}>{children || <NoAttributeProvided name={title} />}</Value>
+      <Value title={title}>{children || <NoAttributeProvided />}</Value>
     </td>
   </tr>
 );
