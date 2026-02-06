@@ -26,6 +26,7 @@ import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -64,7 +65,7 @@ class CertificateServiceTest {
                 new MongoJackObjectMapperProvider(objectMapper),
                 mongodb.mongoConnection()
         );
-        certificateService = new CertificateService(mongoCollections, encryptedValueService);
+        certificateService = new CertificateService(mongoCollections, encryptedValueService, CustomizationConfig.empty());
     }
 
     @Test

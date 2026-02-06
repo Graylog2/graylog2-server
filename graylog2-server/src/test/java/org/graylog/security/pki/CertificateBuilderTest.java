@@ -42,7 +42,7 @@ class CertificateBuilderTest {
     @BeforeEach
     void setUp() {
         encryptedValueService = new EncryptedValueService("1234567890abcdef");
-        builder = new CertificateBuilder(encryptedValueService);
+        builder = new CertificateBuilder(encryptedValueService, "Graylog");
     }
 
     // Key pair generation tests
@@ -307,6 +307,16 @@ class CertificateBuilderTest {
         assertThat(rootCa.issuerChain()).isEmpty();
         assertThat(intermediateCa.issuerChain()).containsExactly(rootCa.certificate());
         assertThat(tokenSigningCert.issuerChain()).containsExactly(intermediateCa.certificate(), rootCa.certificate());
+    }
+
+    @Test
+    void createRootCaIncludesProductNameInSubject() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Test CA", Algorithm.ED25519, Duration.ofDays(365));
+        final X509Certificate cert = PemUtils.parseCertificate(rootCa.certificate());
+
+        final String subjectDn = cert.getSubjectX500Principal().getName();
+        assertThat(subjectDn).contains("CN=Test CA");
+        assertThat(subjectDn).contains("O=Graylog");
     }
 
     // Note: CSR creation and signing tests will be added when the createCsr and signCsr

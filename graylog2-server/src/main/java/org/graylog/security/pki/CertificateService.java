@@ -25,6 +25,7 @@ import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.security.encryption.EncryptedValueService;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,12 +55,16 @@ public class CertificateService {
     private final MongoCollection<CertificateEntry> collection;
     private final MongoUtils<CertificateEntry> utils;
     private final EncryptedValueService encryptedValueService;
+    private final String productName;
 
     @Inject
-    public CertificateService(MongoCollections mongoCollections, EncryptedValueService encryptedValueService) {
+    public CertificateService(MongoCollections mongoCollections,
+                              EncryptedValueService encryptedValueService,
+                              CustomizationConfig customizationConfig) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, CertificateEntry.class);
         this.utils = mongoCollections.utils(collection);
         this.encryptedValueService = encryptedValueService;
+        this.productName = customizationConfig.productName();
 
         collection.createIndex(
                 Indexes.ascending(CertificateEntry.FIELD_FINGERPRINT),
@@ -89,7 +94,7 @@ public class CertificateService {
      * @return a new CertificateBuilder instance
      */
     public CertificateBuilder builder() {
-        return new CertificateBuilder(encryptedValueService);
+        return new CertificateBuilder(encryptedValueService, productName);
     }
 
     /**

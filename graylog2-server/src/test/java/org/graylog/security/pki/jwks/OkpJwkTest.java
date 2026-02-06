@@ -42,7 +42,7 @@ class OkpJwkTest {
     @BeforeEach
     void setUp() {
         final EncryptedValueService encryptedValueService = new EncryptedValueService("1234567890abcdef");
-        builder = new CertificateBuilder(encryptedValueService);
+        builder = new CertificateBuilder(encryptedValueService, "Graylog");
     }
 
     @Test

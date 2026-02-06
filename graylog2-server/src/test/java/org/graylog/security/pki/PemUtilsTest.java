@@ -39,7 +39,7 @@ class PemUtilsTest {
     @BeforeEach
     void setUp() {
         encryptedValueService = new EncryptedValueService("1234567890abcdef");
-        builder = new CertificateBuilder(encryptedValueService);
+        builder = new CertificateBuilder(encryptedValueService, "Graylog");
     }
 
     // toPem(X509Certificate) tests

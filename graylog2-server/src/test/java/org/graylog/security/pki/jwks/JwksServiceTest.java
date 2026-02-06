@@ -53,7 +53,7 @@ class JwksServiceTest {
     @BeforeEach
     void setUp() {
         encryptedValueService = new EncryptedValueService("1234567890abcdef");
-        builder = new CertificateBuilder(encryptedValueService);
+        builder = new CertificateBuilder(encryptedValueService, "Graylog");
         jwksService = new JwksService(certificateService);
     }
 

@@ -79,14 +79,17 @@ public class CertificateBuilder {
     }
 
     private final EncryptedValueService encryptedValueService;
+    private final String productName;
 
     /**
      * Creates a new CertificateBuilder.
      *
      * @param encryptedValueService service for encrypting private keys before storage
+     * @param productName the product name to include as Organization (O=) in certificate subject DNs
      */
-    public CertificateBuilder(EncryptedValueService encryptedValueService) {
+    public CertificateBuilder(EncryptedValueService encryptedValueService, String productName) {
         this.encryptedValueService = encryptedValueService;
+        this.productName = productName;
     }
 
     /**
@@ -127,6 +130,7 @@ public class CertificateBuilder {
 
         final X500Name subject = new X500NameBuilder(BCStyle.INSTANCE)
                 .addRDN(BCStyle.CN, commonName)
+                .addRDN(BCStyle.O, productName)
                 .build();
 
         final Instant now = Instant.now();
@@ -193,6 +197,7 @@ public class CertificateBuilder {
         // Build the subject DN
         final X500Name subject = new X500NameBuilder(BCStyle.INSTANCE)
                 .addRDN(BCStyle.CN, commonName)
+                .addRDN(BCStyle.O, productName)
                 .build();
 
         // Get the issuer DN from the issuer certificate
@@ -269,6 +274,7 @@ public class CertificateBuilder {
         // Build the subject DN
         final X500Name subject = new X500NameBuilder(BCStyle.INSTANCE)
                 .addRDN(BCStyle.CN, commonName)
+                .addRDN(BCStyle.O, productName)
                 .build();
 
         // Get the issuer DN from the issuer certificate
@@ -353,6 +359,7 @@ public class CertificateBuilder {
     public byte[] createCsr(KeyPair keyPair, String commonName) throws IOException, OperatorCreationException {
         final X500Name subject = new X500NameBuilder(BCStyle.INSTANCE)
                 .addRDN(BCStyle.CN, commonName)
+                .addRDN(BCStyle.O, productName)
                 .build();
 
         // Detect algorithm from key pair
@@ -438,6 +445,7 @@ public class CertificateBuilder {
         // Build the subject DN (ignore CSR subject, use provided subjectCn)
         final X500Name subject = new X500NameBuilder(BCStyle.INSTANCE)
                 .addRDN(BCStyle.CN, subjectCn)
+                .addRDN(BCStyle.O, productName)
                 .build();
 
         // Get the issuer DN from the issuer certificate

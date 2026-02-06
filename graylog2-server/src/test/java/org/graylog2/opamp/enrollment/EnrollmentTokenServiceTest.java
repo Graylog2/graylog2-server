@@ -45,6 +45,7 @@ import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -101,7 +102,7 @@ class EnrollmentTokenServiceTest {
                 new MongoJackObjectMapperProvider(objectMapper),
                 mongodb.mongoConnection()
         );
-        certificateService = new CertificateService(mongoCollections, encryptedValueService);
+        certificateService = new CertificateService(mongoCollections, encryptedValueService, CustomizationConfig.empty());
         clusterConfigService = mock(ClusterConfigService.class);
         when(clusterConfigService.get(ClusterId.class))
                 .thenReturn(ClusterId.create(TEST_CLUSTER_ID));
