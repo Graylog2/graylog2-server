@@ -16,7 +16,6 @@
  */
 package org.graylog2.opamp.transport;
 
-import com.google.common.collect.Lists;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.glassfish.grizzly.filterchain.BaseFilter;
@@ -26,15 +25,12 @@ import org.glassfish.grizzly.http.HttpContent;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 import org.glassfish.grizzly.http.HttpResponsePacket;
 import org.glassfish.grizzly.http.util.HttpStatus;
-import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.opamp.OpAmpConstants;
 import org.graylog2.opamp.OpAmpExecutor;
 import org.graylog2.opamp.OpAmpService;
-import org.graylog2.rest.RestTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
 import java.util.concurrent.ExecutorService;
 
 @Singleton
@@ -43,15 +39,12 @@ public class OpAmpWebSocketAuthFilter extends BaseFilter {
 
     private final OpAmpService opAmpService;
     private final ExecutorService executor;
-    private final URI httpExternalUri;
 
     @Inject
     public OpAmpWebSocketAuthFilter(OpAmpService opAmpService,
-                                    @OpAmpExecutor ExecutorService executor,
-                                    HttpConfiguration httpConfiguration) {
+                                    @OpAmpExecutor ExecutorService executor) {
         this.opAmpService = opAmpService;
         this.executor = executor;
-        this.httpExternalUri = httpConfiguration.getHttpExternalUri();
     }
 
     @Override
@@ -70,13 +63,11 @@ public class OpAmpWebSocketAuthFilter extends BaseFilter {
         }
 
         final String authHeader = request.getHeader("Authorization");
-        final var overrideHeaderValues = Lists.newArrayList(request.getHeaders().values(HttpConfiguration.OVERRIDE_HEADER));
 
         ctx.suspend();
         executor.submit(() -> {
             try {
-                final URI effectiveExternalUri = RestTools.buildExternalUri(overrideHeaderValues, httpExternalUri);
-                final var authContext = opAmpService.authenticate(authHeader, effectiveExternalUri, OpAmpAuthContext.Transport.WEBSOCKET);
+                final var authContext = opAmpService.authenticate(authHeader, OpAmpAuthContext.Transport.WEBSOCKET);
                 if (authContext.isEmpty()) {
                     LOG.debug("OpAMP auth failed");
                     send401(ctx, request);

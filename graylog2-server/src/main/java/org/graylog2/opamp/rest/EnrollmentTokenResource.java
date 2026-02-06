@@ -26,18 +26,12 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.opamp.enrollment.EnrollmentTokenService;
-import org.graylog2.rest.RestTools;
-
-import java.net.URI;
 
 @Tag(name = "OpAMP Enrollment", description = "OpAMP agent enrollment management")
 @Path("/opamp/enrollment-tokens")
@@ -47,13 +41,10 @@ import java.net.URI;
 public class EnrollmentTokenResource {
 
     private final EnrollmentTokenService enrollmentTokenService;
-    private final URI httpExternalUri;
 
     @Inject
-    public EnrollmentTokenResource(EnrollmentTokenService enrollmentTokenService,
-                                   HttpConfiguration httpConfiguration) {
+    public EnrollmentTokenResource(EnrollmentTokenService enrollmentTokenService) {
         this.enrollmentTokenService = enrollmentTokenService;
-        this.httpExternalUri = httpConfiguration.getHttpExternalUri();
     }
 
     // TODO: Add @AuditEvent for security audit logging of token creation
@@ -63,10 +54,8 @@ public class EnrollmentTokenResource {
     // TODO: Replace with proper OpAMP permissions (e.g., opamp:enrollment_tokens:create)
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_CREATE)
     public EnrollmentTokenResponse createToken(
-            @Context HttpHeaders httpHeaders,
             @RequestBody(description = "Enrollment token creation request")
             @Valid @NotNull CreateEnrollmentTokenRequest request) {
-        final URI issuer = RestTools.buildExternalUri(httpHeaders.getRequestHeaders(), httpExternalUri);
-        return enrollmentTokenService.createToken(request, issuer);
+        return enrollmentTokenService.createToken(request);
     }
 }

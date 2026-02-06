@@ -32,11 +32,11 @@ import org.graylog2.opamp.config.OpAmpCaConfig;
 import org.graylog2.opamp.rest.CreateEnrollmentTokenRequest;
 import org.graylog2.opamp.rest.EnrollmentTokenResponse;
 import org.graylog2.opamp.transport.OpAmpAuthContext;
+import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
@@ -66,7 +66,7 @@ public class EnrollmentTokenService {
     private static final String ENROLLMENT_CA_CN = "Graylog OpAMP Enrollment CA";
     private static final String TOKEN_SIGNING_CN = "Graylog OpAMP Token Signing";
 
-    public static final String TOKEN_AUDIENCE_PATH = "v1/opamp";
+    private static final String AUDIENCE_SUFFIX = ":opamp";
 
     private final CertificateService certificateService;
     private final ClusterConfigService clusterConfigService;
@@ -79,6 +79,12 @@ public class EnrollmentTokenService {
         this.certificateService = certificateService;
         this.clusterConfigService = clusterConfigService;
         this.agentService = agentService;
+    }
+
+    private String getClusterId() {
+        return clusterConfigService
+                .getOrDefault(ClusterId.class, ClusterId.create("unknown"))
+                .clusterId();
     }
 
     /**
@@ -110,19 +116,18 @@ public class EnrollmentTokenService {
      * The JWT contains:
      * <ul>
      *   <li>{@code kid} header: fingerprint of the signing certificate</li>
-     *   <li>{@code iss}: the issuer URI (typically http_external_uri)</li>
-     *   <li>{@code aud}: fully-qualified URL ({@code issuer} + {@link #TOKEN_AUDIENCE_PATH})</li>
+     *   <li>{@code iss}: cluster ID (informational, not validated)</li>
+     *   <li>{@code aud}: {@code {cluster_id}:opamp} (validated on receipt)</li>
      *   <li>{@code iat}: current timestamp</li>
      *   <li>{@code exp}: expiration timestamp</li>
      *   <li>{@code fleet_id}: optional fleet identifier</li>
      * </ul>
      *
      * @param request the token creation request
-     * @param issuer the issuer URI for the token (e.g., http_external_uri)
      * @return the created token and its expiration time
      * @throws IllegalArgumentException if the requested expiry exceeds the signing certificate's validity
      */
-    public EnrollmentTokenResponse createToken(CreateEnrollmentTokenRequest request, URI issuer) {
+    public EnrollmentTokenResponse createToken(CreateEnrollmentTokenRequest request) {
         final CaHierarchy hierarchy = ensureCaHierarchyExists();
         final CertificateEntry signingCert = hierarchy.tokenSigningCert();
 
@@ -140,7 +145,7 @@ public class EnrollmentTokenService {
                     f("Token expiry %s exceeds signing certificate expiry %s", expiresAt, certExpiry));
         }
 
-        final String token = buildJwt(signingCert, request.fleetId(), issuer, now, expiresAt);
+        final String token = buildJwt(signingCert, request.fleetId(), now, expiresAt);
 
         return new EnrollmentTokenResponse(token, expiresAt);
     }
@@ -152,18 +157,17 @@ public class EnrollmentTokenService {
      * <ul>
      *   <li>Signature verification using the cert identified by {@code kid} header</li>
      *   <li>Expiration check (handled automatically by JJWT)</li>
-     *   <li>Issuer validation against expected issuer</li>
-     *   <li>Audience validation (must be {@code expectedIssuer + "v1/opamp"})</li>
+     *   <li>Audience validation (must be {@code {cluster_id}:opamp})</li>
      *   <li>Required {@code fleet_id} claim</li>
      * </ul>
      *
      * @param token the JWT token string
-     * @param expectedIssuer the expected issuer URI (from request context)
+     * @param transport the transport type (HTTP or WEBSOCKET)
      * @return the enrollment context if valid, empty otherwise
      */
-    public Optional<OpAmpAuthContext.Enrollment> validateToken(String token, URI expectedIssuer, OpAmpAuthContext.Transport transport) {
+    public Optional<OpAmpAuthContext.Enrollment> validateToken(String token, OpAmpAuthContext.Transport transport) {
         try {
-            final String expectedAudience = expectedIssuer.resolve(TOKEN_AUDIENCE_PATH).toString();
+            final String expectedAudience = getClusterId() + AUDIENCE_SUFFIX;
 
             final Jws<Claims> jws = Jwts.parser()
                     .keyLocator(header -> {
@@ -181,8 +185,7 @@ public class EnrollmentTokenService {
                                 })
                                 .orElseThrow(() -> new SecurityException("Unknown kid: " + kid));
                     })
-//                    .requireIssuer(expectedIssuer.toString()) // TODO
-//                    .requireAudience(expectedAudience) // TODO
+                    .requireAudience(expectedAudience)
                     .build()
                     .parseSignedClaims(token);
 
@@ -260,21 +263,22 @@ public class EnrollmentTokenService {
         }
     }
 
-    private String buildJwt(CertificateEntry signingCert, String fleetId, URI issuer,
+    private String buildJwt(CertificateEntry signingCert, String fleetId,
                             Instant issuedAt, Instant expiresAt) {
         try {
             final String privateKeyPem = certificateService.encryptedValueService()
                     .decrypt(signingCert.privateKey());
             final PrivateKey privateKey = PemUtils.parsePrivateKey(privateKeyPem);
 
-            final String audience = issuer.resolve(TOKEN_AUDIENCE_PATH).toString();
+            final String clusterId = getClusterId();
+            final String audience = clusterId + AUDIENCE_SUFFIX;
 
             var builder = Jwts.builder()
                     .header()
                     .add("ctt", "enrollment")
                         .add("kid", signingCert.fingerprint())
                     .and()
-                    .issuer(issuer.toString())
+                    .issuer(clusterId)
                     .audience().add(audience).and()
                     .issuedAt(Date.from(issuedAt))
                     .expiration(Date.from(expiresAt));

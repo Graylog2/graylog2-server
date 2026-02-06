@@ -41,7 +41,6 @@ import org.graylog2.opamp.transport.OpAmpAuthContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
@@ -76,7 +75,7 @@ public class OpAmpService {
         this.collectorInstanceService = collectorInstanceService;
     }
 
-    public Optional<OpAmpAuthContext> authenticate(String authHeader, URI effectiveExternalUri, OpAmpAuthContext.Transport transport) {
+    public Optional<OpAmpAuthContext> authenticate(String authHeader, OpAmpAuthContext.Transport transport) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return Optional.empty();
         }
@@ -89,7 +88,7 @@ public class OpAmpService {
         }
 
         return switch (typ) {
-            case "enrollment" -> enrollmentTokenService.validateToken(token, effectiveExternalUri, transport)
+            case "enrollment" -> enrollmentTokenService.validateToken(token, transport)
                     .map(e -> e);
             case "agent" -> enrollmentTokenService.validateAgentToken(token, transport)
                     .map(i -> i);

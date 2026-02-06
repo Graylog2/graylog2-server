@@ -17,7 +17,6 @@
 package org.graylog2.opamp.transport;
 
 import com.github.joschi.jadconfig.util.Size;
-import com.google.common.collect.Lists;
 import com.google.protobuf.InvalidProtocolBufferException;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -31,15 +30,12 @@ import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.util.HttpStatus;
-import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.opamp.OpAmpExecutor;
 import org.graylog2.opamp.OpAmpService;
-import org.graylog2.rest.RestTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 
@@ -53,17 +49,14 @@ public class OpAmpHttpHandler extends HttpHandler {
     private final OpAmpService opAmpService;
     private final ExecutorService executor;
     private final int maxMessageSize;
-    private final URI httpExternalUri;
 
     @Inject
     public OpAmpHttpHandler(OpAmpService opAmpService,
                             @OpAmpExecutor ExecutorService executor,
-                            @Named("opamp_max_request_body_size") Size maxRequestBodySize,
-                            HttpConfiguration httpConfiguration) {
+                            @Named("opamp_max_request_body_size") Size maxRequestBodySize) {
         this.opAmpService = opAmpService;
         this.maxMessageSize = (int) maxRequestBodySize.toBytes();
         this.executor = executor;
-        this.httpExternalUri = httpConfiguration.getHttpExternalUri();
     }
 
     @Override
@@ -85,9 +78,7 @@ public class OpAmpHttpHandler extends HttpHandler {
             return;
         }
 
-        final var overrideHeaderValues = Lists.newArrayList(request.getHeaders(HttpConfiguration.OVERRIDE_HEADER));
-        final URI effectiveExternalUri = RestTools.buildExternalUri(overrideHeaderValues, httpExternalUri);
-        final var authContext = opAmpService.authenticate(request.getHeader("Authorization"), effectiveExternalUri, OpAmpAuthContext.Transport.HTTP);
+        final var authContext = opAmpService.authenticate(request.getHeader("Authorization"), OpAmpAuthContext.Transport.HTTP);
         if (authContext.isEmpty()) {
             LOG.debug("OpAMP auth failed");
             response.setStatus(HttpStatus.UNAUTHORIZED_401);
