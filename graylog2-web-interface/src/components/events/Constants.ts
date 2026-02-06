@@ -148,6 +148,8 @@ export const eventsTableElements = {
   },
 };
 
+export const REPLAY_SESSION_ID_PARAM = 'replaySessionId';
+
 type EventsMetricsAction = {
   id: string;
   component: React.ComponentType<MiddleSectionProps>;
