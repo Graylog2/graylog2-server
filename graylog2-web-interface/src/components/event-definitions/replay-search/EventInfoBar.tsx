@@ -28,9 +28,9 @@ const EventInfoBar = () => {
     <Table condensed striped>
       <tbody data-testid="info-container">
         {infoAttributes.map(
-          ({ title, content, show }) =>
+          ({ title, content, show, inRows }) =>
             show !== false && (
-              <EventAttribute key={title} title={title}>
+              <EventAttribute key={title} title={title} inRows={inRows}>
                 {content}
               </EventAttribute>
             ),

@@ -43,7 +43,7 @@ const defaultSearchPageLayout: Partial<LayoutState> = {
     isShown: true,
     title: 'Replayed Search',
     sections: [replaySection, ...sidebarSections],
-    contentColumnWidth: 350,
+    contentColumnWidth: 300,
   },
 };
 

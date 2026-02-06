@@ -138,7 +138,7 @@ const AggregationConditions = () => {
       })}
     </List>
   ) : (
-    <NoAttributeProvided name="Aggregation conditions" />
+    <NoAttributeProvided />
   );
 };
 
