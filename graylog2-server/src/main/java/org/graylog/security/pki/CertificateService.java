@@ -25,10 +25,13 @@ import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.security.encryption.EncryptedValueService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +48,7 @@ import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 @Singleton
 public class CertificateService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(CertificateService.class);
     private static final String COLLECTION_NAME = "pki_certificates";
 
     private final MongoCollection<CertificateEntry> collection;
@@ -97,15 +101,40 @@ public class CertificateService {
      * @return the saved certificate entry with its ID
      */
     public CertificateEntry save(CertificateEntry entry) {
-        if (entry.id() == null) {
-            final String insertedId = insertedIdAsString(collection.insertOne(entry));
-            return entry.withId(insertedId);
+        final CertificateEntry enriched = enrichWithDn(entry);
+        if (enriched.id() == null) {
+            final String insertedId = insertedIdAsString(collection.insertOne(enriched));
+            return enriched.withId(insertedId);
         } else {
             collection.replaceOne(
-                    Filters.eq("_id", new ObjectId(entry.id())),
-                    entry,
+                    Filters.eq("_id", new ObjectId(enriched.id())),
+                    enriched,
                     new ReplaceOptions().upsert(false)
             );
+            return enriched;
+        }
+    }
+
+    private CertificateEntry enrichWithDn(CertificateEntry entry) {
+        if (entry.subjectDn() != null && entry.issuerDn() != null) {
+            return entry;
+        }
+        try {
+            final X509Certificate cert = PemUtils.parseCertificate(entry.certificate());
+            return new CertificateEntry(
+                    entry.id(),
+                    entry.fingerprint(),
+                    entry.privateKey(),
+                    entry.certificate(),
+                    entry.issuerChain(),
+                    cert.getSubjectX500Principal().getName(),
+                    cert.getIssuerX500Principal().getName(),
+                    entry.notBefore(),
+                    entry.notAfter(),
+                    entry.createdAt()
+            );
+        } catch (Exception e) {
+            LOG.warn("Failed to extract DN from certificate: {}", e.getMessage());
             return entry;
         }
     }

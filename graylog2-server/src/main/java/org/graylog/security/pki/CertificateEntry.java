@@ -49,6 +49,14 @@ public record CertificateEntry(
         @JsonProperty(FIELD_ISSUER_CHAIN)
         List<String> issuerChain,
 
+        @Nullable
+        @JsonProperty(FIELD_SUBJECT_DN)
+        String subjectDn,
+
+        @Nullable
+        @JsonProperty(FIELD_ISSUER_DN)
+        String issuerDn,
+
         @JsonProperty(FIELD_NOT_BEFORE)
         Instant notBefore,
 
@@ -64,6 +72,8 @@ public record CertificateEntry(
     public static final String FIELD_PRIVATE_KEY = "private_key";
     public static final String FIELD_CERTIFICATE = "certificate";
     public static final String FIELD_ISSUER_CHAIN = "issuer_chain";
+    public static final String FIELD_SUBJECT_DN = "subject_dn";
+    public static final String FIELD_ISSUER_DN = "issuer_dn";
     public static final String FIELD_NOT_BEFORE = "not_before";
     public static final String FIELD_NOT_AFTER = "not_after";
     public static final String FIELD_CREATED_AT = "created_at";
@@ -81,6 +91,8 @@ public record CertificateEntry(
                 privateKey,
                 certificate,
                 issuerChain,
+                subjectDn,
+                issuerDn,
                 notBefore,
                 notAfter,
                 createdAt

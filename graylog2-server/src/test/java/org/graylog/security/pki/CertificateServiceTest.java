@@ -100,6 +100,8 @@ class CertificateServiceTest {
                 createEncryptedValue(),
                 "-----BEGIN CERTIFICATE-----\nUPDATED\n-----END CERTIFICATE-----",
                 List.of(),
+                null,
+                null,
                 Instant.parse("2024-01-01T00:00:00Z"),
                 Instant.parse("2025-01-01T00:00:00Z"),
                 Instant.parse("2024-01-01T00:00:00Z")
@@ -161,6 +163,37 @@ class CertificateServiceTest {
     }
 
     @Test
+    void saveExtractsSubjectAndIssuerDn() throws Exception {
+        final CertificateEntry rootCa = certificateService.builder()
+                .createRootCa("Test Root CA", Algorithm.ED25519, Duration.ofDays(365));
+
+        assertThat(rootCa.subjectDn()).isNull();
+        assertThat(rootCa.issuerDn()).isNull();
+
+        final CertificateEntry saved = certificateService.save(rootCa);
+
+        assertThat(saved.subjectDn()).contains("Test Root CA");
+        assertThat(saved.issuerDn()).contains("Test Root CA"); // self-signed
+
+        final CertificateEntry loaded = certificateService.findById(saved.id()).orElseThrow();
+        assertThat(loaded.subjectDn()).isEqualTo(saved.subjectDn());
+        assertThat(loaded.issuerDn()).isEqualTo(saved.issuerDn());
+    }
+
+    @Test
+    void saveExtractsDnForIntermediateCa() throws Exception {
+        final CertificateEntry rootCa = certificateService.save(
+                certificateService.builder().createRootCa("Root", Algorithm.ED25519, Duration.ofDays(365)));
+
+        final CertificateEntry intermediate = certificateService.builder()
+                .createIntermediateCa("Intermediate", rootCa, Duration.ofDays(180));
+        final CertificateEntry saved = certificateService.save(intermediate);
+
+        assertThat(saved.subjectDn()).contains("Intermediate");
+        assertThat(saved.issuerDn()).contains("Root");
+    }
+
+    @Test
     void integrationTestWithBuilder() throws Exception {
         // Test the full workflow: create cert with builder, save, retrieve
         final CertificateEntry rootCa = certificateService.save(
@@ -182,6 +215,8 @@ class CertificateServiceTest {
                 createEncryptedValue(),
                 "-----BEGIN CERTIFICATE-----\nTEST\n-----END CERTIFICATE-----",
                 List.of("-----BEGIN CERTIFICATE-----\nISSUER\n-----END CERTIFICATE-----"),
+                null,
+                null,
                 Instant.parse("2024-01-01T00:00:00Z"),
                 Instant.parse("2025-01-01T00:00:00Z"),
                 Instant.parse("2024-01-01T00:00:00Z")

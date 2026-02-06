@@ -331,6 +331,8 @@ public class CertificateBuilder {
                 encryptedValueService.encrypt(privateKeyPem),
                 certificatePem,
                 issuerChain,
+                null, // subjectDn - extracted on save
+                null, // issuerDn - extracted on save
                 certificate.getNotBefore().toInstant(),
                 certificate.getNotAfter().toInstant(),
                 Instant.now()

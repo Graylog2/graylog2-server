@@ -202,6 +202,8 @@ class JwksServiceTest {
                 signingCert.privateKey(),
                 signingCert.certificate(),
                 signingCert.issuerChain(),
+                signingCert.subjectDn(),
+                signingCert.issuerDn(),
                 Instant.now().minus(Duration.ofDays(60)),
                 Instant.now().minus(Duration.ofDays(1)), // Expired yesterday
                 signingCert.createdAt()
@@ -217,6 +219,8 @@ class JwksServiceTest {
                 signingCert.privateKey(),
                 signingCert.certificate(),
                 signingCert.issuerChain(),
+                signingCert.subjectDn(),
+                signingCert.issuerDn(),
                 Instant.now().plus(Duration.ofDays(1)), // Starts tomorrow
                 Instant.now().plus(Duration.ofDays(30)),
                 signingCert.createdAt()

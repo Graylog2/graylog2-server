@@ -81,6 +81,8 @@ class CertificateEntryTest {
         assertThat(CertificateEntry.FIELD_PRIVATE_KEY).isEqualTo("private_key");
         assertThat(CertificateEntry.FIELD_CERTIFICATE).isEqualTo("certificate");
         assertThat(CertificateEntry.FIELD_ISSUER_CHAIN).isEqualTo("issuer_chain");
+        assertThat(CertificateEntry.FIELD_SUBJECT_DN).isEqualTo("subject_dn");
+        assertThat(CertificateEntry.FIELD_ISSUER_DN).isEqualTo("issuer_dn");
         assertThat(CertificateEntry.FIELD_NOT_BEFORE).isEqualTo("not_before");
         assertThat(CertificateEntry.FIELD_NOT_AFTER).isEqualTo("not_after");
         assertThat(CertificateEntry.FIELD_CREATED_AT).isEqualTo("created_at");
@@ -100,6 +102,8 @@ class CertificateEntryTest {
                 privateKey,
                 "-----BEGIN CERTIFICATE-----\nTEST\n-----END CERTIFICATE-----",
                 issuerChain,
+                null,
+                null,
                 notBefore,
                 notAfter,
                 createdAt
@@ -110,6 +114,8 @@ class CertificateEntryTest {
         assertThat(entry.privateKey()).isEqualTo(privateKey);
         assertThat(entry.certificate()).isEqualTo("-----BEGIN CERTIFICATE-----\nTEST\n-----END CERTIFICATE-----");
         assertThat(entry.issuerChain()).isEqualTo(issuerChain);
+        assertThat(entry.subjectDn()).isNull();
+        assertThat(entry.issuerDn()).isNull();
         assertThat(entry.notBefore()).isEqualTo(notBefore);
         assertThat(entry.notAfter()).isEqualTo(notAfter);
         assertThat(entry.createdAt()).isEqualTo(createdAt);
@@ -128,6 +134,8 @@ class CertificateEntryTest {
                 privateKey,
                 "-----BEGIN CERTIFICATE-----\nTEST\n-----END CERTIFICATE-----",
                 List.of(),
+                null,
+                null,
                 notBefore,
                 notAfter,
                 createdAt
@@ -140,6 +148,8 @@ class CertificateEntryTest {
         assertThat(withNewId.privateKey()).isEqualTo(original.privateKey());
         assertThat(withNewId.certificate()).isEqualTo(original.certificate());
         assertThat(withNewId.issuerChain()).isEqualTo(original.issuerChain());
+        assertThat(withNewId.subjectDn()).isEqualTo(original.subjectDn());
+        assertThat(withNewId.issuerDn()).isEqualTo(original.issuerDn());
         assertThat(withNewId.notBefore()).isEqualTo(original.notBefore());
         assertThat(withNewId.notAfter()).isEqualTo(original.notAfter());
         assertThat(withNewId.createdAt()).isEqualTo(original.createdAt());
@@ -158,6 +168,8 @@ class CertificateEntryTest {
                 privateKey,
                 "-----BEGIN CERTIFICATE-----\nTEST\n-----END CERTIFICATE-----",
                 List.of("-----BEGIN CERTIFICATE-----\nISSUER\n-----END CERTIFICATE-----"),
+                "CN=Test Subject",
+                "CN=Test Issuer",
                 notBefore,
                 notAfter,
                 createdAt
@@ -171,6 +183,8 @@ class CertificateEntryTest {
         assertThat(node.has("private_key")).isTrue();
         assertThat(node.has("certificate")).isTrue();
         assertThat(node.has("issuer_chain")).isTrue();
+        assertThat(node.has("subject_dn")).isTrue();
+        assertThat(node.has("issuer_dn")).isTrue();
         assertThat(node.has("not_before")).isTrue();
         assertThat(node.has("not_after")).isTrue();
         assertThat(node.has("created_at")).isTrue();
@@ -189,6 +203,8 @@ class CertificateEntryTest {
                 privateKey,
                 "-----BEGIN CERTIFICATE-----\nTEST\n-----END CERTIFICATE-----",
                 List.of("-----BEGIN CERTIFICATE-----\nISSUER\n-----END CERTIFICATE-----"),
+                null,
+                null,
                 notBefore,
                 notAfter,
                 createdAt
