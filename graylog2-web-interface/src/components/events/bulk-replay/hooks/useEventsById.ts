@@ -14,3 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useQuery } from '@tanstack/react-query';
+
+import { Events } from '@graylog/server-api';
+
+const useEventsById = (eventIds: Array<string>) => {
+  const { data, isFetched } = useQuery({
+    queryKey: ['events', eventIds],
+    queryFn: () => Events.getByIds({ event_ids: eventIds }),
+    enabled: !!eventIds,
+  });
+
+  return { data, isFetched };
+};
+export default useEventsById;

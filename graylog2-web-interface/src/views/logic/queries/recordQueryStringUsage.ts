@@ -14,18 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext } from 'react';
+import { SearchQueryStrings } from '@graylog/server-api';
 
-import EventReplaySelectedContext from 'contexts/EventReplaySelectedContext';
-
-const useSelectedEvents = () => {
-  const contextValue = useContext(EventReplaySelectedContext);
-
-  if (!contextValue) {
-    throw new Error('useSelectedEvents hook needs to be used inside EventReplaySelectedContext.Provider');
+const recordQueryStringUsage = async (newQuery: string, oldQuery?: string) => {
+  if (newQuery && newQuery !== oldQuery) {
+    try {
+      await SearchQueryStrings.queryStringUsed({ query_string: newQuery });
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Unable to record last used query string: ', error);
+    }
   }
-
-  return contextValue;
 };
 
-export default useSelectedEvents;
+export default recordQueryStringUsage;

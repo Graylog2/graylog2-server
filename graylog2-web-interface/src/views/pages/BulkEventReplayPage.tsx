@@ -14,51 +14,36 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// @ts-nocheck
 import * as React from 'react';
 import { useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
 
-import { Events } from '@graylog/server-api';
-
-import useLocation from 'routing/useLocation';
+import Store from 'logic/local-storage/Store';
 import Spinner from 'components/common/Spinner';
 import BulkEventReplay from 'components/events/bulk-replay/BulkEventReplay';
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
-import type { RemainingBulkActionsProps } from 'components/events/bulk-replay/types';
-import RemainingBulkActions from 'components/events/bulk-replay/RemainingBulkActions';
 import { singleton } from 'logic/singleton';
+import { REPLAY_SESSION_ID_PARAM } from 'components/events/Constants';
+import useRoutingQuery from 'routing/useQuery';
+import useSessionInitialEventIds from 'components/events/bulk-replay/hooks/useSessionInitialEventIds';
+import useEventsById from 'components/events/bulk-replay/hooks/useEventsById';
 
-export type BulkEventReplayState = {
-  eventIds: Array<string>;
-  returnUrl: string;
-};
-
-const useEventsById = (eventIds: Array<string>) =>
-  useQuery({
-    queryKey: ['events', eventIds],
-    queryFn: () => Events.getByIds({ event_ids: eventIds }),
-  });
-
-type Props = {
-  BulkActions?: React.ComponentType<RemainingBulkActionsProps>;
-};
-
-const BulkEventReplayPage = ({ BulkActions = RemainingBulkActions }: Props) => {
-  const location = useLocation<BulkEventReplayState>();
-  const { eventIds: initialEventIds = [], returnUrl } = location?.state ?? {};
-  const { data: events, isInitialLoading } = useEventsById(initialEventIds);
+const BulkEventReplayPage = () => {
+  const params = useRoutingQuery();
+  const replaySessionId = params[REPLAY_SESSION_ID_PARAM];
+  const initialEventIds = useSessionInitialEventIds();
+  const returnUrl: string = Store.sessionGet(replaySessionId)?.returnUrl;
+  const { data: events, isFetched } = useEventsById(initialEventIds);
 
   const history = useHistory();
-  const onClose = useCallback(() => {
+  const onReturnClick = useCallback(() => {
     history.push(returnUrl ?? Routes.ALERTS.LIST);
   }, [history, returnUrl]);
 
-  return isInitialLoading ? (
-    <Spinner />
+  return initialEventIds && isFetched ? (
+    <BulkEventReplay events={events} initialEventIds={initialEventIds} onReturnClick={onReturnClick} />
   ) : (
-    <BulkEventReplay events={events} initialEventIds={initialEventIds} onClose={onClose} BulkActions={BulkActions} />
+    <Spinner />
   );
 };
 
