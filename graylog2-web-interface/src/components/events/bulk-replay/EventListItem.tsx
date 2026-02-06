@@ -65,6 +65,9 @@ const Summary = styled.span<SummaryProps>(
     flex-grow: 1;
   `,
 );
+const Ellipsis = styled.span`
+  text-overflow: ellipsis;
+`;
 
 const CompletedButton = styled(IconButton)<{ $done: boolean }>(
   ({ theme, $done }) => css`

@@ -14,3 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { SearchQueryStrings } from '@graylog/server-api';
+
+const recordQueryStringUsage = async (newQuery: string, oldQuery?: string) => {
+  if (newQuery && newQuery !== oldQuery) {
+    try {
+      await SearchQueryStrings.queryStringUsed({ query_string: newQuery });
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Unable to record last used query string: ', error);
+    }
+  }
+};
+
+export default recordQueryStringUsage;

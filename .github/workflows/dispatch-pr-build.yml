@@ -59,19 +59,40 @@ jobs:
         env:
           PR_EVENT: "${{ toJSON(github.event.pull_request) }}"
 
+      - name: Detect repository
+        run: |
+          repo="${{ github.repository }}"
+          repo_fork=""
+
+          # Our workflows require caller_repo to be our own repo. For forks
+          # github.repository is the PR author's repo.
+          if ! [[ "${repo,,}" =~ ^graylog2/ ]]; then
+            repo_fork="$repo"
+            repo="Graylog2/${repo#*/}"
+          fi
+
+          echo "repo=$repo" | tee -a "$GITHUB_ENV"
+          echo "repo_fork=$repo_fork" | tee -a "$GITHUB_ENV"
+
       - name: Dispatch job to graylog-project-internal
         if: ${{ (github.event.action != 'edited' && (github.event.action != 'labeled' || github.event.label.name == 'e2e-tests')) || steps.pr-string-changed.outcome == 'success' }}
         run: >
           gh workflow run -R Graylog2/graylog-project-internal pr-build.yml --ref master
-          -f caller_repo=${{ github.repository }}
+          -f caller_repo="${{ env.repo }}"
+          -f caller_repo_fork="${{ env.repo_fork }}"
           -f caller_pr_nr=${{ github.event.number }}
-          -f caller_base_branch=${{ github.base_ref || github.ref_name }}
-          -f caller_head_branch=${{ github.head_ref }}
+          -f caller_base_branch="$BASE_BRANCH"
+          -f caller_head_branch="$HEAD_BRANCH"
           -f head_sha=${{ github.event.pull_request.head.sha }}
-          -f initial_actor="${{ github.actor }}/${{ github.triggering_actor }}"
+          -f initial_actor="$ACTOR/$TRIGGERING_ACTOR"
           -f e2e_tests=${{ steps.e2e-tests.outputs.run }}
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GRAYLOG_PROJECT_INTERNAL_WORKFLOW_RW }}
+          # See: https://docs.github.com/en/actions/reference/security/secure-use#good-practices-for-mitigating-script-injection-attacks
+          BASE_BRANCH: "${{ github.base_ref || github.ref_name }}"
+          HEAD_BRANCH: "${{ github.head_ref }}"
+          ACTOR: "${{ github.actor }}"
+          TRIGGERING_ACTOR: "${{ github.triggering_actor }}"
 
       - name: Give dispatched build time to add its status
         run: sleep 20
