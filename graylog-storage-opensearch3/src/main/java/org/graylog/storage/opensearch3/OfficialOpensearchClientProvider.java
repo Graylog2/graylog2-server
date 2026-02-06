@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.opensearch3;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
@@ -76,8 +77,9 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
             @IndexerHosts List<URI> hosts,
             IndexerJwtAuthToken indexerJwtAuthToken,
             CredentialsProvider credentialsProvider,
-            ElasticsearchClientConfiguration clientConfiguration) {
-        clientCache = Suppliers.memoize(() -> createClient(hosts, indexerJwtAuthToken, credentialsProvider, clientConfiguration));
+            ElasticsearchClientConfiguration clientConfiguration,
+            ObjectMapper objectMapper) {
+        clientCache = Suppliers.memoize(() -> createClient(hosts, indexerJwtAuthToken, credentialsProvider, clientConfiguration, objectMapper));
     }
 
     @Override
@@ -86,7 +88,7 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
     }
 
     @Nonnull
-    private static OfficialOpensearchClient createClient(List<URI> uris, IndexerJwtAuthToken indexerJwtAuthToken, CredentialsProvider credentialsProvider, ElasticsearchClientConfiguration clientConfiguration) {
+    private static OfficialOpensearchClient createClient(List<URI> uris, IndexerJwtAuthToken indexerJwtAuthToken, CredentialsProvider credentialsProvider, ElasticsearchClientConfiguration clientConfiguration, ObjectMapper objectMapper) {
 
         log.info("Initializing OpenSearch client");
 
@@ -149,7 +151,7 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
         });
 
         final OpenSearchTransport transport = builder.build();
-        return new OfficialOpensearchClient(new CustomOpenSearchClient(transport), new CustomAsyncOpenSearchClient(transport));
+        return new OfficialOpensearchClient(new CustomOpenSearchClient(transport), new CustomAsyncOpenSearchClient(transport), objectMapper);
     }
 
     private static Timeout timeout(Duration duration) {
