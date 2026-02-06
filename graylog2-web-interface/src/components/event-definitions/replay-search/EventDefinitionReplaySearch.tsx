@@ -24,6 +24,7 @@ import ReplaySearchContext from 'components/event-definitions/replay-search/Repl
 import useCreateSearch from 'views/hooks/useCreateSearch';
 import sidebarSections, { type SidebarSection } from 'views/components/sidebar/sidebarSections';
 import EventDefinitionSideBar from 'components/event-definitions/replay-search/EventDefinitionSideBar';
+import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
 
 type Props = {
   eventDefinitionMappedData: EventDefinitionMappedData;
@@ -37,7 +38,7 @@ const replaySection: SidebarSection = {
   content: EventDefinitionSideBar,
 };
 
-const defaultSearchPageLayout = {
+const defaultSearchPageLayout: Partial<LayoutState> = {
   sidebar: {
     isShown: true,
     title: 'Replayed Search',

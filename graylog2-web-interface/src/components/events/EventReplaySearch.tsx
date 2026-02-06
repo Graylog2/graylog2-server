@@ -41,7 +41,7 @@ const replaySection: SidebarSection = {
   content: ReplaySearchSidebar,
 };
 
-const defaultSearchPageLayout = {
+const defaultSearchPageLayout: Partial<LayoutState> = {
   sidebar: {
     isShown: true,
     title: 'Replayed Search',
