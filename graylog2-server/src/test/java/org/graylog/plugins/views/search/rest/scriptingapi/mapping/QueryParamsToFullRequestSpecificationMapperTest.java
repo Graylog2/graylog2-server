@@ -180,7 +180,7 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                         Set.of("000000000000000000000001"),
                         Set.of("category1"),
                         KeywordRange.create("last 1 day", "UTC"),
-                        List.of(new Grouping("http_method", 25), new Grouping("controller", 25)),
+                        List.of(new Grouping("http_method", allGroupingsSize), new Grouping("controller", allGroupingsSize)),
                         List.of(new Metric("avg", "took_ms"))
                 )
         );
