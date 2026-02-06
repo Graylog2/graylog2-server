@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3.cl;
+package org.graylog.storage.opensearch3.client;
 
 import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.opensearch.client.opensearch.OpenSearchAsyncClient;

@@ -14,18 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext } from 'react';
+import useRoutingQuery from 'routing/useQuery';
+import { REPLAY_SESSION_ID_PARAM } from 'components/events/Constants';
+import Store from 'logic/local-storage/Store';
 
-import EventReplaySelectedContext from 'contexts/EventReplaySelectedContext';
+const useSessionInitialEventIds = (): Array<string> => {
+  const params = useRoutingQuery();
+  const replaySessionId = params[REPLAY_SESSION_ID_PARAM];
 
-const useSelectedEvents = () => {
-  const contextValue = useContext(EventReplaySelectedContext);
-
-  if (!contextValue) {
-    throw new Error('useSelectedEvents hook needs to be used inside EventReplaySelectedContext.Provider');
-  }
-
-  return contextValue;
+  return Store.sessionGet(replaySessionId)?.initialEventIds ?? [];
 };
 
-export default useSelectedEvents;
+export default useSessionInitialEventIds;
