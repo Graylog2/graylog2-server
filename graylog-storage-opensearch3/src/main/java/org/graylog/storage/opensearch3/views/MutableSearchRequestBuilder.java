@@ -34,6 +34,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Wrapper for SearchRequest.Builder.
+ * All builders in the new client are immutable, write-only and cannot be built more than once.
+ * Since we are mutating a reference to the builder in the handlers, we need to be able to read fields
+ * that are already set (e.g. to check the type or add to the existing query). Also, we need to be able to
+ * copy an existing builder without building and using toBuilder().
+ * This class provides the structure for this.
+ */
 public class MutableSearchRequestBuilder {
 
     Query query;
