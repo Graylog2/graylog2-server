@@ -44,6 +44,7 @@ import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
 import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -58,7 +59,7 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
     public CreatedAggregations<NamedAggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, Time timeSpec, OSGeneratedQueryContext queryContext, Query query) {
         NamedAggregationBuilder root = null;
         NamedAggregationBuilder leaf = null;
-        final var timeZone = queryContext.timezone().toTimeZone().getDisplayName();
+        final var timeZone = queryContext.timezone().toTimeZone().getDisplayName(Locale.ENGLISH);
 
         final Interval interval = timeSpec.interval();
         final TimeRange timerange = query.timerange();
