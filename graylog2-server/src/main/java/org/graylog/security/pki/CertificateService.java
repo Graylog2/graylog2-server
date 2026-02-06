@@ -45,7 +45,7 @@ import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 @Singleton
 public class CertificateService {
 
-    private static final String COLLECTION_NAME = "certificates";
+    private static final String COLLECTION_NAME = "pki_certificates";
 
     private final MongoCollection<CertificateEntry> collection;
     private final MongoUtils<CertificateEntry> utils;
