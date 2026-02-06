@@ -14,18 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
-import EventReplaySelectedContext from 'contexts/EventReplaySelectedContext';
+import { Events } from '@graylog/server-api';
 
-const useSelectedEvents = () => {
-  const contextValue = useContext(EventReplaySelectedContext);
+const useEventsById = (eventIds: Array<string>) => {
+  const { data, isFetched } = useQuery({
+    queryKey: ['events', eventIds],
+    queryFn: () => Events.getByIds({ event_ids: eventIds }),
+    enabled: !!eventIds,
+  });
 
-  if (!contextValue) {
-    throw new Error('useSelectedEvents hook needs to be used inside EventReplaySelectedContext.Provider');
-  }
-
-  return contextValue;
+  return { data, isFetched };
 };
-
-export default useSelectedEvents;
+export default useEventsById;

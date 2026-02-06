@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-// eslint-disable-next-line import/prefer-default-export
 export const events = [
   {
     id: '01HV0YS4GHDMT30E3EMWQVQNK9',
@@ -46,6 +45,13 @@ export const events = [
     assigned_to: undefined,
     created_at: '2024-04-09T08:14:49.445Z',
     name: undefined,
+    timerange_end: null,
+    timestamp_processing: null,
+    source_streams: null,
+    group_by_fields: null,
+    event_definition_type: null,
+    key: null,
+    timerange_start: null,
   },
   {
     id: '01HV0YS4GH0VC7DV6A2VGN1VJ0',
@@ -73,5 +79,12 @@ export const events = [
     assigned_to: undefined,
     created_at: '2024-04-09T08:14:49.445Z',
     name: undefined,
+    timerange_end: null,
+    timestamp_processing: null,
+    source_streams: null,
+    group_by_fields: null,
+    event_definition_type: null,
+    key: null,
+    timerange_start: null,
   },
 ];

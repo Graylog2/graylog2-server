@@ -1,0 +1,5 @@
+type = "a"
+message = "Run bulk replay search for events on separate page. Add extra information about the event and option to switch between selected events to sidebar on replay search page."
+
+issues = ["24845"]
+pulls = ["24767", "graylog-plugin-enterprise#12990"]
