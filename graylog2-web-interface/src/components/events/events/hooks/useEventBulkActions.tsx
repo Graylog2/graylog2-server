@@ -31,8 +31,6 @@ const useEventBulkAction = (events: Array<Event>, onEventCallback?: () => void) 
 
   if (isEmpty(actions)) return { actions: null, pluggableActionModals: null };
 
-  if (isEmpty(flatten(actions))) return { actions: null, pluggableActionModals: null };
-
   return { actions, pluggableActionModals };
 };
 

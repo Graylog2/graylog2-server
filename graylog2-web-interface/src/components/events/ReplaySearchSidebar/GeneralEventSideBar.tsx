@@ -25,7 +25,7 @@ import useEventsAdditionalData from 'components/events/ReplaySearchSidebar/hooks
 import useEventById from 'hooks/useEventById';
 import { Spinner } from 'components/common';
 import ExpandableSection from 'components/events/ReplaySearchSidebar/ExpandableSection';
-import EventInfoBar from 'components/event-definitions/replay-search/EventInfoBar';
+import EventDefinitionInfoTable from 'components/event-definitions/replay-search/EventDefinitionInfoTable';
 
 const attributesList = [
   {
@@ -72,7 +72,7 @@ const GeneralEventSideBar = ({ alertId }: EventReplaySideBarDetailsProps) => {
         />
       </ExpandableSection>
       <ExpandableSection title="Event Definition Details">
-        <EventInfoBar />
+        <EventDefinitionInfoTable />
       </ExpandableSection>
       <ExpandableSection title="Event Procedure Summary">
         <RemediationSteps

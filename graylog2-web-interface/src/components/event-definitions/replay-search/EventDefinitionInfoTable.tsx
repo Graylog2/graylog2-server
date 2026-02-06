@@ -21,7 +21,7 @@ import { Table } from 'components/bootstrap';
 import useAttributeComponents from 'components/event-definitions/replay-search/hooks/useAttributeComponents';
 import EventAttribute from 'components/event-definitions/replay-search/EventAttribute';
 
-const EventInfoBar = () => {
+const EventDefinitionInfoTable = () => {
   const infoAttributes = useAttributeComponents();
 
   return (
@@ -40,4 +40,4 @@ const EventInfoBar = () => {
   );
 };
 
-export default EventInfoBar;
+export default EventDefinitionInfoTable;

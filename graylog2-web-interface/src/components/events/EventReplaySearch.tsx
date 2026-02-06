@@ -30,7 +30,6 @@ type Props = {
   eventDefinitionMappedData: EventDefinitionMappedData;
   eventData: Event;
   searchPageLayout?: Partial<LayoutState>;
-  forceSidebarPinned?: boolean;
 };
 
 const replaySection: SidebarSection = {
@@ -53,7 +52,6 @@ const defaultSearchPageLayout: Partial<LayoutState> = {
 const EventReplaySearch = ({
   eventDefinitionMappedData,
   searchPageLayout = defaultSearchPageLayout,
-  forceSidebarPinned = false,
   eventData,
 }: Props) => {
   const { eventDefinition, aggregations } = eventDefinitionMappedData;
@@ -75,7 +73,7 @@ const EventReplaySearch = ({
 
   return (
     <ReplaySearchContext.Provider value={replaySearchContext}>
-      <ReplaySearch view={view} searchPageLayout={searchPageLayout} forceSidebarPinned={forceSidebarPinned} />
+      <ReplaySearch view={view} searchPageLayout={searchPageLayout} />
     </ReplaySearchContext.Provider>
   );
 };
@@ -83,14 +81,12 @@ const EventReplaySearch = ({
 const WithLoadingBarrier = ({
   eventDefinitionMappedData,
   searchPageLayout = defaultSearchPageLayout,
-  forceSidebarPinned = false,
   eventData,
 }: Props) => (
   <LoadingBarrier eventDefinition={eventDefinitionMappedData.eventDefinition}>
     <EventReplaySearch
       eventDefinitionMappedData={eventDefinitionMappedData}
       searchPageLayout={searchPageLayout}
-      forceSidebarPinned={forceSidebarPinned}
       eventData={eventData}
     />
   </LoadingBarrier>
