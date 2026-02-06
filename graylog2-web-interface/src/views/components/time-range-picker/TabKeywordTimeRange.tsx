@@ -28,7 +28,7 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import { InputDescription, Timestamp } from 'components/common';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 
-import { EMPTY_RANGE } from 'views/components/searchbar/time-range-filter/TimeRangeDisplay';
+import { EMPTY_RANGE } from 'views/components/time-range-picker/TimeRangeDisplay';
 
 const Headline = styled.h3`
   margin-bottom: 5px;
