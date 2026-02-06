@@ -16,43 +16,28 @@
  */
 package org.graylog2.opamp.rest;
 
-import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.MultivaluedHashMap;
-import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.opamp.enrollment.EnrollmentTokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class EnrollmentTokenResourceTest {
 
-    private static final URI TEST_EXTERNAL_URI = URI.create("https://graylog.example.com/");
-
     private EnrollmentTokenResource resource;
     private EnrollmentTokenService enrollmentTokenService;
-    private HttpHeaders httpHeaders;
 
     @BeforeEach
     void setUp() {
         enrollmentTokenService = mock(EnrollmentTokenService.class);
-
-        final HttpConfiguration httpConfiguration = mock(HttpConfiguration.class);
-        when(httpConfiguration.getHttpExternalUri()).thenReturn(TEST_EXTERNAL_URI);
-
-        httpHeaders = mock(HttpHeaders.class);
-        when(httpHeaders.getRequestHeaders()).thenReturn(new MultivaluedHashMap<>());
-
-        resource = new EnrollmentTokenResource(enrollmentTokenService, httpConfiguration);
+        resource = new EnrollmentTokenResource(enrollmentTokenService);
     }
 
     @Test
@@ -66,11 +51,11 @@ class EnrollmentTokenResourceTest {
                 Instant.now().plusSeconds(86400)
         );
 
-        when(enrollmentTokenService.createToken(any(), any())).thenReturn(expectedResponse);
+        when(enrollmentTokenService.createToken(any(CreateEnrollmentTokenRequest.class))).thenReturn(expectedResponse);
 
-        final EnrollmentTokenResponse response = resource.createToken(httpHeaders, request);
+        final EnrollmentTokenResponse response = resource.createToken(request);
 
         assertThat(response).isEqualTo(expectedResponse);
-        verify(enrollmentTokenService).createToken(eq(request), eq(TEST_EXTERNAL_URI));
+        verify(enrollmentTokenService).createToken(request);
     }
 }

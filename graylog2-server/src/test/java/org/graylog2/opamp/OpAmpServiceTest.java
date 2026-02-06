@@ -26,7 +26,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
@@ -60,7 +59,6 @@ class OpAmpServiceTest {
 
     private OpAmpService opAmpService;
 
-    private static final URI EXTERNAL_URI = URI.create("https://graylog.example.com/");
     private static final OpAmpAuthContext.Transport TRANSPORT = OpAmpAuthContext.Transport.HTTP;
 
     @BeforeEach
@@ -75,14 +73,14 @@ class OpAmpServiceTest {
         final String authHeader = "Bearer " + token;
         final OpAmpAuthContext.Enrollment expectedContext = new OpAmpAuthContext.Enrollment("test-fleet", TRANSPORT);
 
-        when(enrollmentTokenService.validateToken(eq(token), eq(EXTERNAL_URI), eq(TRANSPORT)))
+        when(enrollmentTokenService.validateToken(eq(token), eq(TRANSPORT)))
                 .thenReturn(Optional.of(expectedContext));
 
-        final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, EXTERNAL_URI, TRANSPORT);
+        final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, TRANSPORT);
 
         assertThat(result).isPresent();
         assertThat(result.get()).isInstanceOf(OpAmpAuthContext.Enrollment.class);
-        verify(enrollmentTokenService).validateToken(token, EXTERNAL_URI, TRANSPORT);
+        verify(enrollmentTokenService).validateToken(token, TRANSPORT);
         verify(enrollmentTokenService, never()).validateAgentToken(any(), any());
     }
 
@@ -105,12 +103,12 @@ class OpAmpServiceTest {
         when(enrollmentTokenService.validateAgentToken(eq(token), eq(TRANSPORT)))
                 .thenReturn(Optional.of(expectedContext));
 
-        final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, EXTERNAL_URI, TRANSPORT);
+        final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, TRANSPORT);
 
         assertThat(result).isPresent();
         assertThat(result.get()).isInstanceOf(OpAmpAuthContext.Identified.class);
         verify(enrollmentTokenService).validateAgentToken(token, TRANSPORT);
-        verify(enrollmentTokenService, never()).validateToken(any(), any(), any());
+        verify(enrollmentTokenService, never()).validateToken(any(), any());
     }
 
     @Test
@@ -119,10 +117,10 @@ class OpAmpServiceTest {
         final String token = createTokenWithCtt("unknown");
         final String authHeader = "Bearer " + token;
 
-        final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, EXTERNAL_URI, TRANSPORT);
+        final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, TRANSPORT);
 
         assertThat(result).isEmpty();
-        verify(enrollmentTokenService, never()).validateToken(any(), any(), any());
+        verify(enrollmentTokenService, never()).validateToken(any(), any());
         verify(enrollmentTokenService, never()).validateAgentToken(any(), any());
     }
 
@@ -132,10 +130,10 @@ class OpAmpServiceTest {
         final String token = createTokenWithoutCtt();
         final String authHeader = "Bearer " + token;
 
-        final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, EXTERNAL_URI, TRANSPORT);
+        final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, TRANSPORT);
 
         assertThat(result).isEmpty();
-        verify(enrollmentTokenService, never()).validateToken(any(), any(), any());
+        verify(enrollmentTokenService, never()).validateToken(any(), any());
         verify(enrollmentTokenService, never()).validateAgentToken(any(), any());
     }
 
@@ -143,19 +141,19 @@ class OpAmpServiceTest {
     void authenticateReturnsEmptyForMissingBearer() {
         final String authHeader = "Basic dXNlcjpwYXNz";
 
-        final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, EXTERNAL_URI, TRANSPORT);
+        final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, TRANSPORT);
 
         assertThat(result).isEmpty();
-        verify(enrollmentTokenService, never()).validateToken(any(), any(), any());
+        verify(enrollmentTokenService, never()).validateToken(any(), any());
         verify(enrollmentTokenService, never()).validateAgentToken(any(), any());
     }
 
     @Test
     void authenticateReturnsEmptyForNullHeader() {
-        final Optional<OpAmpAuthContext> result = opAmpService.authenticate(null, EXTERNAL_URI, TRANSPORT);
+        final Optional<OpAmpAuthContext> result = opAmpService.authenticate(null, TRANSPORT);
 
         assertThat(result).isEmpty();
-        verify(enrollmentTokenService, never()).validateToken(any(), any(), any());
+        verify(enrollmentTokenService, never()).validateToken(any(), any());
         verify(enrollmentTokenService, never()).validateAgentToken(any(), any());
     }
 
@@ -163,10 +161,10 @@ class OpAmpServiceTest {
     void authenticateReturnsEmptyForMalformedToken() {
         final String authHeader = "Bearer not.a.valid.jwt";
 
-        final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, EXTERNAL_URI, TRANSPORT);
+        final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, TRANSPORT);
 
         assertThat(result).isEmpty();
-        verify(enrollmentTokenService, never()).validateToken(any(), any(), any());
+        verify(enrollmentTokenService, never()).validateToken(any(), any());
         verify(enrollmentTokenService, never()).validateAgentToken(any(), any());
     }
 
@@ -174,10 +172,10 @@ class OpAmpServiceTest {
     void authenticateReturnsEmptyForInvalidBase64() {
         final String authHeader = "Bearer !!!invalid!!!.payload.signature";
 
-        final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, EXTERNAL_URI, TRANSPORT);
+        final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, TRANSPORT);
 
         assertThat(result).isEmpty();
-        verify(enrollmentTokenService, never()).validateToken(any(), any(), any());
+        verify(enrollmentTokenService, never()).validateToken(any(), any());
         verify(enrollmentTokenService, never()).validateAgentToken(any(), any());
     }
 
