@@ -23,7 +23,7 @@ import timerangeToString from 'views/logic/queries/TimeRangeToString';
 import type { DateTime } from 'util/DateTime';
 import useUserDateTime from 'hooks/useUserDateTime';
 
-import TimeRangePickerButton from './time-range-filter/time-range-picker/TimeRangePickerButton';
+import TimeRangePickerButton from 'views/components/time-range-picker/TimeRangePickerButton';
 
 const Wrapper = styled.div`
   display: flex;
