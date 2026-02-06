@@ -143,7 +143,7 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
         final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderFieldsFunction(bucketSpecs.fields(), pivot.sort());
 
         final Aggregate aggregation = previousBucket.aggregations().get(AGG_NAME);
-        if (!(aggregation.isFilters())) { // TODO: Check if this is correct
+        if (!(aggregation.isFilters())) {
             // This happens when the other bucket is passed for column value extraction
             return Stream.of(initialBucket);
         }
