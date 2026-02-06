@@ -99,11 +99,10 @@ class QueryParamsToFullRequestSpecificationMapperTest {
         assertThat(aggregationRequestSpec).isEqualTo(new AggregationRequestSpec(
                         "*",
                         Set.of(),
-                Set.of(),
+                        Set.of(),
                         DEFAULT_TIMERANGE,
                         List.of(new Grouping("http_method")),
-                        List.of(new Metric("count", null)),
-                        null
+                        List.of(new Metric("count", null))
                 )
         );
 
@@ -118,12 +117,10 @@ class QueryParamsToFullRequestSpecificationMapperTest {
         assertThat(aggregationRequestSpec).isEqualTo(new AggregationRequestSpec(
                         "*",
                         Set.of(),
-                Set.of(),
+                        Set.of(),
                         DEFAULT_TIMERANGE,
                         List.of(new Grouping("http_method")),
-                        List.of(new Metric("count", null)),
-                        null
-
+                        List.of(new Metric("count", null))
                 )
         );
 
@@ -158,12 +155,10 @@ class QueryParamsToFullRequestSpecificationMapperTest {
         assertThat(aggregationRequestSpec).isEqualTo(new AggregationRequestSpec(
                         "http_method:GET",
                         Set.of("000000000000000000000001"),
-                Set.of("category1"),
+                        Set.of("category1"),
                         KeywordRange.create("last 1 day", "UTC"),
                         List.of(new Grouping("http_method"), new Grouping("controller")),
-                        List.of(new Metric("avg", "took_ms")),
-                        null
-
+                        List.of(new Metric("avg", "took_ms"))
                 )
         );
     }
@@ -186,8 +181,7 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                         Set.of("category1"),
                         KeywordRange.create("last 1 day", "UTC"),
                         List.of(new Grouping("http_method", 25), new Grouping("controller", 25)),
-                        List.of(new Metric("avg", "took_ms")),
-                        allGroupingsSize
+                        List.of(new Metric("avg", "took_ms"))
                 )
         );
     }

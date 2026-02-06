@@ -80,10 +80,10 @@ public class QueryParamsToFullRequestSpecificationMapper {
             throw new IllegalArgumentException("Percentile metric cannot be used in simplified query format. Please use POST request instead, specifying configuration for percentile metric");
         }
 
-        // Create simple groupings without size - let AggregationRequestSpec apply allGroupingsSize to all groupings
-        final List<Grouping> groupings = groups.stream()
-                .map(Grouping::new)
-                .collect(Collectors.toList());
+        // Apply allGroupingsSize to groupings if specified (for simplified GET endpoint)
+        final List<Grouping> groupings = allGroupingsSize != null
+                ? groups.stream().map(group -> new Grouping(group, allGroupingsSize)).collect(Collectors.toList())
+                : groups.stream().map(Grouping::new).collect(Collectors.toList());
 
         return new AggregationRequestSpec(
                 query,
@@ -91,8 +91,7 @@ public class QueryParamsToFullRequestSpecificationMapper {
                 streamCategories,
                 timerangeParser.parseTimeRange(timerangeKeyword),
                 groupings,
-                metrics.stream().map(Metric::fromStringRepresentation).flatMap(Optional::stream).collect(Collectors.toList()),
-                allGroupingsSize
+                metrics.stream().map(Metric::fromStringRepresentation).flatMap(Optional::stream).collect(Collectors.toList())
         );
     }
 

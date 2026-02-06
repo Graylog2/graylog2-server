@@ -89,8 +89,7 @@ public class AggregateMessagesTool extends Tool<AggregateMessagesTool.Parameters
                     parameters.streamCategories(),
                     RelativeRange.create(parameters.rangeSeconds()),
                     parameters.groupings(),
-                    parameters.metrics(),
-                    null
+                    parameters.metrics()
             );
 
             // the query engine performs permission checks, so we don't have to do that here.
