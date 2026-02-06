@@ -67,7 +67,7 @@ const EventDefinitionReplaySearch = ({ eventDefinitionMappedData }: Props) => {
 
   return (
     <ReplaySearchContext.Provider value={replaySearchContext}>
-      <ReplaySearch searchPageLayout={defaultSearchPageLayout} view={view} />
+      <ReplaySearch searchPageLayout={defaultSearchPageLayout} view={view} forceSidebarPinned />
     </ReplaySearchContext.Provider>
   );
 };
