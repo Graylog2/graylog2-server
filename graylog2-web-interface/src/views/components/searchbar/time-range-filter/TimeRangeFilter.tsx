@@ -27,9 +27,9 @@ import TimeRangePicker from 'views/components/time-range-picker/index';
 import { NO_TIMERANGE_OVERRIDE } from 'views/Constants';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import MoveRange from 'views/components/searchbar/time-range-filter/MoveRange';
+import TimeRangeDisplay from 'views/components/time-range-picker/TimeRangeDisplay';
 
 import TimeRangeFilterButtons from './TimeRangeFilterButtons';
-import TimeRangeDisplay from 'views/components/time-range-picker/TimeRangeDisplay';
 
 const FlexContainer = styled.div`
   display: flex;

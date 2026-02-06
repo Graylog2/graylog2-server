@@ -22,9 +22,9 @@ import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { ButtonGroup } from 'components/bootstrap';
 import { normalizeIfAllMessagesRange } from 'views/logic/queries/NormalizeTimeRange';
 import { SEARCH_BUTTON_WIDTH } from 'views/components/searchbar/SearchButton';
+import TimeRangePickerButton from 'views/components/time-range-picker/TimeRangePickerButton';
 
 import RangePresetDropdown from './TimeRangePresetDropdown';
-import TimeRangePickerButton from 'views/components/time-range-picker/TimeRangePickerButton';
 
 type Props = {
   disabled?: boolean;
