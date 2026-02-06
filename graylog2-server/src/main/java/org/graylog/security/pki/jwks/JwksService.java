@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certificates.jwks;
+package org.graylog.security.pki.jwks;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.graylog.security.certificates.CertificateEntry;
-import org.graylog.security.certificates.CertificateService;
-import org.graylog.security.certificates.PemUtils;
+import org.graylog.security.pki.CertificateEntry;
+import org.graylog.security.pki.CertificateService;
+import org.graylog.security.pki.PemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

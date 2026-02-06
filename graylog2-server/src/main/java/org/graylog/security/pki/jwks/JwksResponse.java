@@ -14,20 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certificates;
+package org.graylog.security.pki.jwks;
 
-import org.graylog.security.certificates.jwks.JwksResource;
-import org.graylog.security.certificates.jwks.JwksService;
-import org.graylog2.plugin.PluginModule;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
 
 /**
- * Guice module for certificate storage and JWKS services.
+ * JSON Web Key Set (JWKS) response as defined in RFC 7517.
+ *
+ * @param keys the list of JSON Web Keys
  */
-public class CertificatesModule extends PluginModule {
-    @Override
-    protected void configure() {
-        bind(CertificateService.class).asEagerSingleton();
-        bind(JwksService.class).asEagerSingleton();
-        addSystemRestResource(JwksResource.class);
+public record JwksResponse(
+        @JsonProperty("keys") List<Jwk> keys
+) {
+
+    /**
+     * Creates an empty JWKS response.
+     *
+     * @return an empty JWKS response
+     */
+    public static JwksResponse empty() {
+        return new JwksResponse(List.of());
     }
 }

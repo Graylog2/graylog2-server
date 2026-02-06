@@ -17,7 +17,7 @@
 package org.graylog2.opamp;
 
 import org.graylog.collectors.CollectorInstanceService;
-import org.graylog.security.certificates.CertificateService;
+import org.graylog.security.pki.CertificateService;
 import org.graylog2.opamp.enrollment.EnrollmentTokenService;
 import org.graylog2.opamp.transport.OpAmpAuthContext;
 import org.junit.jupiter.api.BeforeEach;

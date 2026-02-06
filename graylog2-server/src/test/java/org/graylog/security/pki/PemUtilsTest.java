@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certificates;
+package org.graylog.security.pki;
 
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.jupiter.api.BeforeEach;

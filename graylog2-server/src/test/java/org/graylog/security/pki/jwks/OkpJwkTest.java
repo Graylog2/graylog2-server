@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certificates.jwks;
+package org.graylog.security.pki.jwks;
 
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.graylog.security.certificates.Algorithm;
-import org.graylog.security.certificates.CertificateBuilder;
-import org.graylog.security.certificates.CertificateEntry;
-import org.graylog.security.certificates.PemUtils;
+import org.graylog.security.pki.Algorithm;
+import org.graylog.security.pki.CertificateBuilder;
+import org.graylog.security.pki.CertificateEntry;
+import org.graylog.security.pki.PemUtils;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -52,7 +52,7 @@ import org.graylog.plugins.views.storage.migration.DatanodeMigrationBindings;
 import org.graylog.scheduler.JobSchedulerConfiguration;
 import org.graylog.scheduler.JobSchedulerModule;
 import org.graylog.security.SecurityModule;
-import org.graylog.security.certificates.CertificatesModule;
+import org.graylog.security.pki.PkiModule;
 import org.graylog.security.certutil.CaModule;
 import org.graylog.tracing.TracingModule;
 import org.graylog2.Configuration;
@@ -225,7 +225,7 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                 new DataTieringModule(),
                 new DatanodeMigrationBindings(),
                 new CaModule(),
-                new CertificatesModule(),
+                new PkiModule(),
                 new TelemetryModule(),
                 new DataNodeModule(),
                 new McpServerModule(),
