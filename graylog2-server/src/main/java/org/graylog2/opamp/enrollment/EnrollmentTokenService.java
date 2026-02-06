@@ -32,8 +32,8 @@ import org.graylog2.opamp.config.OpAmpCaConfig;
 import org.graylog2.opamp.rest.CreateEnrollmentTokenRequest;
 import org.graylog2.opamp.rest.EnrollmentTokenResponse;
 import org.graylog2.opamp.transport.OpAmpAuthContext;
-import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.cluster.ClusterId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +45,7 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
@@ -82,9 +83,11 @@ public class EnrollmentTokenService {
     }
 
     private String getClusterId() {
-        return clusterConfigService
-                .getOrDefault(ClusterId.class, ClusterId.create("unknown"))
-                .clusterId();
+        final var clusterId = clusterConfigService.get(ClusterId.class);
+        if (clusterId == null || isNullOrEmpty(clusterId.clusterId())) {
+            throw new IllegalStateException("Missing or empty Cluster ID. This should not happen.");
+        }
+        return clusterId.clusterId();
     }
 
     /**

@@ -67,7 +67,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.within;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -104,7 +103,7 @@ class EnrollmentTokenServiceTest {
         );
         certificateService = new CertificateService(mongoCollections, encryptedValueService);
         clusterConfigService = mock(ClusterConfigService.class);
-        when(clusterConfigService.getOrDefault(eq(ClusterId.class), any()))
+        when(clusterConfigService.get(ClusterId.class))
                 .thenReturn(ClusterId.create(TEST_CLUSTER_ID));
         agentService = new OpAmpAgentService(mongoCollections);
         enrollmentTokenService = new EnrollmentTokenService(certificateService, clusterConfigService, agentService);
@@ -343,7 +342,7 @@ class EnrollmentTokenServiceTest {
         final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request);
 
         // Switch cluster ID so validation audience check fails
-        when(clusterConfigService.getOrDefault(eq(ClusterId.class), any()))
+        when(clusterConfigService.get(ClusterId.class))
                 .thenReturn(ClusterId.create("different-cluster-id"));
 
         final Optional<OpAmpAuthContext.Enrollment> result = enrollmentTokenService.validateToken(
