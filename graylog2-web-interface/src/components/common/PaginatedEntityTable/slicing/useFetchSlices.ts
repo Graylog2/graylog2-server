@@ -21,9 +21,9 @@ import { useQuery } from '@tanstack/react-query';
 import { defaultOnError } from 'util/conditional/onError';
 import TableFetchContext from 'components/common/PaginatedEntityTable/TableFetchContext';
 import type { SearchParams } from 'stores/PaginationTypes';
-import type { Slices } from 'components/common/PaginatedEntityTable/slicing/Slicing';
+import type { Slice } from 'components/common/PaginatedEntityTable/slicing/Slicing';
 
-export type FetchSlices = (column: string, searchParams: SearchParams) => Promise<Slices>;
+export type FetchSlices = (column: string, searchParams: SearchParams) => Promise<Slice[]>;
 
 const useFetchSlices = (fetchSlices: FetchSlices) => {
   const { searchParams: searchParams } = useContext(TableFetchContext);

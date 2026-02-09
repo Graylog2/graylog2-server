@@ -18,7 +18,7 @@ package org.graylog2.rest.resources.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record Slice(@JsonProperty(FIELD_ID) Object value, @JsonProperty(FIELD_TITLE) String title, @JsonProperty(FIELD_COUNT) Integer count) {
+public record Slice(@JsonProperty(FIELD_ID) String value, @JsonProperty(FIELD_TITLE) String title, @JsonProperty(FIELD_COUNT) Integer count) {
     private static final String FIELD_ID = "value";
     private static final String FIELD_TITLE = "title";
     private static final String FIELD_COUNT = "count";

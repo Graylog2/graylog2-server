@@ -71,7 +71,9 @@ const EventsEntityTable = () => {
 
   const sliceRenderers = useMemo(
     () => ({
+      // eslint-disable-next-line react/no-unstable-nested-components
       priority: (priority: number) => <PriorityName priority={priority} />,
+      // eslint-disable-next-line react/no-unstable-nested-components
       alert: (alert: 'true' | 'false') => <EventTypeLabel isAlert={alert === 'true'} />,
     }),
     [],

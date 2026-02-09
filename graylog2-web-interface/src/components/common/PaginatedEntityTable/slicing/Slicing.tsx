@@ -27,7 +27,7 @@ import { type SortMode } from './SliceFilters';
 import SlicesOverview from './SlicesOverview';
 import type { FetchSlices } from './useFetchSlices';
 
-type Slice = { value: string | number; count: number; title?: string };
+export type Slice = { value: string | number; count: number; title?: string };
 export type Slices = Array<Slice>;
 
 const Container = styled.div(
