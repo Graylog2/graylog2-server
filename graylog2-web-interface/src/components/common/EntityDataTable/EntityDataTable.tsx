@@ -224,7 +224,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     internalAttributeColumnOrder,
     defaultDisplayedColumns,
     displayBulkSelectCol,
-    hasRowActions,
   );
 
   const { columnWidths, handleActionsWidthChange, tableIsCompressed, actionsColMinWidth } = useElementWidths<
