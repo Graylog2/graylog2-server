@@ -139,7 +139,7 @@ public class EventsSearchService extends AbstractEventsSearchService {
                     )
                     .datarows()
                     .stream()
-                    .map(r -> new Slice(r.getFirst(), r.getFirst().toString(), Integer.valueOf(r.getLast().toString())))
+                    .map(r -> new Slice(r.getFirst().toString(), r.getFirst().toString(), Integer.valueOf(r.getLast().toString())))
                     .findFirst();
         } catch (QueryFailedException e) {
             throw new RuntimeException(e);
@@ -157,7 +157,7 @@ public class EventsSearchService extends AbstractEventsSearchService {
                     )
                     .datarows()
                     .stream()
-                    .map(r -> new Slice(r.getFirst(), r.getFirst().toString(), Integer.valueOf(r.getLast().toString())))
+                    .map(r -> new Slice(r.getFirst().toString(), r.getFirst().toString(), Integer.valueOf(r.getLast().toString())))
                     .filter(s -> includeAll || !s.title().equals("(Empty Value)"))
                     .toList());
         } catch (QueryFailedException e) {
