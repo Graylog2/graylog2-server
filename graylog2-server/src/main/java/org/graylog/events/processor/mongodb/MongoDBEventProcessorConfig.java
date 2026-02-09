@@ -67,6 +67,7 @@ public abstract class MongoDBEventProcessorConfig implements EventProcessorConfi
     @JsonProperty(FIELD_TIMESTAMP_FIELD)
     public abstract String timestampField();
 
+    // Ignored for START_OF_DAY mode
     @JsonProperty(FIELD_SEARCH_WITHIN_SECONDS)
     public abstract long searchWithinSeconds();
 

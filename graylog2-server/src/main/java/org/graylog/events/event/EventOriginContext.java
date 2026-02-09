@@ -63,55 +63,12 @@ public class EventOriginContext {
         }
     }
 
-    public static Optional<MongoDBAggregatOriginContext> parseMongoDBContext(String url) {
-        if (url.startsWith(MONGODB_AGGREGATION)) {
-            final String[] tokens = url.split(":", -1);  // Use -1 to preserve empty strings
-            if (tokens.length < 7) {
-                return Optional.empty();
-            }
-            // Format: urn:graylog:aggregation:mongodb:database:collection:fromTime:toTime
-            // Tokens: [0]=urn, [1]=graylog, [2]=aggregation, [3]=mongodb, [4]=database, [5]=collection, [6+]=timestamps
-            String database = tokens[4];
-            String collection = tokens[5];
-
-            // Reconstruct timestamps which may contain colons (ISO-8601)
-            // Everything from token 6 to the last one forms the timestamps
-            // Split them by finding the last occurrence that makes sense
-            StringBuilder fromTimeBuilder = new StringBuilder();
-            StringBuilder toTimeBuilder = new StringBuilder();
-
-            // Simple approach: assume fromTime and toTime are separated at the middle
-            // Better approach: ISO-8601 typically has fixed format, reconstruct properly
-            if (tokens.length == 7) {
-                // Simple case: no colons in timestamps
-                return Optional.of(MongoDBAggregatOriginContext.create(database, collection, tokens[6], ""));
-            } else if (tokens.length >= 8) {
-                // Reconstruct: assume last token is part of toTime, rest belong to fromTime or toTime
-                // ISO-8601: 2024-01-15T10:30:00.000Z has 3 colons
-                // We have tokens[6...n], need to split into two timestamps
-                // Heuristic: each ISO timestamp has ~3 colons, so split accordingly
-                int midpoint = 6 + (tokens.length - 6) / 2;
-                fromTimeBuilder.append(tokens[6]);
-                for (int i = 7; i < midpoint; i++) {
-                    fromTimeBuilder.append(":").append(tokens[i]);
-                }
-                toTimeBuilder.append(tokens[midpoint]);
-                for (int i = midpoint + 1; i < tokens.length; i++) {
-                    toTimeBuilder.append(":").append(tokens[i]);
-                }
-                return Optional.of(MongoDBAggregatOriginContext.create(
-                        database, collection, fromTimeBuilder.toString(), toTimeBuilder.toString()));
-            }
-        }
-        return Optional.empty();
-    }
-
     private static void checkArgument(String name, String value) {
         Preconditions.checkArgument(!isNullOrEmpty(value), name + " cannot be null or empty");
     }
 
     @AutoValue
-    public static abstract class ESEventOriginContext {
+    public abstract static class ESEventOriginContext {
         public abstract String indexName();
 
         public abstract String messageId();
@@ -121,20 +78,4 @@ public class EventOriginContext {
         }
     }
 
-    @AutoValue
-    public static abstract class MongoDBAggregatOriginContext {
-        public abstract String database();
-
-        public abstract String collection();
-
-        public abstract String fromTime();
-
-        public abstract String toTime();
-
-        public static MongoDBAggregatOriginContext create(String database, String collection,
-                                                         String fromTime, String toTime) {
-            return new AutoValue_EventOriginContext_MongoDBAggregatOriginContext(
-                    database, collection, fromTime, toTime);
-        }
-    }
 }

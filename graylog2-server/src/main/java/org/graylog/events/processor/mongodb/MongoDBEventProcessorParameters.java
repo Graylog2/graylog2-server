@@ -17,13 +17,11 @@
 package org.graylog.events.processor.mongodb;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.events.processor.EventProcessorParametersWithTimerange;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.joda.time.DateTime;
 
@@ -34,10 +32,6 @@ import static java.util.Objects.requireNonNull;
 @JsonTypeName(MongoDBEventProcessorConfig.TYPE_NAME)
 @JsonDeserialize(builder = MongoDBEventProcessorParameters.Builder.class)
 public abstract class MongoDBEventProcessorParameters implements EventProcessorParametersWithTimerange {
-    private static final String FIELD_BATCH_SIZE = "batch_size";
-
-    @JsonProperty(FIELD_BATCH_SIZE)
-    public abstract int batchSize();
 
     @Override
     public EventProcessorParametersWithTimerange withTimerange(DateTime from, DateTime to) {
@@ -55,25 +49,13 @@ public abstract class MongoDBEventProcessorParameters implements EventProcessorP
     }
 
     @AutoValue.Builder
-    public static abstract class Builder implements EventProcessorParametersWithTimerange.Builder<Builder> {
+    public abstract static class Builder implements EventProcessorParametersWithTimerange.Builder<Builder> {
         @JsonCreator
         public static Builder create() {
-            final RelativeRange timerange;
-            try {
-                timerange = RelativeRange.create(3600);
-            } catch (InvalidRangeParametersException e) {
-                // This should not happen!
-                throw new RuntimeException(e);
-            }
-
             return new AutoValue_MongoDBEventProcessorParameters.Builder()
                     .type(MongoDBEventProcessorConfig.TYPE_NAME)
-                    .timerange(timerange)
-                    .batchSize(500);  // Default batch size
+                    .timerange(RelativeRange.create(3600));
         }
-
-        @JsonProperty(FIELD_BATCH_SIZE)
-        public abstract Builder batchSize(int batchSize);
 
         public abstract MongoDBEventProcessorParameters build();
     }

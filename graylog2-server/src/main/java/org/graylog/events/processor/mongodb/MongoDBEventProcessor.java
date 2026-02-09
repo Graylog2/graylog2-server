@@ -68,6 +68,8 @@ public class MongoDBEventProcessor implements EventProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBEventProcessor.class);
 
+    private static final int MONGO_BATCHSIZE = 200;
+
     private final EventDefinition eventDefinition;
     private final MongoDBEventProcessorConfig config;
     private final MongoCollection<Document> collection;
@@ -112,13 +114,13 @@ public class MongoDBEventProcessor implements EventProcessor {
             // Execute aggregation
             AggregateIterable<Document> aggregateIterable = collection
                     .aggregate(pipeline, Document.class)
-                    .batchSize(parameters.batchSize());
+                    .batchSize(MONGO_BATCHSIZE);
 
             // Get the single result from aggregation
             Document result = aggregateIterable.first();
 
             if (result == null) {
-                LOG.info("Aggregation returned no results for timerange {} to {}",
+                LOG.debug("Aggregation returned no results for timerange {} to {}",
                         parameters.timerange().getFrom(), parameters.timerange().getTo());
                 // Update state even if no results
                 stateService.setState(eventDefinition.id(),
@@ -137,8 +139,7 @@ public class MongoDBEventProcessor implements EventProcessor {
             );
             eventsConsumer.accept(events);
 
-            // TODO
-            LOG.info("Created 1 event from MongoDB aggregation result: {} {}",
+            LOG.debug("Created 1 event from MongoDB aggregation result: {} {}",
                     events.stream().findFirst().map(e -> e.event().getEventDefinitionType()).orElse("N/A"),
                     result.toJson());
 
@@ -273,7 +274,7 @@ public class MongoDBEventProcessor implements EventProcessor {
         else if (value != null) {
             return value.toString();
         }
-        return value;
+        return null;
     }
 
     @Override
@@ -281,7 +282,6 @@ public class MongoDBEventProcessor implements EventProcessor {
                                       Consumer<List<MessageSummary>> messageConsumer,
                                       long limit)
             throws EventProcessorException {
-        // Since events are from aggregation (not individual documents), there's no single source message
-        LOG.debug("sourceMessagesForEvent called for aggregated event, returning empty list");
+        LOG.debug("sourceMessagesForEvent not applicable for DB aggregation event processor");
     }
 }
