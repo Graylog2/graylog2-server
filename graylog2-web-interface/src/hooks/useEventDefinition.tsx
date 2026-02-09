@@ -36,6 +36,11 @@ export type EventDefinitionAggregation = {
 };
 export const definitionsUrl = (definitionId: string) => qualifyUrl(`/events/definitions/${definitionId}`);
 
+export type EventDefinitionMappedData = {
+  eventDefinition: EventDefinition;
+  aggregations: Array<EventDefinitionAggregation>;
+};
+
 const transformExpressionsToArray = ({ series, conditions }): Array<EventDefinitionAggregation> => {
   const res = [];
 
@@ -87,9 +92,7 @@ const transformExpressionsToArray = ({ series, conditions }): Array<EventDefinit
   return res;
 };
 
-const eventDefinitionDataMapper = (
-  data: EventDefinition,
-): { eventDefinition: EventDefinition; aggregations: Array<EventDefinitionAggregation> } => ({
+const eventDefinitionDataMapper = (data: EventDefinition): EventDefinitionMappedData => ({
   eventDefinition: data,
   aggregations:
     data?.config?.series && data?.config?.conditions
@@ -107,7 +110,7 @@ const useEventDefinition = (
   definitionId: string,
   { onErrorHandler }: { onErrorHandler?: (e: FetchError) => void } = {},
 ): {
-  data: { eventDefinition: EventDefinition; aggregations: Array<EventDefinitionAggregation> };
+  data: EventDefinitionMappedData;
   refetch: () => void;
   isLoading: boolean;
   isFetched: boolean;
