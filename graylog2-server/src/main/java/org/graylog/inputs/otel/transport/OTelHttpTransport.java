@@ -89,7 +89,8 @@ public class OTelHttpTransport extends AbstractHttpTransport {
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
             final ConfigurationRequest r = super.getRequestedConfiguration();
-            r.addField(new NumberField(CK_MAX_CHUNK_SIZE,
+            r.addField(ConfigurationRequest.Templates.portNumber(CK_PORT, 4318));
+            r.addField(new NumberField("max_chunk_size",
                     "Max. HTTP chunk size",
                     DEFAULT_OTLP_MAX_CHUNK_SIZE,
                     "The maximum HTTP chunk size in bytes (e. g. length of HTTP request body)",

@@ -30,6 +30,7 @@ import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.opamp.OpAmpCaService;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
@@ -109,5 +110,21 @@ public class OpAmpOTelHttpTransport extends OTelHttpTransport {
 
     @ConfigClass
     public static class Config extends OTelHttpTransport.Config {
+        private static final Set<String> KEPT_FIELDS = Set.of(
+                "bind_address", "port", "recv_buffer_size", "number_worker_threads",
+                "tcp_keepalive", "max_chunk_size", "idle_writer_timeout"
+        );
+
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            final ConfigurationRequest parent = super.getRequestedConfiguration();
+            final ConfigurationRequest r = new ConfigurationRequest();
+            parent.getFields().forEach((key, field) -> {
+                if (KEPT_FIELDS.contains(key)) {
+                    r.addField(field);
+                }
+            });
+            return r;
+        }
     }
 }
