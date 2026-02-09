@@ -163,7 +163,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   parentBgColor?: string;
   appSection?: string;
   /** Actions for each row. */
-  entityActions?: (entity: Entity) => React.ReactNode;
+  entityActions?: (entity: Entity) => React.ReactNode | null;
   /** Meta data. */
   meta?: Meta;
 };
