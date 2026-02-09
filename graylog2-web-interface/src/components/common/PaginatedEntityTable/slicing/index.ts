@@ -14,18 +14,5 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext } from 'react';
 
-import EventReplaySelectedContext from 'contexts/EventReplaySelectedContext';
-
-const useSelectedEvents = () => {
-  const contextValue = useContext(EventReplaySelectedContext);
-
-  if (!contextValue) {
-    throw new Error('useSelectedEvents hook needs to be used inside EventReplaySelectedContext.Provider');
-  }
-
-  return contextValue;
-};
-
-export default useSelectedEvents;
+export { default } from './Slicing';

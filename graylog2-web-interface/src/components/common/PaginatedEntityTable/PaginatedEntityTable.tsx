@@ -32,7 +32,8 @@ import type { PaginatedResponse, FetchOptions } from 'components/common/Paginate
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
 import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
-import Slicing from 'components/common/PaginatedEntityTable/Slicing';
+import Slicing from 'components/common/PaginatedEntityTable/slicing';
+import type { FetchSlices } from 'components/common/PaginatedEntityTable/slicing/useFetchSlices';
 
 import { useWithLocalState, useWithURLParams } from './useFiltersAndPagination';
 
@@ -100,6 +101,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   externalSearch = undefined,
   fetchEntities,
   fetchOptions,
+  fetchSlices = undefined,
   filterValueRenderers = undefined,
   focusSearchAfterMount = false,
   humanName,
@@ -114,6 +116,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   queryHelpComponent = undefined,
   reactQueryOptions,
   searchPlaceholder = undefined,
+  sliceRenderers = undefined,
   setQuery,
   tableLayout,
   topRightCol = undefined,
@@ -193,9 +196,10 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
       <Container>
         {fetchOptions.sliceCol && (
           <Slicing
+            fetchSlices={fetchSlices}
             appSection={appSection}
-            sliceCol={fetchOptions.sliceCol}
             columnSchemas={columnSchemas}
+            sliceRenderers={sliceRenderers}
             onChangeSlicing={onChangeSlicing}
           />
         )}
@@ -325,6 +329,7 @@ export type PaginatedEntityTableProps<T, M> = {
   externalSearch?: ExternalSearch;
   fetchEntities: (options: SearchParams) => Promise<PaginatedResponse<T, M>>;
   fetchOptions?: FetchOptions;
+  fetchSlices?: FetchSlices;
   filterValueRenderers?: React.ComponentProps<typeof EntityFilters>['filterValueRenderers'];
   focusSearchAfterMount?: boolean;
   humanName: string;
@@ -333,6 +338,7 @@ export type PaginatedEntityTableProps<T, M> = {
   onDataLoaded?: (data: PaginatedResponse<T, M>) => void;
   queryHelpComponent?: React.ReactNode;
   searchPlaceholder?: string;
+  sliceRenderers?: { [col: string]: (value: string | number) => React.ReactNode } | undefined;
   tableLayout: DefaultLayout;
   topRightCol?: React.ReactNode;
   withoutURLParams?: boolean;

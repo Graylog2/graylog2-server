@@ -111,9 +111,7 @@ export const fetchClusterDataNodesWithMetrics = async (
     }
   });
 
-  const metricsByHostname = compatibleHostnames.size
-    ? await fetchMetricsForHostnames([...compatibleHostnames])
-    : {};
+  const metricsByHostname = compatibleHostnames.size ? await fetchMetricsForHostnames([...compatibleHostnames]) : {};
 
   return {
     ...base,

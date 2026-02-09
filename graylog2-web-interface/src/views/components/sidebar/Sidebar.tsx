@@ -25,6 +25,7 @@ import SearchPagePreferencesContext from 'views/components/contexts/SearchPagePr
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import zIndices from 'theme/z-indices';
+import type { LayoutSidebarTitle } from 'views/components/contexts/SearchPageLayoutContext';
 
 import SidebarNavigation from './SidebarNavigation';
 import ContentColumn from './ContentColumn';
@@ -41,7 +42,7 @@ type Props = {
   results?: QueryResult;
   searchPreferencesLayout?: SearchPreferencesLayout;
   sections?: Array<SidebarSection>;
-  title: string;
+  title: LayoutSidebarTitle;
   contentColumnWidth?: number;
 };
 
