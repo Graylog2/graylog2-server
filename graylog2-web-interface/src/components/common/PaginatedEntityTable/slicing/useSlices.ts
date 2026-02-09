@@ -16,8 +16,8 @@
  */
 
 import { defaultCompare } from 'logic/DefaultCompare';
+import type { Slices } from 'components/common/PaginatedEntityTable/slicing/Slicing';
 
-import type { Slices } from './Slicing';
 import type { SortMode } from './SliceFilters';
 import useFetchSlices, { type FetchSlices } from './useFetchSlices';
 

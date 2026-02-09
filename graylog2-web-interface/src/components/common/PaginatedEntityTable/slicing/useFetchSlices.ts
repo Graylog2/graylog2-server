@@ -19,21 +19,18 @@ import { useContext } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { defaultOnError } from 'util/conditional/onError';
-import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import TableFetchContext from 'components/common/PaginatedEntityTable/TableFetchContext';
+import type { SearchParams } from 'stores/PaginationTypes';
+import type { Slices } from 'components/common/PaginatedEntityTable/slicing/Slicing';
 
-import type { Slices } from './Slicing';
-
-export type FetchSlices = (column: string, query: string, filters: UrlQueryFilters) => Promise<Slices>;
+export type FetchSlices = (column: string, searchParams: SearchParams) => Promise<Slices>;
 
 const useFetchSlices = (fetchSlices: FetchSlices) => {
-  const {
-    searchParams: { sliceCol, query, filters },
-  } = useContext(TableFetchContext);
+  const { searchParams: searchParams } = useContext(TableFetchContext);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['slicing', sliceCol, query, filters],
-    queryFn: () => defaultOnError(fetchSlices(sliceCol, query, filters), 'Error fetching table slices'),
+    queryKey: ['slicing', searchParams.sliceCol, searchParams],
+    queryFn: () => defaultOnError(fetchSlices(searchParams.sliceCol, searchParams), 'Error fetching table slices'),
   });
 
   return { slices: data ?? [], isLoading };

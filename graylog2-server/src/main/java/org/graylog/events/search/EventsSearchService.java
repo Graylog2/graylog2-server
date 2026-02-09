@@ -22,8 +22,17 @@ import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
+import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiService;
+import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedException;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.Grouping;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.rest.resources.entities.Slice;
+import org.graylog2.rest.resources.entities.Slices;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
@@ -31,6 +40,7 @@ import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -39,15 +49,18 @@ import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
 public class EventsSearchService extends AbstractEventsSearchService {
     private final MoreSearch moreSearch;
     private final StreamService streamService;
+    private final ScriptingApiService scriptingApiService;
 
     @Inject
     public EventsSearchService(MoreSearch moreSearch,
                                StreamService streamService,
                                DBEventDefinitionService eventDefinitionService,
+                               final ScriptingApiService scriptingApiService,
                                ObjectMapper objectMapper) {
         super(eventDefinitionService, streamService, objectMapper);
         this.moreSearch = moreSearch;
         this.streamService = streamService;
+        this.scriptingApiService = scriptingApiService;
     }
 
     private String buildFilter(EventsSearchParameters parameters) {
@@ -63,6 +76,93 @@ public class EventsSearchService extends AbstractEventsSearchService {
         return eventStreams.stream()
                 .filter(streamId -> subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)) || streamId.equals(DEFAULT_EVENTS_STREAM_ID))
                 .collect(Collectors.toSet());
+    }
+
+    public Slices slices(final EventsSlicesRequest request, final Subject subject, final SearchUser searchUser) {
+        // we cover two use cases, if you only want the slices from the resultset that will also be shown in the entity table, we re-use query and timerange for that. Otherwise, we query "all"
+        final var query = request.includeAll() ? "" : request.parameters().query();
+        final var timeRange = request.includeAll() ? RelativeRange.allTime() : request.parameters().timerange();
+
+        return slices(query, timeRange, subject, searchUser, request.sliceColumn(), request.includeAll());
+    }
+
+    // Converted from EventDefinitionPriority.ts
+    public enum EventDefinitionPriority {
+        LOW(1, "low"),
+        MEDIUM(2, "medium"),
+        HIGH(3, "high"),
+        CRITICAL(4, "critical");
+
+        private final int value;
+        private final String name;
+
+        EventDefinitionPriority(int value, String name) {
+            this.value = value;
+            this.name = name;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public static EventDefinitionPriority fromValue(int value) {
+            for (EventDefinitionPriority p : values()) {
+                if (p.value == value) {
+                    return p;
+                }
+            }
+            throw new IllegalArgumentException("Unknown priority value: " + value);
+        }
+
+        public static EventDefinitionPriority fromName(String name) {
+            for (EventDefinitionPriority p : values()) {
+                if (p.name.equalsIgnoreCase(name)) {
+                    return p;
+                }
+            }
+            throw new IllegalArgumentException("Unknown priority name: " + name);
+        }
+    }
+
+    /**
+     * finding the overall count for one column for MongoDB based queries so we can calculate the "empty" case
+     */
+    public Optional<Slice> count(String query, TimeRange timeRange, Subject subject, SearchUser searchUser, final String slicingColumn) {
+        try {
+            return scriptingApiService.executeAggregation(
+                            new AggregationRequestSpec(query, allowedEventStreams(subject), Set.of(), timeRange, List.of(), List.of(new Metric("count", null))),
+                            searchUser
+                    )
+                    .datarows()
+                    .stream()
+                    .map(r -> new Slice(r.getFirst(), r.getFirst().toString(), Integer.valueOf(r.getLast().toString())))
+                    .findFirst();
+        } catch (QueryFailedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * finding all slices for a particular column in the Indexer
+     */
+    public Slices slices(String query, TimeRange timeRange, Subject subject, SearchUser searchUser, final String slicingColumn, final boolean includeAll) {
+        try {
+            return new Slices(scriptingApiService.executeAggregation(
+                            new AggregationRequestSpec(query, allowedEventStreams(subject), Set.of(), timeRange, List.of(new Grouping(slicingColumn, Integer.MAX_VALUE)), List.of(new Metric("count", slicingColumn))),
+                            searchUser
+                    )
+                    .datarows()
+                    .stream()
+                    .map(r -> new Slice(r.getFirst(), r.getFirst().toString(), Integer.valueOf(r.getLast().toString())))
+                    .filter(s -> includeAll || !s.title().equals("(Empty Value)"))
+                    .toList());
+        } catch (QueryFailedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public EventsSearchResult search(EventsSearchParameters parameters, Subject subject) {

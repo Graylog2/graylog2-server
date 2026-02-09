@@ -15,13 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
+
+import { Events } from '@graylog/server-api';
 
 import useTableElements from 'components/events/events/hooks/useTableComponents';
 import { eventsTableElements } from 'components/events/Constants';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import FilterValueRenderers from 'components/events/FilterValueRenderers';
-import fetchEvents, { keyFn } from 'components/events/fetchEvents';
+import fetchEvents, { keyFn, parseFilters, getConcatenatedQuery } from 'components/events/fetchEvents';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import useQuery from 'routing/useQuery';
@@ -30,6 +32,8 @@ import EventsRefreshControls from 'components/events/events/EventsRefreshControl
 import QueryHelper from 'components/common/QueryHelper';
 import EventsWidgets from 'components/events/EventsWidgets';
 import EventsRefreshProvider from 'components/events/EventsRefreshProvider';
+import PriorityName from 'components/events/events/PriorityName';
+import EventTypeLabel from 'components/events/events/EventTypeLabel';
 
 const additionalSearchFields = {
   key: 'The key of the event',
@@ -45,6 +49,34 @@ const EventsEntityTable = () => {
     defaultLayout: eventsTableElements.defaultLayout,
   });
 
+  const _fetchSlices = useCallback(
+    (column: string, searchParams: SearchParams) =>
+      Events.slices({
+        sort_direction: 'asc',
+        include_all: true,
+        sort_by: column,
+        slice_column: column,
+        parameters: {
+          query: getConcatenatedQuery(searchParams.query, streamId as string),
+          page: searchParams.page,
+          per_page: searchParams.pageSize,
+          sort_by: column,
+          sort_direction: 'asc',
+          sort_unmapped_type: '',
+          ...parseFilters(searchParams.filters),
+        },
+      }).then(({ slices: s }) => [...s]),
+    [streamId],
+  );
+
+  const sliceRenderers = useMemo(
+    () => ({
+      priority: (priority: number) => <PriorityName priority={priority} />,
+      alert: (alert: 'true' | 'false') => <EventTypeLabel isAlert={alert === 'true'} />,
+    }),
+    [],
+  );
+
   return (
     <EventsRefreshProvider>
       <PaginatedEntityTable<Event, EventsAdditionalData>
@@ -53,6 +85,8 @@ const EventsEntityTable = () => {
         entityActions={entityActions}
         tableLayout={eventsTableElements.defaultLayout}
         fetchEntities={_fetchEvents}
+        fetchSlices={_fetchSlices}
+        sliceRenderers={sliceRenderers}
         keyFn={keyFn}
         expandedSectionRenderers={expandedSections}
         entityAttributesAreCamelCase={false}

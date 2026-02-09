@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 
 import { Badge, ListGroup, ListGroupItem } from 'components/bootstrap';
 
-import type { Slices } from './Slicing';
+import type { SlicesResult } from './Slicing';
 
 const StyledListGroup = styled(ListGroup)`
   margin-bottom: 0;
@@ -38,7 +38,7 @@ const StyledListGroupItem = styled(ListGroupItem)<{ $active: boolean }>(
 );
 
 type Props = {
-  slices: Slices;
+  slices: SlicesResult;
   activeSlice: string | undefined;
   sliceCol: string | undefined;
   onChangeSlicing: (sliceCol: string | undefined, slice?: string | undefined) => void;
