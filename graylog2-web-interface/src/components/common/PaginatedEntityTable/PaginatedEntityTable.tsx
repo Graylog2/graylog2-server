@@ -323,7 +323,7 @@ export type PaginatedEntityTableProps<T, M> = {
   additionalAttributes?: Array<Attribute>;
   bulkSelection?: EntityDataTableProps['bulkSelection'];
   columnRenderers: EntityDataTableProps['columnRenderers'];
-  entityActions?: EntityDataTableProps['entityActions'];
+  entityActions?: EntityDataTableProps['entityActions'] | null;
   entityAttributesAreCamelCase: boolean;
   expandedSectionRenderers?: ExpandedSectionRenderers<T>;
   externalSearch?: ExternalSearch;
