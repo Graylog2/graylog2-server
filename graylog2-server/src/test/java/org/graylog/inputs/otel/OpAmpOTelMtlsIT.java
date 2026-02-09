@@ -165,8 +165,10 @@ class OpAmpOTelMtlsIT {
 
     @BeforeAll
     static void setupCerts() throws Exception {
-        // Register BC for cert generation (JDK has no certificate builder API)
-        if (Security.getProvider("BC") == null) {
+        // Register BC for cert generation (JDK has no certificate builder API).
+        // Track whether we added it so we only remove our own registration.
+        final boolean bcWasPresent = Security.getProvider("BC") != null;
+        if (!bcWasPresent) {
             Security.addProvider(new BouncyCastleProvider());
         }
 
@@ -209,7 +211,8 @@ class OpAmpOTelMtlsIT {
 
         // Remove BC before converting to JDK format. JDK's SSL engine requires
         // EdECPrivateKey (not BC's BCEdDSAPrivateKey) for Ed25519 TLS operations.
-        if (Security.getProvider("BC") != null) {
+        // Only remove if we added it — other tests may depend on BC being present.
+        if (!bcWasPresent) {
             Security.removeProvider("BC");
         }
 
