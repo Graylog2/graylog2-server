@@ -23,14 +23,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * <p>
  * This record stores MongoDB ObjectId references to the CA certificates used for OpAMP:
  * <ul>
- *   <li>{@code enrollmentCaId} - the intermediate CA that signs agent CSRs during enrollment</li>
+ *   <li>{@code opampCaId} - the intermediate CA used for OpAMP (signs agent CSRs and issues OTLP server certs)</li>
  *   <li>{@code tokenSigningCertId} - the cert that signs enrollment JWTs</li>
+ *   <li>{@code otlpServerCertId} - the TLS server certificate used by the OTLP ingest endpoint</li>
  * </ul>
  */
 public record OpAmpCaConfig(
-        @JsonProperty("enrollment_ca_id")
-        String enrollmentCaId,
+        @JsonProperty("opamp_ca_id")
+        String opampCaId,
 
         @JsonProperty("token_signing_cert_id")
-        String tokenSigningCertId
+        String tokenSigningCertId,
+
+        @JsonProperty("otlp_server_cert_id")
+        String otlpServerCertId
 ) {}

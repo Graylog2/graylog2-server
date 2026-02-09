@@ -36,36 +36,41 @@ class OpAmpCaConfigTest {
     @Test
     void testJsonSerialization() throws JsonProcessingException {
         final OpAmpCaConfig config = new OpAmpCaConfig(
-                "enrollment-ca-object-id-123",
-                "token-signing-cert-object-id-456"
+                "opamp-ca-object-id-123",
+                "token-signing-cert-object-id-456",
+                "otlp-server-cert-object-id-789"
         );
 
         final String json = objectMapper.writeValueAsString(config);
 
-        assertThat(json).contains("\"enrollment_ca_id\":\"enrollment-ca-object-id-123\"");
+        assertThat(json).contains("\"opamp_ca_id\":\"opamp-ca-object-id-123\"");
         assertThat(json).contains("\"token_signing_cert_id\":\"token-signing-cert-object-id-456\"");
+        assertThat(json).contains("\"otlp_server_cert_id\":\"otlp-server-cert-object-id-789\"");
     }
 
     @Test
     void testJsonDeserialization() throws JsonProcessingException {
         final String json = """
                 {
-                    "enrollment_ca_id": "enrollment-ca-object-id-123",
-                    "token_signing_cert_id": "token-signing-cert-object-id-456"
+                    "opamp_ca_id": "opamp-ca-object-id-123",
+                    "token_signing_cert_id": "token-signing-cert-object-id-456",
+                    "otlp_server_cert_id": "otlp-server-cert-object-id-789"
                 }
                 """;
 
         final OpAmpCaConfig config = objectMapper.readValue(json, OpAmpCaConfig.class);
 
-        assertThat(config.enrollmentCaId()).isEqualTo("enrollment-ca-object-id-123");
+        assertThat(config.opampCaId()).isEqualTo("opamp-ca-object-id-123");
         assertThat(config.tokenSigningCertId()).isEqualTo("token-signing-cert-object-id-456");
+        assertThat(config.otlpServerCertId()).isEqualTo("otlp-server-cert-object-id-789");
     }
 
     @Test
     void testJsonRoundtrip() throws JsonProcessingException {
         final OpAmpCaConfig original = new OpAmpCaConfig(
-                "test-enrollment-ca-id",
-                "test-token-signing-id"
+                "test-opamp-ca-id",
+                "test-token-signing-id",
+                "test-otlp-server-cert-id"
         );
 
         final String json = objectMapper.writeValueAsString(original);
@@ -76,12 +81,13 @@ class OpAmpCaConfigTest {
 
     @Test
     void testNullValues() throws JsonProcessingException {
-        final OpAmpCaConfig config = new OpAmpCaConfig(null, null);
+        final OpAmpCaConfig config = new OpAmpCaConfig(null, null, null);
 
         final String json = objectMapper.writeValueAsString(config);
         final OpAmpCaConfig deserialized = objectMapper.readValue(json, OpAmpCaConfig.class);
 
-        assertThat(deserialized.enrollmentCaId()).isNull();
+        assertThat(deserialized.opampCaId()).isNull();
         assertThat(deserialized.tokenSigningCertId()).isNull();
+        assertThat(deserialized.otlpServerCertId()).isNull();
     }
 }

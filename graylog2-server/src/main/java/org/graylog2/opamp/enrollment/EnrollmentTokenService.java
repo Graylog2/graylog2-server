@@ -337,7 +337,7 @@ public class EnrollmentTokenService {
                     builder.createEndEntityCert(TOKEN_SIGNING_CN, enrollmentCa, KeyUsage.digitalSignature, TOKEN_SIGNING_VALIDITY)
             );
 
-            clusterConfigService.write(new OpAmpCaConfig(enrollmentCa.id(), tokenSigningCert.id()));
+            clusterConfigService.write(new OpAmpCaConfig(enrollmentCa.id(), tokenSigningCert.id(), null));
 
             // Re-read config in case another node won the race (ClusterConfig uses upsert)
             config = clusterConfigService.get(OpAmpCaConfig.class);
@@ -348,9 +348,9 @@ public class EnrollmentTokenService {
     }
 
     private CaHierarchy loadFromConfig(OpAmpCaConfig config) {
-        final CertificateEntry enrollmentCa = certificateService.findById(config.enrollmentCaId())
+        final CertificateEntry enrollmentCa = certificateService.findById(config.opampCaId())
                 .orElseThrow(() -> new IllegalStateException(
-                        "OpAMP CA config exists but enrollment CA not found: " + config.enrollmentCaId()));
+                        f("OpAMP CA config exists but OpAMP CA not found: %s", config.opampCaId())));
         final CertificateEntry tokenSigningCert = certificateService.findById(config.tokenSigningCertId())
                 .orElseThrow(() -> new IllegalStateException(
                         "OpAMP CA config exists but token signing cert not found: " + config.tokenSigningCertId()));
