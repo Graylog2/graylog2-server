@@ -27,7 +27,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.util.Base64;
 import java.util.Optional;
 
@@ -49,9 +48,6 @@ class OpAmpServiceTest {
     private EnrollmentTokenService enrollmentTokenService;
 
     @Mock
-    private OpAmpAgentService agentService;
-
-    @Mock
     private CertificateService certificateService;
 
     @Mock
@@ -63,7 +59,7 @@ class OpAmpServiceTest {
 
     @BeforeEach
     void setUp() {
-        opAmpService = new OpAmpService(enrollmentTokenService, agentService, certificateService, collectorInstanceService);
+        opAmpService = new OpAmpService(enrollmentTokenService, certificateService, collectorInstanceService);
     }
 
     @Test
@@ -89,16 +85,8 @@ class OpAmpServiceTest {
         // Create a token with ctt: agent
         final String token = createTokenWithCtt("agent");
         final String authHeader = "Bearer " + token;
-        final OpAmpAgent agent = new OpAmpAgent(
-                "test-id",
-                "instance-uid",
-                "fleet-id",
-                "sha256:fingerprint",
-                "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----",
-                "507f1f77bcf86cd799439011",
-                Instant.now()
-        );
-        final OpAmpAuthContext.Identified expectedContext = new OpAmpAuthContext.Identified(agent, TRANSPORT);
+        final String instanceUid = "instance-uid";
+        final OpAmpAuthContext.Identified expectedContext = new OpAmpAuthContext.Identified(instanceUid, TRANSPORT);
 
         when(enrollmentTokenService.validateAgentToken(eq(token), eq(TRANSPORT)))
                 .thenReturn(Optional.of(expectedContext));

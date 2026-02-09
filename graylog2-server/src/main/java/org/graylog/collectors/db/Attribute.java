@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
 @AutoValue
-@JsonDeserialize
+@JsonDeserialize(builder = Attribute.Builder.class)
 public abstract class Attribute {
 
     @JsonProperty("key")
@@ -32,7 +32,7 @@ public abstract class Attribute {
     public abstract Object value();
 
     public static Builder builder() {
-        return new AutoValue_Attribute.Builder();
+        return Builder.builder();
     }
 
     public static Attribute of(String key, Object value) {
@@ -44,7 +44,7 @@ public abstract class Attribute {
 
         @JsonCreator
         public static Builder builder() {
-            return Attribute.builder();
+            return new AutoValue_Attribute.Builder();
         }
 
         @JsonProperty("key")

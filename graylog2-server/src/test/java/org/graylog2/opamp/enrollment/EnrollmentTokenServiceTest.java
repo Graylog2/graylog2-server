@@ -26,6 +26,8 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
+import org.graylog.collectors.CollectorInstanceService;
+import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
@@ -35,8 +37,6 @@ import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
-import org.graylog2.opamp.OpAmpAgent;
-import org.graylog2.opamp.OpAmpAgentService;
 import org.graylog2.opamp.config.OpAmpCaConfig;
 import org.graylog2.opamp.rest.CreateEnrollmentTokenRequest;
 import org.graylog2.opamp.rest.EnrollmentTokenResponse;
@@ -84,8 +84,8 @@ class EnrollmentTokenServiceTest {
 
     private CertificateService certificateService;
     private ClusterConfigService clusterConfigService;
-    private OpAmpAgentService agentService;
     private EnrollmentTokenService enrollmentTokenService;
+    private CollectorInstanceService collectorInstanceService;
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
@@ -106,8 +106,8 @@ class EnrollmentTokenServiceTest {
         clusterConfigService = mock(ClusterConfigService.class);
         when(clusterConfigService.get(ClusterId.class))
                 .thenReturn(ClusterId.create(TEST_CLUSTER_ID));
-        agentService = new OpAmpAgentService(mongoCollections);
-        enrollmentTokenService = new EnrollmentTokenService(certificateService, clusterConfigService, agentService);
+        collectorInstanceService = new CollectorInstanceService(mongoCollections);
+        enrollmentTokenService = new EnrollmentTokenService(certificateService, clusterConfigService, collectorInstanceService);
     }
 
     @Test
@@ -436,15 +436,14 @@ class EnrollmentTokenServiceTest {
         final String certPem = PemUtils.toPem(signedCert);
 
         // Save agent with cert
-        final OpAmpAgent agent = agentService.save(new OpAmpAgent(
-                null,
+        final CollectorInstanceDTO collectorInstanceDTO = collectorInstanceService.enroll(
                 "test-instance-uid",
                 "test-fleet",
                 certFingerprint,
                 certPem,
                 enrollmentCa.id(),
                 Instant.now()
-        ));
+        );
 
         // Create agent JWT with x5t#S256 header (RFC 7515 format)
         final String agentToken = Jwts.builder()
@@ -452,7 +451,7 @@ class EnrollmentTokenServiceTest {
                     .add("typ", "agent+jwt")
                     .add("x5t#S256", PemUtils.fingerprintToX5t(certFingerprint))
                 .and()
-                .subject(agent.instanceUid())
+                .subject(collectorInstanceDTO.instanceUid())
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
                 .signWith(agentKeyPair.getPrivate())
@@ -463,8 +462,7 @@ class EnrollmentTokenServiceTest {
                 agentToken, OpAmpAuthContext.Transport.HTTP);
 
         assertThat(result).isPresent();
-        assertThat(result.get().agent().id()).isEqualTo(agent.id());
-        assertThat(result.get().agent().instanceUid()).isEqualTo("test-instance-uid");
+        assertThat(result.get().instanceUid()).isEqualTo("test-instance-uid");
         assertThat(result.get().transport()).isEqualTo(OpAmpAuthContext.Transport.HTTP);
     }
 
@@ -546,15 +544,14 @@ class EnrollmentTokenServiceTest {
         final String certPem = PemUtils.toPem(signedCert);
 
         // Save agent with cert
-        final OpAmpAgent agent = agentService.save(new OpAmpAgent(
-                null,
+        final CollectorInstanceDTO collectorInstanceDTO = collectorInstanceService.enroll(
                 "test-instance-uid-2",
                 "test-fleet",
                 certFingerprint,
                 certPem,
                 enrollmentCa.id(),
                 Instant.now()
-        ));
+        );
 
         // Create JWT signed with a DIFFERENT key
         final KeyPair differentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
@@ -563,7 +560,7 @@ class EnrollmentTokenServiceTest {
                     .add("typ", "agent+jwt")
                     .add("x5t#S256", PemUtils.fingerprintToX5t(certFingerprint))
                 .and()
-                .subject(agent.instanceUid())
+                .subject(collectorInstanceDTO.instanceUid())
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
                 .signWith(differentKeyPair.getPrivate())

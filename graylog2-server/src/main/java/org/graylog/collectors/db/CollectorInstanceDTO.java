@@ -22,32 +22,65 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
 import org.graylog2.database.BuildableMongoEntity;
+import org.mongojack.ObjectId;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @AutoValue
 @JsonDeserialize(builder = CollectorInstanceDTO.Builder.class)
 public abstract class CollectorInstanceDTO implements BuildableMongoEntity<CollectorInstanceDTO, CollectorInstanceDTO.Builder> {
+    public static final String FIELD_INSTANCE_UID = "instance_uid";
+    public static final String FIELD_MESSAGE_SEQ_NUM = "message_seq_num";
+    public static final String FIELD_CAPABILITIES = "capabilities";
+    public static final String FIELD_LAST_SEEN = "last_seen";
+    public static final String FIELD_FLEET_ID = "fleet_id";
+    public static final String FIELD_CERTIFICATE_FINGERPRINT = "certificate_fingerprint";
+    public static final String FIELD_CERTIFICATE_PEM = "certificate_pem";
+    public static final String FIELD_ISSUING_CA_ID = "issuing_ca_id";
+    public static final String FIELD_ENROLLED_AT = "enrolled_at";
+    public static final String FIELD_IDENTIFYING_ATTRIBUTES = "identifying_attributes";
+    public static final String FIELD_NON_IDENTIFYING_ATTRIBUTES = "non_identifying_attributes";
 
-    @JsonProperty("instance_uid")
+
+    @JsonProperty(FIELD_INSTANCE_UID)
     public abstract String instanceUid();
 
-    @JsonProperty("message_seq_num")
+    @JsonProperty(FIELD_MESSAGE_SEQ_NUM)
     public abstract long messageSeqNum();
 
-    @JsonProperty("last_seen")
+    @JsonProperty(FIELD_CAPABILITIES)
+    public abstract long capabilities();
+
+    @JsonProperty(FIELD_LAST_SEEN)
     public abstract Instant lastSeen();
 
-    @JsonProperty("identifying_attributes")
-    public abstract Optional<Map<String, Object>> identifyingAttributes();
+    @JsonProperty(FIELD_FLEET_ID)
+    public abstract String fleetId();
 
-    @JsonProperty("non_identifying_attributes")
-    public abstract Optional<Map<String, Object>> nonIdentifyingAttributes();
+    @JsonProperty(FIELD_CERTIFICATE_FINGERPRINT)
+    public abstract String certificateFingerprint();
+
+    @JsonProperty(FIELD_CERTIFICATE_PEM)
+    public abstract String certificatePem();
+
+    @ObjectId
+    @JsonProperty(FIELD_ISSUING_CA_ID)
+    public abstract String issuingCaId();
+
+    @JsonProperty(FIELD_ENROLLED_AT)
+    public abstract Instant enrolledAt();
+
+    @JsonProperty(FIELD_IDENTIFYING_ATTRIBUTES)
+    public abstract Optional<List<Attribute>> identifyingAttributes();
+
+    @JsonProperty(FIELD_NON_IDENTIFYING_ATTRIBUTES)
+    public abstract Optional<List<Attribute>> nonIdentifyingAttributes();
 
     public static Builder builder() {
-        return new AutoValue_CollectorInstanceDTO.Builder();
+        return AutoValue_CollectorInstanceDTO.Builder.create();
     }
 
 
@@ -56,23 +89,43 @@ public abstract class CollectorInstanceDTO implements BuildableMongoEntity<Colle
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_CollectorInstanceDTO.Builder();
+            return new AutoValue_CollectorInstanceDTO.Builder()
+                    .messageSeqNum(0L);
         }
 
-        @JsonProperty("instance_uid")
+        @JsonProperty(FIELD_INSTANCE_UID)
         public abstract Builder instanceUid(String instanceUid);
 
-        @JsonProperty("message_seq_num")
+        @JsonProperty(FIELD_MESSAGE_SEQ_NUM)
         public abstract Builder messageSeqNum(long messageSeqNum);
 
-        @JsonProperty("last_seen")
+        @JsonProperty(FIELD_CAPABILITIES)
+        public abstract Builder capabilities(long capabilities);
+
+        @JsonProperty(FIELD_LAST_SEEN)
         public abstract Builder lastSeen(Instant lastSeen);
 
-        @JsonProperty("identifying_attributes")
-        public abstract Builder identifyingAttributes(@Nullable Map<String, Object> identifyingAttributes);
+        @JsonProperty(FIELD_FLEET_ID)
+        public abstract Builder fleetId(String fleetId);
 
-        @JsonProperty("non_identifying_attributes")
-        public abstract Builder nonIdentifyingAttributes(@Nullable Map<String, Object> nonIdentifyingAttributes);
+        @JsonProperty(FIELD_CERTIFICATE_FINGERPRINT)
+        public abstract Builder certificateFingerprint(String certificateFingerprint);
+
+        @JsonProperty(FIELD_CERTIFICATE_PEM)
+        public abstract Builder certificatePem(String certificatePem);
+
+        @ObjectId
+        @JsonProperty(FIELD_ISSUING_CA_ID)
+        public abstract Builder issuingCaId(String issuingCaId);
+
+        @JsonProperty(FIELD_ENROLLED_AT)
+        public abstract Builder enrolledAt(Instant enrolledAt);
+
+        @JsonProperty(FIELD_IDENTIFYING_ATTRIBUTES)
+        public abstract Builder identifyingAttributes(@Nullable List<Attribute> identifyingAttributes);
+
+        @JsonProperty(FIELD_NON_IDENTIFYING_ATTRIBUTES)
+        public abstract Builder nonIdentifyingAttributes(@Nullable List<Attribute> nonIdentifyingAttributes);
 
         public abstract CollectorInstanceDTO build();
     }

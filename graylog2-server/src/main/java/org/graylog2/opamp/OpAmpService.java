@@ -47,6 +47,7 @@ import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.Arrays;
@@ -60,17 +61,14 @@ public class OpAmpService {
     private static final Logger LOG = LoggerFactory.getLogger(OpAmpService.class);
 
     private final EnrollmentTokenService enrollmentTokenService;
-    private final OpAmpAgentService agentService;
     private final CertificateService certificateService;
     private final CollectorInstanceService collectorInstanceService;
 
     @Inject
     public OpAmpService(EnrollmentTokenService enrollmentTokenService,
-                        OpAmpAgentService agentService,
                         CertificateService certificateService,
                         CollectorInstanceService collectorInstanceService) {
         this.enrollmentTokenService = enrollmentTokenService;
-        this.agentService = agentService;
         this.certificateService = certificateService;
         this.collectorInstanceService = collectorInstanceService;
     }
@@ -133,15 +131,15 @@ public class OpAmpService {
     }
 
     private ServerToAgent handleEnrollment(AgentToServer message, OpAmpAuthContext.Enrollment auth) {
-        final String instanceUid = bytesToUuid(message.getInstanceUid().toByteArray()).toString();
+        final String instanceUid = bytesToUuidString(message.getInstanceUid().toByteArray());
 
         // 1. Reject if already enrolled
-        if (agentService.existsByInstanceUid(instanceUid)) {
-            LOG.warn("Rejecting enrollment: agent {} already enrolled", instanceUid);
+        if (collectorInstanceService.existsByInstanceUid(instanceUid)) {
+            LOG.warn("Rejecting enrollment: collector {} already enrolled", instanceUid);
             return ServerToAgent.newBuilder()
                     .setInstanceUid(message.getInstanceUid())
                     .setErrorResponse(ServerErrorResponse.newBuilder()
-                            .setErrorMessage("Agent already enrolled"))
+                            .setErrorMessage("Collector already enrolled"))
                     .build();
         }
 
@@ -168,12 +166,9 @@ public class OpAmpService {
             final String fingerprint = PemUtils.computeFingerprint(agentCert);
             final String certPem = PemUtils.toPem(agentCert);
 
-            final OpAmpAgent agent = new OpAmpAgent(
-                    null, instanceUid, auth.fleetId(), fingerprint, certPem,
-                    enrollmentCa.id(), Instant.now());
-            agentService.save(agent);
-
-            LOG.info("Enrolled agent {} in fleet {}", instanceUid, auth.fleetId());
+            final CollectorInstanceDTO enroll = collectorInstanceService.enroll(instanceUid, auth.fleetId(),
+                    fingerprint, certPem, enrollmentCa.id(), Instant.now());
+            LOG.info("[{}/{}] Enrolled collector in fleet {}", enroll.instanceUid(), enroll.messageSeqNum(), enroll.fleetId());
 
             // 5. Return certificate
             return ServerToAgent.newBuilder()
@@ -185,19 +180,24 @@ public class OpAmpService {
                                             .setCert(ByteString.copyFromUtf8(certPem)))))
                     .build();
         } catch (Exception e) {
-            LOG.error("Enrollment failed for agent {}", instanceUid, e);
+            LOG.error("Enrollment failed for collector {}", instanceUid, e);
             return errorResponse(message, "Enrollment failed: " + e.getMessage());
         }
     }
 
     private ServerToAgent handleIdentifiedMessage(AgentToServer message, OpAmpAuthContext.Identified auth) {
-        final UUID instanceUid = UUID.nameUUIDFromBytes(message.getInstanceUid().toByteArray());
+        final String instanceUid = bytesToUuidString(message.getInstanceUid().toByteArray());
+
+        // payload and authentication context uids must match
+        if (!Objects.equals(instanceUid, auth.instanceUid())) {
+            return errorResponse(message, "Invalid instanceUid");
+        }
         final long sequenceNum = message.getSequenceNum();
         LOG.debug("[{}/{}] Handling OpAMP message from agent: {}", instanceUid, sequenceNum, message);
 
 
         final CollectorInstanceReport.Builder updateBuilder = CollectorInstanceReport.builder()
-                .instanceUid(instanceUid.toString())
+                .instanceUid(instanceUid)
                 .messageSeqNum(sequenceNum)
                 .capabilities(message.getCapabilities());
 
@@ -258,7 +258,7 @@ public class OpAmpService {
     }
 
     @Nonnull
-    private static List<Attribute> extractAttributes(UUID instanceUid, long sequenceNum, List<Anyvalue.KeyValue> attributesList) {
+    private static List<Attribute> extractAttributes(String instanceUid, long sequenceNum, List<Anyvalue.KeyValue> attributesList) {
         final List<Attribute> attributes = Lists.newArrayListWithExpectedSize(attributesList.size());
         for (final Anyvalue.KeyValue keyValue : attributesList) {
             final Anyvalue.AnyValue value = keyValue.getValue();
@@ -296,8 +296,8 @@ public class OpAmpService {
                 .build();
     }
 
-    private UUID bytesToUuid(byte[] bytes) {
+    private static String bytesToUuidString(byte[] bytes) {
         final ByteBuffer bb = ByteBuffer.wrap(bytes);
-        return new UUID(bb.getLong(), bb.getLong());
+        return new UUID(bb.getLong(), bb.getLong()).toString();
     }
 }

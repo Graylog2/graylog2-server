@@ -18,8 +18,11 @@ package org.graylog.collectors;
 
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
-import com.mongodb.client.model.Projections;
+import com.mongodb.client.model.IndexModel;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReturnDocument;
+import com.mongodb.client.result.InsertOneResult;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bson.conversions.Bson;
@@ -29,6 +32,7 @@ import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +40,14 @@ import java.util.Optional;
 import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
 import static com.mongodb.client.model.Updates.setOnInsert;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_CAPABILITIES;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_CERTIFICATE_FINGERPRINT;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_IDENTIFYING_ATTRIBUTES;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_INSTANCE_UID;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_LAST_SEEN;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_MESSAGE_SEQ_NUM;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_NON_IDENTIFYING_ATTRIBUTES;
+import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 
 @Singleton
 public class CollectorInstanceService {
@@ -47,6 +59,15 @@ public class CollectorInstanceService {
     public CollectorInstanceService(MongoCollections mongoCollections) {
         collection = mongoCollections.collection("collector_instances", CollectorInstanceDTO.class);
         paginationHelper = mongoCollections.paginationHelper(collection);
+
+        collection.createIndexes(List.of(
+                new IndexModel(Indexes.ascending(FIELD_INSTANCE_UID), new IndexOptions().unique(true)),
+                new IndexModel(Indexes.ascending(FIELD_IDENTIFYING_ATTRIBUTES + ".key",
+                        FIELD_IDENTIFYING_ATTRIBUTES + ".value")),
+                new IndexModel(Indexes.ascending(FIELD_NON_IDENTIFYING_ATTRIBUTES + ".key",
+                        FIELD_NON_IDENTIFYING_ATTRIBUTES + ".value")),
+                new IndexModel(Indexes.ascending(FIELD_CERTIFICATE_FINGERPRINT), new IndexOptions().unique(true))
+        ));
     }
 
     /**
@@ -58,25 +79,61 @@ public class CollectorInstanceService {
     public Optional<CollectorInstanceDTO> createOrUpdateFromReport(CollectorInstanceReport update) {
         final List<Bson> updateOps = new ArrayList<>();
 
-        updateOps.add(setOnInsert("instance_uid", update.instanceUid()));
-        updateOps.add(set("last_seen", update.lastSeen()));
-        updateOps.add(set("message_seq_num", update.messageSeqNum()));
+        updateOps.add(setOnInsert(FIELD_INSTANCE_UID, update.instanceUid()));
+        updateOps.add(set(FIELD_LAST_SEEN, update.lastSeen()));
+        updateOps.add(set(FIELD_MESSAGE_SEQ_NUM, update.messageSeqNum()));
+        updateOps.add(set(FIELD_CAPABILITIES, update.capabilities()));
         if (update.identifyingAttributes().isPresent()) {
-            updateOps.add(set("identifying_attributes", update.identifyingAttributes().get()));
+            updateOps.add(set(FIELD_IDENTIFYING_ATTRIBUTES, update.identifyingAttributes().get()));
         }
         if (update.nonIdentifyingAttributes().isPresent()) {
-            updateOps.add(set("non_identifying_attributes", update.nonIdentifyingAttributes().get()));
+            updateOps.add(set(FIELD_NON_IDENTIFYING_ATTRIBUTES, update.nonIdentifyingAttributes().get()));
         }
 
         // we request the ReturnDocument.BEFORE here to avoid having to load the previous document in full just
         // to retrieve the previous `message_seq_num`, which we need to determine what to do next.
         // the result is not the full CollectorInstanceDTO as we have it, but the minimal set of fields necessary to
         // determine next steps
-        return Optional.ofNullable(collection.findOneAndUpdate(Filters.eq("instance_uid", update.instanceUid()),
+        return Optional.ofNullable(collection.findOneAndUpdate(Filters.eq(FIELD_INSTANCE_UID, update.instanceUid()),
                 combine(updateOps),
                 new FindOneAndUpdateOptions()
                         .returnDocument(ReturnDocument.BEFORE)
-                        .projection(Projections.include("instance_uid", "message_seq_num", "last_seen", "capabilities", "txn_cursor"))
+                        // TODO we should define a separate minimal "DTO" for using projections, otherwise we have too many optionals
+//                        .projection(Projections.include(FIELD_INSTANCE_UID, FIELD_MESSAGE_SEQ_NUM, FIELD_LAST_SEEN))
                         .upsert(true)));
+    }
+
+    public boolean existsByInstanceUid(String instanceUid) {
+        return collection.countDocuments(Filters.eq(FIELD_INSTANCE_UID, instanceUid)) == 1L;
+    }
+
+    public CollectorInstanceDTO enroll(String instanceUid, String fleetId, String fingerprint, String certPem, String caId, Instant enrolledAt) {
+        final CollectorInstanceDTO dto = CollectorInstanceDTO.builder()
+                .instanceUid(instanceUid)
+                .lastSeen(enrolledAt)
+                .messageSeqNum(0L) // set to 0 explicitly for clarity, this will cause full resync later in the connection
+                .capabilities(0L) // capabilities are unspecified at this point
+                .fleetId(fleetId)
+                .certificateFingerprint(fingerprint)
+                .certificatePem(certPem)
+                .issuingCaId(caId)
+                .enrolledAt(enrolledAt)
+                .build();
+        final InsertOneResult insertOneResult = collection.insertOne(dto);
+        return dto.toBuilder()
+                .id(insertedIdAsString(insertOneResult))
+                .build();
+    }
+
+    public Optional<CollectorInstanceDTO> findByFingerprint(String fingerprint) {
+        return Optional.ofNullable(
+                collection.find(Filters.eq(FIELD_CERTIFICATE_FINGERPRINT, fingerprint)).first()
+        );
+    }
+
+    public Optional<CollectorInstanceDTO> findByInstanceUid(String instanceUid) {
+        return Optional.ofNullable(
+                collection.find(Filters.eq(FIELD_INSTANCE_UID, instanceUid)).first()
+        );
     }
 }

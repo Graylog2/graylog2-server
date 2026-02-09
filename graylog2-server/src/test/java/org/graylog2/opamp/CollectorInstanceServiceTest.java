@@ -17,6 +17,8 @@
 package org.graylog2.opamp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog.collectors.CollectorInstanceService;
+import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
@@ -36,12 +38,12 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link OpAmpAgentService}.
+ * Tests for {@link CollectorInstanceService}.
  */
 @ExtendWith(MongoDBExtension.class)
-class OpAmpAgentServiceTest {
+class CollectorInstanceServiceTest {
 
-    private OpAmpAgentService opAmpAgentService;
+    private CollectorInstanceService collectorInstanceService;
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
@@ -58,26 +60,23 @@ class OpAmpAgentServiceTest {
                 new MongoJackObjectMapperProvider(objectMapper),
                 mongodb.mongoConnection()
         );
-        opAmpAgentService = new OpAmpAgentService(mongoCollections);
+        collectorInstanceService = new CollectorInstanceService(mongoCollections);
     }
 
     @Test
-    void saveAssignsIdToNewAgent() {
-        final OpAmpAgent agent = createTestAgent(null, "instance-uid-1", "sha256:fingerprint1");
+    void enrollAssignsIdToNewCollector() {
+        final CollectorInstanceDTO collector = enroll(collectorInstanceService, "instance-uid-1", "sha256:fingerprint1");
 
-        final OpAmpAgent savedAgent = opAmpAgentService.save(agent);
-
-        assertThat(savedAgent.id()).isNotNull();
-        assertThat(savedAgent.instanceUid()).isEqualTo("instance-uid-1");
-        assertThat(savedAgent.certificateFingerprint()).isEqualTo("sha256:fingerprint1");
+        assertThat(collector.id()).isNotNull();
+        assertThat(collector.instanceUid()).isEqualTo("instance-uid-1");
+        assertThat(collector.certificateFingerprint()).isEqualTo("sha256:fingerprint1");
     }
 
     @Test
-    void findByInstanceUidReturnsAgent() {
-        final OpAmpAgent agent = createTestAgent(null, "instance-uid-2", "sha256:fingerprint2");
-        opAmpAgentService.save(agent);
+    void findByInstanceUidReturnsCollector() {
+         enroll(collectorInstanceService, "instance-uid-2", "sha256:fingerprint2");
 
-        final Optional<OpAmpAgent> found = opAmpAgentService.findByInstanceUid("instance-uid-2");
+        final Optional<CollectorInstanceDTO> found = collectorInstanceService.findByInstanceUid("instance-uid-2");
 
         assertThat(found).isPresent();
         assertThat(found.get().instanceUid()).isEqualTo("instance-uid-2");
@@ -86,49 +85,35 @@ class OpAmpAgentServiceTest {
 
     @Test
     void findByInstanceUidReturnsEmptyForUnknown() {
-        final Optional<OpAmpAgent> found = opAmpAgentService.findByInstanceUid("non-existent-uid");
+        final Optional<CollectorInstanceDTO> found = collectorInstanceService.findByInstanceUid("non-existent-uid");
 
         assertThat(found).isEmpty();
     }
 
     @Test
-    void findByFingerprintReturnsAgent() {
-        final OpAmpAgent agent = createTestAgent(null, "instance-uid-3", "sha256:fingerprint3");
-        opAmpAgentService.save(agent);
-
-        final Optional<OpAmpAgent> found = opAmpAgentService.findByFingerprint("sha256:fingerprint3");
-
-        assertThat(found).isPresent();
-        assertThat(found.get().instanceUid()).isEqualTo("instance-uid-3");
-        assertThat(found.get().certificateFingerprint()).isEqualTo("sha256:fingerprint3");
-    }
-
-    @Test
     void existsByInstanceUidReturnsTrueForExisting() {
-        final OpAmpAgent agent = createTestAgent(null, "instance-uid-4", "sha256:fingerprint4");
-        opAmpAgentService.save(agent);
+        enroll(collectorInstanceService, "instance-uid-4", "sha256:fingerprint4");
 
-        final boolean exists = opAmpAgentService.existsByInstanceUid("instance-uid-4");
+        final boolean exists = collectorInstanceService.existsByInstanceUid("instance-uid-4");
 
         assertThat(exists).isTrue();
     }
 
     @Test
     void existsByInstanceUidReturnsFalseForUnknown() {
-        final boolean exists = opAmpAgentService.existsByInstanceUid("non-existent-uid");
+        final boolean exists = collectorInstanceService.existsByInstanceUid("non-existent-uid");
 
         assertThat(exists).isFalse();
     }
 
-    private OpAmpAgent createTestAgent(String id, String instanceUid, String fingerprint) {
-        return new OpAmpAgent(
-                id,
+    private static CollectorInstanceDTO enroll(CollectorInstanceService service, String instanceUid, String fingerprint) {
+        return service.enroll(
                 instanceUid,
                 "default-fleet",
                 fingerprint,
                 "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----",
                 "507f1f77bcf86cd799439011", // Valid 24-char hex ObjectId
                 Instant.now()
-        );
+                );
     }
 }

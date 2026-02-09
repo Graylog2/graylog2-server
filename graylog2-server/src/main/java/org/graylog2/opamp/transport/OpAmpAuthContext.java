@@ -17,7 +17,6 @@
 package org.graylog2.opamp.transport;
 
 import org.glassfish.grizzly.http.HttpRequestPacket;
-import org.graylog2.opamp.OpAmpAgent;
 
 import java.util.Optional;
 
@@ -50,5 +49,5 @@ public sealed interface OpAmpAuthContext {
      * Context for enrolled agents authenticating with signed JWTs.
      * Agent already enrolled - normal message handling.
      */
-    record Identified(OpAmpAgent agent, Transport transport) implements OpAmpAuthContext {}
+    record Identified(String instanceUid, Transport transport) implements OpAmpAuthContext {}
 }

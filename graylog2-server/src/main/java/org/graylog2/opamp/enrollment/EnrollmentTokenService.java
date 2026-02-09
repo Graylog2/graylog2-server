@@ -22,12 +22,12 @@ import io.jsonwebtoken.Jwts;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bouncycastle.asn1.x509.KeyUsage;
+import org.graylog.collectors.CollectorInstanceService;
+import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.security.pki.Algorithm;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
 import org.graylog.security.pki.PemUtils;
-import org.graylog2.opamp.OpAmpAgent;
-import org.graylog2.opamp.OpAmpAgentService;
 import org.graylog2.opamp.config.OpAmpCaConfig;
 import org.graylog2.opamp.rest.CreateEnrollmentTokenRequest;
 import org.graylog2.opamp.rest.EnrollmentTokenResponse;
@@ -71,15 +71,15 @@ public class EnrollmentTokenService {
 
     private final CertificateService certificateService;
     private final ClusterConfigService clusterConfigService;
-    private final OpAmpAgentService agentService;
+    private final CollectorInstanceService collectorInstanceService;
 
     @Inject
     public EnrollmentTokenService(CertificateService certificateService,
                                   ClusterConfigService clusterConfigService,
-                                  OpAmpAgentService agentService) {
+                                  CollectorInstanceService collectorInstanceService) {
         this.certificateService = certificateService;
         this.clusterConfigService = clusterConfigService;
-        this.agentService = agentService;
+        this.collectorInstanceService = collectorInstanceService;
     }
 
     private String getClusterId() {
@@ -228,7 +228,7 @@ public class EnrollmentTokenService {
      */
     public Optional<OpAmpAuthContext.Identified> validateAgentToken(String token, OpAmpAuthContext.Transport transport) {
         try {
-            final AtomicReference<OpAmpAgent> agentRef = new AtomicReference<>();
+            final AtomicReference<CollectorInstanceDTO> collectorRef = new AtomicReference<>();
 
             Jwts.parser()
                     .keyLocator(header -> {
@@ -245,23 +245,24 @@ public class EnrollmentTokenService {
                             throw new SecurityException("Invalid x5t#S256 format: " + e.getMessage());
                         }
 
-                        final OpAmpAgent agent = agentService.findByFingerprint(fingerprint)
-                                .orElseThrow(() -> new SecurityException("Unknown agent fingerprint"));
-                        agentRef.set(agent);
+                        // TODO performance this loads the entire collector instance document, which seems excessive
+                        final CollectorInstanceDTO collector = collectorInstanceService.findByFingerprint(fingerprint)
+                                .orElseThrow(() -> new SecurityException("Unknown collector fingerprint"));
+                        collectorRef.set(collector);
                         try {
-                            final X509Certificate cert = PemUtils.parseCertificate(agent.certificatePem());
+                            final X509Certificate cert = PemUtils.parseCertificate(collector.certificatePem());
                             cert.checkValidity();
                             return cert.getPublicKey();
                         } catch (Exception e) {
-                            throw new SecurityException("Failed to parse agent certificate", e);
+                            throw new SecurityException("Failed to parse collector certificate", e);
                         }
                     })
                     .build()
                     .parseSignedClaims(token);
 
-            return Optional.of(new OpAmpAuthContext.Identified(agentRef.get(), transport));
+            return Optional.of(new OpAmpAuthContext.Identified(collectorRef.get().instanceUid(), transport));
         } catch (Exception e) {
-            LOG.warn("Agent token validation failed: {}", e.getMessage());
+            LOG.warn("Agent token validation failed.", e);
             return Optional.empty();
         }
     }
