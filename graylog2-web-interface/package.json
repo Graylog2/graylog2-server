@@ -42,6 +42,7 @@
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
+    "@graylog/sawmill": "file:/Users/linus/graylog/sawmill",
     "@mantine/core": "^8.2.8",
     "@mantine/dropzone": "^8.2.8",
     "@mantine/hooks": "^8.2.8",

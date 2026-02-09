@@ -45,6 +45,7 @@ const SourceCodeContainer = styled.div<ContainerProps>(
     }
 
     ${theme.components.aceEditor}
+
   `,
 );
 
