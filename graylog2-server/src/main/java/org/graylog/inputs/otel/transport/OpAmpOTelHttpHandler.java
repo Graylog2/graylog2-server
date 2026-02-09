@@ -39,6 +39,9 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**
@@ -55,6 +58,11 @@ public class OpAmpOTelHttpHandler extends SimpleChannelInboundHandler<FullHttpRe
     static final String LOGS_PATH = OTelHttpHandler.LOGS_PATH;
     static final String PROTOBUF_CONTENT_TYPE = OTelHttpHandler.PROTOBUF_CONTENT_TYPE;
     static final String JSON_CONTENT_TYPE = OTelHttpHandler.JSON_CONTENT_TYPE;
+
+    // TODO: Replace with proper per-agent ingest metrics. Needs a cardinality-bounded
+    //  approach (e.g., aggregated by fleet, fixed-size ring buffer, periodic batch writes
+    //  to agent record). Remove these log statements once decided.
+    private final Set<String> recentlySeenAgents = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     private final OTelJournalRecordFactory journalRecordFactory;
     private final MessageInput input;
@@ -110,7 +118,14 @@ public class OpAmpOTelHttpHandler extends SimpleChannelInboundHandler<FullHttpRe
                 exportRequest = builder.build();
             }
 
-            // 6. Create journal records, embed agent_instance_uid, and process
+            // 6. Log agent activity
+            if (recentlySeenAgents.add(instanceUid)) {
+                LOG.info("First OTLP data from agent {}", instanceUid);
+            }
+            LOG.debug("Received {} log resource(s) ({} bytes) from agent {}",
+                    exportRequest.getResourceLogsCount(), exportRequest.getSerializedSize(), instanceUid);
+
+            // 7. Create journal records, embed agent_instance_uid, and process
             final Function<byte[], RawMessage> createRawMessage;
             if (ctx.channel().remoteAddress() instanceof InetSocketAddress address) {
                 createRawMessage = bytes -> new RawMessage(bytes, address);
