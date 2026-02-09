@@ -138,6 +138,7 @@ public abstract class EventDto {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_EventDto.Builder()
+                    .streams(ImmutableSet.of())
                     .sourceStreams(ImmutableSet.of())
                     .groupByFields(ImmutableMap.of())
                     .aggregationConditions(ImmutableMap.of())

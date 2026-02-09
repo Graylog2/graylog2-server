@@ -118,7 +118,7 @@ public class MongoDBEventProcessor implements EventProcessor {
             Document result = aggregateIterable.first();
 
             if (result == null) {
-                LOG.debug("Aggregation returned no results for timerange {} to {}",
+                LOG.info("Aggregation returned no results for timerange {} to {}",
                         parameters.timerange().getFrom(), parameters.timerange().getTo());
                 // Update state even if no results
                 stateService.setState(eventDefinition.id(),
@@ -137,7 +137,10 @@ public class MongoDBEventProcessor implements EventProcessor {
             );
             eventsConsumer.accept(events);
 
-            LOG.debug("Created 1 event from MongoDB aggregation result");
+            // TODO
+            LOG.info("Created 1 event from MongoDB aggregation result: {} {}",
+                    events.stream().findFirst().map(e -> e.event().getEventDefinitionType()).orElse("N/A"),
+                    result.toJson());
 
             // Update processor state
             stateService.setState(eventDefinition.id(),
@@ -189,6 +192,10 @@ public class MongoDBEventProcessor implements EventProcessor {
         // Use end of time range as event timestamp
         DateTime timestamp = parameters.timerange().getTo();
         Event event = eventFactory.createEvent(eventDefinition, timestamp, eventDefinition.title());
+
+        // Set timerange for the event
+        event.setTimerangeStart(parameters.timerange().getFrom());
+        event.setTimerangeEnd(parameters.timerange().getTo());
 
         // Set origin context - encodes the time range instead of document ID
         event.setOriginContext(EventOriginContext.mongodbAggregation(
