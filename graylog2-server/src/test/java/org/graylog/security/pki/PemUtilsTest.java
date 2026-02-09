@@ -214,4 +214,30 @@ class PemUtilsTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("sha256:");
     }
+
+    // extractCn tests
+
+    @Test
+    void extractCnReturnsCommonName() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root", Algorithm.ED25519, Duration.ofDays(1));
+        final CertificateEntry agentCert = builder.createEndEntityCert(
+                "my-agent-uid", rootCa,
+                org.bouncycastle.asn1.x509.KeyUsage.digitalSignature,
+                Duration.ofDays(1));
+        final X509Certificate x509 = PemUtils.parseCertificate(agentCert.certificate());
+
+        final String cn = PemUtils.extractCn(x509);
+
+        assertThat(cn).isEqualTo("my-agent-uid");
+    }
+
+    @Test
+    void extractCnWorksForRootCa() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Test CA", Algorithm.ED25519, Duration.ofDays(1));
+        final X509Certificate x509 = PemUtils.parseCertificate(rootCa.certificate());
+
+        final String cn = PemUtils.extractCn(x509);
+
+        assertThat(cn).isEqualTo("Test CA");
+    }
 }

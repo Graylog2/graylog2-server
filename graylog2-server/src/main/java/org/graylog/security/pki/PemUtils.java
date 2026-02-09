@@ -16,6 +16,8 @@
  */
 package org.graylog.security.pki;
 
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.openssl.PEMKeyPair;
@@ -172,6 +174,22 @@ public final class PemUtils {
     public static String x5tToFingerprint(String x5t) {
         final byte[] bytes = Base64.getUrlDecoder().decode(x5t);
         return "sha256:" + HexFormat.of().formatHex(bytes);
+    }
+
+    /**
+     * Extracts the Common Name (CN) from an X.509 certificate's subject distinguished name.
+     *
+     * @param certificate the certificate to extract the CN from
+     * @return the CN value as a string
+     * @throws IllegalArgumentException if the certificate has no CN in its subject DN
+     */
+    public static String extractCn(X509Certificate certificate) {
+        final X500Name x500 = new X500Name(certificate.getSubjectX500Principal().getName());
+        final var rdns = x500.getRDNs(BCStyle.CN);
+        if (rdns.length == 0) {
+            throw new IllegalArgumentException("Certificate subject has no CN");
+        }
+        return rdns[0].getFirst().getValue().toString();
     }
 
     /**
