@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.resources.system.indexer;
 
+import com.google.common.eventbus.EventBus;
 import jakarta.inject.Provider;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ClientErrorException;
@@ -667,7 +668,7 @@ public class IndexSetsResourceTest {
                      Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories, IndexSetRestrictionsService indexSetRestrictionsService) {
             super(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory,
                     indexSetStatsCreator, clusterConfigService, systemJobManager, mock(DataTieringStatusService.class),
-                    openIndexSetFilterFactories, indexSetRestrictionsService);
+                    openIndexSetFilterFactories, indexSetRestrictionsService, mock(EventBus.class));
             this.permitted = permitted;
         }
 

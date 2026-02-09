@@ -17,11 +17,10 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import Menu from 'components/bootstrap/Menu';
 import { LinkContainer } from 'components/common/router';
-import { NavItem } from 'components/bootstrap';
+import { NavItem, MenuItem } from 'components/bootstrap';
 
-const DropdownOption = styled(Menu.Item)(
+const DropdownOption = styled(MenuItem)(
   ({ theme }) => css`
     font-family: ${theme.fonts.family.navigation};
     font-size: ${theme.fonts.size.navigation};

@@ -30,6 +30,10 @@ public abstract class IOStateSummary {
     public abstract String state();
     @JsonProperty
     public abstract DateTime startedAt();
+
+    @JsonProperty
+    @Nullable
+    public abstract DateTime lastFailedAt();
     @JsonProperty
     @Nullable
     public abstract String detailedMessage();
