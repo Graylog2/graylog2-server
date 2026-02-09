@@ -37,12 +37,14 @@ import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
+import org.graylog2.opamp.OpAmpAgentService;
+import org.graylog2.opamp.OpAmpCaService;
 import org.graylog2.opamp.config.OpAmpCaConfig;
 import org.graylog2.opamp.rest.CreateEnrollmentTokenRequest;
 import org.graylog2.opamp.rest.EnrollmentTokenResponse;
 import org.graylog2.opamp.transport.OpAmpAuthContext;
-import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.web.customization.CustomizationConfig;
@@ -84,6 +86,7 @@ class EnrollmentTokenServiceTest {
 
     private CertificateService certificateService;
     private ClusterConfigService clusterConfigService;
+    private OpAmpCaService opAmpCaService;
     private EnrollmentTokenService enrollmentTokenService;
     private CollectorInstanceService collectorInstanceService;
 
@@ -107,7 +110,8 @@ class EnrollmentTokenServiceTest {
         when(clusterConfigService.get(ClusterId.class))
                 .thenReturn(ClusterId.create(TEST_CLUSTER_ID));
         collectorInstanceService = new CollectorInstanceService(mongoCollections);
-        enrollmentTokenService = new EnrollmentTokenService(certificateService, clusterConfigService, collectorInstanceService);
+        opAmpCaService = new OpAmpCaService(certificateService, clusterConfigService);
+        enrollmentTokenService = new EnrollmentTokenService(certificateService, clusterConfigService, agentService, opAmpCaService);
     }
 
     @Test

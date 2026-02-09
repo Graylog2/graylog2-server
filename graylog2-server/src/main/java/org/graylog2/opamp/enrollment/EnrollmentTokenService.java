@@ -21,14 +21,12 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.bouncycastle.asn1.x509.KeyUsage;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.db.CollectorInstanceDTO;
-import org.graylog.security.pki.Algorithm;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
 import org.graylog.security.pki.PemUtils;
-import org.graylog2.opamp.config.OpAmpCaConfig;
+import org.graylog2.opamp.OpAmpCaService;
 import org.graylog2.opamp.rest.CreateEnrollmentTokenRequest;
 import org.graylog2.opamp.rest.EnrollmentTokenResponse;
 import org.graylog2.opamp.transport.OpAmpAuthContext;
@@ -59,27 +57,22 @@ public class EnrollmentTokenService {
 
     private static final Logger LOG = LoggerFactory.getLogger(EnrollmentTokenService.class);
 
-    private static final Duration ROOT_CA_VALIDITY = Duration.ofDays(30 * 365);
-    private static final Duration ENROLLMENT_CA_VALIDITY = Duration.ofDays(5 * 365);
-    private static final Duration TOKEN_SIGNING_VALIDITY = Duration.ofDays(2 * 365);
-
-    private static final String ROOT_CA_CN = "Graylog OpAMP Root CA";
-    private static final String ENROLLMENT_CA_CN = "Graylog OpAMP Enrollment CA";
-    private static final String TOKEN_SIGNING_CN = "Graylog OpAMP Token Signing";
-
     private static final String AUDIENCE_SUFFIX = ":opamp";
 
     private final CertificateService certificateService;
     private final ClusterConfigService clusterConfigService;
     private final CollectorInstanceService collectorInstanceService;
+    private final OpAmpCaService opAmpCaService;
 
     @Inject
     public EnrollmentTokenService(CertificateService certificateService,
                                   ClusterConfigService clusterConfigService,
-                                  CollectorInstanceService collectorInstanceService) {
+                                  CollectorInstanceService collectorInstanceService,
+                                  OpAmpCaService opAmpCaService) {
         this.certificateService = certificateService;
         this.clusterConfigService = clusterConfigService;
         this.collectorInstanceService = collectorInstanceService;
+        this.opAmpCaService = opAmpCaService;
     }
 
     private String getClusterId() {
@@ -93,23 +86,23 @@ public class EnrollmentTokenService {
     /**
      * Returns the token signing certificate for signing enrollment JWTs.
      * <p>
-     * Creates the CA hierarchy on first call if it doesn't exist.
+     * Delegates to {@link OpAmpCaService} which creates the CA hierarchy on first call if it doesn't exist.
      *
      * @return the token signing certificate entry
      */
     public CertificateEntry getTokenSigningCert() {
-        return ensureCaHierarchyExists().tokenSigningCert();
+        return opAmpCaService.getTokenSigningCert();
     }
 
     /**
      * Returns the enrollment CA certificate for signing agent CSRs.
      * <p>
-     * Creates the CA hierarchy on first call if it doesn't exist.
+     * Delegates to {@link OpAmpCaService} which creates the CA hierarchy on first call if it doesn't exist.
      *
      * @return the enrollment CA certificate entry
      */
     public CertificateEntry getEnrollmentCa() {
-        return ensureCaHierarchyExists().enrollmentCa();
+        return opAmpCaService.getOpAmpCa();
     }
 
     /**
@@ -131,8 +124,7 @@ public class EnrollmentTokenService {
      * @throws IllegalArgumentException if the requested expiry exceeds the signing certificate's validity
      */
     public EnrollmentTokenResponse createToken(CreateEnrollmentTokenRequest request) {
-        final CaHierarchy hierarchy = ensureCaHierarchyExists();
-        final CertificateEntry signingCert = hierarchy.tokenSigningCert();
+        final CertificateEntry signingCert = opAmpCaService.getTokenSigningCert();
 
         final Duration expiresIn = request.expiresIn() != null
                 ? request.expiresIn()
@@ -297,65 +289,4 @@ public class EnrollmentTokenService {
         }
     }
 
-    /**
-     * Ensures the CA hierarchy exists, creating it if necessary.
-     * <p>
-     * On first call (no {@link OpAmpCaConfig} exists), creates:
-     * <ul>
-     *   <li>Root CA (Ed25519, 30 years)</li>
-     *   <li>Enrollment CA (intermediate, 5 years)</li>
-     *   <li>Token Signing Cert (end-entity, 2 years)</li>
-     * </ul>
-     * <p>
-     * If multiple nodes race to create the hierarchy, each creates its own certs
-     * and writes to ClusterConfig. The last write wins, and some certs become orphans.
-     * This is acceptable because tokens are validated by looking up the signing cert
-     * by fingerprint (from the JWT's {@code kid} header), not by config reference.
-     *
-     * @return the certificate entries
-     */
-    private CaHierarchy ensureCaHierarchyExists() {
-        OpAmpCaConfig config = clusterConfigService.get(OpAmpCaConfig.class);
-        if (config != null) {
-            return loadFromConfig(config);
-        }
-
-        LOG.info("Creating OpAMP CA hierarchy on first enrollment token request");
-
-        try {
-            final var builder = certificateService.builder();
-
-            final CertificateEntry rootCa = certificateService.save(
-                    builder.createRootCa(ROOT_CA_CN, Algorithm.ED25519, ROOT_CA_VALIDITY)
-            );
-
-            final CertificateEntry enrollmentCa = certificateService.save(
-                    builder.createIntermediateCa(ENROLLMENT_CA_CN, rootCa, ENROLLMENT_CA_VALIDITY)
-            );
-
-            final CertificateEntry tokenSigningCert = certificateService.save(
-                    builder.createEndEntityCert(TOKEN_SIGNING_CN, enrollmentCa, KeyUsage.digitalSignature, TOKEN_SIGNING_VALIDITY)
-            );
-
-            clusterConfigService.write(new OpAmpCaConfig(enrollmentCa.id(), tokenSigningCert.id(), null));
-
-            // Re-read config in case another node won the race (ClusterConfig uses upsert)
-            config = clusterConfigService.get(OpAmpCaConfig.class);
-            return loadFromConfig(config);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create OpAMP CA hierarchy", e);
-        }
-    }
-
-    private CaHierarchy loadFromConfig(OpAmpCaConfig config) {
-        final CertificateEntry enrollmentCa = certificateService.findById(config.opampCaId())
-                .orElseThrow(() -> new IllegalStateException(
-                        f("OpAMP CA config exists but OpAMP CA not found: %s", config.opampCaId())));
-        final CertificateEntry tokenSigningCert = certificateService.findById(config.tokenSigningCertId())
-                .orElseThrow(() -> new IllegalStateException(
-                        "OpAMP CA config exists but token signing cert not found: " + config.tokenSigningCertId()));
-        return new CaHierarchy(enrollmentCa, tokenSigningCert);
-    }
-
-    private record CaHierarchy(CertificateEntry enrollmentCa, CertificateEntry tokenSigningCert) {}
 }

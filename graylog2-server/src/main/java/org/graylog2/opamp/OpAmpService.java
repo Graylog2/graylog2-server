@@ -61,14 +61,17 @@ public class OpAmpService {
     private static final Logger LOG = LoggerFactory.getLogger(OpAmpService.class);
 
     private final EnrollmentTokenService enrollmentTokenService;
+    private final OpAmpCaService opAmpCaService;
     private final CertificateService certificateService;
     private final CollectorInstanceService collectorInstanceService;
 
     @Inject
     public OpAmpService(EnrollmentTokenService enrollmentTokenService,
+                        OpAmpCaService opAmpCaService,
                         CertificateService certificateService,
                         CollectorInstanceService collectorInstanceService) {
         this.enrollmentTokenService = enrollmentTokenService;
+        this.opAmpCaService = opAmpCaService;
         this.certificateService = certificateService;
         this.collectorInstanceService = collectorInstanceService;
     }
@@ -157,8 +160,8 @@ public class OpAmpService {
         }
 
         try {
-            // 3. Sign CSR with Enrollment CA
-            final CertificateEntry enrollmentCa = enrollmentTokenService.getEnrollmentCa();
+            // 3. Sign CSR with OpAMP CA
+            final CertificateEntry enrollmentCa = opAmpCaService.getOpAmpCa();
             final X509Certificate agentCert = certificateService.builder().signCsr(
                     csrBytes.toByteArray(), enrollmentCa, instanceUid, Duration.ofDays(365));
 

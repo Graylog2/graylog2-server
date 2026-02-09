@@ -48,6 +48,12 @@ class OpAmpServiceTest {
     private EnrollmentTokenService enrollmentTokenService;
 
     @Mock
+    private OpAmpCaService opAmpCaService;
+
+    @Mock
+    private OpAmpAgentService agentService;
+
+    @Mock
     private CertificateService certificateService;
 
     @Mock
@@ -59,7 +65,7 @@ class OpAmpServiceTest {
 
     @BeforeEach
     void setUp() {
-        opAmpService = new OpAmpService(enrollmentTokenService, certificateService, collectorInstanceService);
+        opAmpService = new OpAmpService(enrollmentTokenService, opAmpCaService, certificateService, collectorInstanceService);
     }
 
     @Test
