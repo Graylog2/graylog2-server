@@ -319,6 +319,60 @@ class CertificateBuilderTest {
         assertThat(subjectDn).contains("O=Graylog");
     }
 
+    // End-entity certificate with EKU tests
+
+    @Test
+    void createEndEntityCertWithServerAuthEku() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+
+        final CertificateEntry endEntityCert = builder.createEndEntityCert(
+                "OTLP Server", rootCa, KeyUsage.digitalSignature | KeyUsage.keyEncipherment,
+                KeyPurposeId.id_kp_serverAuth, Duration.ofDays(365)
+        );
+
+        final X509Certificate cert = PemUtils.parseCertificate(endEntityCert.certificate());
+
+        // Verify Basic Constraints: CA:FALSE
+        assertThat(cert.getBasicConstraints()).isEqualTo(-1);
+
+        // Verify Extended Key Usage contains serverAuth (OID 1.3.6.1.5.5.7.3.1)
+        final List<String> extendedKeyUsage = cert.getExtendedKeyUsage();
+        assertThat(extendedKeyUsage).isNotNull();
+        assertThat(extendedKeyUsage).contains("1.3.6.1.5.5.7.3.1");
+    }
+
+    @Test
+    void createEndEntityCertWithClientAuthEku() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+
+        final CertificateEntry endEntityCert = builder.createEndEntityCert(
+                "Client Cert", rootCa, KeyUsage.digitalSignature,
+                KeyPurposeId.id_kp_clientAuth, Duration.ofDays(365)
+        );
+
+        final X509Certificate cert = PemUtils.parseCertificate(endEntityCert.certificate());
+
+        // Verify Extended Key Usage contains clientAuth (OID 1.3.6.1.5.5.7.3.2)
+        final List<String> extendedKeyUsage = cert.getExtendedKeyUsage();
+        assertThat(extendedKeyUsage).isNotNull();
+        assertThat(extendedKeyUsage).contains("1.3.6.1.5.5.7.3.2");
+    }
+
+    @Test
+    void createEndEntityCertWithoutEkuHasNoExtendedKeyUsage() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+
+        // Use the original 4-arg method (no EKU)
+        final CertificateEntry endEntityCert = builder.createEndEntityCert(
+                "No EKU", rootCa, KeyUsage.digitalSignature, Duration.ofDays(365)
+        );
+
+        final X509Certificate cert = PemUtils.parseCertificate(endEntityCert.certificate());
+
+        // Should NOT have Extended Key Usage
+        assertThat(cert.getExtendedKeyUsage()).isNull();
+    }
+
     // Note: CSR creation and signing tests will be added when the createCsr and signCsr
     // methods are implemented in CertificateBuilder (Task 4: Add CSR signing to CertificateBuilder)
 }

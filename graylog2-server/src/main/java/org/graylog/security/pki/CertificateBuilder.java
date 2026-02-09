@@ -259,6 +259,35 @@ public class CertificateBuilder {
      * @throws Exception if certificate creation fails
      */
     public CertificateEntry createEndEntityCert(String commonName, CertificateEntry issuer, int keyUsageBits, Duration validity) throws Exception {
+        return createEndEntityCert(commonName, issuer, keyUsageBits, null, validity);
+    }
+
+    /**
+     * Creates an end-entity certificate signed by the specified issuer, with an optional Extended Key Usage extension.
+     * The certificate includes:
+     * <ul>
+     *   <li>Subject: CN=commonName</li>
+     *   <li>Issuer: from parent CA certificate</li>
+     *   <li>Basic Constraints: CA:FALSE (critical)</li>
+     *   <li>Key Usage: configurable via keyUsageBits parameter (critical)</li>
+     *   <li>Extended Key Usage: optional, set when ekuPurpose is non-null (non-critical)</li>
+     *   <li>Algorithm: derived from issuer certificate</li>
+     * </ul>
+     * <p>
+     * End-entity certificates cannot issue other certificates. Use this for
+     * server certificates (with {@link KeyPurposeId#id_kp_serverAuth}) or
+     * client certificates (with {@link KeyPurposeId#id_kp_clientAuth}).
+     *
+     * @param commonName the common name for the end-entity certificate
+     * @param issuer the issuing CA's certificate entry (must contain the private key)
+     * @param keyUsageBits the key usage bits (e.g., {@link KeyUsage#digitalSignature})
+     * @param ekuPurpose the extended key usage purpose (e.g., {@link KeyPurposeId#id_kp_serverAuth}), or null to omit EKU
+     * @param validity the validity period of the certificate
+     * @return a CertificateEntry with encrypted private key and PEM-encoded certificate (no ID - not yet saved)
+     * @throws Exception if certificate creation fails
+     */
+    public CertificateEntry createEndEntityCert(String commonName, CertificateEntry issuer, int keyUsageBits,
+                                                KeyPurposeId ekuPurpose, Duration validity) throws Exception {
         // Parse the issuer's certificate and private key
         final X509Certificate issuerCert = PemUtils.parseCertificate(issuer.certificate());
         final PrivateKey issuerPrivateKey = PemUtils.parsePrivateKey(
@@ -302,6 +331,15 @@ public class CertificateBuilder {
                 true,
                 new KeyUsage(keyUsageBits)
         );
+
+        // Add Extended Key Usage if specified (non-critical)
+        if (ekuPurpose != null) {
+            certBuilder.addExtension(
+                    Extension.extendedKeyUsage,
+                    false,
+                    new ExtendedKeyUsage(ekuPurpose)
+            );
+        }
 
         final X509Certificate certificate = signCertificate(certBuilder, issuerPrivateKey, algorithm);
 
