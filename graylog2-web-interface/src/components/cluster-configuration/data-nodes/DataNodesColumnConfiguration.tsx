@@ -15,8 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
 import type { ColumnRenderers, ColumnSchema } from 'components/common/EntityDataTable';
+import { Icon } from 'components/common';
 import { Link } from 'components/common/router';
 import DataNodeStatusCell from 'components/datanode/DataNodeList/DataNodeStatusCell';
 import type { DataNode } from 'components/datanode/Types';
@@ -48,6 +50,11 @@ const STORAGE_DANGER_THRESHOLD = 0.8;
 const CPU_WARNING_THRESHOLD = 0.7;
 const CPU_DANGER_THRESHOLD = 0.9;
 
+const VersionWarningIcon = styled(Icon)`
+  line-height: 1;
+  transform: translateY(-1px);
+`;
+
 export const createColumnDefinitions = (): Array<ColumnSchema> => [
   { id: 'cpu', title: 'CPU', sortable: false, isDerived: true },
   { id: 'memory', title: 'Memory', sortable: false, isDerived: true },
@@ -69,7 +76,7 @@ const getDataNodeRoles = (dataNode: DataNode) =>
 const calculateUsedFsBytes = (total: number | undefined | null, available: number | undefined | null) =>
   total != null && available != null ? total - available : undefined;
 
-export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
+export const createColumnRenderers = (productName: string): ColumnRenderers<ClusterDataNode> => ({
   attributes: {
     hostname: {
       renderCell: (_value, entity) => {
@@ -141,11 +148,18 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
       staticWidth: 130,
     },
     datanode_version: {
-      renderCell: (_value, entity) => (
-        <SecondaryText>
-          <span>{entity.datanode_version ?? 'N/A'}</span>
-        </SecondaryText>
-      ),
+      renderCell: (_value, entity) => {
+        const versionLabel = entity.datanode_version ?? 'N/A';
+        const showWarning = entity.version_compatible === false;
+        const warningMessage = `This data node version is incompatible with your current ${productName} version, so metrics are disabled.`;
+
+        return (
+          <SecondaryText title={showWarning ? warningMessage : undefined}>
+            <span>{versionLabel}</span>
+            {showWarning && <VersionWarningIcon name="warning" bsStyle="warning" size="sm" />}
+          </SecondaryText>
+        );
+      },
       minWidth: 200,
     },
     opensearch_roles: {

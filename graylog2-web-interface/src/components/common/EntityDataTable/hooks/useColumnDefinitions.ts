@@ -59,7 +59,9 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
 }) => {
   const columnHelper = createColumnHelper<Entity>();
   const bulkSelectCol = useBulkSelectColumnDefinition(displayBulkSelectCol, columnWidths[BULK_SELECT_COL_ID]);
-  const actionsCol = useActionsColumnDefinition<Entity>({
+  // Always include the actions column as the trailing "tail" column, even when there are no row actions.
+  // This lets the table use it to fill remaining space in fully-static layouts.
+  const actionsTailCol = useActionsColumnDefinition<Entity>({
     colWidth: columnWidths[ACTIONS_COL_ID],
     minWidth: actionsColMinWidth,
     entityActions,
@@ -81,10 +83,10 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
 
   return useMemo(
     () =>
-      [...(bulkSelectCol ? [bulkSelectCol] : []), ...attributeCols, ...(actionsCol ? [actionsCol] : [])] as Array<
+      [...(bulkSelectCol ? [bulkSelectCol] : []), ...attributeCols, actionsTailCol] as Array<
         ColumnDef<Entity, unknown>
       >,
-    [bulkSelectCol, attributeCols, actionsCol],
+    [bulkSelectCol, attributeCols, actionsTailCol],
   );
 };
 
