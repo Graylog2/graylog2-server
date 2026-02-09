@@ -20,6 +20,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.apache.hc.client5.http.auth.CredentialsProvider;
@@ -44,6 +45,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 /*
  * Copyright (C) 2020 Graylog, Inc.
@@ -61,6 +63,7 @@ import java.util.List;
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 public class OfficialOpensearchClientProvider implements Provider<OfficialOpensearchClient> {
 
     private static Logger log = LoggerFactory.getLogger(OfficialOpensearchClientProvider.class);
@@ -73,7 +76,7 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
             IndexerJwtAuthToken indexerJwtAuthToken,
             CredentialsProvider credentialsProvider,
             ElasticsearchClientConfiguration clientConfiguration,
-            TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider) {
+            @Nullable TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider) {
         clientCache = Suppliers.memoize(() -> createClient(hosts, indexerJwtAuthToken, credentialsProvider, clientConfiguration, trustManagerAndSocketFactoryProvider));
     }
 
@@ -101,15 +104,10 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
 
         builder.setChunkedEnabled(clientConfiguration.compressionEnabled());
 
+
         builder.setHttpClientConfigCallback(httpClientBuilder -> {
 
-            final TlsStrategy tlsStrategy = ClientTlsStrategyBuilder.create()
-                    .setSslContext(trustManagerAndSocketFactoryProvider.getSslContext())
-                    // See https://issues.apache.org/jira/browse/HTTPCLIENT-2219
-                    .setTlsDetailsFactory(sslEngine -> new TlsDetails(sslEngine.getSession(), sslEngine.getApplicationProtocol()))
-                    .build();
-
-            httpClientBuilder.setConnectionManager(PoolingAsyncClientConnectionManagerBuilder.create()
+            final PoolingAsyncClientConnectionManagerBuilder connectionManagerBuilder = PoolingAsyncClientConnectionManagerBuilder.create()
                     .setMaxConnPerRoute(clientConfiguration.elasticsearchMaxTotalConnectionsPerRoute())
                     .setMaxConnTotal(clientConfiguration.elasticsearchMaxTotalConnections())
                     .setDefaultConnectionConfig(
@@ -118,9 +116,9 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
                                     .setSocketTimeout(timeout(clientConfiguration.elasticsearchSocketTimeout()))
                                     .build()
 
-                    )
-                    .setTlsStrategy(tlsStrategy)
-                    .build());
+                    );
+            tlsStrategy(trustManagerAndSocketFactoryProvider).ifPresent(connectionManagerBuilder::setTlsStrategy);
+            httpClientBuilder.setConnectionManager(connectionManagerBuilder.build());
 
             httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
 
@@ -137,6 +135,16 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
 
         final OpenSearchTransport transport = builder.build();
         return new OfficialOpensearchClient(new CustomOpenSearchClient(transport), new CustomAsyncOpenSearchClient(transport));
+    }
+
+    private static Optional<TlsStrategy> tlsStrategy(@Nullable TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider) {
+        return Optional.ofNullable(trustManagerAndSocketFactoryProvider)
+                .map(TrustManagerAndSocketFactoryProvider::getSslContext)
+                .map(sslContext -> ClientTlsStrategyBuilder.create()
+                        .setSslContext(sslContext)
+                        // See https://issues.apache.org/jira/browse/HTTPCLIENT-2219
+                        .setTlsDetailsFactory(sslEngine -> new TlsDetails(sslEngine.getSession(), sslEngine.getApplicationProtocol()))
+                        .build());
     }
 
     private static Timeout timeout(Duration duration) {
