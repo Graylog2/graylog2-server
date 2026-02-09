@@ -58,6 +58,7 @@ import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.ErrorCause;
 import org.opensearch.client.opensearch._types.ExpandWildcard;
 import org.opensearch.client.opensearch._types.FieldValue;
+import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.ShardFailure;
 import org.opensearch.client.opensearch._types.Time;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
@@ -397,9 +398,26 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
             //TODO: Timeout
             return mSearchFuture.get(1L, TimeUnit.DAYS).responses();
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            OpenSearchException cause = findCause(e);
+            if (cause != null) {
+                return Collections.nCopies(numSearchTypes, MultiSearchResponseItem.of(i -> i
+                        .failure(f -> f.error(c -> c
+                                .type(cause.error().type())
+                                .reason(cause.error().reason()
+                                )))));
+            }
             return Collections.nCopies(numSearchTypes, MultiSearchResponseItem.of(i -> i
-                    .failure(f -> f.error(c -> c.reason(e.getMessage())))));
+                    .failure(f -> f.error(c -> c.type("generic").reason(e.getMessage())))));
         }
+    }
+
+    private static OpenSearchException findCause(Throwable e) {
+        Throwable cause = e.getCause();
+        if (cause == null) return null;
+        if (cause instanceof OpenSearchException) {
+            return (OpenSearchException) cause;
+        }
+        return findCause(cause);
     }
 
     private boolean isMaxClauseCountException(ErrorCause cause) {
