@@ -48,8 +48,8 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
@@ -103,7 +103,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -210,7 +209,9 @@ class OpAmpOTelMtlsIT {
 
         // Remove BC before converting to JDK format. JDK's SSL engine requires
         // EdECPrivateKey (not BC's BCEdDSAPrivateKey) for Ed25519 TLS operations.
-        Security.removeProvider("BC");
+        if (Security.getProvider("BC") != null) {
+            Security.removeProvider("BC");
+        }
 
         // Re-encode and re-parse via JDK providers to get native types
         serverKey = toJdkKey(serverKeyPair.getPrivate());
@@ -275,7 +276,9 @@ class OpAmpOTelMtlsIT {
         try {
             final LogsServiceGrpc.LogsServiceBlockingStub stub = LogsServiceGrpc.newBlockingStub(channel);
             assertThatThrownBy(() -> stub.export(createTestRequest()))
-                    .isInstanceOf(StatusRuntimeException.class);
+                    .isInstanceOf(StatusRuntimeException.class)
+                    .satisfies(e -> assertThat(((StatusRuntimeException) e).getStatus().getCode())
+                            .isIn(io.grpc.Status.Code.UNAVAILABLE, io.grpc.Status.Code.UNAUTHENTICATED));
         } finally {
             channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
         }
