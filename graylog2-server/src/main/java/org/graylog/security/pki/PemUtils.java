@@ -100,9 +100,7 @@ public final class PemUtils {
         try (PEMParser pemParser = new PEMParser(new StringReader(pem))) {
             final Object object = pemParser.readObject();
             if (object instanceof X509CertificateHolder holder) {
-                return new JcaX509CertificateConverter()
-                        .setProvider("BC")
-                        .getCertificate(holder);
+                return new JcaX509CertificateConverter().getCertificate(holder);
             }
             throw new CertificateException("PEM does not contain a valid X.509 certificate");
         }
@@ -119,7 +117,7 @@ public final class PemUtils {
     public static PrivateKey parsePrivateKey(String pem) throws IOException {
         try (PEMParser pemParser = new PEMParser(new StringReader(pem))) {
             final Object object = pemParser.readObject();
-            final JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
+            final JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
             if (object instanceof org.bouncycastle.asn1.pkcs.PrivateKeyInfo privateKeyInfo) {
                 return converter.getPrivateKey(privateKeyInfo);
             } else if (object instanceof PEMKeyPair pemKeyPair) {
@@ -202,7 +200,7 @@ public final class PemUtils {
     public static Algorithm detectAlgorithm(X509Certificate certificate) {
         final String keyAlgorithm = certificate.getPublicKey().getAlgorithm();
         return switch (keyAlgorithm) {
-            case "Ed25519" -> Algorithm.ED25519;
+            case "Ed25519", "EdDSA" -> Algorithm.ED25519;
             case "RSA" -> Algorithm.RSA_4096;
             default -> throw new IllegalArgumentException("Unsupported key algorithm: " + keyAlgorithm);
         };

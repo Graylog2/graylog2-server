@@ -96,8 +96,17 @@ class PemUtilsTest {
         final String pem = PemUtils.toPem(keyPair.getPrivate());
         final PrivateKey parsedKey = PemUtils.parsePrivateKey(pem);
 
-        assertThat(parsedKey.getAlgorithm()).isEqualTo("Ed25519");
-        assertThat(parsedKey.getEncoded()).isEqualTo(keyPair.getPrivate().getEncoded());
+        assertThat(parsedKey.getAlgorithm()).isIn("Ed25519", "EdDSA");
+        // Verify functional equivalence: sign with the parsed key and verify with the original public key.
+        // We cannot compare getEncoded() directly because BC and JDK use different PKCS#8 variants
+        // (BC includes the public key, JDK does not).
+        final var sig = java.security.Signature.getInstance("Ed25519");
+        sig.initSign(parsedKey);
+        sig.update("test".getBytes());
+        final byte[] signature = sig.sign();
+        sig.initVerify(keyPair.getPublic());
+        sig.update("test".getBytes());
+        assertThat(sig.verify(signature)).isTrue();
     }
 
     @Test
