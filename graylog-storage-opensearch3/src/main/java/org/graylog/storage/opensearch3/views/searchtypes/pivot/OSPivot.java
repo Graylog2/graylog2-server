@@ -131,7 +131,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         final Aggregation startTimestamp = Aggregation.builder().min(f -> f.field("timestamp")).build();
         final Aggregation endTimestamp = Aggregation.builder().max(f -> f.field("timestamp")).build();
         searchSourceBuilder.aggregation("timestamp-min", startTimestamp);
-        searchSourceBuilder.aggregation("timestamp-min", endTimestamp);
+        searchSourceBuilder.aggregation("timestamp-max", endTimestamp);
     }
 
     private BucketSpecHandler.CreatedAggregations<NamedAggregationBuilder> createPivots(BucketSpecHandler.Direction direction, Query query, Pivot pivot, List<BucketSpec> pivots, OSGeneratedQueryContext queryContext) {
