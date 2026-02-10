@@ -37,7 +37,6 @@ public record MessagesRequestSpec(@JsonProperty("query") String queryString,
                                   @JsonProperty("fields") List<String> fields) implements SearchRequestSpec {
 
 
-    public static final List<String> DEFAULT_FIELDS = List.of("source", "timestamp");
     public static final String DEFAULT_SORT = Message.FIELD_TIMESTAMP;
     public static final SortSpec.Direction DEFAULT_SORT_ORDER = SortSpec.Direction.Descending;
     public static final int DEFAULT_SIZE = 10;
@@ -68,10 +67,9 @@ public record MessagesRequestSpec(@JsonProperty("query") String queryString,
         if (size <= 0) {
             size = DEFAULT_SIZE;
         }
-        if (fields == null || fields.isEmpty()) {
-            fields = DEFAULT_FIELDS;
+        if (fields == null) {
+            fields = List.of();
         }
-
     }
 
     @Deprecated
