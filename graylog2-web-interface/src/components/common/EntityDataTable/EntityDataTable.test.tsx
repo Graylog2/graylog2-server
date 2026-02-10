@@ -163,6 +163,16 @@ describe('<EntityDataTable />', () => {
     await screen.findByText('Custom actions for Entity title');
   });
 
+  it('keeps the trailing actions column even without row actions', async () => {
+    render(<EntityDataTable {...defaultProps} />);
+
+    const headers = await screen.findAllByRole('columnheader');
+
+    const visibleAttributeHeaders = 3; // title, description, status
+
+    expect(headers).toHaveLength(visibleAttributeHeaders + 1);
+  });
+
   it('should not render column if user does not have required permissions', () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
 

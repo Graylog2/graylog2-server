@@ -39,14 +39,6 @@ class ContentPackParameters extends React.Component<
     onStateChange: () => {},
   };
 
-  static emptyParameter = {
-    name: '',
-    title: '',
-    description: '',
-    type: 'string',
-    default_value: '',
-  };
-
   constructor(props) {
     super(props);
 
@@ -55,6 +47,14 @@ class ContentPackParameters extends React.Component<
       parameterToDelete: undefined,
     };
   }
+
+  static emptyParameter = {
+    name: '',
+    title: '',
+    description: '',
+    type: 'string',
+    default_value: '',
+  };
 
   _addNewParameter = (newParameter, oldParameter) => {
     let newContentPackBuilder = this.props.contentPack.toBuilder();

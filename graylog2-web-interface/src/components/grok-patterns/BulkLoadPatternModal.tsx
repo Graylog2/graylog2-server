@@ -38,8 +38,6 @@ class BulkLoadPatternModal extends React.Component<
     sendTelemetry: () => {},
   };
 
-  private patternFile: Input;
-
   constructor(props) {
     super(props);
 
@@ -48,6 +46,8 @@ class BulkLoadPatternModal extends React.Component<
       importStrategy: 'ABORT_ON_CONFLICT',
     };
   }
+
+  private patternFile: Input;
 
   _openModal = () => {
     this.setState({ showModal: true });
