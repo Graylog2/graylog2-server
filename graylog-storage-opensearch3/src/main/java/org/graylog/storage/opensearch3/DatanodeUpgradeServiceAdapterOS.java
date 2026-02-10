@@ -54,6 +54,7 @@ public class DatanodeUpgradeServiceAdapterOS implements DatanodeUpgradeServiceAd
 
     public static final String REPLICATION_PRIMARIES = "primaries";
     public static final String REPLICATION_ALL = "all";
+    public static final String SETTING_CLUSTER_ROUTING_ALLOCATION_ENABLE = "cluster.routing.allocation.enable";
     private final OfficialOpensearchClient officialOpensearchClient;
     private final ObjectMapper objectMapper;
 
@@ -106,7 +107,7 @@ public class DatanodeUpgradeServiceAdapterOS implements DatanodeUpgradeServiceAd
 
     private String queryShardReplication() {
         final GetClusterSettingsResponse response = officialOpensearchClient.sync(c -> c.cluster().getSettings(settings -> settings.includeDefaults(true).flatSettings(true)), "Failed to obtain shard replication settings!");
-        return getSetting("cluster.routing.allocation.enable", response);
+        return getSetting(SETTING_CLUSTER_ROUTING_ALLOCATION_ENABLE, response);
     }
 
     private static String getSetting(String setting, GetClusterSettingsResponse settings) {
@@ -120,8 +121,8 @@ public class DatanodeUpgradeServiceAdapterOS implements DatanodeUpgradeServiceAd
     }
 
     private FlushResponse configureShardReplication(String shardReplication) {
-        final PutClusterSettingsResponse response = officialOpensearchClient.sync(c -> c.cluster().putSettings(setting -> setting.flatSettings(true).persistent("cluster.routing.allocation.enable", JsonData.of(shardReplication))), "Failed to configure shard replication!");
-        final String value = response.persistent().get("cluster.routing.allocation.enable").to(String.class);
+        final PutClusterSettingsResponse response = officialOpensearchClient.sync(c -> c.cluster().putSettings(setting -> setting.flatSettings(true).persistent(SETTING_CLUSTER_ROUTING_ALLOCATION_ENABLE, JsonData.of(shardReplication))), "Failed to configure shard replication!");
+        final String value = response.persistent().get(SETTING_CLUSTER_ROUTING_ALLOCATION_ENABLE).to(String.class);
         if (!value.equals(shardReplication)) {
             throw new IllegalStateException("Failed to configure shard replication. Expected cluster.routing.allocation.enable=" + shardReplication + " but was: " + value);
         }
