@@ -32,7 +32,7 @@ import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import generateId from 'logic/generateId';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import type { TimeRangePickerFormValues } from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangePicker';
+import type { TimeRangePickerFormValues } from 'views/components/time-range-picker/TimeRangePicker';
 import {
   normalizeFromPickerForSearchBar,
   normalizeFromSearchBarForBackend,

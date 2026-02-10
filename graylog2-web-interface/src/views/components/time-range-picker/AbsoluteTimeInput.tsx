@@ -28,7 +28,7 @@ import useUserDateTime from 'hooks/useUserDateTime';
 
 const TIME_ICON_BOD = 'hourglass_top';
 const TIME_ICON_MID = 'hourglass';
-const TIME_ICON_EOD = 'hourglass_top';
+const TIME_ICON_EOD = 'hourglass_bottom';
 
 const TIME_TYPES = ['hours', 'minutes', 'seconds', 'milliseconds'];
 
@@ -125,7 +125,7 @@ const GridInputGroup = styled(InputGroup)`
   display: contents;
 `;
 
-const _onFocusSelect = (event) => {
+const onFocusSelect = (event) => {
   event.target.select();
 };
 
@@ -166,23 +166,23 @@ const fieldUpdate = (value: string, toUserTimezone: (date: Date) => Moment) => {
     return newTime.format(DATE_TIME_FORMATS.default);
   };
 
-  const handleClickTimeNow = () => {
+  const handleClickTimeNow = (disableMinute: boolean, disableSecond: boolean) => {
     const newTime = toUserTimezone(new Date()).toObject();
 
     return moment({
       ...initialDateTime,
       hours: newTime.hours,
-      minutes: newTime.minutes,
-      seconds: newTime.seconds,
+      minutes: !disableMinute && newTime.minutes,
+      seconds: !disableSecond && newTime.seconds,
     }).format(DATE_TIME_FORMATS.default);
   };
 
-  const handleTimeToggle = (eod = false) =>
+  const handleTimeToggle = (disableMinute: boolean, disableSecond: boolean, eod = false) =>
     moment({
       ...initialDateTime,
       hours: eod ? 23 : 0,
-      minutes: eod ? 59 : 0,
-      seconds: eod ? 59 : 0,
+      minutes: eod && !disableMinute ? 59 : 0,
+      seconds: eod && !disableSecond ? 59 : 0,
     }).format(DATE_TIME_FORMATS.default);
 
   return {
@@ -193,13 +193,21 @@ const fieldUpdate = (value: string, toUserTimezone: (date: Date) => Moment) => {
   };
 };
 
-type Props = {
-  onChange?: (newTime: string) => void;
+type AbsoluteTimeInputProps = {
   dateTime: string;
   range: string;
+  onChange: (time: string) => void;
+  disableMinute?: boolean;
+  disableSecond?: boolean;
 };
 
-const AbsoluteTimeInput = ({ dateTime, range, onChange = () => {} }: Props) => {
+const AbsoluteTimeInput = ({
+  dateTime,
+  range,
+  onChange,
+  disableMinute = false,
+  disableSecond = false,
+}: AbsoluteTimeInputProps) => {
   const hourIcon = useRef<IconName>(TIME_ICON_MID);
   const { toUserTimezone } = useUserDateTime();
 
@@ -208,13 +216,15 @@ const AbsoluteTimeInput = ({ dateTime, range, onChange = () => {} }: Props) => {
     toUserTimezone,
   );
 
-  const _onChangeSetTime = (event) => {
+  const onChangeSetTime = (event) => {
     hourIcon.current = TIME_ICON_MID;
 
-    onChange(handleChangeSetTime(event));
+    if (onChange) {
+      onChange(handleChangeSetTime(event));
+    }
   };
 
-  const _onClickHourToggle = () => {
+  const onClickHourToggle = () => {
     const endOfDay = hourIcon.current === TIME_ICON_BOD;
 
     if (endOfDay) {
@@ -223,13 +233,17 @@ const AbsoluteTimeInput = ({ dateTime, range, onChange = () => {} }: Props) => {
       hourIcon.current = TIME_ICON_BOD;
     }
 
-    onChange(handleTimeToggle(endOfDay));
+    if (onChange) {
+      onChange(handleTimeToggle(disableMinute, disableSecond, endOfDay));
+    }
   };
 
-  const _onClickTimeNow = () => {
+  const onClickTimeNow = () => {
     hourIcon.current = TIME_ICON_MID;
 
-    onChange(handleClickTimeNow());
+    if (onChange) {
+      onChange(handleClickTimeNow(disableMinute, disableSecond));
+    }
   };
 
   return (
@@ -249,7 +263,7 @@ const AbsoluteTimeInput = ({ dateTime, range, onChange = () => {} }: Props) => {
             <StyledButton
               bsStyle="link"
               bsSize="small"
-              onClick={_onClickHourToggle}
+              onClick={onClickHourToggle}
               title="Toggle between beginning and end of day">
               <Icon name={hourIcon.current} />
             </StyledButton>
@@ -259,9 +273,8 @@ const AbsoluteTimeInput = ({ dateTime, range, onChange = () => {} }: Props) => {
             id={`${range}-time-hours`}
             title={`${range} hour`}
             value={initialDateTime.hours ?? ''}
-            onChange={_onChangeSetTime}
-            onFocus={_onFocusSelect}
-            bsSize="sm"
+            onChange={onChangeSetTime}
+            onFocus={onFocusSelect}
           />
           <StyledInputAddon>:</StyledInputAddon>
           <StyledFormControl
@@ -269,9 +282,9 @@ const AbsoluteTimeInput = ({ dateTime, range, onChange = () => {} }: Props) => {
             id={`${range}-time-minutes`}
             title={`${range} minutes`}
             value={initialDateTime.minutes ?? ''}
-            onChange={_onChangeSetTime}
-            onFocus={_onFocusSelect}
-            bsSize="sm"
+            onChange={onChangeSetTime}
+            disabled={disableMinute}
+            onFocus={onFocusSelect}
           />
           <StyledInputAddon>:</StyledInputAddon>
           <StyledFormControl
@@ -279,12 +292,12 @@ const AbsoluteTimeInput = ({ dateTime, range, onChange = () => {} }: Props) => {
             id={`${range}-time-seconds`}
             title={`${range} seconds`}
             value={initialDateTime.seconds ?? ''}
-            onChange={_onChangeSetTime}
-            onFocus={_onFocusSelect}
-            bsSize="sm"
+            onChange={onChangeSetTime}
+            disabled={disableSecond}
+            onFocus={onFocusSelect}
           />
           <StyledInputAddon>
-            <StyledButton bsStyle="link" bsSize="small" onClick={_onClickTimeNow} title="Set to current local time">
+            <StyledButton bsStyle="link" bsSize="small" onClick={onClickTimeNow} title="Set to current local time">
               <Icon name="calendar_clock" />
             </StyledButton>
           </StyledInputAddon>

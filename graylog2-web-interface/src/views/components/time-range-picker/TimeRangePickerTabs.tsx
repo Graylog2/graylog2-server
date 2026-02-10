@@ -25,11 +25,11 @@ import { Tab, Tabs } from 'components/bootstrap';
 import type { AbsoluteTimeRange, KeywordTimeRange, RelativeTimeRange } from 'views/logic/queries/Query';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { isTimeRange } from 'views/typeGuards/timeRange';
-import migrateTimeRangeToNewType from 'views/components/searchbar/time-range-filter/time-range-picker/migrateTimeRangeToNewType';
+import migrateTimeRangeToNewType from 'views/components/time-range-picker/migrateTimeRangeToNewType';
 import useUserDateTime from 'hooks/useUserDateTime';
 import type { DateTime, DateTimeFormats } from 'util/DateTime';
 import { toDateObject } from 'util/DateTime';
-import { RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from 'views/components/searchbar/time-range-filter/time-range-picker/RelativeTimeRangeClassifiedHelper';
+import { RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from 'views/components/time-range-picker/RelativeTimeRangeClassifiedHelper';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { SelectCallback } from 'components/bootstrap/types';
 

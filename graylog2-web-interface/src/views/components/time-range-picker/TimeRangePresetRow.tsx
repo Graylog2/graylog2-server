@@ -23,11 +23,11 @@ import styled from 'styled-components';
 import TimeRangePresetDropdown from 'views/components/searchbar/time-range-filter/TimeRangePresetDropdown';
 import { isTimeRange, isTypeRelative } from 'views/typeGuards/timeRange';
 import { IfPermitted } from 'components/common';
-import SaveTimeRangeAsPresetButton from 'views/components/searchbar/time-range-filter/time-range-picker/SaveTimeRangeAsPresetButton';
+import SaveTimeRangeAsPresetButton from 'views/components/time-range-picker/SaveTimeRangeAsPresetButton';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 import type { TimeRange } from 'views/logic/queries/Query';
-import type { TimeRangePickerFormValues } from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangePicker';
-import { classifyRelativeTimeRange } from 'views/components/searchbar/time-range-filter/time-range-picker/RelativeTimeRangeClassifiedHelper';
+import type { TimeRangePickerFormValues } from 'views/components/time-range-picker/TimeRangePicker';
+import { classifyRelativeTimeRange } from 'views/components/time-range-picker/RelativeTimeRangeClassifiedHelper';
 import { ButtonToolbar } from 'components/bootstrap';
 
 const Container = styled(ButtonToolbar)`

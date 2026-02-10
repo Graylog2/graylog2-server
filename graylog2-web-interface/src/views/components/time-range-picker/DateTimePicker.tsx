@@ -17,8 +17,8 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import AbsoluteDatePicker from 'views/components/searchbar/time-range-filter/time-range-picker/AbsoluteDatePicker';
-import AbsoluteTimeInput from 'views/components/searchbar/time-range-filter/time-range-picker/AbsoluteTimeInput';
+import AbsoluteDatePicker from 'views/components/time-range-picker/AbsoluteDatePicker';
+import AbsoluteTimeInput from 'views/components/time-range-picker/AbsoluteTimeInput';
 
 const ErrorMessage = styled.span(
   ({ theme }) => css`
@@ -33,6 +33,12 @@ const ErrorMessage = styled.span(
 const Overlay = styled.div`
   opacity: 0.1;
 `;
+
+const TimeInputRow = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
 const Disabled = ({ disabled, children = undefined }: React.PropsWithChildren<{ disabled: boolean }>) =>
   disabled ? (
     <Overlay>
@@ -63,7 +69,9 @@ const DateTimePicker = ({
     <Disabled disabled={disabled}>
       <AbsoluteDatePicker onChange={onChange} startDate={startDate} dateTime={value} />
 
-      <AbsoluteTimeInput onChange={onChange} range={range} dateTime={value} />
+      <TimeInputRow>
+        <AbsoluteTimeInput onChange={onChange} range={range} dateTime={value} />
+      </TimeInputRow>
     </Disabled>
 
     <ErrorMessage>{error}</ErrorMessage>
