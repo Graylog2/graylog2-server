@@ -82,7 +82,6 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
         fetchEntities={fetchEntities}
         keyFn={(searchParams) => queryKey(searchParams, field, currentStreams)}
         columnRenderers={columnRenderers}
-        entityActions={null}
         entityAttributesAreCamelCase
         bulkSelection={{
           onChangeSelection,

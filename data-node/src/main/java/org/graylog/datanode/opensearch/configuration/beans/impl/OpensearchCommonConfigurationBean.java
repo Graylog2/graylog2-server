@@ -88,8 +88,6 @@ public class OpensearchCommonConfigurationBean implements DatanodeConfigurationB
             config.put("bootstrap.system_call_filter", "false");
         }
 
-        config.putAll(buildParams.transientConfiguration());
-
         return config.build();
     }
 }
