@@ -68,7 +68,7 @@ public class OSDateRangeHandler extends OSPivotBucketSpecHandler<DateRangeBucket
                     Aggregation.builder().dateRange(dateRangeBuilder.build())
             );
 
-            if (root == null) {
+            if (root == null && leaf == null) {
                 root = builder;
                 leaf = builder;
             } else {

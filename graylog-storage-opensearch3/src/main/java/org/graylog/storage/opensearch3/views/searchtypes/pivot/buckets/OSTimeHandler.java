@@ -17,7 +17,6 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.buckets;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
@@ -76,7 +75,7 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
                         Aggregation.builder().autoDateHistogram(aggregation)
                 );
 
-                if (root == null) {
+                if (root == null && leaf == null) {
                     root = builder;
                     leaf = builder;
                 } else {
@@ -85,7 +84,7 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
                 }
             }
         } else {
-            for (String timeField : Lists.reverse(timeSpec.fields())) {
+            for (String timeField : timeSpec.fields()) {
                 String dateHistogramInterval = interval.toDateInterval(query.effectiveTimeRange(pivot)).toString();
                 final var ordering = orderListForPivot(pivot, queryContext, defaultOrder, query);
 
@@ -102,7 +101,7 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
                         Aggregation.builder().dateHistogram(aggregation)
                                 .aggregations(ordering.sortingAggregations())
                 );
-                if (root == null) {
+                if (root == null && leaf == null) {
                     root = builder;
                     leaf = builder;
                 } else {
