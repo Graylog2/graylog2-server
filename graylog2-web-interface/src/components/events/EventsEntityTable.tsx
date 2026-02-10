@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
 
 import { Events } from '@graylog/server-api';
 
@@ -47,28 +46,22 @@ const sliceRenderers = {
 
 const EventsEntityTable = () => {
   const { stream_id: streamId } = useQuery();
-  const _fetchEvents = useCallback(
-    (searchParams: SearchParams) => fetchEvents(searchParams, streamId as string),
-    [streamId],
-  );
+  const _fetchEvents = (searchParams: SearchParams) => fetchEvents(searchParams, streamId as string);
   const { entityActions, expandedSections, bulkSelection } = useTableElements({
     defaultLayout: eventsTableElements.defaultLayout,
   });
 
-  const _fetchSlices = useCallback(
-    (column: string, query: string, filters: UrlQueryFilters) => {
-      const { filter, timerange } = parseFilters(filters);
+  const _fetchSlices = (column: string, query: string, filters: UrlQueryFilters) => {
+    const { filter, timerange } = parseFilters(filters);
 
-      return Events.slices({
-        include_all: true,
-        slice_column: column,
-        query: getConcatenatedQuery(query, streamId as string),
-        filter,
-        timerange,
-      }).then(({ slices: s }) => [...s]);
-    },
-    [streamId],
-  );
+    return Events.slices({
+      include_all: true,
+      slice_column: column,
+      query: getConcatenatedQuery(query, streamId as string),
+      filter,
+      timerange,
+    });
+  };
 
   return (
     <EventsRefreshProvider>

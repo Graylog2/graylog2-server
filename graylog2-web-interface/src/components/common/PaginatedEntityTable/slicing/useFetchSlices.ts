@@ -23,16 +23,22 @@ import TableFetchContext from 'components/common/PaginatedEntityTable/TableFetch
 import type { Slice } from 'components/common/PaginatedEntityTable/slicing/Slicing';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
-export type FetchSlices = (column: string, query: string, filters: UrlQueryFilters) => Promise<Slice[]>;
+export type FetchSlices = (
+  column: string,
+  query: string,
+  filters: UrlQueryFilters,
+) => Promise<{ slices: Array<Slice> }>;
 
 const useFetchSlices = (fetchSlices: FetchSlices) => {
-  const { searchParams: searchParams } = useContext(TableFetchContext);
+  const {
+    searchParams: { sliceCol, query, filters },
+  } = useContext(TableFetchContext);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['slicing', searchParams.sliceCol, searchParams],
+    queryKey: ['slicing', sliceCol, query, filters],
     queryFn: () =>
       defaultOnError(
-        fetchSlices(searchParams.sliceCol, searchParams.query, searchParams.filters),
+        fetchSlices(sliceCol, query, filters).then(({ slices }) => slices),
         'Error fetching table slices',
       ),
   });
