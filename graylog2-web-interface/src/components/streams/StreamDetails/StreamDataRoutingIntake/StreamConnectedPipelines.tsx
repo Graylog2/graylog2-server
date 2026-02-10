@@ -59,7 +59,6 @@ const StreamConnectedPipelines = ({ stream }: Props) => (
           entityAttributesAreCamelCase={false}
           searchPlaceholder="Search for pipeline"
           columnRenderers={customColumnRenderers}
-          entityActions={() => null}
         />
       </ListCol>
     </Row>

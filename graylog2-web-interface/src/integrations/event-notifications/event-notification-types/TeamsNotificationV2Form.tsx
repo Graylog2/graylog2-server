@@ -15,11 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { SyntheticEvent } from 'react';
-import React from 'react';
+import React, { useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
-// eslint-disable-next-line no-restricted-imports
-import get from 'lodash/get';
-import camelCase from 'lodash/camelCase';
 
 import { getValueFromInput } from 'util/FormsUtils';
 import { Input, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/bootstrap';
@@ -36,239 +33,229 @@ type TeamsNotificationFormV2Type = {
   onChange: any;
 };
 
-class TeamsNotificationV2Form extends React.Component<TeamsNotificationFormV2Type, any> {
-  static defaultConfig = {
-    webhook_url: '',
-    /* eslint-disable no-template-curly-in-string */
-    adaptive_card:
-      '{\n' +
-      '  "type": "message",\n' +
-      '  "attachments": [\n' +
-      '    {\n' +
-      '      "contentType": "application/vnd.microsoft.card.adaptive",\n' +
-      '      "content": {\n' +
-      '        "type": "AdaptiveCard",\n' +
-      '        "version": "1.5",\n' +
-      '        "msTeams": { "width": "full" },\n' +
-      '        "body": [\n' +
-      '          {\n' +
-      '            "type": "TextBlock",\n' +
-      '            "size": "Large",\n' +
-      '            "weight": "Bolder",\n' +
-      '            "text": "${event_definition_title} triggered",\n' +
-      '            "style": "heading",\n' +
-      '            "fontType": "Default"\n' +
-      '          },\n' +
-      '          {\n' +
-      '            "type": "TextBlock",\n' +
-      '            "text": "${event_definition_description}",\n' +
-      '            "wrap": true\n' +
-      '          },\n' +
-      '          {\n' +
-      '            "type": "TextBlock",\n' +
-      '            "text": "Event Details",\n' +
-      '            "wrap": true\n' +
-      '          },\n' +
-      '          {\n' +
-      '            "type": "FactSet",\n' +
-      '            "facts": [\n' +
-      '              {\n' +
-      '                "title": "Type",\n' +
-      '                "value": "${event_definition_type}"\n' +
-      '              },\n' +
-      '              {\n' +
-      '                "title": "Timestamp",\n' +
-      '                "value": "${event.timestamp_processing}"\n' +
-      '              },\n' +
-      '              {\n' +
-      '                "title": "Message",\n' +
-      '                "value": "${event.message}"\n' +
-      '              },\n' +
-      '              {\n' +
-      '                "title": "Source",\n' +
-      '                "value": "${event.source}"\n' +
-      '              },\n' +
-      '              {\n' +
-      '                "title": "Key",\n' +
-      '                "value": "${event.key}"\n' +
-      '              },\n' +
-      '              {\n' +
-      '                "title": "Priority",\n' +
-      '                "value": "${event.priority}"\n' +
-      '              },\n' +
-      '              {\n' +
-      '                "title": "Alert",\n' +
-      '                "value": "${event.alert}"\n' +
-      '              },\n' +
-      '              {\n' +
-      '                "title": "Timerange Start",\n' +
-      '                "value": "${event.timerange_start}"\n' +
-      '              },\n' +
-      '              {\n' +
-      '                "title": "Timerange End",\n' +
-      '                "value": "${event.timerange_end}"\n' +
-      '              }\n' +
-      '            ]\n' +
-      '          }${if event.fields},\n' +
-      '          {\n' +
-      '            "type": "TextBlock",\n' +
-      '            "text": "Event Fields",\n' +
-      '            "weight": "bolder",\n' +
-      '            "size": "medium"\n' +
-      '          },\n' +
-      '          {\n' +
-      '            "type": "FactSet",\n' +
-      '            "facts": [${foreach event.fields field}\n' +
-      '              { "title": "${field.key}", "value": "${field.value}" }${if last_field}${else},${end}${end}\n' +
-      '            ]\n' +
-      '          }${end}${if backlog},\n' +
-      '          {\n' +
-      '            "type": "TextBlock",\n' +
-      '            "text": "Backlog",\n' +
-      '            "weight": "bolder",\n' +
-      '            "size": "medium"\n' +
-      '          },\n' +
-      '          {\n' +
-      '            "type": "FactSet",\n' +
-      '            "facts": [${foreach backlog message}\n' +
-      '              { "title": "Message", "value": "${message.message}" }${if last_message}${else},${end}${end}\n' +
-      '            ]\n' +
-      '          }${end}\n' +
-      '        ],\n' +
-      '        "actions": [{\n' +
-      '          "type": "Action.OpenUrl",\n' +
-      '          "title": "Replay Search",\n' +
-      '          "url": "${http_external_uri}alerts/${event.id}/replay-search"\n' +
-      '        }],\n' +
-      '        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",\n' +
-      '        "rtl": false\n' +
-      '      }\n' +
-      '    }\n' +
-      '  ]\n' +
-      '}',
-    /* eslint-enable no-template-curly-in-string */
-    backlog_size: 0,
-    time_zone: 'UTC',
-  };
+export const defaultConfig: ConfigV2Type = {
+  webhook_url: '',
+  /* eslint-disable no-template-curly-in-string */
+  adaptive_card:
+    '{\n' +
+    '  "type": "message",\n' +
+    '  "attachments": [\n' +
+    '    {\n' +
+    '      "contentType": "application/vnd.microsoft.card.adaptive",\n' +
+    '      "content": {\n' +
+    '        "type": "AdaptiveCard",\n' +
+    '        "version": "1.5",\n' +
+    '        "msTeams": { "width": "full" },\n' +
+    '        "body": [\n' +
+    '          {\n' +
+    '            "type": "TextBlock",\n' +
+    '            "size": "Large",\n' +
+    '            "weight": "Bolder",\n' +
+    '            "text": "${event_definition_title} triggered",\n' +
+    '            "style": "heading",\n' +
+    '            "fontType": "Default"\n' +
+    '          },\n' +
+    '          {\n' +
+    '            "type": "TextBlock",\n' +
+    '            "text": "${event_definition_description}",\n' +
+    '            "wrap": true\n' +
+    '          },\n' +
+    '          {\n' +
+    '            "type": "TextBlock",\n' +
+    '            "text": "Event Details",\n' +
+    '            "wrap": true\n' +
+    '          },\n' +
+    '          {\n' +
+    '            "type": "FactSet",\n' +
+    '            "facts": [\n' +
+    '              {\n' +
+    '                "title": "Type",\n' +
+    '                "value": "${event_definition_type}"\n' +
+    '              },\n' +
+    '              {\n' +
+    '                "title": "Timestamp",\n' +
+    '                "value": "${event.timestamp_processing}"\n' +
+    '              },\n' +
+    '              {\n' +
+    '                "title": "Message",\n' +
+    '                "value": "${event.message}"\n' +
+    '              },\n' +
+    '              {\n' +
+    '                "title": "Source",\n' +
+    '                "value": "${event.source}"\n' +
+    '              },\n' +
+    '              {\n' +
+    '                "title": "Key",\n' +
+    '                "value": "${event.key}"\n' +
+    '              },\n' +
+    '              {\n' +
+    '                "title": "Priority",\n' +
+    '                "value": "${event.priority}"\n' +
+    '              },\n' +
+    '              {\n' +
+    '                "title": "Alert",\n' +
+    '                "value": "${event.alert}"\n' +
+    '              },\n' +
+    '              {\n' +
+    '                "title": "Timerange Start",\n' +
+    '                "value": "${event.timerange_start}"\n' +
+    '              },\n' +
+    '              {\n' +
+    '                "title": "Timerange End",\n' +
+    '                "value": "${event.timerange_end}"\n' +
+    '              }\n' +
+    '            ]\n' +
+    '          }${if event.fields},\n' +
+    '          {\n' +
+    '            "type": "TextBlock",\n' +
+    '            "text": "Event Fields",\n' +
+    '            "weight": "bolder",\n' +
+    '            "size": "medium"\n' +
+    '          },\n' +
+    '          {\n' +
+    '            "type": "FactSet",\n' +
+    '            "facts": [${foreach event.fields field}\n' +
+    '              { "title": "${field.key}", "value": "${field.value}" }${if last_field}${else},${end}${end}\n' +
+    '            ]\n' +
+    '          }${end}${if backlog},\n' +
+    '          {\n' +
+    '            "type": "TextBlock",\n' +
+    '            "text": "Backlog",\n' +
+    '            "weight": "bolder",\n' +
+    '            "size": "medium"\n' +
+    '          },\n' +
+    '          {\n' +
+    '            "type": "FactSet",\n' +
+    '            "facts": [${foreach backlog message}\n' +
+    '              { "title": "Message", "value": "${message.message}" }${if last_message}${else},${end}${end}\n' +
+    '            ]\n' +
+    '          }${end}\n' +
+    '        ],\n' +
+    '        "actions": [{\n' +
+    '          "type": "Action.OpenUrl",\n' +
+    '          "title": "Replay Search",\n' +
+    '          "url": "${http_external_uri}alerts/${event.id}/replay-search"\n' +
+    '        }],\n' +
+    '        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",\n' +
+    '        "rtl": false\n' +
+    '      }\n' +
+    '    }\n' +
+    '  ]\n' +
+    '}',
+  /* eslint-enable no-template-curly-in-string */
+  backlog_size: 0,
+  time_zone: 'UTC',
+};
 
-  constructor(props: TeamsNotificationFormV2Type | Readonly<TeamsNotificationFormV2Type>) {
-    super(props);
+const TeamsNotificationV2Form = ({ config, validation, onChange }: TeamsNotificationFormV2Type) => {
+  const defaultBacklogSize = config.backlog_size;
+  const [isBacklogSizeEnabled, setIsBacklogSizeEnabled] = useState(defaultBacklogSize > 0);
+  const [backlogSize, setBacklogSize] = useState(defaultBacklogSize);
 
-    const defaultBacklogSize = props.config.backlog_size;
-
-    this.state = {
-      isBacklogSizeEnabled: defaultBacklogSize > 0,
-      backlogSize: defaultBacklogSize,
-    };
-  }
-
-  handleBacklogSizeChange: SelectCallback = (event: { target: { name: string } }) => {
-    const { name } = event.target;
-    const value = getValueFromInput(event.target);
-
-    this.setState({ [camelCase(name)]: value });
-    this.propagateChange(name, getValueFromInput(event.target));
-  };
-
-  toggleBacklogSize = () => {
-    const { isBacklogSizeEnabled, backlogSize } = this.state;
-
-    this.setState({ isBacklogSizeEnabled: !isBacklogSizeEnabled });
-    this.propagateChange('backlog_size', isBacklogSizeEnabled ? 0 : backlogSize);
-  };
-
-  propagateChange = (key: string, value: any) => {
-    const { config, onChange } = this.props;
+  const propagateChange = (key: string, value: any) => {
     const nextConfig = cloneDeep(config);
     nextConfig[key] = value;
     onChange(nextConfig);
   };
 
-  handleTimeZoneChange = (nextValue) => {
-    this.propagateChange('time_zone', nextValue);
+  const handleBacklogSizeChange: SelectCallback = (event: { target: { name: string } }) => {
+    const { name } = event.target;
+    const value = getValueFromInput(event.target);
+
+    setBacklogSize(value);
+    propagateChange(name, value);
   };
 
-  handleWebhookUrlChange = (event: SyntheticEvent<EventTarget>) => {
-    this.propagateChange('webhook_url', getValueFromInput(event.target));
+  const toggleBacklogSize = () => {
+    setIsBacklogSizeEnabled((prevIsBacklogSizeEnabled) => {
+      const nextIsBacklogSizeEnabled = !prevIsBacklogSizeEnabled;
+      propagateChange('backlog_size', prevIsBacklogSizeEnabled ? 0 : backlogSize);
+
+      return nextIsBacklogSizeEnabled;
+    });
   };
 
-  handleAdaptiveCardChange = (nextValue: string) => {
-    this.propagateChange('adaptive_card', nextValue);
+  const handleTimeZoneChange = (nextValue) => {
+    propagateChange('time_zone', nextValue);
   };
 
-  render() {
-    const { config, validation } = this.props;
-    const { isBacklogSizeEnabled, backlogSize } = this.state;
-    const element = (
-      <p>
-        Adaptive Card to post to Teams. See <DocumentationLink page={DocsHelper.PAGES.ALERTS} text="docs " /> for more
-        details.
-      </p>
-    );
+  const handleWebhookUrlChange = (event: SyntheticEvent<EventTarget>) => {
+    propagateChange('webhook_url', getValueFromInput(event.target));
+  };
 
-    return (
-      <>
-        <URLAllowListInput
-          label="Webhook URL"
-          onChange={this.handleWebhookUrlChange}
-          validationState={validation.errors.webhook_url ? 'error' : null}
-          validationMessage={get(validation, 'errors.webhook_url[0]', 'Teams "Incoming Webhook" URL')}
-          url={config.webhook_url || ''}
-          autofocus={false}
+  const handleAdaptiveCardChange = (nextValue: string) => {
+    propagateChange('adaptive_card', nextValue);
+  };
+
+  const element = (
+    <p>
+      Adaptive Card to post to Teams. See <DocumentationLink page={DocsHelper.PAGES.ALERTS} text="docs " /> for more
+      details.
+    </p>
+  );
+
+  return (
+    <>
+      <URLAllowListInput
+        label="Webhook URL"
+        onChange={handleWebhookUrlChange}
+        validationState={validation.errors.webhook_url ? 'error' : null}
+        validationMessage={validation?.errors?.webhook_url?.[0] ?? 'Teams "Incoming Webhook" URL'}
+        url={config.webhook_url || ''}
+        autofocus={false}
+      />
+      <FormGroup>
+        <ControlLabel>Adaptive Card Template</ControlLabel>
+        <SourceCodeEditor
+          id="notification-adaptiveCard"
+          mode="text"
+          theme="light"
+          value={config.adaptive_card || ''}
+          wrapEnabled
+          onChange={handleAdaptiveCardChange}
         />
-        <FormGroup>
-          <ControlLabel>Adaptive Card Template</ControlLabel>
-          <SourceCodeEditor
-            id="notification-adaptiveCard"
-            mode="text"
-            theme="light"
-            value={config.adaptive_card || ''}
-            wrapEnabled
-            onChange={this.handleAdaptiveCardChange}
+        <HelpBlock>{validation?.errors?.adaptive_card?.[0] ?? element}</HelpBlock>
+      </FormGroup>
+      <FormGroup>
+        <Input
+          id="notification-time-zone"
+          help="Time zone used for timestamps in the notification body."
+          label="Time zone for date/time values">
+          <TimezoneSelect
+            className="timezone-select"
+            name="time_zone"
+            value={config.time_zone}
+            onChange={handleTimeZoneChange}
+            clearable={false}
           />
-          <HelpBlock>{get(validation, 'errors.adaptive_card[0]', element)}</HelpBlock>
-        </FormGroup>
-        <FormGroup>
-          <Input
-            id="notification-time-zone"
-            help="Time zone used for timestamps in the notification body."
-            label="Time zone for date/time values">
-            <TimezoneSelect
-              className="timezone-select"
-              name="time_zone"
-              value={config.time_zone}
-              onChange={this.handleTimeZoneChange}
-              clearable={false}
+        </Input>
+        <ControlLabel>Message Backlog Limit (optional)</ControlLabel>
+        <InputGroup>
+          <InputGroup.Addon>
+            <input
+              id="toggle_backlog_size"
+              type="checkbox"
+              checked={isBacklogSizeEnabled}
+              onChange={toggleBacklogSize}
             />
-          </Input>
-          <ControlLabel>Message Backlog Limit (optional)</ControlLabel>
-          <InputGroup>
-            <InputGroup.Addon>
-              <input
-                id="toggle_backlog_size"
-                type="checkbox"
-                checked={isBacklogSizeEnabled}
-                onChange={this.toggleBacklogSize}
-              />
-            </InputGroup.Addon>
-            <FormControl
-              type="number"
-              id="backlog_size"
-              name="backlog_size"
-              onChange={this.handleBacklogSizeChange}
-              value={backlogSize}
-              min="0"
-              disabled={!isBacklogSizeEnabled}
-            />
-          </InputGroup>
-          <HelpBlock>
-            Limit the number of backlog messages sent as part of the Microsoft Teams notification. If set to 0, no limit
-            will be enforced.
-          </HelpBlock>
-        </FormGroup>
-      </>
-    );
-  }
-}
+          </InputGroup.Addon>
+          <FormControl
+            type="number"
+            id="backlog_size"
+            name="backlog_size"
+            onChange={handleBacklogSizeChange}
+            value={backlogSize}
+            min="0"
+            disabled={!isBacklogSizeEnabled}
+          />
+        </InputGroup>
+        <HelpBlock>
+          Limit the number of backlog messages sent as part of the Microsoft Teams notification. If set to 0, no limit
+          will be enforced.
+        </HelpBlock>
+      </FormGroup>
+    </>
+  );
+};
 
 export default TeamsNotificationV2Form;
