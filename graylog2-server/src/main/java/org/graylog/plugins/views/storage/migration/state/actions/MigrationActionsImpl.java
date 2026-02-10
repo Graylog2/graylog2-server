@@ -20,7 +20,6 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
 import org.graylog.security.certutil.CaKeystore;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
@@ -43,11 +42,8 @@ import org.graylog2.system.processing.control.RemoteProcessingControlResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class MigrationActionsImpl implements MigrationActions {
     private static final Logger LOG = LoggerFactory.getLogger(MigrationActionsImpl.class);
@@ -65,7 +61,6 @@ public class MigrationActionsImpl implements MigrationActions {
 
     private final DatanodeRestApiProxy datanodeProxy;
     private final ElasticsearchVersionProvider searchVersionProvider;
-    private final List<URI> elasticsearchHosts;
 
     @Inject
     public MigrationActionsImpl(@Assisted MigrationStateMachineContext stateMachineContext,
@@ -75,8 +70,7 @@ public class MigrationActionsImpl implements MigrationActions {
                                 final PreflightConfigService preflightConfigService,
                                 final MetricRegistry metricRegistry,
                                 final DatanodeRestApiProxy datanodeProxy,
-                                ElasticsearchVersionProvider searchVersionProvider,
-                                @Named("elasticsearch_hosts") List<URI> elasticsearchHosts) {
+                                ElasticsearchVersionProvider searchVersionProvider) {
         this.stateMachineContext = stateMachineContext;
         this.clusterConfigService = clusterConfigService;
         this.nodeService = nodeService;
@@ -87,7 +81,6 @@ public class MigrationActionsImpl implements MigrationActions {
         this.metricRegistry = metricRegistry;
         this.datanodeProxy = datanodeProxy;
         this.searchVersionProvider = searchVersionProvider;
-        this.elasticsearchHosts = elasticsearchHosts;
     }
 
 
