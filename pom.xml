@@ -129,7 +129,7 @@
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.46.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
-        <gcs.version>2.62.0</gcs.version>
+        <gcs.version>2.62.1</gcs.version>
         <azure-blob-storage.version>12.33.1</azure-blob-storage.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>5.0.2</geoip2.version>
@@ -154,7 +154,7 @@
         <jbcrypt.version>0.4</jbcrypt.version>
         <jcip-annotations.version>1.0</jcip-annotations.version>
         <jdot.version>1.0</jdot.version>
-        <jersey.version>4.0.0</jersey.version>
+        <jersey.version>4.0.2</jersey.version>
         <jmte.version>7.0.3</jmte.version>
         <joda-time.version>2.14.0</joda-time.version>
         <jool.version>0.9.15</jool.version>
@@ -186,7 +186,7 @@
         <shiro.version>2.0.6</shiro.version>
         <snakeyaml.version>2.5</snakeyaml.version>
         <snappy-java.version>1.1.10.8</snappy-java.version>
-        <oshi.version>6.9.2</oshi.version>
+        <oshi.version>6.9.3</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.17</slf4j.version>
         <streamex.version>0.8.4</streamex.version>
