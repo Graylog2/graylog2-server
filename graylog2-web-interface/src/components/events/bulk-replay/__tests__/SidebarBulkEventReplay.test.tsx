@@ -159,12 +159,12 @@ describe('SidebarBulkEventReplay', () => {
     await expectReplayingEvent(initialEventIds[0]);
 
     await openDropdown();
-
-    await userEvent.click(await screen.findByText(eventMessage(1)));
+    userEvent.click(await screen.findByText(eventMessage(1)));
 
     await expectReplayingEvent(initialEventIds[1]);
 
-    await userEvent.click(await screen.findByText(eventMessage(0)));
+    await openDropdown();
+    userEvent.click(await screen.findByText(eventMessage(0)));
 
     await expectReplayingEvent(initialEventIds[0]);
   });
@@ -190,8 +190,8 @@ describe('SidebarBulkEventReplay', () => {
     await openDropdown();
     await removeEvent(initialEventIds[1]);
 
-    await userEvent.click(await screen.findByRole('button', { name: /bulk actions/i }));
-    await userEvent.click(await screen.findByRole('menuitem', { name: /test action/i }));
+    userEvent.click(await screen.findByRole('button', { name: /bulk actions/i }));
+    userEvent.click(await screen.findByRole('menuitem', { name: /test action/i }));
 
     await waitFor(() => {
       expect(bulkAction).toHaveBeenCalledWith([eventByIndex(0), eventByIndex(2)]);
@@ -205,7 +205,7 @@ describe('SidebarBulkEventReplay', () => {
     const prev = await screen.findByTitle(/previous event/i);
     const next = await screen.findByTitle(/next event/i);
 
-    await userEvent.click(next);
+    userEvent.click(next);
     await expectReplayingEvent(initialEventIds[1]);
 
     await userEvent.click(prev);
