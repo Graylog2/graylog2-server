@@ -26,9 +26,7 @@ import useTriggerMigrationState from 'components/datanode/hooks/useTriggerMigrat
 import {
   IN_PLACE_MIGRATION_STEPS,
   MIGRATION_STATE,
-  REMOTE_REINDEXING_MIGRATION_STEPS,
 } from 'components/datanode/Constants';
-import RemoteReindexingMigration from 'components/datanode/migrations/RemoteReindexingMigration';
 import MigrationError from 'components/datanode/migrations/common/MigrationError';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -45,7 +43,7 @@ const ManualMigrationStep = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.MIGRATION_TYPE_SELECTED, {
       app_pathname: 'datanode',
       app_section: 'migration',
-      event_details: { migration_type: step === 'SELECT_ROLLING_UPGRADE_MIGRATION' ? 'IN-PLACE' : 'REMOTE REINDEX' },
+      event_details: { migration_type: 'IN-PLACE' },
     });
 
     return onTriggerNextState({ step, args });
@@ -53,7 +51,6 @@ const ManualMigrationStep = () => {
 
   const migrationTypeOptions = [
     { label: 'In-Place migration', value: 'SELECT_ROLLING_UPGRADE_MIGRATION' },
-    { label: 'Remote Re-indexing Migration', value: 'SELECT_REMOTE_REINDEX_MIGRATION' },
   ].filter((path) => currentStep.next_steps.includes(path.value));
 
   return (
@@ -84,9 +81,6 @@ const ManualMigrationStep = () => {
       <MigrationError errorMessage={currentStep.error_message} />
       {currentStep && IN_PLACE_MIGRATION_STEPS.includes(currentStep.state) && (
         <InPlaceMigration onTriggerStep={onMigrationStepChange} currentStep={currentStep} />
-      )}
-      {currentStep && REMOTE_REINDEXING_MIGRATION_STEPS.includes(currentStep.state) && (
-        <RemoteReindexingMigration onTriggerStep={onMigrationStepChange} currentStep={currentStep} />
       )}
     </>
   );
