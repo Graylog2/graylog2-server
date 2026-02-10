@@ -95,7 +95,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   additionalAttributes = [],
   bulkSelection = undefined,
   columnRenderers,
-  entityActions,
+  entityActions = undefined,
   entityAttributesAreCamelCase,
   expandedSectionRenderers = undefined,
   externalSearch = undefined,
@@ -323,7 +323,7 @@ export type PaginatedEntityTableProps<T, M> = {
   additionalAttributes?: Array<Attribute>;
   bulkSelection?: EntityDataTableProps['bulkSelection'];
   columnRenderers: EntityDataTableProps['columnRenderers'];
-  entityActions: EntityDataTableProps['entityActions'];
+  entityActions?: EntityDataTableProps['entityActions'];
   entityAttributesAreCamelCase: boolean;
   expandedSectionRenderers?: ExpandedSectionRenderers<T>;
   externalSearch?: ExternalSearch;
