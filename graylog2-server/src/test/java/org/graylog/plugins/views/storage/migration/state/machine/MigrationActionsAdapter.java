@@ -37,22 +37,7 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
-    public void startRemoteReindex() {
-
-    }
-
-    @Override
-    public void requestMigrationStatus() {
-
-    }
-
-    @Override
     public void calculateTrafficEstimate() {
-
-    }
-
-    @Override
-    public void verifyRemoteIndexerConnection() {
 
     }
 
@@ -62,21 +47,7 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
-    public void getElasticsearchHosts() {
-
-    }
-
-    @Override
     public void stopDatanodes() {
-    }
-
-    @Override
-    public void finishRemoteReindexMigration() {
-    }
-
-    @Override
-    public boolean isRemoteReindexMigrationEnabled() {
-        return true;
     }
 
     @Override
@@ -99,39 +70,20 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
-    public void reindexUpgradeSelected() {
-
-    }
-
-    @Override
-    public boolean isRemoteReindexingFinished() {
-        return false;
-    }
-
-    @Override
     public void stopMessageProcessing() {
 
     }
 
     @Override
-    public void startMessageProcessing() {
-
+    public boolean caExists() {
+        return true;
     }
 
     @Override
-    public boolean caDoesNotExist() {
-        return false;
+    public boolean renewalPolicyExists() {
+        return true;
     }
 
-    @Override
-    public boolean renewalPolicyDoesNotExist() {
-        return false;
-    }
-
-    @Override
-    public boolean caAndRenewalPolicyExist() {
-        return false;
-    }
 
     @Override
     public boolean compatibleDatanodesRunning() {
@@ -140,10 +92,6 @@ public class MigrationActionsAdapter implements MigrationActions {
 
     @Override
     public void provisionDataNodes() {
-    }
-
-    @Override
-    public void provisionAndStartDataNodes() {
     }
 
     @Override

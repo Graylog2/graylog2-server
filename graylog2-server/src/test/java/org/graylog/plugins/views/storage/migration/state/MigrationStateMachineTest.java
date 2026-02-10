@@ -22,6 +22,7 @@ import org.graylog.plugins.views.storage.migration.state.machine.MigrationState;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachine;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineProvider;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStep;
+import org.graylog.plugins.views.storage.migration.state.machine.TestableMigrationActions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,7 @@ class MigrationStateMachineTest {
     @Test
     void testPersistence() {
         final InMemoryStateMachinePersistence persistence = new InMemoryStateMachinePersistence();
-        final MigrationStateMachine migrationStateMachine = new MigrationStateMachineProvider(persistence, MigrationActionsAdapter::new).get();
+        final MigrationStateMachine migrationStateMachine = new MigrationStateMachineProvider(persistence, (ctx) -> TestableMigrationActions.initialConfig().build()).get();
         migrationStateMachine.trigger(MigrationStep.SELECT_MIGRATION, Collections.emptyMap());
 
 
@@ -52,7 +53,7 @@ class MigrationStateMachineTest {
     @Test
     void testReset() {
         final InMemoryStateMachinePersistence persistence = new InMemoryStateMachinePersistence();
-        final MigrationStateMachineProvider provider = new MigrationStateMachineProvider(persistence, MigrationActionsAdapter::new);
+        final MigrationStateMachineProvider provider = new MigrationStateMachineProvider(persistence,  (ctx) -> TestableMigrationActions.initialConfig().build());
         final MigrationStateMachine sm = provider.get();
         sm.trigger(MigrationStep.SELECT_MIGRATION, Collections.emptyMap());
 
@@ -66,7 +67,7 @@ class MigrationStateMachineTest {
 
     @Test
     void testSerialization() {
-        final MigrationStateMachine migrationStateMachine = new MigrationStateMachineProvider(new InMemoryStateMachinePersistence(), MigrationActionsAdapter::new).get();
+        final MigrationStateMachine migrationStateMachine = new MigrationStateMachineProvider(new InMemoryStateMachinePersistence(),  (ctx) -> TestableMigrationActions.initialConfig().build()).get();
         final String serialized = migrationStateMachine.serialize();
         Assertions.assertThat(serialized).isNotEmpty().startsWith("digraph G {");
         final String fragment = URLEncoder.encode(serialized, StandardCharsets.UTF_8).replace("+", "%20");
