@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 
 import { Events } from '@graylog/server-api';
 
@@ -40,6 +40,11 @@ const additionalSearchFields = {
   key: 'The key of the event',
 };
 
+const sliceRenderers = {
+  priority: (priority: number) => <PriorityName priority={priority} />,
+  alert: (alert: 'true' | 'false') => <EventTypeLabel isAlert={alert === 'true'} />,
+};
+
 const EventsEntityTable = () => {
   const { stream_id: streamId } = useQuery();
   const _fetchEvents = useCallback(
@@ -59,16 +64,6 @@ const EventsEntityTable = () => {
         ...parseFilters(filters),
       }).then(({ slices: s }) => [...s]),
     [streamId],
-  );
-
-  const sliceRenderers = useMemo(
-    () => ({
-      // eslint-disable-next-line react/no-unstable-nested-components
-      priority: (priority: number) => <PriorityName priority={priority} />,
-      // eslint-disable-next-line react/no-unstable-nested-components
-      alert: (alert: 'true' | 'false') => <EventTypeLabel isAlert={alert === 'true'} />,
-    }),
-    [],
   );
 
   return (
