@@ -52,9 +52,7 @@ const EventsEntityTable = () => {
   const _fetchSlices = useCallback(
     (column: string, searchParams: SearchParams) =>
       Events.slices({
-        sort_direction: 'asc',
         include_all: true,
-        sort_by: column,
         slice_column: column,
         parameters: {
           query: getConcatenatedQuery(searchParams.query, streamId as string),

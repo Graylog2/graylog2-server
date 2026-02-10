@@ -29,8 +29,6 @@ import org.graylog2.rest.resources.entities.SlicesRequest;
 public abstract class EventsSlicesRequest implements SlicesRequest<EventsSearchParameters> {
     private static final String FIELD_PARAMETERS = "parameters";
     private static final String FIELD_SLICE_COLUMN = "slice_column";
-    private static final String FIELD_SORT_BY = "sort_by";
-    private static final String FIELD_SORT_DIRECTION = "sort_direction";
     private static final String FIELD_INCLUDE_ALL = "include_all";
 
     @JsonProperty(FIELD_PARAMETERS)
@@ -40,14 +38,6 @@ public abstract class EventsSlicesRequest implements SlicesRequest<EventsSearchP
     @JsonProperty(FIELD_SLICE_COLUMN)
     @Override
     public abstract String sliceColumn();
-
-    @JsonProperty(FIELD_SORT_BY)
-    @Override
-    public abstract String sortBy();
-
-    @JsonProperty(FIELD_SORT_DIRECTION)
-    @Override
-    public abstract SortDirection sortDirection();
 
     @JsonProperty(FIELD_INCLUDE_ALL)
     @Override
@@ -70,9 +60,7 @@ public abstract class EventsSlicesRequest implements SlicesRequest<EventsSearchP
             return new AutoValue_EventsSlicesRequest.Builder()
                     .sliceColumn("type")
                     .parameters(EventsSearchParameters.empty())
-                    .includeAll(false)
-                    .sortBy("title")
-                    .sortDirection(SortDirection.ASC);
+                    .includeAll(false);
         }
 
         @JsonProperty(FIELD_PARAMETERS)
@@ -80,12 +68,6 @@ public abstract class EventsSlicesRequest implements SlicesRequest<EventsSearchP
 
         @JsonProperty(FIELD_SLICE_COLUMN)
         public abstract Builder sliceColumn(String sliceColumn);
-
-        @JsonProperty(FIELD_SORT_BY)
-        public abstract Builder sortBy(String sortBy);
-
-        @JsonProperty(FIELD_SORT_DIRECTION)
-        public abstract Builder sortDirection(SortDirection sortDirection);
 
         @JsonProperty(FIELD_INCLUDE_ALL)
         public abstract Builder includeAll(boolean includeAll);

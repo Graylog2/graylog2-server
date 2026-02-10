@@ -16,19 +16,8 @@
  */
 package org.graylog2.rest.resources.entities;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public interface SlicesRequest<T> {
-    enum SortDirection {
-        @JsonProperty("asc")
-        ASC,
-        @JsonProperty("desc")
-        DESC
-    }
-
     T parameters();
     String sliceColumn();
-    String sortBy();
-    SortDirection sortDirection();
     boolean includeAll();
 }
