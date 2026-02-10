@@ -60,6 +60,11 @@ import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.gte;
 import static com.mongodb.client.model.Filters.lt;
 
+/**
+ * EventProcessor implementation that executes a MongoDB aggregation pipeline to create events based on the aggregation results.
+ * Events are intended to alert to specific DB conditions - the pipeline is expected to produce a single document result,
+ * which is then converted into an Event.
+ */
 public class MongoDBEventProcessor implements EventProcessor {
     public interface Factory extends EventProcessor.Factory<MongoDBEventProcessor> {
         @Override
@@ -108,15 +113,10 @@ public class MongoDBEventProcessor implements EventProcessor {
         LOG.debug("Creating events from MongoDB aggregation for config={} parameters={}", config, parameters);
 
         try {
-            // Build aggregation pipeline
             List<Bson> pipeline = buildAggregationPipeline(parameters);
-
-            // Execute aggregation
             AggregateIterable<Document> aggregateIterable = collection
                     .aggregate(pipeline, Document.class)
                     .batchSize(MONGO_BATCHSIZE);
-
-            // Get the single result from aggregation
             Document result = aggregateIterable.first();
 
             if (result == null) {
@@ -129,11 +129,8 @@ public class MongoDBEventProcessor implements EventProcessor {
                 return;
             }
 
-            // Create single event from aggregation result
             Event event = createEventFromAggregation(eventFactory, result, parameters);
             Message message = convertAggregationToMessage(result, parameters);
-
-            // Send single event
             List<EventWithContext> events = Collections.singletonList(
                     EventWithContext.create(event, message)
             );
@@ -143,7 +140,6 @@ public class MongoDBEventProcessor implements EventProcessor {
                     events.stream().findFirst().map(e -> e.event().getEventDefinitionType()).orElse("N/A"),
                     result.toJson());
 
-            // Update processor state
             stateService.setState(eventDefinition.id(),
                     parameters.timerange().getFrom(),
                     parameters.timerange().getTo());
@@ -193,12 +189,9 @@ public class MongoDBEventProcessor implements EventProcessor {
         // Use end of time range as event timestamp
         DateTime timestamp = parameters.timerange().getTo();
         Event event = eventFactory.createEvent(eventDefinition, timestamp, eventDefinition.title());
-
-        // Set timerange for the event
         event.setTimerangeStart(parameters.timerange().getFrom());
         event.setTimerangeEnd(parameters.timerange().getTo());
 
-        // Set origin context - encodes the time range instead of document ID
         event.setOriginContext(EventOriginContext.mongodbAggregation(
                 config.collectionName(),
                 parameters.timerange().getFrom().toString(),
@@ -215,7 +208,6 @@ public class MongoDBEventProcessor implements EventProcessor {
             }
         }
 
-        // Set replay info
         event.setReplayInfo(EventReplayInfo.builder()
                 .timerangeStart(parameters.timerange().getFrom())
                 .timerangeEnd(parameters.timerange().getTo())
@@ -226,7 +218,7 @@ public class MongoDBEventProcessor implements EventProcessor {
     }
 
     private Message convertAggregationToMessage(Document aggregationResult,
-                                               MongoDBEventProcessorParameters parameters) {
+                                                MongoDBEventProcessorParameters parameters) {
         // Use end of time range as message timestamp
         DateTime timestamp = parameters.timerange().getTo();
 
