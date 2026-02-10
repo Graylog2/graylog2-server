@@ -65,9 +65,6 @@ const Summary = styled.span<SummaryProps>(
     flex-grow: 1;
   `,
 );
-const Ellipsis = styled.span`
-  text-overflow: ellipsis;
-`;
 
 const CompletedButton = styled(IconButton)<{ $done: boolean }>(
   ({ theme, $done }) => css`
@@ -109,9 +106,7 @@ const EventListItem = ({
         iconType={done ? 'solid' : 'regular'}
         $done={done}
       />
-      <Summary $done={done}>
-        <Ellipsis>{event?.message ?? <i>Unknown</i>}</Ellipsis>
-      </Summary>
+      <Summary $done={done}>{event?.message ?? <i>Unknown</i>}</Summary>
       {isDropdown ? (
         <Icon name="arrow_drop_down" />
       ) : (

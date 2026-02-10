@@ -19,7 +19,6 @@ package org.graylog2.storage.providers;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
-import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.storage.DetectedSearchVersion;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.storage.VersionAwareProvider;

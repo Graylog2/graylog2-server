@@ -14,10 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2;
+package org.graylog.plugins.views.storage.migration.state.machine;
 
-public class RemoteReindexNotAllowedException extends IllegalStateException {
-    public RemoteReindexNotAllowedException(String message) {
-        super(message);
-    }
+public enum TestableAction {
+    startDataNodes,
+    stopDatanodes,
+    provisionDataNodes,
+    stopMessageProcessing,
+    runDirectoryCompatibilityCheck,
+    calculateTrafficEstimate,
+    rollingUpgradeSelected,
+    setPreflightFinished
 }
