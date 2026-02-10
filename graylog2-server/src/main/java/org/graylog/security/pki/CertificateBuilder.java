@@ -200,8 +200,10 @@ public class CertificateBuilder {
                 .addRDN(BCStyle.O, productName)
                 .build();
 
-        // Get the issuer DN from the issuer certificate
-        final X500Name issuerDn = new X500Name(issuerCert.getSubjectX500Principal().getName());
+        // Get the issuer DN from the issuer certificate's DER-encoded subject.
+        // Using getEncoded() instead of getName() preserves the exact RDN order,
+        // which is critical for PKIX path building (X500Principal.equals() compares DER bytes).
+        final X500Name issuerDn = X500Name.getInstance(issuerCert.getSubjectX500Principal().getEncoded());
 
         final Instant now = Instant.now();
         final Instant notAfter = now.plus(validity);
@@ -306,8 +308,10 @@ public class CertificateBuilder {
                 .addRDN(BCStyle.O, productName)
                 .build();
 
-        // Get the issuer DN from the issuer certificate
-        final X500Name issuerDn = new X500Name(issuerCert.getSubjectX500Principal().getName());
+        // Get the issuer DN from the issuer certificate's DER-encoded subject.
+        // Using getEncoded() instead of getName() preserves the exact RDN order,
+        // which is critical for PKIX path building (X500Principal.equals() compares DER bytes).
+        final X500Name issuerDn = X500Name.getInstance(issuerCert.getSubjectX500Principal().getEncoded());
 
         final Instant now = Instant.now();
         final Instant notAfter = now.plus(validity);
@@ -486,8 +490,10 @@ public class CertificateBuilder {
                 .addRDN(BCStyle.O, productName)
                 .build();
 
-        // Get the issuer DN from the issuer certificate
-        final X500Name issuerDn = new X500Name(issuerCert.getSubjectX500Principal().getName());
+        // Get the issuer DN from the issuer certificate's DER-encoded subject.
+        // Using getEncoded() instead of getName() preserves the exact RDN order,
+        // which is critical for PKIX path building (X500Principal.equals() compares DER bytes).
+        final X500Name issuerDn = X500Name.getInstance(issuerCert.getSubjectX500Principal().getEncoded());
 
         final Instant now = Instant.now();
         final Instant notAfter = now.plus(validity);
