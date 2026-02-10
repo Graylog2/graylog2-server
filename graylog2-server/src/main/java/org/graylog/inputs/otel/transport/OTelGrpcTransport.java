@@ -37,15 +37,18 @@ public class OTelGrpcTransport extends AbstractGrpcTransport {
     public static final String NAME = "GrpcTransport";
 
     private final OTelLogsService.Factory logsServiceFactory;
+    private final OTelTraceService.Factory traceServiceFactory;
 
     @Inject
     public OTelGrpcTransport(EventBus eventBus,
                              @Assisted Configuration configuration,
                              LocalMetricRegistry localMetricRegistry,
                              OTelLogsService.Factory logsServiceFactory,
+                             OTelTraceService.Factory traceServiceFactory,
                              EncryptedValueService encryptedValueService) {
         super(eventBus, configuration, localMetricRegistry, encryptedValueService);
         this.logsServiceFactory = logsServiceFactory;
+        this.traceServiceFactory = traceServiceFactory;
     }
 
     @FactoryClass
@@ -68,7 +71,10 @@ public class OTelGrpcTransport extends AbstractGrpcTransport {
 
     @Override
     protected List<ServerServiceDefinition> grpcServices(MessageInput input) {
-        return List.of(logsServiceFactory.create(this, input).bindService());
+        return List.of(
+                logsServiceFactory.create(this, input).bindService(),
+                traceServiceFactory.create(this, input).bindService()
+        );
     }
 
     @Override
