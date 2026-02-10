@@ -113,7 +113,10 @@ public class DatanodeUpgradeServiceAdapterOS implements DatanodeUpgradeServiceAd
         JsonData value = settings.transient_().getOrDefault(setting,
                 settings.persistent().getOrDefault(setting,
                         settings.defaults().get(setting)));
-        return (value == null) ? "" : value.to(String.class);
+        if (value == null) {
+            throw new RuntimeException("Failed to read setting " + setting + "from cluster state");
+        }
+        return value.to(String.class);
     }
 
     private FlushResponse configureShardReplication(String shardReplication) {
@@ -139,10 +142,10 @@ public class DatanodeUpgradeServiceAdapterOS implements DatanodeUpgradeServiceAd
                 .endpoint("/_nodes")
                 .build();
         return officialOpensearchClient.sync(c -> {
-                    try (final Response response = c.generic().execute(req)) {
-                        return parseNodesResponse(response);
-                    }
-                }, "Failed to obtain node infos");
+            try (final Response response = c.generic().execute(req)) {
+                return parseNodesResponse(response);
+            }
+        }, "Failed to obtain node infos");
     }
 
     private List<Node> parseNodesResponse(Response response) {
@@ -166,7 +169,7 @@ public class DatanodeUpgradeServiceAdapterOS implements DatanodeUpgradeServiceAd
     }
 
     private static String parseString(JsonValue clusterManagerNode) {
-        if(clusterManagerNode instanceof JsonString jsonString) {
+        if (clusterManagerNode instanceof JsonString jsonString) {
             return jsonString.getString();
         } else {
             throw new IllegalStateException("Failed to obtain String value from json object!");
