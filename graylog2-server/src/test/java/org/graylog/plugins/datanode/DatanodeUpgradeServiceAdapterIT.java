@@ -29,11 +29,11 @@ import java.util.function.Consumer;
 
 public abstract class DatanodeUpgradeServiceAdapterIT {
 
-    private DatanodeUpgradeServiceAdapter migrationAdapter;
+    private DatanodeUpgradeServiceAdapter upgradeAdapter;
 
     @BeforeEach
     void setUp() {
-        migrationAdapter = createAdapter();
+        upgradeAdapter = createAdapter();
     }
 
     protected abstract DatanodeUpgradeServiceAdapter createAdapter();
@@ -43,20 +43,20 @@ public abstract class DatanodeUpgradeServiceAdapterIT {
 
     @Test
     void testUpgradeOperations() {
-        Assertions.assertThat(migrationAdapter.getClusterState())
+        Assertions.assertThat(upgradeAdapter.getClusterState())
                 .satisfies(expectedState(HealthStatus.Green, ShardReplication.ALL))
                 .satisfies(nodeDetails(indexerVersion()));
 
-        Assertions.assertThat(migrationAdapter.disableShardReplication())
+        Assertions.assertThat(upgradeAdapter.disableShardReplication())
                 .satisfies(this::successfulFlush);
 
-        Assertions.assertThat(migrationAdapter.getClusterState())
+        Assertions.assertThat(upgradeAdapter.getClusterState())
                 .satisfies(expectedState(HealthStatus.Green, ShardReplication.PRIMARIES));
 
-        Assertions.assertThat(migrationAdapter.enableShardReplication())
+        Assertions.assertThat(upgradeAdapter.enableShardReplication())
                 .satisfies(this::successfulFlush);
 
-        Assertions.assertThat(migrationAdapter.getClusterState())
+        Assertions.assertThat(upgradeAdapter.getClusterState())
                 .satisfies(expectedState(HealthStatus.Green, ShardReplication.ALL));
     }
 
