@@ -17,9 +17,10 @@
 package org.graylog.aws.inputs.cloudtrail.api;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -52,7 +53,7 @@ import java.util.Objects;
 /**
  * Web endpoints for the AWS CloudTrail integration.
  */
-@Api(value = "AWSCloudTrail", description = "AWS CloudTrail")
+@Tag(name = "AWSCloudTrail", description = "AWS CloudTrail")
 @Path("/cloudtrail")
 @RequiresAuthentication
 @Produces(MediaType.APPLICATION_JSON)
@@ -69,16 +70,16 @@ public class CloudTrailResource extends AbstractInputsResource implements Plugin
 
     @POST
     @Path("/check_credentials")
-    @ApiOperation(value = "Validate input credentials", response = MediaType.class)
+    @Operation(summary = "Validate input credentials")
     @NoAuditEvent("This does not change any data")
-    public String checkCredentials(@ApiParam(name = "JSON body", required = true)
+    public String checkCredentials(@RequestBody(required = true)
                                    @Valid @NotNull CloudTrailRequestImpl request) throws Exception {
         return cloudTrailDriver.checkCredentials(request);
     }
 
     @GET
     @Path("/getawsregions")
-    @ApiOperation(value = "Get all available AWS regions")
+    @Operation(summary = "Get all available AWS regions")
     public Map<String, String> getAWSRegions() {
         return AWS.buildRegionChoices();
     }
@@ -86,11 +87,11 @@ public class CloudTrailResource extends AbstractInputsResource implements Plugin
     @POST
     @Timed
     @Path("/inputs")
-    @ApiOperation(value = "Create a new CloudTrail input", response = MediaType.class)
+    @Operation(summary = "Create a new CloudTrail input")
     @AuditEvent(type = IntegrationsAuditEventTypes.AWS_CLOUDTRAIL_INPUT_CREATE)
     @RequiresPermissions({RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":org.graylog.aws.inputs.cloudtrail.CloudTrailInput"})
-    public Response create(@ApiParam @QueryParam("setup_wizard") @DefaultValue("false") boolean isSetupWizard,
-                           @ApiParam(name = "JSON body", required = true)
+    public Response create(@Parameter @QueryParam("setup_wizard") @DefaultValue("false") boolean isSetupWizard,
+                           @RequestBody(required = true)
                            @Valid @NotNull CloudTrailCreateInputRequest request) throws Exception {
         Input input = cloudTrailDriver.saveInput(request, Objects.requireNonNull(getCurrentUser()), isSetupWizard);
         return Response.ok().entity(getInputSummary(input)).build();

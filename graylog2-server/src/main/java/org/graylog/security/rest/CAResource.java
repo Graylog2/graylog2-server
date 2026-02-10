@@ -16,9 +16,11 @@
  */
 package org.graylog.security.rest;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -41,18 +43,18 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.bootstrap.preflight.web.resources.model.CertificateAuthorityInformation;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateCARequest;
 import org.graylog2.plugin.rest.ApiError;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import java.net.URI;
 import java.util.List;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
 @Path("/ca")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
-@Api(value = "CA", description = "Certificate Authority", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "CA", description = "Certificate Authority")
 public class CAResource extends RestResource {
     private final CaKeystore caKeystore;
 
@@ -62,7 +64,7 @@ public class CAResource extends RestResource {
     }
 
     @GET
-    @ApiOperation("Returns the CA")
+    @Operation(summary = "Returns the CA")
     @RequiresPermissions(RestPermissions.GRAYLOG_CA_READ)
     public CertificateAuthorityInformation get() throws KeyStoreStorageException {
         return caKeystore.getInformation().orElse(null);
@@ -71,9 +73,9 @@ public class CAResource extends RestResource {
     @POST
     @Path("create")
     @AuditEvent(type = CaAuditEventTypes.CA_CREATE)
-    @ApiOperation("Creates a CA")
+    @Operation(summary = "Creates a CA")
     @RequiresPermissions(RestPermissions.GRAYLOG_CA_CREATE)
-    public Response createCA(@ApiParam(name = "request", required = true) @NotNull @Valid CreateCARequest request) {
+    public Response createCA(@Parameter(name = "request", required = true) @NotNull @Valid CreateCARequest request) {
         final CertificateAuthorityInformation ca = caKeystore.createSelfSigned(request.organization());
         final URI caUri = getUriBuilderToSelf()
                 .path(CAResource.class)
@@ -85,10 +87,13 @@ public class CAResource extends RestResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("upload")
     @AuditEvent(type = CaAuditEventTypes.CA_UPLOAD)
-    @ApiOperation("Upload a CA")
+    @Operation(summary = "Upload a CA")
     @Produces(MediaType.APPLICATION_JSON)
     @RequiresPermissions(RestPermissions.GRAYLOG_CA_CREATE)
-    public Response uploadCA(@ApiParam(name = "password") @FormDataParam("password") String password, @ApiParam(name = "files") @FormDataParam("files") List<FormDataBodyPart> files) {
+    public Response uploadCA(
+            @Parameter(name = "password") @FormDataParam("password") String password,
+            @Parameter(name = "files", array = @ArraySchema(schema = @Schema(type = "string", format = "binary")))
+            @FormDataParam("files") List<FormDataBodyPart> files) {
         try {
             caKeystore.createFromUpload(password, files);
             return Response.ok().build();

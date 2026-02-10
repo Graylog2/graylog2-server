@@ -18,9 +18,10 @@ package org.graylog2.rest.resources.datanodes;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -50,7 +51,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Api(value = "System/Datanodes", description = "Data Node discovery")
+@Tag(name = "System/Datanodes", description = "Data Node discovery")
 @RequiresAuthentication
 @Path("/system/cluster/datanodes")
 @Produces(MediaType.APPLICATION_JSON)
@@ -92,16 +93,17 @@ public class DatanodeResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get a paginated list of all datanodes in this cluster")
-    public PageListResponse<DataNodeDto> dataNodes(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                   @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                   @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                                   @ApiParam(name = "sort",
-                                                             value = "The field to sort the result on",
+    @Operation(summary = "Get a paginated list of all datanodes in this cluster")
+    public PageListResponse<DataNodeDto> dataNodes(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                   @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                   @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                   @Parameter(name = "sort",
+                                                             description = "The field to sort the result on",
                                                              required = true,
-                                                             allowableValues = "title,description,type")
+                                                             schema = @Schema(allowableValues = {"hostname", "data_node_status", "transport_address", "cert_valid_until", "datanode_version"}))
                                                    @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
-                                                   @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                   @Parameter(name = "order", description = "The sort direction",
+                                                             schema = @Schema(allowableValues = {"asc", "desc"}))
                                                    @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order
 
     ) {

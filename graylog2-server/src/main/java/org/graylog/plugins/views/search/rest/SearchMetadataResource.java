@@ -18,9 +18,8 @@ package org.graylog.plugins.views.search.rest;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.GET;
@@ -44,13 +43,13 @@ import org.graylog.plugins.views.search.engine.validation.DataLakeSearchValidato
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.Map;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
-@Api(value = "Search/Metadata", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Search/Metadata")
 @Path("/views/search/metadata")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
@@ -66,9 +65,9 @@ public class SearchMetadataResource extends RestResource implements PluginRestRe
     }
 
     @GET
-    @ApiOperation(value = "Metadata for the given Search object", notes = "Used for already persisted search objects")
+    @Operation(summary = "Metadata for the given Search object", description = "Used for already persisted search objects")
     @Path("{searchId}")
-    public SearchMetadata metadata(@ApiParam("searchId") @PathParam("searchId") String searchId, @Context SearchUser searchUser) {
+    public SearchMetadata metadata(@io.swagger.v3.oas.annotations.Parameter(name = "searchId") @PathParam("searchId") String searchId, @Context SearchUser searchUser) {
         final SearchDTO search = searchDomain.getForUser(searchId, searchUser)
                 .map(SearchDTO::fromSearch)
                 .orElseThrow(() -> new NotFoundException("Search with id " + searchId + " does not exist"));
@@ -76,9 +75,9 @@ public class SearchMetadataResource extends RestResource implements PluginRestRe
     }
 
     @POST
-    @ApiOperation(value = "Metadata for the posted Search object", notes = "Intended for search objects that aren't yet persisted (e.g. for validation or interactive purposes)")
+    @Operation(summary = "Metadata for the posted Search object", description = "Intended for search objects that aren't yet persisted (e.g. for validation or interactive purposes)")
     @NoAuditEvent("Only returning metadata for given search, not changing any data")
-    public SearchMetadata metadataForObject(@ApiParam @NotNull(message = "Search body is mandatory") SearchDTO searchDTO) {
+    public SearchMetadata metadataForObject(@io.swagger.v3.oas.annotations.Parameter @NotNull(message = "Search body is mandatory") SearchDTO searchDTO) {
         if (searchDTO == null) {
             throw new IllegalArgumentException("Search must not be null.");
         }

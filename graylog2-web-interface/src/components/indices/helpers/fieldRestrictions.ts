@@ -16,7 +16,6 @@
  */
 import type { IndexSetFieldRestrictions } from 'stores/indices/IndexSetsStore';
 
-// eslint-disable-next-line import/prefer-default-export
 export const parseFieldRestrictions = (
   fieldRestrictions?: IndexSetFieldRestrictions,
 ): { immutableFields: Array<string>; hiddenFields: Array<string> } => {

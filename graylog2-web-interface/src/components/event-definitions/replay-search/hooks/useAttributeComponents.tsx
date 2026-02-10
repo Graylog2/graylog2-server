@@ -55,7 +55,6 @@ const useAttributeComponents = () => {
       !isEventDefinition && moment(eventDefinition.updated_at).diff(eventData?.timestamp) > 0;
 
     return [
-      { title: 'Timestamp', content: <Timestamp dateTime={eventData?.timestamp} />, show: !isEventDefinition },
       {
         title: 'Event definition updated at',
         content: (
@@ -92,14 +91,15 @@ const useAttributeComponents = () => {
         content:
           searchWithin?.duration && searchWithin?.unit && `${searchWithin.duration} ${searchWithin.unit.toLowerCase()}`,
       },
-      { title: 'Description', content: eventDefinition.description },
       {
         title: 'Notifications',
         content: <Notifications />,
       },
+      { title: 'Description', content: eventDefinition.description, inRows: true },
       {
         title: 'Aggregation conditions',
         content: <AggregationConditions />,
+        inRows: true,
       },
     ];
   }, [eventData?.timestamp, eventDefinition, type]);

@@ -120,6 +120,41 @@ describe('Input Diagnosis Page', () => {
     expect(nodeStateIndicator).toHaveClass('danger');
   });
 
+  it('shows last failed timestamp when provided', async () => {
+    asMock(useInputDiagnosis).mockReturnValue({
+      ...useInputDiagnosisMock,
+      inputNodeStates: {
+        ...useInputDiagnosisMock.inputNodeStates,
+        states: {
+          ...useInputDiagnosisMock.inputNodeStates.states,
+          FAILED: [
+            {
+              node_id: 'test-node-id-2',
+              detailed_message: 'failed for testing',
+              last_failed_at: '2024-01-01T00:00:00.000Z',
+            },
+          ],
+        },
+      },
+    });
+
+    render(<InputDiagnosisPage />);
+
+    expect(await screen.findByText(/Last failed:/i)).toBeInTheDocument();
+  });
+
+  it('shows failed starts 15m count when available', async () => {
+    asMock(useInputDiagnosis).mockReturnValue({
+      ...useInputDiagnosisMock,
+      inputMetrics: { ...useInputDiagnosisMock.inputMetrics, failedStarts15mCount: 42 },
+    });
+
+    render(<InputDiagnosisPage />);
+
+    expect(await screen.findByText(/Failed starts \(last 15min\):/)).toBeInTheDocument();
+    expect(await screen.findByText('42')).toBeInTheDocument();
+  });
+
   it('shows node state success indicator', async () => {
     asMock(useInputDiagnosis).mockReturnValue({
       ...useInputDiagnosisMock,

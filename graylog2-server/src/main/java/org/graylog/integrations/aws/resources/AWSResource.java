@@ -17,9 +17,14 @@
 package org.graylog.integrations.aws.resources;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -60,7 +65,7 @@ import org.graylog2.shared.utilities.ExceptionUtils;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-@Api(value = "AWS", description = "AWS integrations")
+@Tag(name = "AWS", description = "AWS integrations")
 @Path("/aws")
 @RequiresAuthentication
 @Produces(MediaType.APPLICATION_JSON)
@@ -83,7 +88,7 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
     @GET
     @Timed
     @Path("/regions")
-    @ApiOperation(value = "Get all available AWS regions")
+    @Operation(summary = "Get all available AWS regions")
     @RequiresPermissions(AWSPermissions.AWS_READ)
     public RegionsResponse getAwsRegions() {
         return awsService.getAvailableRegions();
@@ -92,30 +97,30 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
     @POST
     @Timed
     @Path("/cloudwatch/log_groups")
-    @ApiOperation(value = "Get all available AWS CloudWatch log groups names for the specified region.")
+    @Operation(summary = "Get all available AWS CloudWatch log groups names for the specified region.")
     @RequiresPermissions(AWSPermissions.AWS_READ)
     @NoAuditEvent("This does not change any data")
-    public LogGroupsResponse getLogGroupNames(@ApiParam(name = "JSON body", required = true) @Valid @NotNull AWSRequestImpl request) {
+    public LogGroupsResponse getLogGroupNames(@RequestBody(required = true) @Valid @NotNull AWSRequestImpl request) {
         return cloudWatchService.getLogGroupNames(request);
     }
 
     @POST
     @Timed
     @Path("/kinesis/streams")
-    @ApiOperation(value = "Get all available Kinesis streams for the specified region.")
+    @Operation(summary = "Get all available Kinesis streams for the specified region.")
     @RequiresPermissions(AWSPermissions.AWS_READ)
     @NoAuditEvent("This does not change any data")
-    public StreamsResponse getKinesisStreams(@ApiParam(name = "JSON body", required = true) @Valid @NotNull AWSRequestImpl request) throws ExecutionException {
+    public StreamsResponse getKinesisStreams(@RequestBody(required = true) @Valid @NotNull AWSRequestImpl request) throws ExecutionException {
         return kinesisService.getKinesisStreamNames(request);
     }
 
     @POST
     @Timed
     @Path("/kinesis/stream_arn")
-    @ApiOperation(value = "Get stream ARN for the specified stream and region.")
+    @Operation(summary = "Get stream ARN for the specified stream and region.")
     @RequiresPermissions(AWSPermissions.AWS_READ)
     @NoAuditEvent("This does not change any data")
-    public Response getStreamArn(@ApiParam(name = "JSON body", required = true) @Valid @NotNull KinesisRequest request) {
+    public Response getStreamArn(@RequestBody(required = true) @Valid @NotNull KinesisRequest request) {
         String response;
         try {
             response = kinesisService.getStreamArn(request);
@@ -129,13 +134,15 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
     @POST
     @Timed
     @Path("/kinesis/health_check")
-    @ApiOperation(
-            value = "Attempt to retrieve logs from the indicated AWS log group with the specified credentials.",
-            response = KinesisHealthCheckResponse.class
-    )
+    @Operation(
+            summary = "Attempt to retrieve logs from the indicated AWS log group with the specified credentials.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "202", description = "AWS log retrieval health check completed successfully",
+                    content = @Content(schema = @Schema(implementation = KinesisHealthCheckResponse.class)))
+    })
     @RequiresPermissions(AWSPermissions.AWS_READ)
     @NoAuditEvent("This does not change any data")
-    public Response kinesisHealthCheck(@ApiParam(name = "JSON body", required = true) @Valid @NotNull KinesisRequest heathCheckRequest) throws ExecutionException, IOException {
+    public Response kinesisHealthCheck(@RequestBody(required = true) @Valid @NotNull KinesisRequest heathCheckRequest) throws ExecutionException, IOException {
 
         KinesisHealthCheckResponse response = kinesisService.healthCheck(heathCheckRequest);
         return Response.accepted().entity(response).build();
@@ -144,11 +151,11 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
     @POST
     @Timed
     @Path("/inputs")
-    @ApiOperation(value = "Create a new AWS input.")
+    @Operation(summary = "Create a new AWS input.")
     @AuditEvent(type = IntegrationsAuditEventTypes.KINESIS_INPUT_CREATE)
     @RequiresPermissions({RestPermissions.INPUTS_CREATE, RestPermissions.INPUT_TYPES_CREATE + ":org.graylog.integrations.aws.inputs.AWSInput"})
-    public Response create(@ApiParam @QueryParam("setup_wizard") @DefaultValue("false") boolean isSetupWizard,
-                           @ApiParam(name = "JSON body", required = true)
+    public Response create(@Parameter @QueryParam("setup_wizard") @DefaultValue("false") boolean isSetupWizard,
+                           @RequestBody(required = true)
                            @Valid @NotNull AWSInputCreateRequest saveRequest) throws Exception {
         Input input = awsService.saveInput(saveRequest, getCurrentUser(), isSetupWizard);
         return Response.ok().entity(getInputSummary(input)).build();

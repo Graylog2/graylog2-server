@@ -17,10 +17,11 @@
 import React from 'react';
 
 import Modal from './Modal';
+import type { ModalSize } from './Modal';
 
 type Props = {
   backdrop?: boolean;
-  bsSize?: 'lg' | 'large' | 'sm' | 'small';
+  bsSize?: ModalSize;
   showModal: boolean;
   onHide: () => void;
   children: React.ReactNode;

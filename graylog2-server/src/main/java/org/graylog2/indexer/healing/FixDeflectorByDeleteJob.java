@@ -26,7 +26,7 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
-import org.graylog2.system.jobs.SystemJob;
+import org.graylog2.system.jobs.LegacySystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +38,7 @@ import static org.graylog2.buffers.Buffers.Type.PROCESS;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class FixDeflectorByDeleteJob extends SystemJob {
+public class FixDeflectorByDeleteJob extends LegacySystemJob {
 
     public interface Factory {
 

@@ -17,9 +17,9 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
@@ -42,7 +42,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 @RequiresAuthentication
-@Api(value = "System/IndexSetDefaults", description = "Index set defaults")
+@Tag(name = "System/IndexSetDefaults", description = "Index set defaults")
 @Path("/system/indices/index_set_defaults")
 @Produces(MediaType.APPLICATION_JSON)
 public class IndexSetDefaultsResource extends RestResource {
@@ -56,10 +56,10 @@ public class IndexSetDefaultsResource extends RestResource {
     @PUT
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Set index set default template")
+    @Operation(summary = "Set index set default template")
     @RequiresPermissions({RestPermissions.CLUSTER_CONFIG_ENTRY_CREATE, RestPermissions.CLUSTER_CONFIG_ENTRY_EDIT})
     @NoAuditEvent("event is handled in service class")
-    public Response update(@ApiParam(name = "body", value = "Index set default template id.", required = true)
+    public Response update(@Parameter(name = "body", description = "Index set default template id.", required = true)
                            @NotNull IndexSetDefaultTemplate defaultTemplate) throws IOException {
         try {
             indexSetDefaultTemplateService.setDefault(defaultTemplate, Optional.ofNullable(getCurrentUser())

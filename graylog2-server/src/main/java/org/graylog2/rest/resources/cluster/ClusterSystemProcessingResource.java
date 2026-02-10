@@ -17,9 +17,9 @@
 package org.graylog2.rest.resources.cluster;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.cluster.Node;
@@ -50,7 +50,7 @@ import java.util.concurrent.ExecutorService;
 import static jakarta.ws.rs.core.Response.Status.BAD_GATEWAY;
 
 @RequiresAuthentication
-@Api(value = "Cluster/Processing", description = "Cluster-wide processing status control.")
+@Tag(name = "Cluster/Processing", description = "Cluster-wide processing status control.")
 @Path("/cluster/{nodeId}/processing")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterSystemProcessingResource extends ProxiedResource {
@@ -74,12 +74,12 @@ public class ClusterSystemProcessingResource extends ProxiedResource {
 
     @POST
     @Timed
-    @ApiOperation(value = "Pause message processing on node",
-                  notes = "If the message journal is enabled, incoming messages will be spooled on disk, if it is disabled, " +
+    @Operation(summary = "Pause message processing on node",
+                  description = "If the message journal is enabled, incoming messages will be spooled on disk, if it is disabled, " +
                           "you might lose messages from inputs which cannot buffer themselves, like AMQP or Kafka-based inputs.")
     @Path("pause")
     @NoAuditEvent("proxy resource, audit event will be emitted on target node")
-    public void pause(@ApiParam(name = "nodeId", value = "The id of the node where processing will be paused.", required = true)
+    public void pause(@Parameter(name = "nodeId", description = "The id of the node where processing will be paused.", required = true)
                       @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         final Response response = this.getRemoteSystemProcessingResource(nodeId).pause().execute();
         if (!response.isSuccessful()) {
@@ -90,10 +90,10 @@ public class ClusterSystemProcessingResource extends ProxiedResource {
 
     @POST
     @Timed
-    @ApiOperation(value = "Resume message processing on node")
+    @Operation(summary = "Resume message processing on node")
     @Path("resume")
     @NoAuditEvent("proxy resource, audit event will be emitted on target node")
-    public void resume(@ApiParam(name = "nodeId", value = "The id of the node where processing will be resumed.", required = true)
+    public void resume(@Parameter(name = "nodeId", description = "The id of the node where processing will be resumed.", required = true)
                        @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         final Response response = this.getRemoteSystemProcessingResource(nodeId).resume().execute();
         if (!response.isSuccessful()) {
