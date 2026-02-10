@@ -60,7 +60,7 @@ public class DatanodeUpgradeService {
         final List<DataNodeDto> upToDateDataNodes = dataNodes.stream().filter(n -> isDatanodeUpToDate(n.getDatanodeVersion(), serverVersion)).collect(Collectors.toList());
         final List<DataNodeDto> toUpgradeDataNodes = dataNodes.stream().filter(n -> !upToDateDataNodes.contains(n)).collect(Collectors.toList());
 
-        final boolean clusterHealthy = clusterState.status().equals(HealthStatus.Green) && clusterState.relocatingShards() == 0;
+        final boolean clusterHealthy = clusterState.status() == HealthStatus.Green && clusterState.relocatingShards() == 0;
         final boolean shardReplicationEnabled = clusterState.shardReplication() == ShardReplication.ALL;
         final boolean clusterReadyForUpgrade = clusterHealthy && shardReplicationEnabled;
 
