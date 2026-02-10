@@ -56,13 +56,17 @@ const EventsEntityTable = () => {
   });
 
   const _fetchSlices = useCallback(
-    (column: string, query: string, filters: UrlQueryFilters) =>
-      Events.slices({
+    (column: string, query: string, filters: UrlQueryFilters) => {
+      const { filter, timerange } = parseFilters(filters);
+
+      return Events.slices({
         include_all: true,
         slice_column: column,
         query: getConcatenatedQuery(query, streamId as string),
-        ...parseFilters(filters),
-      }).then(({ slices: s }) => [...s]),
+        filter,
+        timerange,
+      }).then(({ slices: s }) => [...s]);
+    },
     [streamId],
   );
 

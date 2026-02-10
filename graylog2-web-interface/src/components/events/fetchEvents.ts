@@ -113,8 +113,7 @@ export const getConcatenatedQuery = (query: string, streamId: string) => {
 
 export const defaultTimeRange: RelativeTimeRange = { type: 'relative', range: 6 * 30 * 86400 } as const;
 export const fetchEventsHistogram = async (searchParams: SearchParams) => {
-  const parsedFilters = parseFilters(searchParams.filters, defaultTimeRange);
-  const { timerange } = parsedFilters;
+  const { timerange, filter } = parseFilters(searchParams.filters, defaultTimeRange);
 
   return Events.histogram({
     query: searchParams.query,
@@ -123,7 +122,7 @@ export const fetchEventsHistogram = async (searchParams: SearchParams) => {
     sort_by: searchParams.sort.attributeId,
     sort_direction: searchParams.sort.direction,
     sort_unmapped_type: undefined,
-    ...parsedFilters,
+    filter,
     timerange,
   }).then((results) => ({ timerange, results }));
 };
@@ -133,14 +132,17 @@ export const keyFn = (searchParams: SearchParams) => ['events', 'search', search
 const fetchEvents = (
   searchParams: SearchParams,
   streamId: string,
-): Promise<PaginatedResponse<Event, EventsAdditionalData>> =>
-  fetch('POST', url, {
+): Promise<PaginatedResponse<Event, EventsAdditionalData>> => {
+  const { filter, timerange } = parseFilters(searchParams.filters);
+
+  return fetch('POST', url, {
     query: getConcatenatedQuery(searchParams.query, streamId),
     page: searchParams.page,
     per_page: searchParams.pageSize,
     sort_by: searchParams.sort.attributeId,
     sort_direction: searchParams.sort.direction,
-    ...parseFilters(searchParams.filters),
+    timerange,
+    filter,
   }).then(({ events, total_events, parameters, context }) => ({
     attributes: additionalAttributes,
     list: events.map(({ event }) => event),
@@ -149,5 +151,6 @@ const fetchEvents = (
       context,
     },
   }));
+};
 
 export default fetchEvents;
