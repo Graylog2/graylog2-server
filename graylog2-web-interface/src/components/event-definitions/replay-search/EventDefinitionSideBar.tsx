@@ -14,11 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.datanode;
+import React from 'react';
 
-import org.graylog2.indexer.indexset.IndexSet;
+import ExpandableSection from 'components/events/ReplaySearchSidebar/ExpandableSection';
+import EventDefinitionInfoTable from 'components/event-definitions/replay-search/EventDefinitionInfoTable';
 
-@Deprecated(forRemoval = true)
-public interface DatanodeMigrationLockListener {
-    void onRetry(IndexSet indexSet, Class<?> caller, long attemptNumber);
-}
+const EventDefinitionSideBar = () => (
+  <div>
+    <ExpandableSection title="Event Definition Details">
+      <EventDefinitionInfoTable />
+    </ExpandableSection>
+  </div>
+);
+
+export default EventDefinitionSideBar;

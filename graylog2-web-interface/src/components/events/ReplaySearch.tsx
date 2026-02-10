@@ -19,7 +19,6 @@ import { useMemo } from 'react';
 import merge from 'lodash/merge';
 
 import useCreateSearch from 'views/hooks/useCreateSearch';
-import EventInfoBar from 'components/event-definitions/replay-search/EventInfoBar';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 import SearchPage from 'views/pages/SearchPage';
 import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
@@ -30,24 +29,18 @@ import type View from 'views/logic/views/View';
 
 type ReplaySearchProps = {
   searchPageLayout?: Partial<LayoutState>;
-  forceSidebarPinned?: boolean;
   view: Promise<View>;
 };
 
 const defaultSearchPageLayout = {};
 
-const ReplaySearch = ({
-  searchPageLayout = defaultSearchPageLayout,
-  forceSidebarPinned = false,
-  view: _view,
-}: ReplaySearchProps) => {
+const ReplaySearch = ({ searchPageLayout = defaultSearchPageLayout, view: _view }: ReplaySearchProps) => {
   const view = useCreateSearch(_view);
 
   const _searchPageLayout = useMemo(
     () =>
       merge(
         {
-          infoBar: { component: EventInfoBar },
           sidebar: {
             isShown: true,
             title: 'Replayed Search',
@@ -60,7 +53,7 @@ const ReplaySearch = ({
 
   return (
     <SearchPageLayoutProvider value={_searchPageLayout}>
-      <SearchPage view={view} isNew forceSideBarPinned={forceSidebarPinned} />
+      <SearchPage view={view} isNew forceSideBarPinned />
     </SearchPageLayoutProvider>
   );
 };
