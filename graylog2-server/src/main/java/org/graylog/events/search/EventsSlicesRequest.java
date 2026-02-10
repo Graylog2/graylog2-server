@@ -21,26 +21,33 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog2.rest.resources.entities.SlicesRequest;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = EventsSlicesRequest.Builder.class)
-public abstract class EventsSlicesRequest implements SlicesRequest<EventsSearchParameters> {
-    private static final String FIELD_PARAMETERS = "parameters";
+public abstract class EventsSlicesRequest {
+    private static final String FIELD_QUERY = "query";
+    private static final String FIELD_FILTER = "filter";
+    private static final String FIELD_TIMERANGE = "timerange";
     private static final String FIELD_SLICE_COLUMN = "slice_column";
     private static final String FIELD_INCLUDE_ALL = "include_all";
 
-    @JsonProperty(FIELD_PARAMETERS)
-    @Override
-    public abstract EventsSearchParameters parameters();
+    @JsonProperty(FIELD_QUERY)
+    public abstract String query();
+
+    @JsonProperty(FIELD_FILTER)
+    public abstract EventsSearchFilter filter();
+
+    @JsonProperty(FIELD_TIMERANGE)
+    public abstract TimeRange timerange();
 
     @JsonProperty(FIELD_SLICE_COLUMN)
-    @Override
     public abstract String sliceColumn();
 
     @JsonProperty(FIELD_INCLUDE_ALL)
-    @Override
     public abstract boolean includeAll();
 
     public static Builder builder() {
@@ -57,14 +64,28 @@ public abstract class EventsSlicesRequest implements SlicesRequest<EventsSearchP
     public static abstract class Builder {
         @JsonCreator
         public static Builder create() {
+            RelativeRange timerange = null;
+            try {
+                timerange = RelativeRange.create(3600);
+            } catch (InvalidRangeParametersException e) {
+                // Should not happen
+            }
             return new AutoValue_EventsSlicesRequest.Builder()
                     .sliceColumn("type")
-                    .parameters(EventsSearchParameters.empty())
+                    .query("")
+                    .filter(EventsSearchFilter.empty())
+                    .timerange(timerange)
                     .includeAll(false);
         }
 
-        @JsonProperty(FIELD_PARAMETERS)
-        public abstract Builder parameters(EventsSearchParameters parameters);
+        @JsonProperty(FIELD_QUERY)
+        public abstract Builder query(String query);
+
+        @JsonProperty(FIELD_FILTER)
+        public abstract Builder filter(EventsSearchFilter filter);
+
+        @JsonProperty(FIELD_TIMERANGE)
+        public abstract Builder timerange(TimeRange timerange);
 
         @JsonProperty(FIELD_SLICE_COLUMN)
         public abstract Builder sliceColumn(String sliceColumn);

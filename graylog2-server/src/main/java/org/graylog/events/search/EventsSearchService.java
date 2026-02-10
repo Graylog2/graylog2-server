@@ -80,8 +80,8 @@ public class EventsSearchService extends AbstractEventsSearchService {
 
     public Slices slices(final EventsSlicesRequest request, final Subject subject, final SearchUser searchUser) {
         // we cover two use cases, if you only want the slices from the resultset that will also be shown in the entity table, we re-use query and timerange for that. Otherwise, we query "all"
-        final var query = request.includeAll() ? "" : request.parameters().query();
-        final var timeRange = request.includeAll() ? RelativeRange.allTime() : request.parameters().timerange();
+        final var query = request.includeAll() ? "" : request.query();
+        final var timeRange = request.includeAll() ? RelativeRange.allTime() : request.timerange();
 
         return slices(query, timeRange, subject, searchUser, request.sliceColumn(), request.includeAll());
     }

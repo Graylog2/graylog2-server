@@ -34,6 +34,7 @@ import EventsWidgets from 'components/events/EventsWidgets';
 import EventsRefreshProvider from 'components/events/EventsRefreshProvider';
 import PriorityName from 'components/events/events/PriorityName';
 import EventTypeLabel from 'components/events/events/EventTypeLabel';
+import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
 const additionalSearchFields = {
   key: 'The key of the event',
@@ -50,19 +51,12 @@ const EventsEntityTable = () => {
   });
 
   const _fetchSlices = useCallback(
-    (column: string, searchParams: SearchParams) =>
+    (column: string, query: string, filters: UrlQueryFilters) =>
       Events.slices({
         include_all: true,
         slice_column: column,
-        parameters: {
-          query: getConcatenatedQuery(searchParams.query, streamId as string),
-          page: searchParams.page,
-          per_page: searchParams.pageSize,
-          sort_by: column,
-          sort_direction: 'asc',
-          sort_unmapped_type: '',
-          ...parseFilters(searchParams.filters),
-        },
+        query: getConcatenatedQuery(query, streamId as string),
+        ...parseFilters(filters),
       }).then(({ slices: s }) => [...s]),
     [streamId],
   );
