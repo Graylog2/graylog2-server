@@ -18,34 +18,44 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { DropdownButton } from 'components/bootstrap';
+import { DropdownButton, Button } from 'components/bootstrap';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import MenuItem from 'components/bootstrap/menuitem/MenuItem';
 import { defaultCompare } from 'logic/DefaultCompare';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-const Container = styled.div(
+const SliceHeader = styled.div(
   ({ theme }) => css`
-    min-width: 300px;
-    border-right: 1px solid ${theme.colors.gray[90]};
-    padding-right: ${theme.spacings.sm};
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacings.xs};
+    justify-content: space-between;
+    margin-bottom: ${theme.spacings.sm};
   `,
 );
 
 type Props = {
   appSection: string;
-  sliceCol: string;
+  activeColumnTitle: string | undefined;
+  activeSlice: string | undefined;
+  sliceCol: string | undefined;
   columnSchemas: Array<ColumnSchema>;
-  onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
+  onChangeSlicing: (sliceCol: string | undefined, slice?: string | undefined) => void;
 };
 
-const Slicing = ({ appSection, sliceCol, columnSchemas, onChangeSlicing }: Props) => {
-  const sendTelemetry = useSendTelemetry();
+const SliceHeaderControls = ({
+  appSection,
+  activeColumnTitle,
+  activeSlice,
+  sliceCol,
+  columnSchemas,
+  onChangeSlicing,
+}: Props) => {
   const sliceableColumns = columnSchemas
     .filter((schema) => schema.sliceable)
     .sort(({ title: title1 }, { title: title2 }) => defaultCompare(title1, title2));
-  const activeColumn = sliceableColumns.find(({ id }) => id === sliceCol);
+  const sendTelemetry = useSendTelemetry();
   const onSliceColumn = (columnId: string) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_COLUMN_SELECTED_SECTION, {
       app_section: appSection,
@@ -64,8 +74,8 @@ const Slicing = ({ appSection, sliceCol, columnSchemas, onChangeSlicing }: Props
   };
 
   return (
-    <Container>
-      <DropdownButton bsSize="small" id="slicing-dropdown" title={activeColumn?.title ?? 'Slice by'}>
+    <SliceHeader>
+      <DropdownButton bsSize="small" title={activeColumnTitle ?? 'Slice by'}>
         <MenuItem header>Slice by</MenuItem>
         {sliceableColumns.map((schema) => (
           <MenuItem key={schema.id} onClick={() => onSliceColumn(schema.id)}>
@@ -75,8 +85,13 @@ const Slicing = ({ appSection, sliceCol, columnSchemas, onChangeSlicing }: Props
         <MenuItem divider />
         <MenuItem onClick={onRemoveSlicing}>No slicing</MenuItem>
       </DropdownButton>
-    </Container>
+      {activeSlice && (
+        <Button bsStyle="link" bsSize="sm" onClick={() => onChangeSlicing(sliceCol, undefined)}>
+          Clear slice
+        </Button>
+      )}
+    </SliceHeader>
   );
 };
 
-export default Slicing;
+export default SliceHeaderControls;
