@@ -115,7 +115,7 @@ public class DatanodeUpgradeServiceAdapterOS implements DatanodeUpgradeServiceAd
                 settings.persistent().getOrDefault(setting,
                         settings.defaults().get(setting)));
         if (value == null) {
-            throw new RuntimeException("Failed to read setting " + setting + "from cluster state");
+            throw new IllegalStateException("Failed to read setting " + setting + "from cluster state");
         }
         return value.to(String.class);
     }
