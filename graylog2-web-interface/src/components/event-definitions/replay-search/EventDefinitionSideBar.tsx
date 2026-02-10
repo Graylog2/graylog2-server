@@ -16,20 +16,15 @@
  */
 import React from 'react';
 
-import type { Event, EventsAdditionalData } from 'components/events/events/types';
-import CustomColumnRenderers from 'components/events/events/ColumnRenderers';
+import ExpandableSection from 'components/events/ReplaySearchSidebar/ExpandableSection';
+import EventDefinitionInfoTable from 'components/event-definitions/replay-search/EventDefinitionInfoTable';
 
-type Props<M = EventsAdditionalData> = { event: Event; meta: M; eventDefinitionEventProcedureId: string };
-
-const RemediationSteps = ({ event, meta, eventDefinitionEventProcedureId }: Props) => (
+const EventDefinitionSideBar = () => (
   <div>
-    {CustomColumnRenderers.attributes.remediation_steps.renderCell(
-      undefined,
-      event,
-      meta,
-      eventDefinitionEventProcedureId,
-    )}
+    <ExpandableSection title="Event Definition Details">
+      <EventDefinitionInfoTable />
+    </ExpandableSection>
   </div>
 );
 
-export default RemediationSteps;
+export default EventDefinitionSideBar;

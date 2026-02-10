@@ -426,6 +426,7 @@ export type EventActionComponentProps<T = unknown> = {
   events: Array<Event>;
   modalRef: () => T;
   fromBulk?: boolean;
+  onEventCallback?: () => void;
 };
 
 type MessageActionComponentProps = {

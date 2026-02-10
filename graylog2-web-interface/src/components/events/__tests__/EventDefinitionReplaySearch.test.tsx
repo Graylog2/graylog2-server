@@ -18,7 +18,7 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import useViewsPlugin from 'views/test/testViewsPlugin';
-import EventDefinitionReplaySearch from 'components/event-definitions/EventDefinitionReplaySearch';
+import EventDefinitionReplaySearch from 'components/event-definitions/replay-search/EventDefinitionReplaySearch';
 
 import { eventDefinition, systemEventDefinition } from './fixtures';
 
