@@ -102,7 +102,7 @@ public class OpenSearch3Module extends VersionAwareModule {
         bind(OfficialOpensearchClient.class).toProvider(OfficialOpensearchClientProvider.class).asEagerSingleton();
         bind(CredentialsProvider.class).toProvider(OSCredentialsProvider.class);
         bind(org.apache.hc.client5.http.auth.CredentialsProvider.class).toProvider(OpensearchCredentialsProvider.class);
-        bindForSupportedVersion(DatanodeUpgradeServiceAdapter.class).to(DatanodeUpgradeServiceAdapterOS2.class);
+        bindForSupportedVersion(DatanodeUpgradeServiceAdapter.class).to(DatanodeUpgradeServiceAdapterOS.class);
 
         Multibinder<SnifferBuilder> snifferBuilders = Multibinder.newSetBinder(binder(), SnifferBuilder.class);
         snifferBuilders.addBinding().to(OpensearchClusterSniffer.class);

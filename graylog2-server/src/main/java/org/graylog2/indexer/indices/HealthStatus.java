@@ -36,4 +36,10 @@ public enum HealthStatus {
             default: throw new IllegalArgumentException("Unable to parse health status from string (known: GREEN/YELLOW/RED): " + normalizedValue);
         }
     }
+
+
+    @Override
+    public String toString() {
+        return name().toUpperCase(Locale.ROOT);
+    }
 }

@@ -17,12 +17,13 @@
 package org.graylog.plugins.datanode.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.graylog2.indexer.indices.HealthStatus;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public record ClusterState(String status, String clusterName, int numberOfNodes, int activeShards, int relocatingShards,
+public record ClusterState(HealthStatus status, String clusterName, int numberOfNodes, int activeShards, int relocatingShards,
                            int initializingShards, int unassignedShards, int activePrimaryShards,
                            int delayedUnassignedShards, ShardReplication shardReplication, ManagerNode managerNode,
                            List<Node> opensearchNodes) {
