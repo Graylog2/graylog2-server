@@ -108,8 +108,15 @@ public class MongoDBEventProcessor implements EventProcessor {
                             EventProcessorParameters processorParameters,
                             EventConsumer<List<EventWithContext>> eventsConsumer)
             throws EventProcessorException {
-        final MongoDBEventProcessorParameters parameters = (MongoDBEventProcessorParameters) processorParameters;
-
+        if (!(processorParameters instanceof final MongoDBEventProcessorParameters parameters)) {
+            final String message = String.format(Locale.ROOT,
+                    "Invalid parameters type for MongoDBEventProcessor. Expected <%s> but got <%s> for event definition <%s/%s>.",
+                    MongoDBEventProcessorParameters.class.getSimpleName(),
+                    processorParameters != null ? processorParameters.getClass().getName() : "null",
+                    eventDefinition.title(),
+                    eventDefinition.id());
+            throw new EventProcessorException(message, false, eventDefinition, null);
+        }
         LOG.debug("Creating events from MongoDB aggregation for config={} parameters={}", config, parameters);
 
         try {

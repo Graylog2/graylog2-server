@@ -190,11 +190,11 @@ public class TrafficCounterService implements TrafficUpdater {
         }
 
         public void aggregateToHourly() {
-            histograms.forEach((key, value) -> histograms.put(key, TrafficUpdater.aggregateToHourly(value)));
+            histograms.replaceAll((key, value) -> TrafficUpdater.aggregateToHourly(value));
         }
 
         public void aggregateToDaily() {
-            histograms.forEach((key, value) -> histograms.put(key, TrafficUpdater.aggregateToDaily(value)));
+            histograms.replaceAll((key, value) -> TrafficUpdater.aggregateToDaily(value));
         }
 
         public DateTime getFrom() {

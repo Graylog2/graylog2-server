@@ -224,8 +224,8 @@ public abstract class MongoDBEventProcessorConfig implements EventProcessorConfi
 
     @Override
     public EventProcessorConfigEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
-        // Content pack support can be implemented later if needed
-        return null;
+        // Content pack support is not implemented for MongoDBEventProcessorConfig yet.
+        throw new UnsupportedOperationException("Content pack export is not supported for MongoDBEventProcessorConfig");
     }
 
     @Override

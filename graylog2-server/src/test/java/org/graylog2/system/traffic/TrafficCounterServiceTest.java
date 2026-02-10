@@ -62,7 +62,7 @@ class TrafficCounterServiceTest {
 
             // Record traffic for each 10-minute interval of the current day
             // At 08:20, we have completed 50 intervals (0-49) and are in the 51st interval
-            // 8 hours * 6 (intervals/hour) + 2 intervals (00, 10, 20) = 51 intervals total (0-50)
+            // 8 hours * 6 (intervals/hour) + 2 intervals (10, 20) = 50 intervals total
             int currentInterval = (now.hourOfDay().get() * 6) + (now.minuteOfHour().get() / 10);
             IntStream.rangeClosed(0, currentInterval).forEach(interval ->
                     service.updateTraffic(today.plusMinutes(interval * 10), nodeId, 1, 1, 1));

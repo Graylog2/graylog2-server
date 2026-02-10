@@ -49,13 +49,13 @@ public interface TrafficUpdater {
         return histogram.entrySet().stream()
                 .collect(Collectors.groupingBy(entry -> entry.getKey().withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0),
                         TreeMap::new,
-                        Collectors.mapping(Map.Entry::getValue, Collectors.summingLong(Long::valueOf))));
+                        Collectors.summingLong(Map.Entry::getValue)));
     }
 
     static Map<DateTime, Long> aggregateToDaily(Map<DateTime, Long> histogram) {
         return histogram.entrySet().stream()
                 .collect(Collectors.groupingBy(entry -> entry.getKey().withTimeAtStartOfDay(),
                         TreeMap::new,
-                        Collectors.mapping(Map.Entry::getValue, Collectors.summingLong(Long::valueOf))));
+                        Collectors.summingLong(Map.Entry::getValue)));
     }
 }
