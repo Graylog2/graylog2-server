@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
-        implements BucketSpecHandler<SPEC_TYPE, NamedAggregationBuilder, OSGeneratedQueryContext> {
+        implements BucketSpecHandler<SPEC_TYPE, MutableNamedAggregationBuilder, OSGeneratedQueryContext> {
 
     public record BucketOrder(Type type, String name, SortOrder order) {
         public enum Type {KEY, COUNT, AGGREGATION}

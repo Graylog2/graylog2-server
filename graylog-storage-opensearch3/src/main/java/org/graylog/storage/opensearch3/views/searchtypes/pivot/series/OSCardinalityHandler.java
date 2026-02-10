@@ -17,17 +17,18 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Cardinality;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 import org.opensearch.client.opensearch._types.aggregations.CardinalityAggregate;
-import org.opensearch.client.opensearch._types.aggregations.CardinalityAggregation;
 
 public class OSCardinalityHandler extends OSBasicSeriesSpecHandler<Cardinality> {
 
     @Override
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Cardinality cardinalitySpec) {
-        return SeriesAggregationBuilder.metric(name,
-                CardinalityAggregation.of(a -> a.field(cardinalitySpec.field())).toAggregation());
+        return SeriesAggregationBuilder.metric(new MutableNamedAggregationBuilder(name,
+                Aggregation.builder().cardinality(a -> a.field(cardinalitySpec.field()))));
     }
 
     @Override

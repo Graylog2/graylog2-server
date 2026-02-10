@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
 import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
 import org.opensearch.client.opensearch._types.SortOrder;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
@@ -53,12 +54,12 @@ public class OSLatestHandler extends OSBasicSeriesSpecHandler<Latest> {
                         )
                 )
         );
-        Aggregation filterAgg = Aggregation.of(a -> a
-                .filter(f -> f.exists(e -> e.field(latestSpec.field())))
-                .aggregations(Map.of(AGG_NAME, topHitsSubAgg))
-        );
 
-        return SeriesAggregationBuilder.metric(name, filterAgg);
+        Aggregation.Builder.ContainerBuilder filterAgg = Aggregation.builder()
+                .filter(f -> f.exists(e -> e.field(latestSpec.field())))
+                .aggregations(Map.of(AGG_NAME, topHitsSubAgg));
+
+        return SeriesAggregationBuilder.metric(new MutableNamedAggregationBuilder(name, filterAgg));
     }
 
     @Override

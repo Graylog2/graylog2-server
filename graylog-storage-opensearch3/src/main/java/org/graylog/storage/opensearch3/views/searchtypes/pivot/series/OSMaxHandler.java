@@ -17,16 +17,18 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 import org.opensearch.client.opensearch._types.aggregations.MaxAggregate;
-import org.opensearch.client.opensearch._types.aggregations.MaxAggregation;
 
 public class OSMaxHandler extends OSBasicSeriesSpecHandler<Max> {
 
     @Override
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Max maxSpec) {
-        return SeriesAggregationBuilder.metric(name, MaxAggregation.builder().field(maxSpec.field()).build().toAggregation());
+        return SeriesAggregationBuilder.metric(new MutableNamedAggregationBuilder(name,
+                Aggregation.builder().max(m -> m.field(maxSpec.field()))));
 
     }
 

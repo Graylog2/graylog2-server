@@ -17,13 +17,12 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.buckets;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch3.views.searchtypes.pivot.NamedAggregationBuilder;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotBucketSpecHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.PivotBucket;
 import org.joda.time.base.AbstractDateTime;
@@ -34,18 +33,17 @@ import org.opensearch.client.opensearch._types.aggregations.DateRangeExpression;
 import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
 
 import javax.annotation.Nonnull;
-import java.util.Map;
 import java.util.stream.Stream;
 
 public class OSDateRangeHandler extends OSPivotBucketSpecHandler<DateRangeBucket> {
     private static final String AGG_NAME = "agg";
     @Nonnull
     @Override
-    public CreatedAggregations<NamedAggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, DateRangeBucket dateRangeBucket, OSGeneratedQueryContext queryContext, Query query) {
-        NamedAggregationBuilder root = null;
-        NamedAggregationBuilder leaf = null;
+    public CreatedAggregations<MutableNamedAggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, DateRangeBucket dateRangeBucket, OSGeneratedQueryContext queryContext, Query query) {
+        MutableNamedAggregationBuilder root = null;
+        MutableNamedAggregationBuilder leaf = null;
         // need to iterate through the list reverse to be able to create subaggregations
-        for (String field : Lists.reverse(dateRangeBucket.fields())) {
+        for (String field : dateRangeBucket.fields()) {
             final DateRangeAggregation.Builder dateRangeBuilder = DateRangeAggregation.builder()
                     .field(field);
             dateRangeBucket.ranges().forEach(r -> {
@@ -65,26 +63,17 @@ public class OSDateRangeHandler extends OSPivotBucketSpecHandler<DateRangeBucket
 
             queryContext.recordNameForPivotSpec(pivot, dateRangeBucket, name);
 
-            NamedAggregationBuilder builder = new NamedAggregationBuilder(
+            MutableNamedAggregationBuilder builder = new MutableNamedAggregationBuilder(
                     name,
                     Aggregation.builder().dateRange(dateRangeBuilder.build())
             );
 
             if (root == null) {
                 root = builder;
-                leaf = new NamedAggregationBuilder(
-                        name,
-                        Aggregation.builder().dateRange(dateRangeBuilder.build())
-                );
+                leaf = builder;
             } else {
-                // create new root with old root as nested aggregation
-                root = new NamedAggregationBuilder(
-                        name,
-                        builder.aggregationBuilder().aggregations(Map.of(
-                                root.name(),
-                                root.aggregationBuilder().build()
-                        ))
-                );
+                leaf.subAggregation(builder);
+                leaf = builder;
             }
         }
 

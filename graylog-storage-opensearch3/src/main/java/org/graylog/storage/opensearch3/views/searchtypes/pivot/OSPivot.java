@@ -17,7 +17,6 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.Query;
@@ -74,91 +73,83 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
             seriesStream(pivot, queryContext, "global rollup")
                     .filter(result -> Placement.METRIC.equals(result.placement()))
                     .forEach(agg -> {
-                        searchSourceBuilder.aggregation(agg.aggregationName(), agg.aggregationBuilder());
+                        searchSourceBuilder.aggregation(agg.aggregationBuilder());
                     });
         }
 
-        final BucketSpecHandler.CreatedAggregations<NamedAggregationBuilder> createdAggregations = createPivots(BucketSpecHandler.Direction.Row, query, pivot, pivot.rowGroups(), queryContext);
-        final NamedAggregationBuilder rootAggregation = createdAggregations.root();
-        final NamedAggregationBuilder leafAggregation = createdAggregations.leaf();
-        final List<NamedAggregationBuilder> metrics = createdAggregations.metrics();
+        final BucketSpecHandler.CreatedAggregations<MutableNamedAggregationBuilder> createdAggregations = createPivots(BucketSpecHandler.Direction.Row, query, pivot, pivot.rowGroups(), queryContext);
+        final MutableNamedAggregationBuilder rootAggregation = createdAggregations.root();
+        final MutableNamedAggregationBuilder leafAggregation = createdAggregations.leaf();
+        final List<MutableNamedAggregationBuilder> metrics = createdAggregations.metrics();
         seriesStream(pivot, queryContext, "metrics")
                 .forEach(result -> {
                     switch (result.placement()) {
-                        case METRIC ->
-                                metrics.forEach(metric -> metric.aggregationBuilder().aggregations(result.aggregationName(), result.aggregationBuilder()));
-                        case ROW ->
-                                rootAggregation.aggregationBuilder().aggregations(result.aggregationName(), result.aggregationBuilder());
+                        case METRIC -> metrics.forEach(metric -> metric.subAggregation(result.aggregationBuilder()));
+                        case ROW -> rootAggregation.subAggregation(result.aggregationBuilder());
                         case ROOT -> {
                             if (!generateRollups) {
-                                searchSourceBuilder.aggregation(result.aggregationName(), result.aggregationBuilder());
+                                searchSourceBuilder.aggregation(result.aggregationBuilder());
                             }
                         }
                     }
                 });
 
         if (!pivot.columnGroups().isEmpty()) {
-            final BucketSpecHandler.CreatedAggregations<NamedAggregationBuilder> columnsAggregation = createPivots(BucketSpecHandler.Direction.Column, query, pivot, pivot.columnGroups(), queryContext);
-            final NamedAggregationBuilder columnsRootAggregation = columnsAggregation.root();
-            final NamedAggregationBuilder columnsLeafAggregation = columnsAggregation.leaf();
-            final List<NamedAggregationBuilder> columnMetrics = columnsAggregation.metrics();
+            final BucketSpecHandler.CreatedAggregations<MutableNamedAggregationBuilder> columnsAggregation = createPivots(BucketSpecHandler.Direction.Column, query, pivot, pivot.columnGroups(), queryContext);
+            final MutableNamedAggregationBuilder columnsRootAggregation = columnsAggregation.root();
+            final MutableNamedAggregationBuilder columnsLeafAggregation = columnsAggregation.leaf();
+            final List<MutableNamedAggregationBuilder> columnMetrics = columnsAggregation.metrics();
             seriesStream(pivot, queryContext, "metrics")
                     .forEach(result -> {
-                        var name = result.aggregationName();
-                        var aggregationBuilder = result.aggregationBuilder();
+                        final var aggregationBuilder = result.aggregationBuilder();
                         switch (result.placement()) {
-                            case COLUMN ->
-                                    columnsLeafAggregation.aggregationBuilder().aggregations(name, aggregationBuilder);
-                            case METRIC -> columnMetrics.forEach(metric -> metric.aggregationBuilder()
-                                    .aggregations(name, aggregationBuilder));
+                            case COLUMN -> columnsLeafAggregation.subAggregation(aggregationBuilder);
+                            case METRIC -> columnMetrics.forEach(metric -> metric.subAggregation(aggregationBuilder));
                         }
                     });
             if (leafAggregation != null) {
-                leafAggregation.aggregationBuilder().aggregations(columnsLeafAggregation.name(), columnsRootAggregation.aggregationBuilder().build());
+                leafAggregation.subAggregation(columnsRootAggregation);
             } else {
-                searchSourceBuilder.aggregation(columnsRootAggregation.name(), columnsRootAggregation.aggregationBuilder().build());
+                searchSourceBuilder.aggregation(columnsRootAggregation);
             }
         }
 
         if (rootAggregation != null) {
-            searchSourceBuilder.aggregation(rootAggregation.name(), rootAggregation.aggregationBuilder().build());
+            searchSourceBuilder.aggregation(rootAggregation);
         }
 
         addTimeStampAggregations(searchSourceBuilder);
     }
 
     private void addTimeStampAggregations(MutableSearchRequestBuilder searchSourceBuilder) {
-        final Aggregation startTimestamp = Aggregation.builder().min(f -> f.field("timestamp")).build();
-        final Aggregation endTimestamp = Aggregation.builder().max(f -> f.field("timestamp")).build();
-        searchSourceBuilder.aggregation("timestamp-min", startTimestamp);
-        searchSourceBuilder.aggregation("timestamp-max", endTimestamp);
+        final MutableNamedAggregationBuilder startTimestamp = new MutableNamedAggregationBuilder(
+                "timestamp-min",
+                Aggregation.builder().min(f -> f.field("timestamp")));
+        final MutableNamedAggregationBuilder endTimestamp = new MutableNamedAggregationBuilder(
+                "timestamp-max",
+                Aggregation.builder().max(f -> f.field("timestamp")));
+        searchSourceBuilder.aggregation(startTimestamp);
+        searchSourceBuilder.aggregation(endTimestamp);
     }
 
-    private BucketSpecHandler.CreatedAggregations<NamedAggregationBuilder> createPivots(BucketSpecHandler.Direction direction, Query query, Pivot pivot, List<BucketSpec> pivots, OSGeneratedQueryContext queryContext) {
-        NamedAggregationBuilder leaf = null;
-        NamedAggregationBuilder root = null;
-        final List<NamedAggregationBuilder> metrics = new ArrayList<>();
-        for (BucketSpec bucketSpec : Lists.reverse(pivots)) {
+    private BucketSpecHandler.CreatedAggregations<MutableNamedAggregationBuilder> createPivots(BucketSpecHandler.Direction direction, Query query, Pivot pivot, List<BucketSpec> pivots, OSGeneratedQueryContext queryContext) {
+        MutableNamedAggregationBuilder leaf = null;
+        MutableNamedAggregationBuilder root = null;
+        final List<MutableNamedAggregationBuilder> metrics = new ArrayList<>();
+        for (BucketSpec bucketSpec : pivots) {
             final OSPivotBucketSpecHandler<? extends BucketSpec> bucketHandler = bucketHandlers.get(bucketSpec.type());
-            final BucketSpecHandler.CreatedAggregations<NamedAggregationBuilder> bucketAggregations = bucketHandler.createAggregation(direction, AGG_NAME, pivot, bucketSpec, queryContext, query);
-            final NamedAggregationBuilder aggregationRoot = bucketAggregations.root();
-            final NamedAggregationBuilder aggregationLeaf = bucketAggregations.leaf();
-            final List<NamedAggregationBuilder> aggregationMetrics = bucketAggregations.metrics();
+            final BucketSpecHandler.CreatedAggregations<MutableNamedAggregationBuilder> bucketAggregations = bucketHandler.createAggregation(direction, AGG_NAME, pivot, bucketSpec, queryContext, query);
+            final MutableNamedAggregationBuilder aggregationRoot = bucketAggregations.root();
+            final MutableNamedAggregationBuilder aggregationLeaf = bucketAggregations.leaf();
+            final List<MutableNamedAggregationBuilder> aggregationMetrics = bucketAggregations.metrics();
 
             metrics.addAll(aggregationMetrics);
-
             if (root == null) {
                 root = aggregationRoot;
                 leaf = aggregationLeaf;
             } else {
-                // create new root with old root as nested aggregation
-                root = new NamedAggregationBuilder(
-                        aggregationRoot.name(),
-                        aggregationRoot.aggregationBuilder().aggregations(Map.of(
-                                root.name(),
-                                root.aggregationBuilder().build()
-                        ))
-                );
+                leaf.subAggregation(aggregationRoot);
+                leaf = aggregationLeaf;
             }
         }
 

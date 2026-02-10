@@ -17,23 +17,24 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 import org.opensearch.client.opensearch._types.aggregations.SumAggregate;
-import org.opensearch.client.opensearch._types.aggregations.SumAggregation;
 
 public class OSSumHandler extends OSBasicSeriesSpecHandler<Sum> {
 
     @Override
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Sum sumSpec) {
-        var aggregation = SumAggregation.builder().field(sumSpec.field()).build();
-        return SeriesAggregationBuilder.metric(name, aggregation.toAggregation());
+        var aggregation = Aggregation.builder().sum(s -> s.field(sumSpec.field()));
+        return SeriesAggregationBuilder.metric(new MutableNamedAggregationBuilder(name, aggregation));
     }
 
     @Override
     protected Object getValueFromAggregationResult(final Aggregate agg,
                                                    final Sum seriesSpec) {
-        SumAggregate sum = agg.isSum() ? agg.sum() : null;
+        SumAggregate sum = (agg != null) ? agg.isSum() ? agg.sum() : null : null;
         return sum == null ? null : sum.value();
     }
 

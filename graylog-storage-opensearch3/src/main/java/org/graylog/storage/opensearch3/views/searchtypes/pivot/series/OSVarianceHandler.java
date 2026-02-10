@@ -17,16 +17,17 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
-import org.opensearch.client.opensearch._types.aggregations.ExtendedStatsAggregation;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 
 public class OSVarianceHandler extends OSBasicSeriesSpecHandler<Variance> {
 
     @Override
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Variance varianceSpec) {
-        return SeriesAggregationBuilder.metric(name,
-                ExtendedStatsAggregation.builder().field(varianceSpec.field()).build().toAggregation());
+        return SeriesAggregationBuilder.metric(new MutableNamedAggregationBuilder(name,
+                Aggregation.builder().extendedStats(e -> e.field(varianceSpec.field()))));
     }
 
     @Override

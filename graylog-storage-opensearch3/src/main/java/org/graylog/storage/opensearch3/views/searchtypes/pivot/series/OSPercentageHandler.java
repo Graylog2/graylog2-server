@@ -56,7 +56,7 @@ public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage> {
         var aggregation = createNestedSeriesAggregation(name, pivot, percentage, queryContext);
         return Stream.concat(
                 aggregation.stream(),
-                aggregation.stream().map(r -> SeriesAggregationBuilder.root(name, r.aggregationBuilder()))
+                aggregation.stream().map(r -> SeriesAggregationBuilder.root(r.aggregationBuilder()))
         ).toList();
     }
 

@@ -17,16 +17,17 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
-import org.opensearch.client.opensearch._types.aggregations.AverageAggregation;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 import org.opensearch.client.opensearch._types.aggregations.AvgAggregate;
 
 public class OSAverageHandler extends OSBasicSeriesSpecHandler<Average> {
 
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Average avgSpec) {
-        return SeriesAggregationBuilder.metric(name,
-                AverageAggregation.of(a -> a.field(avgSpec.field())).toAggregation());
+        return SeriesAggregationBuilder.metric(new MutableNamedAggregationBuilder(name,
+                Aggregation.builder().avg(a -> a.field(avgSpec.field()))));
     }
 
     @Override

@@ -16,8 +16,6 @@
  */
 package org.graylog.storage.opensearch3.views.searchtypes.pivot;
 
-import org.opensearch.client.opensearch._types.aggregations.Aggregation;
-
 enum Placement {
     ROOT,
     ROW,
@@ -25,21 +23,21 @@ enum Placement {
     METRIC
 }
 
-public record SeriesAggregationBuilder(String aggregationName, Aggregation aggregationBuilder,
+public record SeriesAggregationBuilder(MutableNamedAggregationBuilder aggregationBuilder,
                                        Placement placement) {
-    public static SeriesAggregationBuilder root(String aggregationName, Aggregation aggregationBuilder) {
-        return new SeriesAggregationBuilder(aggregationName, aggregationBuilder, Placement.ROOT);
+    public static SeriesAggregationBuilder root(MutableNamedAggregationBuilder aggregationBuilder) {
+        return new SeriesAggregationBuilder(aggregationBuilder, Placement.ROOT);
     }
 
-    public static SeriesAggregationBuilder metric(String aggregationName, Aggregation aggregationBuilder) {
-        return new SeriesAggregationBuilder(aggregationName, aggregationBuilder, Placement.METRIC);
+    public static SeriesAggregationBuilder metric(MutableNamedAggregationBuilder aggregationBuilder) {
+        return new SeriesAggregationBuilder(aggregationBuilder, Placement.METRIC);
     }
 
-    public static SeriesAggregationBuilder row(String aggregationName, Aggregation aggregationBuilder) {
-        return new SeriesAggregationBuilder(aggregationName, aggregationBuilder, Placement.ROW);
+    public static SeriesAggregationBuilder row(MutableNamedAggregationBuilder aggregationBuilder) {
+        return new SeriesAggregationBuilder(aggregationBuilder, Placement.ROW);
     }
 
-    public static SeriesAggregationBuilder column(String aggregationName, Aggregation aggregationBuilder) {
-        return new SeriesAggregationBuilder(aggregationName, aggregationBuilder, Placement.COLUMN);
+    public static SeriesAggregationBuilder column(MutableNamedAggregationBuilder aggregationBuilder) {
+        return new SeriesAggregationBuilder(aggregationBuilder, Placement.COLUMN);
     }
 }

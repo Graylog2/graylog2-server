@@ -17,16 +17,19 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
-import org.opensearch.client.opensearch._types.aggregations.PercentilesAggregation;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 
 public class OSPercentilesHandler extends OSBasicSeriesSpecHandler<Percentile> {
 
     @Override
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Percentile percentileSpec) {
-        return SeriesAggregationBuilder.metric(name,
-                PercentilesAggregation.builder().field(percentileSpec.field()).percents(percentileSpec.percentile()).build().toAggregation());
+        return SeriesAggregationBuilder.metric(new MutableNamedAggregationBuilder(name,
+                Aggregation.builder().percentiles(p -> p
+                        .field(percentileSpec.field())
+                        .percents(percentileSpec.percentile()))));
     }
 
     @Override

@@ -19,5 +19,10 @@ package org.graylog.storage.opensearch3.views.searchtypes.pivot;
 
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 
-public record NamedAggregationBuilder(String name, Aggregation.Builder.ContainerBuilder aggregationBuilder) {
+public record NamedAggregationBuilder(String name, MutableNamedAggregationBuilder aggregationBuilder) {
+
+    public void subAggregation(Aggregation aggregation) {
+
+    }
+
 }

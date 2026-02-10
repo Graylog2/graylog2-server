@@ -21,12 +21,14 @@ import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
-import org.opensearch.client.opensearch._types.aggregations.ValueCountAggregation;
+import org.opensearch.client.opensearch._types.aggregations.ValueCountAggregate;
 import org.opensearch.client.opensearch.core.msearch.MultiSearchItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +47,8 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count> {
                 .map(field -> {
                     // the request was for a field count, we have to add a value_count sub aggregation
                     queryContext.recordNameForPivotSpec(pivot, count, name);
-                    return List.of(SeriesAggregationBuilder.metric(name, ValueCountAggregation.of(a -> a.field(field)).toAggregation()));
+                    return List.of(SeriesAggregationBuilder.metric(new MutableNamedAggregationBuilder(name,
+                            Aggregation.builder().valueCount(a -> a.field(field)))));
                 })
                 // doc_count is always present in elasticsearch's bucket aggregations, no need to add it
                 .orElse(List.of());
@@ -61,11 +64,8 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count> {
         if (agg == null) {
             LOG.error("Unexpected null aggregation result, returning 0 for the count. This is a bug.");
             value = 0;
-            // TODO: How was this even possible?
-//        } else if (valueCount instanceof MultiBucketBase) {
-//            value = ((MultiBucketsAggregation.Bucket) valueCount).getDocCount();
-//        } else if (valueCount instanceof Aggregations) {
-//            value = searchResult.getHits().getTotalHits().value;
+        } else if (agg.isMultiTerms()) {
+            value = agg.multiTerms().buckets().array().getFirst().docCount();
         } else if (agg.isValueCount()) {
             value = agg.valueCount() == null ? 0 : agg.valueCount().value();
         } else {
@@ -76,19 +76,15 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count> {
 
     @Override
     public Aggregate extractAggregationFromResult(Pivot pivot, PivotSpec spec, MultiBucketBase aggregations, IndexerGeneratedQueryContext<?> queryContext) {
-//        final String agg = queryContext.getAggNameForPivotSpecFromContext(pivot, spec);
-//        if (agg == null) {
-//            if (aggregations instanceof MultiBucketsAggregation.Bucket) {
-//                return createValueCount(((MultiBucketsAggregation.Bucket) aggregations).getDocCount());
-//            } else if (aggregations instanceof Missing) {
-//                return createValueCount(((Missing) aggregations).getDocCount());
-//            }
-//        } else {
-//            // try to saved sub aggregation type. this might fail if we refer to the total result of the entire result instead of a specific
-//            // value_count aggregation. we'll handle that special case in doHandleResult above
-//            return aggregations.getAggregations().get(agg);
-//        }
-
-        return null;
+        final String agg = queryContext.getAggNameForPivotSpecFromContext(pivot, spec);
+        if (agg == null) {
+            return ValueCountAggregate.of(v -> v
+                    .value((double) aggregations.docCount())
+            ).toAggregate();
+        } else {
+            // try to saved sub aggregation type. this might fail if we refer to the total result of the entire result instead of a specific
+            // value_count aggregation. we'll handle that special case in doHandleResult above
+            return aggregations.aggregations().get(agg);
+        }
     }
 }

@@ -25,7 +25,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Interval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch3.views.searchtypes.pivot.NamedAggregationBuilder;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotBucketSpecHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.PivotBucket;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -44,7 +44,6 @@ import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
 import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
@@ -55,16 +54,16 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
 
     @Nonnull
     @Override
-    public CreatedAggregations<NamedAggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, Time timeSpec, OSGeneratedQueryContext queryContext, Query query) {
-        NamedAggregationBuilder root = null;
-        NamedAggregationBuilder leaf = null;
+    public CreatedAggregations<MutableNamedAggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, Time timeSpec, OSGeneratedQueryContext queryContext, Query query) {
+        MutableNamedAggregationBuilder root = null;
+        MutableNamedAggregationBuilder leaf = null;
         final var timeZone = queryContext.timezone().toTimeZone().getID();
 
         final Interval interval = timeSpec.interval();
         final TimeRange timerange = query.timerange();
         if (interval instanceof AutoInterval autoInterval
                 && isAllMessages(timerange)) {
-            for (String timeField : Lists.reverse(timeSpec.fields())) {
+            for (String timeField : timeSpec.fields()) {
                 AutoDateHistogramAggregation.Builder aggBuilder = AutoDateHistogramAggregation.builder()
                         .field(timeField)
                         .buckets((int) (BASE_NUM_BUCKETS / autoInterval.scaling()))
@@ -72,26 +71,17 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
                         .timeZone(timeZone);
 
                 AutoDateHistogramAggregation aggregation = aggBuilder.build();
-                NamedAggregationBuilder builder = new NamedAggregationBuilder(
+                MutableNamedAggregationBuilder builder = new MutableNamedAggregationBuilder(
                         name,
                         Aggregation.builder().autoDateHistogram(aggregation)
                 );
 
                 if (root == null) {
                     root = builder;
-                    leaf = new NamedAggregationBuilder(
-                            name,
-                            Aggregation.builder().autoDateHistogram(aggregation)
-                    );
+                    leaf = builder;
                 } else {
-                    // create new root with old root as nested aggregation
-                    root = new NamedAggregationBuilder(
-                            name,
-                            builder.aggregationBuilder().aggregations(Map.of(
-                                    root.name(),
-                                    root.aggregationBuilder().build()
-                            ))
-                    );
+                    leaf.subAggregation(builder);
+                    leaf = builder;
                 }
             }
         } else {
@@ -107,26 +97,17 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
                 setInterval(aggBuilder, dateHistogramInterval);
 
                 DateHistogramAggregation aggregation = aggBuilder.build();
-                NamedAggregationBuilder builder = new NamedAggregationBuilder(
+                MutableNamedAggregationBuilder builder = new MutableNamedAggregationBuilder(
                         name,
                         Aggregation.builder().dateHistogram(aggregation)
                                 .aggregations(ordering.sortingAggregations())
                 );
                 if (root == null) {
                     root = builder;
-                    leaf = new NamedAggregationBuilder(
-                            name,
-                            Aggregation.builder().dateHistogram(aggregation)
-                    );
+                    leaf = builder;
                 } else {
-                    // create new root with old root as nested aggregation
-                    root = new NamedAggregationBuilder(
-                            name,
-                            builder.aggregationBuilder().aggregations(Map.of(
-                                    root.name(),
-                                    root.aggregationBuilder().build()
-                            ))
-                    );
+                    leaf.subAggregation(builder);
+                    leaf = builder;
                 }
             }
         }

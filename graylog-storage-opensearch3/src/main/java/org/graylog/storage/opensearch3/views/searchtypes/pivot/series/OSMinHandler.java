@@ -17,16 +17,18 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Min;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 import org.opensearch.client.opensearch._types.aggregations.MinAggregate;
-import org.opensearch.client.opensearch._types.aggregations.MinAggregation;
 
 public class OSMinHandler extends OSBasicSeriesSpecHandler<Min> {
 
     @Override
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Min minSpec) {
-        return SeriesAggregationBuilder.metric(name, MinAggregation.builder().field(minSpec.field()).build().toAggregation());
+        return SeriesAggregationBuilder.metric(new MutableNamedAggregationBuilder(name,
+                Aggregation.builder().min(m -> m.field(minSpec.field()))));
     }
 
     @Override

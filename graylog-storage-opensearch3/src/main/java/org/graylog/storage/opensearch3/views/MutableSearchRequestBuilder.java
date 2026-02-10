@@ -17,11 +17,11 @@
 
 package org.graylog.storage.opensearch3.views;
 
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.opensearch.client.opensearch._types.ExpandWildcard;
 import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.SortOptions;
 import org.opensearch.client.opensearch._types.Time;
-import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.core.search.Highlight;
@@ -30,9 +30,7 @@ import org.opensearch.client.opensearch.core.search.TrackHits;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Wrapper for SearchRequest.Builder.
@@ -57,7 +55,7 @@ public class MutableSearchRequestBuilder {
     List<SortOptions> sort;
     SourceConfig source;
     Highlight highlight;
-    Map<String, Aggregation> aggregations = new HashMap<>();
+    List<MutableNamedAggregationBuilder> aggregations = new ArrayList<>();
     List<FieldValue> searchAfter;
 
     public MutableSearchRequestBuilder query(Query query) {
@@ -146,16 +144,13 @@ public class MutableSearchRequestBuilder {
         return highlight;
     }
 
-    public MutableSearchRequestBuilder aggregations(Map<String, Aggregation> aggregations) {
+    public MutableSearchRequestBuilder aggregations(List<MutableNamedAggregationBuilder> aggregations) {
         this.aggregations = aggregations;
         return this;
     }
 
-    public MutableSearchRequestBuilder aggregation(String name, Aggregation aggregation) {
-//        if (this.aggregations.containsKey(name)) {
-//            throw new IllegalArgumentException("Aggregation already exists: " + name);
-//        }
-        this.aggregations.put(name, aggregation);
+    public MutableSearchRequestBuilder aggregation(MutableNamedAggregationBuilder aggregation) {
+        this.aggregations.add(aggregation);
         return this;
     }
 
@@ -200,7 +195,9 @@ public class MutableSearchRequestBuilder {
                 b.highlight(highlight);
             }
             if (aggregations != null) {
-                b.aggregations(aggregations);
+                aggregations.forEach(aggregation -> {
+                    b.aggregations(aggregation.getName(), aggregation.build());
+                });
             }
             if (searchAfter != null) {
                 b.searchAfter(searchAfter);

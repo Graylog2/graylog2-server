@@ -26,7 +26,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.ValuesBucketOrdering;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch3.views.searchtypes.pivot.NamedAggregationBuilder;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotBucketSpecHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.PivotBucket;
 import org.opensearch.client.opensearch._types.Script;
@@ -62,14 +62,14 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
 
     @Nonnull
     @Override
-    public CreatedAggregations<NamedAggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, Values bucketSpec, OSGeneratedQueryContext queryContext, Query query) {
+    public CreatedAggregations<MutableNamedAggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, Values bucketSpec, OSGeneratedQueryContext queryContext, Query query) {
         final var ordering = orderListForPivot(pivot, queryContext, DEFAULT_ORDER, query);
         final int limit = bucketSpec.limit();
         final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(bucketSpec.fields(), pivot.sort());
         final TermsAggregation.Builder termsAggregationBuilder = createTerms(orderedBuckets, limit);
 
         termsAggregationBuilder.order(mapOrders(ordering.orders()));
-        NamedAggregationBuilder termsAggregation = new NamedAggregationBuilder(
+        MutableNamedAggregationBuilder termsAggregation = new MutableNamedAggregationBuilder(
                 AGG_NAME,
                 Aggregation.builder()
                         .terms(termsAggregationBuilder.build())
@@ -77,12 +77,12 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
         );
 
         final FiltersAggregation.Builder filterAggregationBuilder = createFilter(orderedBuckets, bucketSpec.skipEmptyValues());
-        final NamedAggregationBuilder filterAggregation = new NamedAggregationBuilder(
+        final MutableNamedAggregationBuilder filterAggregation = new MutableNamedAggregationBuilder(
                 name,
                 Aggregation.builder()
                         .filters(filterAggregationBuilder.build())
-                        .aggregations(termsAggregation.name(), termsAggregation.aggregationBuilder().build())
         );
+        filterAggregation.subAggregation(termsAggregation);
         return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
     }
 
