@@ -33,7 +33,6 @@ import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
-import org.graylog2.datanode.RemoteReindexAllowlistEvent;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,15 +72,6 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         this.csrRequester = csrRequester;
         this.stateMachine = stateMachine;
         eventBus.register(this);
-    }
-
-    @Subscribe
-    @SuppressWarnings("unused")
-    public void handleRemoteReindexAllowlistEvent(RemoteReindexAllowlistEvent event) {
-        switch (event.action()) {
-            case ADD -> this.configurationProvider.setAllowlist(event.allowlist(), event.trustedCertificates());
-            case REMOVE -> this.configurationProvider.removeAllowlist();
-        }
     }
 
     @Subscribe
