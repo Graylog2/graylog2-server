@@ -120,7 +120,7 @@ public class DatanodeUpgradeServiceAdapterOS implements DatanodeUpgradeServiceAd
         final PutClusterSettingsResponse response = officialOpensearchClient.sync(c -> c.cluster().putSettings(setting -> setting.flatSettings(true).persistent("cluster.routing.allocation.enable", JsonData.of(shardReplication))), "Failed to configure shard replication!");
         final String value = response.persistent().get("cluster.routing.allocation.enable").to(String.class);
         if (!value.equals(shardReplication)) {
-            throw new IllegalStateException("Failed to disable shard replication. Current cluster.routing.allocation.enable: " + value);
+            throw new IllegalStateException("Failed to configure shard replication. Expected cluster.routing.allocation.enable=" + shardReplication + " but was: " + value);
         }
         return flush();
     }
