@@ -151,7 +151,7 @@ public class DatanodeUpgradeServiceAdapterOS implements DatanodeUpgradeServiceAd
                 final JsonNode parsed = objectMapper.readValue(is, JsonNode.class);
                 return parseNodes(parsed.path("nodes"));
             } catch (IOException e) {
-                throw new RuntimeException("Failed to parse node response");
+                throw new RuntimeException("Failed to parse node response from /_nodes", e);
             }
         }).orElseThrow(() -> new IllegalStateException("Failed to obtain node response"));
     }
