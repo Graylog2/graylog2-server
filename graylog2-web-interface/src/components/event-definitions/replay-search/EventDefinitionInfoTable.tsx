@@ -16,16 +16,21 @@
  */
 
 import React from 'react';
+import styled from 'styled-components';
 
 import { Table } from 'components/bootstrap';
 import useAttributeComponents from 'components/event-definitions/replay-search/hooks/useAttributeComponents';
 import EventAttribute from 'components/event-definitions/replay-search/EventAttribute';
 
+const StyledTable = styled(Table)`
+  margin-bottom: 0;
+`;
+
 const EventDefinitionInfoTable = () => {
   const infoAttributes = useAttributeComponents();
 
   return (
-    <Table condensed striped>
+    <StyledTable condensed striped>
       <tbody data-testid="info-container">
         {infoAttributes.map(
           ({ title, content, show, inRows }) =>
@@ -36,7 +41,7 @@ const EventDefinitionInfoTable = () => {
             ),
         )}
       </tbody>
-    </Table>
+    </StyledTable>
   );
 };
 
