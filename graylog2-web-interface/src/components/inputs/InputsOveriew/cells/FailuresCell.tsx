@@ -21,9 +21,8 @@ import styled, { css } from 'styled-components';
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import { useStore } from 'stores/connect';
 import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
-import { Spinner } from 'components/common';
+import { Link, Spinner } from 'components/common';
 import { formatCount, getValueFromMetric } from 'components/inputs/helpers/InputThroughputUtils';
-import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 
 type Props = {
