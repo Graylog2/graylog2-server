@@ -25,12 +25,12 @@ type Props = {
 };
 
 const RightSidebarProvider = ({ children }: Props) => {
-  const [isOpen, { open, close }] = useDisclosure(false);
+  const [isOpen, { open, close }] = useDisclosure(true);
   const [content, setContent] = useState<RightSidebarContent | null>(null);
   const [width, setWidthState] = useState<number>(400);
 
   const openSidebar = useCallback(
-    <T = Record<string, unknown>>(newContent: RightSidebarContent<T>) => {
+    <T = Record<string, unknown>,>(newContent: RightSidebarContent<T>) => {
       setContent(newContent as RightSidebarContent<any>);
       open();
     },
@@ -41,12 +41,9 @@ const RightSidebarProvider = ({ children }: Props) => {
     close();
   }, [close]);
 
-  const updateContent = useCallback(
-    <T = Record<string, unknown>>(newContent: RightSidebarContent<T>) => {
-      setContent(newContent as RightSidebarContent<any>);
-    },
-    [],
-  );
+  const updateContent = useCallback(<T = Record<string, unknown>,>(newContent: RightSidebarContent<T>) => {
+    setContent(newContent as RightSidebarContent<any>);
+  }, []);
 
   const setWidth = useCallback((newWidth: number) => {
     setWidthState(newWidth);

@@ -19,35 +19,31 @@ import styled, { css } from 'styled-components';
 
 import useRightSidebar from 'hooks/useRightSidebar';
 import IconButton from 'components/common/IconButton';
+import ContentHeadRow from 'components/common/ContentHeadRow';
 
 const Container = styled.div<{ $width: number }>(
-  ({ theme, $width }) => css`
+  ({ $width }) => css`
     width: ${$width}px;
     min-width: ${$width}px;
     flex-shrink: 0;
     align-self: stretch;
     position: sticky;
     top: 0;
-    background-color: ${theme.colors.global.contentBackground};
-    border-left: 1px solid ${theme.colors.variant.light.default};
     display: flex;
     flex-direction: column;
     z-index: 1020;
+    padding: 10px;
   `,
 );
 
-const Header = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px;
-    border-bottom: 1px solid ${theme.colors.variant.light.default};
-    gap: 10px;
-  `,
-);
+const Header = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 15px;
+`;
 
-const Title = styled.h1(
+const Title = styled.h4(
   ({ theme }) => css`
     margin: 0;
     font-size: ${theme.fonts.size.h1};
@@ -78,13 +74,15 @@ const RightSidebar = () => {
 
   return (
     <Container $width={width} role="complementary" aria-label={`${content.title} sidebar`}>
-      <Header>
-        <Title id="sidebar-title">{content.title}</Title>
-        <IconButton name="close" title="Close sidebar" onClick={closeSidebar} aria-label="Close sidebar" />
-      </Header>
-      <ContentArea aria-labelledby="sidebar-title">
-        <ContentComponent {...(content.props || {})} />
-      </ContentArea>
+      <ContentHeadRow className="content">
+        <Header>
+          <Title id="sidebar-title">{content.title}</Title>
+          <IconButton name="close" title="Close sidebar" onClick={closeSidebar} aria-label="Close sidebar" />
+        </Header>
+        <ContentArea aria-labelledby="sidebar-title">
+          <ContentComponent {...(content.props || {})} />
+        </ContentArea>
+      </ContentHeadRow>
     </Container>
   );
 };
