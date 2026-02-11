@@ -32,8 +32,10 @@ import java.nio.file.Path;
 public class ShardStatsParserImpl implements ShardStatsParser {
     @Override
     public ShardStats read(Path shardPath) throws IncompatibleIndexVersionException {
-        try (Directory directory = FSDirectory.open(shardPath.resolve("index"))) {
-            final StandardDirectoryReader reader = (StandardDirectoryReader) org.apache.lucene.index.DirectoryReader.open(directory);
+        try (
+                Directory directory = FSDirectory.open(shardPath.resolve("index"));
+                StandardDirectoryReader reader = (StandardDirectoryReader) org.apache.lucene.index.DirectoryReader.open(directory)
+        ) {
             final int documentsCount = getDocumentsCount(reader);
             final Version minSegmentLuceneVersion = reader.getSegmentInfos().getMinSegmentLuceneVersion();
             return new ShardStats(shardPath, documentsCount, minSegmentLuceneVersion);

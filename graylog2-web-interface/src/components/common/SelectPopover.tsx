@@ -89,8 +89,6 @@ class SelectPopover extends React.Component<
     disabled: false,
   };
 
-  private overlay: { hide: () => void };
-
   constructor(props) {
     super(props);
 
@@ -113,6 +111,8 @@ class SelectPopover extends React.Component<
       this.filterData(filterText, nextProps.items);
     }
   }
+
+  private overlay: { hide: () => void };
 
   handleSelectionChange = (nextSelection) => {
     const { onItemSelect } = this.props;

@@ -20,6 +20,10 @@ import styled, { css } from 'styled-components';
 import type { SearchPreferencesLayout } from 'views/components/contexts/SearchPagePreferencesContext';
 import { IconButton } from 'components/common';
 import zIndices from 'theme/z-indices';
+import type {
+  LayoutSidebarTitle,
+  LayoutSidebarTitleComponent,
+} from 'views/components/contexts/SearchPageLayoutContext';
 
 type Props = {
   children: React.ReactNode;
@@ -28,7 +32,7 @@ type Props = {
   forceSideBarPinned: boolean;
   searchPreferencesLayout: SearchPreferencesLayout | undefined | null;
   sectionTitle: string;
-  title: string;
+  title: LayoutSidebarTitle;
   width?: number;
 };
 
@@ -147,6 +151,10 @@ const toggleSidebarPinning = (searchPageLayout: SearchPreferencesLayout) => {
   togglePinning();
 };
 
+const DefaultTitle: LayoutSidebarTitleComponent = ({ onClose, children = null }) => (
+  <Title onClick={onClose}>{children}</Title>
+);
+
 const ContentColumn = ({
   children,
   title,
@@ -158,14 +166,16 @@ const ContentColumn = ({
   width = 275,
 }: Props) => {
   const sidebarIsPinned = searchPreferencesLayout?.config.sidebar.isPinned || forceSideBarPinned;
+  const titleAttr = typeof title === 'string' ? title : undefined;
+  const TitleComponent = typeof title === 'string' ? DefaultTitle : title;
 
   return (
     <Container $sidebarIsPinned={sidebarIsPinned} $width={width}>
       <ContentGrid>
         <Header>
-          <TitleSection title={title}>
+          <TitleSection title={titleAttr}>
             <CenterVertical>
-              <Title onClick={closeSidebar}>{title}</Title>
+              <TitleComponent onClose={closeSidebar}>{typeof title === 'string' ? title : null}</TitleComponent>
             </CenterVertical>
             {!forceSideBarPinned && enableSidebarPinning && (
               <CenterVertical>
