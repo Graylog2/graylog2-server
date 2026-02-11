@@ -17,13 +17,19 @@
 package org.graylog.plugins.datanode.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.graylog2.indexer.indices.HealthStatus;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-public record ClusterState(HealthStatus status, String clusterName, int numberOfNodes, int activeShards, int relocatingShards,
+public record ClusterState(@JsonSerialize(using = HealthStatusSerializer.class) HealthStatus status, String clusterName,
+                           int numberOfNodes, int activeShards, int relocatingShards,
                            int initializingShards, int unassignedShards, int activePrimaryShards,
                            int delayedUnassignedShards, ShardReplication shardReplication, ManagerNode managerNode,
                            List<Node> opensearchNodes) {
@@ -33,5 +39,12 @@ public record ClusterState(HealthStatus status, String clusterName, int numberOf
         return opensearchNodes.stream().
                 filter(n -> n.host().equals(hostname))
                 .findFirst();
+    }
+
+    private static class HealthStatusSerializer extends JsonSerializer<HealthStatus> {
+        @Override
+        public void serialize(HealthStatus value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+            gen.writeString(value.name().toUpperCase(Locale.ROOT));
+        }
     }
 }
