@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 
 import useRightSidebar from 'hooks/useRightSidebar';
 import IconButton from 'components/common/IconButton';
-import ContentHeadRow from 'components/common/ContentHeadRow';
+import Row from 'components/bootstrap/Row';
 
 const Container = styled.div<{ $width: number }>(
   ({ $width }) => css`
@@ -41,6 +41,7 @@ const Header = styled.div`
   align-items: center;
   justify-content: space-between;
   padding-left: 15px;
+  padding-right: 15px;
 `;
 
 const Title = styled.h4(
@@ -63,6 +64,11 @@ const ContentArea = styled.div`
   min-height: 0;
 `;
 
+const StyledRow = styled(Row)`
+  margin-left: 0px;
+  margin-right: 0px;
+`;
+
 const RightSidebar = () => {
   const { content, width, closeSidebar } = useRightSidebar();
 
@@ -74,7 +80,7 @@ const RightSidebar = () => {
 
   return (
     <Container $width={width} role="complementary" aria-label={`${content.title} sidebar`}>
-      <ContentHeadRow className="content">
+      <StyledRow className="content">
         <Header>
           <Title id="sidebar-title">{content.title}</Title>
           <IconButton name="close" title="Close sidebar" onClick={closeSidebar} aria-label="Close sidebar" />
@@ -82,7 +88,7 @@ const RightSidebar = () => {
         <ContentArea aria-labelledby="sidebar-title">
           <ContentComponent {...(content.props || {})} />
         </ContentArea>
-      </ContentHeadRow>
+      </StyledRow>
     </Container>
   );
 };
