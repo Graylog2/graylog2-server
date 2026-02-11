@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled, { css } from 'styled-components';
 
 import useRightSidebar from 'hooks/useRightSidebar';
@@ -67,6 +67,23 @@ const ContentArea = styled.div(
 const RightSidebar = () => {
   const { content, width, closeSidebar } = useRightSidebar();
 
+  // Handle ESC key to close sidebar
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeSidebar();
+      }
+    };
+
+    if (content) {
+      document.addEventListener('keydown', handleEscape);
+
+      return () => document.removeEventListener('keydown', handleEscape);
+    }
+
+    return undefined;
+  }, [content, closeSidebar]);
+
   if (!content) {
     return null;
   }
@@ -74,12 +91,12 @@ const RightSidebar = () => {
   const ContentComponent = content.component;
 
   return (
-    <Container $width={width}>
+    <Container $width={width} role="complementary" aria-label={`${content.title} sidebar`}>
       <Header>
-        <Title>{content.title}</Title>
-        <IconButton name="close" title="Close sidebar" onClick={closeSidebar} />
+        <Title id="sidebar-title">{content.title}</Title>
+        <IconButton name="close" title="Close sidebar" onClick={closeSidebar} aria-label="Close sidebar" />
       </Header>
-      <ContentArea>
+      <ContentArea aria-labelledby="sidebar-title">
         <ContentComponent {...(content.props || {})} />
       </ContentArea>
     </Container>

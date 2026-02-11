@@ -30,8 +30,8 @@ const RightSidebarProvider = ({ children }: Props) => {
   const [width, setWidthState] = useState<number>(400);
 
   const openSidebar = useCallback(
-    (newContent: RightSidebarContent) => {
-      setContent(newContent);
+    <T = Record<string, unknown>>(newContent: RightSidebarContent<T>) => {
+      setContent(newContent as RightSidebarContent<any>);
       open();
     },
     [open],
@@ -41,9 +41,12 @@ const RightSidebarProvider = ({ children }: Props) => {
     close();
   }, [close]);
 
-  const updateContent = useCallback((newContent: RightSidebarContent) => {
-    setContent(newContent);
-  }, []);
+  const updateContent = useCallback(
+    <T = Record<string, unknown>>(newContent: RightSidebarContent<T>) => {
+      setContent(newContent as RightSidebarContent<any>);
+    },
+    [],
+  );
 
   const setWidth = useCallback((newWidth: number) => {
     setWidthState(newWidth);

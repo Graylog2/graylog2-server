@@ -18,20 +18,20 @@ import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
 
-export type RightSidebarContent = {
+export type RightSidebarContent<T = Record<string, unknown>> = {
   id: string;
   title: string;
-  component: React.ComponentType<any>;
-  props?: Record<string, any>;
+  component: React.ComponentType<T>;
+  props?: T;
 };
 
 export type RightSidebarContextType = {
   isOpen: boolean;
-  content: RightSidebarContent | null;
+  content: RightSidebarContent<any> | null;
   width: number;
-  openSidebar: (content: RightSidebarContent) => void;
+  openSidebar: <T = Record<string, unknown>>(content: RightSidebarContent<T>) => void;
   closeSidebar: () => void;
-  updateContent: (content: RightSidebarContent) => void;
+  updateContent: <T = Record<string, unknown>>(content: RightSidebarContent<T>) => void;
   setWidth: (width: number) => void;
 };
 
