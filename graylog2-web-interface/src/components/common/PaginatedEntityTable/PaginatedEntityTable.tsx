@@ -249,6 +249,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
                 onLayoutPreferencesChange={onLayoutPreferencesChange}
                 onChangeSlicing={onChangeSlicing}
                 expandedSectionRenderers={expandedSectionRenderers}
+                enableSlicing={typeof fetchSlices === 'function'}
                 bulkSelection={bulkSelection}
                 onSortChange={onSortChange}
                 onPageSizeChange={onPageSizeChange}
