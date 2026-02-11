@@ -18,6 +18,8 @@ import { render, screen } from 'wrappedTestingLibrary';
 import * as React from 'react';
 import userEvent from '@testing-library/user-event';
 
+import { NO_TIMERANGE_OVERRIDE } from 'views/Constants';
+
 import TimeRangeDisplay from './TimeRangeDisplay';
 
 describe('TimeRangeDisplay', () => {
@@ -32,5 +34,30 @@ describe('TimeRangeDisplay', () => {
     await userEvent.click(timeRangeDisplay);
 
     expect(toggleShow).toHaveBeenCalled();
+  });
+
+  it('renders from and to values when centerTimestamps is enabled', () => {
+    render(
+      <TimeRangeDisplay
+        centerTimestamps
+        timerange={{ type: 'absolute', from: '2026-01-01 00:00:00', to: '2026-01-02 00:00:00' }}
+      />,
+    );
+
+    expect(screen.getByTestId('from')).toHaveTextContent('From: 2026-01-01 00:00:00');
+    expect(screen.getByTestId('to')).toHaveTextContent('Until: 2026-01-02 00:00:00');
+  });
+
+  it('renders no override text when centerTimestamps is enabled', () => {
+    render(<TimeRangeDisplay centerTimestamps timerange={NO_TIMERANGE_OVERRIDE} />);
+
+    expect(screen.getByText('No Override')).toBeInTheDocument();
+  });
+
+  it('does not crash when timerange is undefined', () => {
+    render(<TimeRangeDisplay timerange={undefined} />);
+
+    expect(screen.getByTestId('from')).toBeInTheDocument();
+    expect(screen.getByTestId('to')).toBeInTheDocument();
   });
 });

@@ -16,17 +16,20 @@
  */
 import { useMemo } from 'react';
 import isEmpty from 'lodash/isEmpty';
-import flatten from 'lodash/flatten';
 
 import usePluggableEventActions from 'components/events/events/hooks/usePluggableEventActions';
 import type { Event } from 'components/events/events/types';
 
-const useEventBulkAction = (events: Array<Event>) => {
-  const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEventActions(events, true);
+const useEventBulkAction = (events: Array<Event>, onEventCallback?: () => void) => {
+  const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEventActions(
+    events,
+    true,
+    onEventCallback,
+  );
 
-  const actions = useMemo(() => [pluggableActions].filter(Boolean), [pluggableActions]);
+  const actions = useMemo(() => pluggableActions.filter(Boolean), [pluggableActions]);
 
-  if (isEmpty(flatten(actions))) return { actions: null, pluggableActionModals: null };
+  if (isEmpty(actions)) return { actions: null, pluggableActionModals: null };
 
   return { actions, pluggableActionModals };
 };
