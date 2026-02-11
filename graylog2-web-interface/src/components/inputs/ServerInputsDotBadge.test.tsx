@@ -20,32 +20,29 @@ import { render, screen } from 'wrappedTestingLibrary';
 import { asMock } from 'helpers/mocking';
 import type { InputState } from 'hooks/useInputsStates';
 import useInputsStates from 'hooks/useInputsStates';
-import usePluginEntities from 'hooks/usePluginEntities';
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 
-import InputsDotBadge from './InputsDotBadge';
+import ServerInputsDotBadge from './ServerInputsDotBadge';
 
 jest.mock('hooks/useInputsStates');
-jest.mock('hooks/usePluginEntities');
 
 const TEXT = 'Inputs';
 
-describe('<InputsDotBadge />', () => {
+describe('<ServerInputsDotBadge />', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    asMock(usePluginEntities).mockReturnValue([]);
   });
 
-  it('returns null while loading', () => {
+  it('renders text while loading', () => {
     asMock(useInputsStates).mockReturnValue({
       refetch: jest.fn(),
       isLoading: true,
       data: undefined,
     });
 
-    render(<InputsDotBadge text={TEXT} />);
+    render(<ServerInputsDotBadge text={TEXT} />);
 
-    expect(screen.queryByText(TEXT)).not.toBeInTheDocument();
+    expect(screen.getByText(TEXT)).toBeInTheDocument();
   });
 
   it('renders plain text when there are no failed/failing/setup inputs', () => {
@@ -57,13 +54,10 @@ describe('<InputsDotBadge />', () => {
           nodeA: { state: 'RUNNING', id: '1', detailed_message: null, message_input: {} as InputSummary },
           nodeB: { state: 'STARTING', id: '2', detailed_message: 'Error', message_input: {} as InputSummary },
         },
-        input2: {
-          nodeC: { state: 'RUNNING', id: '3', detailed_message: null, message_input: {} as InputSummary },
-        },
       },
     });
 
-    render(<InputsDotBadge text={TEXT} />);
+    render(<ServerInputsDotBadge text={TEXT} />);
 
     const textEl = screen.getByText(TEXT);
     expect(textEl).toBeInTheDocument();
@@ -85,7 +79,7 @@ describe('<InputsDotBadge />', () => {
           },
         });
 
-        render(<InputsDotBadge text={TEXT} />);
+        render(<ServerInputsDotBadge text={TEXT} />);
 
         const badge = screen.getByTitle(/Some inputs are in failed state or in setup mode\./i);
         expect(badge).toBeInTheDocument();
@@ -93,63 +87,4 @@ describe('<InputsDotBadge />', () => {
       });
     },
   );
-
-  it('shows badge when an additional provider reports issues', () => {
-    asMock(useInputsStates).mockReturnValue({
-      refetch: jest.fn(),
-      isLoading: false,
-      data: {},
-    });
-
-    asMock(usePluginEntities).mockReturnValue([
-      { useCondition: () => ({ hasIssues: true, title: 'Some forwarder inputs are in failed state.' }) },
-    ]);
-
-    render(<InputsDotBadge text={TEXT} />);
-
-    const badge = screen.getByTitle('Some forwarder inputs are in failed state.');
-    expect(badge).toBeInTheDocument();
-    expect(badge).toHaveTextContent(TEXT);
-  });
-
-  it('composes hover text from multiple sources', () => {
-    asMock(useInputsStates).mockReturnValue({
-      refetch: jest.fn(),
-      isLoading: false,
-      data: {
-        input1: {
-          nodeA: { state: 'FAILED', id: '1', detailed_message: 'Error', message_input: {} as InputSummary },
-        },
-      },
-    });
-
-    asMock(usePluginEntities).mockReturnValue([
-      { useCondition: () => ({ hasIssues: true, title: 'Some forwarder inputs are in failed state.' }) },
-    ]);
-
-    render(<InputsDotBadge text={TEXT} />);
-
-    const badge = screen.getByTitle(
-      'Some inputs are in failed state or in setup mode. Some forwarder inputs are in failed state.',
-    );
-
-    expect(badge).toBeInTheDocument();
-  });
-
-  it('ignores additional providers that report no issues', () => {
-    asMock(useInputsStates).mockReturnValue({
-      refetch: jest.fn(),
-      isLoading: false,
-      data: {},
-    });
-
-    asMock(usePluginEntities).mockReturnValue([
-      { useCondition: () => ({ hasIssues: false, title: 'Some forwarder inputs are in failed state.' }) },
-    ]);
-
-    render(<InputsDotBadge text={TEXT} />);
-
-    const textEl = screen.getByText(TEXT);
-    expect(textEl).not.toHaveAttribute('title');
-  });
 });
