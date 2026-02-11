@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 
+import type { Input } from 'components/messageloaders/Types';
 import useInputsStates from 'hooks/useInputsStates';
 import type { InputStates, InputState } from 'hooks/useInputsStates';
 import { useStore } from 'stores/connect';
@@ -47,6 +48,30 @@ const hasInputInState = (inputStates: InputStates, targetStates: InputState | Ar
   return false;
 };
 
+const getNotificationItems = (
+  inputs: Array<Input> | undefined,
+  inputStates: InputStates | undefined,
+  isLoading: boolean,
+): Array<NotificationItem> => {
+  if (isLoading || !inputs || !inputStates) return [];
+
+  const result: Array<NotificationItem> = [];
+
+  if (hasInputInState(inputStates, [INPUT_STATES.FAILED, INPUT_STATES.FAILING])) {
+    result.push({ severity: 'danger', message: 'in failed state. Failed or failing inputs will not receive traffic until fixed.' });
+  }
+
+  if (hasInputInState(inputStates, INPUT_STATES.SETUP)) {
+    result.push({ severity: 'warning', message: 'in setup mode. Inputs will not receive traffic until started.' });
+  }
+
+  if (inputs.some((input) => !inputStates[input.id])) {
+    result.push({ severity: 'warning', message: 'stopped. Stopped Inputs will not receive traffic until started.' });
+  }
+
+  return result;
+};
+
 const InputsNotifications = () => {
   const { data: inputStates, isLoading } = useInputsStates();
   const inputs = useStore(InputsStore, (state) => state.inputs);
@@ -58,25 +83,7 @@ const InputsNotifications = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const items = useMemo<Array<NotificationItem>>(() => {
-    if (isLoading || !inputs || !inputStates) return [];
-
-    const result: Array<NotificationItem> = [];
-
-    if (hasInputInState(inputStates, [INPUT_STATES.FAILED, INPUT_STATES.FAILING])) {
-      result.push({ severity: 'danger', message: 'in failed state. Failed or failing inputs will not receive traffic until fixed.' });
-    }
-
-    if (hasInputInState(inputStates, INPUT_STATES.SETUP)) {
-      result.push({ severity: 'warning', message: 'in setup mode. Inputs will not receive traffic until started.' });
-    }
-
-    if (inputs.some((input) => !inputStates[input.id])) {
-      result.push({ severity: 'warning', message: 'stopped. Stopped Inputs will not receive traffic until started.' });
-    }
-
-    return result;
-  }, [inputs, inputStates, isLoading]);
+  const items = getNotificationItems(inputs, inputStates, isLoading);
 
   return <NotificationBanner title="One or more inputs are currently" items={items} />;
 };
