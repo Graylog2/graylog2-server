@@ -82,7 +82,7 @@ class DbFilterExpressionParserComputedFieldTest {
         // Verify - should return an $in filter with the matching IDs
         assertEquals(1, result.size());
         final Bson filter = result.get(0);
-        final BsonDocument filterDoc = filter.toBsonDocument(BsonDocument.class, null);
+        final BsonDocument filterDoc = filter.toBsonDocument();
         assertTrue(filterDoc.containsKey("_id"));
         assertTrue(filterDoc.get("_id").isDocument());
         assertTrue(filterDoc.get("_id").asDocument().containsKey("$in"));
@@ -101,7 +101,7 @@ class DbFilterExpressionParserComputedFieldTest {
         // Verify - should return a filter that matches nothing
         assertEquals(1, result.size());
         final Bson filter = result.get(0);
-        final BsonDocument filterDoc = filter.toBsonDocument(BsonDocument.class, null);
+        final BsonDocument filterDoc = filter.toBsonDocument();
         assertTrue(filterDoc.containsKey("_id"));
         // Should filter on an impossible ObjectId
         assertEquals(new ObjectId("000000000000000000000000"), filterDoc.get("_id").asObjectId().getValue());
@@ -142,7 +142,7 @@ class DbFilterExpressionParserComputedFieldTest {
         // Verify - should combine both sets with OR logic (union)
         assertEquals(1, result.size());
         final Bson filter = result.get(0);
-        final BsonDocument filterDoc = filter.toBsonDocument(BsonDocument.class, null);
+        final BsonDocument filterDoc = filter.toBsonDocument();
         assertTrue(filterDoc.containsKey("_id"));
         assertTrue(filterDoc.get("_id").asDocument().containsKey("$in"));
     }
@@ -160,7 +160,7 @@ class DbFilterExpressionParserComputedFieldTest {
         // Verify - should handle exception gracefully and return empty result filter
         assertEquals(1, result.size());
         final Bson filter = result.get(0);
-        final BsonDocument filterDoc = filter.toBsonDocument(BsonDocument.class, null);
+        final BsonDocument filterDoc = filter.toBsonDocument();
         assertTrue(filterDoc.containsKey("_id"));
     }
 
@@ -175,7 +175,7 @@ class DbFilterExpressionParserComputedFieldTest {
         // Verify - should process normally as database field
         assertEquals(1, result.size());
         final Bson filter = result.get(0);
-        final BsonDocument filterDoc = filter.toBsonDocument(BsonDocument.class, null);
+        final BsonDocument filterDoc = filter.toBsonDocument();
         assertFalse(filterDoc.containsKey("_id") && filterDoc.get("_id").isDocument());
     }
 }

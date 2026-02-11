@@ -33,6 +33,7 @@ import retrofit2.Response;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -101,7 +102,7 @@ public class InputRuntimeStatusProvider implements ComputedFieldProvider {
 
     @Override
     public Set<String> getMatchingIds(String filterValue, String authToken) {
-        final String key = filterValue.toUpperCase();
+        final String key = filterValue.toUpperCase(Locale.ROOT);
         final Set<IOState.Type> targetStates = STATUS_GROUPS.get(key);
         if (targetStates == null) {
             LOG.debug("Invalid runtime status filter value: {}", filterValue);

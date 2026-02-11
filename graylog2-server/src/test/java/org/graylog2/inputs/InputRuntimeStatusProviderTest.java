@@ -16,6 +16,7 @@
  */
 package org.graylog2.inputs;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.system.NodeId;
@@ -71,7 +72,9 @@ class InputRuntimeStatusProviderTest {
 
     @BeforeEach
     void setUp() {
-        executorService = Executors.newFixedThreadPool(4);
+        executorService = Executors.newFixedThreadPool(4, new ThreadFactoryBuilder()
+                .setNameFormat("input-runtime-status-test-%d")
+                .build());
         lenient().when(nodeId.getNodeId()).thenReturn(LOCAL_NODE_ID);
 
         provider = new InputRuntimeStatusProvider(
