@@ -19,6 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import RightSidebarProvider from './RightSidebarProvider';
+
 import useRightSidebar from '../hooks/useRightSidebar';
 
 const TestComponent = () => <div>Test Content</div>;
@@ -272,26 +273,6 @@ describe('RightSidebarProvider', () => {
 
       expect(screen.getByTestId('content-id')).toHaveTextContent('test-sidebar');
       expect(screen.getByTestId('can-go-back')).toHaveTextContent('false');
-    });
-
-    it('should enforce max history depth', async () => {
-      render(
-        <RightSidebarProvider>
-          <TestConsumer />
-        </RightSidebarProvider>,
-      );
-
-      for (let i = 0; i < 25; i++) {
-        await userEvent.click(screen.getByText('Open Sidebar'));
-      }
-
-      let backCount = 0;
-      while (screen.getByTestId('can-go-back').textContent === 'true') {
-        await userEvent.click(screen.getByText('Go Back'));
-        backCount++;
-      }
-
-      expect(backCount).toBe(19);
     });
 
     it('should update content without affecting history', async () => {

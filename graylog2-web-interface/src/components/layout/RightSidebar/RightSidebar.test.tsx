@@ -19,6 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import RightSidebar from './RightSidebar';
+
 import RightSidebarProvider from '../../../contexts/RightSidebarProvider';
 import RightSidebarContext from '../../../contexts/RightSidebarContext';
 import useRightSidebar from '../../../hooks/useRightSidebar';

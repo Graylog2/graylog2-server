@@ -36,17 +36,17 @@ const StyledButton = styled.button(
     font-size: inherit;
     font-family: inherit;
 
-    &:hover {
+    :hover {
       color: ${theme.colors.variant.dark.primary};
     }
 
-    &:focus-visible {
+    :focus-visible {
       outline: 2px solid ${theme.colors.variant.primary};
       outline-offset: 2px;
       border-radius: 2px;
     }
 
-    &:active {
+    :active {
       color: ${theme.colors.variant.darker.primary};
     }
   `,

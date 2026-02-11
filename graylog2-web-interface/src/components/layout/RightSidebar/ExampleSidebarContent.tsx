@@ -53,6 +53,93 @@ const ButtonGroup = styled.div`
   gap: 10px;
 `;
 
+const NotificationSettingsContent = ({ userId }: { userId: string }) => (
+  <div>
+    <h4>Notification Settings</h4>
+    <p>User ID: {userId}</p>
+    <p>Configure how and when you receive notifications.</p>
+
+    <NavigationDemo>
+      <h5>Notification Types:</h5>
+      <NavList>
+        <li>Email notifications: Enabled</li>
+        <li>Browser notifications: Disabled</li>
+        <li>Alert notifications: Enabled</li>
+      </NavList>
+    </NavigationDemo>
+  </div>
+);
+
+const SecuritySettingsContent = ({ userId }: { userId: string }) => (
+  <div>
+    <h4>Security Settings</h4>
+    <p>User ID: {userId}</p>
+    <p>Manage security settings and privacy preferences.</p>
+
+    <NavigationDemo>
+      <h5>Security Options:</h5>
+      <NavList>
+        <li>Two-factor authentication: Enabled</li>
+        <li>Session timeout: 30 minutes</li>
+        <li>Last password change: 30 days ago</li>
+      </NavList>
+    </NavigationDemo>
+  </div>
+);
+
+const UserActivityContent = ({ userId }: { userId: string }) => (
+  <div>
+    <h4>User Activity Log</h4>
+    <p>User ID: {userId}</p>
+    <p>Recent activity and actions performed by this user.</p>
+
+    <NavigationDemo>
+      <h5>Activity Details:</h5>
+      <NavList>
+        <li>Login: 2 hours ago</li>
+        <li>Created dashboard: 5 hours ago</li>
+        <li>Updated search query: 1 day ago</li>
+      </NavList>
+    </NavigationDemo>
+  </div>
+);
+
+const UserSettingsContent = ({ userId }: { userId: string }) => (
+  <div>
+    <h4>User Settings</h4>
+    <p>User ID: {userId}</p>
+    <p>Configure user preferences and settings here.</p>
+
+    <NavigationDemo>
+      <h5>Settings Categories:</h5>
+      <NavList>
+        <li>
+          <SidebarNavigationLink
+            content={{
+              id: 'notification-settings',
+              title: 'Notification Settings',
+              component: NotificationSettingsContent,
+              props: { userId },
+            }}>
+            Notification Preferences
+          </SidebarNavigationLink>
+        </li>
+        <li>
+          <SidebarNavigationLink
+            content={{
+              id: 'security-settings',
+              title: 'Security Settings',
+              component: SecuritySettingsContent,
+              props: { userId },
+            }}>
+            Security & Privacy
+          </SidebarNavigationLink>
+        </li>
+      </NavList>
+    </NavigationDemo>
+  </div>
+);
+
 const UserDetailsContent = ({ userId }: { userId: string }) => {
   const { openSidebar } = useRightSidebar();
 
@@ -120,156 +207,6 @@ const UserDetailsContent = ({ userId }: { userId: string }) => {
     </div>
   );
 };
-
-const UserSettingsContent = ({ userId }: { userId: string }) => {
-  const { openSidebar } = useRightSidebar();
-
-  return (
-    <div>
-      <h4>User Settings</h4>
-      <p>User ID: {userId}</p>
-      <p>Configure user preferences and settings here.</p>
-
-      <NavigationDemo>
-        <h5>Settings Categories:</h5>
-        <NavList>
-          <li>
-            <SidebarNavigationLink
-              content={{
-                id: 'notification-settings',
-                title: 'Notification Settings',
-                component: NotificationSettingsContent,
-                props: { userId },
-              }}>
-              Notification Preferences
-            </SidebarNavigationLink>
-          </li>
-          <li>
-            <SidebarNavigationLink
-              content={{
-                id: 'security-settings',
-                title: 'Security Settings',
-                component: SecuritySettingsContent,
-                props: { userId },
-              }}>
-              Security & Privacy
-            </SidebarNavigationLink>
-          </li>
-          <li>
-            <Button
-              bsStyle="link"
-              onClick={() =>
-                openSidebar({
-                  id: 'user-details',
-                  title: 'User Details',
-                  component: UserDetailsContent,
-                  props: { userId },
-                })
-              }>
-              Back to User Details
-            </Button>
-          </li>
-        </NavList>
-      </NavigationDemo>
-    </div>
-  );
-};
-
-const UserActivityContent = ({ userId }: { userId: string }) => (
-  <div>
-    <h4>User Activity Log</h4>
-    <p>User ID: {userId}</p>
-    <p>Recent activity and actions performed by this user.</p>
-
-    <NavigationDemo>
-      <h5>Activity Details:</h5>
-      <NavList>
-        <li>Login: 2 hours ago</li>
-        <li>Created dashboard: 5 hours ago</li>
-        <li>Updated search query: 1 day ago</li>
-      </NavList>
-
-      <h5>Related Pages:</h5>
-      <NavList>
-        <li>
-          <SidebarNavigationLink
-            content={{
-              id: 'user-details',
-              title: 'User Details',
-              component: UserDetailsContent,
-              props: { userId },
-            }}>
-            Back to User Details
-          </SidebarNavigationLink>
-        </li>
-      </NavList>
-    </NavigationDemo>
-  </div>
-);
-
-const NotificationSettingsContent = ({ userId }: { userId: string }) => (
-  <div>
-    <h4>Notification Settings</h4>
-    <p>User ID: {userId}</p>
-    <p>Configure how and when you receive notifications.</p>
-
-    <NavigationDemo>
-      <h5>Notification Types:</h5>
-      <NavList>
-        <li>Email notifications: Enabled</li>
-        <li>Browser notifications: Disabled</li>
-        <li>Alert notifications: Enabled</li>
-      </NavList>
-
-      <h5>Navigate:</h5>
-      <NavList>
-        <li>
-          <SidebarNavigationLink
-            content={{
-              id: 'user-settings',
-              title: 'User Settings',
-              component: UserSettingsContent,
-              props: { userId },
-            }}>
-            Back to Settings
-          </SidebarNavigationLink>
-        </li>
-      </NavList>
-    </NavigationDemo>
-  </div>
-);
-
-const SecuritySettingsContent = ({ userId }: { userId: string }) => (
-  <div>
-    <h4>Security Settings</h4>
-    <p>User ID: {userId}</p>
-    <p>Manage security settings and privacy preferences.</p>
-
-    <NavigationDemo>
-      <h5>Security Options:</h5>
-      <NavList>
-        <li>Two-factor authentication: Enabled</li>
-        <li>Session timeout: 30 minutes</li>
-        <li>Last password change: 30 days ago</li>
-      </NavList>
-
-      <h5>Navigate:</h5>
-      <NavList>
-        <li>
-          <SidebarNavigationLink
-            content={{
-              id: 'user-settings',
-              title: 'User Settings',
-              component: UserSettingsContent,
-              props: { userId },
-            }}>
-            Back to Settings
-          </SidebarNavigationLink>
-        </li>
-      </NavList>
-    </NavigationDemo>
-  </div>
-);
 
 const ExampleSidebarContent = ({ message = 'Test Sidebar Content', userId = undefined }: Props) => (
   <div>

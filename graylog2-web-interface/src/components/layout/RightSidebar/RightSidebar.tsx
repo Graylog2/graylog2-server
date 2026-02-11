@@ -63,15 +63,14 @@ const Title = styled.h4(
 
 const ContentArea = styled.div`
   flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden auto;
   padding: 15px;
   min-height: 0;
 `;
 
 const StyledRow = styled(Row)`
-  margin-left: 0px;
-  margin-right: 0px;
+  margin-left: 0;
+  margin-right: 0;
   flex: 1;
   display: flex;
   flex-direction: column;
