@@ -21,6 +21,7 @@ import type { InputSummary } from 'hooks/usePaginatedInputs';
 import type { InputTypesSummary } from 'hooks/useInputTypes';
 import type { InputStates } from 'hooks/useInputsStates';
 import { TypeCell, NodeCell, ThroughputCell, ExpandedSectionToggleWrapper } from 'components/inputs/InputsOveriew';
+import FailuresCell from 'components/inputs/InputsOveriew/cells/FailuresCell';
 import { InputStateBadge } from 'components/inputs';
 import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';
@@ -73,6 +74,14 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
         </ExpandedSectionToggleWrapper>
       ),
       staticWidth: 180,
+    },
+    input_failures: {
+      renderCell: (_failures: string, input: InputSummary) => (
+        <ExpandedSectionToggleWrapper id={input.id}>
+          <FailuresCell input={input} />
+        </ExpandedSectionToggleWrapper>
+      ),
+      staticWidth: 130,
     },
     address: {
       renderCell: (_address: string, input: InputSummary) => (
