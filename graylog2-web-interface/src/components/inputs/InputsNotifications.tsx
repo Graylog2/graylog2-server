@@ -24,6 +24,7 @@ import { useStore } from 'stores/connect';
 import { InputsStore, InputsActions } from 'stores/inputs/InputsStore';
 import { useQueryParams, ArrayParam, NumberParam, StringParam } from 'routing/QueryParams';
 
+import { RUNTIME_STATUS_FILTER, FAILED_MESSAGE, SETUP_MESSAGE, STOPPED_MESSAGE } from './Constants';
 import NotificationBanner from './NotificationBanner';
 import type { NotificationItem } from './NotificationBanner';
 
@@ -34,10 +35,6 @@ const INPUT_STATES = {
 } as const;
 
 const INPUTS_LIST_REFETCH_INTERVAL = 5000;
-const RUNTIME_STATUS_FILTER = 'runtime_status';
-const FAILED_MESSAGE = 'Inputs have failed and will not receive traffic until started.';
-const SETUP_MESSAGE = 'Inputs currently in setup mode will not receive traffic until started.';
-const STOPPED_MESSAGE = 'Inputs currently stopped will not receive traffic until started.';
 
 const hasInputInState = (inputStates: InputStates, targetStates: InputState | Array<InputState>) => {
   const statesToCheck = Array.isArray(targetStates) ? targetStates : [targetStates];
