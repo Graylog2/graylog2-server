@@ -62,11 +62,11 @@ const allTime = { type: 'relative', range: 0 } as const;
 export const parseFilters = (filters: UrlQueryFilters, defaultTimerange: TimeRange = allTime) => {
   const result: FiltersResult = {
     filter: {
-      extra_filters: {},
+      extra_filters: undefined,
       aggregation_timerange: undefined,
       id: undefined,
-      event_definitions: [],
-      priority: [],
+      event_definitions: undefined,
+      priority: undefined,
       key: undefined,
       alerts: parseTypeFilter(filters?.get('alert')?.[0]),
     },
