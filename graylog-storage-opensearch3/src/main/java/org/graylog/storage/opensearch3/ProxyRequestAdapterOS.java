@@ -56,7 +56,7 @@ public class ProxyRequestAdapterOS implements ProxyRequestAdapter {
                 .body(Body.from(request.body(), APPLICATION_JSON))
                 .build();
 
-        OfficialOpensearchClient client = buildClient(request)
+        OfficialOpensearchClient client = buildClient(request);
         try {
             return client.sync(c -> {
                 try (final org.opensearch.client.opensearch.generic.Response response = c.generic().execute(req)) {
