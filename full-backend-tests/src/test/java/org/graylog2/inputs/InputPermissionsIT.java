@@ -18,12 +18,12 @@ package org.graylog2.inputs;
 
 import net.bytebuddy.utility.RandomString;
 import org.assertj.core.api.Assertions;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApiResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Users;
-import org.graylog.testing.completebackend.FullBackendTest;
-import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -151,7 +151,7 @@ public class InputPermissionsIT {
     void testRestrictedInputCreationAndReading() {
         String inputId = apis.forUser(inputsCreator).inputs().createGlobalInput("testInput",
                 "org.graylog2.inputs.misc.jsonpath.JsonPathInput",
-                Map.of("target_url", "https://example.org",
+                Map.of("target_url", "http://example.org",
                         "interval", 10,
                         "timeunit", "MINUTES",
                         "path", "$.data",
