@@ -43,12 +43,11 @@ public class EventOriginContext {
         return String.join(":", ES_EVENT, indexName, eventId);
     }
 
-    public static String mongodbAggregation(String collection, String fromTime, String toTime) {
+    public static String mongodbAggregation(String collection, long fromTimeMillis, long toTimeMillis) {
         checkArgument("collection", collection);
-        checkArgument("fromTime", fromTime);
-        checkArgument("toTime", toTime);
 
-        return String.join(":", MONGODB_AGGREGATION, collection, fromTime, toTime);
+        return String.join(":", MONGODB_AGGREGATION, collection,
+                String.valueOf(fromTimeMillis), String.valueOf(toTimeMillis));
     }
 
     public static Optional<ESEventOriginContext> parseESContext(String url) {

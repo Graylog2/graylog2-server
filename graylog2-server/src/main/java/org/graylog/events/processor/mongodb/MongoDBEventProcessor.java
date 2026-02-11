@@ -201,8 +201,8 @@ public class MongoDBEventProcessor implements EventProcessor {
 
         event.setOriginContext(EventOriginContext.mongodbAggregation(
                 config.collectionName(),
-                parameters.timerange().getFrom().toString(),
-                parameters.timerange().getTo().toString()
+                parameters.timerange().getFrom().getMillis(),
+                parameters.timerange().getTo().getMillis()
         ));
 
         // Add aggregation result fields to event
