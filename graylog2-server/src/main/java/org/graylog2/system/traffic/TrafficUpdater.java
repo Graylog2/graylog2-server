@@ -34,22 +34,8 @@ public interface TrafficUpdater {
         return observationTime.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
     }
 
-    static DateTime getTenMinuteBucketStart(DateTime observationTime) {
-        // Round down to the nearest 10-minute interval
-        int minute = observationTime.minuteOfHour().get();
-        int roundedMinute = (minute / 10) * 10;
-        return observationTime.withMinuteOfHour(roundedMinute).withSecondOfMinute(0).withMillisOfSecond(0);
-    }
-
     static DateTime getHourBucketStart(DateTime observationTime) {
         return observationTime.withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-    }
-
-    static Map<DateTime, Long> aggregateToHourly(Map<DateTime, Long> histogram) {
-        return histogram.entrySet().stream()
-                .collect(Collectors.groupingBy(entry -> entry.getKey().withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0),
-                        TreeMap::new,
-                        Collectors.summingLong(Map.Entry::getValue)));
     }
 
     static Map<DateTime, Long> aggregateToDaily(Map<DateTime, Long> histogram) {

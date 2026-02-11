@@ -63,23 +63,23 @@ public class TrafficCounterService implements TrafficUpdater {
                               long inLastMinute,
                               long outLastMinute,
                               long decodedLastMinute) {
-        // we bucket traffic data by 10-minute intervals and aggregate it to a day bucket for reporting
-        final DateTime tenMinuteBucket = TrafficUpdater.getTenMinuteBucketStart(observationTime);
+        // we bucket traffic data by the hour and aggregate it to a day bucket for reporting
+        final DateTime dayBucket = TrafficUpdater.getHourBucketStart(observationTime);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Updating traffic for node {} at {}:  in/decoded/out {}/{}/{} bytes",
-                    nodeId, tenMinuteBucket, inLastMinute, decodedLastMinute, outLastMinute);
+                    nodeId, dayBucket, inLastMinute, decodedLastMinute, outLastMinute);
         }
 
         final String escapedNodeId = nodeId.toEscapedString();
-        UpdateResult update = collection.updateOne(Filters.eq(BUCKET, tenMinuteBucket), Updates.combine(
+        UpdateResult update = collection.updateOne(Filters.eq(BUCKET, dayBucket), Updates.combine(
                 incUpdate(FIELD_INPUT, escapedNodeId, inLastMinute),
                 incUpdate(FIELD_OUTPUT, escapedNodeId, outLastMinute),
                 incUpdate(FIELD_DECODED, escapedNodeId, decodedLastMinute)
         ), new UpdateOptions().upsert(true));
 
         if (!update.wasAcknowledged()) {
-            LOG.warn("Unable to update traffic of node {} with bucket {}", nodeId, tenMinuteBucket);
+            LOG.warn("Unable to update traffic of node {} with bucket {}", nodeId, dayBucket);
         }
     }
 
@@ -114,9 +114,7 @@ public class TrafficCounterService implements TrafficUpdater {
             trafficHistograms.add(FIELD_DECODED, trafficDto.bucket(), sumTraffic(trafficDto.decoded()));
         });
 
-        if (interval == TrafficCounterService.Interval.HOURLY) {
-            trafficHistograms.aggregateToHourly();
-        } else if (interval == TrafficCounterService.Interval.DAILY) {
+        if (interval == TrafficCounterService.Interval.DAILY) {
             trafficHistograms.aggregateToDaily();
         }
 
@@ -150,18 +148,7 @@ public class TrafficCounterService implements TrafficUpdater {
     }
 
     public enum Interval {
-        /**
-         * Ten-minute interval buckets (144 per day)
-         */
-        TEN_MINUTE,
-        /**
-         * Hourly interval buckets (24 per day) - aggregated from 10-minute buckets
-         */
-        HOURLY,
-        /**
-         * Daily aggregation (1 per day)
-         */
-        DAILY
+        HOURLY, DAILY
     }
 
     public static class TrafficHistograms {
@@ -187,10 +174,6 @@ public class TrafficCounterService implements TrafficUpdater {
             return Optional.ofNullable(histograms.get(name))
                     .map(traffic -> traffic.values().stream().mapToLong(Long::longValue).sum())
                     .orElse(0L);
-        }
-
-        public void aggregateToHourly() {
-            histograms.replaceAll((key, value) -> TrafficUpdater.aggregateToHourly(value));
         }
 
         public void aggregateToDaily() {
