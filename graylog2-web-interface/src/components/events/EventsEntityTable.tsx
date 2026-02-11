@@ -20,6 +20,7 @@ import { Events } from '@graylog/server-api';
 
 import useTableElements from 'components/events/events/hooks/useTableComponents';
 import { eventsTableElements } from 'components/events/Constants';
+import eventsSliceRenderers from 'components/events/EventsSliceRenderers';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import FilterValueRenderers from 'components/events/FilterValueRenderers';
 import fetchEvents, { keyFn, parseFilters, getConcatenatedQuery } from 'components/events/fetchEvents';
@@ -31,17 +32,10 @@ import EventsRefreshControls from 'components/events/events/EventsRefreshControl
 import QueryHelper from 'components/common/QueryHelper';
 import EventsWidgets from 'components/events/EventsWidgets';
 import EventsRefreshProvider from 'components/events/EventsRefreshProvider';
-import PriorityName from 'components/events/events/PriorityName';
-import EventTypeLabel from 'components/events/events/EventTypeLabel';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
 const additionalSearchFields = {
   key: 'The key of the event',
-};
-
-const sliceRenderers = {
-  priority: (priority: number) => <PriorityName priority={priority} />,
-  alert: (alert: 'true' | 'false') => <EventTypeLabel isAlert={alert === 'true'} />,
 };
 
 const EventsEntityTable = () => {
@@ -72,7 +66,7 @@ const EventsEntityTable = () => {
         tableLayout={eventsTableElements.defaultLayout}
         fetchEntities={_fetchEvents}
         fetchSlices={_fetchSlices}
-        sliceRenderers={sliceRenderers}
+        sliceRenderers={eventsSliceRenderers}
         keyFn={keyFn}
         expandedSectionRenderers={expandedSections}
         entityAttributesAreCamelCase={false}
