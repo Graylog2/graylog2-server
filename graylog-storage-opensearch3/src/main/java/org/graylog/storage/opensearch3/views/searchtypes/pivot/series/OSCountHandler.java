@@ -67,7 +67,7 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count> {
         } else if (agg.isMultiTerms()) {
             value = agg.multiTerms().buckets().array().getFirst().docCount();
         } else if (agg.isValueCount()) {
-            value = agg.valueCount() == null ? 0 : agg.valueCount().value();
+            value = agg.valueCount() == null || agg.valueCount().value() == null ? 0 : agg.valueCount().value().longValue();
         } else {
             value = null;
         }
