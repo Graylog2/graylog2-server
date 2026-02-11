@@ -31,12 +31,15 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
+import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbInputsMetadataService;
+import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
@@ -81,6 +84,7 @@ public class InputPipelineRulesResource extends RestResource {
             EntityAttribute.builder().id(ATTRIBUTE_PIPELINE_RULE).title("Pipeline Rule").searchable(false).build(),
             EntityAttribute.builder().id("pipeline_id").title("Pipeline ID").searchable(false).hidden(true).build(),
             EntityAttribute.builder().id(ATTRIBUTE_PIPELINE).title("Source pipeline").searchable(false).build(),
+            EntityAttribute.builder().id("stage").title("Stage").searchable(false).build(),
             EntityAttribute.builder().id(ATTRIBUTE_CONNECTED_STREAMS).title("Connected streams").searchable(false).build()
     );
     private static final EntityDefaults pipelineSettings = EntityDefaults.builder()
@@ -105,6 +109,7 @@ public class InputPipelineRulesResource extends RestResource {
 
     private final MongoDbInputsMetadataService metadataService;
     private final PipelineService pipelineService;
+    private final PipelineRuleParser pipelineRuleParser;
     private final RuleService ruleService;
     private final StreamRuleService streamRuleService;
     private final StreamService streamService;
@@ -112,11 +117,13 @@ public class InputPipelineRulesResource extends RestResource {
     @Inject
     public InputPipelineRulesResource(MongoDbInputsMetadataService metadataService,
                                       PipelineService pipelineService,
+                                      PipelineRuleParser pipelineRuleParser,
                                       RuleService ruleService,
                                       StreamRuleService streamRuleService,
                                       StreamService streamService) {
         this.metadataService = metadataService;
         this.pipelineService = pipelineService;
+        this.pipelineRuleParser = pipelineRuleParser;
         this.ruleService = ruleService;
         this.streamRuleService = streamRuleService;
         this.streamService = streamService;
@@ -136,7 +143,7 @@ public class InputPipelineRulesResource extends RestResource {
             @Parameter(name = "sort",
                        description = "The field to sort the result on",
                        required = true,
-                       schema = @Schema(allowableValues = {"rule", "pipeline", "connected_streams"}))
+                       schema = @Schema(allowableValues = {"rule", "pipeline", "stage", "connected_streams"}))
             @DefaultValue(DEFAULT_PIPELINE_SORT_FIELD) @QueryParam("sort") String sort,
             @Parameter(name = "order", description = "The sort direction",
                        schema = @Schema(allowableValues = {"asc", "desc"}))
@@ -174,6 +181,19 @@ public class InputPipelineRulesResource extends RestResource {
                 continue;
             }
 
+            int stageNumber = -1;
+            try {
+                Pipeline parsedPipeline = pipelineRuleParser.parsePipeline(pipelineDao.id(), pipelineDao.source());
+                for (Stage stage : parsedPipeline.stages()) {
+                    if (stage.ruleReferences().contains(ruleDao.title())) {
+                        stageNumber = stage.stage() + 1;
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                // Parse failure — leave stage as -1
+            }
+
             Set<String> connectedStreamIds = entry.connectedStreams();
             List<StreamReference> connectedStreams = connectedStreamIds == null ? List.of() : connectedStreamIds.stream()
                     .filter(streamId -> isPermitted(RestPermissions.STREAMS_READ, streamId))
@@ -193,6 +213,7 @@ public class InputPipelineRulesResource extends RestResource {
                     pipelineDao.title(),
                     entry.ruleId(),
                     ruleDao.title(),
+                    stageNumber,
                     connectedStreams));
         }
 
@@ -229,6 +250,7 @@ public class InputPipelineRulesResource extends RestResource {
         return switch (sort) {
             case ATTRIBUTE_PIPELINE -> Comparator.comparing(StreamPipelineRulesResponse::pipeline,
                     String.CASE_INSENSITIVE_ORDER);
+            case "stage" -> Comparator.comparingInt(StreamPipelineRulesResponse::stage);
             case ATTRIBUTE_CONNECTED_STREAMS -> Comparator.comparing(
                     r -> r.connectedStreams().stream()
                             .map(StreamReference::title)

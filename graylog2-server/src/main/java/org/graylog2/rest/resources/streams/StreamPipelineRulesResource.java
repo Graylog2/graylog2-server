@@ -165,6 +165,7 @@ public class StreamPipelineRulesResource extends RestResource {
                                 pipelineDao.title(),
                                 ruleId,
                                 ruleDao.title(),
+                                0,
                                 connectedStreams));
             } catch (NotFoundException e) {
                 // Skip pipelines or rules that no longer exist
