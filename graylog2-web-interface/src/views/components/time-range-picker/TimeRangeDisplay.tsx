@@ -23,11 +23,7 @@ import type {
   AbsoluteTimeRange,
   RelativeTimeRange,
 } from 'views/logic/queries/Query';
-import {
-  isTypeRelativeWithStartOnly,
-  isTypeRelativeWithEnd,
-  isNoTimeRangeOverride,
-} from 'views/typeGuards/timeRange';
+import { isTypeRelativeWithStartOnly, isTypeRelativeWithEnd, isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 import { readableRange } from 'views/logic/queries/TimeRangeToString';
 import assertUnreachable from 'logic/assertUnreachable';
 
@@ -72,15 +68,14 @@ const TimeRangeCell = styled.span<{
   `,
 );
 
-const TimeRangeGap = styled.span<{ $centerTimestamps: boolean }>(
-  ({ $centerTimestamps }) =>
-    $centerTimestamps
-      ? css`
-          grid-column: 2;
-        `
-      : css`
-          display: none;
-        `,
+const TimeRangeGap = styled.span<{ $centerTimestamps: boolean }>(({ $centerTimestamps }) =>
+  $centerTimestamps
+    ? css`
+        grid-column: 2;
+      `
+    : css`
+        display: none;
+      `,
 );
 
 export const range = (timerange: AbsoluteTimeRange | RelativeTimeRange | null | undefined) => {
@@ -117,7 +112,13 @@ export const range = (timerange: AbsoluteTimeRange | RelativeTimeRange | null | 
   }
 };
 
-const TimeRange = ({ centerTimestamps, timerange }: { centerTimestamps: boolean; timerange: TimeRangeType | null | undefined }) => {
+const TimeRange = ({
+  centerTimestamps,
+  timerange,
+}: {
+  centerTimestamps: boolean;
+  timerange: TimeRangeType | null | undefined;
+}) => {
   if (timerange?.type === 'keyword') {
     return (
       <TimeRangeCell $centerTimestamps={centerTimestamps} $fullWidth={centerTimestamps}>

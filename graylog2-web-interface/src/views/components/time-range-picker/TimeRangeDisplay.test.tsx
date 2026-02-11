@@ -40,7 +40,8 @@ describe('TimeRangeDisplay', () => {
     render(
       <TimeRangeDisplay
         centerTimestamps
-        timerange={{ type: 'absolute', from: '2026-01-01 00:00:00', to: '2026-01-02 00:00:00' }} />,
+        timerange={{ type: 'absolute', from: '2026-01-01 00:00:00', to: '2026-01-02 00:00:00' }}
+      />,
     );
 
     expect(screen.getByTestId('from')).toHaveTextContent('From: 2026-01-01 00:00:00');
