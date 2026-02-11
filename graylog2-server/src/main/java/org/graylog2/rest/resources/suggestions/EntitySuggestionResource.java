@@ -27,18 +27,18 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
-
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.database.suggestions.EntitySuggestionResponse;
 import org.graylog2.database.suggestions.EntitySuggestionService;
+import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
 
 @RequiresAuthentication
 @PublicCloudAPI
@@ -68,6 +68,8 @@ public class EntitySuggestionResource extends RestResource {
                                             @QueryParam("display_fields") @Nullable String displayFieldsParam,
                                             @Parameter(name = "display_template", description = "Template for formatting display values (e.g., '{node_id} ({hostname})')")
                                             @QueryParam("display_template") @Nullable String displayTemplate,
+                                            @Parameter(name = "identifier_type", description = "BSON type of the identifier field")
+                                            @QueryParam("identifier_type") @DefaultValue("OBJECT_ID") SearchQueryField.Type identifierType,
                                             @Parameter(name = "page")
                                             @QueryParam("page") @DefaultValue("1") int page,
                                             @Parameter(name = "per_page")
@@ -80,6 +82,6 @@ public class EntitySuggestionResource extends RestResource {
             displayFields = Arrays.asList(displayFieldsParam.split(","));
         }
 
-        return entitySuggestionService.suggest(collection, identifier, column, displayFields, displayTemplate, query, page, perPage, getSubject());
+        return entitySuggestionService.suggest(collection, identifier, column, displayFields, displayTemplate, identifierType, query, page, perPage, getSubject());
     }
 }

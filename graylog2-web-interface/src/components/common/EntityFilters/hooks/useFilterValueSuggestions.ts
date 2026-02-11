@@ -46,6 +46,7 @@ const fetchFilterValueSuggestions = async (
   relatedIdentifier: string,
   displayFields?: string[],
   displayTemplate?: string,
+  identifierType?: string,
 ): Promise<PaginatedSuggestions | undefined> => {
   const additional = {
     collection,
@@ -53,6 +54,7 @@ const fetchFilterValueSuggestions = async (
     column: collectionProperty,
     ...(displayFields && displayFields.length > 0 && { display_fields: displayFields.join(',') }),
     ...(displayTemplate && { display_template: displayTemplate }),
+    ...(identifierType && { identifier_type: identifierType }),
   };
   const url = PaginationURL('entity_suggestions', page, pageSize, query, additional);
 
@@ -67,6 +69,7 @@ const useFilterValueSuggestions = (
   collectionProperty: string,
   displayFields?: string[],
   displayTemplate?: string,
+  identifierType?: string,
 ): {
   data: PaginatedSuggestions | undefined;
   isInitialLoading: boolean;
@@ -80,7 +83,7 @@ const useFilterValueSuggestions = (
 
     queryFn: () =>
       defaultOnError(
-        fetchFilterValueSuggestions(collection, searchParams, collectionProperty, relatedIdentifier, displayFields, displayTemplate),
+        fetchFilterValueSuggestions(collection, searchParams, collectionProperty, relatedIdentifier, displayFields, displayTemplate, identifierType),
         'Loading suggestions for filter failed with status',
         'Could not load filter suggestions',
       ),

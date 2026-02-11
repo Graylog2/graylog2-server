@@ -36,6 +36,15 @@ type CollectionsByAttributeId = {
   [attributeId: string]: string | undefined;
 };
 
+type IdentifierMetaByAttributeId = {
+  [attributeId: string]: {
+    identifier_field?: string;
+    identifier_type?: string;
+    display_fields?: string[];
+    display_template?: string;
+  } | undefined;
+};
+
 type RequestedFilterTitles = Array<{
   id: string;
   title;
@@ -55,6 +64,23 @@ const _collectionsByAttributeId = (attributesMetaData: Attributes) =>
     };
   }, {});
 
+const _identifierMetaByAttributeId = (attributesMetaData: Attributes): IdentifierMetaByAttributeId =>
+  attributesMetaData?.reduce((col, { id, related_collection, related_identifier, type, related_display_fields, related_display_template }) => {
+    if (!related_collection) {
+      return col;
+    }
+
+    return {
+      ...col,
+      [id]: {
+        identifier_field: related_identifier,
+        identifier_type: type,
+        display_fields: related_display_fields,
+        display_template: related_display_template,
+      },
+    };
+  }, {});
+
 const _urlQueryFiltersWithoutTitle = (filters: UrlQueryFilters, collectionsByAttributeId: CollectionsByAttributeId) =>
   filters.entrySeq().reduce((col, [attributeId, filterValues]) => {
     const relatedCollection = collectionsByAttributeId?.[attributeId];
@@ -69,15 +95,21 @@ const _urlQueryFiltersWithoutTitle = (filters: UrlQueryFilters, collectionsByAtt
 const filtersWithoutTitlePayload = (
   filtersWithoutTitle: UrlQueryFilters,
   collectionsByAttributeId: CollectionsByAttributeId,
+  identifierMetaByAttributeId: IdentifierMetaByAttributeId,
 ) => ({
   entities: filtersWithoutTitle.entrySeq().reduce((col, [attributeId, filterValues]) => {
     const relatedCollection = collectionsByAttributeId[attributeId];
+    const meta = identifierMetaByAttributeId[attributeId];
 
     return [
       ...col,
       ...filterValues.map((value) => ({
         id: value,
         type: relatedCollection,
+        ...(meta?.identifier_field && { identifier_field: meta.identifier_field }),
+        ...(meta?.identifier_type && { identifier_type: meta.identifier_type }),
+        ...(meta?.display_fields?.length && { display_fields: meta.display_fields }),
+        ...(meta?.display_template && { display_template: meta.display_template }),
       })),
     ];
   }, []),
@@ -181,8 +213,9 @@ const useFiltersWithTitle = (
   const queryClient = useQueryClient();
   const { formatTime } = useUserDateTime();
   const collectionsByAttributeId = _collectionsByAttributeId(attributesMetaData);
+  const identifierMetaByAttributeId = _identifierMetaByAttributeId(attributesMetaData);
   const urlQueryFiltersWithoutTitle = _urlQueryFiltersWithoutTitle(urlQueryFilters, collectionsByAttributeId);
-  const payload = filtersWithoutTitlePayload(urlQueryFiltersWithoutTitle, collectionsByAttributeId);
+  const payload = filtersWithoutTitlePayload(urlQueryFiltersWithoutTitle, collectionsByAttributeId, identifierMetaByAttributeId);
   const { data, isInitialLoading, isError } = useQuery({
     queryKey: ['entity_titles', payload],
 
@@ -207,12 +240,12 @@ const useFiltersWithTitle = (
   const onChange = useCallback(
     (newFiltersWithTitle: Filters, newUrlQueryFilters: UrlQueryFilters) => {
       const newURLQueryFiltersWithoutTitle = _urlQueryFiltersWithoutTitle(newUrlQueryFilters, collectionsByAttributeId);
-      const newPayload = filtersWithoutTitlePayload(newURLQueryFiltersWithoutTitle, collectionsByAttributeId);
+      const newPayload = filtersWithoutTitlePayload(newURLQueryFiltersWithoutTitle, collectionsByAttributeId, identifierMetaByAttributeId);
       const newResponse = filtersWithTitleToResponse(newFiltersWithTitle, attributesMetaData);
 
       queryClient.setQueryData(['entity_titles', newPayload], { entities: newResponse });
     },
-    [attributesMetaData, collectionsByAttributeId, queryClient],
+    [attributesMetaData, collectionsByAttributeId, identifierMetaByAttributeId, queryClient],
   );
 
   return {

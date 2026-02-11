@@ -27,19 +27,20 @@ import com.mongodb.client.model.Sorts;
 import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.utils.CompositeDisplayFormatter;
 import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.security.EntityPermissionsUtils;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
@@ -69,6 +70,20 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                                             final String valueColumn,
                                             @Nullable final List<String> displayFields,
                                             @Nullable final String displayTemplate,
+                                            final String query,
+                                            final int page,
+                                            final int perPage,
+                                            final Subject subject) {
+        return suggest(collection, targetColumn, valueColumn, displayFields, displayTemplate, null, query, page, perPage, subject);
+    }
+
+    @Override
+    public EntitySuggestionResponse suggest(final String collection,
+                                            final String targetColumn,
+                                            final String valueColumn,
+                                            @Nullable final List<String> displayFields,
+                                            @Nullable final String displayTemplate,
+                                            final SearchQueryField.Type identifierType,
                                             final String query,
                                             final int page,
                                             final int perPage,
@@ -114,17 +129,18 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                         String displayValue;
 
                         if (displayFields != null && !displayFields.isEmpty()) {
-                            displayValue = formatCompositeDisplay(doc, displayFields, displayTemplate);
+                            displayValue = CompositeDisplayFormatter.format(doc, displayFields, displayTemplate);
                         } else {
                             displayValue = doc.getString(valueColumn);
                         }
 
-                        // Handle targetColumn - it could be _id (ObjectId) or a String field
-                        String targetValue;
-                        if ("_id".equals(targetColumn)) {
-                            targetValue = doc.getObjectId("_id").toHexString();
+                        // Extract targetColumn value as String
+                        final String targetValue;
+                        final Object rawValue = doc.get(targetColumn);
+                        if (rawValue instanceof ObjectId oid) {
+                            targetValue = oid.toHexString();
                         } else {
-                            targetValue = doc.getString(targetColumn);
+                            targetValue = rawValue != null ? rawValue.toString() : null;
                         }
 
                         return new EntitySuggestion(
@@ -174,42 +190,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                                             final int page,
                                             final int perPage,
                                             final Subject subject) {
-        return suggest(collection, targetColumn, valueColumn, null, null, query, page, perPage, subject);
-    }
-
-    /**
-     * Formats a composite display value using the provided template and fields.
-     * If a template is provided, it replaces {field} placeholders with values from the document.
-     * If no template is provided, it concatenates all field values with spaces.
-     * Missing or null field values are handled gracefully.
-     *
-     * @param doc The MongoDB document containing field values
-     * @param fields List of field names to include in the display
-     * @param template Optional template string with {field} placeholders
-     * @return Formatted display string
-     */
-    private String formatCompositeDisplay(Document doc, List<String> fields, @Nullable String template) {
-        if (template != null && !template.isEmpty()) {
-            // Replace placeholders: "{node_id} ({hostname})" → "abc-123 (webserver1)"
-            String result = template;
-            for (String field : fields) {
-                String value = doc.getString(field);
-                if (value != null) {
-                    result = result.replace("{" + field + "}", value);
-                } else {
-                    // Remove the placeholder if value is missing
-                    result = result.replace("{" + field + "}", "");
-                }
-            }
-            // Clean up any extra spaces or empty parentheses
-            return result.replaceAll("\\s*\\(\\s*\\)", "").replaceAll("\\s+", " ").trim();
-        } else {
-            // No template: simple space-separated concatenation
-            return fields.stream()
-                    .map(doc::getString)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.joining(" "));
-        }
+        return suggest(collection, targetColumn, valueColumn, null, null, null, query, page, perPage, subject);
     }
 
 }

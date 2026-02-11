@@ -50,6 +50,7 @@ const SuggestionsListFilter = ({ attribute, filterValueRenderer, onSubmit, allAc
     attribute.related_property,
     attribute.related_display_fields,
     attribute.related_display_template,
+    attribute.type,
   );
 
   return (

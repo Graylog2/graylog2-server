@@ -43,6 +43,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -57,10 +58,12 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputImpl;
+import org.graylog2.inputs.InputRuntimeStatusProvider;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.diagnosis.InputDiagnosticService;
 import org.graylog2.inputs.encryption.EncryptedInputConfigs;
@@ -77,6 +80,7 @@ import org.graylog2.rest.models.system.inputs.responses.InputsList;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
+import org.graylog2.rest.resources.entities.FilterOption;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.inputs.MessageInputFactory;
@@ -113,14 +117,32 @@ public class InputsResource extends AbstractInputsResource {
             EntityAttribute.builder().id(MessageInput.FIELD_ID).title("id").type(SearchQueryField.Type.OBJECT_ID).hidden(true).searchable(true).build(),
             EntityAttribute.builder().id(MessageInput.FIELD_TITLE).title("Title").type(SearchQueryField.Type.STRING).searchable(true).build(),
             EntityAttribute.builder().id(MessageInput.FIELD_TYPE).title("Type").type(SearchQueryField.Type.STRING).searchable(true).build(),
-            EntityAttribute.builder().id(MessageInput.FIELD_NODE_ID).title("Node").relatedCollection("nodes").relatedIdentifier("node_id").relatedDisplayFields(List.of("node_id", "hostname")).relatedDisplayTemplate("{node_id} ({hostname})").type(SearchQueryField.Type.STRING).filterable(true).build(),
+            EntityAttribute.builder().id(MessageInput.FIELD_NODE_ID).title("Node").relatedCollection("nodes")
+                    .relatedIdentifier("node_id").relatedDisplayFields(List.of("node_id", "hostname"))
+                    .relatedDisplayTemplate("{node_id} ({hostname})").type(SearchQueryField.Type.STRING)
+                    .filterable(true).build(),
             EntityAttribute.builder().id(MessageInput.FIELD_GLOBAL).title("Global").type(SearchQueryField.Type.BOOLEAN).filterable(true).build(),
             EntityAttribute.builder().id(MessageInput.FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).filterable(true).build(),
-            EntityAttribute.builder().id(MessageInput.FIELD_DESIRED_STATE).title("State").type(SearchQueryField.Type.STRING).filterable(true).build()
+            EntityAttribute.builder().id(MessageInput.FIELD_DESIRED_STATE).title("State").type(SearchQueryField.Type.STRING).filterable(false).build(),
+            EntityAttribute.builder()
+                    .id("runtime_status")
+                    .hidden(true)
+                    .title("State")
+                    .type(SearchQueryField.Type.STRING)
+                    .filterable(true)
+                    .sortable(false)
+                    .filterOptions(getRuntimeStatusFilterOptions())
+                    .build()
     );
     private static final EntityDefaults DEFAULTS = EntityDefaults.builder()
             .sort(Sorting.create(MessageInput.FIELD_TITLE, Sorting.Direction.ASC))
             .build();
+
+    private static Set<FilterOption> getRuntimeStatusFilterOptions() {
+        return InputRuntimeStatusProvider.STATUS_GROUP_TITLES.entrySet().stream()
+                .map(e -> FilterOption.create(e.getKey(), e.getValue()))
+                .collect(Collectors.toSet());
+    }
 
     private final InputService inputService;
     private final InputDiagnosticService inputDiagnosticService;
@@ -142,11 +164,12 @@ public class InputsResource extends AbstractInputsResource {
                           MessageInputFactory messageInputFactory,
                           Configuration config,
                           MongoDbInputsMetadataService metadataService,
-                          ClusterEventBus clusterEventBus) {
+                          ClusterEventBus clusterEventBus,
+                          ComputedFieldRegistry computedFieldRegistry) {
         super(messageInputFactory.getAvailableInputs());
         this.inputService = inputService;
         this.inputDiagnosticService = inputDiagnosticService;
-        this.dbQueryCreator = new DbQueryCreator(MessageInput.FIELD_TITLE, ATTRIBUTES);
+        this.dbQueryCreator = new DbQueryCreator(MessageInput.FIELD_TITLE, ATTRIBUTES, computedFieldRegistry);
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.pipelineService = pipelineService;
@@ -294,11 +317,15 @@ public class InputsResource extends AbstractInputsResource {
                                                   @DefaultValue(MessageInput.FIELD_TITLE) @QueryParam("sort") String sortField,
                                                   @Parameter(name = "order", description = "The sort direction",
                                                             schema = @Schema(allowableValues = {"asc", "desc"}))
-                                                  @DefaultValue("asc") @QueryParam("order") SortOrder order) {
+                                                      @DefaultValue("asc") @QueryParam("order") SortOrder order,
+                                                  @Context HttpHeaders httpHeaders) {
         final Predicate<InputImpl> permissionFilter = input -> isPermitted(RestPermissions.INPUTS_READ, input.getId());
 
+        // Extract authentication token for cluster-wide computed field queries
+        final String authToken = org.graylog2.shared.rest.resources.ProxiedResource.authenticationToken(httpHeaders);
+
         final PaginatedList<Input> result = inputService.paginated(
-                dbQueryCreator.createDbQuery(filters, query),
+                dbQueryCreator.createDbQuery(filters, query, authToken),
                 permissionFilter,
                 order,
                 sortField,

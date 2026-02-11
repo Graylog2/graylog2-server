@@ -17,6 +17,7 @@
 package org.graylog2.database.suggestions;
 
 import org.apache.shiro.subject.Subject;
+import org.graylog2.search.SearchQueryField;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -36,6 +37,17 @@ public interface EntitySuggestionService {
                                      final String valueColumn,
                                      @Nullable final List<String> displayFields,
                                      @Nullable final String displayTemplate,
+                                     final String query,
+                                     final int page,
+                                     final int perPage,
+                                     final Subject subject);
+
+    EntitySuggestionResponse suggest(final String collection,
+                                     final String identifier,
+                                     final String valueColumn,
+                                     @Nullable final List<String> displayFields,
+                                     @Nullable final String displayTemplate,
+                                     @Nullable final SearchQueryField.Type identifierType,
                                      final String query,
                                      final int page,
                                      final int perPage,
