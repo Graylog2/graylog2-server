@@ -15,13 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import type { Input } from 'components/messageloaders/Types';
 import useInputsStates from 'hooks/useInputsStates';
 import type { InputStates, InputState } from 'hooks/useInputsStates';
 import { useStore } from 'stores/connect';
 import { InputsStore, InputsActions } from 'stores/inputs/InputsStore';
+import { useQueryParams, ArrayParam, NumberParam, StringParam } from 'routing/QueryParams';
 
 import NotificationBanner from './NotificationBanner';
 import type { NotificationItem } from './NotificationBanner';
@@ -33,6 +34,10 @@ const INPUT_STATES = {
 } as const;
 
 const INPUTS_LIST_REFETCH_INTERVAL = 5000;
+const RUNTIME_STATUS_FILTER = 'runtime_status';
+const FAILED_MESSAGE = 'Inputs have failed and will not receive traffic until started.';
+const SETUP_MESSAGE = 'Inputs currently in setup mode will not receive traffic until started.';
+const STOPPED_MESSAGE = 'Inputs currently stopped will not receive traffic until started.';
 
 const hasInputInState = (inputStates: InputStates, targetStates: InputState | Array<InputState>) => {
   const statesToCheck = Array.isArray(targetStates) ? targetStates : [targetStates];
@@ -58,18 +63,15 @@ const getNotificationItems = (
   const result: Array<NotificationItem> = [];
 
   if (hasInputInState(inputStates, [INPUT_STATES.FAILED, INPUT_STATES.FAILING])) {
-    result.push({
-      severity: 'danger',
-      message: 'in failed state. Failed or failing inputs will not receive traffic until fixed.',
-    });
+    result.push({ severity: 'danger', message: FAILED_MESSAGE });
   }
 
   if (hasInputInState(inputStates, INPUT_STATES.SETUP)) {
-    result.push({ severity: 'warning', message: 'in setup mode. Inputs will not receive traffic until started.' });
+    result.push({ severity: 'warning', message: SETUP_MESSAGE });
   }
 
   if (inputs.some((input) => !inputStates[input.id])) {
-    result.push({ severity: 'warning', message: 'stopped. Stopped Inputs will not receive traffic until started.' });
+    result.push({ severity: 'warning', message: STOPPED_MESSAGE });
   }
 
   return result;
@@ -78,6 +80,12 @@ const getNotificationItems = (
 const InputsNotifications = () => {
   const { data: inputStates, isLoading } = useInputsStates();
   const inputs = useStore(InputsStore, (state) => state.inputs);
+  const [, setQueryParams] = useQueryParams({
+    filters: ArrayParam,
+    page: NumberParam,
+    slice: StringParam,
+    sliceCol: StringParam,
+  });
 
   useEffect(() => {
     InputsActions.list();
@@ -86,9 +94,68 @@ const InputsNotifications = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const items = getNotificationItems(inputs, inputStates, isLoading);
+  const applyRuntimeStatusFilter = useCallback((status: 'FAILED' | 'SETUP' | 'NOT_RUNNING') => {
+    setQueryParams({
+      filters: [`${RUNTIME_STATUS_FILTER}=${status}`],
+      page: 1,
+      slice: undefined,
+      sliceCol: undefined,
+    });
+  }, [setQueryParams]);
 
-  return <NotificationBanner title="One or more inputs are currently" items={items} />;
+  const items = getNotificationItems(inputs, inputStates, isLoading).map((item) => {
+    if (item.message === FAILED_MESSAGE) {
+      return {
+        ...item,
+        id: 'failed',
+        message: (
+          <>
+            {FAILED_MESSAGE}{' '}
+            <a href="#" onClick={(event) => { event.preventDefault(); applyRuntimeStatusFilter('FAILED'); }}>
+              Show failed inputs
+            </a>
+            .
+          </>
+        ),
+      };
+    }
+
+    if (item.message === SETUP_MESSAGE) {
+      return {
+        ...item,
+        id: 'setup',
+        message: (
+          <>
+            {SETUP_MESSAGE}{' '}
+            <a href="#" onClick={(event) => { event.preventDefault(); applyRuntimeStatusFilter('SETUP'); }}>
+              Show inputs in setup mode
+            </a>
+            .
+          </>
+        ),
+      };
+    }
+
+    if (item.message === STOPPED_MESSAGE) {
+      return {
+        ...item,
+        id: 'stopped',
+        message: (
+          <>
+            {STOPPED_MESSAGE}{' '}
+            <a href="#" onClick={(event) => { event.preventDefault(); applyRuntimeStatusFilter('NOT_RUNNING'); }}>
+              Show stopped inputs
+            </a>
+            .
+          </>
+        ),
+      };
+    }
+
+    return item;
+  });
+
+  return <NotificationBanner title="Warning" items={items} />;
 };
 
 export default InputsNotifications;

@@ -71,4 +71,21 @@ describe('<NotificationBanner>', () => {
     expect(screen.getByText('stopped.')).toBeInTheDocument();
     expect(screen.getAllByRole('alert')).toHaveLength(1);
   });
+
+  it('renders rich message content with links', () => {
+    const items: Array<NotificationItem> = [
+      {
+        severity: 'warning',
+        message: (
+          <>
+            Inputs currently stopped will not receive traffic until started. <a href="#">Show stopped inputs</a>.
+          </>
+        ),
+      },
+    ];
+
+    render(<NotificationBanner title="Test" items={items} />);
+
+    expect(screen.getByRole('link', { name: 'Show stopped inputs' })).toBeInTheDocument();
+  });
 });
