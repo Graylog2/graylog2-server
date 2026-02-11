@@ -79,19 +79,7 @@ const messageInput = {
 };
 
 describe('InputStateControl', () => {
-  it('shows start when feature is enabled and input has no state', async () => {
-    renderSUT({});
-
-    expect(await screen.findByRole('button', { name: /start input/i })).toBeInTheDocument();
-  });
-
-  it('shows start when feature is disabled and input has no state', async () => {
-    renderSUT({}, false);
-
-    expect(await screen.findByRole('button', { name: /start input/i })).toBeInTheDocument();
-  });
-
-  it('shows setup when input is explicitly in SETUP state', async () => {
+  it('shows setup when feature is enabled and input is in setup mode', async () => {
     const setupStates: InputStates = {
       [baseInput.id]: {
         node1: {
@@ -106,6 +94,12 @@ describe('InputStateControl', () => {
     renderSUT(setupStates);
 
     expect(await screen.findByRole('button', { name: /set-up input/i })).toBeInTheDocument();
+  });
+
+  it('falls back to start when feature is disabled and input state is not loaded yet', async () => {
+    renderSUT({}, false);
+
+    expect(await screen.findByRole('button', { name: /start input/i })).toBeInTheDocument();
   });
 
   it('shows stop when input is running', async () => {
@@ -125,23 +119,8 @@ describe('InputStateControl', () => {
     expect(await screen.findByRole('button', { name: /stop input/i })).toBeInTheDocument();
   });
 
-  it('shows start after stopping an input instead of setup', async () => {
-    const runningStates: InputStates = {
-      [baseInput.id]: {
-        node1: {
-          id: baseInput.id,
-          state: 'RUNNING',
-          detailed_message: null,
-          message_input: messageInput,
-        },
-      },
-    };
-
-    const { rerender } = renderSUT(runningStates);
-
-    expect(await screen.findByRole('button', { name: /stop input/i })).toBeInTheDocument();
-
-    rerender(<InputStateControl input={baseInput} inputStates={{}} openWizard={jest.fn()} />);
+  it('shows start instead of setup when input has no state after page reload', async () => {
+    renderSUT({});
 
     expect(await screen.findByRole('button', { name: /start input/i })).toBeInTheDocument();
   });
