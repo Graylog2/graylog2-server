@@ -25,7 +25,7 @@ const Container = styled.div<{ $width: number }>(
     width: ${$width}px;
     min-width: ${$width}px;
     flex-shrink: 0;
-    height: 100vh;
+    align-self: stretch;
     position: sticky;
     top: 0;
     background-color: ${theme.colors.global.contentBackground};
