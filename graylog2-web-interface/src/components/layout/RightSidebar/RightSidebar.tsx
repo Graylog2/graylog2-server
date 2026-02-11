@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
+import React from 'react';
 import styled, { css } from 'styled-components';
 
 import useRightSidebar from 'hooks/useRightSidebar';
@@ -39,50 +39,32 @@ const Header = styled.div(
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: ${theme.spacings.sm};
+    padding: 15px;
     border-bottom: 1px solid ${theme.colors.variant.light.default};
-    min-height: 50px;
+    gap: 10px;
   `,
 );
 
-const Title = styled.h3(
+const Title = styled.h1(
   ({ theme }) => css`
     margin: 0;
-    font-size: ${theme.fonts.size.large};
+    font-size: ${theme.fonts.size.h1};
     font-weight: normal;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    flex: 1;
   `,
 );
 
-const ContentArea = styled.div(
-  ({ theme }) => css`
-    flex: 1;
-    overflow: auto;
-    padding: ${theme.spacings.sm};
-  `,
-);
+const ContentArea = styled.div`
+  flex: 1;
+  overflow: auto;
+  padding: 15px;
+`;
 
 const RightSidebar = () => {
   const { content, width, closeSidebar } = useRightSidebar();
-
-  // Handle ESC key to close sidebar
-  useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        closeSidebar();
-      }
-    };
-
-    if (content) {
-      document.addEventListener('keydown', handleEscape);
-
-      return () => document.removeEventListener('keydown', handleEscape);
-    }
-
-    return undefined;
-  }, [content, closeSidebar]);
 
   if (!content) {
     return null;
