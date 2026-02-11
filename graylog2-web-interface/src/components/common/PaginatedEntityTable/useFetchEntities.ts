@@ -33,6 +33,22 @@ export type FetchOptions = {
   refetchInterval?: number;
 };
 
+const slicesToFilters = (searchParams: SearchParams) => {
+  const newSearchParams = { ...searchParams };
+
+  delete newSearchParams.slice;
+  delete newSearchParams.sliceCol;
+
+  if (searchParams.sliceCol && searchParams.slice) {
+    newSearchParams.filters = newSearchParams.filters.set(searchParams.sliceCol, [
+      ...(newSearchParams.filters[searchParams.sliceCol] ?? []),
+      searchParams.slice,
+    ]);
+  }
+
+  return newSearchParams;
+};
+
 const useFetchEntities = <T, M = unknown>({
   fetchKey,
   searchParams,
@@ -57,7 +73,7 @@ const useFetchEntities = <T, M = unknown>({
 
     queryFn: () =>
       defaultOnError(
-        fetchEntities(searchParams),
+        fetchEntities(slicesToFilters(searchParams)),
         `Fetching ${humanName} failed with status`,
         `Could not retrieve ${humanName}`,
       ),
