@@ -31,7 +31,6 @@ const Container = styled.div<{ $width: number }>(
     top: 0;
     display: flex;
     flex-direction: column;
-    z-index: 1020;
     padding: 10px;
   `,
 );

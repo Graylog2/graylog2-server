@@ -19,7 +19,7 @@ import styled from 'styled-components';
 
 import SidebarNavigationLink from 'components/layout/RightSidebar/SidebarNavigationLink';
 import Button from 'components/bootstrap/Button';
-import useSidebarNavigation from 'hooks/useSidebarNavigation';
+import useRightSidebar from 'hooks/useRightSidebar';
 
 type Props = {
   message?: string;
@@ -54,10 +54,10 @@ const ButtonGroup = styled.div`
 `;
 
 const UserDetailsContent = ({ userId }: { userId: string }) => {
-  const { navigateTo } = useSidebarNavigation();
+  const { openSidebar } = useRightSidebar();
 
   const showSettings = () => {
-    navigateTo({
+    openSidebar({
       id: 'user-settings',
       title: 'User Settings',
       component: UserSettingsContent,
@@ -66,7 +66,7 @@ const UserDetailsContent = ({ userId }: { userId: string }) => {
   };
 
   const showActivity = () => {
-    navigateTo({
+    openSidebar({
       id: 'user-activity',
       title: 'User Activity',
       component: UserActivityContent,
@@ -122,7 +122,7 @@ const UserDetailsContent = ({ userId }: { userId: string }) => {
 };
 
 const UserSettingsContent = ({ userId }: { userId: string }) => {
-  const { navigateTo } = useSidebarNavigation();
+  const { openSidebar } = useRightSidebar();
 
   return (
     <div>
@@ -159,7 +159,7 @@ const UserSettingsContent = ({ userId }: { userId: string }) => {
             <Button
               bsStyle="link"
               onClick={() =>
-                navigateTo({
+                openSidebar({
                   id: 'user-details',
                   title: 'User Details',
                   component: UserDetailsContent,

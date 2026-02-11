@@ -17,7 +17,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import useSidebarNavigation from 'hooks/useSidebarNavigation';
+import useRightSidebar from 'hooks/useRightSidebar';
 import type { RightSidebarContent } from 'contexts/RightSidebarContext';
 
 type Props = {
@@ -53,10 +53,10 @@ const StyledButton = styled.button(
 );
 
 const SidebarNavigationLink = ({ content, children }: Props) => {
-  const { navigateTo } = useSidebarNavigation();
+  const { openSidebar } = useRightSidebar();
 
   const handleClick = () => {
-    navigateTo(content);
+    openSidebar(content);
   };
 
   return (
