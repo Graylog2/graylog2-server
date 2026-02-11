@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncClient async) implements AutoCloseable {
+public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncClient async) {
 
     private static final Logger LOG = LoggerFactory.getLogger(OfficialOpensearchClient.class);
     private static final Pattern invalidWriteTarget = Pattern.compile("no write index is defined for alias \\[(?<target>[\\w_]+)\\]");

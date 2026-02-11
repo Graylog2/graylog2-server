@@ -55,10 +55,9 @@ public class ProxyRequestAdapterOS implements ProxyRequestAdapter {
                 .query(queryParams(request))
                 .body(Body.from(request.body(), APPLICATION_JSON))
                 .build();
-        try (
-                // we want to close the client after this call. It's created only for this single call.
-                OfficialOpensearchClient client = buildClient(request)
-        ) {
+
+        OfficialOpensearchClient client = buildClient(request)
+        try {
             return client.sync(c -> {
                 try (final org.opensearch.client.opensearch.generic.Response response = c.generic().execute(req)) {
                     final InputStream body = response.getBody().map(Body::body).orElseGet(InputStream::nullInputStream);
@@ -66,6 +65,9 @@ public class ProxyRequestAdapterOS implements ProxyRequestAdapter {
                     return new ProxyResponse(response.getStatus(), body, contentType);
                 }
             }, "failed to trigger opensearch request");
+        } finally {
+            // we want to close the client after this call. It's created only for this single call.
+            client.close();
         }
     }
 
