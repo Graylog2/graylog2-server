@@ -25,7 +25,10 @@ const Container = styled.div<{ $width: number }>(
     width: ${$width}px;
     min-width: ${$width}px;
     flex-shrink: 0;
-    height: 100%;
+    height: fit-content;
+    max-height: 100vh;
+    position: sticky;
+    top: 0;
     background-color: ${theme.colors.global.contentBackground};
     border-left: 1px solid ${theme.colors.variant.light.default};
     display: flex;
@@ -59,8 +62,10 @@ const Title = styled.h1(
 
 const ContentArea = styled.div`
   flex: 1;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 15px;
+  min-height: 0;
 `;
 
 const RightSidebar = () => {

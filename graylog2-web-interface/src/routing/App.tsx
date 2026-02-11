@@ -46,19 +46,17 @@ const ContentRow = styled.div`
   display: flex;
   flex-direction: row;
   flex: 1;
-  overflow: hidden;
+  overflow: auto;
 `;
 
 const MainContentColumn = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
-  overflow: hidden;
+  min-width: 0;
 `;
 
 const PageContent = styled.div`
-  height: 100%;
-  overflow: auto;
   flex: 1;
 `;
 
