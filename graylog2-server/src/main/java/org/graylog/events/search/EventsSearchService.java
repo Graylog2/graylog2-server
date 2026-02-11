@@ -37,6 +37,7 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -44,6 +45,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.graylog.events.event.EventDto.FIELD_ALERT;
+import static org.graylog.events.event.EventDto.FIELD_PRIORITY;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
 
 public class EventsSearchService extends AbstractEventsSearchService {
@@ -86,48 +89,6 @@ public class EventsSearchService extends AbstractEventsSearchService {
         return slices(query, timeRange, subject, searchUser, request.sliceColumn(), request.includeAll());
     }
 
-    // Converted from EventDefinitionPriority.ts
-    public enum EventDefinitionPriority {
-        LOW(1, "low"),
-        MEDIUM(2, "medium"),
-        HIGH(3, "high"),
-        CRITICAL(4, "critical");
-
-        private final int value;
-        private final String name;
-
-        EventDefinitionPriority(int value, String name) {
-            this.value = value;
-            this.name = name;
-        }
-
-        public int getValue() {
-            return value;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public static EventDefinitionPriority fromValue(int value) {
-            for (EventDefinitionPriority p : values()) {
-                if (p.value == value) {
-                    return p;
-                }
-            }
-            throw new IllegalArgumentException("Unknown priority value: " + value);
-        }
-
-        public static EventDefinitionPriority fromName(String name) {
-            for (EventDefinitionPriority p : values()) {
-                if (p.name.equalsIgnoreCase(name)) {
-                    return p;
-                }
-            }
-            throw new IllegalArgumentException("Unknown priority name: " + name);
-        }
-    }
-
     /**
      * finding the overall count for one column for MongoDB based queries so we can calculate the "empty" case
      */
@@ -157,20 +118,77 @@ public class EventsSearchService extends AbstractEventsSearchService {
         return new Slice(result.getFirst().toString(), null, Integer.valueOf(result.getLast().toString()));
     }
 
+    // the alert can either be true or false
+    List<Slice> handleAlertColumn(final List<Slice> slices) {
+        if(slices.size() == 2) {
+            return slices;
+        }
+
+        final var TRUE = new Slice( "true", null, 0);
+        final var FALSE = new Slice( "false", null, 0);
+
+        if(slices.isEmpty()) {
+            return List.of(TRUE, FALSE);
+        }
+
+        if(slices.getFirst().value().equals("true")) {
+            return List.of(slices.getFirst(), FALSE);
+        } else {
+            return List.of(TRUE, slices.getFirst());
+        }
+    }
+
+    // priority can be 1 (low) to 4 (critical), see EventDefinitionPriority.ts
+    List<Slice> handlePriorityColumn(final List<Slice> slices) {
+        if(slices.size() == 4) {
+            return slices;
+        }
+
+        final var LOW = new Slice( "1", null, 0);
+        final var MEDIUM = new Slice( "2", null, 0);
+        final var HIGH = new Slice( "3", null, 0);
+        final var CRITICAL = new Slice( "4", null, 0);
+
+        if(slices.isEmpty()) {
+            return List.of(LOW, MEDIUM, HIGH, CRITICAL);
+        }
+
+        List<Slice> fixedList = new ArrayList<>();
+        fixedList.add(slices.stream().filter(s -> s.value().equals(LOW.value())).findAny().orElse(LOW));
+        fixedList.add(slices.stream().filter(s -> s.value().equals(MEDIUM.value())).findAny().orElse(MEDIUM));
+        fixedList.add(slices.stream().filter(s -> s.value().equals(HIGH.value())).findAny().orElse(HIGH));
+        fixedList.add(slices.stream().filter(s -> s.value().equals(CRITICAL.value())).findAny().orElse(CRITICAL));
+
+        return fixedList;
+    }
+
+    private List<Slice> addMissingOptions(final List<Slice> slices, final String slicingColumn) {
+        return switch (slicingColumn) {
+            case FIELD_ALERT -> handleAlertColumn(slices);
+            case FIELD_PRIORITY -> handlePriorityColumn(slices);
+            default -> slices;
+        };
+    }
+
     /**
      * finding all slices for a particular column in the Indexer
      */
     public Slices slices(String query, TimeRange timeRange, Subject subject, SearchUser searchUser, final String slicingColumn, final boolean includeAll) {
         try {
-            return new Slices(scriptingApiService.executeAggregation(
+            final var slices = scriptingApiService.executeAggregation(
                             new AggregationRequestSpec(query, allowedEventStreams(subject), Set.of(), timeRange, List.of(new Grouping(slicingColumn, Integer.MAX_VALUE)), List.of(new Metric("count", slicingColumn))),
                             searchUser
                     )
                     .datarows()
                     .stream()
                     .map(r -> mapAggregationResultsToSlice(slicingColumn, r))
-                    .filter(s -> includeAll || !s.title().equals("(Empty Value)"))
-                    .toList());
+                    .toList();
+
+            final var filtered = includeAll
+                    ? addMissingOptions(slices, slicingColumn)
+                    : slices.stream().filter(s -> !"(Empty Value)".equals(s.value())).toList();
+
+            return new Slices(filtered);
         } catch (QueryFailedException e) {
             throw new RuntimeException(e);
         }

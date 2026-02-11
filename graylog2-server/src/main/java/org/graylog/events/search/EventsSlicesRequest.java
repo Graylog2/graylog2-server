@@ -71,6 +71,7 @@ public abstract class EventsSlicesRequest {
                 // Should not happen
             }
             return new AutoValue_EventsSlicesRequest.Builder()
+                    .sliceColumn("")
                     .query("")
                     .filter(EventsSearchFilter.empty())
                     .timerange(timerange)
