@@ -147,6 +147,17 @@ public class EventsSearchService extends AbstractEventsSearchService {
     }
 
     /**
+     * In the Open Source part, we only map priority and type, both of which are augmented in the FE regarding the title.
+     * So we only need a simple mapping function
+     * @param slicingColumn
+     * @param result
+     * @return Slice
+     */
+    Slice mapAggregationResultsToSlice(final String slicingColumn, final List<Object> result) {
+        return new Slice(result.getFirst().toString(), null, Integer.valueOf(result.getLast().toString()));
+    }
+
+    /**
      * finding all slices for a particular column in the Indexer
      */
     public Slices slices(String query, TimeRange timeRange, Subject subject, SearchUser searchUser, final String slicingColumn, final boolean includeAll) {
@@ -157,7 +168,7 @@ public class EventsSearchService extends AbstractEventsSearchService {
                     )
                     .datarows()
                     .stream()
-                    .map(r -> new Slice(r.getFirst().toString(), r.getFirst().toString(), Integer.valueOf(r.getLast().toString())))
+                    .map(r -> mapAggregationResultsToSlice(slicingColumn, r))
                     .filter(s -> includeAll || !s.title().equals("(Empty Value)"))
                     .toList());
         } catch (QueryFailedException e) {
