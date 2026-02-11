@@ -64,17 +64,48 @@ const renderSUT = (inputStates: InputStates, featureEnabled = true) => {
   return render(<InputStateControl input={baseInput} inputStates={inputStates} openWizard={jest.fn()} />);
 };
 
+const messageInput = {
+  title: baseInput.title,
+  global: baseInput.global,
+  name: baseInput.name,
+  content_pack: '',
+  id: baseInput.id,
+  created_at: baseInput.created_at,
+  type: baseInput.type,
+  creator_user_id: baseInput.creator_user_id,
+  attributes: baseInput.attributes,
+  static_fields: baseInput.static_fields,
+  node: baseInput.node,
+};
+
 describe('InputStateControl', () => {
-  it('shows setup state when feature is enabled and input state is not loaded yet', async () => {
+  it('shows start when feature is enabled and input has no state', async () => {
     renderSUT({});
 
-    expect(await screen.findByRole('button', { name: /set-up input/i })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: /start input/i })).toBeInTheDocument();
   });
 
-  it('falls back to start when feature is disabled and input state is not loaded yet', async () => {
+  it('shows start when feature is disabled and input has no state', async () => {
     renderSUT({}, false);
 
     expect(await screen.findByRole('button', { name: /start input/i })).toBeInTheDocument();
+  });
+
+  it('shows setup when input is explicitly in SETUP state', async () => {
+    const setupStates: InputStates = {
+      [baseInput.id]: {
+        node1: {
+          id: baseInput.id,
+          state: 'SETUP',
+          detailed_message: null,
+          message_input: messageInput,
+        },
+      },
+    };
+
+    renderSUT(setupStates);
+
+    expect(await screen.findByRole('button', { name: /set-up input/i })).toBeInTheDocument();
   });
 
   it('shows stop when input is running', async () => {
@@ -84,19 +115,7 @@ describe('InputStateControl', () => {
           id: baseInput.id,
           state: 'RUNNING',
           detailed_message: null,
-          message_input: {
-            title: baseInput.title,
-            global: baseInput.global,
-            name: baseInput.name,
-            content_pack: '',
-            id: baseInput.id,
-            created_at: baseInput.created_at,
-            type: baseInput.type,
-            creator_user_id: baseInput.creator_user_id,
-            attributes: baseInput.attributes,
-            static_fields: baseInput.static_fields,
-            node: baseInput.node,
-          },
+          message_input: messageInput,
         },
       },
     };
@@ -113,19 +132,7 @@ describe('InputStateControl', () => {
           id: baseInput.id,
           state: 'RUNNING',
           detailed_message: null,
-          message_input: {
-            title: baseInput.title,
-            global: baseInput.global,
-            name: baseInput.name,
-            content_pack: '',
-            id: baseInput.id,
-            created_at: baseInput.created_at,
-            type: baseInput.type,
-            creator_user_id: baseInput.creator_user_id,
-            attributes: baseInput.attributes,
-            static_fields: baseInput.static_fields,
-            node: baseInput.node,
-          },
+          message_input: messageInput,
         },
       },
     };
