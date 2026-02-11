@@ -31,6 +31,8 @@ const INPUT_STATES = {
   SETUP: 'SETUP',
 } as const;
 
+const INPUTS_LIST_REFETCH_INTERVAL = 5000;
+
 const hasInputInState = (inputStates: InputStates, targetStates: InputState | Array<InputState>) => {
   const statesToCheck = Array.isArray(targetStates) ? targetStates : [targetStates];
 
@@ -51,6 +53,9 @@ const InputsNotifications = () => {
 
   useEffect(() => {
     InputsActions.list();
+    const interval = setInterval(InputsActions.list, INPUTS_LIST_REFETCH_INTERVAL);
+
+    return () => clearInterval(interval);
   }, []);
 
   const items = useMemo<Array<NotificationItem>>(() => {
