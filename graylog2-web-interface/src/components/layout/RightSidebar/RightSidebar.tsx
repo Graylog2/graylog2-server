@@ -72,6 +72,10 @@ const ContentArea = styled.div`
 const StyledRow = styled(Row)`
   margin-left: 0px;
   margin-right: 0px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 `;
 
 const RightSidebar = () => {
