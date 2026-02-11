@@ -254,7 +254,7 @@ describe('RightSidebarProvider', () => {
       expect(screen.getByTestId('can-go-forward')).toHaveTextContent('false');
     });
 
-    it('should preserve history when closing/reopening sidebar', async () => {
+    it('should clear history when closing sidebar', async () => {
       render(
         <RightSidebarProvider>
           <TestConsumer />
@@ -265,12 +265,17 @@ describe('RightSidebarProvider', () => {
       await userEvent.click(screen.getByText('Open Sidebar 2'));
 
       expect(screen.getByTestId('content-id')).toHaveTextContent('test-sidebar-2');
+      expect(screen.getByTestId('can-go-back')).toHaveTextContent('true');
 
       await userEvent.click(screen.getByText('Close Sidebar'));
       expect(screen.getByTestId('is-open')).toHaveTextContent('false');
+      expect(screen.getByTestId('content-id')).toHaveTextContent('null');
+      expect(screen.getByTestId('can-go-back')).toHaveTextContent('false');
+      expect(screen.getByTestId('can-go-forward')).toHaveTextContent('false');
 
-      await userEvent.click(screen.getByText('Go Back'));
+      await userEvent.click(screen.getByText('Open Sidebar'));
 
+      expect(screen.getByTestId('is-open')).toHaveTextContent('true');
       expect(screen.getByTestId('content-id')).toHaveTextContent('test-sidebar');
       expect(screen.getByTestId('can-go-back')).toHaveTextContent('false');
     });

@@ -75,6 +75,8 @@ const historyReducer = (state: HistoryState, action: HistoryAction): HistoryStat
     case 'CLOSE_SIDEBAR': {
       return {
         ...state,
+        contentHistory: [],
+        currentIndex: -1,
         isOpen: false,
       };
     }
