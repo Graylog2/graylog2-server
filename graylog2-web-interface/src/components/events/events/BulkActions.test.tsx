@@ -43,6 +43,7 @@ const getEvent = (id: string): Event => ({
   replay_info: undefined,
   alert: undefined,
   message: '',
+  timestamp_processing: null,
 });
 
 const mockedSelectedEntitiesData = {

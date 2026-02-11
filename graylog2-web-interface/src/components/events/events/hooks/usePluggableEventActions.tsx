@@ -20,7 +20,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import type { EventActionComponentProps } from 'views/types';
 import type { Event } from 'components/events/events/types';
 
-const usePluggableEventActions = (events: Array<Event>, onlyBulk: boolean = false) => {
+const usePluggableEventActions = (events: Array<Event>, onlyBulk: boolean = false, onEventCallback?: () => void) => {
   const modalRefs = useRef({});
   const pluggableActions = usePluginEntities('views.components.eventActions');
   const availableActions = pluggableActions.filter(
@@ -41,6 +41,7 @@ const usePluggableEventActions = (events: Array<Event>, onlyBulk: boolean = fals
         events={events}
         modalRef={() => modalRefs.current[key]}
         fromBulk={onlyBulk}
+        onEventCallback={onEventCallback}
       />
     ),
   );

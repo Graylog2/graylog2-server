@@ -1,0 +1,5 @@
+type = "a"
+message = "Add size parameter to /api/search/aggregate endpoint"
+
+pulls = ["24867"]
+issues = ["18838"]
