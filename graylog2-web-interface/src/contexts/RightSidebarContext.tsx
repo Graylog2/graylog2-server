@@ -33,6 +33,10 @@ export type RightSidebarContextType = {
   closeSidebar: () => void;
   updateContent: <T = Record<string, unknown>>(content: RightSidebarContent<T>) => void;
   setWidth: (width: number) => void;
+  goBack: () => void;
+  goForward: () => void;
+  canGoBack: boolean;
+  canGoForward: boolean;
 };
 
 const RightSidebarContext = React.createContext<RightSidebarContextType | undefined>(undefined);

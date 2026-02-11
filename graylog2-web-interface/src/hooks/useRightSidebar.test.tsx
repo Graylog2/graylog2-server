@@ -33,13 +33,17 @@ describe('useRightSidebar', () => {
 
     expect(result.current).toEqual(
       expect.objectContaining({
-        isOpen: true,
+        isOpen: false,
         content: null,
         width: 400,
         openSidebar: expect.any(Function),
         closeSidebar: expect.any(Function),
         updateContent: expect.any(Function),
         setWidth: expect.any(Function),
+        goBack: expect.any(Function),
+        goForward: expect.any(Function),
+        canGoBack: false,
+        canGoForward: false,
       }),
     );
   });

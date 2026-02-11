@@ -44,6 +44,12 @@ const Header = styled.div`
   padding-right: 15px;
 `;
 
+const NavigationButtons = styled.div`
+  display: flex;
+  gap: 4px;
+  margin-right: 8px;
+`;
+
 const Title = styled.h4(
   ({ theme }) => css`
     margin: 0;
@@ -70,7 +76,7 @@ const StyledRow = styled(Row)`
 `;
 
 const RightSidebar = () => {
-  const { content, width, closeSidebar } = useRightSidebar();
+  const { content, width, closeSidebar, goBack, goForward, canGoBack, canGoForward } = useRightSidebar();
 
   if (!content) {
     return null;
@@ -82,6 +88,22 @@ const RightSidebar = () => {
     <Container $width={width} role="complementary" aria-label={`${content.title} sidebar`}>
       <StyledRow className="content">
         <Header>
+          <NavigationButtons>
+            <IconButton
+              name="arrow_back"
+              title="Go back"
+              onClick={goBack}
+              disabled={!canGoBack}
+              aria-label="Go back to previous content"
+            />
+            <IconButton
+              name="arrow_forward"
+              title="Go forward"
+              onClick={goForward}
+              disabled={!canGoForward}
+              aria-label="Go forward to next content"
+            />
+          </NavigationButtons>
           <Title id="sidebar-title">{content.title}</Title>
           <IconButton name="close" title="Close sidebar" onClick={closeSidebar} aria-label="Close sidebar" />
         </Header>

@@ -14,9 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useReducer, useCallback, useMemo } from 'react';
 
-import useDisclosure from 'util/hooks/useDisclosure';
 import RightSidebarContext from 'contexts/RightSidebarContext';
 import type { RightSidebarContent } from 'contexts/RightSidebarContext';
 
@@ -24,42 +23,159 @@ type Props = {
   children: React.ReactNode;
 };
 
+const MAX_HISTORY_DEPTH = 20;
+
+type HistoryState = {
+  contentHistory: Array<RightSidebarContent>;
+  currentIndex: number;
+  isOpen: boolean;
+  width: number;
+};
+
+type HistoryAction =
+  | { type: 'OPEN_SIDEBAR'; content: RightSidebarContent }
+  | { type: 'CLOSE_SIDEBAR' }
+  | { type: 'UPDATE_CONTENT'; content: RightSidebarContent }
+  | { type: 'GO_BACK' }
+  | { type: 'GO_FORWARD' }
+  | { type: 'SET_WIDTH'; width: number };
+
+const initialState: HistoryState = {
+  contentHistory: [],
+  currentIndex: -1,
+  isOpen: false,
+  width: 400,
+};
+
+const historyReducer = (state: HistoryState, action: HistoryAction): HistoryState => {
+  switch (action.type) {
+    case 'OPEN_SIDEBAR': {
+      const newHistory = state.contentHistory.slice(0, state.currentIndex + 1);
+      newHistory.push(action.content);
+
+      if (newHistory.length > MAX_HISTORY_DEPTH) {
+        newHistory.shift();
+
+        return {
+          ...state,
+          contentHistory: newHistory,
+          currentIndex: MAX_HISTORY_DEPTH - 1,
+          isOpen: true,
+        };
+      }
+
+      return {
+        ...state,
+        contentHistory: newHistory,
+        currentIndex: newHistory.length - 1,
+        isOpen: true,
+      };
+    }
+
+    case 'CLOSE_SIDEBAR': {
+      return {
+        ...state,
+        isOpen: false,
+      };
+    }
+
+    case 'UPDATE_CONTENT': {
+      if (state.currentIndex === -1) {
+        return state;
+      }
+
+      const newHistory = [...state.contentHistory];
+      newHistory[state.currentIndex] = action.content;
+
+      return {
+        ...state,
+        contentHistory: newHistory,
+      };
+    }
+
+    case 'GO_BACK': {
+      if (state.currentIndex <= 0) {
+        return state;
+      }
+
+      return {
+        ...state,
+        currentIndex: state.currentIndex - 1,
+      };
+    }
+
+    case 'GO_FORWARD': {
+      if (state.currentIndex >= state.contentHistory.length - 1) {
+        return state;
+      }
+
+      return {
+        ...state,
+        currentIndex: state.currentIndex + 1,
+      };
+    }
+
+    case 'SET_WIDTH': {
+      return {
+        ...state,
+        width: action.width,
+      };
+    }
+
+    default:
+      return state;
+  }
+};
+
 const RightSidebarProvider = ({ children }: Props) => {
-  const [isOpen, { open, close }] = useDisclosure(true);
-  const [content, setContent] = useState<RightSidebarContent | null>(null);
-  const [width, setWidthState] = useState<number>(400);
+  const [state, dispatch] = useReducer(historyReducer, initialState);
+
+  const content = state.currentIndex >= 0 ? state.contentHistory[state.currentIndex] : null;
+  const canGoBack = state.currentIndex > 0;
+  const canGoForward = state.currentIndex < state.contentHistory.length - 1;
 
   const openSidebar = useCallback(
     <T = Record<string, unknown>,>(newContent: RightSidebarContent<T>) => {
-      setContent(newContent as RightSidebarContent<any>);
-      open();
+      dispatch({ type: 'OPEN_SIDEBAR', content: newContent as RightSidebarContent<any> });
     },
-    [open],
+    [],
   );
 
   const closeSidebar = useCallback(() => {
-    close();
-  }, [close]);
+    dispatch({ type: 'CLOSE_SIDEBAR' });
+  }, []);
 
   const updateContent = useCallback(<T = Record<string, unknown>,>(newContent: RightSidebarContent<T>) => {
-    setContent(newContent as RightSidebarContent<any>);
+    dispatch({ type: 'UPDATE_CONTENT', content: newContent as RightSidebarContent<any> });
   }, []);
 
   const setWidth = useCallback((newWidth: number) => {
-    setWidthState(newWidth);
+    dispatch({ type: 'SET_WIDTH', width: newWidth });
+  }, []);
+
+  const goBack = useCallback(() => {
+    dispatch({ type: 'GO_BACK' });
+  }, []);
+
+  const goForward = useCallback(() => {
+    dispatch({ type: 'GO_FORWARD' });
   }, []);
 
   const contextValue = useMemo(
     () => ({
-      isOpen,
+      isOpen: state.isOpen,
       content,
-      width,
+      width: state.width,
       openSidebar,
       closeSidebar,
       updateContent,
       setWidth,
+      goBack,
+      goForward,
+      canGoBack,
+      canGoForward,
     }),
-    [isOpen, content, width, openSidebar, closeSidebar, updateContent, setWidth],
+    [state.isOpen, content, state.width, openSidebar, closeSidebar, updateContent, setWidth, goBack, goForward, canGoBack, canGoForward],
   );
 
   return <RightSidebarContext.Provider value={contextValue}>{children}</RightSidebarContext.Provider>;
