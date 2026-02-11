@@ -55,7 +55,7 @@ type SearchParams = {
 
 type Suggestion = {
   id: string;
-  targetId?: string;
+  target_id?: string;
   value: string;
 };
 
@@ -126,7 +126,8 @@ const SuggestionsList = ({
           useQueryParameter={false}>
           <StyledListGroup>
             {suggestions.map((suggestion) => {
-              const disabled = !!allActiveFilters?.get(attribute.id)?.find(({ value }) => value === suggestion.id);
+              const filterValue = suggestion.target_id || suggestion.id;
+              const disabled = !!allActiveFilters?.get(attribute.id)?.find(({ value }) => value === filterValue);
 
               const onClick = () => {
                 if (disabled) {
@@ -135,7 +136,7 @@ const SuggestionsList = ({
 
                 onSubmit(
                   {
-                    value: suggestion.targetId || suggestion.id,
+                    value: filterValue,
                     title: suggestion.value,
                   },
                   !multiSelect ? true : !isShiftHeld,

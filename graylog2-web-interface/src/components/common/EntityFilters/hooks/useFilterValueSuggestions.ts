@@ -79,7 +79,7 @@ const useFilterValueSuggestions = (
   }
 
   const { data, isInitialLoading } = useQuery({
-    queryKey: ['filters', 'suggestions', searchParams, displayFields, displayTemplate],
+    queryKey: ['filters', 'suggestions', collection, collectionProperty, relatedIdentifier, identifierType, searchParams, displayFields, displayTemplate],
 
     queryFn: () =>
       defaultOnError(
