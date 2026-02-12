@@ -47,9 +47,22 @@ const initialState: HistoryState = {
   width: 400,
 };
 
+const isSameContent = (content1: RightSidebarContent, content2: RightSidebarContent): boolean => content1.id === content2.id;
+
 const historyReducer = (state: HistoryState, action: HistoryAction): HistoryState => {
   switch (action.type) {
     case 'OPEN_SIDEBAR': {
+      if (state.currentIndex >= 0 && isSameContent(state.contentHistory[state.currentIndex], action.content)) {
+        const newHistory = [...state.contentHistory];
+        newHistory[state.currentIndex] = action.content;
+
+        return {
+          ...state,
+          contentHistory: newHistory,
+          isOpen: true,
+        };
+      }
+
       const newHistory = state.contentHistory.slice(0, state.currentIndex + 1);
       newHistory.push(action.content);
 
