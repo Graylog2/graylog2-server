@@ -47,7 +47,7 @@ const extendTypeSlices = (slices: Array<Slice>) => {
   }));
 };
 
-const eventsSliceRenderers: SliceRenderers = {
+const sliceRenderers: SliceRenderers = {
   priority: {
     extendSlices: extendPrioritySlices,
     render: (value) => <PriorityName priority={value} />,
@@ -58,4 +58,4 @@ const eventsSliceRenderers: SliceRenderers = {
   },
 };
 
-export default eventsSliceRenderers;
+export default sliceRenderers;

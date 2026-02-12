@@ -20,7 +20,7 @@ import { Events } from '@graylog/server-api';
 
 import useTableElements from 'components/events/events/hooks/useTableComponents';
 import { eventsTableElements } from 'components/events/Constants';
-import eventsSliceRenderers from 'components/events/EventsSliceRenderers';
+import eventsSliceRenderers from 'components/events/SliceRenderers';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import FilterValueRenderers from 'components/events/FilterValueRenderers';
 import fetchEvents, { keyFn, parseFilters, getConcatenatedQuery } from 'components/events/fetchEvents';
