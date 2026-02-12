@@ -18,6 +18,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import UserNotification from 'util/UserNotification';
 
+import type { CollectorsConfigRequest } from '../types';
 import {
   createFleet,
   updateFleet,
@@ -26,6 +27,7 @@ import {
   updateSource,
   deleteSource,
   createEnrollmentToken,
+  updateCollectorsConfig,
 } from './collectorsApi';
 
 const COLLECTORS_QUERY_KEY = ['collectors'];
@@ -139,6 +141,22 @@ const useCollectorsMutations = () => {
     },
   });
 
+  // Config mutation
+  const updateConfigMutation = useMutation({
+    mutationFn: (config: CollectorsConfigRequest) => updateCollectorsConfig(config),
+    onError: (errorThrown) => {
+      UserNotification.error(
+        `Saving collectors config failed: ${errorThrown}`,
+        'Could not save config',
+      );
+    },
+    onSuccess: () => {
+      UserNotification.success('Collectors config saved.', 'Success!');
+
+      return invalidateCollectorsQueries();
+    },
+  });
+
   return {
     // Fleet operations
     createFleet: createFleetMutation.mutateAsync,
@@ -159,6 +177,10 @@ const useCollectorsMutations = () => {
     // Enrollment token operations
     createEnrollmentToken: createEnrollmentTokenMutation.mutateAsync,
     isCreatingEnrollmentToken: createEnrollmentTokenMutation.isPending,
+
+    // Config operations
+    updateConfig: updateConfigMutation.mutateAsync,
+    isUpdatingConfig: updateConfigMutation.isPending,
   };
 };
 
