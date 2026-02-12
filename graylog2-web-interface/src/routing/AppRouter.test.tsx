@@ -57,13 +57,6 @@ jest.mock('react-router-dom', () => ({
   createBrowserRouter: jest.fn(),
 }));
 
-jest.mock('components/perspectives/hooks/useActivePerspective', () => ({
-  __esModule: true,
-  default: () => ({
-    activePerspective: mockDefaultPerspective,
-  }),
-}));
-
 jest.mock('components/navigation/NotificationBadge', () => () => null);
 
 const AppRouterWithContext = () => (

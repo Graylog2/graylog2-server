@@ -16,12 +16,12 @@
  */
 import styled, { css } from 'styled-components';
 
-const ContentArea = styled.div<{ $isSecurityPerspective?: boolean }>(
-  ({ $isSecurityPerspective, theme }) => css`
+const ContentArea = styled.div(
+  ({ theme }) => css`
     display: flex;
     flex-direction: column;
     padding-left: 0;
-    padding-top: ${$isSecurityPerspective ? '0px' : '15px'};
+    padding-top: 0;
     transition: all 0.33s ease-in-out;
     position: relative;
     width: 100%;
