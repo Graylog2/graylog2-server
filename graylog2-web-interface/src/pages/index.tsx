@@ -107,6 +107,7 @@ const CollectorsFleetsPage = loadAsync(() => import('pages/CollectorsFleetsPage'
 const CollectorsFleetDetailPage = loadAsync(() => import('pages/CollectorsFleetDetailPage'));
 const CollectorsInstancesPage = loadAsync(() => import('pages/CollectorsInstancesPage'));
 const CollectorsDeploymentPage = loadAsync(() => import('pages/CollectorsDeploymentPage'));
+const CollectorsSettingsPage = loadAsync(() => import('pages/CollectorsSettingsPage'));
 const SimulatorPage = loadAsync(() => import('./SimulatorPage'));
 const StartPage = loadAsync(() => import('./StartPage'));
 const StreamEditPage = loadAsync(() => import('./StreamEditPage'));
@@ -218,6 +219,7 @@ export {
   CollectorsFleetDetailPage,
   CollectorsInstancesPage,
   CollectorsDeploymentPage,
+  CollectorsSettingsPage,
   SimulatorPage,
   StartPage,
   StreamEditPage,

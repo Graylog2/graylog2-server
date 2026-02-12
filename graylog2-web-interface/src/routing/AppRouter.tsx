@@ -105,6 +105,7 @@ import {
   CollectorsFleetDetailPage,
   CollectorsInstancesPage,
   CollectorsDeploymentPage,
+  CollectorsSettingsPage,
   SimulatorPage,
   StartPage,
   StreamEditPage,
@@ -387,6 +388,7 @@ const AppRouter = () => {
             { path: `${RoutePaths.SYSTEM.COLLECTORS.FLEETS}/:fleetId`, element: <CollectorsFleetDetailPage /> },
             { path: RoutePaths.SYSTEM.COLLECTORS.INSTANCES, element: <CollectorsInstancesPage /> },
             { path: RoutePaths.SYSTEM.COLLECTORS.DEPLOYMENT, element: <CollectorsDeploymentPage /> },
+            { path: RoutePaths.SYSTEM.COLLECTORS.SETTINGS, element: <CollectorsSettingsPage /> },
 
             { path: RoutePaths.KEYBOARD_SHORTCUTS, element: <KeyboardShortcutsPage /> },
             {
