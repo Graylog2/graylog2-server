@@ -29,6 +29,7 @@ const bindings: PluginExports = {
         { description: 'Fleets', path: Routes.SYSTEM.COLLECTORS.FLEETS },
         { description: 'Instances', path: Routes.SYSTEM.COLLECTORS.INSTANCES },
         { description: 'Deployment', path: Routes.SYSTEM.COLLECTORS.DEPLOYMENT },
+        { description: 'Settings', path: Routes.SYSTEM.COLLECTORS.SETTINGS },
       ],
     },
   ],

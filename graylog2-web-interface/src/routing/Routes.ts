@@ -233,6 +233,7 @@ const Routes = {
       INSTANCES: '/system/collectors/instances',
       INSTANCE: (instanceId: string) => `/system/collectors/instances/${instanceId}`,
       DEPLOYMENT: '/system/collectors/deployment',
+      SETTINGS: '/system/collectors/settings',
     },
   },
   VIEWS: {
