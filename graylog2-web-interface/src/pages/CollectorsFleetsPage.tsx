@@ -16,19 +16,23 @@
  */
 import * as React from 'react';
 import { useState, useMemo, useCallback } from 'react';
+import { Navigate } from 'react-router-dom';
 
 import { Button, Row, Col } from 'components/bootstrap';
-import { DocumentTitle, PageHeader } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import type { SearchParams } from 'stores/PaginationTypes';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import { FleetFormModal } from 'components/collectors/fleets';
 import { fetchPaginatedFleets, fleetsKeyFn, useCollectorsMutations } from 'components/collectors/hooks';
+import { useCollectorsConfig } from 'components/collectors/hooks/useCollectors';
 import type { Fleet } from 'components/collectors/types';
 import customColumnRenderers from 'components/collectors/fleets/ColumnRenderers';
 import { DEFAULT_LAYOUT } from 'components/collectors/fleets/Constants';
+import Routes from 'routing/Routes';
 
 const CollectorsFleetsPage = () => {
+  const { data: config, isLoading } = useCollectorsConfig();
   const [showFleetModal, setShowFleetModal] = useState(false);
   const { createFleet, isCreatingFleet } = useCollectorsMutations();
 
@@ -43,6 +47,14 @@ const CollectorsFleetsPage = () => {
     await createFleet(fleet);
     setShowFleetModal(false);
   };
+
+  if (isLoading) {
+    return <Spinner />;
+  }
+
+  if (!config?.opamp_ca_id) {
+    return <Navigate to={Routes.SYSTEM.COLLECTORS.SETTINGS} />;
+  }
 
   return (
     <DocumentTitle title="Collector Fleets">

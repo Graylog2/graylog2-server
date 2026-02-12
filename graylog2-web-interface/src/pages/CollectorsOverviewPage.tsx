@@ -15,24 +15,39 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Navigate } from 'react-router-dom';
 
 import { Row, Col } from 'components/bootstrap';
-import { DocumentTitle, PageHeader } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { CollectorsOverview } from 'components/collectors/overview';
 import { CollectorsPageNavigation } from 'components/collectors/common';
+import { useCollectorsConfig } from 'components/collectors/hooks/useCollectors';
+import Routes from 'routing/Routes';
 
-const CollectorsOverviewPage = () => (
-  <DocumentTitle title="Collectors Overview">
-    <CollectorsPageNavigation />
-    <PageHeader title="Collectors Overview">
-      <span>Overview of all collectors and sources across your infrastructure.</span>
-    </PageHeader>
-    <Row className="content">
-      <Col md={12}>
-        <CollectorsOverview />
-      </Col>
-    </Row>
-  </DocumentTitle>
-);
+const CollectorsOverviewPage = () => {
+  const { data: config, isLoading } = useCollectorsConfig();
+
+  if (isLoading) {
+    return <Spinner />;
+  }
+
+  if (!config?.opamp_ca_id) {
+    return <Navigate to={Routes.SYSTEM.COLLECTORS.SETTINGS} />;
+  }
+
+  return (
+    <DocumentTitle title="Collectors Overview">
+      <CollectorsPageNavigation />
+      <PageHeader title="Collectors Overview">
+        <span>Overview of all collectors and sources across your infrastructure.</span>
+      </PageHeader>
+      <Row className="content">
+        <Col md={12}>
+          <CollectorsOverview />
+        </Col>
+      </Row>
+    </DocumentTitle>
+  );
+};
 
 export default CollectorsOverviewPage;

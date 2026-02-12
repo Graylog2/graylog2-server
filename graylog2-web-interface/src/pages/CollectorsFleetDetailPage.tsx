@@ -15,15 +15,26 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 
 import { Row, Col } from 'components/bootstrap';
-import { DocumentTitle } from 'components/common';
+import { DocumentTitle, Spinner } from 'components/common';
 import { FleetDetail } from 'components/collectors/fleets';
 import { CollectorsPageNavigation } from 'components/collectors/common';
+import { useCollectorsConfig } from 'components/collectors/hooks/useCollectors';
+import Routes from 'routing/Routes';
 
 const CollectorsFleetDetailPage = () => {
+  const { data: config, isLoading } = useCollectorsConfig();
   const { fleetId } = useParams<{ fleetId: string }>();
+
+  if (isLoading) {
+    return <Spinner />;
+  }
+
+  if (!config?.opamp_ca_id) {
+    return <Navigate to={Routes.SYSTEM.COLLECTORS.SETTINGS} />;
+  }
 
   return (
     <DocumentTitle title="Fleet Detail">

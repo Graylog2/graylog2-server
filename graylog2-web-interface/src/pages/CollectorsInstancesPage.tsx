@@ -16,9 +16,10 @@
  */
 import * as React from 'react';
 import { useState, useMemo, useCallback } from 'react';
+import { Navigate } from 'react-router-dom';
 
 import { Row, Col } from 'components/bootstrap';
-import { DocumentTitle, PageHeader } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import type { SearchParams } from 'stores/PaginationTypes';
 import { CollectorsPageNavigation } from 'components/collectors/common';
@@ -29,12 +30,15 @@ import {
   useFleets,
   useSources,
 } from 'components/collectors/hooks';
+import { useCollectorsConfig } from 'components/collectors/hooks/useCollectors';
 import type { CollectorInstanceView } from 'components/collectors/types';
 import customColumnRenderers from 'components/collectors/instances/ColumnRenderers';
 import useTableElements from 'components/collectors/instances/useTableElements';
 import { DEFAULT_LAYOUT } from 'components/collectors/instances/Constants';
+import Routes from 'routing/Routes';
 
 const CollectorsInstancesPage = () => {
+  const { data: config, isLoading } = useCollectorsConfig();
   const [selectedInstance, setSelectedInstance] = useState<CollectorInstanceView | null>(null);
   const { data: fleets } = useFleets();
   const { data: sources } = useSources();
@@ -64,6 +68,14 @@ const CollectorsInstancesPage = () => {
 
   const getSourcesForInstance = (instance: CollectorInstanceView) =>
     (sources || []).filter((s) => s.fleet_id === instance.fleet_id);
+
+  if (isLoading) {
+    return <Spinner />;
+  }
+
+  if (!config?.opamp_ca_id) {
+    return <Navigate to={Routes.SYSTEM.COLLECTORS.SETTINGS} />;
+  }
 
   return (
     <DocumentTitle title="Collector Instances">
