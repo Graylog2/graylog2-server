@@ -18,6 +18,7 @@ import React from 'react';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import PageNavigation from 'components/common/PageNavigation';
 import AppConfig from 'util/AppConfig';
 import { Link } from 'components/common/router';
 import DocsHelper from 'util/DocsHelper';
@@ -28,6 +29,7 @@ import useInputTypesDescriptions from 'hooks/useInputTypesDescriptions';
 import InputsNotifications from 'components/inputs/InputsNotifications';
 
 const isCloud = AppConfig.isCloud();
+export const INPUTS_PAGE_NAV_TITLE = 'Inputs';
 
 const InputsPage = () => {
   const productName = useProductName();
@@ -40,6 +42,9 @@ const InputsPage = () => {
 
   return (
     <DocumentTitle title="Inputs">
+      <Row>
+        <PageNavigation page={INPUTS_PAGE_NAV_TITLE} />
+      </Row>
       <PageHeader
         title="Inputs"
         documentationLink={{
