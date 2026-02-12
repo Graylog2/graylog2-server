@@ -16,7 +16,7 @@
  */
 
 import * as React from 'react';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import EventListItem from 'components/events/bulk-replay/EventListItem';
@@ -102,13 +102,15 @@ const CollapseButton = styled(IconButton)(
 );
 const SidebarBulkEventReplay = ({ onClose }: Props) => {
   const initialEventIds: Array<string> = useSessionInitialEventIds();
+  const [isOpen, setIsOpen] = useState(false);
+  const togglePopover = useCallback(() => setIsOpen((cur) => !cur), []);
 
   const { eventIds, eventsData: events, selectedId, removeItem, selectItem, markItemAsDone } = useSelectedEvents();
   const total = eventIds.length;
   const completed = eventIds.filter((event) => event.status === 'DONE').length;
   const remainingEvents = eventIds.map((eventId) => events[eventId.id]?.event);
   const curIndex = useMemo(() => eventIds.findIndex((item) => item.id === selectedId), [eventIds, selectedId]);
-  const { actions, pluggableActionModals } = useEventBulkActions(remainingEvents);
+  const { actions, pluggableActionModals } = useEventBulkActions(remainingEvents, togglePopover);
 
   const onGoBack = useCallback(() => {
     selectItem(eventIds[curIndex - 1].id);
@@ -117,6 +119,11 @@ const SidebarBulkEventReplay = ({ onClose }: Props) => {
     selectItem(eventIds[curIndex + 1].id);
   }, [curIndex, eventIds, selectItem]);
 
+  const _selectItem = (eventId: string) => {
+    togglePopover();
+
+    return selectItem(eventId);
+  };
   if (!initialEventIds?.length) return null;
 
   const status = eventIds?.find((state) => state.id === selectedId)?.status;
@@ -126,7 +133,7 @@ const SidebarBulkEventReplay = ({ onClose }: Props) => {
       <ArrowButton onClick={onGoBack} disabled={curIndex === 0}>
         <Icon name="keyboard_arrow_left" title="Previous Event" />
       </ArrowButton>
-      <Popover position="bottom">
+      <Popover position="bottom" opened={isOpen} onDismiss={togglePopover} withArrow>
         <Popover.Target>
           <TargetContainer>
             <EventListItem
@@ -136,6 +143,7 @@ const SidebarBulkEventReplay = ({ onClose }: Props) => {
               done={status === 'DONE'}
               removeItem={removeItem}
               markItemAsDone={markItemAsDone}
+              onClick={togglePopover}
               isDropdown
             />
           </TargetContainer>
@@ -173,7 +181,7 @@ const SidebarBulkEventReplay = ({ onClose }: Props) => {
                       selected={eventId === selectedId}
                       done={eventStatus === 'DONE'}
                       removeItem={removeItem}
-                      onClick={() => selectItem(eventId)}
+                      onClick={() => _selectItem(eventId)}
                       markItemAsDone={markItemAsDone}
                     />
                   </li>

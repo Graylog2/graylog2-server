@@ -16,10 +16,6 @@
  */
 import React from 'react';
 
-type Props = {
-  name: string;
-};
-
-const NoAttributeProvided = ({ name }: Props) => <i>No {name.toLowerCase()} provided</i>;
+const NoAttributeProvided = () => <i>Not provided</i>;
 
 export default NoAttributeProvided;
