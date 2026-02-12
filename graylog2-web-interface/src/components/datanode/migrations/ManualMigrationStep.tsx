@@ -35,22 +35,25 @@ const ManualMigrationStep = () => {
   const { currentStep } = useMigrationState();
   const { onTriggerNextState } = useTriggerMigrationState();
   const sendTelemetry = useSendTelemetry();
+  const inPlaceMigrationAction: MigrationActions = 'SELECT_ROLLING_UPGRADE_MIGRATION';
 
   const onMigrationStepChange = async (step: MigrationActions, args?: StepArgs = {}) =>
     onTriggerNextState({ step, args });
 
   const handleSelectMigrationType = async (step: MigrationActions, args?: StepArgs = {}) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.MIGRATION_TYPE_SELECTED, {
-      app_pathname: 'datanode',
-      app_section: 'migration',
-      event_details: { migration_type: 'IN-PLACE' },
-    });
+    if (step === inPlaceMigrationAction) {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.MIGRATION_TYPE_SELECTED, {
+        app_pathname: 'datanode',
+        app_section: 'migration',
+        event_details: { migration_type: 'IN-PLACE' },
+      });
+    }
 
     return onTriggerNextState({ step, args });
   };
 
   const migrationTypeOptions = [
-    { label: 'In-Place migration', value: 'SELECT_ROLLING_UPGRADE_MIGRATION' },
+    { label: 'In-Place migration', value: inPlaceMigrationAction },
   ].filter((path) => currentStep.next_steps.includes(path.value));
 
   return (
