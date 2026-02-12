@@ -36,6 +36,7 @@ import org.graylog.security.pki.PemUtils;
 import org.graylog2.opamp.enrollment.EnrollmentTokenService;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.CollectorInstanceReport;
@@ -189,7 +190,7 @@ public class OpAmpService {
             // Add OTLP connection settings from CollectorsConfig
             final var collectorsConfig = clusterConfigService.get(CollectorsConfig.class);
             if (collectorsConfig != null) {
-                addOtlpConnectionSettings(connectionSettingsBuilder, collectorsConfig);
+                buildOtlpConnectionSettings(connectionSettingsBuilder, collectorsConfig, opAmpCaService, clusterConfigService);
             }
 
             return ServerToAgent.newBuilder()
@@ -202,27 +203,38 @@ public class OpAmpService {
         }
     }
 
-    private void addOtlpConnectionSettings(ConnectionSettingsOffers.Builder builder,
-                                              CollectorsConfig config) {
+    static void buildOtlpConnectionSettings(ConnectionSettingsOffers.Builder builder,
+                                              CollectorsConfig config,
+                                              OpAmpCaService opAmpCaService,
+                                              ClusterConfigService clusterConfigService) {
         try {
             final CertificateEntry opAmpCa = opAmpCaService.getOpAmpCa();
             final String caPem = opAmpCa.certificate();
 
+            final Opamp.TLSConnectionSettings tlsSettings = Opamp.TLSConnectionSettings.newBuilder()
+                    .setCaPemContents(caPem)
+                    .build();
+
+            final ClusterId clusterId = clusterConfigService.get(ClusterId.class);
+            final String serverName = (clusterId != null && clusterId.clusterId() != null) ? clusterId.clusterId() : "";
+
             if (config.http() != null && config.http().enabled()) {
-                builder.putOtherConnections("otlp-http",
-                        Opamp.OtherConnectionSettings.newBuilder()
-                                .setDestinationEndpoint(f("https://%s:%d", config.http().hostname(), config.http().port()))
-                                .setCertificate(TLSCertificate.newBuilder()
-                                        .setCaCert(ByteString.copyFromUtf8(caPem)))
-                                .build());
+                final var settingsBuilder = Opamp.OtherConnectionSettings.newBuilder()
+                        .setDestinationEndpoint(f("https://%s:%d", config.http().hostname(), config.http().port()))
+                        .setTls(tlsSettings);
+                if (!serverName.isEmpty()) {
+                    settingsBuilder.putOtherSettings("server_name", serverName);
+                }
+                builder.putOtherConnections("otlp-http", settingsBuilder.build());
             }
             if (config.grpc() != null && config.grpc().enabled()) {
-                builder.putOtherConnections("otlp-grpc",
-                        Opamp.OtherConnectionSettings.newBuilder()
-                                .setDestinationEndpoint(f("https://%s:%d", config.grpc().hostname(), config.grpc().port()))
-                                .setCertificate(TLSCertificate.newBuilder()
-                                        .setCaCert(ByteString.copyFromUtf8(caPem)))
-                                .build());
+                final var settingsBuilder = Opamp.OtherConnectionSettings.newBuilder()
+                        .setDestinationEndpoint(f("https://%s:%d", config.grpc().hostname(), config.grpc().port()))
+                        .setTls(tlsSettings);
+                if (!serverName.isEmpty()) {
+                    settingsBuilder.putOtherSettings("server_name", serverName);
+                }
+                builder.putOtherConnections("otlp-grpc", settingsBuilder.build());
             }
         } catch (Exception e) {
             LOG.warn("Failed to add OTLP connection settings to enrollment response", e);
