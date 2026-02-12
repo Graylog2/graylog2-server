@@ -21,7 +21,8 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
 
-import type { Fleet, CollectorInstanceView, Source, CollectorStats } from '../types';
+import type { CollectorsConfig, Fleet, CollectorInstanceView, Source, CollectorStats } from '../types';
+import { fetchCollectorsConfig } from './collectorsApi';
 import {
   mockFleets,
   mockInstances,
@@ -285,4 +286,12 @@ export const useSources = (fleetId?: string) =>
 
       return fleetId ? getSourcesByFleetId(fleetId) : mockSources;
     },
+  });
+
+export const COLLECTORS_CONFIG_KEY = [QUERY_KEY_PREFIX, 'config'];
+
+export const useCollectorsConfig = () =>
+  useQuery<CollectorsConfig>({
+    queryKey: COLLECTORS_CONFIG_KEY,
+    queryFn: fetchCollectorsConfig,
   });
