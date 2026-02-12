@@ -22,7 +22,7 @@ import { act } from 'react';
 
 import asMock from 'helpers/mocking/AsMock';
 import ToolsStore from 'stores/tools/ToolsStore';
-import { EMPTY_RANGE } from 'views/components/searchbar/time-range-filter/TimeRangeDisplay';
+import { EMPTY_RANGE } from 'views/components/time-range-picker/TimeRangeDisplay';
 
 import OriginalTabKeywordTimeRange from './TabKeywordTimeRange';
 

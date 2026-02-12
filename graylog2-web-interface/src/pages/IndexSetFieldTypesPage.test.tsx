@@ -53,7 +53,6 @@ jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappin
 jest.mock('components/common/PaginatedEntityTable/useFetchEntities', () => jest.fn());
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
-jest.mock('components/perspectives/hooks/useActivePerspective');
 
 jest.mock('routing/QueryParams', () => ({
   ...jest.requireActual('routing/QueryParams'),
