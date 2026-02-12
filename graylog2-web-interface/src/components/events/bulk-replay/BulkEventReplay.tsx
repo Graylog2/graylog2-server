@@ -18,7 +18,6 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import useSelectedEvents from 'components/events/bulk-replay/useSelectedEvents';
-import Center from 'components/common/Center';
 import EventReplaySelectedProvider from 'contexts/EventReplaySelectedProvider';
 import { Alert, Button } from 'components/bootstrap';
 import type { SidebarSection } from 'views/components/sidebar/sidebarSections';
@@ -46,10 +45,10 @@ type Props = {
   onReturnClick: () => void;
 };
 
-const AlertWrapper = ({ children = null }: React.PropsWithChildren) => (
-  <Alert bsStyle="info">
-    <Center>{children}</Center>
-  </Alert>
+const AlertWrapper = styled(Alert)(
+  ({ theme }) => `
+  margin: ${theme.spacings.md};
+`,
 );
 
 const replaySection: SidebarSection = {
@@ -81,12 +80,11 @@ const ReplayedSearch = ({
 
   if (total === 0) {
     return (
-      <AlertWrapper>
-        You have removed all events from the list. You can now return back by clicking the{' '}
+      <AlertWrapper bsStyle="info">
+        You have removed all events from the list. You can now return back by clicking{' '}
         <Button bsStyle="link" onClick={onReturnClick}>
           Back to events
         </Button>{' '}
-        button.
       </AlertWrapper>
     );
   }
@@ -96,7 +94,6 @@ const ReplayedSearch = ({
       eventData={selectedEvent.event}
       eventDefinitionMappedData={eventDefinitionMappedData}
       searchPageLayout={searchPageLayout}
-      forceSidebarPinned
     />
   );
 };
