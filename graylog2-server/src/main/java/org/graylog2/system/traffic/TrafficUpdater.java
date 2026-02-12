@@ -42,6 +42,6 @@ public interface TrafficUpdater {
         return histogram.entrySet().stream()
                 .collect(Collectors.groupingBy(entry -> entry.getKey().withTimeAtStartOfDay(),
                         TreeMap::new,
-                        Collectors.mapping(Map.Entry::getValue, Collectors.summingLong(Long::valueOf))));
+                        Collectors.summingLong(Map.Entry::getValue)));
     }
 }

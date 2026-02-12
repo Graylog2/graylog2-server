@@ -27,6 +27,7 @@ public class EventOriginContext {
     private static final String URN = "urn:graylog";
     private static final String ES_MESSAGE = String.join(":", URN, "message:es");
     private static final String ES_EVENT = String.join(":", URN, "event:es");
+    private static final String MONGODB_AGGREGATION = String.join(":", URN, "aggregation:mongodb");
 
     public static String elasticsearchMessage(String indexName, String messageId) {
         checkArgument("indexName", indexName);
@@ -40,6 +41,13 @@ public class EventOriginContext {
         checkArgument("eventId", eventId);
 
         return String.join(":", ES_EVENT, indexName, eventId);
+    }
+
+    public static String mongodbAggregation(String collection, long fromTimeMillis, long toTimeMillis) {
+        checkArgument("collection", collection);
+
+        return String.join(":", MONGODB_AGGREGATION, collection,
+                String.valueOf(fromTimeMillis), String.valueOf(toTimeMillis));
     }
 
     public static Optional<ESEventOriginContext> parseESContext(String url) {
@@ -59,7 +67,7 @@ public class EventOriginContext {
     }
 
     @AutoValue
-    public static abstract class ESEventOriginContext {
+    public abstract static class ESEventOriginContext {
         public abstract String indexName();
 
         public abstract String messageId();
@@ -68,4 +76,5 @@ public class EventOriginContext {
             return new AutoValue_EventOriginContext_ESEventOriginContext(indexName, messageId);
         }
     }
+
 }
