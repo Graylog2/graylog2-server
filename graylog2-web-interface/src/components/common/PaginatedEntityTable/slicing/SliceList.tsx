@@ -16,7 +16,7 @@
  */
 
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { Badge, ListGroup, ListGroupItem } from 'components/bootstrap';
 

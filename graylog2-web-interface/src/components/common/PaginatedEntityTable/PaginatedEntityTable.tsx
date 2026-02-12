@@ -220,6 +220,8 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
                     setUrlQueryFilters={onChangeFilters}
                     filterValueRenderers={filterValueRenderers}
                     appSection={appSection}
+                    activeSliceCol={fetchOptions.sliceCol}
+                    activeSlice={fetchOptions.slice}
                   />
                 </div>
               </SearchForm>

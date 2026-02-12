@@ -16,6 +16,7 @@
  */
 
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { OrderedMap } from 'immutable';
 
 import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 import { defaultOnError } from 'util/conditional/onError';
@@ -40,10 +41,8 @@ const slicesToFilters = (searchParams: SearchParams) => {
   delete newSearchParams.sliceCol;
 
   if (searchParams.sliceCol && searchParams.slice) {
-    newSearchParams.filters = newSearchParams.filters.set(searchParams.sliceCol, [
-      ...(newSearchParams.filters[searchParams.sliceCol] ?? []),
-      searchParams.slice,
-    ]);
+    const filters = newSearchParams.filters ?? OrderedMap<string, Array<string>>();
+    newSearchParams.filters = filters.set(searchParams.sliceCol, [searchParams.slice]);
   }
 
   return newSearchParams;
