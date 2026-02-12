@@ -62,6 +62,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -140,9 +141,13 @@ public class PipelineInterpreter implements MessageProcessor {
             for (Message message : currentSet) {
                 final String msgId = message.getId();
 
-                // this makes a copy of the list, which is mutated later in updateStreamBlacklist
+                // this makes a copy of the stream IDs, which is mutated later in updateStreamBlacklist
                 // it serves as a worklist, to keep track of which <msg, stream> tuples need to be re-run again
-                final Set<String> initialStreamIds = message.getStreams().stream().map(Stream::getId).collect(Collectors.toSet());
+                final Set<Stream> currentStreams = message.getStreamsView();
+                final Set<String> initialStreamIds = new HashSet<>(currentStreams.size());
+                for (final Stream stream : currentStreams) {
+                    initialStreamIds.add(stream.getId());
+                }
 
                 final ImmutableSet<Pipeline> pipelinesToRun = selectPipelines(interpreterListener,
                         processingBlacklist,
@@ -192,7 +197,7 @@ public class PipelineInterpreter implements MessageProcessor {
                                           Message message,
                                           Set<String> initialStreamIds) {
         boolean addedStreams = false;
-        for (Stream stream : message.getStreams()) {
+        for (final Stream stream : message.getStreamsView()) {
             if (!initialStreamIds.remove(stream.getId())) {
                 addedStreams = true;
             } else {

@@ -81,21 +81,21 @@ public class PipelineMetadataUpdater {
         eventBus.register(this);
     }
 
-    public void handlePipelineChanges(PipelinesChangedEvent event, PipelineInterpreter.State state, PipelineResolver resolver, PipelineMetricRegistry metricRegistry) {
+    public void handlePipelineChanges(PipelinesChangedEvent event, PipelineInterpreter.State state) {
         deletePipelineEntries(event);
         deleteInputMentionsForPipelines(event);
         Set<PipelineDao> pipelineDaos = affectedPipelines(event);
-        handleUpdates(pipelineDaos, state, resolver, metricRegistry);
+        handleUpdates(pipelineDaos, state);
     }
 
-    public void handleConnectionChanges(PipelineConnectionsChangedEvent event, PipelineInterpreter.State state, PipelineResolver resolver, PipelineMetricRegistry metricRegistry) {
+    public void handleConnectionChanges(PipelineConnectionsChangedEvent event, PipelineInterpreter.State state) {
         Set<PipelineDao> pipelineDaos = affectedPipelines(event);
-        handleUpdates(pipelineDaos, state, resolver, metricRegistry);
+        handleUpdates(pipelineDaos, state);
     }
 
-    public void handleRuleChanges(RulesChangedEvent event, PipelineInterpreter.State state, PipelineResolver resolver, PipelineMetricRegistry metricRegistry) {
+    public void handleRuleChanges(RulesChangedEvent event, PipelineInterpreter.State state) {
         deleteInputMentionsForRules(event);
-        handleUpdates(affectedPipelines(event), state, resolver, metricRegistry);
+        handleUpdates(affectedPipelines(event), state);
     }
 
     /**
@@ -103,8 +103,8 @@ public class PipelineMetadataUpdater {
      * - remove the metadata record for that input
      * - pipelines that referenced that input need to be re-analyzed to potentially reset the has_input_references flag
      */
-    public void handleInputDeleted(InputDeletedEvent event, PipelineInterpreter.State state, PipelineResolver resolver, PipelineMetricRegistry metricRegistry) {
-        handleUpdates(affectedPipelines(event), state, resolver, metricRegistry);
+    public void handleInputDeleted(InputDeletedEvent event, PipelineInterpreter.State state) {
+        handleUpdates(affectedPipelines(event), state);
         inputsMetadataService.deleteInput(event.inputId());
     }
 
@@ -119,13 +119,10 @@ public class PipelineMetadataUpdater {
     }
 
     protected void handleUpdates(Set<PipelineDao> pipelineDaos,
-                               PipelineInterpreter.State state,
-                               PipelineResolver resolver,
-                               PipelineMetricRegistry metricRegistry) {
-        ImmutableMap<String, Pipeline> pipelines = affectedPipelinesAsMap(pipelineDaos, state);
-        ImmutableMap<String, Pipeline> functions = resolver.resolveFunctions(pipelines.values(), metricRegistry);
-        List<PipelineRulesMetadataDao> ruleRecords = new ArrayList<>();
-        Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions = pipelineAnalyzer.analyzePipelines(pipelines, functions, ruleRecords);
+                               PipelineInterpreter.State state) {
+        final ImmutableMap<String, Pipeline> pipelines = affectedPipelinesAsMap(pipelineDaos, state);
+        final List<PipelineRulesMetadataDao> ruleRecords = new ArrayList<>();
+        final Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions = pipelineAnalyzer.analyzePipelines(pipelines, ruleRecords);
 
         inputsMetadataService.save(inputMentions, true);
         pipelineMetadataService.save(ruleRecords, true);

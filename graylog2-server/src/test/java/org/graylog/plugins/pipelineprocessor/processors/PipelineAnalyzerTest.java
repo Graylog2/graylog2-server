@@ -18,8 +18,10 @@ package org.graylog.plugins.pipelineprocessor.processors;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSortedSet;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
+import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
@@ -82,7 +84,7 @@ class PipelineAnalyzerTest {
     @Test
     void empty() {
         Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> result = pipelineAnalyzer.analyzePipelines(
-                ImmutableMap.of(), ImmutableMap.of(), List.of()
+                ImmutableMap.of(), List.of()
         );
         assertTrue(result.isEmpty());
     }
@@ -92,7 +94,7 @@ class PipelineAnalyzerTest {
         Pipeline pipeline1 = testUtil.createPipelineWithRules("pipeline1", List.of(testUtil.ALWAYS_TRUE));
 
         Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> result = pipelineAnalyzer.analyzePipelines(
-                ImmutableMap.of(pipeline1.id(), pipeline1), ImmutableMap.of(pipeline1.id(), pipeline1), ruleRecords);
+                ImmutableMap.of(pipeline1.id(), pipeline1), ruleRecords);
 
         assertTrue(result.isEmpty());
         assertTrue(ruleRecords.stream().anyMatch(dao ->
@@ -106,7 +108,7 @@ class PipelineAnalyzerTest {
         Pipeline pipeline1 = testUtil.createPipelineWithRules("pipeline1", List.of(testUtil.REMOVE_FIELD));
 
         Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> result = pipelineAnalyzer.analyzePipelines(
-                ImmutableMap.of(pipeline1.id(), pipeline1), ImmutableMap.of(pipeline1.id(), pipeline1), ruleRecords);
+                ImmutableMap.of(pipeline1.id(), pipeline1), ruleRecords);
 
         assertTrue(result.isEmpty());
         assertTrue(ruleRecords.stream().anyMatch(dao ->
@@ -121,7 +123,7 @@ class PipelineAnalyzerTest {
         Pipeline pipeline1 = testUtil.createPipelineWithRules("pipeline1", List.of(testUtil.FROM_INPUT));
 
         Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> result = pipelineAnalyzer.analyzePipelines(
-                ImmutableMap.of(pipeline1.id(), pipeline1), ImmutableMap.of(pipeline1.id(), pipeline1), ruleRecords);
+                ImmutableMap.of(pipeline1.id(), pipeline1), ruleRecords);
 
         assertTrue(result.containsKey(INPUT_ID));
         Set<PipelineInputsMetadataDao.MentionedInEntry> mentions = result.get(INPUT_ID);
@@ -141,7 +143,7 @@ class PipelineAnalyzerTest {
         Pipeline pipeline1 = testUtil.createPipelineWithRules("pipeline1", List.of(testUtil.GL2_SOURCE_INPUT));
 
         Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> result = pipelineAnalyzer.analyzePipelines(
-                ImmutableMap.of(pipeline1.id(), pipeline1), ImmutableMap.of(pipeline1.id(), pipeline1), ruleRecords);
+                ImmutableMap.of(pipeline1.id(), pipeline1), ruleRecords);
 
         assertTrue(result.containsKey(INPUT_ID));
         Set<PipelineInputsMetadataDao.MentionedInEntry> mentions = result.get(INPUT_ID);
@@ -169,7 +171,7 @@ class PipelineAnalyzerTest {
         when(streamService.loadAllByTitle(STREAM3_TITLE)).thenReturn(List.of(stream3));
 
         pipelineAnalyzer.analyzePipelines(
-                ImmutableMap.of(pipeline1.id(), pipeline1), ImmutableMap.of(pipeline1.id(), pipeline1), ruleRecords);
+                ImmutableMap.of(pipeline1.id(), pipeline1), ruleRecords);
 
         assertTrue(ruleRecords.stream().anyMatch(dao ->
                 dao.pipelineId().equals(pipeline1.id())
@@ -187,7 +189,7 @@ class PipelineAnalyzerTest {
         Pipeline pipeline = createPipelineWithFailingRule();
 
         Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> result = pipelineAnalyzer.analyzePipelines(
-                ImmutableMap.of(pipeline.id(), pipeline), ImmutableMap.of(pipeline.id(), pipeline), ruleRecords);
+                ImmutableMap.of(pipeline.id(), pipeline), ruleRecords);
 
         Set<PipelineInputsMetadataDao.MentionedInEntry> mentions = result.get(INPUT_ID);
         assertTrue(mentions.stream().anyMatch(entry -> entry.ruleId().equals(FROM_INPUT_ID)));
@@ -199,6 +201,35 @@ class PipelineAnalyzerTest {
                 .orElseThrow();
 
         assertEquals(Set.of(FromInput.NAME), metadataDao.functions());
+    }
+
+    @Test
+    void stageWithNullRulesIsSkipped() {
+        // Build a pipeline with a stage where setRules() was never called (getRules() returns null).
+        // This can happen if a pipeline is parsed but not resolved.
+        final Stage unresolvedStage = Stage.builder()
+                .stage(0)
+                .match(Stage.Match.EITHER)
+                .ruleReferences(List.of("some-rule"))
+                .build();
+        // Intentionally NOT calling unresolvedStage.setRules(...)
+
+        final Pipeline pipeline = Pipeline.builder()
+                .id("pipeline-unresolved")
+                .name("unresolved-pipeline")
+                .stages(ImmutableSortedSet.of(unresolvedStage))
+                .build();
+
+        when(connectionsService.loadByPipelineId("pipeline-unresolved")).thenReturn(Set.of());
+
+        final Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> result = pipelineAnalyzer.analyzePipelines(
+                ImmutableMap.of(pipeline.id(), pipeline), ruleRecords);
+
+        assertTrue(result.isEmpty());
+        assertTrue(ruleRecords.stream().anyMatch(dao ->
+                dao.pipelineId().equals("pipeline-unresolved")
+                        && dao.rules().isEmpty()
+                        && dao.functions().isEmpty()));
     }
 
     private Pipeline createPipelineWithFailingRule() {

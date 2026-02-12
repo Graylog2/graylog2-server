@@ -115,7 +115,7 @@ public class ConfigurationStateUpdater {
     private PipelineInterpreter.State reloadAndSave(RulesChangedEvent event) {
         final PipelineInterpreter.State state = reloadAndSave();
         if (configuration.isLeader()) { // avoid duplicate work and possible inconsistencies
-            metadataUpdater.handleRuleChanges(event, state, pipelineResolver, pipelineMetricRegistry);
+            metadataUpdater.handleRuleChanges(event, state);
         }
         return state;
     }
@@ -123,7 +123,7 @@ public class ConfigurationStateUpdater {
     private PipelineInterpreter.State reloadAndSave(PipelinesChangedEvent event) {
         final PipelineInterpreter.State state = reloadAndSave();
         if (configuration.isLeader()) { // avoid duplicate work and possible inconsistencies
-            metadataUpdater.handlePipelineChanges(event, state, pipelineResolver, pipelineMetricRegistry);
+            metadataUpdater.handlePipelineChanges(event, state);
         }
         return state;
     }
@@ -131,7 +131,7 @@ public class ConfigurationStateUpdater {
     private PipelineInterpreter.State reloadAndSave(PipelineConnectionsChangedEvent event) {
         final PipelineInterpreter.State state = reloadAndSave();
         if (configuration.isLeader()) { // avoid duplicate work and possible inconsistencies
-            metadataUpdater.handleConnectionChanges(event, state, pipelineResolver, pipelineMetricRegistry);
+            metadataUpdater.handleConnectionChanges(event, state);
         }
         return state;
     }
@@ -139,7 +139,7 @@ public class ConfigurationStateUpdater {
     private PipelineInterpreter.State reloadAndSave(InputDeletedEvent event) {
         final PipelineInterpreter.State state = reloadAndSave();
         if (configuration.isLeader()) { // avoid duplicate work and possible inconsistencies
-            metadataUpdater.handleInputDeleted(event, state, pipelineResolver, pipelineMetricRegistry);
+            metadataUpdater.handleInputDeleted(event, state);
         }
         return state;
     }

@@ -771,6 +771,19 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     /**
+     * Get a read-only view of the streams this message is currently routed to.
+     * <p>
+     * Unlike {@link #getStreams()}, this does not create a copy. It returns an O(1) unmodifiable
+     * wrapper over the underlying set. The view reflects live changes to the stream assignments.
+     * Use this when you only need to iterate or check membership within a single-threaded context.
+     *
+     * @return an unmodifiable view of the current set of assigned streams
+     */
+    public Set<Stream> getStreamsView() {
+        return Collections.unmodifiableSet(this.streams);
+    }
+
+    /**
      * Assign the given stream to this message.
      *
      * @param stream the stream to route this message into
