@@ -103,3 +103,31 @@ export type CollectorStats = {
   total_fleets: number;
   total_sources: number;
 };
+
+export type IngestEndpointConfig = {
+  enabled: boolean;
+  hostname: string;
+  port: number;
+  input_id: string | null;
+};
+
+export type CollectorsConfig = {
+  opamp_ca_id: string | null;
+  token_signing_cert_id: string | null;
+  otlp_server_cert_id: string | null;
+  http: IngestEndpointConfig;
+  grpc: IngestEndpointConfig;
+};
+
+export type CollectorsConfigRequest = {
+  http: {
+    enabled: boolean;
+    hostname: string;
+    port: number;
+  };
+  grpc: {
+    enabled: boolean;
+    hostname: string;
+    port: number;
+  };
+};
