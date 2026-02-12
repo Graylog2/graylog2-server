@@ -29,12 +29,14 @@ import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
 import org.graylog.security.pki.PemUtils;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.cluster.ClusterId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
+import java.util.List;
 
 /**
  * Service for managing the OpAMP CA hierarchy and providing certificate accessors.
@@ -184,10 +186,11 @@ public class OpAmpCaService {
                     builder.createIntermediateCa(OPAMP_CA_CN, rootCa, OPAMP_CA_VALIDITY));
             final CertificateEntry tokenSigningCert = certificateService.save(
                     builder.createEndEntityCert(TOKEN_SIGNING_CN, opAmpCa, KeyUsage.digitalSignature, TOKEN_SIGNING_VALIDITY));
+            final List<String> otlpSans = getClusterIdSans();
             final CertificateEntry otlpServerCert = certificateService.save(
                     builder.createEndEntityCert(OTLP_SERVER_CN, opAmpCa,
                             KeyUsage.digitalSignature | KeyUsage.keyEncipherment,
-                            KeyPurposeId.id_kp_serverAuth, OTLP_SERVER_VALIDITY));
+                            KeyPurposeId.id_kp_serverAuth, OTLP_SERVER_VALIDITY, otlpSans));
 
             cachedHierarchy = new CaHierarchy(opAmpCa, tokenSigningCert, otlpServerCert);
             return cachedHierarchy;
@@ -204,6 +207,15 @@ public class OpAmpCaService {
         final CertificateEntry otlpServerCert = certificateService.findById(config.otlpServerCertId())
                 .orElseThrow(() -> new IllegalStateException("OTLP server cert not found: " + config.otlpServerCertId()));
         return new CaHierarchy(opAmpCa, tokenSigningCert, otlpServerCert);
+    }
+
+    private List<String> getClusterIdSans() {
+        final ClusterId clusterId = clusterConfigService.get(ClusterId.class);
+        if (clusterId != null && clusterId.clusterId() != null && !clusterId.clusterId().isEmpty()) {
+            return List.of(clusterId.clusterId());
+        }
+        LOG.warn("Cluster ID not available — OTLP server cert will have no DNS SAN");
+        return List.of();
     }
 
     public record CaHierarchy(CertificateEntry opAmpCa, CertificateEntry tokenSigningCert, CertificateEntry otlpServerCert) {}

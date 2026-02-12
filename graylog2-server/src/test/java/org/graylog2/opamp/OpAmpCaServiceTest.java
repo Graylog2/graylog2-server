@@ -33,6 +33,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.web.customization.CustomizationConfig;
@@ -145,6 +146,21 @@ class OpAmpCaServiceTest {
         final X509Certificate cert = PemUtils.parseCertificate(otlpServerCert.certificate());
 
         assertThat(cert.getSubjectX500Principal().getName()).contains("CN=Graylog OpAMP OTLP Server");
+    }
+
+    @Test
+    void otlpServerCert_hasClusterIdAsDnsSan() throws Exception {
+        final String testClusterId = "2209F727-F7E1-4123-9386-94FE3B354A07";
+        when(clusterConfigService.get(ClusterId.class)).thenReturn(ClusterId.create(testClusterId));
+        mockClusterConfigStorage();
+
+        final CertificateEntry otlpServerCert = opAmpCaService.getOtlpServerCert();
+        final X509Certificate cert = PemUtils.parseCertificate(otlpServerCert.certificate());
+
+        final var sans = cert.getSubjectAlternativeNames();
+        assertThat(sans).isNotNull();
+        // GeneralName type 2 = dNSName
+        assertThat(sans).anyMatch(entry -> (int) entry.get(0) == 2 && testClusterId.equals(entry.get(1)));
     }
 
     @Test
