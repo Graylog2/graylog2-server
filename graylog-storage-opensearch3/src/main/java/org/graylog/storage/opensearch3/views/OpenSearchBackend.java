@@ -298,7 +298,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                             })
                             .orElse(affectedIndices);
 
-                    Set<String> indices = affectedIndicesForSearchType.isEmpty() ? Collections.singleton("") : affectedIndicesForSearchType;
+                    Set<String> indices = affectedIndicesForSearchType.isEmpty() ? Collections.singleton("*") : affectedIndicesForSearchType;
                     final MutableSearchRequestBuilder searchRequest = searchTypeQueries.get(searchTypeId)
                             .copy()
                             .index(indices.stream().toList())
