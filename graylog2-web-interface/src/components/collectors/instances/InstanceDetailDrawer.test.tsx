@@ -24,22 +24,14 @@ import type { CollectorInstanceView, Source } from '../types';
 
 const mockInstance: CollectorInstanceView = {
   id: 'inst-1',
-  agent_id: 'agent-1',
   instance_uid: 'uid-1',
-  agent_description: {
-    identifying_attributes: [{ key: 'host.name', value: 'prod-web-01' }],
-    non_identifying_attributes: [
-      { key: 'os.type', value: 'linux' },
-      { key: 'os.description', value: 'Ubuntu 22.04' },
-    ],
-  },
-  remote_config_status: { last_remote_config_hash: 'abc123', status: 'APPLIED', error_message: null },
-  health: { healthy: true, start_time_unix_nano: 0, last_error: null },
   capabilities: 15,
   fleet_id: 'fleet-1',
-  first_seen: '2026-01-01T00:00:00Z',
+  enrolled_at: '2026-01-01T00:00:00Z',
   last_seen: new Date().toISOString(),
-  connection_type: 'WEBSOCKET',
+  certificate_fingerprint: 'aa:bb:cc',
+  identifying_attributes: { 'host.name': 'prod-web-01' },
+  non_identifying_attributes: { 'os.type': 'linux', 'os.description': 'Ubuntu 22.04' },
   hostname: 'prod-web-01',
   os: 'linux',
   version: '1.2.0',
@@ -83,19 +75,6 @@ describe('InstanceDetailDrawer', () => {
     );
 
     await screen.findByText('Online');
-  });
-
-  it('renders config status', async () => {
-    render(
-      <InstanceDetailDrawer
-        instance={mockInstance}
-        sources={mockSources}
-        fleetName="production"
-        onClose={jest.fn()}
-      />,
-    );
-
-    await screen.findByText('APPLIED');
   });
 
   it('renders active sources count', async () => {
