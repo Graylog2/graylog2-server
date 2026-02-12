@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.inputs.otel;
+package org.graylog.collectors.input;
 
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
@@ -59,12 +59,14 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.graylog.collectors.CollectorJournal;
+import org.graylog.collectors.input.transport.AgentCertAuthInterceptor;
+import org.graylog.collectors.input.transport.AgentCertChannelHandler;
+import org.graylog.collectors.input.transport.AgentCertTransportFilter;
+import org.graylog.collectors.input.transport.CollectorIngestHttpHandler;
+import org.graylog.collectors.input.transport.CollectorIngestLogsService;
 import org.graylog.inputs.grpc.RemoteAddressProviderInterceptor;
-import org.graylog.inputs.otel.transport.AgentCertAuthInterceptor;
-import org.graylog.inputs.otel.transport.AgentCertChannelHandler;
-import org.graylog.inputs.otel.transport.AgentCertTransportFilter;
-import org.graylog.inputs.otel.transport.OpAmpOTelHttpHandler;
-import org.graylog.inputs.otel.transport.OpAmpOTelLogsService;
+import org.graylog.inputs.otel.OTelJournalRecordFactory;
 import org.graylog.security.pki.Algorithm;
 import org.graylog.security.pki.CertificateBuilder;
 import org.graylog.security.pki.CertificateEntry;
@@ -103,6 +105,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -137,7 +140,7 @@ import static org.mockito.Mockito.verify;
  * infrastructure).
  */
 @ExtendWith(MockitoExtension.class)
-class OpAmpOTelMtlsIT {
+class CollectorIngestMtlsIT {
 
     private static final String AGENT_INSTANCE_UID = "test-agent-instance-123";
     private static final Duration CERT_VALIDITY = Duration.ofDays(1);
@@ -211,7 +214,7 @@ class OpAmpOTelMtlsIT {
 
         // Remove BC before converting to JDK format. JDK's SSL engine requires
         // EdECPrivateKey (not BC's BCEdDSAPrivateKey) for Ed25519 TLS operations.
-        // Only remove if we added it — other tests may depend on BC being present.
+        // Only remove if we added it -- other tests may depend on BC being present.
         if (!bcWasPresent) {
             Security.removeProvider("BC");
         }
@@ -288,7 +291,7 @@ class OpAmpOTelMtlsIT {
     }
 
     @Test
-    void grpcMtlsSetsAgentInstanceUidInJournalRecord() throws Exception {
+    void grpcMtlsSetsCollectorInstanceUidInJournalRecord() throws Exception {
         final int port = startGrpcServer();
         final ManagedChannel channel = createGrpcChannel(agentKey, agentCert, port);
 
@@ -299,9 +302,9 @@ class OpAmpOTelMtlsIT {
             final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
             verify(input).processRawMessage(captor.capture());
 
-            final OTelJournal.Record record = OTelJournal.Record.parseFrom(captor.getValue().getPayload());
-            assertThat(record.hasAgentInstanceUid()).isTrue();
-            assertThat(record.getAgentInstanceUid()).isEqualTo(AGENT_INSTANCE_UID);
+            final CollectorJournal.Record record = CollectorJournal.Record.parseFrom(captor.getValue().getPayload());
+            assertThat(record.hasCollectorInstanceUid()).isTrue();
+            assertThat(record.getCollectorInstanceUid()).isEqualTo(AGENT_INSTANCE_UID);
         } finally {
             channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
         }
@@ -327,8 +330,8 @@ class OpAmpOTelMtlsIT {
             // proving the entire chain from transport filter -> interceptor -> service worked
             final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
             verify(input).processRawMessage(captor.capture());
-            final OTelJournal.Record record = OTelJournal.Record.parseFrom(captor.getValue().getPayload());
-            assertThat(record.getAgentInstanceUid()).isEqualTo(AGENT_INSTANCE_UID);
+            final CollectorJournal.Record record = CollectorJournal.Record.parseFrom(captor.getValue().getPayload());
+            assertThat(record.getCollectorInstanceUid()).isEqualTo(AGENT_INSTANCE_UID);
         } finally {
             channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
         }
@@ -380,7 +383,7 @@ class OpAmpOTelMtlsIT {
     }
 
     @Test
-    void httpMtlsSetsAgentInstanceUidInJournalRecord() throws Exception {
+    void httpMtlsSetsCollectorInstanceUidInJournalRecord() throws Exception {
         final int port = startHttpServer();
         final HttpClient client = createHttpClient(agentKey, agentCert);
 
@@ -399,16 +402,16 @@ class OpAmpOTelMtlsIT {
         final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
         verify(input).processRawMessage(captor.capture());
 
-        final OTelJournal.Record record = OTelJournal.Record.parseFrom(captor.getValue().getPayload());
-        assertThat(record.hasAgentInstanceUid()).isTrue();
-        assertThat(record.getAgentInstanceUid()).isEqualTo(AGENT_INSTANCE_UID);
+        final CollectorJournal.Record record = CollectorJournal.Record.parseFrom(captor.getValue().getPayload());
+        assertThat(record.hasCollectorInstanceUid()).isTrue();
+        assertThat(record.getCollectorInstanceUid()).isEqualTo(AGENT_INSTANCE_UID);
     }
 
     @Test
     void httpSslHandshakeCompletionEventFiresBeforeHttpRequest() throws Exception {
         // This test verifies that SslHandshakeCompletionEvent fires before HTTP requests,
-        // allowing AgentCertChannelHandler to extract the CN before OpAmpOTelHttpHandler processes the request.
-        // If the handshake event did NOT fire, OpAmpOTelHttpHandler would return 401.
+        // allowing AgentCertChannelHandler to extract the CN before CollectorIngestHttpHandler processes the request.
+        // If the handshake event did NOT fire, CollectorIngestHttpHandler would return 401.
         final int port = startHttpServer();
         final HttpClient client = createHttpClient(agentKey, agentCert);
 
@@ -425,11 +428,11 @@ class OpAmpOTelMtlsIT {
         // 200 means the handler found the agent UID, proving the handshake event fired first
         assertThat(response.statusCode()).isEqualTo(200);
 
-        // Verify that agent_instance_uid was propagated all the way to the journal record
+        // Verify that collector_instance_uid was propagated all the way to the journal record
         final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
         verify(input).processRawMessage(captor.capture());
-        final OTelJournal.Record record = OTelJournal.Record.parseFrom(captor.getValue().getPayload());
-        assertThat(record.getAgentInstanceUid()).isEqualTo(AGENT_INSTANCE_UID);
+        final CollectorJournal.Record record = CollectorJournal.Record.parseFrom(captor.getValue().getPayload());
+        assertThat(record.getCollectorInstanceUid()).isEqualTo(AGENT_INSTANCE_UID);
     }
 
     // ----- Helper methods -----
@@ -466,7 +469,7 @@ class OpAmpOTelMtlsIT {
                 SslProvider.JDK
         ).build();
 
-        final OpAmpOTelLogsService logsService = new OpAmpOTelLogsService(
+        final CollectorIngestLogsService logsService = new CollectorIngestLogsService(
                 transport, input, new OTelJournalRecordFactory());
 
         grpcServer = NettyServerBuilder
@@ -519,7 +522,7 @@ class OpAmpOTelMtlsIT {
                         pipeline.addLast("agent-cert-handler", new AgentCertChannelHandler());
                         pipeline.addLast("http-codec", new HttpServerCodec());
                         pipeline.addLast("http-aggregator", new HttpObjectAggregator(1024 * 1024));
-                        pipeline.addLast("http-handler", new OpAmpOTelHttpHandler(journalRecordFactory, input));
+                        pipeline.addLast("http-handler", new CollectorIngestHttpHandler(journalRecordFactory, input));
                     }
                 });
 

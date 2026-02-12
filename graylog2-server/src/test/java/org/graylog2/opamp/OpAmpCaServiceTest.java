@@ -22,6 +22,7 @@ import io.netty.handler.ssl.SslContextBuilder;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
+import org.graylog.collectors.CollectorsConfig;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
@@ -31,7 +32,6 @@ import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
-import org.graylog2.opamp.config.OpAmpCaConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -42,14 +42,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.security.cert.X509Certificate;
 import java.util.Collections;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -83,12 +78,7 @@ class OpAmpCaServiceTest {
     }
 
     private void mockClusterConfigStorage() {
-        final AtomicReference<OpAmpCaConfig> storedConfig = new AtomicReference<>();
-        when(clusterConfigService.get(OpAmpCaConfig.class)).thenAnswer(inv -> storedConfig.get());
-        doAnswer(inv -> {
-            storedConfig.set(inv.getArgument(0));
-            return null;
-        }).when(clusterConfigService).write(any(OpAmpCaConfig.class));
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
     }
 
     @Test
@@ -111,9 +101,6 @@ class OpAmpCaServiceTest {
 
         // Verify all four certs were saved (root CA + opAmpCa + tokenSigning + otlpServer)
         assertThat(certificateService.findAll()).hasSize(4);
-
-        // Verify config was written
-        verify(clusterConfigService).write(any(OpAmpCaConfig.class));
     }
 
     @Test
@@ -127,8 +114,8 @@ class OpAmpCaServiceTest {
         assertThat(second.tokenSigningCert().id()).isEqualTo(first.tokenSigningCert().id());
         assertThat(second.otlpServerCert().id()).isEqualTo(first.otlpServerCert().id());
 
-        // Config was only written once (during first call)
-        verify(clusterConfigService, times(1)).write(any(OpAmpCaConfig.class));
+        // Verify all four certs were saved only once (root CA + opAmpCa + tokenSigning + otlpServer)
+        assertThat(certificateService.findAll()).hasSize(4);
     }
 
     @Test
@@ -171,37 +158,5 @@ class OpAmpCaServiceTest {
         final SslContext sslContext = builder.build();
         assertThat(sslContext).isNotNull();
         assertThat(sslContext.isServer()).isTrue();
-    }
-
-    @Test
-    void ensureInitialized_migratesPartialConfig() {
-        // Simulate a partial config (from before OTLP server cert existed)
-        // First, create a hierarchy without the OTLP server cert
-        final AtomicReference<OpAmpCaConfig> storedConfig = new AtomicReference<>();
-        when(clusterConfigService.get(OpAmpCaConfig.class)).thenAnswer(inv -> storedConfig.get());
-        doAnswer(inv -> {
-            storedConfig.set(inv.getArgument(0));
-            return null;
-        }).when(clusterConfigService).write(any(OpAmpCaConfig.class));
-
-        // Create the hierarchy (which creates all 4 certs)
-        final OpAmpCaService.CaHierarchy initial = opAmpCaService.ensureInitialized();
-
-        // Now simulate a partial config by clearing the otlpServerCertId
-        final OpAmpCaConfig partialConfig = new OpAmpCaConfig(
-                initial.opAmpCa().id(), initial.tokenSigningCert().id(), null);
-        storedConfig.set(partialConfig);
-
-        // Create a new service to test migration
-        final OpAmpCaService newService = new OpAmpCaService(certificateService, clusterConfigService);
-        final OpAmpCaService.CaHierarchy migrated = newService.ensureInitialized();
-
-        // OpAMP CA and token signing cert should be the same
-        assertThat(migrated.opAmpCa().id()).isEqualTo(initial.opAmpCa().id());
-        assertThat(migrated.tokenSigningCert().id()).isEqualTo(initial.tokenSigningCert().id());
-
-        // OTLP server cert should be newly created (different from initial)
-        assertThat(migrated.otlpServerCert()).isNotNull();
-        assertThat(migrated.otlpServerCert().id()).isNotNull();
     }
 }

@@ -16,7 +16,11 @@
  */
 package org.graylog2.opamp.rest;
 
+import jakarta.ws.rs.BadRequestException;
+import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.IngestEndpointConfig;
 import org.graylog2.opamp.enrollment.EnrollmentTokenService;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,6 +28,7 @@ import java.time.Duration;
 import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -33,15 +38,22 @@ class EnrollmentTokenResourceTest {
 
     private EnrollmentTokenResource resource;
     private EnrollmentTokenService enrollmentTokenService;
+    private ClusterConfigService clusterConfigService;
 
     @BeforeEach
     void setUp() {
         enrollmentTokenService = mock(EnrollmentTokenService.class);
-        resource = new EnrollmentTokenResource(enrollmentTokenService);
+        clusterConfigService = mock(ClusterConfigService.class);
+        resource = new EnrollmentTokenResource(enrollmentTokenService, clusterConfigService);
     }
 
     @Test
     void createTokenDelegatesToService() {
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(
+                new CollectorsConfig("ca-id", "token-id", "otlp-id",
+                        new IngestEndpointConfig(true, "host", 14401, "input-1"),
+                        new IngestEndpointConfig(false, "host", 14402, null)));
+
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
                 "test-fleet",
                 Duration.ofDays(1)
@@ -57,5 +69,19 @@ class EnrollmentTokenResourceTest {
 
         assertThat(response).isEqualTo(expectedResponse);
         verify(enrollmentTokenService).createToken(request);
+    }
+
+    @Test
+    void createTokenThrowsWhenCollectorsNotConfigured() {
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+
+        final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
+                "test-fleet",
+                Duration.ofDays(1)
+        );
+
+        assertThatThrownBy(() -> resource.createToken(request))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Collectors must be configured");
     }
 }

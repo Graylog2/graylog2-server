@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package org.graylog.collectors;
+
+option java_package = "org.graylog.collectors";
+option java_outer_classname = "CollectorJournal";
+
+import "otel-raw-journal-record.proto";
+
+message Record {
+  org.graylog.inputs.otel.Record otel_record = 1;
+  optional string collector_instance_uid = 2;
+}

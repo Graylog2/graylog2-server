@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.inputs.otel.transport;
+package org.graylog.collectors.input.transport;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.protobuf.AbstractMessageLite;
@@ -25,6 +25,7 @@ import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse;
 import io.opentelemetry.proto.collector.logs.v1.LogsServiceGrpc;
 import jakarta.inject.Inject;
+import org.graylog.collectors.CollectorJournal;
 import org.graylog.inputs.otel.OTelJournalRecordFactory;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
@@ -42,12 +43,12 @@ import static org.graylog.inputs.grpc.GrpcUtils.createThrottledStatusRuntimeExce
 import static org.graylog.inputs.grpc.RemoteAddressProviderInterceptor.REMOTE_ADDRESS;
 
 /**
- * A gRPC logs service for OpAMP-managed agents that extracts the agent instance UID
+ * A gRPC logs service for collector-managed agents that extracts the agent instance UID
  * from the gRPC {@link Context} (set by {@link AgentCertAuthInterceptor}) and embeds it
  * in each journal record before writing to the Graylog journal.
  */
-public class OpAmpOTelLogsService extends LogsServiceGrpc.LogsServiceImplBase {
-    private static final Logger LOG = LoggerFactory.getLogger(OpAmpOTelLogsService.class);
+public class CollectorIngestLogsService extends LogsServiceGrpc.LogsServiceImplBase {
+    private static final Logger LOG = LoggerFactory.getLogger(CollectorIngestLogsService.class);
 
     // TODO: Replace with proper per-agent ingest metrics. Needs a cardinality-bounded
     //  approach (e.g., aggregated by fleet, fixed-size ring buffer, periodic batch writes
@@ -59,7 +60,7 @@ public class OpAmpOTelLogsService extends LogsServiceGrpc.LogsServiceImplBase {
     private final MessageInput input;
 
     @Inject
-    public OpAmpOTelLogsService(@Assisted ThrottleableTransport2 transport,
+    public CollectorIngestLogsService(@Assisted ThrottleableTransport2 transport,
                                 @Assisted MessageInput input,
                                 OTelJournalRecordFactory journalRecordFactory) {
         this.transport = transport;
@@ -68,7 +69,7 @@ public class OpAmpOTelLogsService extends LogsServiceGrpc.LogsServiceImplBase {
     }
 
     public interface Factory {
-        OpAmpOTelLogsService create(ThrottleableTransport2 transport, MessageInput input);
+        CollectorIngestLogsService create(ThrottleableTransport2 transport, MessageInput input);
     }
 
     @Override
@@ -104,11 +105,13 @@ public class OpAmpOTelLogsService extends LogsServiceGrpc.LogsServiceImplBase {
         }
 
         journalRecordFactory.createFromRequest(request).stream()
-                .map(record -> {
+                .map(otelRecord -> {
+                    final var builder = CollectorJournal.Record.newBuilder()
+                            .setOtelRecord(otelRecord);
                     if (instanceUid != null) {
-                        return record.toBuilder().setAgentInstanceUid(instanceUid).build();
+                        builder.setCollectorInstanceUid(instanceUid);
                     }
-                    return record;
+                    return builder.build();
                 })
                 .map(AbstractMessageLite::toByteArray)
                 .map(createRawMessage)

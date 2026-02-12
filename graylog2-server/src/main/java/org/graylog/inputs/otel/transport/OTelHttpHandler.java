@@ -44,9 +44,9 @@ import java.util.function.Function;
 public class OTelHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     private static final Logger LOG = LoggerFactory.getLogger(OTelHttpHandler.class);
 
-    static final String LOGS_PATH = "/v1/logs";
-    static final String PROTOBUF_CONTENT_TYPE = "application/x-protobuf";
-    static final String JSON_CONTENT_TYPE = "application/json";
+    public static final String LOGS_PATH = "/v1/logs";
+    public static final String PROTOBUF_CONTENT_TYPE = "application/x-protobuf";
+    public static final String JSON_CONTENT_TYPE = "application/json";
 
     private final OTelJournalRecordFactory journalRecordFactory;
     private final MessageInput input;

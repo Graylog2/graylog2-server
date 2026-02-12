@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.inputs.otel.transport;
+package org.graylog.collectors.input.transport;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.util.JsonFormat;
@@ -33,7 +33,7 @@ import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import io.opentelemetry.proto.logs.v1.ResourceLogs;
 import io.opentelemetry.proto.logs.v1.ScopeLogs;
-import org.graylog.inputs.otel.OTelJournal;
+import org.graylog.collectors.CollectorJournal;
 import org.graylog.inputs.otel.OTelJournalRecordFactory;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
@@ -53,7 +53,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
-class OpAmpOTelHttpHandlerTest {
+class CollectorIngestHttpHandlerTest {
 
     @Mock
     private MessageInput input;
@@ -112,7 +112,7 @@ class OpAmpOTelHttpHandlerTest {
     }
 
     @Test
-    void agentInstanceUidIsEmbeddedInJournalRecord() throws Exception {
+    void collectorInstanceUidIsEmbeddedInJournalRecord() throws Exception {
         final String agentUid = "agent-uid-42";
         final EmbeddedChannel channel = createChannel(agentUid);
         final ExportLogsServiceRequest request = createTestRequest();
@@ -129,9 +129,9 @@ class OpAmpOTelHttpHandlerTest {
         verify(input, times(1)).processRawMessage(captor.capture());
 
         final RawMessage rawMessage = captor.getValue();
-        final OTelJournal.Record record = OTelJournal.Record.parseFrom(rawMessage.getPayload());
-        assertThat(record.hasAgentInstanceUid()).isTrue();
-        assertThat(record.getAgentInstanceUid()).isEqualTo(agentUid);
+        final CollectorJournal.Record record = CollectorJournal.Record.parseFrom(rawMessage.getPayload());
+        assertThat(record.hasCollectorInstanceUid()).isTrue();
+        assertThat(record.getCollectorInstanceUid()).isEqualTo(agentUid);
 
         final FullHttpResponse response = channel.readOutbound();
         response.release();
@@ -159,11 +159,11 @@ class OpAmpOTelHttpHandlerTest {
         final String responseJson = response.content().toString(StandardCharsets.UTF_8);
         assertThat(responseJson).contains("partialSuccess");
 
-        // Verify agent UID was embedded
+        // Verify collector instance UID was embedded
         final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
         verify(input, times(1)).processRawMessage(captor.capture());
-        final OTelJournal.Record record = OTelJournal.Record.parseFrom(captor.getValue().getPayload());
-        assertThat(record.getAgentInstanceUid()).isEqualTo(agentUid);
+        final CollectorJournal.Record record = CollectorJournal.Record.parseFrom(captor.getValue().getPayload());
+        assertThat(record.getCollectorInstanceUid()).isEqualTo(agentUid);
 
         response.release();
     }
@@ -221,7 +221,7 @@ class OpAmpOTelHttpHandlerTest {
     }
 
     @Test
-    void multipleLogRecordsEachGetAgentUid() throws Exception {
+    void multipleLogRecordsEachGetCollectorInstanceUid() throws Exception {
         final String agentUid = "multi-agent-001";
         final EmbeddedChannel channel = createChannel(agentUid);
 
@@ -248,8 +248,8 @@ class OpAmpOTelHttpHandlerTest {
         verify(input, times(2)).processRawMessage(captor.capture());
 
         for (final RawMessage rawMessage : captor.getAllValues()) {
-            final OTelJournal.Record record = OTelJournal.Record.parseFrom(rawMessage.getPayload());
-            assertThat(record.getAgentInstanceUid()).isEqualTo(agentUid);
+            final CollectorJournal.Record record = CollectorJournal.Record.parseFrom(rawMessage.getPayload());
+            assertThat(record.getCollectorInstanceUid()).isEqualTo(agentUid);
         }
 
         final FullHttpResponse response = channel.readOutbound();
@@ -258,7 +258,7 @@ class OpAmpOTelHttpHandlerTest {
 
     private EmbeddedChannel createChannel(String agentInstanceUid) {
         final EmbeddedChannel channel = new EmbeddedChannel(
-                new OpAmpOTelHttpHandler(journalRecordFactory, input));
+                new CollectorIngestHttpHandler(journalRecordFactory, input));
         if (agentInstanceUid != null) {
             channel.attr(AgentCertChannelHandler.AGENT_INSTANCE_UID).set(agentInstanceUid);
         }

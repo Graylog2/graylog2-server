@@ -16,12 +16,28 @@
  */
 package org.graylog.collectors;
 
+import com.google.inject.assistedinject.FactoryModuleBuilder;
+import org.graylog.collectors.input.CollectorIngestCodec;
+import org.graylog.collectors.input.CollectorIngestGrpcInput;
+import org.graylog.collectors.input.CollectorIngestHttpInput;
+import org.graylog.collectors.input.transport.CollectorIngestGrpcTransport;
+import org.graylog.collectors.input.transport.CollectorIngestHttpTransport;
+import org.graylog.collectors.input.transport.CollectorIngestLogsService;
 import org.graylog.collectors.rest.CollectorInstancesResource;
 import org.graylog2.plugin.PluginModule;
 
 public class CollectorsModule extends PluginModule {
     @Override
     protected void configure() {
+        addMessageInput(CollectorIngestGrpcInput.class);
+        addMessageInput(CollectorIngestHttpInput.class);
+        addTransport(CollectorIngestGrpcTransport.NAME, CollectorIngestGrpcTransport.class);
+        addTransport(CollectorIngestHttpTransport.NAME, CollectorIngestHttpTransport.class);
+        addCodec(CollectorIngestCodec.NAME, CollectorIngestCodec.class);
+
+        install(new FactoryModuleBuilder().build(CollectorIngestLogsService.Factory.class));
+
+        addRestResource(CollectorsConfigResource.class);
         addSystemRestResource(CollectorInstancesResource.class);
     }
 }

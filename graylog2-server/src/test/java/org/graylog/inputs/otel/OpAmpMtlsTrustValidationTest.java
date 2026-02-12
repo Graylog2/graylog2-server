@@ -53,7 +53,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * Tests that the OpAMP CA hierarchy produces Ed25519 certificates whose trust chain
  * can be validated by JDK's PKIX trust manager during a real TLS handshake.
  * <p>
- * Unlike {@link OpAmpOTelMtlsIT} (which uses {@code InsecureTrustManagerFactory} and
+ * Unlike {@link org.graylog.collectors.input.CollectorIngestMtlsIT} (which uses {@code InsecureTrustManagerFactory} and
  * focuses on mTLS handshake mechanics), this test exercises <b>actual PKIX chain
  * validation</b>: the server's trust manager is configured with only the OpAMP CA
  * (intermediate) certificate, and it must validate the agent's end-entity certificate.

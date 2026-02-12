@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.inputs.otel.transport;
+package org.graylog.collectors.input.transport;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -23,12 +23,15 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.EventLoopGroup;
 import io.netty.handler.ssl.SslContext;
 import jakarta.inject.Named;
+import org.graylog.collectors.CollectorsConfig;
 import org.graylog.inputs.otel.OTelJournalRecordFactory;
+import org.graylog.inputs.otel.transport.OTelHttpTransport;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.opamp.OpAmpCaService;
 import org.graylog2.plugin.LocalMetricRegistry;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -39,26 +42,28 @@ import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.graylog2.utilities.IpSubnet;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
 /**
- * An HTTP transport for OpAMP-managed agents that auto-configures Ed25519 mTLS
+ * An HTTP transport for collector-managed agents that auto-configures Ed25519 mTLS
  * using the OpAMP CA hierarchy. Overrides the TLS handler to use certificates from
  * {@link OpAmpCaService} and adds {@link AgentCertChannelHandler} to extract the
  * agent identity from the client certificate on each connection.
  * <p>
- * The HTTP handler is replaced with {@link OpAmpOTelHttpHandler} which enforces
+ * The HTTP handler is replaced with {@link CollectorIngestHttpHandler} which enforces
  * agent identity presence and embeds the agent instance UID in journal records.
  */
-public class OpAmpOTelHttpTransport extends OTelHttpTransport {
-    public static final String NAME = "OpAmpHttpTransport";
+public class CollectorIngestHttpTransport extends OTelHttpTransport {
+    public static final String NAME = "CollectorIngestHttpTransport";
+    static final int DEFAULT_HTTP_PORT = 14401;
 
     private final OpAmpCaService opAmpCaService;
     private final OTelJournalRecordFactory journalRecordFactory;
 
     @AssistedInject
-    public OpAmpOTelHttpTransport(@Assisted Configuration configuration,
+    public CollectorIngestHttpTransport(@Assisted Configuration configuration,
                                    EventLoopGroup eventLoopGroup,
                                    EventLoopGroupFactory eventLoopGroupFactory,
                                    NettyTransportConfiguration nettyTransportConfiguration,
@@ -67,11 +72,28 @@ public class OpAmpOTelHttpTransport extends OTelHttpTransport {
                                    TLSProtocolsConfiguration tlsConfiguration,
                                    @Named("trusted_proxies") Set<IpSubnet> trustedProxies,
                                    OTelJournalRecordFactory journalRecordFactory,
-                                   OpAmpCaService opAmpCaService) {
-        super(configuration, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration,
-                throughputCounter, localMetricRegistry, tlsConfiguration, trustedProxies, journalRecordFactory);
+                                   OpAmpCaService opAmpCaService,
+                                   ClusterConfigService clusterConfigService) {
+        super(buildTransportConfig(clusterConfigService), eventLoopGroup, eventLoopGroupFactory,
+                nettyTransportConfiguration, throughputCounter, localMetricRegistry,
+                tlsConfiguration, trustedProxies, journalRecordFactory);
         this.opAmpCaService = opAmpCaService;
         this.journalRecordFactory = journalRecordFactory;
+    }
+
+    private static Configuration buildTransportConfig(ClusterConfigService clusterConfigService) {
+        final var config = clusterConfigService.get(CollectorsConfig.class);
+        final int port = (config != null && config.http() != null) ? config.http().port() : DEFAULT_HTTP_PORT;
+        return new Configuration(Map.of(
+                "bind_address", "0.0.0.0",
+                "port", port,
+                "tls_enable", true,
+                "max_chunk_size", 4 * 1024 * 1024,
+                "recv_buffer_size", 1048576,
+                "number_worker_threads", 4,
+                "tcp_keepalive", false,
+                "idle_writer_timeout", 60
+        ));
     }
 
     @Override
@@ -93,38 +115,26 @@ public class OpAmpOTelHttpTransport extends OTelHttpTransport {
         // Add all parent custom handlers (HTTP decoder, decompressor, encoder, aggregator, etc.)
         handlers.putAll(super.getCustomChildChannelHandlers(input));
 
-        // Replace the http-handler with the OpAMP variant that enforces agent identity
-        handlers.replace("http-handler", () -> new OpAmpOTelHttpHandler(journalRecordFactory, input));
+        // Replace the http-handler with the collector ingest variant that enforces agent identity
+        handlers.replace("http-handler", () -> new CollectorIngestHttpHandler(journalRecordFactory, input));
 
         return handlers;
     }
 
     @FactoryClass
-    public interface Factory extends Transport.Factory<OpAmpOTelHttpTransport> {
+    public interface Factory extends Transport.Factory<CollectorIngestHttpTransport> {
         @Override
-        OpAmpOTelHttpTransport create(Configuration configuration);
+        CollectorIngestHttpTransport create(Configuration configuration);
 
         @Override
-        OpAmpOTelHttpTransport.Config getConfig();
+        CollectorIngestHttpTransport.Config getConfig();
     }
 
     @ConfigClass
     public static class Config extends OTelHttpTransport.Config {
-        private static final Set<String> KEPT_FIELDS = Set.of(
-                "bind_address", "port", "recv_buffer_size", "number_worker_threads",
-                "tcp_keepalive", "max_chunk_size", "idle_writer_timeout"
-        );
-
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
-            final ConfigurationRequest parent = super.getRequestedConfiguration();
-            final ConfigurationRequest r = new ConfigurationRequest();
-            parent.getFields().forEach((key, field) -> {
-                if (KEPT_FIELDS.contains(key)) {
-                    r.addField(field);
-                }
-            });
-            return r;
+            return new ConfigurationRequest();
         }
     }
 }

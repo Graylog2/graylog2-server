@@ -14,10 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.inputs.otel.codec;
+package org.graylog.collectors.input;
 
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
+import org.graylog.collectors.CollectorJournal;
 import org.graylog.inputs.otel.OTelJournal;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
@@ -35,14 +36,14 @@ import java.net.InetSocketAddress;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class OpAmpOTelCodecTest {
+class CollectorIngestCodecTest {
 
     private final MessageFactory messageFactory = new TestMessageFactory();
-    private OpAmpOTelCodec codec;
+    private CollectorIngestCodec codec;
 
     @BeforeEach
     void setUp() {
-        codec = new OpAmpOTelCodec(Configuration.EMPTY_CONFIGURATION, messageFactory);
+        codec = new CollectorIngestCodec(Configuration.EMPTY_CONFIGURATION, messageFactory);
     }
 
     @Test
@@ -56,11 +57,15 @@ class OpAmpOTelCodecTest {
                 .setLogRecord(logRecord)
                 .build();
 
-        final var record = OTelJournal.Record.newBuilder()
+        final var otelRecord = OTelJournal.Record.newBuilder()
                 .setLog(log)
                 .build();
 
-        final var rawMessage = new RawMessage(record.toByteArray());
+        final var collectorRecord = CollectorJournal.Record.newBuilder()
+                .setOtelRecord(otelRecord)
+                .build();
+
+        final var rawMessage = new RawMessage(collectorRecord.toByteArray());
         final var decoded = codec.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
@@ -79,11 +84,15 @@ class OpAmpOTelCodecTest {
                 .setLogRecord(logRecord)
                 .build();
 
-        final var record = OTelJournal.Record.newBuilder()
+        final var otelRecord = OTelJournal.Record.newBuilder()
                 .setLog(log)
                 .build();
 
-        final var rawMessage = new RawMessage(record.toByteArray());
+        final var collectorRecord = CollectorJournal.Record.newBuilder()
+                .setOtelRecord(otelRecord)
+                .build();
+
+        final var rawMessage = new RawMessage(collectorRecord.toByteArray());
         final var decoded = codec.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
@@ -102,11 +111,15 @@ class OpAmpOTelCodecTest {
                 .setLogRecord(logRecord)
                 .build();
 
-        final var record = OTelJournal.Record.newBuilder()
+        final var otelRecord = OTelJournal.Record.newBuilder()
                 .setLog(log)
                 .build();
 
-        final var rawMessage = new RawMessage(record.toByteArray());
+        final var collectorRecord = CollectorJournal.Record.newBuilder()
+                .setOtelRecord(otelRecord)
+                .build();
+
+        final var rawMessage = new RawMessage(collectorRecord.toByteArray());
         final var decoded = codec.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
@@ -126,11 +139,15 @@ class OpAmpOTelCodecTest {
                 .setLogRecord(logRecord)
                 .build();
 
-        final var record = OTelJournal.Record.newBuilder()
+        final var otelRecord = OTelJournal.Record.newBuilder()
                 .setLog(log)
                 .build();
 
-        final var rawMessage = new RawMessage(record.toByteArray());
+        final var collectorRecord = CollectorJournal.Record.newBuilder()
+                .setOtelRecord(otelRecord)
+                .build();
+
+        final var rawMessage = new RawMessage(collectorRecord.toByteArray());
         final var decoded = codec.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
@@ -149,11 +166,15 @@ class OpAmpOTelCodecTest {
                 .setLogRecord(logRecord)
                 .build();
 
-        final var record = OTelJournal.Record.newBuilder()
+        final var otelRecord = OTelJournal.Record.newBuilder()
                 .setLog(log)
                 .build();
 
-        final var rawMessage = new RawMessage(record.toByteArray());
+        final var collectorRecord = CollectorJournal.Record.newBuilder()
+                .setOtelRecord(otelRecord)
+                .build();
+
+        final var rawMessage = new RawMessage(collectorRecord.toByteArray());
         final var decoded = codec.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
@@ -164,7 +185,7 @@ class OpAmpOTelCodecTest {
     }
 
     @Test
-    void handlesAgentInstanceUidWhenPresent() {
+    void doesNotMapCollectorInstanceUidToMessageField() {
         final var logRecord = LogRecord.newBuilder()
                 .setBody(AnyValue.newBuilder().setStringValue("agent log"))
                 .setTimeUnixNano(1700000000000000000L)
@@ -174,20 +195,25 @@ class OpAmpOTelCodecTest {
                 .setLogRecord(logRecord)
                 .build();
 
-        final var record = OTelJournal.Record.newBuilder()
+        final var otelRecord = OTelJournal.Record.newBuilder()
                 .setLog(log)
-                .setAgentInstanceUid("agent-123")
                 .build();
 
-        final var rawMessage = new RawMessage(record.toByteArray());
+        final var collectorRecord = CollectorJournal.Record.newBuilder()
+                .setOtelRecord(otelRecord)
+                .setCollectorInstanceUid("agent-123")
+                .build();
+
+        final var rawMessage = new RawMessage(collectorRecord.toByteArray());
         final var decoded = codec.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
-        assertThat(decoded.get().getField("agent_instance_uid")).isEqualTo("agent-123");
+        assertThat(decoded.get().getField("collector_instance_uid")).isNull();
+        assertThat(decoded.get().getField("agent_instance_uid")).isNull();
     }
 
     @Test
-    void handlesMissingAgentInstanceUidGracefully() {
+    void handlesMissingCollectorInstanceUidGracefully() {
         final var logRecord = LogRecord.newBuilder()
                 .setBody(AnyValue.newBuilder().setStringValue("no agent uid"))
                 .setTimeUnixNano(1700000000000000000L)
@@ -197,22 +223,31 @@ class OpAmpOTelCodecTest {
                 .setLogRecord(logRecord)
                 .build();
 
-        final var record = OTelJournal.Record.newBuilder()
+        final var otelRecord = OTelJournal.Record.newBuilder()
                 .setLog(log)
                 .build();
 
-        final var rawMessage = new RawMessage(record.toByteArray());
+        final var collectorRecord = CollectorJournal.Record.newBuilder()
+                .setOtelRecord(otelRecord)
+                .build();
+
+        final var rawMessage = new RawMessage(collectorRecord.toByteArray());
         final var decoded = codec.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
+        assertThat(decoded.get().getField("collector_instance_uid")).isNull();
         assertThat(decoded.get().getField("agent_instance_uid")).isNull();
     }
 
     @Test
     void missingPayloadThrowsInputProcessingException() {
-        final var record = OTelJournal.Record.newBuilder().build();
+        final var otelRecord = OTelJournal.Record.newBuilder().build();
 
-        final var rawMessage = new RawMessage(record.toByteArray());
+        final var collectorRecord = CollectorJournal.Record.newBuilder()
+                .setOtelRecord(otelRecord)
+                .build();
+
+        final var rawMessage = new RawMessage(collectorRecord.toByteArray());
 
         assertThatThrownBy(() -> codec.decodeSafe(rawMessage))
                 .isInstanceOf(InputProcessingException.class)
@@ -230,11 +265,15 @@ class OpAmpOTelCodecTest {
                 .setLogRecord(logRecord)
                 .build();
 
-        final var record = OTelJournal.Record.newBuilder()
+        final var otelRecord = OTelJournal.Record.newBuilder()
                 .setLog(log)
                 .build();
 
-        final var rawMessage = new RawMessage(record.toByteArray(),
+        final var collectorRecord = CollectorJournal.Record.newBuilder()
+                .setOtelRecord(otelRecord)
+                .build();
+
+        final var rawMessage = new RawMessage(collectorRecord.toByteArray(),
                 new InetSocketAddress(Inet4Address.getLoopbackAddress(), 12345));
         final var decoded = codec.decodeSafe(rawMessage);
 

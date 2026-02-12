@@ -29,11 +29,13 @@ import opamp.proto.Opamp.OpAMPConnectionSettings;
 import opamp.proto.Opamp.ServerErrorResponse;
 import opamp.proto.Opamp.ServerToAgent;
 import opamp.proto.Opamp.TLSCertificate;
+import org.graylog.collectors.CollectorsConfig;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
 import org.graylog.security.pki.PemUtils;
 import org.graylog2.opamp.enrollment.EnrollmentTokenService;
 import org.graylog.collectors.CollectorInstanceService;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.CollectorInstanceReport;
@@ -55,6 +57,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 import static java.util.stream.Collectors.toCollection;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Singleton
 public class OpAmpService {
@@ -64,16 +67,19 @@ public class OpAmpService {
     private final OpAmpCaService opAmpCaService;
     private final CertificateService certificateService;
     private final CollectorInstanceService collectorInstanceService;
+    private final ClusterConfigService clusterConfigService;
 
     @Inject
     public OpAmpService(EnrollmentTokenService enrollmentTokenService,
                         OpAmpCaService opAmpCaService,
                         CertificateService certificateService,
-                        CollectorInstanceService collectorInstanceService) {
+                        CollectorInstanceService collectorInstanceService,
+                        ClusterConfigService clusterConfigService) {
         this.enrollmentTokenService = enrollmentTokenService;
         this.opAmpCaService = opAmpCaService;
         this.certificateService = certificateService;
         this.collectorInstanceService = collectorInstanceService;
+        this.clusterConfigService = clusterConfigService;
     }
 
     public Optional<OpAmpAuthContext> authenticate(String authHeader, OpAmpAuthContext.Transport transport) {
@@ -173,18 +179,53 @@ public class OpAmpService {
                     fingerprint, certPem, enrollmentCa.id(), Instant.now());
             LOG.info("[{}/{}] Enrolled collector in fleet {}", enroll.instanceUid(), enroll.messageSeqNum(), enroll.fleetId());
 
-            // 5. Return certificate
+            // 5. Return certificate and connection settings
+            final var connectionSettingsBuilder = ConnectionSettingsOffers.newBuilder()
+                    .setOpamp(OpAMPConnectionSettings.newBuilder()
+                            .setHeartbeatIntervalSeconds(30)
+                            .setCertificate(TLSCertificate.newBuilder()
+                                    .setCert(ByteString.copyFromUtf8(certPem))));
+
+            // Add OTLP connection settings from CollectorsConfig
+            final var collectorsConfig = clusterConfigService.get(CollectorsConfig.class);
+            if (collectorsConfig != null) {
+                addOtlpConnectionSettings(connectionSettingsBuilder, collectorsConfig);
+            }
+
             return ServerToAgent.newBuilder()
                     .setInstanceUid(message.getInstanceUid())
-                    .setConnectionSettings(ConnectionSettingsOffers.newBuilder()
-                            .setOpamp(OpAMPConnectionSettings.newBuilder()
-                                    .setHeartbeatIntervalSeconds(30)
-                                    .setCertificate(TLSCertificate.newBuilder()
-                                            .setCert(ByteString.copyFromUtf8(certPem)))))
+                    .setConnectionSettings(connectionSettingsBuilder)
                     .build();
         } catch (Exception e) {
             LOG.error("Enrollment failed for collector {}", instanceUid, e);
             return errorResponse(message, "Enrollment failed: " + e.getMessage());
+        }
+    }
+
+    private void addOtlpConnectionSettings(ConnectionSettingsOffers.Builder builder,
+                                              CollectorsConfig config) {
+        try {
+            final CertificateEntry opAmpCa = opAmpCaService.getOpAmpCa();
+            final String caPem = opAmpCa.certificate();
+
+            if (config.http() != null && config.http().enabled()) {
+                builder.putOtherConnections("otlp-http",
+                        Opamp.OtherConnectionSettings.newBuilder()
+                                .setDestinationEndpoint(f("https://%s:%d", config.http().hostname(), config.http().port()))
+                                .setCertificate(TLSCertificate.newBuilder()
+                                        .setCaCert(ByteString.copyFromUtf8(caPem)))
+                                .build());
+            }
+            if (config.grpc() != null && config.grpc().enabled()) {
+                builder.putOtherConnections("otlp-grpc",
+                        Opamp.OtherConnectionSettings.newBuilder()
+                                .setDestinationEndpoint(f("https://%s:%d", config.grpc().hostname(), config.grpc().port()))
+                                .setCertificate(TLSCertificate.newBuilder()
+                                        .setCaCert(ByteString.copyFromUtf8(caPem)))
+                                .build());
+            }
+        } catch (Exception e) {
+            LOG.warn("Failed to add OTLP connection settings to enrollment response", e);
         }
     }
 

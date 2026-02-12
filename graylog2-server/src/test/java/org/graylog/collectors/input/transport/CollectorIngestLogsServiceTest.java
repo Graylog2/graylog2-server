@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.inputs.otel.transport;
+package org.graylog.collectors.input.transport;
 
 import com.google.common.io.Resources;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -23,8 +23,8 @@ import io.grpc.Context;
 import io.grpc.stub.StreamObserver;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse;
+import org.graylog.collectors.CollectorJournal;
 import org.graylog.inputs.otel.OTelGrpcInput;
-import org.graylog.inputs.otel.OTelJournal;
 import org.graylog.inputs.otel.OTelJournalRecordFactory;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
@@ -44,7 +44,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class OpAmpOTelLogsServiceTest {
+class CollectorIngestLogsServiceTest {
 
     @Mock
     private ThrottleableTransport2 transport;
@@ -53,15 +53,15 @@ class OpAmpOTelLogsServiceTest {
     @Mock
     private StreamObserver<ExportLogsServiceResponse> responseObserver;
 
-    private OpAmpOTelLogsService logsService;
+    private CollectorIngestLogsService logsService;
 
     @BeforeEach
     void setUp() {
-        logsService = new OpAmpOTelLogsService(transport, input, new OTelJournalRecordFactory());
+        logsService = new CollectorIngestLogsService(transport, input, new OTelJournalRecordFactory());
     }
 
     @Test
-    void exportSetsAgentInstanceUidWhenPresentInContext() throws IOException {
+    void exportSetsCollectorInstanceUidWhenPresentInContext() throws IOException {
         final var request = buildLogsRequest();
         final String expectedUid = "test-agent-uid-123";
 
@@ -71,16 +71,16 @@ class OpAmpOTelLogsServiceTest {
         final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
         verify(input).processRawMessage(captor.capture());
 
-        final OTelJournal.Record record = parseJournalRecord(captor.getValue().getPayload());
-        assertThat(record.hasAgentInstanceUid()).isTrue();
-        assertThat(record.getAgentInstanceUid()).isEqualTo(expectedUid);
+        final CollectorJournal.Record record = parseCollectorJournalRecord(captor.getValue().getPayload());
+        assertThat(record.hasCollectorInstanceUid()).isTrue();
+        assertThat(record.getCollectorInstanceUid()).isEqualTo(expectedUid);
 
         verify(responseObserver).onNext(eq(ExportLogsServiceResponse.newBuilder().build()));
         verify(responseObserver).onCompleted();
     }
 
     @Test
-    void exportDoesNotSetAgentInstanceUidWhenAbsentFromContext() throws IOException {
+    void exportDoesNotSetCollectorInstanceUidWhenAbsentFromContext() throws IOException {
         final var request = buildLogsRequest();
 
         // Run without setting AGENT_INSTANCE_UID in context
@@ -89,8 +89,8 @@ class OpAmpOTelLogsServiceTest {
         final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
         verify(input).processRawMessage(captor.capture());
 
-        final OTelJournal.Record record = parseJournalRecord(captor.getValue().getPayload());
-        assertThat(record.hasAgentInstanceUid()).isFalse();
+        final CollectorJournal.Record record = parseCollectorJournalRecord(captor.getValue().getPayload());
+        assertThat(record.hasCollectorInstanceUid()).isFalse();
 
         verify(responseObserver).onNext(eq(ExportLogsServiceResponse.newBuilder().build()));
         verify(responseObserver).onCompleted();
@@ -104,9 +104,9 @@ class OpAmpOTelLogsServiceTest {
         return requestBuilder.build();
     }
 
-    private OTelJournal.Record parseJournalRecord(byte[] payload) {
+    private CollectorJournal.Record parseCollectorJournalRecord(byte[] payload) {
         try {
-            return OTelJournal.Record.parseFrom(payload);
+            return CollectorJournal.Record.parseFrom(payload);
         } catch (InvalidProtocolBufferException e) {
             throw new RuntimeException(e);
         }

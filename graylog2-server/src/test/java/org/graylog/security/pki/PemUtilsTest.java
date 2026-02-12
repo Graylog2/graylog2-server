@@ -20,6 +20,7 @@ import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
@@ -102,10 +103,10 @@ class PemUtilsTest {
         // (BC includes the public key, JDK does not).
         final var sig = java.security.Signature.getInstance("Ed25519");
         sig.initSign(parsedKey);
-        sig.update("test".getBytes());
+        sig.update("test".getBytes(StandardCharsets.UTF_8));
         final byte[] signature = sig.sign();
         sig.initVerify(keyPair.getPublic());
-        sig.update("test".getBytes());
+        sig.update("test".getBytes(StandardCharsets.UTF_8));
         assertThat(sig.verify(signature)).isTrue();
     }
 

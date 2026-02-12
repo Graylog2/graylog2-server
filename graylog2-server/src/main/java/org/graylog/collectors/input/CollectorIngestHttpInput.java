@@ -14,13 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.inputs.otel;
+package org.graylog.collectors.input;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
-import org.graylog.inputs.otel.codec.OpAmpOTelCodec;
-import org.graylog.inputs.otel.transport.OpAmpOTelGrpcTransport;
+import org.graylog.collectors.input.transport.CollectorIngestHttpTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
@@ -28,31 +27,42 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 
-public class OpAmpOTelGrpcInput extends MessageInput {
-    public static final String NAME = "OpAMP OpenTelemetry (gRPC)";
+/**
+ * An HTTP input for OpAMP-managed agents that auto-configures Ed25519 mTLS from the
+ * OpAMP CA hierarchy. TLS is always enabled — the configuration is forced at construction
+ * time so that the parent transport adds the TLS handler to the Netty pipeline.
+ */
+public class CollectorIngestHttpInput extends MessageInput {
+    public static final String NAME = "Collector Ingest (HTTP)";
 
     @Inject
-    public OpAmpOTelGrpcInput(MetricRegistry metricRegistry,
+    public CollectorIngestHttpInput(MetricRegistry metricRegistry,
                               @Assisted Configuration configuration,
-                              OpAmpOTelGrpcTransport transport,
+                              CollectorIngestHttpTransport.Factory transportFactory,
                               LocalMetricRegistry localRegistry,
-                              OpAmpOTelCodec codec,
+                              CollectorIngestCodec.Factory codecFactory,
                               Config config,
                               Descriptor descriptor,
                               ServerStatus serverStatus) {
-        super(metricRegistry, configuration, transport, localRegistry, codec, config, descriptor, serverStatus);
+        super(metricRegistry, configuration, transportFactory.create(configuration),
+                localRegistry, codecFactory.create(configuration), config, descriptor, serverStatus);
+    }
+
+    @Override
+    public Boolean isGlobal() {
+        return true;
     }
 
     @FactoryClass
-    public interface Factory extends MessageInput.Factory<OpAmpOTelGrpcInput> {
+    public interface Factory extends MessageInput.Factory<CollectorIngestHttpInput> {
         @Override
-        OpAmpOTelGrpcInput create(Configuration configuration);
+        CollectorIngestHttpInput create(Configuration configuration);
 
         @Override
-        OpAmpOTelGrpcInput.Config getConfig();
+        CollectorIngestHttpInput.Config getConfig();
 
         @Override
-        OpAmpOTelGrpcInput.Descriptor getDescriptor();
+        CollectorIngestHttpInput.Descriptor getDescriptor();
     }
 
     public static class Descriptor extends MessageInput.Descriptor {
@@ -63,9 +73,8 @@ public class OpAmpOTelGrpcInput extends MessageInput {
 
     @ConfigClass
     public static class Config extends MessageInput.Config {
-
         @Inject
-        public Config(OpAmpOTelGrpcTransport.Factory transport, OpAmpOTelCodec.Factory codec) {
+        public Config(CollectorIngestHttpTransport.Factory transport, CollectorIngestCodec.Factory codec) {
             super(transport.getConfig(), codec.getConfig());
         }
     }

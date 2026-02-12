@@ -20,6 +20,7 @@ import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.security.pki.CertificateService;
 import org.graylog2.opamp.enrollment.EnrollmentTokenService;
 import org.graylog2.opamp.transport.OpAmpAuthContext;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,13 +52,13 @@ class OpAmpServiceTest {
     private OpAmpCaService opAmpCaService;
 
     @Mock
-    private OpAmpAgentService agentService;
-
-    @Mock
     private CertificateService certificateService;
 
     @Mock
     private CollectorInstanceService collectorInstanceService;
+
+    @Mock
+    private ClusterConfigService clusterConfigService;
 
     private OpAmpService opAmpService;
 
@@ -65,7 +66,7 @@ class OpAmpServiceTest {
 
     @BeforeEach
     void setUp() {
-        opAmpService = new OpAmpService(enrollmentTokenService, opAmpCaService, certificateService, collectorInstanceService);
+        opAmpService = new OpAmpService(enrollmentTokenService, opAmpCaService, certificateService, collectorInstanceService, clusterConfigService);
     }
 
     @Test

@@ -14,13 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.inputs.otel;
+package org.graylog.collectors.input;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
-import org.graylog.inputs.otel.codec.OpAmpOTelCodec;
-import org.graylog.inputs.otel.transport.OpAmpOTelHttpTransport;
+import org.graylog.collectors.input.transport.CollectorIngestGrpcTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
@@ -28,47 +27,36 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 
-/**
- * An HTTP input for OpAMP-managed agents that auto-configures Ed25519 mTLS from the
- * OpAMP CA hierarchy. TLS is always enabled — the configuration is forced at construction
- * time so that the parent transport adds the TLS handler to the Netty pipeline.
- */
-public class OpAmpOTelHttpInput extends MessageInput {
-    public static final String NAME = "OpAMP OpenTelemetry (HTTP)";
+public class CollectorIngestGrpcInput extends MessageInput {
+    public static final String NAME = "Collector Ingest (gRPC)";
 
     @Inject
-    public OpAmpOTelHttpInput(MetricRegistry metricRegistry,
+    public CollectorIngestGrpcInput(MetricRegistry metricRegistry,
                               @Assisted Configuration configuration,
-                              OpAmpOTelHttpTransport.Factory transportFactory,
+                              CollectorIngestGrpcTransport transport,
                               LocalMetricRegistry localRegistry,
-                              OpAmpOTelCodec.Factory codecFactory,
+                              CollectorIngestCodec codec,
                               Config config,
                               Descriptor descriptor,
                               ServerStatus serverStatus) {
-        super(metricRegistry, configuration, transportFactory.create(forceTls(configuration)),
-                localRegistry, codecFactory.create(configuration), config, descriptor, serverStatus);
+        super(metricRegistry, configuration, transport, localRegistry, codec, config, descriptor, serverStatus);
     }
 
-    /**
-     * Forces TLS to be enabled so the parent transport adds the TLS handler to the Netty pipeline.
-     * The actual TLS configuration (certificates, keys) is provided by {@link org.graylog2.opamp.OpAmpCaService}
-     * rather than from user-supplied configuration fields.
-     */
-    private static Configuration forceTls(Configuration configuration) {
-        configuration.setBoolean("tls_enable", true);
-        return configuration;
+    @Override
+    public Boolean isGlobal() {
+        return true;
     }
 
     @FactoryClass
-    public interface Factory extends MessageInput.Factory<OpAmpOTelHttpInput> {
+    public interface Factory extends MessageInput.Factory<CollectorIngestGrpcInput> {
         @Override
-        OpAmpOTelHttpInput create(Configuration configuration);
+        CollectorIngestGrpcInput create(Configuration configuration);
 
         @Override
-        OpAmpOTelHttpInput.Config getConfig();
+        CollectorIngestGrpcInput.Config getConfig();
 
         @Override
-        OpAmpOTelHttpInput.Descriptor getDescriptor();
+        CollectorIngestGrpcInput.Descriptor getDescriptor();
     }
 
     public static class Descriptor extends MessageInput.Descriptor {
@@ -80,7 +68,7 @@ public class OpAmpOTelHttpInput extends MessageInput {
     @ConfigClass
     public static class Config extends MessageInput.Config {
         @Inject
-        public Config(OpAmpOTelHttpTransport.Factory transport, OpAmpOTelCodec.Factory codec) {
+        public Config(CollectorIngestGrpcTransport.Factory transport, CollectorIngestCodec.Factory codec) {
             super(transport.getConfig(), codec.getConfig());
         }
     }

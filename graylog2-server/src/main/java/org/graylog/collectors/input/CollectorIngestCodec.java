@@ -14,13 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.inputs.otel.codec;
+package org.graylog.collectors.input;
 
 import com.google.common.net.InetAddresses;
 import com.google.inject.assistedinject.Assisted;
 import com.google.protobuf.InvalidProtocolBufferException;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
+import org.graylog.collectors.CollectorJournal;
 import org.graylog.inputs.otel.OTelJournal;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
@@ -41,25 +42,25 @@ import org.joda.time.DateTimeZone;
 import java.util.Optional;
 
 /**
- * A codec for OpAMP OTLP inputs that produces minimal field mapping (no {@code otel_*} prefixed fields).
- * Extracts body as message, timestamp, severityText as level, and agent_instance_uid from the journal record.
+ * A codec for Collector Ingest inputs that produces minimal field mapping (no {@code otel_*} prefixed fields).
+ * Extracts body as message, timestamp, and severityText as level from the journal record.
  */
-public class OpAmpOTelCodec implements Codec {
-    public static final String NAME = "OpAmpOpenTelemetry";
+public class CollectorIngestCodec implements Codec {
+    public static final String NAME = "CollectorIngest";
 
     private final Configuration configuration;
     private final MessageFactory messageFactory;
 
     @Inject
-    public OpAmpOTelCodec(@Assisted Configuration configuration, MessageFactory messageFactory) {
+    public CollectorIngestCodec(@Assisted Configuration configuration, MessageFactory messageFactory) {
         this.configuration = configuration;
         this.messageFactory = messageFactory;
     }
 
     @FactoryClass
-    public interface Factory extends AbstractCodec.Factory<OpAmpOTelCodec> {
+    public interface Factory extends AbstractCodec.Factory<CollectorIngestCodec> {
         @Override
-        OpAmpOTelCodec create(Configuration configuration);
+        CollectorIngestCodec create(Configuration configuration);
 
         @Override
         Codec.Config getConfig();
@@ -73,26 +74,25 @@ public class OpAmpOTelCodec implements Codec {
 
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
-            final ConfigurationRequest cr = new ConfigurationRequest();
-            cr.addField(super.getRequestedConfiguration().getField(CK_OVERRIDE_SOURCE));
-            return cr;
+            return new ConfigurationRequest();
         }
     }
 
     @Override
     public Optional<Message> decodeSafe(@Nonnull RawMessage rawMessage) {
-        final OTelJournal.Record journalRecord;
+        final CollectorJournal.Record collectorRecord;
         try {
-            journalRecord = OTelJournal.Record.parseFrom(rawMessage.getPayload());
+            collectorRecord = CollectorJournal.Record.parseFrom(rawMessage.getPayload());
         } catch (InvalidProtocolBufferException e) {
             throw InputProcessingException.create(
-                    "Error parsing OpAMP OpenTelemetry message", ExceptionUtils.getRootCause(e), rawMessage);
+                    "Error parsing Collector Ingest message", ExceptionUtils.getRootCause(e), rawMessage);
         }
 
-        return switch (journalRecord.getPayloadCase()) {
-            case LOG -> decodeLog(journalRecord, rawMessage);
+        final OTelJournal.Record otelRecord = collectorRecord.getOtelRecord();
+        return switch (otelRecord.getPayloadCase()) {
+            case LOG -> decodeLog(otelRecord, rawMessage);
             case PAYLOAD_NOT_SET -> throw InputProcessingException.create(
-                    "Error handling OpAMP OpenTelemetry message. No payload set.", rawMessage);
+                    "Error handling Collector Ingest message. No payload set.", rawMessage);
         };
     }
 
@@ -108,10 +108,6 @@ public class OpAmpOTelCodec implements Codec {
 
         if (!logRecord.getSeverityText().isEmpty()) {
             message.addField("level", logRecord.getSeverityText());
-        }
-
-        if (record.hasAgentInstanceUid()) {
-            message.addField("agent_instance_uid", record.getAgentInstanceUid());
         }
 
         return Optional.of(message);

@@ -13,7 +13,6 @@ message Record {
   oneof payload {
     Log log = 1;
   }
-  optional string agent_instance_uid = 2;
 }
 
 message Log {

@@ -27,6 +27,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.graylog.collectors.CollectorInstanceService;
+import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.security.pki.CertificateEntry;
@@ -37,9 +38,7 @@ import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
-import org.graylog2.opamp.OpAmpAgentService;
 import org.graylog2.opamp.OpAmpCaService;
-import org.graylog2.opamp.config.OpAmpCaConfig;
 import org.graylog2.opamp.rest.CreateEnrollmentTokenRequest;
 import org.graylog2.opamp.rest.EnrollmentTokenResponse;
 import org.graylog2.opamp.transport.OpAmpAuthContext;
@@ -64,16 +63,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.within;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -111,18 +105,13 @@ class EnrollmentTokenServiceTest {
                 .thenReturn(ClusterId.create(TEST_CLUSTER_ID));
         collectorInstanceService = new CollectorInstanceService(mongoCollections);
         opAmpCaService = new OpAmpCaService(certificateService, clusterConfigService);
-        enrollmentTokenService = new EnrollmentTokenService(certificateService, clusterConfigService, agentService, opAmpCaService);
+        enrollmentTokenService = new EnrollmentTokenService(certificateService, clusterConfigService, collectorInstanceService, opAmpCaService);
     }
 
     @Test
     void getTokenSigningCertCreatesHierarchyOnFirstCall() {
-        // Mock ClusterConfigService to track written config
-        final AtomicReference<OpAmpCaConfig> storedConfig = new AtomicReference<>();
-        when(clusterConfigService.get(OpAmpCaConfig.class)).thenAnswer(inv -> storedConfig.get());
-        doAnswer(inv -> {
-            storedConfig.set(inv.getArgument(0));
-            return null;
-        }).when(clusterConfigService).write(any(OpAmpCaConfig.class));
+        // No existing CollectorsConfig - service will create certs and cache in memory
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
 
         final CertificateEntry cert = enrollmentTokenService.getTokenSigningCert();
 
@@ -133,43 +122,27 @@ class EnrollmentTokenServiceTest {
 
         // Token signing cert should have issuer chain (enrollment CA + root CA)
         assertThat(cert.issuerChain()).hasSize(2);
-
-        // Verify config was written
-        verify(clusterConfigService).write(any(OpAmpCaConfig.class));
     }
 
     @Test
     void getTokenSigningCertUsesExistingConfigOnSubsequentCalls() {
-        // Mock ClusterConfigService to track written config
-        final AtomicReference<OpAmpCaConfig> storedConfig = new AtomicReference<>();
-        when(clusterConfigService.get(OpAmpCaConfig.class)).thenAnswer(inv -> storedConfig.get());
-        doAnswer(inv -> {
-            storedConfig.set(inv.getArgument(0));
-            return null;
-        }).when(clusterConfigService).write(any(OpAmpCaConfig.class));
+        // No existing CollectorsConfig - service will create certs and cache in memory
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
 
         // First call - no config, creates hierarchy
         final CertificateEntry firstCert = enrollmentTokenService.getTokenSigningCert();
 
-        // Second call - config exists, should return same cert
+        // Second call - cached hierarchy, should return same cert
         final CertificateEntry secondCert = enrollmentTokenService.getTokenSigningCert();
 
         assertThat(secondCert.id()).isEqualTo(firstCert.id());
         assertThat(secondCert.fingerprint()).isEqualTo(firstCert.fingerprint());
-
-        // Config was only written once (during first call)
-        verify(clusterConfigService, times(1)).write(any(OpAmpCaConfig.class));
     }
 
     @Test
     void getEnrollmentCaCreatesHierarchyOnFirstCall() {
-        // Mock ClusterConfigService to track written config
-        final AtomicReference<OpAmpCaConfig> storedConfig = new AtomicReference<>();
-        when(clusterConfigService.get(OpAmpCaConfig.class)).thenAnswer(inv -> storedConfig.get());
-        doAnswer(inv -> {
-            storedConfig.set(inv.getArgument(0));
-            return null;
-        }).when(clusterConfigService).write(any(OpAmpCaConfig.class));
+        // No existing CollectorsConfig - service will create certs and cache in memory
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
 
         final CertificateEntry cert = enrollmentTokenService.getEnrollmentCa();
 
@@ -179,43 +152,27 @@ class EnrollmentTokenServiceTest {
 
         // Enrollment CA should have issuer chain (root CA only)
         assertThat(cert.issuerChain()).hasSize(1);
-
-        // Verify config was written
-        verify(clusterConfigService).write(any(OpAmpCaConfig.class));
     }
 
     @Test
     void getEnrollmentCaUsesExistingConfigOnSubsequentCalls() {
-        // Mock ClusterConfigService to track written config
-        final AtomicReference<OpAmpCaConfig> storedConfig = new AtomicReference<>();
-        when(clusterConfigService.get(OpAmpCaConfig.class)).thenAnswer(inv -> storedConfig.get());
-        doAnswer(inv -> {
-            storedConfig.set(inv.getArgument(0));
-            return null;
-        }).when(clusterConfigService).write(any(OpAmpCaConfig.class));
+        // No existing CollectorsConfig - service will create certs and cache in memory
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
 
         // First call - no config, creates hierarchy
         final CertificateEntry firstCert = enrollmentTokenService.getEnrollmentCa();
 
-        // Second call - config exists, should return same cert
+        // Second call - cached hierarchy, should return same cert
         final CertificateEntry secondCert = enrollmentTokenService.getEnrollmentCa();
 
         assertThat(secondCert.id()).isEqualTo(firstCert.id());
         assertThat(secondCert.fingerprint()).isEqualTo(firstCert.fingerprint());
-
-        // Config was only written once (during first call)
-        verify(clusterConfigService, times(1)).write(any(OpAmpCaConfig.class));
     }
 
     @Test
     void createTokenReturnsValidJwt() throws Exception {
-        // Mock ClusterConfigService to track written config
-        final AtomicReference<OpAmpCaConfig> storedConfig = new AtomicReference<>();
-        when(clusterConfigService.get(OpAmpCaConfig.class)).thenAnswer(inv -> storedConfig.get());
-        doAnswer(inv -> {
-            storedConfig.set(inv.getArgument(0));
-            return null;
-        }).when(clusterConfigService).write(any(OpAmpCaConfig.class));
+        // No existing CollectorsConfig - service will create certs and cache in memory
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
 
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
                 "test-fleet",
@@ -246,12 +203,8 @@ class EnrollmentTokenServiceTest {
 
     @Test
     void createTokenUsesDefaultExpiryWhenNotSpecified() throws Exception {
-        final AtomicReference<OpAmpCaConfig> storedConfig = new AtomicReference<>();
-        when(clusterConfigService.get(OpAmpCaConfig.class)).thenAnswer(inv -> storedConfig.get());
-        doAnswer(inv -> {
-            storedConfig.set(inv.getArgument(0));
-            return null;
-        }).when(clusterConfigService).write(any(OpAmpCaConfig.class));
+        // No existing CollectorsConfig - service will create certs and cache in memory
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
 
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest("default-fleet", null);
 
@@ -264,12 +217,8 @@ class EnrollmentTokenServiceTest {
 
     @Test
     void createTokenRejectsExpiryBeyondCertValidity() {
-        final AtomicReference<OpAmpCaConfig> storedConfig = new AtomicReference<>();
-        when(clusterConfigService.get(OpAmpCaConfig.class)).thenAnswer(inv -> storedConfig.get());
-        doAnswer(inv -> {
-            storedConfig.set(inv.getArgument(0));
-            return null;
-        }).when(clusterConfigService).write(any(OpAmpCaConfig.class));
+        // No existing CollectorsConfig - service will create certs and cache in memory
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
 
         // Token signing cert is valid for 2 years, so 3 years should fail
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
@@ -284,12 +233,8 @@ class EnrollmentTokenServiceTest {
 
     @Test
     void validateTokenReturnsEnrollmentForValidToken() throws Exception {
-        final AtomicReference<OpAmpCaConfig> storedConfig = new AtomicReference<>();
-        when(clusterConfigService.get(OpAmpCaConfig.class)).thenAnswer(inv -> storedConfig.get());
-        doAnswer(inv -> {
-            storedConfig.set(inv.getArgument(0));
-            return null;
-        }).when(clusterConfigService).write(any(OpAmpCaConfig.class));
+        // No existing CollectorsConfig - service will create certs and cache in memory
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
 
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
                 "test-fleet",
@@ -308,12 +253,8 @@ class EnrollmentTokenServiceTest {
 
     @Test
     void validateTokenReturnsEmptyForExpiredToken() throws Exception {
-        final AtomicReference<OpAmpCaConfig> storedConfig = new AtomicReference<>();
-        when(clusterConfigService.get(OpAmpCaConfig.class)).thenAnswer(inv -> storedConfig.get());
-        doAnswer(inv -> {
-            storedConfig.set(inv.getArgument(0));
-            return null;
-        }).when(clusterConfigService).write(any(OpAmpCaConfig.class));
+        // No existing CollectorsConfig - service will create certs and cache in memory
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
 
         // Create token that expires in 1 second
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
@@ -333,12 +274,8 @@ class EnrollmentTokenServiceTest {
 
     @Test
     void validateTokenReturnsEmptyForWrongClusterId() throws Exception {
-        final AtomicReference<OpAmpCaConfig> storedConfig = new AtomicReference<>();
-        when(clusterConfigService.get(OpAmpCaConfig.class)).thenAnswer(inv -> storedConfig.get());
-        doAnswer(inv -> {
-            storedConfig.set(inv.getArgument(0));
-            return null;
-        }).when(clusterConfigService).write(any(OpAmpCaConfig.class));
+        // No existing CollectorsConfig - service will create certs and cache in memory
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
 
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
                 "test-fleet",
@@ -358,12 +295,8 @@ class EnrollmentTokenServiceTest {
 
     @Test
     void validateTokenReturnsEmptyForInvalidSignature() throws Exception {
-        final AtomicReference<OpAmpCaConfig> storedConfig = new AtomicReference<>();
-        when(clusterConfigService.get(OpAmpCaConfig.class)).thenAnswer(inv -> storedConfig.get());
-        doAnswer(inv -> {
-            storedConfig.set(inv.getArgument(0));
-            return null;
-        }).when(clusterConfigService).write(any(OpAmpCaConfig.class));
+        // No existing CollectorsConfig - service will create certs and cache in memory
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
 
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
                 "test-fleet",
@@ -382,12 +315,8 @@ class EnrollmentTokenServiceTest {
 
     @Test
     void createTokenIncludesCttHeader() throws Exception {
-        final AtomicReference<OpAmpCaConfig> storedConfig = new AtomicReference<>();
-        when(clusterConfigService.get(OpAmpCaConfig.class)).thenAnswer(inv -> storedConfig.get());
-        doAnswer(inv -> {
-            storedConfig.set(inv.getArgument(0));
-            return null;
-        }).when(clusterConfigService).write(any(OpAmpCaConfig.class));
+        // No existing CollectorsConfig - service will create certs and cache in memory
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
 
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest("test-fleet", Duration.ofDays(1));
         final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request);
@@ -401,12 +330,8 @@ class EnrollmentTokenServiceTest {
 
     @Test
     void validateTokenReturnsEmptyForUnknownKid() throws Exception {
-        final AtomicReference<OpAmpCaConfig> storedConfig = new AtomicReference<>();
-        when(clusterConfigService.get(OpAmpCaConfig.class)).thenAnswer(inv -> storedConfig.get());
-        doAnswer(inv -> {
-            storedConfig.set(inv.getArgument(0));
-            return null;
-        }).when(clusterConfigService).write(any(OpAmpCaConfig.class));
+        // No existing CollectorsConfig - service will create certs and cache in memory
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
 
         // Create a valid token structure but with unknown kid
         // This is a token with header {"alg":"EdDSA","kid":"sha256:unknown"}
@@ -420,12 +345,8 @@ class EnrollmentTokenServiceTest {
 
     @Test
     void validateAgentTokenReturnsIdentifiedForValidToken() throws Exception {
-        final AtomicReference<OpAmpCaConfig> storedConfig = new AtomicReference<>();
-        when(clusterConfigService.get(OpAmpCaConfig.class)).thenAnswer(inv -> storedConfig.get());
-        doAnswer(inv -> {
-            storedConfig.set(inv.getArgument(0));
-            return null;
-        }).when(clusterConfigService).write(any(OpAmpCaConfig.class));
+        // No existing CollectorsConfig - service will create certs and cache in memory
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
 
         // Create CA hierarchy
         final CertificateEntry enrollmentCa = enrollmentTokenService.getEnrollmentCa();
@@ -472,12 +393,8 @@ class EnrollmentTokenServiceTest {
 
     @Test
     void validateAgentTokenReturnsEmptyForUnknownFingerprint() throws Exception {
-        final AtomicReference<OpAmpCaConfig> storedConfig = new AtomicReference<>();
-        when(clusterConfigService.get(OpAmpCaConfig.class)).thenAnswer(inv -> storedConfig.get());
-        doAnswer(inv -> {
-            storedConfig.set(inv.getArgument(0));
-            return null;
-        }).when(clusterConfigService).write(any(OpAmpCaConfig.class));
+        // No existing CollectorsConfig - service will create certs and cache in memory
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
 
         // Generate agent key pair (not enrolled)
         final KeyPair agentKeyPair = KeyPairGenerator.getInstance("EC").generateKeyPair();
@@ -528,12 +445,8 @@ class EnrollmentTokenServiceTest {
 
     @Test
     void validateAgentTokenReturnsEmptyForInvalidSignature() throws Exception {
-        final AtomicReference<OpAmpCaConfig> storedConfig = new AtomicReference<>();
-        when(clusterConfigService.get(OpAmpCaConfig.class)).thenAnswer(inv -> storedConfig.get());
-        doAnswer(inv -> {
-            storedConfig.set(inv.getArgument(0));
-            return null;
-        }).when(clusterConfigService).write(any(OpAmpCaConfig.class));
+        // No existing CollectorsConfig - service will create certs and cache in memory
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
 
         // Create CA hierarchy
         final CertificateEntry enrollmentCa = enrollmentTokenService.getEnrollmentCa();

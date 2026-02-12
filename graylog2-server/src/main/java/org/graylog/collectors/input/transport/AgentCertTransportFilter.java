@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.inputs.otel.transport;
+package org.graylog.collectors.input.transport;
 
 import io.grpc.Attributes;
 import io.grpc.Grpc;

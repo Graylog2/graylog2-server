@@ -23,11 +23,11 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.KeyUsage;
+import org.graylog.collectors.CollectorsConfig;
 import org.graylog.security.pki.Algorithm;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
 import org.graylog.security.pki.PemUtils;
-import org.graylog2.opamp.config.OpAmpCaConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,9 +47,9 @@ import java.time.Duration;
  *   <li>OTLP Server cert (end-entity, 2 years) - TLS server certificate for OTLP ingest endpoint</li>
  * </ul>
  * <p>
- * The hierarchy is created on-demand when first accessed. If an older config exists
- * (without the OTLP server cert), the service migrates forward by adding only the
- * missing certificate.
+ * The hierarchy is created on-demand when first accessed via {@link #ensureInitialized()}.
+ * Certificate IDs are persisted in {@link CollectorsConfig} by the caller
+ * ({@link org.graylog.collectors.CollectorsConfigResource}).
  */
 @Singleton
 public class OpAmpCaService {
@@ -68,6 +68,8 @@ public class OpAmpCaService {
     private final CertificateService certificateService;
     private final ClusterConfigService clusterConfigService;
 
+    private volatile CaHierarchy cachedHierarchy;
+
     @Inject
     public OpAmpCaService(CertificateService certificateService,
                           ClusterConfigService clusterConfigService) {
@@ -77,8 +79,6 @@ public class OpAmpCaService {
 
     /**
      * Returns the OpAMP CA certificate for signing agent CSRs.
-     * <p>
-     * Creates the CA hierarchy on first call if it doesn't exist.
      *
      * @return the OpAMP CA certificate entry
      */
@@ -88,8 +88,6 @@ public class OpAmpCaService {
 
     /**
      * Returns the token signing certificate for signing enrollment JWTs.
-     * <p>
-     * Creates the CA hierarchy on first call if it doesn't exist.
      *
      * @return the token signing certificate entry
      */
@@ -99,13 +97,23 @@ public class OpAmpCaService {
 
     /**
      * Returns the OTLP server certificate for TLS on the OTLP ingest endpoint.
-     * <p>
-     * Creates the CA hierarchy on first call if it doesn't exist.
      *
      * @return the OTLP server certificate entry
      */
     public CertificateEntry getOtlpServerCert() {
         return ensureInitialized().otlpServerCert();
+    }
+
+    public String getOpAmpCaId() {
+        return ensureInitialized().opAmpCa().id();
+    }
+
+    public String getTokenSigningCertId() {
+        return ensureInitialized().tokenSigningCert().id();
+    }
+
+    public String getOtlpServerCertId() {
+        return ensureInitialized().otlpServerCert().id();
     }
 
     /**
@@ -143,19 +151,26 @@ public class OpAmpCaService {
     /**
      * Ensures the CA hierarchy is initialized, creating it if necessary.
      * <p>
-     * Handles three scenarios:
+     * Handles two scenarios:
      * <ol>
-     *   <li>Full config exists (with otlpServerCertId) - loads from config</li>
-     *   <li>Partial config exists (without otlpServerCertId) - loads existing certs, adds OTLP server cert</li>
-     *   <li>No config exists - creates the full hierarchy from scratch</li>
+     *   <li>Full config exists in {@link CollectorsConfig} — loads from stored cert IDs</li>
+     *   <li>No config exists — creates the full hierarchy from scratch</li>
      * </ol>
+     * <p>
+     * Results are cached in memory for the lifetime of this singleton. The caller
+     * is responsible for persisting cert IDs into {@link CollectorsConfig}.
      *
      * @return the loaded CA hierarchy
      */
-    CaHierarchy ensureInitialized() {
-        final OpAmpCaConfig config = clusterConfigService.get(OpAmpCaConfig.class);
-        if (config != null && config.otlpServerCertId() != null) {
-            return loadFromConfig(config);
+    public CaHierarchy ensureInitialized() {
+        if (cachedHierarchy != null) {
+            return cachedHierarchy;
+        }
+
+        final CollectorsConfig config = clusterConfigService.get(CollectorsConfig.class);
+        if (config != null && config.opampCaId() != null && config.otlpServerCertId() != null) {
+            cachedHierarchy = loadFromConfig(config);
+            return cachedHierarchy;
         }
 
         LOG.info("Creating OpAMP CA hierarchy");
@@ -163,42 +178,25 @@ public class OpAmpCaService {
         try {
             final var builder = certificateService.builder();
 
-            final CertificateEntry opAmpCa;
-            final CertificateEntry tokenSigningCert;
-
-            if (config != null) {
-                // Partial config exists (has opAmpCa and tokenSigning but no otlpServer)
-                opAmpCa = certificateService.findById(config.opampCaId())
-                        .orElseThrow(() -> new IllegalStateException("OpAMP CA not found: " + config.opampCaId()));
-                tokenSigningCert = certificateService.findById(config.tokenSigningCertId())
-                        .orElseThrow(() -> new IllegalStateException("Token signing cert not found: " + config.tokenSigningCertId()));
-            } else {
-                // No config at all - create full hierarchy
-                final CertificateEntry rootCa = certificateService.save(
-                        builder.createRootCa(ROOT_CA_CN, Algorithm.ED25519, ROOT_CA_VALIDITY));
-                opAmpCa = certificateService.save(
-                        builder.createIntermediateCa(OPAMP_CA_CN, rootCa, OPAMP_CA_VALIDITY));
-                tokenSigningCert = certificateService.save(
-                        builder.createEndEntityCert(TOKEN_SIGNING_CN, opAmpCa, KeyUsage.digitalSignature, TOKEN_SIGNING_VALIDITY));
-            }
-
-            // Always create the OTLP server cert
+            final CertificateEntry rootCa = certificateService.save(
+                    builder.createRootCa(ROOT_CA_CN, Algorithm.ED25519, ROOT_CA_VALIDITY));
+            final CertificateEntry opAmpCa = certificateService.save(
+                    builder.createIntermediateCa(OPAMP_CA_CN, rootCa, OPAMP_CA_VALIDITY));
+            final CertificateEntry tokenSigningCert = certificateService.save(
+                    builder.createEndEntityCert(TOKEN_SIGNING_CN, opAmpCa, KeyUsage.digitalSignature, TOKEN_SIGNING_VALIDITY));
             final CertificateEntry otlpServerCert = certificateService.save(
                     builder.createEndEntityCert(OTLP_SERVER_CN, opAmpCa,
                             KeyUsage.digitalSignature | KeyUsage.keyEncipherment,
                             KeyPurposeId.id_kp_serverAuth, OTLP_SERVER_VALIDITY));
 
-            clusterConfigService.write(new OpAmpCaConfig(opAmpCa.id(), tokenSigningCert.id(), otlpServerCert.id()));
-
-            // Re-read config in case another node won the race
-            final OpAmpCaConfig writtenConfig = clusterConfigService.get(OpAmpCaConfig.class);
-            return loadFromConfig(writtenConfig);
+            cachedHierarchy = new CaHierarchy(opAmpCa, tokenSigningCert, otlpServerCert);
+            return cachedHierarchy;
         } catch (Exception e) {
             throw new RuntimeException("Failed to create OpAMP CA hierarchy", e);
         }
     }
 
-    private CaHierarchy loadFromConfig(OpAmpCaConfig config) {
+    private CaHierarchy loadFromConfig(CollectorsConfig config) {
         final CertificateEntry opAmpCa = certificateService.findById(config.opampCaId())
                 .orElseThrow(() -> new IllegalStateException("OpAMP CA not found: " + config.opampCaId()));
         final CertificateEntry tokenSigningCert = certificateService.findById(config.tokenSigningCertId())
@@ -208,5 +206,5 @@ public class OpAmpCaService {
         return new CaHierarchy(opAmpCa, tokenSigningCert, otlpServerCert);
     }
 
-    record CaHierarchy(CertificateEntry opAmpCa, CertificateEntry tokenSigningCert, CertificateEntry otlpServerCert) {}
+    public record CaHierarchy(CertificateEntry opAmpCa, CertificateEntry tokenSigningCert, CertificateEntry otlpServerCert) {}
 }

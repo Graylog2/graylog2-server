@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.inputs.otel.transport;
+package org.graylog.collectors.input.transport;
 
 import com.google.protobuf.AbstractMessageLite;
 import com.google.protobuf.util.JsonFormat;
@@ -31,7 +31,9 @@ import io.netty.handler.codec.http.HttpVersion;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsPartialSuccess;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse;
+import org.graylog.collectors.CollectorJournal;
 import org.graylog.inputs.otel.OTelJournalRecordFactory;
+import org.graylog.inputs.otel.transport.OTelHttpHandler;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
@@ -45,15 +47,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**
- * An HTTP handler for OpAMP-managed agents that extracts the agent instance UID
+ * An HTTP handler for collector-managed agents that extracts the agent instance UID
  * from the Netty channel attribute (set by {@link AgentCertChannelHandler} during TLS handshake)
  * and embeds it in each journal record before writing to the Graylog journal.
  * <p>
  * If the agent instance UID is not present on the channel (i.e., no valid client certificate),
  * the handler rejects the request with a 401 Unauthorized response.
  */
-public class OpAmpOTelHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
-    private static final Logger LOG = LoggerFactory.getLogger(OpAmpOTelHttpHandler.class);
+public class CollectorIngestHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+    private static final Logger LOG = LoggerFactory.getLogger(CollectorIngestHttpHandler.class);
 
     static final String LOGS_PATH = OTelHttpHandler.LOGS_PATH;
     static final String PROTOBUF_CONTENT_TYPE = OTelHttpHandler.PROTOBUF_CONTENT_TYPE;
@@ -67,7 +69,7 @@ public class OpAmpOTelHttpHandler extends SimpleChannelInboundHandler<FullHttpRe
     private final OTelJournalRecordFactory journalRecordFactory;
     private final MessageInput input;
 
-    public OpAmpOTelHttpHandler(OTelJournalRecordFactory journalRecordFactory, MessageInput input) {
+    public CollectorIngestHttpHandler(OTelJournalRecordFactory journalRecordFactory, MessageInput input) {
         this.journalRecordFactory = journalRecordFactory;
         this.input = input;
     }
@@ -134,12 +136,15 @@ public class OpAmpOTelHttpHandler extends SimpleChannelInboundHandler<FullHttpRe
             }
 
             journalRecordFactory.createFromRequest(exportRequest).stream()
-                    .map(record -> record.toBuilder().setAgentInstanceUid(instanceUid).build())
+                    .map(otelRecord -> CollectorJournal.Record.newBuilder()
+                            .setOtelRecord(otelRecord)
+                            .setCollectorInstanceUid(instanceUid)
+                            .build())
                     .map(AbstractMessageLite::toByteArray)
                     .map(createRawMessage)
                     .forEach(input::processRawMessage);
 
-            // 7. Send success response
+            // 8. Send success response
             sendSuccess(ctx, isProtobuf);
         } catch (Exception e) {
             LOG.debug("Failed to parse OTLP request", e);
