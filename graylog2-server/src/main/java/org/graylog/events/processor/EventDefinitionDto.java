@@ -181,7 +181,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
 
         try {
             validation.addAll(config().validate(userContext));
-            validation.addAll(config().validate(
+            validation.addAll(config().validate(userContext,
                     Optional.ofNullable(oldEventDefinitionDto).map(EventDefinitionDto::config).orElse(null),
                     eventDefinitionConfiguration));
         } catch (UnsupportedOperationException e) {
