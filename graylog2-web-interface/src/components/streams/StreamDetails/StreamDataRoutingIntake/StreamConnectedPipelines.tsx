@@ -48,7 +48,7 @@ const ListCol = styled(Col)(
 );
 
 const StreamConnectedPipelines = ({ stream }: Props) => (
-  <Section title="Connected Pipelines" collapsible defaultClosed>
+  <Section title="Pipelines" collapsible>
     <Row>
       <ListCol md={12}>
         <PaginatedEntityTable<StreamConnectedPipeline>
@@ -59,7 +59,6 @@ const StreamConnectedPipelines = ({ stream }: Props) => (
           entityAttributesAreCamelCase={false}
           searchPlaceholder="Search for pipeline"
           columnRenderers={customColumnRenderers}
-          entityActions={() => null}
         />
       </ListCol>
     </Row>

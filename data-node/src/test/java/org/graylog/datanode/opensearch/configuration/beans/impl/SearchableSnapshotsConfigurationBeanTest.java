@@ -165,7 +165,7 @@ class SearchableSnapshotsConfigurationBeanTest {
     }
 
     private OpensearchConfigurationParams emptyBuildParams(Path tempDir) {
-        return new OpensearchConfigurationParams(Collections.emptyList(), Collections.emptyMap(), tempDir);
+        return new OpensearchConfigurationParams(tempDir);
     }
 
     @Test
