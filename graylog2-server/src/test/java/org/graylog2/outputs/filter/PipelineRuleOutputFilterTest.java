@@ -174,6 +174,6 @@ class PipelineRuleOutputFilterTest {
                 Map.of(RemoveFromStreamDestination.NAME, new RemoveFromStreamDestination(streamCacheService))
         ));
 
-        return new PipelineResolver(ruleParser, PipelineResolverConfig.of(rules::stream, java.util.stream.Stream::of));
+        return new PipelineResolver(new MetricRegistry(), ruleParser, PipelineResolverConfig.of(rules::stream, java.util.stream.Stream::of));
     }
 }

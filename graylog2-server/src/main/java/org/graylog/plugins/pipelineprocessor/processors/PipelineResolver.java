@@ -16,6 +16,8 @@
  */
 package org.graylog.plugins.pipelineprocessor.processors;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSetMultimap;
@@ -34,9 +36,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -60,20 +65,26 @@ public class PipelineResolver {
 
     private static final Logger LOG = LoggerFactory.getLogger(PipelineResolver.class);
 
+    private record CachedRule(String source, Rule rule) {}
+
     private final PipelineRuleParser ruleParser;
     private final PipelineResolverConfig config;
     private final Supplier<Stream<RuleDao>> ruleDaoSupplier;
     private final Supplier<Stream<PipelineDao>> pipelineDaoSupplier;
     private final Supplier<Stream<PipelineConnections>> pipelineConnectionsSupplier;
+    private final Map<String, CachedRule> ruleCache = new HashMap<>();
+    private final Timer resolveRulesTimer;
 
     @Inject
-    public PipelineResolver(@Assisted PipelineRuleParser ruleParser,
+    public PipelineResolver(MetricRegistry metricRegistry,
+                            @Assisted PipelineRuleParser ruleParser,
                             @Assisted PipelineResolverConfig config) {
         this.ruleParser = ruleParser;
         this.config = config;
         this.ruleDaoSupplier = config.rulesSupplier();
         this.pipelineDaoSupplier = config.pipelinesSupplier();
         this.pipelineConnectionsSupplier = config.pipelineConnectionsSupplier();
+        this.resolveRulesTimer = metricRegistry.timer(MetricRegistry.name(PipelineResolver.class, "resolveRules"));
     }
 
     /**
@@ -107,21 +118,40 @@ public class PipelineResolver {
     }
 
     private Map<String, Rule> resolveRules() {
-        // Read all rules and parse them
+        try (final var ignored = resolveRulesTimer.time()) {
+            return doResolveRules();
+        }
+    }
+
+    private Map<String, Rule> doResolveRules() {
+        // Read all rules and parse them, reusing cached ASTs for unchanged rules
         final Map<String, Rule> ruleNameMap = Maps.newHashMap();
+        final Set<String> currentRuleIds = new HashSet<>();
 
         try (final var ruleStream = ruleDaoSupplier.get()) {
             ruleStream.forEach(ruleDao -> {
+                final String ruleId = ruleDao.id();
+                currentRuleIds.add(ruleId);
+
+                final CachedRule cached = ruleCache.get(ruleId);
                 Rule rule;
-                try {
-                    rule = ruleParser.parseRule(ruleDao.id(), ruleDao.source(), false);
-                } catch (ParseException e) {
-                    LOG.warn("Ignoring non parseable rule <{}/{}> with errors <{}>", ruleDao.title(), ruleDao.id(), e.getErrors());
-                    rule = Rule.alwaysFalse("Failed to parse rule: " + ruleDao.id());
+                if (cached != null && cached.source().equals(ruleDao.source())) {
+                    rule = cached.rule();
+                } else {
+                    try {
+                        rule = ruleParser.parseRule(ruleId, ruleDao.source(), false);
+                    } catch (ParseException e) {
+                        LOG.warn("Ignoring non parseable rule <{}/{}> with errors <{}>", ruleDao.title(), ruleId, e.getErrors());
+                        rule = Rule.alwaysFalse("Failed to parse rule: " + ruleId);
+                    }
+                    ruleCache.put(ruleId, new CachedRule(ruleDao.source(), rule));
                 }
                 ruleNameMap.put(rule.name(), rule);
             });
         }
+
+        // Evict cache entries for deleted rules
+        ruleCache.keySet().retainAll(currentRuleIds);
 
         return ruleNameMap;
     }

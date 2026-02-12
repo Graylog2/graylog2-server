@@ -32,16 +32,27 @@ import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.shared.utilities.StringUtils.f;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 class PipelineResolverTest {
 
+    private static final String RESOLVE_RULES_TIMER = "org.graylog.plugins.pipelineprocessor.processors.PipelineResolver.resolveRules";
     private MetricRegistry metricRegistry;
     private RuleDao rule1;
     private PipelineDao pipeline1;
@@ -99,7 +110,7 @@ class PipelineResolverTest {
                 () -> Stream.of(pipeline1),
                 () -> Stream.of(connections1, connections2)
         );
-        final var resolver = new PipelineResolver(
+        final var resolver = new PipelineResolver(metricRegistry,
                 new PipelineRuleParser(new FunctionRegistry(Map.of())),
                 config
         );
@@ -110,7 +121,7 @@ class PipelineResolverTest {
     @Test
     void resolveFunctions() {
         final var registry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
-        final var resolver = new PipelineResolver(
+        final var resolver = new PipelineResolver(metricRegistry,
                 new PipelineRuleParser(new FunctionRegistry(Map.of())),
                 PipelineResolverConfig.of(() -> Stream.of(rule1), Stream::of, Stream::of)
         );
@@ -147,6 +158,7 @@ class PipelineResolverTest {
         });
 
         assertThat(metricRegistry.getMetrics().keySet()).containsExactlyInAnyOrder(
+                RESOLVE_RULES_TIMER,
                 "org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-999.0.not-matched",
                 "org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-999.0.matched",
                 "org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-999.0.failed",
@@ -163,7 +175,7 @@ class PipelineResolverTest {
     @Test
     void resolvePipelines() {
         final var registry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
-        final var resolver = new PipelineResolver(
+        final var resolver = new PipelineResolver(metricRegistry,
                 new PipelineRuleParser(new FunctionRegistry(Map.of())),
                 PipelineResolverConfig.of(
                         () -> Stream.of(rule1),
@@ -192,6 +204,7 @@ class PipelineResolverTest {
         });
 
         assertThat(metricRegistry.getMetrics().keySet()).containsExactlyInAnyOrder(
+                RESOLVE_RULES_TIMER,
                 "org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-1.5.not-matched",
                 "org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-1.5.matched",
                 "org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-1.5.failed",
@@ -208,7 +221,7 @@ class PipelineResolverTest {
     @Test
     void resolvePipelinesWithMetricPrefix() {
         final var registry = PipelineMetricRegistry.create(metricRegistry, "PIPELINE", "RULE");
-        final var resolver = new PipelineResolver(
+        final var resolver = new PipelineResolver(metricRegistry,
                 new PipelineRuleParser(new FunctionRegistry(Map.of())),
                 PipelineResolverConfig.of(
                         () -> Stream.of(rule1),
@@ -220,6 +233,7 @@ class PipelineResolverTest {
         resolver.resolvePipelines(registry);
 
         assertThat(metricRegistry.getMetrics().keySet()).containsExactlyInAnyOrder(
+                RESOLVE_RULES_TIMER,
                 "RULE.rule-1.pipeline-1.5.not-matched",
                 "RULE.rule-1.pipeline-1.5.matched",
                 "RULE.rule-1.pipeline-1.5.failed",
@@ -236,7 +250,7 @@ class PipelineResolverTest {
     @Test
     void resolvePipelinesWithMissingRule() {
         final var registry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
-        final var resolver = new PipelineResolver(
+        final var resolver = new PipelineResolver(metricRegistry,
                 new PipelineRuleParser(new FunctionRegistry(Map.of())),
                 PipelineResolverConfig.of(Stream::of, () -> Stream.of(pipeline1))
         );
@@ -269,7 +283,7 @@ class PipelineResolverTest {
     @Test
     void resolveStreamConnections() {
         final var registry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
-        final var resolver = new PipelineResolver(
+        final var resolver = new PipelineResolver(metricRegistry,
                 new PipelineRuleParser(new FunctionRegistry(Map.of())),
                 PipelineResolverConfig.of(
                         () -> Stream.of(rule1),
@@ -290,5 +304,101 @@ class PipelineResolverTest {
             assertThat(connections).hasSize(1);
             assertThat(connections.get(0).id()).isEqualTo("pipeline-1");
         });
+    }
+
+    @Test
+    void resolveRulesCachesUnchangedRules() {
+        final int ruleCount = 50;
+        final List<RuleDao> rules = new ArrayList<>(buildRules(ruleCount));
+        final var parser = spy(new PipelineRuleParser(new FunctionRegistry(Map.of())));
+        final var registry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
+        final var resolver = new PipelineResolver(metricRegistry, parser, PipelineResolverConfig.of(
+                rules::stream,
+                Stream::of
+        ));
+
+        // First call: cold cache — all rules must be parsed
+        resolver.resolvePipelines(registry);
+        verify(parser, times(ruleCount)).parseRule(anyString(), anyString(), anyBoolean());
+
+        // Second call: warm cache, same rules — no rules should be parsed
+        clearInvocations(parser);
+        resolver.resolvePipelines(registry);
+        verify(parser, never()).parseRule(anyString(), anyString(), anyBoolean());
+    }
+
+    @Test
+    void resolveRulesReparsesModifiedRule() {
+        final int ruleCount = 50;
+        final List<RuleDao> rules = new ArrayList<>(buildRules(ruleCount));
+        final var parser = spy(new PipelineRuleParser(new FunctionRegistry(Map.of())));
+        final var registry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
+        final var resolver = new PipelineResolver(metricRegistry, parser, PipelineResolverConfig.of(
+                rules::stream,
+                Stream::of
+        ));
+
+        // Warm up the cache
+        resolver.resolvePipelines(registry);
+        clearInvocations(parser);
+
+        // Modify one rule's source
+        rules.set(0, rules.get(0).toBuilder()
+                .source(f("""
+                        rule "test-rule-%d"
+                        when false
+                        then
+                        end
+                        """, 0))
+                .build());
+
+        // Only the modified rule should be re-parsed
+        resolver.resolvePipelines(registry);
+        verify(parser, times(1)).parseRule(anyString(), anyString(), anyBoolean());
+    }
+
+    @Test
+    void resolveRulesEvictsDeletedRules() {
+        final int ruleCount = 10;
+        final List<RuleDao> rules = new ArrayList<>(buildRules(ruleCount));
+        final var parser = spy(new PipelineRuleParser(new FunctionRegistry(Map.of())));
+        final var registry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
+        final var resolver = new PipelineResolver(metricRegistry, parser, PipelineResolverConfig.of(
+                rules::stream,
+                Stream::of
+        ));
+
+        // Warm up the cache
+        resolver.resolvePipelines(registry);
+        clearInvocations(parser);
+
+        // Remove a rule
+        final RuleDao removed = rules.remove(0);
+        resolver.resolvePipelines(registry);
+        verify(parser, never()).parseRule(anyString(), anyString(), anyBoolean());
+
+        // Re-add the same rule (same ID, same source) — it was evicted, so it must be re-parsed
+        clearInvocations(parser);
+        rules.add(removed);
+        resolver.resolvePipelines(registry);
+        verify(parser, times(1)).parseRule(anyString(), anyString(), anyBoolean());
+    }
+
+    private static List<RuleDao> buildRules(int count) {
+        return IntStream.range(0, count)
+                .mapToObj(i -> RuleDao.builder()
+                        .id(f("rule-%d", i))
+                        .title(f("test-rule-%d", i))
+                        .description(f("Test rule %d", i))
+                        .createdAt(DateTime.now(DateTimeZone.UTC))
+                        .modifiedAt(DateTime.now(DateTimeZone.UTC))
+                        .source(f("""
+                                rule "test-rule-%d"
+                                when true
+                                then
+                                end
+                                """, i))
+                        .build())
+                .toList();
     }
 }

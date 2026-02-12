@@ -140,7 +140,7 @@ class MessageCreationLoopPreventionTest extends BaseParserTest {
                 pipelineService,
                 pipelineStreamConnectionsService,
                 parser,
-                (config, ruleParser) -> new PipelineResolver(ruleParser, config),
+                (config, ruleParser) -> new PipelineResolver(metricRegistry, ruleParser, config),
                 ruleMetricsConfigService,
                 metricRegistry,
                 mock(PipelineMetadataUpdater.class),
