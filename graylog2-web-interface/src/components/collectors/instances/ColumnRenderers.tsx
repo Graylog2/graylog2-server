@@ -48,7 +48,7 @@ const customColumnRenderers = ({ fleetNames }: Props): ColumnRenderers<Collector
     },
     hostname: {
       renderCell: (_hostname: string, instance: CollectorInstanceView) => (
-        <span>{instance.hostname || instance.agent_id}</span>
+        <span>{instance.hostname || instance.instance_uid}</span>
       ),
       width: 0.3,
     },

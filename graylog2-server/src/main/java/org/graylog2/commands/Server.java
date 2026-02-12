@@ -29,6 +29,7 @@ import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
+import org.graylog.collectors.CollectorsModule;
 import org.graylog.enterprise.EnterpriseModule;
 import org.graylog.events.EventsModule;
 import org.graylog.events.processor.EventDefinitionConfiguration;
@@ -52,8 +53,8 @@ import org.graylog.plugins.views.storage.migration.DatanodeMigrationBindings;
 import org.graylog.scheduler.JobSchedulerConfiguration;
 import org.graylog.scheduler.JobSchedulerModule;
 import org.graylog.security.SecurityModule;
-import org.graylog.security.pki.PkiModule;
 import org.graylog.security.certutil.CaModule;
+import org.graylog.security.pki.PkiModule;
 import org.graylog.tracing.TracingModule;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertConditionBindings;
@@ -230,7 +231,8 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                 new DataNodeModule(),
                 new McpServerModule(),
                 new QuickJumpModule(featureFlags),
-                new OpAmpModule()
+                new OpAmpModule(),
+                new CollectorsModule()
         );
 
         modules.add(new FieldTypeManagementModule());

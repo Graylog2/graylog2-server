@@ -17,6 +17,9 @@
 import { useQuery } from '@tanstack/react-query';
 
 import type { SearchParams, Attribute } from 'stores/PaginationTypes';
+import fetch from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
+import PaginationURL from 'util/PaginationURL';
 
 import type { Fleet, CollectorInstanceView, Source, CollectorStats } from '../types';
 import {
@@ -48,65 +51,64 @@ export type PaginatedCollectorsResponse<T> = {
 export const INSTANCES_KEY_PREFIX = ['collectors', 'instances', 'paginated'];
 export const instancesKeyFn = (searchParams: SearchParams) => [...INSTANCES_KEY_PREFIX, searchParams];
 
-// Mock paginated fetch for instances
+const OFFLINE_THRESHOLD_MS = 5 * 60 * 1000;
+
+const deriveStatus = (lastSeen: string): 'online' | 'offline' => {
+  const elapsed = Date.now() - new Date(lastSeen).getTime();
+
+  return elapsed < OFFLINE_THRESHOLD_MS ? 'online' : 'offline';
+};
+
+type ApiInstanceResponse = {
+  instance_uid: string;
+  fleet_id: string;
+  capabilities: number;
+  enrolled_at: string;
+  last_seen: string;
+  certificate_fingerprint: string;
+  identifying_attributes: Record<string, unknown>;
+  non_identifying_attributes: Record<string, unknown>;
+};
+
+const toView = (dto: ApiInstanceResponse): CollectorInstanceView => {
+  const allAttributes = {...dto.identifying_attributes, ...dto.non_identifying_attributes};
+  return ({
+      id: dto.instance_uid,
+      instance_uid: dto.instance_uid,
+      fleet_id: dto.fleet_id,
+      capabilities: dto.capabilities,
+      enrolled_at: dto.enrolled_at,
+      last_seen: dto.last_seen,
+      certificate_fingerprint: dto.certificate_fingerprint,
+      identifying_attributes: dto.identifying_attributes ?? {},
+      non_identifying_attributes: dto.non_identifying_attributes ?? {},
+      hostname: (allAttributes?.['host.name'] as string) ?? null,
+      os: (allAttributes?.['os.type'] as string) ?? null,
+      version: (allAttributes?.['service.version'] as string) ?? null,
+      status: deriveStatus(dto.last_seen),
+    });
+};
+
+const INSTANCE_ATTRIBUTES: Attribute[] = [
+  { id: 'status', title: 'Status', type: 'STRING', sortable: false },
+  { id: 'hostname', title: 'Hostname', type: 'STRING', sortable: false },
+  { id: 'os', title: 'OS', type: 'STRING', sortable: false },
+  { id: 'fleet_id', title: 'Fleet', type: 'STRING', sortable: false },
+  { id: 'last_seen', title: 'Last Seen', type: 'DATE', sortable: false },
+  { id: 'version', title: 'Version', type: 'STRING', sortable: false },
+];
+
 export const fetchPaginatedInstances = async (
   searchParams: SearchParams,
-  fleetId?: string,
 ): Promise<PaginatedCollectorsResponse<CollectorInstanceView>> => {
-  await delay(200);
+  const url = PaginationURL('/collectors', searchParams.page, searchParams.pageSize);
 
-  let filtered = fleetId ? getInstancesByFleetId(fleetId) : [...mockInstances];
-
-  // Apply search query
-  if (searchParams.query) {
-    const query = searchParams.query.toLowerCase();
-    filtered = filtered.filter(
-      (i) =>
-        i.hostname?.toLowerCase().includes(query) ||
-        i.agent_id.toLowerCase().includes(query),
-    );
-  }
-
-  // Apply filters
-  if (searchParams.filters) {
-    const statusFilter = searchParams.filters.get('status');
-    if (statusFilter?.length) {
-      filtered = filtered.filter((i) => statusFilter.includes(i.status));
-    }
-    const fleetFilter = searchParams.filters.get('fleet_id');
-    if (fleetFilter?.length) {
-      filtered = filtered.filter((i) => fleetFilter.includes(i.fleet_id));
-    }
-  }
-
-  // Apply sorting
-  if (searchParams.sort) {
-    const { attributeId, direction } = searchParams.sort;
-    filtered.sort((a, b) => {
-      const aVal = a[attributeId as keyof CollectorInstanceView] ?? '';
-      const bVal = b[attributeId as keyof CollectorInstanceView] ?? '';
-      const cmp = String(aVal).localeCompare(String(bVal));
-
-      return direction === 'asc' ? cmp : -cmp;
-    });
-  }
-
-  // Apply pagination
-  const total = filtered.length;
-  const start = (searchParams.page - 1) * searchParams.pageSize;
-  const paged = filtered.slice(start, start + searchParams.pageSize);
+  const response = await fetch('GET', qualifyUrl(url));
 
   return {
-    list: paged,
-    pagination: { total },
-    attributes: [
-      { id: 'status', title: 'Status', type: 'STRING', sortable: true, filterable: true },
-      { id: 'hostname', title: 'Hostname', type: 'STRING', sortable: true },
-      { id: 'os', title: 'OS', type: 'STRING', sortable: true },
-      { id: 'fleet_id', title: 'Fleet', type: 'STRING', sortable: true, filterable: true },
-      { id: 'last_seen', title: 'Last Seen', type: 'DATE', sortable: true },
-      { id: 'version', title: 'Version', type: 'STRING', sortable: true },
-    ],
+    list: (response.elements as ApiInstanceResponse[]).map(toView),
+    pagination: response.pagination,
+    attributes: INSTANCE_ATTRIBUTES,
   };
 };
 

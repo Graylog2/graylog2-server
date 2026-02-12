@@ -16,8 +16,6 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type { ColorVariant } from '@graylog/sawmill';
-
 import { Label, Table } from 'components/bootstrap';
 import Drawer from 'components/common/Drawer';
 import { RelativeTime } from 'components/common';
@@ -68,20 +66,11 @@ const SourceList = styled.div`
   gap: ${({ theme }) => theme.spacings.xs};
 `;
 
-const configStatusStyles: Record<string, ColorVariant> = {
-  APPLIED: 'success',
-  APPLYING: 'info',
-  FAILED: 'danger',
-  UNSET: 'default',
-};
-
 const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) => {
-  const osDescription = instance.agent_description.non_identifying_attributes.find(
-    (attr) => attr.key === 'os.description',
-  )?.value;
+  const osDescription = (instance.non_identifying_attributes?.['os.description'] as string) ?? null;
 
   return (
-    <Drawer title={instance.hostname || instance.agent_id} onClose={onClose} size="md">
+    <Drawer title={instance.hostname || instance.instance_uid} onClose={onClose} size="md">
       <Section>
         <DetailRow>
           <Title>Status:</Title>
@@ -107,50 +96,29 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
 
         <DetailRow>
           <Title>Version:</Title>
-          <span>{instance.version}</span>
+          <span>{instance.version || 'Unknown'}</span>
         </DetailRow>
-
-        <DetailRow>
-          <Title>Config:</Title>
-          <span style={{ display: 'inline-flex', gap: '0.25rem', alignItems: 'center' }}>
-            <code>{instance.remote_config_status.last_remote_config_hash.slice(0, 7)}</code>
-            <Label bsStyle={configStatusStyles[instance.remote_config_status.status]}>
-              {instance.remote_config_status.status}
-            </Label>
-          </span>
-        </DetailRow>
-
-        {instance.remote_config_status.error_message && (
-          <DetailRow>
-            <Title>Error:</Title>
-            <span style={{ color: 'red' }}>{instance.remote_config_status.error_message}</span>
-          </DetailRow>
-        )}
       </Section>
 
       <Section>
-        <SectionTitle>System Details</SectionTitle>
+        <SectionTitle>Attributes</SectionTitle>
         <Table striped>
           <tbody>
-            {instance.agent_description.identifying_attributes.map((attr) => (
-              <tr key={attr.key}>
-                <td>{attr.key}</td>
-                <td>{attr.value}</td>
+            {Object.entries(instance.identifying_attributes).map(([key, value]) => (
+              <tr key={key}>
+                <td>{key}</td>
+                <td>{String(value)}</td>
               </tr>
             ))}
-            {instance.agent_description.non_identifying_attributes.map((attr) => (
-              <tr key={attr.key}>
-                <td>{attr.key}</td>
-                <td>{attr.value}</td>
+            {Object.entries(instance.non_identifying_attributes).map(([key, value]) => (
+              <tr key={key}>
+                <td>{key}</td>
+                <td>{String(value)}</td>
               </tr>
             ))}
             <tr>
-              <td>connection_type</td>
-              <td>{instance.connection_type}</td>
-            </tr>
-            <tr>
-              <td>first_seen</td>
-              <td><RelativeTime dateTime={instance.first_seen} /></td>
+              <td>enrolled_at</td>
+              <td><RelativeTime dateTime={instance.enrolled_at} /></td>
             </tr>
           </tbody>
         </Table>

@@ -30,7 +30,9 @@ import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.CollectorInstanceReport;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.database.pagination.MongoPaginationHelper;
+import org.graylog2.search.SearchQuery;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -135,5 +137,9 @@ public class CollectorInstanceService {
         return Optional.ofNullable(
                 collection.find(Filters.eq(FIELD_INSTANCE_UID, instanceUid)).first()
         );
+    }
+
+    public PaginatedList<CollectorInstanceDTO> findPaginated(SearchQuery searchQuery, Bson sort, int page, int perPage) {
+        return paginationHelper.filter(searchQuery.toBson()).sort(sort).perPage(perPage).page(page);
     }
 }

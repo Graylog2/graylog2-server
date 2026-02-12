@@ -26,38 +26,16 @@ export type Fleet = {
   updated_at: string;
 };
 
-export type AgentDescription = {
-  identifying_attributes: Array<{ key: string; value: string }>;
-  non_identifying_attributes: Array<{ key: string; value: string }>;
-};
-
-export type RemoteConfigStatus = {
-  last_remote_config_hash: string;
-  status: 'UNSET' | 'APPLIED' | 'APPLYING' | 'FAILED';
-  error_message: string | null;
-};
-
-export type AgentHealth = {
-  healthy: boolean;
-  start_time_unix_nano: number;
-  last_error: string | null;
-};
-
-export type CollectorInstance = {
+export type CollectorInstanceView = {
   id: string;
-  agent_id: string;
   instance_uid: string;
-  agent_description: AgentDescription;
-  remote_config_status: RemoteConfigStatus;
-  health: AgentHealth;
-  capabilities: number;
   fleet_id: string;
-  first_seen: string;
+  capabilities: number;
+  enrolled_at: string;
   last_seen: string;
-  connection_type: 'HTTP' | 'WEBSOCKET';
-};
-
-export type CollectorInstanceView = CollectorInstance & {
+  certificate_fingerprint: string;
+  identifying_attributes: Record<string, unknown>;
+  non_identifying_attributes: Record<string, unknown>;
   hostname: string | null;
   os: string | null;
   version: string | null;
