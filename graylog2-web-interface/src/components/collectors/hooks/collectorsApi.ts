@@ -17,7 +17,7 @@
 import { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 
-import type { Fleet, Source } from '../types';
+import type { CollectorsConfig, CollectorsConfigRequest, Fleet, Source } from '../types';
 import { mockFleets, mockSources } from '../mockData';
 
 // Simulate network delay
@@ -155,4 +155,14 @@ export const createEnrollmentToken = async (
     fleet_id: input.fleetId,
     expires_in: input.expiresIn,
   });
+};
+
+export const fetchCollectorsConfig = async (): Promise<CollectorsConfig> => {
+  return fetchPeriodically('GET', qualifyUrl('/collectors/config'));
+};
+
+export const updateCollectorsConfig = async (
+  config: CollectorsConfigRequest,
+): Promise<CollectorsConfig> => {
+  return fetchPeriodically('PUT', qualifyUrl('/collectors/config'), config);
 };
