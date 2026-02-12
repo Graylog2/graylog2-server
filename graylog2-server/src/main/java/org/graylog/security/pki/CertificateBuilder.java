@@ -22,6 +22,8 @@ import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -290,6 +292,35 @@ public class CertificateBuilder {
      */
     public CertificateEntry createEndEntityCert(String commonName, CertificateEntry issuer, int keyUsageBits,
                                                 KeyPurposeId ekuPurpose, Duration validity) throws Exception {
+        return createEndEntityCert(commonName, issuer, keyUsageBits, ekuPurpose, validity, List.of());
+    }
+
+    /**
+     * Creates an end-entity certificate signed by the specified issuer, with optional Extended Key Usage
+     * and Subject Alternative Name (SAN) extensions.
+     * The certificate includes:
+     * <ul>
+     *   <li>Subject: CN=commonName</li>
+     *   <li>Issuer: from parent CA certificate</li>
+     *   <li>Basic Constraints: CA:FALSE (critical)</li>
+     *   <li>Key Usage: configurable via keyUsageBits parameter (critical)</li>
+     *   <li>Extended Key Usage: optional, set when ekuPurpose is non-null (non-critical)</li>
+     *   <li>Subject Alternative Name: optional, set when dnsNames is non-empty (non-critical)</li>
+     *   <li>Algorithm: derived from issuer certificate</li>
+     * </ul>
+     *
+     * @param commonName the common name for the end-entity certificate
+     * @param issuer the issuing CA's certificate entry (must contain the private key)
+     * @param keyUsageBits the key usage bits (e.g., {@link KeyUsage#digitalSignature})
+     * @param ekuPurpose the extended key usage purpose (e.g., {@link KeyPurposeId#id_kp_serverAuth}), or null to omit EKU
+     * @param validity the validity period of the certificate
+     * @param dnsNames DNS names to include as Subject Alternative Names, or empty list to omit SAN
+     * @return a CertificateEntry with encrypted private key and PEM-encoded certificate (no ID - not yet saved)
+     * @throws Exception if certificate creation fails
+     */
+    public CertificateEntry createEndEntityCert(String commonName, CertificateEntry issuer, int keyUsageBits,
+                                                KeyPurposeId ekuPurpose, Duration validity,
+                                                List<String> dnsNames) throws Exception {
         // Parse the issuer's certificate and private key
         final X509Certificate issuerCert = PemUtils.parseCertificate(issuer.certificate());
         final PrivateKey issuerPrivateKey = PemUtils.parsePrivateKey(
@@ -343,6 +374,14 @@ public class CertificateBuilder {
                     false,
                     new ExtendedKeyUsage(ekuPurpose)
             );
+        }
+
+        // Add Subject Alternative Names if specified (non-critical)
+        if (dnsNames != null && !dnsNames.isEmpty()) {
+            final GeneralName[] names = dnsNames.stream()
+                    .map(name -> new GeneralName(GeneralName.dNSName, name))
+                    .toArray(GeneralName[]::new);
+            certBuilder.addExtension(Extension.subjectAlternativeName, false, new GeneralNames(names));
         }
 
         final X509Certificate certificate = signCertificate(certBuilder, issuerPrivateKey, algorithm);

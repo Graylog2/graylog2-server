@@ -373,6 +373,44 @@ class CertificateBuilderTest {
         assertThat(cert.getExtendedKeyUsage()).isNull();
     }
 
+    // End-entity certificate with SAN tests
+
+    @Test
+    void createEndEntityCertWithDnsSans() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+
+        final CertificateEntry endEntityCert = builder.createEndEntityCert(
+                "OTLP Server", rootCa, KeyUsage.digitalSignature | KeyUsage.keyEncipherment,
+                KeyPurposeId.id_kp_serverAuth, Duration.ofDays(365),
+                List.of("2209F727-F7E1-4123-9386-94FE3B354A07")
+        );
+
+        final X509Certificate cert = PemUtils.parseCertificate(endEntityCert.certificate());
+
+        // Verify the SAN extension is present with the expected dNSName
+        assertThat(cert.getSubjectAlternativeNames()).isNotNull();
+        assertThat(cert.getSubjectAlternativeNames()).anySatisfy(san -> {
+            // GeneralName type 2 = dNSName
+            assertThat(san.get(0)).isEqualTo(2);
+            assertThat(san.get(1)).isEqualTo("2209F727-F7E1-4123-9386-94FE3B354A07");
+        });
+    }
+
+    @Test
+    void createEndEntityCertWithoutSansHasNoSanExtension() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(3650));
+
+        // Use the 4-arg method (no EKU, no SAN)
+        final CertificateEntry endEntityCert = builder.createEndEntityCert(
+                "No SAN", rootCa, KeyUsage.digitalSignature, Duration.ofDays(365)
+        );
+
+        final X509Certificate cert = PemUtils.parseCertificate(endEntityCert.certificate());
+
+        // Should NOT have Subject Alternative Names
+        assertThat(cert.getSubjectAlternativeNames()).isNull();
+    }
+
     // Note: CSR creation and signing tests will be added when the createCsr and signCsr
     // methods are implemented in CertificateBuilder (Task 4: Add CSR signing to CertificateBuilder)
 }
