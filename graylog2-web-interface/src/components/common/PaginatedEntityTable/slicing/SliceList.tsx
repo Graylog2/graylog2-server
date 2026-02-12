@@ -31,12 +31,6 @@ const SliceInner = styled.div`
   justify-content: space-between;
 `;
 
-const StyledListGroupItem = styled(ListGroupItem)<{ $active: boolean }>(
-  ({ $active }) => css`
-    font-weight: ${$active ? 'bold' : 'normal'};
-  `,
-);
-
 type Props = {
   slices: Slices;
   activeSlice: string | undefined;
@@ -58,15 +52,15 @@ const SliceList = ({
 }: Props) => (
   <StyledListGroup data-testid={listTestId}>
     {slices.map((slice) => (
-      <StyledListGroupItem
+      <ListGroupItem
         key={`${keyPrefix}${String(slice.value)}`}
         onClick={() => onChangeSlicing(sliceCol, String(slice.value))}
-        $active={String(activeSlice) === String(slice.value)}>
+        active={String(activeSlice) === String(slice.value)}>
         <SliceInner>
           {sliceRenderers?.[sliceCol]?.render?.(slice.value) ?? slice.title ?? String(slice.value)}
           <Badge>{slice.count}</Badge>
         </SliceInner>
-      </StyledListGroupItem>
+      </ListGroupItem>
     ))}
   </StyledListGroup>
 );
