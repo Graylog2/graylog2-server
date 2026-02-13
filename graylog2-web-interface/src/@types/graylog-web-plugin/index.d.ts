@@ -400,8 +400,7 @@ declare module 'graylog-web-plugin/plugin' {
     // and provide the result for all components in your plugin.
     globalContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>;
     // Difference between page context providers and global context providers
-    // is that page context providers are rendered within the <App> giving it
-    // access to certain contexts like PerspectivesContext
+    // is that page context providers are rendered within the <App>.
     pageContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>;
     routes?: Array<PluginRoute>;
     pages?: PluginPages;

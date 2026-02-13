@@ -26,7 +26,6 @@ import AppConfig from 'util/AppConfig';
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { adminUser } from 'fixtures/users';
-import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
 import PerspectivesBindings from 'components/perspectives/bindings';
 import { examplePerspective } from 'fixtures/perspectives';
 
@@ -36,9 +35,7 @@ jest.mock('hooks/useCurrentUser');
 
 describe('MainNavbar', () => {
   const SUT = (props: Partial<React.ComponentProps<typeof MainNavbar>>) => (
-    <PerspectivesProvider>
-      <MainNavbar pathname="/" {...props} />
-    </PerspectivesProvider>
+    <MainNavbar pathname="/" {...props} />
   );
 
   beforeAll(() => {

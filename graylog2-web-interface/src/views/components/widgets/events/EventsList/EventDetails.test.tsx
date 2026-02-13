@@ -24,7 +24,6 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import useEventById from 'hooks/useEventById';
 import { mockEventData, mockEventDefinitionTwoAggregations } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import useEventDefinition from 'components/events/events/hooks/useEventDefinition';
-import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
 import { defaultPerspective } from 'fixtures/perspectives';
 
 import EventDetails from './EventDetails';
@@ -35,11 +34,7 @@ jest.mock('hooks/useCurrentUser');
 jest.mock('components/events/events/hooks/useEventDefinition');
 
 const renderEventDetails = () =>
-  render(
-    <PerspectivesProvider>
-      <EventDetails eventId="event-id" />
-    </PerspectivesProvider>,
-  );
+  render(<EventDetails eventId="event-id" />);
 
 describe('EventDetails', () => {
   beforeEach(() => {
