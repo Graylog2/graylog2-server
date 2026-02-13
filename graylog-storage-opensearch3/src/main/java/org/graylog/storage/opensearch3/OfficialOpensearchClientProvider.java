@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.opensearch3;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
@@ -63,7 +64,6 @@ import java.util.Optional;
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 public class OfficialOpensearchClientProvider implements Provider<OfficialOpensearchClient> {
 
     private static Logger log = LoggerFactory.getLogger(OfficialOpensearchClientProvider.class);
@@ -76,8 +76,10 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
             IndexerJwtAuthToken indexerJwtAuthToken,
             CredentialsProvider credentialsProvider,
             ElasticsearchClientConfiguration clientConfiguration,
-            @Nullable TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider) {
-        clientCache = Suppliers.memoize(() -> createClient(hosts, indexerJwtAuthToken, credentialsProvider, clientConfiguration, trustManagerAndSocketFactoryProvider));
+            ObjectMapper objectMapper,
+            @Nullable TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider
+    ) {
+        clientCache = Suppliers.memoize(() -> createClient(hosts, indexerJwtAuthToken, credentialsProvider, clientConfiguration, trustManagerAndSocketFactoryProvider, objectMapper));
     }
 
     @Override
@@ -86,7 +88,7 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
     }
 
     @Nonnull
-    private static OfficialOpensearchClient createClient(List<URI> uris, IndexerJwtAuthToken indexerJwtAuthToken, CredentialsProvider credentialsProvider, ElasticsearchClientConfiguration clientConfiguration, TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider) {
+    private static OfficialOpensearchClient createClient(List<URI> uris, IndexerJwtAuthToken indexerJwtAuthToken, CredentialsProvider credentialsProvider, ElasticsearchClientConfiguration clientConfiguration, TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider, ObjectMapper objectMapper) {
 
         log.info("Initializing OpenSearch client");
 
@@ -134,7 +136,7 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
         });
 
         final OpenSearchTransport transport = builder.build();
-        return new OfficialOpensearchClient(new CustomOpenSearchClient(transport), new CustomAsyncOpenSearchClient(transport));
+        return new OfficialOpensearchClient(new CustomOpenSearchClient(transport), new CustomAsyncOpenSearchClient(transport), objectMapper);
     }
 
     private static Optional<TlsStrategy> tlsStrategy(@Nullable TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider) {

@@ -16,17 +16,14 @@
  */
 package org.graylog.storage.opensearch3.testing.client.mock;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.nio.file.PathMatcher;
+import java.nio.charset.StandardCharsets;
 
-public interface MockedResponse {
-    String method();
-    PathMatcher urlPattern();
-    InputStream newInputStream();
-    default boolean isError() {
-        return false;
-    }
-    default int responseCode() {
-        return 200; //ok
+record StringResponse(String method, java.nio.file.PathMatcher urlPattern, String body) implements MockedResponse {
+
+    @Override
+    public InputStream newInputStream() {
+        return new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
     }
 }
