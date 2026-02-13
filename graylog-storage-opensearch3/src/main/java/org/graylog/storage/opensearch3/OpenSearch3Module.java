@@ -94,7 +94,7 @@ public class OpenSearch3Module extends VersionAwareModule {
 
         bindForSupportedVersion(QuerySuggestionsService.class).to(QuerySuggestionsOS2.class);
 
-        bindForSupportedVersion(ProxyRequestAdapter.class).to(ProxyRequestAdapterOS2.class);
+        bindForSupportedVersion(ProxyRequestAdapter.class).to(ProxyRequestAdapterOS.class);
 
         install(new FactoryModuleBuilder().build(ScrollResultOS2.Factory.class));
 
