@@ -23,31 +23,59 @@ import type {
   AbsoluteTimeRange,
   RelativeTimeRange,
 } from 'views/logic/queries/Query';
-import {
-  isTypeKeyword,
-  isTypeRelativeWithStartOnly,
-  isTypeRelativeWithEnd,
-  isNoTimeRangeOverride,
-} from 'views/typeGuards/timeRange';
+import { isTypeRelativeWithStartOnly, isTypeRelativeWithEnd, isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 import { readableRange } from 'views/logic/queries/TimeRangeToString';
 import assertUnreachable from 'logic/assertUnreachable';
 
 export const EMPTY_RANGE = '----/--/-- --:--:--.---';
 export const EMPTY_OUTPUT = { from: EMPTY_RANGE, until: EMPTY_RANGE };
 
-const TimeRangeWrapper = styled.div(
-  ({ theme }) => css`
+const TimeRangeWrapper = styled.div<{ $centerTimestamps: boolean }>(
+  ({ theme, $centerTimestamps }) => css`
     width: 100%;
-    padding: 3px 13px;
-    display: flex;
-    justify-content: space-around;
     background-color: ${theme.colors.table.row.backgroundStriped};
     align-items: center;
 
-    > span {
-      flex: 1;
-    }
+    ${$centerTimestamps
+      ? css`
+          padding: 3px 0;
+          display: grid;
+          grid-template-columns: 4fr 0.75fr 4fr;
+        `
+      : css`
+          padding: 3px 13px;
+          display: flex;
+          justify-content: space-around;
+        `}
   `,
+);
+
+const TimeRangeCell = styled.span<{
+  $centerTimestamps: boolean;
+  $gridColumn?: '1' | '3';
+  $fullWidth?: boolean;
+}>(
+  ({ $centerTimestamps, $gridColumn, $fullWidth }) => css`
+    ${$centerTimestamps
+      ? css`
+          min-width: 0;
+          text-align: center;
+          grid-column: ${$fullWidth ? '1 / -1' : $gridColumn};
+        `
+      : css`
+          flex: 1;
+        `}
+  `,
+);
+
+const TimeRangeGap = styled.span<{ $centerTimestamps: boolean }>(({ $centerTimestamps }) =>
+  $centerTimestamps
+    ? css`
+        grid-column: 2;
+      `
+    : css`
+        display: none;
+      `,
 );
 
 export const range = (timerange: AbsoluteTimeRange | RelativeTimeRange | null | undefined) => {
@@ -84,12 +112,18 @@ export const range = (timerange: AbsoluteTimeRange | RelativeTimeRange | null | 
   }
 };
 
-const TimeRange = ({ timerange }: { timerange: TimeRangeType | null | undefined }) => {
-  if (isTypeKeyword(timerange)) {
+const TimeRange = ({
+  centerTimestamps,
+  timerange,
+}: {
+  centerTimestamps: boolean;
+  timerange: TimeRangeType | null | undefined;
+}) => {
+  if (timerange?.type === 'keyword') {
     return (
-      <span>
+      <TimeRangeCell $centerTimestamps={centerTimestamps} $fullWidth={centerTimestamps}>
         Keyword: <b>{timerange.keyword}</b>
-      </span>
+      </TimeRangeCell>
     );
   }
 
@@ -97,12 +131,13 @@ const TimeRange = ({ timerange }: { timerange: TimeRangeType | null | undefined 
 
   return (
     <>
-      <span data-testid="from">
+      <TimeRangeCell data-testid="from" $centerTimestamps={centerTimestamps} $gridColumn="1">
         From: <b>{from}</b>
-      </span>
-      <span data-testid="to">
+      </TimeRangeCell>
+      <TimeRangeGap aria-hidden $centerTimestamps={centerTimestamps} />
+      <TimeRangeCell data-testid="to" $centerTimestamps={centerTimestamps} $gridColumn="3">
         Until: <b>{until}</b>
-      </span>
+      </TimeRangeCell>
     </>
   );
 };
@@ -110,14 +145,22 @@ const TimeRange = ({ timerange }: { timerange: TimeRangeType | null | undefined 
 type Props = {
   timerange: TimeRangeType | NoTimeRangeOverride | null | undefined;
   toggleDropdownShow?: () => void;
+  centerTimestamps?: boolean;
 };
 
-const TimeRangeDisplay = ({ timerange, toggleDropdownShow = undefined }: Props) => (
+const TimeRangeDisplay = ({ timerange, toggleDropdownShow = undefined, centerTimestamps = false }: Props) => (
   <TimeRangeWrapper
+    $centerTimestamps={centerTimestamps}
     aria-label="Search Time Range, Opens Time Range Selector On Click"
     role="button"
     onClick={toggleDropdownShow}>
-    {isNoTimeRangeOverride(timerange) ? <span>No Override</span> : <TimeRange timerange={timerange} />}
+    {isNoTimeRangeOverride(timerange) ? (
+      <TimeRangeCell $centerTimestamps={centerTimestamps} $fullWidth={centerTimestamps}>
+        No Override
+      </TimeRangeCell>
+    ) : (
+      <TimeRange centerTimestamps={centerTimestamps} timerange={timerange} />
+    )}
   </TimeRangeWrapper>
 );
 

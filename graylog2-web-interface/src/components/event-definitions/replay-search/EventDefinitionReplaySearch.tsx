@@ -21,15 +21,13 @@ import type { EventDefinitionMappedData } from 'hooks/useEventDefinition';
 import ReplaySearch, { LoadingBarrier } from 'components/events/ReplaySearch';
 import type { ReplaySearchContextType } from 'components/event-definitions/replay-search/ReplaySearchContext';
 import ReplaySearchContext from 'components/event-definitions/replay-search/ReplaySearchContext';
-import type { Event } from 'components/events/events/types';
-import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
-import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
+import useCreateSearch from 'views/hooks/useCreateSearch';
 import sidebarSections, { type SidebarSection } from 'views/components/sidebar/sidebarSections';
+import EventDefinitionSideBar from 'components/event-definitions/replay-search/EventDefinitionSideBar';
+import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
 
 type Props = {
   eventDefinitionMappedData: EventDefinitionMappedData;
-  eventData: Event;
-  searchPageLayout?: Partial<LayoutState>;
 };
 
 const replaySection: SidebarSection = {
@@ -37,7 +35,7 @@ const replaySection: SidebarSection = {
   hoverTitle: 'Replay Details',
   title: null,
   icon: 'play_arrow',
-  content: ReplaySearchSidebar,
+  content: EventDefinitionSideBar,
 };
 
 const defaultSearchPageLayout: Partial<LayoutState> = {
@@ -45,50 +43,38 @@ const defaultSearchPageLayout: Partial<LayoutState> = {
     isShown: true,
     title: 'Replayed Search',
     sections: [replaySection, ...sidebarSections],
-    contentColumnWidth: 350,
+    contentColumnWidth: 300,
   },
 };
 
-const EventReplaySearch = ({
-  eventDefinitionMappedData,
-  searchPageLayout = defaultSearchPageLayout,
-  eventData,
-}: Props) => {
+const EventDefinitionReplaySearch = ({ eventDefinitionMappedData }: Props) => {
   const { eventDefinition, aggregations } = eventDefinitionMappedData;
 
-  const view = useCreateViewForEvent({
-    eventData,
+  const _view = useCreateViewForEvent({
+    eventData: undefined,
     eventDefinition,
     aggregations,
   });
-
+  const view = useCreateSearch(_view);
   const replaySearchContext = useMemo<ReplaySearchContextType>(
     () => ({
-      alertId: eventData?.id,
-      definitionId: eventDefinition?.id,
-      type: eventData?.alert ? 'alert' : 'event',
+      alertId: null,
+      definitionId: eventDefinition.id,
+      type: 'event_definition',
     }),
-    [eventData?.alert, eventData?.id, eventDefinition?.id],
+    [eventDefinition.id],
   );
 
   return (
     <ReplaySearchContext.Provider value={replaySearchContext}>
-      <ReplaySearch view={view} searchPageLayout={searchPageLayout} />
+      <ReplaySearch searchPageLayout={defaultSearchPageLayout} view={view} />
     </ReplaySearchContext.Provider>
   );
 };
 
-const WithLoadingBarrier = ({
-  eventDefinitionMappedData,
-  searchPageLayout = defaultSearchPageLayout,
-  eventData,
-}: Props) => (
+const WithLoadingBarrier = ({ eventDefinitionMappedData }: Props) => (
   <LoadingBarrier eventDefinition={eventDefinitionMappedData.eventDefinition}>
-    <EventReplaySearch
-      eventDefinitionMappedData={eventDefinitionMappedData}
-      searchPageLayout={searchPageLayout}
-      eventData={eventData}
-    />
+    <EventDefinitionReplaySearch eventDefinitionMappedData={eventDefinitionMappedData} />
   </LoadingBarrier>
 );
 

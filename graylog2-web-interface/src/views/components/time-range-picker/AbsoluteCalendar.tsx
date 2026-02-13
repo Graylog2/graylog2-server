@@ -18,7 +18,7 @@ import * as React from 'react';
 import { Field } from 'formik';
 
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
-import DateTimePicker from 'views/components/searchbar/time-range-filter/time-range-picker/DateTimePicker';
+import DateTimePicker from 'views/components/time-range-picker/DateTimePicker';
 
 type Props = {
   startDate?: Date;

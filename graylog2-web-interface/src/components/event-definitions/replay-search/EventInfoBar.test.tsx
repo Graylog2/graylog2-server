@@ -16,11 +16,10 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import userEvent from '@testing-library/user-event';
 
 import MockStore from 'helpers/mocking/StoreMock';
 import asMock from 'helpers/mocking/AsMock';
-import EventInfoBar from 'components/event-definitions/replay-search/EventInfoBar';
+import EventDefinitionInfoTable from 'components/event-definitions/replay-search/EventDefinitionInfoTable';
 import {
   mockedMappedAggregation,
   mockEventData,
@@ -82,7 +81,7 @@ jest.mock('views/logic/slices/highlightSelectors', () => ({
   selectHighlightingRules: jest.fn(),
 }));
 
-describe('<EventInfoBar />', () => {
+describe('<EventDefinitionInfoTable />', () => {
   const EventInfoComponent = ({ type }: { type: AlertType }) => (
     <TestStoreProvider>
       <ReplaySearchContext.Provider
@@ -91,7 +90,7 @@ describe('<EventInfoBar />', () => {
           definitionId: '',
           alertId: '',
         }}>
-        <EventInfoBar />
+        <EventDefinitionInfoTable />
       </ReplaySearchContext.Provider>
     </TestStoreProvider>
   );
@@ -176,22 +175,5 @@ describe('<EventInfoBar />', () => {
 
     expect(timestamp).not.toBeInTheDocument();
     expect(eventDefinition).not.toBeInTheDocument();
-  });
-
-  it('show and hide data on button click', async () => {
-    render(<EventInfoComponent type="event_definition" />);
-
-    const hideButton = await screen.findByText('Hide event definition details');
-    const detailsContainer = await screen.findByTestId('info-container');
-
-    await userEvent.click(hideButton);
-
-    expect(detailsContainer).not.toBeInTheDocument();
-
-    const showButton = await screen.findByText('Show event definition details');
-
-    await userEvent.click(showButton);
-
-    await screen.findByTestId('info-container');
   });
 });

@@ -59,7 +59,7 @@ const Notifications = () => {
       })}
     </>
   ) : (
-    <NoAttributeProvided name="Notifications" />
+    <NoAttributeProvided />
   );
 };
 
