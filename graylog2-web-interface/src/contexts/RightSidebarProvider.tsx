@@ -29,12 +29,15 @@ type HistoryState = {
   contentHistory: Array<RightSidebarContent>;
   currentIndex: number;
   isOpen: boolean;
+  isCollapsed: boolean;
   width: number;
 };
 
 type HistoryAction =
   | { type: 'OPEN_SIDEBAR'; content: RightSidebarContent }
   | { type: 'CLOSE_SIDEBAR' }
+  | { type: 'COLLAPSE_SIDEBAR' }
+  | { type: 'EXPAND_SIDEBAR' }
   | { type: 'UPDATE_CONTENT'; content: RightSidebarContent }
   | { type: 'GO_BACK' }
   | { type: 'GO_FORWARD' }
@@ -44,6 +47,7 @@ const initialState: HistoryState = {
   contentHistory: [],
   currentIndex: -1,
   isOpen: false,
+  isCollapsed: false,
   width: 400,
 };
 
@@ -60,6 +64,7 @@ const historyReducer = (state: HistoryState, action: HistoryAction): HistoryStat
           ...state,
           contentHistory: newHistory,
           isOpen: true,
+          isCollapsed: false,
         };
       }
 
@@ -74,6 +79,7 @@ const historyReducer = (state: HistoryState, action: HistoryAction): HistoryStat
           contentHistory: newHistory,
           currentIndex: MAX_HISTORY_DEPTH - 1,
           isOpen: true,
+          isCollapsed: false,
         };
       }
 
@@ -82,6 +88,7 @@ const historyReducer = (state: HistoryState, action: HistoryAction): HistoryStat
         contentHistory: newHistory,
         currentIndex: newHistory.length - 1,
         isOpen: true,
+        isCollapsed: false,
       };
     }
 
@@ -91,6 +98,21 @@ const historyReducer = (state: HistoryState, action: HistoryAction): HistoryStat
         contentHistory: [],
         currentIndex: -1,
         isOpen: false,
+        isCollapsed: false,
+      };
+    }
+
+    case 'COLLAPSE_SIDEBAR': {
+      return {
+        ...state,
+        isCollapsed: true,
+      };
+    }
+
+    case 'EXPAND_SIDEBAR': {
+      return {
+        ...state,
+        isCollapsed: false,
       };
     }
 
@@ -160,6 +182,14 @@ const RightSidebarProvider = ({ children }: Props) => {
     dispatch({ type: 'CLOSE_SIDEBAR' });
   }, []);
 
+  const collapseSidebar = useCallback(() => {
+    dispatch({ type: 'COLLAPSE_SIDEBAR' });
+  }, []);
+
+  const expandSidebar = useCallback(() => {
+    dispatch({ type: 'EXPAND_SIDEBAR' });
+  }, []);
+
   const updateContent = useCallback(<T = Record<string, unknown>,>(newContent: RightSidebarContent<T>) => {
     dispatch({ type: 'UPDATE_CONTENT', content: newContent as RightSidebarContent<any> });
   }, []);
@@ -179,10 +209,13 @@ const RightSidebarProvider = ({ children }: Props) => {
   const contextValue = useMemo(
     () => ({
       isOpen: state.isOpen,
+      isCollapsed: state.isCollapsed,
       content,
       width: state.width,
       openSidebar,
       closeSidebar,
+      collapseSidebar,
+      expandSidebar,
       updateContent,
       setWidth,
       goBack,
@@ -190,7 +223,7 @@ const RightSidebarProvider = ({ children }: Props) => {
       canGoBack,
       canGoForward,
     }),
-    [state.isOpen, content, state.width, openSidebar, closeSidebar, updateContent, setWidth, goBack, goForward, canGoBack, canGoForward],
+    [state.isOpen, state.isCollapsed, content, state.width, openSidebar, closeSidebar, collapseSidebar, expandSidebar, updateContent, setWidth, goBack, goForward, canGoBack, canGoForward],
   );
 
   return <RightSidebarContext.Provider value={contextValue}>{children}</RightSidebarContext.Provider>;

@@ -25,11 +25,12 @@ import useRightSidebar from '../hooks/useRightSidebar';
 const TestComponent = () => <div>Test Content</div>;
 
 const TestConsumer = () => {
-  const { isOpen, content, width, openSidebar, closeSidebar, setWidth, updateContent, goBack, goForward, canGoBack, canGoForward } = useRightSidebar();
+  const { isOpen, isCollapsed, content, width, openSidebar, closeSidebar, collapseSidebar, expandSidebar, setWidth, updateContent, goBack, goForward, canGoBack, canGoForward } = useRightSidebar();
 
   return (
     <div>
       <div data-testid="is-open">{String(isOpen)}</div>
+      <div data-testid="is-collapsed">{String(isCollapsed)}</div>
       <div data-testid="content-id">{content?.id || 'null'}</div>
       <div data-testid="width">{width}</div>
       <div data-testid="can-go-back">{String(canGoBack)}</div>
@@ -82,6 +83,12 @@ const TestConsumer = () => {
       <button type="button" onClick={closeSidebar}>
         Close Sidebar
       </button>
+      <button type="button" onClick={collapseSidebar}>
+        Collapse Sidebar
+      </button>
+      <button type="button" onClick={expandSidebar}>
+        Expand Sidebar
+      </button>
       <button type="button" onClick={() => setWidth(500)}>
         Set Width 500
       </button>
@@ -104,6 +111,7 @@ describe('RightSidebarProvider', () => {
     );
 
     expect(screen.getByTestId('is-open')).toHaveTextContent('false');
+    expect(screen.getByTestId('is-collapsed')).toHaveTextContent('false');
     expect(screen.getByTestId('content-id')).toHaveTextContent('null');
     expect(screen.getByTestId('width')).toHaveTextContent('400');
     expect(screen.getByTestId('can-go-back')).toHaveTextContent('false');
@@ -317,6 +325,92 @@ describe('RightSidebarProvider', () => {
 
       await userEvent.click(screen.getByText('Go Forward'));
       expect(screen.getByTestId('content-id')).toHaveTextContent('test-sidebar');
+    });
+  });
+
+  describe('Collapse/Expand', () => {
+    it('should collapse the sidebar', async () => {
+      render(
+        <RightSidebarProvider>
+          <TestConsumer />
+        </RightSidebarProvider>,
+      );
+
+      await userEvent.click(screen.getByText('Open Sidebar'));
+      expect(screen.getByTestId('is-open')).toHaveTextContent('true');
+      expect(screen.getByTestId('is-collapsed')).toHaveTextContent('false');
+
+      await userEvent.click(screen.getByText('Collapse Sidebar'));
+      expect(screen.getByTestId('is-open')).toHaveTextContent('true');
+      expect(screen.getByTestId('is-collapsed')).toHaveTextContent('true');
+      expect(screen.getByTestId('content-id')).toHaveTextContent('test-sidebar');
+    });
+
+    it('should expand the sidebar after collapsing', async () => {
+      render(
+        <RightSidebarProvider>
+          <TestConsumer />
+        </RightSidebarProvider>,
+      );
+
+      await userEvent.click(screen.getByText('Open Sidebar'));
+      await userEvent.click(screen.getByText('Collapse Sidebar'));
+      expect(screen.getByTestId('is-collapsed')).toHaveTextContent('true');
+
+      await userEvent.click(screen.getByText('Expand Sidebar'));
+      expect(screen.getByTestId('is-collapsed')).toHaveTextContent('false');
+      expect(screen.getByTestId('is-open')).toHaveTextContent('true');
+      expect(screen.getByTestId('content-id')).toHaveTextContent('test-sidebar');
+    });
+
+    it('should preserve history when collapsing and expanding', async () => {
+      render(
+        <RightSidebarProvider>
+          <TestConsumer />
+        </RightSidebarProvider>,
+      );
+
+      await userEvent.click(screen.getByText('Open Sidebar'));
+      await userEvent.click(screen.getByText('Open Sidebar 2'));
+      expect(screen.getByTestId('can-go-back')).toHaveTextContent('true');
+
+      await userEvent.click(screen.getByText('Collapse Sidebar'));
+      await userEvent.click(screen.getByText('Expand Sidebar'));
+
+      expect(screen.getByTestId('content-id')).toHaveTextContent('test-sidebar-2');
+      expect(screen.getByTestId('can-go-back')).toHaveTextContent('true');
+    });
+
+    it('should expand when opening new content while collapsed', async () => {
+      render(
+        <RightSidebarProvider>
+          <TestConsumer />
+        </RightSidebarProvider>,
+      );
+
+      await userEvent.click(screen.getByText('Open Sidebar'));
+      await userEvent.click(screen.getByText('Collapse Sidebar'));
+      expect(screen.getByTestId('is-collapsed')).toHaveTextContent('true');
+
+      await userEvent.click(screen.getByText('Open Sidebar 2'));
+      expect(screen.getByTestId('is-collapsed')).toHaveTextContent('false');
+      expect(screen.getByTestId('content-id')).toHaveTextContent('test-sidebar-2');
+    });
+
+    it('should reset collapsed state when closing sidebar', async () => {
+      render(
+        <RightSidebarProvider>
+          <TestConsumer />
+        </RightSidebarProvider>,
+      );
+
+      await userEvent.click(screen.getByText('Open Sidebar'));
+      await userEvent.click(screen.getByText('Collapse Sidebar'));
+      expect(screen.getByTestId('is-collapsed')).toHaveTextContent('true');
+
+      await userEvent.click(screen.getByText('Close Sidebar'));
+      expect(screen.getByTestId('is-collapsed')).toHaveTextContent('false');
+      expect(screen.getByTestId('is-open')).toHaveTextContent('false');
     });
   });
 });

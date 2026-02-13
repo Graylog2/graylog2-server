@@ -18,8 +18,11 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import useRightSidebar from 'hooks/useRightSidebar';
+import Icon from 'components/common/Icon';
 import IconButton from 'components/common/IconButton';
 import Row from 'components/bootstrap/Row';
+
+const COLLAPSED_WIDTH = 36;
 
 const Container = styled.div<{ $width: number }>(
   ({ $width }) => css`
@@ -32,6 +35,52 @@ const Container = styled.div<{ $width: number }>(
     display: flex;
     flex-direction: column;
     padding: 10px;
+  `,
+);
+
+const CollapsedContainer = styled.div(
+  ({ theme }) => css`
+    width: ${COLLAPSED_WIDTH}px;
+    min-width: ${COLLAPSED_WIDTH}px;
+    flex-shrink: 0;
+    align-self: stretch;
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: ${theme.colors.global.contentBackground};
+  `,
+);
+
+const CollapsedTitleArea = styled.div(
+  ({ theme }) => css`
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    cursor: pointer;
+    overflow: hidden;
+
+    :hover {
+      background-color: ${theme.colors.variant.lightest.default};
+    }
+  `,
+);
+
+const CollapsedTitle = styled.span(
+  ({ theme }) => css`
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    font-size: ${theme.fonts.size.small};
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 100%;
+    color: ${theme.colors.text.primary};
+    user-select: none;
   `,
 );
 
@@ -48,6 +97,28 @@ const NavigationButtons = styled.div`
   gap: 4px;
   margin-right: 8px;
 `;
+
+const HeaderActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+`;
+
+const CollapseButton = styled.button(
+  ({ theme }) => css`
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: ${theme.colors.text.primary};
+    display: flex;
+    align-items: center;
+
+    :hover {
+      color: ${theme.colors.variant.dark.default};
+    }
+  `,
+);
 
 const Title = styled.h4(
   ({ theme }) => css`
@@ -78,10 +149,23 @@ const StyledRow = styled(Row)`
 `;
 
 const RightSidebar = () => {
-  const { content, width, closeSidebar, goBack, goForward, canGoBack, canGoForward } = useRightSidebar();
+  const { content, width, isCollapsed, closeSidebar, collapseSidebar, expandSidebar, goBack, goForward, canGoBack, canGoForward } = useRightSidebar();
 
   if (!content) {
     return null;
+  }
+
+  if (isCollapsed) {
+    return (
+      <CollapsedContainer
+        role="complementary"
+        aria-label={`${content.title} sidebar (collapsed)`}>
+        <IconButton name="close" title="Close sidebar" onClick={closeSidebar} aria-label="Close sidebar" />
+        <CollapsedTitleArea onClick={expandSidebar} title="Expand sidebar">
+          <CollapsedTitle>{content.title}</CollapsedTitle>
+        </CollapsedTitleArea>
+      </CollapsedContainer>
+    );
   }
 
   const ContentComponent = content.component;
@@ -107,7 +191,12 @@ const RightSidebar = () => {
             />
           </NavigationButtons>
           <Title id="sidebar-title">{content.title}</Title>
-          <IconButton name="close" title="Close sidebar" onClick={closeSidebar} aria-label="Close sidebar" />
+          <HeaderActions>
+            <CollapseButton type="button" title="Collapse sidebar" onClick={collapseSidebar} aria-label="Collapse sidebar">
+              <Icon name="collapse_content" />
+            </CollapseButton>
+            <IconButton name="close" title="Close sidebar" onClick={closeSidebar} aria-label="Close sidebar" />
+          </HeaderActions>
         </Header>
         <ContentArea aria-labelledby="sidebar-title">
           <ContentComponent {...(content.props || {})} />
