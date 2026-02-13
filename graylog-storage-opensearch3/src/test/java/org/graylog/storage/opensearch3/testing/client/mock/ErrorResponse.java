@@ -19,14 +19,15 @@ package org.graylog.storage.opensearch3.testing.client.mock;
 import java.io.InputStream;
 import java.nio.file.PathMatcher;
 
-public interface MockedResponse {
-    String method();
-    PathMatcher urlPattern();
-    InputStream newInputStream();
-    default boolean isError() {
-        return false;
+public record ErrorResponse(String method, PathMatcher urlPattern, int responseCode, String error) implements MockedResponse {
+
+    @Override
+    public InputStream newInputStream() {
+        return InputStream.nullInputStream();
     }
-    default int responseCode() {
-        return 200; //ok
+
+    @Override
+    public boolean isError() {
+        return true;
     }
 }

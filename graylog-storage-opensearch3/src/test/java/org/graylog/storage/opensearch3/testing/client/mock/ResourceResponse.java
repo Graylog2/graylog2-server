@@ -16,17 +16,18 @@
  */
 package org.graylog.storage.opensearch3.testing.client.mock;
 
+import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.PathMatcher;
+import java.net.URL;
 
-public interface MockedResponse {
-    String method();
-    PathMatcher urlPattern();
-    InputStream newInputStream();
-    default boolean isError() {
-        return false;
-    }
-    default int responseCode() {
-        return 200; //ok
+public record ResourceResponse(String method, java.nio.file.PathMatcher urlPattern, URL resource) implements MockedResponse {
+
+    @Override
+    public InputStream newInputStream() {
+        try {
+            return resource.openStream();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
