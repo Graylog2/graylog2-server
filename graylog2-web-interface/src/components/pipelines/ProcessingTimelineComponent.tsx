@@ -126,7 +126,7 @@ const ProcessingTimelineComponent = () => {
       onDeletePipeline={() => _deletePipeline(pipelineItem)}
     />
   );
-  const headers = ['Pipeline', 'Connected to Streams', 'Processing Timeline', 'Actions'];
+  const headers = ['Pipeline', 'Connected to Streams', 'Processing Errors', 'Processing Timeline', 'Actions'];
 
   return (
     <div>
