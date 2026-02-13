@@ -22,36 +22,14 @@ import ReplaySearch, { LoadingBarrier } from 'components/events/ReplaySearch';
 import type { ReplaySearchContextType } from 'components/event-definitions/replay-search/ReplaySearchContext';
 import ReplaySearchContext from 'components/event-definitions/replay-search/ReplaySearchContext';
 import type { Event } from 'components/events/events/types';
-import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
-import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
-import sidebarSections, { type SidebarSection } from 'views/components/sidebar/sidebarSections';
 
 type Props = {
   eventDefinitionMappedData: EventDefinitionMappedData;
   eventData: Event;
-  searchPageLayout?: Partial<LayoutState>;
-};
-
-const replaySection: SidebarSection = {
-  key: 'eventDescription',
-  hoverTitle: 'Replay Details',
-  title: null,
-  icon: 'play_arrow',
-  content: ReplaySearchSidebar,
-};
-
-const defaultSearchPageLayout: Partial<LayoutState> = {
-  sidebar: {
-    isShown: true,
-    title: 'Replayed Search',
-    sections: [replaySection, ...sidebarSections],
-    contentColumnWidth: 350,
-  },
 };
 
 const EventReplaySearch = ({
   eventDefinitionMappedData,
-  searchPageLayout = defaultSearchPageLayout,
   eventData,
 }: Props) => {
   const { eventDefinition, aggregations } = eventDefinitionMappedData;
@@ -73,20 +51,18 @@ const EventReplaySearch = ({
 
   return (
     <ReplaySearchContext.Provider value={replaySearchContext}>
-      <ReplaySearch view={view} searchPageLayout={searchPageLayout} />
+      <ReplaySearch view={view} />
     </ReplaySearchContext.Provider>
   );
 };
 
 const WithLoadingBarrier = ({
   eventDefinitionMappedData,
-  searchPageLayout = defaultSearchPageLayout,
   eventData,
 }: Props) => (
   <LoadingBarrier eventDefinition={eventDefinitionMappedData.eventDefinition}>
     <EventReplaySearch
       eventDefinitionMappedData={eventDefinitionMappedData}
-      searchPageLayout={searchPageLayout}
       eventData={eventData}
     />
   </LoadingBarrier>
