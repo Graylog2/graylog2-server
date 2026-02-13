@@ -22,7 +22,7 @@ import DOMPurify from 'dompurify';
 import LoginBox from 'components/login/LoginBox';
 import PublicNotifications from 'components/common/PublicNotifications';
 import backgroundImage from 'images/auth/login-bg.svg';
-import { Logo } from 'components/perspectives/DefaultBrand';
+import { Logo } from 'components/perspectives/NavigationBrand';
 import AppConfig from 'util/AppConfig';
 import useThemes from 'theme/hooks/useThemes';
 import useCustomLogo from 'brand-customization/useCustomLogo';

@@ -17,7 +17,7 @@
 
 import Routes from 'routing/Routes';
 
-import DefaultBrand from './DefaultBrand';
+import DefaultBrand from './NavigationBrand';
 
 const perspectivesBindings = {
   perspectives: [

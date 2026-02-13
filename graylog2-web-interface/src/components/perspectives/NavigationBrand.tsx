@@ -65,14 +65,6 @@ export const Logo = ({ color }: { color: string }) => (
   </svg>
 );
 
-const Container = styled.div`
-  display: inline-flex;
-`;
-
-type Props = {
-  className?: string;
-};
-
 const StyledSvgContainer = styled.div`
   svg {
     width: 100%;
@@ -81,7 +73,8 @@ const StyledSvgContainer = styled.div`
     display: block;
   }
 `;
-export const BrandNavLogo = () => {
+
+const NavigationBrand = () => {
   const theme = useTheme();
   const customLogo = useCustomLogo(theme.mode);
 
@@ -90,10 +83,4 @@ export const BrandNavLogo = () => {
   return <Logo color={theme.colors.brand.logo} />;
 };
 
-const DefaultBrand = ({ className = '' }: Props) => (
-  <Container className={`${className}`}>
-    <BrandNavLogo />
-  </Container>
-);
-
-export default DefaultBrand;
+export default NavigationBrand;
