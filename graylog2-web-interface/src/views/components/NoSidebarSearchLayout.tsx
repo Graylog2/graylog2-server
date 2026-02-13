@@ -41,7 +41,7 @@ type Props = React.PropsWithChildren<{
   viewActions?: LayoutState['viewActions'];
 }>;
 
-const NoSidebarSearchLayout = ({ children, viewActions = SAVE_COPY }: Props) => {
+const NoSidebarSearchLayout = ({ children = undefined, viewActions = SAVE_COPY }: Props) => {
   const searchPageLayout = useMemo(
     () => ({
       sidebar: { isShown: false },
