@@ -57,8 +57,9 @@ const EventReplaySearch = ({
       id: 'replay-search-sidebar',
       title: 'Replay Details',
       component: ReplaySearchSidebar,
+      props: { alertId: eventData?.id },
     });
-  }, [openSidebar]);
+  }, [openSidebar, eventData?.id]);
 
   return (
     <ReplaySearchContext.Provider value={replaySearchContext}>
