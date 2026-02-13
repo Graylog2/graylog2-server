@@ -30,7 +30,6 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import AppConfig from 'util/AppConfig';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
 import HotkeysProvider from 'contexts/HotkeysProvider';
-import { defaultPerspective as mockDefaultPerspective } from 'fixtures/perspectives';
 
 import AppRouter from './AppRouter';
 
@@ -85,12 +84,7 @@ const mockRoutes = (routes: PluginExports['routes']) => {
 };
 
 describe('AppRouter', () => {
-  const defaultPlugins = {
-    perspectives: [mockDefaultPerspective],
-  };
-
   beforeEach(() => {
-    asMock(usePluginEntities).mockImplementation((entityKey) => defaultPlugins[entityKey] ?? []);
     AppConfig.isFeatureEnabled = jest.fn(() => false);
     asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) => createMemoryRouter(routes));
   });

@@ -18,7 +18,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 import Immutable from 'immutable';
 import * as React from 'react';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
-import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 import { defaultUser } from 'defaultMockValues';
 import userEvent from '@testing-library/user-event';
 
@@ -26,21 +26,13 @@ import AppConfig from 'util/AppConfig';
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { adminUser } from 'fixtures/users';
-import PerspectivesBindings from 'components/perspectives/bindings';
-import { examplePerspective } from 'fixtures/perspectives';
 
 import MainNavbar from './MainNavbar';
 
 jest.mock('hooks/useCurrentUser');
 
 describe('MainNavbar', () => {
-  const SUT = (props: Partial<React.ComponentProps<typeof MainNavbar>>) => (
-    <MainNavbar pathname="/" {...props} />
-  );
-
-  beforeAll(() => {
-    PluginStore.register(new PluginManifest({}, PerspectivesBindings));
-  });
+  const SUT = (props: Partial<React.ComponentProps<typeof MainNavbar>>) => <MainNavbar pathname="/" {...props} />;
 
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
@@ -93,7 +85,6 @@ describe('MainNavbar', () => {
           {
             description: 'Merged dropdown test',
             path: '/',
-            perspective: examplePerspective.id,
             children: [{ path: '/another-route', description: 'Menu item for specific perspective' }],
           },
         ],

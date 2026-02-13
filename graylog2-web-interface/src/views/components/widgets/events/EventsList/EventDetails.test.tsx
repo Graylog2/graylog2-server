@@ -24,7 +24,6 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import useEventById from 'hooks/useEventById';
 import { mockEventData, mockEventDefinitionTwoAggregations } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import useEventDefinition from 'components/events/events/hooks/useEventDefinition';
-import { defaultPerspective } from 'fixtures/perspectives';
 
 import EventDetails from './EventDetails';
 
@@ -33,8 +32,7 @@ jest.mock('hooks/useEventById');
 jest.mock('hooks/useCurrentUser');
 jest.mock('components/events/events/hooks/useEventDefinition');
 
-const renderEventDetails = () =>
-  render(<EventDetails eventId="event-id" />);
+const renderEventDetails = () => render(<EventDetails eventId="event-id" />);
 
 describe('EventDetails', () => {
   beforeEach(() => {
@@ -44,7 +42,6 @@ describe('EventDetails', () => {
           'views.components.widgets.events.detailsComponent': [],
           'views.components.eventActions': [],
           eventDefinitionTypes: [],
-          perspectives: [defaultPerspective],
           'views.components.eventProcedureSummary': [],
         })[entityKey],
     );
@@ -71,7 +68,6 @@ describe('EventDetails', () => {
               key: 'details-component',
             },
           ],
-          perspectives: [defaultPerspective],
         })[entityKey],
     );
 
