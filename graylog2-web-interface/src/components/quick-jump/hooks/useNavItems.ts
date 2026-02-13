@@ -65,22 +65,6 @@ const useConfigurationPages = () => {
 
 const useQuickJumpActions = (): SearchResultItem[] => {
   const { isScratchpadVisible } = useContext(ScratchpadContext);
-  const { activePerspective, availablePerspectives, setActivePerspective } = useContext(PerspectivesContext);
-  const history = useHistory();
-  const perspectiveActions = useMemo(
-    () =>
-      availablePerspectives
-        .filter((perspective) => perspective !== activePerspective)
-        .map((perspective) => ({
-          type: ACTION_TYPE,
-          title: `Switch to ${perspective.title} perspective`,
-          action: () => {
-            setActivePerspective(perspective.id);
-            history.push(perspective.welcomeRoute);
-          },
-        })),
-    [activePerspective, availablePerspectives, history, setActivePerspective],
-  );
 
   return [
     {
@@ -104,7 +88,6 @@ const useQuickJumpActions = (): SearchResultItem[] => {
         toggleScratchpad();
       },
     },
-    ...perspectiveActions,
   ];
 };
 
