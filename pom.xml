@@ -135,7 +135,7 @@
         <geoip2.version>5.0.2</geoip2.version>
         <grizzly-websockets.version>4.0.2</grizzly-websockets.version> <!-- Should match the version used by Jersey -->
         <grok.version>0.1.9-graylog-3</grok.version>
-        <grpc.version>1.78.0</grpc.version>
+        <grpc.version>1.79.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.5.0-jre</guava.version>
         <guice.version>7.0.0</guice.version>
@@ -168,7 +168,7 @@
         <lucene.version>9.12.3</lucene.version>
         <lz4.version>1.10.3</lz4.version>
         <metrics.version>4.2.38</metrics.version>
-        <mongodb-driver.version>5.6.2</mongodb-driver.version>
+        <mongodb-driver.version>5.6.3</mongodb-driver.version>
         <mongojack.version>5.1.0</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.2.9.Final</netty.version>
@@ -184,7 +184,7 @@
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>3.0.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
-        <shiro.version>2.0.6</shiro.version>
+        <shiro.version>2.1.0</shiro.version>
         <snakeyaml.version>2.5</snakeyaml.version>
         <snappy-java.version>1.1.10.8</snappy-java.version>
         <oshi.version>6.9.3</oshi.version>
@@ -199,7 +199,7 @@
         <unboundid-ldap.version>7.0.4</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.1</validation-api.version>
-        <zstd.version>1.5.7-6</zstd.version>
+        <zstd.version>1.5.7-7</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.13.0</jjwt.version>
@@ -784,7 +784,7 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.72.3</version>
+                            <version>8.72.6</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
