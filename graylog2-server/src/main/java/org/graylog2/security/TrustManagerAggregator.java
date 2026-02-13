@@ -17,6 +17,7 @@
 package org.graylog2.security;
 
 import com.google.common.collect.Iterables;
+import org.graylog2.shared.utilities.StringUtils;
 
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
@@ -76,14 +77,12 @@ public class TrustManagerAggregator implements X509TrustManager {
             List<CertificateException> failures) {
 
         StringBuilder message = new StringBuilder();
-        message.append(String.format(
-                "Certificate chain validation failed for %s trust. ", trustType));
-        message.append(String.format(
-                "Tried %d trust manager(s), all rejected the certificate. ", failures.size()));
+        message.append(StringUtils.f("Certificate chain validation failed for %s trust. ", trustType));
+        message.append(StringUtils.f("Tried %d trust manager(s), all rejected the certificate. ", failures.size()));
 
         if (chain != null && chain.length > 0) {
             X509Certificate cert = chain[0];
-            message.append(String.format(
+            message.append(StringUtils.f(
                     "Certificate details - Subject: '%s', Issuer: '%s', Valid: %s to %s. ",
                     cert.getSubjectX500Principal().getName(),
                     cert.getIssuerX500Principal().getName(),
@@ -92,8 +91,8 @@ public class TrustManagerAggregator implements X509TrustManager {
             ));
         }
 
-        message.append(String.format("Auth type: %s. ", authType));
-        message.append(String.format("Chain length: %d. ", chain != null ? chain.length : 0));
+        message.append(StringUtils.f("Auth type: %s. ", authType));
+        message.append(StringUtils.f("Chain length: %d. ", chain != null ? chain.length : 0));
 
         CertificateException exception = new CertificateException(message.toString());
 
