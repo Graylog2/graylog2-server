@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.opensearch3;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
@@ -68,6 +69,7 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
     private static final Logger LOGGER = LoggerFactory.getLogger(OfficialOpensearchClientProvider.class);
 
     private final Supplier<OfficialOpensearchClient> clientCache;
+    private final ObjectMapper objectMapper;
     private final TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider;
     private final IndexerJwtAuthToken indexerJwtAuthToken;
     private final CredentialsProvider credentialsProvider;
@@ -79,11 +81,13 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
             IndexerJwtAuthToken indexerJwtAuthToken,
             CredentialsProvider credentialsProvider,
             ElasticsearchClientConfiguration clientConfiguration,
+            ObjectMapper objectMapper,
             TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider
     ) {
         this.indexerJwtAuthToken = indexerJwtAuthToken;
         this.credentialsProvider = credentialsProvider;
         this.clientConfiguration = clientConfiguration;
+        this.objectMapper = objectMapper;
         this.trustManagerAndSocketFactoryProvider = trustManagerAndSocketFactoryProvider;
         clientCache = Suppliers.memoize(() -> buildClient(hosts));
     }
@@ -143,7 +147,7 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
         });
 
         final OpenSearchTransport transport = builder.build();
-        return new OfficialOpensearchClient(new CustomOpenSearchClient(transport), new CustomAsyncOpenSearchClient(transport));
+        return new OfficialOpensearchClient(new CustomOpenSearchClient(transport), new CustomAsyncOpenSearchClient(transport), objectMapper);
     }
 
     private static Optional<TlsStrategy> tlsStrategy(@Nullable TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider) {
