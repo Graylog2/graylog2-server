@@ -142,6 +142,8 @@ public class OpAmpCaService {
             final X509Certificate cert = PemUtils.parseCertificate(otlpServerCert.certificate());
             final X509Certificate caCert = PemUtils.parseCertificate(opAmpCa.certificate());
 
+            // JDK provider required: BoringSSL (OPENSSL) can load Ed25519 keys but cannot
+            // complete TLS handshakes — its cipher suite negotiation doesn't recognize Ed25519.
             return SslContextBuilder.forServer(key, cert)
                     .sslProvider(SslProvider.JDK)
                     .clientAuth(ClientAuth.REQUIRE)

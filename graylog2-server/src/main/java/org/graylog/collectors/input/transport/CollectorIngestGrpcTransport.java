@@ -92,6 +92,8 @@ public class CollectorIngestGrpcTransport extends ThrottleableTransport2 {
         final SslContext sslContext;
         try {
             final var sslContextBuilder = opAmpCaService.newServerSslContextBuilder();
+            // JDK provider required: BoringSSL (OPENSSL) can load Ed25519 keys but cannot
+            // complete TLS handshakes — its cipher suite negotiation doesn't recognize Ed25519.
             sslContext = GrpcSslContexts.configure(sslContextBuilder, SslProvider.JDK).build();
         } catch (Exception e) {
             throw new MisfireException("Failed to configure TLS for Collector Ingest gRPC input", e);

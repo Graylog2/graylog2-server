@@ -24,11 +24,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.security.KeyPair;
+import java.security.cert.CertPathValidator;
+import java.security.cert.CertPathValidatorException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.PKIXParameters;
+import java.security.cert.TrustAnchor;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
@@ -409,6 +416,89 @@ class CertificateBuilderTest {
 
         // Should NOT have Subject Alternative Names
         assertThat(cert.getSubjectAlternativeNames()).isNull();
+    }
+
+    // PKIX trust chain validation tests
+
+    @Test
+    void pkixAcceptsEndEntityCertSignedByIntermediateCa() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(1));
+        final CertificateEntry intermediateCa = builder.createIntermediateCa("Intermediate CA", rootCa, Duration.ofDays(1));
+        final CertificateEntry endEntity = builder.createEndEntityCert("test-agent", intermediateCa,
+                KeyUsage.digitalSignature, KeyPurposeId.id_kp_clientAuth, Duration.ofDays(1));
+
+        final X509Certificate endEntityCert = PemUtils.parseCertificate(endEntity.certificate());
+        final X509Certificate intermediateCert = PemUtils.parseCertificate(intermediateCa.certificate());
+
+        final CertPathValidator validator = CertPathValidator.getInstance("PKIX");
+        final CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        final var certPath = cf.generateCertPath(List.of(endEntityCert));
+        final var params = new PKIXParameters(Set.of(new TrustAnchor(intermediateCert, null)));
+        params.setRevocationEnabled(false);
+
+        assertThatCode(() -> validator.validate(certPath, params)).doesNotThrowAnyException();
+    }
+
+    @Test
+    void pkixValidatesFullChainFromEndEntityToRoot() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(1));
+        final CertificateEntry intermediateCa = builder.createIntermediateCa("Intermediate CA", rootCa, Duration.ofDays(1));
+        final CertificateEntry endEntity = builder.createEndEntityCert("test-agent", intermediateCa,
+                KeyUsage.digitalSignature, KeyPurposeId.id_kp_clientAuth, Duration.ofDays(1));
+
+        final X509Certificate endEntityCert = PemUtils.parseCertificate(endEntity.certificate());
+        final X509Certificate intermediateCert = PemUtils.parseCertificate(intermediateCa.certificate());
+        final X509Certificate rootCert = PemUtils.parseCertificate(rootCa.certificate());
+
+        final CertPathValidator validator = CertPathValidator.getInstance("PKIX");
+        final CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        final var certPath = cf.generateCertPath(List.of(endEntityCert, intermediateCert));
+        final var params = new PKIXParameters(Set.of(new TrustAnchor(rootCert, null)));
+        params.setRevocationEnabled(false);
+
+        assertThatCode(() -> validator.validate(certPath, params)).doesNotThrowAnyException();
+    }
+
+    @Test
+    void pkixRejectsEndEntityCertNotSignedByTrustedCa() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.ED25519, Duration.ofDays(1));
+        final CertificateEntry intermediateCa = builder.createIntermediateCa("Intermediate CA", rootCa, Duration.ofDays(1));
+        final X509Certificate intermediateCert = PemUtils.parseCertificate(intermediateCa.certificate());
+
+        // Create a rogue CA and sign an end-entity cert with it
+        final CertificateEntry rogueRootCa = builder.createRootCa("Rogue CA", Algorithm.ED25519, Duration.ofDays(1));
+        final CertificateEntry rogueCert = builder.createEndEntityCert("rogue-agent", rogueRootCa,
+                KeyUsage.digitalSignature, KeyPurposeId.id_kp_clientAuth, Duration.ofDays(1));
+
+        final X509Certificate rogueEndEntityCert = PemUtils.parseCertificate(rogueCert.certificate());
+
+        final CertPathValidator validator = CertPathValidator.getInstance("PKIX");
+        final CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        final var certPath = cf.generateCertPath(List.of(rogueEndEntityCert));
+        final var params = new PKIXParameters(Set.of(new TrustAnchor(intermediateCert, null)));
+        params.setRevocationEnabled(false);
+
+        assertThatThrownBy(() -> validator.validate(certPath, params))
+                .isInstanceOf(CertPathValidatorException.class);
+    }
+
+    @Test
+    void pkixAcceptsRsaEndEntityCertSignedByIntermediateCa() throws Exception {
+        final CertificateEntry rootCa = builder.createRootCa("Root CA", Algorithm.RSA_4096, Duration.ofDays(1));
+        final CertificateEntry intermediateCa = builder.createIntermediateCa("Intermediate CA", rootCa, Duration.ofDays(1));
+        final CertificateEntry endEntity = builder.createEndEntityCert("test-agent", intermediateCa,
+                KeyUsage.digitalSignature, KeyPurposeId.id_kp_clientAuth, Duration.ofDays(1));
+
+        final X509Certificate endEntityCert = PemUtils.parseCertificate(endEntity.certificate());
+        final X509Certificate intermediateCert = PemUtils.parseCertificate(intermediateCa.certificate());
+
+        final CertPathValidator validator = CertPathValidator.getInstance("PKIX");
+        final CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        final var certPath = cf.generateCertPath(List.of(endEntityCert));
+        final var params = new PKIXParameters(Set.of(new TrustAnchor(intermediateCert, null)));
+        params.setRevocationEnabled(false);
+
+        assertThatCode(() -> validator.validate(certPath, params)).doesNotThrowAnyException();
     }
 
     // Note: CSR creation and signing tests will be added when the createCsr and signCsr

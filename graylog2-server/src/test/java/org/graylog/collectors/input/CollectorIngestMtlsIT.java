@@ -84,28 +84,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.ByteArrayInputStream;
-import java.math.BigInteger;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.Principal;
-import java.security.PrivateKey;
-import java.security.Security;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
-
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -114,30 +92,43 @@ import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedKeyManager;
 import javax.net.ssl.X509TrustManager;
+import java.math.BigInteger;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.Principal;
+import java.security.PrivateKey;
+import java.security.Security;
+import java.security.cert.X509Certificate;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 
 /**
- * Integration tests for Ed25519 mTLS end-to-end via {@code SslProvider.JDK}.
+ * Integration tests for Ed25519 mTLS end-to-end.
  * <p>
  * These tests verify the main technical risk: Ed25519 mTLS works for both gRPC and HTTP
  * transports. Each test starts a real server with TLS, creates client connections using
  * Ed25519 certificates, and validates that authentication and data flow work correctly.
  * <p>
  * BouncyCastle is used to generate Ed25519 certificates (JDK does not provide a
- * certificate builder API). After generation, BC is removed from the security provider
- * list and all keys/certs are converted to JDK-native format. This is necessary because
- * JDK's SSL engine requires {@code EdECPrivateKey} (not BC's {@code BCEdDSAPrivateKey})
- * for Ed25519 TLS operations.
+ * certificate builder API). All keys and certs are parsed through {@link PemUtils}
+ * (same code path as production) which returns JDK-native types via SunEC.
  * <p>
  * Both client and server use {@code InsecureTrustManagerFactory} to bypass PKIX cert path
- * validation, which has compatibility issues with Ed25519 certs in the test environment.
- * The server still enforces {@code ClientAuth.REQUIRE}, ensuring the client must present
- * a certificate. The focus of these tests is on the mTLS handshake mechanics and agent
- * identity propagation, not on cert chain validation (which is handled by standard JDK
- * infrastructure).
+ * validation. The server still enforces {@code ClientAuth.REQUIRE}, ensuring the client
+ * must present a certificate. The focus of these tests is on the mTLS handshake mechanics
+ * and agent identity propagation, not on cert chain validation.
  */
 @ExtendWith(MockitoExtension.class)
 class CollectorIngestMtlsIT {
@@ -145,15 +136,15 @@ class CollectorIngestMtlsIT {
     private static final String AGENT_INSTANCE_UID = "test-agent-instance-123";
     private static final Duration CERT_VALIDITY = Duration.ofDays(1);
 
-    // Server cert with SAN for 127.0.0.1 - JDK-native format
+    // Server cert with SAN for 127.0.0.1
     private static PrivateKey serverKey;
     private static X509Certificate serverCert;
 
-    // Agent cert signed by the CA - JDK-native format
+    // Agent cert signed by the CA
     private static PrivateKey agentKey;
     private static X509Certificate agentCert;
 
-    // CA cert (self-signed root) - JDK-native format
+    // CA cert (self-signed root)
     private static X509Certificate caCert;
 
     @Mock
@@ -169,9 +160,7 @@ class CollectorIngestMtlsIT {
     @BeforeAll
     static void setupCerts() throws Exception {
         // Register BC for cert generation (JDK has no certificate builder API).
-        // Track whether we added it so we only remove our own registration.
-        final boolean bcWasPresent = Security.getProvider("BC") != null;
-        if (!bcWasPresent) {
+        if (Security.getProvider("BC") == null) {
             Security.addProvider(new BouncyCastleProvider());
         }
 
@@ -183,13 +172,19 @@ class CollectorIngestMtlsIT {
         final CertificateEntry agentCertEntry = certificateBuilder.createEndEntityCert(AGENT_INSTANCE_UID, caEntry,
                 KeyUsage.digitalSignature, KeyPurposeId.id_kp_clientAuth, CERT_VALIDITY);
 
-        // Create server cert with SAN for IP 127.0.0.1 (required by hostname verification)
-        final X509Certificate issuerCertBc = PemUtils.parseCertificate(caEntry.certificate());
-        final PrivateKey issuerKeyBc = PemUtils.parsePrivateKey(encryptedValueService.decrypt(caEntry.privateKey()));
-        final KeyPair serverKeyPair = KeyPairGenerator.getInstance("Ed25519", "BC").generateKeyPair();
+        // Parse CA and agent certs via PemUtils — same code path as production
+        // (OpAmpCaService.newServerSslContextBuilder())
+        caCert = PemUtils.parseCertificate(caEntry.certificate());
+        agentKey = PemUtils.parsePrivateKey(encryptedValueService.decrypt(agentCertEntry.privateKey()));
+        agentCert = PemUtils.parseCertificate(agentCertEntry.certificate());
+
+        // Create server cert with SAN for IP 127.0.0.1 (required by hostname verification).
+        // CertificateBuilder only supports DNS SANs, so we build this one manually with BC.
+        final PrivateKey issuerKey = PemUtils.parsePrivateKey(encryptedValueService.decrypt(caEntry.privateKey()));
+        final KeyPair serverKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
         final X500Name serverSubject = new X500NameBuilder(BCStyle.INSTANCE)
                 .addRDN(BCStyle.CN, "Test Server").addRDN(BCStyle.O, "Test").build();
-        final X500Name issuerDn = new X500Name(issuerCertBc.getSubjectX500Principal().getName());
+        final X500Name issuerDn = new X500Name(caCert.getSubjectX500Principal().getName());
         final Instant now = Instant.now();
         final JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                 issuerDn, BigInteger.valueOf(System.currentTimeMillis()),
@@ -203,28 +198,10 @@ class CollectorIngestMtlsIT {
         certBuilder.addExtension(Extension.subjectAlternativeName, false,
                 new GeneralNames(new GeneralName(GeneralName.iPAddress, "127.0.0.1")));
         final ContentSigner signer = new JcaContentSignerBuilder("Ed25519")
-                .setProvider("BC").build(issuerKeyBc);
-        final X509Certificate serverCertBc = new JcaX509CertificateConverter()
-                .setProvider("BC").getCertificate(certBuilder.build(signer));
-
-        // Parse agent cert/key via PemUtils (returns BC-backed objects)
-        final PrivateKey agentKeyBc = PemUtils.parsePrivateKey(encryptedValueService.decrypt(agentCertEntry.privateKey()));
-        final X509Certificate agentCertBc = PemUtils.parseCertificate(agentCertEntry.certificate());
-        final X509Certificate caCertBc = PemUtils.parseCertificate(caEntry.certificate());
-
-        // Remove BC before converting to JDK format. JDK's SSL engine requires
-        // EdECPrivateKey (not BC's BCEdDSAPrivateKey) for Ed25519 TLS operations.
-        // Only remove if we added it -- other tests may depend on BC being present.
-        if (!bcWasPresent) {
-            Security.removeProvider("BC");
-        }
-
-        // Re-encode and re-parse via JDK providers to get native types
-        serverKey = toJdkKey(serverKeyPair.getPrivate());
-        serverCert = toJdkCert(serverCertBc);
-        agentKey = toJdkKey(agentKeyBc);
-        agentCert = toJdkCert(agentCertBc);
-        caCert = toJdkCert(caCertBc);
+                .setProvider("BC").build(issuerKey);
+        serverCert = new JcaX509CertificateConverter()
+                .getCertificate(certBuilder.build(signer));
+        serverKey = serverKeyPair.getPrivate();
     }
 
     @BeforeEach
@@ -437,33 +414,12 @@ class CollectorIngestMtlsIT {
 
     // ----- Helper methods -----
 
-    /**
-     * Converts a BouncyCastle Ed25519 private key to JDK-native format.
-     * Re-encoding via PKCS#8 and re-parsing via JDK's SunEC provider produces
-     * a native {@code EdECPrivateKey} that JDK's SSL engine can use.
-     */
-    private static PrivateKey toJdkKey(PrivateKey bcKey) throws Exception {
-        final KeyFactory kf = KeyFactory.getInstance("Ed25519", "SunEC");
-        return kf.generatePrivate(new PKCS8EncodedKeySpec(bcKey.getEncoded()));
-    }
-
-    /**
-     * Converts a BouncyCastle X.509 certificate to JDK-native format.
-     * Re-encoding via DER and re-parsing via JDK's SUN provider produces
-     * a native {@code X509CertImpl}.
-     */
-    private static X509Certificate toJdkCert(X509Certificate bcCert) throws Exception {
-        final CertificateFactory cf = CertificateFactory.getInstance("X.509", "SUN");
-        return (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(bcCert.getEncoded()));
-    }
-
     private int startGrpcServer() throws Exception {
         // InsecureTrustManagerFactory accepts any client cert. ClientAuth.REQUIRE
         // still enforces that a cert MUST be presented. The cert is then available
         // in the SSL session for CN extraction by AgentCertTransportFilter.
         final SslContext sslContext = GrpcSslContexts.configure(
                 SslContextBuilder.forServer(serverKey, serverCert)
-                        .sslProvider(SslProvider.JDK)
                         .clientAuth(ClientAuth.REQUIRE)
                         .trustManager(InsecureTrustManagerFactory.INSTANCE),
                 SslProvider.JDK
