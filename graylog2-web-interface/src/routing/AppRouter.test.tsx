@@ -86,6 +86,7 @@ const mockRoutes = (routes: PluginExports['routes']) => {
 describe('AppRouter', () => {
   beforeEach(() => {
     AppConfig.isFeatureEnabled = jest.fn(() => false);
+    asMock(usePluginEntities).mockReturnValue([]);
     asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) => createMemoryRouter(routes));
   });
 

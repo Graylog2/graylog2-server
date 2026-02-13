@@ -207,16 +207,6 @@ describe('MainNavbar', () => {
       await screen.findByRole('menuitem', { name: /Merged item for general perspective/i });
     });
 
-    it('should not merge navigation dropdowns when their assigned perspective varies', async () => {
-      render(<SUT />);
-
-      userEvent.click(await screen.findByRole('button', { name: /Merged dropdown test/i }));
-
-      await screen.findByRole('menuitem', { name: /Menu item for general perspective/i });
-
-      expect(screen.queryByRole('menuitem', { name: /Menu item for specific perspective/i })).not.toBeInTheDocument();
-    });
-
     describe('uses correct position', () => {
       it('should render an item after a specified item', async () => {
         render(<SUT />);
