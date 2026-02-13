@@ -43,6 +43,7 @@ public abstract class CollectorInstanceDTO implements BuildableMongoEntity<Colle
     public static final String FIELD_ENROLLED_AT = "enrolled_at";
     public static final String FIELD_IDENTIFYING_ATTRIBUTES = "identifying_attributes";
     public static final String FIELD_NON_IDENTIFYING_ATTRIBUTES = "non_identifying_attributes";
+    public static final String FIELD_LAST_PROCESSED_TXN_SEQ = "last_processed_txn_seq";
 
 
     @JsonProperty(FIELD_INSTANCE_UID)
@@ -79,6 +80,9 @@ public abstract class CollectorInstanceDTO implements BuildableMongoEntity<Colle
     @JsonProperty(FIELD_NON_IDENTIFYING_ATTRIBUTES)
     public abstract Optional<List<Attribute>> nonIdentifyingAttributes();
 
+    @JsonProperty(FIELD_LAST_PROCESSED_TXN_SEQ)
+    public abstract long lastProcessedTxnSeq();
+
     public static Builder builder() {
         return AutoValue_CollectorInstanceDTO.Builder.create();
     }
@@ -90,7 +94,8 @@ public abstract class CollectorInstanceDTO implements BuildableMongoEntity<Colle
         @JsonCreator
         public static Builder create() {
             return new AutoValue_CollectorInstanceDTO.Builder()
-                    .messageSeqNum(0L);
+                    .messageSeqNum(0L)
+                    .lastProcessedTxnSeq(0L);
         }
 
         @JsonProperty(FIELD_INSTANCE_UID)
@@ -126,6 +131,9 @@ public abstract class CollectorInstanceDTO implements BuildableMongoEntity<Colle
 
         @JsonProperty(FIELD_NON_IDENTIFYING_ATTRIBUTES)
         public abstract Builder nonIdentifyingAttributes(@Nullable List<Attribute> nonIdentifyingAttributes);
+
+        @JsonProperty(FIELD_LAST_PROCESSED_TXN_SEQ)
+        public abstract Builder lastProcessedTxnSeq(long lastProcessedTxnSeq);
 
         public abstract CollectorInstanceDTO build();
     }

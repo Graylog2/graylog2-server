@@ -32,8 +32,10 @@ import org.graylog2.plugin.PluginModule;
 public class CollectorsModule extends PluginModule {
     @Override
     protected void configure() {
+        // Fleet transaction log
         Multibinder.newSetBinder(binder(), String.class, SequenceTopics.class)
                 .addBinding().toInstance("fleet_txn_log");
+        bind(FleetTransactionLogService.class);
 
         addMessageInput(CollectorIngestGrpcInput.class);
         addMessageInput(CollectorIngestHttpInput.class);
