@@ -26,8 +26,6 @@ import AppConfig from 'util/AppConfig';
 import type { SearchResultItem } from 'components/quick-jump/Types';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
-import PerspectivesContext from 'components/perspectives/contexts/PerspectivesContext';
-import useHistory from 'routing/useHistory';
 
 const useEntityCreatorItems = () => {
   const { isPermitted } = usePermissions();
