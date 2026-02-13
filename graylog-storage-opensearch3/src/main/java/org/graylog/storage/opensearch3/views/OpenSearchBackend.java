@@ -298,13 +298,14 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                             })
                             .orElse(affectedIndices);
 
-                    Set<String> indices = affectedIndicesForSearchType.isEmpty() ? Collections.singleton("*") : affectedIndicesForSearchType;
-                    final MutableSearchRequestBuilder searchRequest = searchTypeQueries.get(searchTypeId)
+                    MutableSearchRequestBuilder searchRequest = searchTypeQueries.get(searchTypeId)
                             .copy()
-                            .index(indices.stream().toList())
                             .allowNoIndices(true)
                             .ignoreUnavailable(true)
                             .expandWildcards(ExpandWildcard.Open);
+                    if (affectedIndices != null && !affectedIndicesForSearchType.isEmpty()) {
+                        searchRequest.index(affectedIndicesForSearchType.stream().toList());
+                    }
 
                     if (!SearchJob.NO_CANCELLATION.equals(job.getCancelAfterSeconds())) {
                         searchRequest.cancelAfterTimeInterval(Time.of(t -> t.time(job.getCancelAfterSeconds() + "s")));
