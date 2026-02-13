@@ -72,9 +72,8 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         if (generateRollups) {
             seriesStream(pivot, queryContext, "global rollup")
                     .filter(result -> Placement.METRIC.equals(result.placement()))
-                    .forEach(agg -> {
-                        searchSourceBuilder.aggregation(agg.aggregationBuilder());
-                    });
+                    .map(SeriesAggregationBuilder::aggregationBuilder)
+                    .forEach(searchSourceBuilder::aggregation);
         }
 
         final BucketSpecHandler.CreatedAggregations<MutableNamedAggregationBuilder> createdAggregations = createPivots(BucketSpecHandler.Direction.Row, query, pivot, pivot.rowGroups(), queryContext);
@@ -144,7 +143,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
             final List<MutableNamedAggregationBuilder> aggregationMetrics = bucketAggregations.metrics();
 
             metrics.addAll(aggregationMetrics);
-            if (root == null) {
+            if (root == null && leaf == null) {
                 root = aggregationRoot;
                 leaf = aggregationLeaf;
             } else {
