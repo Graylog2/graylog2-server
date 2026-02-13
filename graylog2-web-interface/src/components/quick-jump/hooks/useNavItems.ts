@@ -163,7 +163,6 @@ const useMainNavigationItems = () => {
       ? item.children.map<BaseNavigationItem>((child) => ({
           ...child,
           description: `${item.description} / ${child.description}`,
-          perspective: item.perspective,
         }))
       : [item],
   );

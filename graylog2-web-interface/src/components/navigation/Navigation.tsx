@@ -23,7 +23,7 @@ import AppConfig from 'util/AppConfig';
 import { Navbar, Nav } from 'components/bootstrap';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import Routes from 'routing/Routes';
-import BrandNavLogo from 'components/perspectives/NavigationBrand';
+import BrandNavLogo from 'components/navigation/NavigationBrand';
 import usePluginEntities from 'hooks/usePluginEntities';
 import MainNavbar from 'components/navigation/MainNavbar';
 import { FEATURE_FLAG } from 'components/quick-jump/Constants';
