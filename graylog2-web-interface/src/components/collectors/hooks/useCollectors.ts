@@ -16,10 +16,12 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
+import { SystemInputs } from '@graylog/server-api';
 import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
+import type { InputSummary } from 'hooks/usePaginatedInputs';
 
 import type { CollectorsConfig, Fleet, CollectorInstanceView, Source, CollectorStats } from '../types';
 import { fetchCollectorsConfig } from './collectorsApi';
@@ -294,4 +296,11 @@ export const useCollectorsConfig = () =>
   useQuery<CollectorsConfig>({
     queryKey: COLLECTORS_CONFIG_KEY,
     queryFn: fetchCollectorsConfig,
+  });
+
+export const useInput = (inputId: string | null) =>
+  useQuery<InputSummary>({
+    queryKey: ['inputs', inputId],
+    queryFn: () => SystemInputs.get(inputId) as Promise<InputSummary>,
+    enabled: !!inputId,
   });

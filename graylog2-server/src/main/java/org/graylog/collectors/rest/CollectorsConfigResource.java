@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors;
+package org.graylog.collectors.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,6 +32,8 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.IngestEndpointConfig;
 import org.graylog.collectors.input.CollectorIngestGrpcInput;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -44,20 +46,20 @@ import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.RestTools;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.Map;
 
-@Tag(name = "Collectors", description = "Managed collector configuration")
+@Tag(name = "Collectors/Config", description = "Managed collector configuration")
 @Path("/collectors/config")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
-public class CollectorsConfigResource implements PluginRestResource {
+public class CollectorsConfigResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorsConfigResource.class);
 
     static final int DEFAULT_HTTP_PORT = 14401;
@@ -90,7 +92,7 @@ public class CollectorsConfigResource implements PluginRestResource {
         final var hostname = RestTools.buildExternalUri(requestContext.getHeaders(), httpExternalUri).getHost();
         return new CollectorsConfig(
                 null, null, null,
-                new IngestEndpointConfig(true, hostname, DEFAULT_HTTP_PORT, null),
+                new IngestEndpointConfig(false, hostname, DEFAULT_HTTP_PORT, null),
                 new IngestEndpointConfig(false, hostname, DEFAULT_GRPC_PORT, null)
         );
     }

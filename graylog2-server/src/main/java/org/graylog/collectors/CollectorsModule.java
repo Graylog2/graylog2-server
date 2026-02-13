@@ -24,6 +24,7 @@ import org.graylog.collectors.input.transport.CollectorIngestGrpcTransport;
 import org.graylog.collectors.input.transport.CollectorIngestHttpTransport;
 import org.graylog.collectors.input.transport.CollectorIngestLogsService;
 import org.graylog.collectors.rest.CollectorInstancesResource;
+import org.graylog.collectors.rest.CollectorsConfigResource;
 import org.graylog2.plugin.PluginModule;
 
 public class CollectorsModule extends PluginModule {
@@ -37,7 +38,7 @@ public class CollectorsModule extends PluginModule {
 
         install(new FactoryModuleBuilder().build(CollectorIngestLogsService.Factory.class));
 
-        addRestResource(CollectorsConfigResource.class);
+        addSystemRestResource(CollectorsConfigResource.class);
         addSystemRestResource(CollectorInstancesResource.class);
     }
 }

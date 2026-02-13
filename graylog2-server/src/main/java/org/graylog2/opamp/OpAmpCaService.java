@@ -24,6 +24,7 @@ import jakarta.inject.Singleton;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.rest.CollectorsConfigResource;
 import org.graylog.security.pki.Algorithm;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
@@ -51,7 +52,7 @@ import java.util.List;
  * <p>
  * The hierarchy is created on-demand when first accessed via {@link #ensureInitialized()}.
  * Certificate IDs are persisted in {@link CollectorsConfig} by the caller
- * ({@link org.graylog.collectors.CollectorsConfigResource}).
+ * ({@link CollectorsConfigResource}).
  */
 @Singleton
 public class OpAmpCaService {
