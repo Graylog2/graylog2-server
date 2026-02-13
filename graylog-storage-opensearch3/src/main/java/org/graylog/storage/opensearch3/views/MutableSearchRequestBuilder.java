@@ -207,7 +207,7 @@ public class MutableSearchRequestBuilder {
     }
 
     public MutableSearchRequestBuilder copy() {
-        return new MutableSearchRequestBuilder()
+        final MutableSearchRequestBuilder copy = new MutableSearchRequestBuilder()
                 .query(query)
                 .from(from)
                 .size(size)
@@ -216,11 +216,14 @@ public class MutableSearchRequestBuilder {
                 .allowNoIndices(allowNoIndices)
                 .ignoreUnavailable(ignoreUnavailable)
                 .expandWildcards(expandWildcards)
-                .sort(sort)
+                .cancelAfterTimeInterval(cancelAfterTimeInterval)
+                .preference(preference)
                 .source(source)
                 .highlight(highlight)
-                .aggregations(aggregations)
                 .searchAfter(searchAfter);
+        copy.aggregations = new ArrayList<>(aggregations);
+        copy.sort = sort != null ? new ArrayList<>(sort) : null;
+        return copy;
     }
 
     @Override
