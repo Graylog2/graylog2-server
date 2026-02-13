@@ -100,6 +100,7 @@ import org.graylog2.migrations.MigrationsModule;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.opamp.OpAmpConfiguration;
+import org.graylog2.database.MongoSequenceModule;
 import org.graylog2.opamp.OpAmpModule;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.plugin.ServerStatus;
@@ -231,6 +232,7 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                 new DataNodeModule(),
                 new McpServerModule(),
                 new QuickJumpModule(featureFlags),
+                new MongoSequenceModule(),
                 new OpAmpModule(),
                 new CollectorsModule()
         );

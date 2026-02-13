@@ -25,11 +25,16 @@ import org.graylog.collectors.input.transport.CollectorIngestHttpTransport;
 import org.graylog.collectors.input.transport.CollectorIngestLogsService;
 import org.graylog.collectors.rest.CollectorInstancesResource;
 import org.graylog.collectors.rest.CollectorsConfigResource;
+import com.google.inject.multibindings.Multibinder;
+import org.graylog2.database.SequenceTopics;
 import org.graylog2.plugin.PluginModule;
 
 public class CollectorsModule extends PluginModule {
     @Override
     protected void configure() {
+        Multibinder.newSetBinder(binder(), String.class, SequenceTopics.class)
+                .addBinding().toInstance("fleet_txn_log");
+
         addMessageInput(CollectorIngestGrpcInput.class);
         addMessageInput(CollectorIngestHttpInput.class);
         addTransport(CollectorIngestGrpcTransport.NAME, CollectorIngestGrpcTransport.class);
