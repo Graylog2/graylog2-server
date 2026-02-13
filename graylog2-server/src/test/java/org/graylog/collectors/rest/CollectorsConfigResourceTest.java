@@ -99,7 +99,7 @@ class CollectorsConfigResourceTest {
 
         final var result = resource.get(requestContext);
 
-        assertThat(result.http().enabled()).isTrue();
+        assertThat(result.http().enabled()).isFalse();
         assertThat(result.http().hostname()).isEqualTo("graylog.example.com");
         assertThat(result.http().port()).isEqualTo(14401);
         assertThat(result.http().inputId()).isNull();
