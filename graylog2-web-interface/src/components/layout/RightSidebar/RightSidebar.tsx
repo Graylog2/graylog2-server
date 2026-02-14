@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 import useRightSidebar from 'hooks/useRightSidebar';
 import Icon from 'components/common/Icon';
@@ -23,6 +23,20 @@ import IconButton from 'components/common/IconButton';
 import Row from 'components/bootstrap/Row';
 
 const COLLAPSED_WIDTH = 36;
+const ANIMATION_DURATION = '0.3s';
+
+const slide = keyframes`
+  from {
+    width: 0;
+    min-width: 0;
+  }
+`;
+
+const fade = keyframes`
+  from {
+    opacity: 0;
+  }
+`;
 
 const Container = styled.div<{ $width: number }>(
   ({ $width }) => css`
@@ -35,6 +49,11 @@ const Container = styled.div<{ $width: number }>(
     display: flex;
     flex-direction: column;
     padding: 10px;
+    animation: ${slide} ${ANIMATION_DURATION} ease-in-out;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   `,
 );
 
@@ -81,6 +100,12 @@ const CollapsedTitle = styled.span(
     max-height: 100%;
     color: ${theme.colors.text.primary};
     user-select: none;
+
+    animation: ${fade} ${ANIMATION_DURATION} ease-in-out;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
   `,
 );
 
@@ -137,6 +162,12 @@ const ContentArea = styled.div`
   overflow: hidden auto;
   padding: 15px;
   min-height: 0;
+
+  animation: ${fade} ${ANIMATION_DURATION} cubic-bezier(1, 0, 1, 0.3);
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
 `;
 
 const StyledRow = styled(Row)`
