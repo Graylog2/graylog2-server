@@ -89,7 +89,9 @@ public class CloudTrailInput extends MessageInput {
             super(NAME, false, "");
         }
 
-        // isForwarderCompatible() is enabled by default.suc
+        public boolean isForwarderCompatible() {
+            return false;
+        }
 
         public boolean isCloudCompatible() {
             return true;
