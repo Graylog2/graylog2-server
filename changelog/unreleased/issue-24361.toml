@@ -1,5 +1,5 @@
 type = "a"
-message = "Add default 34-day time range filter to Alerts Entity Table"
+message = "Set the default timerange to 30-day for filtering Alerts Entity Table"
 
 pulls = ["24950"]
 issues = ["24361"]
