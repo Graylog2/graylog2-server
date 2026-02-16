@@ -127,10 +127,10 @@
         <commons-validator.version>1.10.1</commons-validator.version>
         <commons-io.version>2.21.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
-        <error-prone.version>2.46.0</error-prone.version>
+        <error-prone.version>2.47.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
         <gcs.version>2.62.1</gcs.version>
-        <azure-blob-storage.version>12.33.1</azure-blob-storage.version>
+        <azure-blob-storage.version>12.33.2</azure-blob-storage.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>5.0.2</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
@@ -152,8 +152,6 @@
         <jakarta.servlet-api.version>6.1.0</jakarta.servlet-api.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <jbcrypt.version>0.4</jbcrypt.version>
-        <jcip-annotations.version>1.0</jcip-annotations.version>
-        <jdot.version>1.0</jdot.version>
         <jersey.version>4.0.2</jersey.version>
         <jmte.version>7.0.3</jmte.version>
         <joda-time.version>2.14.0</joda-time.version>
@@ -170,7 +168,7 @@
         <mongodb-driver.version>5.6.3</mongodb-driver.version>
         <mongojack.version>5.1.0</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.2.9.Final</netty.version>
+        <netty.version>4.2.10.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.75.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>5.3.2</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
@@ -783,7 +781,7 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.72.6</version>
+                            <version>8.72.8</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
