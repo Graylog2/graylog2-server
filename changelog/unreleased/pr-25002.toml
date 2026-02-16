@@ -5,7 +5,7 @@ details.user = """
 As part of merging into a single general perspective, we simplified perspective-related plugin integration in core:
 
   - removed the `perspectives` plugin export and its core registration
-  - removed perspective-based handling from navigation plugin contributions (`navigation` and `pageNavigation`)
+  - plugin-provided `navigation` and `pageNavigation` entities no longer support the `perspective` key.
 """
 
 issues = ["Graylog2/graylog-plugin-enterprise#13194"]
