@@ -151,7 +151,6 @@ type BaseNavigationItem = {
   description: string;
   path: QualifiedUrl<string>;
   permissions?: Permission | Array<Permission>;
-  perspective?: string;
 };
 
 const useMainNavigationItems = () => {

@@ -338,7 +338,6 @@ declare module 'graylog-web-plugin/plugin' {
 
   interface PageNavigation {
     description: string;
-    perspective?: string;
     children: Array<{
       description: string;
       position?: PluginNavigation['position'];
@@ -372,7 +371,6 @@ declare module 'graylog-web-plugin/plugin' {
   type PluginNavigation = {
     description: string;
     requiredFeatureFlag?: string;
-    perspective?: string;
     BadgeComponent?: React.ComponentType<{ text: string }>;
     position?: { last: true } | { after: string } | undefined;
     permissions?: Permission | Array<Permission>;
