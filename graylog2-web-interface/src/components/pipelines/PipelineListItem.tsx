@@ -149,13 +149,13 @@ const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeleteP
       <td>{_formatStages()}</td>
       <td>
         <ButtonToolbar>
-          <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(id)} aria-label='Edit Pipeline'>
+          <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(id)} aria-label="Edit Pipeline">
             <Button disabled={!isPermitted('pipeline:edit')} bsSize="xsmall">
               Edit
             </Button>
           </LinkContainer>
           <Button
-            aria-label='Delete Pipeline'
+            aria-label="Delete Pipeline"
             disabled={!isPermitted('pipeline:delete') || isNotDeletable}
             bsStyle="danger"
             bsSize="xsmall"
