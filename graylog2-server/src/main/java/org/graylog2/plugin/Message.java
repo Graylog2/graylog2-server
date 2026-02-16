@@ -18,6 +18,7 @@ package org.graylog2.plugin;
 
 import com.codahale.metrics.Meter;
 import com.eaio.uuid.UUID;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
@@ -776,6 +777,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
      * will be reflected in the returned set. Only use this when the set is consumed immediately
      * (e.g. iteration, streaming) and not held across operations that may mutate the message.
      */
+    @JsonIgnore
     public Set<Stream> getStreamsUnmodifiable() {
         return Collections.unmodifiableSet(this.streams);
     }
