@@ -23,6 +23,8 @@ import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 import org.opensearch.client.opensearch._types.aggregations.MaxAggregate;
 
+import java.util.Optional;
+
 public class OSMaxHandler extends OSBasicSeriesSpecHandler<Max> {
 
     @Override
@@ -35,7 +37,10 @@ public class OSMaxHandler extends OSBasicSeriesSpecHandler<Max> {
     @Override
     protected Object getValueFromAggregationResult(final Aggregate agg,
                                                    final Max maxSpec) {
-        MaxAggregate max = agg.isMax() ? agg.max() : null;
-        return max == null ? null : max.value();
+        return Optional.ofNullable(agg)
+                .filter(Aggregate::isMax)
+                .map(Aggregate::max)
+                .map(MaxAggregate::value)
+                .orElse(null);
     }
 }

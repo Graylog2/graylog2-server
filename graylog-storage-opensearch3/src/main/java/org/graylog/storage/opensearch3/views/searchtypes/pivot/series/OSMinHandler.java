@@ -23,6 +23,8 @@ import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 import org.opensearch.client.opensearch._types.aggregations.MinAggregate;
 
+import java.util.Optional;
+
 public class OSMinHandler extends OSBasicSeriesSpecHandler<Min> {
 
     @Override
@@ -33,7 +35,10 @@ public class OSMinHandler extends OSBasicSeriesSpecHandler<Min> {
 
     @Override
     protected Object getValueFromAggregationResult(final Aggregate agg, final Min minSpec) {
-        MinAggregate min = agg.isMin() ? agg.min() : null;
-        return min == null ? null : min.value();
+        return Optional.ofNullable(agg)
+                .filter(Aggregate::isMin)
+                .map(Aggregate::min)
+                .map(MinAggregate::value)
+                .orElse(null);
     }
 }

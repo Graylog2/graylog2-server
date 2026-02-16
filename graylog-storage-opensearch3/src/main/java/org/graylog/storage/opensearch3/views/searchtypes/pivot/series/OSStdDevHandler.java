@@ -21,6 +21,9 @@ import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggre
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.ExtendedStatsAggregateBase;
+
+import java.util.Optional;
 
 public class OSStdDevHandler extends OSBasicSeriesSpecHandler<StdDev> {
 
@@ -32,7 +35,10 @@ public class OSStdDevHandler extends OSBasicSeriesSpecHandler<StdDev> {
 
     @Override
     protected Object getValueFromAggregationResult(final Aggregate agg, final StdDev seriesSpec) {
-        var extendedStats = agg.isExtendedStats() ? agg.extendedStats() : null;
-        return extendedStats == null ? null : extendedStats.stdDeviation();
+        return Optional.ofNullable(agg)
+                .filter(Aggregate::isExtendedStats)
+                .map(Aggregate::extendedStats)
+                .map(ExtendedStatsAggregateBase::stdDeviation)
+                .orElse(null);
     }
 }
