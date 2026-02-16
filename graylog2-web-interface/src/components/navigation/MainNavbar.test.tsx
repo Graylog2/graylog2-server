@@ -75,17 +75,12 @@ describe('MainNavbar', () => {
           {
             description: 'Merged dropdown test',
             path: '/',
-            children: [{ path: '/another-route', description: 'Menu item for general perspective' }],
+            children: [{ path: '/another-route', description: 'Dropdown menu item 1' }],
           },
           {
             description: 'Merged dropdown test',
             path: '/',
-            children: [{ path: '/just-another-route', description: 'Merged item for general perspective' }],
-          },
-          {
-            description: 'Merged dropdown test',
-            path: '/',
-            children: [{ path: '/another-route', description: 'Menu item for specific perspective' }],
+            children: [{ path: '/just-another-route', description: 'Dropdown menu item 2' }],
           },
         ],
       } as PluginExports,
@@ -203,8 +198,8 @@ describe('MainNavbar', () => {
 
       userEvent.click(await screen.findByRole('button', { name: /Merged dropdown test/i }));
 
-      await screen.findByRole('menuitem', { name: /Menu item for general perspective/i });
-      await screen.findByRole('menuitem', { name: /Merged item for general perspective/i });
+      await screen.findByRole('menuitem', { name: /Dropdown menu item 1/i });
+      await screen.findByRole('menuitem', { name: /Dropdown menu item 2/i });
     });
 
     describe('uses correct position', () => {
