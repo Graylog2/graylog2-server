@@ -112,10 +112,16 @@ public class ConfigurationStateUpdater {
         return newState;
     }
 
+    // Metadata updates are best-effort: metadata is a derived cache rebuilt from scratch on every
+    // restart, so a failed incremental update will be corrected on next boot.
     private PipelineInterpreter.State reloadAndSave(RulesChangedEvent event) {
         final PipelineInterpreter.State state = reloadAndSave();
         if (configuration.isLeader()) { // avoid duplicate work and possible inconsistencies
-            metadataUpdater.handleRuleChanges(event, state, pipelineResolver, pipelineMetricRegistry);
+            try {
+                metadataUpdater.handleRuleChanges(event, state);
+            } catch (Exception e) {
+                log.warn("Failed to update pipeline metadata for rule changes: {}", e.getMessage(), e);
+            }
         }
         return state;
     }
@@ -123,7 +129,11 @@ public class ConfigurationStateUpdater {
     private PipelineInterpreter.State reloadAndSave(PipelinesChangedEvent event) {
         final PipelineInterpreter.State state = reloadAndSave();
         if (configuration.isLeader()) { // avoid duplicate work and possible inconsistencies
-            metadataUpdater.handlePipelineChanges(event, state, pipelineResolver, pipelineMetricRegistry);
+            try {
+                metadataUpdater.handlePipelineChanges(event, state);
+            } catch (Exception e) {
+                log.warn("Failed to update pipeline metadata for pipeline changes: {}", e.getMessage(), e);
+            }
         }
         return state;
     }
@@ -131,7 +141,11 @@ public class ConfigurationStateUpdater {
     private PipelineInterpreter.State reloadAndSave(PipelineConnectionsChangedEvent event) {
         final PipelineInterpreter.State state = reloadAndSave();
         if (configuration.isLeader()) { // avoid duplicate work and possible inconsistencies
-            metadataUpdater.handleConnectionChanges(event, state, pipelineResolver, pipelineMetricRegistry);
+            try {
+                metadataUpdater.handleConnectionChanges(event, state);
+            } catch (Exception e) {
+                log.warn("Failed to update pipeline metadata for connection changes: {}", e.getMessage(), e);
+            }
         }
         return state;
     }
@@ -139,7 +153,11 @@ public class ConfigurationStateUpdater {
     private PipelineInterpreter.State reloadAndSave(InputDeletedEvent event) {
         final PipelineInterpreter.State state = reloadAndSave();
         if (configuration.isLeader()) { // avoid duplicate work and possible inconsistencies
-            metadataUpdater.handleInputDeleted(event, state, pipelineResolver, pipelineMetricRegistry);
+            try {
+                metadataUpdater.handleInputDeleted(event, state);
+            } catch (Exception e) {
+                log.warn("Failed to update pipeline metadata for input deletion: {}", e.getMessage(), e);
+            }
         }
         return state;
     }
