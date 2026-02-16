@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class OSCountHandler extends OSPivotSeriesSpecHandler<Count> {
@@ -67,7 +68,10 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count> {
         } else if (agg.isMultiTerms()) {
             value = agg.multiTerms().buckets().array().getFirst().docCount();
         } else if (agg.isValueCount()) {
-            value = agg.valueCount() == null || agg.valueCount().value() == null ? 0 : agg.valueCount().value().longValue();
+            value = Optional.ofNullable(agg.valueCount())
+                    .map(ValueCountAggregate::value)
+                    .map(Double::longValue)
+                    .orElse(0L);
         } else {
             value = null;
         }
