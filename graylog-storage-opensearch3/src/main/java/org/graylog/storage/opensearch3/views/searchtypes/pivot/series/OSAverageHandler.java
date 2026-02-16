@@ -23,6 +23,8 @@ import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 import org.opensearch.client.opensearch._types.aggregations.AvgAggregate;
 
+import java.util.Optional;
+
 public class OSAverageHandler extends OSBasicSeriesSpecHandler<Average> {
 
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Average avgSpec) {
@@ -33,7 +35,9 @@ public class OSAverageHandler extends OSBasicSeriesSpecHandler<Average> {
     @Override
     protected Object getValueFromAggregationResult(final Aggregate agg, final Average avgSpec) {
         AvgAggregate avg = (agg.isAvg()) ? agg.avg() : null;
-        double value = (avg == null || avg.value() == null) ? 0 : avg.value();
+        double value = Optional.ofNullable(avg)
+                .map(AvgAggregate::value)
+                .orElse(0.0);
         if (avgSpec.wholeNumber()) {
             if (Double.isNaN(value) || Double.isInfinite(value)) {
                 value = 0;
