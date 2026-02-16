@@ -74,7 +74,7 @@ const _identifierMetaByAttributeId = (attributesMetaData: Attributes): Identifie
       ...col,
       [id]: {
         identifier_field: related_identifier,
-        identifier_type: type,
+        identifier_type: related_identifier ? type : undefined,
         display_fields: related_display_fields,
         display_template: related_display_template,
       },
