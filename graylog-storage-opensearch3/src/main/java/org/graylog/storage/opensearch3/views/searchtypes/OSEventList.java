@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.opensearch3.views.searchtypes;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
@@ -110,13 +109,7 @@ public class OSEventList implements EventListStrategy {
 
     protected List<Map<String, Object>> extractResult(MultiSearchItem<JsonData> result) {
         return result.hits().hits().stream()
-                .map(r -> {
-                    try {
-                        return serializationUtils.toMap(r);
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
+                .map(serializationUtils::toMap)
                 .toList();
     }
 

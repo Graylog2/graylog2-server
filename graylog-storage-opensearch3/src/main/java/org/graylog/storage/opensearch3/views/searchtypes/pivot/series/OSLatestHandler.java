@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
 import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
@@ -73,13 +72,7 @@ public class OSLatestHandler extends OSBasicSeriesSpecHandler<Latest> {
                 .filter(hits -> !hits.isEmpty())
                 .stream().findFirst()
                 .map(List::getFirst)
-                .map(hit -> {
-                    try {
-                        return serializationUtils.toMap(hit.source());
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
+                .map(hit -> serializationUtils.toMap(hit.source()))
                 .map(source -> source.get(seriesSpec.field()))
                 .orElse(null);
     }

@@ -51,7 +51,7 @@ public class OSSerializationUtils {
     }
 
 
-    public Map<String, Object> toMap(final JsonData openSearchSerializableObject) throws JsonProcessingException {
+    public Map<String, Object> toMap(final JsonData openSearchSerializableObject) {
         try (StringWriter writer = new StringWriter()) {
             JsonWriter jsonWriter = Json.createWriter(writer);
             jsonWriter.write(openSearchSerializableObject.toJson());
@@ -59,7 +59,7 @@ public class OSSerializationUtils {
             jsonWriter.close();
             return toMap(json);
         } catch (IOException e) {
-            throw new JsonSerializationException("Error serializing json", e);
+            throw new RuntimeException("Error serializing json", e);
         }
     }
 
@@ -69,15 +69,15 @@ public class OSSerializationUtils {
         }
     }
 
-    public Map<String, Object> toMap(final PlainJsonSerializable openSearchSerializableObject) throws JsonProcessingException {
+    public Map<String, Object> toMap(final PlainJsonSerializable openSearchSerializableObject) {
         return toMap(openSearchSerializableObject.toJsonString());
     }
 
-    public Map<String, Object> toMap(final String json) throws JsonProcessingException {
+    public Map<String, Object> toMap(final String json) {
         try {
             return this.jsonpMapper.objectMapper().readValue(json, new TypeReference<>() {});
         } catch (IOException e) {
-            throw new JsonSerializationException("Error serializing json", e);
+            throw new RuntimeException("Error serializing json", e);
         }
     }
 

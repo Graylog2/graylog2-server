@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.opensearch3.views.searchtypes;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -75,11 +74,7 @@ public class OSMessageList implements OSSearchTypeHandler<MessageList> {
 
     private ResultMessage resultMessageFromSearchHit(Hit<JsonData> hit) {
         final Map<String, List<String>> highlights = hit.highlight();
-        try {
-            return resultMessageFactory.parseFromSource(hit.id(), hit.index(), serializationUtils.toMap(hit.source()), highlights);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return resultMessageFactory.parseFromSource(hit.id(), hit.index(), serializationUtils.toMap(hit.source()), highlights);
     }
 
     @Override
