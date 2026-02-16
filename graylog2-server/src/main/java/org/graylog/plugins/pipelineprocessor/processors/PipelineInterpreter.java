@@ -141,8 +141,10 @@ public class PipelineInterpreter implements MessageProcessor {
             for (Message message : currentSet) {
                 final String msgId = message.getId();
 
-                // this makes a copy of the stream IDs, which is mutated later in updateStreamBlacklist
-                // it serves as a worklist, to keep track of which <msg, stream> tuples need to be re-run again
+                // getStreamsView() returns a live, unmodifiable view of the message's streams (not a copy).
+                // We immediately extract the stream IDs into a mutable set that serves as a worklist
+                // to keep track of which <msg, stream> tuples need to be re-run again.
+                // The worklist is mutated later in updateStreamBlacklist.
                 final Set<Stream> currentStreams = message.getStreamsView();
                 final Set<String> initialStreamIds = new HashSet<>(currentStreams.size());
                 for (final Stream stream : currentStreams) {
