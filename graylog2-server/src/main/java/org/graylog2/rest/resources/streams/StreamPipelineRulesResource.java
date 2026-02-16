@@ -76,8 +76,8 @@ public class StreamPipelineRulesResource extends RestResource {
             EntityAttribute.builder().id("rule_id").title("Pipeline Rule ID").searchable(false).hidden(true).build(),
             EntityAttribute.builder().id(ATTRIBUTE_PIPELINE_RULE).title("Pipeline Rule").searchable(true).build(),
             EntityAttribute.builder().id("pipeline_id").title("Pipeline ID").searchable(false).hidden(true).build(),
-            EntityAttribute.builder().id(ATTRIBUTE_PIPELINE).title("Pipeline").searchable(true).build(),
-            EntityAttribute.builder().id(ATTRIBUTE_CONNECTED_STREAM).title("Connected Streams").searchable(true).build()
+            EntityAttribute.builder().id(ATTRIBUTE_PIPELINE).title("Source pipeline").searchable(false).build(),
+            EntityAttribute.builder().id(ATTRIBUTE_CONNECTED_STREAM).title("Source streams").searchable(false).build()
     );
         private static final Map<String, Function<StreamPipelineRulesResponse, String>> FIELD_EXTRACTORS = Map.of(
                 ATTRIBUTE_PIPELINE_RULE, StreamPipelineRulesResponse::ruleName,

@@ -17,7 +17,6 @@
 package org.graylog2.rest.resources;
 
 import org.graylog.plugins.views.search.engine.monitoring.data.histogram.rest.HistogramResponseWriter;
-import org.graylog.plugins.views.storage.migration.RemoteReindexResource;
 import org.graylog.security.rest.CAResource;
 import org.graylog.security.rest.CertificateRenewalResource;
 import org.graylog.security.rest.CertificatesResource;
@@ -172,7 +171,6 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(DataNodeRestApiProxyResource.class);
         addSystemRestResource(DataNodeManagementResource.class);
         addSystemRestResource(DatanodeUpgradeResource.class);
-        addSystemRestResource(RemoteReindexResource.class);
         addSystemRestResource(CAResource.class);
         addSystemRestResource(ClientCertResource.class);
         addSystemRestResource(CertificatesResource.class);

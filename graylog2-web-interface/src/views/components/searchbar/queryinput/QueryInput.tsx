@@ -212,14 +212,10 @@ const useShowHotkeysInOverview = () => {
 };
 
 type Props = BaseProps & {
-  // eslint-disable-next-line react/require-default-props
   commands?: Array<Command>;
-  // eslint-disable-next-line react/require-default-props
   disableExecution?: boolean;
-  // eslint-disable-next-line react/require-default-props
   isValidating?: boolean;
   name: string;
-  // eslint-disable-next-line react/require-default-props
   onBlur?: (query: string) => void;
   onChange: (changeEvent: { target: { value: string; name: string } }) => Promise<string>;
   onExecute: (query: string) => void;
@@ -227,128 +223,126 @@ type Props = BaseProps & {
   completer: any;
 };
 
-const QueryInput = React.forwardRef<Editor, Props>(
-  (
-    {
-      className = '',
-      commands = [],
-      disableExecution = false,
-      error,
-      height,
-      inputId,
-      isValidating = undefined,
-      maxLines,
-      onBlur = undefined,
-      onChange,
-      onExecute: onExecuteProp,
-      placeholder = '',
-      value = '',
-      validate,
-      warning,
-      wrapEnabled,
-      name,
-      completer,
-    },
-    outerRef,
-  ) => {
-    const innerRef = useRef<Editor>(null);
-    const inputElement = innerRef.current?.container;
-    const { width: inputWidth } = useElementDimensions(inputElement);
-    const isInitialTokenizerUpdate = useRef(true);
-    const { enableSmartSearch } = useContext(UserPreferencesContext);
-    const onLoadEditor = useCallback((editor: Editor) => _onLoadEditor(editor, isInitialTokenizerUpdate), []);
-    const onExecute = useCallback(
-      (editor: Editor) =>
-        handleExecution({
-          editor,
-          onExecute: onExecuteProp,
-          value,
-          error,
-          disableExecution,
-          isValidating,
-          validate,
-        }),
-      [onExecuteProp, value, error, disableExecution, isValidating, validate],
-    );
-    const _commands = useMemo(
-      () => [
-        ...commands,
-        {
-          name: 'Execute',
-          bindKey: { win: 'Enter', mac: 'Enter' },
-          exec: onExecute,
-        },
-        {
-          name: 'Show completions',
-          bindKey: { win: 'Ctrl-Space', mac: 'Alt-Space' },
-          exec: async (editor: Editor) => {
-            if (editor.getValue()) {
-              startAutocomplete(editor);
-
-              return;
-            }
-
-            await displayHistoryCompletions(editor);
-          },
-        },
-        {
-          name: 'Show query history',
-          bindKey: { win: 'Alt-Shift-H', mac: 'Alt-Shift-H' },
-          exec: async (editor: Editor) => {
-            displayHistoryCompletions(editor);
-          },
-        },
-        // The following will disable the mentioned hotkeys.
-        {
-          name: 'Do nothing',
-          bindKey: { win: 'Ctrl-Shift-Space', mac: 'Ctrl-Space|Ctrl-Shift-Space' },
-          exec: () => {},
-        },
-      ],
-      [commands, onExecute],
-    );
-    const updateEditorConfiguration = useCallback(
-      (node: { editor: Editor }) => _updateEditorConfiguration(node, completer, _commands, innerRef),
-      [_commands, completer],
-    );
-    const _onChange = useCallback(
-      (newQuery: string) => {
-        onChange({ target: { value: newQuery, name } });
-
-        return Promise.resolve(newQuery);
+const QueryInput = (
+  {
+    className = '',
+    commands = [],
+    disableExecution = false,
+    error,
+    height,
+    inputId,
+    isValidating = false,
+    maxLines,
+    onBlur = undefined,
+    onChange,
+    onExecute: onExecuteProp,
+    placeholder = '',
+    value = '',
+    validate,
+    warning,
+    wrapEnabled,
+    name,
+    completer,
+  }: Props,
+  outerRef: React.ForwardedRef<Editor>,
+) => {
+  const innerRef = useRef<Editor>(null);
+  const inputElement = innerRef.current?.container;
+  const { width: inputWidth } = useElementDimensions(inputElement);
+  const isInitialTokenizerUpdate = useRef(true);
+  const { enableSmartSearch } = useContext(UserPreferencesContext);
+  const onLoadEditor = useCallback((editor: Editor) => _onLoadEditor(editor, isInitialTokenizerUpdate), []);
+  const onExecute = useCallback(
+    (editor: Editor) =>
+      handleExecution({
+        editor,
+        onExecute: onExecuteProp,
+        value,
+        error,
+        disableExecution,
+        isValidating,
+        validate,
+      }),
+    [onExecuteProp, value, error, disableExecution, isValidating, validate],
+  );
+  const _commands = useMemo(
+    () => [
+      ...commands,
+      {
+        name: 'Execute',
+        bindKey: { win: 'Enter', mac: 'Enter' },
+        exec: onExecute,
       },
-      [name, onChange],
-    );
+      {
+        name: 'Show completions',
+        bindKey: { win: 'Ctrl-Space', mac: 'Alt-Space' },
+        exec: async (editor: Editor) => {
+          if (editor.getValue()) {
+            startAutocomplete(editor);
 
-    useShowHotkeysInOverview();
-    useImperativeHandle(outerRef, () => innerRef.current, []);
+            return;
+          }
 
-    const offsetLeft = useMemo(() => inputElement?.getBoundingClientRect()?.left, [inputElement]);
+          await displayHistoryCompletions(editor);
+        },
+      },
+      {
+        name: 'Show query history',
+        bindKey: { win: 'Alt-Shift-H', mac: 'Alt-Shift-H' },
+        exec: async (editor: Editor) => {
+          displayHistoryCompletions(editor);
+        },
+      },
+      // The following will disable the mentioned hotkeys.
+      {
+        name: 'Do nothing',
+        bindKey: { win: 'Ctrl-Shift-Space', mac: 'Ctrl-Space|Ctrl-Shift-Space' },
+        exec: () => {},
+      },
+    ],
+    [commands, onExecute],
+  );
+  const updateEditorConfiguration = useCallback(
+    (node: { editor: Editor }) => _updateEditorConfiguration(node, completer, _commands, innerRef),
+    [_commands, completer],
+  );
+  const _onChange = useCallback(
+    (newQuery: string) => {
+      onChange({ target: { value: newQuery, name } });
 
-    return (
-      <Container $hasValue={!!value}>
-        <GlobalEditorStyles $width={inputWidth} $offsetLeft={offsetLeft} />
-        <BasicQueryInput
-          height={height}
-          className={className}
-          disabled={false}
-          enableAutocompletion={enableSmartSearch}
-          error={error}
-          inputId={inputId}
-          warning={warning}
-          maxLines={maxLines}
-          onBlur={onBlur}
-          onExecute={onExecute}
-          onChange={_onChange}
-          onLoad={onLoadEditor}
-          placeholder={placeholder}
-          ref={updateEditorConfiguration}
-          value={value}
-          wrapEnabled={wrapEnabled}
-        />
-      </Container>
-    );
-  },
-);
+      return Promise.resolve(newQuery);
+    },
+    [name, onChange],
+  );
 
-export default QueryInput;
+  useShowHotkeysInOverview();
+  useImperativeHandle(outerRef, () => innerRef.current, []);
+
+  const offsetLeft = useMemo(() => inputElement?.getBoundingClientRect()?.left, [inputElement]);
+
+  return (
+    <Container $hasValue={!!value}>
+      <GlobalEditorStyles $width={inputWidth} $offsetLeft={offsetLeft} />
+      <BasicQueryInput
+        height={height}
+        className={className}
+        disabled={false}
+        enableAutocompletion={enableSmartSearch}
+        error={error}
+        inputId={inputId}
+        warning={warning}
+        maxLines={maxLines}
+        onBlur={onBlur}
+        onExecute={onExecute}
+        onChange={_onChange}
+        onLoad={onLoadEditor}
+        placeholder={placeholder}
+        ref={updateEditorConfiguration}
+        value={value}
+        wrapEnabled={wrapEnabled}
+      />
+    </Container>
+  );
+};
+
+export default React.forwardRef(QueryInput);

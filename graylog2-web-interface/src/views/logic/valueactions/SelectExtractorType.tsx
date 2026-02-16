@@ -37,12 +37,6 @@ const _getExtractorTypes = () =>
   }));
 
 class SelectExtractorType extends React.Component<ActionComponentProps, State> {
-  static contextType = ActionContext;
-
-  readonly context: ActionContexts;
-
-  extractorRoutes = {};
-
   constructor(props) {
     super(props);
 
@@ -64,6 +58,12 @@ class SelectExtractorType extends React.Component<ActionComponentProps, State> {
       message.id,
     );
   }
+
+  extractorRoutes = {};
+
+  readonly context: ActionContexts;
+
+  static contextType = ActionContext;
 
   _onSubmit = () => {
     const { onClose } = this.props;

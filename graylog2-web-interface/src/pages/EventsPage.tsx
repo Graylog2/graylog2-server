@@ -24,20 +24,14 @@ import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import EventsEntityTable from 'components/events/EventsEntityTable';
 import { Row, Col } from 'components/bootstrap';
 
-const AlertsPageComponent = () => {
+const AlertsOverview = () => {
   const {
     data: { valid: validSecurityLicense },
   } = usePluggableLicenseCheck('/license/security');
   const pluggableSecurityEventsPage = usePluginEntities('views.components.securityEventsPage');
 
   if (!validSecurityLicense) {
-    return (
-      <Row className="content">
-        <Col xs={12}>
-          <EventsEntityTable />
-        </Col>
-      </Row>
-    );
+    return <EventsEntityTable />;
   }
 
   return (
@@ -64,7 +58,11 @@ const EventsPage = () => (
       </span>
     </PageHeader>
 
-    {AlertsPageComponent()}
+    <Row className="content">
+      <Col md={12}>
+        <AlertsOverview />
+      </Col>
+    </Row>
   </DocumentTitle>
 );
 
