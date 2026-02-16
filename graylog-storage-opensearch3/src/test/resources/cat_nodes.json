@@ -1,0 +1,21 @@
+[
+  {
+    "id": "nodeWithCorrectInfo",
+    "name": "nodeWithCorrectInfo",
+    "node.role": "dimr",
+    "ip": "182.88.0.2",
+    "version": "2.19.3",
+    "file_desc.max": "1048576",
+    "disk.used": "45gb",
+    "disk.total": "411.5gb",
+    "disk.used_percent": "10.95"
+  },
+  {
+    "id": "nodeWithMissingDiskStatistics",
+    "name": "nodeWithMissingDiskStatistics",
+    "node.role": "dimr",
+    "ip": "182.88.0.1",
+    "version": "2.19.3",
+    "file_desc.max": "1048576"
+  }
+]

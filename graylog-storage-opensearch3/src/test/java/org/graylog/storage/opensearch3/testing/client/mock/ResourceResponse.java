@@ -14,16 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.models.system.inputs.responses;
+package org.graylog.storage.opensearch3.testing.client.mock;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
-@JsonAutoDetect
-public record InputUpdated(@JsonProperty("id") String id) {
-    @JsonCreator
-    public static InputUpdated create(@JsonProperty("id") String inputId) {
-        return new InputUpdated(inputId);
+public record ResourceResponse(String method, java.nio.file.PathMatcher urlPattern, URL resource) implements MockedResponse {
+
+    @Override
+    public InputStream newInputStream() {
+        try {
+            return resource.openStream();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
