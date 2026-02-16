@@ -34,12 +34,15 @@ import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 
 import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog.storage.opensearch3.views.searchtypes.pivot.buckets.OSTimeHandler.DATE_TIME_FORMAT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doReturn;
@@ -104,10 +107,11 @@ class OSTimeHandlerTest {
 
         final BucketSpecHandler.CreatedAggregations<MutableNamedAggregationBuilder> createdAggregations = this.osTimeHandler.doCreateAggregation(BucketSpecHandler.Direction.Row, "foobar", pivot, time, queryContext, query);
         assertEquals(createdAggregations.root().getName(), createdAggregations.leaf().getName());
-//        assertTrue(createdAggregations.root().aggregationBuilder() instanceof AutoDateHistogramAggregation.Builder);
-//        assertEquals("foobar", createdAggregations.root().name());
-//        assertEquals("foobar", ((AutoDateHistogramAggregationBuilder) createdAggregations.root()).field());
-//        assertEquals(DATE_TIME_FORMAT, ((AutoDateHistogramAggregationBuilder) createdAggregations.root()).format());
+        Aggregation builtAggregation = createdAggregations.root().build();
+        assertTrue(builtAggregation.isAutoDateHistogram());
+        assertEquals("foobar", createdAggregations.root().getName());
+        assertEquals("foobar", builtAggregation.autoDateHistogram().field());
+        assertEquals(DATE_TIME_FORMAT, builtAggregation.autoDateHistogram().format());
 
     }
 
