@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage> {
@@ -108,15 +109,15 @@ public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage> {
         if (agg == null) {
             LOG.error("Unexpected null aggregation result, returning 0 for the count. This is a bug.");
             value = 0;
-            // TODO!!!
-//        } else if (valueCount instanceof MultiBucketsAggregation.Bucket) {
-//            value = ((MultiBucketsAggregation.Bucket) valueCount).getDocCount();
-//        } else if (valueCount instanceof Aggregations) {
-//            value = searchResult.hits().total().value();
+        } else if (agg.isMultiTerms()) {
+            value = agg.multiTerms().buckets().array().getFirst().docCount();
         } else if (agg.isValueCount()) {
-            value = (agg.valueCount() == null || agg.valueCount().value() == null) ? 0L : agg.valueCount().value().longValue();
+            value = Optional.ofNullable(agg.valueCount())
+                    .map(ValueCountAggregate::value)
+                    .map(Double::longValue)
+                    .orElse(0L);
         } else {
-            value = 0L; // TODO!!!
+            value = 0L;
         }
 
         var initialBucket = osGeneratedQueryContext.rowBucket().orElseGet(() -> InitialBucket.create(searchResult));
