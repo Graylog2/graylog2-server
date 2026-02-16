@@ -16,7 +16,14 @@
  */
 package org.graylog.plugins.datanode;
 
+import com.github.rholder.retry.Attempt;
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryListener;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import com.github.zafarkhaja.semver.Version;
+import io.restassured.response.ValidatableResponse;
 import org.assertj.core.api.Assertions;
 import org.graylog.plugins.datanode.dto.ClusterState;
 import org.graylog.plugins.datanode.dto.FlushResponse;
@@ -24,16 +31,23 @@ import org.graylog.plugins.datanode.dto.ShardReplication;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public abstract class DatanodeUpgradeServiceAdapterIT {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatanodeUpgradeServiceAdapterIT.class);
+
     private DatanodeUpgradeServiceAdapter upgradeAdapter;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws ExecutionException, RetryException {
         upgradeAdapter = createAdapter();
+        waitForGreenClusterState(upgradeAdapter);
     }
 
     protected abstract DatanodeUpgradeServiceAdapter createAdapter();
@@ -58,6 +72,21 @@ public abstract class DatanodeUpgradeServiceAdapterIT {
 
         Assertions.assertThat(upgradeAdapter.getClusterState())
                 .satisfies(expectedState(HealthStatus.Green, ShardReplication.ALL));
+    }
+
+    private void waitForGreenClusterState(DatanodeUpgradeServiceAdapter upgradeAdapter) throws ExecutionException, RetryException {
+        RetryerBuilder.<HealthStatus>newBuilder()
+                .retryIfResult(status -> status != HealthStatus.Green)
+                .withStopStrategy(StopStrategies.stopAfterDelay(1, TimeUnit.MINUTES))
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .withRetryListener(new RetryListener() {
+                    @Override
+                    public <V> void onRetry(Attempt<V> attempt) {
+                        LOGGER.info("Waiting for opensearch cluster health to become green. Attempt {}", attempt.getAttemptNumber());
+                    }
+                })
+                .build()
+                .call(() -> upgradeAdapter.getClusterState().status());
     }
 
     private Consumer<ClusterState> nodeDetails(Version version) {
