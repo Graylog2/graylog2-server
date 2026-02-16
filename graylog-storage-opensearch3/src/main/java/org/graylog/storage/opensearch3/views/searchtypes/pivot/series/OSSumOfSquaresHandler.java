@@ -21,6 +21,9 @@ import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggre
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.ExtendedStatsAggregateBase;
+
+import java.util.Optional;
 
 public class OSSumOfSquaresHandler extends OSBasicSeriesSpecHandler<SumOfSquares> {
 
@@ -32,8 +35,11 @@ public class OSSumOfSquaresHandler extends OSBasicSeriesSpecHandler<SumOfSquares
 
     @Override
     protected Object getValueFromAggregationResult(final Aggregate agg, final SumOfSquares seriesSpec) {
-        var extendedStats = agg.isExtendedStats() ? agg.extendedStats() : null;
-        return extendedStats == null ? null : extendedStats.sumOfSquares();
+        return Optional.ofNullable(agg)
+                .filter(Aggregate::isExtendedStats)
+                .map(Aggregate::extendedStats)
+                .map(ExtendedStatsAggregateBase::sumOfSquares)
+                .orElse(null);
     }
 }
 
