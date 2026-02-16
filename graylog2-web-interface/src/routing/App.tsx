@@ -32,6 +32,9 @@ import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesP
 import PageContextProviders from 'components/page/contexts/PageContextProviders';
 import { singleton } from 'logic/singleton';
 import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
+import RightSidebarProvider from 'contexts/RightSidebarProvider';
+import RightSidebar from 'components/layout/RightSidebar';
+import RightSidebarContext from 'contexts/RightSidebarContext';
 
 const AppLayout = styled.div`
   display: flex;
@@ -39,9 +42,21 @@ const AppLayout = styled.div`
   height: 100%;
 `;
 
-const PageContent = styled.div`
-  height: 100%;
+const ContentRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex: 1;
   overflow: auto;
+`;
+
+const MainContentColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+`;
+
+const PageContent = styled.div`
   flex: 1;
 `;
 
@@ -55,27 +70,36 @@ const App = () => (
 
         return (
           <PerspectivesProvider>
-            <HotkeysProvider>
-              <ScratchpadProvider loginName={currentUser.username}>
-                <NavigationTelemetry />
-                <>
-                  <AppLayout>
-                    <Navigation />
-                    <Scratchpad />
-                    <ReportedErrorBoundary>
-                      <RuntimeErrorBoundary>
-                        <PageContextProviders>
-                          <PageContent>
-                            <Outlet />
-                          </PageContent>
-                        </PageContextProviders>
-                      </RuntimeErrorBoundary>
-                    </ReportedErrorBoundary>
-                  </AppLayout>
-                  <HotkeysModalContainer />
-                </>
-              </ScratchpadProvider>
-            </HotkeysProvider>
+            <RightSidebarProvider>
+              <HotkeysProvider>
+                <ScratchpadProvider loginName={currentUser.username}>
+                  <NavigationTelemetry />
+                  <>
+                    <AppLayout>
+                      <Navigation />
+                      <ContentRow>
+                        <MainContentColumn>
+                          <Scratchpad />
+                          <ReportedErrorBoundary>
+                            <RuntimeErrorBoundary>
+                              <PageContextProviders>
+                                <PageContent>
+                                  <Outlet />
+                                </PageContent>
+                              </PageContextProviders>
+                            </RuntimeErrorBoundary>
+                          </ReportedErrorBoundary>
+                        </MainContentColumn>
+                        <RightSidebarContext.Consumer>
+                          {({ isOpen }) => isOpen && <RightSidebar />}
+                        </RightSidebarContext.Consumer>
+                      </ContentRow>
+                    </AppLayout>
+                    <HotkeysModalContainer />
+                  </>
+                </ScratchpadProvider>
+              </HotkeysProvider>
+            </RightSidebarProvider>
           </PerspectivesProvider>
         );
       }}
