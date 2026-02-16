@@ -142,7 +142,7 @@ public class PipelineInterpreter implements MessageProcessor {
 
                 // this makes a copy of the list, which is mutated later in updateStreamBlacklist
                 // it serves as a worklist, to keep track of which <msg, stream> tuples need to be re-run again
-                final Set<String> initialStreamIds = message.getStreams().stream().map(Stream::getId).collect(Collectors.toSet());
+                final Set<String> initialStreamIds = message.getStreamsUnmodifiable().stream().map(Stream::getId).collect(Collectors.toSet());
 
                 final ImmutableSet<Pipeline> pipelinesToRun = selectPipelines(interpreterListener,
                         processingBlacklist,
@@ -192,7 +192,7 @@ public class PipelineInterpreter implements MessageProcessor {
                                           Message message,
                                           Set<String> initialStreamIds) {
         boolean addedStreams = false;
-        for (Stream stream : message.getStreams()) {
+        for (Stream stream : message.getStreamsUnmodifiable()) {
             if (!initialStreamIds.remove(stream.getId())) {
                 addedStreams = true;
             } else {

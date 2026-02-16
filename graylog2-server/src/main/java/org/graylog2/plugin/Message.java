@@ -771,6 +771,16 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     /**
+     * Returns a lightweight, unmodifiable view of the streams this message is currently routed to.
+     * Unlike {@link #getStreams()}, this does not create a copy — changes to the message's streams
+     * will be reflected in the returned set. Only use this when the set is consumed immediately
+     * (e.g. iteration, streaming) and not held across operations that may mutate the message.
+     */
+    public Set<Stream> getStreamsUnmodifiable() {
+        return Collections.unmodifiableSet(this.streams);
+    }
+
+    /**
      * Assign the given stream to this message.
      *
      * @param stream the stream to route this message into
