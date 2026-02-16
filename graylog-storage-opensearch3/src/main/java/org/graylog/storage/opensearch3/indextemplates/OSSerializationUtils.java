@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.json.Json;
+import jakarta.json.JsonWriter;
 import jakarta.json.stream.JsonParser;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.json.JsonpDeserializer;
@@ -52,8 +53,10 @@ public class OSSerializationUtils {
 
     public Map<String, Object> toMap(final JsonData openSearchSerializableObject) throws JsonProcessingException {
         try (StringWriter writer = new StringWriter()) {
-            Json.createWriter(writer).write(openSearchSerializableObject.toJson());
+            JsonWriter jsonWriter = Json.createWriter(writer);
+            jsonWriter.write(openSearchSerializableObject.toJson());
             String json = writer.toString();
+            jsonWriter.close();
             return toMap(json);
         } catch (IOException e) {
             throw new JsonSerializationException("Error serializing json", e);
