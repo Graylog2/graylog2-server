@@ -190,7 +190,6 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
             case StringTermsBucket sterms -> sterms.key();
             case DoubleTermsBucket dterms -> dterms.keyAsString();
             case LongTermsBucket lterms -> lterms.keyAsString();
-            //TODO: do we need to consider more types?
             default -> "";
         };
         return splitKeys(keys);
