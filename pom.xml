@@ -783,7 +783,7 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.72.6</version>
+                            <version>8.72.8</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
