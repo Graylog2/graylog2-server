@@ -81,7 +81,7 @@ public class OpenSearch3Module extends VersionAwareModule {
             bindForSupportedVersion(IndexTemplateAdapter.class).to(LegacyIndexTemplateAdapter.class);
         }
         bindForSupportedVersion(IndexFieldTypePollerAdapter.class).to(IndexFieldTypePollerAdapterOS.class);
-        bindForSupportedVersion(IndexToolsAdapter.class).to(IndexToolsAdapterOS2.class);
+        bindForSupportedVersion(IndexToolsAdapter.class).to(IndexToolsAdapterOS.class);
         bindForSupportedVersion(MessagesAdapter.class).to(MessagesAdapterOS2.class);
         bindForSupportedVersion(MultiChunkResultRetriever.class).to(PaginationOS2.class);
         bindForSupportedVersion(MoreSearchAdapter.class).to(MoreSearchAdapterOS2.class);
