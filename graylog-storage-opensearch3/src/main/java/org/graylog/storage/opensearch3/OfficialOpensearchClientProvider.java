@@ -66,9 +66,14 @@ import java.util.Optional;
  */
 public class OfficialOpensearchClientProvider implements Provider<OfficialOpensearchClient> {
 
-    private static Logger log = LoggerFactory.getLogger(OfficialOpensearchClientProvider.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OfficialOpensearchClientProvider.class);
 
     private final Supplier<OfficialOpensearchClient> clientCache;
+    private final ObjectMapper objectMapper;
+    private final TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider;
+    private final IndexerJwtAuthToken indexerJwtAuthToken;
+    private final CredentialsProvider credentialsProvider;
+    private final ElasticsearchClientConfiguration clientConfiguration;
 
     @Inject
     public OfficialOpensearchClientProvider(
@@ -77,9 +82,14 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
             CredentialsProvider credentialsProvider,
             ElasticsearchClientConfiguration clientConfiguration,
             ObjectMapper objectMapper,
-            @Nullable TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider
+            TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider
     ) {
-        clientCache = Suppliers.memoize(() -> createClient(hosts, indexerJwtAuthToken, credentialsProvider, clientConfiguration, trustManagerAndSocketFactoryProvider, objectMapper));
+        this.indexerJwtAuthToken = indexerJwtAuthToken;
+        this.credentialsProvider = credentialsProvider;
+        this.clientConfiguration = clientConfiguration;
+        this.objectMapper = objectMapper;
+        this.trustManagerAndSocketFactoryProvider = trustManagerAndSocketFactoryProvider;
+        clientCache = Suppliers.memoize(() -> buildClient(hosts));
     }
 
     @Override
@@ -87,11 +97,13 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
         return clientCache.get();
     }
 
+    /**
+     * Don't use this method directly if you don't need a client targetting specific opensearch host(s). Use the cached
+     * instance provided by this supplier {@link #get()} method or let the OfficialOpensearchClient inject directly.
+     * If you obtain an instance here, don't forget to close it after the task is finished.
+     */
     @Nonnull
-    private static OfficialOpensearchClient createClient(List<URI> uris, IndexerJwtAuthToken indexerJwtAuthToken, CredentialsProvider credentialsProvider, ElasticsearchClientConfiguration clientConfiguration, TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider, ObjectMapper objectMapper) {
-
-        log.info("Initializing OpenSearch client");
-
+    OfficialOpensearchClient buildClient(List<URI> uris) {
         final HttpHost[] hosts = uris.stream().map(uri -> new HttpHost(uri.getScheme(), uri.getHost(), uri.getPort())).toArray(HttpHost[]::new);
 
         final ApacheHttpClient5TransportBuilder builder = ApacheHttpClient5TransportBuilder.builder(hosts);
@@ -108,7 +120,6 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
 
 
         builder.setHttpClientConfigCallback(httpClientBuilder -> {
-
             final PoolingAsyncClientConnectionManagerBuilder connectionManagerBuilder = PoolingAsyncClientConnectionManagerBuilder.create()
                     .setMaxConnPerRoute(clientConfiguration.elasticsearchMaxTotalConnectionsPerRoute())
                     .setMaxConnTotal(clientConfiguration.elasticsearchMaxTotalConnections())
