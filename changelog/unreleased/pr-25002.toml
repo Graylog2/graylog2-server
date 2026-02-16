@@ -1,0 +1,12 @@
+type = "changed"
+message = "Removing `perspectives` frontend plugin and perspective-based navigation handling."
+
+details.user = """
+As part of merging into a single general perspective, we simplified perspective-related plugin integration in core:
+
+  - removed the `perspectives` plugin export and its core registration
+  - removed perspective-based handling from navigation plugin contributions (`navigation` and `pageNavigation`)
+"""
+
+issues = ["Graylog2/graylog-plugin-enterprise#13194"]
+pulls = ["25002"]
