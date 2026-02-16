@@ -19,13 +19,14 @@ package org.graylog.events.notifications;
 import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.scheduler.DBJobDefinitionService;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Map;
 import java.util.Optional;
@@ -36,9 +37,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class NotificationResourceHandlerTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private NotificationResourceHandler notificationResourceHandler;
 
@@ -66,7 +67,7 @@ public class NotificationResourceHandlerTest {
                 .build();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         when(dbNotificationService.get(anyString())).thenReturn(Optional.of(getHttpNotification()));
         when(eventNotificationFactory.create()).thenReturn(eventNotification);

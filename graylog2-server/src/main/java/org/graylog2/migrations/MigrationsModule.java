@@ -70,10 +70,10 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20230904073300_MigrateThemePreferences.class);
         addMigration(V20240312140000_RemoveFieldTypeMappingsManagerRole.class);
         addMigration(V202404170856_UpdateIndexSetTemplates.class);
-        addMigration(V20240927120300_DataNodeMigrationIndexSet.class);
         addMigration(V20250304102900_ScopeMigration.class);
         addMigration(V20250206105400_TokenManagementConfiguration.class);
         addMigration(V20250219134200_DefaultTTLForNewTokens.class);
+        addMigration(V20251002090400_RemoveLegacySessions.class);
         addMigration(V20250506090000_AddInputTypesPermissions.class);
         addMigration(V20250630180000_MigrateSystemStreams.class);
         addMigration(V20250721090000_AddClusterConfigurationPermission.class);
@@ -81,5 +81,8 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20250815000000_CreateDefaultPasswordRequirements.class);
         addMigration(V20250820180000_ReapplyIndexSetScopeMigration.class);
         addMigration(V20250917184400_AddSystemEntitySource.class);
+        addMigration(V20251003000000_AddMcpConfigurationMigration.class);
+        addMigration(V20251222123500_CreatePipelineMetadata.class);
+        addMigration(V20251103123300_MigrateEntityListPreferences.class);
     }
 }

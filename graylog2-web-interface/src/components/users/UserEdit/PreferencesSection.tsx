@@ -101,7 +101,7 @@ const PreferencesSection = ({ user }: Props) => {
               <Col xs={12}>
                 <div className="pull-right">
                   <Button
-                    bsStyle="success"
+                    bsStyle="primary"
                     disabled={isSubmitting || !isValid}
                     title="Update Preferences"
                     type="submit">

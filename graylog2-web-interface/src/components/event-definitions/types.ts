@@ -55,6 +55,7 @@ export interface EventDefinitionType {
     config: EventDefinition['config'];
     definitionId?: string;
   }>;
+  useCondition: () => boolean;
 }
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {

@@ -42,7 +42,7 @@ module.exports = {
     '^@graylog/server-api(.*)$': '<rootDir>/target/api$1',
   },
   testEnvironment: 'jsdom',
-  testPathIgnorePatterns: ['.fixtures.[jt]s$'],
+  testPathIgnorePatterns: ['.fixtures.[jt]s$', '^<rootDir>/target/'],
   testTimeout: applyTimeoutMultiplier(5000),
   transform: {
     '^.+\\.[tj]sx?$': 'babel-jest',

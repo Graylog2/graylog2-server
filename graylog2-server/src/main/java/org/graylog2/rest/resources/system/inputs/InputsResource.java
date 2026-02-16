@@ -18,11 +18,15 @@ package org.graylog2.rest.resources.system.inputs;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import com.google.common.collect.ImmutableList;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -43,14 +47,20 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbInputsMetadataService;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.Configuration;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.database.PaginatedList;
+import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.Input;
+import org.graylog2.inputs.InputImpl;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.diagnosis.InputDiagnosticService;
 import org.graylog2.inputs.encryption.EncryptedInputConfigs;
@@ -58,13 +68,20 @@ import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.streams.StreamRule;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDiagnostics;
 import org.graylog2.rest.models.system.inputs.responses.InputSummary;
 import org.graylog2.rest.models.system.inputs.responses.InputsList;
+import org.graylog2.rest.models.tools.responses.PageListResponse;
+import org.graylog2.rest.resources.entities.EntityAttribute;
+import org.graylog2.rest.resources.entities.EntityDefaults;
+import org.graylog2.rest.resources.entities.Sorting;
+import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
@@ -73,32 +90,47 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
 @RequiresAuthentication
-@Api(value = "System/Inputs", description = "Message inputs", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "System/Inputs", description = "Message inputs")
 @Path("/system/inputs")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class InputsResource extends AbstractInputsResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(InputsResource.class);
+    private static final List<EntityAttribute> ATTRIBUTES = List.of(
+            EntityAttribute.builder().id(MessageInput.FIELD_ID).title("id").type(SearchQueryField.Type.OBJECT_ID).hidden(true).searchable(true).build(),
+            EntityAttribute.builder().id(MessageInput.FIELD_TITLE).title("Title").type(SearchQueryField.Type.STRING).searchable(true).build(),
+            EntityAttribute.builder().id(MessageInput.FIELD_TYPE).title("Type").type(SearchQueryField.Type.STRING).searchable(true).build(),
+            EntityAttribute.builder().id(MessageInput.FIELD_NODE_ID).title("Node").type(SearchQueryField.Type.STRING).filterable(true).build(),
+            EntityAttribute.builder().id(MessageInput.FIELD_GLOBAL).title("Global").type(SearchQueryField.Type.BOOLEAN).filterable(true).build(),
+            EntityAttribute.builder().id(MessageInput.FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).filterable(true).build(),
+            EntityAttribute.builder().id(MessageInput.FIELD_DESIRED_STATE).title("State").type(SearchQueryField.Type.STRING).filterable(true).build()
+    );
+    private static final EntityDefaults DEFAULTS = EntityDefaults.builder()
+            .sort(Sorting.create(MessageInput.FIELD_TITLE, Sorting.Direction.ASC))
+            .build();
 
     private final InputService inputService;
     private final InputDiagnosticService inputDiagnosticService;
+    private final DbQueryCreator dbQueryCreator;
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
     private final PipelineService pipelineService;
     private final MessageInputFactory messageInputFactory;
     private final Configuration config;
+    private final MongoDbInputsMetadataService metadataService;
     private final ClusterEventBus clusterEventBus;
 
     @Inject
@@ -109,26 +141,30 @@ public class InputsResource extends AbstractInputsResource {
                           PipelineService pipelineService,
                           MessageInputFactory messageInputFactory,
                           Configuration config,
+                          MongoDbInputsMetadataService metadataService,
                           ClusterEventBus clusterEventBus) {
         super(messageInputFactory.getAvailableInputs());
         this.inputService = inputService;
         this.inputDiagnosticService = inputDiagnosticService;
+        this.dbQueryCreator = new DbQueryCreator(MessageInput.FIELD_TITLE, ATTRIBUTES);
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.pipelineService = pipelineService;
         this.messageInputFactory = messageInputFactory;
         this.config = config;
+        this.metadataService = metadataService;
         this.clusterEventBus = clusterEventBus;
     }
 
     @GET
     @Timed
-    @ApiOperation(value = "Get information of a single input on this node")
+    @Operation(summary = "Get information of a single input on this node")
     @Path("/{inputId}")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input.")
+            @ApiResponse(responseCode = "200", description = "Returns the input", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "No such input.")
     })
-    public InputSummary get(@ApiParam(name = "inputId", required = true)
+    public InputSummary get(@Parameter(name = "inputId", required = true)
                             @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
 
@@ -139,17 +175,59 @@ public class InputsResource extends AbstractInputsResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get diagnostic information of a single input")
+    @Operation(summary = "Get diagnostic information of a single input")
     @Path("/diagnostics/{inputId}")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input.")
+            @ApiResponse(responseCode = "200", description = "Returns diagnostics", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "No such input.")
     })
-    public InputDiagnostics diagnostics(@ApiParam(name = "inputId", required = true)
+    public InputDiagnostics diagnostics(@Parameter(name = "inputId", required = true)
                                         @PathParam("inputId") String inputId,
                                         @Context SearchUser searchUser) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
         final Input input = inputService.find(inputId);
         return inputDiagnosticService.getInputDiagnostics(input, searchUser);
+    }
+
+    @GET
+    @Timed
+    @Operation(summary = "Get information about usage of input in pipeline rules")
+    @Path("meta/{inputId}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns metadata", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "No such input.")
+    })
+    public PipelineInputsMetadataDao pipelineMetadata(@Parameter(name = "inputId", required = true)
+                                                      @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
+        checkPermission(RestPermissions.INPUTS_READ, inputId);
+        return filterPipelines(metadataService.getByInputId(inputId));
+    }
+
+    @POST
+    @Operation(summary = "Bulk retrieval of input metadata")
+    @NoAuditEvent("Test resource - doesn't change any data")
+    @Path("meta/retrieve")
+    public List<PipelineInputsMetadataDao> pipelineMetadataBulk(
+            @NotNull @RequestBody(required = true) @NotNull List<String> inputIds) {
+        final ImmutableList<PipelineInputsMetadataDao> daoList = metadataService.getByInputIds(
+                inputIds.stream()
+                        .filter(inputId -> isPermitted(RestPermissions.INPUTS_READ, inputId))
+                        .toList());
+        return daoList.stream().map(this::filterPipelines).toList();
+    }
+
+    private PipelineInputsMetadataDao filterPipelines(PipelineInputsMetadataDao dao) {
+        final PipelineInputsMetadataDao.Builder builder = PipelineInputsMetadataDao.builder()
+                .id(dao.id())
+                .inputId(dao.inputId());
+        List<PipelineInputsMetadataDao.MentionedInEntry> mentionedIn = new ArrayList<>();
+        for (PipelineInputsMetadataDao.MentionedInEntry entry : dao.mentionedIn()) {
+            if (isPermitted(PipelineRestPermissions.PIPELINE_READ, entry.pipelineId())) {
+                mentionedIn.add(entry);
+            }
+        }
+        builder.mentionedIn(mentionedIn);
+        return builder.build();
     }
 
     public record InputReferences(
@@ -165,12 +243,13 @@ public class InputsResource extends AbstractInputsResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Returns any streams or pipeline that reference the given input")
+    @Operation(summary = "Returns any streams or pipeline that reference the given input")
     @Path("/references/{inputId}")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input.")
+            @ApiResponse(responseCode = "200", description = "Returns references", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "No such input.")
     })
-    public InputReferences getReferences(@ApiParam(name = "inputId", required = true)
+    public InputReferences getReferences(@Parameter(name = "inputId", required = true)
                                              @PathParam("inputId") String inputId) {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
         checkPermission(PipelineRestPermissions.PIPELINE_READ);
@@ -189,7 +268,7 @@ public class InputsResource extends AbstractInputsResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get all inputs")
+    @Operation(summary = "Get all inputs")
     public InputsList list() {
         final Set<InputSummary> inputs = inputService.all().stream()
                 .filter(input -> isPermitted(RestPermissions.INPUTS_READ, input.getId()))
@@ -199,21 +278,64 @@ public class InputsResource extends AbstractInputsResource {
         return InputsList.create(inputs);
     }
 
+    @GET
+    @Timed
+    @Path("/paginated")
+    @Operation(summary = "Get a paginated list of inputs")
+    @Produces(MediaType.APPLICATION_JSON)
+    public PageListResponse<InputSummary> getPage(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                  @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                  @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                  @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
+                                                  @Parameter(name = "sort",
+                                                            description = "The field to sort the result on",
+                                                            required = true,
+                                                            schema = @Schema(allowableValues = {"title", "created_at", "status"}))
+                                                  @DefaultValue(MessageInput.FIELD_TITLE) @QueryParam("sort") String sortField,
+                                                  @Parameter(name = "order", description = "The sort direction",
+                                                            schema = @Schema(allowableValues = {"asc", "desc"}))
+                                                  @DefaultValue("asc") @QueryParam("order") SortOrder order) {
+        final Predicate<InputImpl> permissionFilter = input -> isPermitted(RestPermissions.INPUTS_READ, input.getId());
+
+        final PaginatedList<Input> result = inputService.paginated(
+                dbQueryCreator.createDbQuery(filters, query),
+                permissionFilter,
+                order,
+                sortField,
+                page,
+                perPage
+        );
+
+        List<InputSummary> summaries = result.stream()
+                .map(this::getInputSummary)
+                .toList();
+
+        PaginatedList<InputSummary> mappedResult = new PaginatedList<>(
+                summaries,
+                result.pagination().total(),
+                result.pagination().page(),
+                result.pagination().perPage(),
+                result.grandTotal().orElse(0L)
+        );
+
+        return PageListResponse.create(query, mappedResult.pagination(), mappedResult.pagination().total(), sortField, order, mappedResult, ATTRIBUTES, DEFAULTS);
+    }
+
     @POST
     @Timed
-    @ApiOperation(
-            value = "Launch input on this node",
-            response = InputCreated.class
-    )
+    @Operation(
+            summary = "Launch input on this node")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input type registered"),
-            @ApiResponse(code = 400, message = "Missing or invalid configuration"),
-            @ApiResponse(code = 400, message = "Type is exclusive and already has input running")
+            @ApiResponse(responseCode = "201", description = "Input launched successfully",
+                    content = @Content(schema = @Schema(implementation = InputCreated.class))),
+            @ApiResponse(responseCode = "404", description = "No such input type registered"),
+            @ApiResponse(responseCode = "400", description = "Missing or invalid configuration"),
+            @ApiResponse(responseCode = "400", description = "Type is exclusive and already has input running")
     })
     @RequiresPermissions(RestPermissions.INPUTS_CREATE)
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_CREATE)
-    public Response create(@ApiParam @QueryParam("setup_wizard") @DefaultValue("false") boolean isSetupWizard,
-                           @ApiParam(name = "JSON body", required = true)
+    public Response create(@Parameter @QueryParam("setup_wizard") @DefaultValue("false") boolean isSetupWizard,
+                           @RequestBody(required = true)
                            @Valid @NotNull InputCreateRequest lr) throws ValidationException {
         try {
             throwBadRequestIfNotGlobal(lr);
@@ -246,12 +368,13 @@ public class InputsResource extends AbstractInputsResource {
     @DELETE
     @Timed
     @Path("/{inputId}")
-    @ApiOperation(value = "Terminate input on this node")
+    @Operation(summary = "Terminate input on this node")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input on this node.")
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "404", description = "No such input on this node.")
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_DELETE)
-    public void terminate(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
+    public void terminate(@Parameter(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_TERMINATE, inputId);
         final Input input = inputService.find(inputId);
         checkPermission(RestPermissions.INPUT_TYPES_CREATE, input.getType()); // remove after sharing inputs implemented
@@ -263,17 +386,17 @@ public class InputsResource extends AbstractInputsResource {
     @PUT
     @Timed
     @Path("/{inputId}")
-    @ApiOperation(
-            value = "Update input on this node",
-            response = InputCreated.class
-    )
+    @Operation(
+            summary = "Update input on this node")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input on this node."),
-            @ApiResponse(code = 400, message = "Missing or invalid input configuration.")
+            @ApiResponse(responseCode = "201", description = "Input updated successfully",
+                    content = @Content(schema = @Schema(implementation = InputCreated.class))),
+            @ApiResponse(responseCode = "404", description = "No such input on this node."),
+            @ApiResponse(responseCode = "400", description = "Missing or invalid input configuration.")
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_UPDATE)
-    public Response update(@ApiParam(name = "JSON body", required = true) @Valid @NotNull InputCreateRequest lr,
-                           @ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException, NoSuchInputTypeException, ConfigurationException, ValidationException {
+    public Response update(@RequestBody(required = true) @Valid @NotNull InputCreateRequest lr,
+                           @Parameter(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException, NoSuchInputTypeException, ConfigurationException, ValidationException {
 
         throwBadRequestIfNotGlobal(lr);
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
@@ -306,8 +429,8 @@ public class InputsResource extends AbstractInputsResource {
     }
 
     private void throwBadRequestIfNotGlobal(InputCreateRequest lr) {
-        if (config.isCloud() && !lr.global()) {
-            throw new BadRequestException("Only global inputs are allowed in the cloud environment!");
+        if ((config.isCloud() || config.isGlobalInputsOnly()) && !lr.global()) {
+            throw new BadRequestException("Only global inputs are allowed!");
         }
     }
 }

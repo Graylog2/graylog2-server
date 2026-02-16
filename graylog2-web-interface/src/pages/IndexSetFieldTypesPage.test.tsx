@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, within } from 'wrappedTestingLibrary';
+import { render, screen, within } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { useQueryParam } from 'routing/QueryParams';
 import { MockStore } from 'helpers/mocking';
@@ -79,7 +80,12 @@ describe('IndexSetFieldTypesPage', () => {
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
         ...layoutPreferences,
-        displayedAttributes: ['field_name', 'origin', 'is_reserved', 'type'],
+        attributes: {
+          field_name: { status: 'show' },
+          origin: { status: 'show' },
+          is_reserved: { status: 'show' },
+          type: { status: 'show' },
+        },
       },
       isInitialLoading: false,
       refetch: () => {},
@@ -109,7 +115,7 @@ describe('IndexSetFieldTypesPage', () => {
     renderIndexSetFieldTypesPage();
     const tableRow = await screen.findByTestId('table-row-field-1');
     const editButton = await within(tableRow).findByText('Edit');
-    fireEvent.click(editButton);
+    await userEvent.click(editButton);
     await screen.findByText(/change field-1 field type/i);
     const modal = await screen.findByRole('dialog', { name: /Change field-1 Field Type/i });
     await within(modal).findByText('Boolean');
@@ -126,7 +132,7 @@ describe('IndexSetFieldTypesPage', () => {
 
     renderIndexSetFieldTypesPage();
     const editButton = await screen.findByRole('button', { name: /change field type/i });
-    fireEvent.click(editButton);
+    await userEvent.click(editButton);
 
     const modal = await screen.findByRole('dialog', { name: /change field type/i });
     await within(modal).findByRole('heading', { name: /change field type/i });

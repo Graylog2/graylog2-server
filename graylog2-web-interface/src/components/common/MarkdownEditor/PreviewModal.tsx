@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ReactDom from 'react-dom';
 import styled from 'styled-components';
 
@@ -77,14 +78,14 @@ type Props = {
 };
 
 function PreviewModal({ value, show, onClose }: Props) {
-  const [height, setHeight] = React.useState<number>(0);
+  const [height, setHeight] = useState<number>(0);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const contentHeight = document.getElementById('preview-body')?.scrollHeight;
     setHeight(contentHeight);
   }, [show]);
 
-  const Component = React.useMemo(
+  const Component = useMemo(
     () =>
       show ? (
         <Backdrop onClick={() => onClose()}>
@@ -95,7 +96,7 @@ function PreviewModal({ value, show, onClose }: Props) {
             </Row>
             <Preview value={value} height={height} show />
             <Row style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
-              <Button bsStyle="success" role="button" onClick={() => onClose()}>
+              <Button bsStyle="primary" role="button" onClick={() => onClose()}>
                 Close
               </Button>
             </Row>

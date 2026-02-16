@@ -21,22 +21,23 @@ import org.graylog2.plugin.inputs.Converter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.jodatime.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DateConverterTest {
-    @Before
+    @BeforeEach
     public void setUp() {
         DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2017-01-01T00:00:00.000Z").getMillis());
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         DateTimeUtils.setCurrentMillisSystem();
     }
@@ -80,16 +81,20 @@ public class DateConverterTest {
                 .isEqualTo("2017-05-19T10:20:30.000Z");
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void testWithEmptyDateFormat() throws Exception {
-        final DateConverter converter = new DateConverter(config("", null, null));
-        assertThat((DateTime) converter.convert("foo")).isNull();
+        assertThrows(ConfigurationException.class, () -> {
+            final DateConverter converter = new DateConverter(config("", null, null));
+            assertThat((DateTime) converter.convert("foo")).isNull();
+        });
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void testWithNullDateFormat() throws Exception {
-        final DateConverter dateConverter = new DateConverter(config(null, null, null));
-        assertThat((DateTime) dateConverter.convert("foo")).isNull();
+        assertThrows(ConfigurationException.class, () -> {
+            final DateConverter dateConverter = new DateConverter(config(null, null, null));
+            assertThat((DateTime) dateConverter.convert("foo")).isNull();
+        });
     }
 
     @Test

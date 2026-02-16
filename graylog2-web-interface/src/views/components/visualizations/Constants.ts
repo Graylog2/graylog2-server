@@ -16,10 +16,13 @@
  */
 
 export const DECIMAL_PLACES = 1;
-export const Y_POSITION_AXIS_STEP = 0.1;
-export const DEFAULT_AXIS_KEY = 'withoutUnit';
+export const DEFAULT_AXIS_KEY = 'number';
 export const TIME_AXIS_LABELS_QUANTITY = 4;
 export const NO_FIELD_NAME_SERIES = 'no_field_name_series';
 
 export const UNIT_FEATURE_FLAG = 'configurable_value_units';
 export const CANDIDATE_PICK_RADIUS = 10;
+
+export const TICK_VALS_SECOND_MARGIN = 80;
+export const TICK_VALS_FIRST_MARGIN = 10;
+export const AXIS_LABEL_MARGIN = 10;

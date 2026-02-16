@@ -18,24 +18,15 @@ package org.graylog2.shared.fields;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotBlank;
 
-public interface TitleAndDescriptionFields {
-    String FIELD_TITLE = "title";
+public interface TitleAndDescriptionFields extends TitleField {
     String FIELD_DESCRIPTION = "description";
-
-    @JsonProperty(FIELD_TITLE)
-    @NotBlank
-    String title();
 
     @JsonProperty(FIELD_DESCRIPTION)
     @Nullable
     String description();
 
-    interface TitleAndDescriptionFieldsBuilder<T> {
-
-        @JsonProperty(FIELD_TITLE)
-        T title(@NotBlank String title);
+    interface TitleAndDescriptionFieldsBuilder<T> extends TitleFieldBuilder<T> {
 
         @JsonProperty(FIELD_DESCRIPTION)
         T description(String description);

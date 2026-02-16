@@ -54,6 +54,12 @@ class EventNotificationFormContainer extends React.Component<
     [key: string]: any;
   }
 > {
+  static scrollToFirstError() {
+    if (document.getElementsByClassName('has-error')[0] !== undefined) {
+      document.getElementsByClassName('has-error')[0].scrollIntoView(true);
+    }
+  }
+
   static defaultProps = {
     action: 'edit',
     notification: {
@@ -65,14 +71,6 @@ class EventNotificationFormContainer extends React.Component<
     formId: undefined,
     onSubmit: () => {},
   };
-
-  static scrollToFirstError() {
-    if (document.getElementsByClassName('has-error')[0] !== undefined) {
-      document.getElementsByClassName('has-error')[0].scrollIntoView(true);
-    }
-  }
-
-  private testPromise: CancellablePromise<void>;
 
   constructor(props) {
     super(props);
@@ -91,6 +89,8 @@ class EventNotificationFormContainer extends React.Component<
       this.testPromise.cancel();
     }
   }
+
+  private testPromise: CancellablePromise<void>;
 
   handleChange = (key, value) => {
     const { notification } = this.state;

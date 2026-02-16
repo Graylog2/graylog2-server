@@ -1,0 +1,4 @@
+type = "c"
+message = "Pin actions column in entity tables (streams overview, event definitions overview, etc.)"
+
+pulls = ["24507"]

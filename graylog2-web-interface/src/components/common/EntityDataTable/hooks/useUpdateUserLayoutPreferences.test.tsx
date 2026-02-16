@@ -44,7 +44,7 @@ describe('useUserSearchFilterQuery hook', () => {
   it('should update user layout preferences', async () => {
     const { result } = renderHook(() => useUpdateUserLayoutPreferences('streams'), { wrapper });
 
-    result.current.mutate(layoutPreferences);
+    result.current.mutateAsync(layoutPreferences);
 
     await waitFor(() =>
       expect(fetch).toHaveBeenCalledWith(
@@ -58,12 +58,13 @@ describe('useUserSearchFilterQuery hook', () => {
   it('should allow partial update of user layout preferences', async () => {
     const { result } = renderHook(() => useUpdateUserLayoutPreferences('streams'), { wrapper });
 
-    result.current.mutate({ perPage: 100 });
+    result.current.mutateAsync({ perPage: 100 });
 
     await waitFor(() =>
       expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/entitylists/preferences/streams'), {
-        displayed_attributes: layoutPreferencesJSON.displayed_attributes,
+        attributes: layoutPreferencesJSON.attributes,
         sort: layoutPreferencesJSON.sort,
+        custom_preferences: undefined,
         per_page: 100,
       }),
     );

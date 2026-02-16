@@ -22,6 +22,7 @@ import type { ClickPoint } from 'views/components/visualizations/OnClickPopover/
 import ValueRenderer from 'views/components/visualizations/OnClickPopover/ValueRenderer';
 import getHoverSwatchColor from 'views/components/visualizations/utils/getHoverSwatchColor';
 import Popover from 'components/common/Popover';
+import PopoverTitle from 'views/components/visualizations/OnClickPopover/PopoverTitle';
 
 const StyledListGroup = styled(ListGroup)`
   max-height: 300px;
@@ -35,15 +36,15 @@ type Props = {
 };
 
 const ClickPointSelector = ({ clickPointsInRadius, onSelect, metricMapper }: Props) => (
-  <Popover.Dropdown>
+  <Popover.Dropdown title={<PopoverTitle>Metrics</PopoverTitle>}>
     <StyledListGroup>
       {clickPointsInRadius.map((clickPoint: ClickPoint) => {
         const { value, metric } = metricMapper(clickPoint);
         const traceColor = getHoverSwatchColor(clickPoint);
 
         return (
-          <ListGroupItem onClick={() => onSelect(clickPoint)}>
-            <ValueRenderer value={value} label={metric} traceColor={traceColor} />
+          <ListGroupItem onClick={() => onSelect(clickPoint)} key={metric}>
+            <ValueRenderer value={value} field={metric} traceColor={traceColor} />
           </ListGroupItem>
         );
       })}

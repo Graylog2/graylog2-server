@@ -16,9 +16,15 @@
  */
 package org.graylog.plugins.views.search.rest;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.export.ExportJobFactory;
@@ -26,19 +32,12 @@ import org.graylog.plugins.views.search.export.ExportJobService;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.export.ResultFormat;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import jakarta.inject.Inject;
 
-import jakarta.validation.Valid;
-
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
-@Api(value = "Search/Export", description = "Creating/Managing Export Jobs.", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Search/Export", description = "Creating/Managing Export Jobs.")
 @Path("/views/export")
 @RequiresAuthentication
 public class ExportJobsResource extends RestResource {
@@ -52,31 +51,31 @@ public class ExportJobsResource extends RestResource {
         this.exportJobFactory = exportJobFactory;
     }
 
-    @ApiOperation(value = "Create job to export a defined set of messages")
+    @Operation(summary = "Create job to export a defined set of messages")
     @POST
     @AuditEvent(type = ViewsAuditEventTypes.EXPORT_JOB_CREATED)
-    public String create(@ApiParam @Valid MessagesRequest rawrequest) {
+    public String create(@RequestBody(required = true) @Valid MessagesRequest rawrequest) {
         return exportJobService.save(exportJobFactory.fromMessagesRequest(rawrequest));
     }
 
-    @ApiOperation(value = "Create job to export search result")
+    @Operation(summary = "Create job to export search result")
     @POST
     @Path("{searchId}")
     @AuditEvent(type = ViewsAuditEventTypes.EXPORT_JOB_CREATED)
     public String createForSearch(
-            @ApiParam(value = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
-            @ApiParam(value = "Optional overrides") @Valid ResultFormat formatFromClient) {
+            @Parameter(description = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
+            @Parameter(name = "Optional overrides") @Valid ResultFormat formatFromClient) {
         return exportJobService.save(exportJobFactory.forSearch(searchId, formatFromClient));
     }
 
-    @ApiOperation(value = "Create job to export search type")
+    @Operation(summary = "Create job to export search type")
     @POST
     @Path("{searchId}/{searchTypeId}")
     @AuditEvent(type = ViewsAuditEventTypes.EXPORT_JOB_CREATED)
     public String createForSearchType(
-            @ApiParam(value = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
-            @ApiParam(value = "ID of a Message Table contained in the Search", name = "searchTypeId") @PathParam("searchTypeId") String searchTypeId,
-            @ApiParam(value = "Optional overrides") @Valid ResultFormat formatFromClient) {
+            @Parameter(description = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
+            @Parameter(description = "ID of a Message Table contained in the Search", name = "searchTypeId") @PathParam("searchTypeId") String searchTypeId,
+            @Parameter(name = "Optional overrides") @Valid ResultFormat formatFromClient) {
         return exportJobService.save(exportJobFactory.forSearchType(searchId, searchTypeId, formatFromClient));
     }
 }

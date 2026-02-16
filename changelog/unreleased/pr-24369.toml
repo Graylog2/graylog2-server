@@ -1,0 +1,5 @@
+type = "f"
+message = "Add node_id between searchable fields in paginated server nodes endpoint"
+
+pulls = ["24369"]
+issues = ["Graylog2/graylog-plugin-enterprise#12632"]

@@ -17,11 +17,14 @@
 package org.graylog2.lookup.adapters.dnslookup;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.documentation.Documentation;
+import com.github.joschi.jadconfig.documentation.DocumentationSection;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import org.graylog2.plugin.PluginConfigBean;
 
+@DocumentationSection(heading = "Dns Lookup Adapter Configuration", description = "")
 public class DnsLookupAdapterConfiguration implements PluginConfigBean {
     private static final String PREFIX = "dns_lookup_adapter_";
     protected static final String RESOLVER_POOL_SIZE = PREFIX + "resolver_pool_size";
@@ -30,9 +33,11 @@ public class DnsLookupAdapterConfiguration implements PluginConfigBean {
     protected static final int DEFAULT_POOL_SIZE = 10;
     protected static final int DEFAULT_REFRESH_INTERVAL_SECONDS = 300;
 
+    @Documentation("tbd")
     @Parameter(value = RESOLVER_POOL_SIZE, validators = PositiveIntegerValidator.class)
     private int poolSize = DEFAULT_POOL_SIZE;
 
+    @Documentation("tbd")
     @Parameter(value = RESOLVER_POOL_REFRESH_INTERVAL, validators = PositiveDurationValidator.class)
     private Duration poolRefreshInterval = Duration.seconds(DEFAULT_REFRESH_INTERVAL_SECONDS);
 

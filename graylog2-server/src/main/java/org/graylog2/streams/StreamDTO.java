@@ -59,6 +59,7 @@ abstract class StreamDTO implements ScopedEntity<StreamDTO.Builder> {
     public static final String EMBEDDED_ALERT_CONDITIONS = "alert_conditions";
     public static final String FIELD_IS_EDITABLE = "is_editable";
     public static final String FIELD_CATEGORIES = "categories";
+    public static final String FIELD_FAVORITE_FIELDS = "favorite_fields";
     public static final Stream.MatchingType DEFAULT_MATCHING_TYPE = Stream.MatchingType.AND;
 
     @JsonProperty(FIELD_CREATOR_USER_ID)
@@ -115,6 +116,10 @@ abstract class StreamDTO implements ScopedEntity<StreamDTO.Builder> {
     @JsonProperty(FIELD_CATEGORIES)
     @Nullable
     public abstract List<String> categories();
+
+    @JsonProperty(FIELD_FAVORITE_FIELDS)
+    @Nullable
+    public abstract List<String> favoriteFields();
 
     public abstract Builder toBuilder();
 
@@ -186,6 +191,9 @@ abstract class StreamDTO implements ScopedEntity<StreamDTO.Builder> {
 
         @JsonProperty(FIELD_CATEGORIES)
         public abstract Builder categories(List<String> categories);
+
+        @JsonProperty(FIELD_FAVORITE_FIELDS)
+        public abstract Builder favoriteFields(List<String> favoriteFields);
 
         public abstract String id();
 

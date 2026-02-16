@@ -31,12 +31,13 @@ import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.streams.matchers.StreamRuleMock;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.List;
@@ -44,17 +45,17 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class StreamRouterEngineTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private StreamFaultManager streamFaultManager;
@@ -65,7 +66,7 @@ public class StreamRouterEngineTest {
     private StreamMetrics streamMetrics;
     private final MessageFactory messageFactory = new TestMessageFactory();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         defaultStreamProvider = () -> defaultStream;
         streamMetrics = new StreamMetrics(new MetricRegistry());
@@ -754,7 +755,7 @@ public class StreamRouterEngineTest {
         final Message message1 = getMessage();
         message1.addFields(ImmutableMap.of("custom1", "value1"));
 
-        assertTrue("Message without \"custom2\" should not match conditions", engine.match(message1).isEmpty());
+        assertTrue(engine.match(message1).isEmpty(), "Message without \"custom2\" should not match conditions");
 
         final Message message2 = getMessage();
         message2.addFields(ImmutableMap.of(
@@ -763,8 +764,8 @@ public class StreamRouterEngineTest {
                 )
         );
 
-        assertEquals("Message with \"custom1\" and \"custom2\" should match conditions",
-                Lists.newArrayList(stream), engine.match(message2));
+        assertEquals(Lists.newArrayList(stream),
+                engine.match(message2), "Message with \"custom1\" and \"custom2\" should match conditions");
     }
 
     private StreamMock getStreamMock(String title) {

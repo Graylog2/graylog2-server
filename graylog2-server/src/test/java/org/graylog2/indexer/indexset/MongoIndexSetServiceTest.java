@@ -20,8 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.Subscribe;
 import com.mongodb.client.model.Filters;
 import org.bson.types.ObjectId;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.buffers.processors.fakestreams.FakeStream;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
@@ -44,12 +44,13 @@ import org.graylog2.security.SafeClasses;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.streams.StreamService;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -60,16 +61,15 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 import static org.graylog2.indexer.indexset.IndexSetConfig.DEFAULT_FIELD_TYPE_REFRESH_INTERVAL;
+import static org.graylog2.indexer.template.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class MongoIndexSetServiceTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
@@ -82,14 +82,13 @@ public class MongoIndexSetServiceTest {
     private StreamService streamService;
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) {
         clusterEventBus = new ClusterEventBus();
-        clusterConfigService = new ClusterConfigServiceImpl(objectMapperProvider, mongodb.mongoConnection(),
+        clusterConfigService = new ClusterConfigServiceImpl(objectMapperProvider, mongoCollections.mongoConnection(),
                 nodeId, new RestrictedChainingClassLoader(
                 new ChainingClassLoader(getClass().getClassLoader()), SafeClasses.allGraylogInternal()),
                 clusterEventBus);
-        MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongodb.mongoConnection());
         final EntityScopeService entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope(), new NonDeletableSystemScope()));
         indexSetService = new MongoIndexSetService(mongoCollections, streamService, clusterConfigService, clusterEventBus, entityScopeService);
     }
@@ -169,10 +168,11 @@ public class MongoIndexSetServiceTest {
         assertThat(indexSetConfig.id()).isEqualTo("57f3d721a43c2d59cb750002");
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     @MongoDBFixtures("MongoIndexSetServiceTest.json")
     public void getDefaultWithoutDefault() {
-        indexSetService.getDefault();
+        assertThrows(IllegalStateException.class, () ->
+            indexSetService.getDefault());
     }
 
     @Test
@@ -390,6 +390,7 @@ public class MongoIndexSetServiceTest {
         assertThat(subscriber.getEvents()).isEmpty();
     }
 
+    @ExtendWith(MongoDBExtension.class)
     private static class IndexSetCreatedSubscriber {
         private final List<IndexSetCreatedEvent> events = new CopyOnWriteArrayList<>();
 
@@ -403,6 +404,7 @@ public class MongoIndexSetServiceTest {
         }
     }
 
+    @ExtendWith(MongoDBExtension.class)
     private static class IndexSetDeletedSubscriber {
         private final List<IndexSetDeletedEvent> events = new CopyOnWriteArrayList<>();
 

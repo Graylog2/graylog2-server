@@ -25,9 +25,7 @@ import org.graylog2.plugin.configuration.fields.DropdownField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.database.ValidationException;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,10 +33,10 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.MapEntry.entry;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ConfigurationMapConverterTest {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void testConvertValues() throws Exception {
@@ -86,30 +84,32 @@ public class ConfigurationMapConverterTest {
     }
 
     @Test
-    public void convertValuesThrowsIllegalArgumentExceptionOnEmptyFieldDescription() throws Exception {
-        thrown.expect(ValidationException.class);
-        thrown.expectMessage("Unknown configuration field description for field \"string\"");
+    public void convertValuesThrowsIllegalArgumentExceptionOnEmptyFieldDescription() {
+        Throwable exception = assertThrows(ValidationException.class, () -> {
 
-        final ConfigurationRequest cr = new ConfigurationRequest();
+            final ConfigurationRequest cr = new ConfigurationRequest();
 
-        final Map<String, Object> data = new HashMap<>();
-        data.put("string", "foo");
+            final Map<String, Object> data = new HashMap<>();
+            data.put("string", "foo");
 
-        ConfigurationMapConverter.convertValues(data, cr);
+            ConfigurationMapConverter.convertValues(data, cr);
+        });
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Unknown configuration field description for field \"string\""));
     }
 
     @Test
-    public void convertValuesThrowsIllegalArgumentExceptionOnUnknwonType() throws Exception {
-        thrown.expect(ValidationException.class);
-        thrown.expectMessage("Unknown configuration field type \"dummy\"");
+    public void convertValuesThrowsIllegalArgumentExceptionOnUnknwonType() {
+        Throwable exception = assertThrows(ValidationException.class, () -> {
 
-        final ConfigurationRequest cr = new ConfigurationRequest();
-        cr.addField(new DummyField());
+            final ConfigurationRequest cr = new ConfigurationRequest();
+            cr.addField(new DummyField());
 
-        final Map<String, Object> data = new HashMap<>();
-        data.put("dummy", "foo");
+            final Map<String, Object> data = new HashMap<>();
+            data.put("dummy", "foo");
 
-        ConfigurationMapConverter.convertValues(data, cr);
+            ConfigurationMapConverter.convertValues(data, cr);
+        });
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Unknown configuration field type \"dummy\""));
     }
 
     public static class DummyField extends AbstractConfigurationField {

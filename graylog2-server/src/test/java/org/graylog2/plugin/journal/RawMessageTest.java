@@ -18,13 +18,13 @@ package org.graylog2.plugin.journal;
 
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.system.SimpleNodeId;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class RawMessageTest {
     @Test

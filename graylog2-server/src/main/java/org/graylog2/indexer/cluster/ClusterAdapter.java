@@ -25,6 +25,7 @@ import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.graylog2.system.stats.elasticsearch.ClusterStats;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
+import org.graylog2.system.stats.elasticsearch.NodeOSInfo;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
 
 import java.util.Collection;
@@ -60,6 +61,8 @@ public interface ClusterAdapter {
     PendingTasksStats pendingTasks();
 
     Map<String, NodeInfo> nodesInfo();
+
+    Map<String, NodeOSInfo> nodesHostInfo();
 
     ShardStats shardStats();
 

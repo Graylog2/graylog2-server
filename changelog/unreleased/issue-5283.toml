@@ -1,5 +1,5 @@
-type = "f"
-message = "Support for password complexity rules."
+type = "a"
+message = "add Password Complexity Configuration"
 
-pulls = ["23419"]
 issues = ["5283"]
+pulls = ["24644"]

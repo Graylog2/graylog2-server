@@ -26,11 +26,11 @@ import NumberUtils from 'util/NumberUtils';
 const Index = ({
   index,
   indexDetails,
-  indexSetId,
+  indexSetId = undefined,
 }: {
   index: IndexSummaryType;
   indexDetails: Array<IndexInfo>;
-  indexSetId: string;
+  indexSetId?: string;
 }) => {
   const indexRange = index && index.range ? index.range : null;
   const details = indexDetails.find(({ index_name }) => index_name === index.index_name);
@@ -73,11 +73,11 @@ const ClosedIndex = ({ index }: { index: IndexSummaryType }) => {
 const IndexListItem = ({
   indexDetails,
   index,
-  indexSetId,
+  indexSetId = undefined,
 }: {
   indexDetails: Array<IndexInfo>;
   index: IndexSummaryType;
-  indexSetId: string;
+  indexSetId?: string;
 }) =>
   !index.is_closed ? (
     <Index
@@ -95,7 +95,7 @@ type Props = {
   subheading: string;
   indices: Array<IndexSummaryType>;
   indexDetails: Array<IndexInfo>;
-  indexSetId: string;
+  indexSetId?: string;
 };
 
 const SectionHeader = styled(Row)(
@@ -133,7 +133,7 @@ const StatList = styled.dl`
   }
 `;
 
-const IndexSection = ({ headline, subheading, indices, indexDetails, indexSetId }: Props) => {
+const IndexSection = ({ headline, subheading, indices, indexDetails, indexSetId = undefined }: Props) => {
   const size = indices.map((index) => index.size?.bytes || 0).reduce((partialSum, a) => partialSum + a, 0) || 0;
   const shards = indices.map((index) => index.shard_count).reduce((partialSum, a) => partialSum + a, 0) || 0;
 
@@ -156,7 +156,7 @@ const IndexSection = ({ headline, subheading, indices, indexDetails, indexSetId 
         </Col>
       </SectionHeader>
       {indices.map((index) => (
-        <IndexListItem indexDetails={indexDetails} index={index} indexSetId={indexSetId} />
+        <IndexListItem key={index.index_name} indexDetails={indexDetails} index={index} indexSetId={indexSetId} />
       ))}
     </>
   );

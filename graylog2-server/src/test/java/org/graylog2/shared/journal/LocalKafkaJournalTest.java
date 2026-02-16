@@ -38,15 +38,16 @@ import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Period;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -71,32 +72,32 @@ import static org.apache.commons.io.filefilter.FileFilterUtils.nameFileFilter;
 import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class LocalKafkaJournalTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-    @Rule
-    public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    public File temporaryFolder;
 
     private ServerStatus serverStatus;
     private ScheduledThreadPoolExecutor scheduler;
     private File journalDirectory;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         scheduler = new ScheduledThreadPoolExecutor(1);
         scheduler.prestartCoreThread();
-        journalDirectory = temporaryFolder.newFolder();
+        journalDirectory = newFolder(temporaryFolder, "junit");
 
-        final File nodeId = temporaryFolder.newFile("node-id");
+        final File nodeId = newFile(temporaryFolder, "node-id");
         Files.write(nodeId.toPath(), UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8));
 
         final var nodeIdProvider = new FilePersistedNodeIdProvider(nodeId.getAbsolutePath());
@@ -110,7 +111,7 @@ public class LocalKafkaJournalTest {
         serverStatus = new ServerStatus(configuration, EnumSet.of(ServerStatus.Capability.SERVER), new EventBus("KafkaJournalTest"), NullAuditEventSender::new, nodeIdProvider.get());
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         scheduler.shutdown();
     }
@@ -286,14 +287,14 @@ public class LocalKafkaJournalTest {
 
         final File[] files = journalDirectory.listFiles();
         assertNotNull(files);
-        assertTrue("there should be files in the journal directory", files.length > 0);
+        assertTrue(files.length > 0, "there should be files in the journal directory");
 
         final File[] messageJournalDir = journalDirectory.listFiles((FileFilter) and(directoryFileFilter(),
                                                                                      nameFileFilter("messagejournal-0")));
         assertTrue(messageJournalDir.length == 1);
         final File[] logFiles = messageJournalDir[0].listFiles((FileFilter) and(fileFileFilter(),
                                                                                 suffixFileFilter(".log")));
-        assertEquals("should have two journal segments", 3, logFiles.length);
+        assertEquals(3, logFiles.length, "should have two journal segments");
     }
 
     @Test
@@ -371,15 +372,15 @@ public class LocalKafkaJournalTest {
             }
 
             int cleanedLogs = journal.runRetention();
-            assertEquals("no segments should've been cleaned", 0, cleanedLogs);
-            assertEquals("two segments segment should remain", 2, countSegmentsInDir(messageJournalDir));
+            assertEquals(0, cleanedLogs, "no segments should've been cleaned");
+            assertEquals(2, countSegmentsInDir(messageJournalDir), "two segments segment should remain");
 
             // move clock beyond the retention period and clean again
             clock.tick(Period.seconds(120));
 
             cleanedLogs = journal.runRetention();
-            assertEquals("two segments should've been cleaned (only one will actually be removed...)", 2, cleanedLogs);
-            assertEquals("one segment should remain", 1, countSegmentsInDir(messageJournalDir));
+            assertEquals(2, cleanedLogs, "two segments should've been cleaned (only one will actually be removed...)");
+            assertEquals(1, countSegmentsInDir(messageJournalDir), "one segment should remain");
 
         } finally {
             DateTimeUtils.setCurrentMillisSystem();
@@ -419,15 +420,15 @@ public class LocalKafkaJournalTest {
 
         // mark first half of first segment committed, should not clean anything
         journal.markJournalOffsetCommitted(bulkSize / 2);
-        assertEquals("should not touch segments", 0, journal.runRetention());
+        assertEquals(0, journal.runRetention(), "should not touch segments");
         assertEquals(3, countSegmentsInDir(messageJournalDir));
 
         journal.markJournalOffsetCommitted(bulkSize + 1);
-        assertEquals("first segment should've been purged", 1, journal.runRetention());
+        assertEquals(1, journal.runRetention(), "first segment should've been purged");
         assertEquals(2, countSegmentsInDir(messageJournalDir));
 
         journal.markJournalOffsetCommitted(bulkSize * 4);
-        assertEquals("only purge one segment, not the active one", 1, journal.runRetention());
+        assertEquals(1, journal.runRetention(), "only purge one segment, not the active one");
         assertEquals(1, countSegmentsInDir(messageJournalDir));
     }
 
@@ -597,7 +598,7 @@ public class LocalKafkaJournalTest {
      * to run the test multiple times because as it's a race condition, it can't be triggered reliably.
      */
     @Test
-    @Ignore
+    @Disabled
     public void readNext() throws Exception {
         final LocalKafkaJournal journal = new LocalKafkaJournal(journalDirectory.toPath(),
                 scheduler, Size.kilobytes(1L),
@@ -655,5 +656,20 @@ public class LocalKafkaJournalTest {
         final int cleanedLogs = journal.runRetention();
         assertEquals(1, cleanedLogs);
         assertThat(journal.getJournalUtilization().get()).isLessThan(utilizationAfterBulk);
+    }
+
+    private static File newFolder(File root, String... subDirs) throws IOException {
+        String subFolder = String.join("/", subDirs);
+        File result = new File(root, subFolder);
+        if (!result.mkdirs()) {
+            throw new IOException("Couldn't create folders " + root);
+        }
+        return result;
+    }
+
+    private static File newFile(File parent, String child) throws IOException {
+        File result = new File(parent, child);
+        result.createNewFile();
+        return result;
     }
 }

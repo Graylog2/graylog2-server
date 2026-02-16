@@ -19,25 +19,26 @@ package org.graylog2.suggestions;
 import io.restassured.response.ValidatableResponse;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 
-@ContainerMatrixTestsConfiguration(searchVersions = SearchServer.OS2_LATEST)
+@GraylogBackendConfiguration
 public class EntitySuggestionsIT {
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    public EntitySuggestionsIT(GraylogApis api) {
-        this.api = api;
+    @BeforeAll
+    static void init(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void returnsTitlesForDashboards() {
-        final var randomIdentifier = RandomStringUtils.randomAlphanumeric(8);
+        final var randomIdentifier = RandomStringUtils.secure().nextAlphanumeric(8);
         final var dashboard1 = api.dashboards().createDashboard("First " + randomIdentifier);
         final var dashboard2 = api.dashboards().createDashboard("Second " + randomIdentifier);
         final var dashboard3 = api.dashboards().createDashboard("Third " + randomIdentifier);

@@ -31,6 +31,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.AnalyzeReque
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.AnalyzeResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.XContentType;
 import org.graylog.shaded.opensearch2.org.opensearch.core.rest.RestStatus;
+import org.graylog.storage.exceptions.ParsedOpenSearchException;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.messages.Indexable;
@@ -226,7 +227,7 @@ public class MessagesAdapterOS2 implements MessagesAdapter {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return new IndexRequest(request.indexSet().getWriteIndexAlias())
+        return new IndexRequest(request.writeIndex())
                 .id(request.message().getId())
                 .source(body, XContentType.JSON);
     }

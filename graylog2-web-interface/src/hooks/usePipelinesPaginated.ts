@@ -32,7 +32,7 @@ type PaginatedPipelinesParams = {
   page: number;
   perPage: number;
   query?: string;
-  order?: 'asc' | ' desc';
+  order?: 'asc' | 'desc';
 };
 
 const DEFAULT_DATA = {

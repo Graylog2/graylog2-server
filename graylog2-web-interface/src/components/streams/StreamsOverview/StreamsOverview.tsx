@@ -29,6 +29,9 @@ import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValue
 import useTableElements from 'components/streams/StreamsOverview/hooks/useTableComponents';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import type { SearchParams } from 'stores/PaginationTypes';
+import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
 import CustomColumnRenderers from './ColumnRenderers';
 import usePipelineColumn from './hooks/usePipelineColumn';
@@ -65,23 +68,27 @@ const StreamsOverview = ({ indexSets }: Props) => {
       CustomColumnRenderers(indexSets, isPipelineColumnPermitted, currentUser.permissions, pluggableColumnRenderers),
     [indexSets, isPipelineColumnPermitted, currentUser.permissions, pluggableColumnRenderers],
   );
-  const { columnOrder, additionalAttributes, defaultLayout } = useMemo(
+  const { additionalAttributes, defaultLayout } = useMemo(
     () => getStreamTableElements(currentUser.permissions, isPipelineColumnPermitted, pluggableAttributes),
     [currentUser.permissions, isPipelineColumnPermitted, pluggableAttributes],
   );
 
+  const fetchEntities = (options: SearchParams): Promise<PaginatedResponse<Stream>> => {
+    CurrentUserStore.update(CurrentUserStore.getInitialState().currentUser.username);
+
+    return fetchStreams(options);
+  };
+
   return (
     <PaginatedEntityTable<Stream>
       humanName="streams"
-      columnsOrder={columnOrder}
       additionalAttributes={additionalAttributes}
       queryHelpComponent={<QueryHelper entityName="stream" />}
       entityActions={entityActions}
       tableLayout={defaultLayout}
-      fetchEntities={fetchStreams}
+      fetchEntities={fetchEntities}
       keyFn={keyFn}
-      actionsCellWidth={220}
-      expandedSectionsRenderer={expandedSections}
+      expandedSectionRenderers={expandedSections}
       bulkSelection={{ actions: bulkActions }}
       entityAttributesAreCamelCase={false}
       filterValueRenderers={FilterValueRenderers}

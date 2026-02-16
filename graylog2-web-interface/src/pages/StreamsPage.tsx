@@ -14,14 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { Row, Col } from 'components/bootstrap';
-import CreateStreamButton from 'components/streams/CreateStreamButton';
 import StreamsOverview from 'components/streams/StreamsOverview';
 import PageHeader from 'components/common/PageHeader';
-import { DocumentTitle, IfPermitted, Spinner } from 'components/common';
+import { DocumentTitle, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
 import type { Stream } from 'stores/streams/StreamsStore';
@@ -32,14 +31,27 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { EntityShare } from 'actions/permissions/EntityShareActions';
 import useStreamMutations from 'hooks/useStreamMutations';
 import { KEY_PREFIX } from 'components/streams/hooks/useStreams';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CreateButton from 'components/common/CreateButton';
+import Routes from 'routing/Routes';
+import useLocation from 'routing/useLocation';
+import StreamModal from 'components/streams/StreamModal';
+import useHistory from 'routing/useHistory';
 
 const StreamsPage = () => {
   const { indexSets } = useStore(IndexSetsStore);
   const sendTelemetry = useSendTelemetry();
   const { createStream } = useStreamMutations();
   const queryClient = useQueryClient();
+  const { pathname } = useLocation();
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  useEffect(() => {
+    setShowCreateModal(pathname === Routes.STREAM_NEW);
+  }, [pathname]);
+  const history = useHistory();
+  const closeCreateModal = useCallback(() => history.push(Routes.STREAMS), [history]);
 
-  const onSave = (stream: Stream & EntityShare) => {
+  const onCreate = async (stream: Stream & EntityShare) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.NEW_STREAM_CREATED, {
       app_pathname: 'streams',
     });
@@ -47,6 +59,7 @@ const StreamsPage = () => {
     return createStream(stream).then(() => {
       UserNotification.success('Stream has been successfully created.', 'Success');
       queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
+      CurrentUserStore.reload();
     });
   };
 
@@ -68,11 +81,7 @@ const StreamsPage = () => {
           title: 'Streams documentation',
           path: DocsHelper.PAGES.STREAMS,
         }}
-        actions={
-          <IfPermitted permissions="streams:create">
-            <CreateStreamButton bsStyle="success" onCreate={onSave} indexSets={indexSets} />
-          </IfPermitted>
-        }>
+        actions={<CreateButton entityKey="Stream" />}>
         <span>
           You can route incoming messages into streams by applying rules against them. Messages matching the rules of a
           stream are routed into it. A message can also be routed into multiple streams.
@@ -84,6 +93,17 @@ const StreamsPage = () => {
           <StreamsOverview indexSets={indexSets} />
         </Col>
       </Row>
+      {showCreateModal && (
+        <StreamModal
+          title="Create stream"
+          submitButtonText="Create stream"
+          submitLoadingText="Creating stream..."
+          indexSets={indexSets}
+          onSubmit={onCreate}
+          onClose={closeCreateModal}
+          isNew
+        />
+      )}
     </DocumentTitle>
   );
 };

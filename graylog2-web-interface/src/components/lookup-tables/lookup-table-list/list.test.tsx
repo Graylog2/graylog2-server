@@ -84,11 +84,13 @@ jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
   }),
 }));
 
+const moreActionsName = { name: new RegExp(`More Actions for ${LOOKUP_TABLES[0].name}`, 'i') };
+
 describe('Lookup Table List', () => {
   it('should render a list of lookup tables', async () => {
     render(<LookupTableList />);
 
-    await screen.findAllByRole('button', { name: /help/i });
+    await screen.findAllByRole('button', { name: /Show search syntax help/i });
 
     screen.getByText(/0 table title/i);
     screen.getByText(/0 table description/i);
@@ -112,13 +114,13 @@ describe('Lookup Table List', () => {
   it('should show an actions menu', async () => {
     render(<LookupTableList />);
 
-    await screen.findByRole('button', { name: LOOKUP_TABLES[0].id });
+    await screen.findByRole('button', moreActionsName);
   });
 
   it('should be able to edit a table', async () => {
     render(<LookupTableList />);
 
-    userEvent.click(await screen.findByRole('button', { name: LOOKUP_TABLES[0].id }));
+    userEvent.click(await screen.findByRole('button', moreActionsName));
 
     await screen.findByRole('menuitem', { name: /edit/i });
   });
@@ -126,7 +128,7 @@ describe('Lookup Table List', () => {
   it('should be able to delete a table', async () => {
     render(<LookupTableList />);
 
-    userEvent.click(await screen.findByRole('button', { name: LOOKUP_TABLES[0].id }));
+    userEvent.click(await screen.findByRole('button', moreActionsName));
     userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
     userEvent.click(await screen.findByRole('button', { name: /delete/i }));
 

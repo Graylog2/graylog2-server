@@ -20,12 +20,14 @@ import org.graylog.integrations.aws.resources.requests.AWSRequest;
 import org.graylog2.Configuration;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.iam.IamClient;
 import software.amazon.awssdk.services.iam.IamClientBuilder;
@@ -40,7 +42,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class AwsClientBuilderUtilTest {
 
     // Mock Objects
@@ -58,9 +61,9 @@ public class AwsClientBuilderUtilTest {
 
     private AWSClientBuilderUtil awsClientBuilderUtil;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        awsClientBuilderUtil = new AWSClientBuilderUtil(encryptedValueService, mock(Configuration.class));
+        awsClientBuilderUtil = new AWSClientBuilderUtil(AWSAuthFactory::new, encryptedValueService, mock(Configuration.class));
     }
 
     // Test Cases

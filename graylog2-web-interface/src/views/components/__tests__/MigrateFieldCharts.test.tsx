@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, fireEvent, waitFor, screen, waitForElementToBeRemoved } from 'wrappedTestingLibrary';
+import { render, waitFor, screen, waitForElementToBeRemoved } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
@@ -89,7 +90,7 @@ const renderAndMigrate = async () => {
   render(<MigrateFieldCharts />);
   const migrateButton = await screen.findByText('Migrate');
 
-  fireEvent.click(migrateButton);
+  await userEvent.click(migrateButton);
 
   await waitForElementToBeRemoved(migrateButton);
 };

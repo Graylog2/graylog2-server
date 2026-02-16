@@ -33,6 +33,7 @@ const bindings: PluginExports = {
       formComponent: FilterAggregationFormContainer,
       summaryComponent: FilterAggregationSummary,
       defaultConfig: FilterAggregationForm.defaultConfig,
+      useCondition: () => true,
     },
   ],
 };

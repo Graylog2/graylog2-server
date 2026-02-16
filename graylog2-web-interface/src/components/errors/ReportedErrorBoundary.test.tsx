@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import suppressConsole from 'helpers/suppressConsole';
 import ErrorsActions from 'actions/errors/ErrorsActions';
@@ -130,7 +131,7 @@ describe('ReportedErrorBoundary', () => {
     await screen.findByText('Missing Permissions');
 
     const link = await screen.findByRole('link', { name: 'Go back' });
-    fireEvent.click(link);
+    await userEvent.click(link);
 
     await screen.findByText('Hello World!');
   });

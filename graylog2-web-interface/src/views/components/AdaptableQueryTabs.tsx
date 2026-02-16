@@ -23,7 +23,7 @@ import { OrderedSet } from 'immutable';
 import UserNotification from 'util/UserNotification';
 import type { QueryId } from 'views/logic/queries/Query';
 import type QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
-import { Nav, NavItem, DropdownButton, MenuItem } from 'components/bootstrap';
+import { Nav, NavItem, MenuItem } from 'components/bootstrap';
 import { Icon, IconButton } from 'components/common';
 import QueryTitle from 'views/components/queries/QueryTitle';
 import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabsConfiguration';
@@ -31,7 +31,6 @@ import CopyToDashboardForm from 'views/components/widgets/CopyToDashboardForm';
 import View from 'views/logic/views/View';
 import type { SearchJson } from 'views/logic/search/Search';
 import Search from 'views/logic/search/Search';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import CopyPageToDashboard from 'views/logic/views/CopyPageToDashboard';
 import { loadAsDashboard, loadDashboard } from 'views/logic/views/Actions';
 import createSearch from 'views/logic/slices/createSearch';
@@ -47,6 +46,8 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useCurrentQueryId from 'views/logic/queries/useCurrentQueryId';
 import useView from 'views/hooks/useView';
 import useIsNew from 'views/hooks/useIsNew';
+import { updateView, getView } from 'views/api/views';
+import { MoreActionsMenu } from 'components/common/MoreActions';
 
 import type { QueryTabsProps } from './QueryTabs';
 
@@ -143,17 +144,15 @@ const QueryTab = styled(NavItem)`
 
 const MoreTabsLi = ({ menuItems }: { menuItems: OrderedSet<React.ReactNode> }) => (
   <li className={MORE_TABS_LI_CLASS}>
-    <DropdownButton
-      title={<Icon name="more_horiz" />}
+    <MoreActionsMenu
       className={MORE_TABS_BUTTON_CLASS}
       id="query-tabs-more"
       aria-label="More Dashboard Pages"
-      noCaret
       bsStyle="link"
       keepMounted
       pullRight>
       {menuItems.toArray()}
-    </DropdownButton>
+    </MoreActionsMenu>
   </li>
 );
 
@@ -229,7 +228,7 @@ const adjustTabsVisibility = (
 const _updateDashboardWithNewSearch = (dashboard: View, newSearch: Search) => {
   const newDashboard = dashboard.toBuilder().search(newSearch).build();
 
-  return ViewManagementActions.update(newDashboard);
+  return updateView(newDashboard);
 };
 
 const addPageToDashboard =
@@ -255,7 +254,7 @@ const _onCopyToDashboard =
     const view = selectView(getState());
     const queryId = selectActiveQuery(getState());
 
-    const dashboardJson = await ViewManagementActions.get(selectedDashboardId);
+    const dashboardJson = await getView(selectedDashboardId);
     const targetDashboard = View.fromJSON(dashboardJson);
 
     return fetchSearch(dashboardJson.search_id).then(addPageToDashboard(targetDashboard, view, queryId));

@@ -22,7 +22,7 @@ import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,9 +101,8 @@ public class MessageULIDGeneratorTest {
         final DateTime largeDate = DateTime.parse("+10889-08-02T05:31:50.656Z");
         final Message message = messageFactory.createMessage("foo", "source", largeDate);
 
-        assertThatThrownBy(() -> {
-            generator.createULID(message);
-        }).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() ->
+            generator.createULID(message)).isInstanceOf(IllegalArgumentException.class);
     }
 
     private int extractSequenceNr(ULID.Value ulid) {

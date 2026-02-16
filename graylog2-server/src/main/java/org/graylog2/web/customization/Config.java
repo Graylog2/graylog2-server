@@ -19,6 +19,7 @@ package org.graylog2.web.customization;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -28,6 +29,7 @@ public record Config(
         Optional<String> favicon,
         Optional<Logo> logo,
         @JsonProperty("help_url") Optional<String> helpUrl,
+        @JsonProperty("help_pages") Optional<Map<String, String>> helpPages,
         Optional<Login> login,
         Optional<Welcome> welcome,
         Optional<Navigation> navigation,
@@ -68,13 +70,23 @@ public record Config(
     public record Footer(Optional<Boolean> enabled) {}
 
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
-    public record Features(@JsonProperty("ai_investigation_report") Optional<FeaturesItem> aiInvestigationReport) {}
+    public record Features(@JsonProperty("ai_investigation_report") Optional<FeaturesItem> aiInvestigationReport,
+                           @JsonProperty("widget_summary") Optional<FeaturesItem> widgetSummary) {}
 
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
     public record FeaturesItem(Optional<Boolean> enabled) {}
 
     public static Config empty() {
-        return new Config(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+        return new Config(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+    }
+
+    public static Config forProductName(String productName) {
+        return new Config(Optional.of(productName), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+    }
+
+    public Config withWelcome(Welcome welcome) {
+        return new Config(productName, favicon, logo, helpUrl, helpPages, login, Optional.of(welcome), navigation, footer, resources, features);
     }
 }

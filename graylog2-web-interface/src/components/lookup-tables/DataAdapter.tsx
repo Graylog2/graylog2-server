@@ -15,27 +15,32 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
+import Routes from 'routing/Routes';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { Row, Col, Button, Input, Label } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 import useScopePermissions from 'hooks/useScopePermissions';
-import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
 
 import type { DataAdapterPluginType } from './types';
 import ConfigSummaryDefinitionListWrapper from './ConfigSummaryDefinitionListWrapper';
 
 type Props = {
   dataAdapter: LookupTableAdapter;
+  noEdit?: boolean;
 };
 
-const DataAdapter = ({ dataAdapter }: Props) => {
-  const [lookupKey, setLookupKey] = React.useState('');
-  const [lookupResult, setLookupResult] = React.useState(null);
+const DataAdapter = ({ dataAdapter, noEdit = false }: Props) => {
+  const [lookupKey, setLookupKey] = useState('');
+  const [lookupResult, setLookupResult] = useState(null);
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(dataAdapter);
-  const { setModal, setTitle, setEntity } = useModalContext();
+  const navigate = useNavigate();
+
+  const canEdit = !noEdit && !loadingScopePermissions && scopePermissions?.is_mutable;
 
   const _onChange = (event: React.SyntheticEvent) => {
     setLookupKey(getValueFromInput(event.target));
@@ -50,9 +55,7 @@ const DataAdapter = ({ dataAdapter }: Props) => {
   };
 
   const handleEdit = () => {
-    setModal('DATA-ADAPTER-EDIT');
-    setTitle(dataAdapter.name);
-    setEntity(dataAdapter);
+    navigate(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(dataAdapter.name));
   };
 
   const plugin = usePluginEntities('lookupTableAdapters').find(
@@ -71,7 +74,7 @@ const DataAdapter = ({ dataAdapter }: Props) => {
       <Col md={12}>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Label>{plugin.displayName}</Label>
-          {!loadingScopePermissions && scopePermissions?.is_mutable && (
+          {canEdit && (
             <Button bsStyle="primary" onClick={handleEdit} role="button" name="edit_square">
               Edit
             </Button>
@@ -103,7 +106,7 @@ const DataAdapter = ({ dataAdapter }: Props) => {
               help="Key to look up a value for."
               value={lookupKey}
             />
-            <Button type="submit" bsStyle="success">
+            <Button type="submit" bsStyle="primary">
               Look up
             </Button>
           </fieldset>

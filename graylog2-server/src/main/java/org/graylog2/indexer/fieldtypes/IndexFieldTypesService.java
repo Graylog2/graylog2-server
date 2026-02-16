@@ -33,7 +33,9 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -172,6 +174,21 @@ public class IndexFieldTypesService {
         );
 
         return findByQuery(query);
+    }
+
+    public Collection<FieldTypeDTO> findForSingleField(String fieldName, Collection<String> indexNames) {
+        final var query = and(
+                in(FIELD_INDEX_NAME, indexNames),
+                in(FIELDS_FIELD_NAMES, fieldName)
+        );
+
+        return collection.aggregate(Arrays.asList(
+                        Aggregates.match(query),
+                        Aggregates.unwind("$" + FIELD_FIELDS),
+                        Aggregates.match(Filters.eq(FIELDS_FIELD_NAMES, fieldName)),
+                        Aggregates.replaceRoot("$" + FIELD_FIELDS)
+                ), FieldTypeDTO.class)
+                .into(new HashSet<>());
     }
 
     public Collection<IndexFieldTypesDTO> findAll() {

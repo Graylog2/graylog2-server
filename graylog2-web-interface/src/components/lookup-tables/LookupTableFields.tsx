@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useEffect } from 'react';
 import memoize from 'lodash/memoize';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
@@ -27,7 +29,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
 import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
 
-const LOOKUP_PERMISSIONS = ['lookuptables:read'];
+const LOOKUP_PERMISSIONS: Permission[] = ['lookuptables:read'] as const;
 
 type Props = {
   onTableNameChange: (arg: string) => void;
@@ -56,7 +58,7 @@ const LookupTableFields = ({
   const lookupTables = useStore(LookupTablesStore);
   const currentUser = useCurrentUser();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS)) {
       return;
     }

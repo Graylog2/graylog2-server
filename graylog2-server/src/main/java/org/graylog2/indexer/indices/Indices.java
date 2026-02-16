@@ -30,15 +30,13 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.datatiering.WarmIndexDeletedEvent;
 import org.graylog2.datatiering.WarmIndexInfo;
 import org.graylog2.indexer.ElasticsearchException;
-import org.graylog2.indexer.IgnoreIndexTemplate;
-import org.graylog2.indexer.IndexMappingFactory;
-import org.graylog2.indexer.IndexMappingTemplate;
 import org.graylog2.indexer.IndexNotFoundException;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexTemplateNotFoundException;
+import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
-import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
+import org.graylog2.indexer.indexset.basic.BasicIndexSet;
+import org.graylog2.indexer.indexset.basic.BasicIndexSetConfig;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
@@ -47,6 +45,11 @@ import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.indexer.indices.events.IndicesReopenedEvent;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.searches.IndexRangeStats;
+import org.graylog2.indexer.template.IgnoreIndexTemplate;
+import org.graylog2.indexer.template.IndexMappingFactory;
+import org.graylog2.indexer.template.IndexMappingTemplate;
+import org.graylog2.indexer.template.IndexTemplateConfig;
+import org.graylog2.indexer.template.IndexTemplateNotFoundException;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.joda.time.DateTime;
@@ -78,6 +81,7 @@ public class Indices {
     private final EventBus eventBus;
     private final IndicesAdapter indicesAdapter;
     private final IndexFieldTypeProfileService profileService;
+    private final CountsAdapter countsAdapter;
 
     @Inject
     public Indices(IndexMappingFactory indexMappingFactory,
@@ -85,13 +89,15 @@ public class Indices {
                    AuditEventSender auditEventSender,
                    EventBus eventBus,
                    IndicesAdapter indicesAdapter,
-                   IndexFieldTypeProfileService profileService) {
+                   IndexFieldTypeProfileService profileService,
+                   CountsAdapter countsAdapter) {
         this.indexMappingFactory = indexMappingFactory;
         this.nodeId = nodeId;
         this.auditEventSender = auditEventSender;
         this.eventBus = eventBus;
         this.indicesAdapter = indicesAdapter;
         this.profileService = profileService;
+        this.countsAdapter = countsAdapter;
     }
 
     public IndicesBlockStatus getIndicesBlocksStatus(final List<String> indices) {
@@ -103,7 +109,7 @@ public class Indices {
     }
 
     public void move(String source, String target) {
-        indicesAdapter.move(source, target, (result) -> {
+        indicesAdapter.move(source, target, result -> {
             LOG.info("Moving index <{}> to <{}>: Bulk indexed {} messages, took {} ms, failures: {}",
                     source,
                     target,
@@ -138,14 +144,14 @@ public class Indices {
     }
 
     public long numberOfMessages(String indexName) throws IndexNotFoundException {
-        return indicesAdapter.numberOfMessages(indexName);
+        return countsAdapter.totalCount(List.of(indexName));
     }
 
     public IndexSetStats getIndexSetStats() {
         return indicesAdapter.getIndexSetStats();
     }
 
-    public JsonNode getIndexStats(final IndexSet indexSet) {
+    public JsonNode getIndexStats(final BasicIndexSet indexSet) {
         return indicesAdapter.getIndexStats(Collections.singleton(indexSet.getIndexWildcard()));
     }
 
@@ -186,11 +192,10 @@ public class Indices {
         return indicesAdapter.resolveAlias(alias);
     }
 
-    public void ensureIndexTemplate(IndexSet indexSet) {
-        final IndexSetConfig indexSetConfig = indexSet.getConfig();
-        final String templateName = indexSetConfig.indexTemplateName();
+    public void ensureIndexTemplate(IndexTemplateConfig config) {
+        final String templateName = config.indexTemplateName();
         try {
-            var template = buildTemplate(indexSet, indexSetConfig);
+            var template = buildTemplate(config);
             if (indicesAdapter.ensureIndexTemplate(templateName, template)) {
                 LOG.info("Successfully ensured index template {}", templateName);
             } else {
@@ -200,20 +205,20 @@ public class Indices {
             LOG.warn(e.getMessage());
             if (e.isFailOnMissingTemplate() && !indicesAdapter.indexTemplateExists(templateName)) {
                 throw new IndexTemplateNotFoundException(f("No index template with name '%s' (type - '%s') found in Elasticsearch",
-                        templateName, indexSetConfig.indexTemplateType().orElse(null)));
+                        templateName, config.indexTemplateType().orElse(null)));
             }
         }
     }
 
-    public Template getIndexTemplate(IndexSet indexSet) {
-        final IndexSetMappingTemplate indexSetMappingTemplate = getTemplateIndexSetConfig(indexSet, indexSet.getConfig(), profileService);
-        return indexMappingFactory.createIndexMapping(indexSet.getConfig())
+    public Template getIndexTemplate(IndexTemplateConfig config) {
+        final IndexSetMappingTemplate indexSetMappingTemplate = getTemplateIndexSetConfig(config, profileService);
+        return indexMappingFactory.createIndexMapping(config)
                 .toTemplate(indexSetMappingTemplate);
     }
 
-    Template buildTemplate(IndexSet indexSet, IndexSetConfig indexSetConfig) throws IgnoreIndexTemplate {
-        final IndexSetMappingTemplate indexSetMappingTemplate = getTemplateIndexSetConfig(indexSet, indexSetConfig, profileService);
-        return indexMappingFactory.createIndexMapping(indexSetConfig)
+    Template buildTemplate(IndexTemplateConfig config) throws IgnoreIndexTemplate {
+        final IndexSetMappingTemplate indexSetMappingTemplate = getTemplateIndexSetConfig(config, profileService);
+        return indexMappingFactory.createIndexMapping(config)
                 .toTemplate(indexSetMappingTemplate, 0L);
     }
 
@@ -226,31 +231,31 @@ public class Indices {
         }
     }
 
-    public boolean create(String indexName, IndexSet indexSet) {
-        return create(indexName, indexSet, null, null);
+    public boolean create(String indexName, BasicIndexSetConfig config) {
+        return create(indexName, config, null, null);
     }
 
     public boolean create(String indexName,
-                          IndexSet indexSet,
+                          BasicIndexSetConfig config,
                           @Nullable Map<String, Object> indexMapping,
                           @Nullable Map<String, Object> indexSettings) {
         try {
             // Make sure our index template exists before creating an index!
-            ensureIndexTemplate(indexSet);
-            Optional<IndexMappingTemplate> indexMappingTemplate = indexMapping(indexSet);
+            ensureIndexTemplate(config.indexTemplateConfig());
+            Optional<IndexMappingTemplate> indexMappingTemplate = indexMapping(config.indexTemplateConfig());
             IndexSettings settings = indexMappingTemplate
-                    .map(t -> t.indexSettings(indexSet.getConfig(), indexSettings))
-                    .orElse(IndexMappingTemplate.createIndexSettings(indexSet.getConfig()));
+                    .map(t -> t.indexSettings(config, indexSettings))
+                    .orElse(IndexMappingTemplate.createIndexSettings(config));
 
             Map<String, Object> mappings = indexMappingTemplate
-                    .map(t -> t.indexMappings(indexSet.getConfig(), indexMapping))
+                    .map(t -> t.indexMappings(config.indexTemplateConfig(), indexMapping))
                     .orElse(null);
 
             indicesAdapter.create(indexName, settings, mappings);
         } catch (Exception e) {
             if ((indexSettings != null || indexMapping != null)) {
                 LOG.info("Couldn't create index {}. Error: {}. Fall back to default settings/mappings and retry.", indexName, e.getMessage(), e);
-                return create(indexName, indexSet, null, null);
+                return create(indexName, config, null, null);
             }
             LOG.warn("Couldn't create index {}. Error: {}", indexName, e.getMessage(), e);
             auditEventSender.failure(AuditActor.system(nodeId), ES_INDEX_CREATE, ImmutableMap.of("indexName", indexName));
@@ -260,32 +265,29 @@ public class Indices {
         return true;
     }
 
-    private Optional<IndexMappingTemplate> indexMapping(IndexSet indexSet) {
+    private Optional<IndexMappingTemplate> indexMapping(IndexTemplateConfig config) {
         try {
-            return Optional.of(indexMappingFactory.createIndexMapping(indexSet.getConfig()));
+            return Optional.of(indexMappingFactory.createIndexMapping(config));
         } catch (IgnoreIndexTemplate e) {
             return Optional.empty();
         }
     }
 
     public IndexSetMappingTemplate getTemplateIndexSetConfig(
-            final IndexSet indexSet,
-            final IndexSetConfig indexSetConfig,
+            final IndexTemplateConfig config,
             final IndexFieldTypeProfileService profileService) {
-        final String profileId = indexSetConfig.fieldTypeProfile();
-        final CustomFieldMappings customFieldMappings = indexSetConfig.customFieldMappings();
+        final String profileId = config.fieldTypeProfile();
+        final CustomFieldMappings customFieldMappings = config.customFieldMappings();
         if (profileId != null && !profileId.isEmpty()) {
             final Optional<IndexFieldTypeProfile> fieldTypeProfile = profileService.get(profileId);
             if (fieldTypeProfile.isPresent() && !fieldTypeProfile.get().customFieldMappings().isEmpty()) {
-                return new IndexSetMappingTemplate(indexSetConfig.indexAnalyzer(),
-                        indexSet.getIndexWildcard(),
+                return new IndexSetMappingTemplate(config.indexAnalyzer(),
+                        config.indexWildcard(),
                         fieldTypeProfile.get().customFieldMappings().mergeWith(customFieldMappings));
             }
         }
 
-        return new IndexSetMappingTemplate(indexSetConfig.indexAnalyzer(),
-                indexSet.getIndexWildcard(),
-                customFieldMappings);
+        return new IndexSetMappingTemplate(config.indexAnalyzer(), config.indexWildcard(), customFieldMappings);
     }
 
     public Map<String, Set<String>> getAllMessageFieldsForIndices(final String[] writeIndexWildcards) {
@@ -340,13 +342,13 @@ public class Indices {
         return indicesAdapter.closedIndices(indices);
     }
 
-    public Set<String> getClosedIndices(final IndexSet indexSet) {
+    public Set<String> getClosedIndices(final BasicIndexSet indexSet) {
         return getClosedIndices(Collections.singleton(indexSet.getIndexWildcard()));
     }
 
-    public Set<String> getIndices(final IndexSet indexSet, final String... statusFilter) {
+    public Set<String> getIndices(final IndexSet indexSet, final IndexStatus... statusFilter) {
         final String indexWildcard = indexSet.getIndexWildcard();
-        final List<String> status = Arrays.asList(statusFilter);
+        final List<IndexStatus> status = Arrays.asList(statusFilter);
         return indicesAdapter.indices(indexWildcard, status, indexSet.getConfig().id());
     }
 

@@ -38,11 +38,12 @@ jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 jest.mock('util/UserNotification', () => ({ error: jest.fn() }));
 jest.mock('./useUserLayoutPreferences');
 
-describe('useUserSearchFilterQuery hook', () => {
+describe('useTableLayout hook', () => {
   const defaultLayout = {
     defaultSort: { attributeId: 'description', direction: 'asc' } as const,
     defaultPageSize: 20,
     defaultDisplayedAttributes: ['title'],
+    defaultColumnOrder: ['title'],
   };
 
   afterEach(() => {
@@ -60,7 +61,8 @@ describe('useUserSearchFilterQuery hook', () => {
     );
 
     expect(result.current.layoutConfig).toEqual({
-      displayedAttributes: layoutPreferences.displayedAttributes,
+      attributes: layoutPreferences.attributes,
+      order: undefined,
       sort: layoutPreferences.sort,
       pageSize: layoutPreferences.perPage,
     });
@@ -79,7 +81,8 @@ describe('useUserSearchFilterQuery hook', () => {
     );
 
     expect(result.current.layoutConfig).toEqual({
-      displayedAttributes: defaultLayout.defaultDisplayedAttributes,
+      attributes: undefined,
+      order: undefined,
       sort: defaultLayout.defaultSort,
       pageSize: defaultLayout.defaultPageSize,
     });
@@ -101,7 +104,8 @@ describe('useUserSearchFilterQuery hook', () => {
     );
 
     expect(result.current.layoutConfig).toEqual({
-      displayedAttributes: defaultLayout.defaultDisplayedAttributes,
+      attributes: undefined,
+      order: undefined,
       sort: defaultLayout.defaultSort,
       pageSize: layoutPreferences.perPage,
     });

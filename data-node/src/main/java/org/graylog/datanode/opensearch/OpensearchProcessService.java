@@ -24,6 +24,7 @@ import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bootstrap.preflight.DatanodeDirectoriesLockfileCheck;
+import org.graylog.datanode.configuration.DatanodeCertificateRenewedEvent;
 import org.graylog.datanode.configuration.OpensearchConfigurationService;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
@@ -32,7 +33,6 @@ import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
-import org.graylog2.datanode.RemoteReindexAllowlistEvent;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,15 +76,6 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void handleRemoteReindexAllowlistEvent(RemoteReindexAllowlistEvent event) {
-        switch (event.action()) {
-            case ADD -> this.configurationProvider.setAllowlist(event.allowlist(), event.trustedCertificates());
-            case REMOVE -> this.configurationProvider.removeAllowlist();
-        }
-    }
-
-    @Subscribe
-    @SuppressWarnings("unused")
     public void handleNodeLifecycleEvent(DataNodeLifecycleEvent event) {
         if (nodeId.getNodeId().equals(event.nodeId())) {
             switch (event.trigger()) {
@@ -102,6 +93,11 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                 }
             }
         }
+    }
+
+    @Subscribe
+    public void handleCertificateChangeEvent(DatanodeCertificateRenewedEvent event) {
+        stateMachine.fire(OpensearchEvent.CERTIFICATES_RELOAD);
     }
 
     private void checkWritePreflightFinishedOnInsecureStartup() {

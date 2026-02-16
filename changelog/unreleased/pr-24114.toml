@@ -1,0 +1,5 @@
+type = "fixed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Fix that Index Set Warm Tier couldn't be activated for some existing indices."
+
+issues = ["graylog-plugin-enterprise#12430"]
+pulls = ["24114"]

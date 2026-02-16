@@ -57,7 +57,7 @@ const EventDetailsTable = <E extends EntityBase = Event>({
                 <b>{attribute.title}</b>
               </TD>
             )}
-            <td>{renderCell ? renderCell(value, event, attribute, meta, eventProcedureId) : value}</td>
+            <td>{renderCell ? renderCell(value, event, meta, eventProcedureId) : value}</td>
           </tr>
         );
       })}

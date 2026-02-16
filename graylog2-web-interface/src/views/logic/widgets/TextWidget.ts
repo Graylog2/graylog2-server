@@ -36,12 +36,26 @@ export default class TextWidget extends Widget {
     streams: Array<string>,
     streamCategories: Array<string>,
     filters?: FiltersType,
+    description?: string,
+    context?: string,
   ) {
-    super(id, TextWidget.type, config, filter, timerange, query, streams, streamCategories, filters);
+    super(
+      id,
+      TextWidget.type,
+      config,
+      filter,
+      timerange,
+      query,
+      streams,
+      streamCategories,
+      filters,
+      description,
+      context,
+    );
   }
 
   static fromJSON(value: WidgetState) {
-    const { id, config, filter, timerange, query, streams, stream_categories, filters } = value;
+    const { id, config, filter, timerange, query, streams, stream_categories, filters, description, context } = value;
 
     return new TextWidget(
       id,
@@ -52,6 +66,8 @@ export default class TextWidget extends Widget {
       streams,
       stream_categories,
       filters,
+      description,
+      context,
     );
   }
 
@@ -68,10 +84,13 @@ export default class TextWidget extends Widget {
   }
 
   toBuilder() {
-    const { id, config, filter, timerange, query, streams, stream_categories, filters } = this._value;
+    const { id, config, filter, timerange, query, streams, stream_categories, filters, description, context } =
+      this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Map({ id, config, filter, timerange, query, streams, stream_categories, filters }));
+    return new Builder(
+      Map({ id, config, filter, timerange, query, streams, stream_categories, filters, description, context }),
+    );
   }
 
   static builder() {
@@ -82,8 +101,20 @@ export default class TextWidget extends Widget {
 
 class Builder extends Widget.Builder {
   build() {
-    const { id, config, filter, timerange, query, streams, stream_categories, filters } = this.value.toObject();
+    const { id, config, filter, timerange, query, streams, stream_categories, filters, description, context } =
+      this.value.toObject();
 
-    return new TextWidget(id, config, filter, timerange, query, streams, stream_categories, filters);
+    return new TextWidget(
+      id,
+      config,
+      filter,
+      timerange,
+      query,
+      streams,
+      stream_categories,
+      filters,
+      description,
+      context,
+    );
   }
 }

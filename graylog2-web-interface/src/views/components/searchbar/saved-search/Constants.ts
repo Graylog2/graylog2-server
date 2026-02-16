@@ -17,10 +17,10 @@
 
 import type { Sort } from 'stores/PaginationTypes';
 
-export const ENTITY_TABLE_ID = 'saved-searches';
 export const DEFAULT_LAYOUT = {
-  pageSize: 20,
-  sort: { attributeId: 'title', direction: 'asc' } as Sort,
-  displayedColumns: ['title', 'summary', 'favorite'],
-  columnsOrder: ['title', 'summary', 'description', 'owner', 'created_at', 'last_updated_at', 'favorite'],
+  entityTableId: 'saved-searches',
+  defaultPageSize: 20,
+  defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
+  defaultDisplayedAttributes: ['title', 'summary', 'favorite'],
+  defaultColumnOrder: ['title', 'summary', 'description', 'owner', 'created_at', 'last_updated_at', 'favorite'],
 };

@@ -216,7 +216,8 @@ const DataTable = ({
     [formContext?.dirty, editing, widget?.config, widget?.id, dispatch],
   );
 
-  const { columnPivots, rowPivots, series, rollupForBackendQuery: rollup } = config;
+  const { columnPivots, rowPivots, series, rollupForBackendQuery: rollup, visualizationConfig } = config;
+  const showRowNumbers = (visualizationConfig as DataTableVisualizationConfig)?.showRowNumbers ?? true;
   const widgetUnits = useWidgetUnits(config);
 
   const rows = retrieveChartData(data) ?? [];
@@ -237,20 +238,21 @@ const DataTable = ({
 
   const actualColumnPivotFields = _extractColumnPivotValues(rows);
   const pinnedColumns = useMemo(
-    () => widget?.config?.visualizationConfig?.pinnedColumns || Immutable.Set(),
+    () => widget?.config?.visualizationConfig?.pinnedColumns ?? Immutable.Set(),
     [widget?.config?.visualizationConfig?.pinnedColumns],
   );
 
   const stickyLeftMarginsByColumnIndex = useMemo(() => {
     let prev = 0;
     const res = [];
+    const lineNumberOffset = widget?.config?.visualizationConfig?.showRowNumbers === false ? 0 : 1;
 
     const rowPivotsFields = rowPivots.flatMap((rowPivot) => rowPivot.fields ?? []);
 
     rowPivotsFields.forEach((field, index) => {
       if (pinnedColumns.has(field)) {
         const column = field;
-        res.push({ index, column, leftMargin: prev });
+        res.push({ index: index + lineNumberOffset, column, leftMargin: prev });
         prev += rowPivotColumnsWidth[field];
       }
     });
@@ -258,19 +260,20 @@ const DataTable = ({
     series.forEach((row, index) => {
       if (pinnedColumns.has(row.function)) {
         const column = row.function;
-        res.push({ index: index + rowPivots.length, column, leftMargin: prev });
+        res.push({ index: index + rowPivots.length + lineNumberOffset, column, leftMargin: prev });
         prev += rowPivotColumnsWidth[row.function];
       }
     });
 
     return res;
-  }, [rowPivotColumnsWidth, rowPivots, pinnedColumns, series]);
+  }, [widget?.config?.visualizationConfig?.showRowNumbers, rowPivots, series, pinnedColumns, rowPivotColumnsWidth]);
   const formattedRows = deduplicateValues(expandedRows, rowFieldNames).map((reducedItem, idx) => {
     const valuePath = rowFieldNames.map((pivotField) => ({ [pivotField]: expandedRows[idx][pivotField] }));
     const key = `datatableentry-${idx}`;
 
     return (
       <DataTableEntry
+        index={idx + 1}
         key={key}
         fields={effectiveFields}
         item={reducedItem}
@@ -279,6 +282,7 @@ const DataTable = ({
         columnPivotValues={actualColumnPivotFields}
         types={fields}
         series={series}
+        showRowNumbers={showRowNumbers}
         units={widgetUnits}
       />
     );
@@ -308,6 +312,7 @@ const DataTable = ({
               setLoadingState={setLoadingState}
               pinnedColumns={pinnedColumns}
               togglePin={togglePin}
+              showRowNumbers={showRowNumbers}
             />
           </THead>
           <TBody $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>{formattedRows}</TBody>

@@ -33,7 +33,6 @@ import org.graylog.testing.TestUserServiceExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.users.events.UserDeletedEvent;
@@ -66,7 +65,7 @@ public class LastOpenedServiceTest {
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb,
-               MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
+               MongoCollections mongoCollections,
                GRNRegistry grnRegistry,
                TestUserService testUserService) {
 
@@ -94,7 +93,7 @@ public class LastOpenedServiceTest {
 
         this.testUserService = testUserService;
         this.grnRegistry = grnRegistry;
-        this.lastOpenedService = new LastOpenedService(new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()), new EventBus());
+        this.lastOpenedService = new LastOpenedService(mongoCollections, new EventBus());
     }
 
     @Test

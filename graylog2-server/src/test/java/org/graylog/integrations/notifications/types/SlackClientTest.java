@@ -24,11 +24,10 @@ import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.Timeout;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -37,21 +36,21 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@Timeout(value = 10, unit = TimeUnit.SECONDS)
 public class SlackClientTest {
-    @Rule
-    public Timeout timout = Timeout.seconds(10);
 
     private final MockWebServer server = new MockWebServer();
     private final OkHttpClient httpClient = new OkHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         server.start();
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws IOException {
         server.close();
     }
@@ -70,21 +69,25 @@ public class SlackClientTest {
         assertThat(recordedRequest.getBody().string(StandardCharsets.UTF_8)).isEqualTo(objectMapper.writeValueAsString(getMessage()));
     }
 
-    @Test(expected = TemporaryEventNotificationException.class)
+    @Test
     public void sendThrowsTempNotifException_whenHttpClientThrowsIOException() throws Exception {
-        final OkHttpClient httpClient =
-                this.httpClient.newBuilder().readTimeout(1, TimeUnit.MILLISECONDS).build();
+        assertThrows(TemporaryEventNotificationException.class, () -> {
+            final OkHttpClient httpClient =
+                    this.httpClient.newBuilder().readTimeout(1, TimeUnit.MILLISECONDS).build();
 
-        SlackClient slackClient = new SlackClient(httpClient, objectMapper);
-        slackClient.send(getMessage(), server.url("/").toString());
+            SlackClient slackClient = new SlackClient(httpClient, objectMapper);
+            slackClient.send(getMessage(), server.url("/").toString());
+        });
     }
 
-    @Test(expected = PermanentEventNotificationException.class)
+    @Test
     public void sendThrowsPermNotifException_whenPostReturnsHttp402() throws Exception {
-        server.enqueue(new MockResponse(402, Headers.of(), ""));
+        assertThrows(PermanentEventNotificationException.class, () -> {
+            server.enqueue(new MockResponse(402, Headers.of(), ""));
 
-        SlackClient slackClient = new SlackClient(httpClient, objectMapper);
-        slackClient.send(getMessage(), server.url("/").toString());
+            SlackClient slackClient = new SlackClient(httpClient, objectMapper);
+            slackClient.send(getMessage(), server.url("/").toString());
+        });
     }
 
     @Test

@@ -93,7 +93,7 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string; predefined
   const predefinedInfo = useMemo(() => {
     if (!predefinedUnit?.isDefined) return null;
 
-    const unitName = units[predefinedUnit.unitType].find(({ abbrev }) => abbrev === predefinedUnit?.abbrev).name;
+    const unitName = units[predefinedUnit?.unitType].find(({ abbrev }) => abbrev === predefinedUnit?.abbrev).name;
 
     return (
       <>
@@ -173,7 +173,7 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string; predefined
             <Button bsSize="xs" onClick={onClear}>
               Clear
             </Button>
-            <Button bsSize="xs" bsStyle="success" onClick={toggleShow}>
+            <Button bsSize="xs" bsStyle="primary" onClick={toggleShow}>
               OK
             </Button>
           </ModalButtonToolbar>

@@ -20,15 +20,20 @@ import io.restassured.response.ValidatableResponse;
 import org.assertj.core.api.Assertions;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.conditions.EnabledIfSearchServer;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
+import org.graylog2.storage.SearchVersion;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.util.List;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.DATANODE_DEV, additionalConfigurationParameters = {@ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_PROXY_API_ALLOWLIST", value = "false")})
+@GraylogBackendConfiguration(
+        serverLifecycle = Lifecycle.CLASS,
+        env = @GraylogBackendConfiguration.Env(key = "GRAYLOG_DATANODE_PROXY_API_ALLOWLIST", value = "false")
+)
+@EnabledIfSearchServer(distribution = SearchVersion.Distribution.DATANODE)
 public class DatanodeRestProxyIT {
 
     private GraylogApis apis;
@@ -38,7 +43,7 @@ public class DatanodeRestProxyIT {
         this.apis = apis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTargetAllDatanodeInstance() {
         final List<String> datanodes = apis.system().datanodes().properJSONPath().read("elements.*.hostname");
 
@@ -51,18 +56,18 @@ public class DatanodeRestProxyIT {
         }
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTargetAnyDatanodeInstance() {
         apis.get("/datanodes/any/rest/", 200)
                 .assertThat().body("opensearch.node.node_name", Matchers.equalTo("indexer"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTargetSpecificDatanodeInstance() {
         final List<String> datanodes = apis.system().datanodes().properJSONPath().read("elements.*.hostname");
         Assertions.assertThat(datanodes).isNotEmpty();
 
-        final String hostname = datanodes.iterator().next();
+        final String hostname = datanodes.getFirst();
         apis.get("/datanodes/" + hostname + "/rest/", 200)
                 .assertThat().body("opensearch.node.node_name", Matchers.equalTo("indexer"));
 

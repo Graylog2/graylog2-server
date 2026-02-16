@@ -130,7 +130,7 @@ const StepHealthCheck = ({ onChange, onSubmit }: StepHealthCheckProps) => {
             Checking again in: <Countdown timeInSeconds={120} callback={checkForLogs} paused={pauseCountdown} />
           </strong>
 
-          <Button type="button" bsStyle="success" bsSize="sm" onClick={checkForLogs} disabled={logDataProgress.loading}>
+          <Button type="button" bsStyle="primary" bsSize="sm" onClick={checkForLogs} disabled={logDataProgress.loading}>
             {logDataProgress.loading ? 'Checking...' : 'Check Now'}
           </Button>
         </CheckAgain>

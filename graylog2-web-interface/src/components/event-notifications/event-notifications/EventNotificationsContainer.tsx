@@ -27,6 +27,9 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
+import type { SearchParams } from 'stores/PaginationTypes';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
 import NotificationConfigTypeCell from './NotificationConfigTypeCell';
 import NotificationTitle from './NotificationTitle';
@@ -55,13 +58,14 @@ const customColumnRenderers = (
 });
 
 const EventNotificationsContainer = () => {
+  const currentUser = CurrentUserStore.getInitialState();
   const { isLoadingTest, testResults, getNotificationTest } = useNotificationTest();
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
     usePluggableEntityTableElements<EventNotification>(null, 'notification');
 
-  const { defaultLayout, columnOrder, additionalAttributes } = getEventNotificationTableElements(pluggableAttributes);
+  const { defaultLayout, additionalAttributes } = getEventNotificationTableElements(pluggableAttributes);
   const columnRenderers = useMemo(
     () => customColumnRenderers(testResults, pluggableColumnRenderers),
     [testResults, pluggableColumnRenderers],
@@ -95,16 +99,21 @@ const EventNotificationsContainer = () => {
     [handleTest, isLoadingTest],
   );
 
+  const fetchEntities = async (searchParams: SearchParams): Promise<PaginatedResponse<EventNotification>> => {
+    CurrentUserStore.update(currentUser.currentUser.username);
+
+    return fetchEventNotifications(searchParams);
+  };
+
   return (
     <PaginatedEntityTable<EventNotification>
       humanName="event notifications"
-      columnsOrder={columnOrder}
       queryHelpComponent={<QueryHelper entityName="notification" />}
       entityActions={renderEvenNotificationActions}
       tableLayout={defaultLayout}
-      fetchEntities={fetchEventNotifications}
+      fetchEntities={fetchEntities}
       additionalAttributes={additionalAttributes}
-      expandedSectionsRenderer={expandedSections}
+      expandedSectionRenderers={expandedSections}
       keyFn={keyFn}
       bulkSelection={{ actions: <BulkActions /> }}
       entityAttributesAreCamelCase

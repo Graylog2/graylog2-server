@@ -141,7 +141,7 @@ const RolesSelector = ({
         />
         {!submitOnSelect && (
           <SubmitButton
-            bsStyle="success"
+            bsStyle="primary"
             onClick={_onSubmit}
             disabled={isSubmitting || !selectedRoleNames}
             title="Assign Role"

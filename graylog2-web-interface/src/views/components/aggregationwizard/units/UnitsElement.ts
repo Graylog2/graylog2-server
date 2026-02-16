@@ -36,15 +36,15 @@ const toConfig = (formValues: WidgetConfigFormValues, configBuilder: Aggregation
 const validate = () => ({});
 
 const UnitsElement: AggregationElement<'units'> = {
-  title: 'Units',
+  title: null,
   key: 'units',
   order: 5,
   allowCreate: () => false,
-  component: () => null,
+  component: null,
   fromConfig,
   toConfig,
   validate,
-  isEmpty: () => false,
+  isEmpty: () => true,
 };
 
 export default UnitsElement;

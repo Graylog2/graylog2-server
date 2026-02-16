@@ -18,17 +18,17 @@ package org.graylog2.inputs;
 
 import net.bytebuddy.utility.RandomString;
 import org.assertj.core.api.Assertions;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApiResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Users;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -36,25 +36,23 @@ import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.VM, searchVersions = SearchServer.DATANODE_DEV)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.VM)
 public class InputPermissionsIT {
+    private static final Duration TIMEOUT = Duration.ofSeconds(30);
 
-    private final GraylogApis apis;
+    private static GraylogApis apis;
 
-    private GraylogApiResponse roleInputsReader;
-    private GraylogApiResponse roleInputsCreator;
-    private GraylogApiResponse roleRestrictedInputsCreator;
+    private static GraylogApiResponse roleInputsReader;
+    private static GraylogApiResponse roleInputsCreator;
+    private static GraylogApiResponse roleRestrictedInputsCreator;
 
-    private Users.User inputsReader;
-    private Users.User inputsCreator;
-    private Users.User restrictedInputsCreator;
-
-    public InputPermissionsIT(GraylogApis apis) {
-        this.apis = apis;
-    }
+    private static Users.User inputsReader;
+    private static Users.User inputsCreator;
+    private static Users.User restrictedInputsCreator;
 
     @BeforeAll
-    void setUp() {
+    static void setUp(GraylogApis graylogApis) throws Exception {
+        apis = graylogApis;
         roleInputsReader = apis.roles().create("custom_inputs_reader", "inputs reader can only see inputs", Set.of(
                 RestPermissions.INPUTS_READ
         ), false);
@@ -86,6 +84,7 @@ public class InputPermissionsIT {
     /**
      * Roles are stored in mongodb, but the auth backend is refreshing those only once every second. If we trigger a call
      * before the role is refreshed, we may get weird results.
+     *
      * @see org.graylog2.security.InMemoryRolePermissionResolver
      */
     private static void waitForRolesCacheRefresh() {
@@ -98,7 +97,7 @@ public class InputPermissionsIT {
         }
     }
 
-    private Users.User createUser(String username, GraylogApiResponse... roles) {
+    private static Users.User createUser(String username, GraylogApiResponse... roles) {
         return new Users.User(username, RandomString.make(), "<Generated>", username,
                 username + "@graylog", false, 30_0000, "Europe/Vienna",
                 Arrays.stream(roles).map(role -> role.properJSONPath().read("name", String.class)).toList(), List.of());
@@ -115,7 +114,7 @@ public class InputPermissionsIT {
         apis.roles().delete(roleRestrictedInputsCreator.properJSONPath().read("name", String.class));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testPermittedInputCreationAndReading() {
         String inputId = apis.forUser(inputsCreator).inputs().createGlobalInput("testInput",
                 "org.graylog2.inputs.random.FakeHttpMessageInput",
@@ -126,7 +125,7 @@ public class InputPermissionsIT {
                         apis.inputs().getInputState(inputId)
                                 .extract().body().jsonPath().get("state")
                                 .equals("RUNNING"),
-                "Timed out waiting for HTTP Random Message Input to become available");
+                "Timed out waiting for HTTP Random Message Input to become available", TIMEOUT);
 
         apis.forUser(inputsReader).inputs().getInput(inputId).assertThat().body("id", equalTo(inputId));
 
@@ -141,18 +140,18 @@ public class InputPermissionsIT {
                         apis.inputs().getInputState(inputId2)
                                 .extract().body().jsonPath().get("state")
                                 .equals("RUNNING"),
-                "Timed out waiting for HTTP Random Message Input to become available");
+                "Timed out waiting for HTTP Random Message Input to become available", TIMEOUT);
 
         apis.forUser(inputsReader).inputs().getInput(inputId2).assertThat().body("id", equalTo(inputId2));
 
         apis.inputs().deleteInput(inputId2);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testRestrictedInputCreationAndReading() {
         String inputId = apis.forUser(inputsCreator).inputs().createGlobalInput("testInput",
                 "org.graylog2.inputs.misc.jsonpath.JsonPathInput",
-                Map.of("target_url", "https://example.org",
+                Map.of("target_url", "http://example.org",
                         "interval", 10,
                         "timeunit", "MINUTES",
                         "path", "$.data",
@@ -161,7 +160,7 @@ public class InputPermissionsIT {
                         apis.inputs().getInputState(inputId)
                                 .extract().body().jsonPath().get("state")
                                 .equals("RUNNING"),
-                "Timed out waiting for Json Input to become available");
+                "Timed out waiting for Json Input to become available", TIMEOUT);
 
         apis.forUser(inputsReader).inputs().getInput(inputId).assertThat().body("id", equalTo(inputId));
 
@@ -179,7 +178,7 @@ public class InputPermissionsIT {
 
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testInputTypesRead() {
         final GraylogApiResponse inputTypesForReader = apis.forUser(inputsReader).inputs().getInputTypes();
         final Map<String, String> typesReader = inputTypesForReader.properJSONPath().read("types");

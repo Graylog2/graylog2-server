@@ -20,21 +20,24 @@ import { useMemo } from 'react';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 import type { Attribute } from 'stores/PaginationTypes';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
+import type { DefaultLayout } from 'components/common/EntityDataTable/types';
 
-const useNonDisplayedAttributes = (defaultLayout) => {
+const useNonDisplayedAttributes = (defaultLayout: DefaultLayout) => {
   const { attributes } = useTableFetchContext();
   const {
-    layoutConfig: { displayedAttributes },
+    layoutConfig: { attributes: columnPreferences = {} },
     isInitialLoading,
   } = useTableLayout(defaultLayout);
 
   return useMemo<Array<Attribute>>(() => {
     if (isInitialLoading) return [];
 
-    const displayedAttributesSet = new Set(displayedAttributes);
+    const displayedAttributesSet = new Set(
+      Object.keys(columnPreferences).filter((key) => columnPreferences[key].status === 'show'),
+    );
 
     return attributes.filter(({ id }) => !displayedAttributesSet.has(id));
-  }, [attributes, displayedAttributes, isInitialLoading]);
+  }, [attributes, columnPreferences, isInitialLoading]);
 };
 
 export default useNonDisplayedAttributes;

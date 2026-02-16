@@ -1,0 +1,5 @@
+type = "a" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Add server node lifecycle field to system/cluster/nodes/paginated API"
+
+issues = []
+pulls = ["24239"]

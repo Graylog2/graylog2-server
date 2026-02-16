@@ -18,9 +18,7 @@ package org.graylog2.system.traffic;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.testing.mongodb.MongoDBExtension;
-import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.system.NodeId;
@@ -45,8 +43,8 @@ class TrafficCounterServiceTest {
     private TrafficCounterService service;
 
     @BeforeEach
-    void setUp(MongoDBTestService mongodb, MongoJackObjectMapperProvider objectMapperProvider) {
-        service = new TrafficCounterService(new MongoCollections(objectMapperProvider, mongodb.mongoConnection()));
+    void setUp(MongoCollections mongoCollections) {
+        service = new TrafficCounterService(mongoCollections);
     }
 
     static DateTime getDayBucket(DateTime time) {

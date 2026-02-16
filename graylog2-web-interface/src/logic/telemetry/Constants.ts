@@ -18,7 +18,6 @@
 // Please note, each project has its own collection of telemetry event types.
 // Only maintain event types related to core features in this file.
 
-// eslint-disable-next-line import/prefer-default-export
 export const TELEMETRY_EVENT_TYPE = {
   SEARCH_TIMERANGE_PRESET_SELECTED: 'Search TimeRange Preset Selected',
   SEARCH_TIMERANGE_PICKER_TOGGLED: 'Search TimeRange Picker Toggled',
@@ -46,6 +45,14 @@ export const TELEMETRY_EVENT_TYPE = {
     WIDGET_EDIT_CANCEL_CLICKED: 'Search Widget Edit Cancel Clicked',
     WIDGET_CONFIG_UPDATED: 'Search Widget Config Updated',
     EXPORT: 'Search Widget Exported',
+  },
+  FAVORITE_FIELDS: {
+    EDIT_OPEN: 'Favorite Fields Edit Open',
+    EDIT_CANCELED: 'Favorite Fields Edit Canceled',
+    EDIT_SAVED: 'Favorite Fields Edit Saved',
+    TOGGLED: 'Favorite Field Toggled',
+    REORDERED: 'Favorite Field Reordered',
+    NON_FAVORITE_SHOW_TOGGLED: 'Non Favorite Field Show Toggled',
   },
   SEARCH_WIDGET_CREATE: {
     AGGREGATION: 'Search Widget Aggregation Created',
@@ -116,6 +123,7 @@ export const TELEMETRY_EVENT_TYPE = {
   EVENTDEFINITION_DUPLICATED: 'EventDefinition Duplicated',
   EVENTDEFINITION_NEXT_CLICKED: 'EventDefinition Next Clicked',
   EVENTDEFINITION_PREVIOUS_CLICKED: 'EventDefinition Previous Clicked',
+  EVENTDEFINITION_REPLAY_SEARCH_CLICKED: 'EventDefinition Replay Search Clicked',
   EVENTDEFINITION_DETAILS: {
     STEP_CLICKED: 'EventDefinition Details Step Clicked',
     PRIORITY_CHANGED: 'EventDefinition Details Priority Changed',
@@ -188,10 +196,8 @@ export const TELEMETRY_EVENT_TYPE = {
     STREAM_ITEM_DATA_ROUTING_STREAM_INDEXSET_UPDATE_OPENED: 'Stream Item Data Routing Stream IndexSet Update Opened',
     STREAM_ITEM_DATA_ROUTING_INDEXER_FILTER_UPDATE_OPENED: 'Stream Item Data Routing Indexer Filter Update Opened',
     STREAM_ITEM_DATA_ROUTING_INDEXER_FILTER_CREATE_OPENED: 'Stream Item Data Routing Indexer Filter Create Opened',
-    STREAM_ITEM_DATA_ROUTING_DATA_WAREHOUSE_FILTER_CREATE_OPENED:
-      'Stream Item Data Routing Data Warehouse Filter Create Opened',
-    STREAM_ITEM_DATA_ROUTING_DATA_WAREHOUSE_FILTER_UPDATE_OPENED:
-      'Stream Item Data Routing Data Warehouse Filter Update Opened',
+    STREAM_ITEM_DATA_ROUTING_DATA_LAKE_FILTER_CREATE_OPENED: 'Stream Item Data Routing Data Lake Filter Create Opened',
+    STREAM_ITEM_DATA_ROUTING_DATA_LAKE_FILTER_UPDATE_OPENED: 'Stream Item Data Routing Data Lake Filter Update Opened',
     STREAM_ITEM_DATA_ROUTING_FILTER_DELETE_OPENED: 'Stream Item Data Routing Filter Delete Opened',
     STREAM_ITEM_DATA_ROUTING_INTAKE_OPENED: 'Stream Item Data Routing Intake Opened',
     STREAM_ITEM_DATA_ROUTING_PROCESSING_OPENED: 'Stream Item Data Routing Processing Opened',
@@ -252,6 +258,8 @@ export const TELEMETRY_EVENT_TYPE = {
     CERTIFICATE_RENEWAL_POLICY_UPDATED: 'Configurations Certificate Renewal Policy Updated',
     DECORATORS_UPDATED: 'Configurations Decorators Updated',
     GEOLOCATION_CONFIGURATION_UPDATED: 'Configurations Geolocation Configuration Updated',
+    MARKDOWN_UPDATED: 'Configurations Markdown Updated',
+    PASSWORD_COMPLEXITY_UPDATED: 'Configurations Password Complexity Updated',
   },
   INPUTS: {
     INPUT_SELECTED: 'Inputs Input Selected',
@@ -420,11 +428,20 @@ export const TELEMETRY_EVENT_TYPE = {
     ACTION_RAN: 'Alerts And Events Action Ran',
   },
   ENTITY_DATA_TABLE: {
+    COLUMNS_RESET: 'Entity Data Table Columns Reset',
     COLUMNS_CHANGED: 'Entity Data Table Columns Changed',
+    COLUMN_ORDER_CHANGED: 'Entity Data Table Column Order Changed',
     SORT_CHANGED: 'Entity Data Table Sort Changed',
     PAGE_SIZE_CHANGED: 'Entity Data Table Page Size Changed',
     FILTER_CREATED: 'Entity Data Table Filter Created',
     FILTER_DELETED: 'Entity Data Table Filter Deleted',
     FILTER_CHANGED: 'Entity Data Table Filter Changed',
+    SLICE_COLUMN_SELECTED_HEADER: 'Entity Data Table Slice Column Selected (Header)',
+    SLICE_COLUMN_SELECTED_SECTION: 'Entity Data Table Slice Column Selected (Section)',
+    SLICE_REMOVED: 'Entity Data Table Slice Removed',
+    SLICE_VALUE_SELECTED: 'Entity Data Table Slice Value Selected',
+    SLICE_SEARCH_CHANGED: 'Entity Data Table Slice Search Changed',
+    SLICE_SORT_CHANGED: 'Entity Data Table Slice Sort Changed',
+    SLICE_EMPTY_VALUES_TOGGLED: 'Entity Data Table Slice Empty Values Toggled',
   },
 } as const;

@@ -19,13 +19,11 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import { useStore } from 'stores/connect';
 import LoggingSubsystem from 'components/loggers/LoggingSubsystem';
 import LogLevelMetricsOverview from 'components/loggers/LogLevelMetricsOverview';
 import { Col, Row, Button } from 'components/bootstrap';
 import { LinkToNode, IfPermitted, Icon } from 'components/common';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type Props = {
@@ -36,7 +34,6 @@ const metric_name = 'org.apache.logging.log4j.core.Appender.all';
 
 const NodeLoggers = ({ nodeId, subsystems }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const location = useLocation();
 
   const { metrics } = useStore(MetricsStore);
   const [showDetails, setShowDetails] = useState(false);
@@ -84,7 +81,6 @@ const NodeLoggers = ({ nodeId, subsystems }: Props) => {
                   setShowDetails((prevShowDetails) => !prevShowDetails);
 
                   sendTelemetry(TELEMETRY_EVENT_TYPE.LOGGING.SHOW_LOG_LEVEL_METRICS_TOGGLED, {
-                    app_pathname: getPathnameWithoutId(location.pathname),
                     app_section: 'log-level',
                     app_action_value: 'show-metrics',
                     event_details: { showing: !showDetails },

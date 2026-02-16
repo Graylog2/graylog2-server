@@ -18,12 +18,13 @@ package org.graylog2.migrations;
 
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.users.UserConfiguration;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.threeten.extra.PeriodDuration;
 
 import java.time.Duration;
@@ -33,18 +34,17 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class V20250219134200_DefaultTTLForNewTokensTest {
     //We prepare some existing config with explicitly updated values, so we can safely check they're not touched by the migration:
     private final UserConfiguration existingConfig = UserConfiguration.create(true, Duration.of(10, ChronoUnit.HOURS), true, false, PeriodDuration.of(Duration.ofDays(7)));
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
     @Mock
     private ClusterConfigService configService;
 
     private V20250219134200_DefaultTTLForNewTokens testee;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         testee = new V20250219134200_DefaultTTLForNewTokens(configService);
     }

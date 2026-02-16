@@ -18,17 +18,31 @@ package org.graylog.plugins.views.search.validation;
 
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class QueryValidationServiceImplTest {
 
-    public static final MappedFieldTypesService FIELD_TYPES_SERVICE = (streamIds, timeRange) -> Collections.emptySet();
+    public static final MappedFieldTypesService FIELD_TYPES_SERVICE = new MappedFieldTypesService() {
+        @Override
+        public Set<MappedFieldTypeDTO> fieldTypesByStreamIds(Collection<String> streamIds, TimeRange timeRange) {
+            return Set.of();
+        }
+
+        @Override
+        public Set<MappedFieldTypeDTO> singleFieldTypeByStreamIds(Collection<String> streams, TimeRange timerange, String field) {
+            return Set.of();
+        }
+    };
     public static final LuceneQueryParser LUCENE_QUERY_PARSER = new LuceneQueryParser(false);
 
     @Test

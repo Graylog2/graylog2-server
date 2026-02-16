@@ -81,11 +81,15 @@ const EntityCreateShareFormGroup = ({
   const defaultShareSelection = { granteeId: null, capabilityId: 'view' };
   const [disableSubmit, setDisableSubmit] = useState(entityShareState?.validationResults?.failed);
   const [shareSelection, setShareSelection] = useState<SelectionRequest>(defaultShareSelection);
-  const [entityShare, setEntityShare] = useState<Omit<EntitySharePayload, 'prepare_request'>>(null);
+  const [entityShare, setEntityShare] = useState<Omit<EntitySharePayload, 'prepare_request'>>(
+    defaultSharePayload ?? null,
+  );
   const PluggableEntityShareFormGroup = usePluggableEntityShareFormGroup();
 
   useEffect(() => {
-    EntityShareDomain.prepare(entityType, entityTitle, entityGRN, defaultSharePayload);
+    const { selected_collections: _, ...rest } = defaultSharePayload ?? {};
+
+    EntityShareDomain.prepare(entityType, entityTitle, entityGRN, rest);
   }, [entityType, entityTitle, entityGRN, defaultSharePayload]);
 
   const resetSelection = () => {
@@ -108,7 +112,6 @@ const EntityCreateShareFormGroup = ({
     return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, payload).then((response) => {
       onSetEntityShare({ ...entityShare, selected_grantee_capabilities: newSelectedCapabilities });
       resetSelection();
-      setDisableSubmit(false);
 
       return response;
     });
@@ -168,7 +171,7 @@ const EntityCreateShareFormGroup = ({
                 value={shareSelection.capabilityId}
               />
               <ShareSubmitButton
-                bsStyle="success"
+                bsStyle="primary"
                 title="Add Collaborator"
                 onClick={handleAddCollaborator}
                 disabled={disableSubmit || !shareSelection.granteeId}>
@@ -195,7 +198,11 @@ const EntityCreateShareFormGroup = ({
             availableGrantees={entityShareState.availableGrantees}
           />
           {PluggableEntityShareFormGroup && (
-            <PluggableEntityShareFormGroup entityType={entityType} onChange={handleAdditionalFormChange} />
+            <PluggableEntityShareFormGroup
+              entityType={entityType}
+              onChange={handleAdditionalFormChange}
+              value={defaultSharePayload?.selected_collections || []}
+            />
           )}
         </>
       ) : (

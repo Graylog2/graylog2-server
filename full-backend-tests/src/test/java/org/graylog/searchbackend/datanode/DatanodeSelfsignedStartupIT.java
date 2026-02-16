@@ -23,39 +23,45 @@ import jakarta.annotation.Nonnull;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.conditions.EnabledIfSearchServer;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.restoperations.DatanodeOpensearchWait;
 import org.graylog.testing.restoperations.RestOperationParameters;
 import org.graylog2.security.JwtSecret;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.graylog2.security.jwt.IndexerJwtAuthTokenProvider;
+import org.graylog2.storage.SearchVersion;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Clock;
 import java.util.concurrent.ExecutionException;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.DATANODE_DEV,
-                                   additionalConfigurationParameters = {
-                                           @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
-                                           @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_SELFSIGNED_STARTUP", value = "true"),
-                                           @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),
-                                   })
+@GraylogBackendConfiguration(
+        serverLifecycle = Lifecycle.CLASS,
+        env = {
+                @GraylogBackendConfiguration.Env(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
+                @GraylogBackendConfiguration.Env(key = "GRAYLOG_SELFSIGNED_STARTUP", value = "true"),
+                @GraylogBackendConfiguration.Env(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),
+        }
+)
+@EnabledIfSearchServer(distribution = SearchVersion.Distribution.DATANODE)
 public class DatanodeSelfsignedStartupIT {
 
 
     private final Logger log = LoggerFactory.getLogger(DatanodeProvisioningIT.class);
 
-    private final GraylogApis apis;
+    private static GraylogApis apis;
 
-    public DatanodeSelfsignedStartupIT(GraylogApis apis) {
-        this.apis = apis;
+    @BeforeAll
+    static void beforeAll(GraylogApis graylogApis) {
+        apis = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     public void testSelfsignedStartup() throws ExecutionException, RetryException {
         testEncryptedConnectionToOpensearch();
     }
@@ -77,7 +83,7 @@ public class DatanodeSelfsignedStartupIT {
 
             response.assertThat().body("status", Matchers.equalTo("green"));
         } catch (Exception e) {
-            log.error("Could not connect to Opensearch\n" + apis.backend().getSearchLogs());
+            log.error("Could not connect to Opensearch\n{}", apis.backend().getSearchLogs());
             throw e;
         }
     }

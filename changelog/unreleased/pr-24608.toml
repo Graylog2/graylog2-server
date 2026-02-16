@@ -1,0 +1,5 @@
+type = "a"
+message = "Add autofill for index prefix from title in index set creation"
+
+issues = ["24568"]
+pulls = ["24608"]

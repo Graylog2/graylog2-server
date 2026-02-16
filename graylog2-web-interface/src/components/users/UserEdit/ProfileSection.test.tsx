@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
-import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
 
 import { alice } from 'fixtures/users';
 
@@ -42,7 +43,7 @@ describe('<ProfileSection />', () => {
     render(<ProfileSection user={exampleUser} onSubmit={(data) => onSubmitStub(data)} />);
 
     const submitButton = screen.getByText('Update Profile');
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(onSubmitStub).toHaveBeenCalledTimes(1));
 
@@ -62,10 +63,13 @@ describe('<ProfileSection />', () => {
     const emailInput = screen.getByLabelText('E-Mail Address');
     const submitButton = screen.getByText('Update Profile');
 
-    fireEvent.change(firstNameInput, { target: { value: 'New first name' } });
-    fireEvent.change(lastNameInput, { target: { value: 'New last name' } });
-    fireEvent.change(emailInput, { target: { value: 'newfullname@example.org' } });
-    fireEvent.click(submitButton);
+    await userEvent.clear(firstNameInput);
+    await userEvent.type(firstNameInput, 'New first name');
+    await userEvent.clear(lastNameInput);
+    await userEvent.type(lastNameInput, 'New last name');
+    await userEvent.clear(emailInput);
+    await userEvent.type(emailInput, 'newfullname@example.org');
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(onSubmitStub).toHaveBeenCalledTimes(1));
 

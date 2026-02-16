@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 
 import { IfPermitted, MultiSelect, SourceCodeEditor, TimezoneSelect } from 'components/common';
@@ -24,65 +24,11 @@ import { ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap'
 import { getValueFromInput } from 'util/FormsUtils';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
-
-// TODO: Default body template should come from the server
-const DEFAULT_BODY_TEMPLATE = `--- [Event Definition] ---------------------------
-Title:       \${event_definition_title}
-Description: \${event_definition_description}
-Type:        \${event_definition_type}
---- [Event] --------------------------------------
-Alert Replay:         \${http_external_uri}alerts/\${event.id}/replay-search
-Timestamp:            \${event.timestamp}
-Message:              \${event.message}
-Source:               \${event.source}
-Key:                  \${event.key}
-Priority:             \${event.priority}
-Alert:                \${event.alert}
-Timestamp Processing: \${event.timestamp}
-Timerange Start:      \${event.timerange_start}
-Timerange End:        \${event.timerange_end}
-Fields:
-\${foreach event.fields field}  \${field.key}: \${field.value}
-\${end}
-\${if backlog}
---- [Backlog] ------------------------------------
-Last messages accounting for this alert:
-\${foreach backlog message}
-\${message}
-\${end}
-\${end}
-`;
-
-const DEFAULT_HTML_BODY_TEMPLATE = `<table width="100%" border="0" cellpadding="10" cellspacing="0" style="background-color:#f9f9f9;border:none;line-height:1.2"><tbody>
-<tr style="line-height:1.5"><th colspan="2" style="background-color:#e6e6e6">Event Definition</th></tr>
-<tr><td width="200px">Title</td><td>\${event_definition_title}</td></tr>
-<tr><td>Description</td><td>\${event_definition_description}</td></tr>
-<tr><td>Type</td><td>\${event_definition_type}</td></tr>
-</tbody></table>
-<br /><table width="100%" border="0" cellpadding="10" cellspacing="0" style="background-color:#f9f9f9;border:none;line-height:1.2"><tbody>
-<tr><th colspan="2" style="background-color:#e6e6e6;line-height:1.5">Event</th></tr>
-<tr><td>Alert Replay</td><td>\${http_external_uri}alerts/\${event.id}/replay-search</td></tr>
-<tr><td width="200px">Timestamp</td><td>\${event.timestamp}</td></tr>
-<tr><td>Message</td><td>\${event.message}</td></tr>
-<tr><td>Source</td><td>\${event.source}</td></tr>
-<tr><td>Key</td><td>\${event.key}</td></tr>
-<tr><td>Priority</td><td>\${event.priority}</td></tr>
-<tr><td>Alert</td><td>\${event.alert}</td></tr>
-<tr><td>Timestamp Processing</td><td>\${event.timestamp}</td></tr>
-<tr><td>Timerange Start</td><td>\${event.timerange_start}</td></tr>
-<tr><td>Timerange End</td><td>\${event.timerange_end}</td></tr>
-<tr><td>Source Streams</td><td>\${event.source_streams}</td></tr>
-<tr><td>Fields</td><td><ul style="list-style-type:square;">\${foreach event.fields field}<li>\${field.key}:\${field.value}</li>\${end}<ul></td></tr>
-</tbody></table>
-\${if backlog}
-<br /><table width="100%" border="0" cellpadding="10" cellspacing="0" style="background-color:#f9f9f9;border:none;line-height:1.2"><tbody>
-<tr><th style="background-color:#e6e6e6;line-height:1.5">Backlog (Last messages accounting for this alert)</th></tr>
-\${foreach backlog message}
-<tr><td>\${message}</td></tr>
-\${end}
-</tbody></table>
-\${end}
-`;
+import usePluginEntities from 'hooks/usePluginEntities';
+import {
+  DEFAULT_BODY_TEMPLATE,
+  DEFAULT_HTML_BODY_TEMPLATE,
+} from 'components/event-notifications/event-notification-types/emailNotificationTemplates';
 
 // eslint-disable-next-line no-template-curly-in-string
 const LOOKUP_KEY_PLACEHOLDER_TEXT = '${event.group_by_fields.group_by_field}';
@@ -108,6 +54,120 @@ const EventProcedureCheckbox = ({ checked, onChange }) => {
       />
     </FormGroup>
   );
+};
+
+const EmailTemplatesRunner = ({
+  config,
+  onChange,
+  resetKey = undefined,
+}: {
+  config: any;
+  onChange: (next: any) => void;
+  resetKey?: string | number | undefined;
+}) => {
+  const { data: { valid: validCustomizationLicense } = { valid: false } } = usePluggableLicenseCheck(
+    '/license/enterprise/customization',
+  );
+
+  const entities = usePluginEntities('customization.emailTemplates');
+  const providingEntity = useMemo(
+    () => (entities ?? []).find((e: any) => typeof e?.hooks?.useEmailTemplate === 'function'),
+    [entities],
+  );
+
+  const noopUseEmailTemplate = useCallback(() => ({ templateConfig: undefined }), []);
+  const useEmailTemplateHook = (providingEntity?.hooks?.useEmailTemplate ?? noopUseEmailTemplate) as () => {
+    templateConfig?: {
+      override_defaults?: boolean;
+      text_body?: string | null;
+      html_body?: string | null;
+    };
+  };
+
+  const { templateConfig } = useEmailTemplateHook() || {};
+
+  const key = String(resetKey ?? 'default');
+
+  // Re-apply when any of these change
+  const sig =
+    validCustomizationLicense && templateConfig
+      ? `${key}|${templateConfig.override_defaults ? '1' : '0'}|${templateConfig.text_body ?? ''}|${templateConfig.html_body ?? ''}`
+      : `${key}|no-license-or-config`;
+
+  const lastSigRef = useRef<string>('init');
+
+  useEffect(() => {
+    if (!validCustomizationLicense || !templateConfig) return;
+
+    if (lastSigRef.current === sig) return;
+
+    const { override_defaults, text_body, html_body } = templateConfig;
+
+    let next = config;
+    let changed = false;
+
+    if (override_defaults === true) {
+      const nextCfg = { ...config };
+      const trimmedBody = (config.body_template ?? '').trim();
+      const trimmedHtml = (config.html_body_template ?? '').trim();
+
+      const shouldOverrideBody =
+        typeof text_body === 'string' &&
+        (trimmedBody === '' || (config.body_template ?? '') === DEFAULT_BODY_TEMPLATE) &&
+        text_body !== config.body_template;
+      const shouldOverrideHtml =
+        typeof html_body === 'string' &&
+        (trimmedHtml === '' || (config.html_body_template ?? '') === DEFAULT_HTML_BODY_TEMPLATE) &&
+        html_body !== config.html_body_template;
+
+      if (shouldOverrideBody) {
+        nextCfg.body_template = text_body;
+        changed = true;
+      }
+      if (shouldOverrideHtml) {
+        nextCfg.html_body_template = html_body;
+        changed = true;
+      }
+
+      if (changed) next = nextCfg;
+    } else {
+      const trimmedBody = (config.body_template ?? '').trim();
+      const trimmedHtml = (config.html_body_template ?? '').trim();
+      const hasCustomBody =
+        trimmedBody !== '' &&
+        (config.body_template ?? '') !== DEFAULT_BODY_TEMPLATE &&
+        trimmedBody !== DEFAULT_BODY_TEMPLATE;
+      const hasCustomHtml =
+        trimmedHtml !== '' &&
+        (config.html_body_template ?? '') !== DEFAULT_HTML_BODY_TEMPLATE &&
+        trimmedHtml !== DEFAULT_HTML_BODY_TEMPLATE;
+
+      if (hasCustomBody || hasCustomHtml) {
+        lastSigRef.current = sig;
+
+        return;
+      }
+
+      const nextCfg = { ...config };
+
+      if (trimmedBody === '') {
+        nextCfg.body_template = DEFAULT_BODY_TEMPLATE;
+        changed = true;
+      }
+      if (trimmedHtml === '') {
+        nextCfg.html_body_template = DEFAULT_HTML_BODY_TEMPLATE;
+        changed = true;
+      }
+
+      if (changed) next = nextCfg;
+    }
+
+    if (changed) onChange(next);
+
+    lastSigRef.current = sig;
+  }, [sig, validCustomizationLicense, templateConfig, config, onChange]);
+
+  return null;
 };
 
 type EmailNotificationFormProps = {
@@ -558,10 +618,11 @@ class EmailNotificationForm extends React.Component<
   };
 
   render() {
-    const { config, validation } = this.props;
+    const { config, validation, onChange } = this.props;
 
     return (
       <>
+        <EmailTemplatesRunner config={config} onChange={onChange} resetKey={config?.type || config?.id} />
         <Input
           id="notification-subject"
           name="subject"

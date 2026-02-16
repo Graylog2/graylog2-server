@@ -23,12 +23,13 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog.security.CapabilityRegistry;
 import org.graylog.security.GranteeAuthorizer;
 import org.graylog2.shared.security.RestPermissions;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Set;
 
@@ -41,9 +42,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class EntityDependencyPermissionCheckerTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private GranteeAuthorizer.Factory userAuthorizerFactory;
@@ -51,7 +52,7 @@ public class EntityDependencyPermissionCheckerTest {
     private EntityDependencyPermissionChecker resolver;
     private final GRNRegistry grnRegistry = GRNRegistry.createWithBuiltinTypes();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.resolver = new EntityDependencyPermissionChecker(userAuthorizerFactory, new CapabilityRegistry(grnRegistry, Set.of(new RestPermissions())));
     }
@@ -59,26 +60,23 @@ public class EntityDependencyPermissionCheckerTest {
     @Test
     public void checkWithPermitted() {
         // Read is permitted on the stream so we expect to receive an empty result from the check
-        assertThat(runCheck(true, true)).satisfies(result -> {
-            assertThat(result.values()).isEmpty();
-        });
+        assertThat(runCheck(true, true)).satisfies(result ->
+            assertThat(result.values()).isEmpty());
     }
 
     @Test
     public void checkWithDenied() {
         // Read is NOT permitted on the stream so we expect to receive the stream in the result
-        assertThat(runCheck(true, false)).satisfies(result -> {
-            assertThat(result.values()).isNotEmpty();
-        });
+        assertThat(runCheck(true, false)).satisfies(result ->
+            assertThat(result.values()).isNotEmpty());
     }
 
     @Test
     public void checkWithDeniedAndSharingUserDenied() {
         // Since the sharing user cannot view the dependency, we don't return it in the result even though the
         // grantee cannot access it (to avoid exposing the dependency)
-        assertThat(runCheck(false, true)).satisfies(result -> {
-            assertThat(result.values()).isEmpty();
-        });
+        assertThat(runCheck(false, true)).satisfies(result ->
+            assertThat(result.values()).isEmpty());
     }
 
     private ImmutableMultimap<GRN, EntityDescriptor> runCheck(boolean isSharingUserAuthorized, boolean isGranteeUserAuthorized) {

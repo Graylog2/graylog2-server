@@ -16,7 +16,7 @@
  */
 package org.graylog2.shared.buffers;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 
 import static org.mockito.Mockito.mock;

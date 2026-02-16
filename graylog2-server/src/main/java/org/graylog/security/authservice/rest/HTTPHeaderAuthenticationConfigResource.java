@@ -16,8 +16,8 @@
  */
 package org.graylog.security.authservice.rest;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
@@ -40,7 +40,7 @@ import jakarta.ws.rs.core.MediaType;
 @Path("/system/authentication/http-header-auth-config")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Api(value = "System/Authentication/HTTPHeaderAuthConfig", description = "Manage the HTTP header authentication configuration")
+@Tag(name = "System/Authentication/HTTPHeaderAuthConfig", description = "Manage the HTTP header authentication configuration")
 @RequiresAuthentication
 public class HTTPHeaderAuthenticationConfigResource {
     private final ClusterConfigService clusterConfigService;
@@ -51,14 +51,14 @@ public class HTTPHeaderAuthenticationConfigResource {
     }
 
     @GET
-    @ApiOperation("Get HTTP header authentication config")
+    @Operation(summary = "Get HTTP header authentication config")
     @RequiresPermissions(RestPermissions.AUTH_HTTP_HEADER_CONFIG_READ)
     public HTTPHeaderAuthConfig getConfig() {
         return loadConfig();
     }
 
     @PUT
-    @ApiOperation("Update HTTP header authentication config")
+    @Operation(summary = "Update HTTP header authentication config")
     @RequiresPermissions(RestPermissions.AUTH_HTTP_HEADER_CONFIG_EDIT)
     @AuditEvent(type = AuditEventTypes.AUTHENTICATION_HTTP_HEADER_CONFIG_UPDATE)
     public HTTPHeaderAuthConfig updateConfig(@Valid HTTPHeaderAuthConfig config) {

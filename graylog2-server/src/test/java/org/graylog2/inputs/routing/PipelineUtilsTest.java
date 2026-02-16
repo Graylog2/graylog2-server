@@ -31,19 +31,18 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.DeletableSystemScope;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -53,9 +52,8 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class PipelineUtilsTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
 
     @Mock
     private PipelineService pipelineService;
@@ -96,18 +94,20 @@ public class PipelineUtilsTest {
         }
     }
 
-    @Test(expected = BadRequestException.class)
+    @Test
     public void throwWithUnexpectedSystemRule() throws Exception {
-        final String pipelineId = "pipelineId";
-        final PipelineSource pipelineSource = loadFixture("org/graylog2/inputs/routing/InputRoutingPipelineSource1.json");
-        final PipelineRuleParser parser = new PipelineRuleParser(mock(FunctionRegistry.class));
-        createPipeline(pipelineId);
-        createRule(true);
+        assertThrows(BadRequestException.class, () -> {
+            final String pipelineId = "pipelineId";
+            final PipelineSource pipelineSource = loadFixture("org/graylog2/inputs/routing/InputRoutingPipelineSource1.json");
+            final PipelineRuleParser parser = new PipelineRuleParser(mock(FunctionRegistry.class));
+            createPipeline(pipelineId);
+            createRule(true);
 
-        try (final MockedStatic<PipelineSource> pipelineSourceMockedStatic = mockStatic(PipelineSource.class)) {
-            pipelineSourceMockedStatic.when(() -> PipelineSource.fromDao(any(), any())).thenReturn(pipelineSource);
-            PipelineUtils.update(pipelineService, parser, ruleService, pipelineId, pipelineSource, true);
-        }
+            try (final MockedStatic<PipelineSource> pipelineSourceMockedStatic = mockStatic(PipelineSource.class)) {
+                pipelineSourceMockedStatic.when(() -> PipelineSource.fromDao(any(), any())).thenReturn(pipelineSource);
+                PipelineUtils.update(pipelineService, parser, ruleService, pipelineId, pipelineSource, true);
+            }
+        });
     }
 
     private PipelineSource loadFixture(String name) throws IOException {

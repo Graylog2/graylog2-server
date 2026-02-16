@@ -19,10 +19,12 @@ package org.graylog.events.procedures;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.event.EventReplayInfo;
 import org.joda.time.DateTime;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Map;
 import java.util.Optional;
@@ -31,7 +33,8 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class ActionTest {
     private static final String COMPLEX_SEARCH_QUERY = "+(field1:\"hello world\"~2 OR field2:[* TO 2025-12-31]) AND -(field3:/[a-z]+.*/ OR field4:(foo* bar?)) NOT title:(test^2.0 OR \"bad:value\") && field5:{1 TO 10} || field6:(a && b || c) \\+escaped\\:colon";
     private static final String COMPLEX_SEARCH_QUERY_URI_SAFE = "/search?q=%2B%28field1%3A%22hello+world%22%7E2+OR+field2%3A%5B*+TO+2025-12-31%5D%29+AND+-%28field3%3A%2F%5Ba-z%5D%2B.*%2F+OR+field4%3A%28foo*+bar%3F%29%29+NOT+title%3A%28test%5E2.0+OR+%22bad%3Avalue%22%29+%26%26+field5%3A%7B1+TO+10%7D+%7C%7C+field6%3A%28a+%26%26+b+%7C%7C+c%29+%5C%2Bescaped%5C%3Acolon&rangetype=absolute&from=2016-06-08T18%3A36%3A20.000Z&to=2025-06-08T18%3A36%3A20.000Z";
@@ -84,7 +87,7 @@ public class ActionTest {
 
         String actionText = executeNotificationConfig().getLink(event).toString();
 
-        assertThat(actionText).contains("security/security-events/alerts?query=id%3A%24%7Bevent.id%7D");
+        assertThat(actionText).contains("/security/security-events/alerts?query=id%3A" + ID);
     }
 
     private ExecuteNotification.Config executeNotificationConfig() {

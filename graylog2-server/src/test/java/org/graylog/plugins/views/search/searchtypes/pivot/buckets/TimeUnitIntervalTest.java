@@ -18,10 +18,10 @@ package org.graylog.plugins.views.search.searchtypes.pivot.buckets;
 
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,13 +29,13 @@ import java.util.Collection;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-@RunWith(Enclosed.class)
 public class TimeUnitIntervalTest {
     private static TimeUnitInterval.Builder builder() {
         return TimeUnitInterval.Builder.builder();
     }
 
-    public static class InvalidTimeUnits {
+    @Nested
+    public class InvalidTimeUnits {
         public static final String INVALID_TIME_UNIT_MESSAGE = "Time unit must be {quantity}{unit}, where quantity is a positive number and unit [smhdwMy].";
 
         @Test
@@ -67,9 +67,8 @@ public class TimeUnitIntervalTest {
         }
     }
 
-    @RunWith(Parameterized.class)
-    public static class ValidTimeUnitIntervalsTest {
-        @Parameterized.Parameters
+    @Nested
+    public class ValidTimeUnitIntervalsTest {
         public static Collection<Object[]> data() {
             return Arrays.asList(new Object[][]{
                     {"1s", "1s"},
@@ -91,16 +90,9 @@ public class TimeUnitIntervalTest {
             });
         }
 
-        private final String timeunit;
-        private final String expectedTimeunit;
-
-        public ValidTimeUnitIntervalsTest(String timeunit, String expectedTimeunit) {
-            this.timeunit = timeunit;
-            this.expectedTimeunit = expectedTimeunit;
-        }
-
-        @Test
-        public void allowsPositiveQuantityAndKnownUnit() throws InvalidRangeParametersException {
+        @MethodSource("data")
+        @ParameterizedTest
+        public void allowsPositiveQuantityAndKnownUnit(String timeunit, String expectedTimeunit) throws InvalidRangeParametersException {
             final TimeUnitInterval interval = builder().timeunit(timeunit).build();
 
             assertThat(interval.toDateInterval(RelativeRange.create(300)).toString())

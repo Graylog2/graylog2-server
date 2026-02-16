@@ -21,27 +21,30 @@ import com.google.common.collect.ImmutableMap;
 import org.graylog2.ConfigurationException;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class JsonExtractorTest {
     private JsonExtractor jsonExtractor;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Extractor.ReservedFieldException, ConfigurationException {
         jsonExtractor = new JsonExtractor(new MetricRegistry(), "json", "title", 0L, Extractor.CursorStrategy.COPY,
                 "source", "target", Collections.<String, Object>emptyMap(), "user", Collections.<Converter>emptyList(), Extractor.ConditionType.NONE,
                 "");
     }
 
-    @Test(expected = ConfigurationException.class)
-    public void constructorFailsOnMissingConfiguration() throws Extractor.ReservedFieldException, ConfigurationException {
-        new JsonExtractor(new MetricRegistry(), "json", "title", 0L, Extractor.CursorStrategy.COPY,
-                "source", "target", null, "user", Collections.<Converter>emptyList(), Extractor.ConditionType.NONE, "");
+    @Test
+    public void constructorFailsOnMissingConfiguration() throws Extractor.ReservedFieldException {
+        assertThrows(ConfigurationException.class, () -> {
+            new JsonExtractor(new MetricRegistry(), "json", "title", 0L, Extractor.CursorStrategy.COPY,
+                    "source", "target", null, "user", Collections.<Converter>emptyList(), Extractor.ConditionType.NONE, "");
+        });
     }
 
     @Test

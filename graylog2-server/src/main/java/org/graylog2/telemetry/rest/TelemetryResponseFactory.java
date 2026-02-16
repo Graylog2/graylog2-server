@@ -16,20 +16,20 @@
  */
 package org.graylog2.telemetry.rest;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.inject.Inject;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.system.traffic.TrafficCounterService.TrafficHistogram;
+import org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto;
 import org.joda.time.DateTime;
 
 import java.util.List;
 import java.util.Map;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
-import static org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo.FIELD_IS_LEADER;
-import static org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo.FIELD_VERSION;
 
 public class TelemetryResponseFactory {
     private static final String PREFIX_USER = "user";
@@ -37,25 +37,28 @@ public class TelemetryResponseFactory {
     private static final String PLUGIN = "plugin";
     private static final String SEARCH_CLUSTER = "search_cluster";
     private static final String DATA_NODES = "data_nodes";
-
+    public static final String CLUSTER_ID = "cluster_id";
+    public static final String CLUSTER_CREATION_DATE = "cluster_creation_date";
+    public static final String NODES_COUNT = "nodes_count";
+    public static final String OUTPUT_TRAFFIC_LAST_MONTH = "traffic_last_month";
+    public static final String INPUT_TRAFFIC_LAST_MONTH = "input_traffic_last_month";
+    public static final String USERS_COUNT = "users_count";
+    public static final String NODE_LEADER_APP_VERSION = "node_leader_app_version";
+    public static final String INSTALLATION_SOURCE = "installation_source";
+    public static final String NODES = "nodes";
     public static final String CLUSTER = "cluster";
     public static final String LICENSE = "license";
     public static final String LICENSE_COUNT = "license_count";
     public static final String CURRENT_USER = "current_user";
     public static final String TEAMS_COUNT = "%s_team_count".formatted(PREFIX_USER);
 
+    public static final String UNKNOWN_VERSION = "unknown";
+
     private final ObjectMapper mapper;
 
     @Inject
     public TelemetryResponseFactory(ObjectMapper mapper) {
         this.mapper = mapper;
-    }
-
-    private static boolean isLeader(Map<String, Object> n) {
-        if (n.get(FIELD_IS_LEADER) instanceof Boolean isLeader) {
-            return isLeader;
-        }
-        return false;
     }
 
     ObjectNode createTelemetryResponse(ObjectNode clusterInfo,
@@ -94,36 +97,45 @@ public class TelemetryResponseFactory {
 
     ObjectNode createClusterInfo(String clusterId,
                                  DateTime clusterCreationDate,
-                                 Map<String, Map<String, Object>> nodes,
+                                 List<TelemetryClusterInfoDto> telemetryClusterInfoList,
                                  TrafficHistogram trafficLastMonth,
                                  long usersCount,
                                  String installationSource
     ) {
         ObjectNode clusterInfo = mapper.createObjectNode();
-        clusterInfo.put("cluster_id", clusterId);
-        clusterInfo.set("cluster_creation_date", mapper.convertValue(clusterCreationDate, JsonNode.class));
-        clusterInfo.put("nodes_count", nodes.size());
-        clusterInfo.put("traffic_last_month", sumTraffic(trafficLastMonth.output()));
-        clusterInfo.put("input_traffic_last_month", sumTraffic(trafficLastMonth.input()));
-        clusterInfo.put("users_count", usersCount);
+        clusterInfo.put(CLUSTER_ID, clusterId);
+        clusterInfo.set(CLUSTER_CREATION_DATE, mapper.convertValue(clusterCreationDate, JsonNode.class));
+        clusterInfo.put(NODES_COUNT, telemetryClusterInfoList.size());
+        clusterInfo.put(OUTPUT_TRAFFIC_LAST_MONTH, sumTraffic(trafficLastMonth.output()));
+        clusterInfo.put(INPUT_TRAFFIC_LAST_MONTH, sumTraffic(trafficLastMonth.input()));
+        clusterInfo.put(USERS_COUNT, usersCount);
         clusterInfo.put(LICENSE_COUNT, 0);
-        clusterInfo.set("node_leader_app_version", mapper.convertValue(leaderNodeVersion(nodes), JsonNode.class));
-        clusterInfo.put("installation_source", installationSource);
-        clusterInfo.set("nodes", mapper.convertValue(nodes, JsonNode.class));
-        return clusterInfo;
+        clusterInfo.set(NODE_LEADER_APP_VERSION, mapper.convertValue(leaderNodeVersion(telemetryClusterInfoList), JsonNode.class));
+        clusterInfo.put(INSTALLATION_SOURCE, installationSource);
+        clusterInfo.set(NODES, mapper.convertValue(mapByNodeId(telemetryClusterInfoList), JsonNode.class));
 
+        return clusterInfo;
     }
 
     private static long sumTraffic(Map<DateTime, Long> traffic) {
         return traffic.values().stream().mapToLong(Long::longValue).sum();
     }
 
-    private Object leaderNodeVersion(Map<String, Map<String, Object>> nodes) {
-        return nodes.values().stream()
-                .filter(TelemetryResponseFactory::isLeader)
-                .map(stringObjectMap -> stringObjectMap.get(FIELD_VERSION))
+    private Object leaderNodeVersion(List<TelemetryClusterInfoDto> nodes) {
+        return nodes.stream()
+                .filter(TelemetryClusterInfoDto::isLeader)
+                .map(TelemetryClusterInfoDto::version)
                 .findFirst()
-                .orElse("unknown");
+                .orElse(UNKNOWN_VERSION);
+    }
+
+    private Map<String, Map<String, Object>> mapByNodeId(List<TelemetryClusterInfoDto> nodes) {
+        return nodes.stream().collect(
+                java.util.stream.Collectors.toMap(
+                        TelemetryClusterInfoDto::nodeId,
+                        n -> mapper.convertValue(n, new TypeReference<>() {})
+                )
+        );
     }
 
     ObjectNode createPluginInfo(boolean isEnterprisePluginInstalled,

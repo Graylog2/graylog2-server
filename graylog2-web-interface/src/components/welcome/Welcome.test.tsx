@@ -95,18 +95,6 @@ jest.mock('components/welcome/hooks/useRecentActivity', () =>
   })),
 );
 
-jest.mock('routing/Routes', () => ({
-  pluginRoute: (x) => x,
-  dashboard_show: (x) => `/route/DASHBOARDS_VIEWID/${x}`,
-  getPluginRoute: (x) => () => x,
-  SEARCH: '/search',
-  SYSTEM: {
-    USERS: {
-      edit: () => '/edit-profile-page',
-    },
-  },
-}));
-
 jest.mock('hooks/useCurrentUser');
 
 describe('Welcome', () => {
@@ -123,7 +111,7 @@ describe('Welcome', () => {
       );
       const linkToEditProfile = await screen.findByText('edit profile');
 
-      expect(linkToEditProfile).toHaveAttribute('href', '/edit-profile-page');
+      expect(linkToEditProfile).toHaveAttribute('href', '/system/users/edit/admin-id');
     });
 
     it('Shows appropriate message without link for readOnly users', async () => {

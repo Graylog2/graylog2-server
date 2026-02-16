@@ -19,13 +19,13 @@ package org.graylog2.inputs.transports;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HttpTransportConfigTest {
     @Test
@@ -50,7 +50,7 @@ public class HttpTransportConfigTest {
         final HashMap<String, Object> configMap = new HashMap<>();
         configMap.put(HttpTransport.CK_MAX_CHUNK_SIZE, 10);
         final Configuration config = new Configuration(configMap);
-        Assert.assertEquals(10, HttpTransport.parseMaxChunkSize(config));
+        Assertions.assertEquals(10, HttpTransport.parseMaxChunkSize(config));
     }
 
     @Test
@@ -58,6 +58,6 @@ public class HttpTransportConfigTest {
         final HashMap<String, Object> configMap = new HashMap<>();
         configMap.put(HttpTransport.CK_MAX_CHUNK_SIZE, -10);
         final Configuration config = new Configuration(configMap);
-        Assert.assertEquals(HttpTransport.DEFAULT_MAX_CHUNK_SIZE, HttpTransport.parseMaxChunkSize(config));
+        Assertions.assertEquals(HttpTransport.DEFAULT_MAX_CHUNK_SIZE, HttpTransport.parseMaxChunkSize(config));
     }
 }

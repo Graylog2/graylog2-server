@@ -31,7 +31,7 @@ const ChangeFieldTypeButton = ({ indexSetId }: Props) => {
 
   return (
     <>
-      <Button bsStyle="success" onClick={toggleModal}>
+      <Button bsStyle="primary" onClick={toggleModal}>
         Change field type
       </Button>
       {showModal && (

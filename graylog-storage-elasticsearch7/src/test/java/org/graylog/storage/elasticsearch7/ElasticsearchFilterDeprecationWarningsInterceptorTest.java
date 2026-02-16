@@ -21,7 +21,7 @@ import org.graylog.shaded.elasticsearch7.org.apache.http.HttpResponse;
 import org.graylog.shaded.elasticsearch7.org.apache.http.ProtocolVersion;
 import org.graylog.shaded.elasticsearch7.org.apache.http.message.BasicHttpResponse;
 import org.graylog.shaded.elasticsearch7.org.apache.http.message.BasicStatusLine;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 

@@ -69,11 +69,18 @@ const KeyboardShortcutsPage = loadAsync(() => import('./KeyboardShortcutsPage'))
 const LoadingPage = loadAsync(() => import(/* webpackChunkName: "LoadingPage" */ 'pages/LoadingPage'));
 const LoggersPage = loadAsync(() => import('./LoggersPage'));
 const LoginPage = loadAsync(() => import(/* webpackChunkName: "LoginPage" */ 'pages/LoginPage'));
+const LUTCacheDetailsPage = loadAsync(() => import('./LUTCacheDetailsPage'));
 const LUTCachesPage = loadAsync(() => import('./LUTCachesPage'));
+const LUTCachesFormPage = loadAsync(() => import('./LUTCachesFormPage'));
 const LUTDataAdaptersPage = loadAsync(() => import('./LUTDataAdaptersPage'));
+const LUTDataAdaptersFormPage = loadAsync(() => import('./LUTDataAdaptersFormPage'));
+const LUTDataAdapterDetailsPage = loadAsync(() => import('./LUTDataAdapterDetailsPage'));
 const LUTTablesPage = loadAsync(() => import('./LUTTablesPage'));
+const LUTFormPage = loadAsync(() => import('./LUTFormPage'));
+const LUTDetailsPage = loadAsync(() => import('./LUTDetailsPage'));
 const NodeInputsPage = loadAsync(() => import('./NodeInputsPage'));
 const NotFoundPage = loadAsync(() => import('./NotFoundPage'));
+const ApiBrowserPage = loadAsync(() => import('./ApiBrowserPage'));
 const PipelineDetailsPage = loadAsync(() => import('./PipelineDetailsPage'));
 const PipelinesOverviewPage = loadAsync(() => import('./PipelinesOverviewPage'));
 const RoleDetailsPage = loadAsync(() => import('./RoleDetailsPage'));
@@ -167,11 +174,18 @@ export {
   LoadingPage,
   LoggersPage,
   LoginPage,
+  LUTCacheDetailsPage,
   LUTCachesPage,
+  LUTCachesFormPage,
   LUTDataAdaptersPage,
+  LUTDataAdaptersFormPage,
+  LUTDataAdapterDetailsPage,
   LUTTablesPage,
+  LUTFormPage,
+  LUTDetailsPage,
   NodeInputsPage,
   NotFoundPage,
+  ApiBrowserPage,
   PipelineDetailsPage,
   PipelinesOverviewPage,
   ProcessBufferDumpPage,

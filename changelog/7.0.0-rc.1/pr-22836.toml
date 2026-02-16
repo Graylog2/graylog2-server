@@ -1,0 +1,7 @@
+type = "fixed"
+message = "Fix enterprise overiew unecessary page re-render."
+
+issues = [""]
+pulls = ["22836"]
+
+contributors = [""]

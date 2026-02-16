@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
-import { screen, render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { screen, render, waitFor } from 'wrappedTestingLibrary';
 
 import SidecarFailureTrackingList from './SidecarFailureTrackingList';
 
@@ -99,7 +100,7 @@ describe('SidecarFailureTrackingList', () => {
     await screen.findByText('Sidecar');
 
     const searchInput = await screen.findByPlaceholderText(/find sidecars/i);
-    fireEvent.change(searchInput, { target: { value: 'demo' } });
+    await userEvent.type(searchInput, '{selectall}demo');
 
     await waitFor(() => expect(handleQueryChange).toHaveBeenCalledWith('demo', expect.anything()));
   });
@@ -111,7 +112,7 @@ describe('SidecarFailureTrackingList', () => {
 
     const hideActiveButton = screen.getByRole('button', { name: 'Hide inactive sidecars' });
 
-    fireEvent.click(hideActiveButton);
+    await userEvent.click(hideActiveButton);
     await waitFor(() => expect(toggleShowInactive).toHaveBeenCalled());
   });
 
@@ -123,10 +124,10 @@ describe('SidecarFailureTrackingList', () => {
     const sortByNameButton = screen.getByTitle('node_name');
     const sortByLastSeenButton = screen.getByTitle('last_seen');
 
-    fireEvent.click(sortByNameButton);
+    await userEvent.click(sortByNameButton);
     await waitFor(() => expect(handleSortChange).toHaveBeenCalledWith('node_name'));
 
-    fireEvent.click(sortByLastSeenButton);
+    await userEvent.click(sortByLastSeenButton);
 
     await waitFor(() => expect(handleSortChange).toHaveBeenCalledWith('last_seen'));
   });

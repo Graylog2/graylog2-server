@@ -20,11 +20,10 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.datatiering.DataTieringOrchestrator;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.Cluster;
-import org.graylog2.indexer.datanode.DatanodeMigrationLockService;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
@@ -48,8 +47,6 @@ public class IndexRetentionThread extends Periodical {
     private final Map<String, Provider<RetentionStrategy>> retentionStrategyMap;
     private final DataTieringOrchestrator dataTieringOrchestrator;
 
-    private final DatanodeMigrationLockService migrationLockService;
-
     @Inject
     public IndexRetentionThread(ElasticsearchConfiguration configuration,
                                 IndexSetRegistry indexSetRegistry,
@@ -57,7 +54,7 @@ public class IndexRetentionThread extends Periodical {
                                 NodeId nodeId,
                                 NotificationService notificationService,
                                 Map<String, Provider<RetentionStrategy>> retentionStrategyMap,
-                                DataTieringOrchestrator dataTieringOrchestrator, DatanodeMigrationLockService migrationLockService) {
+                                DataTieringOrchestrator dataTieringOrchestrator) {
         this.configuration = configuration;
         this.indexSetRegistry = indexSetRegistry;
         this.cluster = cluster;
@@ -65,43 +62,42 @@ public class IndexRetentionThread extends Periodical {
         this.notificationService = notificationService;
         this.retentionStrategyMap = retentionStrategyMap;
         this.dataTieringOrchestrator = dataTieringOrchestrator;
-        this.migrationLockService = migrationLockService;
     }
 
     @Override
     public void doRun() {
         if (!cluster.isConnected()) {
-            LOG.info("Skipping index retention checks because the Elasticsearch cluster is unreachable");
+            LOG.warn("Skipping index retention checks because the Elasticsearch cluster is unreachable");
             return;
         }
         if (!cluster.isHealthy()) {
-            LOG.info("Skipping index retention checks because the Elasticsearch cluster is unhealthy: {}, Index Registry is up: {}", cluster.health().isPresent() ? cluster.health().get() : "unknown", cluster.indexSetRegistryIsUp());
+            LOG.warn("Skipping index retention checks because the Elasticsearch cluster is unhealthy: {}, Index Registry is up: {}",
+                    cluster.health().isPresent() ? cluster.health().get() : "unknown", cluster.indexSetRegistryIsUp());
             return;
         }
 
-        for (final IndexSet indexSet : indexSetRegistry) {
+        for (final IndexSet indexSet : indexSetRegistry.getAllIndexSets()) {
             if (!indexSet.getConfig().isWritable()) {
                 LOG.debug("Skipping non-writable index set <{}> ({})", indexSet.getConfig().id(), indexSet.getConfig().title());
                 continue;
             }
 
-            migrationLockService.tryRun(indexSet, IndexRotationThread.class, () -> {
-                final IndexSetConfig config = indexSet.getConfig();
-                if (config.dataTieringConfig() != null) {
-                    dataTieringOrchestrator.retain(indexSet);
-                } else {
-                    final Provider<RetentionStrategy> retentionStrategyProvider = retentionStrategyMap.get(config.retentionStrategyClass());
 
-                    if (retentionStrategyProvider == null) {
-                        LOG.warn("Retention strategy \"{}\" not found, not running index retention!", config.retentionStrategyClass());
-                        retentionProblemNotification("Index Retention Problem!",
-                                "Index retention strategy " + config.retentionStrategyClass() + " not found! Please fix your index retention configuration!");
-                        return;
-                    }
+            final IndexSetConfig config = indexSet.getConfig();
+            if (config.dataTieringConfig() != null) {
+                dataTieringOrchestrator.retain(indexSet);
+            } else {
+                final Provider<RetentionStrategy> retentionStrategyProvider = retentionStrategyMap.get(config.retentionStrategyClass());
 
-                    retentionStrategyProvider.get().retain(indexSet);
+                if (retentionStrategyProvider == null) {
+                    LOG.warn("Retention strategy \"{}\" not found, not running index retention!", config.retentionStrategyClass());
+                    retentionProblemNotification("Index Retention Problem!",
+                            "Index retention strategy " + config.retentionStrategyClass() + " not found! Please fix your index retention configuration!");
+                    return;
                 }
-            });
+
+                retentionStrategyProvider.get().retain(indexSet);
+            }
         }
     }
 

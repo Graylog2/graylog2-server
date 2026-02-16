@@ -48,7 +48,7 @@ const createEvent = (name: string, value: any) =>
     target: { name, value },
   }) as React.ChangeEvent<any>;
 
-const MultiSelectField = ({ name, field, title, error, value, onChange, values }: FieldComponentProps) => {
+const MultiSelectField = ({ name, field, title, error, value, onChange, values, inputHelp }: FieldComponentProps) => {
   if (field.type !== 'multi-select') {
     throw new Error('Invalid field type passed!');
   }
@@ -74,7 +74,13 @@ const MultiSelectField = ({ name, field, title, error, value, onChange, values }
   }, [optionsSet, value, onSelect, selectedValue]);
 
   return (
-    <Input id={`${name}-select`} label={title} error={error} labelClassName="col-sm-3" wrapperClassName="col-sm-9">
+    <Input
+      id={`${name}-select`}
+      label={title}
+      error={error}
+      labelClassName="col-sm-3"
+      wrapperClassName="col-sm-9"
+      help={inputHelp}>
       <Select
         options={selectOption}
         name={name}

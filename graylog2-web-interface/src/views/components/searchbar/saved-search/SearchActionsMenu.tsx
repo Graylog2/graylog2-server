@@ -19,9 +19,8 @@ import styled from 'styled-components';
 import { useCallback, useState, useContext, useRef } from 'react';
 
 import { isPermitted } from 'util/PermissionsMixin';
-import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
+import { Button, ButtonGroup, MenuItem } from 'components/bootstrap';
 import { Icon, ShareButton } from 'components/common';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 import View from 'views/logic/views/View';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
@@ -52,6 +51,8 @@ import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import useHotkey from 'hooks/useHotkey';
 import { createGRN } from 'logic/permissions/GRN';
 import useSelectedStreamsGRN from 'views/hooks/useSelectedStreamsGRN';
+import { createView, deleteView } from 'views/api/views';
+import { MoreActionsMenu } from 'components/common/MoreActions';
 
 import SavedSearchForm from './SavedSearchForm';
 
@@ -76,13 +77,9 @@ const usePluggableSearchAction = (loaded: boolean, view: View) => {
     .filter((perspective) => (perspective.useCondition ? !!perspective.useCondition() : true))
     .map(({ component: PluggableSearchAction, key, modals }) => {
       if (modals) {
-        const refs = modals
-          .map(({ key: modalKey }) => modalKey)
-          .reduce((acc, mKey: string) => {
-            acc[mKey] = () => modalRefs.current[mKey];
-
-            return acc;
-          }, {});
+        const refs = Object.fromEntries(
+          modals.map(({ key: modalKey }) => modalKey).map((mKey) => [mKey, () => modalRefs.current[mKey]]),
+        );
 
         return <PluggableSearchAction key={key} loaded={loaded} search={view} modalRefs={refs} />;
       }
@@ -173,7 +170,7 @@ const SearchActionsMenu = () => {
 
       const newView = viewWithPluginData.toBuilder().newId().title(newTitle).type(View.Type.Search).build();
 
-      ViewManagementActions.create(newView, entityShare, view.id)
+      createView(newView, entityShare, view.id)
         .then((createdView) => {
           toggleFormModal();
 
@@ -190,7 +187,7 @@ const SearchActionsMenu = () => {
 
   const deleteSavedSearch = useCallback(
     (deletedView: View) =>
-      ViewManagementActions.delete(deletedView)
+      deleteView(deletedView)
         .then(() =>
           UserNotification.success(`Deleting saved search "${deletedView.title}" was successful!`, 'Success!'),
         )
@@ -255,12 +252,7 @@ const SearchActionsMenu = () => {
         bsStyle="default"
         disabledInfo={isNew && 'Only saved searches can be shared.'}
       />
-      <DropdownButton
-        title={<Icon name="more_horiz" />}
-        aria-label="Open search actions dropdown"
-        id="search-actions-dropdown"
-        pullRight
-        noCaret>
+      <MoreActionsMenu aria-label="Open search actions dropdown" id="search-actions-dropdown" pullRight solid>
         <MenuItem onSelect={toggleMetadataEdit} disabled={!isAllowedToEdit} icon="edit">
           Edit metadata
         </MenuItem>
@@ -281,7 +273,7 @@ const SearchActionsMenu = () => {
             {pluggableActions}
           </>
         ) : null}
-      </DropdownButton>
+      </MoreActionsMenu>
       {showExport && <ExportModal view={view} closeModal={toggleExport} />}
       {showMetadataEdit && (
         <ViewPropertiesModal

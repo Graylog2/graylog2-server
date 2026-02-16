@@ -19,18 +19,19 @@ package org.graylog2.rest.resources.system;
 import org.graylog2.rest.models.system.urlallowlist.AllowlistRegexGenerationRequest;
 import org.graylog2.rest.models.system.urlallowlist.AllowlistRegexGenerationResponse;
 import org.graylog2.system.urlallowlist.RegexHelper;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class UrlAllowlistResourceTest {
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     @InjectMocks
     UrlAllowlistResource urlAllowlistResource;

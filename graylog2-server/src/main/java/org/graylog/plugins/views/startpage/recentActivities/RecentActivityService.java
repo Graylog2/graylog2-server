@@ -16,27 +16,37 @@
  */
 package org.graylog.plugins.views.startpage.recentActivities;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.mongodb.BasicDBObject;
-import jakarta.inject.Singleton;
-import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.CreateCollectionOptions;
 import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.security.Capability;
+import org.graylog.security.CapabilityRegistry;
+import org.graylog.security.DBGrantService;
+import org.graylog.security.GrantDTO;
 import org.graylog.security.PermissionAndRoleResolver;
+import org.graylog.security.shares.GranteeService;
+import org.graylog.security.shares.PluggableEntityService;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.plugin.security.Permission;
 import org.graylog2.rest.models.SortOrder;
 
 import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Singleton
 public class RecentActivityService {
@@ -48,14 +58,23 @@ public class RecentActivityService {
     private static final long MAXIMUM_RECENT_ACTIVITIES = 10000;
     private final MongoCollection<RecentActivityDTO> db;
     private final MongoPaginationHelper<RecentActivityDTO> pagination;
+    private final DBGrantService grantService;
+    private final GranteeService granteeService;
+    private final PluggableEntityService pluggableEntityService;
+    private CapabilityRegistry capabilityRegistry;
 
     @Inject
     public RecentActivityService(final MongoCollections mongoCollections,
                                  final MongoConnection mongoConnection,
                                  final EventBus eventBus,
                                  final GRNRegistry grnRegistry,
-                                 final PermissionAndRoleResolver permissionAndRoleResolver) {
-        this(mongoCollections, mongoConnection, eventBus, grnRegistry, permissionAndRoleResolver, MAXIMUM_RECENT_ACTIVITIES);
+                                 final PermissionAndRoleResolver permissionAndRoleResolver,
+                                 final DBGrantService grantService,
+                                 final GranteeService granteeService,
+                                 final PluggableEntityService pluggableEntityService,
+                                 final CapabilityRegistry capabilityRegistry) {
+        this(mongoCollections, mongoConnection, eventBus, grnRegistry, permissionAndRoleResolver, MAXIMUM_RECENT_ACTIVITIES,
+                grantService, granteeService, pluggableEntityService, capabilityRegistry);
     }
 
     /*
@@ -66,7 +85,15 @@ public class RecentActivityService {
                                     final EventBus eventBus,
                                     final GRNRegistry grnRegistry,
                                     final PermissionAndRoleResolver permissionAndRoleResolver,
-                                    final long maximum) {
+                                    final long maximum,
+                                    final DBGrantService grantService,
+                                    final GranteeService granteeService,
+                                    final PluggableEntityService pluggableEntityService,
+                                    final CapabilityRegistry capabilityRegistry) {
+        this.grantService = grantService;
+        this.granteeService = granteeService;
+        this.pluggableEntityService = pluggableEntityService;
+        this.capabilityRegistry = capabilityRegistry;
         final var mongodb = mongoConnection.getMongoDatabase();
         if (!mongodb.listCollectionNames().into(new HashSet<>()).contains(COLLECTION_NAME)) {
             mongodb.createCollection(COLLECTION_NAME, new CreateCollectionOptions().capped(true).sizeInBytes(maximum * 1024).maxDocuments(maximum));
@@ -122,15 +149,33 @@ public class RecentActivityService {
 
         // filter relevant activities by permissions
         final var principal = grnRegistry.newGRN(GRNTypes.USER, user.getUser().getId());
-        final var grns = permissionAndRoleResolver.resolveGrantees(principal).stream().map(GRN::toString).toList();
-        var query = Filters.in(RecentActivityDTO.FIELD_GRANTEE, grns);
+        final var grantees = permissionAndRoleResolver.resolveGrantees(principal).stream().map(GRN::toString).toList();
+        final var sharedEntities = getShareGRNsFor(principal);
         return pagination
                 .perPage(perPage)
                 .sort(sort)
-                .filter(query)
                 .includeGrandTotal(true)
-                .grandTotalFilter(query)
-                .page(page);
+                .page(page, activity -> {
+                    final var itemGRN = activity.itemGrn();
+                    final var hasAnyPermission = capabilityRegistry.getPermissions(Capability.VIEW, itemGRN.grnType())
+                            .stream()
+                            .map(Permission::permission)
+                            .anyMatch(permission -> user.isPermitted(permission, itemGRN.entity()));
+                    return hasAnyPermission || grantees.contains(activity.grantee()) || sharedEntities.contains(itemGRN);
+                });
+    }
+
+    private Set<GRN> getShareGRNsFor(GRN grantee) {
+        // Get all aliases for the grantee to make sure we find all entities the grantee has access to
+        final Set<GRN> granteeAliases = granteeService.getGranteeAliases(grantee);
+
+        final ImmutableSet<GrantDTO> grants = grantService.getForGranteesOrGlobalWithCapability(granteeAliases, Capability.VIEW);
+
+        return grants.stream()
+                .map(GrantDTO::target)
+                .flatMap(pluggableEntityService::expand)
+                .filter(pluggableEntityService.excludeTypesFilter())
+                .collect(Collectors.toSet());
     }
 
     public void deleteAllEntriesForEntity(GRN grn) {

@@ -28,9 +28,8 @@ export const DEFAULT_LAYOUT = {
   defaultPageSize: 20,
   defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
   defaultDisplayedAttributes: ['title', 'built_in', 'description'],
+  defaultColumnOrder: ['title', 'built_in', 'description'],
 };
-
-const COLUMNS_ORDER = ['title', 'built_in', 'description'];
 
 const IndexSetTemplatesList = () => {
   const templateActions = useCallback(
@@ -43,7 +42,6 @@ const IndexSetTemplatesList = () => {
   return (
     <PaginatedEntityTable<IndexSetTemplate>
       humanName="index set templates"
-      columnsOrder={COLUMNS_ORDER}
       entityActions={templateActions}
       tableLayout={DEFAULT_LAYOUT}
       fetchEntities={fetchIndexSetTemplates}

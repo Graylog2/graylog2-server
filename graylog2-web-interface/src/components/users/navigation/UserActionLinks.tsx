@@ -32,19 +32,19 @@ const UserActionLinks = ({ userId, userIsReadOnly, username }: Props) => (
   <ButtonToolbar>
     <IfPermitted permissions={`users:edit:${username}`}>
       <LinkContainer to={Routes.SYSTEM.USERS.show(userId)}>
-        <Button bsStyle="success">View Details</Button>
+        <Button>View Details</Button>
       </LinkContainer>
     </IfPermitted>
     {!userIsReadOnly && (
       <IfPermitted permissions={`users:edit:${username}`}>
         <LinkContainer to={Routes.SYSTEM.USERS.edit(userId)}>
-          <Button bsStyle="success">Edit User</Button>
+          <Button bsStyle="primary">Edit User</Button>
         </LinkContainer>
       </IfPermitted>
     )}
     <IfPermitted permissions={[`users:tokenlist:${username}`]}>
       <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(userId)}>
-        <Button bsStyle="success">Edit Tokens</Button>
+        <Button bsStyle="primary">Edit Tokens</Button>
       </LinkContainer>
     </IfPermitted>
   </ButtonToolbar>

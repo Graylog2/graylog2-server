@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 import { useState, useCallback, forwardRef, useMemo } from 'react';
+import styled from 'styled-components';
 
-import { IconButton, SortableList, Icon } from 'components/common';
+import { IconButton, SortableList } from 'components/common';
 import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
-import type { DraggableProps, DragHandleProps } from 'components/common/SortableList';
 import FieldUnit from 'views/components/aggregationwizard/units/FieldUnit';
 
 const ListItemContainer = styled.div`
@@ -39,18 +38,9 @@ const FieldTitle = styled(TextOverflowEllipsis)`
   flex: 1;
 `;
 
-const DragHandle = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 25px;
-  margin-right: 5px;
-`;
-
 type ListItemProps = {
   className: string;
-  dragHandleProps: DragHandleProps;
-  draggableProps: DraggableProps;
+  dragHandle: React.ReactNode;
   fieldSelect: React.ComponentType<React.ComponentProps<typeof FieldSelect>>;
   item: { id: string; title: string };
   onChange: (fieldName: string) => void;
@@ -58,7 +48,6 @@ type ListItemProps = {
   selectSize: 'normal' | 'small';
   selectedFields: Array<string>;
   showUnit: boolean;
-  testIdPrefix: string;
 };
 
 const Actions = styled.div`
@@ -69,8 +58,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
   (
     {
       className,
-      dragHandleProps,
-      draggableProps,
+      dragHandle,
       fieldSelect = FieldSelect,
       item,
       onChange,
@@ -78,7 +66,6 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
       selectSize,
       selectedFields,
       showUnit,
-      testIdPrefix,
     }: ListItemProps,
     ref,
   ) => {
@@ -90,7 +77,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
     };
 
     return (
-      <ListItemContainer className={className} ref={ref} {...(draggableProps ?? {})}>
+      <ListItemContainer className={className} ref={ref}>
         {isEditing && (
           <EditFieldSelect
             id="add-field-select"
@@ -111,9 +98,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
 
         {!isEditing && (
           <>
-            <DragHandle {...dragHandleProps} data-testid={`${testIdPrefix}-drag-handle`}>
-              <Icon name="drag_indicator" />
-            </DragHandle>
+            {dragHandle}
             <FieldTitle>{item.title}</FieldTitle>
             <Actions>
               {showUnit && <FieldUnit field={item.title} />}
@@ -134,11 +119,9 @@ type Props = {
   selectSize?: 'normal' | 'small';
   selectedFields: Array<string>;
   showUnit?: boolean;
-  testPrefix?: string;
 };
 
 const SelectedFieldsList = ({
-  testPrefix = undefined,
   selectedFields,
   onChange,
   selectSize = undefined,
@@ -167,23 +150,31 @@ const SelectedFieldsList = ({
   );
 
   const SortableListItem = useCallback(
-    ({ item, index, dragHandleProps, draggableProps, className, ref }) => (
-      <ListItem
-        onChange={(newFieldName) => onChangeField(index, newFieldName)}
-        onRemove={() => onRemoveField(item.id)}
-        selectSize={selectSize}
-        selectedFields={selectedFields ?? []}
-        item={item}
-        fieldSelect={fieldSelect}
-        testIdPrefix={`${testPrefix}-field-${index}`}
-        dragHandleProps={dragHandleProps}
-        draggableProps={draggableProps}
-        className={className}
-        ref={ref}
-        showUnit={showUnit}
-      />
-    ),
-    [selectSize, selectedFields, fieldSelect, testPrefix, showUnit, onChangeField, onRemoveField],
+    (props: {
+      item: { id: string; title: string };
+      index: number;
+      dragHandle: React.ReactNode;
+      className: string;
+      ref: React.Ref<HTMLDivElement>;
+    }) => {
+      const { item, index, dragHandle, className, ref } = props;
+
+      return (
+        <ListItem
+          onChange={(newFieldName) => onChangeField(index, newFieldName)}
+          onRemove={() => onRemoveField(item.id)}
+          selectSize={selectSize}
+          selectedFields={selectedFields ?? []}
+          item={item}
+          fieldSelect={fieldSelect}
+          dragHandle={dragHandle}
+          className={className}
+          ref={ref}
+          showUnit={showUnit}
+        />
+      );
+    },
+    [selectSize, selectedFields, fieldSelect, showUnit, onChangeField, onRemoveField],
   );
 
   const onSortChange = useCallback(

@@ -17,17 +17,18 @@
 import React, { useState } from 'react';
 
 import { Button, ButtonToolbar } from 'components/bootstrap';
-import { ConfirmDialog } from 'components/common';
+import { ConfirmDialog, IfPermitted } from 'components/common';
 import useDeleteTokenMutation from 'components/users/UsersTokenManagement/hooks/useDeleteTokenMutation';
 
 type Props = {
   userId: string;
+  username: string;
   tokenId: string;
   tokenName: string;
   onDeleteCallback?: () => void;
 };
 
-const TokenActions = ({ userId, tokenId, tokenName, onDeleteCallback = () => {} }: Props) => {
+const TokenActions = ({ userId, username, tokenId, tokenName, onDeleteCallback = () => {} }: Props) => {
   const { deleteToken } = useDeleteTokenMutation(userId, tokenId);
   const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
@@ -51,7 +52,7 @@ const TokenActions = ({ userId, tokenId, tokenName, onDeleteCallback = () => {} 
   };
 
   return (
-    <>
+    <IfPermitted permissions={[`users:tokenremove:${username}`]}>
       {showDeleteDialog && (
         <ConfirmDialog show={showDeleteDialog} title="Deleting token" onCancel={cancelDelete} onConfirm={handleDelete}>
           <p>You are about to delete the token: &quot;{tokenName}&quot;. Are you sure?</p>
@@ -63,7 +64,7 @@ const TokenActions = ({ userId, tokenId, tokenName, onDeleteCallback = () => {} 
           Delete
         </Button>
       </ButtonToolbar>
-    </>
+    </IfPermitted>
   );
 };
 

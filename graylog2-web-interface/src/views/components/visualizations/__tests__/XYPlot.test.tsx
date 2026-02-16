@@ -123,7 +123,11 @@ describe('XYPlot', () => {
     expect(GenericPlot).toHaveBeenCalledWith(
       expect.objectContaining({
         'layout': expect.objectContaining({
-          xaxis: { range: ['2018-10-12T04:04:21.723+02:00', '2018-10-12T12:04:21.723+02:00'], type: 'date' },
+          xaxis: {
+            range: ['2018-10-12T04:04:21.723+02:00', '2018-10-12T12:04:21.723+02:00'],
+            type: 'date',
+            fixedrange: false,
+          },
         }),
       }),
       {},
@@ -149,7 +153,11 @@ describe('XYPlot', () => {
     expect(GenericPlot).toHaveBeenCalledWith(
       expect.objectContaining({
         'layout': expect.objectContaining({
-          xaxis: { range: ['2018-10-12T04:04:21.723+02:00', '2018-10-12T12:04:21.723+02:00'], type: 'date' },
+          xaxis: {
+            range: ['2018-10-12T04:04:21.723+02:00', '2018-10-12T12:04:21.723+02:00'],
+            type: 'date',
+            fixedrange: false,
+          },
         }),
       }),
       {},

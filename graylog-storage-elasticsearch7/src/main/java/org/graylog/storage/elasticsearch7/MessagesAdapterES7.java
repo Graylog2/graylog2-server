@@ -223,7 +223,7 @@ public class MessagesAdapterES7 implements MessagesAdapter {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return new IndexRequest(request.indexSet().getWriteIndexAlias())
+        return new IndexRequest(request.writeIndex())
                 .id(request.message().getId())
                 .source(body, XContentType.JSON);
     }

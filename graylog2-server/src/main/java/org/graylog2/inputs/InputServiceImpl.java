@@ -17,25 +17,26 @@
 package org.graylog2.inputs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
+import com.mongodb.client.model.Sorts;
+import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.UpdateResult;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.BadRequestException;
+import org.apache.commons.lang3.StringUtils;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.graylog2.database.MongoConnection;
+import org.graylog2.database.MongoCollection;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.database.PersistedServiceImpl;
+import org.graylog2.database.PaginatedList;
+import org.graylog2.database.pagination.MongoPaginationHelper;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.encryption.EncryptedInputConfigs;
@@ -43,15 +44,14 @@ import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.inputs.extractors.events.ExtractorCreated;
 import org.graylog2.inputs.extractors.events.ExtractorDeleted;
 import org.graylog2.inputs.extractors.events.ExtractorUpdated;
-import org.graylog2.jackson.TypeReferences;
 import org.graylog2.plugin.IOState;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.database.EmbeddedPersistable;
-import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
@@ -59,151 +59,242 @@ import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueMapperConfig;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
-public class InputServiceImpl extends PersistedServiceImpl implements InputService {
+import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.or;
+import static com.mongodb.client.model.Filters.regex;
+import static org.graylog2.inputs.InputImpl.FIELD_CREATED_AT;
+
+public class InputServiceImpl implements InputService {
     private static final Logger LOG = LoggerFactory.getLogger(InputServiceImpl.class);
+    public static final String COLLECTION_NAME = "inputs";
 
     private final ExtractorFactory extractorFactory;
     private final ConverterFactory converterFactory;
     private final MessageInputFactory messageInputFactory;
     private final EventBus clusterEventBus;
-    private final DBCollection dbCollection;
+    private final MongoCollection<InputImpl> collection;
+    private final com.mongodb.client.MongoCollection<Document> documentCollection;
+    private final MongoUtils<InputImpl> mongoUtils;
+    private final MongoPaginationHelper<InputImpl> paginationHelper;
     private final ObjectMapper objectMapper;
 
     @Inject
-    public InputServiceImpl(MongoConnection mongoConnection,
+    public InputServiceImpl(MongoCollections mongoCollections,
                             ExtractorFactory extractorFactory,
                             ConverterFactory converterFactory,
                             MessageInputFactory messageInputFactory,
                             ClusterEventBus clusterEventBus,
                             ObjectMapper objectMapper) {
-        super(mongoConnection);
         this.extractorFactory = extractorFactory;
         this.converterFactory = converterFactory;
         this.messageInputFactory = messageInputFactory;
         this.clusterEventBus = clusterEventBus;
-        this.dbCollection = collection(InputImpl.class);
+        this.collection = mongoCollections.collection(COLLECTION_NAME, InputImpl.class);
+        this.documentCollection = mongoCollections.nonEntityCollection(COLLECTION_NAME, Document.class);
+        this.mongoUtils = mongoCollections.utils(collection);
+        this.paginationHelper = mongoCollections.paginationHelper(collection);
         this.objectMapper = objectMapper.copy();
         EncryptedValueMapperConfig.enableDatabase(this.objectMapper);
     }
 
     @Override
     public List<Input> all() {
-        final List<DBObject> ownInputs = query(InputImpl.class, new BasicDBObject());
+        final ImmutableList.Builder<Input> result = ImmutableList.builder();
+        collection.find().forEach(result::add);
 
-        final ImmutableList.Builder<Input> inputs = ImmutableList.builder();
-        for (final DBObject o : ownInputs) {
-            inputs.add(createFromDbObject(o));
-        }
+        return result.build();
+    }
 
-        return inputs.build();
+    @Override
+    public PaginatedList<Input> paginated(Bson searchQuery,
+                                          Predicate<InputImpl> filter,
+                                          SortOrder order,
+                                          String sortField,
+                                          int page,
+                                          int perPage) {
+        final PaginatedList<InputImpl> pagedListResponse = paginationHelper.perPage(perPage)
+                .sort(order.toBsonSort(sortField))
+                .filter(searchQuery)
+                .page(page, filter);
+        final List<Input> inputs = new ArrayList<>(pagedListResponse.stream().map(this::withEncryptedFields).toList());
+        return new PaginatedList<>(inputs, pagedListResponse.pagination().total(), pagedListResponse.pagination().page(), pagedListResponse.pagination().perPage());
     }
 
     @Override
     public List<Input> allOfThisNode(final String nodeId) {
-        final List<BasicDBObject> query = ImmutableList.of(
-                new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId),
-                new BasicDBObject(MessageInput.FIELD_GLOBAL, true));
-        final List<DBObject> ownInputs = query(InputImpl.class, new BasicDBObject("$or", query));
+        final ImmutableList.Builder<Input> result = ImmutableList.builder();
+        collection.find(or(
+                eq(MessageInput.FIELD_NODE_ID, nodeId),
+                eq(MessageInput.FIELD_GLOBAL, true)
+        )).forEach(e -> result.add(withEncryptedFields(e)));
 
-        final ImmutableList.Builder<Input> inputs = ImmutableList.builder();
-        for (final DBObject o : ownInputs) {
-            inputs.add(createFromDbObject(o));
-        }
-
-        return inputs.build();
+        return result.build();
     }
 
     @Override
     public List<Input> allByType(final String type) {
-        final ImmutableList.Builder<Input> inputs = ImmutableList.builder();
-        for (final DBObject o : query(InputImpl.class, new BasicDBObject(MessageInput.FIELD_TYPE, type))) {
-            inputs.add(createFromDbObject(o));
-        }
-        return inputs.build();
+        final ImmutableList.Builder<Input> result = ImmutableList.builder();
+        collection.find(eq(MessageInput.FIELD_TYPE, type)).forEach(e -> result.add(withEncryptedFields(e)));
+
+        return result.build();
+    }
+
+    /**
+     * Finds input IDs by title using a case-insensitive regex search. This is designed to mimic
+     * InputRegistry::findByTitle behavior.
+     * Regex takes advantage of MongoDB indexes, making this method efficient for large datasets.
+     */
+    @Override
+    public List<String> findIdsByTitle(String title) {
+        final ImmutableList.Builder<String> result = ImmutableList.builder();
+        collection.find(regex(InputImpl.FIELD_TITLE, title, "i")).forEach(input -> result.add(input.getId()));
+        return result.build();
     }
 
     @Override
     public Set<Input> findByIds(Collection<String> ids) {
-        final Set<ObjectId> objectIds = ids.stream()
-                .map(ObjectId::new)
-                .collect(Collectors.toSet());
+        final Set<Input> result = new HashSet<>();
+        mongoUtils.getByIds(ids).forEach(e -> result.add(withEncryptedFields(e)));
 
-        final DBObject query = BasicDBObjectBuilder.start()
-                .push(InputImpl.FIELD_ID)
-                .append("$in", objectIds)
-                .get();
-        final Stream<InputImpl> inputStream = query(InputImpl.class, query).stream()
-                .map(o -> createFromDbObject(o));
-        return inputStream
-                .collect(Collectors.toSet());
+        return result;
     }
 
-    @Override
-    public <T extends Persisted> String save(T model) throws ValidationException {
+    public String save(Input model) throws ValidationException {
         return save(model, true);
     }
 
     @Override
-    public <T extends Persisted> String saveWithoutEvents(T model) throws ValidationException {
+    public String saveWithoutEvents(Input model) throws ValidationException {
         return save(model, false);
     }
 
-    private <T extends Persisted> String save(T model, boolean fireEvents) throws ValidationException {
-        final String resultId = super.save(model);
-        if (resultId != null && !resultId.isEmpty() && fireEvents) {
-            publishChange(InputCreated.create(resultId));
+    private InputImpl toInputImpl(Input input) {
+        if (input instanceof InputImpl inputImpl) {
+            return inputImpl;
         }
-        return resultId;
+        throw new IllegalArgumentException("Expected InputImpl, got " + input.getClass().getName());
+    }
+
+    private String save(Input model, boolean fireEvents) throws ValidationException {
+        validateStaticFields(model);
+        final InputImpl input = toInputImpl(model);
+        String inputId = input.getId();
+        boolean isNew = (inputId == null || inputId.isBlank());
+
+        if (isNew) {
+            inputId = MongoUtils.insertedIdAsString(collection.insertOne(input));
+        } else {
+            collection.replaceOne(MongoUtils.idEq(inputId), input);
+        }
+
+        if (fireEvents) {
+            publishChange(InputCreated.create(inputId));
+        }
+
+        return inputId;
     }
 
     @Override
     public String update(Input model) throws ValidationException {
-        final String resultId = super.save(model);
-        if (resultId != null && !resultId.isEmpty()) {
-            publishChange(InputUpdated.create(resultId));
+        validateStaticFields(model);
+        final InputImpl input = toInputImpl(model);
+        final String inputId = input.getId();
+
+        collection.replaceOne(MongoUtils.idEq(inputId), input);
+        publishChange(InputUpdated.create(inputId));
+
+        return inputId;
+    }
+
+    private void validateStaticFields(Input input) throws ValidationException {
+        final Map<String, String> staticFields = input.getStaticFields();
+        if (staticFields == null || staticFields.isEmpty()) {
+            return;
         }
-        return resultId;
+        for (Map.Entry<String, String> entry : staticFields.entrySet()) {
+            final String key = entry.getKey();
+            final String value = entry.getValue();
+            if (key == null || key.isBlank()) {
+                throw new ValidationException("Static field key must not be blank");
+            }
+            if (value == null || value.isBlank()) {
+                throw new ValidationException("Static field value for key '" + key + "' must not be blank");
+            }
+        }
+
     }
 
     @Override
-    public <T extends Persisted> String saveWithoutValidation(T model) {
-        final String resultId = super.saveWithoutValidation(model);
-        if (resultId != null && !resultId.isEmpty()) {
-            publishChange(InputCreated.create(resultId));
-        }
-        return resultId;
-    }
-
-    @Override
-    public <T extends Persisted> int destroy(T model) {
-        final int result = super.destroy(model);
-        if (result > 0) {
+    public int destroy(Input model) {
+        boolean deleted = mongoUtils.deleteById(model.getId());
+        if (deleted) {
             publishChange(InputDeleted.create(model.getId()));
         }
-        return result;
+        return deleted ? 1 : 0;
     }
 
     @Override
     public Input create(String id, Map<String, Object> fields) {
-        return new InputImpl(new ObjectId(id), fields);
+        InputImpl.Builder builder = buildFromMap(fields);
+        builder.setId(id);
+        return builder.build();
     }
 
     @Override
     public Input create(Map<String, Object> fields) {
-        return new InputImpl(fields);
+        return buildFromMap(fields).build();
+    }
+
+    private InputImpl.Builder buildFromMap(Map<String, Object> fields) {
+        final DateTime createdAt = (DateTime) fields.getOrDefault(FIELD_CREATED_AT, Tools.nowUTC());
+        final boolean isGlobal = (Boolean) fields.getOrDefault(MessageInput.FIELD_GLOBAL, false);
+        final InputImpl.Builder builder = InputImpl.builder()
+                .setType((String) fields.get(MessageInput.FIELD_TYPE))
+                .setTitle((String) fields.get(MessageInput.FIELD_TITLE))
+                .setCreatorUserId((String) fields.get(MessageInput.FIELD_CREATOR_USER_ID))
+                .setGlobal(isGlobal)
+                .setConfiguration((Map<String, Object>) fields.get(MessageInput.FIELD_CONFIGURATION))
+                .setCreatedAt(createdAt);
+
+        final String desiredStateStr = (String) fields.get(MessageInput.FIELD_DESIRED_STATE);
+        if (desiredStateStr != null && !desiredStateStr.isBlank()) {
+            builder.setPersistedDesiredState(IOState.Type.valueOf(desiredStateStr));
+        }
+
+        final String contentPack = (String) fields.get(MessageInput.FIELD_CONTENT_PACK);
+        if (contentPack != null && !contentPack.isBlank()) {
+            builder.setContentPack(contentPack);
+        }
+
+        final List<Map<String, String>> staticFields = (List<Map<String, String>>) fields.get(MessageInput.FIELD_STATIC_FIELDS);
+        if (staticFields != null && !staticFields.isEmpty()) {
+            builder.setEmbeddedStaticFields(staticFields);
+        }
+
+        if (!isGlobal) {
+            builder.setNodeId((String) fields.get(MessageInput.FIELD_NODE_ID));
+        }
+
+        return builder;
     }
 
     @Override
@@ -211,164 +302,237 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         if (!ObjectId.isValid(id)) {
             throw new NotFoundException("Input id <" + id + "> is invalid!");
         }
-        final DBObject o = get(org.graylog2.inputs.InputImpl.class, id);
-        if (o == null) {
-            throw new NotFoundException("Input <" + id + "> not found!");
-        }
-        return createFromDbObject(o);
+
+        final InputImpl input = mongoUtils.getById(id)
+                .orElseThrow(() -> new NotFoundException("Couldn't find input " + id));
+        return withEncryptedFields(input);
     }
 
     @Override
-    public Input findForThisNodeOrGlobal(String nodeId, String id) throws NotFoundException {
-        final List<BasicDBObject> forThisNodeOrGlobal = ImmutableList.of(
-                new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId),
-                new BasicDBObject(MessageInput.FIELD_GLOBAL, true));
+    public Input findForThisNodeOrGlobal(String nodeId, String id) {
+        final Bson forThisNodeOrGlobal = or(eq(MessageInput.FIELD_NODE_ID, nodeId), eq(MessageInput.FIELD_GLOBAL, true));
+        final Bson query = and(eq(InputImpl.FIELD_ID, new ObjectId(id)), forThisNodeOrGlobal);
 
-        final List<BasicDBObject> query = ImmutableList.of(
-                new BasicDBObject(InputImpl.FIELD_ID, new ObjectId(id)),
-                new BasicDBObject("$or", forThisNodeOrGlobal));
-
-        final DBObject o = findOne(InputImpl.class, new BasicDBObject("$and", query));
-        return createFromDbObject(o);
+        return collection.find(query).first();
     }
 
     @Override
     public Input findForThisNode(String nodeId, String id) throws NotFoundException, IllegalArgumentException {
-        final List<BasicDBObject> forThisNode = ImmutableList.of(
-                new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId),
-                new BasicDBObject(MessageInput.FIELD_GLOBAL, false));
-
-        final List<BasicDBObject> query = ImmutableList.of(
-                new BasicDBObject(InputImpl.FIELD_ID, new ObjectId(id)),
-                new BasicDBObject("$and", forThisNode));
-
-        final DBObject o = findOne(InputImpl.class, new BasicDBObject("$and", query));
-        if (o == null) {
+        final Bson forThisNodeOrGlobal = or(eq(MessageInput.FIELD_NODE_ID, nodeId), eq(MessageInput.FIELD_GLOBAL, false));
+        final Bson query = and(eq(InputImpl.FIELD_ID, new ObjectId(id)), forThisNodeOrGlobal);
+        final InputImpl input = collection.find(query).first();
+        if (input == null) {
             throw new NotFoundException("Couldn't find input " + id + " on Graylog node " + nodeId);
         } else {
-            return createFromDbObject(o);
+            return input;
         }
     }
 
     @Override
-    public void addExtractor(Input input, Extractor extractor) throws ValidationException {
-        embed(input, InputImpl.EMBEDDED_EXTRACTORS, extractor);
-        publishChange(ExtractorCreated.create(input.getId(), extractor.getId()));
+    public void addExtractor(Input input, Extractor extractor) throws ValidationException  {
+        validateExtractor(extractor);
+        final Document embeddedDoc = new Document(extractor.getPersistedFields());
+        final UpdateResult result = collection.updateOne(
+                MongoUtils.idEq(input.getId()),
+                Updates.push(InputImpl.EMBEDDED_EXTRACTORS, embeddedDoc)
+        );
+
+        if (result.wasAcknowledged()) {
+            publishChange(ExtractorCreated.create(input.getId(), extractor.getId()));
+        }
+    }
+
+    public void validateExtractor(Extractor extractor) throws ValidationException {
+        if (StringUtils.isBlank(extractor.getTitle())) {
+            throw new ValidationException("Extractor title must not be blank");
+        }
+
+        if (extractor.getType() == null) {
+            throw new ValidationException("Extractor type must not be blank");
+        }
+
+        if (extractor.getCursorStrategy() == null) {
+            throw new ValidationException("Extractor cursor strategy must not be blank");
+        }
+
+        if (StringUtils.isBlank(extractor.getSourceField())) {
+            throw new ValidationException("Extractor source field must not be blank");
+        }
+
+        if (StringUtils.isBlank(extractor.getCreatorUserId())) {
+            throw new ValidationException("Extractor creator user id must not be blank");
+        }
+
+        if (extractor.getExtractorConfig() == null) {
+            throw new ValidationException("Extractor config must not be null");
+        }
     }
 
     @Override
     public void updateExtractor(Input input, Extractor extractor) throws ValidationException {
-        removeEmbedded(input, InputImpl.EMBEDDED_EXTRACTORS, extractor.getId());
-        embed(input, InputImpl.EMBEDDED_EXTRACTORS, extractor);
+        validateExtractor(extractor);
+        final Document embeddedDoc = new Document(extractor.getPersistedFields());
+
+        //First remove the old extractor
+        collection.updateOne(
+                MongoUtils.idEq(input.getId()),
+                MongoUtils.removeEmbedded(InputImpl.EMBEDDED_EXTRACTORS, Extractor.FIELD_ID, extractor.getId())
+        );
+
+        collection.updateOne(
+                MongoUtils.idEq(input.getId()),
+                Updates.push(InputImpl.EMBEDDED_EXTRACTORS, embeddedDoc)
+        );
+
         publishChange(ExtractorUpdated.create(input.getId(), extractor.getId()));
     }
 
     @Override
     public void addStaticField(Input input, final String key, final String value) throws ValidationException {
-        final EmbeddedPersistable obj = () -> ImmutableMap.of(
-                InputImpl.FIELD_STATIC_FIELD_KEY, key,
-                InputImpl.FIELD_STATIC_FIELD_VALUE, value);
+        final Document staticFieldDoc = new Document()
+                .append(InputImpl.FIELD_STATIC_FIELD_KEY, key)
+                .append(InputImpl.FIELD_STATIC_FIELD_VALUE, value);
 
-        embed(input, InputImpl.EMBEDDED_STATIC_FIELDS, obj);
-        publishChange(InputUpdated.create(input.getId()));
+        final UpdateResult updateResult = collection.updateOne(
+                MongoUtils.idEq(input.getId()),
+                Updates.push(InputImpl.EMBEDDED_STATIC_FIELDS, staticFieldDoc)
+        );
+
+        if (updateResult.wasAcknowledged()) {
+            publishChange(InputUpdated.create(input.getId()));
+        }
     }
 
     @Override
-    public List<Map.Entry<String, String>> getStaticFields(Input input) {
-        if (input.getFields().get(InputImpl.EMBEDDED_STATIC_FIELDS) == null) {
+    public List<Map.Entry<String, String>> getStaticFields(String inputId) {
+        final Document resultDoc = documentCollection.find(
+                MongoUtils.idEq(inputId)
+        ).projection(Projections.include(InputImpl.EMBEDDED_STATIC_FIELDS)).first();
+
+        if (resultDoc == null) {
             return Collections.emptyList();
         }
 
-        final ImmutableList.Builder<Map.Entry<String, String>> listBuilder = ImmutableList.builder();
-        final BasicDBList mSF = (BasicDBList) input.getFields().get(InputImpl.EMBEDDED_STATIC_FIELDS);
-        for (final Object element : mSF) {
-            final DBObject ex = (BasicDBObject) element;
-            try {
-                final Map.Entry<String, String> staticField =
-                        Maps.immutableEntry((String) ex.get(InputImpl.FIELD_STATIC_FIELD_KEY),
-                                (String) ex.get(InputImpl.FIELD_STATIC_FIELD_VALUE));
-                listBuilder.add(staticField);
-            } catch (Exception e) {
-                LOG.error("Cannot build static field from persisted data. Skipping.", e);
-            }
+        final List<Object> rawList = resultDoc.getList(InputImpl.EMBEDDED_STATIC_FIELDS, Object.class);
+        if (rawList == null || rawList.isEmpty()) {
+            return Collections.emptyList();
         }
 
-        return listBuilder.build();
+        return rawList.stream()
+                .map(this::toDocument)
+                .map(field -> Map.entry(
+                        field.getString(InputImpl.FIELD_STATIC_FIELD_KEY),
+                        field.getString(InputImpl.FIELD_STATIC_FIELD_VALUE)
+                ))
+                .toList();
     }
+
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Extractor> getExtractors(Input input) {
-        if (input.getFields().get(InputImpl.EMBEDDED_EXTRACTORS) == null) {
+    public List<Extractor> getExtractors(String inputId) {
+        final Document resultDoc = documentCollection.find(MongoUtils.idEq(inputId))
+                .projection(Projections.include(InputImpl.EMBEDDED_EXTRACTORS))
+                .first();
+
+        if (resultDoc == null) {
             return Collections.emptyList();
         }
 
         final ImmutableList.Builder<Extractor> listBuilder = ImmutableList.builder();
-        final BasicDBList mEx = (BasicDBList) input.getFields().get(InputImpl.EMBEDDED_EXTRACTORS);
-        for (final Object element : mEx) {
-            final DBObject ex = (BasicDBObject) element;
-
-            // SOFT MIGRATION: does this extractor have an order set? Implemented for issue: #726
-            Long order = 0L;
-            if (ex.containsField(Extractor.FIELD_ORDER)) {
-                /* We use json format to describe our test fixtures
-                   This format will only return Integer on this place,
-                   which can't be converted to long. So I first cast
-                   it to Number and eventually to long */
-                Number num = (Number) ex.get(Extractor.FIELD_ORDER);
-                order = num.longValue(); // mongodb driver gives us a java.lang.Long
-            }
-
-            try {
-                final Extractor extractor = extractorFactory.factory(
-                        (String) ex.get(Extractor.FIELD_ID),
-                        (String) ex.get(Extractor.FIELD_TITLE),
-                        order.intValue(),
-                        Extractor.CursorStrategy.valueOf(((String) ex.get(Extractor.FIELD_CURSOR_STRATEGY)).toUpperCase(Locale.ENGLISH)),
-                        Extractor.Type.valueOf(((String) ex.get(Extractor.FIELD_TYPE)).toUpperCase(Locale.ENGLISH)),
-                        (String) ex.get(Extractor.FIELD_SOURCE_FIELD),
-                        (String) ex.get(Extractor.FIELD_TARGET_FIELD),
-                        (Map<String, Object>) ex.get(Extractor.FIELD_EXTRACTOR_CONFIG),
-                        (String) ex.get(Extractor.FIELD_CREATOR_USER_ID),
-                        getConvertersOfExtractor(ex),
-                        Extractor.ConditionType.valueOf(((String) ex.get(Extractor.FIELD_CONDITION_TYPE)).toUpperCase(Locale.ENGLISH)),
-                        (String) ex.get(Extractor.FIELD_CONDITION_VALUE)
-                );
-
-                listBuilder.add(extractor);
-            } catch (Exception e) {
-                LOG.error("Cannot build extractor from persisted data. Skipping.", e);
-            }
+        final List<Object> list = resultDoc.getList(InputImpl.EMBEDDED_EXTRACTORS, Object.class);
+        if (list != null) {
+            list.stream()
+                    .map(this::toDocument)
+                    .map(this::getExtractorFromDoc)
+                    .forEach(listBuilder::add);
         }
-
         return listBuilder.build();
     }
 
     @Override
     public Extractor getExtractor(final Input input, final String extractorId) throws NotFoundException {
-        final Optional<Extractor> extractor = Iterables.tryFind(this.getExtractors(input), new Predicate<>() {
-            @Override
-            public boolean apply(Extractor extractor) {
-                return extractor.getId().equals(extractorId);
-            }
-        });
+        final Document doc = documentCollection.find(
+                        Filters.and(
+                                MongoUtils.idEq(input.getId()),
+                                Filters.elemMatch(InputImpl.EMBEDDED_EXTRACTORS,
+                                        Filters.eq(Extractor.FIELD_ID, extractorId))
+                        )
+                )
+                .projection(Projections.fields(
+                        Projections.elemMatch(InputImpl.EMBEDDED_EXTRACTORS,
+                                Filters.eq(Extractor.FIELD_ID, extractorId))
+                ))
+                .first();
 
-        if (!extractor.isPresent()) {
-            LOG.error("Extractor <{}> not found.", extractorId);
-            throw new NotFoundException("Couldn't find extractor " + extractorId);
+        if (doc == null || !doc.containsKey(InputImpl.EMBEDDED_EXTRACTORS)) {
+            throw new NotFoundException("Extractor " + extractorId + " not found for input " + input.getId());
         }
 
-        return extractor.get();
+        final List<Object> extractors = doc.getList(InputImpl.EMBEDDED_EXTRACTORS, Object.class);
+        if (extractors == null || extractors.isEmpty()) {
+            throw new NotFoundException("Extractor " + extractorId + " not found for input " + input.getId());
+        }
+
+        final Document extractorDoc = toDocument(extractors.getFirst());
+        final Extractor extractor = getExtractorFromDoc(extractorDoc);
+        if (extractor == null) {
+            throw new NotFoundException("Extractor " + extractorId + " not found for input " + input.getId());
+        }
+
+        return extractor;
     }
 
     @SuppressWarnings("unchecked")
-    private List<Converter> getConvertersOfExtractor(DBObject extractor) {
+    private Document toDocument(Object raw) {
+        if (raw instanceof Document doc) {
+            return doc;
+        }
+        if (raw instanceof Map<?, ?> map) {
+            return new Document((Map<String, Object>) map);
+        }
+        throw new IllegalArgumentException("Unsupported value type: " + raw.getClass());
+    }
+
+    @SuppressWarnings("unchecked")
+    private Extractor getExtractorFromDoc(Document ex) {
+        try {
+            /* We use json format to describe our test fixtures
+                   This format will only return Integer on this place,
+                   which can't be converted to long. So I first cast
+                   it to Number and eventually to long */
+            long order = Optional.ofNullable(ex.get(Extractor.FIELD_ORDER))
+                    .map(v -> ((Number) v).longValue())
+                    .orElse(0L);
+
+            final UnaryOperator<String> normalizeEnum = s -> s == null ? null : s.toUpperCase(Locale.ENGLISH);
+
+            return extractorFactory.factory(
+                    ex.getString(Extractor.FIELD_ID),
+                    ex.getString(Extractor.FIELD_TITLE),
+                    (int) order,
+                    Extractor.CursorStrategy.valueOf(normalizeEnum.apply(ex.getString(Extractor.FIELD_CURSOR_STRATEGY))),
+                    Extractor.Type.valueOf(normalizeEnum.apply(ex.getString(Extractor.FIELD_TYPE))),
+                    ex.getString(Extractor.FIELD_SOURCE_FIELD),
+                    ex.getString(Extractor.FIELD_TARGET_FIELD),
+                    (Map<String, Object>) ex.get(Extractor.FIELD_EXTRACTOR_CONFIG),
+                    ex.getString(Extractor.FIELD_CREATOR_USER_ID),
+                    getConvertersOfExtractor(ex),
+                    Extractor.ConditionType.valueOf(normalizeEnum.apply(ex.getString(Extractor.FIELD_CONDITION_TYPE))),
+                    ex.getString(Extractor.FIELD_CONDITION_VALUE)
+            );
+        } catch (Exception e) {
+            LOG.error("Cannot build extractor from persisted data. Skipping. Document: {}", ex.toJson(), e);
+            return null;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Converter> getConvertersOfExtractor(Document extractor) {
         final ImmutableList.Builder<Converter> listBuilder = ImmutableList.builder();
+        final List<Document> list = extractor.getList(Extractor.FIELD_CONVERTERS, Object.class).stream().map(this::toDocument).toList();
 
-        final BasicDBList converters = (BasicDBList) extractor.get(Extractor.FIELD_CONVERTERS);
-        for (final Object element : converters) {
-            final DBObject c = (BasicDBObject) element;
-
+        list.forEach(c -> {
             try {
                 listBuilder.add(converterFactory.create(
                         Converter.Type.valueOf(((String) c.get(Extractor.FIELD_CONVERTER_TYPE)).toUpperCase(Locale.ENGLISH)),
@@ -379,21 +543,33 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
             } catch (Exception e) {
                 LOG.error("Cannot build converter from persisted data.", e);
             }
-        }
+        });
 
         return listBuilder.build();
     }
 
     @Override
     public void removeExtractor(Input input, String extractorId) {
-        removeEmbedded(input, InputImpl.EMBEDDED_EXTRACTORS, extractorId);
-        publishChange(ExtractorDeleted.create(input.getId(), extractorId));
+        UpdateResult updateResult = collection.updateOne(
+                MongoUtils.idEq(input.getId()),
+                MongoUtils.removeEmbedded(InputImpl.EMBEDDED_EXTRACTORS, Extractor.FIELD_ID, extractorId)
+        );
+
+        if (updateResult.wasAcknowledged()) {
+            publishChange(ExtractorDeleted.create(input.getId(), extractorId));
+        }
     }
 
     @Override
     public void removeStaticField(Input input, String key) {
-        removeEmbedded(input, InputImpl.FIELD_STATIC_FIELD_KEY, InputImpl.EMBEDDED_STATIC_FIELDS, key);
-        publishChange(InputUpdated.create(input.getId()));
+        UpdateResult updateResult = collection.updateOne(
+                MongoUtils.idEq(input.getId()),
+                MongoUtils.removeEmbedded(InputImpl.EMBEDDED_STATIC_FIELDS, InputImpl.FIELD_STATIC_FIELD_KEY, key)
+        );
+
+        if (updateResult.wasAcknowledged()) {
+            publishChange(InputUpdated.create(input.getId()));
+        }
     }
 
     @Override
@@ -422,115 +598,95 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
     @Override
     public long totalCount() {
-        return totalCount(InputImpl.class);
+        return collection.countDocuments();
     }
 
     @Override
     public long globalCount() {
-        return count(InputImpl.class, new BasicDBObject(MessageInput.FIELD_GLOBAL, true));
+        return collection.countDocuments(eq(MessageInput.FIELD_GLOBAL, true));
     }
 
     @Override
     public long localCount() {
-        return count(InputImpl.class, new BasicDBObject(MessageInput.FIELD_GLOBAL, false));
+        return collection.countDocuments(eq(MessageInput.FIELD_GLOBAL, false));
     }
 
     @Override
     public Map<String, Long> totalCountByType() {
         final Map<String, Long> inputCountByType = new HashMap<>();
-        try (DBCursor inputTypes = dbCollection.find(null, new BasicDBObject(MessageInput.FIELD_TYPE, 1))) {
-            for (DBObject inputType : inputTypes) {
-                final String type = (String) inputType.get(MessageInput.FIELD_TYPE);
-                if (type != null) {
-                    final Long oldValue = inputCountByType.get(type);
-                    final Long newValue = (oldValue == null) ? 1 : oldValue + 1;
-                    inputCountByType.put(type, newValue);
-                }
-            }
-        }
+
+        final List<Bson> pipeline = List.of(
+                Aggregates.group("$" + MessageInput.FIELD_TYPE, Accumulators.sum("count", 1)),
+                Aggregates.sort(Sorts.ascending(MessageInput.FIELD_TYPE))
+        );
+
+        collection.aggregate(pipeline, Document.class)
+                .forEach(doc -> {
+                    final String type = doc.getString(MessageInput.FIELD_TYPE);
+                    if (type != null) {
+                        final long count = doc.get("count", Long.class);
+                        inputCountByType.put(type, count);
+                    }
+                });
 
         return inputCountByType;
     }
 
     @Override
     public long localCountForNode(String nodeId) {
-        final List<BasicDBObject> forThisNode = ImmutableList.of(new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId));
-
-        final List<BasicDBObject> query = ImmutableList.of(
-                new BasicDBObject(MessageInput.FIELD_GLOBAL, false),
-                new BasicDBObject("$or", forThisNode));
-
-        return count(InputImpl.class, new BasicDBObject("$and", query));
+        return collection.countDocuments(and(
+                eq(MessageInput.FIELD_NODE_ID, nodeId),
+                eq(MessageInput.FIELD_GLOBAL, false)
+        ));
     }
 
     @Override
     public long totalCountForNode(String nodeId) {
-        final List<BasicDBObject> query = ImmutableList.of(
-                new BasicDBObject(MessageInput.FIELD_GLOBAL, true),
-                new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId));
-
-        return count(InputImpl.class, new BasicDBObject("$or", query));
+        return collection.countDocuments(or(
+                eq(MessageInput.FIELD_NODE_ID, nodeId),
+                eq(MessageInput.FIELD_GLOBAL, true)
+        ));
     }
 
     @Override
     public long totalExtractorCount() {
-        final DBObject query = new BasicDBObject(InputImpl.EMBEDDED_EXTRACTORS, new BasicDBObject("$exists", true));
-        long extractorsCount = 0;
-        try (DBCursor inputs = dbCollection.find(query, new BasicDBObject(InputImpl.EMBEDDED_EXTRACTORS, 1))) {
-            for (DBObject input : inputs) {
-                final BasicDBList extractors = (BasicDBList) input.get(InputImpl.EMBEDDED_EXTRACTORS);
-                extractorsCount += extractors.size();
-            }
-        }
-
-        return extractorsCount;
+        final AtomicLong extractorsCount = new AtomicLong();
+        documentCollection.find(Filters.exists(InputImpl.EMBEDDED_EXTRACTORS))
+                .projection(Projections.include(InputImpl.EMBEDDED_EXTRACTORS))
+                .forEach(docs -> {
+                    List<?> extractors = docs.getList(InputImpl.EMBEDDED_EXTRACTORS, Object.class);
+                    if (extractors != null) {
+                        extractorsCount.addAndGet(extractors.size());
+                    }
+                });
+        return extractorsCount.get();
     }
 
     @Override
     public Map<Extractor.Type, Long> totalExtractorCountByType() {
-        final DBObject query = new BasicDBObject(InputImpl.EMBEDDED_EXTRACTORS, new BasicDBObject("$exists", true));
-        try (DBCursor inputs = dbCollection.find(query, new BasicDBObject(InputImpl.EMBEDDED_EXTRACTORS, 1))) {
-            final Map<Extractor.Type, Long> extractorsCountByType = new HashMap<>();
-            for (DBObject input : inputs) {
-                final BasicDBList extractors = (BasicDBList) input.get(InputImpl.EMBEDDED_EXTRACTORS);
-                for (Object dbObject : extractors) {
-                    final DBObject extractor = (DBObject) dbObject;
-                    final Extractor.Type type = Extractor.Type.fuzzyValueOf(((String) extractor.get(Extractor.FIELD_TYPE)));
-                    if (type != null) {
-                        final Long oldValue = extractorsCountByType.get(type);
-                        final Long newValue = (oldValue == null) ? 1 : oldValue + 1;
-                        extractorsCountByType.put(type, newValue);
+        final Map<Extractor.Type, Long> extractorsCountByType = new HashMap<>();
+
+        documentCollection.find(Filters.exists(InputImpl.EMBEDDED_EXTRACTORS))
+                .projection(Projections.include(InputImpl.EMBEDDED_EXTRACTORS))
+                .forEach(doc -> {
+                    List<Document> extractors = doc.getList(InputImpl.EMBEDDED_EXTRACTORS, Document.class);
+                    if (extractors == null) return;
+
+                    for (Document extractorDoc : extractors) {
+                        final String typeStr = extractorDoc.getString(Extractor.FIELD_TYPE);
+                        final Extractor.Type type = Extractor.Type.fuzzyValueOf(typeStr);
+
+                        if (type != null) {
+                            extractorsCountByType.merge(type, 1L, Long::sum);
+                        }
                     }
-                }
-            }
-            return extractorsCountByType;
-        }
+                });
+
+        return extractorsCountByType;
     }
 
     private void publishChange(Object event) {
         this.clusterEventBus.post(event);
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private InputImpl createFromDbObject(DBObject o) {
-        final Map<String, Object> inputMap = new HashMap<>(o.toMap());
-
-        final String type = (String) inputMap.get(MessageInput.FIELD_TYPE);
-        final var encryptedFields = getEncryptedFields(type);
-
-        if (encryptedFields.isEmpty()) {
-            return new InputImpl((ObjectId) inputMap.get(InputImpl.FIELD_ID), inputMap);
-        }
-
-        final Map<String, Object> config = new HashMap<>((Map) inputMap.get(MessageInput.FIELD_CONFIGURATION));
-        encryptedFields.forEach(field -> {
-            final var encryptedValue = objectMapper.convertValue(config.get(field), EncryptedValue.class);
-            config.put(field, encryptedValue);
-        });
-
-        inputMap.put(MessageInput.FIELD_CONFIGURATION, config);
-
-        return new InputImpl((ObjectId) inputMap.get(InputImpl.FIELD_ID), inputMap);
     }
 
     private Set<String> getEncryptedFields(String type) {
@@ -539,25 +695,39 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
                 .orElse(Set.of());
     }
 
-    @Override
-    protected void fieldTransformations(Map<String, Object> doc) {
-        for (Map.Entry<String, Object> x : doc.entrySet()) {
-            if (x.getValue() instanceof EncryptedValue encryptedValue) {
-                doc.put(x.getKey(), objectMapper.convertValue(encryptedValue, TypeReferences.MAP_STRING_OBJECT));
+    private InputImpl withEncryptedFields(InputImpl input) {
+        if (input == null) {
+            return null;
+        }
+        final Set<String> encryptedFields = getEncryptedFields(input.getType());
+        if (encryptedFields.isEmpty()) {
+            return input;
+        }
+        final Map<String, Object> originalConfig = input.getConfiguration();
+        if (originalConfig == null || originalConfig.isEmpty()) {
+            return input;
+        }
+
+        boolean modified = false;
+        final Map<String, Object> newConfig = new HashMap<>(originalConfig);
+        for (String field : encryptedFields) {
+            final Object raw = newConfig.get(field);
+            if (raw != null && !(raw instanceof EncryptedValue)) {
+                try {
+                    final EncryptedValue ev = objectMapper.convertValue(raw, EncryptedValue.class);
+                    newConfig.put(field, ev);
+                    modified = true;
+                } catch (IllegalArgumentException e) {
+                    LOG.warn("Failed to convert field '{}' to EncryptedValue for input '{}': {}", field, input.getId(), e.getMessage());
+                }
             }
         }
-        super.fieldTransformations(doc);
+        return modified ? input.toBuilder().setConfiguration(newConfig).build() : input;
     }
 
     @Override
-    public void persistDesiredState(Input input, IOState.Type desiredState) {
-        try {
-            input.setDesiredState(desiredState);
-            saveWithoutEvents(input);
-        } catch (ValidationException e) {
-            LOG.error("Missing or invalid input configuration.", e);
-            throw new BadRequestException("Missing or invalid input configuration.", e);
-        }
+    public void persistDesiredState(Input input, IOState.Type desiredState) throws ValidationException {
+        final Input updatedInput = input.withDesiredState(desiredState);
+        saveWithoutEvents(updatedInput);
     }
-
 }

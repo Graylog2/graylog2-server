@@ -17,37 +17,39 @@
 package org.graylog.plugins.views;
 
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ContainerMatrixTestsConfiguration
+@GraylogBackendConfiguration
 public class ViewsResourceIT {
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    public ViewsResourceIT(GraylogApis apis) {
-        this.api = apis;
+    @BeforeAll
+    static void init(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testEmptyBody() {
         api.post("/views", 400)
-                 .assertThat().body("message[0]", equalTo("View is mandatory"));
+                .assertThat().body("message[0]", equalTo("View is mandatory"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testCreateViewRequestWithoutPersistedSearch() {
         api.postWithResource("/views", "org/graylog/plugins/views/views-request.json", 400);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testCreateSearchPersistView() {
         api.postWithResource("/views/search", "org/graylog/plugins/views/save-search-request.json", 201);
         api.postWithResource("/views", "org/graylog/plugins/views/views-request.json", 200);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testInvalidSearchType() {
         api.postWithResource("/views/search", "org/graylog/plugins/views/save-search-request-invalid.json", 201);
         api.postWithResource("/views", "org/graylog/plugins/views/views-request-invalid-search-type.json", 400)

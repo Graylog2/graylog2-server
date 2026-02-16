@@ -17,12 +17,27 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
+import { usePluginExports } from 'views/test/testPlugins';
+import { prefixUrl } from 'routing/Routes';
+
 import RulesPage from './RulesPage';
 
+const rulesPlugin = {
+  entityCreators: [
+    {
+      id: 'Pipeline Rule',
+      title: 'Create Rule',
+      type: 'Pipeline Rule',
+      path: prefixUrl('/foo'),
+    },
+  ],
+};
 describe('RulesPage', () => {
+  usePluginExports(rulesPlugin);
+
   it('should show create rule button', async () => {
     render(<RulesPage />);
 
-    await screen.findByRole('button', { name: 'Create Rule' });
+    await screen.findByRole('link', { name: /Create Rule/i });
   });
 });

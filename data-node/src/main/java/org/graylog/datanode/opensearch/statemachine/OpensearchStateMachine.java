@@ -54,6 +54,7 @@ public class OpensearchStateMachine extends ProcessStateMachine<OpensearchState,
                 .ignore(OpensearchEvent.HEALTH_CHECK_FAILED);
 
         config.configure(OpensearchState.PREPARED)
+                .permitReentry(OpensearchEvent.CERTIFICATES_RELOAD, process::reloadCertificates)
                 .permit(OpensearchEvent.PROCESS_STARTED, OpensearchState.STARTING)
                 .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.TERMINATED)
@@ -67,6 +68,7 @@ public class OpensearchStateMachine extends ProcessStateMachine<OpensearchState,
                 .permitDynamic(OpensearchEvent.HEALTH_CHECK_FAILED,
                         () -> startupFailuresCounter.failedTooManyTimes() ? OpensearchState.FAILED : OpensearchState.STARTING,
                         startupFailuresCounter::increment)
+                .permitReentry(OpensearchEvent.CERTIFICATES_RELOAD, process::reloadCertificates)
                 .permit(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.AVAILABLE)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.TERMINATED)
                 .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED)
@@ -78,6 +80,7 @@ public class OpensearchStateMachine extends ProcessStateMachine<OpensearchState,
                 .onEntry(rebootCounter::resetFailuresCounter)
                 .onEntry(process::available)
                 .permitReentry(OpensearchEvent.HEALTH_CHECK_OK)
+                .permitReentry(OpensearchEvent.CERTIFICATES_RELOAD, process::reloadCertificates)
                 .permit(OpensearchEvent.HEALTH_CHECK_FAILED, OpensearchState.NOT_RESPONDING)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.TERMINATED)
                 .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED)
@@ -92,6 +95,7 @@ public class OpensearchStateMachine extends ProcessStateMachine<OpensearchState,
                         () -> restFailureCounter.failedTooManyTimes() ? OpensearchState.FAILED : OpensearchState.NOT_RESPONDING,
                         restFailureCounter::increment
                 )
+                .permitReentry(OpensearchEvent.CERTIFICATES_RELOAD, process::reloadCertificates)
                 .permit(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.AVAILABLE)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.TERMINATED)
                 .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED);
@@ -100,6 +104,7 @@ public class OpensearchStateMachine extends ProcessStateMachine<OpensearchState,
         // TODO: what to do if the process fails? Reboot?
         config.configure(OpensearchState.FAILED)
                 .ignore(OpensearchEvent.HEALTH_CHECK_FAILED)
+                .ignore(OpensearchEvent.CERTIFICATES_RELOAD)
                 .permit(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.AVAILABLE)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.TERMINATED)
                 .permit(OpensearchEvent.PROCESS_PREPARED, OpensearchState.PREPARED) //restart if reconfigured
@@ -112,16 +117,19 @@ public class OpensearchStateMachine extends ProcessStateMachine<OpensearchState,
                 .permit(OpensearchEvent.PROCESS_STARTED, OpensearchState.STARTING, rebootCounter::increment)
                 .ignore(OpensearchEvent.HEALTH_CHECK_FAILED)
                 .ignore(OpensearchEvent.PROCESS_STOPPED)
-                .ignore(OpensearchEvent.PROCESS_TERMINATED); // final state, all following terminate events are ignored
+                .ignore(OpensearchEvent.PROCESS_TERMINATED) // final state, all following terminate events are ignored
+                .ignore(OpensearchEvent.CERTIFICATES_RELOAD);
 
         config.configure(OpensearchState.REMOVING)
                 .onEntry(process::remove)
                 .ignore(OpensearchEvent.HEALTH_CHECK_OK)
+                .ignore(OpensearchEvent.CERTIFICATES_RELOAD)
                 .permit(OpensearchEvent.HEALTH_CHECK_FAILED, OpensearchState.FAILED)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.REMOVED);
 
         config.configure(OpensearchState.REMOVED)
                 .onEntry(process::stop)
+                .ignore(OpensearchEvent.CERTIFICATES_RELOAD)
                 .permit(OpensearchEvent.RESET, OpensearchState.WAITING_FOR_CONFIGURATION, process::reset)
                 .ignore(OpensearchEvent.PROCESS_STOPPED);
 

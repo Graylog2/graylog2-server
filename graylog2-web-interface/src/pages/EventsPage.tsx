@@ -16,15 +16,15 @@
  */
 import React from 'react';
 
-import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import usePluginEntities from 'hooks/usePluginEntities';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import EventsEntityTable from 'components/events/EventsEntityTable';
+import { Row, Col } from 'components/bootstrap';
 
-const AlertsPageComponent = () => {
+const AlertsOverview = () => {
   const {
     data: { valid: validSecurityLicense },
   } = usePluggableLicenseCheck('/license/security');
@@ -36,8 +36,8 @@ const AlertsPageComponent = () => {
 
   return (
     <>
-      {pluggableSecurityEventsPage.map(({ component: PluggableSecurityEventsPage }) => (
-        <PluggableSecurityEventsPage />
+      {pluggableSecurityEventsPage.map(({ component: PluggableSecurityEventsPage, key }) => (
+        <PluggableSecurityEventsPage key={key} />
       ))}
     </>
   );
@@ -59,7 +59,9 @@ const EventsPage = () => (
     </PageHeader>
 
     <Row className="content">
-      <Col md={12}>{AlertsPageComponent()}</Col>
+      <Col md={12}>
+        <AlertsOverview />
+      </Col>
     </Row>
   </DocumentTitle>
 );

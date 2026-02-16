@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
 
 import { ModalSubmit } from 'components/common';
 import { Input } from 'components/bootstrap';
@@ -24,20 +23,6 @@ import useLogin from 'components/login/useLogin';
 type Props = {
   onErrorChange: (message?: string) => void;
 };
-
-const SigninButton = styled(ModalSubmit)(
-  ({ theme }) => css`
-    button.mantine-Button-root {
-      background-color: ${theme.colors.brand.primary};
-      border-color: ${theme.colors.brand.primary};
-
-      &:hover {
-        background-color: ${theme.colors.brand.primary};
-        border-color: ${theme.colors.brand.primary};
-      }
-    }
-  `,
-);
 
 const LoginForm = ({ onErrorChange }: Props) => {
   const { login, isLoading } = useLogin(onErrorChange);
@@ -59,7 +44,7 @@ const LoginForm = ({ onErrorChange }: Props) => {
 
       <Input id="password" type="password" label="Password" autoComplete="current-password" required />
 
-      <SigninButton
+      <ModalSubmit
         displayCancel={false}
         isSubmitting={isLoading}
         isAsyncSubmit

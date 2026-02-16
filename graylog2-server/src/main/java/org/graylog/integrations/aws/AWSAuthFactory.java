@@ -45,12 +45,12 @@ public class AWSAuthFactory {
      * using Java props, environment variables, EC2 instance roles etc. See the {@link DefaultCredentialsProvider}
      * Javadoc for more information.
      */
-    public static AwsCredentialsProvider create(boolean isCloud,
-                                                @Nullable String stsRegion,
-                                                @Nullable String accessKey,
-                                                @Nullable String secretKey,
-                                                @Nullable String assumeRoleArn) {
-        AwsCredentialsProvider awsCredentials = isCloud ? getCloudAwsCredentialsProvider(accessKey, secretKey) :
+    public AwsCredentialsProvider create(boolean requireKeySecret,
+                                         @Nullable String stsRegion,
+                                         @Nullable String accessKey,
+                                         @Nullable String secretKey,
+                                         @Nullable String assumeRoleArn) {
+        AwsCredentialsProvider awsCredentials = requireKeySecret ? getKeySecretCredentialsProvider(accessKey, secretKey) :
                 getAwsCredentialsProvider(accessKey, secretKey);
 
         // Apply the Assume Role ARN Authorization if specified. All AWSCredentialsProviders support this.
@@ -66,15 +66,15 @@ public class AWSAuthFactory {
         AwsCredentialsProvider awsCredentials;
         if (!isNullOrEmpty(accessKey) && !isNullOrEmpty(secretKey)) {
             LOG.debug("Using explicitly provided key and secret.");
-            awsCredentials = StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey));
+            awsCredentials = getKeySecretCredentialsProvider(accessKey, secretKey);
         } else {
             LOG.debug("Using default authorization provider chain.");
-            awsCredentials = DefaultCredentialsProvider.create();
+            awsCredentials = DefaultCredentialsProvider.builder().build();
         }
         return awsCredentials;
     }
 
-    private static AwsCredentialsProvider getCloudAwsCredentialsProvider(String accessKey, String secretKey) {
+    private static AwsCredentialsProvider getKeySecretCredentialsProvider(String accessKey, String secretKey) {
         Preconditions.checkArgument(StringUtils.isNotBlank(accessKey), "Access key is required.");
         Preconditions.checkArgument(StringUtils.isNotBlank(secretKey), "Secret key is required.");
         return StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey));

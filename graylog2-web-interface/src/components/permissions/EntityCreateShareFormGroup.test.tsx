@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
@@ -73,12 +74,7 @@ describe('EntityCreateShareFormGroup', () => {
     render(<SUT />);
 
     await waitFor(() => {
-      expect(EntityShareActions.prepare).toHaveBeenCalledWith(
-        mockEntity.entityType,
-        '',
-        mockEntity.entityId,
-        undefined,
-      );
+      expect(EntityShareActions.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', mockEntity.entityId, {});
     });
   });
 
@@ -97,7 +93,7 @@ describe('EntityCreateShareFormGroup', () => {
       name: /add collaborator/i,
     });
 
-    fireEvent.click(addCollaborator);
+    await userEvent.click(addCollaborator);
 
     await waitFor(() => {
       expect(EntityShareActions.prepare).toHaveBeenCalledWith('stream', '', null, {

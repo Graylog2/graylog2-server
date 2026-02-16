@@ -42,7 +42,7 @@ const Header = () => <StyledH2>Cluster</StyledH2>;
 const ClusterInfo = () => {
   const nodes = useStore(NodesStore);
 
-  if (!nodes) {
+  if (!nodes?.clusterId) {
     return <Spinner />;
   }
 

@@ -72,7 +72,7 @@ class ConfigurationList extends React.Component<Props> {
           <Col md={12}>
             <div className="pull-right">
               <LinkContainer to={Routes.SYSTEM.SIDECARS.NEW_CONFIGURATION}>
-                <Button onClick={this.openModal} bsStyle="success" bsSize="small">
+                <Button onClick={this.openModal} bsStyle="primary" bsSize="small">
                   Create Configuration
                 </Button>
               </LinkContainer>

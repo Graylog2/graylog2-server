@@ -40,10 +40,10 @@ jest.mock('util/AppConfig', () => ({
   rootTimeZone: jest.fn(() => 'America/Chicago'),
   gl2ServerUrl: jest.fn(() => undefined),
   isCloud: jest.fn(() => false),
+  isFeatureEnabled: () => true,
 }));
 
-// eslint-disable-next-line react/require-default-props
-const AreaVisualization = (props: React.ComponentProps<typeof OriginalAreaVisualization>) => (
+const AreaVisualization = ({ ...props }: React.ComponentProps<typeof OriginalAreaVisualization>) => (
   <TestStoreProvider>
     <TestFieldTypesContextProvider>
       <OriginalAreaVisualization {...props} />
@@ -84,7 +84,11 @@ describe('AreaVisualization', () => {
     expect(GenericPlot).toHaveBeenCalledWith(
       expect.objectContaining({
         layout: expect.objectContaining({
-          xaxis: { range: ['2019-11-28T16:21:00.486+01:00', '2019-11-28T16:25:57.000+01:00'], type: 'date' },
+          xaxis: {
+            range: ['2019-11-28T16:21:00.486+01:00', '2019-11-28T16:25:57.000+01:00'],
+            type: 'date',
+            fixedrange: false,
+          },
           legend: { y: -0.14 },
         }),
         chartData: [

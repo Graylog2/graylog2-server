@@ -35,6 +35,7 @@ export type Stream = {
   is_default: boolean;
   is_editable: boolean;
   categories: string[];
+  favorite_fields?: Array<string>;
 };
 
 export type StreamRule = {

@@ -1,0 +1,44 @@
+{
+  "views": [
+    {
+      "_id": {
+        "$oid": "68d3c1a65fcf61295888ad8c"
+      },
+      "type": "DASHBOARD",
+      "title": "Test Dashboard",
+      "summary": "Test Dashboard",
+      "description": "Test Dashboard",
+      "search_id": "68d3c1a65fcf61295888ad8b",
+      "properties": [],
+      "requires": {},
+      "state": {},
+      "owner": "admin",
+      "created_at": {
+        "$date": "2023-06-01T08:43:23.743Z"
+      },
+      "last_updated_at": {
+        "$date": "2025-09-24T10:02:14.176Z"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "68ef5a140f5ba3bef59ca64b"
+      },
+      "type": "DASHBOARD",
+      "title": "Illuminate:Test Dashboard",
+      "summary": "Test Dashboard",
+      "description": "Test Dashboard",
+      "search_id": "68ef5a140f5ba3bef59ca64a",
+      "properties": [],
+      "requires": {},
+      "state": {},
+      "owner": null,
+      "created_at": {
+        "$date": "2023-06-01T08:43:23.743Z"
+      },
+      "last_updated_at": {
+        "$date": "2025-09-24T10:02:14.176Z"
+      }
+    }
+  ]
+}

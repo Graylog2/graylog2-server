@@ -34,8 +34,8 @@ public class TelemetryTestHelper {
     public static final String LICENSE = "license";
     static final String PLUGIN = "plugin";
     static final String SEARCH_CLUSTER = "search_cluster";
-    public static final String DATA_WAREHOUSE_ACCOUNTED_OUTPUT = "data_warehouse_accounted_output_traffic_last_month";
-    public static final String DATA_WAREHOUSE_NOT_ACCOUNTED_OUTPUT = "data_warehouse_not_accounted_output_traffic_last_month";
+    public static final String DATA_LAKE_ACCOUNTED_OUTPUT = "data_lake_accounted_output_traffic_last_month";
+    public static final String DATA_LAKE_NOT_ACCOUNTED_OUTPUT = "data_lake_not_accounted_output_traffic_last_month";
 
     static final String DATA_NODES = "data_nodes";
 

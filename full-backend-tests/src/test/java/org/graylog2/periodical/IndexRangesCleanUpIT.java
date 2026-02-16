@@ -21,10 +21,11 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import org.assertj.core.api.ListAssert;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -33,18 +34,19 @@ import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class IndexRangesCleanUpIT {
     public static final String RANGE_CLEANUP_PREFIX = "range-cleanup";
     public static final String INDEX_TWO = RANGE_CLEANUP_PREFIX + "_1";
     public static final String INDEX_ONE = RANGE_CLEANUP_PREFIX + "_0";
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    public IndexRangesCleanUpIT(GraylogApis api) {
-        this.api = api;
+    @BeforeAll
+    static void init(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testCleanUp() throws ExecutionException, RetryException {
         String indexSetId = api.indices().createIndexSet("Range clean up", "test index range clean up", RANGE_CLEANUP_PREFIX);
 
@@ -59,20 +61,17 @@ public class IndexRangesCleanUpIT {
 
         assertIndexRanges(ranges -> ranges.isNotEmpty().doesNotContain(INDEX_ONE));
 
-        //Deleting index set without deleting underlying indices
+        //Deleting index set without deleting underlying indices should now remove ranges immediately
         api.indices().deleteIndexSet(indexSetId, false);
-        assertIndexRanges(ranges -> ranges.isNotEmpty().contains(INDEX_TWO));
-
-        //Trigger clean up periodical over api
-        api.indices().rebuildIndexRanges();
         assertIndexRanges(ranges -> ranges.isNotEmpty().doesNotContain(INDEX_TWO));
     }
 
     private void assertIndexRanges(Consumer<ListAssert<String>> assertion) throws ExecutionException, RetryException {
         RetryerBuilder.<Void>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
-                .withStopStrategy(StopStrategies.stopAfterDelay(30, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterDelay(60, TimeUnit.SECONDS))
                 .retryIfRuntimeException()
+                .retryIfExceptionOfType(AssertionError.class)
                 .build()
                 .call(() -> {
                     final List<String> ranges = api.indices().listIndexRanges().properJSONPath().read("ranges.*.index_name");

@@ -129,11 +129,11 @@ class AddNotificationForm extends React.Component<
     const { notifications } = this.props;
     const { displayNewNotificationForm, selectedNotification } = this.state;
     const doneButton = displayNewNotificationForm ? (
-      <Button bsStyle="success" type="submit" form="new-notification-form">
+      <Button bsStyle="primary" type="submit" form="new-notification-form">
         Add notification
       </Button>
     ) : (
-      <Button bsStyle="success" onClick={this.handleSubmit}>
+      <Button bsStyle="primary" onClick={this.handleSubmit}>
         Add notification
       </Button>
     );

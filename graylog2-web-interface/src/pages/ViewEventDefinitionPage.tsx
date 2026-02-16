@@ -133,15 +133,13 @@ const ViewEventDefinitionPage = () => {
           actions={
             <ButtonToolbar>
               <IfPermitted permissions={`eventdefinitions:edit:${params.definitionId}`}>
-                <Button bsStyle="success" onClick={onEditEventDefinition}>
+                <Button bsStyle="primary" onClick={onEditEventDefinition}>
                   Edit Event Definition
                 </Button>
               </IfPermitted>
               {!isSystemEventDefinition(eventDefinition) && (
                 <IfPermitted permissions="eventdefinitions:create">
-                  <Button onClick={() => setShowDialog(true)} bsStyle="success">
-                    Duplicate Event Definition
-                  </Button>
+                  <Button onClick={() => setShowDialog(true)}>Duplicate Event Definition</Button>
                 </IfPermitted>
               )}
             </ButtonToolbar>

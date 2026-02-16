@@ -104,7 +104,7 @@ const GranteesSelector = ({
                 availableCapabilities={availableCapabilities}
               />
               <SubmitButton
-                bsStyle="success"
+                bsStyle="primary"
                 disabled={isSubmitting || !isValid}
                 title="Add Collaborator"
                 type="submit">

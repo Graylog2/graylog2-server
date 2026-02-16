@@ -14,16 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import type {
   ClickPoint,
   OnClickPopoverDropdown,
   FieldData,
+  Step,
 } from 'views/components/visualizations/OnClickPopover/Types';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import ClickPointSelector from 'views/components/visualizations/OnClickPopover/ClickPointSelector';
 import ValueActionsDropdown from 'views/components/visualizations/OnClickPopover/ValueActionsDropdown';
+import { AdditionalContext } from 'views/logic/ActionContext';
+import useQueryFieldTypes from 'views/hooks/useQueryFieldTypes';
 
 type Props = {
   component: OnClickPopoverDropdown;
@@ -47,37 +50,76 @@ const DropdownSwitcher = ({
   metricMapper = defaultMetricMapper,
   onPopoverClose,
 }: Props) => {
+  const [step, setStep] = useState<Step>(null);
   const [selectedClickPoint, setSelectedClickPoint] = useState<ClickPoint>();
-  const [showValuesComponent, setShowValuesComponent] = useState<boolean>();
   const [fieldData, setFieldData] = useState<FieldData>(null);
+  const types = useQueryFieldTypes();
 
   const onSelect = (pt: ClickPoint) => {
-    setShowValuesComponent(true);
     setSelectedClickPoint(pt);
+    setStep('values');
   };
+
+  const hasPointsInRadius = useMemo(() => {
+    const len = clickPointsInRadius?.length;
+
+    return !!len && len > 1;
+  }, [clickPointsInRadius]);
 
   useEffect(() => {
     setSelectedClickPoint(clickPoint);
-    const len = clickPointsInRadius?.length;
-    setShowValuesComponent(!len || len === 1);
+    setStep(!hasPointsInRadius ? 'values' : 'traces');
     setFieldData(null);
-  }, [clickPoint, clickPointsInRadius]);
+  }, [clickPoint, clickPointsInRadius, hasPointsInRadius]);
 
-  if (!selectedClickPoint) return null;
+  const additionalContextValue = useMemo(
+    () => ({
+      valuePath: fieldData?.contexts?.valuePath,
+      fieldTypes: types,
+    }),
+    [fieldData?.contexts?.valuePath, types],
+  );
+
+  const onValueSelect = (data: FieldData) => {
+    setStep('actions');
+    setFieldData(data);
+  };
 
   const onActionRun = () => {
     onPopoverClose();
     setFieldData(null);
+    setStep(null);
   };
 
-  if (fieldData)
-    return <ValueActionsDropdown field={fieldData.field} value={fieldData.value} onActionRun={onActionRun} />;
+  if (!selectedClickPoint) return null;
 
-  return showValuesComponent ? (
-    <Component clickPoint={selectedClickPoint} config={config} setFieldData={setFieldData} />
-  ) : (
-    <ClickPointSelector clickPointsInRadius={clickPointsInRadius} metricMapper={metricMapper} onSelect={onSelect} />
-  );
+  if (step === 'traces')
+    return (
+      <ClickPointSelector clickPointsInRadius={clickPointsInRadius} metricMapper={metricMapper} onSelect={onSelect} />
+    );
+  if (step === 'values')
+    return (
+      <Component
+        clickPoint={selectedClickPoint}
+        config={config}
+        setFieldData={onValueSelect}
+        showBackButton={hasPointsInRadius}
+        setStep={setStep}
+      />
+    );
+  if (step === 'actions')
+    return (
+      <AdditionalContext.Provider value={additionalContextValue}>
+        <ValueActionsDropdown
+          setStep={setStep}
+          field={fieldData.field}
+          value={fieldData.value}
+          onActionRun={onActionRun}
+        />
+      </AdditionalContext.Provider>
+    );
+
+  return null;
 };
 
 export default DropdownSwitcher;

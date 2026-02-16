@@ -30,6 +30,7 @@ import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.functions.arrays.ArrayContains;
 import org.graylog.plugins.pipelineprocessor.functions.arrays.ArrayRemove;
 import org.graylog.plugins.pipelineprocessor.functions.arrays.StringArrayAdd;
@@ -119,6 +120,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveMultipleFi
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveSingleField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveStringFieldsByValue;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RenameField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RenameFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
@@ -179,6 +181,7 @@ import org.joda.time.Period;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
@@ -244,6 +247,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(SetField.NAME, new SetField());
         functions.put(SetFields.NAME, new SetFields());
         functions.put(RenameField.NAME, new RenameField());
+        functions.put(RenameFields.NAME, new RenameFields());
         functions.put(RemoveField.NAME, new RemoveField());
         functions.put(RemoveSingleField.NAME, new RemoveSingleField());
         functions.put(RemoveMultipleFields.NAME, new RemoveMultipleFields());
@@ -573,6 +577,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(evaluatedMessage.getField("array")).isEqualTo(Arrays.asList(1, 2, 3));
         assertThat(evaluatedMessage.getField("store")).isInstanceOf(Map.class);
         assertThat(evaluatedMessage.getField("expensive")).isEqualTo(10);
+        assertThat(evaluatedMessage.getField("escaped")).isEqualTo("a \t +");
     }
 
     @Test
@@ -861,6 +866,33 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
+    void shouldNotCopyIdFieldWhenCloningMessage() {
+        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
+        message.addField("foo", "bar");
+
+        final Message clonedMessage = spy(messageFactory.createMessage("test", "test", Tools.nowUTC()));
+        final MessageFactory messageFactoryMock = mock(MessageFactory.class);
+        when(messageFactoryMock.createMessage(anyString(), anyString(), any(DateTime.class))).thenReturn(clonedMessage);
+
+        final CloneMessage cloneMessageFunction = new CloneMessage(messageFactoryMock);
+        final EvaluationContext context = new EvaluationContext(message);
+        final FunctionArgs args = new FunctionArgs(cloneMessageFunction, Collections.emptyMap());
+
+        final Message evaluatedClone = cloneMessageFunction.evaluate(args, context);
+
+        assertThat(evaluatedClone).isSameAs(clonedMessage);
+
+        final ArgumentCaptor<Map<String, Object>> fieldsCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(clonedMessage).addFields(fieldsCaptor.capture());
+        assertThat(fieldsCaptor.getValue()).doesNotContainKey(Message.FIELD_ID);
+
+        assertThat(clonedMessage.getFieldAs(String.class, "foo")).isEqualTo("bar");
+        assertThat(clonedMessage.getFieldAs(String.class, Message.FIELD_ID))
+                .isNotEqualTo(message.getFieldAs(String.class, Message.FIELD_ID));
+        assertThat(context.createdMessages()).contains(clonedMessage);
+    }
+
+    @Test
     void grok() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = evaluateRule(rule);
@@ -1026,6 +1058,28 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.hasField("field_1")).isFalse();
         assertThat(message.hasField("field_2")).isTrue();
         assertThat(message.hasField("field_b")).isTrue();
+    }
+
+    @Test
+    void renameFields() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+
+        final Message in = messageFactory.createMessage("bulk rename", "bulk-source", Tools.nowUTC());
+        in.addField("old_field_one", "value-1");
+        in.addField("old_field_two", 42);
+        in.addField("present", "value");
+        in.addField("unchanged_field", "still-here");
+
+        final Message message = evaluateRule(rule, in);
+
+        assertThat(message.hasField("old_field_one")).isFalse();
+        assertThat(message.hasField("old_field_two")).isFalse();
+        assertThat(message.getField("new_field_one")).isEqualTo("value-1");
+        assertThat(message.getField("new_field_two")).isEqualTo(42);
+        assertThat(message.getField("unchanged_field")).isEqualTo("still-here");
+        assertThat(message.hasField("present")).isFalse();
+        assertThat(message.getField("renamed")).isEqualTo("value");
+        assertThat(message.hasField("ignored_new_name")).isFalse();
     }
 
     @Test

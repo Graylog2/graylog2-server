@@ -28,12 +28,13 @@ type KeySecretProps = {
   onChange: (...args: any[]) => void;
   awsKey?: any;
   awsSecret?: any;
+  required?: boolean;
 };
 
-const KeySecret = ({ onChange, awsKey = undefined, awsSecret = undefined }: KeySecretProps) => (
+const KeySecret = ({ onChange, awsKey = undefined, awsSecret = undefined, required = true }: KeySecretProps) => (
   <>
     <ValidatedInput
-      id="awsCloudWatchAwsKey"
+      id="awsAccessKey"
       type="text"
       label="AWS Access Key"
       placeholder="AK****************"
@@ -41,20 +42,28 @@ const KeySecret = ({ onChange, awsKey = undefined, awsSecret = undefined }: KeyS
       fieldData={awsKey}
       autoComplete="off"
       maxLength={512}
-      help='Your AWS Key should be a 20-character long, alphanumeric string that starts with the letters "AK".'
-      required
+      help={
+        required
+          ? 'Your AWS Key should be a 20-character long, alphanumeric string that starts with the letters "AK".'
+          : 'Your AWS Key should be a 20-character long, alphanumeric string that starts with the letters "AK". (Optional - will use legacy AWS plugin configuration if not provided)'
+      }
+      required={required}
     />
 
     <StyledMaskedInput
-      id="awsCloudWatchAwsSecret"
+      id="awsSecretKey"
       label="AWS Secret Key"
       placeholder="***********"
       onChange={onChange}
       fieldData={awsSecret}
       autoComplete="off"
       maxLength={512}
-      help="Your AWS Secret is usually a 40-character long, base-64 encoded string."
-      required
+      help={
+        required
+          ? 'Your AWS Secret is usually a 40-character long, base-64 encoded string.'
+          : 'Your AWS Secret is usually a 40-character long, base-64 encoded string. (Optional - will use legacy AWS plugin configuration if not provided)'
+      }
+      required={required}
     />
   </>
 );

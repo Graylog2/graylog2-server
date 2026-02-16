@@ -18,29 +18,30 @@ package org.graylog.events.event;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(MongoDBExtension.class)
 public class ESMongoDateTimeDeserializerTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private MongoJackObjectMapperProvider mapperProvider;
+    private MongoCollections mongoCollections;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) throws Exception {
+        this.mongoCollections = mongoCollections;
         mapperProvider = new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
     }
 
@@ -61,7 +62,7 @@ public class ESMongoDateTimeDeserializerTest {
     @Test
     @MongoDBFixtures("DateTime.json")
     public void deserializeMongoDateTime() {
-        final var db = new MongoCollections(mapperProvider, mongodb.mongoConnection()).nonEntityCollection("date_collection", DTO.class);
+        final var db = mongoCollections.nonEntityCollection("date_collection", DTO.class);
 
         final DTO value = db.find().first();
         assertThat(value).isNotNull();

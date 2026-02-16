@@ -22,9 +22,9 @@ import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.TooLongFrameException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 
@@ -34,12 +34,12 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 public class SyslogTCPFramingRouterHandlerTest {
     private EmbeddedChannel channel;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         channel = new EmbeddedChannel(new SyslogTCPFramingRouterHandler(32, Delimiters.lineDelimiter()));
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         assertThat(channel.finish()).isFalse();
     }

@@ -17,18 +17,15 @@
 package org.graylog2.lookup;
 
 import com.google.common.collect.ImmutableMap;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class LookupDefaultMultiValueTest {
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void createMulti() throws Exception {
@@ -44,23 +41,23 @@ public class LookupDefaultMultiValueTest {
     }
 
     @Test
-    public void createSingleString() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
+    public void createSingleString() {
+        assertThrows(IllegalArgumentException.class, () ->
 
-        LookupDefaultMultiValue.create("foo", LookupDefaultMultiValue.Type.STRING);
+            LookupDefaultMultiValue.create("foo", LookupDefaultMultiValue.Type.STRING));
     }
 
     @Test
-    public void createSingleNumber() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
+    public void createSingleNumber() {
+        assertThrows(IllegalArgumentException.class, () ->
 
-        LookupDefaultMultiValue.create("42", LookupDefaultMultiValue.Type.NUMBER);
+            LookupDefaultMultiValue.create("42", LookupDefaultMultiValue.Type.NUMBER));
     }
 
     @Test
-    public void createSingleBoolean() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
+    public void createSingleBoolean() {
+        assertThrows(IllegalArgumentException.class, () ->
 
-        LookupDefaultMultiValue.create("true", LookupDefaultMultiValue.Type.BOOLEAN);
+            LookupDefaultMultiValue.create("true", LookupDefaultMultiValue.Type.BOOLEAN));
     }
 }

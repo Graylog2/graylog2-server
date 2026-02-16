@@ -156,7 +156,7 @@ const NodeOverview = ({
           <HideOnCloud>
             <span className="pull-right">
               <LinkContainer to={Routes.node_inputs(node.node_id)}>
-                <Button bsStyle="success" bsSize="small">
+                <Button bsStyle="primary" bsSize="small">
                   Manage inputs
                 </Button>
               </LinkContainer>

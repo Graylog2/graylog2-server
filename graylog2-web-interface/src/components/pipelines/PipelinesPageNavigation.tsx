@@ -17,18 +17,12 @@
 import * as React from 'react';
 
 import PageNavigation from 'components/common/PageNavigation';
-import Routes from 'routing/Routes';
 import { Row } from 'components/bootstrap';
-
-const NAV_ITEMS = [
-  { description: 'Manage pipelines', path: Routes.SYSTEM.PIPELINES.OVERVIEW, exactPathMatch: true },
-  { description: 'Manage rules', path: Routes.SYSTEM.PIPELINES.RULES },
-  { description: 'Simulator', path: Routes.SYSTEM.PIPELINES.SIMULATOR },
-];
+import { PAGE_NAV_TITLE } from 'components/pipelines/bindings';
 
 const EventsPageNavigation = () => (
   <Row>
-    <PageNavigation items={NAV_ITEMS} />
+    <PageNavigation page={PAGE_NAV_TITLE} />
   </Row>
 );
 

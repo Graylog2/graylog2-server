@@ -17,9 +17,10 @@
 import React from 'react';
 import * as Immutable from 'immutable';
 import type { Matcher } from 'wrappedTestingLibrary';
-import { render, within, screen, waitFor, fireEvent } from 'wrappedTestingLibrary';
+import { render, within, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
+import { act } from 'wrappedTestingLibrary/hooks';
 
 import selectEvent from 'helpers/selectEvent';
 import Direction from 'views/logic/aggregationbuilder/Direction';
@@ -34,6 +35,7 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { SimpleFieldTypesContextProvider } from 'views/components/contexts/TestFieldTypesContextProvider';
+import useSortableItemRectsMock from 'components/common/SortableList/tests/useSortableItemRectsMock';
 
 import AggregationWizard from '../AggregationWizard';
 
@@ -243,35 +245,48 @@ describe('AggregationWizard', () => {
     extendedTimeout,
   );
 
-  it(
-    'should correctly update sort of sort elements',
-    async () => {
-      const sort1 = new SortConfig('pivot', 'http_method', Direction.Ascending);
-      const sort2 = new SortConfig('pivot', 'took_ms', Direction.Descending);
+  describe('test reordering', () => {
+    useSortableItemRectsMock();
 
-      const config = widgetConfig.toBuilder().rowPivots([pivot0, pivot1]).sort([sort1, sort2]).build();
+    it(
+      'should correctly update sort of sort elements',
+      async () => {
+        const sort1 = new SortConfig('pivot', 'http_method', Direction.Ascending);
+        const sort2 = new SortConfig('pivot', 'took_ms', Direction.Descending);
 
-      const onChange = jest.fn();
-      renderSUT({ onChange, config });
+        const config = widgetConfig.toBuilder().rowPivots([pivot0, pivot1]).sort([sort1, sort2]).build();
 
-      const sortSection = await screen.findByTestId('Sort-section');
+        const onChange = jest.fn();
+        renderSUT({ onChange, config });
 
-      const firstItem = within(sortSection).getByTestId('sort-0-drag-handle');
-      fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
-      await screen.findByText(/You have lifted an item/i);
-      fireEvent.keyDown(firstItem, { key: 'ArrowDown', keyCode: 40 });
-      await screen.findByText(/You have moved the item/i);
-      fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
-      await screen.findByText(/You have dropped the item/i);
+        const sortSection = await screen.findByTestId('Sort-section');
 
-      await submitWidgetConfigForm();
+        const [firstItemDragHandle] = within(sortSection).getAllByRole('button', {
+          name: /Drag or press space to reorder/i,
+        });
+        await firstItemDragHandle.focus();
 
-      const updatedConfig = config.toBuilder().sort([sort2, sort1]).build();
+        await act(async () => {
+          await userEvent.keyboard('[Space]');
+        });
 
-      await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
+        userEvent.keyboard('{ArrowDown}');
 
-      expect(onChange).toHaveBeenCalledWith(updatedConfig);
-    },
-    extendedTimeout,
-  );
+        await screen.findByText(/was moved over droppable area/i);
+
+        await act(async () => {
+          await userEvent.keyboard('[Space]');
+        });
+
+        await submitWidgetConfigForm();
+
+        const updatedConfig = config.toBuilder().sort([sort2, sort1]).build();
+
+        await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
+
+        expect(onChange).toHaveBeenCalledWith(updatedConfig);
+      },
+      extendedTimeout,
+    );
+  });
 });

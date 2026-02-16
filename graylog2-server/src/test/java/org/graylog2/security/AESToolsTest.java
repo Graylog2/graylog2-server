@@ -18,8 +18,8 @@ package org.graylog2.security;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.security.SecureRandom;
 
@@ -35,7 +35,7 @@ public class AESToolsTest {
         new SecureRandom().nextBytes(iv);
         final String encrypt = AESTools.encrypt("I am secret", "1234567890123456", Hex.encodeHexString(iv));
         final String decrypt = AESTools.decrypt(encrypt, "1234567890123456", Hex.encodeHexString(iv));
-        Assert.assertEquals("I am secret", decrypt);
+        Assertions.assertEquals("I am secret", decrypt);
     }
 
     @Test
@@ -48,7 +48,7 @@ public class AESToolsTest {
         final String salt = "53569ac046df1097";
 
         final String decrypt = AESTools.decrypt(cipherText, "1234567890123456", salt);
-        Assert.assertEquals("I am secret", decrypt);
+        Assertions.assertEquals("I am secret", decrypt);
     }
     @Test
     public void testDecryptStaticISO10126PaddedLongCipherText() {
@@ -60,7 +60,7 @@ public class AESToolsTest {
         final String salt = "17c4bd3761b530f7";
 
         final String decrypt = AESTools.decrypt(cipherText, "1234567890123456", salt);
-        Assert.assertEquals("I am a very very very long secret", decrypt);
+        Assertions.assertEquals("I am a very very very long secret", decrypt);
     }
 
     @Test
@@ -73,7 +73,7 @@ public class AESToolsTest {
         final String salt = "612ac41505dc0120";
 
         final String decrypt = AESTools.decrypt(cipherText, "1234567890123456", salt);
-        Assert.assertEquals("I am secret", decrypt);
+        Assertions.assertEquals("I am secret", decrypt);
     }
 
     @Test
@@ -82,7 +82,7 @@ public class AESToolsTest {
         new SecureRandom().nextBytes(iv);
         final String encrypt = AESTools.encrypt("I am secret", "1234567890123456789012345678901234567", Hex.encodeHexString(iv));
         final String decrypt = AESTools.decrypt(encrypt, "1234567890123456789012345678901234567", Hex.encodeHexString(iv));
-        Assert.assertEquals("I am secret", decrypt);
+        Assertions.assertEquals("I am secret", decrypt);
     }
 
     @Test
@@ -91,7 +91,7 @@ public class AESToolsTest {
         new SecureRandom().nextBytes(iv);
         final String encrypt = AESTools.encrypt("I am secret", "123456789012345678", Hex.encodeHexString(iv));
         final String decrypt = AESTools.decrypt(encrypt, "123456789012345678", Hex.encodeHexString(iv));
-        Assert.assertEquals("I am secret", decrypt);
+        Assertions.assertEquals("I am secret", decrypt);
     }
 
     @Test
@@ -100,7 +100,7 @@ public class AESToolsTest {
         new SecureRandom().nextBytes(iv);
         final String encrypt = AESTools.encrypt("I am secret", "123456789012345\u00E4", Hex.encodeHexString(iv));
         final String decrypt = AESTools.decrypt(encrypt, "123456789012345\u00E4", Hex.encodeHexString(iv));
-        Assert.assertEquals("I am secret", decrypt);
+        Assertions.assertEquals("I am secret", decrypt);
     }
 
     @Test

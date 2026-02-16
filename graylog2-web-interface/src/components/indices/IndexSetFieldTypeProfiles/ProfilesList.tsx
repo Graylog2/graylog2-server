@@ -33,6 +33,7 @@ export const DEFAULT_LAYOUT = {
   defaultPageSize: 20,
   defaultSort: { attributeId: 'name', direction: 'asc' } as Sort,
   defaultDisplayedAttributes: ['name', 'description', 'custom_field_mappings', 'index_set_ids'],
+  defaultColumnOrder: ['name', 'description', 'custom_field_mappings', 'index_set_ids'],
 };
 
 const expandedSections = {
@@ -44,8 +45,6 @@ const expandedSections = {
   },
 };
 
-const COLUMNS_ORDER = ['name', 'description', 'custom_field_mappings', 'index_set_ids'];
-
 const ProfilesList = () => {
   const { indexSets } = useStore(IndexSetsStore);
   const normalizedIndexSetsTitles = useMemo(() => mapValues(keyBy(indexSets, 'id'), 'title'), [indexSets]);
@@ -54,13 +53,12 @@ const ProfilesList = () => {
   return (
     <PaginatedEntityTable<IndexSetFieldTypeProfile>
       humanName="index set profiles"
-      columnsOrder={COLUMNS_ORDER}
       entityActions={profileActions}
       tableLayout={DEFAULT_LAYOUT}
       fetchEntities={fetchIndexSetFieldTypeProfiles}
       keyFn={keyFn}
       entityAttributesAreCamelCase
-      expandedSectionsRenderer={expandedSections}
+      expandedSectionRenderers={expandedSections}
       columnRenderers={customColumnRenderers}
       searchPlaceholder="Search for profile name"
     />

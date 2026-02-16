@@ -27,7 +27,7 @@ type Props = {
 
 const EditLinkButton = ({ authenticationBackendId, stepKey }: Props) => (
   <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authenticationBackendId, stepKey)}>
-    <Button bsStyle="success" bsSize="small">
+    <Button bsStyle="primary" bsSize="small">
       Edit
     </Button>
   </LinkContainer>

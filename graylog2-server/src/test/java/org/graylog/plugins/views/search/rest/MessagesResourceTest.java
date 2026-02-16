@@ -34,12 +34,15 @@ import org.graylog.plugins.views.search.validation.QueryValidationService;
 import org.graylog.plugins.views.search.validation.QueryValidationServiceImpl;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
@@ -75,7 +78,17 @@ public class MessagesResourceTest {
         executionGuard = mock(SearchExecutionGuard.class);
         SearchDomain searchDomain = mock(SearchDomain.class);
 
-        final MappedFieldTypesService mappedFieldTypesService = (streamIds, timeRange) -> Collections.emptySet();
+        final MappedFieldTypesService mappedFieldTypesService = new MappedFieldTypesService() {
+            @Override
+            public Set<MappedFieldTypeDTO> fieldTypesByStreamIds(Collection<String> streamIds, TimeRange timeRange) {
+                return Set.of();
+            }
+
+            @Override
+            public Set<MappedFieldTypeDTO> singleFieldTypeByStreamIds(Collection<String> streams, TimeRange timerange, String field) {
+                return Set.of();
+            }
+        };
         final QueryValidationServiceImpl validationService = new QueryValidationServiceImpl(
                 new LuceneQueryParser(false),
                 mappedFieldTypesService,

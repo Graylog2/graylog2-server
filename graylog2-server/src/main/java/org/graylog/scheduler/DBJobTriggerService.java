@@ -85,7 +85,7 @@ public class DBJobTriggerService {
     public static final String COLLECTION_NAME = "scheduler_triggers";
     private static final String FIELD_ID = "_id";
     static final String FIELD_JOB_DEFINITION_ID = JobTriggerDto.FIELD_JOB_DEFINITION_ID;
-    private static final String FIELD_LOCK_OWNER = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_OWNER;
+    public static final String FIELD_LOCK_OWNER = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_OWNER;
     private static final String FIELD_LAST_LOCK_OWNER = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_LAST_OWNER;
     private static final String FIELD_PROGRESS = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_PROGRESS;
     private static final String FIELD_LAST_LOCK_TIME = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_LAST_LOCK_TIME;
@@ -94,14 +94,14 @@ public class DBJobTriggerService {
     private static final String FIELD_END_TIME = JobTriggerDto.FIELD_END_TIME;
     private static final String FIELD_STATUS = JobTriggerDto.FIELD_STATUS;
     private static final String FIELD_SCHEDULE = JobTriggerDto.FIELD_SCHEDULE;
-    private static final String FIELD_DATA = JobTriggerDto.FIELD_DATA;
+    public static final String FIELD_DATA = JobTriggerDto.FIELD_DATA;
     private static final String FIELD_UPDATED_AT = JobTriggerDto.FIELD_UPDATED_AT;
     private static final String FIELD_CONCURRENCY_RESCHEDULE_COUNT = JobTriggerDto.FIELD_CONCURRENCY_RESCHEDULE_COUNT;
     private static final String FIELD_TRIGGERED_AT = JobTriggerDto.FIELD_TRIGGERED_AT;
     private static final String FIELD_CONSTRAINTS = JobTriggerDto.FIELD_CONSTRAINTS;
     private static final String FIELD_LAST_EXECUTION_DURATION = JobTriggerDto.FIELD_EXECUTION_DURATION;
     private static final String FIELD_IS_CANCELLED = JobTriggerDto.FIELD_IS_CANCELLED;
-    private static final String FIELD_JOB_DEFINITION_TYPE = JobTriggerDto.FIELD_JOB_DEFINITION_TYPE;
+    public static final String FIELD_JOB_DEFINITION_TYPE = JobTriggerDto.FIELD_JOB_DEFINITION_TYPE;
 
     private final String nodeId;
     private final JobSchedulerClock clock;
@@ -110,17 +110,32 @@ public class DBJobTriggerService {
     private final MongoCollection<JobTriggerDto> collection;
     private final MongoUtils<JobTriggerDto> mongoUtils;
 
+    /**
+     * Creates a new job trigger service for user job triggers. Use {@link DBSystemJobTriggerService} for system job triggers.
+     */
     @Inject
     public DBJobTriggerService(MongoCollections mongoCollections,
                                NodeId nodeId,
                                JobSchedulerClock clock,
                                SchedulerCapabilitiesService schedulerCapabilitiesService,
                                @Named(LOCK_EXPIRATION_DURATION) Duration lockExpirationDuration) {
+        this(mongoCollections, COLLECTION_NAME, nodeId, clock, schedulerCapabilitiesService, lockExpirationDuration);
+    }
+
+    /**
+     * Should only be used by subclasses.
+     */
+    protected DBJobTriggerService(MongoCollections mongoCollections,
+                                  String collectionName,
+                                  NodeId nodeId,
+                                  JobSchedulerClock clock,
+                                  SchedulerCapabilitiesService schedulerCapabilitiesService,
+                                  Duration lockExpirationDuration) {
         this.nodeId = nodeId.getNodeId();
         this.clock = clock;
         this.schedulerCapabilitiesService = schedulerCapabilitiesService;
         this.lockExpirationDuration = lockExpirationDuration;
-        this.collection = mongoCollections.collection(COLLECTION_NAME, JobTriggerDto.class);
+        this.collection = mongoCollections.collection(collectionName, JobTriggerDto.class);
         this.mongoUtils = mongoCollections.utils(collection);
 
         collection.createIndex(Indexes.ascending(FIELD_JOB_DEFINITION_ID));
@@ -131,6 +146,8 @@ public class DBJobTriggerService {
         collection.createIndex(Indexes.ascending(FIELD_NEXT_TIME));
         collection.createIndex(Indexes.ascending(FIELD_CONSTRAINTS));
         collection.createIndex(Indexes.ascending(FIELD_JOB_DEFINITION_TYPE));
+        collection.createIndex(Indexes.ascending(FIELD_UPDATED_AT));
+        collection.createIndex(Indexes.ascending(FIELD_SCHEDULE + "." + JobSchedule.TYPE_FIELD));
     }
 
     @SuppressWarnings("unused")
@@ -327,7 +344,8 @@ public class DBJobTriggerService {
                 eq(FIELD_LOCK_OWNER, null),
                 or(
                         eq(FIELD_STATUS, JobTriggerStatus.COMPLETE),
-                        eq(FIELD_STATUS, JobTriggerStatus.CANCELLED)
+                        eq(FIELD_STATUS, JobTriggerStatus.CANCELLED),
+                        eq(FIELD_STATUS, JobTriggerStatus.ERROR)
                 ),
                 eq(FIELD_SCHEDULE + "." + JobSchedule.TYPE_FIELD, OnceJobSchedule.TYPE_NAME),
                 lt(FIELD_UPDATED_AT, clock.nowUTC().minus(unit.toMillis(timeValue)))

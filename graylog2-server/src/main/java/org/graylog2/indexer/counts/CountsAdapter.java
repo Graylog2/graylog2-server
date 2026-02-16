@@ -16,8 +16,17 @@
  */
 package org.graylog2.indexer.counts;
 
+import org.graylog2.indexer.results.CountResult;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+
 import java.util.List;
+import java.util.Set;
 
 public interface CountsAdapter {
     long totalCount(List<String> indices);
+
+    CountResult count(Set<String> affectedIndices,
+                      String query,
+                      TimeRange range,
+                      String filter);
 }

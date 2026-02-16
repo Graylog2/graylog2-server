@@ -1,0 +1,5 @@
+type = "a"
+message = "Create metrics supplier for MongoDB."
+
+pulls = ["24091"]
+issues = ["Graylog2/graylog-plugin-enterprise#12206"]

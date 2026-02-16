@@ -97,7 +97,7 @@ const SettingsSection = ({
               )}
             </IfPermitted>
             <TimezoneFormGroup />
-            <IfPermitted permissions="user:edit">
+            <IfPermitted permissions="users:edit">
               <ServiceAccountFormGroup />
             </IfPermitted>
             <StartpageFormGroup userId={id} permissions={permissions} />
@@ -105,7 +105,7 @@ const SettingsSection = ({
             <Row className="no-bm">
               <Col xs={12}>
                 <div className="pull-right">
-                  <Button bsStyle="success" disabled={isSubmitting || !isValid} title="Update Settings" type="submit">
+                  <Button bsStyle="primary" disabled={isSubmitting || !isValid} title="Update Settings" type="submit">
                     Update Settings
                   </Button>
                 </div>

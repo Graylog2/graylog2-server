@@ -28,20 +28,21 @@ import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.time.ZonedDateTime;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -50,11 +51,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class V20161122174500_AssignIndexSetsToStreamsMigrationTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private IndexSetService indexSetService;
@@ -65,7 +64,7 @@ public class V20161122174500_AssignIndexSetsToStreamsMigrationTest {
 
     private Migration migration;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         migration = new V20161122174500_AssignIndexSetsToStreamsMigration(streamService, indexSetService, clusterConfigService);
     }
@@ -144,21 +143,21 @@ public class V20161122174500_AssignIndexSetsToStreamsMigrationTest {
     }
 
     @Test
-    public void upgradeWithoutAnyIndexSetConfig() throws Exception {
+    public void upgradeWithoutAnyIndexSetConfig() {
         when(indexSetService.findAll()).thenReturn(Collections.emptyList());
 
-        expectedException.expect(IllegalStateException.class);
+        assertThrows(IllegalStateException.class, () ->
 
-        migration.upgrade();
+            migration.upgrade());
     }
 
     @Test
-    public void upgradeWithMoreThanOneIndexSetConfig() throws Exception {
+    public void upgradeWithMoreThanOneIndexSetConfig() {
         when(indexSetService.findAll()).thenReturn(Lists.newArrayList(mock(IndexSetConfig.class), mock(IndexSetConfig.class)));
 
-        expectedException.expect(IllegalStateException.class);
+        assertThrows(IllegalStateException.class, () ->
 
-        migration.upgrade();
+            migration.upgrade());
     }
 
     @Test

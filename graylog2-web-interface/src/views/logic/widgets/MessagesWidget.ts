@@ -37,8 +37,22 @@ export default class MessagesWidget extends Widget {
     streams: Array<string>,
     streamCategories: Array<string>,
     filters?: FiltersType,
+    description?: string,
+    context?: string,
   ) {
-    super(id, MessagesWidget.type, config, filter, timerange, query, streams, streamCategories, filters);
+    super(
+      id,
+      MessagesWidget.type,
+      config,
+      filter,
+      timerange,
+      query,
+      streams,
+      streamCategories,
+      filters,
+      description,
+      context,
+    );
   }
 
   static type = 'messages';
@@ -51,7 +65,7 @@ export default class MessagesWidget extends Widget {
   }
 
   static fromJSON(value: WidgetState) {
-    const { id, config, filter, timerange, query, streams, stream_categories, filters } = value;
+    const { id, config, filter, timerange, query, streams, stream_categories, filters, description, context } = value;
 
     return new MessagesWidget(
       id,
@@ -62,6 +76,8 @@ export default class MessagesWidget extends Widget {
       streams,
       stream_categories,
       filters,
+      description,
+      context,
     );
   }
 
@@ -86,10 +102,13 @@ export default class MessagesWidget extends Widget {
   }
 
   toBuilder() {
-    const { id, config, filter, timerange, query, streams, stream_categories, filters } = this._value;
+    const { id, config, filter, timerange, query, streams, stream_categories, filters, description, context } =
+      this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Map({ id, config, filter, timerange, query, streams, stream_categories, filters }));
+    return new Builder(
+      Map({ id, config, filter, timerange, query, streams, stream_categories, filters, description, context }),
+    );
   }
 
   static builder() {
@@ -104,8 +123,20 @@ export default class MessagesWidget extends Widget {
 
 class Builder extends Widget.Builder {
   build() {
-    const { id, config, filter, timerange, query, streams, stream_categories, filters } = this.value.toObject();
+    const { id, config, filter, timerange, query, streams, stream_categories, filters, description, context } =
+      this.value.toObject();
 
-    return new MessagesWidget(id, config, filter, timerange, query, streams, stream_categories, filters);
+    return new MessagesWidget(
+      id,
+      config,
+      filter,
+      timerange,
+      query,
+      streams,
+      stream_categories,
+      filters,
+      description,
+      context,
+    );
   }
 }

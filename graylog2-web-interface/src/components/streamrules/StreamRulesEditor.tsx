@@ -115,7 +115,7 @@ const StreamRulesEditor = ({ streamId, messageId = '', index = '' }: Props) => {
         <hr />
 
         <div className="buttons pull-right">
-          <Button bsStyle="success" className="show-stream-rule" onClick={_onAddStreamRule}>
+          <Button bsStyle="primary" className="show-stream-rule" onClick={_onAddStreamRule}>
             Add stream rule
           </Button>
           {showStreamRuleForm && (
@@ -158,7 +158,7 @@ const StreamRulesEditor = ({ streamId, messageId = '', index = '' }: Props) => {
 
         <p>
           <LinkContainer to={Routes.STREAMS}>
-            <Button bsStyle="success">I&apos;m done!</Button>
+            <Button bsStyle="primary">I&apos;m done!</Button>
           </LinkContainer>
         </p>
       </Col>

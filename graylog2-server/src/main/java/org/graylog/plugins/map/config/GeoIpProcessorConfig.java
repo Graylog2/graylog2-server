@@ -17,6 +17,8 @@
 package org.graylog.plugins.map.config;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.documentation.Documentation;
+import com.github.joschi.jadconfig.documentation.DocumentationSection;
 import com.github.joschi.jadconfig.validators.PathReadableValidator;
 import jakarta.inject.Singleton;
 import org.graylog2.bindings.NamedBindingOverride;
@@ -26,12 +28,14 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 @SuppressWarnings({"unused", "FieldMayBeFinal"})
+@DocumentationSection(heading = "GeoIP processor configuration", description = "")
 @Singleton
 public class GeoIpProcessorConfig extends PathConfiguration {
     private static final String PREFIX = "geo_ip_processor";
     public static final String S3_DOWNLOAD_LOCATION = PREFIX + "_s3_download_location";
     public static final String DISABLE_IPINFO_DB_TYPE_CHECK = PREFIX + "_disable_ipinfo_db_type_check";
 
+    @Documentation(value = "tbd")
     @Parameter(value = S3_DOWNLOAD_LOCATION, validators = PathReadableValidator.class)
     private Path s3DownloadLocation;
 
@@ -40,6 +44,7 @@ public class GeoIpProcessorConfig extends PathConfiguration {
         return Optional.ofNullable(s3DownloadLocation).orElse(getDataDir().resolve("geolocation"));
     }
 
+    @Documentation(value = "tbd")
     @Parameter(value = DISABLE_IPINFO_DB_TYPE_CHECK)
     private boolean disableIpInfoDBTypeCheck = false;
 }

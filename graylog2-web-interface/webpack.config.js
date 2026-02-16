@@ -39,6 +39,7 @@ const webpackConfig = merge(coreConfig, {
   dependencies: ['vendor'],
   entry: {
     app: APP_PATH,
+    preload: [path.resolve(APP_PATH, 'preload.ts')],
     polyfill: [path.resolve(APP_PATH, 'polyfill.js')],
   },
   module: {

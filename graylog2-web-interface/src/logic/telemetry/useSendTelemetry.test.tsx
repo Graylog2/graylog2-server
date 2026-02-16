@@ -22,6 +22,7 @@ import TelemetryContext from 'logic/telemetry/TelemetryContext';
 import useSendTelemetry from './useSendTelemetry';
 
 jest.mock('util/AppConfig');
+jest.mock('routing/useLocation', () => () => ({ pathname: '/foo' }));
 
 const contextValue = {
   sendTelemetry: jest.fn(),
@@ -48,6 +49,7 @@ describe('useSendTelemetry', () => {
 
     expect(contextValue.sendTelemetry).toHaveBeenCalledWith('$pageview', {
       app_path_pattern: undefined,
+      app_pathname: 'foo',
       app_section: 'welcome section',
     });
   });

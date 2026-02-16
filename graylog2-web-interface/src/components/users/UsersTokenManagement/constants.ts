@@ -33,17 +33,17 @@ export const DEFAULT_LAYOUT = {
     'external_user',
     'title',
   ],
+  defaultColumnOrder: [
+    'id',
+    'username',
+    'user_id',
+    'NAME',
+    'created_at',
+    'last_access',
+    'expires_at',
+    'external_user',
+    'title',
+  ],
 };
-export const COLUMNS_ORDER = [
-  'id',
-  'username',
-  'user_id',
-  'NAME',
-  'created_at',
-  'last_access',
-  'expires_at',
-  'external_user',
-  'title',
-];
 
 export const ADDITIONAL_ATTRIBUTES = [];

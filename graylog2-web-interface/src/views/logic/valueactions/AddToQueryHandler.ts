@@ -14,12 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import uniq from 'lodash/uniq';
+
 import type FieldType from 'views/logic/fieldtypes/FieldType';
+import recordQueryStringUsage from 'views/logic/queries/recordQueryStringUsage';
 import { escape, addToQuery, formatTimestamp, predicate } from 'views/logic/queries/QueryHelper';
 import { updateQueryString } from 'views/logic/slices/viewSlice';
 import { selectQueryString } from 'views/logic/slices/viewSelectors';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
-import type { RootState } from 'views/types';
+import type { RootState, ActionContexts } from 'views/types';
+import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
+import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
 
 const formatNewQuery = (oldQuery: string, field: string, value: string | number, type: FieldType) => {
   const predicateValue = type.type === 'date' ? formatTimestamp(value) : escape(value);
@@ -32,13 +37,30 @@ type Arguments = {
   field: string;
   value?: string | number;
   type: FieldType;
+  contexts?: ActionContexts;
 };
 
 const AddToQueryHandler =
-  ({ queryId, field, value = '', type }: Arguments) =>
+  ({ queryId, field, value = '', type, contexts }: Arguments) =>
   async (dispatch: ViewsDispatch, getState: () => RootState) => {
     const oldQuery = selectQueryString(queryId)(getState());
-    const newQuery = formatNewQuery(oldQuery, field, value, type);
+    const valuesToAdd = uniq(
+      hasMultipleValueForActions(contexts)
+        ? contexts.valuePath.map((path) => {
+            const [pathField, pathValue] = Object.entries(path)[0];
+
+            return { field: pathField, value: pathValue, type: fieldTypeFor(field, contexts?.fieldTypes) };
+          })
+        : [{ field, value, type }],
+    );
+
+    const newQuery = valuesToAdd.reduce(
+      (prev, valueToAdd) =>
+        formatNewQuery(prev, valueToAdd.field, valueToAdd.value as string | number, valueToAdd.type),
+      oldQuery,
+    );
+
+    await recordQueryStringUsage(newQuery, oldQuery);
 
     return dispatch(updateQueryString(queryId, newQuery));
   };

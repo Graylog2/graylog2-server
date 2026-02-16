@@ -17,23 +17,13 @@
 import * as React from 'react';
 
 import PageNavigation from 'components/common/PageNavigation';
-import usePluginEntities from 'hooks/usePluginEntities';
 import { Row } from 'components/bootstrap';
-import { ALERTS_TITLE } from 'components/events/bindings';
+import { PAGE_NAVIGATION_TITLE } from 'components/events/bindings';
 
-const EventsPageNavigation = () => {
-  const navigationItems = usePluginEntities('alerts.pageNavigation');
-
-  const formattedNavigationItems = navigationItems.map((item) => ({
-    ...item,
-    exactPathMatch: item.description === ALERTS_TITLE,
-  }));
-
-  return (
-    <Row>
-      <PageNavigation items={formattedNavigationItems} />
-    </Row>
-  );
-};
+const EventsPageNavigation = () => (
+  <Row>
+    <PageNavigation page={PAGE_NAVIGATION_TITLE} />
+  </Row>
+);
 
 export default EventsPageNavigation;

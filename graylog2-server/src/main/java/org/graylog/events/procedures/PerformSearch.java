@@ -119,6 +119,21 @@ public class PerformSearch extends Action {
             return uriBuilder.build().getLinkPath();
         }
 
+        @JsonIgnore
+        @Override
+        public String validate() {
+            if (Boolean.TRUE.equals(useSavedSearch())) {
+                if (savedSearch() == null || savedSearch().isEmpty()) {
+                    return "Saved search cannot be empty";
+                }
+            } else {
+                if (query() == null || query().isEmpty()) {
+                    return "Search query cannot be empty";
+                }
+            }
+            return null;
+        }
+
         @AutoValue.Builder
         public abstract static class Builder {
             @JsonProperty(TYPE_FIELD)

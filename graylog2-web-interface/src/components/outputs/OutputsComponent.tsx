@@ -17,15 +17,14 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import type * as Immutable from 'immutable';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import { Row, Col } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 import Spinner from 'components/common/Spinner';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { OutputsStore } from 'stores/outputs/OutputsStore';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { isPermitted } from 'util/PermissionsMixin';
 import useAvailableOutputTypes from 'components/streams/useAvailableOutputTypes';
@@ -36,11 +35,10 @@ import AssignOutputDropdown from './AssignOutputDropdown';
 
 type Props = {
   streamId?: string;
-  permissions: Immutable.List<string>;
+  permissions: Immutable.List<Permission>;
 };
 
 const OutputsComponent = ({ streamId = undefined, permissions }: Props) => {
-  const location = useLocation();
   const sendTelemetry = useSendTelemetry();
   const { data: types } = useAvailableOutputTypes();
   const [outputs, setOutputs] = useState();
@@ -84,7 +82,6 @@ const OutputsComponent = ({ streamId = undefined, permissions }: Props) => {
 
   const _handleCreateOutput = (data) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_CREATED, {
-      app_pathname: getPathnameWithoutId(location.pathname),
       app_action_value: 'create-output',
     });
 
@@ -105,7 +102,6 @@ const OutputsComponent = ({ streamId = undefined, permissions }: Props) => {
 
   const _handleAssignOutput = (outputId) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_ASSIGNED, {
-      app_pathname: getPathnameWithoutId(location.pathname),
       app_action_value: 'assign-output',
     });
 
@@ -118,7 +114,6 @@ const OutputsComponent = ({ streamId = undefined, permissions }: Props) => {
 
   const _removeOutputGlobally = (outputId) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_GLOBALLY_REMOVED, {
-      app_pathname: getPathnameWithoutId(location.pathname),
       app_action_value: 'globally-remove-output',
     });
 
@@ -135,7 +130,6 @@ const OutputsComponent = ({ streamId = undefined, permissions }: Props) => {
 
   const _removeOutputFromStream = (outputId: string, _streamId: string) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_FROM_STREAM_REMOVED, {
-      app_pathname: getPathnameWithoutId(location.pathname),
       app_action_value: 'remove-output-from-stream',
     });
 
@@ -152,7 +146,6 @@ const OutputsComponent = ({ streamId = undefined, permissions }: Props) => {
 
   const _handleOutputUpdate = (output, deltas) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_UPDATED, {
-      app_pathname: getPathnameWithoutId(location.pathname),
       app_action_value: 'output-update',
     });
 

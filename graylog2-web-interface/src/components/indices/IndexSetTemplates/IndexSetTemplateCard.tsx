@@ -59,7 +59,7 @@ const Description = styled.p`
 `;
 
 const IndexSetTemplateCard = ({ template, handleCardClick, isSelected }: Props) => {
-  const dataTieringConfig = prepareDataTieringInitialValues(template.index_set_config.data_tiering, PluginStore);
+  const dataTieringConfig = prepareDataTieringInitialValues(template.index_set_config.data_tiering, PluginStore, false);
 
   return (
     <StyledCard $selected={isSelected} $disabled={!template.enabled}>

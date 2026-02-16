@@ -16,170 +16,214 @@
  */
 package org.graylog2.inputs;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import com.mongodb.BasicDBList;
-import com.mongodb.DBObject;
-import org.apache.commons.lang3.EnumUtils;
-import org.bson.types.ObjectId;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.graylog2.database.DbEntity;
-import org.graylog2.database.PersistedImpl;
-import org.graylog2.database.validators.DateValidator;
-import org.graylog2.database.validators.FilledStringValidator;
-import org.graylog2.database.validators.MapValidator;
-import org.graylog2.database.validators.OptionalStringValidator;
+import org.graylog2.database.MongoEntity;
 import org.graylog2.plugin.IOState;
-import org.graylog2.plugin.database.validators.Validator;
-import org.graylog2.plugin.inputs.Extractor;
-import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import org.mongojack.Id;
+import org.mongojack.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
+import javax.annotation.Nullable;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
-import static com.google.common.base.Strings.emptyToNull;
-import static org.graylog2.shared.security.RestPermissions.INPUTS_READ;
-
-@DbEntity(collection = "inputs",
-          readPermission = INPUTS_READ)
-public class InputImpl extends PersistedImpl implements Input {
+@AutoValue
+@JsonDeserialize(builder = InputImpl.Builder.class)
+@DbEntity(collection = InputServiceImpl.COLLECTION_NAME, readPermission = RestPermissions.INPUTS_READ)
+public abstract class InputImpl implements Input, MongoEntity {
     private static final Logger LOG = LoggerFactory.getLogger(InputImpl.class);
 
     public static final String FIELD_ID = "_id";
-    public static final String FIELD_STATIC_FIELD_KEY = "key";
-    public static final String FIELD_STATIC_FIELD_VALUE = "value";
-
+    public static final String FIELD_TYPE = "type";
+    public static final String FIELD_NODE_ID = "node_id";
+    public static final String FIELD_NAME = "name";
+    public static final String FIELD_TITLE = "title";
+    public static final String FIELD_CONFIGURATION = "configuration";
+    public static final String FIELD_CREATOR_USER_ID = "creator_user_id";
+    public static final String FIELD_CREATED_AT = "created_at";
+    public static final String FIELD_GLOBAL = "global";
     public static final String EMBEDDED_EXTRACTORS = "extractors";
     public static final String EMBEDDED_STATIC_FIELDS = "static_fields";
+    public static final String FIELD_STATIC_FIELD_KEY = "key";
+    public static final String FIELD_STATIC_FIELD_VALUE = "value";
+    public static final String FIELD_DESIRED_STATE = "desired_state";
+    public static final String FIELD_CONTENT_PACK = "content_pack";
 
-    public InputImpl(final Map<String, Object> fields) {
-        super(fields);
-    }
-
-    public InputImpl(final ObjectId id, final Map<String, Object> fields) {
-        super(id, fields);
-    }
-
-    @Override
-    public Map<String, Validator> getValidations() {
-        final ImmutableMap.Builder<String, Validator> validations = ImmutableMap.builder();
-        //validations.put(MessageInput.FIELD_INPUT_ID, new FilledStringValidator());
-        validations.put(MessageInput.FIELD_TITLE, new FilledStringValidator());
-        validations.put(MessageInput.FIELD_TYPE, new FilledStringValidator());
-        validations.put(MessageInput.FIELD_CONFIGURATION, new MapValidator());
-        validations.put(MessageInput.FIELD_CREATOR_USER_ID, new FilledStringValidator());
-        validations.put(MessageInput.FIELD_CREATED_AT, new DateValidator());
-        validations.put(MessageInput.FIELD_CONTENT_PACK, new OptionalStringValidator());
-
-        return validations.build();
-    }
+    @Id
+    @ObjectId
+    @JsonProperty(FIELD_ID)
+    @Nullable
+    public abstract String getId();
 
     @Override
-    public Map<String, Validator> getEmbeddedValidations(String key) {
-        if (EMBEDDED_EXTRACTORS.equals(key)) {
-            final ImmutableMap.Builder<String, Validator> validations = ImmutableMap.builder();
-            validations.put(Extractor.FIELD_ID, new FilledStringValidator());
-            validations.put(Extractor.FIELD_TITLE, new FilledStringValidator());
-            validations.put(Extractor.FIELD_TYPE, new FilledStringValidator());
-            validations.put(Extractor.FIELD_CURSOR_STRATEGY, new FilledStringValidator());
-            validations.put(Extractor.FIELD_TARGET_FIELD, new OptionalStringValidator());
-            validations.put(Extractor.FIELD_SOURCE_FIELD, new FilledStringValidator());
-            validations.put(Extractor.FIELD_CREATOR_USER_ID, new FilledStringValidator());
-            validations.put(Extractor.FIELD_EXTRACTOR_CONFIG, new MapValidator());
-            return validations.build();
-        }
-
-        if (EMBEDDED_STATIC_FIELDS.equals(key)) {
-            return ImmutableMap.of(
-                    FIELD_STATIC_FIELD_KEY, new FilledStringValidator(),
-                    FIELD_STATIC_FIELD_VALUE, new FilledStringValidator());
-        }
-
-        return Collections.emptyMap();
+    public String id() {
+        return getId();
     }
 
-    @Override
-    public String getTitle() {
-        return (String) fields.get(MessageInput.FIELD_TITLE);
-    }
+    @NotBlank
+    @JsonProperty(FIELD_TITLE)
+    public abstract String getTitle();
 
-    @Override
-    public DateTime getCreatedAt() {
-        return new DateTime(fields.get(MessageInput.FIELD_CREATED_AT), DateTimeZone.UTC);
-    }
+    @NotNull
+    @JsonProperty(FIELD_CREATED_AT)
+    public abstract DateTime getCreatedAt();
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public Map<String, Object> getConfiguration() {
-        return (Map<String, Object>) fields.get(MessageInput.FIELD_CONFIGURATION);
-    }
+    @NotNull
+    @JsonProperty(FIELD_CONFIGURATION)
+    public abstract Map<String, Object> getConfiguration();
 
-    @Override
+    @JsonProperty(EMBEDDED_STATIC_FIELDS)
+    public abstract List<Map<String, String>> getEmbeddedStaticFields();
+
     public Map<String, String> getStaticFields() {
-        if (fields.get(EMBEDDED_STATIC_FIELDS) == null) {
-            return Collections.emptyMap();
+        final List<Map<String, String>> embeddedStaticFields = getEmbeddedStaticFields();
+        if (embeddedStaticFields == null || embeddedStaticFields.isEmpty()) {
+            return Map.of();
         }
 
-        final BasicDBList list = (BasicDBList) fields.get(EMBEDDED_STATIC_FIELDS);
-        final Map<String, String> staticFields = Maps.newHashMapWithExpectedSize(list.size());
-        for (final Object element : list) {
-            try {
-                final DBObject field = (DBObject) element;
-                staticFields.put((String) field.get(FIELD_STATIC_FIELD_KEY), (String) field.get(FIELD_STATIC_FIELD_VALUE));
-            } catch (Exception e) {
-                LOG.error("Cannot build static field from persisted data. Skipping.", e);
+        final Map<String, String> result = new LinkedHashMap<>(embeddedStaticFields.size());
+
+        for (Map<String, String> map : embeddedStaticFields) {
+            final String key = map.get(FIELD_STATIC_FIELD_KEY);
+            final String value = map.get(FIELD_STATIC_FIELD_VALUE);
+
+            if (key != null && value != null) {
+                if (result.put(key, value) != null) {
+                    LOG.warn("Duplicate static field key '{}' found in input [{}], keeping last value", key, getId());
+                }
             }
         }
 
-        return staticFields;
+        return result;
     }
 
-    @Override
-    public String getType() {
-        return (String) fields.get(MessageInput.FIELD_TYPE);
-    }
+    @NotNull
+    @JsonProperty(FIELD_TYPE)
+    public abstract String getType();
 
-    @Override
-    public String getCreatorUserId() {
-        return (String) fields.get(MessageInput.FIELD_CREATOR_USER_ID);
-    }
+    @NotNull
+    @JsonProperty(FIELD_CREATOR_USER_ID)
+    public abstract String getCreatorUserId();
 
-    @Override
-    public Boolean isGlobal() {
-        final Object global = fields.get(MessageInput.FIELD_GLOBAL);
-        if (global instanceof Boolean) {
-            return (Boolean) global;
-        } else {
-            return false;
-        }
-    }
+    @JsonProperty(FIELD_GLOBAL)
+    public abstract boolean isGlobal();
 
-    @Override
-    public String getContentPack() {
-        return (String) fields.get(MessageInput.FIELD_CONTENT_PACK);
-    }
+    @Nullable
+    @JsonProperty(FIELD_CONTENT_PACK)
+    public abstract String getContentPack();
 
-    @Override
-    public String getNodeId() {
-        return emptyToNull((String) fields.get(MessageInput.FIELD_NODE_ID));
-    }
+    @Nullable
+    @JsonProperty(FIELD_NODE_ID)
+    public abstract String getNodeId();
+
+    @Nullable
+    @JsonProperty(FIELD_DESIRED_STATE)
+    public abstract IOState.Type getPersistedDesiredState();
 
     @Override
     public IOState.Type getDesiredState() {
-        if (fields.containsKey(MessageInput.FIELD_DESIRED_STATE)) {
-            String value = (String) fields.get(MessageInput.FIELD_DESIRED_STATE);
-            if (EnumUtils.isValidEnum(IOState.Type.class, value)) {
-                return IOState.Type.valueOf(value);
-            }
+        final IOState.Type persistedDesiredState = getPersistedDesiredState();
+        return persistedDesiredState != null ? persistedDesiredState : IOState.Type.RUNNING;
+    }
+
+    public static Builder builder() {
+        return Builder.create();
+    }
+
+    public abstract Builder toBuilder();
+
+    @AutoValue.Builder
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public abstract static class Builder {
+        @JsonCreator
+        public static Builder create() {
+            return new AutoValue_InputImpl.Builder().setEmbeddedStaticFields(List.of())
+                    .setGlobal(false);
         }
-        return IOState.Type.RUNNING;
+
+        @JsonProperty(FIELD_ID)
+        public abstract Builder setId(String id);
+
+        @JsonProperty(FIELD_TITLE)
+        public abstract Builder setTitle(String title);
+
+        @JsonProperty(FIELD_CREATED_AT)
+        public abstract Builder setCreatedAt(DateTime createdAt);
+
+        @JsonProperty(FIELD_CONFIGURATION)
+        public abstract Builder setConfiguration(Map<String, Object> configuration);
+
+        @JsonProperty(EMBEDDED_STATIC_FIELDS)
+        public abstract Builder setEmbeddedStaticFields(List<Map<String, String>> staticFields);
+
+        @JsonProperty(FIELD_TYPE)
+        public abstract Builder setType(String type);
+
+        @JsonProperty(FIELD_CREATOR_USER_ID)
+        public abstract Builder setCreatorUserId(String creatorUserId);
+
+        @JsonProperty(FIELD_GLOBAL)
+        public abstract Builder setGlobal(boolean isGlobal);
+
+        @JsonProperty(FIELD_CONTENT_PACK)
+        public abstract Builder setContentPack(String contentPack);
+
+        @JsonProperty(FIELD_NODE_ID)
+        public abstract Builder setNodeId(String nodeId);
+
+        @JsonProperty(FIELD_DESIRED_STATE)
+        public abstract Builder setPersistedDesiredState(IOState.Type desiredState);
+
+        public abstract InputImpl build();
     }
 
     @Override
-    public void setDesiredState(IOState.Type desiredState) {
-        fields.put(MessageInput.FIELD_DESIRED_STATE, desiredState.toString());
+    public Input withDesiredState(IOState.Type desiredState) {
+        return toBuilder().setPersistedDesiredState(desiredState).build();
+    }
+
+    @Override
+    public Map<String, Object> getFields() {
+        final Map<String, Object> doc = new java.util.LinkedHashMap<>();
+
+        if (getId() != null) {
+            doc.put(FIELD_ID, getId());
+        }
+        doc.put(FIELD_TYPE, getType());
+        doc.put(FIELD_TITLE, getTitle());
+        doc.put(FIELD_CREATOR_USER_ID, getCreatorUserId());
+        doc.put(FIELD_CREATED_AT, getCreatedAt());
+        doc.put(FIELD_GLOBAL, isGlobal());
+
+        doc.put(FIELD_CONFIGURATION, getConfiguration());
+
+        final List<Map<String, String>> staticFields = getEmbeddedStaticFields();
+        if (staticFields != null && !getStaticFields().isEmpty()) {
+            doc.put(EMBEDDED_STATIC_FIELDS, getEmbeddedStaticFields());
+        }
+
+        if (getContentPack() != null) {
+            doc.put(FIELD_CONTENT_PACK, getContentPack());
+        }
+        if (getNodeId() != null && !getNodeId().isBlank()) {
+            doc.put(FIELD_NODE_ID, getNodeId());
+        }
+
+        if (getDesiredState() != null) {
+            doc.put(FIELD_DESIRED_STATE, getDesiredState().name());
+        }
+
+        return doc;
     }
 }

@@ -19,6 +19,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { InputsActions } from 'stores/inputs/InputsStore';
 import type { InputDescription } from 'stores/inputs/InputTypesStore';
@@ -30,8 +31,11 @@ import useLocation from 'routing/useLocation';
 import { Col, Row, Button } from 'components/bootstrap';
 import { Select } from 'components/common';
 import { InputForm } from 'components/inputs';
-import type { ConfiguredInput } from 'components/messageloaders/Types';
+import type { ConfiguredInput, Input } from 'components/messageloaders/Types';
 import useInputTypes from 'components/inputs/useInputTypes';
+import { KEY_PREFIX } from 'hooks/usePaginatedInputs';
+import useFeature from 'hooks/useFeature';
+import { INPUT_SETUP_MODE_FEATURE_FLAG, InputSetupWizard } from 'components/inputs/InputSetupWizard';
 
 const StyledForm = styled.form`
   display: flex;
@@ -50,9 +54,26 @@ const CreateInputControl = () => {
   const [selectedInput, setSelectedInput] = useState<string | undefined>(undefined);
   const [selectedInputDefinition, setSelectedInputDefinition] = useState<InputDescription | undefined>(undefined);
   const [customInputConfiguration, setCustomInputConfiguration] = useState(undefined);
+  const [showWizard, setShowWizard] = useState<boolean>(false);
+  const [createdInputId, setCreatedInputId] = useState<string | null>(null);
+  const [createdInputData, setCreatedInputData] = useState<ConfiguredInput | null>(null);
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const inputTypes = useInputTypes();
+  const queryClient = useQueryClient();
+  const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
+
+  const openWizard = (inputId: string, inputData: ConfiguredInput) => {
+    setCreatedInputId(inputId);
+    setCreatedInputData(inputData);
+    setShowWizard(true);
+  };
+
+  const closeWizard = () => {
+    setShowWizard(false);
+    setCreatedInputId(null);
+    setCreatedInputData(null);
+  };
 
   const resetFields = () => {
     setSelectedInput(undefined);
@@ -117,9 +138,28 @@ const CreateInputControl = () => {
       app_action_value: 'input-create',
     });
 
-    InputsActions.create(data).then(() => {
+    InputsActions.create(data).then((response: { id: string }) => {
+      queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
+
+      if (inputSetupFeatureFlagIsEnabled && response?.id) {
+        setTimeout(() => openWizard(response.id, data), 500);
+      }
+
       resetFields();
     });
+  };
+
+  const createInputForWizard = () => {
+    if (!createdInputId || !createdInputData) return null;
+
+    return {
+      id: createdInputId,
+      title: createdInputData.title,
+      type: createdInputData.type,
+      attributes: createdInputData.configuration,
+      global: createdInputData.global || false,
+      node: createdInputData.node || null,
+    } as Input;
   };
 
   const CustomInputsConfiguration = customInputConfiguration ? customInputConfiguration.component : null;
@@ -137,7 +177,7 @@ const CreateInputControl = () => {
             />
           </FormGroup>
           &nbsp;
-          <Button bsStyle="success" type="submit" disabled={!selectedInput}>
+          <Button bsStyle="primary" type="submit" disabled={!selectedInput}>
             Launch new input
           </Button>
         </StyledForm>
@@ -162,6 +202,9 @@ const CreateInputControl = () => {
               />
             )
           ))}
+        {inputSetupFeatureFlagIsEnabled && showWizard && createdInputId && (
+          <InputSetupWizard input={createInputForWizard()} show={showWizard} onClose={closeWizard} />
+        )}
       </Col>
     </Row>
   );

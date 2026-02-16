@@ -36,6 +36,8 @@ import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.grn.GRNDescriptorProvider;
 import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypeProvider;
+import org.graylog.mcp.server.ResourceProvider;
+import org.graylog.mcp.server.Tool;
 import org.graylog.plugins.views.search.export.ExportFormat;
 import org.graylog.scheduler.Job;
 import org.graylog.scheduler.JobDefinitionConfig;
@@ -43,6 +45,8 @@ import org.graylog.scheduler.JobSchedule;
 import org.graylog.scheduler.JobTriggerData;
 import org.graylog.scheduler.capabilities.SchedulerCapabilities;
 import org.graylog.scheduler.rest.JobResourceHandler;
+import org.graylog.scheduler.system.SystemJob;
+import org.graylog.scheduler.system.SystemJobConfig;
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.AuthServiceBackendConfig;
 import org.graylog.security.entities.EntityRegistrationHandler;
@@ -70,6 +74,7 @@ import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.plugin.outputs.FilteredMessageOutput;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.periodical.Periodical;
+import org.graylog2.plugin.quickjump.QuickJumpProvider;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.plugin.security.PluginPermissions;
@@ -303,20 +308,20 @@ public abstract class PluginModule extends Graylog2Module {
         registerJacksonSubtype(configClass, name);
     }
 
-    private MapBinder<String, Job.Factory> jobBinder() {
-        return MapBinder.newMapBinder(binder(), String.class, Job.Factory.class);
+    private MapBinder<String, Job.Factory<? extends Job>> jobBinder() {
+        return MapBinder.newMapBinder(binder(), new TypeLiteral<>() {}, new TypeLiteral<>() {});
     }
 
     protected void addSchedulerJob(String name,
                                    Class<? extends Job> jobClass,
-                                   Class<? extends Job.Factory> factoryClass,
+                                   Class<? extends Job.Factory<? extends Job>> factoryClass,
                                    Class<? extends JobDefinitionConfig> configClass) {
         addSchedulerJob(name, jobClass, factoryClass, configClass, null);
     }
 
     protected void addSchedulerJob(String name,
                                    Class<? extends Job> jobClass,
-                                   Class<? extends Job.Factory> factoryClass,
+                                   Class<? extends Job.Factory<? extends Job>> factoryClass,
                                    Class<? extends JobDefinitionConfig> configClass,
                                    Class<? extends JobTriggerData> dataClass) {
         install(new FactoryModuleBuilder().implement(Job.class, jobClass).build(factoryClass));
@@ -327,6 +332,19 @@ public abstract class PluginModule extends Graylog2Module {
         if (dataClass != null) {
             registerJacksonSubtype(dataClass, name);
         }
+    }
+
+    protected MapBinder<String, SystemJob.Factory<? extends SystemJob<? extends SystemJobConfig>>> systemJobBinder() {
+        return MapBinder.newMapBinder(binder(), new TypeLiteral<>() {}, new TypeLiteral<>() {});
+    }
+
+    protected void addSystemSchedulerJob(String name,
+                                         Class<? extends SystemJob<? extends SystemJobConfig>> jobClass,
+                                         Class<? extends SystemJob.Factory<? extends SystemJob<? extends SystemJobConfig>>> factoryClass,
+                                         Class<? extends JobTriggerData> dataClass) {
+        install(new FactoryModuleBuilder().implement(SystemJob.class, jobClass).build(factoryClass));
+        systemJobBinder().addBinding(name).to(factoryClass);
+        registerJacksonSubtype(dataClass, name);
     }
 
     protected void addJobSchedulerSchedule(String name, Class<? extends JobSchedule> scheduleClass) {
@@ -500,5 +518,41 @@ public abstract class PluginModule extends Graylog2Module {
 
             dbEntitiesBinder().addBinding().toInstance(entitiesClass);
         }
+    }
+
+    protected MapBinder<String, Tool<?, ?>> mcpToolBinder() {
+        return MapBinder.newMapBinder(binder(), TypeLiteral.get(String.class), new TypeLiteral<Tool<?, ?>>() {});
+    }
+
+    protected void addMcpTool(String name, Class<? extends Tool<?, ?>> toolClass) {
+        mcpToolBinder().addBinding(name).to(toolClass);
+    }
+
+    protected MapBinder<GRNType, ResourceProvider> mcpResourceBinder() {
+        return MapBinder.newMapBinder(binder(), GRNType.class, ResourceProvider.class);
+    }
+
+    protected void addMcpResource(GRNType grnType, Class<? extends ResourceProvider> resourceClass) {
+        mcpResourceBinder().addBinding(grnType).to(resourceClass);
+    }
+
+    protected Multibinder<com.github.victools.jsonschema.generator.Module> schemaModuleBinder() {
+        return Multibinder.newSetBinder(
+                binder(),
+                com.github.victools.jsonschema.generator.Module.class,
+                org.graylog.mcp.server.McpSchemaModule.class
+        );
+    }
+
+    protected void addSchemaModule(Class<? extends com.github.victools.jsonschema.generator.Module> moduleClass) {
+        schemaModuleBinder().addBinding().to(moduleClass);
+    }
+
+    protected Multibinder<QuickJumpProvider> quickJumpProviderBinder() {
+        return Multibinder.newSetBinder(binder(), QuickJumpProvider.class);
+    }
+
+    protected void addQuickJumpProvider(QuickJumpProvider provider) {
+        quickJumpProviderBinder().addBinding().toInstance(provider);
     }
 }

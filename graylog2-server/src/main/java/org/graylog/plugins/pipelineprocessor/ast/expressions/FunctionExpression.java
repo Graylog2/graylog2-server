@@ -28,10 +28,8 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory;
 
-import java.time.Duration;
-
 public class FunctionExpression extends BaseExpression {
-    private static final RateLimitedLog RATE_LIMITED_LOG = RateLimitedLogFactory.createRateLimitedLog(FunctionExpression.class, 1, Duration.ofSeconds(60));
+    private static final RateLimitedLog RATE_LIMITED_LOG = RateLimitedLogFactory.createQuietDefaultRateLimitedLog(FunctionExpression.class);
 
     private final FunctionArgs args;
     private final Function<?> function;

@@ -23,6 +23,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.MustBeClosed;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.UpdateResult;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
@@ -34,13 +35,14 @@ import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.database.utils.ScopedEntityMongoUtils;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.MongoIndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.Tools;
@@ -78,6 +80,7 @@ import static com.mongodb.client.model.Filters.in;
 import static com.mongodb.client.model.Updates.addEachToSet;
 import static com.mongodb.client.model.Updates.pull;
 import static com.mongodb.client.model.Updates.set;
+import static org.graylog2.database.entities.ScopedEntity.FIELD_SCOPE;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.idsIn;
 import static org.graylog2.database.utils.MongoUtils.stream;
@@ -92,7 +95,7 @@ import static org.graylog2.streams.StreamImpl.FIELD_TITLE;
 
 public class StreamServiceImpl implements StreamService {
     private static final Logger LOG = LoggerFactory.getLogger(StreamServiceImpl.class);
-    private static final String COLLECTION_NAME = "streams";
+    public static final String COLLECTION_NAME = "streams";
     private final MongoCollection<StreamDTO> collection;
     private final MongoUtils<StreamDTO> mongoUtils;
     private final ScopedEntityMongoUtils<StreamDTO> scopedMongoUtils;
@@ -381,6 +384,25 @@ public class StreamServiceImpl implements StreamService {
     }
 
     @Override
+    public Map<String, Long> countBySource() {
+        long illuminateStreamCount = collection.countDocuments(
+                Filters.and(
+                        Filters.regex(FIELD_TITLE, "^Illuminate:"),
+                        Filters.eq(FIELD_SCOPE, DefaultEntityScope.NAME)
+                )
+        );
+
+        long userStreamCount = collection.countDocuments(
+                Filters.eq(FIELD_SCOPE, DefaultEntityScope.NAME)
+        ) - illuminateStreamCount;
+
+        return Map.of(
+                "illuminate_streams", illuminateStreamCount,
+                "user_streams", userStreamCount
+        );
+    }
+
+    @Override
     public void destroy(Stream stream) throws NotFoundException, StreamGuardException {
         checkDeletionGuards(stream.getId());
 
@@ -475,8 +497,8 @@ public class StreamServiceImpl implements StreamService {
     @Override
     public String save(Stream stream) throws ValidationException {
         final StreamImpl streamImpl = (StreamImpl) stream;
-        scopedMongoUtils.upsert(streamImpl.toDTO());
-
+        final StreamDTO upserted = scopedMongoUtils.upsert(streamImpl.toDTO());
+        clusterEventBus.post(StreamsChangedEvent.create(upserted.id()));
         return streamImpl.id();
     }
 

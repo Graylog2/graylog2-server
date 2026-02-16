@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import OriginalViewHeader from 'views/components/views/ViewHeader';
@@ -86,7 +86,7 @@ describe('ViewHeader', () => {
 
     const editButton = await screen.findByTitle('Edit dashboard Some view metadata');
 
-    fireEvent.click(editButton);
+    await userEvent.click(editButton);
     await screen.findByText('Editing saved dashboard', { exact: false });
 
     const titleInput = await screen.findByRole('textbox', { name: /title/i });

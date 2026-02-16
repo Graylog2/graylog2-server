@@ -27,7 +27,7 @@ import jakarta.validation.ValidationException;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MetricValidatorTest {
 

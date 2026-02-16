@@ -19,9 +19,7 @@ import styled, { css } from 'styled-components';
 
 import RuleBlockDisplay from 'components/rules/rule-builder/RuleBlockDisplay';
 import RuleBlockForm from 'components/rules/rule-builder/RuleBlockForm';
-import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { Modal } from 'components/bootstrap';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
@@ -45,6 +43,7 @@ type Props = {
   deleteBlock: (orderIndex: number, type: string) => void;
 };
 
+const appSection = 'pipeline-rule-builder';
 const RuleBuilderBlock = ({
   type,
   blockDict,
@@ -60,7 +59,6 @@ const RuleBuilderBlock = ({
   const [insertMode, setInsertMode] = useState<'above' | 'below' | undefined>(undefined);
   const [insertBlockDict, setInsertBlockDict] = useState<BlockDict>(undefined);
 
-  const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
   useEffect(() => {
@@ -122,8 +120,7 @@ const RuleBuilderBlock = ({
         ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.DELETE_CONDITION_CLICKED
         : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.DELETE_ACTION_CLICKED,
       {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: 'pipeline-rule-builder',
+        app_section: appSection,
         app_action_value: `delete-${type}-button`,
       },
     );
@@ -137,8 +134,7 @@ const RuleBuilderBlock = ({
         ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.EDIT_CONDITION_CLICKED
         : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.EDIT_ACTION_CLICKED,
       {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: 'pipeline-rule-builder',
+        app_section: appSection,
         app_action_value: `edit-${type}-button`,
       },
     );
@@ -148,8 +144,7 @@ const RuleBuilderBlock = ({
 
   const onNegate = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.NEGATE_CONDITION_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'pipeline-rule-builder',
+      app_section: appSection,
       app_action_value: `negate-${type}-button`,
     });
 
@@ -158,8 +153,7 @@ const RuleBuilderBlock = ({
 
   const onDuplicate = async () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.DUPLICATE_ACTION_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'pipeline-rule-builder',
+      app_section: appSection,
       app_action_value: `duplicate-${type}`,
     });
 
@@ -179,8 +173,7 @@ const RuleBuilderBlock = ({
 
   const onInsertAbove = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.INSERT_ABOVE_ACTION_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'pipeline-rule-builder',
+      app_section: appSection,
       app_action_value: `insert-above-${type}`,
     });
 
@@ -189,8 +182,7 @@ const RuleBuilderBlock = ({
 
   const onInsertBelow = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.INSERT_BELOW_ACTION_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'pipeline-rule-builder',
+      app_section: appSection,
       app_action_value: `insert-below-${type}`,
     });
 

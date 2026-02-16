@@ -16,8 +16,13 @@
  */
 import AppConfig from 'util/AppConfig';
 
-const useFeaturesCustomization = () => ({
-  aiInvestigationReport: AppConfig?.branding?.()?.features?.ai_investigation_report,
-});
+const useFeaturesCustomization = () => {
+  const featureToggles = AppConfig?.branding?.()?.features;
+
+  return {
+    aiInvestigationReport: featureToggles?.ai_investigation_report,
+    widgetSummary: featureToggles?.widget_summary,
+  };
+};
 
 export default useFeaturesCustomization;

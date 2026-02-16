@@ -18,12 +18,13 @@ package org.graylog2.rest.resources.system.inputs;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.eventbus.EventBus;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
@@ -38,6 +39,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.IOState;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
@@ -55,7 +57,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequiresAuthentication
-@Api(value = "System/InputStates", description = "Message input states of this node")
+@Tag(name = "System/InputStates", description = "Message input states of this node")
 @Path("/system/inputstates")
 @Produces(MediaType.APPLICATION_JSON)
 public class InputStatesResource extends AbstractInputsResource {
@@ -77,7 +79,7 @@ public class InputStatesResource extends AbstractInputsResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get all input states of this node")
+    @Operation(summary = "Get all input states of this node")
     public InputStatesList list() {
         final Set<InputStateSummary> result = this.inputRegistry.stream()
                 .filter(inputState -> isPermitted(RestPermissions.INPUTS_READ, inputState.getStoppable().getId()))
@@ -90,11 +92,12 @@ public class InputStatesResource extends AbstractInputsResource {
     @GET
     @Path("/{inputId}")
     @Timed
-    @ApiOperation(value = "Get input state for specified input id on this node")
+    @Operation(summary = "Get input state for specified input id on this node")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input on this node."),
+            @ApiResponse(responseCode = "200", description = "Returns input state", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "No such input on this node."),
     })
-    public InputStateSummary get(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
+    public InputStateSummary get(@Parameter(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
         final IOState<MessageInput> inputState = this.inputRegistry.getInputState(inputId);
         if (inputState == null) {
@@ -106,16 +109,22 @@ public class InputStatesResource extends AbstractInputsResource {
     @PUT
     @Path("/{inputId}")
     @Timed
-    @ApiOperation(value = "(Re-)Start specified input on this node")
+    @Operation(summary = "(Re-)Start specified input on this node")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input on this node."),
+            @ApiResponse(responseCode = "200", description = "Returns ID of started input", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "No such input on this node."),
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_START)
-    public InputCreated start(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
+    public InputCreated start(@Parameter(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_CHANGESTATE, inputId);
         final Input input = inputService.find(inputId);
-        checkPermission(RestPermissions.INPUT_TYPES_CREATE, input.getType()); // remove after sharing inputs implemented
-        inputService.persistDesiredState(input, IOState.Type.RUNNING);
+        checkPermission(RestPermissions.INPUT_TYPES_CREATE, input.getType());// remove after sharing inputs implemented
+        try {
+            inputService.persistDesiredState(input, IOState.Type.RUNNING);
+        } catch (ValidationException e) {
+            throw new BadRequestException(e);
+        }
+
         final InputCreated result = InputCreated.create(inputId);
         this.serverEventBus.post(result);
 
@@ -125,16 +134,22 @@ public class InputStatesResource extends AbstractInputsResource {
     @PUT
     @Path("/setup/{inputId}")
     @Timed
-    @ApiOperation(value = "Switch specified input to setup mode")
+    @Operation(summary = "Switch specified input to setup mode")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input on this node."),
+            @ApiResponse(responseCode = "200", description = "Returns ID of input switched to setup mode", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "No such input on this node."),
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_SETUP)
-    public InputSetup setup(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
+    public InputSetup setup(@Parameter(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_CHANGESTATE, inputId);
         final Input input = inputService.find(inputId);
         checkPermission(RestPermissions.INPUT_TYPES_CREATE, input.getType()); // remove after sharing inputs implemented
-        inputService.persistDesiredState(input, IOState.Type.SETUP);
+        try {
+            inputService.persistDesiredState(input, IOState.Type.SETUP);
+        } catch (ValidationException e) {
+            throw new BadRequestException(e);
+        }
+
         final InputSetup result = InputSetup.create(inputId);
         this.serverEventBus.post(result);
 
@@ -144,16 +159,22 @@ public class InputStatesResource extends AbstractInputsResource {
     @DELETE
     @Path("/{inputId}")
     @Timed
-    @ApiOperation(value = "Stop specified input on this node")
+    @Operation(summary = "Stop specified input on this node")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input on this node."),
+            @ApiResponse(responseCode = "200", description = "Returns ID of stopped input", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "No such input on this node."),
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_STOP)
-    public InputDeleted stop(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
+    public InputDeleted stop(@Parameter(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_CHANGESTATE, inputId);
         final Input input = inputService.find(inputId);
         checkPermission(RestPermissions.INPUT_TYPES_CREATE, input.getType()); // remove after sharing inputs implemented
-        inputService.persistDesiredState(input, IOState.Type.STOPPED);
+        try {
+            inputService.persistDesiredState(input, IOState.Type.STOPPED);
+        } catch (ValidationException e) {
+            throw new BadRequestException(e);
+        }
+
         final InputDeleted result = InputDeleted.create(inputId);
         this.serverEventBus.post(result);
 
@@ -166,6 +187,7 @@ public class InputStatesResource extends AbstractInputsResource {
                 messageInput.getId(),
                 inputState.getState().toString(),
                 inputState.getStartedAt(),
+                inputState.getLastFailedAt(),
                 inputState.getDetailedMessage(),
                 InputSummary.create(
                         messageInput.getTitle(),

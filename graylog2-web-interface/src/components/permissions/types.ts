@@ -31,6 +31,7 @@ export type ModalHandler = {
 export type EntityActionModalProps<T, M> = React.PropsWithRef<{
   entity: T;
   entityType: string;
+  onClose?: () => void;
 }> & {
   ref: React.LegacyRef<M>;
 };
@@ -56,7 +57,7 @@ export type TableElement<T extends EntityBase> = {
     entityId: string;
     entityType: string;
   }>;
-  useCondition: () => true;
+  useCondition: () => boolean;
 };
 
 declare module 'graylog-web-plugin/plugin' {

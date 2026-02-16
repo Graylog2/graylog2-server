@@ -15,12 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 type InternalState = {
   id: string;
   name: string;
   description: string;
-  permissions: Immutable.Set<string>;
+  permissions: Immutable.Set<Permission>;
   readOnly: boolean;
 };
 
@@ -28,7 +29,7 @@ export type RoleJSON = {
   id: string;
   name: string;
   description: string;
-  permissions: Immutable.Set<string>;
+  permissions: Immutable.Set<Permission>;
   read_only: boolean;
 };
 

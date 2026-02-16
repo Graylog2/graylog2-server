@@ -61,18 +61,6 @@ public class StreamsForFieldRetrieverOS2 implements StreamsForFieldRetriever {
                 .collect(Collectors.toMap(FieldBucket::fieldName, FieldBucket::value));
     }
 
-    @Override
-    public Set<String> getStreams(final String fieldName, final String indexName) {
-        final SearchRequest searchRequest = createSearchRequest(List.of(fieldName), indexName);
-
-        final SearchResponse searchResult = client.search(searchRequest, "Unable to retrieve fields types aggregations");
-
-        final ParsedFilters aggregation = searchResult.getAggregations().get(AGG_NAME);
-        final var bucket = aggregation.getBucketByKey(fieldName);
-
-        return retrieveStreamsFromAggregationInResponse(bucket);
-    }
-
     private Set<String> retrieveStreamsFromAggregationInResponse(ParsedFilters.ParsedBucket searchResult) {
         final Aggregations aggregations = searchResult.getAggregations();
         if (aggregations != null) {

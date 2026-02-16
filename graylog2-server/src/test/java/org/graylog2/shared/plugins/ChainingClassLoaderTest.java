@@ -16,7 +16,7 @@
  */
 package org.graylog2.shared.plugins;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -29,14 +29,21 @@ import java.util.Collections;
 import java.util.Enumeration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ChainingClassLoaderTest {
-    @Test(expected = ClassNotFoundException.class)
+
+    public static final String NAME_FOR_TEST_PLEASE_DONT_COLLIDE = "name_for_test_please_dont_collide";
+    public static final String THIS_CLASS_HOPE_FULLY_DOES_NOT_EXIST = "ThisClassHopeFullyDoesNotExist";
+
+    @Test
     public void loadThrowsClassNotFoundExceptionIfClassDoesNotExist() throws Exception {
-        final ChainingClassLoader chainingClassLoader = new ChainingClassLoader(getClass().getClassLoader());
-        chainingClassLoader.loadClass("ThisClassHopeFullyDoesNotExist" + Instant.now().toEpochMilli());
+        assertThrows(ClassNotFoundException.class, () -> {
+            final ChainingClassLoader chainingClassLoader = new ChainingClassLoader(getClass().getClassLoader());
+            chainingClassLoader.loadClass(THIS_CLASS_HOPE_FULLY_DOES_NOT_EXIST + Instant.now().toEpochMilli());
+        });
     }
 
     @Test
@@ -75,7 +82,7 @@ public class ChainingClassLoaderTest {
     @Test
     public void getResourceAsStreamReturnsNullIfResourceDoesNotExist() throws Exception {
         final ChainingClassLoader chainingClassLoader = new ChainingClassLoader(getClass().getClassLoader());
-        final InputStream stream = chainingClassLoader.getResourceAsStream("ThisClassHopeFullyDoesNotExist" + Instant.now().toEpochMilli());
+        final InputStream stream = chainingClassLoader.getResourceAsStream(THIS_CLASS_HOPE_FULLY_DOES_NOT_EXIST + Instant.now().toEpochMilli());
         assertThat(stream).isNull();
     }
 
@@ -84,12 +91,12 @@ public class ChainingClassLoaderTest {
         final ClassLoader parent = getClass().getClassLoader();
         final ClassLoader child = mock(ClassLoader.class);
         final ByteArrayInputStream inputStream = new ByteArrayInputStream("foobar".getBytes(StandardCharsets.UTF_8));
-        when(child.getResourceAsStream("name")).thenReturn(inputStream);
+        when(child.getResourceAsStream(NAME_FOR_TEST_PLEASE_DONT_COLLIDE)).thenReturn(inputStream);
 
         final ChainingClassLoader chainingClassLoader = new ChainingClassLoader(parent);
         chainingClassLoader.addClassLoader(child);
 
-        final InputStream stream = chainingClassLoader.getResourceAsStream("name");
+        final InputStream stream = chainingClassLoader.getResourceAsStream(NAME_FOR_TEST_PLEASE_DONT_COLLIDE);
         final ByteArrayInputStream expected = new ByteArrayInputStream("foobar".getBytes(StandardCharsets.UTF_8));
         assertThat(stream).hasSameContentAs(expected);
     }
@@ -97,7 +104,7 @@ public class ChainingClassLoaderTest {
     @Test
     public void getResourceReturnsNullIfResourceDoesNotExist() throws Exception {
         final ChainingClassLoader chainingClassLoader = new ChainingClassLoader(getClass().getClassLoader());
-        final URL resource = chainingClassLoader.getResource("ThisClassHopeFullyDoesNotExist" + Instant.now().toEpochMilli());
+        final URL resource = chainingClassLoader.getResource(THIS_CLASS_HOPE_FULLY_DOES_NOT_EXIST + Instant.now().toEpochMilli());
         assertThat(resource).isNull();
     }
 
@@ -106,19 +113,19 @@ public class ChainingClassLoaderTest {
         final ClassLoader parent = getClass().getClassLoader();
         final ClassLoader child = mock(ClassLoader.class);
         final URL url = URI.create("file://test").toURL();
-        when(child.getResource("name")).thenReturn(url);
+        when(child.getResource(NAME_FOR_TEST_PLEASE_DONT_COLLIDE)).thenReturn(url);
 
         final ChainingClassLoader chainingClassLoader = new ChainingClassLoader(parent);
         chainingClassLoader.addClassLoader(child);
 
-        final URL resource = chainingClassLoader.getResource("name");
+        final URL resource = chainingClassLoader.getResource(NAME_FOR_TEST_PLEASE_DONT_COLLIDE);
         assertThat(resource).isEqualTo(url);
     }
 
     @Test
     public void getResourcesReturnsEmptyEnumerationIfResourceDoesNotExist() throws Exception {
         final ChainingClassLoader chainingClassLoader = new ChainingClassLoader(getClass().getClassLoader());
-        final Enumeration<URL> resources = chainingClassLoader.getResources("ThisClassHopeFullyDoesNotExist" + Instant.now().toEpochMilli());
+        final Enumeration<URL> resources = chainingClassLoader.getResources(THIS_CLASS_HOPE_FULLY_DOES_NOT_EXIST + Instant.now().toEpochMilli());
         assertThat(resources.hasMoreElements()).isFalse();
     }
 
@@ -128,12 +135,12 @@ public class ChainingClassLoaderTest {
         final ClassLoader parent = getClass().getClassLoader();
         final ClassLoader child = mock(ClassLoader.class);
         final Enumeration<URL> urls = Collections.enumeration(Collections.singleton(URI.create("file://test").toURL()));
-        when(child.getResources("name")).thenReturn(urls);
+        when(child.getResources(NAME_FOR_TEST_PLEASE_DONT_COLLIDE)).thenReturn(urls);
 
         final ChainingClassLoader chainingClassLoader = new ChainingClassLoader(parent);
         chainingClassLoader.addClassLoader(child);
 
-        final Enumeration<URL> resources = chainingClassLoader.getResources("name");
+        final Enumeration<URL> resources = chainingClassLoader.getResources(NAME_FOR_TEST_PLEASE_DONT_COLLIDE);
         assertThat(Collections.list(resources)).containsExactly(URI.create("file://test").toURL());
     }
 

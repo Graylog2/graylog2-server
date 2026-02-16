@@ -22,11 +22,8 @@ import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
-import org.graylog.events.processor.EventDefinitionDto;
-import org.graylog2.indexer.IndexMapping;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
@@ -34,28 +31,23 @@ import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
-import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID;
 
-public class EventsSearchService {
+public class EventsSearchService extends AbstractEventsSearchService {
     private final MoreSearch moreSearch;
     private final StreamService streamService;
-    private final DBEventDefinitionService eventDefinitionService;
-    private final ObjectMapper objectMapper;
 
     @Inject
     public EventsSearchService(MoreSearch moreSearch,
                                StreamService streamService,
                                DBEventDefinitionService eventDefinitionService,
                                ObjectMapper objectMapper) {
+        super(eventDefinitionService, streamService, objectMapper);
         this.moreSearch = moreSearch;
         this.streamService = streamService;
-        this.eventDefinitionService = eventDefinitionService;
-        this.objectMapper = objectMapper;
     }
 
     private String buildFilter(EventsSearchParameters parameters) {
@@ -63,7 +55,7 @@ public class EventsSearchService {
     }
 
     private Set<String> allowedEventStreams(Subject subject) {
-        final var eventStreams = Set.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
+        final var eventStreams = defaultEventStreams();
         if (subject.isPermitted(RestPermissions.STREAMS_READ)) {
             return eventStreams;
         }
@@ -83,32 +75,7 @@ public class EventsSearchService {
 
         final MoreSearch.Result result = moreSearch.eventSearch(parameters, filter, eventStreams, forbiddenSourceStreams(subject));
 
-        final ImmutableSet.Builder<String> eventDefinitionIdsBuilder = ImmutableSet.builder();
-        final ImmutableSet.Builder<String> streamIdsBuilder = ImmutableSet.builder();
-
-        final List<EventsSearchResult.Event> events = result.results().stream()
-                .map(resultMsg -> {
-                    final EventDto eventDto = objectMapper.convertValue(resultMsg.getMessage().getFields(), EventDto.class);
-
-                    eventDefinitionIdsBuilder.add((String) resultMsg.getMessage().getField(EventDto.FIELD_EVENT_DEFINITION_ID));
-                    streamIdsBuilder.addAll(resultMsg.getMessage().getStreamIds());
-
-                    return EventsSearchResult.Event.create(eventDto, resultMsg.getIndex(), IndexMapping.TYPE_MESSAGE);
-                }).collect(Collectors.toList());
-
-        final EventsSearchResult.Context context = EventsSearchResult.Context.create(
-                lookupEventDefinitions(eventDefinitionIdsBuilder.build(), subject),
-                lookupStreams(streamIdsBuilder.build(), subject)
-        );
-
-        return EventsSearchResult.builder()
-                .parameters(parameters)
-                .totalEvents(result.resultsCount())
-                .duration(result.duration())
-                .events(events)
-                .usedIndices(result.usedIndexNames())
-                .context(context)
-                .build();
+        return buildResultForSubject(parameters, result, subject);
     }
 
     public EventsHistogramResult histogram(EventsSearchParameters parameters, Subject subject, ZoneId timeZone) {
@@ -158,20 +125,16 @@ public class EventsSearchService {
         }
     }
 
-    private Map<String, EventsSearchResult.ContextEntity> lookupStreams(Set<String> streams, final Subject subject) {
-        final var allowedStreams = streams.stream().filter(streamId -> subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId))).collect(Collectors.toSet());
+    private EventsSearchResult buildResultForSubject(EventsSearchParameters parameters,
+                                                     MoreSearch.Result result,
+                                                     Subject subject) {
+        final ImmutableSet.Builder<String> eventDefinitionIdsBuilder = ImmutableSet.builder();
+        final ImmutableSet.Builder<String> streamIdsBuilder = ImmutableSet.builder();
+        final List<EventsSearchResult.Event> events = toEvents(result, eventDefinitionIdsBuilder, streamIdsBuilder);
+        final EventsSearchResult.Context context = EventsSearchResult.Context.create(
+                lookupEventDefinitions(eventDefinitionIdsBuilder.build(), subject),
+                lookupStreams(streamIdsBuilder.build(), subject));
 
-        return streamService.loadByIds(allowedStreams)
-                .stream()
-                .collect(Collectors.toMap(Stream::getId, s -> EventsSearchResult.ContextEntity.create(s.getId(), s.getTitle(), s.getDescription())));
-    }
-
-    private Map<String, EventsSearchResult.ContextEntity> lookupEventDefinitions(Set<String> eventDefinitions, final Subject subject) {
-        final var allowedEventDefinitions = eventDefinitions.stream().filter(eventDefinitionId -> subject.isPermitted(String.join(":", RestPermissions.EVENT_DEFINITIONS_READ, eventDefinitionId))).collect(Collectors.toSet());
-
-        return eventDefinitionService.getByIds(allowedEventDefinitions)
-                .stream()
-                .collect(Collectors.toMap(EventDefinitionDto::id,
-                        d -> EventsSearchResult.ContextEntity.create(d.id(), d.title(), d.description(), d.remediationSteps())));
+        return assembleResult(parameters, result, events, context);
     }
 }

@@ -17,8 +17,7 @@
 package org.graylog2.rest;
 
 import com.google.common.base.MoreObjects;
-import io.swagger.annotations.ApiParam;
-
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.QueryParam;
 
@@ -35,27 +34,27 @@ import jakarta.ws.rs.QueryParam;
  * }</pre>
  */
 public class PaginationParameters {
-    @ApiParam
+    @Parameter
     @QueryParam("query")
     @DefaultValue("")
     private String query = "";
 
-    @ApiParam
+    @Parameter
     @QueryParam("page")
     @DefaultValue("1")
     private int page = 1;
 
-    @ApiParam
+    @Parameter
     @QueryParam("per_page")
     @DefaultValue("50")
     private int perPage = 50;
 
-    @ApiParam
+    @Parameter
     @QueryParam("sort")
     @DefaultValue("")
     private String sortBy = "";
 
-    @ApiParam
+    @Parameter
     @QueryParam("order")
     @DefaultValue("asc")
     private String order = "asc";

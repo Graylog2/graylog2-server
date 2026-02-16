@@ -22,11 +22,11 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
 import org.graylog2.indexer.indexset.events.IndexSetDeletedEvent;
 import org.graylog2.indexer.indices.Indices;
@@ -196,7 +196,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
             final Stopwatch stopwatch = Stopwatch.createStarted();
             try {
                 this.pollInProgress.put(indexSetId, Boolean.TRUE);
-                final MongoIndexSet indexSet = mongoIndexSetFactory.create(indexSetConfig);
+                final IndexSet indexSet = mongoIndexSetFactory.create(indexSetConfig);
                 // Only check the active write index on a regular basis, the others don't change anymore
                 final String activeWriteIndex = indexSet.getActiveWriteIndex();
                 if (activeWriteIndex != null) {

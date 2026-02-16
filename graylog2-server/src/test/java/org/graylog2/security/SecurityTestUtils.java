@@ -228,7 +228,7 @@ public class SecurityTestUtils {
     /**
      * Simple Shiro Realm to hold user/role information
      */
-    static class TestRealm extends SimpleAccountRealm {
+    public static class TestRealm extends SimpleAccountRealm {
 
         public void addRole(String roleName, Set<String> permissions) {
             SimpleRole role = new SimpleRole(roleName, permissions.stream().map(WildcardPermission::new).collect(Collectors.toSet()));

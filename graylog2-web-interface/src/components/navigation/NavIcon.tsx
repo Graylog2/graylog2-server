@@ -33,6 +33,7 @@ const DEFAULT_ICONS: Record<NavIconType, IconName> = {
   'scratchpad': 'edit_square',
   'user_menu': 'person',
   'help': 'help',
+  'search': 'search',
 };
 
 const SvgContainer = styled.div`

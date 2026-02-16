@@ -1,0 +1,5 @@
+type = "a" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Add GET /api/system/cluster/nodes/paginated endpoint for obtaining server nodes in the standardized entity/pagination way."
+
+issues = []
+pulls = ["24163"]

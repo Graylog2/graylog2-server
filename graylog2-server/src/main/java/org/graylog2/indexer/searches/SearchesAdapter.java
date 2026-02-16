@@ -18,20 +18,13 @@ package org.graylog2.indexer.searches;
 
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.results.ChunkedResult;
-import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
-import java.util.List;
 import java.util.Set;
 
 public interface SearchesAdapter {
-    CountResult count(Set<String> affectedIndices, String query, TimeRange range, String filter);
-
-    ChunkedResult scroll(Set<String> indexWildcards, Sorting sorting, String filter, String query, TimeRange range, int limit, int offset, List<String> fields);
-
-    ChunkedResult scroll(Set<String> indexWildcards, Sorting sorting, String filter, String query, int batchSize);
 
     ChunkedResult scroll(ChunkCommand chunkCommand);
 

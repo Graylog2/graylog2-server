@@ -50,14 +50,14 @@ public class OpensearchCommonConfigurationBean implements DatanodeConfigurationB
     public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams buildParams) {
         return DatanodeConfigurationPart.builder()
                 .properties(commonOpensearchConfig(buildParams))
-                .nodeRoles(getNodeRoles())
+                .nodeRoles(getNodeRoles(localConfiguration))
                 .javaOpt("-Xms%s".formatted(localConfiguration.getOpensearchHeap()))
                 .javaOpt("-Xmx%s".formatted(localConfiguration.getOpensearchHeap()))
                 .javaOpt("-Dopensearch.transport.cname_in_publish_address=true")
                 .build();
     }
 
-    private List<String> getNodeRoles() {
+    public static List<String> getNodeRoles(Configuration localConfiguration) {
         final List<String> configuredRoles = localConfiguration.getNodeRoles();
         if(configuredRoles != null && !configuredRoles.isEmpty()) {
             return configuredRoles;
@@ -87,8 +87,6 @@ public class OpensearchCommonConfigurationBean implements DatanodeConfigurationB
         if (OS.isFamilyMac()) {
             config.put("bootstrap.system_call_filter", "false");
         }
-
-        config.putAll(buildParams.transientConfiguration());
 
         return config.build();
     }

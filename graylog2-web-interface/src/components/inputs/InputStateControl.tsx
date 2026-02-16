@@ -18,9 +18,7 @@ import * as React from 'react';
 import { useState } from 'react';
 
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
-import type { InputStates } from 'stores/inputs/InputStatesStore';
 import { isInputRunning, isInputInSetupMode } from 'components/inputs/helpers/inputState';
-import { useStore } from 'stores/connect';
 import useFeature from 'hooks/useFeature';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
@@ -29,19 +27,21 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { Button } from 'components/bootstrap';
 import { INPUT_SETUP_MODE_FEATURE_FLAG } from 'components/inputs/InputSetupWizard';
+import type { InputStates } from 'hooks/useInputsStates';
+import useIsInitialUnknownInputState from 'components/inputs/hooks/useIsInitialUnknownInputState';
 
 type Props = {
   input: Input;
+  inputStates: InputStates;
   openWizard: () => void;
 };
 
-const InputStateControl = ({ input, openWizard }: Props) => {
+const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
-
+  const isInitialUnknownState = useIsInitialUnknownInputState(inputStates, input.id);
   const startInput = () => {
     setIsLoading(true);
 
@@ -77,9 +77,9 @@ const InputStateControl = ({ input, openWizard }: Props) => {
     openWizard();
   };
 
-  if (inputSetupFeatureFlagIsEnabled && isInputInSetupMode(inputStates, input.id)) {
+  if (inputSetupFeatureFlagIsEnabled && (isInputInSetupMode(inputStates, input.id) || isInitialUnknownState)) {
     return (
-      <Button bsStyle="warning" onClick={setupInput}>
+      <Button bsStyle="warning" bsSize="xsmall" onClick={setupInput}>
         Set-up Input
       </Button>
     );
@@ -87,14 +87,14 @@ const InputStateControl = ({ input, openWizard }: Props) => {
 
   if (isInputRunning(inputStates, input.id)) {
     return (
-      <Button bsStyle="primary" onClick={stopInput} disabled={isLoading}>
+      <Button bsSize="xsmall" onClick={stopInput} disabled={isLoading}>
         {isLoading ? 'Stopping...' : 'Stop input'}
       </Button>
     );
   }
 
   return (
-    <Button bsStyle="success" onClick={startInput} disabled={isLoading}>
+    <Button bsStyle="primary" bsSize="xsmall" onClick={startInput} disabled={isLoading}>
       {isLoading ? 'Starting...' : 'Start input'}
     </Button>
   );

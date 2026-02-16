@@ -48,20 +48,13 @@ jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
   gl2ServerUrl: jest.fn(() => undefined),
   gl2DevMode: jest.fn(() => false),
-  isFeatureEnabled: jest.fn(() => false),
+  isFeatureEnabled: jest.fn(() => true),
   isCloud: jest.fn(() => false),
 }));
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   createBrowserRouter: jest.fn(),
-}));
-
-jest.mock('components/perspectives/hooks/useActivePerspective', () => ({
-  __esModule: true,
-  default: () => ({
-    activePerspective: mockDefaultPerspective,
-  }),
 }));
 
 jest.mock('components/navigation/NotificationBadge', () => () => null);

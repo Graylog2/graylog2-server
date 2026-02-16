@@ -1,0 +1,5 @@
+type = "a"
+message = "Added the ability to resize flexible width columns in entity tables (alerts overview, streams overview, etc.)."
+
+issues = ["23934"]
+pulls = ["24362"]

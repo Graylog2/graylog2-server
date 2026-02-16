@@ -24,6 +24,7 @@ import UserNotification from 'util/UserNotification';
 import {
   fetchErrors,
   fetchPaginatedLookupTables,
+  fetchLookupTable,
   createLookupTable,
   updateLookupTable,
   purgeLookupTableKey,
@@ -31,11 +32,13 @@ import {
   testLookupTableKey,
   deleteLookupTable,
   fetchPaginatedCaches,
+  fetchCache,
   fetchCacheTypes,
   deleteCache,
   fetchPaginatedDataAdapters,
   deleteDataAdapter,
   fetchLookupPreview,
+  fetchDataAdapter,
   fetchDataAdapterTypes,
   createCache,
   updateCache,
@@ -50,6 +53,22 @@ export function useFetchLookupTables() {
   return { fetchPaginatedLookupTables, lookupTablesKeyFn };
 }
 
+export function useFetchLookupTable(idOrName: string) {
+  const { data, isLoading } = useQuery({
+    queryKey: ['lookup-table-details', idOrName],
+    queryFn: () => defaultOnError(fetchLookupTable(idOrName), 'Failed to fetch lookup table'),
+    retry: false,
+    enabled: !!idOrName,
+  });
+
+  const { lookup_tables } = data || { lookup_tables: [] };
+
+  return {
+    lookupTable: lookup_tables?.[0],
+    loadingLookupTable: isLoading,
+  };
+}
+
 export function useCreateLookupTable() {
   const queryClient = useQueryClient();
 
@@ -59,6 +78,10 @@ export function useCreateLookupTable() {
       UserNotification.success('Lookup Table created successfully');
       queryClient.invalidateQueries({
         queryKey: ['lookup-tables'],
+        refetchType: 'active',
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['lookup-table-details'],
         refetchType: 'active',
       });
     },
@@ -72,10 +95,20 @@ export function useCreateLookupTable() {
 }
 
 export function useUpdateLookupTable() {
+  const queryClient = useQueryClient();
+
   const { mutateAsync, isPending: isLoading } = useMutation({
     mutationFn: updateLookupTable,
     onSuccess: () => {
       UserNotification.success('Lookup Table updated successfully');
+      queryClient.invalidateQueries({
+        queryKey: ['lookup-tables'],
+        refetchType: 'active',
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['lookup-table-details'],
+        refetchType: 'active',
+      });
     },
     onError: (error: Error) => UserNotification.error(error.message),
   });
@@ -119,9 +152,6 @@ export function usePurgeAllLookupTableKey() {
 export function useTestLookupTableKey() {
   const { mutateAsync, isPending } = useMutation({
     mutationFn: testLookupTableKey,
-    onSuccess: () => {
-      UserNotification.success('Lookup table purged successfully');
-    },
     onError: (error: Error) => UserNotification.error(error.message),
   });
 
@@ -168,6 +198,42 @@ export function useFetchCaches() {
   return { fetchPaginatedCaches, cachesKeyFn };
 }
 
+export function useFetchAllCaches() {
+  const { data, isLoading } = useQuery({
+    queryKey: ['all-caches'],
+    queryFn: () =>
+      defaultOnError(
+        fetchPaginatedCaches({
+          page: 1,
+          pageSize: 10000,
+          query: null,
+          sort: { attributeId: 'name', direction: 'asc' },
+        }),
+        'Failed to fetch all caches',
+      ),
+    retry: false,
+  });
+
+  return {
+    allCaches: data?.list || [],
+    loadingAllCaches: isLoading,
+  };
+}
+
+export function useFetchCache(idOrName: string) {
+  const { data, isLoading } = useQuery({
+    queryKey: ['cache-details', idOrName],
+    queryFn: () => defaultOnError(fetchCache(idOrName), 'Failed to fetch cache'),
+    retry: false,
+    enabled: !!idOrName,
+  });
+
+  return {
+    cache: data,
+    loadingCache: isLoading,
+  };
+}
+
 export function useFetchCacheTypes() {
   const { data, isLoading } = useQuery({
     queryKey: ['cache-types'],
@@ -197,6 +263,14 @@ export function useCreateCache() {
         queryKey: ['caches'],
         refetchType: 'active',
       });
+      queryClient.invalidateQueries({
+        queryKey: ['all-caches'],
+        refetchType: 'active',
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['cache-details'],
+        refetchType: 'active',
+      });
     },
     onError: (error: Error) => UserNotification.error(error.message),
   });
@@ -208,10 +282,24 @@ export function useCreateCache() {
 }
 
 export function useUpdateCache() {
+  const queryClient = useQueryClient();
+
   const { mutateAsync, isPending: isLoading } = useMutation({
     mutationFn: updateCache,
     onSuccess: () => {
       UserNotification.success('Cache updated successfully');
+      queryClient.invalidateQueries({
+        queryKey: ['caches'],
+        refetchType: 'active',
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['all-caches'],
+        refetchType: 'active',
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['cache-details'],
+        refetchType: 'active',
+      });
     },
     onError: (error: Error) => UserNotification.error(error.message),
   });
@@ -245,6 +333,28 @@ export function useFetchDataAdapters() {
   return { fetchPaginatedDataAdapters, dataAdaptersKeyFn };
 }
 
+export function useFetchAllDataAdapters() {
+  const { data, isLoading } = useQuery({
+    queryKey: ['all-data-adapters'],
+    queryFn: () =>
+      defaultOnError(
+        fetchPaginatedDataAdapters({
+          page: 1,
+          pageSize: 10000,
+          query: null,
+          sort: { attributeId: 'name', direction: 'asc' },
+        }),
+        'Failed to fetch all data adapters',
+      ),
+    retry: false,
+  });
+
+  return {
+    allDataAdapters: data?.list || [],
+    loadingAllDataAdapters: isLoading,
+  };
+}
+
 export function useFetchDataAdapterTypes() {
   const { data, isLoading } = useQuery({
     queryKey: ['data-adapter-types'],
@@ -252,6 +362,20 @@ export function useFetchDataAdapterTypes() {
   });
 
   return { fetchingDataAdapterTypes: isLoading, types: data };
+}
+
+export function useFetchDataAdapter(idOrName: string) {
+  const { data, isFetching } = useQuery({
+    queryKey: ['data-adapter-details', idOrName],
+    queryFn: () => defaultOnError(fetchDataAdapter(idOrName), 'Failed to fetch data adapter'),
+    retry: false,
+    enabled: !!idOrName,
+  });
+
+  return {
+    dataAdapter: data,
+    loadingDataAdapter: isFetching,
+  };
 }
 
 export function useCreateAdapter() {
@@ -265,6 +389,14 @@ export function useCreateAdapter() {
         queryKey: ['adapters'],
         refetchType: 'active',
       });
+      queryClient.invalidateQueries({
+        queryKey: ['all-data-adapters'],
+        refetchType: 'active',
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['data-adapter-details'],
+        refetchType: 'active',
+      });
     },
     onError: (error: Error) => UserNotification.error(error.message),
   });
@@ -276,10 +408,24 @@ export function useCreateAdapter() {
 }
 
 export function useUpdateAdapter() {
+  const queryClient = useQueryClient();
+
   const { mutateAsync, isPending: isLoading } = useMutation({
     mutationFn: updateDataAdapter,
     onSuccess: () => {
       UserNotification.success('Data Adapter updated successfully');
+      queryClient.invalidateQueries({
+        queryKey: ['adapters'],
+        refetchType: 'active',
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['all-data-adapters'],
+        refetchType: 'active',
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['data-adapter-details'],
+        refetchType: 'active',
+      });
     },
     onError: (error: Error) => UserNotification.error(error.message),
   });

@@ -44,15 +44,6 @@ type State = {
 };
 
 class JSONExtractorConfiguration extends React.Component<Props, State> {
-  private DEFAULT_CONFIGURATION = {
-    list_separator: ', ',
-    key_separator: '_',
-    kv_separator: '=',
-    key_prefix: '',
-    replace_key_whitespace: false,
-    key_whitespace_replacement: '_',
-  };
-
   static defaultProps = {
     exampleMessage: undefined,
   };
@@ -73,6 +64,15 @@ class JSONExtractorConfiguration extends React.Component<Props, State> {
   UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({ configuration: this._getEffectiveConfiguration(nextProps.configuration) });
   }
+
+  private DEFAULT_CONFIGURATION = {
+    list_separator: ', ',
+    key_separator: '_',
+    kv_separator: '=',
+    key_prefix: '',
+    replace_key_whitespace: false,
+    key_whitespace_replacement: '_',
+  };
 
   _onTryClick = () => {
     this.setState({ trying: true });

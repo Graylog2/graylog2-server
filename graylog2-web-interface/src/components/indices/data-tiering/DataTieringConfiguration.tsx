@@ -40,14 +40,23 @@ const DATA_TIERING_HOT_WARM_DEFAULTS = {
 
 export const durationToRoundedDays = (duration: string) => Math.round(moment.duration(duration).asDays());
 
-const dataTieringFormValuesWithDefaults = (values: DataTieringFormValues, pluginStore): DataTieringFormValues => {
+const dataTieringFormValuesWithDefaults = (
+  values: DataTieringFormValues,
+  pluginStore,
+  isDataTieringImmutable: boolean,
+): DataTieringFormValues => {
   const dataTieringPlugin = pluginStore
     .exports('dataTiering')
     .find((plugin) => plugin.type === DATA_TIERING_TYPE.HOT_WARM);
   const dataTieringType = dataTieringPlugin?.type ?? DATA_TIERING_TYPE.HOT_ONLY;
 
   if (dataTieringType === DATA_TIERING_TYPE.HOT_WARM) {
-    const hotWarmDefaults = { ...DATA_TIERING_HOT_ONLY_DEFAULTS, ...DATA_TIERING_HOT_WARM_DEFAULTS, ...values };
+    const hotWarmDefaults = {
+      ...DATA_TIERING_HOT_ONLY_DEFAULTS,
+      ...DATA_TIERING_HOT_WARM_DEFAULTS,
+      ...values,
+      ...(values.type === DATA_TIERING_TYPE.HOT_ONLY && isDataTieringImmutable ? { index_hot_lifetime_min: null } : {}),
+    };
 
     return hotWarmDefaults;
   }
@@ -57,7 +66,11 @@ const dataTieringFormValuesWithDefaults = (values: DataTieringFormValues, plugin
   return hotOnlyDefaults;
 };
 
-export const prepareDataTieringInitialValues = (config: DataTieringConfig, pluginStore): DataTieringFormValues => {
+export const prepareDataTieringInitialValues = (
+  config: DataTieringConfig,
+  pluginStore,
+  isDataTieringImmutable: boolean,
+): DataTieringFormValues => {
   let formValues = { ...config };
 
   dayFields.forEach((field) => {
@@ -67,16 +80,24 @@ export const prepareDataTieringInitialValues = (config: DataTieringConfig, plugi
     }
   });
 
-  return dataTieringFormValuesWithDefaults(formValues as unknown as DataTieringFormValues, pluginStore);
+  return dataTieringFormValuesWithDefaults(
+    formValues as unknown as DataTieringFormValues,
+    pluginStore,
+    isDataTieringImmutable,
+  );
 };
 
-export const prepareDataTieringConfig = (formValues: DataTieringFormValues, pluginStore): DataTieringConfig => {
+export const prepareDataTieringConfig = (
+  formValues: DataTieringFormValues,
+  pluginStore,
+  isDataTieringImmutable: boolean,
+): DataTieringConfig => {
   const dataTieringPlugin = pluginStore
     .exports('dataTiering')
     .find((plugin) => plugin.type === DATA_TIERING_TYPE.HOT_WARM);
   const dataTieringType = dataTieringPlugin?.type ?? DATA_TIERING_TYPE.HOT_ONLY;
 
-  let config = dataTieringFormValuesWithDefaults(formValues, pluginStore);
+  let config = dataTieringFormValuesWithDefaults(formValues, pluginStore, isDataTieringImmutable);
 
   if (dataTieringType === DATA_TIERING_TYPE.HOT_ONLY) {
     hotWarmOnlyFormFields.forEach((field) => {
@@ -117,7 +138,6 @@ const DataTieringConfiguration = <ValuesPrefix extends string | undefined>({
   const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => plugin.type === 'hot_warm');
 
   const { values } = useFormikContext<FormValues<ValuesPrefix>>();
-
   const sectionDisabled: boolean = immutableFields.includes('data_tiering');
 
   const formValue = (field: keyof DataTieringFormValues) => {

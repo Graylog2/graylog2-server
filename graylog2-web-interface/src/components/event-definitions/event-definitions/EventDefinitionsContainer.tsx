@@ -54,10 +54,10 @@ const getCustomColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByAt
       renderCell: (_status: string, eventDefinition: EventDefinition) => (
         <StatusCell eventDefinition={eventDefinition} />
       ),
-      staticWidth: 100,
+      staticWidth: 110,
     },
     priority: {
-      staticWidth: 100,
+      staticWidth: 'matchHeader' as const,
     },
     '_entity_source.source': {
       renderCell: (_title: string, eventDefinition: EventDefinition) => (
@@ -82,7 +82,7 @@ const renderEventDefinitionActions = (listItem: EventDefinition) => (
 const EventDefinitionsContainer = () => {
   const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
     usePluggableEntityTableElements<EventDefinition>(null, 'event_definition');
-  const { defaultLayout, columnOrder, additionalAttributes } = getEventDefinitionTableElements(pluggableAttributes);
+  const { defaultLayout, additionalAttributes } = getEventDefinitionTableElements(pluggableAttributes);
   const expandedSections = useMemo(
     () => ({
       ...pluggableExpandedSections,
@@ -93,7 +93,6 @@ const EventDefinitionsContainer = () => {
   return (
     <PaginatedEntityTable<EventDefinition>
       humanName="event definitions"
-      columnsOrder={columnOrder}
       additionalAttributes={additionalAttributes}
       queryHelpComponent={<QueryHelper entityName="event definition" />}
       tableLayout={defaultLayout}
@@ -101,7 +100,7 @@ const EventDefinitionsContainer = () => {
       entityActions={renderEventDefinitionActions}
       keyFn={keyFn}
       entityAttributesAreCamelCase={false}
-      expandedSectionsRenderer={expandedSections}
+      expandedSectionRenderers={expandedSections}
       filterValueRenderers={FilterValueRenderers}
       columnRenderers={getCustomColumnRenderers(pluggableColumnRenderers)}
       bulkSelection={bulkSelection}

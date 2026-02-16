@@ -1,106 +1,44 @@
-Upgrading to Graylog 7.0.x
+Upgrading to Graylog 7.1.x
 ==========================
+
+## User Session Termination
+
+All user sessions will be terminated when upgrading because the internal storage format for sessions has been changed.
+Users will have to log in again.
 
 ## Breaking Changes
 
-### Java 21
+### External Authentication Services: Changed Default User Time Zone
 
-Graylog now requires Java 21 to run. Earlier versions are no longer supported.
+The authentication backends for Active Directory, LDAP, OIDC, Okta, and SAML previously set the time zone for
+newly synchronized users to the value of the `root_timezone` config file setting. ("UTC" by default)
 
-Our operating system packages and container images are shipping with the
-correct Java version.
+Graylog 7.1 introduces a configurable "default user time zone" setting for all authentication backends.
+The default value is unset, meaning that the browser's time zone will be used by default.
 
-### Mongo DB 7.0
+### Formatting Change of `aggregation_conditions` Field in Aggregation Events
 
-Graylog now requires at least Mongo DB version 7.0. Earlier versions are no longer supported.
-
-In general, MongoDB upgrades must be done from one minor release to the next, going to the latest bug fix version 
-in that release. Please refer to the Mongo DB upgrade documentation for details:
-- [Upgrade tutorial](https://www.mongodb.com/docs/manual/tutorial/upgrade-revision/#std-label-upgrade-to-latest-revision/)
-- [6.0](https://www.mongodb.com/docs/manual/release-notes/6.0-upgrade/)
-- [7.0](https://www.mongodb.com/docs/manual/release-notes/7.0-upgrade/)
-- [8.0](https://www.mongodb.com/docs/manual/release-notes/8.0-upgrade/)
-
-### Kafka Inputs
-
-The `kafka-clients` library was updated to 4.x which removes support for Kafka
-brokers with version 2.0 and earlier. That means all Graylog 7.0 Kafka inputs
-can only talk to Kafka brokers with version 2.1 or newer.
-
-### Enterprise Theme Color Customization
-
-The logic for generating color shades based on custom-defined color variants (error, informative, etc.)
-has been slightly adjusted. This change ensures that the exact color specified in the customization settings
-is now used as the primary color for elements like buttons and badges in the UI.
+The `aggregation_conditions` map previously used keys with parentheses on the aggregation type. These needed to be
+escaped if they were used directly in Notification templates, e.g. `${aggregation_conditions.count\\(\\)}`,
+`${aggregation_conditions.sum\\(fieldname\\)}`. To avoid the need for escaping, their format has been modified to use
+underscores instead, e.g. `${aggregation_conditions.count}`, `${aggregation_conditions.sum_fieldname}`. Any
+existing notifications using the escaping of parentheses in explicit `aggregation_conditions` key names will need to
+be modified to instead use the underscore format.
 
 ## Configuration File Changes
 
-| Option        | Action     | Description                                    |
-|---------------|------------|------------------------------------------------|
-| `tbd`         | **added**  |                                                |
-
-## Default Configuration Changes
-
-- The permission to view the "Cluster Configuration" page was removed from the `Reader` role. This permission is now
-  available with the `Cluster Configuration Reader` role. There is an automatic one-time migration to add this role to
-  all existing users with the `Reader` role to ensure backwards compatibility. New users that will be created in the
-  future need to be explicitly assigned to the `Cluster Configuration Reader` role if they should be able to access the
-  page.
-- Only admins are allowed to create a new API token. Existing tokens are not affected by this change. Also, new tokens
-  will expire after 30 days by default.
+| Option | Action    | Description |
+|--------|-----------|-------------|
+| `tbd`  | **added** |             |
 
 ## Java API Changes
 
 - tbd
 
-## General REST API Changes
-
-- In Graylog 7.0, an issue was fixed that previously allowed additional unknown JSON properties to be accepted 
-  (and ignored) in API requests on the Graylog leader node. Now that the issue has been fixed, API requests on the 
-  leader node will once again only accept JSON payloads that contain explicitly mapped/supported properties.
-- APIs for entity creation now use a parameter `CreateEntityRequest` to keep entity fields separated from sharing 
-  information. This is a breaking change for all API requests that create entities, such as streams, dashboards, etc.
-  <br> Affected entities: 
-  - Search / Dashboard 
-  - Search Filter 
-  - Report
-  - Event Definition
-  - Stream
-  - Notifications
-  - Sigma rules
-  - Event procedure
-  - Event step
-  - Content Pack installation
-  - Teams
-  
-  <br> For example, the request payload to create a stream might now look like this:
-
-```json
-{
-    "entity":{
-        "index_set_id":"65b7ba138cdb8c534a953fef",
-        "description":"An example stream",
-        "title":"My Stream",
-        "remove_matches_from_default_stream":false
-    },
-    "share_request":{
-        "selected_grantee_capabilities":{
-            "grn::::search:684158906442150b2eefb78c":"own"
-        }
-    }
-}
-```
-- Access to the API browser now requires the `api_browser:read` permission. This permission can be granted by assigning 
-  the new “API Browser Reader” role to a user.
-
 ## REST API Endpoint Changes
 
 The following REST API changes have been made.
 
-| Endpoint                          | Description                                                                                                                                                                                |
-|-----------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `GET /system/urlallowlist`        | Renamed from `GET /system/urlwhitelist`. The corresponding REST API permission is renamed to `urlallowlist:read`.                                                                          |
-| `PUT /system/urlallowlist`        | Renamed from `PUT /system/urlwhitelist`                                                                         . The corresponding REST API permission is renamed to `urlallowlist:write` |
-| `POST /system/urlallowlist/check` | Renamed from `POST /system/urlwhitelist/check`                                                                                                                                             |
-| `POST /system/urlallowlist/generate_regex` | Renamed from `POST /system/urlwhitelist/generate_regex`                                                                                                                                    |
-| `GET /<endpoint>`                 | description                                                                                                                                                                                |
+| Endpoint             | Description                        |
+|----------------------|------------------------------------|
+| `GET /<endpoint>`    | Description of the endpoint change |

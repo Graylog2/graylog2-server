@@ -30,13 +30,14 @@ import org.graylog2.indexer.cluster.health.WatermarkSettings;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -57,9 +58,9 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class IndexerClusterCheckerThreadTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private Cluster cluster;
@@ -69,7 +70,7 @@ public class IndexerClusterCheckerThreadTest {
 
     private IndexerClusterCheckerThread indexerClusterCheckerThread;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         indexerClusterCheckerThread = new IndexerClusterCheckerThread(notificationService, cluster);
     }

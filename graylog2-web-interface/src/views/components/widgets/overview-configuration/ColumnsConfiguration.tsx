@@ -27,9 +27,7 @@ type Props = {
   columns: Array<string>;
   createSelectPlaceholder?: string;
   displaySortableListOverlayInPortal?: boolean;
-
   name: string;
-  testPrefix?: string;
 };
 
 const ColumnsConfiguration = ({
@@ -38,13 +36,11 @@ const ColumnsConfiguration = ({
   createSelectPlaceholder = 'Add a column',
   displaySortableListOverlayInPortal = false,
   name,
-  testPrefix = '',
 }: Props) => (
   <Field name={name}>
     {({ field: { value, onChange } }) => (
       <>
         <SelectedColumnsList
-          testPrefix={testPrefix}
           selectedColumns={value.toArray()}
           columnTitle={columnTitle}
           displayOverlayInPortal={displaySortableListOverlayInPortal}

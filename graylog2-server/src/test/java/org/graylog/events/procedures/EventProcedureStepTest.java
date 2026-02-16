@@ -18,7 +18,7 @@ package org.graylog.events.procedures;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -17,9 +17,10 @@
 package org.graylog2.shared.security;
 
 import org.apache.shiro.subject.Subject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -49,8 +50,10 @@ public class ShiroPrincipalTest {
         assertThat(shiroPrincipal.getSubject()).isSameAs(subject);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testConstructorWithNullSubject() throws Exception {
-        new ShiroPrincipal(null);
+        assertThrows(NullPointerException.class, () -> {
+            new ShiroPrincipal(null);
+        });
     }
 }

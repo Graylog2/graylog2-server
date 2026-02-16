@@ -1,0 +1,4 @@
+type = "a"
+message = "Showing optional line numbers in data table of aggregation widgets (enabled by default)."
+
+pulls = ["23672"]

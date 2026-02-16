@@ -14,10 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { InputStates, InputState } from 'stores/inputs/InputStatesStore';
+import type { InputState, InputStates } from 'hooks/useInputsStates';
 
 const inputHasSomeState = (inputStates: InputStates, inputId: string, states: Array<InputState>): boolean => {
   if (!inputStates) return false;
+
   const inputState = inputStates[inputId];
   if (!inputState) return false;
 

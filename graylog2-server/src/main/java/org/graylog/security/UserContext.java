@@ -17,14 +17,20 @@
 package org.graylog.security;
 
 import jakarta.inject.Inject;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.authz.permission.AllPermission;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 import org.graylog.grn.GRN;
+import org.graylog.util.uuid.ConcurrentUUID;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.security.Permission;
+import org.graylog2.shared.rest.RequestIdFilter;
+import org.graylog2.shared.security.ShiroRequestHeadersBinder;
 import org.graylog2.shared.users.UserService;
 
 import java.util.Optional;
@@ -33,7 +39,7 @@ import java.util.concurrent.Callable;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-public class UserContext implements HasUser {
+public class UserContext implements HasUser, HasPermissions {
     private final UserService userService;
     private final String userId;
     private final Subject subject;
@@ -50,7 +56,7 @@ public class UserContext implements HasUser {
          * Create a UserContext from the currently accessible Shiro Subject available to the calling code depending on runtime environment.
          * This should only be called from within an existing Shiro context.
          * If a UserContext is needed from an environment where there is no existing context,
-         * the code can be run using: {@link UserContext#runAs(String username, Callable)}
+         * the code can be run using: {@link UserContext#runAs(String username, UserService userService, Callable)}
          *
          * @return a user context reflecting the currently executing user.
          * @throws UserContextMissingException
@@ -93,43 +99,24 @@ public class UserContext implements HasUser {
                 .sessionCreationEnabled(false)
                 .buildSubject();
 
-        return subject.execute(callable);
+        return subject.execute(wrapWithRequestHeader(callable));
 
     }
 
-
-    /**
-     * Build a temporary Shiro Subject and run the callable within that context
-     *
-     * @param userId The userId of the subject
-     * @param callable The callable to be executed
-     * @param <T>      The return type of the callable.
-     * @return whatever the callable returns.
-     */
-    public static <T> T runAs(String userId, Callable<T> callable) {
-        final Subject subject = new Subject.Builder()
-                .principals(new SimplePrincipalCollection(userId, "runAs-context"))
-                .authenticated(true)
-                .sessionCreationEnabled(false)
-                .buildSubject();
-
-        return subject.execute(callable);
-    }
-
-    /**
-     * Build a temporary Shiro Subject and run the callable within that context
-     *
-     * @param userId The userId of the subject
-     * @param runnable The runnable to be executed
-     */
-    public static void runAs(String userId, Runnable runnable) {
-        final Subject subject = new Subject.Builder()
-                .principals(new SimplePrincipalCollection(userId, "runAs-context"))
-                .authenticated(true)
-                .sessionCreationEnabled(false)
-                .buildSubject();
-
-        subject.execute(runnable);
+    private static <T> Callable<T> wrapWithRequestHeader(Callable<T> callable) {
+        // temporarily add "X-Request-Id" header to suppress warning in org.graylog2.security.realm.MongoDbAuthorizationRealm
+        return () -> {
+            final MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+            headers.putSingle(RequestIdFilter.X_REQUEST_ID, ConcurrentUUID.generateRandomUuid().toString());
+            ThreadContext.put(ShiroRequestHeadersBinder.REQUEST_HEADERS, headers);
+            try {
+                return callable.call();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            } finally {
+                ThreadContext.remove(ShiroRequestHeadersBinder.REQUEST_HEADERS);
+            }
+        };
     }
 
     public UserContext(String userId, Subject subject, UserService userService) {

@@ -20,7 +20,6 @@ package org.graylog2.database.dbcatalog;
 import org.graylog2.cluster.nodes.ServerNodeEntity;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.users.UserImpl;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -30,7 +29,6 @@ import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 import static org.graylog2.shared.security.RestPermissions.USERS_READ;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Disabled
 class DbEntitiesCatalogProviderTest {
     @Test
     void testHandlesEntitiesWithDefaultTitleFieldProperly() {
@@ -59,6 +57,6 @@ class DbEntitiesCatalogProviderTest {
 
         final DbEntityCatalogEntry entryByCollectionName = dbEntitiesCatalog.getByCollectionName(UserImpl.COLLECTION_NAME).get();
 
-        assertEquals(new DbEntityCatalogEntry(UserImpl.COLLECTION_NAME, UserImpl.USERNAME, UserImpl.class, USERS_READ), entryByCollectionName);
+        assertEquals(new DbEntityCatalogEntry(UserImpl.COLLECTION_NAME, UserImpl.FULL_NAME, UserImpl.class, USERS_READ), entryByCollectionName);
     }
 }

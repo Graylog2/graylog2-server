@@ -17,7 +17,7 @@
 import React from 'react';
 
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
-import useColumnRenderers from 'components/events/events/ColumnRenderers';
+import ColumnRenderers from 'components/events/events/ColumnRenderers';
 import EventDetailsTable from 'components/events/events/EventDetailsTable';
 import { useGetEventDefinition } from 'components/event-definitions/hooks/useEventDefinitions';
 import { Spinner } from 'components/common';
@@ -29,7 +29,6 @@ type Props = {
 };
 
 const GeneralEventDetailsTable = ({ event, attributesList, meta }: Props) => {
-  const { attributes: attributesRenderers } = useColumnRenderers();
   const { event_definition_id } = event;
   const { data, isFetching } = useGetEventDefinition(event_definition_id);
 
@@ -42,7 +41,7 @@ const GeneralEventDetailsTable = ({ event, attributesList, meta }: Props) => {
       event={event}
       meta={meta}
       eventProcedureId={eventDefinitionEventProcedureId}
-      attributesRenderers={attributesRenderers}
+      attributesRenderers={ColumnRenderers.attributes}
       attributesList={attributesList}
     />
   );

@@ -41,8 +41,6 @@ import { GradientColor, StaticColor } from 'views/logic/views/formatting/highlig
 import { ModalSubmit } from 'components/common';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 
 type Props = {
   onClose: () => void;
@@ -109,7 +107,6 @@ const colorFromObject = (color: StaticColorObject | GradientColorObject) => {
 const HighlightForm = ({ onClose, rule = undefined, onSubmit: onSubmitProp }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
   const sendTelemetry = useSendTelemetry();
-  const location = useLocation();
   const fields = fieldTypes?.all ? fieldTypes.all : Immutable.List<FieldTypeMapping>();
   const fieldOptions = useMemo(
     () =>
@@ -125,13 +122,12 @@ const HighlightForm = ({ onClose, rule = undefined, onSubmit: onSubmitProp }: Pr
       const newColor = colorFromObject(color);
 
       sendTelemetry(TELEMETRY_EVENT_TYPE[`SEARCH_SIDEBAR_HIGHLIGHT_${rule ? 'UPDATED' : 'CREATED'}`], {
-        app_pathname: getPathnameWithoutId(location.pathname),
         app_action_value: 'search-sidebar-highlight',
       });
 
       return onSubmitProp(field, value, condition, newColor).then(onClose);
     },
-    [location.pathname, onClose, onSubmitProp, rule, sendTelemetry],
+    [onClose, onSubmitProp, rule, sendTelemetry],
   );
 
   const headerPrefix = rule ? 'Edit' : 'Create';

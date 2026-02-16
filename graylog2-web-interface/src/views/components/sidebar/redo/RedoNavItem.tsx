@@ -23,8 +23,6 @@ import { selectUndoRedoAvailability } from 'views/logic/slices/undoRedoSelectors
 import { redo } from 'views/logic/slices/undoRedoActions';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import useHotkey from 'hooks/useHotkey';
 import useViewType from 'views/hooks/useViewType';
 import type { ViewType } from 'views/logic/views/View';
@@ -36,16 +34,14 @@ const RedoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
   const dispatch = useViewsDispatch();
   const { isRedoAvailable } = useViewsSelector(selectUndoRedoAvailability);
   const sendTelemetry = useSendTelemetry();
-  const location = useLocation();
 
   const onClick = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_SIDEBAR_REDO, {
-      app_pathname: getPathnameWithoutId(location.pathname),
       app_action_value: 'search-sidebar-redo',
     });
 
     return dispatch(redo());
-  }, [dispatch, location.pathname, sendTelemetry]);
+  }, [dispatch, sendTelemetry]);
 
   useHotkey({
     actionKey: 'redo',

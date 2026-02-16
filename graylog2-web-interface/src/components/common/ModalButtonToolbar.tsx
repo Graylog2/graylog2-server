@@ -19,9 +19,6 @@ import styled from 'styled-components';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
 const ModalButtonToolbar = styled(ButtonToolbar)`
-  display: flex;
   justify-content: flex-end;
-  align-items: end;
-  gap: 0.25em;
 `;
 export default ModalButtonToolbar;

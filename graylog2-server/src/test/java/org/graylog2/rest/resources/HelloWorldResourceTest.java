@@ -21,8 +21,8 @@ import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.models.HelloWorldResponse;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,7 +37,7 @@ public class HelloWorldResourceTest extends RestResourceBaseTest {
     private HelloWorldResource helloWorldResource;
     private ClusterConfigService clusterConfigService;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         NodeId nodeId = new SimpleNodeId(CK_NODE_ID);
         this.clusterConfigService = mock(ClusterConfigService.class);

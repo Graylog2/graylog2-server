@@ -23,5 +23,5 @@ import org.graylog.plugins.views.search.SearchType;
  */
 public interface DataLakeSearchType extends SearchType {
 
-    String PREFIX = "data_warehouse_";
+    String PREFIX = "data_lake_";
 }

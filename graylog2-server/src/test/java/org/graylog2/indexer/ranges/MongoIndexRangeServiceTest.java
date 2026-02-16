@@ -19,14 +19,14 @@ package org.graylog2.indexer.ranges;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import org.assertj.jodatime.api.Assertions;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.ElasticsearchException;
-import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.events.IndicesClosedEvent;
@@ -37,12 +37,13 @@ import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.Set;
@@ -50,14 +51,13 @@ import java.util.SortedSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class MongoIndexRangeServiceTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
@@ -69,11 +69,11 @@ public class MongoIndexRangeServiceTest {
     private EventBus localEventBus;
     private MongoIndexRangeService indexRangeService;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) throws Exception {
         localEventBus = new EventBus("local-event-bus");
         indexRangeService = new MongoIndexRangeService(
-                new MongoCollections(objectMapperProvider, mongodb.mongoConnection()), indices, indexSetRegistry,
+                mongoCollections, indices, indexSetRegistry,
                 new NullAuditEventSender(), new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"), localEventBus);
     }
 
@@ -89,15 +89,17 @@ public class MongoIndexRangeServiceTest {
         assertThat(indexRange.calculationDuration()).isEqualTo(23);
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     @MongoDBFixtures("MongoIndexRangeServiceTest-LegacyIndexRanges.json")
     public void getIgnoresLegacyIndexRange() throws Exception {
-        indexRangeService.get("graylog_0");
+        assertThrows(NotFoundException.class, () ->
+                indexRangeService.get("graylog_0"));
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void getThrowsNotFoundException() throws Exception {
-        indexRangeService.get("does-not-exist");
+        assertThrows(NotFoundException.class, () ->
+                indexRangeService.get("does-not-exist"));
     }
 
     /**
@@ -115,9 +117,24 @@ public class MongoIndexRangeServiceTest {
         final SortedSet<IndexRange> indexRanges = indexRangeService.find(begin, end);
 
         assertThat(indexRanges).containsExactly(
+                MongoIndexRange.create("55e0261a0cc6980000000008", "graylog_deflect", new DateTime(1970, 1, 1, 0, 0, DateTimeZone.UTC), new DateTime(1970, 1, 1, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 6, 0, 0, DateTimeZone.UTC), 42),
                 MongoIndexRange.create("55e0261a0cc6980000000002", "graylog_2", new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 3, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 3, 0, 0, DateTimeZone.UTC), 42),
                 MongoIndexRange.create("55e0261a0cc6980000000003", "graylog_3", new DateTime(2015, 1, 3, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 4, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 4, 0, 0, DateTimeZone.UTC), 42),
-                MongoIndexRange.create("55e0261a0cc6980000000004", "graylog_4", new DateTime(2015, 1, 4, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 5, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 5, 0, 0, DateTimeZone.UTC), 42)
+                MongoIndexRange.create("55e0261a0cc6980000000004", "graylog_4", new DateTime(2015, 1, 4, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 5, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 5, 0, 0, DateTimeZone.UTC), 42),
+                MongoIndexRange.create("55e0261a0cc6980000000006", "graylog_6", new DateTime(1970, 1, 1, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 6, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 6, 0, 0, DateTimeZone.UTC), 42)
+        );
+    }
+
+    @Test
+    @MongoDBFixtures("MongoIndexRangeServiceTest-distinct.json")
+    public void findReturnsOnlyDeflectorIndex() throws Exception {
+        // looking at a timerange that contains no other indices so only the deflector is returned
+        final DateTime begin = new DateTime(2017, 1, 1, 0, 0, DateTimeZone.UTC);
+        final DateTime end = new DateTime(2017, 11, 1, 0, 0, DateTimeZone.UTC);
+        final SortedSet<IndexRange> indexRanges = indexRangeService.find(begin, end);
+
+        assertThat(indexRanges).containsExactly(
+                MongoIndexRange.create("55e0261a0cc6980000000008", "graylog_deflect", new DateTime(1970, 1, 1, 0, 0, DateTimeZone.UTC), new DateTime(1970, 1, 1, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 6, 0, 0, DateTimeZone.UTC), 42)
         );
     }
 
@@ -174,12 +191,14 @@ public class MongoIndexRangeServiceTest {
         Assertions.assertThat(indexRange.calculatedAt()).isEqualToIgnoringHours(DateTime.now(DateTimeZone.UTC));
     }
 
-    @Test(expected = ElasticsearchException.class)
+    @Test
     public void calculateRangeFailsIfIndexIsNotHealthy() throws Exception {
-        final String index = "graylog";
-        when(indices.waitForRecovery(index)).thenThrow(new ElasticsearchException("TEST"));
+        assertThrows(ElasticsearchException.class, () -> {
+            final String index = "graylog";
+            when(indices.waitForRecovery(index)).thenThrow(new ElasticsearchException("TEST"));
 
-        indexRangeService.calculateRange(index);
+            indexRangeService.calculateRange(index);
+        });
     }
 
     @Test
@@ -204,6 +223,41 @@ public class MongoIndexRangeServiceTest {
         assertThatThrownBy(() -> indexRangeService.calculateRange("does-not-exist"))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Unable to calculate range for index <does-not-exist>, index is unhealthy: Red");
+    }
+
+    @Test
+    void calculateAndSave() {
+        final String index = "graylog";
+        final DateTime min = new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC);
+        final DateTime max = new DateTime(2015, 1, 1, 5, 0, DateTimeZone.UTC);
+        when(indices.waitForRecovery(index)).thenReturn(HealthStatus.Green);
+        when(indices.indexRangeStatsOfIndex(index)).thenReturn(IndexRangeStats.create(min, max));
+
+        indexRangeService.save(indexRangeService.calculateRange(index));
+
+        final var ranges = indexRangeService.findAll();
+
+        assertThat(ranges).hasSize(1);
+
+        final var savedRange = ranges.first();
+
+        assertThat(savedRange.indexName()).isEqualTo(index);
+        assertThat(savedRange.begin()).isEqualTo(min);
+        assertThat(savedRange.end()).isEqualTo(max);
+
+        when(indices.indexRangeStatsOfIndex(index)).thenReturn(IndexRangeStats.create(min.plusYears(1), max.plusYears(1)));
+
+        assertThat(indexRangeService.calculateRangeAndSave(index)).isTrue();
+
+        final var updatedRanges = indexRangeService.findAll();
+
+        assertThat(updatedRanges).hasSize(1);
+
+        final var updatedRange = updatedRanges.first();
+
+        assertThat(updatedRange.indexName()).isEqualTo(index);
+        assertThat(updatedRange.begin()).isEqualTo(min.plusYears(1));
+        assertThat(updatedRange.end()).isEqualTo(max.plusYears(1));
     }
 
     @Test

@@ -17,19 +17,19 @@
 import { flushSync } from 'react-dom';
 
 import UserNotification from 'util/UserNotification';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import { loadDashboard } from 'views/logic/views/Actions';
 import type { HistoryFunction } from 'routing/useHistory';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import { setIsDirty, setIsNew } from 'views/logic/slices/viewSlice';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import { createView } from 'views/api/views';
 
 import type View from './View';
 
 export default (view: View, history: HistoryFunction, entityShare?: EntitySharePayload, existingViewId?: string) =>
   async (dispatch: ViewsDispatch) => {
     try {
-      const savedView = await ViewManagementActions.create(view, entityShare, existingViewId);
+      const savedView = await createView(view, entityShare, existingViewId);
 
       flushSync(() => {
         dispatch(setIsDirty(false));

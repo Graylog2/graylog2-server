@@ -17,7 +17,7 @@
 import React, { useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 
-import { DEFAULT_LAYOUT, ADDITIONAL_ATTRIBUTES, COLUMNS_ORDER } from 'components/users/UsersTokenManagement/constants';
+import { DEFAULT_LAYOUT, ADDITIONAL_ATTRIBUTES } from 'components/users/UsersTokenManagement/constants';
 import { Row, Col } from 'components/bootstrap';
 import { fetchTokens, keyFn } from 'components/users/UsersTokenManagement/hooks/useTokens';
 import type { Token } from 'components/users/UsersTokenManagement/hooks/useTokens';
@@ -39,8 +39,8 @@ const Header = styled.div`
 
 const TokenManagement = () => {
   const tokenAction = useCallback(
-    ({ user_id, id: tokenId, NAME: tokenName }: Token) => (
-      <TokenActions userId={user_id} tokenId={tokenId} tokenName={tokenName} />
+    ({ user_id, username, id: tokenId, NAME: tokenName }: Token) => (
+      <TokenActions userId={user_id} username={username} tokenId={tokenId} tokenName={tokenName} />
     ),
     [],
   );
@@ -82,9 +82,7 @@ const TokenManagement = () => {
             queryHelpComponent={
               <QueryHelper entityName="token" commonFields={[]} fieldMap={fieldMap} example={tokenExamples} />
             }
-            columnsOrder={COLUMNS_ORDER}
             additionalAttributes={ADDITIONAL_ATTRIBUTES}
-            actionsCellWidth={320}
             entityActions={tokenAction}
             tableLayout={DEFAULT_LAYOUT}
             fetchEntities={fetchTokens}

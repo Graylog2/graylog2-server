@@ -60,9 +60,9 @@ type InternalState = {
 };
 
 type EntitySource = {
-  source: String;
-  entityType: String;
-  parentId?: String;
+  source: string;
+  entityType: string;
+  parentId?: string;
 };
 
 export type ViewJson = {
@@ -213,8 +213,22 @@ export default class View {
   }
 
   toBuilder(): Builder {
-    const { id, title, summary, description, search, properties, state, createdAt, owner, requires, type, favorite } =
-      this._value;
+    const {
+      id,
+      title,
+      summary,
+      description,
+      search,
+      properties,
+      state,
+      createdAt,
+      owner,
+      requires,
+      type,
+      favorite,
+      lastUpdatedAt,
+      entitySource,
+    } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(
@@ -231,6 +245,8 @@ export default class View {
         requires,
         type,
         favorite,
+        lastUpdatedAt,
+        entitySource,
       }),
     );
   }
@@ -270,7 +286,7 @@ export default class View {
     } = value;
     const viewState: ViewStateMap = Immutable.Map(state).map(ViewState.fromJSON).toMap();
     const createdAtDate = new Date(created_at);
-    const lastUpdatedAtDate = new Date(last_updated_at);
+    const lastUpdatedAtDate = last_updated_at ? new Date(last_updated_at) : undefined;
 
     return View.create()
       .toBuilder()
@@ -353,7 +369,7 @@ class Builder {
     return new Builder(this.value.set('lastUpdatedAt', value));
   }
 
-  entitySource(value: String): Builder {
+  entitySource(value: string): Builder {
     return new Builder(this.value.set('entitySource', value));
   }
 

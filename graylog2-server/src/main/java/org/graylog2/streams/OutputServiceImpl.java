@@ -43,6 +43,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.graylog2.database.utils.MongoUtils.idEq;
 
@@ -134,27 +136,19 @@ public class OutputServiceImpl implements OutputService {
 
     @Override
     public Map<String, Long> countByType() {
-        final Map<String, Long> outputsCountByType = new HashMap<>();
+        final Map<String, Long> outputsCountByType;
         try (final var stream = MongoUtils.stream(rawCollection.find()
                 .projection(Projections.include(OutputImpl.FIELD_TYPE)))) {
 
-            stream.forEach(outputType -> {
-                final String type = (String) outputType.get(OutputImpl.FIELD_TYPE);
-                if (type != null) {
-                    final Long oldValue = outputsCountByType.get(type);
-                    final Long newValue = (oldValue == null) ? 1 : oldValue + 1;
-                    outputsCountByType.put(type, newValue);
-                }
-            });
+            outputsCountByType = new HashMap<>(stream.map(doc -> doc.getString(OutputImpl.FIELD_TYPE))
+                    .collect(Collectors.groupingBy(Function.identity(), Collectors.counting())));
         }
 
         return outputsCountByType;
     }
 
     private OutputImpl implOrFail(Output output) {
-        final OutputImpl outputImpl;
-        if (output instanceof OutputImpl) {
-            outputImpl = (OutputImpl) output;
+        if (output instanceof OutputImpl outputImpl) {
             return outputImpl;
         } else {
             throw new IllegalArgumentException("Supplied output must be of implementation type OutputImpl, not " + output.getClass());

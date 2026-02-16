@@ -16,34 +16,27 @@
  */
 package org.graylog2.decorators;
 
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@ExtendWith(MongoDBExtension.class)
 public class DecoratorServiceImplTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
 
     private DecoratorServiceImpl decoratorService;
 
-    @Before
-    public void setUp() {
-        final ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider();
-        final MongoJackObjectMapperProvider provider = new MongoJackObjectMapperProvider(objectMapperProvider.get());
-        decoratorService = new DecoratorServiceImpl(new MongoCollections(provider, mongodb.mongoConnection()));
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) {
+        decoratorService = new DecoratorServiceImpl(mongoCollections);
     }
 
     @Test
@@ -77,19 +70,19 @@ public class DecoratorServiceImplTest {
     }
 
     @Test
-    public void findByIdThrowsNotFoundExceptionForMissingDecorator() throws NotFoundException {
-        expectedException.expect(NotFoundException.class);
-        expectedException.expectMessage("Decorator with id 588bcafebabedeadbeef0001 not found.");
+    public void findByIdThrowsNotFoundExceptionForMissingDecorator() {
+        Throwable exception = assertThrows(NotFoundException.class, () ->
 
-        decoratorService.findById("588bcafebabedeadbeef0001");
+            decoratorService.findById("588bcafebabedeadbeef0001"));
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Decorator with id 588bcafebabedeadbeef0001 not found."));
     }
 
     @Test
-    public void findByIdThrowsIllegalArgumentExceptionForInvalidObjectId() throws NotFoundException {
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("state should be: hexString has 24 characters");
+    public void findByIdThrowsIllegalArgumentExceptionForInvalidObjectId() {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () ->
 
-        decoratorService.findById("NOPE");
+            decoratorService.findById("NOPE"));
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("state should be: hexString has 24 characters"));
     }
 
     @Test
@@ -165,9 +158,9 @@ public class DecoratorServiceImplTest {
 
     @Test
     public void deleteThrowsIllegalArgumentExceptionForInvalidObjectId() {
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("state should be: hexString has 24 characters");
+        Throwable exception = assertThrows(IllegalArgumentException.class, () ->
 
-        decoratorService.delete("NOPE");
+            decoratorService.delete("NOPE"));
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("state should be: hexString has 24 characters"));
     }
 }

@@ -67,6 +67,7 @@ export const HELP = {
       interface
     </span>
   ),
+  defaultUserTimezone: <span>Choose the default time zone for new users.</span>,
 };
 
 export const AUTH_BACKEND_META = {

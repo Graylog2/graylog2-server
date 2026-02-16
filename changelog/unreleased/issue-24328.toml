@@ -1,0 +1,5 @@
+type = "a"
+message = "Added multiple PagerDuty Notification improvements: custom incident title, fully customizable incident key, and use Replay Search URL for link instead of generic stream search."
+
+issues = ["24328"]
+pulls = ["24504"]

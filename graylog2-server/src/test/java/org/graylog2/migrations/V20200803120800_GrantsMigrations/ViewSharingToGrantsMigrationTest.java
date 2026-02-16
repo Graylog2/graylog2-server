@@ -37,7 +37,6 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.entities.source.EntitySourceService;
@@ -79,7 +78,7 @@ class ViewSharingToGrantsMigrationTest {
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb,
-               MongoJackObjectMapperProvider objectMapperProvider,
+               MongoCollections mongoCollections,
                GRNRegistry grnRegistry,
                @Mock ClusterConfigService clusterConfigService,
                @Mock UserService userService,
@@ -88,7 +87,7 @@ class ViewSharingToGrantsMigrationTest {
         this.dbCollection = mongodb.mongoCollection("view_sharings");
         this.userService = userService;
         this.roleService = roleService;
-        this.grantService = new DBGrantService(new MongoCollections(objectMapperProvider, mongodb.mongoConnection()));
+        this.grantService = new DBGrantService(mongoCollections);
 
         when(userService.load(anyString())).thenAnswer(a -> {
             final String argument = a.getArgument(0);
@@ -97,7 +96,6 @@ class ViewSharingToGrantsMigrationTest {
 
         final EntityRegistrar entityRegistrar = new EntityRegistrar(grantService, grnRegistry,
                 () -> Set.of(new EntityOwnershipRegistrationHandler(grantService, grnRegistry)));
-        final MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongodb.mongoConnection());
         final TestViewService viewService = new TestViewService(clusterConfigService, entityRegistrar, mongoCollections);
 
         this.migration = new ViewSharingToGrantsMigration(mongodb.mongoConnection(), grantService, userService, roleService, "admin", viewService, grnRegistry);

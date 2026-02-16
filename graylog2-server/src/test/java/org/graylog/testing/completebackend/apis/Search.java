@@ -73,6 +73,7 @@ public class Search implements GraylogRestApi {
             final var results = searchMessages(timeRange, streams);
             LOG.error("Messages we're waiting for: {}", String.join(", ", messages));
             LOG.error("Messages found: {}", String.join(", ", results));
+            api.log();
             throw error;
         }
         return this;

@@ -17,9 +17,7 @@
 package org.graylog2.database.utils;
 
 import org.graylog.testing.mongodb.MongoDBExtension;
-import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
@@ -43,8 +41,7 @@ public class ScopedEntityMongoUtilsTest {
     private ScopedEntityMongoUtils<ScopedDTO> scopedEntityMongoUtils;
 
     @BeforeEach
-    void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider objectMapperProvider) {
-        MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongoDBTestService.mongoConnection());
+    void setUp(MongoCollections mongoCollections) {
         collection = mongoCollections.collection("test", ScopedDTO.class);
         EntityScopeService scopeService = new EntityScopeService(Set.of(
                 new DefaultEntityScope(),

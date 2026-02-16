@@ -14,17 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useMemo } from 'react';
+import type { PluginExports } from 'graylog-web-plugin/plugin';
+
+import type { QualifiedUrl } from 'routing/Routes';
 import Routes from 'routing/Routes';
 import assertUnreachable from 'logic/assertUnreachable';
 import usePluginEntities from 'hooks/usePluginEntities';
 
-const getFirstMatchingEntityRoute = (
-  entityRouteResolver: Array<(id: string, type: string) => string | null>,
+const getFirstMatchingEntityRouteFromPlugin = (
+  entityRouteResolver: PluginExports['entityRoutes'],
   id: string,
   type: string,
 ) => {
-  for (let i = 0; i < entityRouteResolver.length; i += 1) {
-    const entityRoute = entityRouteResolver[i](id, type);
+  if (!entityRouteResolver?.length) {
+    return undefined;
+  }
+
+  for (const resolver of entityRouteResolver) {
+    const entityRoute = resolver(id, type);
 
     if (entityRoute) {
       return entityRoute;
@@ -34,60 +42,89 @@ const getFirstMatchingEntityRoute = (
   return undefined;
 };
 
-const useEntityRouteFromPlugin = (id: string, type: string) => {
-  const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
-  if (!pluginEntityRoutesResolver?.length) {
-    return null;
+const getBaseEntityRoute = (id: string, type: string): QualifiedUrl<string> | undefined => {
+  switch (type?.toLowerCase()) {
+    case 'user':
+      return Routes.SYSTEM.USERS.show(id);
+    case 'dashboard':
+      return Routes.dashboard_show(id);
+    case 'event_definition':
+      return Routes.ALERTS.DEFINITIONS.show(id);
+    case 'notification':
+      return Routes.ALERTS.NOTIFICATIONS.show(id);
+    case 'search':
+      return Routes.show_saved_search(id);
+    case 'stream':
+      return Routes.stream_search(id);
+    case 'role':
+      return Routes.SYSTEM.AUTHZROLES.show(id);
+    case 'output':
+      return Routes.SYSTEM.OUTPUTS;
+    case 'index_set':
+      return Routes.SYSTEM.INDEX_SETS.SHOW(id);
+    case 'content_pack':
+      return Routes.SYSTEM.CONTENTPACKS.show(id);
+    case 'lookup_table':
+      return Routes.SYSTEM.LOOKUPTABLES.show(id);
+    case 'lookup_table_cache':
+      return Routes.SYSTEM.LOOKUPTABLES.CACHES.show(id);
+    case 'lookup_table_data_adapter':
+      return Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(id);
+    case 'pipeline_rule':
+      return Routes.SYSTEM.PIPELINES.RULE(id);
+    case 'pipeline':
+      return Routes.SYSTEM.PIPELINES.PIPELINE(id);
+    case 'input':
+      return Routes.SYSTEM.INPUT_DIAGNOSIS(id);
+    case 'event_notification':
+      return Routes.ALERTS.NOTIFICATIONS.show(id);
+    case 'node':
+      return Routes.SYSTEM.CLUSTER.NODE_SHOW(id);
   }
 
-  return getFirstMatchingEntityRoute(pluginEntityRoutesResolver, id, type);
+  return undefined;
 };
 
-const useShowRouteForEntity = (id: string, type: string) => {
-  const entityRouteFromPlugin = useEntityRouteFromPlugin(id, type);
+export const getEntityRoute = (
+  id: string,
+  type: string,
+  entityRouteResolver: PluginExports['entityRoutes'],
+  entityTypeGenerators: { [type: string]: PluginExports['entityTypeRoute'][number]['route'] },
+): QualifiedUrl<string> => {
+  const entityRouteFromPlugin = getFirstMatchingEntityRouteFromPlugin(entityRouteResolver, id, type);
 
   if (entityRouteFromPlugin) {
     return entityRouteFromPlugin;
   }
 
-  switch (type?.toLowerCase()) {
-    case 'user':
-      return Routes.SYSTEM.USERS.show(id);
-    case 'team':
-      return Routes.getPluginRoute('SYSTEM_TEAMS_TEAMID')(id);
-    case 'team_users':
-      return Routes.getPluginRoute('SYSTEM_TEAMS_TEAMID')(id);
-    case 'dashboard':
-      return Routes.dashboard_show(id);
-    case 'event_definition':
-      return Routes.ALERTS.DEFINITIONS.show(id);
-    case 'event_procedure':
-      return Routes.getPluginRoute('ALERTS_EVENT-PROCEDURES_PROCEDURES');
-    case 'event_procedure_step':
-      return Routes.getPluginRoute('ALERTS_EVENT-PROCEDURES_STEPS');
-    case 'notification':
-      return Routes.ALERTS.NOTIFICATIONS.show(id);
-    case 'search':
-      return Routes.getPluginRoute('SEARCH_VIEWID')(id);
-    case 'stream':
-      return Routes.stream_search(id);
-    case 'search_filter':
-      return Routes.getPluginRoute('MY-FILTERS_DETAILS_FILTERID')?.(id);
-    case 'sigma_rule':
-      return Routes.getPluginRoute('SECURITY_SIGMA');
-    case 'report':
-      return Routes.getPluginRoute('REPORTS_REPORTID_ARCHIVE')?.(id);
-    case 'role':
-      return Routes.SYSTEM.AUTHZROLES.show(id);
-    case 'output':
-      return Routes.SYSTEM.OUTPUTS;
-    case 'collection':
-      return Routes.getPluginRoute('COLLECTIONS_COLLECTIONID')?.(id);
-    case 'collection_entities':
-      return Routes.getPluginRoute('COLLECTIONS_COLLECTIONID')?.(id);
-    default:
-      return assertUnreachable((type as never) ?? '(undefined)', "Can't find route for type");
+  const baseRoute = getBaseEntityRoute(id, type);
+
+  if (baseRoute) {
+    return baseRoute;
   }
+
+  const pluginRoute = entityTypeGenerators[type];
+  if (pluginRoute) {
+    return pluginRoute(id);
+  }
+
+  return assertUnreachable((type as never) ?? '(undefined)', "Can't find route for type");
+};
+
+export const usePluginEntityTypeGenerators = () => {
+  const pluginEntityTypeGenerators = usePluginEntities('entityTypeRoute');
+
+  return useMemo(
+    () => Object.fromEntries(pluginEntityTypeGenerators.map((e) => [e.type, e.route])),
+    [pluginEntityTypeGenerators],
+  );
+};
+
+const useShowRouteForEntity = (id: string, type: string) => {
+  const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
+  const entityTypeGenerators = usePluginEntityTypeGenerators();
+
+  return getEntityRoute(id, type, pluginEntityRoutesResolver, entityTypeGenerators);
 };
 
 export default useShowRouteForEntity;

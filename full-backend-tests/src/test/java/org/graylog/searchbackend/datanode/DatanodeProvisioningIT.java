@@ -26,7 +26,6 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
-import io.restassured.response.ValidatableResponse;
 import jakarta.annotation.Nonnull;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.lang.RandomStringUtils;
@@ -36,20 +35,23 @@ import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.CertutilCa;
 import org.graylog.security.certutil.console.TestableConsole;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.conditions.EnabledIfSearchServer;
 import org.graylog.testing.restoperations.DatanodeOpensearchWait;
 import org.graylog.testing.restoperations.RestOperationParameters;
+import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.security.JwtSecret;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.graylog2.security.jwt.IndexerJwtAuthTokenProvider;
+import org.graylog2.storage.SearchVersion;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
@@ -68,6 +70,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.time.Clock;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -76,23 +79,25 @@ import java.util.regex.Pattern;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.not;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.DATANODE_DEV,
-                                   additionalConfigurationParameters = {
-                                           @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
-                                           @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),
-                                   })
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
+                             env = {
+                                     @GraylogBackendConfiguration.Env(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
+                                     @GraylogBackendConfiguration.Env(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),
+                             })
+@EnabledIfSearchServer(distribution = SearchVersion.Distribution.DATANODE)
 public class DatanodeProvisioningIT {
 
     private final Logger log = LoggerFactory.getLogger(DatanodeProvisioningIT.class);
 
-    private final GraylogApis apis;
+    private static GraylogApis apis;
 
     @TempDir
     private Path tempDir;
     private BasicAuthCredentials basicAuth;
 
-    public DatanodeProvisioningIT(GraylogApis apis) {
-        this.apis = apis;
+    @BeforeAll
+    static void beforeAll(GraylogApis graylogApis) {
+        apis = graylogApis;
     }
 
     @BeforeEach
@@ -105,14 +110,14 @@ public class DatanodeProvisioningIT {
         resetPreflight();
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void provisionDatanodeGenerateCA() throws ExecutionException, RetryException, KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
         final String caSubjectName = createSelfSignedCA();
 
         configureAutomaticCertRenewalPolicy();
         triggerDatanodeProvisioning();
         // Wait till all the datanodes become CONNECTED (=stated with certificates)
-        final List<DatanodeStatus> connectedDatanodes = waitForDatanodesConnected(basicAuth);
+        final List<DatanodeStatus> connectedDatanodes = waitForDatanodesConnected();
         // verify that we have one connected datanode
         Assertions.assertThat(connectedDatanodes)
                 .hasSize(1);
@@ -128,7 +133,7 @@ public class DatanodeProvisioningIT {
         Assertions.assertThat(subject.getName()).isEqualTo("CN=" + caSubjectName);
     }
 
-    private void testEncryptedConnectionToOpensearch(KeyStore truststore) throws ExecutionException, RetryException, KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
+    private void testEncryptedConnectionToOpensearch(KeyStore truststore) throws ExecutionException, RetryException {
         try {
             new DatanodeOpensearchWait(RestOperationParameters.builder()
                     .port(getOpensearchPort())
@@ -148,8 +153,8 @@ public class DatanodeProvisioningIT {
         return provider.get();
     }
 
-    private List<DatanodeStatus> waitForDatanodesConnected(BasicAuthCredentials basicAuth) throws ExecutionException, RetryException {
-        List<DatanodeStatus> connectedDatanodes = null;
+    private List<DatanodeStatus> waitForDatanodesConnected() throws ExecutionException, RetryException {
+        List<DatanodeStatus> connectedDatanodes;
         try {
             connectedDatanodes = RetryerBuilder.<List<DatanodeStatus>>newBuilder()
                     .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
@@ -162,7 +167,7 @@ public class DatanodeProvisioningIT {
                             }
                         }
                     })
-                    .retryIfResult(list -> list.isEmpty() || !list.stream().allMatch(node ->
+                    .retryIfResult(list -> Objects.requireNonNull(list).isEmpty() || !list.stream().allMatch(node ->
                             node.status().equals(DataNodeProvisioningConfig.State.CONNECTED.name()) &&
                                     node.dataNodeStatus().equals(DataNodeStatus.AVAILABLE.name())
                     ))
@@ -175,11 +180,11 @@ public class DatanodeProvisioningIT {
         return connectedDatanodes;
     }
 
-    private ValidatableResponse triggerDatanodeProvisioning() {
-        return given()
-                .spec(apis.requestSpecification())
+    private void triggerDatanodeProvisioning() {
+        given().spec(apis.requestSpecification())
                 .body("")
-                .auth().basic(basicAuth.username, basicAuth.password)
+                .auth()
+                .basic(basicAuth.username, basicAuth.password)
                 .post("/generate")
                 .then()
                 .statusCode(HttpStatus.SC_NO_CONTENT);
@@ -187,10 +192,10 @@ public class DatanodeProvisioningIT {
 
     private String createSelfSignedCA() {
         String subject = "Graylog CA generated " + RandomStringUtils.randomAlphanumeric(10);
-        given()
-                .spec(apis.requestSpecification())
+        given().spec(apis.requestSpecification())
                 .body("{\"organization\":\"" + subject + "\"}")
-                .auth().basic(basicAuth.username, basicAuth.password)
+                .auth()
+                .basic(basicAuth.username, basicAuth.password)
                 .post("/ca/create")
                 .then()
                 .statusCode(HttpStatus.SC_CREATED);
@@ -207,17 +212,17 @@ public class DatanodeProvisioningIT {
                 .statusCode(HttpStatus.SC_NO_CONTENT);
     }
 
-    private ValidatableResponse configureAutomaticCertRenewalPolicy() {
-        return given()
-                .spec(apis.requestSpecification())
+    private void configureAutomaticCertRenewalPolicy() {
+        given().spec(apis.requestSpecification())
                 .body("{\"mode\":\"Automatic\",\"certificate_lifetime\":\"P30D\"}")
-                .auth().basic(basicAuth.username, basicAuth.password)
+                .auth()
+                .basic(basicAuth.username, basicAuth.password)
                 .post("/renewal_policy")
                 .then()
                 .statusCode(HttpStatus.SC_NO_CONTENT);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void provisionDatanodeUploadCA() throws ExecutionException, RetryException, CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
         final Path caKeystore = createCA();
 
@@ -225,7 +230,7 @@ public class DatanodeProvisioningIT {
         configureAutomaticCertRenewalPolicy();
         triggerDatanodeProvisioning();
         // Wait till all the datanodes become CONNECTED (=stated with certificates)
-        final List<DatanodeStatus> connectedDatanodes = waitForDatanodesConnected(basicAuth);
+        final List<DatanodeStatus> connectedDatanodes = waitForDatanodesConnected();
         // verify that we have one connected datanode
         Assertions.assertThat(connectedDatanodes)
                 .hasSize(1);
@@ -236,10 +241,10 @@ public class DatanodeProvisioningIT {
         testEncryptedConnectionToOpensearch(truststore);
     }
 
-    private ValidatableResponse uploadCA(Path caKeystore) {
-        return given()
-                .spec(apis.requestSpecification())
-                .auth().basic(basicAuth.username, basicAuth.password)
+    private void uploadCA(Path caKeystore) {
+        given().spec(apis.requestSpecification())
+                .auth()
+                .basic(basicAuth.username, basicAuth.password)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .multiPart("files", caKeystore.toFile())
                 .multiPart("password", "my-secret-password")
@@ -286,7 +291,7 @@ public class DatanodeProvisioningIT {
                 .auth().basic(basicAuth.username, basicAuth.password)
                 .get("/data_nodes")
                 .then()
-                .extract().body().as(new TypeRef<List<DatanodeStatus>>() {});
+                .extract().body().as(new TypeRef<>() {});
 
     }
 
@@ -307,9 +312,9 @@ public class DatanodeProvisioningIT {
             @JsonProperty("transport_address") String transportAddress,
             @JsonProperty("status") String status,
             @JsonProperty("error_msg") String errorMsg,
-            @JsonProperty("hostname") String hostname,
+            @JsonProperty(DataNodeDto.FIELD_HOSTNAME) String hostname,
             @JsonProperty("short_node_id") String shortNodeId,
-            @JsonProperty("data_node_status") String dataNodeStatus
+            @JsonProperty(DataNodeDto.FIELD_DATANODE_STATUS) String dataNodeStatus
     ) {
     }
 }

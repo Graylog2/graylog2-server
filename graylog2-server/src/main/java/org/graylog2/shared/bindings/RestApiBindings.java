@@ -19,10 +19,12 @@ package org.graylog2.shared.bindings;
 import com.google.inject.Scopes;
 import com.google.inject.multibindings.Multibinder;
 import jakarta.ws.rs.container.DynamicFeature;
+import org.graylog.mcp.server.McpRestResource;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.rest.resources.RestResourcesModule;
 import org.graylog2.rest.resources.system.CookieFactory;
+import org.graylog2.shared.rest.documentation.openapi.OpenAPIBindings;
 import org.graylog2.shared.rest.resources.RestResourcesSharedModule;
 import org.graylog2.shared.security.ShiroSecurityBinding;
 import org.graylog2.web.IndexHtmlGenerator;
@@ -54,10 +56,14 @@ public class RestApiBindings extends PluginModule {
         bind(Config.class).toProvider(ConfigProvider.class);
         bind(CookieFactory.class).in(Scopes.SINGLETON);
 
+        install(new OpenAPIBindings());
+
         // Install all resource modules
         install(new WebResourcesModule());
         install(new RestResourcesModule(configuration));
         install(new RestResourcesSharedModule());
+
+        addSystemRestResource(McpRestResource.class);
     }
 
     private void bindDynamicFeatures() {

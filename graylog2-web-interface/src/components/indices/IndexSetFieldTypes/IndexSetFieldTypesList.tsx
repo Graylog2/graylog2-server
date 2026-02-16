@@ -41,9 +41,8 @@ export const DEFAULT_LAYOUT = {
   defaultPageSize: 20,
   defaultSort: { attributeId: 'field_name', direction: 'asc' } as Sort,
   defaultDisplayedAttributes: ['field_name', 'type', 'origin', 'is_reserved'],
+  defaultColumnOrder: ['field_name', 'type', 'origin', 'is_reserved'],
 };
-
-const COLUMNS_ORDER = ['field_name', 'type', 'origin', 'is_reserved'];
 
 const StyledStatusIcon = styled(StatusIcon)`
   margin-right: 5px;
@@ -106,14 +105,13 @@ const IndexSetFieldTypesList = () => {
   return (
     <PaginatedEntityTable<IndexSetFieldType>
       humanName="index set field types"
-      columnsOrder={COLUMNS_ORDER}
       entityActions={indexFieldTypeChangeAllowed && renderActions}
       tableLayout={DEFAULT_LAYOUT}
       topRightCol={indexFieldTypeChangeAllowed && <IndexSetProfile />}
       fetchEntities={(searchParams) => fetchIndexSetFieldTypes(indexSetId, searchParams)}
       keyFn={keyFn}
       bulkSelection={bulkSelection}
-      expandedSectionsRenderer={expandedSections}
+      expandedSectionRenderers={expandedSections}
       entityAttributesAreCamelCase
       filterValueRenderers={FilterValueRenderers}
       columnRenderers={customColumnRenderers}

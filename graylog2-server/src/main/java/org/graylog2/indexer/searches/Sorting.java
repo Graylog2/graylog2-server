@@ -58,6 +58,10 @@ public class Sorting {
         return this.direction;
     }
 
+    public String getUppercasedDirection() {
+        return this.direction.toString().toUpperCase(Locale.ENGLISH);
+    }
+
     public Optional<String> getUnmappedType() {
         return Optional.ofNullable(this.unmappedType);
     }

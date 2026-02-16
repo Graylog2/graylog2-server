@@ -17,10 +17,15 @@
 package org.graylog.plugins.views.search.views.widgets.aggregation;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
+
+import java.util.HashMap;
+import java.util.Optional;
 
 public interface XYVisualizationConfig {
     String FIELD_AXIS_TYPE = "axis_type";
+    String FIELD_AXIS_CONFIG = "axis_config";
     AxisType DEFAULT_AXIS_TYPE = AxisType.LINEAR;
 
     enum AxisType {
@@ -41,4 +46,18 @@ public interface XYVisualizationConfig {
     }
 
     AxisType axisType();
+
+    enum UnitType {
+        number,
+        percent,
+        time,
+        size,
+        xaxis;
+    }
+
+    record SingleAxisConfig(@JsonProperty Optional<String> title, @JsonProperty Optional<String> color) {}
+
+    class AxisConfig extends HashMap<UnitType, SingleAxisConfig> {}
+
+    Optional<AxisConfig> axisConfig();
 }

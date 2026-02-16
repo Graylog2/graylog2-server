@@ -70,7 +70,7 @@ const DataNodePage = () => {
   }
 
   const datanode = data as DataNode;
-  const datanodeDisabled = datanode.data_node_status !== 'AVAILABLE';
+  const datanodeDisabled = datanode.datanode_status !== 'AVAILABLE';
 
   return (
     <DocumentTitle title={`Data Nodes: ${datanode.hostname}`}>
@@ -95,10 +95,10 @@ const DataNodePage = () => {
               <dd>
                 <StatusLabel
                   bsStyle={datanodeDisabled ? 'warning' : 'success'}
-                  title={datanode.data_node_status}
-                  aria-label={datanode.data_node_status}
+                  title={datanode.datanode_status}
+                  aria-label={datanode.datanode_status}
                   role="button">
-                  {datanode.data_node_status || 'N/A'}
+                  {datanode.datanode_status || 'N/A'}
                 </StatusLabel>
               </dd>
               <dt>Certificate valid until:</dt>

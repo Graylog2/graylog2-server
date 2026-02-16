@@ -18,7 +18,6 @@ package org.graylog2.indexer.messages;
 
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog2.Configuration;
-import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Message;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.joda.time.DateTime;
@@ -177,7 +176,7 @@ class MessagesBulkIndexRetryingTest {
     private List<MessageWithIndex> messagesWithIds(String... ids) {
         return Arrays.stream(ids)
                 .map(this::messageWithId)
-                .map(m -> new MessageWithIndex(ImmutableMessage.wrap(m), mock(IndexSet.class)))
+                .map(m -> new MessageWithIndex(ImmutableMessage.wrap(m), "randomIndex"))
                 .collect(Collectors.toList());
     }
 
@@ -189,7 +188,7 @@ class MessagesBulkIndexRetryingTest {
     }
 
     private List<MessageWithIndex> messageListWith(Message mockedMessage) {
-        return List.of(new MessageWithIndex(ImmutableMessage.wrap(mockedMessage), mock(IndexSet.class)));
+        return List.of(new MessageWithIndex(ImmutableMessage.wrap(mockedMessage), "randomIndex"));
     }
 
     private IndexingError errorResultItem(String messageId, IndexingError.Type errorType, String errorReason) {

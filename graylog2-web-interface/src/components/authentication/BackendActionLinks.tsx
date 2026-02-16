@@ -37,7 +37,7 @@ const BackendActionLinks = ({ activeBackend, finishedLoading }: Props) => (
       </Button>
     </LinkContainer>
     <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.CREATE}>
-      <Button bsStyle="success" type="button">
+      <Button bsStyle="primary" type="button">
         Create service
       </Button>
     </LinkContainer>

@@ -18,14 +18,22 @@ import * as React from 'react';
 
 import { FormikInput } from 'components/common';
 import { Row, Col, Input } from 'components/bootstrap';
+import { DEFAULT_PASSWORD_COMPLEXITY_CONFIG, passwordComplexityErrors } from 'logic/users/passwordComplexity';
+import type { PasswordComplexityConfigType } from 'stores/configurations/ConfigurationsStore';
+import PasswordRules from 'components/users/PasswordRules';
+import usePasswordHelpText from 'components/users/usePasswordHelpText';
 
-export const PASSWORD_MIN_LENGTH = 6;
-
-export const validatePasswords = (errors: { [name: string]: string }, password: string, passwordRepeat: string) => {
+export const validatePasswords = (
+  errors: { [name: string]: React.ReactNode },
+  password: string,
+  passwordRepeat: string,
+  passwordConfig: PasswordComplexityConfigType = DEFAULT_PASSWORD_COMPLEXITY_CONFIG,
+) => {
   const newErrors = { ...errors };
+  const complexityErrors = passwordComplexityErrors(password, passwordConfig);
 
-  if (password && password.length < PASSWORD_MIN_LENGTH) {
-    newErrors.password = `Password must be at least ${PASSWORD_MIN_LENGTH} characters long`;
+  if (complexityErrors.length > 0) {
+    newErrors.password = <PasswordRules lines={complexityErrors} />;
   }
 
   if (password && passwordRepeat) {
@@ -39,45 +47,51 @@ export const validatePasswords = (errors: { [name: string]: string }, password: 
   return newErrors;
 };
 
-type Props = {};
+type Props = {
+  passwordComplexityConfig: PasswordComplexityConfigType;
+};
 
-// eslint-disable-next-line no-empty-pattern
-const PasswordFormGroup = ({}: Props) => (
-  <Input
-    id="password-field"
-    label="Password"
-    help={`Passwords must be at least ${PASSWORD_MIN_LENGTH} characters long. We recommend using a strong password.`}
-    labelClassName="col-sm-3"
-    wrapperClassName="col-sm-9">
-    <Row className="no-bm">
-      <Col sm={6}>
-        <FormikInput
-          name="password"
-          id="password"
-          maxLength={100}
-          type="password"
-          placeholder="Password"
-          required
-          formGroupClassName="form-group no-bm"
-          wrapperClassName="col-xs-12"
-          minLength={PASSWORD_MIN_LENGTH}
-        />
-      </Col>
-      <Col sm={6}>
-        <FormikInput
-          name="password_repeat"
-          id="password_repeat"
-          maxLength={100}
-          type="password"
-          placeholder="Repeat password"
-          formGroupClassName="form-group no-bm"
-          required
-          wrapperClassName="col-xs-12"
-          minLength={PASSWORD_MIN_LENGTH}
-        />
-      </Col>
-    </Row>
-  </Input>
-);
+const PasswordFormGroup = ({ passwordComplexityConfig }: Props) => {
+  const minLength = passwordComplexityConfig.min_length;
+  const effectiveHelpText = usePasswordHelpText({ passwordComplexityConfig });
+
+  return (
+    <Input
+      id="password-field"
+      label="Password"
+      help={effectiveHelpText}
+      labelClassName="col-sm-3"
+      wrapperClassName="col-sm-9">
+      <Row className="no-bm">
+        <Col sm={6}>
+          <FormikInput
+            name="password"
+            id="password"
+            maxLength={100}
+            type="password"
+            placeholder="Password"
+            required
+            formGroupClassName="form-group no-bm"
+            wrapperClassName="col-xs-12"
+            minLength={minLength}
+          />
+        </Col>
+        <Col sm={6}>
+          <FormikInput
+            name="password_repeat"
+            id="password_repeat"
+            maxLength={100}
+            type="password"
+            placeholder="Repeat password"
+            formGroupClassName="form-group no-bm"
+            required
+            wrapperClassName="col-xs-12"
+            minLength={minLength}
+          />
+        </Col>
+      </Row>
+    </Input>
+  );
+};
 
 export default PasswordFormGroup;

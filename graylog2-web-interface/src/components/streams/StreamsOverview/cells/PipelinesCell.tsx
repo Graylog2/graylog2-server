@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useRef } from 'react';
 import * as React from 'react';
+import { useRef } from 'react';
 
-import StreamCountBadge from 'components/streams/StreamCountBadge';
 import type { Stream } from 'stores/streams/StreamsStore';
 import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
+import { CountBadge } from 'components/common';
 
 type Props = {
   stream: Stream;
@@ -36,11 +36,7 @@ const PipelinesCell = ({ stream }: Props) => {
 
   const pipelinesCount = data?.length || 0;
 
-  return (
-    <StreamCountBadge disabled={pipelinesCount === 0} ref={buttonRef} title="Connected pipelines">
-      {pipelinesCount}
-    </StreamCountBadge>
-  );
+  return <CountBadge count={pipelinesCount} ref={buttonRef} title="Connected pipelines" />;
 };
 
 export default PipelinesCell;

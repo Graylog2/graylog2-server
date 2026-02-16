@@ -18,5 +18,6 @@ package org.graylog2.indexer;
 
 public interface Constants {
     String COMPOSABLE_INDEX_TEMPLATES_FEATURE = "composable_index_templates";
+    String USE_OPENSEARCH3_CLIENT_FEATURE = "opensearch3_client";
     String ES_DATE_FORMAT = "8yyyy-MM-dd HH:mm:ss.SSS";
 }

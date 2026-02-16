@@ -19,7 +19,6 @@ package org.graylog.testing.elasticsearch;
 import com.google.common.io.Resources;
 import org.graylog2.shared.utilities.StringUtils;
 import org.graylog2.storage.SearchVersion;
-import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
@@ -36,13 +35,14 @@ import java.util.stream.Collectors;
 /**
  * This rule starts a SearchServer instance and provides a configured {@link Client}.
  */
-public abstract class TestableSearchServerInstance extends ExternalResource implements SearchServerInstance {
+public abstract class TestableSearchServerInstance implements SearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(TestableSearchServerInstance.class);
 
     private static final Map<ContainerCacheKey, GenericContainer<?>> containersByVersion = new ConcurrentHashMap<>();
 
     protected static final int OPENSEARCH_PORT = 9200;
 
+    private final boolean cachedInstance;
     private final SearchVersion version;
     protected final String heapSize;
     protected final Network network;
@@ -52,6 +52,7 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
 
     protected static volatile boolean isFirstContainerStart = true;
     private boolean closed = false;
+    protected ContainerCacheKey cacheKey;
 
     @Override
     public abstract Client client();
@@ -59,11 +60,12 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     @Override
     public abstract FixtureImporter fixtureImporter();
 
-    protected TestableSearchServerInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize) {
-        this(version, hostname, network, heapSize, Map.of());
+    protected TestableSearchServerInstance(final boolean cachedInstance, final SearchVersion version, final String hostname, final Network network, final String heapSize) {
+        this(cachedInstance, version, hostname, network, heapSize, Map.of());
     }
 
-    protected TestableSearchServerInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize, Map<String, String> env) {
+    protected TestableSearchServerInstance(final boolean cachedInstance, final SearchVersion version, final String hostname, final Network network, final String heapSize, Map<String, String> env) {
+        this.cachedInstance = cachedInstance;
         this.version = version;
         this.heapSize = heapSize;
         this.network = network;
@@ -80,15 +82,12 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     @Override
     public GenericContainer<?> createContainer(SearchVersion version, Network network, String heapSize, Map<String, String> env) {
         final var image = imageName();
-        final ContainerCacheKey cacheKey = new ContainerCacheKey(version, heapSize, env);
+        if (!cachedInstance) {
+            return doBuildContainer(image);
+        }
+        cacheKey = new ContainerCacheKey(version, heapSize, env);
         if (!containersByVersion.containsKey(cacheKey)) {
-            LOG.debug("Creating instance {}", image);
-            GenericContainer<?> container = buildContainer(image, network);
-            container.start();
-            if (LOG.isDebugEnabled()) {
-                container.followOutput(new Slf4jLogConsumer(LOG).withPrefix(image));
-            }
-            containersByVersion.put(cacheKey, container);
+            containersByVersion.put(cacheKey, doBuildContainer(image));
         } else {
             isFirstContainerStart = false;
         }
@@ -96,9 +95,15 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
         return containersByVersion.get(cacheKey);
     }
 
-    @Override
-    protected void after() {
-        cleanUp();
+    private GenericContainer<?> doBuildContainer(String image) {
+        LOG.debug("Creating instance {} (cached: {})", image, cachedInstance);
+        isFirstContainerStart = true;
+        final GenericContainer<?> container = buildContainer(image, network);
+        container.start();
+        if (LOG.isDebugEnabled()) {
+            container.followOutput(new Slf4jLogConsumer(LOG).withPrefix(image));
+        }
+        return container;
     }
 
     @Override
@@ -107,7 +112,7 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
             try {
                 client().cleanUp();
             } catch (Exception e) {
-                LOG.warn("Failed to run cleanup of " + searchServer(), e);
+                LOG.warn("Failed to run cleanup of {} (ID: {})", version, container.getContainerId(), e);
             }
         } else {
             LOG.debug("Cleanup skipped, client already closed");
@@ -134,6 +139,11 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     @Override
     public SearchVersion version() {
         return version;
+    }
+
+    @Override
+    public String instanceId() {
+        return container.getContainerId();
     }
 
     @Override

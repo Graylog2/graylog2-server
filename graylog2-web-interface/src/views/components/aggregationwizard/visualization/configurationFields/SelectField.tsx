@@ -37,13 +37,19 @@ const createEvent = (name: string, value: any) =>
     target: { name, value },
   }) as React.ChangeEvent<any>;
 
-const SelectField = ({ name, field, title, error, value, onChange }: FieldComponentProps) => {
+const SelectField = ({ name, field, title, error, value, onChange, inputHelp }: FieldComponentProps) => {
   if (field.type !== 'select') {
     throw new Error('Invalid field type passed!');
   }
 
   return (
-    <Input id={`${name}-select`} label={title} error={error} labelClassName="col-sm-3" wrapperClassName="col-sm-9">
+    <Input
+      id={`${name}-select`}
+      label={title}
+      error={error}
+      labelClassName="col-sm-3"
+      wrapperClassName="col-sm-9"
+      help={inputHelp}>
       <Select
         options={makeOptions(field.options)}
         aria-label={`Select ${field.title}`}

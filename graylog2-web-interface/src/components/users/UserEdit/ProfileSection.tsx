@@ -81,7 +81,7 @@ const ProfileSection = ({ user, onSubmit }: Props) => {
             <Row className="no-bm">
               <Col xs={12}>
                 <div className="pull-right">
-                  <Button bsStyle="success" disabled={isSubmitting || !isValid} title="Update Profile" type="submit">
+                  <Button bsStyle="primary" disabled={isSubmitting || !isValid} title="Update Profile" type="submit">
                     Update Profile
                   </Button>
                 </div>

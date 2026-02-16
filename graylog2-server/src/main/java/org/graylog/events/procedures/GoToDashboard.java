@@ -81,6 +81,15 @@ public class GoToDashboard extends Action {
             return uriBuilder.build().getLinkPath();
         }
 
+        @JsonIgnore
+        @Override
+        public String validate() {
+            if (dashboardId() == null || dashboardId().isEmpty()) {
+                return "Dashboard cannot be empty";
+            }
+            return null;
+        }
+
         @AutoValue.Builder
         public abstract static class Builder {
             @JsonProperty(TYPE_FIELD)

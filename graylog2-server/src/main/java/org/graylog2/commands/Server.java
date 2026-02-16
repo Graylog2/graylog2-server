@@ -16,6 +16,7 @@
  */
 package org.graylog2.commands;
 
+import com.github.joschi.jadconfig.documentation.DocumentedBeansService;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.collect.ImmutableList;
@@ -32,6 +33,7 @@ import org.graylog.enterprise.EnterpriseModule;
 import org.graylog.events.EventsModule;
 import org.graylog.events.processor.EventDefinitionConfiguration;
 import org.graylog.grn.GRNTypesModule;
+import org.graylog.mcp.server.McpServerModule;
 import org.graylog.metrics.prometheus.PrometheusExporterConfiguration;
 import org.graylog.metrics.prometheus.PrometheusMetricsModule;
 import org.graylog.plugins.cef.CEFInputModule;
@@ -98,6 +100,7 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.quickjump.QuickJumpModule;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.resources.system.ClusterConfigValidatorModule;
 import org.graylog2.shared.UI;
@@ -128,7 +131,7 @@ import static org.graylog2.plugin.ServerStatus.Capability.MASTER;
 import static org.graylog2.plugin.ServerStatus.Capability.SERVER;
 
 @Command(name = "server", description = "Start the Graylog server")
-public class Server extends ServerBootstrap {
+public class Server extends ServerBootstrap implements DocumentedBeansService {
     protected static final Configuration configuration = new Configuration();
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
     private final HttpConfiguration httpConfiguration = new HttpConfiguration();
@@ -163,6 +166,11 @@ public class Server extends ServerBootstrap {
 
     public boolean isLocal() {
         return local;
+    }
+
+    @Override
+    public List<Object> getDocumentedConfigurationBeans() {
+        return getCommandConfigurationBeans();
     }
 
     @Override
@@ -214,7 +222,9 @@ public class Server extends ServerBootstrap {
                 new DatanodeMigrationBindings(),
                 new CaModule(),
                 new TelemetryModule(),
-                new DataNodeModule()
+                new DataNodeModule(),
+                new McpServerModule(),
+                new QuickJumpModule(featureFlags)
         );
 
         modules.add(new FieldTypeManagementModule());
@@ -258,6 +268,8 @@ public class Server extends ServerBootstrap {
                         .setLeader(leaderElectionService.isLeader())
                         .setTransportAddress(httpConfiguration.getHttpPublishUri().toString())
                         .setHostname(Tools.getLocalCanonicalHostname())
+                        .setProcessing(serverStatus.isProcessing())
+                        .setLifecycle(serverStatus.getLifecycle())
                         .build());
         serverStatus.setLocalMode(isLocal());
         if (leaderElectionService.isLeader() && !nodeService.isOnlyLeader(serverStatus.getNodeId())) {

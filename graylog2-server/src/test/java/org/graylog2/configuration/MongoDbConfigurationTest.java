@@ -20,13 +20,14 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Map;
 
 import static java.util.Collections.singletonMap;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MongoDbConfigurationTest {
     @Test
@@ -52,16 +53,20 @@ public class MongoDbConfigurationTest {
         assertEquals("mongodb://localhost/graylog", configuration.getUri());
     }
 
-    @Test(expected = ValidationException.class)
-    public void validateFailsIfUriIsEmpty() throws RepositoryException, ValidationException {
-        MongoDbConfiguration configuration = new MongoDbConfiguration();
-        new JadConfig(new InMemoryRepository(singletonMap("mongodb_uri", "")), configuration).process();
+    @Test
+    public void validateFailsIfUriIsEmpty() throws RepositoryException {
+        assertThrows(ValidationException.class, () -> {
+            MongoDbConfiguration configuration = new MongoDbConfiguration();
+            new JadConfig(new InMemoryRepository(singletonMap("mongodb_uri", "")), configuration).process();
+        });
     }
 
-    @Test(expected = ValidationException.class)
-    public void validateFailsIfUriIsInvalid() throws RepositoryException, ValidationException {
-        MongoDbConfiguration configuration = new MongoDbConfiguration();
-        new JadConfig(new InMemoryRepository(singletonMap("mongodb_uri", "Boom")), configuration).process();
+    @Test
+    public void validateFailsIfUriIsInvalid() throws RepositoryException {
+        assertThrows(ValidationException.class, () -> {
+            MongoDbConfiguration configuration = new MongoDbConfiguration();
+            new JadConfig(new InMemoryRepository(singletonMap("mongodb_uri", "Boom")), configuration).process();
+        });
     }
 
     @Test

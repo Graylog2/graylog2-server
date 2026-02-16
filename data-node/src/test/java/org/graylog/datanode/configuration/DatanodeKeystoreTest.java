@@ -39,8 +39,10 @@ import java.util.List;
 
 class DatanodeKeystoreTest {
 
+    private static final CertificateGenerator CERTIFICATE_GENERATOR = new CertificateGenerator(1024);
+
     private EventBus eventBus;
-    private final List<DatanodeKeystoreChangedEvent> receivedEvents = new LinkedList<>();
+    private final List<Object> receivedEvents = new LinkedList<>();
 
     @BeforeEach
     void setUp() {
@@ -54,7 +56,13 @@ class DatanodeKeystoreTest {
     }
 
     @Subscribe
-    public void subscribe(DatanodeKeystoreChangedEvent event) {
+    public void subscribe(DatanodeCertificateChangedEvent event) {
+        // remember received events so we can verify them later
+        receivedEvents.add(event);
+    }
+
+    @Subscribe
+    public void subscribe(DatanodeCertificateRenewedEvent event) {
         // remember received events so we can verify them later
         receivedEvents.add(event);
     }
@@ -74,7 +82,7 @@ class DatanodeKeystoreTest {
         Assertions.assertThat(csr.getSubject().toString()).isEqualTo("CN=my-hostname");
 
         final CsrSigner signer = new CsrSigner();
-        final KeyPair ca = CertificateGenerator.generate(CertRequest.selfSigned("Graylog CA").isCA(true).validity(Duration.ofDays(365)));
+        final KeyPair ca = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("Graylog CA").isCA(true).validity(Duration.ofDays(365)));
         final X509Certificate datanodeCert = signer.sign(ca.privateKey(), ca.certificate(), csr, 30);
         final CertificateChain certChain = new CertificateChain(datanodeCert, List.of(ca.certificate()));
 
@@ -93,15 +101,15 @@ class DatanodeKeystoreTest {
         final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(DatanodeTestUtils.tempDirectories(tempDir), "foobar", this.eventBus);
         datanodeKeystore.create( DatanodeTestUtils.generateKeyPair(Duration.ofDays(30)));
 
-        final KeyPair rootCa = CertificateGenerator.generate(CertRequest.selfSigned("root")
+        final KeyPair rootCa = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("root")
                 .isCA(true)
                 .validity(Duration.ofDays(365)));
 
-        final KeyPair intermediate = CertificateGenerator.generate(CertRequest.signed("intermediate", rootCa)
+        final KeyPair intermediate = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.signed("intermediate", rootCa)
                 .isCA(true)
                 .validity(Duration.ofDays(365)));
 
-        final KeyPair server = CertificateGenerator.generate(CertRequest.signed("server", intermediate)
+        final KeyPair server = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.signed("server", intermediate)
                 .isCA(true)
                 .validity(Duration.ofDays(365)));
 

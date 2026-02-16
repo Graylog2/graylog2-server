@@ -30,12 +30,12 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.entities.NonDeletableSystemScope;
 import org.graylog2.database.utils.MongoUtils;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetValidator;
-import org.graylog2.indexer.MongoIndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfigFactory;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.MongoIndexSet;
+import org.graylog2.indexer.indexset.validation.IndexSetValidator;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamImpl;
@@ -51,9 +51,9 @@ import java.util.Optional;
 import static java.util.Locale.US;
 import static java.util.Objects.requireNonNull;
 import static org.graylog.events.processor.DBEventDefinitionService.SYSTEM_NOTIFICATION_EVENT_DEFINITION;
-import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
-import static org.graylog2.indexer.indexset.fields.ExtendedIndexSetFields.FIELD_INDEX_PREFIX;
-import static org.graylog2.indexer.indexset.fields.ExtendedIndexSetFields.FIELD_INDEX_TEMPLATE_TYPE;
+import static org.graylog2.indexer.indexset.fields.IndexPrefixField.FIELD_INDEX_PREFIX;
+import static org.graylog2.indexer.indexset.fields.IndexTemplateTypeField.FIELD_INDEX_TEMPLATE_TYPE;
+import static org.graylog2.indexer.template.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 
 public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20190705071400_AddEventIndexSetsMigration.class);

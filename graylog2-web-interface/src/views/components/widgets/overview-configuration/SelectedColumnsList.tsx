@@ -15,11 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
-import { useCallback, forwardRef, useMemo } from 'react';
 
-import { IconButton, SortableList, Icon } from 'components/common';
-import type { DragHandleProps, DraggableProps } from 'components/common/SortableList';
+import { IconButton, SortableList } from 'components/common';
 import UnknownAttributeTitle from 'views/components/widgets/events/UnknownAttributeTitle';
 
 const ListItemContainer = styled.div`
@@ -33,67 +32,17 @@ const ColumnTitle = styled.div`
   flex: 1;
 `;
 
-const DragHandle = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 25px;
-  margin-right: 5px;
-`;
-
-type ListItemProps = {
-  item: { id: string; title: string };
-  draggableProps: DraggableProps;
-  dragHandleProps: DragHandleProps;
-  className: string;
-  onChange: (columnName: string) => void;
-  onRemove: () => void;
-  selectedColumns: Array<string>;
-  testIdPrefix: string;
-};
-
-const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
-  ({ className, dragHandleProps, draggableProps, item, onRemove, testIdPrefix }: ListItemProps, ref) => (
-    <ListItemContainer className={className} ref={ref} {...(draggableProps ?? {})}>
-      <DragHandle {...dragHandleProps} data-testid={`${testIdPrefix}-drag-handle`}>
-        <Icon name="drag_indicator" />
-      </DragHandle>
-      <ColumnTitle>{item.title === 'unknown' ? <UnknownAttributeTitle /> : item.title}</ColumnTitle>
-      <div>
-        <IconButton name="delete" title={`Remove ${item.title} column`} onClick={onRemove} />
-      </div>
-    </ListItemContainer>
-  ),
-);
-
 type Props = {
   onChange: (newSelectedColumns: Array<string>) => void;
   displayOverlayInPortal?: boolean;
   selectedColumns: Array<string>;
   columnTitle: (column: string) => string;
-  testPrefix?: string;
 };
 
-const SelectedColumnsList = ({
-  testPrefix = undefined,
-  selectedColumns,
-  onChange,
-  displayOverlayInPortal = false,
-  columnTitle,
-}: Props) => {
+const SelectedColumnsList = ({ selectedColumns, onChange, displayOverlayInPortal = false, columnTitle }: Props) => {
   const columnsForList = useMemo(
     () => selectedColumns?.map((column) => ({ id: column, title: columnTitle(column) })),
     [columnTitle, selectedColumns],
-  );
-
-  const onChangeColumn = useCallback(
-    (columnIndex: number, newFieldName: string) => {
-      const newColumns = [...selectedColumns];
-      newColumns[columnIndex] = newFieldName;
-
-      onChange(newColumns);
-    },
-    [onChange, selectedColumns],
   );
 
   const onRemoveColumn = useCallback(
@@ -105,20 +54,25 @@ const SelectedColumnsList = ({
   );
 
   const SortableListItem = useCallback(
-    ({ item, index, dragHandleProps, draggableProps, className, ref }) => (
-      <ListItem
-        onChange={(newFieldName) => onChangeColumn(index, newFieldName)}
-        onRemove={() => onRemoveColumn(item.id)}
-        selectedColumns={selectedColumns ?? []}
-        item={item}
-        testIdPrefix={`${testPrefix}-column-${index}`}
-        dragHandleProps={dragHandleProps}
-        draggableProps={draggableProps}
-        className={className}
-        ref={ref}
-      />
-    ),
-    [selectedColumns, testPrefix, onChangeColumn, onRemoveColumn],
+    (props: {
+      item: { id: string; title: string };
+      dragHandle: React.ReactNode;
+      className?: string;
+      ref: React.Ref<HTMLDivElement>;
+    }) => {
+      const { item, dragHandle, className, ref } = props;
+
+      return (
+        <ListItemContainer className={className} ref={ref}>
+          {dragHandle}
+          <ColumnTitle>{item.title === 'unknown' ? <UnknownAttributeTitle /> : item.title}</ColumnTitle>
+          <div>
+            <IconButton name="delete" title={`Remove ${item.title} column`} onClick={() => onRemoveColumn(item.id)} />
+          </div>
+        </ListItemContainer>
+      );
+    },
+    [onRemoveColumn],
   );
 
   const onSortChange = useCallback(

@@ -45,7 +45,7 @@ type Props = {
 };
 
 const InputForm = ({
-  globalValue = false,
+  globalValue = true,
   configFields,
   nodeValue = undefined,
   titleValue = undefined,
@@ -58,7 +58,7 @@ const InputForm = ({
   setShowModal,
   submitButtonText,
 }: Props) => {
-  const [global, setGlobal] = useState<boolean>(globalValue ?? false);
+  const [global, setGlobal] = useState<boolean>(globalValue ?? true);
   const [node, setNode] = useState<string | undefined>(nodeValue);
   const configFormRef = useRef(null);
 
@@ -80,7 +80,7 @@ const InputForm = ({
     const newData = {
       ...data,
       ...{
-        global: AppConfig.isCloud() || global,
+        global: AppConfig.isCloud() || AppConfig.globalInputsOnly() || global,
         node: node,
       },
     };
@@ -133,13 +133,9 @@ const InputForm = ({
       submitAction={onSubmit}
       typeName={typeName}
       cancelAction={onCancel}>
-      {description && (
-        <Alert bsStyle="info">
-          {description}
-        </Alert>
-      )}
+      {description && <Alert bsStyle="info">{description}</Alert>}
       <HideOnCloud>
-        <NodeOrGlobalSelect onChange={handleChange} global={global} node={node} />
+        {!AppConfig.globalInputsOnly() && <NodeOrGlobalSelect onChange={handleChange} global={global} node={node} />}
       </HideOnCloud>
     </ConfigurationForm>
   );

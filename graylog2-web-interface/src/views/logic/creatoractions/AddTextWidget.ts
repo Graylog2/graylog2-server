@@ -20,9 +20,7 @@ import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import { addWidget } from 'views/logic/slices/widgetActions';
 
 const defaultText = `
-## This is a new text widget!
-
-Please edit me to set the text you want to display. You can include:
+Please edit me to set the text (Markdown) you want to display. You can include:
    - tables
    - images
    - links

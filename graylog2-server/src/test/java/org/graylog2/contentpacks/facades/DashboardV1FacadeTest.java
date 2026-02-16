@@ -40,8 +40,8 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.ValueConfigDTO
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
 import org.graylog.security.entities.EntityRegistrar;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.facades.dashboardV1.DashboardV1Facade;
 import org.graylog2.contentpacks.facades.dashboardV1.DashboardWidgetConverter;
@@ -66,9 +66,9 @@ import org.graylog2.streams.StreamImpl;
 import org.graylog2.users.UserImpl;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.io.IOException;
 import java.net.URL;
@@ -82,10 +82,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MongoDBExtension.class)
 public class DashboardV1FacadeTest {
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
@@ -93,8 +91,8 @@ public class DashboardV1FacadeTest {
     private ViewDTO viewDTO;
 
 
-    @Before
-    public void setUp() throws IOException {
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) throws IOException {
         objectMapper.registerSubtypes(new NamedType(AggregationConfigDTO.class, AggregationConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(MessageListConfigDTO.class, MessageListConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(LineVisualizationConfigDTO.class, LineVisualizationConfigDTO.NAME));
@@ -109,10 +107,7 @@ public class DashboardV1FacadeTest {
         objectMapper.registerSubtypes(new NamedType(StreamFilter.class, StreamFilter.NAME));
         objectMapper.registerSubtypes(new NamedType(QueryStringFilter.class, QueryStringFilter.NAME));
         objectMapper.registerSubtypes(new NamedType(AutoIntervalDTO.class, AutoIntervalDTO.type));
-        final MongoConnection mongoConnection = mongodb.mongoConnection();
-        final MongoJackObjectMapperProvider mapper = new MongoJackObjectMapperProvider(objectMapper);
-        searchDbService = new ViewFacadeTest.TestSearchDBService(mongoConnection, mapper);
-        final MongoCollections mongoCollections = new MongoCollections(mapper, mongoConnection);
+        searchDbService = new ViewFacadeTest.TestSearchDBService(mongoCollections);
         ViewFacadeTest.TestViewService viewService = new ViewFacadeTest.TestViewService(null, mongoCollections);
         ViewFacadeTest.TestViewSummaryService viewSummaryService = new ViewFacadeTest.TestViewSummaryService(mongoCollections);
         UserService userService = mock(UserService.class);

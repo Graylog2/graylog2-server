@@ -22,12 +22,18 @@ import Routes from 'routing/Routes';
 export const EVENT_DEFINITIONS_TITLE = 'Event Definitions';
 export const ALERTS_TITLE = 'Alerts & Events';
 const NOTIFICATIONS_TITLE = 'Notifications';
+export const PAGE_NAVIGATION_TITLE = 'Alerts';
 
 const eventsBindings: PluginExports = {
-  'alerts.pageNavigation': [
-    { description: ALERTS_TITLE, path: Routes.ALERTS.LIST },
-    { description: EVENT_DEFINITIONS_TITLE, path: Routes.ALERTS.DEFINITIONS.LIST },
-    { description: NOTIFICATIONS_TITLE, path: Routes.ALERTS.NOTIFICATIONS.LIST },
+  pageNavigation: [
+    {
+      description: PAGE_NAVIGATION_TITLE,
+      children: [
+        { description: ALERTS_TITLE, path: Routes.ALERTS.LIST, exactPathMatch: true },
+        { description: EVENT_DEFINITIONS_TITLE, path: Routes.ALERTS.DEFINITIONS.LIST },
+        { description: NOTIFICATIONS_TITLE, path: Routes.ALERTS.NOTIFICATIONS.LIST },
+      ],
+    },
   ],
 };
 

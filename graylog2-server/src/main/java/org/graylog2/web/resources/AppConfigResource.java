@@ -105,6 +105,7 @@ public class AppConfigResource {
                 .put("telemetry", toPrettyJsonString(telemetryConfiguration.telemetryFrontendSettings()))
                 .put("contentStream", toPrettyJsonString((contentStreamConfiguration.contentStreamFrontendSettings())))
                 .put("branding", toPrettyJsonString(customizationConfig))
+                .put("globalInputsOnly", configuration.isGlobalInputsOnly())
                 .build();
         return templateEngine.transform(template, model);
     }

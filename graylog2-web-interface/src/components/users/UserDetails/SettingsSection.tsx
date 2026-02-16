@@ -24,8 +24,8 @@ import { IfPermitted, ReadOnlyFormGroup } from 'components/common';
 import type User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import { StreamsActions } from 'stores/streams/StreamsStore';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import useIsGlobalTimeoutEnabled from 'hooks/useIsGlobalTimeoutEnabled';
+import { getView } from 'views/api/views';
 
 type Props = {
   user: User;
@@ -60,7 +60,7 @@ const StartpageValue = ({ type, id }: { type: string | null | undefined; id: str
     if (type === 'stream') {
       StreamsActions.get(id).then(({ title: streamTitle }) => setTitle(streamTitle));
     } else {
-      ViewManagementActions.get(id).then(({ title: viewTitle }) => setTitle(viewTitle));
+      getView(id).then(({ title: viewTitle }) => setTitle(viewTitle));
     }
   }, [id, type]);
 

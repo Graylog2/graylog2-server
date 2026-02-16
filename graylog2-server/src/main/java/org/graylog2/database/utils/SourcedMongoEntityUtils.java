@@ -21,6 +21,7 @@ import org.graylog2.database.entities.SourcedScopedEntity;
 import org.graylog2.database.entities.source.EntitySource;
 import org.graylog2.search.SearchQuery;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -54,6 +55,37 @@ public class SourcedMongoEntityUtils {
             filters = removeEntitySourceFilter(filters);
         }
         return new FilterPredicate<>(filters, predicate);
+    }
+
+    /**
+     * Handles the _entity_source filtering for entities that have not yet been converted to use the common entity
+     * table on the frontend and still supply filters as a string. The filters for each field are separated by a
+     * semicolon ';'. The filter values are comma-delimited. An example filter string with _entity_source.source:
+     * filter1:'filter_value1';_entity_source.source:'ILLUMINATE';filter3:'value1,value2,value3'
+     * <p>
+     * The caller will be responsible for rejoining the list of filter strings (FilterPredicate.filters) with the
+     * necessary delimiter.
+     *
+     * @param filters   string of filters separated by ';'.
+     * @param predicate existing predicate for the SourcedScopedEntity
+     * @param <T>       class that implements SourcedScopedEntity
+     * @return modified filters and predicate that properly apply _entity_source.source filtering
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static <T extends SourcedScopedEntity> FilterPredicate<T> handleScopedEntitySourceFilter(String filters,
+                                                                                                    Predicate<T> predicate) {
+        List<String> cleanedFilters = Arrays.asList(filters.split(";"));
+        final List<String> entitySourceFilter = filterValues(cleanedFilters);
+        if (!entitySourceFilter.isEmpty()) {
+            // entitySourceFilters should only have a size of 1 since it will be a comma-delimited string
+            final String sourceString = entitySourceFilter.getFirst();
+
+            final List<String> sourceFilters = List.of(sourceString.substring(1, sourceString.length() - 1).split(","));
+            predicate = predicate.and(entity -> sourceFilters.stream()
+                    .anyMatch(source -> sourceMatches(entity.entitySource().orElse(null), source)));
+            cleanedFilters = removeEntitySourceFilter(cleanedFilters);
+        }
+        return new FilterPredicate<>(cleanedFilters, predicate);
     }
 
     private static List<String> filterValues(List<String> filters) {

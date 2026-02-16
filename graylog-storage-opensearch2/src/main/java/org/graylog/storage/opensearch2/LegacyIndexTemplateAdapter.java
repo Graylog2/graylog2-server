@@ -20,6 +20,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.templa
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.IndexTemplatesExistRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutIndexTemplateRequest;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.Template;
 
 import jakarta.inject.Inject;

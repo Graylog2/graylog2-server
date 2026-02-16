@@ -18,7 +18,6 @@ package org.graylog.plugins.views.search.rest.scriptingapi;
 
 import com.google.common.eventbus.EventBus;
 import jakarta.inject.Inject;
-import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.engine.SearchExecutor;
@@ -57,7 +56,7 @@ public class ScriptingApiServiceImpl implements ScriptingApiService {
         this.serverEventBus = serverEventBus;
     }
 
-    public TabularResponse executeQuery(MessagesRequestSpec messagesRequestSpec, SearchUser searchUser, Subject subject) throws QueryFailedException {
+    public TabularResponse executeQuery(MessagesRequestSpec messagesRequestSpec, SearchUser searchUser) throws QueryFailedException {
         //Step 1: map simple request to more complex search
         Search search = searchCreator.mapToSearch(messagesRequestSpec, searchUser);
 
@@ -66,7 +65,7 @@ public class ScriptingApiServiceImpl implements ScriptingApiService {
         postAuditEvent(searchJob, searchUser.getUser());
 
         //Step 3: take complex response and try to map it to simpler, tabular form
-        return messagesTabularResponseCreator.mapToResponse(messagesRequestSpec, searchJob, searchUser, subject);
+        return messagesTabularResponseCreator.mapToResponse(messagesRequestSpec, searchJob, searchUser);
     }
 
     public TabularResponse executeAggregation(AggregationRequestSpec aggregationRequestSpec, SearchUser searchUser) throws QueryFailedException {

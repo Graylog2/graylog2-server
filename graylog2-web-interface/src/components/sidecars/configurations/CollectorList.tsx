@@ -67,7 +67,7 @@ class CollectorList extends React.Component<CollectorListProps> {
           <Col md={12}>
             <div className="pull-right">
               <LinkContainer to={Routes.SYSTEM.SIDECARS.NEW_COLLECTOR}>
-                <Button bsStyle="success" bsSize="small">
+                <Button bsStyle="primary" bsSize="small">
                   Create Log Collector
                 </Button>
               </LinkContainer>

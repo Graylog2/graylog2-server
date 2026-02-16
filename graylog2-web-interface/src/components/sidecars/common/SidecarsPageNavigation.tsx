@@ -17,19 +17,12 @@
 import * as React from 'react';
 
 import PageNavigation from 'components/common/PageNavigation';
-import Routes from 'routing/Routes';
 import { Row } from 'components/bootstrap';
-
-const NAV_ITEMS = [
-  { description: 'Overview', path: Routes.SYSTEM.SIDECARS.OVERVIEW, exactPathMatch: true },
-  { description: 'Administration', path: Routes.SYSTEM.SIDECARS.ADMINISTRATION },
-  { description: 'Configuration', path: Routes.SYSTEM.SIDECARS.CONFIGURATION },
-  { description: 'Failure Tracking', path: Routes.SYSTEM.SIDECARS.FAILURE_TRACKING },
-];
+import { PAGE_NAV_TITLE } from 'components/sidecars/bindings';
 
 const SidecarsPageNavigation = () => (
   <Row>
-    <PageNavigation items={NAV_ITEMS} />
+    <PageNavigation page={PAGE_NAV_TITLE} />
   </Row>
 );
 

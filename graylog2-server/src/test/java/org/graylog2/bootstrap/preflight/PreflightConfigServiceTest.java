@@ -19,7 +19,6 @@ package org.graylog2.bootstrap.preflight;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import org.assertj.core.api.Assertions;
-import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.Configuration;
@@ -28,22 +27,25 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.V20230929142900_CreateInitialPreflightPassword;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.nio.file.Path;
 import java.util.Map;
 
+@ExtendWith(MongoDBExtension.class)
 class PreflightConfigServiceTest {
 
-    @RegisterExtension
-    static MongoDBExtension mongodbExtension = MongoDBExtension.create(MongodbServer.DEFAULT_VERSION);
     private MongoConnection mongoConnection;
 
+    @TempDir
+    private Path tempDir;
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
         // run the migration which create the initial password for preflight
-        new V20230929142900_CreateInitialPreflightPassword(mongodb.mongoConnection()).upgrade();
         mongoConnection = mongodb.mongoConnection();
+        new V20230929142900_CreateInitialPreflightPassword(mongoConnection).upgrade();
 
     }
 
@@ -66,7 +68,10 @@ class PreflightConfigServiceTest {
 
     @Test
     void testConfiguredPreflightPassword() throws ValidationException, RepositoryException {
-        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration(), Map.of("preflight_web_password", "my-secret-password"));
+        final Map<String, String> properties = Map.of(
+                "preflight_web_password", "my-secret-password"
+        );
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration(), properties, tempDir);
 
         PreflightConfigService preflightConfigService = new PreflightConfigServiceImpl(mongoConnection, configuration);
         final String password = preflightConfigService.getPreflightPassword();

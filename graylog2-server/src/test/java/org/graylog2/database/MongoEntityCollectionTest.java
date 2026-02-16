@@ -18,9 +18,7 @@ package org.graylog2.database;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog.testing.mongodb.MongoDBExtension;
-import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,10 +39,8 @@ class MongoEntityCollectionTest {
     MongoCollection<Entity> collection;
 
     @BeforeEach
-    void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider mongoJackObjectMapperProvider) {
-        final var collections = new MongoCollections(mongoJackObjectMapperProvider, mongoDBTestService.mongoConnection());
-
-        this.collection = collections.collection("mongo_collection_test", Entity.class);
+    void setUp(MongoCollections mongoCollections) {
+        this.collection = mongoCollections.collection("mongo_collection_test", Entity.class);
     }
 
     @Test

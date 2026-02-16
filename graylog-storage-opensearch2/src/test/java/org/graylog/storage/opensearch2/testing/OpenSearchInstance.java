@@ -35,7 +35,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequ
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexResponse;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.RestClientProvider;
-import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
@@ -62,12 +61,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import static java.util.Objects.isNull;
-
 public class OpenSearchInstance extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearchInstance.class);
-
-    public static final SearchServer OPENSEARCH_VERSION = SearchServer.DEFAULT_OPENSEARCH_VERSION;
 
     private OpenSearchClient openSearchClient;
     private Client client;
@@ -75,12 +70,12 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     private Adapters adapters;
     private List<String> featureFlags;
 
-    public OpenSearchInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
-        this(version, hostname, network, heapSize, featureFlags, Map.of());
+    public OpenSearchInstance(final boolean cachedInstance, final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
+        this(cachedInstance, version, hostname, network, heapSize, featureFlags, Map.of());
     }
 
-    public OpenSearchInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags, Map<String, String> env) {
-        super(version, hostname, network, heapSize, env);
+    public OpenSearchInstance(final boolean cachedInstance, final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags, Map<String, String> env) {
+        super(cachedInstance, version, hostname, network, heapSize, env);
         this.featureFlags = featureFlags;
     }
 
@@ -199,11 +194,6 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     }
 
     @Override
-    public SearchServer searchServer() {
-        return OPENSEARCH_VERSION;
-    }
-
-    @Override
     public Client client() {
         return this.client;
     }
@@ -220,8 +210,6 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     @Override
     public GenericContainer<?> buildContainer(String image, Network network) {
         var container = new OpenSearchContainer(DockerImageName.parse(image))
-                // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
-                .withReuse(isNull(System.getenv("CI")))
                 .withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())
                 .withEnv("cluster.info.update.interval", "10s")
                 .withEnv("cluster.routing.allocation.disk.reroute_interval", "5s")

@@ -116,12 +116,18 @@ public interface Journal {
 
     class JournalReadEntry {
 
+        private final byte[] idBytes;
         private final byte[] payload;
         private final long offset;
 
-        public JournalReadEntry(byte[] payload, long offset) {
+        public JournalReadEntry(byte[] idBytes, byte[] payload, long offset) {
+            this.idBytes = idBytes;
             this.payload = payload;
             this.offset = offset;
+        }
+
+        public JournalReadEntry(byte[] payload, long offset) {
+            this(null, payload, offset);
         }
 
         public long getOffset() {
@@ -130,6 +136,10 @@ public interface Journal {
 
         public byte[] getPayload() {
             return payload;
+        }
+
+        public byte[] getIdBytes() {
+            return idBytes;
         }
     }
 }

@@ -27,17 +27,20 @@ import type { ValueGroups, OnClickPopoverDropdownProps } from 'views/components/
 const PieOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: OnClickPopoverDropdownProps) => {
   const { rowPivotValues, columnPivotValues, metricValue } = useMemo<ValueGroups>(() => {
     if (!clickPoint || !config) return {};
+
     const traceColor = getHoverSwatchColor(clickPoint);
     const splitNames: Array<string | number> = (clickPoint.data.originalName ?? clickPoint.data.name).split(
       keySeparator,
     );
     const metric: string = config.series.length === 1 ? config.series[0].function : (splitNames.pop() as string);
+    const columnValues = splitNames.filter((value) => value !== metric);
 
     const columnPivotsToFields = config?.columnPivots?.flatMap((pivot) => pivot.fields) ?? [];
 
     const rowPivotsToFields = config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [];
-    const splitXValues: Array<string | number> =
-      clickPoint.data.originalLabels?.[clickPoint.pointNumber].split(keySeparator);
+    const splitXValues: Array<string | number> = rowPivotsToFields?.length
+      ? clickPoint.data.originalLabels?.[clickPoint.pointNumber].split(keySeparator)
+      : [];
 
     return {
       rowPivotValues: splitXValues.map((value, i) => ({
@@ -46,7 +49,7 @@ const PieOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: OnClick
         text: String(value),
         traceColor,
       })),
-      columnPivotValues: splitNames.map((value, i) => ({
+      columnPivotValues: columnValues.map((value, i) => ({
         value,
         field: columnPivotsToFields[i],
         text: String(value),
@@ -55,17 +58,19 @@ const PieOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: OnClick
       metricValue: {
         value: clickPoint.value,
         field: metric,
-        text: `${String(clickPoint.text ?? clickPoint?.value)}`,
+        text: `${String(clickPoint?.value)}`,
         traceColor,
       },
     };
   }, [clickPoint, config]);
 
   const formatedPercentageValue = useMemo(() => {
-    const { value, unit } = getPrettifiedValue(clickPoint?.percent, { abbrev: 'd%', unitType: 'percent' });
+    if (!clickPoint.percent) return clickPoint.text;
+
+    const { value, unit } = getPrettifiedValue(clickPoint.percent, { abbrev: 'd%', unitType: 'percent' });
 
     return formatValueWithUnitLabel(value, unit?.abbrev);
-  }, [clickPoint?.percent]);
+  }, [clickPoint.percent, clickPoint.text]);
 
   return (
     <Popover.Dropdown title={formatedPercentageValue}>
@@ -74,6 +79,7 @@ const PieOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: OnClick
         columnPivotValues={columnPivotValues}
         metricValue={metricValue}
         setFieldData={setFieldData}
+        config={config}
       />
     </Popover.Dropdown>
   );

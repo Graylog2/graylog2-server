@@ -21,7 +21,6 @@ import org.graylog.testing.PropertyLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.BindMode;
-import org.testcontainers.containers.Container;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
@@ -59,11 +58,7 @@ public class NodeContainerFactory {
 
     public static GenericContainer<?> buildContainer(NodeContainerConfig config) {
         checkBinaries(config);
-        if (!config.skipPackaging) {
-            MavenPackager.packageJarIfNecessary(config.mavenProjectDirProvider);
-        } else {
-            LOG.info("Skipping packaging");
-        }
+        MavenPackager.packageJarIfNecessary(config.mavenProjectDirProvider);
         ImageFromDockerfile image = createImage(config);
 
         return createRunningContainer(config, image);
@@ -87,18 +82,6 @@ public class NodeContainerFactory {
         return image;
     }
 
-    private static boolean containerFileExists(final GenericContainer container, String path) {
-        try {
-            Container.ExecResult r = container.execInContainer("/bin/sh", "-c",
-                    "if [ -f " + path + " ] ; then echo '0' ; else (>&2 echo '1') ; fi");
-
-            return !r.getStderr().contains("1");
-        } catch (IOException | InterruptedException e) {
-            LOG.error("Could not check for file existence: " + path, e);
-            return false;
-        }
-    }
-
     private static void checkBinaries(NodeContainerConfig config) {
         final Path fileCopyBaseDir = config.mavenProjectDirProvider.getFileCopyBaseDir();
         config.mavenProjectDirProvider.getFilesToAddToBinDir().forEach(filename -> {
@@ -119,7 +102,6 @@ public class NodeContainerFactory {
     private static GenericContainer<?> createRunningContainer(NodeContainerConfig config, ImageFromDockerfile image) {
         Path fileCopyBaseDir = config.mavenProjectDirProvider.getFileCopyBaseDir();
         List<Path> pluginJars = config.pluginJarsProvider.getJars();
-        boolean includeFrontend = config.mavenProjectDirProvider.includeFrontend();
 
         GenericContainer<?> container = new GenericContainer<>(image)
                 .withFileSystemBind(property("server_jar"), GRAYLOG_HOME + "/graylog.jar", BindMode.READ_ONLY)
@@ -127,8 +109,6 @@ public class NodeContainerFactory {
                 .withEnv("GRAYLOG_DATA_DIR", "data")
                 .withEnv("GRAYLOG_MONGODB_URI", config.mongoDbUri)
                 .withEnv(ENV_GRAYLOG_ELASTICSEARCH_HOSTS, config.elasticsearchUri)
-                // TODO: should we set this override search version or let graylog server to detect it from the search server itself?
-                .withEnv("GRAYLOG_ELASTICSEARCH_VERSION", config.elasticsearchVersion.encode())
                 .withEnv("GRAYLOG_ELASTICSEARCH_VERSION_PROBE_DELAY", "500ms")
                 .withEnv("GRAYLOG_PASSWORD_SECRET", config.passwordSecret)
                 .withEnv("GRAYLOG_NODE_ID_FILE", "data/config/node-id")
@@ -145,14 +125,10 @@ public class NodeContainerFactory {
                 .withEnv("GRAYLOG_TRANSPORT_EMAIL_FROM_EMAIL", "developers@graylog.com")
 
                 .withEnv("GRAYLOG_ENABLE_DEBUG_RESOURCES", "true") // see RestResourcesModule#addDebugResources
-                .withEnv(config.configParams)
+                .withEnv(config.env)
                 .withExposedPorts(config.portsToExpose());
 
         container.waitingFor(getWaitStrategy(container.getEnvMap())).withStartupTimeout(Duration.of(600, SECONDS));
-
-        if (!includeFrontend) {
-            container.withEnv("DEVELOPMENT", "true");
-        }
 
         config.proxiedRequestsTimeout.ifPresent(proxiedRequestsTimeout -> container.withEnv("GRAYLOG_PROXIED_REQUESTS_DEFAULT_CALL_TIMEOUT", proxiedRequestsTimeout));
 
@@ -182,16 +158,18 @@ public class NodeContainerFactory {
 
     private static WaitAllStrategy getWaitStrategy(Map<String, String> env) {
         final WaitAllStrategy waitAllStrategy = new WaitAllStrategy().withStrategy(new WaitForSuccessOrFailureStrategy().withSuccessAndFailures(
-                        List.of(
-                                ".*Graylog server up and running.*",
-                                ".*It seems you are starting Graylog for the first time. To set up a fresh install.*"
-                        ),
-                        List.of(
-                                ".*Exception while running migrations.*",
-                                ".*Graylog startup failed.*",
-                                ".*Guice/MissingImplementation.*"
-                        )));
-        if(indexerIsPredefined(env)) { // we have defined an indexer, no preflight will occur, let's wait for the full boot with index ranges
+                List.of(
+                        ".*Graylog server up and running.*",
+                        ".*It seems you are starting Graylog for the first time. To set up a fresh install.*"
+                ),
+                List.of(
+                        ".*Exception while running migrations.*",
+                        ".*Graylog startup failed.*",
+                        ".*\\[Guice/.+?\\].*",
+                        ".*java.lang.NoClassDefFoundError.*",
+                        ".*Terminating the server :\\(.*"
+                )));
+        if (indexerIsPredefined(env)) { // we have defined an indexer, no preflight will occur, let's wait for the full boot with index ranges
             // To be able to search for data we need the index ranges to be computed. Since this is an async
             // background job, we need to wait until they have been created.
             final var baseUrl = Optional.ofNullable(env.get("GRAYLOG_HTTP_PUBLISH_URI"))

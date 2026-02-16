@@ -52,7 +52,7 @@ public interface ClusterConfigService {
      * @return An instance of the raw persisted Java class or {@code null} if it couldn't be retrieved.
      */
     ClusterConfig getRaw(Class<?> key);
-    
+
     /**
      * Retrieve Java class of a certain type from the cluster configuration or return a default value
      * in case that failed.
@@ -66,6 +66,7 @@ public interface ClusterConfigService {
 
     /**
      * Write a configuration bean to the cluster configuration with the specified key.
+     *
      * @param key     The key that is used to write the cluster config object to the database.
      * @param payload The object to write to the cluster configuration. Must be serializable by Jackson!
      * @param <T>     The type of the Java configuration bean.
@@ -87,6 +88,14 @@ public interface ClusterConfigService {
      * @return The number of removed entries from the cluster configuration.
      */
     <T> int remove(Class<T> type);
+
+    /**
+     * Remove a configuration bean from the cluster configuration.
+     *
+     * @param key The key that is used to delete the cluster config object from the database.
+     * @return The number of removed entries from the cluster configuration.
+     */
+    int remove(String key);
 
     /**
      * List all classes of configuration beans in the database.

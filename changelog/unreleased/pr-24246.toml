@@ -1,0 +1,4 @@
+type = "f"
+message = "Rolled back to view type forms for Lookup Tables, Caches and Data Adapters"
+
+pulls = ["24246"]

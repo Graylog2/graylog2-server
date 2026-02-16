@@ -18,24 +18,25 @@ package org.graylog.events.rest;
 
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static java.net.HttpURLConnection.HTTP_OK;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = {SearchServer.DATANODE_DEV, SearchServer.OS2_LATEST, SearchServer.ES7})
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class EventsResourceIT {
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    public EventsResourceIT(GraylogApis graylogApis) {
-        this.api = graylogApis;
+    @BeforeAll
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testDefaultRequest() {
         given()
                 .spec(api.requestSpecification())

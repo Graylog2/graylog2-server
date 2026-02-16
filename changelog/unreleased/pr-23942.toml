@@ -1,0 +1,5 @@
+type = "a"
+message = "Create metrics supplier for inputs."
+
+issues = ['Graylog2/graylog-plugin-enterprise#12201']
+pulls = ["23942"]

@@ -18,13 +18,13 @@ package org.graylog.security.authzroles;
 
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.client.FindIterable;
-import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.pagination.MongoPaginationHelper;
@@ -36,9 +36,11 @@ import org.graylog2.shared.users.UserService;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class PaginatedAuthzRolesService {
@@ -72,6 +74,17 @@ public class PaginatedAuthzRolesService {
         return StreamSupport.stream(docs.spliterator(), false)
                 .map(doc -> doc.get("_id", ObjectId.class).toHexString())
                 .collect(ImmutableSet.toImmutableSet());
+    }
+
+    public Map<String, String> getRolesByIdAndName() {
+        final FindIterable<Document> docs = documentCollection.find()
+                .projection(Projections.include("_id", "name"));
+
+        return StreamSupport.stream(docs.spliterator(), false)
+                .collect(Collectors.toMap(
+                        doc -> doc.getObjectId("_id").toHexString(),
+                        doc -> doc.getString("name")
+                ));
     }
 
     public List<AuthzRoleDTO> findByIds(Collection<String> ids) {

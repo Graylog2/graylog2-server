@@ -15,13 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import selectEvent from 'helpers/selectEvent';
 import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import useFieldTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
-import useFieldTypeUsages from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
+import { fetchFieldTypeUsages } from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import TestStoreProvider from 'views/test/TestStoreProvider';
@@ -98,23 +99,21 @@ const fieldTypeUsages = [
   },
 ];
 const paginatedFieldUsage = {
-  data: {
-    list: fieldTypeUsages,
-    pagination: {
-      total: 2,
-      page: 1,
-      perPage: 5,
-      count: 1,
-    },
-    attributes,
+  list: fieldTypeUsages,
+  pagination: {
+    total: 2,
+    page: 1,
+    perPage: 5,
+    count: 1,
   },
-  refetch: () => {},
-  isInitialLoading: false,
-  isLoading: false,
+  attributes,
 };
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation', () => jest.fn());
-jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages', () => jest.fn());
+jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages', () => ({
+  ...jest.requireActual('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages'),
+  fetchFieldTypeUsages: jest.fn(() => async () => {}),
+}));
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation', () => jest.fn());
 
@@ -169,12 +168,16 @@ describe('ChangeFieldTypeModal', () => {
     });
 
     asMock(useFieldTypeMutation).mockReturnValue({ isLoading: false, putFieldTypeMutation: putFieldTypeMutationMock });
-    asMock(useFieldTypeUsages).mockReturnValue(paginatedFieldUsage);
+    asMock(fetchFieldTypeUsages).mockResolvedValue(paginatedFieldUsage);
 
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
         ...layoutPreferences,
-        displayedAttributes: ['index_set_title', 'stream_titles', 'types'],
+        attributes: {
+          index_set_title: { status: 'show' },
+          stream_titles: { status: 'show' },
+          types: { status: 'show' },
+        },
       },
       isInitialLoading: false,
       refetch: () => {},
@@ -212,8 +215,8 @@ describe('ChangeFieldTypeModal', () => {
     const submit = await screen.findByTitle(/change field type/i);
 
     const rowCheckboxes = await screen.findAllByTitle(/deselect entity/i);
-    fireEvent.click(rowCheckboxes[1]);
-    fireEvent.click(submit);
+    await userEvent.click(rowCheckboxes[1]);
+    await userEvent.click(submit);
 
     await waitFor(() =>
       expect(putFieldTypeMutationMock).toHaveBeenCalledWith({
@@ -232,7 +235,7 @@ describe('ChangeFieldTypeModal', () => {
 
     const submit = await screen.findByTitle(/change field type/i);
 
-    fireEvent.click(submit);
+    await userEvent.click(submit);
 
     await waitFor(() =>
       expect(putFieldTypeMutationMock).toHaveBeenCalledWith({

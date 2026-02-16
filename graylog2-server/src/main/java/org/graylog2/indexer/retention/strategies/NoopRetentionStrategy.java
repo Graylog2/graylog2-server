@@ -16,7 +16,7 @@
  */
 package org.graylog2.indexer.retention.strategies;
 
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.retention.executors.CountBasedRetentionExecutor;
 import org.graylog2.indexer.retention.executors.TimeBasedRetentionExecutor;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;

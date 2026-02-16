@@ -152,8 +152,8 @@ export const showSearchPath = `${searchPath}/:viewId`;
 
 export const dashboardsPath = '/dashboards';
 export const newDashboardsPath = `${dashboardsPath}/new`;
-export const dashboardsTvPath = `${dashboardsPath}/tv/:viewId`;
-export const showDashboardsPath = `${dashboardsPath}/:viewId`;
+export const dashboardsTvPath = (viewId: string = ':viewId') => `${dashboardsPath}/tv/${viewId}`;
+export const showDashboardsPath = (viewId: string = ':viewId') => `${dashboardsPath}/${viewId}`;
 
 export const extendedSearchPath = '/extendedsearch';
 
@@ -168,3 +168,4 @@ export const VISUALIZATION_TABLE_HEADER_HEIGHT = 28;
 export const keySeparator = '\u2E31';
 export const humanSeparator = '-';
 export const thresholdsSupportedVisualizations = ['bar', 'area', 'line', 'scatter'];
+export const multipleValuesActionsSupportedVisualizations = ['bar', 'area', 'line', 'scatter'];

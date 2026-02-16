@@ -30,14 +30,14 @@ import { Alert, Col, Row, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { FormSubmit, IfPermitted, NoSearchResult, ReadOnlyFormGroup } from 'components/common';
 import useHistory from 'routing/useHistory';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useIsGlobalTimeoutEnabled from 'hooks/useIsGlobalTimeoutEnabled';
 import { Link } from 'components/common/router';
 import { Headline } from 'components/common/Section/SectionComponent';
 import useProductName from 'brand-customization/useProductName';
+import usePasswordComplexityConfig from 'components/users/usePasswordComplexityConfig';
+import type { PasswordComplexityConfigType } from 'stores/configurations/ConfigurationsStore';
 
 import TimezoneFormGroup from './TimezoneFormGroup';
 import TimeoutFormGroup from './TimeoutFormGroup';
@@ -62,7 +62,11 @@ const oktaUserForm = isCloud ? PluginStore.exports('cloud')[0].oktaUserForm : nu
 
 type RequestError = { additional: { res: { text: string } } };
 
-const PasswordGroup = () => {
+type PasswordGroupProps = {
+  passwordComplexityConfig: PasswordComplexityConfigType;
+};
+
+const PasswordGroup = ({ passwordComplexityConfig }: PasswordGroupProps) => {
   if (isCloud && oktaUserForm) {
     const {
       fields: { password: CloudPasswordFormGroup },
@@ -71,7 +75,7 @@ const PasswordGroup = () => {
     return <CloudPasswordFormGroup />;
   }
 
-  return <PasswordFormGroup />;
+  return <PasswordFormGroup passwordComplexityConfig={passwordComplexityConfig} />;
 };
 
 const UserNameGroup = () => {
@@ -115,9 +119,9 @@ const UserCreate = () => {
   const [submitError, setSubmitError] = useState<RequestError | undefined>();
   const [selectedRoles, setSelectedRoles] = useState<Immutable.Set<DescriptiveItem>>(Immutable.Set([initialRole]));
   const history = useHistory();
-  const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
   const isGlobalTimeoutEnabled = useIsGlobalTimeoutEnabled();
+  const passwordComplexityConfig = usePasswordComplexityConfig();
 
   const validate = (values) => {
     let errors = {};
@@ -131,7 +135,7 @@ const UserCreate = () => {
 
       errors = validateCloudPasswords(errors, password, passwordRepeat);
     } else {
-      errors = validatePasswords(errors, password, passwordRepeat);
+      errors = validatePasswords(errors, password, passwordRepeat, passwordComplexityConfig);
     }
 
     return errors;
@@ -185,12 +189,11 @@ const UserCreate = () => {
   };
 
   const onSubmit = (data) => {
-    handleFormSubmit(data, user.roles);
-
     sendTelemetry(TELEMETRY_EVENT_TYPE.USERS.USER_CREATED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'user-create-form',
     });
+
+    return handleFormSubmit(data, user.roles);
   };
 
   return (
@@ -263,7 +266,7 @@ const UserCreate = () => {
               </div>
               <div>
                 <Headline>Password</Headline>
-                <PasswordGroup />
+                <PasswordGroup passwordComplexityConfig={passwordComplexityConfig} />
               </div>
               {submitError && (
                 <Row>

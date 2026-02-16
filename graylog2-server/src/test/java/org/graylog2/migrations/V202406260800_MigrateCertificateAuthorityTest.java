@@ -17,40 +17,36 @@
 package org.graylog2.migrations;
 
 import org.assertj.core.api.Assertions;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBExtension;
+import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog2.cluster.certificates.EncryptedCaKeystore;
+import org.graylog2.database.MongoCollection;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.MongoConnection;
+import org.graylog2.database.MongoEntity;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.util.HashSet;
 import java.util.Set;
 
+@ExtendWith(MongoDBExtension.class)
 class V202406260800_MigrateCertificateAuthorityTest {
 
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @BeforeEach
-    void setUp() {
-        mongodb.start();
-    }
-
-    @AfterEach
-    void tearDown() {
-        mongodb.close();
-    }
-
     @Test
-    void testMigration() {
-        mongodb.importFixture("V202406260800_MigrateCertificateAuthorityTest.json", V202406260800_MigrateCertificateAuthorityTest.class);
+    @MongoDBFixtures({"V202406260800_MigrateCertificateAuthorityTest.json"})
+    void testMigration(MongoCollections mongoCollections) {
+        final MongoConnection mongoConnection = mongoCollections.mongoConnection();
+        // using the interface means we really can't do anything with data here, but we only care about the count at this point.
+        final MongoCollection<MongoEntity> collection = mongoCollections.collection(V202406260800_MigrateCertificateAuthority.LEGACY_COLLECTION_NAME, MongoEntity.class);
+
         final ClusterConfigService clusterConfigService = Mockito.mock(ClusterConfigService.class);
-        final V202406260800_MigrateCertificateAuthority migration = new V202406260800_MigrateCertificateAuthority(clusterConfigService, mongodb.mongoConnection());
+        final V202406260800_MigrateCertificateAuthority migration = new V202406260800_MigrateCertificateAuthority(clusterConfigService, mongoConnection);
 
-
-        final long documentsCount = mongodb.mongoConnection().getMongoDatabase().getCollection(V202406260800_MigrateCertificateAuthority.LEGACY_COLLECTION_NAME).countDocuments();
+        final long documentsCount = collection.countDocuments();
         // there should be one entry with the encoded CA keystore
         Assertions.assertThat(documentsCount).isEqualTo(1);
 
@@ -62,7 +58,9 @@ class V202406260800_MigrateCertificateAuthorityTest {
         Assertions.assertThat(captor.getValue().keystore().value()).startsWith("b97f382e52e0cf");
         Assertions.assertThat(captor.getValue().keystore().salt()).isEqualTo("753bacc1ae1df5e3");
 
-        final Set<String> existingCollections = mongodb.mongoConnection().getMongoDatabase().listCollectionNames().into(new HashSet<>());
+        final Set<String> existingCollections = mongoConnection.getMongoDatabase().listCollectionNames().into(new HashSet<>());
         Assertions.assertThat(existingCollections).doesNotContain(V202406260800_MigrateCertificateAuthority.LEGACY_COLLECTION_NAME);
+
+        Mockito.verify(clusterConfigService, Mockito.times(1)).write(Mockito.any(V202406260800_MigrateCertificateAuthority.MigrationCompleted.class));
     }
 }

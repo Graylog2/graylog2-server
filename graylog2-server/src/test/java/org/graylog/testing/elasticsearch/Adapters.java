@@ -21,6 +21,7 @@ import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.searches.SearchesAdapter;
@@ -41,4 +42,6 @@ public interface Adapters {
     IndexFieldTypePollerAdapter indexFieldTypePollerAdapter();
 
     IndexFieldTypePollerAdapter indexFieldTypePollerAdapter(final Configuration configuration);
+
+    IndexTemplateAdapter indexTemplateAdapter();
 }

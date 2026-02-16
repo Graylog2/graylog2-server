@@ -114,7 +114,7 @@ const StageForm = ({
       <Button
         disabled={!isPermitted(currentUser.permissions, 'pipeline:edit') || disableEdit}
         onClick={openModal}
-        bsStyle={create ? 'success' : 'info'}>
+        bsStyle={create ? 'primary' : 'info'}>
         {create ? 'Add new stage' : 'Edit'}
       </Button>
       <BootstrapModalForm

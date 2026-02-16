@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
-import { fireEvent } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom';
+import userEvent from '@testing-library/user-event';
 
 import { Button } from 'components/bootstrap';
 
@@ -49,7 +49,7 @@ describe('LinkContainer', () => {
 
     expect(screen.queryByText('Hello world!')).not.toBeInTheDocument();
 
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     await screen.findByText('Hello world!');
   });
@@ -63,7 +63,7 @@ describe('LinkContainer', () => {
       </LinkContainer>,
     );
 
-    fireEvent.click(await screen.findByText('All Alerts'));
+    await userEvent.click(await screen.findByText('All Alerts'));
 
     expect(onClick).toHaveBeenCalled();
   });
@@ -78,7 +78,7 @@ describe('LinkContainer', () => {
       </LinkContainer>,
     );
 
-    fireEvent.click(await findByText('All Alerts'));
+    await userEvent.click(await findByText('All Alerts'));
 
     expect(onClick).toHaveBeenCalled();
   });
@@ -94,7 +94,7 @@ describe('LinkContainer', () => {
       </LinkContainer>,
     );
 
-    fireEvent.click(await screen.findByText('All Alerts'), { ctrlKey: true });
+    await userEvent.click(await screen.findByText('All Alerts'), { ctrlKey: true });
 
     expect(onClick).not.toHaveBeenCalled();
   });
@@ -128,7 +128,7 @@ describe('LinkContainer', () => {
       </div>,
     );
 
-    fireEvent.click(await screen.findByText('All Alerts'));
+    await userEvent.click(await screen.findByText('All Alerts'));
 
     await waitFor(() => expect(childOnClick).toHaveBeenCalled());
 
@@ -152,7 +152,7 @@ describe('LinkContainer', () => {
       </Routes>,
     );
 
-    fireEvent.click(await screen.findByText('All Alerts'));
+    await userEvent.click(await screen.findByText('All Alerts'));
 
     expect(screen.queryByText(/Hello World!/i)).not.toBeInTheDocument();
   });

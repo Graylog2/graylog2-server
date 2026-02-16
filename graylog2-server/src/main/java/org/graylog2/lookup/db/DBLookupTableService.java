@@ -136,4 +136,13 @@ public class DBLookupTableService {
     public void forEach(Consumer<? super LookupTableDto> action) {
         collection.find().forEach(action);
     }
+
+    /**
+     * Returns the total count of lookup tables.
+     *
+     * @return total count of lookup tables
+     */
+    public long count() {
+        return collection.countDocuments();
+    }
 }

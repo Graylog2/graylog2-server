@@ -31,8 +31,8 @@ import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.util.AsciiString;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 
@@ -54,7 +54,7 @@ public class HttpHandlerTest {
     private static final String BEARER_EXPECTED_TOKEN = "Bearer: expected-token";
     private EmbeddedChannel channel;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         channel = new EmbeddedChannel(new HttpHandler(true, null, null, "/gelf"));
     }
