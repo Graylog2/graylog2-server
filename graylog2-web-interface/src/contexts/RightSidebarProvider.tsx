@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import isEqual from 'lodash/isEqual';
 import React, { useReducer, useCallback, useMemo } from 'react';
 
 import RightSidebarContext from 'contexts/RightSidebarContext';
@@ -51,7 +52,10 @@ const initialState: HistoryState = {
   width: 400,
 };
 
-const isSameContent = (content1: RightSidebarContent, content2: RightSidebarContent): boolean => content1.id === content2.id;
+const isSameContent = (content1: RightSidebarContent, content2: RightSidebarContent): boolean =>
+  content1.id === content2.id
+  && content1.component === content2.component
+  && isEqual(content1.props, content2.props);
 
 const historyReducer = (state: HistoryState, action: HistoryAction): HistoryState => {
   switch (action.type) {

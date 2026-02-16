@@ -23,6 +23,7 @@ import RightSidebarProvider from './RightSidebarProvider';
 import useRightSidebar from '../hooks/useRightSidebar';
 
 const TestComponent = () => <div>Test Content</div>;
+const TestComponent2 = () => <div>Test Content 2</div>;
 
 const TestConsumer = () => {
   const { isOpen, isCollapsed, content, width, openSidebar, closeSidebar, collapseSidebar, expandSidebar, setWidth, updateContent, goBack, goForward, canGoBack, canGoForward } = useRightSidebar();
@@ -68,6 +69,30 @@ const TestConsumer = () => {
           })
         }>
         Open Sidebar 3
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          openSidebar({
+            id: 'test-sidebar',
+            title: 'Test Sidebar',
+            component: TestComponent,
+            props: { testProp: 'different-value' },
+          })
+        }>
+        Open Sidebar Different Props
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          openSidebar({
+            id: 'test-sidebar',
+            title: 'Test Sidebar',
+            component: TestComponent2,
+            props: { testProp: 'value' },
+          })
+        }>
+        Open Sidebar Different Component
       </button>
       <button
         type="button"
@@ -325,6 +350,73 @@ describe('RightSidebarProvider', () => {
 
       await userEvent.click(screen.getByText('Go Forward'));
       expect(screen.getByTestId('content-id')).toHaveTextContent('test-sidebar');
+    });
+  });
+
+  describe('Content Deduplication', () => {
+    it('should not add a new history entry when opening with identical content', async () => {
+      render(
+        <RightSidebarProvider>
+          <TestConsumer />
+        </RightSidebarProvider>,
+      );
+
+      await userEvent.click(screen.getByText('Open Sidebar'));
+      expect(screen.getByTestId('content-id')).toHaveTextContent('test-sidebar');
+      expect(screen.getByTestId('can-go-back')).toHaveTextContent('false');
+
+      // Open the exact same sidebar again (same id, component, props)
+      await userEvent.click(screen.getByText('Open Sidebar'));
+      expect(screen.getByTestId('content-id')).toHaveTextContent('test-sidebar');
+      expect(screen.getByTestId('can-go-back')).toHaveTextContent('false');
+    });
+
+    it('should add a new history entry when opening with same id but different props', async () => {
+      render(
+        <RightSidebarProvider>
+          <TestConsumer />
+        </RightSidebarProvider>,
+      );
+
+      await userEvent.click(screen.getByText('Open Sidebar'));
+      expect(screen.getByTestId('content-id')).toHaveTextContent('test-sidebar');
+      expect(screen.getByTestId('can-go-back')).toHaveTextContent('false');
+
+      await userEvent.click(screen.getByText('Open Sidebar Different Props'));
+      expect(screen.getByTestId('content-id')).toHaveTextContent('test-sidebar');
+      expect(screen.getByTestId('can-go-back')).toHaveTextContent('true');
+    });
+
+    it('should add a new history entry when opening with same id but different component', async () => {
+      render(
+        <RightSidebarProvider>
+          <TestConsumer />
+        </RightSidebarProvider>,
+      );
+
+      await userEvent.click(screen.getByText('Open Sidebar'));
+      expect(screen.getByTestId('content-id')).toHaveTextContent('test-sidebar');
+      expect(screen.getByTestId('can-go-back')).toHaveTextContent('false');
+
+      await userEvent.click(screen.getByText('Open Sidebar Different Component'));
+      expect(screen.getByTestId('content-id')).toHaveTextContent('test-sidebar');
+      expect(screen.getByTestId('can-go-back')).toHaveTextContent('true');
+    });
+
+    it('should not add duplicate history entries when opening identical content repeatedly', async () => {
+      render(
+        <RightSidebarProvider>
+          <TestConsumer />
+        </RightSidebarProvider>,
+      );
+
+      await userEvent.click(screen.getByText('Open Sidebar'));
+      await userEvent.click(screen.getByText('Open Sidebar'));
+      await userEvent.click(screen.getByText('Open Sidebar'));
+
+      expect(screen.getByTestId('content-id')).toHaveTextContent('test-sidebar');
+      expect(screen.getByTestId('can-go-back')).toHaveTextContent('false');
+      expect(screen.getByTestId('can-go-forward')).toHaveTextContent('false');
     });
   });
 
