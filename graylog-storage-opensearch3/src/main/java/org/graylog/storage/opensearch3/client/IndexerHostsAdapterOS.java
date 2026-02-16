@@ -16,18 +16,17 @@
  */
 package org.graylog.storage.opensearch3.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.inject.Inject;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.indexer.client.IndexerHostsAdapter;
-import org.opensearch.client.opensearch.nodes.NodesInfoResponse;
-import org.opensearch.client.opensearch.nodes.info.NodeInfo;
-import org.opensearch.client.opensearch.nodes.info.NodeInfoHttp;
-import org.opensearch.client.opensearch.nodes.info.NodesInfoMetric;
+import org.opensearch.client.opensearch.generic.Requests;
 
 import java.net.URI;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.StreamSupport;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -43,14 +42,15 @@ public class IndexerHostsAdapterOS implements IndexerHostsAdapter {
 
     @Override
     public List<URI> getActiveHosts() {
-        final NodesInfoResponse response = client.sync(
-                c -> c.nodes().info(r -> r.metric(NodesInfoMetric.Http)),
+        final JsonNode response = client.performRequest(
+                Requests.builder().endpoint("/_nodes/http").method("GET").build(),
                 "Unable to retrieve indexer hosts"
         );
-        return response.nodes().values().stream()
-                .map(NodeInfo::http)
-                .filter(Objects::nonNull)
-                .map(NodeInfoHttp::publishAddress)
+        final JsonNode nodes = response.path("nodes");
+        final Iterator<String> nodeIds = nodes.fieldNames();
+        return StreamSupport.stream(((Iterable<String>) () -> nodeIds).spliterator(), false)
+                .map(nodeId -> nodes.path(nodeId).path("http").path("publish_address").asText())
+                .filter(addr -> !addr.isEmpty())
                 .map(this::toURI)
                 .toList();
     }
@@ -59,6 +59,9 @@ public class IndexerHostsAdapterOS implements IndexerHostsAdapter {
         if (address.startsWith("http://") || address.startsWith("https://")) {
             return URI.create(address);
         }
-        return URI.create(f("%s://%s", defaultScheme, address));
+        // publish_address can be in "hostname/ip:port" format — use the ip:port part
+        final int slashIndex = address.indexOf('/');
+        final String hostPort = slashIndex >= 0 ? address.substring(slashIndex + 1) : address;
+        return URI.create(f("%s://%s", defaultScheme, hostPort));
     }
 }

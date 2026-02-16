@@ -71,6 +71,21 @@ class IndexerHostsAdapterOSTest {
     }
 
     @Test
+    void handlesHostnameSlashIpPortFormat() {
+        final OfficialOpensearchClient client = ServerlessOpenSearchClient.builder()
+                .stubResponse("GET", "/_nodes/http", Resources.getResource("nodes_http_with_hostname.json"))
+                .build();
+        final IndexerHostsAdapterOS adapter = new IndexerHostsAdapterOS(client, List.of(URI.create("https://localhost:9200")));
+
+        final List<URI> hosts = adapter.getActiveHosts();
+
+        assertThat(hosts).containsExactlyInAnyOrder(
+                URI.create("https://172.18.0.2:9200"),
+                URI.create("https://172.18.0.3:9200")
+        );
+    }
+
+    @Test
     void defaultsToHttpWhenNoHostsConfigured() {
         final OfficialOpensearchClient client = ServerlessOpenSearchClient.builder()
                 .stubResponse("GET", "/_nodes/http", Resources.getResource("nodes_http.json"))
