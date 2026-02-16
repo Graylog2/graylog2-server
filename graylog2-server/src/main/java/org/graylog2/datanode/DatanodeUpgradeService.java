@@ -26,6 +26,7 @@ import org.graylog.plugins.datanode.dto.Node;
 import org.graylog.plugins.datanode.dto.ShardReplication;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.plugin.Version;
 
 import java.util.ArrayList;
@@ -59,7 +60,7 @@ public class DatanodeUpgradeService {
         final List<DataNodeDto> upToDateDataNodes = dataNodes.stream().filter(n -> isDatanodeUpToDate(n.getDatanodeVersion(), serverVersion)).collect(Collectors.toList());
         final List<DataNodeDto> toUpgradeDataNodes = dataNodes.stream().filter(n -> !upToDateDataNodes.contains(n)).collect(Collectors.toList());
 
-        final boolean clusterHealthy = clusterState.status().equals("GREEN") && clusterState.relocatingShards() == 0;
+        final boolean clusterHealthy = clusterState.status() == HealthStatus.Green && clusterState.relocatingShards() == 0;
         final boolean shardReplicationEnabled = clusterState.shardReplication() == ShardReplication.ALL;
         final boolean clusterReadyForUpgrade = clusterHealthy && shardReplicationEnabled;
 
@@ -131,12 +132,10 @@ public class DatanodeUpgradeService {
     }
 
     public FlushResponse stopReplication() {
-        upgradeService.disableShardReplication();
-        return upgradeService.flush();
+        return upgradeService.disableShardReplication();
     }
 
     public FlushResponse startReplication() {
-        upgradeService.enableShardReplication();
-        return upgradeService.flush();
+        return upgradeService.enableShardReplication();
     }
 }

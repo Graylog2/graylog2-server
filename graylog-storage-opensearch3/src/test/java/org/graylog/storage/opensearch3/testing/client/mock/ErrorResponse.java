@@ -14,13 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.datanode;
+package org.graylog.storage.opensearch3.testing.client.mock;
 
-import org.graylog.plugins.datanode.dto.ClusterState;
-import org.graylog.plugins.datanode.dto.FlushResponse;
+import java.io.InputStream;
+import java.nio.file.PathMatcher;
 
-public interface DatanodeUpgradeServiceAdapter {
-    ClusterState getClusterState();
-    FlushResponse disableShardReplication();
-    FlushResponse enableShardReplication();
+public record ErrorResponse(String method, PathMatcher urlPattern, int responseCode, String error) implements MockedResponse {
+
+    @Override
+    public InputStream newInputStream() {
+        return InputStream.nullInputStream();
+    }
+
+    @Override
+    public boolean isError() {
+        return true;
+    }
 }
