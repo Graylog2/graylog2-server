@@ -71,7 +71,7 @@ public class PaginationOS implements MultiChunkResultRetriever {
             builder.index(new LinkedList<>(indices));
             builder.query(query);
             builder.ignoreUnavailable(true);
-            builder.allowNoIndices(false);
+            builder.allowNoIndices(true);
             builder.expandWildcards(ExpandWildcard.Open);
             builder.trackTotalHits(th -> th.enabled(true));
 
