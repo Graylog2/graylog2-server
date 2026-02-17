@@ -18,14 +18,17 @@ package org.graylog.storage.elasticsearch7.stats;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableSet;
 import jakarta.inject.Inject;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Response;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
+import org.graylog2.indexer.indices.util.IndexNameBatching;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -86,6 +89,28 @@ public class StatsApi {
     private JsonNode stats(Collection<String> indices,
                            Collection<String> metrics,
                            Consumer<Request> prepareRequest) {
+        final List<List<String>> batches = IndexNameBatching.partitionByJoinedLength(
+                indices, IndexNameBatching.MAX_INDICES_URL_LENGTH);
+
+        if (batches.size() <= 1) {
+            return singleStats(indices, metrics, prepareRequest);
+        }
+
+        final ObjectNode mergedIndices = objectMapper.createObjectNode();
+        for (final List<String> batch : batches) {
+            final JsonNode batchResult = singleStats(batch, metrics, prepareRequest);
+            batchResult.path("indices").fields()
+                    .forEachRemaining(entry -> mergedIndices.set(entry.getKey(), entry.getValue()));
+        }
+
+        final ObjectNode result = objectMapper.createObjectNode();
+        result.set("indices", mergedIndices);
+        return result;
+    }
+
+    private JsonNode singleStats(Collection<String> indices,
+                                 Collection<String> metrics,
+                                 Consumer<Request> prepareRequest) {
         final StringBuilder endpoint = new StringBuilder();
         if (!indices.isEmpty()) {
             final String joinedIndices = String.join(",", indices);
