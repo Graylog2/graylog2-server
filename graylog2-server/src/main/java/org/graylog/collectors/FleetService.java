@@ -24,6 +24,7 @@ import com.mongodb.client.model.ReplaceOptions;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.graylog.collectors.db.FleetConfig;
 import org.graylog.collectors.db.FleetDTO;
 import org.graylog.collectors.db.MarkerType;
 import org.graylog2.database.MongoCollection;
@@ -56,13 +57,16 @@ public class FleetService {
     private final MongoPaginationHelper<FleetDTO> paginationHelper;
     private final SearchQueryParser searchQueryParser;
     private final FleetTransactionLogService txnLogService;
+    private final SourceService sourceService;
 
     @Inject
-    public FleetService(MongoCollections mongoCollections, FleetTransactionLogService txnLogService) {
+    public FleetService(MongoCollections mongoCollections, FleetTransactionLogService txnLogService,
+                        SourceService sourceService) {
         this.collection = mongoCollections.collection("fleets", FleetDTO.class);
         this.paginationHelper = mongoCollections.paginationHelper(collection);
         this.searchQueryParser = new SearchQueryParser(FleetDTO.FIELD_NAME, SEARCH_FIELD_MAPPING);
         this.txnLogService = txnLogService;
+        this.sourceService = sourceService;
 
         collection.createIndexes(List.of(
                 new IndexModel(Indexes.ascending(FleetDTO.FIELD_NAME), new IndexOptions().unique(true))
@@ -131,5 +135,12 @@ public class FleetService {
             txnLogService.appendFleetMarker(fleetId, MarkerType.CONFIG_CHANGED);
         }
         return deleted;
+    }
+
+    public Optional<FleetConfig> assembleConfig(String fleetId) {
+        return get(fleetId).map(fleet -> {
+            var sources = sourceService.listAllByFleet(fleetId);
+            return new FleetConfig(fleet, sources);
+        });
     }
 }

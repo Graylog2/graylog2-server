@@ -16,8 +16,11 @@
  */
 package org.graylog.collectors;
 
+import org.graylog.collectors.db.FileSourceConfig;
+import org.graylog.collectors.db.FleetConfig;
 import org.graylog.collectors.db.FleetDTO;
 import org.graylog.collectors.db.MarkerType;
+import org.graylog.collectors.db.SourceConfig;
 import org.graylog.collectors.db.TransactionMarker;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoJackExtension;
@@ -46,6 +49,7 @@ class FleetServiceTest {
     private static final NodeId NODE_ID = new SimpleNodeId("test-node-1");
 
     private FleetService fleetService;
+    private SourceService sourceService;
     private FleetTransactionLogService txnLogService;
 
     @BeforeEach
@@ -56,7 +60,12 @@ class FleetServiceTest {
                 Set.of(FleetTransactionLogService.SEQUENCE_TOPIC)
         );
         txnLogService = new FleetTransactionLogService(mongoCollections, sequenceService, NODE_ID);
-        fleetService = new FleetService(mongoCollections, txnLogService);
+        sourceService = new SourceService(mongoCollections, txnLogService);
+        fleetService = new FleetService(mongoCollections, txnLogService, sourceService);
+    }
+
+    private SourceConfig validFileConfig() {
+        return new FileSourceConfig(List.of("/var/log/syslog"), "tail", null);
     }
 
     @Test
@@ -163,5 +172,39 @@ class FleetServiceTest {
         assertThat(result.pagination().total()).isEqualTo(1);
         assertThat(result.delegate()).hasSize(1);
         assertThat(result.delegate().getFirst().name()).isEqualTo("alpha-fleet");
+    }
+
+    @Test
+    void assembleConfigReturnsFleetWithSources() {
+        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet", "1.0.0");
+        sourceService.create(fleet.id(), "source-1", "First source", true, validFileConfig());
+        sourceService.create(fleet.id(), "source-2", "Second source", true, validFileConfig());
+
+        Optional<FleetConfig> config = fleetService.assembleConfig(fleet.id());
+
+        assertThat(config).isPresent();
+        assertThat(config.get().fleet().name()).isEqualTo("test-fleet");
+        assertThat(config.get().sources()).hasSize(2);
+    }
+
+    @Test
+    void assembleConfigForDeletedFleetReturnsEmpty() {
+        Optional<FleetConfig> config = fleetService.assembleConfig("aaaaaaaaaaaaaaaaaaaaaaaa");
+
+        assertThat(config).isEmpty();
+    }
+
+    @Test
+    void deleteFleetCascadesSourceDeletion() {
+        FleetDTO fleet = fleetService.create("test-fleet", "A test fleet", null);
+        sourceService.create(fleet.id(), "source-1", "First source", true, validFileConfig());
+        sourceService.create(fleet.id(), "source-2", "Second source", true, validFileConfig());
+
+        // Simulate the cascade delete as done by FleetResource
+        sourceService.deleteAllByFleet(fleet.id());
+        fleetService.delete(fleet.id());
+
+        assertThat(fleetService.get(fleet.id())).isEmpty();
+        assertThat(sourceService.listAllByFleet(fleet.id())).isEmpty();
     }
 }

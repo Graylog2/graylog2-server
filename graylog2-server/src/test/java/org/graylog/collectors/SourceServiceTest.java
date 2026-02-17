@@ -60,8 +60,8 @@ class SourceServiceTest {
                 Set.of(FleetTransactionLogService.SEQUENCE_TOPIC)
         );
         txnLogService = new FleetTransactionLogService(mongoCollections, sequenceService, NODE_ID);
-        fleetService = new FleetService(mongoCollections, txnLogService);
         sourceService = new SourceService(mongoCollections, txnLogService);
+        fleetService = new FleetService(mongoCollections, txnLogService, sourceService);
     }
 
     private SourceConfig validFileConfig() {
