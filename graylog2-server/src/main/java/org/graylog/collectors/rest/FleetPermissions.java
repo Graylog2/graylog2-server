@@ -37,24 +37,15 @@ public class FleetPermissions implements PluginPermissions {
     public static final String SOURCE_DELETE = "collectors_sources:delete";
 
     private static final ImmutableSet<Permission> PERMISSIONS = ImmutableSet.of(
-            create(FLEET_CREATE, ""),
-            create(FLEET_READ, ""),
-            create(FLEET_EDIT, ""),
-            create(FLEET_DELETE, ""),
-            create(SOURCE_CREATE, ""),
-            create(SOURCE_READ, ""),
-            create(SOURCE_EDIT, ""),
-            create(SOURCE_DELETE, "")
+            create(FLEET_CREATE, "Create a new fleet"),
+            create(FLEET_READ, "Read fleet details"),
+            create(FLEET_EDIT, "Edit fleet details"),
+            create(FLEET_DELETE, "Delete a fleet"),
+            create(SOURCE_CREATE, "Create a new source in a fleet"),
+            create(SOURCE_READ, "Read a source details in a fleet"),
+            create(SOURCE_EDIT, "Edit a source details in a fleet"),
+            create(SOURCE_DELETE, "Delete a source from a fleet")
     );
-
-    private static final ImmutableSet<String> READER_BASE_PERMISSION_SELECTION = ImmutableSet.of(
-            FLEET_READ,
-            SOURCE_READ
-    );
-
-    private static final Set<Permission> READER_BASE_PERMISSIONS = PERMISSIONS.stream()
-            .filter(permission -> READER_BASE_PERMISSION_SELECTION.contains(permission.permission()))
-            .collect(Collectors.toSet());
 
     @Override
     public Set<Permission> permissions() {
@@ -63,6 +54,6 @@ public class FleetPermissions implements PluginPermissions {
 
     @Override
     public Set<Permission> readerBasePermissions() {
-        return READER_BASE_PERMISSIONS;
+        return Set.of();
     }
 }
