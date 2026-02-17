@@ -114,7 +114,6 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
 
     static final String CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING = "cluster.routing.allocation.exclude._name";
     boolean allocationExcludeChecked = false;
-    ScheduledExecutorService executorService;
 
     @Inject
     OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, final CustomCAX509TrustManager trustManager,
@@ -351,8 +350,10 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
                         clusterClient.putSettings(settings, RequestOptions.DEFAULT);
                 if (response.isAcknowledged()) {
                     allocationExcludeChecked = false; // reset to rejoin cluster in case of failure
-                    executorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("datanode-removal").build());
-                    executorService.scheduleAtFixedRate(this::checkRemovalStatus, 10, 10, TimeUnit.SECONDS);
+                    @SuppressWarnings("resource")
+                    final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor(
+                            new ThreadFactoryBuilder().setNameFormat("datanode-removal").build());
+                    executorService.scheduleAtFixedRate(() -> checkRemovalStatus(executorService), 10, 10, TimeUnit.SECONDS);
                 } else {
                     throw new RuntimeException("Failed to exclude node from cluster allocation");
                 }
@@ -365,7 +366,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     /**
      * started by onRemove() to check if all shards have been relocated
      */
-    void checkRemovalStatus() {
+    void checkRemovalStatus(ScheduledExecutorService executorService) {
         final Optional<RestHighLevelClient> restClient = restClient();
         if (restClient.isPresent()) {
             try {
@@ -378,6 +379,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
                     eventBus.post(DataNodeLifecycleEvent.create(nodeId.getNodeId(), DataNodeLifecycleTrigger.REMOVED));
                 }
             } catch (IOException | OpenSearchStatusException e) {
+                executorService.shutdown();
                 throw new RuntimeException("Error checking removal status", e);
             }
         }
