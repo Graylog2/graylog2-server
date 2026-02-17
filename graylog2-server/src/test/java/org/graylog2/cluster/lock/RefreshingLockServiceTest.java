@@ -16,6 +16,8 @@
  */
 package org.graylog2.cluster.lock;
 
+import org.graylog2.shared.SuppressForbidden;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +28,7 @@ import java.time.Duration;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Optional;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -39,7 +42,6 @@ public class RefreshingLockServiceTest {
     @Mock
     private LockService lockService;
 
-    @Mock
     private ScheduledExecutorService scheduler;
 
     private RefreshingLockService refreshingLockService;
@@ -59,12 +61,21 @@ public class RefreshingLockServiceTest {
             .build();
 
     @BeforeEach
+    @SuppressForbidden("Using Executors.newSingleThreadScheduledExecutor() is okay in tests")
     void setUp() {
+        scheduler = Executors.newSingleThreadScheduledExecutor();
         refreshingLockService = new RefreshingLockService(
                 lockService,
                 scheduler,
                 Duration.ofMinutes(5)
         );
+    }
+
+    @AfterEach
+    void tearDown() {
+        if (scheduler != null) {
+            scheduler.shutdownNow();
+        }
     }
 
     @Test
