@@ -21,13 +21,13 @@ import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.XContentBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.HasAggregations;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.missing.Missing;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.InternalValueCount;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ValueCount;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ValueCountAggregationBuilder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
@@ -37,9 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> {
@@ -84,9 +82,9 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> 
         final String agg = queryContext.getAggNameForPivotSpecFromContext(pivot, spec);
         if (agg == null) {
             if (aggregations instanceof MultiBucketsAggregation.Bucket) {
-                return createValueCount(((MultiBucketsAggregation.Bucket) aggregations).getDocCount());
+                return new InternalValueCount(null, ((MultiBucketsAggregation.Bucket) aggregations).getDocCount(), null);
             } else if (aggregations instanceof Missing) {
-                return createValueCount(((Missing) aggregations).getDocCount());
+                return new InternalValueCount(null, ((Missing) aggregations).getDocCount(), null);
             }
         } else {
             // try to saved sub aggregation type. this might fail if we refer to the total result of the entire result instead of a specific
@@ -95,44 +93,5 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> 
         }
 
         return null;
-    }
-
-    private Aggregation createValueCount(final Long docCount) {
-        return new ValueCount() {
-            @Override
-            public long getValue() {
-                return docCount;
-            }
-
-            @Override
-            public double value() {
-                return docCount;
-            }
-
-            @Override
-            public String getValueAsString() {
-                return docCount.toString();
-            }
-
-            @Override
-            public String getName() {
-                return null;
-            }
-
-            @Override
-            public String getType() {
-                return null;
-            }
-
-            @Override
-            public Map<String, Object> getMetadata() {
-                return null;
-            }
-
-            @Override
-            public XContentBuilder toXContent(XContentBuilder xContentBuilder, Params params) throws IOException {
-                return null;
-            }
-        };
     }
 }

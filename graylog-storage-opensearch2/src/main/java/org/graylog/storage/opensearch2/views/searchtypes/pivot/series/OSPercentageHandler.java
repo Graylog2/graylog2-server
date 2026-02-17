@@ -24,11 +24,11 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentage;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.XContentBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.HasAggregations;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.InternalValueCount;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ParsedSum;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ValueCount;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
@@ -40,7 +40,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage, ValueCount> {
@@ -155,48 +154,10 @@ public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage, Va
             return result;
         }
         if (result instanceof ParsedSum sum) {
-            return createValueCount(sum.getValue());
+            return new InternalValueCount(null, (long) sum.getValue(), null);
         }
 
         throw new IllegalStateException("Unable to parse result: " + result);
     }
 
-    private Aggregation createValueCount(final Double value) {
-        return new ValueCount() {
-            @Override
-            public long getValue() {
-                return value.longValue();
-            }
-
-            @Override
-            public double value() {
-                return value;
-            }
-
-            @Override
-            public String getValueAsString() {
-                return value.toString();
-            }
-
-            @Override
-            public String getName() {
-                return null;
-            }
-
-            @Override
-            public String getType() {
-                return null;
-            }
-
-            @Override
-            public Map<String, Object> getMetadata() {
-                return null;
-            }
-
-            @Override
-            public XContentBuilder toXContent(XContentBuilder xContentBuilder, Params params) {
-                return null;
-            }
-        };
-    }
 }
