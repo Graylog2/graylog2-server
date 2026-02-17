@@ -49,6 +49,10 @@ public class FleetTransactionLogService {
     static final String FIELD_PAYLOAD = "payload";
     static final String FIELD_CREATED_AT = "created_at";
     static final String FIELD_CREATED_BY = "created_by";
+    /**
+     * The maximum number of bulk action targets we allow for a transaction log entry.
+     */
+    public static final int MAX_BULK_TARGET_SIZE = 100;
 
     private final MongoCollection<Document> collection;
     private final MongoSequenceService sequenceService;
@@ -80,8 +84,8 @@ public class FleetTransactionLogService {
         if (instanceUids == null || instanceUids.isEmpty()) {
             throw new IllegalArgumentException("instanceUids must not be empty");
         }
-        if (instanceUids.size() > 100) {
-            throw new IllegalArgumentException("instanceUids must not exceed 100 elements, got " + instanceUids.size());
+        if (instanceUids.size() > MAX_BULK_TARGET_SIZE) {
+            throw new IllegalArgumentException("instanceUids must not exceed " + MAX_BULK_TARGET_SIZE + " elements, got " + instanceUids.size());
         }
         return appendMarker(TransactionMarker.TARGET_COLLECTOR, instanceUids, type, payload);
     }
