@@ -62,10 +62,9 @@ public class TokenUsageServiceImpl implements TokenUsageService {
                                                        String sort,
                                                        SortOrder order) {
         final PaginatedList<AccessTokenEntity> currentPage = this.accessTokenService.findPaginated(searchQuery, page, perPage, sort, order);
-        if (LOG.isInfoEnabled()) {
-            final String logSearch = searchQuery.getQueryMap().isEmpty() ? "" : ", query \"" + searchQuery.getQueryString() + "\", sort by " + sort + ", ordering " + order;
-            LOG.info("Loaded {} tokens in page {} containing max {} items{}.", currentPage.pagination().count(), page, perPage, logSearch);
-        }
+        //Logs information for the request, including its response. If the query is defined, more details will be logged too:
+        LOG.debug("Loaded {} tokens in page {} containing max {} items{}.", currentPage.pagination().count(), page, perPage,
+                searchQuery.getQueryMap().isEmpty() ? "" : ", query \"" + searchQuery.getQueryString() + "\", sort by " + sort + ", ordering " + order);
 
         //We loaded all matching tokens, let's now extract the respective users having created these tokens and (if applicable) their authentication-backend:
         final Map<String, User> usersOfThisPage = currentPage.stream()
