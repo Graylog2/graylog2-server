@@ -20,7 +20,6 @@ import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.events.search.MoreSearchAdapterIT;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.storage.opensearch3.MoreSearchAdapterOS;
-import org.graylog.storage.opensearch3.OS2ResultMessageFactory;
 import org.graylog.storage.opensearch3.PaginationOS;
 import org.graylog.storage.opensearch3.SearchRequestFactoryOS;
 import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
@@ -44,8 +43,6 @@ public class MoreSearchAdapterOSUsingPaginationIT extends MoreSearchAdapterIT {
     @Override
     protected MoreSearchAdapter createMoreSearchAdapter() {
         return new MoreSearchAdapterOS(openSearchInstance.getOfficialOpensearchClient(), true,
-                new PaginationOS(resultMessageFactory, openSearchInstance.getOfficialOpensearchClient(), new SearchRequestFactoryOS(true, new IgnoreSearchFilters()), true),
-                new OS2ResultMessageFactory(resultMessageFactory)
-        );
+                new PaginationOS(resultMessageFactory, openSearchInstance.getOfficialOpensearchClient(), new SearchRequestFactoryOS(true, new IgnoreSearchFilters()), true), resultMessageFactory);
     }
 }

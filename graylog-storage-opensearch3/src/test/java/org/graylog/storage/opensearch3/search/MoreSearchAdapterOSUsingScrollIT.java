@@ -20,7 +20,6 @@ import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.events.search.MoreSearchAdapterIT;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.storage.opensearch3.MoreSearchAdapterOS;
-import org.graylog.storage.opensearch3.OS2ResultMessageFactory;
 import org.graylog.storage.opensearch3.OpenSearchClient;
 import org.graylog.storage.opensearch3.Scroll;
 import org.graylog.storage.opensearch3.ScrollResultOS2;
@@ -53,8 +52,7 @@ public class MoreSearchAdapterOSUsingScrollIT extends MoreSearchAdapterIT {
                         ),
                         new SearchRequestFactory(false, true, new IgnoreSearchFilters())
                 ),
-                new OS2ResultMessageFactory(resultMessageFactory)
-
+                resultMessageFactory
         );
     }
 }

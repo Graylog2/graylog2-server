@@ -30,9 +30,9 @@ import org.graylog2.indexer.results.ChunkedResult;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.results.ResultChunk;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.results.ResultMessageFactory;
 import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.Sorting;
-import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -82,17 +82,17 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     private final OfficialOpensearchClient opensearchClient;
     private final Boolean allowLeadingWildcard;
     private final MultiChunkResultRetriever multiChunkResultRetriever;
-    private final OS2ResultMessageFactory resultMessageFactory;
+    private final ResultMessageFactory messageFactory;
 
     @Inject
     public MoreSearchAdapterOS(OfficialOpensearchClient opensearchClient,
                                @Named("allow_leading_wildcard_searches") Boolean allowLeadingWildcard,
                                MultiChunkResultRetriever multiChunkResultRetriever,
-                               OS2ResultMessageFactory resultMessageFactory) {
+                               ResultMessageFactory messageFactory) {
         this.opensearchClient = opensearchClient;
         this.allowLeadingWildcard = allowLeadingWildcard;
         this.multiChunkResultRetriever = multiChunkResultRetriever;
-        this.resultMessageFactory = resultMessageFactory;
+        this.messageFactory = messageFactory;
     }
 
     @Override
@@ -125,7 +125,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
         final org.opensearch.client.opensearch.core.SearchResponse<Map> searchResult = opensearchClient.sync(c -> c.search(newSearchRequest, Map.class), "Unable to perform search query");
 
         final List<ResultMessage> hits = searchResult.hits().hits().stream()
-                .map(resultMessageFactory::fromSearchHit)
+                .map(hit -> messageFactory.parseFromSource(hit.id(), hit.index(), hit.source(), hit.highlight()))
                 .collect(Collectors.toList());
 
         final long total = searchResult.hits().total().value();
