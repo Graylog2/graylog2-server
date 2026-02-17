@@ -199,16 +199,20 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                         processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), rowBucket, true, "row-leaf");
                     }
                     if (!pivot.columnGroups().isEmpty()) {
-                        var contextWithRowBucket = queryContext.withRowBucket(rowBucket);
-                        retrieveBuckets(pivot, pivot.columnGroups(), rowBucket)
-                                .forEach(columnBucketTuple -> {
-                                    final ImmutableList<String> columnKeys = columnBucketTuple.keys();
-                                    colGroupNames.add(String.join(", ", Stream.concat(columnKeys.stream(), seriesNames.stream()).toList()));
+                        queryContext.storeCurrentRowBucket(rowBucket);
+                        try {
+                            retrieveBuckets(pivot, pivot.columnGroups(), rowBucket)
+                                    .forEach(columnBucketTuple -> {
+                                        final ImmutableList<String> columnKeys = columnBucketTuple.keys();
+                                        colGroupNames.add(String.join(", ", Stream.concat(columnKeys.stream(), seriesNames.stream()).toList()));
 
-                                    final MultiBucketsAggregation.Bucket columnBucket = columnBucketTuple.bucket();
+                                        final MultiBucketsAggregation.Bucket columnBucket = columnBucketTuple.bucket();
 
-                                    processSeries(rowBuilder, queryResult, contextWithRowBucket, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
-                                });
+                                        processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
+                                    });
+                        } finally {
+                            queryContext.removeCurrentRowBucket();
+                        }
                     }
                     resultBuilder.addRow(rowBuilder.build());
                 });

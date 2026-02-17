@@ -43,7 +43,7 @@ public abstract class ESPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
 
     public record SortOrders(List<BucketOrder> orders, List<AggregationBuilder> sortingAggregations) {}
 
-    protected SortOrders orderListForPivot(Pivot pivot, IndexerGeneratedQueryContext<?> queryContext, BucketOrder defaultOrder, Query query) {
+    protected SortOrders orderListForPivot(Pivot pivot, IndexerGeneratedQueryContext<?, ?> queryContext, BucketOrder defaultOrder, Query query) {
         final List<AggregationBuilder> sortingAggregations = new ArrayList<>();
         final List<BucketOrder> ordering = pivot.sort()
                 .stream()
@@ -93,7 +93,7 @@ public abstract class ESPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
                 : new SortOrders(ordering, List.copyOf(sortingAggregations));
     }
 
-    private boolean isSortOnNumericPivotField(Pivot pivot, PivotSort pivotSort, IndexerGeneratedQueryContext<?> queryContext, Query query) {
+    private boolean isSortOnNumericPivotField(Pivot pivot, PivotSort pivotSort, IndexerGeneratedQueryContext<?, ?> queryContext, Query query) {
         return queryContext.fieldType(query.effectiveStreams(pivot), pivotSort.field())
                 .filter(this::isNumericFieldType)
                 .isPresent();

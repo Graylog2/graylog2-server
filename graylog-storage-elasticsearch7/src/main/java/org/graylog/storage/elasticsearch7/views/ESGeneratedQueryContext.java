@@ -31,13 +31,10 @@ import org.joda.time.DateTimeZone;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
 
-public class ESGeneratedQueryContext extends IndexerGeneratedQueryContext<SearchSourceBuilder> {
+public class ESGeneratedQueryContext extends IndexerGeneratedQueryContext<SearchSourceBuilder, MultiBucketsAggregation.Bucket> {
 
     private final ElasticsearchBackend elasticsearchBackend;
-    private final MultiBucketsAggregation.Bucket rowBucket;
 
     @AssistedInject
     public ESGeneratedQueryContext(
@@ -48,21 +45,6 @@ public class ESGeneratedQueryContext extends IndexerGeneratedQueryContext<Search
             FieldTypesLookup fieldTypes) {
         super(new HashMap<>(), new HashSet<>(validationErrors), fieldTypes, timezone, ssb, new HashMap<>());
         this.elasticsearchBackend = elasticsearchBackend;
-        this.rowBucket = null;
-    }
-
-    private ESGeneratedQueryContext(
-            ElasticsearchBackend elasticsearchBackend,
-            SearchSourceBuilder ssb,
-            Collection<SearchError> validationErrors,
-            FieldTypesLookup fieldTypes,
-            MultiBucketsAggregation.Bucket rowBucket,
-            Map<String, SearchSourceBuilder> searchTypeQueries,
-            Map<Object, Object> contextMap,
-            DateTimeZone timezone) {
-        super(contextMap, new HashSet<>(validationErrors), fieldTypes, timezone, ssb, searchTypeQueries);
-        this.elasticsearchBackend = elasticsearchBackend;
-        this.rowBucket = rowBucket;
     }
 
     public interface Factory {
@@ -80,13 +62,5 @@ public class ESGeneratedQueryContext extends IndexerGeneratedQueryContext<Search
                 .query(elasticsearchBackend.generateFilterClause(searchType.filter())
                         .map(filterClause -> (QueryBuilder) new BoolQueryBuilder().must(ssb.query()).must(filterClause))
                         .orElse(ssb.query())));
-    }
-
-    public ESGeneratedQueryContext withRowBucket(MultiBucketsAggregation.Bucket rowBucket) {
-        return new ESGeneratedQueryContext(elasticsearchBackend, ssb, errors, fieldTypes, rowBucket, searchTypeQueries, contextMap, timezone);
-    }
-
-    public Optional<MultiBucketsAggregation.Bucket> rowBucket() {
-        return Optional.ofNullable(this.rowBucket);
     }
 }
