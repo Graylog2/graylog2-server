@@ -110,7 +110,7 @@ public abstract class IndexToolsAdapterIT extends ElasticsearchBaseTest {
 
     private void indexTestDocuments() {
         final DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS").withZoneUTC();
-        final String timestamp = formatter.print(DateTime.now(DateTimeZone.UTC).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0));
+        final String timestamp = formatter.print(DateTime.now(DateTimeZone.UTC));
 
         final BulkIndexRequest bulkRequest = new BulkIndexRequest();
 
