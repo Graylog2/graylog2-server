@@ -23,6 +23,8 @@ import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 import org.opensearch.client.opensearch._types.aggregations.CardinalityAggregate;
 
+import java.util.Optional;
+
 public class OSCardinalityHandler extends OSBasicSeriesSpecHandler<Cardinality> {
 
     @Override
@@ -34,7 +36,10 @@ public class OSCardinalityHandler extends OSBasicSeriesSpecHandler<Cardinality> 
     @Override
     protected Object getValueFromAggregationResult(final Aggregate agg,
                                                    final Cardinality cardinalitySpec) {
-        CardinalityAggregate cardinality = agg.isCardinality() ? agg.cardinality() : null;
-        return cardinality == null ? null : cardinality.value();
+        return Optional.ofNullable(agg)
+                .filter(Aggregate::isCardinality)
+                .map(Aggregate::cardinality)
+                .map(CardinalityAggregate::value)
+                .orElse(null);
     }
 }
