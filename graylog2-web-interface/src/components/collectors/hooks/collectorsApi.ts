@@ -27,11 +27,7 @@ export type CreateFleetInput = {
 };
 export type UpdateFleetInput = {
   fleetId: string;
-  updates: {
-    name: string;
-    description: string;
-    target_version?: string | null;
-  };
+  updates: Partial<Fleet>;
 };
 
 // Source API types
