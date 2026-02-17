@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.opensearch3.indextemplates;
 
-import org.graylog.storage.opensearch3.OSSerializationUtils;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog2.indexer.indices.Template;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.mapping.TypeMapping;
@@ -49,7 +47,6 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 
 @ExtendWith(MockitoExtension.class)
 class ComposableIndexTemplateAdapterTest {
@@ -79,11 +76,6 @@ class ComposableIndexTemplateAdapterTest {
                 13L,
                 new Template.Settings(Map.of())
         );
-
-        try (MockedStatic<OSSerializationUtils> templateMapper = mockStatic(OSSerializationUtils.class)) {
-            templateMapper.when(() -> OSSerializationUtils.fromMap(template.mappings(), TypeMapping._DESERIALIZER)).thenReturn(typeMapping);
-            templateMapper.when(() -> OSSerializationUtils.fromMap(template.settings(), IndexSettings._DESERIALIZER)).thenReturn(indexSettings);
-        }
 
         doReturn(PutIndexTemplateResponse.builder().acknowledged(true).build())
                 .when(indicesClient)

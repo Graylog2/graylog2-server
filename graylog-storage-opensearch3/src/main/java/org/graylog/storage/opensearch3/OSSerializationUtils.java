@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -100,17 +101,23 @@ public class OSSerializationUtils {
 
 
     public static Map<String, JsonData> toJsonDataMap(final Map<String, Object> map) {
-        return map.entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                                Map.Entry::getKey,
-                                entry -> JsonData.of(entry.getValue())
+        return Optional.ofNullable(map)
+                .map(m -> m
+                        .entrySet()
+                        .stream()
+                        .collect(Collectors.toMap(
+                                        Map.Entry::getKey,
+                                        entry -> JsonData.of(entry.getValue())
+                                )
                         )
-                );
+                ).orElse(Map.of());
     }
 
     public static <T> T fromMap(final Map<String, Object> mapRepresentation,
                          final JsonpDeserializer<T> deserializer) throws JsonProcessingException {
+        if (mapRepresentation == null) {
+            return null;
+        }
         final String json = jsonpMapper.objectMapper().writeValueAsString(mapRepresentation);
         return fromJson(json, deserializer);
     }
