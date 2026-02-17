@@ -14,127 +14,78 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { fetchPeriodically } from 'logic/rest/FetchProvider';
+import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 
 import type { CollectorsConfig, CollectorsConfigRequest, Fleet, Source } from '../types';
-import { mockFleets, mockSources } from '../mockData';
-
-// Simulate network delay
-const delay = (ms: number) => new Promise((resolve) => { setTimeout(resolve, ms); });
-const MOCK_DELAY = 300;
 
 // Fleet API types
-export type CreateFleetInput = Omit<Fleet, 'id' | 'created_at' | 'updated_at'>;
-export type UpdateFleetInput = { fleetId: string; updates: Partial<Fleet> };
+export type CreateFleetInput = {
+  name: string;
+  description: string;
+  target_version?: string | null;
+};
+export type UpdateFleetInput = {
+  fleetId: string;
+  updates: {
+    name: string;
+    description: string;
+    target_version?: string | null;
+  };
+};
 
 // Source API types
-export type CreateSourceInput = Omit<Source, 'id'>;
-export type UpdateSourceInput = { sourceId: string; updates: Partial<Source> };
+export type CreateSourceInput = {
+  fleetId: string;
+  source: Omit<Source, 'id' | 'fleet_id'>;
+};
+export type UpdateSourceInput = {
+  fleetId: string;
+  sourceId: string;
+  updates: Omit<Source, 'id' | 'fleet_id'>;
+};
+export type DeleteSourceInput = {
+  fleetId: string;
+  sourceId: string;
+};
 
 // Fleet API functions
-export const createFleet = async (input: CreateFleetInput): Promise<Fleet> => {
-  await delay(MOCK_DELAY);
+export const createFleet = async (input: CreateFleetInput): Promise<Fleet> =>
+  fetch('POST', qualifyUrl('/collectors/fleets'), {
+    name: input.name,
+    description: input.description,
+    target_version: input.target_version ?? null,
+  });
 
-  const now = new Date().toISOString();
-  const newFleet: Fleet = {
-    ...input,
-    id: `fleet-${Date.now()}`,
-    created_at: now,
-    updated_at: now,
-  };
+export const updateFleet = async ({ fleetId, updates }: UpdateFleetInput): Promise<Fleet> =>
+  fetch('PUT', qualifyUrl(`/collectors/fleets/${fleetId}`), {
+    name: updates.name,
+    description: updates.description,
+    target_version: updates.target_version ?? null,
+  });
 
-  mockFleets.push(newFleet);
-
-  return newFleet;
-};
-
-export const updateFleet = async ({ fleetId, updates }: UpdateFleetInput): Promise<Fleet> => {
-  await delay(MOCK_DELAY);
-
-  const index = mockFleets.findIndex((f) => f.id === fleetId);
-
-  if (index === -1) {
-    throw new Error(`Fleet not found: ${fleetId}`);
-  }
-
-  const updatedFleet: Fleet = {
-    ...mockFleets[index],
-    ...updates,
-    id: fleetId, // Prevent id from being overwritten
-    updated_at: new Date().toISOString(),
-  };
-
-  mockFleets[index] = updatedFleet;
-
-  return updatedFleet;
-};
-
-export const deleteFleet = async (fleetId: string): Promise<void> => {
-  await delay(MOCK_DELAY);
-
-  const index = mockFleets.findIndex((f) => f.id === fleetId);
-
-  if (index === -1) {
-    throw new Error(`Fleet not found: ${fleetId}`);
-  }
-
-  // Remove the fleet
-  mockFleets.splice(index, 1);
-
-  // Also delete all sources belonging to this fleet
-  for (let i = mockSources.length - 1; i >= 0; i -= 1) {
-    if (mockSources[i].fleet_id === fleetId) {
-      mockSources.splice(i, 1);
-    }
-  }
-};
+export const deleteFleet = async (fleetId: string): Promise<void> =>
+  fetch('DELETE', qualifyUrl(`/collectors/fleets/${fleetId}`));
 
 // Source API functions
-export const createSource = async (input: CreateSourceInput): Promise<Source> => {
-  await delay(MOCK_DELAY);
+export const createSource = async ({ fleetId, source }: CreateSourceInput): Promise<Source> =>
+  fetch('POST', qualifyUrl(`/collectors/fleets/${fleetId}/sources`), {
+    name: source.name,
+    description: source.description,
+    enabled: source.enabled,
+    config: source.config,
+  });
 
-  const newSource = {
-    ...input,
-    id: `src-${Date.now()}`,
-  } as Source;
+export const updateSource = async ({ fleetId, sourceId, updates }: UpdateSourceInput): Promise<Source> =>
+  fetch('PUT', qualifyUrl(`/collectors/fleets/${fleetId}/sources/${sourceId}`), {
+    name: updates.name,
+    description: updates.description,
+    enabled: updates.enabled,
+    config: updates.config,
+  });
 
-  mockSources.push(newSource);
-
-  return newSource;
-};
-
-export const updateSource = async ({ sourceId, updates }: UpdateSourceInput): Promise<Source> => {
-  await delay(MOCK_DELAY);
-
-  const index = mockSources.findIndex((s) => s.id === sourceId);
-
-  if (index === -1) {
-    throw new Error(`Source not found: ${sourceId}`);
-  }
-
-  const updatedSource = {
-    ...mockSources[index],
-    ...updates,
-    id: sourceId, // Prevent id from being overwritten
-  } as Source;
-
-  mockSources[index] = updatedSource;
-
-  return updatedSource;
-};
-
-export const deleteSource = async (sourceId: string): Promise<void> => {
-  await delay(MOCK_DELAY);
-
-  const index = mockSources.findIndex((s) => s.id === sourceId);
-
-  if (index === -1) {
-    throw new Error(`Source not found: ${sourceId}`);
-  }
-
-  mockSources.splice(index, 1);
-};
+export const deleteSource = async ({ fleetId, sourceId }: DeleteSourceInput): Promise<void> =>
+  fetch('DELETE', qualifyUrl(`/collectors/fleets/${fleetId}/sources/${sourceId}`));
 
 // Enrollment Token API types
 export type CreateEnrollmentTokenInput = {

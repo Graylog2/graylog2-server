@@ -25,23 +25,8 @@ import type { InputSummary } from 'hooks/usePaginatedInputs';
 
 import type { CollectorsConfig, Fleet, CollectorInstanceView, Source, CollectorStats } from '../types';
 import { fetchCollectorsConfig } from './collectorsApi';
-import {
-  mockFleets,
-  mockInstances,
-  mockSources,
-  mockStats,
-  getFleetById,
-  getInstancesByFleetId,
-  getSourcesByFleetId,
-  getFleetStats,
-} from '../mockData';
 
 const QUERY_KEY_PREFIX = 'collectors';
-
-// Simulate API delay
-const delay = (ms: number) => new Promise<void>((resolve) => {
-  setTimeout(resolve, ms);
-});
 
 // Paginated response type matching Graylog standard
 export type PaginatedCollectorsResponse<T> = {
@@ -122,46 +107,17 @@ export const fleetsKeyFn = (searchParams: SearchParams) => [...FLEETS_KEY_PREFIX
 export const fetchPaginatedFleets = async (
   searchParams: SearchParams,
 ): Promise<PaginatedCollectorsResponse<Fleet>> => {
-  await delay(200);
+  const url = PaginationURL('/collectors/fleets', searchParams.page, searchParams.pageSize, searchParams.query, {
+    sort: searchParams.sort?.attributeId,
+    order: searchParams.sort?.direction,
+  });
 
-  let filtered = [...mockFleets];
-
-  // Apply search query
-  if (searchParams.query) {
-    const query = searchParams.query.toLowerCase();
-    filtered = filtered.filter(
-      (f) =>
-        f.name.toLowerCase().includes(query) ||
-        f.description.toLowerCase().includes(query),
-    );
-  }
-
-  // Apply sorting
-  if (searchParams.sort) {
-    const { attributeId, direction } = searchParams.sort;
-    filtered.sort((a, b) => {
-      const aVal = a[attributeId as keyof Fleet] ?? '';
-      const bVal = b[attributeId as keyof Fleet] ?? '';
-      const cmp = String(aVal).localeCompare(String(bVal));
-
-      return direction === 'asc' ? cmp : -cmp;
-    });
-  }
-
-  // Apply pagination
-  const total = filtered.length;
-  const start = (searchParams.page - 1) * searchParams.pageSize;
-  const paged = filtered.slice(start, start + searchParams.pageSize);
+  const response = await fetch('GET', qualifyUrl(url));
 
   return {
-    list: paged,
-    pagination: { total },
-    attributes: [
-      { id: 'name', title: 'Name', type: 'STRING', sortable: true },
-      { id: 'description', title: 'Description', type: 'STRING', sortable: false },
-      { id: 'target_version', title: 'Target Version', type: 'STRING', sortable: true },
-      { id: 'created_at', title: 'Created', type: 'DATE', sortable: true },
-    ],
+    list: response.elements,
+    pagination: { total: response.total },
+    attributes: response.attributes,
   };
 };
 
@@ -171,102 +127,49 @@ export const sourcesKeyFn = (searchParams: SearchParams) => [...SOURCES_KEY_PREF
 
 export const fetchPaginatedSources = async (
   searchParams: SearchParams,
-  fleetId?: string,
+  fleetId: string,
 ): Promise<PaginatedCollectorsResponse<Source>> => {
-  await delay(200);
+  const url = PaginationURL(`/collectors/fleets/${fleetId}/sources`, searchParams.page, searchParams.pageSize, searchParams.query, {
+    sort: searchParams.sort?.attributeId,
+    order: searchParams.sort?.direction,
+  });
 
-  let filtered = fleetId ? getSourcesByFleetId(fleetId) : [...mockSources];
-
-  // Apply search query
-  if (searchParams.query) {
-    const query = searchParams.query.toLowerCase();
-    filtered = filtered.filter(
-      (s) =>
-        s.name.toLowerCase().includes(query) ||
-        s.description.toLowerCase().includes(query),
-    );
-  }
-
-  // Apply filters
-  if (searchParams.filters) {
-    const typeFilter = searchParams.filters.get('type');
-    if (typeFilter?.length) {
-      filtered = filtered.filter((s) => typeFilter.includes(s.type));
-    }
-    const enabledFilter = searchParams.filters.get('enabled');
-    if (enabledFilter?.length) {
-      filtered = filtered.filter((s) => enabledFilter.includes(String(s.enabled)));
-    }
-  }
-
-  // Apply sorting
-  if (searchParams.sort) {
-    const { attributeId, direction } = searchParams.sort;
-    filtered.sort((a, b) => {
-      const aVal = a[attributeId as keyof Source] ?? '';
-      const bVal = b[attributeId as keyof Source] ?? '';
-      const cmp = String(aVal).localeCompare(String(bVal));
-
-      return direction === 'asc' ? cmp : -cmp;
-    });
-  }
-
-  // Apply pagination
-  const total = filtered.length;
-  const start = (searchParams.page - 1) * searchParams.pageSize;
-  const paged = filtered.slice(start, start + searchParams.pageSize);
+  const response = await fetch('GET', qualifyUrl(url));
 
   return {
-    list: paged,
-    pagination: { total },
-    attributes: [
-      { id: 'name', title: 'Name', type: 'STRING', sortable: true },
-      { id: 'type', title: 'Type', type: 'STRING', sortable: true, filterable: true },
-      { id: 'enabled', title: 'Enabled', type: 'BOOLEAN', sortable: true, filterable: true },
-      { id: 'description', title: 'Description', type: 'STRING', sortable: false },
-    ],
+    list: response.elements,
+    pagination: { total: response.total },
+    attributes: response.attributes,
   };
 };
 
 export const useCollectorStats = () =>
   useQuery<CollectorStats>({
     queryKey: [QUERY_KEY_PREFIX, 'stats'],
-    queryFn: async () => {
-      await delay(200);
-
-      return mockStats;
-    },
+    queryFn: async () => fetch('GET', qualifyUrl('/collectors/stats')),
   });
 
 export const useFleets = () =>
   useQuery<Fleet[]>({
     queryKey: [QUERY_KEY_PREFIX, 'fleets'],
     queryFn: async () => {
-      await delay(200);
+      const response = await fetch('GET', qualifyUrl('/collectors/fleets?per_page=0'));
 
-      return mockFleets;
+      return response.elements;
     },
   });
 
 export const useFleet = (fleetId: string) =>
-  useQuery<Fleet | undefined>({
+  useQuery<Fleet>({
     queryKey: [QUERY_KEY_PREFIX, 'fleets', fleetId],
-    queryFn: async () => {
-      await delay(200);
-
-      return getFleetById(fleetId);
-    },
+    queryFn: () => fetch('GET', qualifyUrl(`/collectors/fleets/${fleetId}`)),
     enabled: !!fleetId,
   });
 
 export const useFleetStats = (fleetId: string) =>
   useQuery({
     queryKey: [QUERY_KEY_PREFIX, 'fleets', fleetId, 'stats'],
-    queryFn: async () => {
-      await delay(100);
-
-      return getFleetStats(fleetId);
-    },
+    queryFn: () => fetch('GET', qualifyUrl(`/collectors/fleets/${fleetId}/stats`)),
     enabled: !!fleetId,
   });
 
@@ -274,9 +177,12 @@ export const useInstances = (fleetId?: string) =>
   useQuery<CollectorInstanceView[]>({
     queryKey: [QUERY_KEY_PREFIX, 'instances', { fleetId }],
     queryFn: async () => {
-      await delay(200);
+      const url = fleetId
+        ? `/collectors?fleet_id=${encodeURIComponent(fleetId)}&per_page=0`
+        : '/collectors?per_page=0';
+      const response = await fetch('GET', qualifyUrl(url));
 
-      return fleetId ? getInstancesByFleetId(fleetId) : mockInstances;
+      return (response.elements as ApiInstanceResponse[]).map(toView);
     },
   });
 
@@ -284,10 +190,12 @@ export const useSources = (fleetId?: string) =>
   useQuery<Source[]>({
     queryKey: [QUERY_KEY_PREFIX, 'sources', { fleetId }],
     queryFn: async () => {
-      await delay(200);
+      if (!fleetId) return [];
+      const response = await fetch('GET', qualifyUrl(`/collectors/fleets/${fleetId}/sources?per_page=0`));
 
-      return fleetId ? getSourcesByFleetId(fleetId) : mockSources;
+      return response.elements;
     },
+    enabled: !!fleetId,
   });
 
 export const COLLECTORS_CONFIG_KEY = [QUERY_KEY_PREFIX, 'config'];

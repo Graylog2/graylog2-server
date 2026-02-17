@@ -15,18 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Spinner } from 'components/common';
-import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
-import type { SearchParams } from 'stores/PaginationTypes';
 
-import { useCollectorStats, fetchPaginatedSources, sourcesKeyFn } from '../hooks';
+import { useCollectorStats } from '../hooks';
 import StatCard from '../common/StatCard';
-import sourceColumnRenderers from '../sources/ColumnRenderers';
-import { DEFAULT_LAYOUT as SOURCES_LAYOUT } from '../sources/Constants';
-import type { Source } from '../types';
 
 const StatsRow = styled.div(
   ({ theme }) => css`
@@ -37,21 +31,8 @@ const StatsRow = styled.div(
   `,
 );
 
-const Section = styled.div(
-  ({ theme }) => css`
-    margin-top: ${theme.spacings.lg};
-  `,
-);
-
 const CollectorsOverview = () => {
   const { data: stats, isLoading: statsLoading } = useCollectorStats();
-
-  const sourceRenderers = useMemo(() => sourceColumnRenderers(), []);
-
-  const fetchSources = useCallback(
-    (searchParams: SearchParams) => fetchPaginatedSources(searchParams),
-    [],
-  );
 
   if (statsLoading) {
     return <Spinner />;
@@ -66,19 +47,6 @@ const CollectorsOverview = () => {
         <StatCard value={stats?.total_fleets || 0} label="Fleets" />
         <StatCard value={stats?.total_sources || 0} label="Sources" />
       </StatsRow>
-
-      <Section>
-        <h4 style={{ marginBottom: '1rem' }}>Active Sources</h4>
-        <PaginatedEntityTable<Source>
-          humanName="sources"
-          tableLayout={SOURCES_LAYOUT}
-          fetchEntities={fetchSources}
-          keyFn={sourcesKeyFn}
-          entityAttributesAreCamelCase={false}
-          columnRenderers={sourceRenderers}
-          entityActions={() => null}
-        />
-      </Section>
     </div>
   );
 };

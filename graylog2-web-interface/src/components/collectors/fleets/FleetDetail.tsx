@@ -115,10 +115,10 @@ const FleetDetail = ({ fleetId }: Props) => {
 
   const handleSaveSource = async (source: Omit<Source, 'id'>) => {
     if (editingSource) {
-      await updateSource({ sourceId: editingSource.id, updates: source as Partial<Source> });
+      await updateSource({ fleetId, sourceId: editingSource.id, updates: source as Omit<Source, 'id' | 'fleet_id'> });
       setEditingSource(null);
     } else {
-      await createSource(source);
+      await createSource({ fleetId, source: source as Omit<Source, 'id' | 'fleet_id'> });
       setShowSourceModal(false);
     }
   };
