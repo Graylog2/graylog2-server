@@ -8416,7 +8416,7 @@ escodegen@^2.1.0:
     eslint-plugin-compat "6.1.0"
     eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
     eslint-plugin-import "2.32.0"
-    eslint-plugin-jest "29.12.2"
+    eslint-plugin-jest "29.13.0"
     eslint-plugin-jest-dom "5.5.0"
     eslint-plugin-jest-formatting "3.1.0"
     eslint-plugin-jsx-a11y "6.10.2"
@@ -8517,10 +8517,10 @@ eslint-plugin-jest-formatting@3.1.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-jest-formatting/-/eslint-plugin-jest-formatting-3.1.0.tgz#b26dd5a40f432b642dcc880021a771bb1c93dcd2"
   integrity sha512-XyysraZ1JSgGbLSDxjj5HzKKh0glgWf+7CkqxbTqb7zEhW7X2WHo5SBQ8cGhnszKN+2Lj3/oevBlHNbHezoc/A==
 
-eslint-plugin-jest@29.12.2:
-  version "29.12.2"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-29.12.2.tgz#10c0f77f107113b1114557b860c6ac39574d5283"
-  integrity sha512-IIRg0IZ5yuERfzOZrKuNScxk9yeuKo0M4Urx7RZcthK5HE/8gJUY518bdi7picLRBJVctjOW3yVx0zyBp4Cq+g==
+eslint-plugin-jest@29.13.0:
+  version "29.13.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-29.13.0.tgz#e7717db3433006cf50ce48134300c482fe6da17b"
+  integrity sha512-VoONe0NsaQLb7ijvg4k35rzchqfyCaBsXammNMCkTyLvKLTpzQOVdXiPC54q7Vp/W7shMcqPBLwAc3yRSiGjSQ==
   dependencies:
     "@typescript-eslint/utils" "^8.0.0"
 
@@ -14541,9 +14541,9 @@ react-window-infinite-loader@^2.0.1:
   integrity sha512-+Deq2JkxfDr5N6WAwKQJLECiBARZ1yvVv9rElSXPO6yaMt3YTIs2y8TpsH67lIWGYFMnESvO6mgvETEZuCCjuw==
 
 react-window@^2.2.5:
-  version "2.2.5"
-  resolved "https://registry.yarnpkg.com/react-window/-/react-window-2.2.5.tgz#425a29609980083aafd5a48a1711a2af9319c1d2"
-  integrity sha512-6viWvPSZvVuMIe9hrl4IIZoVfO/npiqOb03m4Z9w+VihmVzBbiudUrtUqDpsWdKvd/Ai31TCR25CBcFFAUm28w==
+  version "2.2.6"
+  resolved "https://registry.yarnpkg.com/react-window/-/react-window-2.2.6.tgz#00ca174346b5146d3c33a752d888181250c71d9f"
+  integrity sha512-v89O08xRdpCaEuf380B39D1C/0KgUDZA59xft6SVAjzjz/xQxSyXrgDWHymIsYI6TMrqE8WO+G0/PB9AGE8VNA==
 
 react@18.3.1:
   version "18.3.1"

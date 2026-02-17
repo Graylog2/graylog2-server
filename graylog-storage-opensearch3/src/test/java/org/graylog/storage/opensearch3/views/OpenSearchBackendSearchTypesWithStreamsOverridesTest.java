@@ -26,12 +26,13 @@ import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
-import org.graylog.storage.opensearch3.testing.TestMultisearchResponse;
+import org.graylog.storage.opensearch3.testing.TestMsearchResponse;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch.core.MsearchResponse;
+import org.opensearch.client.opensearch.core.SearchRequest;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -50,7 +51,7 @@ public class OpenSearchBackendSearchTypesWithStreamsOverridesTest extends OpenSe
 
     @BeforeEach
     public void setUp() throws Exception {
-        final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
+        final MsearchResponse<JsonData> response = TestMsearchResponse.fromFixture("successfulMultiSearchResponse.json");
         mockCancellableMSearch(response);
         when(indexLookup.indexNamesForStreamsInTimeRange(eq(ImmutableSet.of(stream1Id)), any()))
                 .thenReturn(ImmutableSet.of("index1", "index2"));
@@ -132,7 +133,7 @@ public class OpenSearchBackendSearchTypesWithStreamsOverridesTest extends OpenSe
 
         this.openSearchBackend.doRun(job, query, context);
 
-        verify(client).cancellableMsearch(clientRequestCaptor.capture());
+        verify(openSearchBackend).cancellableMsearch(clientRequestCaptor.capture());
 
         return clientRequestCaptor.getValue();
     }

@@ -32,15 +32,16 @@ import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
-import org.graylog.storage.opensearch3.testing.TestMultisearchResponse;
+import org.graylog.storage.opensearch3.testing.TestMsearchResponse;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch.core.MsearchResponse;
+import org.opensearch.client.opensearch.core.SearchRequest;
 
 import java.util.Collections;
 import java.util.List;
@@ -86,13 +87,13 @@ public class OpenSearchBackendSearchTypeOverridesTest extends OpenSearchBackendG
     @Test
     public void overridesInSearchTypeAreIncorporatedIntoGeneratedQueries() throws Exception {
         final OSGeneratedQueryContext queryContext = createContext(query);
-        final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
+        final MsearchResponse<JsonData> response = TestMsearchResponse.fromFixture("successfulMultiSearchResponse.json");
         mockCancellableMSearch(response);
 
         final List<SearchRequest> generatedRequest = run(searchJob, query, queryContext);
 
-        final DocumentContext pivot1 = parse(generatedRequest.get(0).source().toString());
-        final DocumentContext pivot2 = parse(generatedRequest.get(1).source().toString());
+        final DocumentContext pivot1 = parse(generatedRequest.get(0).toJsonString());
+        final DocumentContext pivot2 = parse(generatedRequest.get(1).toJsonString());
 
         assertThat(queryStrings(pivot1)).containsExactly("production:true", "global:filter", "local:filter");
         assertThat(timerangeFrom(pivot1)).containsExactly("2019-09-11 10:31:52.819");
@@ -122,11 +123,11 @@ public class OpenSearchBackendSearchTypeOverridesTest extends OpenSearchBackendG
     }
 
     private List<String> timerangeFrom(DocumentContext pivot) {
-        return pivot.read("$..timestamp.from", new TypeRef<>() {});
+        return pivot.read("$..timestamp.gte", new TypeRef<>() {});
     }
 
     private List<String> timerangeTo(DocumentContext pivot) {
-        return pivot.read("$..timestamp.to", new TypeRef<>() {});
+        return pivot.read("$..timestamp.lt", new TypeRef<>() {});
     }
 
     @Test
@@ -139,7 +140,7 @@ public class OpenSearchBackendSearchTypeOverridesTest extends OpenSearchBackendG
                 .thenReturn(ImmutableSet.of("searchTypeIndex"));
 
         final OSGeneratedQueryContext queryContext = createContext(query);
-        final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
+        final MsearchResponse<JsonData> response = TestMsearchResponse.fromFixture("successfulMultiSearchResponse.json");
         mockCancellableMSearch(response);
 
         final List<SearchRequest> generatedRequest = run(searchJob, query, queryContext);

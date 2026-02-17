@@ -24,8 +24,8 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
-import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHits;
-import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
+import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
+import org.graylog.storage.opensearch3.views.MutableSearchRequestBuilder;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog.testing.jsonpath.JsonPathAssert;
 import org.graylog2.indexer.results.ResultMessageFactory;
@@ -34,7 +34,13 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.jupiter.api.Test;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch.core.msearch.MultiSearchItem;
+import org.opensearch.client.opensearch.core.search.HitsMetadata;
+import org.opensearch.client.opensearch.core.search.TotalHits;
+import org.opensearch.client.opensearch.core.search.TotalHitsRelation;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -48,15 +54,19 @@ public class OSMessageListTest {
     private final ResultMessageFactory resultMessageFactory = new TestResultMessageFactory();
 
     @Test
+    @SuppressWarnings("unchecked")
     public void includesCustomNameInResultIfPresent() {
         final OSMessageList esMessageList = new OSMessageList(new LegacyDecoratorProcessor.Fake(),
-                new TestResultMessageFactory(), false);
+                new TestResultMessageFactory(), false, new OSSerializationUtils());
         final MessageList messageList = someMessageList().toBuilder().name("customResult").build();
+        
+        HitsMetadata<JsonData> hitsMetadata = (HitsMetadata<JsonData>) HitsMetadata.builder()
+                .total(TotalHits.builder().value(0).relation(TotalHitsRelation.Eq).build())
+                .hits(new ArrayList<>())
+                .build();
 
-        final org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse result =
-                mock(org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse.class);
-
-        when(result.getHits()).thenReturn(SearchHits.empty());
+        MultiSearchItem<JsonData> result = mock(MultiSearchItem.class);
+        when(result.hits()).thenReturn(hitsMetadata);
 
         final SearchType.Result searchTypeResult = esMessageList.doExtractResult(someQuery(), messageList, result, null);
 
@@ -69,7 +79,7 @@ public class OSMessageListTest {
 
         OSGeneratedQueryContext context = generateQueryPartWithHighlighting(messageList);
 
-        assertThat(context.searchSourceBuilder(messageList).highlighter()).isNotNull();
+        assertThat(context.searchSourceBuilder(messageList).highlight()).isNotNull();
     }
 
     @Test
@@ -78,7 +88,7 @@ public class OSMessageListTest {
 
         OSGeneratedQueryContext context = generateQueryPartWithoutHighlighting(messageList);
 
-        assertThat(context.searchSourceBuilder(messageList).highlighter())
+        assertThat(context.searchSourceBuilder(messageList).highlight())
                 .as("there should be no highlighter configured")
                 .isNull();
     }
@@ -160,7 +170,8 @@ public class OSMessageListTest {
                 .build();
         final OSGeneratedQueryContext context = mockQueryContext(messageList);
         final OSGeneratedQueryContext queryContext = generateQueryPartWithContextFor(messageList, true, context);
-        final DocumentContext doc = JsonPath.parse(queryContext.searchSourceBuilder(messageList).toString());
+        String json = queryContext.searchSourceBuilder(messageList).toString();
+        final DocumentContext doc = JsonPath.parse(json);
 
         assertThat((List<?>) doc.read("$.sort")).hasSize(2);
         JsonPathAssert.assertThat(doc).jsonPathAsString("$.sort[0].gl2_second_sort_field.order").isEqualTo("desc");
@@ -219,7 +230,7 @@ public class OSMessageListTest {
     private OSGeneratedQueryContext mockQueryContext(MessageList messageList) {
         OSGeneratedQueryContext context = mock(OSGeneratedQueryContext.class);
 
-        when(context.searchSourceBuilder(messageList)).thenReturn(new SearchSourceBuilder());
+        when(context.searchSourceBuilder(messageList)).thenReturn(new MutableSearchRequestBuilder());
 
         return context;
     }
@@ -230,7 +241,8 @@ public class OSMessageListTest {
         OSMessageList sut = new OSMessageList(
                 new LegacyDecoratorProcessor.Fake(),
                 resultMessageFactory,
-                allowHighlighting);
+                allowHighlighting,
+                new OSSerializationUtils());
 
         sut.doGenerateQueryPart(someQuery(), messageList, context);
 
