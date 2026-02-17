@@ -34,8 +34,9 @@ public class OSAverageHandler extends OSBasicSeriesSpecHandler<Average> {
 
     @Override
     protected Object getValueFromAggregationResult(final Aggregate agg, final Average avgSpec) {
-        AvgAggregate avg = (agg.isAvg()) ? agg.avg() : null;
-        double value = Optional.ofNullable(avg)
+        double value = Optional.ofNullable(agg)
+                .filter(Aggregate::isAvg)
+                .map(Aggregate::avg)
                 .map(AvgAggregate::value)
                 .orElse(0.0);
         if (avgSpec.wholeNumber()) {

@@ -22,6 +22,8 @@ import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
 import org.opensearch.client.opensearch.core.msearch.MultiSearchItem;
 import org.opensearch.client.opensearch.core.search.TotalHits;
 
+import java.util.Optional;
+
 public class InitialBucket extends MultiBucketBase {
 
     private InitialBucket(Builder b) {
@@ -64,8 +66,7 @@ public class InitialBucket extends MultiBucketBase {
     }
 
     public static InitialBucket create(MultiSearchItem<JsonData> searchResponse) {
-        TotalHits total = searchResponse.hits().total();
-        long value = (total != null) ? total.value() : 0;
+        long value = Optional.ofNullable(searchResponse.hits().total()).map(TotalHits::value).orElse(0L);
         return InitialBucket.builder().docCount(value).aggregations(searchResponse.aggregations()).build();
     }
 
