@@ -81,7 +81,7 @@ public class AdaptersOS implements Adapters {
 
     @Override
     public CountsAdapter countsAdapter() {
-        return new CountsAdapterOS(officialOpensearchClient, new SearchRequestFactoryOS(true));
+        return new CountsAdapterOS(officialOpensearchClient, new SearchRequestFactoryOS(true, new IgnoreSearchFilters()));
     }
 
     @Override
