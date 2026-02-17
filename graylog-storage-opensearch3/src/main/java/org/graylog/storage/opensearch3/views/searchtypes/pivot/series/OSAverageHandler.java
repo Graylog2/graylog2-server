@@ -17,21 +17,28 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Avg;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.AvgAggregationBuilder;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.AvgAggregate;
 
-public class OSAverageHandler extends OSBasicSeriesSpecHandler<Average, Avg> {
+import java.util.Optional;
+
+public class OSAverageHandler extends OSBasicSeriesSpecHandler<Average> {
 
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Average avgSpec) {
-        final AvgAggregationBuilder avg = AggregationBuilders.avg(name).field(avgSpec.field());
-        return SeriesAggregationBuilder.metric(avg);
+        return SeriesAggregationBuilder.metric(new MutableNamedAggregationBuilder(name,
+                Aggregation.builder().avg(a -> a.field(avgSpec.field()))));
     }
 
     @Override
-    protected Object getValueFromAggregationResult(final Avg avg, final Average avgSpec) {
-        double value = avg.getValue();
+    protected Object getValueFromAggregationResult(final Aggregate agg, final Average avgSpec) {
+        double value = Optional.ofNullable(agg)
+                .filter(Aggregate::isAvg)
+                .map(Aggregate::avg)
+                .map(AvgAggregate::value)
+                .orElse(0.0);
         if (avgSpec.wholeNumber()) {
             if (Double.isNaN(value) || Double.isInfinite(value)) {
                 value = 0;
