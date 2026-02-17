@@ -154,7 +154,7 @@ class FleetServiceTest {
 
         SearchQuery query = fleetService.parseSearchQuery("");
         PaginatedList<FleetDTO> result = fleetService.findPaginated(query, 1, 2,
-                FleetDTO.FIELD_NAME, SortOrder.ASCENDING);
+                FleetDTO.FIELD_NAME, SortOrder.ASCENDING, fleet -> true);
 
         assertThat(result.pagination().total()).isEqualTo(3);
         assertThat(result.delegate()).hasSize(2);
@@ -167,7 +167,7 @@ class FleetServiceTest {
 
         SearchQuery query = fleetService.parseSearchQuery("alpha");
         PaginatedList<FleetDTO> result = fleetService.findPaginated(query, 1, 10,
-                FleetDTO.FIELD_NAME, SortOrder.ASCENDING);
+                FleetDTO.FIELD_NAME, SortOrder.ASCENDING, fleet -> true);
 
         assertThat(result.pagination().total()).isEqualTo(1);
         assertThat(result.delegate()).hasSize(1);
@@ -200,8 +200,6 @@ class FleetServiceTest {
         sourceService.create(fleet.id(), "source-1", "First source", true, validFileConfig());
         sourceService.create(fleet.id(), "source-2", "Second source", true, validFileConfig());
 
-        // Simulate the cascade delete as done by FleetResource
-        sourceService.deleteAllByFleet(fleet.id());
         fleetService.delete(fleet.id());
 
         assertThat(fleetService.get(fleet.id())).isEmpty();

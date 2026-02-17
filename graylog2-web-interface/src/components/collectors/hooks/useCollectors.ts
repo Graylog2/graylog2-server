@@ -116,7 +116,7 @@ export const fetchPaginatedFleets = async (
 
   return {
     list: response.elements,
-    pagination: { total: response.total },
+    pagination: response.pagination,
     attributes: response.attributes,
   };
 };
@@ -138,7 +138,7 @@ export const fetchPaginatedSources = async (
 
   return {
     list: response.elements,
-    pagination: { total: response.total },
+    pagination: response.pagination,
     attributes: response.attributes,
   };
 };

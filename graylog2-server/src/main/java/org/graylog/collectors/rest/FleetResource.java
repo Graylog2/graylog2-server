@@ -21,6 +21,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -38,7 +40,6 @@ import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.collectors.FleetService;
-import org.graylog.collectors.SourceService;
 import org.graylog.collectors.db.FleetDTO;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.SortOrder;
@@ -69,12 +70,10 @@ public class FleetResource extends RestResource {
             .build();
 
     private final FleetService fleetService;
-    private final SourceService sourceService;
 
     @Inject
-    public FleetResource(FleetService fleetService, SourceService sourceService) {
+    public FleetResource(FleetService fleetService) {
         this.fleetService = fleetService;
-        this.sourceService = sourceService;
     }
 
     @GET
@@ -94,7 +93,8 @@ public class FleetResource extends RestResource {
             throw new BadRequestException("Invalid search query: " + e.getMessage(), e);
         }
 
-        final PaginatedList<FleetDTO> result = fleetService.findPaginated(searchQuery, page, perPage, sort, order);
+        final PaginatedList<FleetDTO> result = fleetService.findPaginated(searchQuery, page, perPage, sort, order,
+                fleet -> isPermitted(FleetPermissions.FLEET_READ, fleet.id()));
 
         return PageListResponse.create(
                 query,
@@ -123,7 +123,7 @@ public class FleetResource extends RestResource {
     @Timed
     @Operation(summary = "Create a new fleet")
     @RequiresPermissions(FleetPermissions.FLEET_CREATE)
-    public Response create(CreateFleetRequest request) {
+    public Response create(@Valid @NotNull CreateFleetRequest request) {
         // TODO: audit event
         final FleetDTO created;
         try {
@@ -144,12 +144,19 @@ public class FleetResource extends RestResource {
     @Path("/{fleetId}")
     @Timed
     @Operation(summary = "Update a fleet")
-    public FleetResponse update(@PathParam("fleetId") String fleetId, UpdateFleetRequest request) {
+    public Response update(@PathParam("fleetId") String fleetId, @Valid @NotNull UpdateFleetRequest request) {
         checkPermission(FleetPermissions.FLEET_EDIT, fleetId);
         // TODO: audit event
-        return fleetService.update(fleetId, request.name(), request.description(), request.targetVersion())
-                .map(FleetResponse::fromDTO)
-                .orElseThrow(() -> new NotFoundException("Fleet " + fleetId + " not found"));
+        try {
+            return fleetService.update(fleetId, request.name(), request.description(), request.targetVersion())
+                    .map(FleetResponse::fromDTO)
+                    .map(response -> Response.ok(response).build())
+                    .orElseThrow(() -> new NotFoundException("Fleet " + fleetId + " not found"));
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.CONFLICT)
+                    .entity(java.util.Map.of("message", e.getMessage()))
+                    .build();
+        }
     }
 
     @DELETE
@@ -159,7 +166,6 @@ public class FleetResource extends RestResource {
     public void delete(@PathParam("fleetId") String fleetId) {
         checkPermission(FleetPermissions.FLEET_DELETE, fleetId);
         // TODO: audit event
-        sourceService.deleteAllByFleet(fleetId);
         if (!fleetService.delete(fleetId)) {
             throw new NotFoundException("Fleet " + fleetId + " not found");
         }

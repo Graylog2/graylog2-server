@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
@@ -49,7 +50,8 @@ public class SourceService {
 
     private static final Map<String, SearchQueryField> SEARCH_FIELD_MAPPING = Map.of(
             "name", SearchQueryField.create(SourceDTO.FIELD_NAME),
-            "description", SearchQueryField.create(SourceDTO.FIELD_DESCRIPTION)
+            "description", SearchQueryField.create(SourceDTO.FIELD_DESCRIPTION),
+            "type", SearchQueryField.create("config.type")
     );
 
     private final MongoCollection<SourceDTO> collection;
@@ -81,12 +83,13 @@ public class SourceService {
     }
 
     public PaginatedList<SourceDTO> findByFleet(String fleetId, SearchQuery searchQuery, int page, int perPage,
-                                                 String sortField, SortOrder order) {
+                                                 String sortField, SortOrder order,
+                                                 Predicate<SourceDTO> permissionFilter) {
         return paginationHelper
                 .filter(Filters.and(searchQuery.toBson(), Filters.eq(SourceDTO.FIELD_FLEET_ID, fleetId)))
                 .sort(order.toBsonSort(sortField))
                 .perPage(perPage)
-                .page(page);
+                .page(page, permissionFilter);
     }
 
     public List<SourceDTO> listAllByFleet(String fleetId) {
@@ -135,7 +138,15 @@ public class SourceService {
                     .enabled(enabled)
                     .config(config)
                     .build();
-            collection.replaceOne(idEq(sourceId), updated);
+            try {
+                collection.replaceOne(idEq(sourceId), updated);
+            } catch (MongoException e) {
+                if (MongoUtils.isDuplicateKeyError(e)) {
+                    throw new IllegalArgumentException(
+                            "A source with name '" + name + "' already exists in fleet '" + fleetId + "'", e);
+                }
+                throw e;
+            }
             txnLogService.appendFleetMarker(fleetId, MarkerType.CONFIG_CHANGED);
             return updated;
         });
@@ -152,8 +163,12 @@ public class SourceService {
     }
 
     public long deleteAllByFleet(String fleetId) {
+        return deleteAllByFleet(fleetId, true);
+    }
+
+    public long deleteAllByFleet(String fleetId, boolean appendMarker) {
         long deletedCount = collection.deleteMany(Filters.eq(SourceDTO.FIELD_FLEET_ID, fleetId)).getDeletedCount();
-        if (deletedCount > 0) {
+        if (deletedCount > 0 && appendMarker) {
             txnLogService.appendFleetMarker(fleetId, MarkerType.CONFIG_CHANGED);
         }
         return deletedCount;

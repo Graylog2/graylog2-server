@@ -17,11 +17,13 @@
 package org.graylog.collectors.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.graylog.collectors.db.SourceConfig;
 
 public record UpdateSourceRequest(
-        @JsonProperty("name") String name,
-        @JsonProperty("description") String description,
+        @NotBlank @JsonProperty("name") String name,
+        @NotNull @JsonProperty("description") String description,
         @JsonProperty("enabled") boolean enabled,
-        @JsonProperty("config") SourceConfig config) {
+        @NotNull @JsonProperty("config") SourceConfig config) {
 }

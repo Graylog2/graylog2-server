@@ -21,6 +21,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -93,7 +95,8 @@ public class SourceResource extends RestResource {
             throw new BadRequestException("Invalid search query: " + e.getMessage(), e);
         }
 
-        final PaginatedList<SourceDTO> result = sourceService.findByFleet(fleetId, searchQuery, page, perPage, sort, order);
+        final PaginatedList<SourceDTO> result = sourceService.findByFleet(fleetId, searchQuery, page, perPage, sort, order,
+                source -> isPermitted(FleetPermissions.SOURCE_READ, source.id()));
 
         return PageListResponse.create(
                 query,
@@ -126,7 +129,7 @@ public class SourceResource extends RestResource {
     @RequiresPermissions(FleetPermissions.SOURCE_CREATE)
     public Response create(
             @Parameter(name = "fleetId") @PathParam("fleetId") String fleetId,
-            CreateSourceRequest request) {
+            @Valid @NotNull CreateSourceRequest request) {
         // TODO: audit event
         final SourceDTO created;
         try {
@@ -150,15 +153,25 @@ public class SourceResource extends RestResource {
     @Path("/{sourceId}")
     @Timed
     @Operation(summary = "Update a source")
-    public SourceResponse update(
+    public Response update(
             @Parameter(name = "fleetId") @PathParam("fleetId") String fleetId,
             @PathParam("sourceId") String sourceId,
-            UpdateSourceRequest request) {
+            @Valid @NotNull UpdateSourceRequest request) {
         checkPermission(FleetPermissions.SOURCE_EDIT, sourceId);
         // TODO: audit event
-        return sourceService.update(fleetId, sourceId, request.name(), request.description(), request.enabled(), request.config())
-                .map(SourceResponse::fromDTO)
-                .orElseThrow(() -> new NotFoundException("Source " + sourceId + " not found"));
+        try {
+            return sourceService.update(fleetId, sourceId, request.name(), request.description(), request.enabled(), request.config())
+                    .map(SourceResponse::fromDTO)
+                    .map(response -> Response.ok(response).build())
+                    .orElseThrow(() -> new NotFoundException("Source " + sourceId + " not found"));
+        } catch (IllegalArgumentException e) {
+            if (e.getMessage() != null && e.getMessage().contains("already exists")) {
+                return Response.status(Response.Status.CONFLICT)
+                        .entity(java.util.Map.of("message", e.getMessage()))
+                        .build();
+            }
+            throw new BadRequestException(e.getMessage(), e);
+        }
     }
 
     @DELETE

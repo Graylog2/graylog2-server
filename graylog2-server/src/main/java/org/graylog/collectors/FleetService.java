@@ -41,6 +41,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
@@ -78,12 +79,13 @@ public class FleetService {
     }
 
     public PaginatedList<FleetDTO> findPaginated(SearchQuery searchQuery, int page, int perPage,
-                                                  String sortField, SortOrder order) {
+                                                  String sortField, SortOrder order,
+                                                  Predicate<FleetDTO> permissionFilter) {
         return paginationHelper
                 .filter(searchQuery.toBson())
                 .sort(order.toBsonSort(sortField))
                 .perPage(perPage)
-                .page(page);
+                .page(page, permissionFilter);
     }
 
     public Optional<FleetDTO> get(String fleetId) {
@@ -123,13 +125,21 @@ public class FleetService {
                     .targetVersion(targetVersion)
                     .updatedAt(Instant.now())
                     .build();
-            collection.replaceOne(idEq(fleetId), updated);
+            try {
+                collection.replaceOne(idEq(fleetId), updated);
+            } catch (MongoException e) {
+                if (MongoUtils.isDuplicateKeyError(e)) {
+                    throw new IllegalArgumentException("A fleet with name '" + name + "' already exists", e);
+                }
+                throw e;
+            }
             txnLogService.appendFleetMarker(fleetId, MarkerType.CONFIG_CHANGED);
             return updated;
         });
     }
 
     public boolean delete(String fleetId) {
+        sourceService.deleteAllByFleet(fleetId, false);
         final boolean deleted = collection.deleteOne(idEq(fleetId)).getDeletedCount() > 0;
         if (deleted) {
             txnLogService.appendFleetMarker(fleetId, MarkerType.CONFIG_CHANGED);

@@ -168,7 +168,7 @@ class SourceServiceTest {
 
         SearchQuery query = sourceService.parseSearchQuery("");
         PaginatedList<SourceDTO> result = sourceService.findByFleet(fleetA.id(), query, 1, 10,
-                SourceDTO.FIELD_NAME, SortOrder.ASCENDING);
+                SourceDTO.FIELD_NAME, SortOrder.ASCENDING, source -> true);
 
         assertThat(result.pagination().total()).isEqualTo(2);
         assertThat(result.delegate()).hasSize(2);

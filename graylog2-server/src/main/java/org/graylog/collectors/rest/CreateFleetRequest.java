@@ -18,9 +18,11 @@ package org.graylog.collectors.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record CreateFleetRequest(
-        @JsonProperty("name") String name,
-        @JsonProperty("description") String description,
+        @NotBlank @JsonProperty("name") String name,
+        @NotNull @JsonProperty("description") String description,
         @Nullable @JsonProperty("target_version") String targetVersion) {
 }
