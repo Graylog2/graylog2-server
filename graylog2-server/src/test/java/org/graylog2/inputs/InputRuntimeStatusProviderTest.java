@@ -19,6 +19,7 @@ package org.graylog2.inputs;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
+import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.resources.system.inputs.RemoteInputStatesResource;
@@ -66,6 +67,9 @@ class InputRuntimeStatusProviderTest {
     private InputRegistry inputRegistry;
 
     @Mock
+    private InputService inputService;
+
+    @Mock
     private NodeId nodeId;
 
     private ExecutorService executorService;
@@ -81,6 +85,7 @@ class InputRuntimeStatusProviderTest {
                 nodeService,
                 remoteInterfaceProvider,
                 inputRegistry,
+                inputService,
                 nodeId,
                 executorService
         );
@@ -150,7 +155,7 @@ class InputRuntimeStatusProviderTest {
 
         // Create a new provider so cache is fresh
         provider = new InputRuntimeStatusProvider(
-                nodeService, remoteInterfaceProvider, inputRegistry, nodeId, executorService);
+                nodeService, remoteInterfaceProvider, inputRegistry, inputService, nodeId, executorService);
 
         // Should match RUNNING (from local) — cache has both RUNNING and FAILED for global-input
         final Set<String> running = provider.getMatchingIds("RUNNING", AUTH_TOKEN);
@@ -225,23 +230,28 @@ class InputRuntimeStatusProviderTest {
     }
 
     @Test
-    void notRunningGroupMatchesStoppedTerminatedStoppingCreated() throws Exception {
-        when(inputRegistry.getStatusesByInputId()).thenReturn(Map.of(
-                "input-1", "STOPPED",
-                "input-2", "TERMINATED",
-                "input-3", "RUNNING",
-                "input-4", "CREATED"
-        ));
-
-        Node remoteNode = mock(Node.class);
-        when(nodeService.allActive()).thenReturn(Map.of(
-                LOCAL_NODE_ID, mock(Node.class),
-                "remote-1", remoteNode
-        ));
-        mockRemoteCall(remoteNode, Map.of("input-5", "STOPPING"));
+    void notRunningGroupQueriesDbForStoppedDesiredState() {
+        when(inputService.findIdsByDesiredState(IOState.Type.STOPPED))
+                .thenReturn(Set.of("input-1", "input-5"));
 
         final Set<String> notRunning = provider.getMatchingIds("NOT_RUNNING", AUTH_TOKEN);
-        assertEquals(Set.of("input-1", "input-2", "input-4", "input-5"), notRunning);
+        assertEquals(Set.of("input-1", "input-5"), notRunning);
+
+        // Should NOT query the registry or remote nodes for NOT_RUNNING
+        verify(inputRegistry, never()).getStatusesByInputId();
+        verify(nodeService, never()).allActive();
+    }
+
+    @Test
+    void runningGroupStillUsesRegistry() {
+        when(inputRegistry.getStatusesByInputId()).thenReturn(Map.of("input-1", "RUNNING"));
+        when(nodeService.allActive()).thenReturn(Map.of(LOCAL_NODE_ID, mock(Node.class)));
+
+        final Set<String> running = provider.getMatchingIds("RUNNING", AUTH_TOKEN);
+        assertEquals(Set.of("input-1"), running);
+
+        // Should NOT query the DB for RUNNING
+        verify(inputService, never()).findIdsByDesiredState(any());
     }
 
     @Test

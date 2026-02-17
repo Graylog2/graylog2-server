@@ -81,6 +81,7 @@ public class InputRuntimeStatusProvider implements ComputedFieldProvider {
     private final NodeService nodeService;
     private final RemoteInterfaceProvider remoteInterfaceProvider;
     private final InputRegistry inputRegistry;
+    private final InputService inputService;
     private final NodeId nodeId;
     private final ExecutorService executorService;
 
@@ -91,11 +92,13 @@ public class InputRuntimeStatusProvider implements ComputedFieldProvider {
     public InputRuntimeStatusProvider(NodeService nodeService,
                                      RemoteInterfaceProvider remoteInterfaceProvider,
                                      InputRegistry inputRegistry,
+                                      InputService inputService,
                                      NodeId nodeId,
                                      @Named("proxiedRequestsExecutorService") ExecutorService executorService) {
         this.nodeService = nodeService;
         this.remoteInterfaceProvider = remoteInterfaceProvider;
         this.inputRegistry = inputRegistry;
+        this.inputService = inputService;
         this.nodeId = nodeId;
         this.executorService = executorService;
     }
@@ -108,6 +111,14 @@ public class InputRuntimeStatusProvider implements ComputedFieldProvider {
             LOG.debug("Invalid runtime status filter value: {}", filterValue);
             return Set.of();
         }
+
+        // For NOT_RUNNING: query desired_state from DB since stopped inputs are absent from the InputRegistry
+        if ("NOT_RUNNING".equals(key)) {
+            final Set<String> matching = inputService.findIdsByDesiredState(IOState.Type.STOPPED);
+            LOG.debug("Found {} inputs with runtime_status group={}", matching.size(), key);
+            return matching;
+        }
+
 
         final Set<String> targetStrings = targetStates.stream()
                 .map(IOState.Type::toString)
