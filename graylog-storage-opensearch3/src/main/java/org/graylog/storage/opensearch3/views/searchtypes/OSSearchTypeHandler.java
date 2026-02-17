@@ -19,8 +19,9 @@ package org.graylog.storage.opensearch3.views.searchtypes;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.SearchTypeHandler;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch.core.msearch.MultiSearchItem;
 
 /**
  * Signature of search type handlers the OpenSearch backend takes.
@@ -28,11 +29,11 @@ import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
  *
  * @param <S> the {@link SearchType SearchType} this handler deals with
  */
-public interface OSSearchTypeHandler<S extends SearchType> extends SearchTypeHandler<S, OSGeneratedQueryContext, SearchResponse> {
+public interface OSSearchTypeHandler<S extends SearchType> extends SearchTypeHandler<S, OSGeneratedQueryContext, MultiSearchItem<JsonData>> {
     @Override
-    default SearchType.Result doExtractResultImpl(Query query, S searchType, SearchResponse queryResult, OSGeneratedQueryContext queryContext) {
+    default SearchType.Result doExtractResultImpl(Query query, S searchType, MultiSearchItem<JsonData> queryResult, OSGeneratedQueryContext queryContext) {
         return doExtractResult(query, searchType, queryResult, queryContext);
     }
 
-    SearchType.Result doExtractResult(Query query, S searchType, SearchResponse queryResult, OSGeneratedQueryContext queryContext);
+    SearchType.Result doExtractResult(Query query, S searchType, MultiSearchItem<JsonData> queryResult, OSGeneratedQueryContext queryContext);
 }
