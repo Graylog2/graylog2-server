@@ -72,9 +72,7 @@ public final class IndexNameBatching {
             currentLength = currentBatch.size() == 1 ? itemLength : currentLength + 1 + itemLength;
         }
 
-        if (!currentBatch.isEmpty()) {
-            batches.add(currentBatch);
-        }
+        batches.add(currentBatch);
 
         return batches;
     }

@@ -99,8 +99,8 @@ public class StatsApi {
         final ObjectNode mergedIndices = objectMapper.createObjectNode();
         for (final List<String> batch : batches) {
             final JsonNode batchResult = singleStats(batch, metrics, prepareRequest);
-            batchResult.path("indices").fields()
-                    .forEachRemaining(entry -> mergedIndices.set(entry.getKey(), entry.getValue()));
+            batchResult.path("indices").properties()
+                    .forEach(entry -> mergedIndices.set(entry.getKey(), entry.getValue()));
         }
 
         final ObjectNode result = objectMapper.createObjectNode();
