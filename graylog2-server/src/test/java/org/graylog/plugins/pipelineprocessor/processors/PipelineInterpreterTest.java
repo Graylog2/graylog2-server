@@ -506,7 +506,6 @@ public class PipelineInterpreterTest {
         when(ruleMetricsConfigService.get()).thenReturn(RuleMetricsConfigDto.createDefault());
 
         final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(
-                mock(Configuration.class),
                 ruleService,
                 pipelineService,
                 connectionsService,
@@ -514,7 +513,6 @@ public class PipelineInterpreterTest {
                 (config, ruleParser) -> new PipelineResolver(ruleParser, config),
                 ruleMetricsConfigService,
                 metricRegistry,
-                mock(PipelineMetadataUpdater.class),
                 Executors.newScheduledThreadPool(1),
                 eventBus,
                 (currentPipelines, streamPipelineConnections, ruleMetricsConfig) ->
