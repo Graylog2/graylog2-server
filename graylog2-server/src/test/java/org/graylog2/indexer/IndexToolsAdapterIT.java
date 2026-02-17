@@ -20,6 +20,8 @@ import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -107,35 +109,36 @@ public abstract class IndexToolsAdapterIT extends ElasticsearchBaseTest {
     }
 
     private void indexTestDocuments() {
-        final DateTime baseTime = DateTime.now(DateTimeZone.UTC).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+        final DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS").withZoneUTC();
+        final String timestamp = formatter.print(DateTime.now(DateTimeZone.UTC).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0));
 
         final BulkIndexRequest bulkRequest = new BulkIndexRequest();
 
         bulkRequest.addRequest(INDEX_NAME, Map.of(
                 "message", "test message 1",
                 "source", "source-a",
-                "timestamp", baseTime.toString(),
+                "timestamp", timestamp,
                 "streams", java.util.List.of(STREAM_1)
         ));
 
         bulkRequest.addRequest(INDEX_NAME, Map.of(
                 "message", "test message 2",
                 "source", "source-a",
-                "timestamp", baseTime.toString(),
+                "timestamp", timestamp,
                 "streams", java.util.List.of(STREAM_1, STREAM_2)
         ));
 
         bulkRequest.addRequest(INDEX_NAME, Map.of(
                 "message", "test message 3",
                 "source", "source-b",
-                "timestamp", baseTime.toString(),
+                "timestamp", timestamp,
                 "streams", java.util.List.of(STREAM_2)
         ));
 
         bulkRequest.addRequest(INDEX_NAME, Map.of(
                 "message", "test message 4",
                 "source", "source-a",
-                "timestamp", baseTime.toString(),
+                "timestamp", timestamp,
                 "streams", java.util.List.of(STREAM_1)
         ));
 
