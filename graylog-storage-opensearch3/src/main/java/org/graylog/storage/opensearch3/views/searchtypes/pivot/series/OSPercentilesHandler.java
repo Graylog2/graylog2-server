@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
 import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
@@ -30,12 +29,10 @@ import java.util.Optional;
 
 public class OSPercentilesHandler extends OSBasicSeriesSpecHandler<Percentile> {
 
-    private final ObjectMapper objectMapper;
     private final OSSerializationUtils serializationUtils;
 
     @Inject
-    public OSPercentilesHandler(ObjectMapper objectMapper, OSSerializationUtils serializationUtils) {
-        this.objectMapper = objectMapper;
+    public OSPercentilesHandler(OSSerializationUtils serializationUtils) {
         this.serializationUtils = serializationUtils;
     }
 
