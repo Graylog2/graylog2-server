@@ -125,15 +125,7 @@ public class FleetResource extends RestResource {
     @RequiresPermissions(FleetPermissions.FLEET_CREATE)
     public Response create(@Valid @NotNull CreateFleetRequest request) {
         // TODO: audit event
-        final FleetDTO created;
-        try {
-            created = fleetService.create(request.name(), request.description(), request.targetVersion());
-        } catch (IllegalArgumentException e) {
-            return Response.status(Response.Status.CONFLICT)
-                    .entity(java.util.Map.of("message", e.getMessage()))
-                    .build();
-        }
-
+        final FleetDTO created = fleetService.create(request.name(), request.description(), request.targetVersion());
         final FleetResponse response = FleetResponse.fromDTO(created);
         final URI uri = getUriBuilderToSelf().path(FleetResource.class, "get")
                 .build(created.id());
@@ -144,19 +136,12 @@ public class FleetResource extends RestResource {
     @Path("/{fleetId}")
     @Timed
     @Operation(summary = "Update a fleet")
-    public Response update(@PathParam("fleetId") String fleetId, @Valid @NotNull UpdateFleetRequest request) {
+    public FleetResponse update(@PathParam("fleetId") String fleetId, @Valid @NotNull UpdateFleetRequest request) {
         checkPermission(FleetPermissions.FLEET_EDIT, fleetId);
         // TODO: audit event
-        try {
-            return fleetService.update(fleetId, request.name(), request.description(), request.targetVersion())
-                    .map(FleetResponse::fromDTO)
-                    .map(response -> Response.ok(response).build())
-                    .orElseThrow(() -> new NotFoundException("Fleet " + fleetId + " not found"));
-        } catch (IllegalArgumentException e) {
-            return Response.status(Response.Status.CONFLICT)
-                    .entity(java.util.Map.of("message", e.getMessage()))
-                    .build();
-        }
+        return fleetService.update(fleetId, request.name(), request.description(), request.targetVersion())
+                .map(FleetResponse::fromDTO)
+                .orElseThrow(() -> new NotFoundException("Fleet " + fleetId + " not found"));
     }
 
     @DELETE

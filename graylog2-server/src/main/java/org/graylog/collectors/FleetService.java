@@ -16,11 +16,6 @@
  */
 package org.graylog.collectors;
 
-import com.mongodb.MongoException;
-import com.mongodb.client.model.IndexModel;
-import com.mongodb.client.model.IndexOptions;
-import com.mongodb.client.model.Indexes;
-import com.mongodb.client.model.ReplaceOptions;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -31,14 +26,12 @@ import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.pagination.MongoPaginationHelper;
-import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -68,10 +61,6 @@ public class FleetService {
         this.searchQueryParser = new SearchQueryParser(FleetDTO.FIELD_NAME, SEARCH_FIELD_MAPPING);
         this.txnLogService = txnLogService;
         this.sourceService = sourceService;
-
-        collection.createIndexes(List.of(
-                new IndexModel(Indexes.ascending(FleetDTO.FIELD_NAME), new IndexOptions().unique(true))
-        ));
     }
 
     public SearchQuery parseSearchQuery(String query) {
@@ -102,19 +91,12 @@ public class FleetService {
                 .updatedAt(now)
                 .build();
 
-        try {
-            final var result = collection.insertOne(fleet);
-            final FleetDTO saved = fleet.toBuilder()
-                    .id(insertedIdAsString(result))
-                    .build();
-            txnLogService.appendFleetMarker(saved.id(), MarkerType.CONFIG_CHANGED);
-            return saved;
-        } catch (MongoException e) {
-            if (MongoUtils.isDuplicateKeyError(e)) {
-                throw new IllegalArgumentException("A fleet with name '" + name + "' already exists", e);
-            }
-            throw e;
-        }
+        final var result = collection.insertOne(fleet);
+        final FleetDTO saved = fleet.toBuilder()
+                .id(insertedIdAsString(result))
+                .build();
+        txnLogService.appendFleetMarker(saved.id(), MarkerType.CONFIG_CHANGED);
+        return saved;
     }
 
     public Optional<FleetDTO> update(String fleetId, String name, String description, @Nullable String targetVersion) {
@@ -125,14 +107,7 @@ public class FleetService {
                     .targetVersion(targetVersion)
                     .updatedAt(Instant.now())
                     .build();
-            try {
-                collection.replaceOne(idEq(fleetId), updated);
-            } catch (MongoException e) {
-                if (MongoUtils.isDuplicateKeyError(e)) {
-                    throw new IllegalArgumentException("A fleet with name '" + name + "' already exists", e);
-                }
-                throw e;
-            }
+            collection.replaceOne(idEq(fleetId), updated);
             txnLogService.appendFleetMarker(fleetId, MarkerType.CONFIG_CHANGED);
             return updated;
         });

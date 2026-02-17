@@ -40,7 +40,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
@@ -139,11 +138,12 @@ class FleetServiceTest {
     }
 
     @Test
-    void duplicateNameThrowsException() {
-        fleetService.create("test-fleet", "First fleet", null);
+    void duplicateNameAllowed() {
+        FleetDTO first = fleetService.create("test-fleet", "First fleet", null);
+        FleetDTO second = fleetService.create("test-fleet", "Second fleet", null);
 
-        assertThatThrownBy(() -> fleetService.create("test-fleet", "Second fleet", null))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThat(first.id()).isNotEqualTo(second.id());
+        assertThat(first.name()).isEqualTo(second.name());
     }
 
     @Test
