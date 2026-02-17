@@ -51,7 +51,6 @@ const StreamRules = ({ stream }: Props) => {
       <Section
         title="Stream rules"
         collapsible
-        defaultClosed
         actions={
           <IfPermitted permissions={`streams:edit:${stream.id}`}>
             <CreateStreamRuleButton

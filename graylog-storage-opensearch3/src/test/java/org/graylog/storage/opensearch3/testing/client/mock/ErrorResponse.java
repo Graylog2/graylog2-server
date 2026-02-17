@@ -14,30 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+package org.graylog.storage.opensearch3.testing.client.mock;
 
-import { usePluginExports } from 'views/test/testPlugins';
-import { prefixUrl } from 'routing/Routes';
+import java.io.InputStream;
+import java.nio.file.PathMatcher;
 
-import RulesPage from './RulesPage';
+public record ErrorResponse(String method, PathMatcher urlPattern, int responseCode, String error) implements MockedResponse {
 
-const rulesPlugin = {
-  entityCreators: [
-    {
-      id: 'Pipeline Rule',
-      title: 'Create Rule',
-      type: 'Pipeline Rule',
-      path: prefixUrl('/foo'),
-    },
-  ],
-};
-describe('RulesPage', () => {
-  usePluginExports(rulesPlugin);
+    @Override
+    public InputStream newInputStream() {
+        return InputStream.nullInputStream();
+    }
 
-  it('should show create rule button', async () => {
-    render(<RulesPage />);
-
-    await screen.findByRole('link', { name: /Create Rule/i });
-  });
-});
+    @Override
+    public boolean isError() {
+        return true;
+    }
+}
