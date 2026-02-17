@@ -21,10 +21,6 @@ import org.graylog.plugins.datanode.dto.FlushResponse;
 
 public interface DatanodeUpgradeServiceAdapter {
     ClusterState getClusterState();
-
-    void disableShardReplication();
-
-    void enableShardReplication();
-
-    FlushResponse flush();
+    FlushResponse disableShardReplication();
+    FlushResponse enableShardReplication();
 }
