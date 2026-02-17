@@ -16,13 +16,28 @@
  */
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
+import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 
+import java.util.Map;
+import java.util.Optional;
+
 public class OSPercentilesHandler extends OSBasicSeriesSpecHandler<Percentile> {
+
+    private final ObjectMapper objectMapper;
+    private final OSSerializationUtils serializationUtils;
+
+    @Inject
+    public OSPercentilesHandler(ObjectMapper objectMapper, OSSerializationUtils serializationUtils) {
+        this.objectMapper = objectMapper;
+        this.serializationUtils = serializationUtils;
+    }
 
     @Override
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Percentile percentileSpec) {
@@ -34,6 +49,15 @@ public class OSPercentilesHandler extends OSBasicSeriesSpecHandler<Percentile> {
 
     @Override
     protected Object getValueFromAggregationResult(final Aggregate agg, final Percentile percentileSpec) {
-        return null; // TODO!!!
+        return Optional.ofNullable(agg)
+                .filter(Aggregate::isTdigestPercentiles)
+                .map(Aggregate::tdigestPercentiles)
+                .flatMap(v -> v.values().keyed().entrySet()
+                        .stream()
+                        .filter(e -> Double.parseDouble(e.getKey()) == percentileSpec.percentile())
+                        .findFirst()
+                        .map(Map.Entry::getValue)
+                        .map(serializationUtils::toObject)
+                );
     }
 }

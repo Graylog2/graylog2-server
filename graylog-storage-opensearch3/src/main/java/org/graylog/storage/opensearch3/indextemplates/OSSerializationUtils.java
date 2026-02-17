@@ -18,6 +18,7 @@ package org.graylog.storage.opensearch3.indextemplates;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.json.Json;
@@ -50,22 +51,45 @@ public class OSSerializationUtils {
         this.jsonpMapper = new JacksonJsonpMapper();
     }
 
-
-    public Map<String, Object> toMap(final JsonData openSearchSerializableObject) {
-        try (StringWriter writer = new StringWriter()) {
-            JsonWriter jsonWriter = Json.createWriter(writer);
-            jsonWriter.write(openSearchSerializableObject.toJson());
-            String json = writer.toString();
-            jsonWriter.close();
-            return toMap(json);
-        } catch (IOException e) {
-            throw new RuntimeException("Error serializing json", e);
+    public static Object valueNode(JsonNode jsonNode) {
+        if (jsonNode.isInt()) {
+            return jsonNode.asInt();
+        } else if (jsonNode.isLong()) {
+            return jsonNode.asLong();
+        } else if (jsonNode.isIntegralNumber()) {
+            return jsonNode.asLong();
+        } else if (jsonNode.isFloatingPointNumber()) {
+            return jsonNode.asDouble();
+        } else if (jsonNode.isBoolean()) {
+            return jsonNode.asBoolean();
+        } else if (jsonNode.isNull()) {
+            return null;
+        } else {
+            return jsonNode.asText();
         }
     }
 
-    static class JsonSerializationException extends JsonProcessingException {
-        public JsonSerializationException(String message, Throwable cause) {
-            super(message, cause);
+    public Object toObject(JsonData jsonData) {
+        try {
+            return valueNode(jsonpMapper.objectMapper().readTree(toJson(jsonData)));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Map<String, Object> toMap(final JsonData openSearchSerializableObject) {
+        String json = toJson(openSearchSerializableObject);
+        return toMap(json);
+    }
+
+    private String toJson(final JsonData openSearchSerializableObject) {
+        try (StringWriter writer = new StringWriter()) {
+            JsonWriter jsonWriter = Json.createWriter(writer);
+            jsonWriter.write(openSearchSerializableObject.toJson());
+            jsonWriter.close();
+            return writer.toString();
+        } catch (IOException e) {
+            throw new RuntimeException("Error serializing json", e);
         }
     }
 
