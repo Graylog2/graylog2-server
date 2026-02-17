@@ -14,20 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Col, Button } from 'components/bootstrap';
-import { EntityListItem, Spinner } from 'components/common';
+import { ConfirmDialog, EntityListItem, Spinner } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import type { PipelineType, StageType } from 'components/pipelines/types';
 import { useStore } from 'stores/connect';
-import { RulesStore } from 'stores/rules/RulesStore';
+import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
 import type { RuleType } from 'stores/rules/RulesStore';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
+import { PIPELINE_QUERY_KEY } from 'hooks/usePipeline';
 
 import StageForm from './StageForm';
-import StageRules from './StageRules';
+import StageRules, { INPUT_SETUP_WIZARD_ROUTING_RULE_DESCRIPTION } from './StageRules';
+
+const DEFAULT_ROUTING_PIPELINE = 'Default Routing';
 
 type Props = {
   stage: StageType;
@@ -40,7 +44,46 @@ type Props = {
 
 const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete, disableEdit = false }: Props) => {
   const currentUser = useCurrentUser();
+  const queryClient = useQueryClient();
   const { rules: allRules }: { rules: RuleType[] } = useStore(RulesStore);
+  const [removingRuleId, setRemovingRuleId] = useState<string | undefined>(undefined);
+  const [rulePendingRemoval, setRulePendingRemoval] = useState<RuleType | undefined>(undefined);
+
+  const stageRules = useMemo(
+    () => stage.rules.map((name) => allRules?.find((rule) => rule.title === name)),
+    [allRules, stage.rules],
+  );
+
+  const canRemoveRoutingRules =
+    pipeline.title === DEFAULT_ROUTING_PIPELINE &&
+    isPermitted(currentUser.permissions, 'pipeline_rule:delete');
+
+  const openRemoveRoutingRuleDialog = useCallback(
+    (rule: RuleType) => {
+      if (removingRuleId) return;
+      if (!rule?.id || rule.description !== INPUT_SETUP_WIZARD_ROUTING_RULE_DESCRIPTION) return;
+      setRulePendingRemoval(rule);
+    },
+    [removingRuleId],
+  );
+
+  const closeRemoveRoutingRuleDialog = useCallback(() => {
+    setRulePendingRemoval(undefined);
+  }, []);
+
+  const confirmRemoveRoutingRule = useCallback(() => {
+    if (removingRuleId) return;
+    if (!rulePendingRemoval?.id || rulePendingRemoval.description !== INPUT_SETUP_WIZARD_ROUTING_RULE_DESCRIPTION)
+      return;
+
+    const ruleToDelete = rulePendingRemoval;
+
+    setRulePendingRemoval(undefined);
+    setRemovingRuleId(ruleToDelete.id);
+    RulesActions.delete(ruleToDelete)
+      .then(() => queryClient.invalidateQueries({ queryKey: [...PIPELINE_QUERY_KEY, pipeline.id] }))
+      .finally(() => setRemovingRuleId(undefined));
+  }, [pipeline.id, queryClient, removingRuleId, rulePendingRemoval]);
 
   const suffix = `Contains ${stage.rules.length === 1 ? '1 rule' : `${stage.rules.length} rules`}`;
 
@@ -110,20 +153,35 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete, disableEdit =
     <StageRules
       pipeline={pipeline}
       stage={stage}
-      rules={stage.rules.map((name) => allRules.filter((r) => r.title === name)[0])}
+      rules={stageRules}
+      canRemoveRoutingRules={canRemoveRoutingRules}
+      removingRuleId={removingRuleId}
+      onRemoveRule={openRemoveRoutingRuleDialog}
     />
   ) : (
     <Spinner />
   );
 
   return (
-    <EntityListItem
-      title={`Stage ${stage.stage}`}
-      titleSuffix={suffix}
-      actions={actions}
-      description={block}
-      contentRow={<Col md={12}>{content}</Col>}
-    />
+    <>
+      <EntityListItem
+        title={`Stage ${stage.stage}`}
+        titleSuffix={suffix}
+        actions={actions}
+        description={block}
+        contentRow={<Col md={12}>{content}</Col>}
+      />
+      {rulePendingRemoval && (
+        <ConfirmDialog
+          title="Remove Routing Rule"
+          show
+          onConfirm={confirmRemoveRoutingRule}
+          onCancel={closeRemoveRoutingRuleDialog}
+          btnConfirmText="Remove">
+          <span>Do you really want to remove routing rule <b>{rulePendingRemoval.title}</b>?</span>
+        </ConfirmDialog>
+      )}
+    </>
   );
 };
 
