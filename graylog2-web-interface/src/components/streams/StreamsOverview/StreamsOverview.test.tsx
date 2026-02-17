@@ -27,12 +27,14 @@ import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
 import { streamRuleTypes } from 'fixtures/streamRuleTypes';
 import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
+import useStreamDestinationFilterRuleCount from 'components/streams/hooks/useStreamDestinationFilterRuleCount';
 
 import StreamsOverview from './StreamsOverview';
 
 jest.mock('components/common/PaginatedEntityTable/useFetchEntities');
 jest.mock('components/streams/hooks/useStreamRuleTypes');
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
+jest.mock('components/streams/hooks/useStreamDestinationFilterRuleCount');
 
 jest.mock('stores/inputs/StreamRulesInputsStore', () => ({
   StreamRulesInputsActions: {
@@ -98,6 +100,13 @@ describe('StreamsOverview', () => {
     });
 
     asMock(useStreamRuleTypes).mockReturnValue({ data: streamRuleTypes });
+    asMock(useStreamDestinationFilterRuleCount).mockReturnValue({
+      data: 0,
+      refetch: () => {},
+      isInitialLoading: false,
+      error: undefined,
+      isError: false,
+    });
   });
 
   it('should render empty', async () => {

@@ -36,7 +36,10 @@ import org.graylog2.search.SearchQueryParser;
 import org.graylog2.streams.events.StreamDeletedEvent;
 import org.mongojack.Id;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -44,6 +47,7 @@ import java.util.function.Predicate;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.in;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedId;
@@ -130,6 +134,21 @@ public class StreamDestinationFilterService {
     public Optional<StreamDestinationFilterRuleDTO> findByIdForStream(String streamId, String id) {
         collection.find(and(eq(FIELD_STREAM_ID, streamId), idEq(id)));
         return utils.getById(id);
+    }
+
+    public Map<String, Long> countByStreamIds(Collection<String> streamIds, Predicate<String> permissionSelector) {
+        if (streamIds.isEmpty()) {
+            return Map.of();
+        }
+
+        final Map<String, Long> countsByStreamId = new HashMap<>();
+        collection.find(in(FIELD_STREAM_ID, streamIds)).forEach(dto -> {
+            if (permissionSelector.test(dto.id())) {
+                countsByStreamId.merge(dto.streamId(), 1L, Long::sum);
+            }
+        });
+
+        return countsByStreamId;
     }
 
     public StreamDestinationFilterRuleDTO createForStream(String streamId, StreamDestinationFilterRuleDTO dto) {
