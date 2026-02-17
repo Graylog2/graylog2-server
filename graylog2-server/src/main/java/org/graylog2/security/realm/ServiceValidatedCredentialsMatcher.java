@@ -18,7 +18,10 @@ package org.graylog2.security.realm;
 
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAccount;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
+
+import java.util.Optional;
 
 /**
  * A {@link CredentialsMatcher} for realms that perform credential validation internally within
@@ -72,6 +75,18 @@ public class ServiceValidatedCredentialsMatcher implements CredentialsMatcher {
             return "ServiceValidatedCredentialsMatcher.AUTHENTICATED";
         }
     };
+
+    public static final Object SIMULATED = new Object() {
+        @Override
+        public String toString() {
+            return "ServiceValidatedCredentialsMatcher.SIMULATED";
+        }
+    };
+
+    @Override
+    public Optional<AuthenticationInfo> createSimulatedCredentials() {
+        return Optional.of(new SimpleAccount("simulated", SIMULATED, "simulated realm"));
+    }
 
     @Override
     public boolean doCredentialsMatch(AuthenticationToken token, AuthenticationInfo info) {
