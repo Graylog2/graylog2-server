@@ -25,7 +25,7 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.events.CommonEventSummary;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.events.EventSummary;
-import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
+import org.graylog.storage.opensearch3.OSSerializationUtils;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.FieldSort;
@@ -42,12 +42,10 @@ import java.util.stream.Collectors;
 
 public class OSEventList implements EventListStrategy {
     private final ObjectMapper objectMapper;
-    private final OSSerializationUtils serializationUtils;
 
     @Inject
-    public OSEventList(ObjectMapper objectMapper, OSSerializationUtils serializationUtils) {
+    public OSEventList(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
-        this.serializationUtils = serializationUtils;
     }
 
     @Override
@@ -109,7 +107,7 @@ public class OSEventList implements EventListStrategy {
 
     protected List<Map<String, Object>> extractResult(MultiSearchItem<JsonData> result) {
         return result.hits().hits().stream()
-                .map(serializationUtils::toMap)
+                .map(OSSerializationUtils::toMap)
                 .toList();
     }
 

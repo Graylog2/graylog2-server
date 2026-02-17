@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.opensearch3.indextemplates;
 
+import org.graylog.storage.opensearch3.OSSerializationUtils;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog2.indexer.indices.Template;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch.OpenSearchClient;
@@ -46,14 +48,12 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 
 @ExtendWith(MockitoExtension.class)
 class LegacyIndexTemplateAdapterTest {
 
     private LegacyIndexTemplateAdapter toTest;
-
-    @Mock
-    private OSSerializationUtils templateMapper;
 
     @Mock
     private OpenSearchIndicesClient indicesClient;
@@ -65,7 +65,7 @@ class LegacyIndexTemplateAdapterTest {
         doReturn(syncClient).when(officialOpensearchClient).sync();
         doReturn(indicesClient).when(syncClient).indices();
 
-        toTest = new LegacyIndexTemplateAdapter(officialOpensearchClient, templateMapper);
+        toTest = new LegacyIndexTemplateAdapter(officialOpensearchClient);
     }
 
     @Test
@@ -78,8 +78,11 @@ class LegacyIndexTemplateAdapterTest {
                 13L,
                 new Template.Settings(Map.of())
         );
-        doReturn(typeMapping).when(templateMapper).fromMap(template.mappings(), TypeMapping._DESERIALIZER);
-        doReturn(settings).when(templateMapper).toJsonDataMap(template.settings());
+
+        try (MockedStatic<OSSerializationUtils> templateMapper = mockStatic(OSSerializationUtils.class)) {
+            templateMapper.when(() -> OSSerializationUtils.fromMap(template.mappings(), TypeMapping._DESERIALIZER)).thenReturn(typeMapping);
+            templateMapper.when(() -> OSSerializationUtils.toJsonDataMap(template.settings())).thenReturn(settings);
+        }
 
         doReturn(PutTemplateResponse.builder().acknowledged(true).build())
                 .when(indicesClient)

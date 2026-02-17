@@ -14,13 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3.indextemplates;
+package org.graylog.storage.opensearch3;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import jakarta.json.Json;
 import jakarta.json.JsonWriter;
 import jakarta.json.stream.JsonParser;
@@ -41,15 +39,9 @@ import java.util.stream.Collectors;
  * Utility class that helps use our APIs based on maps with OS3, strongly typed, builder-based APIs.
  * It has its disadvantages, but simplifies significantly mapping between nested maps and complex `org.opensearch.client.opensearch._types.*` classes.
  */
-@Singleton
 public class OSSerializationUtils {
 
-    private final JacksonJsonpMapper jsonpMapper;
-
-    @Inject
-    public OSSerializationUtils() {
-        this.jsonpMapper = new JacksonJsonpMapper();
-    }
+    private static final JacksonJsonpMapper jsonpMapper = new JacksonJsonpMapper();
 
     public static Object valueNode(JsonNode jsonNode) {
         if (jsonNode.isInt()) {
@@ -69,7 +61,7 @@ public class OSSerializationUtils {
         }
     }
 
-    public Object toObject(JsonData jsonData) {
+    public static Object toObject(JsonData jsonData) {
         try {
             return valueNode(jsonpMapper.objectMapper().readTree(toJson(jsonData)));
         } catch (JsonProcessingException e) {
@@ -77,12 +69,12 @@ public class OSSerializationUtils {
         }
     }
 
-    public Map<String, Object> toMap(final JsonData openSearchSerializableObject) {
+    public static Map<String, Object> toMap(final JsonData openSearchSerializableObject) {
         String json = toJson(openSearchSerializableObject);
         return toMap(json);
     }
 
-    private String toJson(final JsonData openSearchSerializableObject) {
+    private static String toJson(final JsonData openSearchSerializableObject) {
         try (
                 StringWriter writer = new StringWriter();
                 JsonWriter jsonWriter = Json.createWriter(writer)
@@ -94,20 +86,20 @@ public class OSSerializationUtils {
         }
     }
 
-    public Map<String, Object> toMap(final PlainJsonSerializable openSearchSerializableObject) {
+    public static Map<String, Object> toMap(final PlainJsonSerializable openSearchSerializableObject) {
         return toMap(openSearchSerializableObject.toJsonString());
     }
 
-    public Map<String, Object> toMap(final String json) {
+    public static Map<String, Object> toMap(final String json) {
         try {
-            return this.jsonpMapper.objectMapper().readValue(json, new TypeReference<>() {});
+            return jsonpMapper.objectMapper().readValue(json, new TypeReference<>() {});
         } catch (IOException e) {
             throw new RuntimeException("Error serializing json", e);
         }
     }
 
 
-    public Map<String, JsonData> toJsonDataMap(final Map<String, Object> map) {
+    public static Map<String, JsonData> toJsonDataMap(final Map<String, Object> map) {
         return map.entrySet()
                 .stream()
                 .collect(Collectors.toMap(
@@ -117,18 +109,18 @@ public class OSSerializationUtils {
                 );
     }
 
-    public <T> T fromMap(final Map<String, Object> mapRepresentation,
+    public static <T> T fromMap(final Map<String, Object> mapRepresentation,
                          final JsonpDeserializer<T> deserializer) throws JsonProcessingException {
-        final String json = this.jsonpMapper.objectMapper().writeValueAsString(mapRepresentation);
+        final String json = jsonpMapper.objectMapper().writeValueAsString(mapRepresentation);
         return fromJson(json, deserializer);
     }
 
-    public <T> T fromJson(final String json, final JsonpDeserializer<T> deserializer) {
+    public static <T> T fromJson(final String json, final JsonpDeserializer<T> deserializer) {
         final JsonParser parser = jsonpMapper.jsonProvider().createParser(new StringReader(json));
         return deserializer.deserialize(parser, jsonpMapper);
     }
 
-    public RequestItem toMsearch(SearchRequest request) {
+    public static RequestItem toMsearch(SearchRequest request) {
         return RequestItem.of(req -> req
                 .body(mbody -> mbody
                         .aggregations(request.aggregations())

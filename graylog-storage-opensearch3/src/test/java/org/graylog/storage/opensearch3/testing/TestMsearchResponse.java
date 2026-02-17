@@ -19,7 +19,6 @@ package org.graylog.storage.opensearch3.testing;
 import com.google.common.io.Resources;
 import jakarta.json.stream.JsonParser;
 import org.apache.commons.io.FileUtils;
-import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.json.JsonpDeserializer;
 import org.opensearch.client.json.jackson.JacksonJsonProvider;
@@ -41,7 +40,6 @@ public class TestMsearchResponse {
     }
 
     private static MsearchResponse<JsonData> resultFor(String result) throws IOException {
-        OSSerializationUtils utils = new OSSerializationUtils();
         JsonpDeserializer<MsearchResponse<JsonData>> deserializer = MsearchResponse.createMsearchResponseDeserializer(JsonData._DESERIALIZER);
         try (StringReader reader = new StringReader(result)) {
             JsonParser parser = JacksonJsonProvider.provider().createParser(reader);
