@@ -83,10 +83,11 @@ public class OSSerializationUtils {
     }
 
     private String toJson(final JsonData openSearchSerializableObject) {
-        try (StringWriter writer = new StringWriter()) {
-            JsonWriter jsonWriter = Json.createWriter(writer);
+        try (
+                StringWriter writer = new StringWriter();
+                JsonWriter jsonWriter = Json.createWriter(writer)
+        ) {
             jsonWriter.write(openSearchSerializableObject.toJson());
-            jsonWriter.close();
             return writer.toString();
         } catch (IOException e) {
             throw new RuntimeException("Error serializing json", e);
