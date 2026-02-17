@@ -63,7 +63,8 @@ public class SourceResource extends RestResource {
     private static final List<EntityAttribute> ATTRIBUTES = List.of(
             EntityAttribute.builder().id("name").title("Name").build(),
             EntityAttribute.builder().id("description").title("Description").build(),
-            EntityAttribute.builder().id("type").title("Type").build()
+            EntityAttribute.builder().id("type").title("Type").sortable(false).build(),
+            EntityAttribute.builder().id("enabled").title("Enabled").sortable(false).build()
     );
 
     private static final EntityDefaults DEFAULTS = EntityDefaults.builder()

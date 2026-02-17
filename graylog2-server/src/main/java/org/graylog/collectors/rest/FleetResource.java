@@ -39,7 +39,9 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.FleetService;
+import org.graylog.collectors.SourceService;
 import org.graylog.collectors.db.FleetDTO;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.SortOrder;
@@ -51,6 +53,8 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.net.URI;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 @Tag(name = "Collectors/Fleets")
@@ -69,11 +73,18 @@ public class FleetResource extends RestResource {
             .sort(Sorting.create("name", Sorting.Direction.ASC))
             .build();
 
+    private static final Duration ONLINE_THRESHOLD = Duration.ofMinutes(5);
+
     private final FleetService fleetService;
+    private final CollectorInstanceService instanceService;
+    private final SourceService sourceService;
 
     @Inject
-    public FleetResource(FleetService fleetService) {
+    public FleetResource(FleetService fleetService, CollectorInstanceService instanceService,
+                         SourceService sourceService) {
         this.fleetService = fleetService;
+        this.instanceService = instanceService;
+        this.sourceService = sourceService;
     }
 
     @GET
@@ -119,6 +130,23 @@ public class FleetResource extends RestResource {
                 .orElseThrow(() -> new NotFoundException("Fleet " + fleetId + " not found"));
     }
 
+    @GET
+    @Path("/{fleetId}/stats")
+    @Timed
+    @Operation(summary = "Get statistics for a fleet")
+    public FleetStatsResponse stats(@PathParam("fleetId") String fleetId) {
+        checkPermission(FleetPermissions.FLEET_READ, fleetId);
+        if (fleetService.get(fleetId).isEmpty()) {
+            throw new NotFoundException("Fleet " + fleetId + " not found");
+        }
+        final long totalInstances = instanceService.countByFleet(fleetId);
+        final long onlineInstances = instanceService.countOnlineByFleet(fleetId,
+                Instant.now().minus(ONLINE_THRESHOLD));
+        final long totalSources = sourceService.countByFleet(fleetId);
+        return new FleetStatsResponse(totalInstances, onlineInstances,
+                totalInstances - onlineInstances, totalSources);
+    }
+
     @POST
     @Timed
     @Operation(summary = "Create a new fleet")
@@ -151,6 +179,7 @@ public class FleetResource extends RestResource {
     public void delete(@PathParam("fleetId") String fleetId) {
         checkPermission(FleetPermissions.FLEET_DELETE, fleetId);
         // TODO: audit event
+        // TODO should this fail if there are still collectors using it? should a replacement fleed be required?
         if (!fleetService.delete(fleetId)) {
             throw new NotFoundException("Fleet " + fleetId + " not found");
         }

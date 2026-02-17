@@ -17,6 +17,7 @@
 package org.graylog.collectors.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nullable;
 import org.graylog.collectors.db.SourceConfig;
 import org.graylog.collectors.db.SourceDTO;
 
@@ -24,7 +25,7 @@ public record SourceResponse(
         @JsonProperty("id") String id,
         @JsonProperty("fleet_id") String fleetId,
         @JsonProperty("name") String name,
-        @JsonProperty("description") String description,
+        @Nullable @JsonProperty("description") String description,
         @JsonProperty("enabled") boolean enabled,
         @JsonProperty("type") String type,
         @JsonProperty("config") SourceConfig config) {

@@ -142,4 +142,23 @@ public class CollectorInstanceService {
     public PaginatedList<CollectorInstanceDTO> findPaginated(SearchQuery searchQuery, Bson sort, int page, int perPage) {
         return paginationHelper.filter(searchQuery.toBson()).sort(sort).perPage(perPage).page(page);
     }
+
+    public long count() {
+        return collection.countDocuments();
+    }
+
+    public long countOnline(Instant onlineThreshold) {
+        return collection.countDocuments(Filters.gte(FIELD_LAST_SEEN, onlineThreshold));
+    }
+
+    public long countByFleet(String fleetId) {
+        return collection.countDocuments(Filters.eq(CollectorInstanceDTO.FIELD_FLEET_ID, fleetId));
+    }
+
+    public long countOnlineByFleet(String fleetId, Instant onlineThreshold) {
+        return collection.countDocuments(Filters.and(
+                Filters.eq(CollectorInstanceDTO.FIELD_FLEET_ID, fleetId),
+                Filters.gte(FIELD_LAST_SEEN, onlineThreshold)
+        ));
+    }
 }

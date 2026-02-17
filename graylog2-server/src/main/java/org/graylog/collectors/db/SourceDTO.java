@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import jakarta.annotation.Nullable;
 import org.graylog2.database.BuildableMongoEntity;
 
 @AutoValue
@@ -37,6 +38,7 @@ public abstract class SourceDTO implements BuildableMongoEntity<SourceDTO, Sourc
     @JsonProperty(FIELD_NAME)
     public abstract String name();
 
+    @Nullable
     @JsonProperty(FIELD_DESCRIPTION)
     public abstract String description();
 
@@ -66,7 +68,7 @@ public abstract class SourceDTO implements BuildableMongoEntity<SourceDTO, Sourc
         public abstract Builder name(String name);
 
         @JsonProperty(FIELD_DESCRIPTION)
-        public abstract Builder description(String description);
+        public abstract Builder description(@Nullable String description);
 
         @JsonProperty(FIELD_ENABLED)
         public abstract Builder enabled(boolean enabled);

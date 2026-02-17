@@ -21,6 +21,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexModel;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.collectors.db.MarkerType;
@@ -101,7 +102,7 @@ public class SourceService {
                 .filter(source -> source.fleetId().equals(fleetId));
     }
 
-    public SourceDTO create(String fleetId, String name, String description, boolean enabled, SourceConfig config) {
+    public SourceDTO create(String fleetId, String name, @Nullable String description, boolean enabled, SourceConfig config) {
         config.validate();
 
         final SourceDTO source = SourceDTO.builder()
@@ -128,7 +129,7 @@ public class SourceService {
         }
     }
 
-    public Optional<SourceDTO> update(String fleetId, String sourceId, String name, String description,
+    public Optional<SourceDTO> update(String fleetId, String sourceId, String name, @Nullable String description,
                                        boolean enabled, SourceConfig config) {
         return get(fleetId, sourceId).map(existing -> {
             config.validate();
@@ -164,6 +165,14 @@ public class SourceService {
 
     public long deleteAllByFleet(String fleetId) {
         return deleteAllByFleet(fleetId, true);
+    }
+
+    public long count() {
+        return collection.countDocuments();
+    }
+
+    public long countByFleet(String fleetId) {
+        return collection.countDocuments(Filters.eq(SourceDTO.FIELD_FLEET_ID, fleetId));
     }
 
     public long deleteAllByFleet(String fleetId, boolean appendMarker) {

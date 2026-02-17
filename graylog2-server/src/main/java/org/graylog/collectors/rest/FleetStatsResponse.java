@@ -17,14 +17,10 @@
 package org.graylog.collectors.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import org.graylog.collectors.db.SourceConfig;
 
-public record CreateSourceRequest(
-        @NotBlank @JsonProperty("name") String name,
-        @Nullable @JsonProperty("description") String description,
-        @JsonProperty("enabled") boolean enabled,
-        @NotNull @JsonProperty("config") SourceConfig config) {
+public record FleetStatsResponse(
+        @JsonProperty("total_instances") long totalInstances,
+        @JsonProperty("online_instances") long onlineInstances,
+        @JsonProperty("offline_instances") long offlineInstances,
+        @JsonProperty("total_sources") long totalSources) {
 }

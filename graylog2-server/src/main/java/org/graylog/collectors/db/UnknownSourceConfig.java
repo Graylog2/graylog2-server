@@ -18,20 +18,19 @@ package org.graylog.collectors.db;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@JsonIgnoreProperties(value = SourceConfig.TYPE_FIELD)
 public class UnknownSourceConfig implements SourceConfig {
-    @JsonProperty(TYPE_FIELD)
-    private String type;
 
     private final Map<String, Object> additionalProperties = new LinkedHashMap<>();
 
     @Override
     public String type() {
-        return type;
+        return (String) additionalProperties.get(TYPE_FIELD);
     }
 
     @JsonAnyGetter

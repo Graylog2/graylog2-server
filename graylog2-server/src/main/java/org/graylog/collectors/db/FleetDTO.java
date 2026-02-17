@@ -37,6 +37,7 @@ public abstract class FleetDTO implements BuildableMongoEntity<FleetDTO, FleetDT
     @JsonProperty(FIELD_NAME)
     public abstract String name();
 
+    @Nullable
     @JsonProperty(FIELD_DESCRIPTION)
     public abstract String description();
 
@@ -66,7 +67,7 @@ public abstract class FleetDTO implements BuildableMongoEntity<FleetDTO, FleetDT
         public abstract Builder name(String name);
 
         @JsonProperty(FIELD_DESCRIPTION)
-        public abstract Builder description(String description);
+        public abstract Builder description(@Nullable String description);
 
         @JsonProperty(FIELD_TARGET_VERSION)
         public abstract Builder targetVersion(@Nullable String targetVersion);

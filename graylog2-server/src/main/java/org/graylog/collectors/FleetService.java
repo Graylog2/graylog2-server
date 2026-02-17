@@ -77,11 +77,15 @@ public class FleetService {
                 .page(page, permissionFilter);
     }
 
+    public long count() {
+        return collection.countDocuments();
+    }
+
     public Optional<FleetDTO> get(String fleetId) {
         return Optional.ofNullable(collection.find(idEq(fleetId)).first());
     }
 
-    public FleetDTO create(String name, String description, @Nullable String targetVersion) {
+    public FleetDTO create(String name, @Nullable String description, @Nullable String targetVersion) {
         final Instant now = Instant.now();
         final FleetDTO fleet = FleetDTO.builder()
                 .name(name)
@@ -99,7 +103,7 @@ public class FleetService {
         return saved;
     }
 
-    public Optional<FleetDTO> update(String fleetId, String name, String description, @Nullable String targetVersion) {
+    public Optional<FleetDTO> update(String fleetId, String name, @Nullable String description, @Nullable String targetVersion) {
         return get(fleetId).map(existing -> {
             final FleetDTO updated = existing.toBuilder()
                     .name(name)

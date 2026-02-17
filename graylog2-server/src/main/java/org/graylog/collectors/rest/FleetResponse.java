@@ -25,7 +25,7 @@ import java.time.Instant;
 public record FleetResponse(
         @JsonProperty("id") String id,
         @JsonProperty("name") String name,
-        @JsonProperty("description") String description,
+        @Nullable @JsonProperty("description") String description,
         @Nullable @JsonProperty("target_version") String targetVersion,
         @JsonProperty("created_at") Instant createdAt,
         @JsonProperty("updated_at") Instant updatedAt) {

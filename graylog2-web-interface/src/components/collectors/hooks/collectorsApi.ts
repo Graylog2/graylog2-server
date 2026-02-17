@@ -22,7 +22,7 @@ import type { CollectorsConfig, CollectorsConfigRequest, Fleet, Source } from '.
 // Fleet API types
 export type CreateFleetInput = {
   name: string;
-  description: string;
+  description?: string;
   target_version?: string | null;
 };
 export type UpdateFleetInput = {

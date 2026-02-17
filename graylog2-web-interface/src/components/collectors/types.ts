@@ -20,7 +20,7 @@
 export type Fleet = {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   target_version: string | null;
   created_at: string;
   updated_at: string;
@@ -48,7 +48,7 @@ export type SourceBase = {
   id: string;
   fleet_id: string;
   name: string;
-  description: string;
+  description?: string;
   enabled: boolean;
   type: SourceType;
 };

@@ -30,6 +30,8 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.collectors.CollectorInstanceService;
+import org.graylog.collectors.FleetService;
+import org.graylog.collectors.SourceService;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog2.database.PaginatedList;
@@ -43,6 +45,8 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -58,11 +62,34 @@ import static java.util.stream.Collectors.toMap;
 public class CollectorInstancesResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorInstancesResource.class);
 
+    private static final Duration ONLINE_THRESHOLD = Duration.ofMinutes(5);
+
     private final CollectorInstanceService collectorInstanceService;
+    private final FleetService fleetService;
+    private final SourceService sourceService;
 
     @Inject
-    public CollectorInstancesResource(CollectorInstanceService collectorInstanceService) {
+    public CollectorInstancesResource(CollectorInstanceService collectorInstanceService,
+                                      FleetService fleetService, SourceService sourceService) {
         this.collectorInstanceService = collectorInstanceService;
+        this.fleetService = fleetService;
+        this.sourceService = sourceService;
+    }
+
+    @GET
+    @Path("/stats")
+    @Timed
+    @Operation(summary = "Get global collector statistics")
+    public CollectorStatsResponse stats() {
+        final long totalInstances = collectorInstanceService.count();
+        final long onlineInstances = collectorInstanceService.countOnline(
+                Instant.now().minus(ONLINE_THRESHOLD));
+        return new CollectorStatsResponse(
+                totalInstances,
+                onlineInstances,
+                totalInstances - onlineInstances,
+                fleetService.count(),
+                sourceService.count());
     }
 
     @GET
