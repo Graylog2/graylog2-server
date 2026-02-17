@@ -24,6 +24,8 @@ import java.util.Set;
 /**
  * A raw marker entry from the fleet transaction log.
  *
+ *  This is persisted in a non-entity collection, thus it has no Jackson mapping.
+ *
  * @param seq       sequence number (the _id in MongoDB)
  * @param target    "fleet" or "collector"
  * @param targetIds fleet IDs or collector instance UIDs (always a set, even for single targets)
