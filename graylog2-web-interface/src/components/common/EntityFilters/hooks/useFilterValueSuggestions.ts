@@ -42,11 +42,11 @@ type PaginatedSuggestions = {
 const fetchFilterValueSuggestions = async (
   collection: string,
   { query, page, pageSize }: SearchParams,
-  collectionProperty: string = 'title',
   relatedIdentifier: string,
   displayFields?: string[],
   displayTemplate?: string,
   identifierType?: string,
+  collectionProperty: string = 'title',
 ): Promise<PaginatedSuggestions | undefined> => {
   const additional = {
     collection,
@@ -83,7 +83,7 @@ const useFilterValueSuggestions = (
 
     queryFn: () =>
       defaultOnError(
-        fetchFilterValueSuggestions(collection, searchParams, collectionProperty, relatedIdentifier, displayFields, displayTemplate, identifierType),
+        fetchFilterValueSuggestions(collection, searchParams, relatedIdentifier, displayFields, displayTemplate, identifierType, collectionProperty),
         'Loading suggestions for filter failed with status',
         'Could not load filter suggestions',
       ),
