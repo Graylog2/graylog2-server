@@ -96,7 +96,7 @@ public class OpenSearch3Module extends VersionAwareModule {
 
         bindForSupportedVersion(ProxyRequestAdapter.class).to(ProxyRequestAdapterOS.class);
 
-        install(new FactoryModuleBuilder().build(ScrollResultOS2.Factory.class));
+        install(new FactoryModuleBuilder().build(ScrollResultOS3.Factory.class));
 
         bind(RestHighLevelClient.class).toProvider(RestClientProvider.class);
         bind(OfficialOpensearchClient.class).toProvider(OfficialOpensearchClientProvider.class).asEagerSingleton();

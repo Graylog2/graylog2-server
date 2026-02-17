@@ -17,44 +17,75 @@
 package org.graylog.storage.opensearch3;
 
 import jakarta.inject.Inject;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
-import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
+import org.graylog.storage.search.SearchCommand;
 import org.graylog2.indexer.results.ChunkedResult;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.searches.ChunkCommand;
+import org.opensearch.client.opensearch._types.ExpandWildcard;
+import org.opensearch.client.opensearch._types.Time;
+import org.opensearch.client.opensearch._types.query_dsl.Query;
+import org.opensearch.client.opensearch.core.SearchRequest;
+import org.opensearch.client.opensearch.core.SearchResponse;
 
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 
 @Deprecated
 public class Scroll implements MultiChunkResultRetriever {
     private static final String DEFAULT_SCROLLTIME = "1m";
-    private final OpenSearchClient client;
-    private final ScrollResultOS2.Factory scrollResultFactory;
-    private final SearchRequestFactory searchRequestFactory;
+    private final OfficialOpensearchClient opensearchClient;
+    private final ScrollResultOS3.Factory scrollResultFactory;
+    private final SearchRequestFactoryOS searchRequestFactory;
 
     @Inject
-    public Scroll(OpenSearchClient client,
-                  ScrollResultOS2.Factory scrollResultFactory,
-                  SearchRequestFactory searchRequestFactory) {
-        this.client = client;
+    public Scroll(OfficialOpensearchClient opensearchClient,
+                  ScrollResultOS3.Factory scrollResultFactory,
+                  SearchRequestFactoryOS searchRequestFactory) {
+        this.opensearchClient = opensearchClient;
         this.scrollResultFactory = scrollResultFactory;
         this.searchRequestFactory = searchRequestFactory;
     }
 
     @Override
     public ChunkedResult retrieveChunkedResult(ChunkCommand chunkCommand) {
-        final SearchSourceBuilder searchQuery = searchRequestFactory.create(chunkCommand);
-        final SearchRequest request = scrollBuilder(searchQuery, chunkCommand.indices());
-        final SearchResponse result = client.execute((c, requestOptions) -> c.search(request, requestOptions), "Unable to perform scroll search");
-        return scrollResultFactory.create(result, searchQuery.toString(), DEFAULT_SCROLLTIME, chunkCommand.fields(), chunkCommand.limit().orElse(-1));
+        final Query query = createQuery(chunkCommand);
+        final SearchRequest request = buildScrollRequest(query, chunkCommand);
+        final SearchResponse<Map> result = opensearchClient.sync(
+                c -> c.search(request, Map.class),
+                "Unable to perform scroll search"
+        );
+        return scrollResultFactory.create(result, request.toString(), DEFAULT_SCROLLTIME, chunkCommand.fields(), chunkCommand.limit().orElse(-1));
     }
 
-    private SearchRequest scrollBuilder(SearchSourceBuilder query, Set<String> indices) {
-        return new SearchRequest(indices.toArray(new String[0]))
-                .source(query)
-                .scroll(DEFAULT_SCROLLTIME)
-                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
+    Query createQuery(final ChunkCommand chunkCommand) {
+        final SearchCommand searchCommand = SearchCommand.from(chunkCommand);
+        return searchRequestFactory.createQuery(searchCommand);
+    }
+
+    SearchRequest buildScrollRequest(Query query, ChunkCommand chunkCommand) {
+        final Set<String> indices = chunkCommand.indices();
+
+        final Time scrollTime = new Time.Builder().time(DEFAULT_SCROLLTIME).build();
+
+        return SearchRequest.of(builder -> {
+            builder.index(new LinkedList<>(indices));
+            builder.query(query);
+            builder.scroll(scrollTime);
+            builder.ignoreUnavailable(true);
+            builder.allowNoIndices(true);
+            builder.expandWildcards(ExpandWildcard.Open);
+            builder.trackTotalHits(th -> th.enabled(true));
+
+            // Set source fields
+            if (!chunkCommand.fields().isEmpty()) {
+                builder.source(s -> s.filter(sf -> sf.includes(new LinkedList<>(chunkCommand.fields()))));
+            }
+
+            // Set batch size
+            chunkCommand.batchSize().ifPresent(batchSize -> builder.size(Math.toIntExact(batchSize)));
+
+            return builder;
+        });
     }
 }

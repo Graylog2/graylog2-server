@@ -41,6 +41,12 @@ public class CustomAsyncOpenSearchClient extends OpenSearchAsyncClient {
      */
     @Override
     public <TDocument> CompletableFuture<SearchResponse<TDocument>> search(SearchRequest request, Class<TDocument> tDocumentClass) throws IOException, OpenSearchException {
+
+        // msearch doesn't support scroll, we can't switch to msearch in this case!
+        if (request.scroll() != null) {
+            return super.search(request, tDocumentClass);
+        }
+
         return super.msearch(msearch -> msearch.searches(serializationUtils.toMsearch(request)), tDocumentClass)
                 // TODO: error handling?
                 .thenApply(result -> result.responses().getFirst().result());
