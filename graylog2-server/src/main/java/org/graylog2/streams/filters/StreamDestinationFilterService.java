@@ -24,7 +24,9 @@ import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Projections;
 import jakarta.inject.Inject;
+import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
@@ -61,6 +63,7 @@ import static org.graylog2.streams.filters.StreamDestinationFilterRuleDTO.FIELD_
 
 public class StreamDestinationFilterService {
     public static final String COLLECTION = "stream_destination_filters";
+    private static final String FIELD_ID = "_id";
 
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put(FIELD_TITLE, SearchQueryField.create(FIELD_TITLE))
@@ -142,11 +145,16 @@ public class StreamDestinationFilterService {
         }
 
         final Map<String, Long> countsByStreamId = new HashMap<>();
-        collection.find(in(FIELD_STREAM_ID, streamIds)).forEach(dto -> {
-            if (permissionSelector.test(dto.id())) {
-                countsByStreamId.merge(dto.streamId(), 1L, Long::sum);
-            }
-        });
+        collection.find(in(FIELD_STREAM_ID, streamIds), Document.class)
+                .projection(Projections.include(FIELD_ID, FIELD_STREAM_ID))
+                .forEach(document -> {
+                    final var id = document.getObjectId(FIELD_ID);
+                    final var streamId = document.getString(FIELD_STREAM_ID);
+
+                    if (id != null && streamId != null && permissionSelector.test(id.toHexString())) {
+                        countsByStreamId.merge(streamId, 1L, Long::sum);
+                    }
+                });
 
         return countsByStreamId;
     }
