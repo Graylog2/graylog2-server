@@ -1,0 +1,292 @@
+{
+  "documents": [
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_1",
+            "indexType": "message",
+            "indexId": "01AAAAAAAAK0000000000001"
+          }
+        },
+        {
+          "data": {
+            "id": "01AAAAAAAAK0000000000001",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "def-agg-001",
+            "origin_context": null,
+            "timestamp": "2025-01-15 17:00:00.000",
+            "timestamp_processing": "2025-01-15 17:00:05.000",
+            "timerange_start": "2025-01-15 16:00:00.000",
+            "timerange_end": "2025-01-15 17:00:00.000",
+            "streams": ["000000000000000000000002"],
+            "source_streams": ["000000000000000000000001"],
+            "message": "Test event with key host-a 1",
+            "source": "test-host",
+            "key_tuple": ["host-a"],
+            "key": "host-a",
+            "priority": 1,
+            "scores": {"raw_risk": 1.0, "normalized_risk": 1.0},
+            "associated_assets": [],
+            "alert": true,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": null
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_1",
+            "indexType": "message",
+            "indexId": "01AAAAAAAAK0000000000002"
+          }
+        },
+        {
+          "data": {
+            "id": "01AAAAAAAAK0000000000002",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "def-agg-001",
+            "origin_context": null,
+            "timestamp": "2025-01-15 17:30:00.000",
+            "timestamp_processing": "2025-01-15 17:30:05.000",
+            "timerange_start": "2025-01-15 16:30:00.000",
+            "timerange_end": "2025-01-15 17:30:00.000",
+            "streams": ["000000000000000000000002"],
+            "source_streams": ["000000000000000000000001"],
+            "message": "Test event with key host-a 2",
+            "source": "test-host",
+            "key_tuple": ["host-a"],
+            "key": "host-a",
+            "priority": 2,
+            "scores": {"raw_risk": 2.0, "normalized_risk": 2.0},
+            "associated_assets": [],
+            "alert": false,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": null
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_1",
+            "indexType": "message",
+            "indexId": "01AAAAAAAAK0000000000003"
+          }
+        },
+        {
+          "data": {
+            "id": "01AAAAAAAAK0000000000003",
+            "event_definition_type": "sigma-v1",
+            "event_definition_id": "def-sig-001",
+            "origin_context": null,
+            "timestamp": "2025-01-15 18:00:00.000",
+            "timestamp_processing": "2025-01-15 18:00:05.000",
+            "timerange_start": "2025-01-15 17:00:00.000",
+            "timerange_end": "2025-01-15 18:00:00.000",
+            "streams": ["000000000000000000000002"],
+            "source_streams": ["000000000000000000000001"],
+            "message": "Test event with key host-b 3",
+            "source": "test-host",
+            "key_tuple": ["host-b"],
+            "key": "host-b",
+            "priority": 2,
+            "scores": {"raw_risk": 2.0, "normalized_risk": 2.0},
+            "associated_assets": [],
+            "alert": true,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": null
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_1",
+            "indexType": "message",
+            "indexId": "01AAAAAAAAK0000000000004"
+          }
+        },
+        {
+          "data": {
+            "id": "01AAAAAAAAK0000000000004",
+            "event_definition_type": "correlation-v1",
+            "event_definition_id": "def-cor-001",
+            "origin_context": null,
+            "timestamp": "2025-01-15 18:30:00.000",
+            "timestamp_processing": "2025-01-15 18:30:05.000",
+            "timerange_start": "2025-01-15 17:30:00.000",
+            "timerange_end": "2025-01-15 18:30:00.000",
+            "streams": ["000000000000000000000002"],
+            "source_streams": ["000000000000000000000001"],
+            "message": "Test event with key host-b 4",
+            "source": "test-host",
+            "key_tuple": ["host-b"],
+            "key": "host-b",
+            "priority": 3,
+            "scores": {"raw_risk": 3.0, "normalized_risk": 3.0},
+            "associated_assets": [],
+            "alert": false,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": null
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_1",
+            "indexType": "message",
+            "indexId": "01AAAAAAAAK0000000000005"
+          }
+        },
+        {
+          "data": {
+            "id": "01AAAAAAAAK0000000000005",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "def-agg-002",
+            "origin_context": null,
+            "timestamp": "2025-01-15 19:00:00.000",
+            "timestamp_processing": "2025-01-15 19:00:05.000",
+            "timerange_start": "2025-01-15 18:00:00.000",
+            "timerange_end": "2025-01-15 19:00:00.000",
+            "streams": ["000000000000000000000002"],
+            "source_streams": ["000000000000000000000001"],
+            "message": "Test event with key host-b 5",
+            "source": "test-host",
+            "key_tuple": ["host-b"],
+            "key": "host-b",
+            "priority": 3,
+            "scores": {"raw_risk": 3.0, "normalized_risk": 3.0},
+            "associated_assets": [],
+            "alert": true,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": null
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_1",
+            "indexType": "message",
+            "indexId": "01AAAAAAAAK0000000000006"
+          }
+        },
+        {
+          "data": {
+            "id": "01AAAAAAAAK0000000000006",
+            "event_definition_type": "sigma-v1",
+            "event_definition_id": "def-sig-001",
+            "origin_context": null,
+            "timestamp": "2025-01-15 19:30:00.000",
+            "timestamp_processing": "2025-01-15 19:30:05.000",
+            "timerange_start": "2025-01-15 18:30:00.000",
+            "timerange_end": "2025-01-15 19:30:00.000",
+            "streams": ["000000000000000000000002"],
+            "source_streams": ["000000000000000000000001"],
+            "message": "Test event with key host-c 6",
+            "source": "test-host",
+            "key_tuple": ["host-c"],
+            "key": "host-c",
+            "priority": 1,
+            "scores": {"raw_risk": 1.0, "normalized_risk": 1.0},
+            "associated_assets": [],
+            "alert": false,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": null
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_1",
+            "indexType": "message",
+            "indexId": "01AAAAAAAAK0000000000007"
+          }
+        },
+        {
+          "data": {
+            "id": "01AAAAAAAAK0000000000007",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "def-agg-001",
+            "origin_context": null,
+            "timestamp": "2025-01-15 20:00:00.000",
+            "timestamp_processing": "2025-01-15 20:00:05.000",
+            "timerange_start": "2025-01-15 19:00:00.000",
+            "timerange_end": "2025-01-15 20:00:00.000",
+            "streams": ["000000000000000000000002"],
+            "source_streams": ["000000000000000000000001"],
+            "message": "Test event with key host-c 7",
+            "source": "test-host",
+            "key_tuple": ["host-c"],
+            "key": "host-c",
+            "priority": 4,
+            "scores": {"raw_risk": 4.0, "normalized_risk": 4.0},
+            "associated_assets": [],
+            "alert": true,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": null
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_1",
+            "indexType": "message",
+            "indexId": "01AAAAAAAAK0000000000008"
+          }
+        },
+        {
+          "data": {
+            "id": "01AAAAAAAAK0000000000008",
+            "event_definition_type": "sigma-v1",
+            "event_definition_id": "def-sig-002",
+            "origin_context": null,
+            "timestamp": "2025-01-15 20:30:00.000",
+            "timestamp_processing": "2025-01-15 20:30:05.000",
+            "timerange_start": "2025-01-15 19:30:00.000",
+            "timerange_end": "2025-01-15 20:30:00.000",
+            "streams": ["000000000000000000000002"],
+            "source_streams": ["000000000000000000000001"],
+            "message": "Test event with key host-d 8",
+            "source": "test-host",
+            "key_tuple": ["host-d"],
+            "key": "host-d",
+            "priority": 2,
+            "scores": {"raw_risk": 2.0, "normalized_risk": 2.0},
+            "associated_assets": [],
+            "alert": false,
+            "fields": {},
+            "group_by_fields": {},
+            "replay_info": null
+          }
+        }
+      ]
+    }
+  ]
+}
