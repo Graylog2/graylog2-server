@@ -1,211 +1,212 @@
 # Contributing
 
-Please follow [the instructions on graylog.org](https://www.graylog.org/get-involved/).
+Thank you for contributing to the Graylog web interface. This guide covers conventions and standards for both human contributors and AI coding agents.
+
+For general contribution instructions, visit [graylog.org/get-involved](https://www.graylog.org/get-involved/).
+
+> **AI agents**: Also read [AGENT.md](./AGENT.md) for agent-specific instructions, commands, and project structure details.
 
 ## Code of Conduct
-In the interest of fostering an open and welcoming environment, we as
-contributors and maintainers pledge to making participation in our project and
-our community a harassment-free experience for everyone, regardless of age, body
-size, disability, ethnicity, gender identity and expression, level of experience,
-nationality, personal appearance, race, religion, or sexual identity and
-orientation.
+
+In the interest of fostering an open and welcoming environment, we as contributors and maintainers pledge to making participation in our project and our community a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience, nationality, personal appearance, race, religion, or sexual identity and orientation.
 
 Please read and understand the [Code of Conduct](https://github.com/Graylog2/graylog2-server/blob/master/CODE_OF_CONDUCT.md).
 
-## Conventions
+## Code Style
 
-### Consistent Code Style
-- We use ESLint to detect some issues in our code. We mostly follow the [Airbnb Javascript style guide](https://github.com/airbnb/javascript) to write frontend code, with a few exceptions.
-- We maintain those custom rules in a package, which is part of [our graylog2-server repository](https://raw.githubusercontent.com/Graylog2/graylog2-server/master/graylog2-web-interface/packages/eslint-config-graylog/index.js).
-- Ensure you are seeing linter hints in you IDE and consider enabling the setting "fix linter hints on save" ([IntelliJ Docs](https://www.jetbrains.com/help/idea/eslint.html#ws_eslint_configure_run_eslint_on_save)).
-- There is a CI job, which checks if there are linter hints in changes files.
-- If you want to see all linter hints for changed files locally, you can run `yarn lint:changes`. You will need to commit your changes first.
-- If you want to see linter hints for a specific file, you can run `yarn lint:path /path/to/file`.
+- We use ESLint to detect issues in our code, mostly following the [Airbnb Javascript style guide](https://github.com/airbnb/javascript) with some exceptions.
+- Custom rules are maintained in [`eslint-config-graylog`](https://raw.githubusercontent.com/Graylog2/graylog2-server/master/graylog2-web-interface/packages/eslint-config-graylog/index.js).
+- Enable linter hints in your IDE and consider enabling "fix on save" ([IntelliJ docs](https://www.jetbrains.com/help/idea/eslint.html#ws_eslint_configure_run_eslint_on_save)).
+- A CI job checks for linter hints in changed files.
+- `yarn lint:changes` — lint all changed files (requires committed changes).
+- `yarn lint:path <file>` — lint a specific file.
 
-### Naming
-#### Function Naming
-- Generally use a verb as a function name.
+## Naming
 
-#### Class Naming
-- Generally use a noun as a class name
+- **Functions**: use a verb as the name.
+- **Classes**: use a noun as the name.
 
-### Class vs functional components
-Small components should be functional components. When a component is more complex, you can decide which type of component
-you want to use (class or a functional component with react hooks). When you don’t have a preference, use a functional component.
+## Components
 
-### Type definitions
-- We use TypeScript for new React components, using static types for props.
-- Due to support for `PropTypes` being dropped with React 19, we do not use them anymore.
-- Also, in functional components, `defaultProps` should now be avoided in favor of [default parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Default_parameters). See [here](https://react.dev/blog/2024/04/25/react-19-upgrade-guide) for details.
-- When touching existing components, they should be migrated to functional, typed components. Exceptions for this are bugfixes, where the effort for migrating components exceeds the actual fix or could have unforeseen consequences.
-- Names of unused parameters
-  - Sometimes you need to define a parameter which is not being used, for example when you just want to use the second parameter. To satisfy TypeScript the parameter name needs to be prefixed with underscore.
-  - Instead of defining just `_`, use a more meaningful name, like `_theParameterName`. (Related to [this discussion](https://github.com/Graylog2/graylog2-server/pull/12176#pullrequestreview-940555887)).
-- `types.d.ts` can have hidden errors, like missing imports. Rename it temporary to `types.ts` to detect the most obvious ones.
+### Class vs Functional
 
-### Imports
-#### ES6 modules_
-- Prefer ES6 modules (import and export) over a non-standard module system and CommonJS’s require.
+Small components should be functional. For complex components, either class or functional with hooks is acceptable — when in doubt, prefer functional.
 
-#### Modules
+### Size and Simplicity
+
+- Keep components under 300 lines.
+- Components should not contain business logic. Extract transformation/computation logic into helper functions that can be reused and tested independently.
+
+### Reusing Components
+
+- We wrap react-bootstrap components in our own wrappers, importable from `components/graylog`. Always use these wrappers instead of importing react-bootstrap directly.
+- Check the [frontend documentation](https://graylog2.github.io/frontend-documentation) for available common components before creating new ones.
+
+## Type Definitions
+
+- Use **TypeScript** for all new React components with static types for props.
+- **No PropTypes** — support was dropped with React 19.
+- Use **default parameters** instead of `defaultProps` in functional components. See the [React 19 upgrade guide](https://react.dev/blog/2024/04/25/react-19-upgrade-guide).
+- When touching existing components, migrate them to functional, typed components. Exception: trivial bugfixes where migration effort exceeds the fix or risks unforeseen consequences.
+- Prefix unused parameters with an underscore and a meaningful name (e.g., `_eventType`), not just `_`. See [this discussion](https://github.com/Graylog2/graylog2-server/pull/12176#pullrequestreview-940555887).
+- `types.d.ts` can hide errors like missing imports. Temporarily rename to `types.ts` to detect them.
+
+## Imports
+
+- Prefer ES6 modules (`import`/`export`) over CommonJS `require`.
 - Modules with one export should use default export.
-- When a module has several exports, you should use the default export only if one of the exports serves the main purpose of the module.
-- Sometimes, specially when working on a folder containing common components, it may be useful to add an `index.ts` file with all exports of that folder, allowing consumers of those exports to combine several imports in the same line.
-- The downside of this is that it might introduce cyclic dependencies (which can be resolved by babel/webpack by proxying, but should be avoided)
+- With multiple exports, use default export only if one serves the module's main purpose.
+- `index.ts` barrel files in component folders can simplify imports but may introduce cyclic dependencies — use with caution.
 
-### React components
-- Keep components small, as in < 300 lines
-- Keep components simple, so they do not contain real logic. You need to transform the structure of an object when a user clicks on a button? Create a helper function for the logic which can be reused. Place the helper function in a place where it can be found easily.
+## State Management
 
-### Testing
-- We use `testing-library` for tests, as it has been proven that it results in more reliable tests. Please follow their [Guiding Principles](https://testing-library.com/docs/guiding-principles) and their guide for [picking a good query](https://testing-library.com/docs/queries/about#priority).
-- When adding new functionality, try to write unit tests for every possible use case. If you are not sure where to start, try to test what is important for the user.
-- A test should not rely on the knowledge of the inner workings of the system under test. Especially when testing React components, we prefer to test it like a user would use it.
-- Test files should be on the same level 
-  - `ComponentA.jsx` 
-  - `ComponentA.test.jsx` 
-- Except you have to create a few fixtures, in this case create a __tests__ directory. 
-  - ComponentA.jsx
-  - `__tests__/ComponentA.test.jsx`
-  - `__tests__/ComponentA.test.case1.json`
-  - `__tests__/ComponentA.text.case1.result.json`
-- Testing-Library's tests should import the `render` function from `wrappedTestingLibrary`.
-- Do not use snapshot tests to test the state of a component.
-  - Imagine the following case: User clicks on a button and we display an alert. You can test this behavior with a snapshot, but it has many disadvantages. You can also just use the react-testing-library method `getByText()` to check if the alert is being displayed
-  - When you create a snapshot you will need to update the snapshot often, for example when the button style changes.
-  - Good use case for snapshot tests: check if a complex result of a function call is correct.
-- Test timeouts
-  - We have some flaky tests which fail, when jest has less resources to run the tests and the execution of a test just takes more time. In this case you will see failing tests with the error message “Exceeded timeout of 5000 ms for a test”.
-  - You can avoid this by increasing the timeout for jest tests. `yarn test --maxWorkers=150%`.
-  - You can reduce also the timeout: `yarn test --maxWorkers=25%`. This can be helpful if you want to get an idea how the result looks on computers with less power.
-- Chrome extension “Testing Playground”
-  - Helps you find the best queries to select elements
+**New code** should use (in order of simplicity):
+1. `useState` — for local component state
+2. `useContext` — for state shared across a component hierarchy
+3. Redux — for complex state
 
-### Injecting stores
-*Using Reflux is generally discouraged and we are slowly refactoring away all of its usages.*
+**Existing Reflux stores** (discouraged for new code):
+- Prefer replacing with `react-query` (API caching) or `useState`/`useContext` (state).
+- If migration isn't possible yet, access via `useStore`.
 
-When writing new code, state management should be handled either through a component state (`useState`), a context (if shared across multiple components in a complex hierarchy) or redux (if the state itself is complex). Generally, the simplest way should be picked for managing the state.
+## Testing
 
-For dealing with existing Reflux stores:
+- **Framework**: Jest + [Testing Library](https://testing-library.com/).
+- Follow Testing Library's [Guiding Principles](https://testing-library.com/docs/guiding-principles) and their guide for [picking a good query](https://testing-library.com/docs/queries/about#priority).
+- Import `render` from `wrappedTestingLibrary`, not directly from `@testing-library/react`.
+- Write unit tests for every use case of new functionality.
+- Test from the user's perspective — do not rely on internal implementation details.
+- **No snapshot tests** for component state. Use Testing Library queries (`getByText`, etc.) instead. Snapshot tests are acceptable for verifying complex function return values.
 
- - Ideally, the Reflux store should be replaced with:
-   - `react-query` if it is used to cache API access
-   - `useState`/`useContext` if it is managing state
- - If this is not possible (yet), the state should be accessed using `useStore`
- 
-### Important to know
+### Test File Placement
 
-#### Session timeouts
-To ensure a user session does not time out when a user interacts with the frontend, the session will be extended
-with every API request which implements `fetch` from the `FetchProvider`.
-It is important that periodical request do not extend the user session. For periodically request we use `fetchPeriodically` instead.
-
-
-### Good to know / gotchas
-
-#### Default Values
-- Using if and an assignment or the logical or assignment, you may end up assigning a default value when you didn't want to do it, e.g.
-```js
-const a = undefined || 'default';
-const b = null || 'default';
-const c = false || 'default';
-const d = 0 || 'default';
-const e = '' || 'default';
-// They will all contain the 'default' value.
+Test files go next to their source files:
 ```
-- Using default values on functions and destructuring only assigns default values when initial value was `undefined`, e.g.
-```js
-const testDefaultValues = ({ value1 = 12, value2 = 34 }) => {
-  console.log(value1, value2);
-}
-testDefaultValues({ value1: undefined, value2: null })
-// Output: 12, null
-```
-- With the introduction of support for nullish coalescing, we should use ?? for default values:
-```js
-// These will contain 'default
-const a = undefined ?? 'default'
-const b = null ?? 'default'
-// These will contain the original value
-const c = false ?? 'default'
-const d = 0 ?? 'default'
-const e = '' ?? 'default'
+ComponentA.tsx
+ComponentA.test.tsx
 ```
 
-#### Avoid `Array.reduce` for object construction
-Using `Array.reduce` to construct an object from an array is a common pattern. When working with many items (like hundreds or thousands) it can become really slow. 
-Using `Object.fromEntries` is a better alternative in most cases. Have a look at [this PR](https://github.com/Graylog2/graylog2-server/pull/12162) for more information.
+If fixtures are needed, use a `__tests__/` directory:
+```
+ComponentA.tsx
+__tests__/ComponentA.test.tsx
+__tests__/ComponentA.test.case1.json
+```
 
-### Reusing components
-- We use react-bootstrap for many UI common components. To help us deal with breaking changes in their APIs, and to style the components as we want, we use our own wrappers around react bootstrap components. You can import these components from components/graylog.
-- Please ensure to check the [frontend documentation](https://graylog2.github.io/frontend-documentation) to see which common components we use. Whenever possible try using a common component, since that help us have a more consistent UI and make components used in different parts of the product behave the same way.
+### Test Timeouts
 
-### Internal packages
-We currently have a few internal packages, used for the core application and all plug-ins:
-- `graylog-web-plugin` contains common packages for both the core and plug-ins, webpack configuration for building plug-ins, as well as some interfaces to register and consume plugins.
-- `eslint-config-graylog` contains our custom linter configuration, based on eslint-config-airbnb.
-- `stylelint-config-graylog` contains our custom stylelint configuration, based on the default stylelint config.
+Some tests are flaky under resource constraints ("Exceeded timeout of 5000 ms"). Adjust workers:
+- `yarn test --maxWorkers=150%` — increase timeout margin.
+- `yarn test --maxWorkers=25%` — simulate low-power environments.
 
-### Browser compatibility
-We currently do not have a pre-release process to test different or old browser. Nevertheless you should test layout changes in at least all modern browsers (Chrome, Firefox, Safari). Bigger layout changes should also be tested in older browsers. Have a look at our [public browser compatibility list](https://docs.graylog.org/docs/web-interface#browser-compatibility).
+### Useful Tool
 
-### Plugin System
-- Graylog's plugin system allows users to extend the graylog core product without changing its source code. There are multiple points in the application which can be extended, like the navigation.
-- In the frontend you can register anything to the plugin store with `PluginStore.register(new PluginManifest({}, { thePluginStoreKey: [thePluginData] }));` in a plugin and use it with `usePluginEntities('thePluginStoreKey');`.
-- Currently, there is no documentation about the available plugin store keys, you need to look up the usage in the code. 
-- If you want to test the UI without plugins you can run `disable_plugins=true yarn start`.
-- If you want to create a new plugin please have a look at [this example](https://github.com/Graylog2/graylog-plugin-sample) for more information. 
+The Chrome extension "Testing Playground" helps find the best queries to select elements.
 
-### Refactoring existing code
-- When you are working on a feature, you will sometimes need to do some small changes on related files.
-- Fix visible eslint warning in these files (such as deconstructing the props)
-  - There is a CI job (ci-web-linter) that turns green when all linter hints are fixed
-  - If fixing the linter hints is too much for the scope of the PR (e.g. a bugfix PR for a patch release), fixing them can be omitted and the PR merged even if that job is red. This should be an exemption though.
-- Separate the refactoring/fixing of linter hints in (a) separate commit(s)
-- When the refactoring gets too big, create a separate PR.
-- When making changes closer to a release or working on changes that will be backported, please consider the risk of doing the refactoring of fixing linter errors now. If it feels too risky or there are too many changes, it may be a sign that the refactoring should wait.
+## JavaScript Gotchas
 
-### Working on a feature
-- Especially for more complex changes it is helpful to test different scenarios
-  - Test with different roles. For example not only with an admin user, but also with a user who has only the reader role and as little permissions as possible.
-  - Test with different resolutions.
-  - Test with different browsers (especially Safari).
-  - Most important, test with homogeneous data and with a high volume of data.
-- Execute checks locally before creating a PR
-  - Running all checks in CI can take an hour, make sure you execute the most important ones locally first.
-  - Run `yarn tsc && yarn lint:changes && yarn test` in at least the core and enterprise project.
+### Default Values
 
-### Common problems
-- yarn cache
-  - the yarn cache can get very big, like 200GB. Make sure to run `yarn cache clean` from time to time.
+Use nullish coalescing (`??`) instead of logical OR (`||`) for defaults:
 
-### UI Styling
+```js
+// ?? only replaces undefined/null
+const a = undefined ?? 'default'; // 'default'
+const b = false ?? 'default';     // false
+const c = 0 ?? 'default';         // 0
+const d = '' ?? 'default';        // ''
 
-#### Forms
-- Latest research suggest forms with aligned labels and inputs are the easiest to use and navigate for users, so avoid using horizontal forms unless there is a good reason for it.
-- Add helper text to help users fill the input.
-- Only show validation state when something changed or the form was submitted.
-- Prefer our own Select component over the default one.
-- Avoid adding long forms into a modal.
-- Mark optional fields as optional by adding “(Optional)” to the label text.
-- We are working on using standard components and libraries to make our forms more consistent.
+// || replaces all falsy values (usually not what you want)
+const e = false || 'default';     // 'default'
+const f = 0 || 'default';         // 'default'
+```
 
-#### Responsive styles
-- Using Graylog in large and medium size screens should be possible for all features in our product.
-- Using Graylog in a mobile device may suppose some challenges, specially when graphs are an important part of the page.
+Default parameters and destructuring only assign defaults when the value is `undefined`, not `null`:
+```js
+const test = ({ value1 = 12, value2 = 34 }) => console.log(value1, value2);
+test({ value1: undefined, value2: null }); // 12, null
+```
 
-#### Button sizes and colours
-- Use grey (`default`) or blue (`info`) buttons to display neutral actions.
-- Use red (`danger`) buttons to display actions that will destroy information.
-- Use yellow (`warning`) buttons to display actions that may be dangerous.
-- Use green (`success`) buttons to display actions that will create information.
-- Avoid using `link` buttons, since that is considered misleading. Buttons and anchors have different purposes and usability, so we should try to use anchors only to navigate.
+### Avoid `Array.reduce` for Object Construction
 
-#### Page loading indicator
-- Use a `Spinner` whenever a page is loading data from the backend.
-- We are working on different levels of loading indicators.
+`Array.reduce` is slow for building objects from large arrays. Use `Object.fromEntries` instead. See [this PR](https://github.com/Graylog2/graylog2-server/pull/12162) for details.
+
+## Session Timeouts
+
+To prevent session expiry during user interaction, every API request using `fetch` from `FetchProvider` extends the session. Periodic requests must use `fetchPeriodically` instead to avoid extending the session when the user is idle.
+
+## Plugin System
+
+- Register: `PluginStore.register(new PluginManifest({}, { key: [data] }));`
+- Consume: `usePluginEntities('key')`
+- No central docs for plugin store keys — search the codebase.
+- Test without plugins: `disable_plugins=true yarn start`
+- Example plugin: [graylog-plugin-sample](https://github.com/Graylog2/graylog-plugin-sample)
+
+## Internal Packages
+
+- `graylog-web-plugin` — shared packages for core and plugins, webpack config for plugin builds, plugin registration interfaces.
+- `eslint-config-graylog` — custom ESLint config based on eslint-config-airbnb.
+- `stylelint-config-graylog` — custom Stylelint config.
+
+## Refactoring
+
+- Fix visible ESLint warnings in files you touch.
+- Separate refactoring into dedicated commits.
+- If refactoring grows large, create a separate PR.
+- Near releases or for backported changes, weigh the risk of refactoring — defer if it adds too many changes.
+
+## Working on a Feature
+
+Test thoroughly before submitting a PR:
+- Different user roles (admin, reader, minimal permissions).
+- Different screen resolutions.
+- Different browsers (especially Safari).
+- Heterogeneous data and high data volumes.
+
+Run checks locally before creating a PR:
+```sh
+yarn tsc && yarn lint:changes && yarn test
+```
+
+## Browser Compatibility
+
+Test layout changes in Chrome, Firefox, and Safari. Larger layout changes should also be tested in older browsers. See the [browser compatibility list](https://docs.graylog.org/docs/web-interface#browser-compatibility).
+
+## UI Styling
+
+### Forms
+- Use vertically aligned labels and inputs (no horizontal forms without good reason).
+- Add helper text to inputs.
+- Show validation state only after changes or form submission.
+- Prefer our own `Select` component over the native one.
+- Avoid long forms in modals.
+- Mark optional fields with "(Optional)" in the label.
+
+### Responsive Styles
+- Large and medium screens: all features must work.
+- Mobile: graphs and complex layouts may have limitations.
+
+### Button Colors
+| Color | Variant | Use for |
+|-------|---------|---------|
+| Grey | `default` | Neutral actions |
+| Blue | `info` | Neutral actions |
+| Red | `danger` | Destructive actions |
+| Yellow | `warning` | Potentially dangerous actions |
+| Green | `success` | Creative actions (creating data) |
+
+Avoid `link` style buttons — use actual anchors for navigation.
+
+### Page Loading
+- Use `Spinner` when loading data from the backend.
 
 ### Modals
-- Users should be able to close a modal with the keyboard, i.e. typing ESC.
-- Modal forms should not close when clicking outside of the modal, since it is easy to lose some data.
-- Modal forms should focus on the first input (you can use autofocus for that).
+- ESC key must close modals.
+- Form modals should not close on outside click (to prevent data loss).
+- Form modals should autofocus the first input.
+
+## Common Problems
+
+### Yarn Cache
+The yarn cache can grow very large (200GB+). Run `yarn cache clean` periodically.
