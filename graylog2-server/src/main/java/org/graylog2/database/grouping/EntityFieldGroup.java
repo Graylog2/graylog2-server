@@ -1,4 +1,8 @@
 package org.graylog2.database.grouping;
 
-public record EntityFieldGroup(String fieldValue, String fieldTitle, long count) {
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record EntityFieldGroup(@JsonProperty("id") String fieldValue,
+                               @JsonProperty("value") String fieldTitle,
+                               @JsonProperty("count") long count) {
 }
