@@ -20,6 +20,7 @@ import isDeepEqual from 'stores/isDeepEqual';
 import type { ViewHook, ViewHookArguments } from 'views/logic/hooks/ViewHook';
 import View from 'views/logic/views/View';
 import normalizeSearchURLQueryParams from 'views/logic/NormalizeSearchURLQueryParams';
+import createSearch from 'views/logic/slices/createSearch';
 
 const bindSearchParamsFromQuery: ViewHook = async ({ query, view, executionState }: ViewHookArguments) => {
   if (view.type !== View.Type.Search) {
@@ -67,7 +68,7 @@ const bindSearchParamsFromQuery: ViewHook = async ({ query, view, executionState
     return [view, executionState];
   }
 
-  const newSearch = view.search.toBuilder().queries([newQuery]).build();
+  const newSearch = await createSearch(view.search.toBuilder().newId().queries([newQuery]).build());
   const newView = view.toBuilder().search(newSearch).build();
 
   return [newView, executionState];

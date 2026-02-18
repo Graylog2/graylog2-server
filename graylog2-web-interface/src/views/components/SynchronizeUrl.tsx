@@ -25,7 +25,7 @@ import { selectView } from 'views/logic/slices/viewSelectors';
 import { selectSearchExecutionState } from 'views/logic/slices/searchExecutionSelectors';
 import useLocation from 'routing/useLocation';
 import useQuery from 'routing/useQuery';
-import { updateView } from 'views/logic/slices/viewSlice';
+import { updateView, executeActiveQuery } from 'views/logic/slices/viewSlice';
 
 const bindSearchParamsFromQueryThunk =
   (query: { [key: string]: unknown }) => async (dispatch: ViewsDispatch, getState: () => RootState) => {
@@ -41,7 +41,9 @@ const bindSearchParamsFromQueryThunk =
     const [newView] = result;
 
     if (newView !== view) {
-      return dispatch(updateView(newView, true));
+      await dispatch(updateView(newView, false));
+
+      return dispatch(executeActiveQuery());
     }
   };
 
