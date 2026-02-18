@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { Event } from 'components/events/events/types';
+import type React from 'react';
 
 export type RemainingBulkActionsProps = {
-  events: Event[];
   completed: boolean;
+  actions: React.ReactNode[];
 };

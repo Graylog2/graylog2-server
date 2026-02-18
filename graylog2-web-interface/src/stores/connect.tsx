@@ -129,7 +129,6 @@ function connect<C extends React.ComponentType<React.ComponentProps<C>>, Stores,
   };
 
   class ConnectStoresWrapper extends React.Component<ConnectedProps<C, MappedProps>, ResultType<Stores>> {
-
     constructor(props) {
       super(props);
 

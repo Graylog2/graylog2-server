@@ -22,11 +22,9 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.engine.IndexerGeneratedQueryContext;
 import org.graylog.plugins.views.search.errors.SearchError;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
-import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.joda.time.DateTimeZone;
+import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
+import org.opensearch.client.opensearch._types.query_dsl.QueryBuilders;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -35,14 +33,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public class OSGeneratedQueryContext extends IndexerGeneratedQueryContext<SearchSourceBuilder> {
+public class OSGeneratedQueryContext extends IndexerGeneratedQueryContext<MutableSearchRequestBuilder> {
     private final OpenSearchBackend openSearchBackend;
-    private final MultiBucketsAggregation.Bucket rowBucket;
+    private final MultiBucketBase rowBucket;
 
     @AssistedInject
     public OSGeneratedQueryContext(
             @Assisted OpenSearchBackend elasticsearchBackend,
-            @Assisted SearchSourceBuilder ssb,
+            @Assisted MutableSearchRequestBuilder ssb,
             @Assisted Collection<SearchError> validationErrors,
             @Assisted DateTimeZone timezone,
             FieldTypesLookup fieldTypes) {
@@ -52,11 +50,11 @@ public class OSGeneratedQueryContext extends IndexerGeneratedQueryContext<Search
     }
 
     private OSGeneratedQueryContext(OpenSearchBackend openSearchBackend,
-                                    SearchSourceBuilder ssb,
+                                    MutableSearchRequestBuilder ssb,
                                     Set<SearchError> errors,
                                     FieldTypesLookup fieldTypes,
-                                    MultiBucketsAggregation.Bucket rowBucket,
-                                    Map<String, SearchSourceBuilder> searchTypeQueries,
+                                    MultiBucketBase rowBucket,
+                                    Map<String, MutableSearchRequestBuilder> searchTypeQueries,
                                     Map<Object, Object> contextMap,
                                     DateTimeZone timezone) {
         super(contextMap, new HashSet<>(errors), fieldTypes, timezone, ssb, searchTypeQueries);
@@ -67,25 +65,30 @@ public class OSGeneratedQueryContext extends IndexerGeneratedQueryContext<Search
     public interface Factory {
         OSGeneratedQueryContext create(
                 OpenSearchBackend elasticsearchBackend,
-                SearchSourceBuilder ssb,
+                MutableSearchRequestBuilder ssb,
                 Collection<SearchError> validationErrors,
                 DateTimeZone timezone
         );
     }
 
-    public SearchSourceBuilder searchSourceBuilder(SearchType searchType) {
-        return this.searchTypeQueries.computeIfAbsent(searchType.id(), (ignored) -> ssb.shallowCopy()
-                .slice(ssb.slice())
-                .query(openSearchBackend.generateFilterClause(searchType.filter())
-                        .map(filterClause -> (QueryBuilder) new BoolQueryBuilder().must(ssb.query()).must(filterClause))
-                        .orElse(ssb.query())));
+    public MutableSearchRequestBuilder searchSourceBuilder(SearchType searchType) {
+        return this.searchTypeQueries.computeIfAbsent(searchType.id(), ignored ->
+                ssb.copy().query(
+                        openSearchBackend.generateFilterQuery(searchType.filter())
+                                .map(filterClause ->
+                                        QueryBuilders.bool()
+                                                .must(ssb.query())
+                                                .must(filterClause)
+                                                .build().toQuery())
+                                .orElse(ssb.query())
+                ));
     }
 
-    public OSGeneratedQueryContext withRowBucket(MultiBucketsAggregation.Bucket rowBucket) {
+    public OSGeneratedQueryContext withRowBucket(MultiBucketBase rowBucket) {
         return new OSGeneratedQueryContext(openSearchBackend, ssb, errors, fieldTypes, rowBucket, searchTypeQueries, contextMap, timezone);
     }
 
-    public Optional<MultiBucketsAggregation.Bucket> rowBucket() {
+    public Optional<MultiBucketBase> rowBucket() {
         return Optional.ofNullable(this.rowBucket);
     }
 
