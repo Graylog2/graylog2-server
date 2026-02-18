@@ -28,7 +28,6 @@ import RuntimeErrorBoundary from 'components/errors/RuntimeErrorBoundary';
 import NavigationTelemetry from 'logic/telemetry/NavigationTelemetry';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 import HotkeysModalContainer from 'components/hotkeys/HotkeysModalContainer';
-import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
 import PageContextProviders from 'components/page/contexts/PageContextProviders';
 import { singleton } from 'logic/singleton';
 import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
@@ -69,38 +68,36 @@ const App = () => (
         }
 
         return (
-          <PerspectivesProvider>
-            <RightSidebarProvider>
-              <HotkeysProvider>
-                <ScratchpadProvider loginName={currentUser.username}>
-                  <NavigationTelemetry />
-                  <>
-                    <AppLayout>
-                      <Navigation />
-                      <ContentRow>
-                        <MainContentColumn>
-                          <Scratchpad />
-                          <ReportedErrorBoundary>
-                            <RuntimeErrorBoundary>
-                              <PageContextProviders>
-                                <PageContent>
-                                  <Outlet />
-                                </PageContent>
-                              </PageContextProviders>
-                            </RuntimeErrorBoundary>
-                          </ReportedErrorBoundary>
-                        </MainContentColumn>
-                        <RightSidebarContext.Consumer>
-                          {({ isOpen }) => isOpen && <RightSidebar />}
-                        </RightSidebarContext.Consumer>
-                      </ContentRow>
-                    </AppLayout>
-                    <HotkeysModalContainer />
-                  </>
-                </ScratchpadProvider>
-              </HotkeysProvider>
-            </RightSidebarProvider>
-          </PerspectivesProvider>
+          <RightSidebarProvider>
+            <HotkeysProvider>
+              <ScratchpadProvider loginName={currentUser.username}>
+                <NavigationTelemetry />
+                <>
+                  <AppLayout>
+                    <Navigation />
+                    <ContentRow>
+                      <MainContentColumn>
+                        <Scratchpad />
+                        <ReportedErrorBoundary>
+                          <RuntimeErrorBoundary>
+                            <PageContextProviders>
+                              <PageContent>
+                                <Outlet />
+                              </PageContent>
+                            </PageContextProviders>
+                          </RuntimeErrorBoundary>
+                        </ReportedErrorBoundary>
+                      </MainContentColumn>
+                      <RightSidebarContext.Consumer>
+                        {({ isOpen }) => isOpen && <RightSidebar />}
+                      </RightSidebarContext.Consumer>
+                    </ContentRow>
+                  </AppLayout>
+                  <HotkeysModalContainer />
+                </>
+              </ScratchpadProvider>
+            </HotkeysProvider>
+          </RightSidebarProvider>
         );
       }}
     </CurrentUserContext.Consumer>
