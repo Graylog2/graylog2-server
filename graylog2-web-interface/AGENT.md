@@ -16,20 +16,20 @@ This file contains instructions for AI coding agents working on the Graylog web 
 
 ## Common Commands
 
-| Task | Command |
-|------|---------|
-| Install dependencies | `yarn install` |
-| Start dev server | `yarn start` |
-| Start without plugins | `disable_plugins=true yarn start` |
-| Build (no plugins) | `yarn build` |
-| Run all tests | `yarn test` |
-| Run a specific test | `yarn test --testPathPattern=<pattern>` |
-| Type check | `yarn tsc` |
-| Lint changed files | `yarn lint:changes` (requires committed changes) |
-| Lint a specific file | `yarn lint:path <file>` |
-| Lint styles | `yarn lint:styles` |
-| Lint styles for a file | `yarn lint:styles:path <file>` |
-| Format code | `yarn format` |
+| Task                   | Command                                          |
+| ---------------------- | ------------------------------------------------ |
+| Install dependencies   | `yarn install`                                   |
+| Start dev server       | `yarn start`                                     |
+| Start without plugins  | `disable_plugins=true yarn start`                |
+| Build (no plugins)     | `yarn build`                                     |
+| Run all tests          | `yarn test`                                      |
+| Run a specific test    | `yarn test --testPathPattern=<pattern>`          |
+| Type check             | `yarn tsc`                                       |
+| Lint changed files     | `yarn lint:changes` (requires committed changes) |
+| Lint a specific file   | `yarn lint:path <file>`                          |
+| Lint styles            | `yarn lint:styles`                               |
+| Lint styles for a file | `yarn lint:styles:path <file>`                   |
+| Format code            | `yarn format`                                    |
 
 ## Pre-PR Verification
 

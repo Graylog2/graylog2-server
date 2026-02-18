@@ -61,11 +61,13 @@ Small components should be functional. For complex components, either class or f
 ## State Management
 
 **New code** should use (in order of simplicity):
+
 1. `useState` — for local component state
 2. `useContext` — for state shared across a component hierarchy
 3. Redux — for complex state
 
 **Existing Reflux stores** (discouraged for new code):
+
 - Prefer replacing with `react-query` (API caching) or `useState`/`useContext` (state).
 - If migration isn't possible yet, access via `useStore`.
 
@@ -81,12 +83,14 @@ Small components should be functional. For complex components, either class or f
 ### Test File Placement
 
 Test files go next to their source files:
+
 ```
 ComponentA.tsx
 ComponentA.test.tsx
 ```
 
 If fixtures are needed, use a `__tests__/` directory:
+
 ```
 ComponentA.tsx
 __tests__/ComponentA.test.tsx
@@ -96,6 +100,7 @@ __tests__/ComponentA.test.case1.json
 ### Test Timeouts
 
 Some tests are flaky under resource constraints ("Exceeded timeout of 5000 ms"). Adjust workers:
+
 - `yarn test --maxWorkers=150%` — increase timeout margin.
 - `yarn test --maxWorkers=25%` — simulate low-power environments.
 
@@ -112,16 +117,17 @@ Use nullish coalescing (`??`) instead of logical OR (`||`) for defaults:
 ```js
 // ?? only replaces undefined/null
 const a = undefined ?? 'default'; // 'default'
-const b = false ?? 'default';     // false
-const c = 0 ?? 'default';         // 0
-const d = '' ?? 'default';        // ''
+const b = false ?? 'default'; // false
+const c = 0 ?? 'default'; // 0
+const d = '' ?? 'default'; // ''
 
 // || replaces all falsy values (usually not what you want)
-const e = false || 'default';     // 'default'
-const f = 0 || 'default';         // 'default'
+const e = false || 'default'; // 'default'
+const f = 0 || 'default'; // 'default'
 ```
 
 Default parameters and destructuring only assign defaults when the value is `undefined`, not `null`:
+
 ```js
 const test = ({ value1 = 12, value2 = 34 }) => console.log(value1, value2);
 test({ value1: undefined, value2: null }); // 12, null
@@ -159,12 +165,14 @@ To prevent session expiry during user interaction, every API request using `fetc
 ## Working on a Feature
 
 Test thoroughly before submitting a PR:
+
 - Different user roles (admin, reader, minimal permissions).
 - Different screen resolutions.
 - Different browsers (especially Safari).
 - Heterogeneous data and high data volumes.
 
 Run checks locally before creating a PR:
+
 ```sh
 yarn tsc && yarn lint:changes && yarn test
 ```
@@ -176,6 +184,7 @@ Test layout changes in Chrome, Firefox, and Safari. Larger layout changes should
 ## UI Styling
 
 ### Forms
+
 - Use vertically aligned labels and inputs (no horizontal forms without good reason).
 - Add helper text to inputs.
 - Show validation state only after changes or form submission.
@@ -184,24 +193,28 @@ Test layout changes in Chrome, Firefox, and Safari. Larger layout changes should
 - Mark optional fields with "(Optional)" in the label.
 
 ### Responsive Styles
+
 - Large and medium screens: all features must work.
 - Mobile: graphs and complex layouts may have limitations.
 
 ### Button Colors
-| Color | Variant | Use for |
-|-------|---------|---------|
-| Grey | `default` | Neutral actions |
-| Blue | `info` | Neutral actions |
-| Red | `danger` | Destructive actions |
-| Yellow | `warning` | Potentially dangerous actions |
-| Green | `success` | Creative actions (creating data) |
+
+| Color  | Variant   | Use for                          |
+| ------ | --------- | -------------------------------- |
+| Grey   | `default` | Neutral actions                  |
+| Blue   | `info`    | Neutral actions                  |
+| Red    | `danger`  | Destructive actions              |
+| Yellow | `warning` | Potentially dangerous actions    |
+| Green  | `success` | Creative actions (creating data) |
 
 Avoid `link` style buttons — use actual anchors for navigation.
 
 ### Page Loading
+
 - Use `Spinner` when loading data from the backend.
 
 ### Modals
+
 - ESC key must close modals.
 - Form modals should not close on outside click (to prevent data loss).
 - Form modals should autofocus the first input.
@@ -209,4 +222,5 @@ Avoid `link` style buttons — use actual anchors for navigation.
 ## Common Problems
 
 ### Yarn Cache
+
 The yarn cache can grow very large (200GB+). Run `yarn cache clean` periodically.
