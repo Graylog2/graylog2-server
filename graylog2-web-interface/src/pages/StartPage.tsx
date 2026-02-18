@@ -25,7 +25,7 @@ import useActivePerspective from 'components/perspectives/hooks/useActivePerspec
 
 const StartPage = () => {
   const { currentUser } = useStore(CurrentUserStore);
-  const { activePerspective } = useActivePerspective();
+  const { activePerspective, setActivePerspective } = useActivePerspective();
   const isLoading = !currentUser;
   const history = useHistory();
 
@@ -46,6 +46,7 @@ const StartPage = () => {
       } else if (startPage.type === 'stream') {
         redirect(Routes.stream_search(startPage.id));
       } else if (startPage.type === 'graylog_security_welcome') {
+        setActivePerspective('security');
         redirect(Routes.SECURITY.OVERVIEW);
       } else if (startPage?.id !== 'default') {
         redirect(Routes.show_saved_search(startPage.id));
@@ -57,7 +58,7 @@ const StartPage = () => {
     }
 
     redirect(activePerspective.welcomeRoute);
-  }, [activePerspective, currentUser?.startpage, redirect]);
+  }, [activePerspective, setActivePerspective, currentUser?.startpage, redirect]);
 
   useEffect(() => {
     CurrentUserStore.reload();
