@@ -57,6 +57,8 @@ const StreamRules = ({ stream }: Props) => {
               bsStyle="primary"
               disabled={isDefaultStream || isNotEditable}
               streamId={stream.id}
+              streamTitle={stream.title}
+              streamIsPaused={stream.disabled}
             />
           </IfPermitted>
         }>

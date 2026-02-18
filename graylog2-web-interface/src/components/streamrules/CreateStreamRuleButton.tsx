@@ -16,17 +16,15 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 
 import { Button } from 'components/bootstrap';
 import type { BsSize } from 'components/bootstrap/types';
 import type { StyleProps } from 'components/bootstrap/Button';
-import type { StreamRule } from 'stores/streams/StreamsStore';
-import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
-import UserNotification from 'util/UserNotification';
 import { IfPermitted } from 'components/common';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useCreateStreamRule from 'components/streamrules/hooks/useCreateStreamRule';
+import StartStreamAfterRuleCreateDialog from 'components/streamrules/StartStreamAfterRuleCreateDialog';
 
 import StreamRuleModal from './StreamRuleModal';
 
@@ -36,7 +34,9 @@ type Props = {
   buttonText?: string;
   className?: string;
   disabled?: boolean;
-  streamId?: string;
+  streamId: string;
+  streamTitle?: string;
+  streamIsPaused?: boolean;
 };
 
 const CreateStreamRuleButton = ({
@@ -45,25 +45,25 @@ const CreateStreamRuleButton = ({
   buttonText = 'Create Rule',
   className = undefined,
   disabled = false,
-  streamId = undefined,
+  streamId,
+  streamTitle = undefined,
+  streamIsPaused = false,
 }: Props) => {
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const queryClient = useQueryClient();
   const toggleCreateModal = useCallback(() => setShowCreateModal((cur) => !cur), []);
   const sendTelemetry = useSendTelemetry();
+  const {
+    onCreateStreamRule: onSaveStreamRule,
+    showStartStreamDialog,
+    onCancelStartStreamDialog,
+    onStartStream,
+    isStartingStream,
+  } = useCreateStreamRule({
+    streamId,
+    streamIsPaused,
+  });
 
-  const onSaveStreamRule = useCallback(
-    (_streamRuleId: string, streamRule: StreamRule) =>
-      StreamRulesStore.create(streamId, streamRule, () => {
-        UserNotification.success('Stream rule was created successfully.', 'Success');
-        queryClient.invalidateQueries({
-          queryKey: ['stream', streamId],
-        });
-      }),
-    [streamId, queryClient],
-  );
-
-  const onCreateStreamRule = () => {
+  const openCreateStreamRuleModal = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DATA_ROUTING_INTAKE_CREATE_RULE_OPENED, {
       app_pathname: 'streams',
     });
@@ -73,7 +73,12 @@ const CreateStreamRuleButton = ({
 
   return (
     <IfPermitted permissions={`streams:edit:${streamId}`}>
-      <Button bsSize={bsSize} bsStyle={bsStyle} disabled={disabled} className={className} onClick={onCreateStreamRule}>
+      <Button
+        bsSize={bsSize}
+        bsStyle={bsStyle}
+        disabled={disabled}
+        className={className}
+        onClick={openCreateStreamRuleModal}>
         {buttonText}
       </Button>
       {showCreateModal && (
@@ -85,6 +90,13 @@ const CreateStreamRuleButton = ({
           onSubmit={onSaveStreamRule}
         />
       )}
+      <StartStreamAfterRuleCreateDialog
+        show={showStartStreamDialog}
+        streamTitle={streamTitle}
+        onConfirm={onStartStream}
+        onCancel={onCancelStartStreamDialog}
+        isSubmitting={isStartingStream}
+      />
     </IfPermitted>
   );
 };

@@ -17,14 +17,14 @@
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 
-import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
+import type { Stream } from 'stores/streams/StreamsStore';
 import { Button } from 'components/bootstrap';
 import StreamRuleModal from 'components/streamrules/StreamRuleModal';
-import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
-import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 import { LinkContainer } from 'components/common/router';
 import { IfPermitted } from 'components/common';
+import useCreateStreamRule from 'components/streamrules/hooks/useCreateStreamRule';
+import StartStreamAfterRuleCreateDialog from 'components/streamrules/StartStreamAfterRuleCreateDialog';
 
 type Props = {
   stream: Stream;
@@ -40,13 +40,16 @@ const RulesSectionActions = ({ stream }: Props) => {
     setShowAddRuleModal((cur) => !cur);
   }, []);
 
-  const onSaveStreamRule = useCallback(
-    (_streamRuleId: string, streamRule: StreamRule) =>
-      StreamRulesStore.create(stream.id, streamRule, () =>
-        UserNotification.success('Stream rule was created successfully.', 'Success'),
-      ),
-    [stream.id],
-  );
+  const {
+    onCreateStreamRule,
+    showStartStreamDialog,
+    onCancelStartStreamDialog,
+    onStartStream,
+    isStartingStream,
+  } = useCreateStreamRule({
+    streamId: stream.id,
+    streamIsPaused: stream.disabled,
+  });
 
   return (
     <>
@@ -68,9 +71,16 @@ const RulesSectionActions = ({ stream }: Props) => {
           title="New Stream Rule"
           submitButtonText="Create Rule"
           submitLoadingText="Creating Rule..."
-          onSubmit={onSaveStreamRule}
+          onSubmit={onCreateStreamRule}
         />
       )}
+      <StartStreamAfterRuleCreateDialog
+        show={showStartStreamDialog}
+        streamTitle={stream.title}
+        onConfirm={onStartStream}
+        onCancel={onCancelStartStreamDialog}
+        isSubmitting={isStartingStream}
+      />
     </>
   );
 };
