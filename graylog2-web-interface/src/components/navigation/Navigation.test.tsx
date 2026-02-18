@@ -23,11 +23,8 @@ import mockComponent from 'helpers/mocking/MockComponent';
 import { asMock } from 'helpers/mocking';
 import Navigation from 'components/navigation/Navigation';
 import useCurrentUser from 'hooks/useCurrentUser';
-import PerspectivesBindings from 'components/perspectives/bindings';
-import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
 import useLocation from 'routing/useLocation';
 import HotkeysProvider from 'contexts/HotkeysProvider';
-import { usePluginExports } from 'views/test/testPlugins';
 
 jest.mock('./ScratchpadToggle', () => mockComponent('ScratchpadToggle'));
 jest.mock('hooks/useCurrentUser');
@@ -38,13 +35,9 @@ jest.mock('routing/useLocation', () => jest.fn(() => ({ pathname: '' })));
 describe('Navigation', () => {
   const SUT = () => (
     <HotkeysProvider>
-      <PerspectivesProvider>
-        <Navigation />
-      </PerspectivesProvider>
+      <Navigation />
     </HotkeysProvider>
   );
-
-  usePluginExports(PerspectivesBindings);
 
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);

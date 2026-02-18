@@ -16,13 +16,10 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useMemo, forwardRef } from 'react';
 import 'wicg-inert';
 
 import Hotspot from 'components/security/teaser/Hotspot';
-import { SAVE_COPY } from 'views/components/contexts/SearchPageLayoutContext';
-import PageContentLayout from 'components/layout/PageContentLayout';
-import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
+import NoSidebarSearchLayout from 'views/components/NoSidebarSearchLayout';
 import type { SearchJobResult } from 'views/logic/SearchResult';
 import type { SearchJson } from 'views/logic/search/Search';
 import StaticSearch from 'views/components/StaticSearch';
@@ -33,10 +30,8 @@ type HotspotMeta = {
   description: string;
 };
 
-const StyledPageContentLayout = styled(PageContentLayout)`
-  .page-content-grid {
-    position: relative;
-  }
+const ReadOnlyContainer = styled.div`
+  height: 100%;
 `;
 
 const DashboardOverlay = styled.div`
@@ -49,21 +44,6 @@ const DashboardOverlay = styled.div`
   z-index: 1;
 `;
 
-const searchAreaContainer = (hotspots: Array<HotspotMeta>) =>
-  forwardRef<HTMLDivElement, React.PropsWithChildren>(({ children }, ref) => (
-    <StyledPageContentLayout ref={ref}>
-      <DashboardOverlay>
-        {hotspots.map(({ description, positionX, positionY }, index) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <Hotspot positionX={positionX} positionY={positionY} index={index} key={`hotspot-${index}`}>
-            {description}
-          </Hotspot>
-        ))}
-      </DashboardOverlay>
-      <div inert="">{children}</div>
-    </StyledPageContentLayout>
-  ));
-
 type Props = {
   searchJson: Partial<SearchJson>;
   viewJson: any;
@@ -71,21 +51,20 @@ type Props = {
   hotspots: Array<HotspotMeta>;
 };
 
-const TeaserSearch = ({ searchJson, viewJson, searchJobResult, hotspots }: Props) => {
-  const searchPageLayout = useMemo(
-    () => ({
-      sidebar: { isShown: false },
-      viewActions: SAVE_COPY,
-      searchAreaContainer: { component: searchAreaContainer(hotspots) },
-    }),
-    [hotspots],
-  );
-
-  return (
-    <SearchPageLayoutProvider value={searchPageLayout}>
+const TeaserSearch = ({ searchJson, viewJson, searchJobResult, hotspots }: Props) => (
+  <NoSidebarSearchLayout>
+    <DashboardOverlay>
+      {hotspots.map(({ description, positionX, positionY }, index) => (
+        // eslint-disable-next-line react/no-array-index-key
+        <Hotspot positionX={positionX} positionY={positionY} index={index} key={`hotspot-${index}`}>
+          {description}
+        </Hotspot>
+      ))}
+    </DashboardOverlay>
+    <ReadOnlyContainer inert="">
       <StaticSearch searchJson={searchJson} viewJson={viewJson} searchJobResult={searchJobResult} />
-    </SearchPageLayoutProvider>
-  );
-};
+    </ReadOnlyContainer>
+  </NoSidebarSearchLayout>
+);
 
 export default TeaserSearch;
