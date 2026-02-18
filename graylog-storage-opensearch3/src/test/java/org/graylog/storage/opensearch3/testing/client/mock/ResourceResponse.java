@@ -14,13 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import styled from 'styled-components';
+package org.graylog.storage.opensearch3.testing.client.mock;
 
-const LayoutContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  position: relative;
-`;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
-export default LayoutContainer;
+public record ResourceResponse(String method, java.nio.file.PathMatcher urlPattern, URL resource) implements MockedResponse {
+
+    @Override
+    public InputStream newInputStream() {
+        try {
+            return resource.openStream();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
