@@ -65,7 +65,7 @@ class SourceServiceTest {
     }
 
     private SourceConfig validFileConfig() {
-        return new FileSourceConfig(List.of("/var/log/syslog"), "tail", null);
+        return FileSourceConfig.builder().paths(List.of("/var/log/syslog")).readMode("tail").build();
     }
 
     @Test
@@ -124,7 +124,7 @@ class SourceServiceTest {
         FleetDTO fleet = fleetService.create("test-fleet", "A test fleet", null);
         SourceDTO created = sourceService.create(fleet.id(), "my-source", "Original desc", true, validFileConfig());
 
-        SourceConfig newConfig = new FileSourceConfig(List.of("/var/log/auth.log"), "tail", null);
+        SourceConfig newConfig = FileSourceConfig.builder().paths(List.of("/var/log/auth.log")).readMode("tail").build();
         Optional<SourceDTO> updated = sourceService.update(fleet.id(), created.id(), "updated-source", "Updated desc", false, newConfig);
 
         assertThat(updated).isPresent();
@@ -132,6 +132,7 @@ class SourceServiceTest {
         assertThat(updated.get().description()).isEqualTo("Updated desc");
         assertThat(updated.get().enabled()).isFalse();
         assertThat(((FileSourceConfig) updated.get().config()).paths()).containsExactly("/var/log/auth.log");
+        assertThat(updated.get().config().type()).isEqualTo("file");
     }
 
     @Test
@@ -223,7 +224,7 @@ class SourceServiceTest {
     @Test
     void createSourceWithInvalidConfigThrows() {
         FleetDTO fleet = fleetService.create("test-fleet", "A test fleet", null);
-        SourceConfig invalidConfig = new FileSourceConfig(List.of(), "tail", null);
+        SourceConfig invalidConfig = FileSourceConfig.builder().paths(List.of()).readMode("tail").build();
 
         assertThatThrownBy(() -> sourceService.create(fleet.id(), "my-source", "A source", true, invalidConfig))
                 .isInstanceOf(IllegalArgumentException.class);

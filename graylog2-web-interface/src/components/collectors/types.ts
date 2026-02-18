@@ -60,14 +60,15 @@ export type FileSourceConfig = {
 };
 
 export type JournaldSourceConfig = {
-  units: string[];
   priority: number;
+  match_pattern?: string;
 };
 
 export type WindowsEventLogSourceConfig = {
   channels: string[];
   read_mode: 'beginning' | 'end';
   event_format: 'json' | 'xml';
+  query?: string;
 };
 
 export type TcpSourceConfig = {

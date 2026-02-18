@@ -16,30 +16,58 @@
  */
 package org.graylog.collectors.db;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.auto.value.AutoValue;
 
+@AutoValue
 @JsonTypeName(UdpSourceConfig.TYPE_NAME)
-@JsonIgnoreProperties(value = SourceConfig.TYPE_FIELD, allowGetters = true)
-public record UdpSourceConfig(
-        @JsonProperty("bind_address") String bindAddress,
-        @JsonProperty("port") int port
-) implements SourceConfig {
+@JsonDeserialize(builder = UdpSourceConfig.Builder.class)
+public abstract class UdpSourceConfig implements SourceConfig {
     public static final String TYPE_NAME = "udp";
 
     @Override
-    public String type() {
-        return TYPE_NAME;
+    @JsonProperty(TYPE_FIELD)
+    public abstract String type();
+
+    @JsonProperty("bind_address")
+    public abstract String bindAddress();
+
+    @JsonProperty("port")
+    public abstract int port();
+
+    public static Builder builder() {
+        return Builder.create();
     }
 
     @Override
     public void validate() {
-        if (bindAddress == null || bindAddress.isBlank()) {
+        if (bindAddress() == null || bindAddress().isBlank()) {
             throw new IllegalArgumentException("UdpSourceConfig requires a non-blank bind_address");
         }
-        if (port < 1 || port > 65535) {
+        if (port() < 1 || port() > 65535) {
             throw new IllegalArgumentException("UdpSourceConfig port must be between 1 and 65535");
         }
+    }
+
+    @AutoValue.Builder
+    public abstract static class Builder {
+        @JsonCreator
+        public static Builder create() {
+            return new AutoValue_UdpSourceConfig.Builder().type(TYPE_NAME);
+        }
+
+        @JsonProperty(TYPE_FIELD)
+        public abstract Builder type(String type);
+
+        @JsonProperty("bind_address")
+        public abstract Builder bindAddress(String bindAddress);
+
+        @JsonProperty("port")
+        public abstract Builder port(int port);
+
+        public abstract UdpSourceConfig build();
     }
 }

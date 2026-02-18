@@ -49,14 +49,20 @@ class SourceDTOTest {
                 .name("Syslog file source")
                 .description("Reads syslog")
                 .enabled(true)
-                .config(new FileSourceConfig(
-                        List.of("/var/log/syslog"),
-                        "tail",
-                        new MultilineConfig("^\\d{4}-", true)
-                ))
+                .config(FileSourceConfig.builder()
+                        .paths(List.of("/var/log/syslog"))
+                        .readMode("tail")
+                        .multiline(new MultilineConfig("^\\d{4}-", true))
+                        .build())
                 .build();
 
         final var json = objectMapper.writeValueAsString(original);
+
+        // Verify the type field is present in the nested config
+        final var tree = objectMapper.readTree(json);
+        assertThat(tree.get("config").has("type")).isTrue();
+        assertThat(tree.get("config").get("type").asText()).isEqualTo("file");
+
         final var deserialized = objectMapper.readValue(json, SourceDTO.class);
 
         assertThat(deserialized).isEqualTo(original);
@@ -73,7 +79,7 @@ class SourceDTOTest {
                 .fleetId("fleet-1")
                 .name("TCP source")
                 .description("TCP listener")
-                .config(new TcpSourceConfig("0.0.0.0", 5140))
+                .config(TcpSourceConfig.builder().bindAddress("0.0.0.0").port(5140).build())
                 .build();
 
         assertThat(source.config().type()).isEqualTo("tcp");
@@ -85,7 +91,7 @@ class SourceDTOTest {
                 .fleetId("fleet-1")
                 .name("Test source")
                 .description("Testing defaults")
-                .config(new FileSourceConfig(List.of("/var/log/test"), "tail", null))
+                .config(FileSourceConfig.builder().paths(List.of("/var/log/test")).readMode("tail").build())
                 .build();
 
         assertThat(source.enabled()).isTrue();

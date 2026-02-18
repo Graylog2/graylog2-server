@@ -60,7 +60,7 @@ const FleetDetail = ({ fleetId }: Props) => {
   const { data: fleet, isLoading: fleetLoading } = useFleet(fleetId);
   const { data: stats, isLoading: statsLoading } = useFleetStats(fleetId);
   const { data: sources } = useSources(fleetId);
-  const { createSource, isCreatingSource, updateSource, isUpdatingSource, updateFleet, isUpdatingFleet, deleteFleet, isDeletingFleet } = useCollectorsMutations();
+  const { createSource, isCreatingSource, updateSource, isUpdatingSource, deleteSource, updateFleet, isUpdatingFleet, deleteFleet, isDeletingFleet } = useCollectorsMutations();
   const [showSourceModal, setShowSourceModal] = useState(false);
   const [editingSource, setEditingSource] = useState<Source | null>(null);
   const [selectedInstance, setSelectedInstance] = useState<CollectorInstanceView | null>(null);
@@ -93,13 +93,28 @@ const FleetDetail = ({ fleetId }: Props) => {
     [],
   );
 
+  const handleDeleteSource = useCallback(
+    async (source: Source) => {
+      // eslint-disable-next-line no-alert
+      if (window.confirm(`Are you sure you want to delete source "${source.name}"?`)) {
+        await deleteSource({ fleetId, sourceId: source.id });
+      }
+    },
+    [deleteSource, fleetId],
+  );
+
   const sourceActions = useCallback(
     (source: Source) => (
-      <Button bsStyle="link" bsSize="xs" onClick={() => setEditingSource(source)}>
-        Edit
-      </Button>
+      <>
+        <Button bsStyle="link" bsSize="xs" onClick={() => setEditingSource(source)}>
+          Edit
+        </Button>
+        <Button bsStyle="link" bsSize="xs" onClick={() => handleDeleteSource(source)}>
+          Delete
+        </Button>
+      </>
     ),
-    [],
+    [handleDeleteSource],
   );
 
   const getSourcesForInstance = (instance: CollectorInstanceView) =>

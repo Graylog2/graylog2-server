@@ -40,7 +40,7 @@ const sourceTypeLabels: Record<SourceType, string> = {
 
 const defaultConfigs: Record<SourceType, FileSourceConfig | JournaldSourceConfig | TcpSourceConfig | UdpSourceConfig | WindowsEventLogSourceConfig> = {
   file: { paths: [''], read_mode: 'end' },
-  journald: { units: [], priority: 6 },
+  journald: { priority: 6 },
   windows_event_log: { channels: ['Application'], read_mode: 'end', event_format: 'json' },
   tcp: { bind_address: '0.0.0.0', port: 5514, framing: 'newline' },
   udp: { bind_address: '0.0.0.0', port: 5514 },
@@ -127,14 +127,6 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
     return (
       <>
         <Input
-          id="journald-units"
-          type="text"
-          label="Units"
-          help="Comma-separated systemd unit names (leave empty for all)"
-          value={journaldConfig.units.join(', ')}
-          onChange={(e) => updateJournaldConfig({ units: e.target.value.split(',').map((u) => u.trim()).filter(Boolean) })}
-        />
-        <Input
           id="journald-priority"
           type="number"
           label="Priority"
@@ -143,6 +135,14 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
           onChange={(e) => updateJournaldConfig({ priority: Number(e.target.value) || 6 })}
           min={0}
           max={7}
+        />
+        <Input
+          id="journald-match-pattern"
+          type="text"
+          label="Match Pattern"
+          help="Optional journald match expression to filter entries"
+          value={journaldConfig.match_pattern || ''}
+          onChange={(e) => updateJournaldConfig({ match_pattern: e.target.value || undefined })}
         />
       </>
     );

@@ -64,7 +64,7 @@ class FleetServiceTest {
     }
 
     private SourceConfig validFileConfig() {
-        return new FileSourceConfig(List.of("/var/log/syslog"), "tail", null);
+        return FileSourceConfig.builder().paths(List.of("/var/log/syslog")).readMode("tail").build();
     }
 
     @Test

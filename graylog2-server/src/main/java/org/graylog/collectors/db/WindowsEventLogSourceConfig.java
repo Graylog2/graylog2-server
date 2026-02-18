@@ -16,30 +16,80 @@
  */
 package org.graylog.collectors.db;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
 
 import java.util.List;
 
+@AutoValue
 @JsonTypeName(WindowsEventLogSourceConfig.TYPE_NAME)
-@JsonIgnoreProperties(value = SourceConfig.TYPE_FIELD, allowGetters = true)
-public record WindowsEventLogSourceConfig(
-        @JsonProperty("channels") List<String> channels,
-        @Nullable @JsonProperty("query") String query
-) implements SourceConfig {
+@JsonDeserialize(builder = WindowsEventLogSourceConfig.Builder.class)
+public abstract class WindowsEventLogSourceConfig implements SourceConfig {
     public static final String TYPE_NAME = "windows_event_log";
 
     @Override
-    public String type() {
-        return TYPE_NAME;
+    @JsonProperty(TYPE_FIELD)
+    public abstract String type();
+
+    @JsonProperty("channels")
+    public abstract List<String> channels();
+
+    @JsonProperty("read_mode")
+    public abstract String readMode();
+
+    @JsonProperty("event_format")
+    public abstract String eventFormat();
+
+    @Nullable
+    @JsonProperty("query")
+    public abstract String query();
+
+    public static Builder builder() {
+        return Builder.create();
     }
 
     @Override
     public void validate() {
-        if (channels == null || channels.isEmpty()) {
+        if (channels() == null || channels().isEmpty()) {
             throw new IllegalArgumentException("WindowsEventLogSourceConfig requires at least one channel");
         }
+        if (readMode() == null || readMode().isBlank()) {
+            throw new IllegalArgumentException("WindowsEventLogSourceConfig requires a non-blank read_mode");
+        }
+        if (eventFormat() == null || eventFormat().isBlank()) {
+            throw new IllegalArgumentException("WindowsEventLogSourceConfig requires a non-blank event_format");
+        }
+    }
+
+    @AutoValue.Builder
+    public abstract static class Builder {
+        @JsonCreator
+        public static Builder create() {
+            return new AutoValue_WindowsEventLogSourceConfig.Builder()
+                    .type(TYPE_NAME)
+                    .readMode("end")
+                    .eventFormat("json");
+        }
+
+        @JsonProperty(TYPE_FIELD)
+        public abstract Builder type(String type);
+
+        @JsonProperty("channels")
+        public abstract Builder channels(List<String> channels);
+
+        @JsonProperty("read_mode")
+        public abstract Builder readMode(String readMode);
+
+        @JsonProperty("event_format")
+        public abstract Builder eventFormat(String eventFormat);
+
+        @JsonProperty("query")
+        public abstract Builder query(@Nullable String query);
+
+        public abstract WindowsEventLogSourceConfig build();
     }
 }

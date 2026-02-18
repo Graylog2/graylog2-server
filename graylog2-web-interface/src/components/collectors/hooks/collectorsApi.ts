@@ -69,7 +69,7 @@ export const createSource = async ({ fleetId, source }: CreateSourceInput): Prom
     name: source.name,
     description: source.description,
     enabled: source.enabled,
-    config: source.config,
+    config: { type: source.type, ...source.config },
   });
 
 export const updateSource = async ({ fleetId, sourceId, updates }: UpdateSourceInput): Promise<Source> =>
@@ -77,7 +77,7 @@ export const updateSource = async ({ fleetId, sourceId, updates }: UpdateSourceI
     name: updates.name,
     description: updates.description,
     enabled: updates.enabled,
-    config: updates.config,
+    config: { type: updates.type, ...updates.config },
   });
 
 export const deleteSource = async ({ fleetId, sourceId }: DeleteSourceInput): Promise<void> =>

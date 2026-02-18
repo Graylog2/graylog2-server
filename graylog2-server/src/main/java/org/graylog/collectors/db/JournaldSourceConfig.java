@@ -16,30 +16,57 @@
  */
 package org.graylog.collectors.db;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
 
-import java.util.List;
-
+@AutoValue
 @JsonTypeName(JournaldSourceConfig.TYPE_NAME)
-@JsonIgnoreProperties(value = SourceConfig.TYPE_FIELD, allowGetters = true)
-public record JournaldSourceConfig(
-        @JsonProperty("units") List<String> units,
-        @Nullable @JsonProperty("match_pattern") String matchPattern
-) implements SourceConfig {
+@JsonDeserialize(builder = JournaldSourceConfig.Builder.class)
+public abstract class JournaldSourceConfig implements SourceConfig {
     public static final String TYPE_NAME = "journald";
 
     @Override
-    public String type() {
-        return TYPE_NAME;
+    @JsonProperty(TYPE_FIELD)
+    public abstract String type();
+
+    @JsonProperty("priority")
+    public abstract int priority();
+
+    @Nullable
+    @JsonProperty("match_pattern")
+    public abstract String matchPattern();
+
+    public static Builder builder() {
+        return Builder.create();
     }
 
     @Override
     public void validate() {
-        if (units == null || units.isEmpty()) {
-            throw new IllegalArgumentException("JournaldSourceConfig requires at least one unit");
+        if (priority() < 0 || priority() > 7) {
+            throw new IllegalArgumentException("JournaldSourceConfig priority must be between 0 and 7");
         }
+    }
+
+    @AutoValue.Builder
+    public abstract static class Builder {
+        @JsonCreator
+        public static Builder create() {
+            return new AutoValue_JournaldSourceConfig.Builder().type(TYPE_NAME).priority(6);
+        }
+
+        @JsonProperty(TYPE_FIELD)
+        public abstract Builder type(String type);
+
+        @JsonProperty("priority")
+        public abstract Builder priority(int priority);
+
+        @JsonProperty("match_pattern")
+        public abstract Builder matchPattern(@Nullable String matchPattern);
+
+        public abstract JournaldSourceConfig build();
     }
 }

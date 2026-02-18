@@ -16,34 +16,68 @@
  */
 package org.graylog.collectors.db;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
 
 import java.util.List;
 
+@AutoValue
 @JsonTypeName(FileSourceConfig.TYPE_NAME)
-@JsonIgnoreProperties(value = SourceConfig.TYPE_FIELD, allowGetters = true)
-public record FileSourceConfig(
-        @JsonProperty("paths") List<String> paths,
-        @JsonProperty("read_mode") String readMode,
-        @Nullable @JsonProperty("multiline") MultilineConfig multiline
-) implements SourceConfig {
+@JsonDeserialize(builder = FileSourceConfig.Builder.class)
+public abstract class FileSourceConfig implements SourceConfig {
     public static final String TYPE_NAME = "file";
 
     @Override
-    public String type() {
-        return TYPE_NAME;
+    @JsonProperty(TYPE_FIELD)
+    public abstract String type();
+
+    @JsonProperty("paths")
+    public abstract List<String> paths();
+
+    @JsonProperty("read_mode")
+    public abstract String readMode();
+
+    @Nullable
+    @JsonProperty("multiline")
+    public abstract MultilineConfig multiline();
+
+    public static Builder builder() {
+        return Builder.create();
     }
 
     @Override
     public void validate() {
-        if (paths == null || paths.isEmpty()) {
+        if (paths() == null || paths().isEmpty()) {
             throw new IllegalArgumentException("FileSourceConfig requires at least one path");
         }
-        if (readMode == null || readMode.isBlank()) {
+        if (readMode() == null || readMode().isBlank()) {
             throw new IllegalArgumentException("FileSourceConfig requires a non-blank read_mode");
         }
+    }
+
+    @AutoValue.Builder
+    public abstract static class Builder {
+        @JsonCreator
+        public static Builder create() {
+            return new AutoValue_FileSourceConfig.Builder().type(TYPE_NAME);
+        }
+
+        @JsonProperty(TYPE_FIELD)
+        public abstract Builder type(String type);
+
+        @JsonProperty("paths")
+        public abstract Builder paths(List<String> paths);
+
+        @JsonProperty("read_mode")
+        public abstract Builder readMode(String readMode);
+
+        @JsonProperty("multiline")
+        public abstract Builder multiline(@Nullable MultilineConfig multiline);
+
+        public abstract FileSourceConfig build();
     }
 }

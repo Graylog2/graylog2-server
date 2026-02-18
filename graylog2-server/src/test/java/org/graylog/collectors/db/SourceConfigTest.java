@@ -107,27 +107,52 @@ class SourceConfigTest {
 
     @Test
     void fileSourceValidation() {
-        final var config = new FileSourceConfig(List.of(), "tail", null);
+        final var config = FileSourceConfig.builder().paths(List.of()).readMode("tail").build();
         assertThatThrownBy(config::validate).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void tcpSourcePortValidation() {
-        final var config = new TcpSourceConfig("0.0.0.0", 0);
+        final var config = TcpSourceConfig.builder().bindAddress("0.0.0.0").port(0).build();
         assertThatThrownBy(config::validate).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void jsonRoundTrip() throws Exception {
-        final var original = new FileSourceConfig(
-                List.of("/var/log/syslog"),
-                "tail",
-                new MultilineConfig("^\\d{4}-", true)
-        );
+        final var original = FileSourceConfig.builder()
+                .paths(List.of("/var/log/syslog"))
+                .readMode("tail")
+                .multiline(new MultilineConfig("^\\d{4}-", true))
+                .build();
 
         final var json = objectMapper.writeValueAsString(original);
         final var deserialized = objectMapper.readValue(json, SourceConfig.class);
 
         assertThat(deserialized).isEqualTo(original);
+    }
+
+    @Test
+    void serializationIncludesTypeField() throws Exception {
+        final var config = FileSourceConfig.builder()
+                .paths(List.of("/var/log/syslog"))
+                .readMode("tail")
+                .build();
+
+        final var json = objectMapper.writeValueAsString(config);
+        final var tree = objectMapper.readTree(json);
+
+        assertThat(tree.has("type")).isTrue();
+        assertThat(tree.get("type").asText()).isEqualTo("file");
+    }
+
+    @Test
+    void tcpSerializationIncludesTypeField() throws Exception {
+        final var config = TcpSourceConfig.builder().bindAddress("0.0.0.0").port(5140).build();
+
+        final var json = objectMapper.writeValueAsString(config);
+        final var tree = objectMapper.readTree(json);
+
+        assertThat(tree.has("type")).isTrue();
+        assertThat(tree.get("type").asText()).isEqualTo("tcp");
     }
 }
