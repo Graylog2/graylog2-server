@@ -18,6 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 import { useCallback } from 'react';
 
+import Routes from 'routing/Routes';
 import Menu from 'components/bootstrap/Menu';
 import Icon from 'components/common/Icon';
 import usePerspectives from 'components/perspectives/hooks/usePerspectives';
@@ -69,12 +70,10 @@ const Switcher = () => {
 
   const onChangePerspective = useCallback(
     (nextPerspectiveId: string) => () => {
-      const { welcomeRoute } = perspectives.find(({ id }) => id === nextPerspectiveId);
-
-      history.push(welcomeRoute);
+      history.push(Routes.STARTPAGE);
       setActivePerspective(nextPerspectiveId);
     },
-    [history, perspectives, setActivePerspective],
+    [history, setActivePerspective],
   );
 
   return (

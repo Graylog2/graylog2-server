@@ -28,7 +28,7 @@ export const examplePerspective = {
   id: 'example-perspective',
   title: 'Example Perspective',
   brandComponent: () => <div />,
-  welcomeRoute: '',
+  welcomeRoute: '/',
 };
 
 export const unavailablePerspective = {
