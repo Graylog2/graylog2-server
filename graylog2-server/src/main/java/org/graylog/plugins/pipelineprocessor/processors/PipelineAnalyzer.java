@@ -112,6 +112,16 @@ public class PipelineAnalyzer {
                     .map(PipelineConnections::streamId)
                     .collect(Collectors.toSet());
 
+            final Map<String, String> connectedStreamTitles = new HashMap<>();
+            for (final String streamId : connectedStreams) {
+                final String title = streamService.streamTitleFromCache(streamId);
+                if (title != null) {
+                    connectedStreamTitles.put(streamId, title);
+                }
+            }
+
+            final Map<String, String> ruleTitles = new HashMap<>();
+
             Set<Stage> stages = functions.get(pipeline.id()).stages();
             if (stages != null) {
                 for (Stage stage : stages) {
@@ -120,6 +130,7 @@ public class PipelineAnalyzer {
                     for (Rule rule : stageRules) {
                         if (rule == null) continue;
                         ruleSet.add(rule.id());
+                        ruleTitles.put(rule.id(), rule.name());
                         boolean ruleHasReferences = analyzeRule(
                                 pipeline, connectedStreams, rule, functionSet, deprecatedFunctionSet, routingRulesMap, routedStreamsMap, inputMentions);
                         hasInputReferences = hasInputReferences || ruleHasReferences;
@@ -127,12 +138,15 @@ public class PipelineAnalyzer {
                 }
             }
             ruleRecords.add(rulesBuilder
+                    .pipelineTitle(pipeline.name())
                     .rules(ruleSet)
                     .streams(connectedStreams)
                     .functions(functionSet)
                     .deprecatedFunctions(deprecatedFunctionSet)
                     .streamsByRuleId(routingRulesMap)
                     .routedStreamTitleById(routedStreamsMap)
+                    .ruleTitlesById(ruleTitles)
+                    .connectedStreamTitlesById(connectedStreamTitles)
                     .hasInputReferences(hasInputReferences)
                     .build());
         });

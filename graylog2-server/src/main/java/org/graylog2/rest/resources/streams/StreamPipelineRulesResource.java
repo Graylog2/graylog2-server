@@ -31,15 +31,7 @@ package org.graylog2.rest.resources.streams;
     import jakarta.ws.rs.QueryParam;
     import jakarta.ws.rs.core.MediaType;
     import org.apache.shiro.authz.annotation.RequiresAuthentication;
-    import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
-    import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
-    import org.graylog.plugins.pipelineprocessor.db.PipelineService;
-    import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
-    import org.graylog.plugins.pipelineprocessor.db.RuleDao;
-    import org.graylog.plugins.pipelineprocessor.db.RuleService;
     import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
-    import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
-    import org.graylog2.database.NotFoundException;
     import org.graylog2.database.PaginatedList;
     import org.graylog2.rest.models.SortOrder;
     import org.graylog2.rest.models.tools.responses.PageListResponse;
@@ -47,16 +39,12 @@ package org.graylog2.rest.resources.streams;
     import org.graylog2.rest.resources.entities.EntityDefaults;
     import org.graylog2.rest.resources.entities.Sorting;
     import org.graylog2.rest.resources.streams.responses.StreamPipelineRulesResponse;
-    import org.graylog2.rest.resources.streams.responses.StreamReference;
     import org.graylog2.search.SearchQueryField;
     import org.graylog2.shared.rest.PublicCloudAPI;
     import org.graylog2.shared.rest.resources.RestResource;
-    import org.graylog2.streams.StreamService;
 
     import java.util.List;
     import java.util.Locale;
-    import java.util.Objects;
-    import java.util.stream.Stream;
 
 @RequiresAuthentication
 @PublicCloudAPI
@@ -69,33 +57,27 @@ public class StreamPipelineRulesResource extends RestResource {
     private static final String DEFAULT_SORT_FIELD = ATTRIBUTE_PIPELINE_RULE;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
-            EntityAttribute.builder().id("id").title("id").type(SearchQueryField.Type.OBJECT_ID).hidden(true).searchable(true).build(),
-            EntityAttribute.builder().id("rule_id").title("Pipeline Rule ID").searchable(false).hidden(true).build(),
-            EntityAttribute.builder().id(ATTRIBUTE_PIPELINE_RULE).title("Pipeline Rule").searchable(false).build(),
-            EntityAttribute.builder().id("pipeline_id").title("Pipeline ID").searchable(false).hidden(true).build(),
-            EntityAttribute.builder().id(ATTRIBUTE_PIPELINE).title("Source pipeline").searchable(false).build(),
-            EntityAttribute.builder().id(ATTRIBUTE_CONNECTED_STREAM).title("Source streams").searchable(false).build()
+            EntityAttribute.builder().id("id").title("id").type(SearchQueryField.Type.OBJECT_ID).hidden(true).searchable(false).build(),
+            EntityAttribute.builder().id("rule_id").title("Pipeline Rule ID").hidden(true).searchable(false).build(),
+            EntityAttribute.builder().id(ATTRIBUTE_PIPELINE_RULE).title("Pipeline Rule")
+                    .searchable(true).sortable(true).filterable(true)
+                    .relatedCollection("pipeline_processor_rules").relatedIdentifier("_id").relatedProperty("title")
+                    .build(),
+            EntityAttribute.builder().id("pipeline_id").title("Pipeline ID").hidden(true).searchable(false).build(),
+            EntityAttribute.builder().id(ATTRIBUTE_PIPELINE).title("Source pipeline")
+                    .searchable(true).sortable(true).filterable(true)
+                    .relatedCollection("pipeline_processor_pipelines").relatedIdentifier("_id").relatedProperty("title")
+                    .build(),
+            EntityAttribute.builder().id(ATTRIBUTE_CONNECTED_STREAM).title("Source streams").searchable(false).sortable(false).build()
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT)))).build();
 
     private final MongoDbPipelineMetadataService mongoDbPipelineMetadataService;
-    private final PipelineService pipelineService;
-    private final RuleService ruleService;
-    private final PipelineStreamConnectionsService connectionsService;
-    private final StreamService streamService;
 
     @Inject
-    public StreamPipelineRulesResource(MongoDbPipelineMetadataService mongoDbPipelineMetadataService,
-                                       PipelineService pipelineService,
-                                       RuleService ruleService,
-                                       PipelineStreamConnectionsService connectionsService,
-                                       StreamService streamService) {
+    public StreamPipelineRulesResource(MongoDbPipelineMetadataService mongoDbPipelineMetadataService) {
         this.mongoDbPipelineMetadataService = mongoDbPipelineMetadataService;
-        this.pipelineService = pipelineService;
-        this.ruleService = ruleService;
-        this.connectionsService = connectionsService;
-        this.streamService = streamService;
     }
 
     @GET
@@ -118,58 +100,12 @@ public class StreamPipelineRulesResource extends RestResource {
                        schema = @Schema(allowableValues = {"asc", "desc"}))
             @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
 
-        // Pagination is primarily for UX purposes - OK to fetch all and then paginate in memory
-        List<StreamPipelineRulesResponse> responseList =
-                mongoDbPipelineMetadataService.getRoutingPipelines(streamId).stream()
-                        .flatMap(dao -> buildResponse(dao, streamId))
-                        .toList();
-        final PaginatedList<StreamPipelineRulesResponse> paginatedList =
-                new PaginatedList<>(responseList, responseList.size(), page, perPage);
+        final PaginatedList<StreamPipelineRulesResponse> result =
+                mongoDbPipelineMetadataService.getRoutingRulesPaginated(
+                        streamId, query, sort, order, page, perPage);
 
         return PageListResponse.create(
-                query, paginatedList.pagination(),
-                paginatedList.grandTotal().orElse(0L), sort, order, paginatedList.delegate(), attributes, settings);
-    }
-
-    private Stream<StreamPipelineRulesResponse> buildResponse(PipelineRulesMetadataDao dao, String streamId) {
-        List<StreamPipelineRulesResponse> responseList = new java.util.ArrayList<>();
-        final List<String> relevantRules = dao.streamsByRuleId().keySet().stream()
-                .filter(ruleId -> dao.streamsByRuleId().get(ruleId).contains(streamId)).toList();
-
-        PipelineDao pipelineDao;
-        try {
-            pipelineDao = pipelineService.load(dao.pipelineId());
-        } catch (NotFoundException e) {
-            return Stream.empty();
-        }
-
-        List<StreamReference> connectedStreams = connectionsService.loadByPipelineId(pipelineDao.id()).stream()
-                .map(PipelineConnections::streamId)
-                .map(id -> {
-                    try {
-                        return new StreamReference(id, streamService.load(id).getTitle());
-                    } catch (NotFoundException e) {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .toList();
-
-        relevantRules.forEach(ruleId -> {
-            try {
-                RuleDao ruleDao = ruleService.load(ruleId);
-                responseList.add(
-                        new StreamPipelineRulesResponse(
-                                ruleId,
-                                dao.pipelineId(),
-                                pipelineDao.title(),
-                                ruleId,
-                                ruleDao.title(),
-                                connectedStreams));
-            } catch (NotFoundException e) {
-                // Skip pipelines or rules that no longer exist
-            }
-        });
-        return responseList.stream();
+                query, result.pagination(),
+                result.grandTotal().orElse(0L), sort, order, result.delegate(), attributes, settings);
     }
 }

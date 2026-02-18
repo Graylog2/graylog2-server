@@ -30,7 +30,6 @@ import org.graylog.plugins.pipelineprocessor.processors.PipelineAnalyzer;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineResolver;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineResolverConfig;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +37,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import static org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbInputsMetadataService.INPUTS_COLLECTION_NAME;
@@ -51,7 +49,6 @@ import static org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMe
 public class V20251222123500_CreatePipelineMetadata extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20251222123500_CreatePipelineMetadata.class);
 
-    private final ClusterConfigService configService;
     private final MongoDatabase db;
     private final PipelineResolver pipelineResolver;
     private final PipelineAnalyzer pipelineAnalyzer;
@@ -59,8 +56,7 @@ public class V20251222123500_CreatePipelineMetadata extends Migration {
     private final MongoDbInputsMetadataService inputsMetadataService;
 
     @Inject
-    public V20251222123500_CreatePipelineMetadata(ClusterConfigService configService,
-                                                  MongoConnection mongoConnection,
+    public V20251222123500_CreatePipelineMetadata(MongoConnection mongoConnection,
                                                   MongoDbRuleService ruleService,
                                                   MongoDbPipelineMetadataService pipelineMetadataService,
                                                   MongoDbInputsMetadataService inputsMetadataService,
@@ -69,7 +65,6 @@ public class V20251222123500_CreatePipelineMetadata extends Migration {
                                                   PipelineStreamConnectionsService pipelineStreamConnectionsService,
                                                   PipelineRuleParser pipelineRuleParser,
                                                   PipelineResolver.Factory pipelineResolverFactory) {
-        this.configService = configService;
         this.db = mongoConnection.getMongoDatabase();
         this.pipelineMetadataService = pipelineMetadataService;
         this.inputsMetadataService = inputsMetadataService;
@@ -91,13 +86,9 @@ public class V20251222123500_CreatePipelineMetadata extends Migration {
 
     @Override
     public void upgrade() {
-        if (migrationAlreadyApplied()) {
-            return;
-        }
-        doUpgrade();
-    }
+        db.getCollection(RULES_COLLECTION_NAME).drop();
+        db.getCollection(INPUTS_COLLECTION_NAME).drop();
 
-    private void createMetadata() {
         LOG.info("Creating pipeline metadata collection.");
         final List<PipelineRulesMetadataDao> ruleRecords = new ArrayList<>();
         final Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions =
@@ -106,23 +97,4 @@ public class V20251222123500_CreatePipelineMetadata extends Migration {
         pipelineMetadataService.save(ruleRecords, false);
         inputsMetadataService.save(inputMentions, false);
     }
-
-    public void doUpgrade() {
-        db.getCollection(RULES_COLLECTION_NAME).drop();
-        db.getCollection(INPUTS_COLLECTION_NAME).drop();
-        createMetadata();
-
-        markMigrationApplied();
-    }
-
-    private boolean migrationAlreadyApplied() {
-        return Objects.nonNull(configService.get(V20251222123500_CreatePipelineMetadata.MigrationCompleted.class));
-    }
-
-    // The second migration marker indicates that schema has been upgraded to include routed_streams field
-    private void markMigrationApplied() {
-        configService.write(new V20251222123500_CreatePipelineMetadata.MigrationCompleted());
-    }
-
-    public record MigrationCompleted() {}
 }

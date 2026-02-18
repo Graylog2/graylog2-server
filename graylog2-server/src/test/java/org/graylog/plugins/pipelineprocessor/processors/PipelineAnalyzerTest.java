@@ -77,6 +77,7 @@ class PipelineAnalyzerTest {
         testUtil = new PipelineTestUtil(connectionsService, inputService);
 
         when(inputService.find(INPUT_ID)).thenReturn(mock(org.graylog2.inputs.Input.class));
+        when(streamService.streamTitleFromCache(STREAM1_ID)).thenReturn("Stream 1");
     }
 
     @Test
@@ -97,6 +98,11 @@ class PipelineAnalyzerTest {
         assertTrue(result.isEmpty());
         assertTrue(ruleRecords.stream().anyMatch(dao ->
                 dao.pipelineId().equals(pipeline1.id())
+                        && dao.pipelineTitle().equals("pipeline1")
+                        && dao.ruleTitlesById().containsKey(ALWAYS_TRUE_ID)
+                        && dao.ruleTitlesById().get(ALWAYS_TRUE_ID).equals("alwaysTrue")
+                        && dao.connectedStreamTitlesById().containsKey(STREAM1_ID)
+                        && dao.connectedStreamTitlesById().get(STREAM1_ID).equals("Stream 1")
                         && dao.functions().isEmpty()
                         && dao.rules().contains(ALWAYS_TRUE_ID)));
     }
@@ -174,6 +180,7 @@ class PipelineAnalyzerTest {
         assertTrue(ruleRecords.stream().anyMatch(dao ->
                 dao.pipelineId().equals(pipeline1.id())
                         && dao.rules().contains(ROUTING_ID)
+                        && dao.ruleTitlesById().get(ROUTING_ID).equals("routing")
                         && dao.functions().contains("route_to_stream")
                         && dao.routedStreamTitleById().get(STREAM2_ID).equals(STREAM2_TITLE)
                         && dao.streamsByRuleId().get(ROUTING_ID).contains(STREAM2_ID)
