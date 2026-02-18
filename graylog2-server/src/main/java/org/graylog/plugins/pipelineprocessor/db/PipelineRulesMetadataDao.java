@@ -38,6 +38,9 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
     public static final String FIELD_ROUTING_RULES = "routing_rules";
     public static final String FIELD_ROUTED_STREAMS = "routed_streams";
     public static final String FIELD_HAS_INPUT_REFERENCES = "has_input_references";
+    public static final String FIELD_PIPELINE_TITLE = "pipeline_title";
+    public static final String FIELD_RULE_TITLES = "rule_titles";
+    public static final String FIELD_CONNECTED_STREAM_TITLES = "connected_stream_titles";
 
     @JsonProperty(FIELD_PIPELINE_ID)
     public abstract String pipelineId();
@@ -65,6 +68,15 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
     @JsonProperty(FIELD_HAS_INPUT_REFERENCES)
     public abstract Boolean hasInputReferences();
 
+    @JsonProperty(FIELD_PIPELINE_TITLE)
+    public abstract String pipelineTitle();
+
+    @JsonProperty(FIELD_RULE_TITLES)
+    public abstract Map<String, String> ruleTitlesById();
+
+    @JsonProperty(FIELD_CONNECTED_STREAM_TITLES)
+    public abstract Map<String, String> connectedStreamTitlesById();
+
     @JsonIgnore
     public boolean hasDeprecatedFunctions() {
         return deprecatedFunctions() != null && !deprecatedFunctions().isEmpty();
@@ -79,7 +91,10 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
                 .deprecatedFunctions(new HashSet<>())
                 .hasInputReferences(false)
                 .streamsByRuleId(new HashMap<>())
-                .routedStreamTitleById(new HashMap<>());
+                .routedStreamTitleById(new HashMap<>())
+                .pipelineTitle("")
+                .ruleTitlesById(new HashMap<>())
+                .connectedStreamTitlesById(new HashMap<>());
     }
 
     @AutoValue.Builder
@@ -108,5 +123,14 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
 
         @JsonProperty(FIELD_HAS_INPUT_REFERENCES)
         public abstract Builder hasInputReferences(Boolean hasInputReferences);
+
+        @JsonProperty(FIELD_PIPELINE_TITLE)
+        public abstract Builder pipelineTitle(String pipelineTitle);
+
+        @JsonProperty(FIELD_RULE_TITLES)
+        public abstract Builder ruleTitlesById(Map<String, String> ruleTitlesById);
+
+        @JsonProperty(FIELD_CONNECTED_STREAM_TITLES)
+        public abstract Builder connectedStreamTitlesById(Map<String, String> connectedStreamTitlesById);
     }
 }
