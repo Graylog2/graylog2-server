@@ -138,8 +138,8 @@ public class DbFilterExpressionParser {
                     Set<String> matchingIds = provider.getMatchingIds(value, authToken);
                     fieldMatches.addAll(matchingIds);
                 } catch (Exception e) {
-                    // If provider fails (e.g., invalid value), treat as no matches
-                    // This will cause the field to contribute an empty set, resulting in no results
+                    throw new IllegalStateException(
+                            "Filtering failed for computed field '" + fieldName + "' with value '" + value + "'", e);
                 }
             }
 

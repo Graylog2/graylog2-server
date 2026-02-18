@@ -16,7 +16,6 @@
  */
 package org.graylog2.database.filtering;
 
-import com.mongodb.client.model.Filters;
 import org.bson.BsonDocument;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -34,6 +33,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -71,15 +71,12 @@ class DbFilterExpressionParserComputedFieldTest {
 
     @Test
     void filtersOnComputedFieldOnly() {
-        // Setup
         when(computedFieldRegistry.isComputedField("computed_field")).thenReturn(true);
         when(computedFieldRegistry.getProvider("computed_field")).thenReturn(Optional.of(mockProvider));
         when(mockProvider.getMatchingIds(eq("test_value"), eq(null))).thenReturn(Set.of("507f1f77bcf86cd799439011", "507f1f77bcf86cd799439012"));
 
-        // Execute
         final List<Bson> result = parser.parse(List.of("computed_field:test_value"), attributes);
 
-        // Verify - should return an $in filter with the matching IDs
         assertEquals(1, result.size());
         final Bson filter = result.get(0);
         final BsonDocument filterDoc = filter.toBsonDocument();
@@ -90,20 +87,16 @@ class DbFilterExpressionParserComputedFieldTest {
 
     @Test
     void filtersOnComputedFieldWithNoMatches() {
-        // Setup - provider returns empty set
         when(computedFieldRegistry.isComputedField("computed_field")).thenReturn(true);
         when(computedFieldRegistry.getProvider("computed_field")).thenReturn(Optional.of(mockProvider));
         when(mockProvider.getMatchingIds(eq("no_match_value"), eq(null))).thenReturn(Set.of());
 
-        // Execute
         final List<Bson> result = parser.parse(List.of("computed_field:no_match_value"), attributes);
 
-        // Verify - should return a filter that matches nothing
         assertEquals(1, result.size());
         final Bson filter = result.get(0);
         final BsonDocument filterDoc = filter.toBsonDocument();
         assertTrue(filterDoc.containsKey("_id"));
-        // Should filter on an impossible ObjectId
         assertEquals(new ObjectId("000000000000000000000000"), filterDoc.get("_id").asObjectId().getValue());
     }
 
@@ -115,31 +108,26 @@ class DbFilterExpressionParserComputedFieldTest {
         when(computedFieldRegistry.getProvider("computed_field")).thenReturn(Optional.of(mockProvider));
         when(mockProvider.getMatchingIds(eq("computed_value"), eq(null))).thenReturn(Set.of("507f1f77bcf86cd799439011"));
 
-        // Execute - mix computed and database field filters
         final List<Bson> result = parser.parse(
                 List.of("computed_field:computed_value", "title:test_title"),
                 attributes
         );
 
-        // Verify - should return 2 filters (one for computed, one for database)
         assertEquals(2, result.size());
     }
 
     @Test
     void handlesMultipleValuesForSameComputedField() {
-        // Setup - OR logic within same field
         when(computedFieldRegistry.isComputedField("computed_field")).thenReturn(true);
         when(computedFieldRegistry.getProvider("computed_field")).thenReturn(Optional.of(mockProvider));
         when(mockProvider.getMatchingIds(eq("value1"), eq(null))).thenReturn(Set.of("507f1f77bcf86cd799439011"));
         when(mockProvider.getMatchingIds(eq("value2"), eq(null))).thenReturn(Set.of("507f1f77bcf86cd799439012"));
 
-        // Execute
         final List<Bson> result = parser.parse(
                 List.of("computed_field:value1", "computed_field:value2"),
                 attributes
         );
 
-        // Verify - should combine both sets with OR logic (union)
         assertEquals(1, result.size());
         final Bson filter = result.get(0);
         final BsonDocument filterDoc = filter.toBsonDocument();
@@ -148,31 +136,20 @@ class DbFilterExpressionParserComputedFieldTest {
     }
 
     @Test
-    void handlesInvalidComputedFieldValue() {
-        // Setup - provider throws exception for invalid value
+    void throwErroOnInvalidComputedFieldValue() {
         when(computedFieldRegistry.isComputedField("computed_field")).thenReturn(true);
         when(computedFieldRegistry.getProvider("computed_field")).thenReturn(Optional.of(mockProvider));
         when(mockProvider.getMatchingIds(eq("invalid_value"), eq(null))).thenThrow(new IllegalArgumentException("Invalid value"));
 
-        // Execute
-        final List<Bson> result = parser.parse(List.of("computed_field:invalid_value"), attributes);
-
-        // Verify - should handle exception gracefully and return empty result filter
-        assertEquals(1, result.size());
-        final Bson filter = result.get(0);
-        final BsonDocument filterDoc = filter.toBsonDocument();
-        assertTrue(filterDoc.containsKey("_id"));
+        assertThrows(IllegalStateException.class, () -> parser.parse(List.of("computed_field:invalid_value"), attributes));
     }
 
     @Test
     void handlesNoComputedFields() {
-        // Setup - no computed fields
         when(computedFieldRegistry.isComputedField("title")).thenReturn(false);
 
-        // Execute - only database field filters
         final List<Bson> result = parser.parse(List.of("title:test_title"), attributes);
 
-        // Verify - should process normally as database field
         assertEquals(1, result.size());
         final Bson filter = result.get(0);
         final BsonDocument filterDoc = filter.toBsonDocument();
