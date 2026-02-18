@@ -90,8 +90,8 @@ const ExpandedDestinationFilterRulesSection = ({ stream }: Props) => {
   return (
     <>
       <p>
-        Showing {total} configured filter <Pluralize value={total} singular="rule" plural="rules" /> across Index Set,
-        Data Lake and Outputs destinations.
+        Showing {total} configured filter <Pluralize value={total} singular="rule" plural="rules" /> across all
+        destinations.
       </p>
       <PaginatedList
         totalItems={total}
