@@ -14,32 +14,48 @@ This file contains instructions for AI coding agents working on the Graylog web 
 - **Linter**: ESLint (extends `eslint-config-graylog`, based on Airbnb)
 - **Style linter**: Stylelint (`stylelint-config-graylog`)
 
-## Common Commands
+## Commands
 
-| Task                   | Command                                          |
-| ---------------------- | ------------------------------------------------ |
-| Install dependencies   | `yarn install`                                   |
-| Start dev server       | `yarn start`                                     |
-| Start without plugins  | `disable_plugins=true yarn start`                |
-| Build (no plugins)     | `yarn build`                                     |
-| Run all tests          | `yarn test`                                      |
-| Run a specific test    | `yarn test --testPathPattern=<pattern>`          |
-| Type check             | `yarn tsc`                                       |
-| Lint changed files     | `yarn lint:changes` (requires committed changes) |
-| Lint a specific file   | `yarn lint:path <file>`                          |
-| Lint styles            | `yarn lint:styles`                               |
-| Lint styles for a file | `yarn lint:styles:path <file>`                   |
-| Format code            | `yarn format`                                    |
+```bash
+# Install dependencies
+yarn install
 
-## Pre-PR Verification
+# Start dev server
+yarn start
 
-Before considering work complete, run:
+# Start dev server without plugins
+disable_plugins=true yarn start
 
-```sh
+# Build (without plugins)
+yarn build
+
+# Run all tests
+yarn test
+
+# Run a specific test
+yarn test --testPathPattern=<pattern>
+
+# Type check
+yarn tsc
+
+# Lint changed files (requires committed changes)
+yarn lint:changes
+
+# Lint a specific file
+yarn lint:path <file>
+
+# Lint styles
+yarn lint:styles
+
+# Lint styles for a specific file
+yarn lint:styles:path <file>
+
+# Format code
+yarn format
+
+# Pre-PR verification (run before considering work complete)
 yarn tsc && yarn lint:changes && yarn test
 ```
-
-If tests time out, try `yarn test --maxWorkers=150%`.
 
 ## Project Structure
 

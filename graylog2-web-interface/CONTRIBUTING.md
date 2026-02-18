@@ -97,13 +97,6 @@ __tests__/ComponentA.test.tsx
 __tests__/ComponentA.test.case1.json
 ```
 
-### Test Timeouts
-
-Some tests are flaky under resource constraints ("Exceeded timeout of 5000 ms"). Adjust workers:
-
-- `yarn test --maxWorkers=150%` — increase timeout margin.
-- `yarn test --maxWorkers=25%` — simulate low-power environments.
-
 ### Useful Tool
 
 The Chrome extension "Testing Playground" helps find the best queries to select elements.
