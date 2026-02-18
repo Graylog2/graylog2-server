@@ -122,7 +122,7 @@ public class FleetResource extends RestResource {
     @Path("/{fleetId}")
     @Timed
     @Operation(summary = "Get a single fleet")
-    public FleetResponse get(@PathParam("fleetId") String fleetId) {
+    public FleetResponse get(@Parameter(name = "fleetId") @PathParam("fleetId") String fleetId) {
         checkPermission(FleetPermissions.FLEET_READ, fleetId);
         // TODO: audit event
         return fleetService.get(fleetId)
@@ -134,7 +134,7 @@ public class FleetResource extends RestResource {
     @Path("/{fleetId}/stats")
     @Timed
     @Operation(summary = "Get statistics for a fleet")
-    public FleetStatsResponse stats(@PathParam("fleetId") String fleetId) {
+    public FleetStatsResponse stats(@Parameter(name = "fleetId") @PathParam("fleetId") String fleetId) {
         checkPermission(FleetPermissions.FLEET_READ, fleetId);
         if (fleetService.get(fleetId).isEmpty()) {
             throw new NotFoundException("Fleet " + fleetId + " not found");
@@ -164,7 +164,7 @@ public class FleetResource extends RestResource {
     @Path("/{fleetId}")
     @Timed
     @Operation(summary = "Update a fleet")
-    public FleetResponse update(@PathParam("fleetId") String fleetId, @Valid @NotNull UpdateFleetRequest request) {
+    public FleetResponse update(@Parameter(name = "fleetId") @PathParam("fleetId") String fleetId, @Valid @NotNull UpdateFleetRequest request) {
         checkPermission(FleetPermissions.FLEET_EDIT, fleetId);
         // TODO: audit event
         return fleetService.update(fleetId, request.name(), request.description(), request.targetVersion())
@@ -176,7 +176,7 @@ public class FleetResource extends RestResource {
     @Path("/{fleetId}")
     @Timed
     @Operation(summary = "Delete a fleet")
-    public void delete(@PathParam("fleetId") String fleetId) {
+    public void delete(@Parameter(name = "fleetId") @PathParam("fleetId") String fleetId) {
         checkPermission(FleetPermissions.FLEET_DELETE, fleetId);
         // TODO: audit event
         // TODO should this fail if there are still collectors using it? should a replacement fleed be required?

@@ -116,7 +116,7 @@ public class SourceResource extends RestResource {
     @Operation(summary = "Get a single source")
     public SourceResponse get(
             @Parameter(name = "fleetId") @PathParam("fleetId") String fleetId,
-            @PathParam("sourceId") String sourceId) {
+            @Parameter(name = "sourceId") @PathParam("sourceId") String sourceId) {
         checkPermission(FleetPermissions.SOURCE_READ, sourceId);
         // TODO: audit event
         return sourceService.get(fleetId, sourceId)
@@ -156,7 +156,7 @@ public class SourceResource extends RestResource {
     @Operation(summary = "Update a source")
     public Response update(
             @Parameter(name = "fleetId") @PathParam("fleetId") String fleetId,
-            @PathParam("sourceId") String sourceId,
+            @Parameter(name = "sourceId") @PathParam("sourceId") String sourceId,
             @Valid @NotNull UpdateSourceRequest request) {
         checkPermission(FleetPermissions.SOURCE_EDIT, sourceId);
         // TODO: audit event
@@ -181,7 +181,7 @@ public class SourceResource extends RestResource {
     @Operation(summary = "Delete a source")
     public void delete(
             @Parameter(name = "fleetId") @PathParam("fleetId") String fleetId,
-            @PathParam("sourceId") String sourceId) {
+            @Parameter(name = "sourceId") @PathParam("sourceId") String sourceId) {
         checkPermission(FleetPermissions.SOURCE_DELETE, sourceId);
         // TODO: audit event
         if (!sourceService.delete(fleetId, sourceId)) {
