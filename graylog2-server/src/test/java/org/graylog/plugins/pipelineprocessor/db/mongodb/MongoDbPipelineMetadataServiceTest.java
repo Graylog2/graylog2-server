@@ -267,4 +267,41 @@ class MongoDbPipelineMetadataServiceTest {
                 .extracting("title")
                 .containsExactlyInAnyOrder("Source Stream Alpha", "Source Stream Beta");
     }
+
+    @Test
+    void testRuleRoutingToMultipleStreams() {
+        // A single rule routes to s1, s2, and s3
+        final PipelineRulesMetadataDao pipeline = PipelineRulesMetadataDao.builder()
+                .pipelineId("pipeline1")
+                .pipelineTitle("Multi-Route Pipeline")
+                .rules(Set.of("rule1"))
+                .streams(Set.of("source_stream_1"))
+                .functions(Set.of())
+                .deprecatedFunctions(Set.of())
+                .streamsByRuleId(Map.of("rule1", Set.of("s1", "s2", "s3")))
+                .routedStreamTitleById(Map.of("s1", "Stream 1", "s2", "Stream 2", "s3", "Stream 3"))
+                .ruleTitlesById(Map.of("rule1", "Fan-Out Rule"))
+                .connectedStreamTitlesById(Map.of("source_stream_1", "Source Stream 1"))
+                .hasInputReferences(false)
+                .build();
+
+        service.save(List.of(pipeline), false);
+
+        // Querying for each target stream should return the rule
+        for (final String streamId : List.of("s1", "s2", "s3")) {
+            final PaginatedList<StreamPipelineRulesResponse> result = service.getRoutingRulesPaginated(
+                    streamId, null, "rule", SortOrder.ASCENDING, 1, 10);
+            assertThat(result)
+                    .as("Query for stream '%s'", streamId)
+                    .hasSize(1);
+            assertThat(result.getFirst().rule()).isEqualTo("Fan-Out Rule");
+            assertThat(result.getFirst().ruleId()).isEqualTo("rule1");
+            assertThat(result.getFirst().pipeline()).isEqualTo("Multi-Route Pipeline");
+        }
+
+        // Querying for a stream NOT in the set should return nothing
+        final PaginatedList<StreamPipelineRulesResponse> noResult = service.getRoutingRulesPaginated(
+                "s4", null, "rule", SortOrder.ASCENDING, 1, 10);
+        assertThat(noResult).isEmpty();
+    }
 }
