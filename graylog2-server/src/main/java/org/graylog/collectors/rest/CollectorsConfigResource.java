@@ -92,7 +92,7 @@ public class CollectorsConfigResource extends RestResource {
         final var hostname = RestTools.buildExternalUri(requestContext.getHeaders(), httpExternalUri).getHost();
         return new CollectorsConfig(
                 null, null, null,
-                new IngestEndpointConfig(false, hostname, DEFAULT_HTTP_PORT, null),
+                new IngestEndpointConfig(true, hostname, DEFAULT_HTTP_PORT, null),
                 new IngestEndpointConfig(false, hostname, DEFAULT_GRPC_PORT, null)
         );
     }
