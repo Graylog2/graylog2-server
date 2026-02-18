@@ -17,22 +17,29 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ExtendedStats;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ExtendedStatsAggregationBuilder;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.ExtendedStatsAggregateBase;
 
-public class OSSumOfSquaresHandler extends OSBasicSeriesSpecHandler<SumOfSquares, ExtendedStats> {
+import java.util.Optional;
+
+public class OSSumOfSquaresHandler extends OSBasicSeriesSpecHandler<SumOfSquares> {
 
     @Override
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final SumOfSquares sumOfSquaresSpec) {
-        final ExtendedStatsAggregationBuilder sumOfSquares = AggregationBuilders.extendedStats(name).field(sumOfSquaresSpec.field());
-        return SeriesAggregationBuilder.metric(sumOfSquares);
+        return SeriesAggregationBuilder.metric(new MutableNamedAggregationBuilder(name,
+                Aggregation.builder().extendedStats(e -> e.field(sumOfSquaresSpec.field()))));
     }
 
     @Override
-    protected Object getValueFromAggregationResult(final ExtendedStats extendedStats, final SumOfSquares seriesSpec) {
-        return extendedStats.getSumOfSquares();
+    protected Object getValueFromAggregationResult(final Aggregate agg, final SumOfSquares seriesSpec) {
+        return Optional.ofNullable(agg)
+                .filter(Aggregate::isExtendedStats)
+                .map(Aggregate::extendedStats)
+                .map(ExtendedStatsAggregateBase::sumOfSquares)
+                .orElse(null);
     }
 }
 

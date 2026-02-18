@@ -14,23 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import styled, { css } from 'styled-components';
+package org.graylog.storage.opensearch3.testing.client.mock;
 
-const ContentArea = styled.div<{ $isSecurityPerspective?: boolean }>(
-  ({ $isSecurityPerspective, theme }) => css`
-    display: flex;
-    flex-direction: column;
-    padding-left: 0;
-    padding-top: ${$isSecurityPerspective ? '0px' : '15px'};
-    transition: all 0.33s ease-in-out;
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    z-index: 10;
-    top: 0;
-    background: ${theme.colors.global.background};
-  `,
-);
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
-export default ContentArea;
+record StringResponse(String method, java.nio.file.PathMatcher urlPattern, String body) implements MockedResponse {
+
+    @Override
+    public InputStream newInputStream() {
+        return new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
+    }
+}
