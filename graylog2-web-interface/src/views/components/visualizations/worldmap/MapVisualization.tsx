@@ -20,6 +20,7 @@ import { CircleMarker, MapContainer, Popup, TileLayer, useMap, useMapEvents } fr
 import chroma from 'chroma-js';
 import flatten from 'lodash/flatten';
 import leafletStyles from 'leaflet/dist/leaflet.css';
+import styled from 'styled-components';
 
 import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 
@@ -28,6 +29,38 @@ import style from './MapVisualization.css';
 import InteractiveContext from '../../contexts/InteractiveContext';
 
 const DEFAULT_VIEWPORT = Viewport.create([0, 0], 1);
+const FALLBACK_TILE_URLS = [
+  'https://{s}.tile.openstreetmap.de/{z}/{x}/{y}.png',
+  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+];
+
+const ErrorOverlay = styled.div(({ theme }) => `
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: ${theme.colors.global.contentBackground};
+  opacity: 0.95;
+  z-index: 1000;
+  padding: 20px;
+  text-align: center;
+`);
+
+const ErrorTitle = styled.div(({ theme }) => `
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: ${theme.colors.text.primary};
+`);
+
+const ErrorMessage = styled.div(({ theme }) => `
+  font-size: 14px;
+  color: ${theme.colors.text.primary};
+`);
 
 type MapVisualizationProps = {
   attribution?: string;
@@ -149,13 +182,16 @@ const MapVisualization = ({
   markerRadiusSize = 10,
   onChange,
   onRenderComplete = defaultOnRenderComplete,
-  url = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  url = 'https://{s}.tile.openstreetmap.us/{z}/{x}/{y}.png',
   viewport = DEFAULT_VIEWPORT,
   width,
 }: MapVisualizationProps) => {
   const [_isMapReady, setIsMapReady] = useState<boolean>(false);
   const [_areTilesReady, setAreTilesReady] = useState<boolean>(false);
   const [_viewport, setViewport] = useState<Viewport>(DEFAULT_VIEWPORT);
+  const [_tileUrl, setTileUrl] = useState<string>(url);
+  const [_fallbackIndex, setFallbackIndex] = useState<number>(-1);
+  const [_allFallbacksFailed, setAllFallbacksFailed] = useState<boolean>(false);
   const _map: MapRef = useRef();
 
   useEffect(() => {
@@ -187,6 +223,17 @@ const MapVisualization = ({
   const _handleTilesReady = useCallback(() => {
     setAreTilesReady(true);
   }, []);
+
+  const _handleTileError = useCallback(() => {
+    const nextFallbackIndex = _fallbackIndex + 1;
+
+    if (nextFallbackIndex < FALLBACK_TILE_URLS.length) {
+      setTileUrl(FALLBACK_TILE_URLS[nextFallbackIndex]);
+      setFallbackIndex(nextFallbackIndex);
+    } else {
+      setAllFallbacksFailed(true);
+    }
+  }, [_fallbackIndex]);
 
   const _onChange = useCallback(
     (newViewport: Viewport) => {
@@ -227,6 +274,16 @@ const MapVisualization = ({
       {(interactive) => (
         <div className={locked ? style.mapLocked : ''} style={{ position: 'relative', zIndex: 0 }}>
           {locked && <div className={style.overlay} style={{ height, width }} />}
+          {_allFallbacksFailed && (
+            <ErrorOverlay>
+              <div>
+                <ErrorTitle>Unable to Load Map</ErrorTitle>
+                <ErrorMessage>
+                  All tile servers are currently unreachable. Please check your network connection or try again later.
+                </ErrorMessage>
+              </div>
+            </ErrorOverlay>
+          )}
           <MapContainer
             ref={_map}
             boundsOptions={{ maxZoom: 19, animate: interactive }}
@@ -248,7 +305,11 @@ const MapVisualization = ({
             zoomAnimation={interactive}
             zoomControl={interactive}>
             <MapEvents onViewportChanged={_onChange} />
-            <TileLayer url={url} attribution={attribution} eventHandlers={{ load: _handleTilesReady }} />
+            <TileLayer
+              url={_tileUrl}
+              attribution={attribution}
+              eventHandlers={{ load: _handleTilesReady, tileerror: _handleTileError }}
+            />
             {markers}
           </MapContainer>
         </div>
