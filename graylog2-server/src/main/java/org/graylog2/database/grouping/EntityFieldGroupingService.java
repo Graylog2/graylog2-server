@@ -12,5 +12,17 @@ public interface EntityFieldGroupingService {
                                         String groupFilter,
                                         int page,
                                         int pageSize,
+                                        SortOrder sortOrder,
+                                        SortField sortField,
                                         Subject subject);
+
+    enum SortOrder {
+        ASC,
+        DESC
+    }
+
+    enum SortField {
+        COUNT,
+        VALUE
+    }
 }
