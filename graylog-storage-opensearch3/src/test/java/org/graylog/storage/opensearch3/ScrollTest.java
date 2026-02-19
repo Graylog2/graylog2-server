@@ -257,4 +257,52 @@ class ScrollTest {
         assertThat(request.from()).isEqualTo(offset);
         assertThat(request.size()).isEqualTo(limit);
     }
+
+    @Test
+    void buildScrollRequestShouldApplySliceParams() {
+        // Given
+        final ChunkCommand.SliceParams sliceParams = new ChunkCommand.SliceParams(1, 3);
+        final ChunkCommand chunkCommand = ChunkCommand.builder()
+                .indices(Set.of("graylog_0"))
+                .range(RANGE)
+                .fields(List.of("message"))
+                .sliceParams(sliceParams)
+                .build();
+
+        final Query query = searchRequestFactory.createQuery(chunkCommand.query(), chunkCommand.range(), chunkCommand.filter());
+
+        // When
+        final SearchRequest request = scroll.buildScrollRequest(query, chunkCommand);
+
+        // Then
+        assertThat(request.slice()).isNotNull();
+        assertThat(request.slice().id()).isEqualTo(1);
+        assertThat(request.slice().max()).isEqualTo(3);
+    }
+
+    @Test
+    void buildScrollRequestShouldNotApplyOffsetWhenUsingSlices() {
+        // Given - offset and slice params are mutually exclusive
+        final int offset = 50;
+        final ChunkCommand.SliceParams sliceParams = new ChunkCommand.SliceParams(0, 2);
+        final ChunkCommand chunkCommand = ChunkCommand.builder()
+                .indices(Set.of("graylog_0"))
+                .range(RANGE)
+                .fields(List.of("message"))
+                .offset(offset)
+                .sliceParams(sliceParams)
+                .build();
+
+        final Query query = searchRequestFactory.createQuery(chunkCommand.query(), chunkCommand.range(), chunkCommand.filter());
+
+        // When
+        final SearchRequest request = scroll.buildScrollRequest(query, chunkCommand);
+
+        // Then
+        assertThat(request.slice()).isNotNull();
+        assertThat(request.slice().id()).isEqualTo(0);
+        assertThat(request.slice().max()).isEqualTo(2);
+        // Offset should NOT be applied when using slices
+        assertThat(request.from()).isNull();
+    }
 }

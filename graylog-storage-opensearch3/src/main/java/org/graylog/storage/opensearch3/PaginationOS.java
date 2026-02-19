@@ -87,7 +87,11 @@ public class PaginationOS implements MultiChunkResultRetriever {
 
             // Set pagination - apply limit first, then let batchSize override if present
             final SearchCommand searchCommand = SearchCommand.from(chunkCommand);
-            searchCommand.offset().ifPresent(builder::from);
+            // IMPORTANT: Don't use 'from' (offset) with slice parameters - they're incompatible in OpenSearch/Elasticsearch
+            // Combining them can cause incorrect results and duplicate hit counts
+            if (chunkCommand.sliceParams().isEmpty()) {
+                searchCommand.offset().ifPresent(builder::from);
+            }
             searchCommand.limit().ifPresent(builder::size);
             chunkCommand.batchSize().ifPresent(batchSize -> builder.size(Math.toIntExact(batchSize)));
 

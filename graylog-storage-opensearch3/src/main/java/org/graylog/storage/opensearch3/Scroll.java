@@ -82,8 +82,16 @@ public class Scroll implements MultiChunkResultRetriever {
                 builder.source(s -> s.filter(sf -> sf.includes(new LinkedList<>(chunkCommand.fields()))));
             }
 
+            // Set slice parameters
+            chunkCommand.sliceParams().ifPresent(sliceParams ->
+                    builder.slice(slice -> slice.id(sliceParams.id()).max(sliceParams.max()))
+            );
+
             // Set pagination parameters
-            chunkCommand.offset().ifPresent(offset -> builder.from(offset));
+            // IMPORTANT: Don't use 'from' (offset) with slice parameters - they're incompatible in OpenSearch/Elasticsearch
+            if (chunkCommand.sliceParams().isEmpty()) {
+                chunkCommand.offset().ifPresent(offset -> builder.from(offset));
+            }
 
             // Set batch size, or use limit as fallback if batchSize is absent
             if (chunkCommand.batchSize().isPresent()) {

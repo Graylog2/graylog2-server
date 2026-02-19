@@ -44,7 +44,7 @@ public class CustomOpenSearchClient extends OpenSearchClient {
     public <TDocument> SearchResponse<TDocument> search(SearchRequest request, Class<TDocument> tDocumentClass) throws IOException, OpenSearchException {
 
         // msearch doesn't support scroll, we can't switch to msearch in this case!
-        if (request.scroll() != null) {
+        if (request.scroll() != null || request.slice() != null) {
             return super.search(request, tDocumentClass);
         }
 
