@@ -19,6 +19,7 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type { StreamRule } from 'stores/streams/StreamsStore';
 
 import useCreateStreamRule from './useCreateStreamRule';
 
@@ -57,7 +58,9 @@ jest.mock('util/UserNotification', () => ({
   },
 }));
 
-const streamRule = {
+const streamRule: StreamRule = {
+  id: 'rule-id',
+  stream_id: 'stream-id',
   field: 'source',
   type: 1,
   value: 'example',
