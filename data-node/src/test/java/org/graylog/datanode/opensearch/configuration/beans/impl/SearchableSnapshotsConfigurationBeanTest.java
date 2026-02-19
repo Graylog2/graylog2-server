@@ -65,7 +65,7 @@ class SearchableSnapshotsConfigurationBeanTest {
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.nodeRoles())
-                .contains(OpensearchNodeRole.SEARCH);
+                .contains(OpensearchNodeRole.WARM);
 
         Assertions.assertThat(configurationPart.keystoreItems())
                 .map(OpensearchKeystoreItem::key)
@@ -100,7 +100,7 @@ class SearchableSnapshotsConfigurationBeanTest {
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.nodeRoles())
-                .contains(OpensearchNodeRole.SEARCH);
+                .contains(OpensearchNodeRole.WARM);
 
         Assertions.assertThat(configurationPart.keystoreItems())
                 .hasSize(1)
@@ -128,7 +128,7 @@ class SearchableSnapshotsConfigurationBeanTest {
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.nodeRoles())
-                .contains(OpensearchNodeRole.SEARCH);
+                .contains(OpensearchNodeRole.WARM);
 
         Assertions.assertThat(configurationPart.properties())
                 .containsEntry("node.search.cache.size", "10gb");
@@ -153,7 +153,7 @@ class SearchableSnapshotsConfigurationBeanTest {
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.nodeRoles())
-                .contains(OpensearchNodeRole.SEARCH);
+                .contains(OpensearchNodeRole.WARM);
 
         Assertions.assertThat(configurationPart.properties())
                 .containsEntry("node.search.cache.size", "10gb");
@@ -187,7 +187,7 @@ class SearchableSnapshotsConfigurationBeanTest {
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
 
         Assertions.assertThat(configurationPart.nodeRoles())
-                .contains(OpensearchNodeRole.SEARCH);
+                .contains(OpensearchNodeRole.WARM);
 
         Assertions.assertThat(configurationPart.keystoreItems())
                 .isEmpty();
@@ -246,7 +246,7 @@ class SearchableSnapshotsConfigurationBeanTest {
     }
 
     @Test
-    void testRepoConfigWithoutSearchRole(@TempDir Path tempDir) throws ValidationException, RepositoryException, IOException {
+    void testRepoConfigWithoutWarmRole(@TempDir Path tempDir) throws ValidationException, RepositoryException, IOException {
 
         final String snapshotsPath = Files.createDirectory(tempDir.resolve("snapshots")).toAbsolutePath().toString();
         final FsRepositoryConfiguration fsRepo = fsConfiguration(snapshotsPath);
