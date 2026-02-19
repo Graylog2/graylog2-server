@@ -46,7 +46,7 @@ public class SliceByResource extends RestResource {
                                    @QueryParam("query") @DefaultValue("") String query) {
 
         return new SliceByResponse(
-                entitySuggestionService.groupByField(collection, column, query, "TBD", getSubject()),
+                entitySuggestionService.groupByField(collection, column, query, "TBD", page, perPage, getSubject()),
                 null
         );
     }

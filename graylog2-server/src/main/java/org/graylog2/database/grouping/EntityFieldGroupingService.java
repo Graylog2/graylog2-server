@@ -10,5 +10,7 @@ public interface EntityFieldGroupingService {
                                         String fieldName,
                                         String query,
                                         String groupFilter,
+                                        int page,
+                                        int pageSize,
                                         Subject subject);
 }
