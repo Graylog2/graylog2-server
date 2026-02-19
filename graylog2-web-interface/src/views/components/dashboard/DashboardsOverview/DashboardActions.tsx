@@ -53,9 +53,7 @@ const usePluggableDashboardActions = (dashboard: View) => {
   const modalRefs = useRef({});
   const pluggableActions = usePluginEntities('views.components.dashboardActions');
 
-  const availableActions = pluggableActions.filter((perspective) =>
-    perspective.useCondition ? !!perspective.useCondition() : true,
-  );
+  const availableActions = pluggableActions.filter((action) => (action.useCondition ? !!action.useCondition() : true));
   const actions = availableActions.map(({ component: PluggableDashboardAction, key }) => (
     <PluggableDashboardAction
       key={`dashboard-action-${key}`}

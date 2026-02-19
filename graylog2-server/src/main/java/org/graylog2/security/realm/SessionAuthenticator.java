@@ -21,7 +21,6 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAccount;
-import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
@@ -51,7 +50,7 @@ public class SessionAuthenticator extends AuthenticatingRealm {
         this.userService = userService;
         this.clusterConfigService = clusterConfigService;
         // this realm either rejects a session, or allows the associated user implicitly
-        setCredentialsMatcher(new AllowAllCredentialsMatcher());
+        setCredentialsMatcher(new ServiceValidatedCredentialsMatcher());
         setAuthenticationTokenClass(SessionIdToken.class);
         setCachingEnabled(false);
     }
@@ -99,7 +98,7 @@ public class SessionAuthenticator extends AuthenticatingRealm {
         }
         ThreadContext.bind(subject);
 
-        return new SimpleAccount(user.getId(), null, "session authenticator");
+        return new SimpleAccount(user.getId(), ServiceValidatedCredentialsMatcher.AUTHENTICATED, "session authenticator");
     }
 
     private HTTPHeaderAuthConfig loadHTTPHeaderConfig() {

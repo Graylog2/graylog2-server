@@ -54,6 +54,7 @@ export interface EventDefinitionType {
     currentUser: User;
     config: EventDefinition['config'];
     definitionId?: string;
+    entityScope?: string;
   }>;
   useCondition: () => boolean;
 }
