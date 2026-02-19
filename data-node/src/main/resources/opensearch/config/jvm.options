@@ -37,6 +37,3 @@
 -Dorg.apache.lucene.store.MMapDirectory.sharedArenaMaxPermits=1
 
 -XX:+UseCompactObjectHeaders
-
-# Explicitly allow security manager (https://bugs.openjdk.java.net/browse/JDK-8270380)
--Djava.security.manager=allow
