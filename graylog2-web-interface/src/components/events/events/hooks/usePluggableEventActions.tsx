@@ -24,8 +24,7 @@ const usePluggableEventActions = (events: Array<Event>, onlyBulk: boolean = fals
   const modalRefs = useRef({});
   const pluggableActions = usePluginEntities('views.components.eventActions');
   const availableActions = pluggableActions.filter(
-    (perspective) =>
-      (onlyBulk ? perspective.isBulk : true) && (perspective.useCondition ? !!perspective.useCondition(events) : true),
+    (action) => (onlyBulk ? action.isBulk : true) && (action.useCondition ? !!action.useCondition(events) : true),
   );
 
   const actions = availableActions.map(
