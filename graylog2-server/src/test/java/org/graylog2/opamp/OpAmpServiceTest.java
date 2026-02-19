@@ -17,6 +17,8 @@
 package org.graylog2.opamp;
 
 import org.graylog.collectors.CollectorInstanceService;
+import org.graylog.collectors.FleetTransactionLogService;
+import org.graylog.collectors.SourceService;
 import org.graylog.security.pki.CertificateService;
 import org.graylog2.opamp.enrollment.EnrollmentTokenService;
 import org.graylog2.opamp.transport.OpAmpAuthContext;
@@ -60,13 +62,20 @@ class OpAmpServiceTest {
     @Mock
     private ClusterConfigService clusterConfigService;
 
+    @Mock
+    private FleetTransactionLogService fleetTransactionLogService;
+
+    @Mock
+    private SourceService sourceService;
+
     private OpAmpService opAmpService;
 
     private static final OpAmpAuthContext.Transport TRANSPORT = OpAmpAuthContext.Transport.HTTP;
 
     @BeforeEach
     void setUp() {
-        opAmpService = new OpAmpService(enrollmentTokenService, opAmpCaService, certificateService, collectorInstanceService, clusterConfigService);
+        opAmpService = new OpAmpService(enrollmentTokenService, opAmpCaService, certificateService,
+                collectorInstanceService, clusterConfigService, fleetTransactionLogService, sourceService);
     }
 
     @Test

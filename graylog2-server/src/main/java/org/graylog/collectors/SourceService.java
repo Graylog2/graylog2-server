@@ -37,14 +37,15 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
+import static org.graylog2.database.utils.MongoUtils.stream;
 
 @Singleton
 public class SourceService {
@@ -93,8 +94,8 @@ public class SourceService {
                 .page(page, permissionFilter);
     }
 
-    public List<SourceDTO> listAllByFleet(String fleetId) {
-        return collection.find(Filters.eq(SourceDTO.FIELD_FLEET_ID, fleetId)).into(new ArrayList<>());
+    public Stream<SourceDTO> streamAllByFleet(String fleetId) {
+        return stream(collection.find(Filters.eq(SourceDTO.FIELD_FLEET_ID, fleetId)));
     }
 
     public Optional<SourceDTO> get(String fleetId, String sourceId) {

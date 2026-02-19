@@ -16,11 +16,13 @@
  */
 package org.graylog.collectors;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.IndexModel;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.ReturnDocument;
 import com.mongodb.client.result.InsertOneResult;
 import jakarta.inject.Inject;
@@ -33,6 +35,7 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.search.SearchQuery;
+import org.mongojack.Id;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -44,11 +47,14 @@ import static com.mongodb.client.model.Updates.set;
 import static com.mongodb.client.model.Updates.setOnInsert;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_CAPABILITIES;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_CERTIFICATE_FINGERPRINT;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_FLEET_ID;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_IDENTIFYING_ATTRIBUTES;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_INSTANCE_UID;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_LAST_PROCESSED_TXN_SEQ;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_LAST_SEEN;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_MESSAGE_SEQ_NUM;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_NON_IDENTIFYING_ATTRIBUTES;
+import static org.graylog2.database.MongoEntity.FIELD_ID;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 
 @Singleton
@@ -56,10 +62,12 @@ public class CollectorInstanceService {
 
     private final MongoCollection<CollectorInstanceDTO> collection;
     private final MongoPaginationHelper<CollectorInstanceDTO> paginationHelper;
+    private final com.mongodb.client.MongoCollection<MinimalCollectorInstanceDTO> projectedCollection;
 
     @Inject
     public CollectorInstanceService(MongoCollections mongoCollections) {
         collection = mongoCollections.collection("collector_instances", CollectorInstanceDTO.class);
+        projectedCollection = mongoCollections.nonEntityCollection("collector_instances", MinimalCollectorInstanceDTO.class);
         paginationHelper = mongoCollections.paginationHelper(collection);
 
         collection.createIndexes(List.of(
@@ -78,7 +86,7 @@ public class CollectorInstanceService {
      * @param update the report to save
      * @return optionally the previous version of the report
      */
-    public Optional<CollectorInstanceDTO> createOrUpdateFromReport(CollectorInstanceReport update) {
+    public Optional<MinimalCollectorInstanceDTO> createOrUpdateFromReport(CollectorInstanceReport update) {
         final List<Bson> updateOps = new ArrayList<>();
 
         updateOps.add(setOnInsert(FIELD_INSTANCE_UID, update.instanceUid()));
@@ -96,13 +104,15 @@ public class CollectorInstanceService {
         // to retrieve the previous `message_seq_num`, which we need to determine what to do next.
         // the result is not the full CollectorInstanceDTO as we have it, but the minimal set of fields necessary to
         // determine next steps
-        return Optional.ofNullable(collection.findOneAndUpdate(Filters.eq(FIELD_INSTANCE_UID, update.instanceUid()),
+        final MinimalCollectorInstanceDTO previousInstanceDto = projectedCollection.findOneAndUpdate(Filters.eq(FIELD_INSTANCE_UID, update.instanceUid()),
                 combine(updateOps),
                 new FindOneAndUpdateOptions()
                         .returnDocument(ReturnDocument.BEFORE)
                         // TODO we should define a separate minimal "DTO" for using projections, otherwise we have too many optionals
-//                        .projection(Projections.include(FIELD_INSTANCE_UID, FIELD_MESSAGE_SEQ_NUM, FIELD_LAST_SEEN))
-                        .upsert(true)));
+                        .projection(Projections.include(FIELD_MESSAGE_SEQ_NUM, FIELD_LAST_PROCESSED_TXN_SEQ, FIELD_FLEET_ID))
+                        .upsert(true));
+
+        return Optional.ofNullable(previousInstanceDto);
     }
 
     public boolean existsByInstanceUid(String instanceUid) {
@@ -161,4 +171,9 @@ public class CollectorInstanceService {
                 Filters.gte(FIELD_LAST_SEEN, onlineThreshold)
         ));
     }
+
+    public record MinimalCollectorInstanceDTO(@Id @JsonProperty(FIELD_ID) String id,
+                                              @JsonProperty(FIELD_FLEET_ID) String fleetId,
+                                              @JsonProperty(FIELD_MESSAGE_SEQ_NUM) long messageSeqNum,
+                                              @JsonProperty(FIELD_LAST_PROCESSED_TXN_SEQ) long lastProcessTxnSeq) {}
 }

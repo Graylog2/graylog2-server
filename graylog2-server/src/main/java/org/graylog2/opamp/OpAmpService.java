@@ -16,11 +16,14 @@
  */
 package org.graylog2.opamp;
 
-import com.google.protobuf.ByteString;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+import com.google.protobuf.ByteString;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import jakarta.ws.rs.core.MediaType;
 import opamp.proto.Anyvalue;
 import opamp.proto.Opamp;
 import opamp.proto.Opamp.AgentToServer;
@@ -29,18 +32,22 @@ import opamp.proto.Opamp.OpAMPConnectionSettings;
 import opamp.proto.Opamp.ServerErrorResponse;
 import opamp.proto.Opamp.ServerToAgent;
 import opamp.proto.Opamp.TLSCertificate;
+import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.FleetTransactionLogService;
+import org.graylog.collectors.SourceService;
+import org.graylog.collectors.db.Attribute;
+import org.graylog.collectors.db.CoalescedActions;
+import org.graylog.collectors.db.CollectorInstanceDTO;
+import org.graylog.collectors.db.CollectorInstanceReport;
+import org.graylog.collectors.db.TransactionMarker;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
 import org.graylog.security.pki.PemUtils;
 import org.graylog2.opamp.enrollment.EnrollmentTokenService;
-import org.graylog.collectors.CollectorInstanceService;
+import org.graylog2.opamp.transport.OpAmpAuthContext;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
-import org.graylog.collectors.db.Attribute;
-import org.graylog.collectors.db.CollectorInstanceDTO;
-import org.graylog.collectors.db.CollectorInstanceReport;
-import org.graylog2.opamp.transport.OpAmpAuthContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,13 +56,13 @@ import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
 
 import static java.util.stream.Collectors.toCollection;
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -69,18 +76,20 @@ public class OpAmpService {
     private final CertificateService certificateService;
     private final CollectorInstanceService collectorInstanceService;
     private final ClusterConfigService clusterConfigService;
+    private final FleetTransactionLogService txnLogService;
+    private final SourceService sourceService;
+    private final ObjectMapper objectMapper;
 
     @Inject
-    public OpAmpService(EnrollmentTokenService enrollmentTokenService,
-                        OpAmpCaService opAmpCaService,
-                        CertificateService certificateService,
-                        CollectorInstanceService collectorInstanceService,
-                        ClusterConfigService clusterConfigService) {
+    public OpAmpService(EnrollmentTokenService enrollmentTokenService, OpAmpCaService opAmpCaService, CertificateService certificateService, CollectorInstanceService collectorInstanceService, ClusterConfigService clusterConfigService, FleetTransactionLogService txnLogService, SourceService sourceService, ObjectMapper objectMapper) {
         this.enrollmentTokenService = enrollmentTokenService;
         this.opAmpCaService = opAmpCaService;
         this.certificateService = certificateService;
         this.collectorInstanceService = collectorInstanceService;
         this.clusterConfigService = clusterConfigService;
+        this.txnLogService = txnLogService;
+        this.sourceService = sourceService;
+        this.objectMapper = objectMapper;
     }
 
     public Optional<OpAmpAuthContext> authenticate(String authHeader, OpAmpAuthContext.Transport transport) {
@@ -96,10 +105,8 @@ public class OpAmpService {
         }
 
         return switch (typ) {
-            case "enrollment" -> enrollmentTokenService.validateToken(token, transport)
-                    .map(e -> e);
-            case "agent" -> enrollmentTokenService.validateAgentToken(token, transport)
-                    .map(i -> i);
+            case "enrollment" -> enrollmentTokenService.validateToken(token, transport).map(e -> e);
+            case "agent" -> enrollmentTokenService.validateAgentToken(token, transport).map(i -> i);
             default -> {
                 LOG.warn("Unknown token type: {}", typ);
                 yield Optional.empty();
@@ -146,22 +153,15 @@ public class OpAmpService {
         // 1. Reject if already enrolled
         if (collectorInstanceService.existsByInstanceUid(instanceUid)) {
             LOG.warn("Rejecting enrollment: collector {} already enrolled", instanceUid);
-            return ServerToAgent.newBuilder()
-                    .setInstanceUid(message.getInstanceUid())
-                    .setErrorResponse(ServerErrorResponse.newBuilder()
-                            .setErrorMessage("Collector already enrolled"))
-                    .build();
+            return ServerToAgent.newBuilder().setInstanceUid(message.getInstanceUid()).setErrorResponse(ServerErrorResponse.newBuilder().setErrorMessage("Collector already enrolled")).build();
         }
 
         // 2. Extract CSR
-        if (!message.hasConnectionSettingsRequest() ||
-                !message.getConnectionSettingsRequest().hasOpamp() ||
-                !message.getConnectionSettingsRequest().getOpamp().hasCertificateRequest()) {
+        if (!message.hasConnectionSettingsRequest() || !message.getConnectionSettingsRequest().hasOpamp() || !message.getConnectionSettingsRequest().getOpamp().hasCertificateRequest()) {
             return errorResponse(message, "Missing CSR in enrollment request");
         }
 
-        final ByteString csrBytes = message.getConnectionSettingsRequest()
-                .getOpamp().getCertificateRequest().getCsr();
+        final ByteString csrBytes = message.getConnectionSettingsRequest().getOpamp().getCertificateRequest().getCsr();
         if (csrBytes.isEmpty()) {
             return errorResponse(message, "Empty CSR");
         }
@@ -169,23 +169,17 @@ public class OpAmpService {
         try {
             // 3. Sign CSR with OpAMP CA
             final CertificateEntry enrollmentCa = opAmpCaService.getOpAmpCa();
-            final X509Certificate agentCert = certificateService.builder().signCsr(
-                    csrBytes.toByteArray(), enrollmentCa, instanceUid, Duration.ofDays(365));
+            final X509Certificate agentCert = certificateService.builder().signCsr(csrBytes.toByteArray(), enrollmentCa, instanceUid, Duration.ofDays(365));
 
             // 4. Save agent record
             final String fingerprint = PemUtils.computeFingerprint(agentCert);
             final String certPem = PemUtils.toPem(agentCert);
 
-            final CollectorInstanceDTO enroll = collectorInstanceService.enroll(instanceUid, auth.fleetId(),
-                    fingerprint, certPem, enrollmentCa.id(), Instant.now());
+            final CollectorInstanceDTO enroll = collectorInstanceService.enroll(instanceUid, auth.fleetId(), fingerprint, certPem, enrollmentCa.id(), Instant.now());
             LOG.info("[{}/{}] Enrolled collector in fleet {}", enroll.instanceUid(), enroll.messageSeqNum(), enroll.fleetId());
 
             // 5. Return certificate and connection settings
-            final var connectionSettingsBuilder = ConnectionSettingsOffers.newBuilder()
-                    .setOpamp(OpAMPConnectionSettings.newBuilder()
-                            .setHeartbeatIntervalSeconds(30)
-                            .setCertificate(TLSCertificate.newBuilder()
-                                    .setCert(ByteString.copyFromUtf8(certPem))));
+            final var connectionSettingsBuilder = ConnectionSettingsOffers.newBuilder().setOpamp(OpAMPConnectionSettings.newBuilder().setHeartbeatIntervalSeconds(30).setCertificate(TLSCertificate.newBuilder().setCert(ByteString.copyFromUtf8(certPem))));
 
             // Add OTLP connection settings from CollectorsConfig
             final var collectorsConfig = clusterConfigService.get(CollectorsConfig.class);
@@ -193,44 +187,32 @@ public class OpAmpService {
                 buildOtlpConnectionSettings(connectionSettingsBuilder, collectorsConfig, opAmpCaService, clusterConfigService);
             }
 
-            return ServerToAgent.newBuilder()
-                    .setInstanceUid(message.getInstanceUid())
-                    .setConnectionSettings(connectionSettingsBuilder)
-                    .build();
+            return ServerToAgent.newBuilder().setInstanceUid(message.getInstanceUid()).setConnectionSettings(connectionSettingsBuilder).build();
         } catch (Exception e) {
             LOG.error("Enrollment failed for collector {}", instanceUid, e);
             return errorResponse(message, "Enrollment failed: " + e.getMessage());
         }
     }
 
-    static void buildOtlpConnectionSettings(ConnectionSettingsOffers.Builder builder,
-                                              CollectorsConfig config,
-                                              OpAmpCaService opAmpCaService,
-                                              ClusterConfigService clusterConfigService) {
+    static void buildOtlpConnectionSettings(ConnectionSettingsOffers.Builder builder, CollectorsConfig config, OpAmpCaService opAmpCaService, ClusterConfigService clusterConfigService) {
         try {
             final CertificateEntry opAmpCa = opAmpCaService.getOpAmpCa();
             final String caPem = opAmpCa.certificate();
 
-            final Opamp.TLSConnectionSettings tlsSettings = Opamp.TLSConnectionSettings.newBuilder()
-                    .setCaPemContents(caPem)
-                    .build();
+            final Opamp.TLSConnectionSettings tlsSettings = Opamp.TLSConnectionSettings.newBuilder().setCaPemContents(caPem).build();
 
             final ClusterId clusterId = clusterConfigService.get(ClusterId.class);
             final String serverName = (clusterId != null && clusterId.clusterId() != null) ? clusterId.clusterId() : "";
 
             if (config.http() != null && config.http().enabled()) {
-                final var settingsBuilder = Opamp.OtherConnectionSettings.newBuilder()
-                        .setDestinationEndpoint(f("https://%s:%d", config.http().hostname(), config.http().port()))
-                        .setTls(tlsSettings);
+                final var settingsBuilder = Opamp.OtherConnectionSettings.newBuilder().setDestinationEndpoint(f("https://%s:%d", config.http().hostname(), config.http().port())).setTls(tlsSettings);
                 if (!serverName.isEmpty()) {
                     settingsBuilder.putOtherSettings("server_name", serverName);
                 }
                 builder.putOtherConnections("otlp-http", settingsBuilder.build());
             }
             if (config.grpc() != null && config.grpc().enabled()) {
-                final var settingsBuilder = Opamp.OtherConnectionSettings.newBuilder()
-                        .setDestinationEndpoint(f("https://%s:%d", config.grpc().hostname(), config.grpc().port()))
-                        .setTls(tlsSettings);
+                final var settingsBuilder = Opamp.OtherConnectionSettings.newBuilder().setDestinationEndpoint(f("https://%s:%d", config.grpc().hostname(), config.grpc().port())).setTls(tlsSettings);
                 if (!serverName.isEmpty()) {
                     settingsBuilder.putOtherSettings("server_name", serverName);
                 }
@@ -252,10 +234,7 @@ public class OpAmpService {
         LOG.debug("[{}/{}] Handling OpAMP message from agent: {}", instanceUid, sequenceNum, message);
 
 
-        final CollectorInstanceReport.Builder updateBuilder = CollectorInstanceReport.builder()
-                .instanceUid(instanceUid)
-                .messageSeqNum(sequenceNum)
-                .capabilities(message.getCapabilities());
+        final CollectorInstanceReport.Builder updateBuilder = CollectorInstanceReport.builder().instanceUid(instanceUid).messageSeqNum(sequenceNum).capabilities(message.getCapabilities());
 
         final EnumSet<Opamp.AgentCapabilities> agentCapabilities = fromBitmask(message.getCapabilities());
         for (Opamp.AgentCapabilities cap : agentCapabilities) {
@@ -291,15 +270,15 @@ public class OpAmpService {
 
         // let's save the report and load the previously known values for the important properties
         // previousState is not the entire document, but the minimal version to avoid high deserialization cost
-        final Optional<CollectorInstanceDTO> previousState = collectorInstanceService.createOrUpdateFromReport(updateBuilder.build());
+        final Optional<CollectorInstanceService.MinimalCollectorInstanceDTO> previousState = collectorInstanceService.createOrUpdateFromReport(updateBuilder.build());
         long previousSeqNum = 0L;
         if (previousState.isPresent()) {
             previousSeqNum = previousState.get().messageSeqNum();
+
         }
 
         // determine our response
-        final ServerToAgent.Builder responseBuilder = ServerToAgent.newBuilder()
-                .setInstanceUid(message.getInstanceUid());
+        final ServerToAgent.Builder responseBuilder = ServerToAgent.newBuilder().setCapabilities(Opamp.ServerCapabilities.ServerCapabilities_AcceptsStatus_VALUE).setInstanceUid(message.getInstanceUid());
 
         LOG.debug("[{}/{}] previously seen sequence number {}", instanceUid, sequenceNum, previousSeqNum);
         if ((previousSeqNum == 0L) || ((previousSeqNum + 1) != sequenceNum)) {
@@ -308,6 +287,47 @@ public class OpAmpService {
             // in either case we need to request a full state report
             responseBuilder.setFlags(Opamp.ServerToAgentFlags.ServerToAgentFlags_ReportFullState_VALUE);
             LOG.debug("[{}/{}] Non-consecutive sequence detected, requesting full state report from this agent.", instanceUid, sequenceNum);
+        } else {
+            long lastProcessedTxnSeq = previousState.map(CollectorInstanceService.MinimalCollectorInstanceDTO::lastProcessTxnSeq).orElse(0L);
+            final String fleetId = previousState.map(CollectorInstanceService.MinimalCollectorInstanceDTO::fleetId).orElse(null);
+
+            final List<TransactionMarker> unprocessedMarkers = txnLogService.getUnprocessedMarkers(fleetId, instanceUid, lastProcessedTxnSeq);
+            final CoalescedActions coalesced = txnLogService.coalesce(unprocessedMarkers);
+            LOG.debug("[{}/{}] {} unprocessed markers for this collector (last processed tnx id {}) coalesced to {}", instanceUid, sequenceNum, unprocessedMarkers.size(), lastProcessedTxnSeq, coalesced);
+
+            if (coalesced.recomputeConfig()) {
+                final var effectiveFleetId = (coalesced.newFleetId() == null) ? fleetId : coalesced.newFleetId();
+                LOG.debug("[{}/{}] Computing new collector config for fleet id {}", instanceUid, sequenceNum, effectiveFleetId);
+
+                final Opamp.AgentConfigMap.Builder configMapBuilder = Opamp.AgentConfigMap.newBuilder();
+                try (final var sources = sourceService.streamAllByFleet(effectiveFleetId)) {
+                    sources.forEach(sourceDTO -> {
+                        try {
+                            configMapBuilder.putConfigMap(sourceDTO.id(),
+                                    Opamp.AgentConfigFile.newBuilder()
+                                            .setContentType(MediaType.APPLICATION_JSON)
+                                            .setBody(ByteString.copyFromUtf8(objectMapper.writeValueAsString(sourceDTO)))
+                                            .build()
+                            );
+                        } catch (JsonProcessingException e) {
+                            LOG.error("[{}/{}] Unable to serialize source configuration: {}", instanceUid, sequenceNum, sourceDTO.name(), e);
+                        }
+                    });
+                }
+
+                responseBuilder.setRemoteConfig(Opamp.AgentRemoteConfig.newBuilder()
+                        .setConfig(configMapBuilder)
+                        .setConfigHash(ByteString.copyFromUtf8("TODO")).build() // TODO consistent hashing
+                );
+            }
+            if (coalesced.restart()) {
+                LOG.debug("[{}/{}] Scheduled restart", instanceUid, sequenceNum);
+                responseBuilder.setCommand(Opamp.ServerToAgentCommand.newBuilder().setType(Opamp.CommandType.CommandType_Restart).build());
+            }
+            if (coalesced.runDiscovery()) {
+                LOG.debug("[{}/{}] Scheduled discovery run", instanceUid, sequenceNum);
+                // TODO we don't have discovery yet, this is probably a custom message in the future
+            }
         }
 
         return responseBuilder.build();
@@ -328,28 +348,20 @@ public class OpAmpService {
                 case BYTES_VALUE -> // TODO does this make sense for us?
                         attributes.add(Attribute.of(keyValue.getKey(), value.getBytesValue()));
                 case ARRAY_VALUE, KVLIST_VALUE ->
-                        LOG.error("[{}/{}] Unsupported value type for identifying attributes, must be a scalar type but is {}",
-                                instanceUid, sequenceNum, value.getValueCase());
+                        LOG.error("[{}/{}] Unsupported value type for identifying attributes, must be a scalar type but is {}", instanceUid, sequenceNum, value.getValueCase());
                 case VALUE_NOT_SET ->
-                        LOG.error("[{}/{}] Unsupported value type for identifying attributes, the value is undefined",
-                                instanceUid, sequenceNum);
+                        LOG.error("[{}/{}] Unsupported value type for identifying attributes, the value is undefined", instanceUid, sequenceNum);
             }
         }
         return attributes;
     }
 
     private static EnumSet<Opamp.AgentCapabilities> fromBitmask(long capabilities) {
-        return Arrays.stream(Opamp.AgentCapabilities.values())
-                .filter(c -> c != Opamp.AgentCapabilities.UNRECOGNIZED)
-                .filter(c -> (capabilities & c.getNumber()) != 0)
-                .collect(toCollection(() -> EnumSet.noneOf(Opamp.AgentCapabilities.class)));
+        return Arrays.stream(Opamp.AgentCapabilities.values()).filter(c -> c != Opamp.AgentCapabilities.UNRECOGNIZED).filter(c -> (capabilities & c.getNumber()) != 0).collect(toCollection(() -> EnumSet.noneOf(Opamp.AgentCapabilities.class)));
     }
 
     private ServerToAgent errorResponse(AgentToServer message, String errorMessage) {
-        return ServerToAgent.newBuilder()
-                .setInstanceUid(message.getInstanceUid())
-                .setErrorResponse(ServerErrorResponse.newBuilder().setErrorMessage(errorMessage))
-                .build();
+        return ServerToAgent.newBuilder().setInstanceUid(message.getInstanceUid()).setErrorResponse(ServerErrorResponse.newBuilder().setErrorMessage(errorMessage)).build();
     }
 
     private static String bytesToUuidString(byte[] bytes) {

@@ -128,8 +128,9 @@ public class FleetService {
 
     public Optional<FleetConfig> assembleConfig(String fleetId) {
         return get(fleetId).map(fleet -> {
-            var sources = sourceService.listAllByFleet(fleetId);
-            return new FleetConfig(fleet, sources);
+            try (final var sources = sourceService.streamAllByFleet(fleetId)) {
+                return new FleetConfig(fleet, sources.toList());
+            }
         });
     }
 }

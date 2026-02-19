@@ -178,14 +178,14 @@ class SourceServiceTest {
     }
 
     @Test
-    void listAllByFleet() {
+    void streamAllByFleet() {
         FleetDTO fleet = fleetService.create("test-fleet", "A test fleet", null);
         sourceService.create(fleet.id(), "source-1", "Source 1", true, validFileConfig());
         sourceService.create(fleet.id(), "source-2", "Source 2", true, validFileConfig());
 
-        List<SourceDTO> sources = sourceService.listAllByFleet(fleet.id());
-
-        assertThat(sources).hasSize(2);
+        try (final var stream = sourceService.streamAllByFleet(fleet.id())) {
+            assertThat(stream).hasSize(2);
+        }
     }
 
     @Test
@@ -197,7 +197,9 @@ class SourceServiceTest {
         long deleted = sourceService.deleteAllByFleet(fleet.id());
 
         assertThat(deleted).isEqualTo(2);
-        assertThat(sourceService.listAllByFleet(fleet.id())).isEmpty();
+        try (final var stream = sourceService.streamAllByFleet(fleet.id())) {
+            assertThat(stream).isEmpty();
+        }
     }
 
     @Test

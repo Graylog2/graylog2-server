@@ -203,6 +203,6 @@ class FleetServiceTest {
         fleetService.delete(fleet.id());
 
         assertThat(fleetService.get(fleet.id())).isEmpty();
-        assertThat(sourceService.listAllByFleet(fleet.id())).isEmpty();
+        assertThat(sourceService.streamAllByFleet(fleet.id())).isEmpty();
     }
 }
