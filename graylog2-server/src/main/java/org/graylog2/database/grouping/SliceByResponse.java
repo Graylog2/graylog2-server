@@ -5,6 +5,7 @@ import org.graylog2.database.PaginatedList;
 
 import java.util.List;
 
-public record SliceByResponse(@JsonProperty("slices") List<EntityFieldGroup> suggestions,
+//TODO: unify field names and this record name with Slices record from unmerged Jan's PR
+public record SliceByResponse(@JsonProperty("slices") List<EntityFieldGroup> slices,
                               @JsonProperty("pagination") PaginatedList.PaginationInfo pagination) {
 }
