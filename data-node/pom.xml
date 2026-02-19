@@ -43,8 +43,8 @@
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <opensearch.version>3.5.0</opensearch.version>
-        <opensearch.mac.jdk.version>21.0.7</opensearch.mac.jdk.version>
-        <opensearch.mac.jdk.build>6</opensearch.mac.jdk.build>
+        <opensearch.mac.jdk.version>25.0.2</opensearch.mac.jdk.version>
+        <opensearch.mac.jdk.build>10</opensearch.mac.jdk.build>
 
         <!--
            We don't need to sign anything in this module. This fixes a release build error related to setting
@@ -1010,10 +1010,10 @@
                                 </goals>
                                 <configuration>
                                     <url>
-                                        https://github.com/adoptium/temurin21-binaries/releases/download/jdk-${opensearch.mac.jdk.version}%2B${opensearch.mac.jdk.build}/OpenJDK21U-jdk_x64_mac_hotspot_${opensearch.mac.jdk.version}_${opensearch.mac.jdk.build}.tar.gz
+                                        https://github.com/adoptium/temurin25-binaries/releases/download/jdk-${opensearch.mac.jdk.version}%2B${opensearch.mac.jdk.build}/OpenJDK25U-jdk_x64_mac_hotspot_${opensearch.mac.jdk.version}_${opensearch.mac.jdk.build}.tar.gz
                                     </url>
                                     <sha512>
-                                        981de4ed6629975b84f2604dd2c601e66633691b1da835e0b8741c4712d5b24b51e757686624dc1b2492e61a9e9a27c8ac73bfc9e571d6e8c1c5db8ec6a4189c
+                                        76d05d952ea451e0f0872e20895d7e65eb501dcd60b7e376819a489e2a7fdc758dfccc098f5b17024bb8a8b633240d84a50021628ab7a5525abc7d3cd09765a4
                                     </sha512>
                                     <outputDirectory>
                                         ${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/jdk-mac
@@ -1035,10 +1035,10 @@
                                 </goals>
                                 <configuration>
                                     <url>
-                                        https://github.com/adoptium/temurin21-binaries/releases/download/jdk-${opensearch.mac.jdk.version}%2B${opensearch.mac.jdk.build}/OpenJDK21U-jdk_aarch64_mac_hotspot_${opensearch.mac.jdk.version}_${opensearch.mac.jdk.build}.tar.gz
+                                        https://github.com/adoptium/temurin25-binaries/releases/download/jdk-${opensearch.mac.jdk.version}%2B${opensearch.mac.jdk.build}/OpenJDK25U-jdk_aarch64_mac_hotspot_${opensearch.mac.jdk.version}_${opensearch.mac.jdk.build}.tar.gz
                                     </url>
                                     <sha512>
-                                        5bd61c1634daa5b6e0c473de6c0883ac2d29c0daa7101dd852113a5197b6cd60f790c0f7f53a64b2dbbb45f030ee4481c9d38745615a1a39b8efbef41e4b8115
+                                        f15a4ae987c1da6e9d12afafde3a95c5ac8c0f35617b6b49e9de1ba0d8eb886d6c1b3f6492dfa0de44996e5a5cde41e6240e05568ec563498a7471c8bd94c044
                                     </sha512>
                                     <outputDirectory>
                                         ${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/jdk-mac
