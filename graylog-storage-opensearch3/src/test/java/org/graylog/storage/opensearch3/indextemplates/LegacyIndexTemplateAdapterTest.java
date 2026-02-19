@@ -53,9 +53,6 @@ class LegacyIndexTemplateAdapterTest {
     private LegacyIndexTemplateAdapter toTest;
 
     @Mock
-    private OSSerializationUtils templateMapper;
-
-    @Mock
     private OpenSearchIndicesClient indicesClient;
 
     @BeforeEach
@@ -65,7 +62,7 @@ class LegacyIndexTemplateAdapterTest {
         doReturn(syncClient).when(officialOpensearchClient).sync();
         doReturn(indicesClient).when(syncClient).indices();
 
-        toTest = new LegacyIndexTemplateAdapter(officialOpensearchClient, templateMapper);
+        toTest = new LegacyIndexTemplateAdapter(officialOpensearchClient);
     }
 
     @Test
@@ -78,8 +75,6 @@ class LegacyIndexTemplateAdapterTest {
                 13L,
                 new Template.Settings(Map.of())
         );
-        doReturn(typeMapping).when(templateMapper).fromMap(template.mappings(), TypeMapping._DESERIALIZER);
-        doReturn(settings).when(templateMapper).toJsonDataMap(template.settings());
 
         doReturn(PutTemplateResponse.builder().acknowledged(true).build())
                 .when(indicesClient)

@@ -24,7 +24,7 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
-import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
+import org.graylog.storage.opensearch3.OSSerializationUtils;
 import org.graylog.storage.opensearch3.views.MutableSearchRequestBuilder;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog2.indexer.results.ResultMessage;
@@ -60,21 +60,19 @@ public class OSMessageList implements OSSearchTypeHandler<MessageList> {
     private final LegacyDecoratorProcessor decoratorProcessor;
     private final ResultMessageFactory resultMessageFactory;
     private final boolean allowHighlighting;
-    private final OSSerializationUtils serializationUtils;
 
     @Inject
     public OSMessageList(LegacyDecoratorProcessor decoratorProcessor,
                          ResultMessageFactory resultMessageFactory,
-                         @Named("allow_highlighting") boolean allowHighlighting, OSSerializationUtils serializationUtils) {
+                         @Named("allow_highlighting") boolean allowHighlighting) {
         this.decoratorProcessor = decoratorProcessor;
         this.resultMessageFactory = resultMessageFactory;
         this.allowHighlighting = allowHighlighting;
-        this.serializationUtils = serializationUtils;
     }
 
     private ResultMessage resultMessageFromSearchHit(Hit<JsonData> hit) {
         final Map<String, List<String>> highlights = hit.highlight();
-        return resultMessageFactory.parseFromSource(hit.id(), hit.index(), serializationUtils.toMap(hit.source()), highlights);
+        return resultMessageFactory.parseFromSource(hit.id(), hit.index(), OSSerializationUtils.toMap(hit.source()), highlights);
     }
 
     @Override

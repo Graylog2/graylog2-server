@@ -16,7 +16,7 @@
  */
 package org.graylog.storage.opensearch3.client;
 
-import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
+import org.graylog.storage.opensearch3.OSSerializationUtils;
 import org.opensearch.client.opensearch.OpenSearchAsyncClient;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch.core.SearchRequest;
@@ -27,11 +27,9 @@ import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
 public class CustomAsyncOpenSearchClient extends OpenSearchAsyncClient {
-    private final OSSerializationUtils serializationUtils;
 
     public CustomAsyncOpenSearchClient(OpenSearchTransport transport) {
         super(transport);
-        this.serializationUtils = new OSSerializationUtils();
     }
 
     /**
@@ -41,7 +39,7 @@ public class CustomAsyncOpenSearchClient extends OpenSearchAsyncClient {
      */
     @Override
     public <TDocument> CompletableFuture<SearchResponse<TDocument>> search(SearchRequest request, Class<TDocument> tDocumentClass) throws IOException, OpenSearchException {
-        return super.msearch(msearch -> msearch.searches(serializationUtils.toMsearch(request)), tDocumentClass)
+        return super.msearch(msearch -> msearch.searches(OSSerializationUtils.toMsearch(request)), tDocumentClass)
                 // TODO: error handling?
                 .thenApply(result -> result.responses().getFirst().result());
     }

@@ -16,7 +16,7 @@
  */
 package org.graylog.storage.opensearch3.client;
 
-import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
+import org.graylog.storage.opensearch3.OSSerializationUtils;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch.core.MsearchResponse;
@@ -28,11 +28,9 @@ import org.opensearch.client.transport.OpenSearchTransport;
 import java.io.IOException;
 
 public class CustomOpenSearchClient extends OpenSearchClient {
-    private final OSSerializationUtils serializationUtils;
 
     public CustomOpenSearchClient(OpenSearchTransport transport) {
         super(transport);
-        this.serializationUtils = new OSSerializationUtils();
     }
 
     /**
@@ -42,7 +40,7 @@ public class CustomOpenSearchClient extends OpenSearchClient {
      */
     @Override
     public <TDocument> SearchResponse<TDocument> search(SearchRequest request, Class<TDocument> tDocumentClass) throws IOException, OpenSearchException {
-        final MsearchResponse<TDocument> multiSearchResponse = super.msearch(req -> req.searches(serializationUtils.toMsearch(request)), tDocumentClass);
+        final MsearchResponse<TDocument> multiSearchResponse = super.msearch(req -> req.searches(OSSerializationUtils.toMsearch(request)), tDocumentClass);
         final MultiSearchResponseItem<TDocument> resp = multiSearchResponse.responses().getFirst();
         if (resp.isFailure()) {
             throw new OpenSearchException(resp.failure());
