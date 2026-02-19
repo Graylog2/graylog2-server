@@ -4,7 +4,7 @@
       "document": [
         {
           "index": {
-            "indexName": "gl-events_1",
+            "indexName": "gl-events_0",
             "indexType": "message",
             "indexId": "01AAAAAAAA0000000000000001"
           }
@@ -20,7 +20,7 @@
             "timerange_start": "2025-01-15 09:00:00.000",
             "timerange_end": "2025-01-15 10:00:00.000",
             "streams": ["000000000000000000000002"],
-            "source_streams": ["000000000000000000000001"],
+            "source_streams": ["stream-001"],
             "message": "Test event 1",
             "source": "test-host",
             "key_tuple": [],
@@ -40,7 +40,7 @@
       "document": [
         {
           "index": {
-            "indexName": "gl-events_1",
+            "indexName": "gl-events_0",
             "indexType": "message",
             "indexId": "01AAAAAAAA0000000000000002"
           }
@@ -56,7 +56,7 @@
             "timerange_start": "2025-01-15 09:30:00.000",
             "timerange_end": "2025-01-15 10:30:00.000",
             "streams": ["000000000000000000000002"],
-            "source_streams": ["000000000000000000000001"],
+            "source_streams": ["stream-001"],
             "message": "Test event 2",
             "source": "test-host",
             "key_tuple": [],
@@ -76,7 +76,7 @@
       "document": [
         {
           "index": {
-            "indexName": "gl-events_1",
+            "indexName": "gl-events_0",
             "indexType": "message",
             "indexId": "01AAAAAAAA0000000000000003"
           }
@@ -92,7 +92,7 @@
             "timerange_start": "2025-01-15 10:00:00.000",
             "timerange_end": "2025-01-15 11:00:00.000",
             "streams": ["000000000000000000000002"],
-            "source_streams": ["000000000000000000000001"],
+            "source_streams": ["stream-001"],
             "message": "Test event 3",
             "source": "test-host",
             "key_tuple": [],
@@ -112,7 +112,7 @@
       "document": [
         {
           "index": {
-            "indexName": "gl-events_1",
+            "indexName": "gl-events_0",
             "indexType": "message",
             "indexId": "01AAAAAAAA0000000000000004"
           }
@@ -128,7 +128,7 @@
             "timerange_start": "2025-01-15 10:30:00.000",
             "timerange_end": "2025-01-15 11:30:00.000",
             "streams": ["000000000000000000000002"],
-            "source_streams": ["000000000000000000000001"],
+            "source_streams": ["stream-001"],
             "message": "Test event 4",
             "source": "test-host",
             "key_tuple": [],
@@ -148,7 +148,7 @@
       "document": [
         {
           "index": {
-            "indexName": "gl-events_1",
+            "indexName": "gl-events_0",
             "indexType": "message",
             "indexId": "01AAAAAAAA0000000000000005"
           }
@@ -164,7 +164,7 @@
             "timerange_start": "2025-01-15 11:00:00.000",
             "timerange_end": "2025-01-15 12:00:00.000",
             "streams": ["000000000000000000000002"],
-            "source_streams": ["000000000000000000000001"],
+            "source_streams": ["stream-001"],
             "message": "Test event 5",
             "source": "test-host",
             "key_tuple": [],
@@ -184,7 +184,7 @@
       "document": [
         {
           "index": {
-            "indexName": "gl-events_1",
+            "indexName": "gl-events_0",
             "indexType": "message",
             "indexId": "01AAAAAAAA0000000000000006"
           }
@@ -200,7 +200,7 @@
             "timerange_start": "2025-01-15 11:30:00.000",
             "timerange_end": "2025-01-15 12:30:00.000",
             "streams": ["000000000000000000000002"],
-            "source_streams": ["000000000000000000000001"],
+            "source_streams": ["stream-001"],
             "message": "Test event 6",
             "source": "test-host",
             "key_tuple": [],
@@ -220,7 +220,7 @@
       "document": [
         {
           "index": {
-            "indexName": "gl-events_1",
+            "indexName": "gl-events_0",
             "indexType": "message",
             "indexId": "01AAAAAAAA0000000000000007"
           }
@@ -236,7 +236,7 @@
             "timerange_start": "2025-01-15 12:00:00.000",
             "timerange_end": "2025-01-15 13:00:00.000",
             "streams": ["000000000000000000000002"],
-            "source_streams": ["000000000000000000000001"],
+            "source_streams": ["stream-001"],
             "message": "Test event 7",
             "source": "test-host",
             "key_tuple": [],
@@ -256,7 +256,7 @@
       "document": [
         {
           "index": {
-            "indexName": "gl-events_1",
+            "indexName": "gl-events_0",
             "indexType": "message",
             "indexId": "01AAAAAAAA0000000000000008"
           }
@@ -272,7 +272,7 @@
             "timerange_start": "2025-01-15 12:30:00.000",
             "timerange_end": "2025-01-15 13:30:00.000",
             "streams": ["000000000000000000000002"],
-            "source_streams": ["000000000000000000000001"],
+            "source_streams": ["stream-001"],
             "message": "Test event 8",
             "source": "test-host",
             "key_tuple": [],
@@ -292,7 +292,7 @@
       "document": [
         {
           "index": {
-            "indexName": "gl-events_1",
+            "indexName": "gl-events_0",
             "indexType": "message",
             "indexId": "01AAAAAAAA0000000000000009"
           }
@@ -308,7 +308,7 @@
             "timerange_start": "2025-01-15 13:00:00.000",
             "timerange_end": "2025-01-15 14:00:00.000",
             "streams": ["000000000000000000000002"],
-            "source_streams": ["000000000000000000000001"],
+            "source_streams": ["stream-001"],
             "message": "Test event 9",
             "source": "test-host",
             "key_tuple": [],
@@ -328,7 +328,7 @@
       "document": [
         {
           "index": {
-            "indexName": "gl-events_1",
+            "indexName": "gl-events_0",
             "indexType": "message",
             "indexId": "01AAAAAAAA000000000000000A"
           }
@@ -344,7 +344,7 @@
             "timerange_start": "2025-01-15 13:30:00.000",
             "timerange_end": "2025-01-15 14:30:00.000",
             "streams": ["000000000000000000000002"],
-            "source_streams": ["000000000000000000000001"],
+            "source_streams": ["stream-001"],
             "message": "Test event 10",
             "source": "test-host",
             "key_tuple": [],
@@ -364,7 +364,7 @@
       "document": [
         {
           "index": {
-            "indexName": "gl-events_1",
+            "indexName": "gl-events_0",
             "indexType": "message",
             "indexId": "01AAAAAAAA000000000000000B"
           }
@@ -380,7 +380,7 @@
             "timerange_start": "2025-01-15 14:00:00.000",
             "timerange_end": "2025-01-15 15:00:00.000",
             "streams": ["000000000000000000000002"],
-            "source_streams": ["000000000000000000000001"],
+            "source_streams": ["stream-001"],
             "message": "Test event 11",
             "source": "test-host",
             "key_tuple": [],
@@ -400,7 +400,7 @@
       "document": [
         {
           "index": {
-            "indexName": "gl-events_1",
+            "indexName": "gl-events_0",
             "indexType": "message",
             "indexId": "01AAAAAAAA000000000000000C"
           }
@@ -416,7 +416,7 @@
             "timerange_start": "2025-01-15 14:30:00.000",
             "timerange_end": "2025-01-15 15:30:00.000",
             "streams": ["000000000000000000000002"],
-            "source_streams": ["000000000000000000000001"],
+            "source_streams": ["stream-001"],
             "message": "Test event 12",
             "source": "test-host",
             "key_tuple": [],

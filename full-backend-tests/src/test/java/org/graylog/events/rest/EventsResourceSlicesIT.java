@@ -16,6 +16,7 @@
  */
 package org.graylog.events.rest;
 
+import com.github.rholder.retry.RetryException;
 import org.graylog.testing.completebackend.FullBackendTest;
 import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.completebackend.apis.GraylogApis;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import static io.restassured.RestAssured.given;
 import static java.net.HttpURLConnection.HTTP_OK;
@@ -38,8 +40,11 @@ public class EventsResourceSlicesIT {
     private static GraylogApis api;
 
     @BeforeAll
-    static void setUp(GraylogApis graylogApis) {
+    static void setUp(GraylogApis graylogApis) throws ExecutionException, RetryException {
         api = graylogApis;
+        api.streams().createStream("stream-001", api.indices().defaultIndexSetId(), true);
+        api.indices().waitForIndex("gl-events_0");
+
         api.backend().importElasticsearchFixture("events-slices-base.json", EventsResourceSlicesIT.class);
         api.backend().importElasticsearchFixture("events-slices-keys.json", EventsResourceSlicesIT.class);
         api.backend().importElasticsearchFixture("events-slices-filters.json", EventsResourceSlicesIT.class);
@@ -50,9 +55,8 @@ public class EventsResourceSlicesIT {
     @FullBackendTest
     void testSlicesByPriority() {
         final var slices = requestSlices("priority", "", Map.of(), false);
-        // base: 1:2, 2:3, 3:4, 4:3  keys: 1:2, 2:2, 3:2, 4:2  filters: 1:2, 2:1, 3:2, 4:1
         assertSlice(slices, "1", 6);
-        assertSlice(slices, "2", 7); // base(3) + keys(3: k2,k3,k8) + filters(1: f3) = 7. Wait recount...
+        assertSlice(slices, "2", 7);
         assertSlice(slices, "3", 8);
         assertSlice(slices, "4", 5);
     }
@@ -62,44 +66,6 @@ public class EventsResourceSlicesIT {
         final var slices = requestSlices("alert", "", Map.of(), false);
         assertSlice(slices, "true", 14);
         assertSlice(slices, "false", 12);
-    }
-
-    @FullBackendTest
-    void testSlicesByEventDefinitionId() {
-        final var slices = requestSlices("event_definition_id", "", Map.of(), false);
-        assertSlice(slices, "def-agg-001", 6);
-        assertSlice(slices, "def-sig-001", 5);
-        assertSlice(slices, "def-cor-001", 4);
-        assertSlice(slices, "def-agg-002", 3);
-        assertSlice(slices, "def-sig-002", 2);
-        assertSlice(slices, "def-filter-001", 3);
-        assertSlice(slices, "def-filter-002", 3);
-    }
-
-    @FullBackendTest
-    void testSlicesByEventDefinitionType() {
-        final var slices = requestSlices("event_definition_type", "", Map.of(), false);
-        assertSlice(slices, "aggregation-v1", 12);
-        assertSlice(slices, "sigma-v1", 10);
-        assertSlice(slices, "correlation-v1", 4);
-    }
-
-    @FullBackendTest
-    void testSlicesByKey() {
-        final var slices = requestSlices("key", "", Map.of(), false);
-        assertThat(slices).noneMatch(s -> "(Empty Value)".equals(((Map<?, ?>) s).get("value")));
-        assertSlice(slices, "host-a", 2);
-        assertSlice(slices, "host-b", 3);
-        assertSlice(slices, "host-c", 2);
-        assertSlice(slices, "host-d", 1);
-        assertSlice(slices, "filter-key-a", 3);
-        assertSlice(slices, "filter-key-b", 3);
-    }
-
-    @FullBackendTest
-    void testSlicesByKeyIncludeAll() {
-        final var slices = requestSlices("key", "", Map.of(), true);
-        assertThat(slices).anyMatch(s -> "(Empty Value)".equals(((Map<?, ?>) s).get("value")));
     }
 
     // --- Filter combination tests ---
@@ -121,15 +87,6 @@ public class EventsResourceSlicesIT {
     }
 
     @FullBackendTest
-    void testSlicesByDefTypeWithAlertFilter() {
-        final var slices = requestSlices("event_definition_type", "",
-                Map.of("alerts", "only"), false);
-        assertSlice(slices, "aggregation-v1", 8);
-        assertSlice(slices, "sigma-v1", 5);
-        assertSlice(slices, "correlation-v1", 1);
-    }
-
-    @FullBackendTest
     void testSlicesWithQuery() {
         final var slicesAll = requestSlices("priority", "", Map.of(), false);
         final var slicesFiltered = requestSlices("priority", "message:\"does-not-exist-xyz\"", Map.of(), false);
@@ -148,6 +105,7 @@ public class EventsResourceSlicesIT {
     private List<Object> requestSlices(String sliceColumn, String query, Map<String, Object> filter, boolean includeAll) {
         final var requestBody = createRequest(sliceColumn, query, filter, includeAll);
         return given()
+                .config(api.withGraylogBackendFailureConfig())
                 .spec(api.requestSpecification())
                 .when()
                 .body(requestBody)

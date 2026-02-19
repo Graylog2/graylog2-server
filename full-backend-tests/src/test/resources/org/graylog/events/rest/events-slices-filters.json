@@ -4,7 +4,7 @@
       "document": [
         {
           "index": {
-            "indexName": "gl-events_1",
+            "indexName": "gl-events_0",
             "indexType": "message",
             "indexId": "01AAAAAAAAF0000000000001"
           }
@@ -20,7 +20,7 @@
             "timerange_start": "2025-01-15 20:00:00.000",
             "timerange_end": "2025-01-15 21:00:00.000",
             "streams": ["000000000000000000000002"],
-            "source_streams": ["000000000000000000000001"],
+            "source_streams": ["stream-001"],
             "message": "Test filter event 1",
             "source": "test-host",
             "key_tuple": ["filter-key-a"],
@@ -40,7 +40,7 @@
       "document": [
         {
           "index": {
-            "indexName": "gl-events_1",
+            "indexName": "gl-events_0",
             "indexType": "message",
             "indexId": "01AAAAAAAAF0000000000002"
           }
@@ -56,7 +56,7 @@
             "timerange_start": "2025-01-15 20:30:00.000",
             "timerange_end": "2025-01-15 21:30:00.000",
             "streams": ["000000000000000000000002"],
-            "source_streams": ["000000000000000000000001"],
+            "source_streams": ["stream-001"],
             "message": "Test filter event 2",
             "source": "test-host",
             "key_tuple": ["filter-key-a"],
@@ -76,7 +76,7 @@
       "document": [
         {
           "index": {
-            "indexName": "gl-events_1",
+            "indexName": "gl-events_0",
             "indexType": "message",
             "indexId": "01AAAAAAAAF0000000000003"
           }
@@ -92,7 +92,7 @@
             "timerange_start": "2025-01-15 21:00:00.000",
             "timerange_end": "2025-01-15 22:00:00.000",
             "streams": ["000000000000000000000002"],
-            "source_streams": ["000000000000000000000001"],
+            "source_streams": ["stream-001"],
             "message": "Test filter event 3",
             "source": "test-host",
             "key_tuple": ["filter-key-b"],
@@ -112,7 +112,7 @@
       "document": [
         {
           "index": {
-            "indexName": "gl-events_1",
+            "indexName": "gl-events_0",
             "indexType": "message",
             "indexId": "01AAAAAAAAF0000000000004"
           }
@@ -128,7 +128,7 @@
             "timerange_start": "2025-01-15 21:30:00.000",
             "timerange_end": "2025-01-15 22:30:00.000",
             "streams": ["000000000000000000000002"],
-            "source_streams": ["000000000000000000000001"],
+            "source_streams": ["stream-001"],
             "message": "Test filter event 4",
             "source": "test-host",
             "key_tuple": ["filter-key-a"],
@@ -148,7 +148,7 @@
       "document": [
         {
           "index": {
-            "indexName": "gl-events_1",
+            "indexName": "gl-events_0",
             "indexType": "message",
             "indexId": "01AAAAAAAAF0000000000005"
           }
@@ -164,7 +164,7 @@
             "timerange_start": "2025-01-15 22:00:00.000",
             "timerange_end": "2025-01-15 23:00:00.000",
             "streams": ["000000000000000000000002"],
-            "source_streams": ["000000000000000000000001"],
+            "source_streams": ["stream-001"],
             "message": "Test filter event 5",
             "source": "test-host",
             "key_tuple": ["filter-key-b"],
@@ -184,7 +184,7 @@
       "document": [
         {
           "index": {
-            "indexName": "gl-events_1",
+            "indexName": "gl-events_0",
             "indexType": "message",
             "indexId": "01AAAAAAAAF0000000000006"
           }
@@ -200,7 +200,7 @@
             "timerange_start": "2025-01-15 22:30:00.000",
             "timerange_end": "2025-01-15 23:30:00.000",
             "streams": ["000000000000000000000002"],
-            "source_streams": ["000000000000000000000001"],
+            "source_streams": ["stream-001"],
             "message": "Test filter event 6",
             "source": "test-host",
             "key_tuple": ["filter-key-b"],
