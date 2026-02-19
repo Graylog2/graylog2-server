@@ -43,7 +43,11 @@ public class SliceByResource extends RestResource {
                                    @Parameter(name = "per_page")
                                    @QueryParam("per_page") @DefaultValue("10") int perPage,
                                    @Parameter(name = "query")
-                                   @QueryParam("query") @DefaultValue("") String query) {
+                                   @QueryParam("query") @DefaultValue("") String query,
+                                   @Parameter(name = "sort_order")
+                                   @QueryParam("sort_order") @DefaultValue("DESC") EntityFieldGroupingService.SortOrder sortOrder,
+                                   @Parameter(name = "sort_field")
+                                   @QueryParam("sort_field") @DefaultValue("COUNT") EntityFieldGroupingService.SortField sortField) {
 
         return new SliceByResponse(
                 entitySuggestionService.groupByField(
@@ -53,8 +57,8 @@ public class SliceByResource extends RestResource {
                         "TBD",
                         page,
                         perPage,
-                        EntityFieldGroupingService.SortOrder.DESC,
-                        EntityFieldGroupingService.SortField.COUNT,
+                        sortOrder,
+                        sortField,
                         getSubject()),
                 null
         );
