@@ -15,6 +15,18 @@ This release includes frontend plugin API changes related to perspectives.
 - The `perspectives` plugin export has been removed from core.
 - Plugin-provided `navigation` and `pageNavigation` entities no longer support the `perspective` key.
 
+### Security Events UI Routes Consolidated into Alerts
+
+The dedicated Security Events UI routes under `/security/security-events/*` have been removed in favor of the
+existing Alerts routes.
+
+If you have bookmarks, links, or runbooks pointing to the old routes, update them to:
+
+- `/alerts`
+- `/alerts/definitions`
+- `/alerts/notifications`
+- `/alerts/event-procedures/*`
+
 ### External Authentication Services: Changed Default User Time Zone
 
 The authentication backends for Active Directory, LDAP, OIDC, Okta, and SAML previously set the time zone for
