@@ -205,7 +205,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     }
 
     @AutoValue.Builder
-    public static abstract class Builder implements SourcedScopedEntity.Builder<Builder> {
+    public abstract static class Builder implements SourcedScopedEntity.Builder<Builder> {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_EventDefinitionDto.Builder()
