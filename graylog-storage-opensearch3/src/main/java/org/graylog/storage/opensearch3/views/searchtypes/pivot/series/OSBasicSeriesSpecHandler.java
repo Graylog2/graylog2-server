@@ -19,19 +19,20 @@ package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpecHandler;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch.core.msearch.MultiSearchItem;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public abstract class OSBasicSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGGREGATION_RESULT extends Aggregation>
-        extends OSPivotSeriesSpecHandler<SPEC_TYPE, AGGREGATION_RESULT> {
+public abstract class OSBasicSeriesSpecHandler<SPEC_TYPE extends SeriesSpec>
+        extends OSPivotSeriesSpecHandler<SPEC_TYPE> {
 
     @Override
     public @Nonnull List<SeriesAggregationBuilder> doCreateAggregation(String name,
@@ -47,8 +48,8 @@ public abstract class OSBasicSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGG
     @Override
     public Stream<SeriesSpecHandler.Value> doHandleResult(Pivot pivot,
                                                           SPEC_TYPE seriesSpec,
-                                                          SearchResponse searchResult,
-                                                          AGGREGATION_RESULT aggregationResult,
+                                                          MultiSearchItem<JsonData> queryResult,
+                                                          Aggregate aggregationResult,
                                                           OSGeneratedQueryContext queryContext) {
 
         return Optional.ofNullable(getValueFromAggregationResult(aggregationResult, seriesSpec))
@@ -59,5 +60,5 @@ public abstract class OSBasicSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGG
                 .stream();
     }
 
-    protected abstract Object getValueFromAggregationResult(final AGGREGATION_RESULT aggregationResult, final SPEC_TYPE seriesSpec);
+    protected abstract Object getValueFromAggregationResult(final Aggregate aggregationResult, final SPEC_TYPE seriesSpec);
 }

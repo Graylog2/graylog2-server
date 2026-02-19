@@ -27,17 +27,12 @@ public class DatanodeUpgradeServiceAdapterES7 implements DatanodeUpgradeServiceA
     }
 
     @Override
-    public void disableShardReplication() {
+    public FlushResponse disableShardReplication() {
         throw new UnsupportedOperationException("Not supported for elasticsearch.");
     }
 
     @Override
-    public void enableShardReplication() {
-        throw new UnsupportedOperationException("Not supported for elasticsearch.");
-    }
-
-    @Override
-    public FlushResponse flush() {
+    public FlushResponse enableShardReplication() {
         throw new UnsupportedOperationException("Not supported for elasticsearch.");
     }
 }

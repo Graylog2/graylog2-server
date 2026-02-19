@@ -27,8 +27,8 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.engine.monitoring.collection.NoOpStatsCollector;
 import org.graylog.plugins.views.search.errors.SearchError;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
-import org.graylog.storage.opensearch3.testing.TestMultisearchResponse;
+import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
+import org.graylog.storage.opensearch3.testing.TestMsearchResponse;
 import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.streams.StreamService;
@@ -39,6 +39,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch.core.MsearchResponse;
 
 import java.util.Collections;
 import java.util.Set;
@@ -51,7 +53,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
-public class OpenSearchBackendErrorHandlingTest extends OpensearchMockedClientTestBase {
+public class OpenSearchBackendErrorHandlingTest extends OfficialOpensearchMockedClientTestBase {
 
     @Mock
     protected IndexLookup indexLookup;
@@ -76,7 +78,10 @@ public class OpenSearchBackendErrorHandlingTest extends OpensearchMockedClientTe
                 usedSearchFilters -> Collections.emptySet(),
                 new NoOpStatsCollector<>(),
                 mock(StreamService.class),
-                false);
+                false,
+                1,
+                1,
+                new OSSerializationUtils());
         when(indexLookup.indexNamesForStreamsInTimeRange(any(), any())).thenReturn(Collections.emptySet());
 
         final SearchType searchType1 = mock(SearchType.class);
@@ -107,7 +112,7 @@ public class OpenSearchBackendErrorHandlingTest extends OpensearchMockedClientTe
 
     @Test
     public void deduplicateShardErrorsOnSearchTypeLevel() throws Exception {
-        final MultiSearchResponse multiSearchResult = TestMultisearchResponse.fromFixture("errorhandling/failureOnSearchTypeLevel.json");
+        final MsearchResponse<JsonData> multiSearchResult = TestMsearchResponse.fromFixture("errorhandling/failureOnSearchTypeLevel.json");
         mockCancellableMSearch(multiSearchResult);
 
         final QueryResult queryResult = this.backend.doRun(searchJob, query, queryContext);
@@ -123,7 +128,7 @@ public class OpenSearchBackendErrorHandlingTest extends OpensearchMockedClientTe
 
     @Test
     public void deduplicateNumericShardErrorsOnSearchTypeLevel() throws Exception {
-        final MultiSearchResponse multiSearchResult = TestMultisearchResponse.fromFixture("errorhandling/numericFailureOnSearchTypeLevel.json");
+        final MsearchResponse<JsonData> multiSearchResult = TestMsearchResponse.fromFixture("errorhandling/numericFailureOnSearchTypeLevel.json");
         mockCancellableMSearch(multiSearchResult);
 
         final QueryResult queryResult = this.backend.doRun(searchJob, query, queryContext);

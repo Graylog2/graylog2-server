@@ -138,8 +138,7 @@ public class OpensearchProcessImplTest {
         when(health.getRelocatingShards()).thenReturn(0);
         when(clusterClient.health(any(), any())).thenReturn(health);
         final ScheduledExecutorService executor = mock(ScheduledExecutorService.class);
-        opensearchProcess.executorService = executor;
-        opensearchProcess.checkRemovalStatus();
+        opensearchProcess.checkRemovalStatus(executor);
         verify(processState).fire(OpensearchEvent.PROCESS_STOPPED);
         verify(executor).shutdown();
     }

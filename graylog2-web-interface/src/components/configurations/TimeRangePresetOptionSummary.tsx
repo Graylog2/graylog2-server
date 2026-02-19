@@ -20,7 +20,7 @@ import styled from 'styled-components';
 import assertUnreachable from 'logic/assertUnreachable';
 import type { TimeRangePreset } from 'components/configurations/TimeRangePresetForm';
 import type { KeywordTimeRange, TimeRange } from 'views/logic/queries/Query';
-import { range } from 'views/components/searchbar/time-range-filter/TimeRangeDisplay';
+import { range } from 'views/components/time-range-picker/TimeRangeDisplay';
 
 type Props = { options: Array<TimeRangePreset> };
 

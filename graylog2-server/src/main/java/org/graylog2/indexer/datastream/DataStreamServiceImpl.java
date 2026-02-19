@@ -24,6 +24,8 @@ import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.plugin.streams.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -31,6 +33,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DataStreamServiceImpl implements DataStreamService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataStreamServiceImpl.class);
 
     private static final Map<String, String> TIMESTAMP_TYPE = Map.of(
             "type", "date",
@@ -64,6 +68,7 @@ public class DataStreamServiceImpl implements DataStreamService {
     }
 
     private void updateDataStreamTemplate(String dataStreamName, String timestampField, Map<String, Map<String, String>> mappings) {
+        LOGGER.info("Updating datastream template, stream name: {}", dataStreamName);
         final Map<String, Map<String, String>> effectiveMappings = mappings.containsKey(timestampField)
                 ? mappings
                 : ImmutableMap.<String, Map<String, String>>builder().putAll(mappings).put(timestampField, TIMESTAMP_TYPE).build();

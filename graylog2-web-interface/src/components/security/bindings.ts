@@ -20,9 +20,7 @@ import Routes, { SECURITY_PATH } from 'routing/Routes';
 import SecurityPageEntry from 'components/security/SecurityPageEntry';
 import DEFAULT_ENTERPRISE_NAV_ITEM from 'components/navigation/DefaultEnterpriseNavItem';
 
-const routes = [
-  { path: `${SECURITY_PATH}/*`, component: SecurityPageEntry, parentComponent: ({ children }) => children },
-];
+const routes = [{ path: `${SECURITY_PATH}/*`, component: SecurityPageEntry }];
 
 export const DEFAULT_SECURITY_NAV_ITEM = {
   description: 'Security',
