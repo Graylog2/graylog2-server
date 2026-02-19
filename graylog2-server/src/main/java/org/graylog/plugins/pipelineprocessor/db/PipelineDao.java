@@ -19,6 +19,9 @@ package org.graylog.plugins.pipelineprocessor.db;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineService;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.database.entities.ScopedEntity;
@@ -31,6 +34,7 @@ import javax.annotation.Nullable;
 import static org.graylog.plugins.pipelineprocessor.rest.PipelineResource.GL_INPUT_ROUTING_PIPELINE;
 
 @AutoValue
+@DbEntity(collection = MongoDbPipelineService.COLLECTION, readPermission = PipelineRestPermissions.PIPELINE_READ)
 public abstract class PipelineDao implements ScopedEntity<PipelineDao.Builder> {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TITLE = "title";

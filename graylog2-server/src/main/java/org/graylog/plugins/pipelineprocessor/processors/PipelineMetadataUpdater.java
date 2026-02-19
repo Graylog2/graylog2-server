@@ -26,6 +26,7 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.RoutingRuleDao;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbInputsMetadataService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
 import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEvent;
@@ -125,10 +126,12 @@ public class PipelineMetadataUpdater {
         ImmutableMap<String, Pipeline> pipelines = affectedPipelinesAsMap(pipelineDaos, state);
         ImmutableMap<String, Pipeline> functions = resolver.resolveFunctions(pipelines.values(), metricRegistry);
         List<PipelineRulesMetadataDao> ruleRecords = new ArrayList<>();
-        Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions = pipelineAnalyzer.analyzePipelines(pipelines, functions, ruleRecords);
+        List<RoutingRuleDao> routingRuleRecords = new ArrayList<>();
+        Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions =
+                pipelineAnalyzer.analyzePipelines(pipelines, functions, ruleRecords, routingRuleRecords);
 
         inputsMetadataService.save(inputMentions, true);
-        pipelineMetadataService.save(ruleRecords, true);
+        pipelineMetadataService.save(ruleRecords, routingRuleRecords, true);
     }
 
     private Set<PipelineDao> loadPipelineDaos(Set<String> ids) {

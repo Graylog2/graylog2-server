@@ -24,6 +24,7 @@ import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.db.RoutingRuleDao;
 import org.graylog.plugins.pipelineprocessor.functions.FromInput;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.streams.Stream;
@@ -58,6 +59,7 @@ class PipelineAnalyzerTest {
     protected static final String BROKEN_RULE_NAME = "broken_rule";
     private PipelineAnalyzer pipelineAnalyzer;
     private List<PipelineRulesMetadataDao> ruleRecords;
+    private List<RoutingRuleDao> routingRuleRecords;
     private PipelineTestUtil testUtil;
 
     @Mock
@@ -74,15 +76,17 @@ class PipelineAnalyzerTest {
         org.mockito.MockitoAnnotations.openMocks(this).close();
         pipelineAnalyzer = new PipelineAnalyzer(connectionsService, inputService, new MetricRegistry(), streamService);
         ruleRecords = new ArrayList<>();
+        routingRuleRecords = new ArrayList<>();
         testUtil = new PipelineTestUtil(connectionsService, inputService);
 
         when(inputService.find(INPUT_ID)).thenReturn(mock(org.graylog2.inputs.Input.class));
+        when(streamService.streamTitleFromCache(STREAM1_ID)).thenReturn("Stream 1");
     }
 
     @Test
     void empty() {
         Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> result = pipelineAnalyzer.analyzePipelines(
-                ImmutableMap.of(), ImmutableMap.of(), List.of()
+                ImmutableMap.of(), ImmutableMap.of(), List.of(), List.of()
         );
         assertTrue(result.isEmpty());
     }
@@ -92,11 +96,17 @@ class PipelineAnalyzerTest {
         Pipeline pipeline1 = testUtil.createPipelineWithRules("pipeline1", List.of(testUtil.ALWAYS_TRUE));
 
         Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> result = pipelineAnalyzer.analyzePipelines(
-                ImmutableMap.of(pipeline1.id(), pipeline1), ImmutableMap.of(pipeline1.id(), pipeline1), ruleRecords);
+                ImmutableMap.of(pipeline1.id(), pipeline1), ImmutableMap.of(pipeline1.id(), pipeline1),
+                ruleRecords, routingRuleRecords);
 
         assertTrue(result.isEmpty());
         assertTrue(ruleRecords.stream().anyMatch(dao ->
                 dao.pipelineId().equals(pipeline1.id())
+                        && dao.pipelineTitle().equals("pipeline1")
+                        && dao.ruleTitlesById().containsKey(ALWAYS_TRUE_ID)
+                        && dao.ruleTitlesById().get(ALWAYS_TRUE_ID).equals("alwaysTrue")
+                        && dao.connectedStreamTitlesById().containsKey(STREAM1_ID)
+                        && dao.connectedStreamTitlesById().get(STREAM1_ID).equals("Stream 1")
                         && dao.functions().isEmpty()
                         && dao.rules().contains(ALWAYS_TRUE_ID)));
     }
@@ -106,7 +116,8 @@ class PipelineAnalyzerTest {
         Pipeline pipeline1 = testUtil.createPipelineWithRules("pipeline1", List.of(testUtil.REMOVE_FIELD));
 
         Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> result = pipelineAnalyzer.analyzePipelines(
-                ImmutableMap.of(pipeline1.id(), pipeline1), ImmutableMap.of(pipeline1.id(), pipeline1), ruleRecords);
+                ImmutableMap.of(pipeline1.id(), pipeline1), ImmutableMap.of(pipeline1.id(), pipeline1),
+                ruleRecords, routingRuleRecords);
 
         assertTrue(result.isEmpty());
         assertTrue(ruleRecords.stream().anyMatch(dao ->
@@ -121,7 +132,8 @@ class PipelineAnalyzerTest {
         Pipeline pipeline1 = testUtil.createPipelineWithRules("pipeline1", List.of(testUtil.FROM_INPUT));
 
         Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> result = pipelineAnalyzer.analyzePipelines(
-                ImmutableMap.of(pipeline1.id(), pipeline1), ImmutableMap.of(pipeline1.id(), pipeline1), ruleRecords);
+                ImmutableMap.of(pipeline1.id(), pipeline1), ImmutableMap.of(pipeline1.id(), pipeline1),
+                ruleRecords, routingRuleRecords);
 
         assertTrue(result.containsKey(INPUT_ID));
         Set<PipelineInputsMetadataDao.MentionedInEntry> mentions = result.get(INPUT_ID);
@@ -141,7 +153,8 @@ class PipelineAnalyzerTest {
         Pipeline pipeline1 = testUtil.createPipelineWithRules("pipeline1", List.of(testUtil.GL2_SOURCE_INPUT));
 
         Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> result = pipelineAnalyzer.analyzePipelines(
-                ImmutableMap.of(pipeline1.id(), pipeline1), ImmutableMap.of(pipeline1.id(), pipeline1), ruleRecords);
+                ImmutableMap.of(pipeline1.id(), pipeline1), ImmutableMap.of(pipeline1.id(), pipeline1),
+                ruleRecords, routingRuleRecords);
 
         assertTrue(result.containsKey(INPUT_ID));
         Set<PipelineInputsMetadataDao.MentionedInEntry> mentions = result.get(INPUT_ID);
@@ -169,16 +182,24 @@ class PipelineAnalyzerTest {
         when(streamService.loadAllByTitle(STREAM3_TITLE)).thenReturn(List.of(stream3));
 
         pipelineAnalyzer.analyzePipelines(
-                ImmutableMap.of(pipeline1.id(), pipeline1), ImmutableMap.of(pipeline1.id(), pipeline1), ruleRecords);
+                ImmutableMap.of(pipeline1.id(), pipeline1), ImmutableMap.of(pipeline1.id(), pipeline1),
+                ruleRecords, routingRuleRecords);
 
+        // Pipeline-level metadata should contain the rule and function
         assertTrue(ruleRecords.stream().anyMatch(dao ->
                 dao.pipelineId().equals(pipeline1.id())
                         && dao.rules().contains(ROUTING_ID)
+                        && dao.ruleTitlesById().get(ROUTING_ID).equals("routing")
                         && dao.functions().contains("route_to_stream")
-                        && dao.routedStreamTitleById().get(STREAM2_ID).equals(STREAM2_TITLE)
-                        && dao.streamsByRuleId().get(ROUTING_ID).contains(STREAM2_ID)
-                        && dao.routedStreamTitleById().get(STREAM3_ID).equals(STREAM3_TITLE)
-                        && dao.streamsByRuleId().get(ROUTING_ID).contains(STREAM3_ID)
+        ));
+
+        // Routing rule records should contain the stream routing information
+        assertTrue(routingRuleRecords.stream().anyMatch(dao ->
+                dao.pipelineId().equals(pipeline1.id())
+                        && dao.ruleId().equals(ROUTING_ID)
+                        && dao.ruleTitle().equals("routing")
+                        && dao.routedStreamIds().contains(STREAM2_ID)
+                        && dao.routedStreamIds().contains(STREAM3_ID)
         ));
     }
 
@@ -187,7 +208,8 @@ class PipelineAnalyzerTest {
         Pipeline pipeline = createPipelineWithFailingRule();
 
         Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> result = pipelineAnalyzer.analyzePipelines(
-                ImmutableMap.of(pipeline.id(), pipeline), ImmutableMap.of(pipeline.id(), pipeline), ruleRecords);
+                ImmutableMap.of(pipeline.id(), pipeline), ImmutableMap.of(pipeline.id(), pipeline),
+                ruleRecords, routingRuleRecords);
 
         Set<PipelineInputsMetadataDao.MentionedInEntry> mentions = result.get(INPUT_ID);
         assertTrue(mentions.stream().anyMatch(entry -> entry.ruleId().equals(FROM_INPUT_ID)));
