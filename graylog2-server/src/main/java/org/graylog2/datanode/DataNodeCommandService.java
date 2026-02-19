@@ -31,4 +31,6 @@ public interface DataNodeCommandService {
     DataNodeDto startNode(String nodeId) throws NodeNotFoundException;
 
     DataNodeDto triggerCertificateSigningRequest(String nodeId, DatanodeStartType startType) throws NodeNotFoundException;
+
+    DataNodeDto removeNodeConfiguration(String nodeId) throws NodeNotFoundException;
 }

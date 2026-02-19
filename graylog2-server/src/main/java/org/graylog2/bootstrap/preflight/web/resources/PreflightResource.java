@@ -180,6 +180,7 @@ public class PreflightResource {
     private void stopNode(DataNodeDto node) {
         try {
             dataNodeCommandService.stopNode(node.getNodeId());
+            dataNodeCommandService.removeNodeConfiguration(node.getNodeId());
         } catch (NodeNotFoundException e) {
             throw new RuntimeException(e);
         }

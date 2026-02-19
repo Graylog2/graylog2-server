@@ -25,6 +25,8 @@ import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bootstrap.preflight.DatanodeDirectoriesLockfileCheck;
 import org.graylog.datanode.configuration.DatanodeCertificateRenewedEvent;
+import org.graylog.datanode.configuration.DatanodeKeystore;
+import org.graylog.datanode.configuration.DatanodeKeystoreException;
 import org.graylog.datanode.configuration.OpensearchConfigurationService;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
@@ -48,6 +50,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private final DatanodeDirectoriesLockfileCheck lockfileCheck;
     private final PreflightConfigService preflightConfigService;
     private final Configuration configuration;
+    private final DatanodeKeystore datanodeKeystore;
 
     private final OpensearchStateMachine stateMachine;
     private final CsrRequester csrRequester;
@@ -62,13 +65,14 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
             final NodeId nodeId,
             final DatanodeDirectoriesLockfileCheck lockfileCheck,
             final PreflightConfigService preflightConfigService,
-            final OpensearchProcess process, CsrRequester csrRequester, OpensearchStateMachine stateMachine) {
+            final OpensearchProcess process, DatanodeKeystore datanodeKeystore, CsrRequester csrRequester, OpensearchStateMachine stateMachine) {
         this.configurationProvider = configurationProvider;
         this.configuration = configuration;
         this.nodeId = nodeId;
         this.lockfileCheck = lockfileCheck;
         this.preflightConfigService = preflightConfigService;
         this.process = process;
+        this.datanodeKeystore = datanodeKeystore;
         this.csrRequester = csrRequester;
         this.stateMachine = stateMachine;
         eventBus.register(this);
@@ -90,6 +94,14 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                 case REQUEST_CSR_WITH_AUTOSTART -> {
                     this.processAutostart = true;
                     csrRequester.triggerCertificateSigningRequest();
+                }
+                case REMOVE_NODE_CONFIGURATION -> {
+                    try {
+                        datanodeKeystore.resetToSelfsignedCertificate();
+                        stateMachine.fire(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED);
+                    } catch (DatanodeKeystoreException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         }

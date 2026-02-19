@@ -23,6 +23,8 @@ import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.graylog.security.certutil.CertRequest;
+import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
 import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.csr.CsrGenerator;
@@ -48,6 +50,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -65,6 +68,7 @@ public class DatanodeKeystore {
     private static final RandomStringUtils RANDOM_STRING_UTILS = RandomStringUtils.secure();
     private static final Path DATANODE_KEYSTORE_FILE = Path.of("keystore.jks");
     public static String DATANODE_KEY_ALIAS = "datanode";
+    public static final Duration DEFAULT_SELFSIGNED_CERT_VALIDITY = Duration.ofDays(99 * 365);
 
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeKeystore.class);
     private final Path keystoreFile;
@@ -101,6 +105,20 @@ public class DatanodeKeystore {
             }
         } catch (KeyStoreException e) {
             throw new DatanodeKeystoreException("Failed to check if datanode certificate is self-signed.", e);
+        }
+    }
+
+    public synchronized KeyStore resetToSelfsignedCertificate() throws DatanodeKeystoreException {
+        final CertRequest certRequest = CertRequest.selfSigned(DATANODE_KEY_ALIAS)
+                .isCA(false)
+                .validity(DEFAULT_SELFSIGNED_CERT_VALIDITY);
+        try {
+            final KeyPair selfsignedCert = CertificateGenerator.generate(certRequest);
+            final KeyStore result = create(selfsignedCert);
+            eventBus.post(new DatanodeCertificateChangedEvent());
+            return result;
+        } catch (Exception e) {
+            throw new DatanodeKeystoreException(e);
         }
     }
 

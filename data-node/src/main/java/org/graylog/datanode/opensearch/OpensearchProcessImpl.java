@@ -230,6 +230,11 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         );
     }
 
+    @Override
+    public void removeConfiguration() {
+        this.opensearchConfiguration = Optional.empty();
+    }
+
     @VisibleForTesting
     void checkConfiguredHeap() {
         Size heap = Size.parse(configuration.getOpensearchHeap());

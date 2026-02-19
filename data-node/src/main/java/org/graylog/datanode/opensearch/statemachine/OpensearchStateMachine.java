@@ -115,6 +115,7 @@ public class OpensearchStateMachine extends ProcessStateMachine<OpensearchState,
         config.configure(OpensearchState.TERMINATED)
                 .onEntry(process::stop)
                 .permit(OpensearchEvent.PROCESS_STARTED, OpensearchState.STARTING, rebootCounter::increment)
+                .permit(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED, OpensearchState.WAITING_FOR_CONFIGURATION, process::removeConfiguration)
                 .ignore(OpensearchEvent.HEALTH_CHECK_FAILED)
                 .ignore(OpensearchEvent.PROCESS_STOPPED)
                 .ignore(OpensearchEvent.PROCESS_TERMINATED) // final state, all following terminate events are ignored
