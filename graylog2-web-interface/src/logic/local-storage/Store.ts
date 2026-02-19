@@ -20,7 +20,7 @@ const Store = {
     storage.setItem(key, JSON.stringify(value));
   },
 
-  get(key: string, storage: Storage = window.localStorage): any {
+  get<T = unknown>(key: string, storage: Storage = window.localStorage): T | undefined {
     const value = storage.getItem(key);
 
     if (value === undefined || value === null) {
@@ -28,9 +28,9 @@ const Store = {
     }
 
     try {
-      return JSON.parse(value);
+      return JSON.parse(value) as T;
     } catch (e) {
-      return value;
+      return value as T;
     }
   },
 
@@ -42,8 +42,8 @@ const Store = {
     return Store.set(key, value, window.sessionStorage);
   },
 
-  sessionGet(key: string): any {
-    return Store.get(key, window.sessionStorage);
+  sessionGet<T = unknown>(key: string): T | undefined {
+    return Store.get<T>(key, window.sessionStorage);
   },
 
   sessionDelete(key: string): void {

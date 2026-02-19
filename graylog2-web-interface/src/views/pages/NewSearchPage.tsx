@@ -35,7 +35,7 @@ const useParametersFromStore = () => {
 
   return useMemo(() => {
     if (sessionId) {
-      const searchDataFromStore = Store.get(sessionId as string);
+      const searchDataFromStore = Store.get<string>(sessionId as string);
       Store.delete(sessionId as string);
 
       const searchData = searchDataFromStore ? JSON.parse(searchDataFromStore) : undefined;
