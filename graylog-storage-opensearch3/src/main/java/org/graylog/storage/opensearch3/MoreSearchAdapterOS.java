@@ -76,8 +76,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class MoreSearchAdapterOS implements MoreSearchAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(MoreSearchAdapterOS.class);
-    private static final String termsAggregationName = "alert_type";
-    private static final String histogramAggregationName = "histogram";
+    private static final String TERMS_AGGREGATION_NAME = "alert_type";
+    private static final String HISTOGRAM_AGGREGATION_NAME = "histogram";
 
     private final OfficialOpensearchClient opensearchClient;
     private final Boolean allowLeadingWildcard;
@@ -234,10 +234,10 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
 
                 return dh;
             })
-                    .aggregations(termsAggregationName, Aggregation.builder().terms(terms -> terms.minDocCount(0).field(EventDto.FIELD_ALERT)).build())
+                    .aggregations(TERMS_AGGREGATION_NAME, Aggregation.builder().terms(terms -> terms.minDocCount(0).field(EventDto.FIELD_ALERT)).build())
                     .build();
 
-            builder.aggregations(histogramAggregationName, histogramAggregation);
+            builder.aggregations(HISTOGRAM_AGGREGATION_NAME, histogramAggregation);
             return builder;
         });
 
@@ -250,7 +250,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
 
         final SearchResponse<Map> searchResult = opensearchClient.sync(c -> c.search(newSearchRequest, Map.class), "Unable to perform search query");
 
-        final DateHistogramAggregate histogramResult = searchResult.aggregations().get(histogramAggregationName).dateHistogram();
+        final DateHistogramAggregate histogramResult = searchResult.aggregations().get(HISTOGRAM_AGGREGATION_NAME).dateHistogram();
         final var histogramBuckets = histogramResult.buckets();
 
         final List<DateHistogramBucket> buckets = histogramBuckets.array();
@@ -259,7 +259,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
         final var events = new ArrayList<MoreSearch.Histogram.Bucket>(buckets.size());
 
         buckets.forEach(bucket -> {
-            final LongTermsAggregate parsedTerms = bucket.aggregations().get(termsAggregationName).lterms();
+            final LongTermsAggregate parsedTerms = bucket.aggregations().get(TERMS_AGGREGATION_NAME).lterms();
             final ZonedDateTime dateTime = Instant.ofEpochMilli(bucket.key()).atZone(timeZone);
             final var alertCount = parsedTerms.buckets().array().stream().filter(b -> b.keyAsString().equals("true")).findFirst().map(MultiBucketBase::docCount).orElse(0L);
             final var eventCount = parsedTerms.buckets().array().stream().filter(b -> b.keyAsString().equals("false")).findFirst().map(MultiBucketBase::docCount).orElse(0L);
