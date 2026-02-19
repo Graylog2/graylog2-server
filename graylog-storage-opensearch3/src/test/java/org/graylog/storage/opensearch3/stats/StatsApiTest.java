@@ -17,6 +17,7 @@
 package org.graylog.storage.opensearch3.stats;
 
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
+import org.graylog2.indexer.indices.util.IndexNameBatching;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,15 +36,19 @@ import org.opensearch.client.opensearch.indices.stats.IndexStats;
 import org.opensearch.client.opensearch.indices.stats.IndicesStats;
 import org.opensearch.client.opensearch.indices.stats.IndicesStatsMetric;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -164,6 +169,64 @@ class StatsApiTest {
                 .build();
     }
 
+
+    @Test
+    void multipleBatchesMergeResults() throws Exception {
+        final List<String> indices = IntStream.range(0, 80)
+                .mapToObj(i -> "restored-archive-data-lake-68b002df50e89877d351cb83_" + (1758100000000L + i))
+                .toList();
+
+        final List<List<String>> batches = IndexNameBatching.partitionByJoinedLength(
+                indices, IndexNameBatching.MAX_INDICES_URL_LENGTH);
+        assertThat(batches.size()).isGreaterThan(1);
+
+        // Return batch-specific responses based on the request's index list
+        doAnswer(invocation -> {
+            final IndicesStatsRequest req = invocation.getArgument(0);
+            final List<String> requestedIndices = req.index();
+            final Map<String, IndicesStats> batchIndices = new HashMap<>();
+            for (final String idx : requestedIndices) {
+                batchIndices.put(idx, buildIndicesStats("uuid-" + idx, requestedIndices.indexOf(idx)));
+            }
+            return IndicesStatsResponse.builder()
+                    .all(mock(AllIndicesStats.class))
+                    .indices(batchIndices)
+                    .shards(mock(ShardStatistics.class))
+                    .build();
+        }).when(indicesClient).stats(any(IndicesStatsRequest.class));
+
+        final Map<String, IndicesStats> result = statsApi.indicesStatsWithDocsAndStore(indices);
+
+        assertThat(result).hasSize(indices.size());
+        for (final String index : indices) {
+            assertThat(result).containsKey(index);
+        }
+    }
+
+    @Test
+    void shardLevelBatchesMergeResults() throws Exception {
+        final List<String> indices = IntStream.range(0, 80)
+                .mapToObj(i -> "restored-archive-data-lake-68b002df50e89877d351cb83_" + (1758100000000L + i))
+                .toList();
+
+        doAnswer(invocation -> {
+            final IndicesStatsRequest req = invocation.getArgument(0);
+            final List<String> requestedIndices = req.index();
+            final Map<String, IndicesStats> batchIndices = new HashMap<>();
+            for (final String idx : requestedIndices) {
+                batchIndices.put(idx, buildIndicesStats("uuid-" + idx, requestedIndices.indexOf(idx)));
+            }
+            return IndicesStatsResponse.builder()
+                    .all(mock(AllIndicesStats.class))
+                    .indices(batchIndices)
+                    .shards(mock(ShardStatistics.class))
+                    .build();
+        }).when(indicesClient).stats(any(IndicesStatsRequest.class));
+
+        final Map<String, IndicesStats> result = statsApi.indicesStatsWithShardLevel(indices);
+
+        assertThat(result).hasSize(indices.size());
+    }
 
     private IndexStats emptyIndexStats() {
         return IndexStats.builder().build();
