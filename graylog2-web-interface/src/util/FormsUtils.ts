@@ -58,15 +58,15 @@ export const validateValue = (fieldValue: unknown, conditionType: string, condit
       if (!fieldValue || (fieldValue as { size?: number })?.size === 0) return 'Field is required.';
       break;
     case 'min':
-      if ((fieldValue as number) < Number(conditionValue)) return `Must be greater than ${conditionValue}.`;
+      if (Number(fieldValue) < Number(conditionValue)) return `Must be greater than ${conditionValue}.`;
       break;
     case 'max':
-      if ((fieldValue as number) > Number(conditionValue)) return `Must be smaller than ${conditionValue}.`;
+      if (Number(fieldValue) > Number(conditionValue)) return `Must be smaller than ${conditionValue}.`;
       break;
     case 'url':
       if (fieldValue) {
-        if (conditionValue && !isValidURL(fieldValue as string)) return 'Must be a URL.';
-        if (!conditionValue && isValidURL(fieldValue as string)) return 'Must not be a URL.';
+        if (conditionValue && !isValidURL(String(fieldValue))) return 'Must be a URL.';
+        if (!conditionValue && isValidURL(String(fieldValue))) return 'Must not be a URL.';
       }
       break;
     default:

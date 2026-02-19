@@ -22,8 +22,22 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
+type SystemJob = {
+  id: string;
+  description: string;
+  name: string;
+  info: string;
+  node_id: string;
+  started_at: string;
+  percent_complete: number;
+  provides_progress: boolean;
+  is_cancelable: boolean;
+};
+
+type SystemJobsListResponse = Record<string, { jobs: Array<SystemJob> }>;
+
 type SystemJobsActionsType = {
-  list: () => Promise<unknown>;
+  list: () => Promise<SystemJobsListResponse>;
   getJob: (jobId: string) => Promise<unknown>;
   acknowledgeJob: (jobId: string) => Promise<unknown>;
   cancelJob: (jobId: string) => Promise<unknown>;
@@ -49,7 +63,7 @@ export const SystemJobsStore: Store<{ jobs: unknown; jobsById: Record<string, un
     },
     list() {
       const url = URLUtils.qualifyUrl(ApiRoutes.SystemJobsApiController.list().url);
-      const promise = fetchPeriodically('GET', url).then((response: unknown) => {
+      const promise = fetchPeriodically<SystemJobsListResponse>('GET', url).then((response) => {
         this.jobs = response;
         this.trigger({ jobs: response });
 

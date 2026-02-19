@@ -61,7 +61,7 @@ export default class Entity {
         return c;
       }
 
-      return Constraint.fromJSON(c as ConstraintJSON);
+      return Constraint.fromJSON(c);
     });
 
     this._value = {
@@ -126,11 +126,7 @@ export default class Entity {
 
   /* implement custom instanceof */
   static [Symbol.hasInstance](obj: unknown): boolean {
-    if ((obj as Entity).isEntity) {
-      return true;
-    }
-
-    return false;
+    return !!(obj as { isEntity?: boolean })?.isEntity;
   }
 
   getValueFromData(key: string): string | undefined {
