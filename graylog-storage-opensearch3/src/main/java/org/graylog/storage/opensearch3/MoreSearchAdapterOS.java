@@ -111,7 +111,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
             builder.expandWildcards(ExpandWildcard.Open);
 
             if(!affectedIndices.isEmpty()) {
-                builder.index(new LinkedList<>(affectedIndices));
+                builder.index(new ArrayList<>(affectedIndices));
             }
 
             return builder;
