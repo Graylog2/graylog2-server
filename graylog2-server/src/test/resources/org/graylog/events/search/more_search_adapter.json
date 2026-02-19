@@ -110,6 +110,9 @@
             "alert": false,
             "streams": [
               "000000000000000000000001"
+            ],
+            "source_streams": [
+              "source_stream_a"
             ]
           }
         }
@@ -133,6 +136,9 @@
             "alert": false,
             "streams": [
               "000000000000000000000001"
+            ],
+            "source_streams": [
+              "forbidden_stream"
             ]
           }
         }

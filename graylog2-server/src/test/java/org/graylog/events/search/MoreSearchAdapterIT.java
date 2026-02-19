@@ -223,6 +223,263 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
         assertThat(allResults).isEmpty();
     }
 
+    @Test
+    public void eventSearchSortsCorrectlyByTimestamp() {
+        // Test ascending order (default)
+        final MoreSearch.Result resultAsc = toTest.eventSearch("*",
+                RelativeRange.allTime(),
+                Set.of(INDEX_NAME),
+                Sorting.DEFAULT,
+                1, 10, ALL_STREAMS, "", Set.of());
+
+        assertThat(resultAsc.results()).hasSize(7);
+        // Default sorting is descending by timestamp, so newest first
+        verifyResult(resultAsc, 0, 7); // newest first
+        verifyResult(resultAsc, 6, 1); // oldest last
+    }
+
+    @Test
+    public void eventSearchSortsCorrectlyAscending() {
+        // Test explicit ascending order
+        final MoreSearch.Result result = toTest.eventSearch("*",
+                RelativeRange.allTime(),
+                Set.of(INDEX_NAME),
+                new Sorting("timestamp", Sorting.Direction.ASC),
+                1, 10, ALL_STREAMS, "", Set.of());
+
+        assertThat(result.results()).hasSize(7);
+        // Ascending order - oldest first
+        verifyResult(result, 0, 1); // oldest first
+        verifyResult(result, 6, 7); // newest last
+    }
+
+    @Test
+    public void eventSearchSortsCorrectlyDescending() {
+        // Test explicit descending order
+        final MoreSearch.Result result = toTest.eventSearch("*",
+                RelativeRange.allTime(),
+                Set.of(INDEX_NAME),
+                new Sorting("timestamp", Sorting.Direction.DESC),
+                1, 10, ALL_STREAMS, "", Set.of());
+
+        assertThat(result.results()).hasSize(7);
+        // Descending order - newest first
+        verifyResult(result, 0, 7); // newest first
+        verifyResult(result, 6, 1); // oldest last
+    }
+
+    @Test
+    public void eventSearchWithExtraFiltersGreaterThan() {
+        final Map<String, Set<String>> extraFilters = Map.of("number", Set.of(">5"));
+        final MoreSearch.Result result = toTest.eventSearch("*",
+                RelativeRange.allTime(),
+                Set.of(INDEX_NAME),
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", Set.of(), extraFilters);
+
+        assertThat(result.results()).hasSize(2);
+        verifyResult(result, 0, 7);
+        verifyResult(result, 1, 6);
+    }
+
+    @Test
+    public void eventSearchWithExtraFiltersGreaterThanOrEqual() {
+        final Map<String, Set<String>> extraFilters = Map.of("number", Set.of(">=6"));
+        final MoreSearch.Result result = toTest.eventSearch("*",
+                RelativeRange.allTime(),
+                Set.of(INDEX_NAME),
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", Set.of(), extraFilters);
+
+        assertThat(result.results()).hasSize(2);
+        verifyResult(result, 0, 7);
+        verifyResult(result, 1, 6);
+    }
+
+    @Test
+    public void eventSearchWithExtraFiltersLessThan() {
+        final Map<String, Set<String>> extraFilters = Map.of("number", Set.of("<4"));
+        final MoreSearch.Result result = toTest.eventSearch("*",
+                RelativeRange.allTime(),
+                Set.of(INDEX_NAME),
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", Set.of(), extraFilters);
+
+        assertThat(result.results()).hasSize(3);
+        verifyResult(result, 0, 3);
+        verifyResult(result, 1, 2);
+        verifyResult(result, 2, 1);
+    }
+
+    @Test
+    public void eventSearchWithExtraFiltersLessThanOrEqual() {
+        final Map<String, Set<String>> extraFilters = Map.of("number", Set.of("<=3"));
+        final MoreSearch.Result result = toTest.eventSearch("*",
+                RelativeRange.allTime(),
+                Set.of(INDEX_NAME),
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", Set.of(), extraFilters);
+
+        assertThat(result.results()).hasSize(3);
+        verifyResult(result, 0, 3);
+        verifyResult(result, 1, 2);
+        verifyResult(result, 2, 1);
+    }
+
+    @Test
+    public void eventSearchWithMultipleExtraFilters() {
+        final Map<String, Set<String>> extraFilters = Map.of(
+                "number", Set.of(">=4", "<=6")
+        );
+        final MoreSearch.Result result = toTest.eventSearch("*",
+                RelativeRange.allTime(),
+                Set.of(INDEX_NAME),
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", Set.of(), extraFilters);
+
+        assertThat(result.results()).hasSize(3);
+        verifyResult(result, 0, 6);
+        verifyResult(result, 1, 5);
+        verifyResult(result, 2, 4);
+    }
+
+    @Test
+    public void eventSearchWithFilterString() {
+        final MoreSearch.Result result = toTest.eventSearch("*",
+                RelativeRange.allTime(),
+                Set.of(INDEX_NAME),
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "alert:true", Set.of());
+
+        assertThat(result.results()).hasSize(3); // Only messages with alert:true
+        verifyResult(result, 0, 7);
+        verifyResult(result, 1, 3);
+        verifyResult(result, 2, 1);
+    }
+
+    @Test
+    public void eventSearchWithBothQueryAndFilter() {
+        final MoreSearch.Result result = toTest.eventSearch("message:Ahoj",
+                RelativeRange.allTime(),
+                Set.of(INDEX_NAME),
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "alert:true", Set.of());
+
+        assertThat(result.results()).hasSize(1); // Only message 7 has both
+        verifyResult(result, 0, 7);
+    }
+
+    @Test
+    public void eventSearchWithQueryAndExtraFilters() {
+        final Map<String, Set<String>> extraFilters = Map.of("number", Set.of(">4"));
+        final MoreSearch.Result result = toTest.eventSearch("message:Ahoj",
+                RelativeRange.allTime(),
+                Set.of(INDEX_NAME),
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", Set.of(), extraFilters);
+
+        assertThat(result.results()).hasSize(3); // Messages 5, 6, 7 have "Ahoj" and number > 4
+        verifyResult(result, 0, 7);
+        verifyResult(result, 1, 6);
+        verifyResult(result, 2, 5);
+    }
+
+    @Test
+    public void eventSearchReturnsEmptyForPageBeyondResults() {
+        final MoreSearch.Result result = toTest.eventSearch("*",
+                RelativeRange.allTime(),
+                Set.of(INDEX_NAME),
+                Sorting.DEFAULT, 100, 10, ALL_STREAMS, "", Set.of());
+
+        assertThat(result.results()).isEmpty();
+    }
+
+    @Test
+    public void scrollEventsCanBeStoppedEarly() throws Exception {
+        int batchSize = 2;
+        final AtomicInteger batchCount = new AtomicInteger(0);
+        final List<ResultMessage> allResults = new ArrayList<>();
+
+        toTest.scrollEvents("*", RelativeRange.allTime(), Set.of(INDEX_NAME),
+                ALL_STREAMS, Collections.emptyList(), batchSize,
+                (chunkResults, requestContinue) -> {
+                    batchCount.incrementAndGet();
+                    allResults.addAll(chunkResults);
+                    if (batchCount.get() >= 2) {
+                        requestContinue.set(false); // Stop after 2 batches
+                    }
+                });
+
+        assertThat(batchCount.get()).isEqualTo(2);
+        assertThat(allResults).hasSizeLessThanOrEqualTo(4); // 2 batches * 2 per batch
+    }
+
+    @Test
+    public void scrollEventsWithDifferentBatchSizes() throws Exception {
+        // Test with batch size of 1
+        int batchSize = 1;
+        final AtomicInteger count = new AtomicInteger(0);
+        final List<ResultMessage> allResults = new ArrayList<>();
+
+        toTest.scrollEvents("*", RelativeRange.allTime(), Set.of(INDEX_NAME),
+                ALL_STREAMS, Collections.emptyList(), batchSize,
+                getCountingAndCollectingScrollEventsCallback(count, allResults));
+
+        assertThat(count).hasValue(7); // Should have 7 batches with 1 message each
+        assertThat(allResults).hasSize(7);
+
+        // Test with larger batch size
+        final AtomicInteger count2 = new AtomicInteger(0);
+        final List<ResultMessage> allResults2 = new ArrayList<>();
+        int batchSize2 = 10;
+
+        toTest.scrollEvents("*", RelativeRange.allTime(), Set.of(INDEX_NAME),
+                ALL_STREAMS, Collections.emptyList(), batchSize2,
+                getCountingAndCollectingScrollEventsCallback(count2, allResults2));
+
+        assertThat(count2).hasValue(1); // Should have 1 batch with all 7 messages
+        assertThat(allResults2).hasSize(7);
+    }
+
+    @Test
+    public void eventSearchExcludesForbiddenSourceStreams() {
+        // Message 6 has "forbidden_stream" in source_streams, so it should be excluded
+        final MoreSearch.Result result = toTest.eventSearch("*",
+                RelativeRange.allTime(),
+                Set.of(INDEX_NAME),
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "",
+                Set.of("forbidden_stream"));
+
+        assertThat(result.results()).hasSize(6); // Should exclude message 6
+        // Verify message 6 is not in results
+        assertThat(result.results())
+                .noneMatch(rm -> rm.getMessage().getField("number").equals(6));
+    }
+
+    @Test
+    public void eventSearchExcludesMultipleForbiddenSourceStreams() {
+        // Messages 5 and 6 have source_streams, should be excluded
+        final MoreSearch.Result result = toTest.eventSearch("*",
+                RelativeRange.allTime(),
+                Set.of(INDEX_NAME),
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "",
+                Set.of("forbidden_stream", "source_stream_a"));
+
+        assertThat(result.results()).hasSize(5); // Should exclude messages 5 and 6
+        // Verify messages 5 and 6 are not in results
+        assertThat(result.results())
+                .noneMatch(rm -> {
+                    Object number = rm.getMessage().getField("number");
+                    return number.equals(5) || number.equals(6);
+                });
+    }
+
+    @Test
+    public void eventSearchWithForbiddenStreamsAndQueryString() {
+        // Search for "Ahoj" messages (5, 6, 7) but exclude those with forbidden stream (6)
+        final MoreSearch.Result result = toTest.eventSearch("message:Ahoj",
+                RelativeRange.allTime(),
+                Set.of(INDEX_NAME),
+                Sorting.DEFAULT, 1, 10, ALL_STREAMS, "",
+                Set.of("forbidden_stream"));
+
+        assertThat(result.results()).hasSize(2); // Should get messages 5 and 7, but not 6
+        verifyResult(result, 0, 7);
+        verifyResult(result, 1, 5);
+    }
+
     @Nonnull
     private MoreSearchAdapter.ScrollEventsCallback getCountingAndCollectingScrollEventsCallback(AtomicInteger count,
                                                                                                 Collection<ResultMessage> allResults) {
