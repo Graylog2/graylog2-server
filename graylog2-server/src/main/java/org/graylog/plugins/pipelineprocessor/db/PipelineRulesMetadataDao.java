@@ -35,8 +35,6 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
     private static final String FIELD_STREAMS = "streams";
     private static final String FIELD_FUNCTIONS = "functions";
     private static final String FIELD_DEPRECATED_FUNCTIONS = "deprecated_functions";
-    public static final String FIELD_ROUTING_RULES = "routing_rules";
-    public static final String FIELD_ROUTED_STREAMS = "routed_streams";
     public static final String FIELD_HAS_INPUT_REFERENCES = "has_input_references";
     public static final String FIELD_PIPELINE_TITLE = "pipeline_title";
     public static final String FIELD_RULE_TITLES = "rule_titles";
@@ -56,14 +54,6 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
 
     @JsonProperty(FIELD_DEPRECATED_FUNCTIONS)
     public abstract Set<String> deprecatedFunctions();
-
-    @JsonProperty(FIELD_ROUTING_RULES)
-    // Maps rule ID to IDs of routed stream
-    public abstract Map<String, Set<String>> streamsByRuleId();
-
-    @JsonProperty(FIELD_ROUTED_STREAMS)
-    // Maps stream ID to stream title
-    public abstract Map<String, String> routedStreamTitleById();
 
     @JsonProperty(FIELD_HAS_INPUT_REFERENCES)
     public abstract Boolean hasInputReferences();
@@ -90,8 +80,6 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
                 .functions(new HashSet<>())
                 .deprecatedFunctions(new HashSet<>())
                 .hasInputReferences(false)
-                .streamsByRuleId(new HashMap<>())
-                .routedStreamTitleById(new HashMap<>())
                 .pipelineTitle("")
                 .ruleTitlesById(new HashMap<>())
                 .connectedStreamTitlesById(new HashMap<>());
@@ -114,12 +102,6 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
 
         @JsonProperty(FIELD_DEPRECATED_FUNCTIONS)
         public abstract Builder deprecatedFunctions(Set<String> deprecatedFunctions);
-
-        @JsonProperty(FIELD_ROUTING_RULES)
-        public abstract Builder streamsByRuleId(Map<String, Set<String>> routingRules);
-
-        @JsonProperty(FIELD_ROUTED_STREAMS)
-        public abstract Builder routedStreamTitleById(Map<String, String> routedStreamsMap);
 
         @JsonProperty(FIELD_HAS_INPUT_REFERENCES)
         public abstract Builder hasInputReferences(Boolean hasInputReferences);

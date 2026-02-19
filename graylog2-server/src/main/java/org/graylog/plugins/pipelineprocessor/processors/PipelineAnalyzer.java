@@ -33,12 +33,14 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.db.RoutingRuleDao;
 import org.graylog.plugins.pipelineprocessor.functions.FromInput;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.rest.resources.streams.responses.StreamReference;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,16 +88,18 @@ public class PipelineAnalyzer {
 
     public Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> analyzePipelines(
             PipelineResolver resolver,
-            List<PipelineRulesMetadataDao> ruleRecords) {
+            List<PipelineRulesMetadataDao> ruleRecords,
+            List<RoutingRuleDao> routingRuleRecords) {
         final ImmutableMap<String, Pipeline> pipelines = resolver.resolvePipelines(pipelineMetricRegistry);
         final ImmutableMap<String, Pipeline> functions = resolver.resolveFunctions(pipelines.values(), pipelineMetricRegistry);
-        return analyzePipelines(pipelines, functions, ruleRecords);
+        return analyzePipelines(pipelines, functions, ruleRecords, routingRuleRecords);
     }
 
     public Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> analyzePipelines(
             ImmutableMap<String, Pipeline> pipelines,
             ImmutableMap<String, Pipeline> functions,
-            List<PipelineRulesMetadataDao> ruleRecords) {
+            List<PipelineRulesMetadataDao> ruleRecords,
+            List<RoutingRuleDao> routingRuleRecords) {
         final Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions = new HashMap<>();
 
         pipelines.values().forEach(pipeline -> {
@@ -143,12 +147,26 @@ public class PipelineAnalyzer {
                     .streams(connectedStreams)
                     .functions(functionSet)
                     .deprecatedFunctions(deprecatedFunctionSet)
-                    .streamsByRuleId(routingRulesMap)
-                    .routedStreamTitleById(routedStreamsMap)
                     .ruleTitlesById(ruleTitles)
                     .connectedStreamTitlesById(connectedStreamTitles)
                     .hasInputReferences(hasInputReferences)
                     .build());
+
+            // Build one RoutingRuleDao per rule that has routing targets
+            final List<StreamReference> connectedStreamRefs = connectedStreamTitles.entrySet().stream()
+                    .map(e -> new StreamReference(e.getKey(), e.getValue()))
+                    .toList();
+            for (final var entry : routingRulesMap.entrySet()) {
+                final String ruleId = entry.getKey();
+                routingRuleRecords.add(RoutingRuleDao.builder()
+                        .pipelineId(pipeline.id())
+                        .pipelineTitle(pipeline.name())
+                        .ruleId(ruleId)
+                        .ruleTitle(ruleTitles.getOrDefault(ruleId, "Unknown"))
+                        .routedStreamIds(List.copyOf(entry.getValue()))
+                        .connectedStreams(connectedStreamRefs)
+                        .build());
+            }
         });
         return inputMentions;
     }

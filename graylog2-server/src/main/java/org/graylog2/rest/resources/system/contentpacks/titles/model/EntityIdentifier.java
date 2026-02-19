@@ -22,8 +22,8 @@ import org.graylog2.search.SearchQueryField;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public record EntityIdentifier(@JsonProperty("id") String id,
-                               @JsonProperty("type") String type,
+public record EntityIdentifier(@JsonProperty(value = "id", required = true) String id,
+                               @JsonProperty(value = "type", required = true) String type,
                                @JsonProperty("identifier_field") @Nullable String identifierField,
                                @JsonProperty("identifier_type") @Nullable String identifierType,
                                @JsonProperty("display_fields") @Nullable List<String> displayFields,

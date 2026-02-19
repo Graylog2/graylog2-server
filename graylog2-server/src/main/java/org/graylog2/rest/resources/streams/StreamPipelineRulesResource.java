@@ -31,8 +31,10 @@ package org.graylog2.rest.resources.streams;
     import jakarta.ws.rs.QueryParam;
     import jakarta.ws.rs.core.MediaType;
     import org.apache.shiro.authz.annotation.RequiresAuthentication;
+    import org.graylog.plugins.pipelineprocessor.db.RoutingRuleDao;
     import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
     import org.graylog2.database.PaginatedList;
+    import org.graylog2.database.filtering.DbQueryCreator;
     import org.graylog2.rest.models.SortOrder;
     import org.graylog2.rest.models.tools.responses.PageListResponse;
     import org.graylog2.rest.resources.entities.EntityAttribute;
@@ -51,33 +53,36 @@ package org.graylog2.rest.resources.streams;
 @Tag(name = "Stream/RoutingRules", description = "Stream routing with pipeline rules")
 @Path("/routing_rules")
 public class StreamPipelineRulesResource extends RestResource {
-    private static final String ATTRIBUTE_PIPELINE_RULE = "rule";
-    private static final String ATTRIBUTE_PIPELINE = "pipeline";
-    private static final String ATTRIBUTE_CONNECTED_STREAM = "connected_streams";
-    private static final String DEFAULT_SORT_FIELD = ATTRIBUTE_PIPELINE_RULE;
+    private static final String DEFAULT_SORT_FIELD = RoutingRuleDao.FIELD_RULE_TITLE;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
             EntityAttribute.builder().id("id").title("id").type(SearchQueryField.Type.OBJECT_ID).hidden(true).searchable(false).build(),
-            EntityAttribute.builder().id("rule_id").title("Pipeline Rule ID").hidden(true).searchable(false).build(),
-            EntityAttribute.builder().id(ATTRIBUTE_PIPELINE_RULE).title("Pipeline Rule")
-                    .searchable(true).sortable(true).filterable(true)
-                    .relatedCollection("pipeline_processor_rules").relatedIdentifier("_id").relatedProperty("title")
+            EntityAttribute.builder().id(RoutingRuleDao.FIELD_RULE_ID).title("Pipeline Rule")
+                    .hidden(true).filterable(true)
+                    .relatedCollection("pipeline_processor_rules").relatedProperty("title")
                     .build(),
-            EntityAttribute.builder().id("pipeline_id").title("Pipeline ID").hidden(true).searchable(false).build(),
-            EntityAttribute.builder().id(ATTRIBUTE_PIPELINE).title("Source pipeline")
-                    .searchable(true).sortable(true).filterable(true)
-                    .relatedCollection("pipeline_processor_pipelines").relatedIdentifier("_id").relatedProperty("title")
+            EntityAttribute.builder().id(RoutingRuleDao.FIELD_RULE_TITLE).title("Pipeline Rule")
+                    .searchable(true).sortable(true)
                     .build(),
-            EntityAttribute.builder().id(ATTRIBUTE_CONNECTED_STREAM).title("Source streams").searchable(false).sortable(false).build()
+            EntityAttribute.builder().id(RoutingRuleDao.FIELD_PIPELINE_ID).title("Source pipeline")
+                    .hidden(true).filterable(true)
+                    .relatedCollection("pipeline_processor_pipelines").relatedProperty("title")
+                    .build(),
+            EntityAttribute.builder().id(RoutingRuleDao.FIELD_PIPELINE_TITLE).title("Source pipeline")
+                    .searchable(true).sortable(true)
+                    .build(),
+            EntityAttribute.builder().id(RoutingRuleDao.FIELD_CONNECTED_STREAMS).title("Source streams").searchable(false).sortable(false).build()
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT)))).build();
 
     private final MongoDbPipelineMetadataService mongoDbPipelineMetadataService;
+    private final DbQueryCreator dbQueryCreator;
 
     @Inject
     public StreamPipelineRulesResource(MongoDbPipelineMetadataService mongoDbPipelineMetadataService) {
         this.mongoDbPipelineMetadataService = mongoDbPipelineMetadataService;
+        this.dbQueryCreator = new DbQueryCreator(RoutingRuleDao.FIELD_RULE_TITLE, attributes);
     }
 
     @GET
@@ -90,19 +95,20 @@ public class StreamPipelineRulesResource extends RestResource {
             @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
             @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
             @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
-            @Parameter(name = "filters") @QueryParam("filters") List<String> filters, // currently unused
+            @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
             @Parameter(name = "sort",
                        description = "The field to sort the result on",
                        required = true,
-                       schema = @Schema(allowableValues = {"rule", "pipeline", "connected_streams"}))
+                       schema = @Schema(allowableValues = {"rule", "pipeline"}))
             @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
             @Parameter(name = "order", description = "The sort direction",
                        schema = @Schema(allowableValues = {"asc", "desc"}))
             @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
 
+        final var dbQuery = dbQueryCreator.createDbQuery(filters, query);
         final PaginatedList<StreamPipelineRulesResponse> result =
                 mongoDbPipelineMetadataService.getRoutingRulesPaginated(
-                        streamId, query, sort, order, page, perPage);
+                        streamId, dbQuery, sort, order, page, perPage);
 
         return PageListResponse.create(
                 query, result.pagination(),
