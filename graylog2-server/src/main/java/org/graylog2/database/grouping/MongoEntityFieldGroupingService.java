@@ -35,17 +35,25 @@ public class MongoEntityFieldGroupingService implements EntityFieldGroupingServi
                                                final String groupFilter,
                                                final Subject subject) {
         final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collectionName);
+        final var userCanReadAllEntities = permissionsUtils.hasAllPermission(subject) ||
+                permissionsUtils.hasReadPermissionForWholeCollection(subject, collectionName);
 
-        final AggregateIterable<Document> results = mongoCollection.aggregate(List.of(
-                Aggregates.group("$" + fieldName, Accumulators.sum(COUNT_FIELD_NAME, 1)),
-                Aggregates.sort(Sorts.descending(COUNT_FIELD_NAME))
-        ));
+        if (userCanReadAllEntities) {
+            final AggregateIterable<Document> results = mongoCollection.aggregate(List.of(
+                    Aggregates.group("$" + fieldName, Accumulators.sum(COUNT_FIELD_NAME, 1)),
+                    Aggregates.sort(Sorts.descending(COUNT_FIELD_NAME))
+            ));
 
-        List<EntityFieldGroup> result = new ArrayList<>();
-        results.forEach(x -> {
-            final String id = x.get("_id").toString();
-            result.add(new EntityFieldGroup(id, id, x.getInteger(COUNT_FIELD_NAME, 0)));
-        });
-        return result;
+            List<EntityFieldGroup> result = new ArrayList<>();
+            results.forEach(x -> {
+                final String id = x.get("_id").toString();
+                //it is very likely that BE should fetch related entities and enrich second field of EntityFieldGroup class, instead of using id there
+                result.add(new EntityFieldGroup(id, id, x.getInteger(COUNT_FIELD_NAME, 0)));
+            });
+            return result;
+        } else {
+            //TODO: undoable in MongoDB, only possible in-memory, but highly inefficient
+            return List.of();
+        }
     }
 }
