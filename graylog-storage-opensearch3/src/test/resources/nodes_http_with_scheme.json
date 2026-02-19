@@ -1,0 +1,24 @@
+{
+  "_nodes": {
+    "total": 1,
+    "successful": 1,
+    "failed": 0
+  },
+  "cluster_name": "opensearch-cluster",
+  "nodes": {
+    "node1": {
+      "name": "os01",
+      "transport_address": "172.18.0.2:9300",
+      "ip": "172.18.0.2",
+      "version": "2.11.0",
+      "build_hash": "abc123",
+      "build_type": "docker",
+      "roles": ["data", "ingest", "master"],
+      "http": {
+        "bound_address": ["0.0.0.0:9200"],
+        "publish_address": "https://172.18.0.2:9200",
+        "max_content_length_in_bytes": 104857600
+      }
+    }
+  }
+}
