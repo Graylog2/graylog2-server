@@ -22,7 +22,7 @@ const useSessionInitialEventIds = (): Array<string> => {
   const params = useRoutingQuery();
   const replaySessionId = params[REPLAY_SESSION_ID_PARAM];
 
-  return Store.sessionGet(replaySessionId)?.initialEventIds ?? [];
+  return Store.sessionGet(replaySessionId as string)?.initialEventIds ?? [];
 };
 
 export default useSessionInitialEventIds;

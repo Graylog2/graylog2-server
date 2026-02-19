@@ -33,7 +33,7 @@ jest.mock('logic/local-storage/Store', () => ({
 describe('PluggableSearchBarControls', () => {
   beforeEach(() => {
     asMock(usePluginEntities).mockReturnValue([]);
-    Store.get.mockReturnValue(false);
+    asMock(Store.get).mockReturnValue(false);
   });
 
   const createPluggableSearchBarControl =
@@ -84,7 +84,7 @@ describe('PluggableSearchBarControls', () => {
   });
 
   it('should not render anything when there are no pluggable controls and search filter preview is hidden', () => {
-    Store.get.mockReturnValue(true);
+    asMock(Store.get).mockReturnValue(true);
     const { container } = render(<PluggableSearchBarControls />);
 
     expect(container.children).toHaveLength(2);

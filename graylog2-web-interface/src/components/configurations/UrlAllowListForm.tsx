@@ -148,7 +148,7 @@ const UrlAllowListForm = ({ urls = [], onUpdate = () => {}, disabled = false, ne
   };
 
   const _onInputChange = (event: React.ChangeEvent<HTMLInputElement>, idx: number) => {
-    _validate(event.target.name, idx, getValueFromInput(event.target));
+    _validate(event.target.name, idx, getValueFromInput(event.target) as string);
   };
 
   const _onUpdateType = (idx: number, type: string) => {

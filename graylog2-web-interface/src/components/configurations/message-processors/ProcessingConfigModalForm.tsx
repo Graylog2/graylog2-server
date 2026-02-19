@@ -106,7 +106,7 @@ const ProcessingConfigModalForm = ({ closeModal, formConfig }: Props) => {
                   id="enableFutureTimestampNormalization"
                   help={futureTimestampNormalizationHelpText}
                   onChange={(event) =>
-                    handleEnableFutureTimestampNormalisation(getValueFromInput(event.target), setFieldValue)
+                    handleEnableFutureTimestampNormalisation(getValueFromInput(event.target) as boolean, setFieldValue)
                   }
                   label={<LabelSpan>Future Timestamp Normalization</LabelSpan>}
                 />

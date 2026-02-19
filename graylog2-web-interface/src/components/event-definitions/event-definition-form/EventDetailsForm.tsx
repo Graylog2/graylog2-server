@@ -93,7 +93,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name } = event.target;
 
-    onChange(name, FormsUtils.getValueFromInput(event.target));
+    onChange(name, FormsUtils.getValueFromInput(event.target) as string | number);
   };
 
   const handlePriorityChange = (nextPriority: string) => {

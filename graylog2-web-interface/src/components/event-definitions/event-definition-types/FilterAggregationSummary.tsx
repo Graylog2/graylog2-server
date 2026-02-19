@@ -27,6 +27,7 @@ import { isPermitted } from 'util/PermissionsMixin';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import Routes from 'routing/Routes';
 import validateExpression from 'logic/alerts/AggregationExpressionValidation';
+import type { Expression } from 'logic/alerts/AggregationExpressionValidation';
 import type { Stream } from 'views/stores/StreamsStore';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
@@ -166,7 +167,7 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId = undefine
   const effectiveStreamIds = configStreams?.filter((s) => isPermitted(currentUser.permissions, `streams:read:${s}`));
   const streamIdsWithMissingPermission = configStreams?.filter((s) => !effectiveStreamIds.includes(s));
 
-  const validationResults = validateExpression(conditions.expression, series);
+  const validationResults = validateExpression(conditions?.expression as Expression | null, series);
 
   const renderCronExpression = (expression) => {
     if (expression) {

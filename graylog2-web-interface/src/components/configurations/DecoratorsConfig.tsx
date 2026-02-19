@@ -37,11 +37,11 @@ import formatDecorator from './decorators/FormatDecorator';
 const DecoratorsConfig = () => {
   const { data: streams, isLoading: streamsLoading } = useQuery<Array<Stream>>({
     queryKey: ['streamsMap'],
-    queryFn: StreamsActions.listStreams,
+    queryFn: StreamsActions.listStreams as () => Promise<Array<Stream>>,
   });
   const { data: types, isLoading: typesLoading } = useQuery<{ [key: string]: DecoratorType }>({
     queryKey: ['decorators', 'types'],
-    queryFn: DecoratorsActions.available,
+    queryFn: DecoratorsActions.available as () => Promise<{ [key: string]: DecoratorType }>,
   });
   const {
     data: decorators,
@@ -49,7 +49,7 @@ const DecoratorsConfig = () => {
     refetch: refetchDecorators,
   } = useQuery<Array<Decorator>>({
     queryKey: ['decorators', 'available'],
-    queryFn: DecoratorsActions.list,
+    queryFn: DecoratorsActions.list as () => Promise<Array<Decorator>>,
   });
   const [showConfigModal, setShowConfigModal] = useState(false);
   const streamsMap = useMemo(() => Object.fromEntries(streams?.map((s) => [s.id, s] as const) ?? []), [streams]);

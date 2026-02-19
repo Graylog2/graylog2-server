@@ -34,7 +34,7 @@ const BooleanField = ({ autoFocus = false, field, onChange, title, typeName, val
   const handleChange = (event) => {
     const nextValue = getValueFromInput(event.target);
 
-    onChange(title, nextValue);
+    onChange(title, nextValue as boolean);
   };
 
   return (

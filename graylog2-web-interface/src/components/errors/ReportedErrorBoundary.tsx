@@ -79,7 +79,7 @@ const ReportedErrorBoundary = ({ children }: Props) => {
   const location = useLocation();
 
   useEffect(() => {
-    setReportedError(null);
+    setReportedError(undefined);
   }, [location]);
 
   return reportedError ? <ReportedErrorPage reportedError={reportedError} /> : <>{children}</>;

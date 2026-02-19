@@ -64,7 +64,7 @@ const NumberField = ({ autoFocus = false, field, onChange, title, typeName, valu
   const handleChange = ({ target }) => {
     const numericValue = getValueFromInput(target);
 
-    onChange(title, numericValue);
+    onChange(title, numericValue as number);
   };
 
   const isRequired = !field.is_optional;

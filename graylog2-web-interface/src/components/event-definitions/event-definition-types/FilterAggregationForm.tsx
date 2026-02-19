@@ -92,7 +92,7 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
 
   const handleTypeChange = useCallback(
     (event: React.FormEvent<Radio>) => {
-      const nextConditionType = Number(FormsUtils.getValueFromInput(event.target));
+      const nextConditionType = Number(FormsUtils.getValueFromInput(event.target as HTMLInputElement));
 
       setConditionType(nextConditionType);
       let newExistingAggregationConfig;

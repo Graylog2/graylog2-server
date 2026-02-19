@@ -1,0 +1,58 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import Reflux from 'reflux';
+
+import * as URLUtils from 'util/URLUtils';
+import UserNotification from 'util/UserNotification';
+import fetch from 'logic/rest/FetchProvider';
+import { singletonStore } from 'logic/singleton';
+
+export const SystemProcessingStore = singletonStore('core.SystemProcessing', () =>
+  Reflux.createStore({
+    sourceUrl: (nodeId: string) => `/cluster/${nodeId}/processing`,
+
+    pause(nodeId: string) {
+      return fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl(nodeId)}/pause`)).then(
+        () => {
+          this.trigger({});
+          UserNotification.success(`Message processing paused successfully in '${nodeId}'`);
+        },
+        (error: unknown) => {
+          UserNotification.error(
+            `Pausing message processing in '${nodeId}' failed: ${error}`,
+            `Could not pause message processing in node '${nodeId}'`,
+          );
+        },
+      );
+    },
+
+    resume(nodeId: string) {
+      return fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl(nodeId)}/resume`)).then(
+        () => {
+          this.trigger({});
+          UserNotification.success(`Message processing resumed successfully in '${nodeId}'`);
+        },
+        (error: unknown) => {
+          UserNotification.error(
+            `Resuming message processing in '${nodeId}' failed: ${error}`,
+            `Could not resume message processing in node '${nodeId}'`,
+          );
+        },
+      );
+    },
+  }),
+);

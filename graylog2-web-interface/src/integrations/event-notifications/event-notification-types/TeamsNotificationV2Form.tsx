@@ -21,7 +21,6 @@ import cloneDeep from 'lodash/cloneDeep';
 import { getValueFromInput } from 'util/FormsUtils';
 import { Input, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/bootstrap';
 import { TimezoneSelect, URLAllowListInput, SourceCodeEditor } from 'components/common';
-import type { SelectCallback } from 'components/bootstrap/types';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
 
@@ -158,9 +157,9 @@ const TeamsNotificationV2Form = ({ config, validation, onChange }: TeamsNotifica
     onChange(nextConfig);
   };
 
-  const handleBacklogSizeChange: SelectCallback = (event: { target: { name: string } }) => {
+  const handleBacklogSizeChange = (event: any) => {
     const { name } = event.target;
-    const value = getValueFromInput(event.target);
+    const value = Number(getValueFromInput(event.target));
 
     setBacklogSize(value);
     propagateChange(name, value);
@@ -180,7 +179,7 @@ const TeamsNotificationV2Form = ({ config, validation, onChange }: TeamsNotifica
   };
 
   const handleWebhookUrlChange = (event: SyntheticEvent<EventTarget>) => {
-    propagateChange('webhook_url', getValueFromInput(event.target));
+    propagateChange('webhook_url', getValueFromInput(event.target as HTMLInputElement));
   };
 
   const handleAdaptiveCardChange = (nextValue: string) => {

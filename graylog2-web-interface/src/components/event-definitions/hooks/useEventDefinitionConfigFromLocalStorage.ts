@@ -53,9 +53,9 @@ const useEventDefinitionConfigFromLocalStorage = (): {
   const { 'session-id': sessionId } = useQuery();
 
   return useMemo(() => {
-    const parsedLocalStorageConfig = Store.get(sessionId);
+    const parsedLocalStorageConfig = Store.get(sessionId as string);
     if (!parsedLocalStorageConfig) return { hasLocalStorageConfig: false, configFromLocalStorage: undefined };
-    Store.delete(sessionId);
+    Store.delete(sessionId as string);
 
     const {
       type,

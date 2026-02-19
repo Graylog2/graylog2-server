@@ -50,7 +50,7 @@ const CaffeineCacheFieldSet = ({ config }: Props, ref: any) => {
   const handleIgnoreNullChange = (event) => {
     const ignoreValue = getValueFromInput(event.target);
 
-    const valConfig = { ...values.config, ignore_null: ignoreValue };
+    const valConfig = { ...values.config, ignore_null: ignoreValue as boolean };
     setStateConfig(valConfig);
     setValues({ ...values, config: valConfig });
   };

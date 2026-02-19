@@ -1,0 +1,233 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+// eslint-disable-next-line no-restricted-imports
+import { Navbar as BootstrapNavbar } from 'react-bootstrap';
+import styled, { css } from 'styled-components';
+import chroma from 'chroma-js';
+
+const Navbar = styled(BootstrapNavbar)(
+  ({ theme }) => {
+    const variant = theme.colors.variant as Record<string, any>;
+
+    return css`
+    position: relative;
+    min-height: auto;
+    background-color: ${theme.colors.global.navigationBackground};
+    border: 0;
+    box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
+    margin-bottom: 0;
+
+    .navbar-text {
+      color: ${theme.colors.text.primary};
+    }
+
+    @media (max-width: ${theme.breakpoints.max.md}) {
+      && .navbar-collapse {
+        position: absolute;
+        background-color: ${theme.colors.global.navigationBackground};
+        width: 100%;
+      }
+    }
+
+    .navbar-nav {
+      > li > a,
+      > li > .btn-link {
+        color: ${theme.colors.text.primary};
+
+        &:hover,
+        &:focus {
+          color: ${variant.darker.default};
+          background-color: transparent;
+        }
+      }
+
+      > .active > a,
+      > .active > .btn-link {
+        color: ${theme.colors.text.primary};
+        background-color: transparent;
+
+        &:hover,
+        &:focus {
+          color: ${variant.darkest.default};
+          background-color: transparent;
+        }
+      }
+
+      > .disabled > a,
+      > .disabled > .btn-link {
+        &,
+        &:hover,
+        &:focus {
+          color: ${theme.colors.gray[70]};
+          background-color: transparent;
+        }
+      }
+
+      > .open > a,
+      > .open > .btn-link {
+        &,
+        &:hover,
+        &:focus {
+          color: ${variant.darkest.default};
+          background-color: transparent;
+        }
+      }
+
+      @media (max-width: ${theme.breakpoints.max.md}) {
+        padding-left: 50px;
+
+        > li > a,
+        > li > .btn-link {
+          &:hover,
+          &:focus {
+            color: ${variant.darker.default};
+            background-color: transparent;
+          }
+        }
+
+        .open .dropdown-menu {
+          > li > a,
+          > li > .btn-link {
+            color: ${variant.darkest.default};
+
+            &:hover,
+            &:focus {
+              color: ${variant.darker.default};
+              background-color: ${variant.lightest.default};
+            }
+          }
+
+          > .active > a,
+          > .active > .btn-link {
+            color: ${variant.darkest.default};
+            background-color: ${theme.colors.gray[90]};
+
+            &:hover,
+            &:focus {
+              color: ${variant.darkest.default};
+              background-color: ${theme.colors.gray[80]};
+            }
+          }
+
+          > .disabled > a,
+          > .disabled > .btn-link {
+            &,
+            &:hover,
+            &:focus {
+              color: ${theme.colors.gray[70]};
+              background-color: transparent;
+            }
+          }
+        }
+      }
+    }
+
+    .navbar-toggle {
+      background-color: ${theme.colors.global.navigationBackground};
+      border-color: ${variant.dark.default};
+      transition:
+        background-color 150ms ease-in-out,
+        border-color 150ms ease-in-out;
+      position: relative;
+
+      &:not(.collapsed) {
+        .icon-bar:nth-last-child(1),
+        .icon-bar:nth-last-child(3) {
+          transition:
+            transform 150ms ease-in 150ms,
+            top 150ms ease-in 0s;
+        }
+
+        .icon-bar:nth-last-child(1) {
+          transform: rotate(-45deg) translate(4px, -4px);
+        }
+
+        .icon-bar:nth-last-child(3) {
+          transform: rotate(45deg) translate(4px, 4px);
+        }
+
+        .icon-bar:nth-last-child(2) {
+          transition: opacity 0s ease 150ms;
+          opacity: 0;
+        }
+      }
+
+      .icon-bar {
+        background-color: ${theme.colors.text.primary};
+        transition:
+          background-color 150ms ease-in-out,
+          transform 150ms ease-in 0s,
+          opacity 300ms ease-in 0s;
+        transform: rotate(0deg);
+        position: relative;
+        opacity: 1;
+      }
+
+      &:hover,
+      &:focus,
+      &:not(.collapsed) {
+        background-color: ${variant.lighter.default};
+        border-color: ${variant.default};
+
+        .icon-bar {
+          background-color: ${theme.colors.text.primary};
+        }
+      }
+    }
+
+    .navbar-collapse,
+    .navbar-form {
+      border-color: ${chroma(theme.colors.gray[90] as string).darken(0.065).css()};
+    }
+
+    .navbar-link {
+      color: ${variant.default};
+
+      &:hover {
+        color: ${chroma(variant.default as string).darken(0.25).css()};
+      }
+    }
+
+    .btn-link {
+      color: ${variant.default};
+
+      &:hover,
+      &:focus {
+        color: ${variant.dark.default};
+      }
+
+      &[disabled],
+      fieldset[disabled] & {
+        &:hover,
+        &:focus {
+          color: ${theme.colors.gray[80]};
+        }
+      }
+    }
+
+    .dropdown-header {
+      margin-top: 4px;
+      text-transform: uppercase;
+      padding: 0 15px !important;
+      font-weight: bold;
+    }
+  `;
+  },
+);
+
+/** @component */
+export default Navbar;

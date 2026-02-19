@@ -50,7 +50,7 @@ const DashboardPropertiesModal = ({
 
   const _onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name } = event.target;
-    let value = FormsUtils.getValueFromInput(event.target);
+    let value = FormsUtils.getValueFromInput(event.target) as string;
     const trimmedValue = value.trim();
 
     if (trimmedValue === '') {
@@ -59,13 +59,13 @@ const DashboardPropertiesModal = ({
 
     switch (name) {
       case 'title':
-        setUpdatedDashboard((_updatedDashboard) => _updatedDashboard.toBuilder().title(value).build());
+        setUpdatedDashboard((_updatedDashboard) => _updatedDashboard.toBuilder().title(value as string).build());
         break;
       case 'summary':
-        setUpdatedDashboard((_updatedDashboard) => _updatedDashboard.toBuilder().summary(value).build());
+        setUpdatedDashboard((_updatedDashboard) => _updatedDashboard.toBuilder().summary(value as string).build());
         break;
       case 'description':
-        setUpdatedDashboard((_updatedDashboard) => _updatedDashboard.toBuilder().description(value).build());
+        setUpdatedDashboard((_updatedDashboard) => _updatedDashboard.toBuilder().description(value as string).build());
         break;
       default:
     }

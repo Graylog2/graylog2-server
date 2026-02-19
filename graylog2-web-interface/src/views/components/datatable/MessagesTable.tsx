@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
 
 import { Table } from 'components/bootstrap';
 
@@ -23,8 +24,8 @@ const MessagesContainer = styled.div`
   width: 100%;
 `;
 
-const StyledTable = styled(Table)<{ $stickyHeader: boolean }>(
-  ({ theme, $stickyHeader }) => css`
+const StyledTable = styled(Table as React.ComponentType<React.ComponentProps<typeof Table>>)<{ $stickyHeader: boolean }>(
+  ({ theme, $stickyHeader }: { theme: DefaultTheme; $stickyHeader: boolean }) => css`
     position: relative;
     font-size: ${theme.fonts.size.small};
     margin: 0;
