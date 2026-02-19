@@ -33,6 +33,8 @@ public class MongoEntityFieldGroupingService implements EntityFieldGroupingServi
                                                final String fieldName,
                                                final String query,
                                                final String groupFilter,
+                                               final int page,
+                                               final int pageSize,
                                                final Subject subject) {
         final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collectionName);
         final var userCanReadAllEntities = permissionsUtils.hasAllPermission(subject) ||
@@ -41,7 +43,9 @@ public class MongoEntityFieldGroupingService implements EntityFieldGroupingServi
         if (userCanReadAllEntities) {
             final AggregateIterable<Document> results = mongoCollection.aggregate(List.of(
                     Aggregates.group("$" + fieldName, Accumulators.sum(COUNT_FIELD_NAME, 1)),
-                    Aggregates.sort(Sorts.descending(COUNT_FIELD_NAME))
+                    Aggregates.sort(Sorts.descending(COUNT_FIELD_NAME, "_id")),
+                    Aggregates.skip((page - 1) * pageSize),
+                    Aggregates.limit(pageSize)
             ));
 
             List<EntityFieldGroup> result = new ArrayList<>();
