@@ -21,7 +21,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog2.database.BuildableMongoEntity;
 import org.graylog2.rest.resources.streams.responses.StreamReference;
+import org.mongojack.Id;
+import org.mongojack.ObjectId;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -37,6 +40,13 @@ public abstract class RoutingRuleDao implements BuildableMongoEntity<RoutingRule
     public static final String FIELD_RULE_TITLE = "rule";
     public static final String FIELD_ROUTED_STREAM_IDS = "routed_stream_ids";
     public static final String FIELD_CONNECTED_STREAMS = "connected_streams";
+
+    @JsonProperty(FIELD_ID)
+    @Nullable
+    @Id
+    @ObjectId
+    @Override
+    public abstract String id();
 
     @JsonProperty(FIELD_PIPELINE_ID)
     public abstract String pipelineId();
@@ -60,8 +70,16 @@ public abstract class RoutingRuleDao implements BuildableMongoEntity<RoutingRule
         return new AutoValue_RoutingRuleDao.Builder();
     }
 
+    @Override
+    public abstract Builder toBuilder();
+
     @AutoValue.Builder
     public abstract static class Builder implements BuildableMongoEntity.Builder<RoutingRuleDao, Builder> {
+
+        @Id
+        @ObjectId
+        @JsonProperty(FIELD_ID)
+        public abstract Builder id(@Nullable String id);
 
         @JsonProperty(FIELD_PIPELINE_ID)
         public abstract Builder pipelineId(String pipelineId);
@@ -80,5 +98,7 @@ public abstract class RoutingRuleDao implements BuildableMongoEntity<RoutingRule
 
         @JsonProperty(FIELD_CONNECTED_STREAMS)
         public abstract Builder connectedStreams(List<StreamReference> connectedStreams);
+
+        public abstract RoutingRuleDao build();
     }
 }
