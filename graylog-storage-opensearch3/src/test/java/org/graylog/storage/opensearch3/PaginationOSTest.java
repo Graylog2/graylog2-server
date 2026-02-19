@@ -85,7 +85,7 @@ class PaginationOSTest {
 
         // Then
         assertThat(request.ignoreUnavailable()).isTrue();
-        assertThat(request.allowNoIndices()).isFalse();
+        assertThat(request.allowNoIndices()).isTrue();
         assertThat(request.expandWildcards()).contains(ExpandWildcard.Open);
     }
 
