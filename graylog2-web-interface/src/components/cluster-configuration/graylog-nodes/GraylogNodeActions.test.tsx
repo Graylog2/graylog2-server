@@ -77,7 +77,16 @@ describe('GraylogNodeActions', () => {
     const button = await screen.findByRole('button', { name: /More/i });
     await userEvent.click(button);
 
-    await screen.findByRole('menuitem', { name: /Override load Balancer status to DEAD/i });
+    await screen.findByRole('menuitem', { name: /Override load balancer status to DEAD/i });
+  });
+
+  it('shows set load balancer to DEAD menu item when lb_status is ALIVE', async () => {
+    render(<GraylogNodeActions node={{ ...nodeMock, lb_status: 'ALIVE' }} />);
+
+    const button = await screen.findByRole('button', { name: /More/i });
+    await userEvent.click(button);
+
+    await screen.findByRole('menuitem', { name: /Override load balancer status to DEAD/i });
   });
 
   it('shows set load balancer to ALIVE menu item when lb_status is not alive', async () => {
@@ -86,6 +95,6 @@ describe('GraylogNodeActions', () => {
     const button = await screen.findByRole('button', { name: /More/i });
     await userEvent.click(button);
 
-    await screen.findByRole('menuitem', { name: /Override load Balancer status to ALIVE/i });
+    await screen.findByRole('menuitem', { name: /Override load balancer status to ALIVE/i });
   });
 });

@@ -62,13 +62,13 @@ const GraylogNodeActions = ({ node }: Props) => {
           </MenuItem>
         </IfPermitted>
         <IfPermitted permissions="lbstatus:change">
-          {node.lb_status === 'alive' ? (
+          {node.lb_status?.toUpperCase() === 'ALIVE' ? (
             <MenuItem onSelect={() => setLoadBalancerStatusToConfirm('DEAD')}>
-              Override load Balancer status to DEAD
+              Override load balancer status to DEAD
             </MenuItem>
           ) : (
             <MenuItem onSelect={() => setLoadBalancerStatusToConfirm('ALIVE')}>
-              Override load Balancer status to ALIVE
+              Override load balancer status to ALIVE
             </MenuItem>
           )}
         </IfPermitted>
