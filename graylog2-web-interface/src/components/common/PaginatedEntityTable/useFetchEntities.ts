@@ -68,6 +68,7 @@ const useFetchEntities = <T, M = unknown>({
   refetch: () => void;
 } => {
   const { data, isInitialLoading, refetch } = useQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: fetchKey,
 
     queryFn: () =>
