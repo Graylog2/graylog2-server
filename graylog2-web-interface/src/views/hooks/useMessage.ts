@@ -26,7 +26,7 @@ import type FetchError from 'logic/errors/FetchError';
 export const fetchMessage = async (index: string, id: string) => {
   const message = await Messages.search(index, id);
 
-  return MessageFormatter.formatResultMessage(message) as Message;
+  return MessageFormatter.formatResultMessage(message);
 };
 
 const useMessage = (

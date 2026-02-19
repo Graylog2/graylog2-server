@@ -179,7 +179,7 @@ const parseRawMessage = (
   };
 
   return Messages.parse(payload).then(
-    (response) => MessageFormatter.formatResultMessage(response) as Message,
+    (response) => MessageFormatter.formatResultMessage(response),
     (error): undefined => {
       if (error.additional && error.additional.status === 400) {
         UserNotification.error(
