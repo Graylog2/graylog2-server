@@ -54,11 +54,9 @@ public class ScrollResultOS3 extends ChunkedQueryResultOS {
     @Nullable
     protected SearchResponse<Map> nextSearchResult() {
         final String currentScrollId = this.lastSearchResponse.scrollId();
-        System.out.println("DEBUG: nextSearchResult called, scrollId=" + currentScrollId);
 
         if (currentScrollId == null) {
             // with ignore_unavailable=true and no available indices, response does not contain scrollId
-            System.out.println("DEBUG: scrollId is null, returning null");
             return null;
         }
 
@@ -67,7 +65,6 @@ public class ScrollResultOS3 extends ChunkedQueryResultOS {
                 .orElse(DEFAULT_SCROLL);
 
         final Time time = new Time.Builder().time(scrollTime).build();
-        System.out.println("DEBUG: Creating scroll request with scrollTime=" + scrollTime + ", time.time()=" + time.time());
         final ScrollRequest scrollRequest = ScrollRequest.of(sr -> sr
                 .scrollId(currentScrollId)
                 .scroll(time));
@@ -77,7 +74,6 @@ public class ScrollResultOS3 extends ChunkedQueryResultOS {
                 "Unable to retrieve next chunk from search: "
         );
 
-        System.out.println("DEBUG: Got scroll response, hits=" + (response != null ? response.hits().hits().size() : "null"));
         return response;
     }
 

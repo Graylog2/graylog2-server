@@ -231,4 +231,81 @@ class PaginationOSTest {
         // Then
         assertThat(query.toJsonString()).contains("test query");
     }
+
+    @Test
+    void buildSearchRequestShouldApplyOffset() {
+        // Given
+        final int offset = 100;
+        final ChunkCommand chunkCommand = ChunkCommand.builder()
+                .indices(Set.of("graylog_0"))
+                .range(RANGE)
+                .fields(List.of("message"))
+                .offset(offset)
+                .build();
+
+        // When
+        final SearchRequest request = paginationOS.buildSearchRequest(chunkCommand);
+
+        // Then
+        assertThat(request.from()).isEqualTo(offset);
+    }
+
+    @Test
+    void buildSearchRequestShouldUseLimitAsFallbackWhenBatchSizeAbsent() {
+        // Given
+        final int limit = 75;
+        final ChunkCommand chunkCommand = ChunkCommand.builder()
+                .indices(Set.of("graylog_0"))
+                .range(RANGE)
+                .fields(List.of("message"))
+                .limit(limit)
+                .build();
+
+        // When
+        final SearchRequest request = paginationOS.buildSearchRequest(chunkCommand);
+
+        // Then
+        assertThat(request.size()).isEqualTo(limit);
+    }
+
+    @Test
+    void buildSearchRequestShouldPreferBatchSizeOverLimit() {
+        // Given
+        final int batchSize = 50;
+        final int limit = 1000;
+        final ChunkCommand chunkCommand = ChunkCommand.builder()
+                .indices(Set.of("graylog_0"))
+                .range(RANGE)
+                .fields(List.of("message"))
+                .batchSize(batchSize)
+                .limit(limit)
+                .build();
+
+        // When
+        final SearchRequest request = paginationOS.buildSearchRequest(chunkCommand);
+
+        // Then
+        assertThat(request.size()).isEqualTo(batchSize);
+    }
+
+    @Test
+    void buildSearchRequestShouldApplyOffsetAndLimit() {
+        // Given
+        final int offset = 50;
+        final int limit = 25;
+        final ChunkCommand chunkCommand = ChunkCommand.builder()
+                .indices(Set.of("graylog_0"))
+                .range(RANGE)
+                .fields(List.of("message"))
+                .offset(offset)
+                .limit(limit)
+                .build();
+
+        // When
+        final SearchRequest request = paginationOS.buildSearchRequest(chunkCommand);
+
+        // Then
+        assertThat(request.from()).isEqualTo(offset);
+        assertThat(request.size()).isEqualTo(limit);
+    }
 }

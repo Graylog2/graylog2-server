@@ -109,6 +109,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
 
             builder.ignoreUnavailable(true);
             builder.expandWildcards(ExpandWildcard.Open);
+            builder.allowNoIndices(true);
 
             if(!affectedIndices.isEmpty()) {
                 builder.index(new ArrayList<>(affectedIndices));
@@ -210,6 +211,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
             builder.trackTotalHits(th -> th.enabled(true));
 
             builder.ignoreUnavailable(true);
+            builder.allowNoIndices(true);
             builder.expandWildcards(ExpandWildcard.Open);
 
             if(!affectedIndices.isEmpty()) {
@@ -282,18 +284,20 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
         return Query.builder().multiMatch(multiMatch -> multiMatch.fields(field).query(value)).build();
     }
 
-    private SortOptions newCreateSorting(Sorting sorting) {
+    List<SortOptions> newCreateSorting(Sorting sorting) {
         final org.opensearch.client.opensearch._types.SortOrder order = sortOrder(sorting);
 
-        return SortOptions.of(builder -> {
-            if (EventDto.FIELD_TIMERANGE_START.equals(sorting.getField())) {
-                builder.field(sort -> withUnmapped(sort.field(EventDto.FIELD_TIMERANGE_START).order(order), sorting));
-                builder.field(sort -> withUnmapped(sort.field(EventDto.FIELD_TIMERANGE_END).order(order), sorting));
-            } else {
-                builder.field(sort -> withUnmapped(sort.field(sorting.getField()).order(order), sorting));
-            }
-            return builder;
-        });
+        if (EventDto.FIELD_TIMERANGE_START.equals(sorting.getField())) {
+            // When sorting by timerange start, add two separate sort clauses
+            return List.of(
+                    SortOptions.of(builder -> builder.field(sort -> withUnmapped(sort.field(EventDto.FIELD_TIMERANGE_START).order(order), sorting))),
+                    SortOptions.of(builder -> builder.field(sort -> withUnmapped(sort.field(EventDto.FIELD_TIMERANGE_END).order(order), sorting)))
+            );
+        } else {
+            return List.of(
+                    SortOptions.of(builder -> builder.field(sort -> withUnmapped(sort.field(sorting.getField()).order(order), sorting)))
+            );
+        }
     }
 
     private FieldSort.Builder withUnmapped(FieldSort.Builder builder, Sorting sorting) {

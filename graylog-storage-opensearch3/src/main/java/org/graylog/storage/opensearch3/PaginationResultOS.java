@@ -70,6 +70,12 @@ public class PaginationResultOS extends ChunkedQueryResultOS {
             if (initialSearchRequest.source() != null) {
                 builder.source(initialSearchRequest.source());
             }
+            if (initialSearchRequest.slice() != null) {
+                builder.slice(initialSearchRequest.slice());
+            }
+            if (initialSearchRequest.from() != null) {
+                builder.from(initialSearchRequest.from());
+            }
             if (initialSearchRequest.size() != null) {
                 builder.size(initialSearchRequest.size());
             }

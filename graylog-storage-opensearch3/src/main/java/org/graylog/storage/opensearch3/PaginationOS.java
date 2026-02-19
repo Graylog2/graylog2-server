@@ -80,18 +80,16 @@ public class PaginationOS implements MultiChunkResultRetriever {
                 builder.source(s -> s.filter(sf -> sf.includes(new LinkedList<>(chunkCommand.fields()))));
             }
 
-            // Set batch size
-            chunkCommand.batchSize().ifPresent(batchSize -> builder.size(Math.toIntExact(batchSize)));
-
             // Set slice parameters
             chunkCommand.sliceParams().ifPresent(sliceParams ->
                     builder.slice(slice -> slice.id(sliceParams.id()).max(sliceParams.max()))
             );
 
-            // Set pagination
+            // Set pagination - apply limit first, then let batchSize override if present
             final SearchCommand searchCommand = SearchCommand.from(chunkCommand);
             searchCommand.offset().ifPresent(builder::from);
             searchCommand.limit().ifPresent(builder::size);
+            chunkCommand.batchSize().ifPresent(batchSize -> builder.size(Math.toIntExact(batchSize)));
 
             // Set sorting
             final Sorting sorting = searchCommand.sorting().orElse(DEFAULT_SORTING);

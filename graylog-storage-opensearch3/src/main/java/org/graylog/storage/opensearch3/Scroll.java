@@ -82,8 +82,15 @@ public class Scroll implements MultiChunkResultRetriever {
                 builder.source(s -> s.filter(sf -> sf.includes(new LinkedList<>(chunkCommand.fields()))));
             }
 
-            // Set batch size
-            chunkCommand.batchSize().ifPresent(batchSize -> builder.size(Math.toIntExact(batchSize)));
+            // Set pagination parameters
+            chunkCommand.offset().ifPresent(offset -> builder.from(offset));
+
+            // Set batch size, or use limit as fallback if batchSize is absent
+            if (chunkCommand.batchSize().isPresent()) {
+                builder.size(Math.toIntExact(chunkCommand.batchSize().getAsLong()));
+            } else {
+                chunkCommand.limit().ifPresent(builder::size);
+            }
 
             return builder;
         });

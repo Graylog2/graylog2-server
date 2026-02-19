@@ -172,4 +172,89 @@ class ScrollTest {
         assertThat(request.trackTotalHits()).isNotNull();
         assertThat(request.trackTotalHits().enabled()).isTrue();
     }
+
+    @Test
+    void buildScrollRequestShouldApplyOffset() {
+        // Given
+        final int offset = 100;
+        final ChunkCommand chunkCommand = ChunkCommand.builder()
+                .indices(Set.of("graylog_0"))
+                .range(RANGE)
+                .fields(List.of("message"))
+                .offset(offset)
+                .build();
+
+        final Query query = searchRequestFactory.createQuery(chunkCommand.query(), chunkCommand.range(), chunkCommand.filter());
+
+        // When
+        final SearchRequest request = scroll.buildScrollRequest(query, chunkCommand);
+
+        // Then
+        assertThat(request.from()).isEqualTo(offset);
+    }
+
+    @Test
+    void buildScrollRequestShouldUseLimitAsFallbackWhenBatchSizeAbsent() {
+        // Given
+        final int limit = 75;
+        final ChunkCommand chunkCommand = ChunkCommand.builder()
+                .indices(Set.of("graylog_0"))
+                .range(RANGE)
+                .fields(List.of("message"))
+                .limit(limit)
+                .build();
+
+        final Query query = searchRequestFactory.createQuery(chunkCommand.query(), chunkCommand.range(), chunkCommand.filter());
+
+        // When
+        final SearchRequest request = scroll.buildScrollRequest(query, chunkCommand);
+
+        // Then
+        assertThat(request.size()).isEqualTo(limit);
+    }
+
+    @Test
+    void buildScrollRequestShouldPreferBatchSizeOverLimit() {
+        // Given
+        final int batchSize = 50;
+        final int limit = 100;
+        final ChunkCommand chunkCommand = ChunkCommand.builder()
+                .indices(Set.of("graylog_0"))
+                .range(RANGE)
+                .fields(List.of("message"))
+                .batchSize(batchSize)
+                .limit(limit)
+                .build();
+
+        final Query query = searchRequestFactory.createQuery(chunkCommand.query(), chunkCommand.range(), chunkCommand.filter());
+
+        // When
+        final SearchRequest request = scroll.buildScrollRequest(query, chunkCommand);
+
+        // Then
+        assertThat(request.size()).isEqualTo(batchSize);
+    }
+
+    @Test
+    void buildScrollRequestShouldApplyOffsetAndLimit() {
+        // Given
+        final int offset = 50;
+        final int limit = 25;
+        final ChunkCommand chunkCommand = ChunkCommand.builder()
+                .indices(Set.of("graylog_0"))
+                .range(RANGE)
+                .fields(List.of("message"))
+                .offset(offset)
+                .limit(limit)
+                .build();
+
+        final Query query = searchRequestFactory.createQuery(chunkCommand.query(), chunkCommand.range(), chunkCommand.filter());
+
+        // When
+        final SearchRequest request = scroll.buildScrollRequest(query, chunkCommand);
+
+        // Then
+        assertThat(request.from()).isEqualTo(offset);
+        assertThat(request.size()).isEqualTo(limit);
+    }
 }
