@@ -25,6 +25,8 @@ import jakarta.annotation.Nullable;
 import org.apache.http.client.utils.URIBuilder;
 import org.graylog.events.event.EventDto;
 import org.graylog2.database.entities.DefaultEntityScope;
+
+import java.util.Set;
 import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.security.html.HTMLSanitizerConverter;
 import org.mongojack.Id;
@@ -57,6 +59,10 @@ public abstract class EventProcedureStep implements ScopedEntity<EventProcedureS
 
     public URIBuilder getLink(EventDto event) {
         return action() != null ? action().config().getLink(event) : null;
+    }
+
+    public URIBuilder getLink(Set<EventDto> events) {
+        return action() != null ? action().config().getLink(events) : null;
     }
 
     @AutoValue.Builder

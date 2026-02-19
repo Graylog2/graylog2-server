@@ -29,6 +29,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.graylog.events.event.EventDto;
 
 import java.net.URISyntaxException;
+import java.util.Set;
 
 /**
  * Redirects the frontend to a link.
@@ -73,6 +74,12 @@ public class Link extends Action {
             } catch (URISyntaxException e) {
                 return null;
             }
+        }
+
+        @JsonIgnore
+        @Override
+        public URIBuilder getLink(Set<EventDto> events) {
+            return getLink((EventDto) null);
         }
 
         @JsonIgnore

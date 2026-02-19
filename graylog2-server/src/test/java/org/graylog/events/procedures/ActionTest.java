@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @MockitoSettings(strictness = Strictness.WARN)
@@ -88,6 +89,88 @@ public class ActionTest {
         String actionText = executeNotificationConfig().getLink(event).toString();
 
         assertThat(actionText).contains("/security/security-events/alerts?query=id%3A" + ID);
+    }
+
+    @Test
+    public void testPerformSearchGetLink_bulkCombinesTimeranges() {
+        EventDto event1 = mockEventWithReplayInfo("e1",
+                DateTime.parse("2024-01-01T00:00:00.000Z"),
+                DateTime.parse("2024-01-01T12:00:00.000Z"));
+        EventDto event2 = mockEventWithReplayInfo("e2",
+                DateTime.parse("2024-01-02T00:00:00.000Z"),
+                DateTime.parse("2024-01-02T12:00:00.000Z"));
+
+        String link = performSearchQueryConfig().getLink(Set.of(event1, event2)).toString();
+
+        assertThat(link).contains("search?q=");
+        assertThat(link).contains("rangetype=absolute");
+        assertThat(link).contains("from=2024-01-01T00%3A00%3A00.000Z");
+        assertThat(link).contains("to=2024-01-02T12%3A00%3A00.000Z");
+    }
+
+    @Test
+    public void testPerformSearchGetLink_bulkSavedSearch() {
+        EventDto event1 = mockEventWithReplayInfo("e1",
+                DateTime.parse("2024-03-01T00:00:00.000Z"),
+                DateTime.parse("2024-03-01T06:00:00.000Z"));
+        EventDto event2 = mockEventWithReplayInfo("e2",
+                DateTime.parse("2024-02-15T00:00:00.000Z"),
+                DateTime.parse("2024-03-02T00:00:00.000Z"));
+
+        String link = performSavedSearchConfig().getLink(Set.of(event1, event2)).toString();
+
+        assertThat(link).contains("views/" + ID);
+        assertThat(link).contains("rangetype=absolute");
+        assertThat(link).contains("from=2024-02-15T00%3A00%3A00.000Z");
+        assertThat(link).contains("to=2024-03-02T00%3A00%3A00.000Z");
+    }
+
+    @Test
+    public void testExecuteNotificationGetLink_bulk() {
+        EventDto event1 = mockEvent("event-abc");
+        EventDto event2 = mockEvent("event-def");
+
+        String link = executeNotificationConfig().getLink(Set.of(event1, event2)).toString();
+
+        assertThat(link).contains("security/security-events/alerts");
+        assertThat(link).contains("id%3Aevent-abc");
+        assertThat(link).contains("id%3Aevent-def");
+        assertThat(link).contains("OR");
+    }
+
+    @Test
+    public void testGoToDashboardGetLink_bulkThrowsUnsupported() {
+        assertThatThrownBy(() -> goToDashboardConfig().getLink(Set.of(event)))
+                .isInstanceOf(UnsupportedOperationException.class)
+                .hasMessageContaining("Go To Dashboard");
+    }
+
+    @Test
+    public void testLinkGetLink_bulkReturnsSameLink() {
+        Link.Config linkConfig = Link.Config.builder()
+                .link("https://example.com/wiki")
+                .build();
+
+        String link = linkConfig.getLink(Set.of(event)).toString();
+
+        assertThat(link).isEqualTo("https://example.com/wiki");
+    }
+
+    private EventDto mockEvent(String id) {
+        EventDto mock = org.mockito.Mockito.mock(EventDto.class);
+        when(mock.id()).thenReturn(id);
+        return mock;
+    }
+
+    private EventDto mockEventWithReplayInfo(String id, DateTime start, DateTime end) {
+        EventDto mock = mockEvent(id);
+        when(mock.replayInfo()).thenReturn(Optional.of(EventReplayInfo.builder()
+                .timerangeStart(start)
+                .timerangeEnd(end)
+                .query("")
+                .streams(Set.of())
+                .build()));
+        return mock;
     }
 
     private ExecuteNotification.Config executeNotificationConfig() {

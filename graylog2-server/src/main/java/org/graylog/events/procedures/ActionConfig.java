@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.apache.http.client.utils.URIBuilder;
 import org.graylog.events.event.EventDto;
 
+import java.util.Set;
+
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
@@ -35,6 +37,8 @@ public interface ActionConfig {
     String type();
 
     URIBuilder getLink(EventDto event);
+
+    URIBuilder getLink(Set<EventDto> events);
 
     String validate();
 
@@ -51,6 +55,11 @@ public interface ActionConfig {
 
         @Override
         public URIBuilder getLink(EventDto event) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public URIBuilder getLink(Set<EventDto> events) {
             throw new UnsupportedOperationException();
         }
     }

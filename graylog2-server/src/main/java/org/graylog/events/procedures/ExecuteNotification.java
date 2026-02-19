@@ -28,6 +28,9 @@ import jakarta.inject.Inject;
 import org.apache.http.client.utils.URIBuilder;
 import org.graylog.events.event.EventDto;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
  * Executes an existing notification with the event.
  */
@@ -67,6 +70,18 @@ public class ExecuteNotification extends Action {
             final TemplateURI.Builder uriBuilder = new TemplateURI.Builder();
             uriBuilder.setPath("security/security-events/alerts");
             uriBuilder.addParameter("query", "id:" + event.id());
+            return uriBuilder.build().getLinkPath();
+        }
+
+        @JsonIgnore
+        @Override
+        public URIBuilder getLink(Set<EventDto> events) {
+            final String combinedQuery = events.stream()
+                    .map(e -> "id:" + e.id())
+                    .collect(Collectors.joining(" OR "));
+            final TemplateURI.Builder uriBuilder = new TemplateURI.Builder();
+            uriBuilder.setPath("security/security-events/alerts");
+            uriBuilder.addParameter("query", combinedQuery);
             return uriBuilder.build().getLinkPath();
         }
 

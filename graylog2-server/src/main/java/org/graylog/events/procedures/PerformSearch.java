@@ -29,6 +29,8 @@ import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import org.apache.http.client.utils.URIBuilder;
 import org.graylog.events.event.EventDto;
+import org.graylog.events.event.EventReplayInfo;
+import org.joda.time.DateTime;
 
 import java.util.Collections;
 import java.util.Map;
@@ -114,6 +116,42 @@ public class PerformSearch extends Action {
                 uriBuilder.addParameter("rangetype", "absolute");
                 uriBuilder.addParameter("from", event.replayInfo().get().timerangeStart().toString());
                 uriBuilder.addParameter("to", event.replayInfo().get().timerangeEnd().toString());
+            }
+
+            return uriBuilder.build().getLinkPath();
+        }
+
+        @JsonIgnore
+        @Override
+        public URIBuilder getLink(Set<EventDto> events) {
+            final TemplateURI.Builder uriBuilder = new TemplateURI.Builder();
+            if (Boolean.TRUE.equals(useSavedSearch())) {
+                uriBuilder.setPath("views/" + savedSearch());
+                uriBuilder.setParameters(parameters());
+            } else {
+                uriBuilder.setPath("search");
+                uriBuilder.addParameter("q", query());
+            }
+
+            DateTime earliestStart = null;
+            DateTime latestEnd = null;
+            for (EventDto event : events) {
+                if (event.replayInfo().isPresent()) {
+                    final EventReplayInfo replayInfo = event.replayInfo().get();
+                    if (replayInfo.timerangeStart() != null) {
+                        earliestStart = earliestStart == null || replayInfo.timerangeStart().isBefore(earliestStart)
+                                ? replayInfo.timerangeStart() : earliestStart;
+                    }
+                    if (replayInfo.timerangeEnd() != null) {
+                        latestEnd = latestEnd == null || replayInfo.timerangeEnd().isAfter(latestEnd)
+                                ? replayInfo.timerangeEnd() : latestEnd;
+                    }
+                }
+            }
+            if (earliestStart != null && latestEnd != null) {
+                uriBuilder.addParameter("rangetype", "absolute");
+                uriBuilder.addParameter("from", earliestStart.toString());
+                uriBuilder.addParameter("to", latestEnd.toString());
             }
 
             return uriBuilder.build().getLinkPath();

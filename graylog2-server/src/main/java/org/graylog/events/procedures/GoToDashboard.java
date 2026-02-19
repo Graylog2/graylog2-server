@@ -31,6 +31,7 @@ import org.graylog.events.event.EventDto;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Redirects the frontend to an existing dashboard.
@@ -79,6 +80,12 @@ public class GoToDashboard extends Action {
             uriBuilder.setPath("dashboards/" + dashboardId());
             uriBuilder.setParameters(parameters());
             return uriBuilder.build().getLinkPath();
+        }
+
+        @JsonIgnore
+        @Override
+        public URIBuilder getLink(Set<EventDto> events) {
+            throw new UnsupportedOperationException("Bulk execution is not supported for Go To Dashboard steps");
         }
 
         @JsonIgnore
