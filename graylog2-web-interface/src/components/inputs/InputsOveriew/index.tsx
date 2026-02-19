@@ -21,6 +21,7 @@ export { default as InputsActions } from './InputsActions';
 export { default as TypeCell } from './cells/TypeCell';
 export { default as NodeCell } from './cells/NodeCell';
 export { default as ThroughputCell } from './cells/ThroughputCell';
+export { default as FailuresCell } from './cells/FailuresCell';
 export { default as ExpandedSectionToggleWrapper } from './ExpandedSectionToggleWrapper';
 export { default as ThroughputSection } from './expanded-sections/ThroughputSection';
 export { default as Connections } from './expanded-sections/Connections';
