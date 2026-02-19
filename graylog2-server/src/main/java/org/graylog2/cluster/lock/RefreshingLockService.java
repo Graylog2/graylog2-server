@@ -85,6 +85,9 @@ public class RefreshingLockService implements AutoCloseable {
     }
 
     private void scheduleLock(Lock newLock) {
+        if (lock != null) {
+            throw new IllegalStateException("Unable to acquire new lock, already holding lock that would get lost: " + lock);
+        }
         lock = newLock;
         Duration duration = lockTTL.minusSeconds(30);
         if (duration.isNegative() || duration.isZero()) {
