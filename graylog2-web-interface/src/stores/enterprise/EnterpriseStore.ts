@@ -61,13 +61,12 @@ export const EnterpriseStore = singletonStore('core.Enterprise', () =>
     },
 
     getLicenseInfo() {
-      const promise = fetch('GET', this.enterpriseUrl('info'));
+      type LicenseInfoResponse = { license_info: { license_status: unknown } };
+      const promise = fetch<LicenseInfoResponse>('GET', this.enterpriseUrl('info'));
 
       promise.then(
-        (response: unknown) => {
-          const resp = response as Record<string, unknown>;
-          const licenseInfo = resp.license_info as Record<string, unknown>;
-          this.licenseStatus = licenseInfo.license_status;
+        (response) => {
+          this.licenseStatus = response.license_info.license_status;
           this.propagateChanges();
 
           return response;

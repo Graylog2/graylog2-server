@@ -45,11 +45,11 @@ export const SimulatorStore = singletonStore('core.Simulator', () =>
         input_id: inputId,
       };
 
-      const promise = fetch('POST', url, simulation).then((response: unknown) => {
-        const resp = response as Record<string, unknown>;
-        const formattedResponse = ObjectUtils.clone(resp);
+      type SimulateResponse = { messages: Array<unknown>; [key: string]: unknown };
+      const promise = fetch<SimulateResponse>('POST', url, simulation).then((response) => {
+        const formattedResponse = ObjectUtils.clone(response);
 
-        formattedResponse.messages = (resp.messages as Array<any>).map((msg: any) => MessageFormatter.formatMessageSummary(msg));
+        formattedResponse.messages = response.messages.map((msg) => MessageFormatter.formatMessageSummary(msg));
 
         return formattedResponse;
       });

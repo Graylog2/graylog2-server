@@ -28,6 +28,39 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
+type EventDefinitionListResponse = {
+  event_definitions: unknown;
+  context: unknown;
+  query?: string;
+  count?: number;
+  page?: number;
+  per_page?: number;
+  total?: number;
+  grand_total?: number;
+};
+
+type EventDefinitionSearchResponse = {
+  elements: unknown;
+  query: string;
+  attributes: unknown;
+  pagination: {
+    count: number;
+    total: number;
+    page: number;
+    per_page: number;
+  };
+};
+
+type EventDefinitionGetResponse = {
+  event_definition: unknown;
+  context: unknown;
+  is_mutable: boolean;
+};
+
+type EventDefinitionCopyResponse = {
+  title: string;
+};
+
 type EventDefinitionsActionsType = {
   listAll: () => Promise<unknown>;
   listPaginated: (params: { query?: string; page?: number; pageSize?: number }) => Promise<unknown>;
@@ -117,12 +150,11 @@ export const EventDefinitionsStore = singletonStore('core.EventDefinitions', () 
     },
 
     listAll() {
-      const promise = fetch('GET', this.eventDefinitionsUrl({ query: { per_page: 0 } }));
+      const promise = fetch<EventDefinitionListResponse>('GET', this.eventDefinitionsUrl({ query: { per_page: 0 } }));
 
-      promise.then((response: unknown) => {
-        const resp = response as Record<string, unknown>;
-        this.all = resp.event_definitions;
-        this.context = resp.context;
+      promise.then((response) => {
+        this.all = response.event_definitions;
+        this.context = response.context;
         this.propagateChanges();
 
         return response;
@@ -132,7 +164,7 @@ export const EventDefinitionsStore = singletonStore('core.EventDefinitions', () 
     },
 
     listPaginated({ query = '', page = 1, pageSize = 10 }: { query?: string; page?: number; pageSize?: number }) {
-      const promise = fetch(
+      const promise = fetch<EventDefinitionListResponse>(
         'GET',
         this.eventDefinitionsUrl({
           query: {
@@ -144,18 +176,17 @@ export const EventDefinitionsStore = singletonStore('core.EventDefinitions', () 
       );
 
       promise
-        .then((response: unknown) => {
-          const resp = response as Record<string, unknown>;
-          this.eventDefinitions = resp.event_definitions;
-          this.context = resp.context;
-          this.query = resp.query;
+        .then((response) => {
+          this.eventDefinitions = response.event_definitions;
+          this.context = response.context;
+          this.query = response.query;
 
           this.pagination = {
-            count: resp.count,
-            page: resp.page,
-            pageSize: resp.per_page,
-            total: resp.total,
-            grandTotal: resp.grand_total,
+            count: response.count,
+            page: response.page,
+            pageSize: response.per_page,
+            total: response.total,
+            grandTotal: response.grand_total,
           };
 
           this.propagateChanges();
@@ -174,14 +205,13 @@ export const EventDefinitionsStore = singletonStore('core.EventDefinitions', () 
 
     searchPaginated(newPage: number, newPerPage: number, newQuery: string, additional: unknown) {
       const url = PaginationURL(`${this.sourceUrl}/paginated`, newPage, newPerPage, newQuery, additional);
-      const promise = fetch('GET', URLUtils.qualifyUrl(url)).then((response: unknown) => {
-        const resp = response as Record<string, unknown>;
+      const promise = fetch<EventDefinitionSearchResponse>('GET', URLUtils.qualifyUrl(url)).then((response) => {
         const {
           elements,
           query,
           attributes,
-        } = resp;
-        const pagination = resp.pagination as Record<string, unknown>;
+          pagination,
+        } = response;
         const { count, total, page, per_page: perPage } = pagination;
 
         return {
@@ -202,18 +232,14 @@ export const EventDefinitionsStore = singletonStore('core.EventDefinitions', () 
       return promise;
     },
     get(eventDefinitionId: string) {
-      const promise = fetch('GET', this.eventDefinitionsUrl({ segments: [eventDefinitionId, 'with-context'] }));
+      const promise = fetch<EventDefinitionGetResponse>('GET', this.eventDefinitionsUrl({ segments: [eventDefinitionId, 'with-context'] }));
 
       promise
-        .then((response: unknown) => {
-          const resp = response as Record<string, unknown>;
-
-          return {
-            eventDefinition: resp.event_definition,
-            context: resp.context,
-            is_mutable: resp.is_mutable,
-          };
-        })
+        .then((response) => ({
+            eventDefinition: response.event_definition,
+            context: response.context,
+            is_mutable: response.is_mutable,
+          }))
         .catch((error: { status?: number; additional?: { body?: { message?: string } } }) => {
           if (error.status === 404) {
             UserNotification.error(
@@ -229,7 +255,7 @@ export const EventDefinitionsStore = singletonStore('core.EventDefinitions', () 
     },
 
     setAlertFlag(eventDefinition: Record<string, unknown>) {
-      const notifications = eventDefinition.notifications as Array<unknown>;
+      const notifications = (eventDefinition.notifications ?? []) as Array<unknown>;
       const isAlert = notifications.length > 0;
 
       return { ...eventDefinition, alert: isAlert };
@@ -280,14 +306,13 @@ export const EventDefinitionsStore = singletonStore('core.EventDefinitions', () 
     },
 
     copy(eventDefinition: Record<string, unknown>) {
-      const promise = fetch('POST', this.eventDefinitionsUrl({ segments: [eventDefinition.id as string, 'duplicate'] }));
+      const promise = fetch<EventDefinitionCopyResponse>('POST', this.eventDefinitionsUrl({ segments: [String(eventDefinition.id), 'duplicate'] }));
 
       promise.then(
-        (response: unknown) => {
-          const resp = response as Record<string, unknown>;
+        (response) => {
           UserNotification.success(
             'Event Definition duplicated successfully',
-            `Event Definition "${resp.title}" was created successfully.`,
+            `Event Definition "${response.title}" was created successfully.`,
           );
 
           this.refresh();
@@ -340,13 +365,13 @@ export const EventDefinitionsStore = singletonStore('core.EventDefinitions', () 
     },
 
     delete(eventDefinition: Record<string, unknown>) {
-      const promise = fetch('DELETE', this.eventDefinitionsUrl({ segments: [eventDefinition.id as string] }));
+      const promise = fetch('DELETE', this.eventDefinitionsUrl({ segments: [String(eventDefinition.id)] }));
 
       EventDefinitionsActions.delete.promise(promise);
     },
 
     enable(eventDefinition: Record<string, unknown>) {
-      const promise = fetch('PUT', this.eventDefinitionsUrl({ segments: [eventDefinition.id as string, 'schedule'] }));
+      const promise = fetch('PUT', this.eventDefinitionsUrl({ segments: [String(eventDefinition.id), 'schedule'] }));
 
       promise.then(
         (response: unknown) => {
@@ -373,7 +398,7 @@ export const EventDefinitionsStore = singletonStore('core.EventDefinitions', () 
     },
 
     disable(eventDefinition: Record<string, unknown>) {
-      const promise = fetch('PUT', this.eventDefinitionsUrl({ segments: [eventDefinition.id as string, 'unschedule'] }));
+      const promise = fetch('PUT', this.eventDefinitionsUrl({ segments: [String(eventDefinition.id), 'unschedule'] }));
 
       promise.then(
         (response: unknown) => {
@@ -402,7 +427,7 @@ export const EventDefinitionsStore = singletonStore('core.EventDefinitions', () 
     clearNotificationQueue(eventDefinition: Record<string, unknown>) {
       const promise = fetch(
         'PUT',
-        this.eventDefinitionsUrl({ segments: [eventDefinition.id as string, 'clear-notification-queue'] }),
+        this.eventDefinitionsUrl({ segments: [String(eventDefinition.id), 'clear-notification-queue'] }),
       );
 
       promise.then(

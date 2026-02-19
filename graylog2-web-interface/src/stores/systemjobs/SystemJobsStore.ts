@@ -60,10 +60,9 @@ export const SystemJobsStore: Store<{ jobs: unknown; jobsById: Record<string, un
     },
     getJob(jobId: string) {
       const url = URLUtils.qualifyUrl(ApiRoutes.SystemJobsApiController.getJob(jobId).url);
-      const promise = fetch('GET', url).then(
-        (response: unknown) => {
-          const resp = response as Record<string, unknown>;
-          this.jobsById = { ...this.jobsById, [resp.id as string]: response };
+      const promise = fetch<{ id: string }>('GET', url).then(
+        (response) => {
+          this.jobsById = { ...this.jobsById, [response.id]: response };
           this.trigger({ jobsById: this.jobsById });
 
           return response;
@@ -90,9 +89,8 @@ export const SystemJobsStore: Store<{ jobs: unknown; jobsById: Record<string, un
     },
     cancelJob(jobId: string) {
       const url = URLUtils.qualifyUrl(ApiRoutes.SystemJobsApiController.cancelJob(jobId).url);
-      const promise = fetch('DELETE', url).then((response: unknown) => {
-        const resp = response as Record<string, unknown>;
-        delete this.jobsById[resp.id as string];
+      const promise = fetch<{ id: string }>('DELETE', url).then((response) => {
+        delete this.jobsById[response.id];
       });
 
       SystemJobsActions.cancelJob.promise(promise);

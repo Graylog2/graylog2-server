@@ -26,8 +26,8 @@ export const PluginsStore = singletonStore('core.Plugins', () =>
     sourceUrl: (nodeId: string) => `/cluster/${nodeId}/plugins`,
 
     list(nodeId: string): Promise<unknown> {
-      const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl(nodeId))).then(
-        (response: unknown) => (response as Record<string, unknown>).plugins,
+      const promise = fetch<{ plugins: unknown }>('GET', URLUtils.qualifyUrl(this.sourceUrl(nodeId))).then(
+        (response) => response.plugins,
         (error: unknown) =>
           UserNotification.error(`Getting plugins on node "${nodeId}" failed: ${error}`, 'Could not get plugins'),
       );

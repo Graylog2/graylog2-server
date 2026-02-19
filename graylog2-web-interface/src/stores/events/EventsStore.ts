@@ -116,7 +116,19 @@ export const EventsStore: Store<{
       filter?: Record<string, unknown>;
       timerange?: Record<string, unknown>;
     }) {
-      const promise = fetch('POST', this.eventsUrl({}), {
+      type EventsSearchResponse = {
+        events: unknown;
+        total_events: unknown;
+        context: unknown;
+        parameters: {
+          query: string;
+          page: number;
+          per_page: number;
+          filter: Record<string, unknown>;
+          timerange: Record<string, unknown>;
+        };
+      };
+      const promise = fetch<EventsSearchResponse>('POST', this.eventsUrl({}), {
         query: query,
         page: page,
         per_page: pageSize,
@@ -125,21 +137,19 @@ export const EventsStore: Store<{
       });
 
       promise
-        .then((response: unknown) => {
-          const resp = response as Record<string, unknown>;
-          const params = resp.parameters as Record<string, unknown>;
-          this.events = resp.events;
+        .then((response) => {
+          this.events = response.events;
 
           this.parameters = {
-            query: params.query,
-            page: params.page,
-            pageSize: params.per_page,
-            filter: params.filter,
-            timerange: params.timerange,
+            query: response.parameters.query,
+            page: response.parameters.page,
+            pageSize: response.parameters.per_page,
+            filter: response.parameters.filter,
+            timerange: response.parameters.timerange,
           };
 
-          this.totalEvents = resp.total_events;
-          this.context = resp.context;
+          this.totalEvents = response.total_events;
+          this.context = response.context;
           this.propagateChanges();
 
           return response;

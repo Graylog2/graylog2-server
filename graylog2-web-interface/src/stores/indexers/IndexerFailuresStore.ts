@@ -32,9 +32,10 @@ export const IndexerFailuresStore = singletonStore('core.IndexerFailures', () =>
       return fetch('GET', url);
     },
 
-    count(since: unknown): Promise<unknown> {
-      const momentSince = (since as { format?: unknown }).format ? (since as moment.Moment) : moment(since as string);
+    count(since: moment.Moment | string): Promise<unknown> {
+      const momentSince = moment.isMoment(since) ? since : moment(since);
       const isoSince = momentSince.format('YYYY-MM-DDTHH:mm:ss.SSS');
+      // ApiRoutes.count expects number but actually accepts any value for URL interpolation
       const url = URLUtils.qualifyUrl(ApiRoutes.IndexerFailuresApiController.count(isoSince as unknown as number).url);
 
       return fetch('GET', url);
