@@ -16,13 +16,18 @@
  */
 package org.graylog2.opamp;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.SourceService;
+import org.graylog.grn.GRNRegistry;
 import org.graylog.security.pki.CertificateService;
+import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.opamp.enrollment.EnrollmentTokenService;
 import org.graylog2.opamp.transport.OpAmpAuthContext;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.security.encryption.EncryptedValueService;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +36,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -74,8 +80,17 @@ class OpAmpServiceTest {
 
     @BeforeEach
     void setUp() {
+        final EncryptedValueService encryptedValueService = new EncryptedValueService("1234567890abcdef");
+        final ObjectMapper objectMapper = new ObjectMapperProvider(
+                ObjectMapperProvider.class.getClassLoader(),
+                Collections.emptySet(),
+                encryptedValueService,
+                GRNRegistry.createWithBuiltinTypes(),
+                InputConfigurationBeanDeserializerModifier.withoutConfig()
+        ).get();
+
         opAmpService = new OpAmpService(enrollmentTokenService, opAmpCaService, certificateService,
-                collectorInstanceService, clusterConfigService, fleetTransactionLogService, sourceService);
+                collectorInstanceService, clusterConfigService, fleetTransactionLogService, sourceService, objectMapper);
     }
 
     @Test
