@@ -30,7 +30,6 @@ import org.graylog.plugins.pipelineprocessor.processors.PipelineAnalyzer;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineResolver;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineResolverConfig;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,20 +37,18 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import static org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbInputsMetadataService.INPUTS_COLLECTION_NAME;
 import static org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService.RULES_COLLECTION_NAME;
 
 /**
- * Migration to create the pipeline metadata collections, if any of them do not exist yet.
- * Updated to include information routing rules and routed streams.
+ * Rebuilds the pipeline metadata collections on every startup. This ensures metadata stays in sync with the
+ * primary pipeline, rule, and connection data even if incremental updates were missed or failed.
  */
 public class V20251222123500_CreatePipelineMetadata extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20251222123500_CreatePipelineMetadata.class);
 
-    private final ClusterConfigService configService;
     private final MongoDatabase db;
     private final PipelineResolver pipelineResolver;
     private final PipelineAnalyzer pipelineAnalyzer;
@@ -59,8 +56,7 @@ public class V20251222123500_CreatePipelineMetadata extends Migration {
     private final MongoDbInputsMetadataService inputsMetadataService;
 
     @Inject
-    public V20251222123500_CreatePipelineMetadata(ClusterConfigService configService,
-                                                  MongoConnection mongoConnection,
+    public V20251222123500_CreatePipelineMetadata(MongoConnection mongoConnection,
                                                   MongoDbRuleService ruleService,
                                                   MongoDbPipelineMetadataService pipelineMetadataService,
                                                   MongoDbInputsMetadataService inputsMetadataService,
@@ -69,7 +65,6 @@ public class V20251222123500_CreatePipelineMetadata extends Migration {
                                                   PipelineStreamConnectionsService pipelineStreamConnectionsService,
                                                   PipelineRuleParser pipelineRuleParser,
                                                   PipelineResolver.Factory pipelineResolverFactory) {
-        this.configService = configService;
         this.db = mongoConnection.getMongoDatabase();
         this.pipelineMetadataService = pipelineMetadataService;
         this.inputsMetadataService = inputsMetadataService;
@@ -89,16 +84,17 @@ public class V20251222123500_CreatePipelineMetadata extends Migration {
         return ZonedDateTime.parse("2025-12-22T12:35:00Z");
     }
 
+    // This migration intentionally runs on every server restart (no MigrationCompleted guard).
+    // Pipeline metadata is a derived cache built from pipelines, rules, and stream connections.
+    // Incremental updates can silently fail or drift out of sync due to lost events, exceptions,
+    // or partial writes. Rebuilding from scratch on startup guarantees consistency.
     @Override
     public void upgrade() {
-        if (migrationAlreadyApplied()) {
-            return;
-        }
         doUpgrade();
     }
 
     private void createMetadata() {
-        LOG.info("Creating pipeline metadata collection.");
+        LOG.info("Rebuilding pipeline metadata collections.");
         final List<PipelineRulesMetadataDao> ruleRecords = new ArrayList<>();
         final Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions =
                 pipelineAnalyzer.analyzePipelines(pipelineResolver, ruleRecords);
@@ -111,18 +107,5 @@ public class V20251222123500_CreatePipelineMetadata extends Migration {
         db.getCollection(RULES_COLLECTION_NAME).drop();
         db.getCollection(INPUTS_COLLECTION_NAME).drop();
         createMetadata();
-
-        markMigrationApplied();
     }
-
-    private boolean migrationAlreadyApplied() {
-        return Objects.nonNull(configService.get(V20251222123500_CreatePipelineMetadata.MigrationCompleted.class));
-    }
-
-    // The second migration marker indicates that schema has been upgraded to include routed_streams field
-    private void markMigrationApplied() {
-        configService.write(new V20251222123500_CreatePipelineMetadata.MigrationCompleted());
-    }
-
-    public record MigrationCompleted() {}
 }
