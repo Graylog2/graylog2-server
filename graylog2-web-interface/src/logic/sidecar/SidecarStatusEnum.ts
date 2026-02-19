@@ -23,17 +23,26 @@ type StatusProperty = {
   name: string;
 };
 
-const SidecarStatusEnum = {
-  RUNNING: 0 as StatusCode,
-  UNKNOWN: 1 as StatusCode,
-  FAILING: 2 as StatusCode,
-  STOPPED: 3 as StatusCode,
+const SidecarStatusEnum: {
+  RUNNING: StatusCode;
+  UNKNOWN: StatusCode;
+  FAILING: StatusCode;
+  STOPPED: StatusCode;
+  properties: Record<StatusCode, StatusProperty>;
+  isValidStatusCode: (statusCode: number) => boolean;
+  toStatusCode: (stringStatus: string) => StatusCode;
+  toString: (statusCode: number | string) => string;
+} = {
+  RUNNING: 0,
+  UNKNOWN: 1,
+  FAILING: 2,
+  STOPPED: 3,
   properties: {
     0: { name: 'running' },
     1: { name: 'unknown' },
     2: { name: 'failing' },
     3: { name: 'stopped' },
-  } as Record<StatusCode, StatusProperty>,
+  },
 
   isValidStatusCode(statusCode: number): boolean {
     return Object.keys(this.properties).includes(String(statusCode));
@@ -57,7 +66,7 @@ const SidecarStatusEnum = {
     return this.UNKNOWN;
   },
 
-  toString(statusCode: number): string {
+  toString(statusCode: number | string): string {
     switch (toNumber(statusCode)) {
       case this.RUNNING:
         return 'running';

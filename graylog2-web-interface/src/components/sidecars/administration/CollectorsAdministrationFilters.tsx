@@ -184,7 +184,7 @@ const CollectorsAdministrationFilters = (props: Props) => {
       onFilterChange('status', statusCode, callback);
 
     const statusFilter = filters.status;
-    const statusFormatter = (statusCode: string) => upperFirst(SidecarStatusEnum.toString(statusCode as unknown as number));
+    const statusFormatter = (statusCode: string) => upperFirst(SidecarStatusEnum.toString(statusCode));
 
     return (
       <SelectPopover

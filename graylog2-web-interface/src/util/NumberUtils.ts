@@ -30,7 +30,7 @@ const NumberUtils = {
       case '-Infinity':
         return Number.MIN_VALUE;
       default:
-        return number as number;
+        return Number(number);
     }
   },
   normalizeGraphNumber(number: NumberInput): number {
@@ -40,7 +40,7 @@ const NumberUtils = {
       case '-Infinity':
         return 0;
       default:
-        return number as number;
+        return Number(number);
     }
   },
   formatNumber(number: NumberInput): string {
