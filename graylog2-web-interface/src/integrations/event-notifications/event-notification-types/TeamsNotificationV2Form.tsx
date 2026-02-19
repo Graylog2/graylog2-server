@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { SyntheticEvent } from 'react';
 import React, { useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -178,8 +177,8 @@ const TeamsNotificationV2Form = ({ config, validation, onChange }: TeamsNotifica
     propagateChange('time_zone', nextValue);
   };
 
-  const handleWebhookUrlChange = (event: SyntheticEvent<EventTarget>) => {
-    propagateChange('webhook_url', getValueFromInput(event.target as HTMLInputElement));
+  const handleWebhookUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    propagateChange('webhook_url', getValueFromInput(event.target));
   };
 
   const handleAdaptiveCardChange = (nextValue: string) => {
