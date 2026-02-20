@@ -14,21 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useContext, useMemo } from 'react';
 
-import { useStore } from 'stores/connect';
-import { StreamsStore } from 'views/stores/StreamsStore';
+import StreamsContext from 'contexts/StreamsContext';
 
-import StreamsContext from './StreamsContext';
+const useEditableStreams = () => {
+  const _streams = useContext(StreamsContext);
 
-type Props = {
-  children: React.ReactElement;
+  return useMemo(() => _streams.filter((s) => s.is_editable), [_streams]);
 };
-
-const StreamsProvider = ({ children }: Props) => {
-  const _streams = useStore(StreamsStore, ({ streams }) => streams);
-
-  return <StreamsContext.Provider value={_streams}>{children}</StreamsContext.Provider>;
-};
-
-export default StreamsProvider;
+export default useEditableStreams;

@@ -21,7 +21,6 @@ import styled, { css } from 'styled-components';
 import PageContentLayout from 'components/layout/PageContentLayout';
 import Sidebar from 'views/components/sidebar/Sidebar';
 import SearchResult from 'views/components/SearchResult';
-import { StreamsActions } from 'views/stores/StreamsStore';
 import HeaderElements from 'views/components/HeaderElements';
 import QueryBarElements from 'views/components/QueryBarElements';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
@@ -165,10 +164,6 @@ const Search = ({ forceSideBarPinned = false }: Props) => {
   useEffect(() => {
     refreshSearch();
   }, [refreshSearch]);
-
-  useEffect(() => {
-    StreamsActions.refresh();
-  }, []);
 
   useOnWindowUnload();
 
