@@ -155,8 +155,8 @@ class DatanodeKeystoreTest {
         long validityDays = (cert.getNotAfter().getTime() - cert.getNotBefore().getTime()) / (1000L * 60 * 60 * 24);
         Assertions.assertThat(validityDays).isBetween(99L * 365 - 10, 99L * 365 + 10);
 
-        // No events should be posted for self-signed certificate creation
-        Assertions.assertThat(this.receivedEvents).isEmpty();
+        // One event should be posted for self-signed certificate creation
+        Assertions.assertThat(this.receivedEvents).hasSize(1);
     }
 
     @Test
@@ -188,7 +188,7 @@ class DatanodeKeystoreTest {
         final X509Certificate cert = (X509Certificate) keystore.getCertificate(DatanodeKeystore.DATANODE_KEY_ALIAS);
         Assertions.assertThat(cert.getIssuerX500Principal()).isEqualTo(cert.getSubjectX500Principal());
 
-        // No events should be posted when resetting to self-signed
-        Assertions.assertThat(this.receivedEvents).isEmpty();
+        // One event should be posted when resetting to self-signed
+        Assertions.assertThat(this.receivedEvents).hasSize(1);
     }
 }
