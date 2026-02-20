@@ -672,7 +672,9 @@
                                 -->
                                 <chmod dir="${project.build.directory}/opensearch"
                                        includes="opensearch-*/config/**"
-                                       perm="ugo+r"/>
+                                       perm="ugo+r"
+                                       parallel="false"
+                                />
                             </target>
                         </configuration>
                     </execution>
