@@ -29,9 +29,7 @@ import EventDetails from './EventDetails';
 const usePluggableDashboardActions = (eventId: string) => {
   const modalRefs = useRef({});
   const pluggableActions = usePluginEntities('views.components.widgets.events.actions');
-  const availableActions = pluggableActions.filter((perspective) =>
-    perspective.useCondition ? !!perspective.useCondition() : true,
-  );
+  const availableActions = pluggableActions.filter((action) => (action.useCondition ? !!action.useCondition() : true));
   const actions = availableActions.map(({ component: PluggableDashboardAction, key }) => (
     <PluggableDashboardAction key={`event-action-${key}`} eventId={eventId} modalRef={() => modalRefs.current[key]} />
   ));
