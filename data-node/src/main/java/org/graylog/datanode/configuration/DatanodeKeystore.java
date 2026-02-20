@@ -108,7 +108,7 @@ public class DatanodeKeystore {
         }
     }
 
-    public synchronized KeyStore resetToSelfsignedCertificate() throws DatanodeKeystoreException {
+    public synchronized KeyStore initWithSeflsignedCertificate() throws DatanodeKeystoreException {
         final CertRequest certRequest = CertRequest.selfSigned(DATANODE_KEY_ALIAS)
                 .isCA(false)
                 .validity(DEFAULT_SELFSIGNED_CERT_VALIDITY);

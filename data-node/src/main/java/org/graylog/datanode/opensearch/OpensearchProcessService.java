@@ -97,7 +97,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                 }
                 case REMOVE_NODE_CONFIGURATION -> {
                     try {
-                        datanodeKeystore.resetToSelfsignedCertificate();
+                        datanodeKeystore.initWithSeflsignedCertificate();
                         stateMachine.fire(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED);
                     } catch (DatanodeKeystoreException e) {
                         throw new RuntimeException(e);

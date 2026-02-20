@@ -28,16 +28,12 @@ import org.graylog.datanode.bootstrap.preflight.LegacyDatanodeKeystoreProvider;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.configuration.DatanodeKeystoreException;
 import org.graylog.datanode.opensearch.CsrRequester;
-import org.graylog.security.certutil.CertRequest;
-import org.graylog.security.certutil.CertificateGenerator;
-import org.graylog.security.certutil.KeyPair;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.KeyStore;
-import java.time.Duration;
 import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -54,7 +50,6 @@ import java.util.concurrent.TimeUnit;
 public class DatanodeKeystoreInitService implements DatanodeBlockingInit {
 
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeKeystoreInitService.class);
-    public static final Duration DEFAULT_SELFSIGNED_CERT_VALIDITY = Duration.ofDays(99 * 365);
 
     private final DatanodeKeystore datanodeKeystore;
     private final LegacyDatanodeKeystoreProvider legacyDatanodeKeystoreProvider;
@@ -89,7 +84,7 @@ public class DatanodeKeystoreInitService implements DatanodeBlockingInit {
                     datanodeKeystore.create(legacyKeystore.get());
                     legacyDatanodeKeystoreProvider.deleteLocalPrivateKey();
                 } else {
-                    datanodeKeystore.create(generateKeyPair());
+                    datanodeKeystore.initWithSeflsignedCertificate();
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -145,13 +140,5 @@ public class DatanodeKeystoreInitService implements DatanodeBlockingInit {
         } catch (ExecutionException | RetryException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private static KeyPair generateKeyPair() throws Exception {
-        final CertRequest certRequest = CertRequest.selfSigned(DatanodeKeystore.DATANODE_KEY_ALIAS)
-                .isCA(false)
-                .validity(DEFAULT_SELFSIGNED_CERT_VALIDITY);
-
-        return CertificateGenerator.generate(certRequest);
     }
 }
