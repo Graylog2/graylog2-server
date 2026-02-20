@@ -44,12 +44,20 @@ public final class GlobalMetricNames {
     public static final String OUTPUT_BUFFER_USAGE = "org.graylog2.buffers.output.usage";
     public static final String OUTPUT_BUFFER_SIZE = "org.graylog2.buffers.output.size";
 
-    public static final String JOURNAL_APPEND_RATE = name("org.graylog2.journal.append", RATE_SUFFIX);
-    public static final String JOURNAL_READ_RATE = name("org.graylog2.journal.read", RATE_SUFFIX);
-    public static final String JOURNAL_SEGMENTS = "org.graylog2.journal.segments";
-    public static final String JOURNAL_UNCOMMITTED_ENTRIES = "org.graylog2.journal.entries-uncommitted";
-    public static final String JOURNAL_SIZE = "org.graylog2.journal.size";
-    public static final String JOURNAL_SIZE_LIMIT = "org.graylog2.journal.size-limit";
-    public static final String JOURNAL_UTILIZATION_RATIO = "org.graylog2.journal.utilization-ratio";
-    public static final String JOURNAL_OLDEST_SEGMENT = name("org.graylog2.journal", OLDEST_SEGMENT_SUFFIX);
+    public static final String JOURNAL_GLOBAL_PREFIX =  "org.graylog2.journal";
+    public static final String JOURNAL_APPEND_RATE_SUFFIX = name("append", RATE_SUFFIX);
+    public static final String JOURNAL_APPEND_RATE = name(JOURNAL_GLOBAL_PREFIX, JOURNAL_APPEND_RATE_SUFFIX);
+    public static final String JOURNAL_READ_RATE_SUFFIX = name("read", RATE_SUFFIX);
+    public static final String JOURNAL_READ_RATE = name(JOURNAL_GLOBAL_PREFIX, JOURNAL_READ_RATE_SUFFIX);
+    public static final String JOURNAL_SEGMENTS_SUFFIX = "segments";
+    public static final String JOURNAL_SEGMENTS = name(JOURNAL_GLOBAL_PREFIX, JOURNAL_SEGMENTS_SUFFIX);
+    public static final String JOURNAL_UNCOMMITTED_ENTRIES_SUFFIX = "entries-uncommitted";
+    public static final String JOURNAL_UNCOMMITTED_ENTRIES = name(JOURNAL_GLOBAL_PREFIX, JOURNAL_UNCOMMITTED_ENTRIES_SUFFIX);
+    public static final String JOURNAL_SIZE_SUFFIX = "size";
+    public static final String JOURNAL_SIZE = name(JOURNAL_GLOBAL_PREFIX, JOURNAL_SIZE_SUFFIX);
+    public static final String JOURNAL_SIZE_LIMIT_SUFFIX = "size-limit";
+    public static final String JOURNAL_SIZE_LIMIT = name(JOURNAL_GLOBAL_PREFIX, JOURNAL_SIZE_LIMIT_SUFFIX);
+    public static final String JOURNAL_UTILIZATION_RATIO_SUFFIX = "utilization-ratio";
+    public static final String JOURNAL_UTILIZATION_RATIO = name(JOURNAL_GLOBAL_PREFIX, JOURNAL_UTILIZATION_RATIO_SUFFIX);
+    public static final String JOURNAL_OLDEST_SEGMENT = name(JOURNAL_GLOBAL_PREFIX, OLDEST_SEGMENT_SUFFIX);
 }
