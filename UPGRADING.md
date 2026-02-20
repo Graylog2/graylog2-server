@@ -1,4 +1,5 @@
-# Upgrading to Graylog 7.1.x
+Upgrading to Graylog 7.1.x
+==========================
 
 ## User Session Termination
 
