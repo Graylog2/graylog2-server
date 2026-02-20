@@ -1,26 +1,33 @@
 package org.graylog2.database.grouping;
 
+import com.google.common.base.Strings;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
 import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.shared.security.EntityPermissionsUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 public class MongoEntityFieldGroupingService implements EntityFieldGroupingService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(MongoEntityFieldGroupingService.class);
+
     static final String COUNT_FIELD_NAME = "count";
     static final String ID_FIELD_NAME = "_id";
-    static final List<String> SORT_BY_ID_FIELDS = List.of(COUNT_FIELD_NAME, ID_FIELD_NAME);
-    static final List<String> SORT_BY_VALUE_FIELDS = SORT_BY_ID_FIELDS.reversed();
+    static final List<String> SORT_BY_COUNT_FIELDS = List.of(COUNT_FIELD_NAME, ID_FIELD_NAME);
+    static final List<String> SORT_BY_VALUE_FIELDS = SORT_BY_COUNT_FIELDS.reversed();
 
     private final MongoConnection mongoConnection;
     private final EntityPermissionsUtils permissionsUtils;
@@ -33,43 +40,84 @@ public class MongoEntityFieldGroupingService implements EntityFieldGroupingServi
     }
 
     @Override
-    public List<EntityFieldGroup> groupByField(final String collectionName,
-                                               final String fieldName,
-                                               final String query,
-                                               final String groupFilter,
-                                               final int page,
-                                               final int pageSize,
-                                               final SortOrder sortOrder,
-                                               final SortField sortField,
-                                               final Subject subject) {
+    public EntityFieldBucketResponse groupByField(final String collectionName,
+                                                  final String fieldName,
+                                                  final String query,
+                                                  final String bucketsFilter,
+                                                  final int page,
+                                                  final int pageSize,
+                                                  final SortOrder sortOrder,
+                                                  final SortField sortField,
+                                                  final Subject subject) {
         final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collectionName);
         final var userCanReadAllEntities = permissionsUtils.hasAllPermission(subject) ||
                 permissionsUtils.hasReadPermissionForWholeCollection(subject, collectionName);
 
-        if (userCanReadAllEntities) {
-            final AggregateIterable<Document> results = mongoCollection.aggregate(List.of(
-                    Aggregates.group("$" + fieldName, Accumulators.sum(COUNT_FIELD_NAME, 1)),
-                    buildSortStage(sortOrder, sortField),
-                    Aggregates.skip((page - 1) * pageSize),
-                    Aggregates.limit(pageSize)
-            ));
+        final var queryFilter = !Strings.isNullOrEmpty(query)
+                ? Filters.regex(fieldName, query, "i")
+                : Filters.empty();
 
-            List<EntityFieldGroup> result = new ArrayList<>();
-            results.forEach(x -> {
-                final String id = x.get(ID_FIELD_NAME).toString();
-                //it is very likely that BE should fetch related entities and enrich second field of EntityFieldGroup class, instead of using id there
-                result.add(new EntityFieldGroup(id, id, x.getInteger(COUNT_FIELD_NAME, 0)));
-            });
-            return result;
+        if (userCanReadAllEntities) {
+            final int total = getTotalNumberOfBuckets(fieldName, mongoCollection, queryFilter);
+            final List<EntityFieldBucket> paginatedAndSortedResults = getPage(fieldName, page, pageSize, sortOrder, sortField, mongoCollection, queryFilter);
+
+            return new EntityFieldBucketResponse(paginatedAndSortedResults,
+                    PaginatedList.PaginationInfo.create(
+                            total,
+                            paginatedAndSortedResults.size(),
+                            page,
+                            pageSize)
+            );
         } else {
+            LOG.warn("Returning empty results for slice-by - user does not have permission to read all entities in collection '{}'", collectionName);
             //TODO: undoable in MongoDB, only possible in-memory, but highly inefficient
-            return List.of();
+            return new EntityFieldBucketResponse(List.of(), PaginatedList.PaginationInfo.create(0, 0, page, pageSize));
         }
+    }
+
+    private List<EntityFieldBucket> getPage(final String fieldName,
+                                            final int page,
+                                            final int pageSize,
+                                            final SortOrder sortOrder,
+                                            final SortField sortField,
+                                            final MongoCollection<Document> mongoCollection,
+                                            final Bson queryFilter) {
+        final AggregateIterable<Document> aggregateIterable = mongoCollection.aggregate(
+                List.of(
+                        Aggregates.match(queryFilter),
+                        Aggregates.group("$" + fieldName, Accumulators.sum(COUNT_FIELD_NAME, 1)),
+                        //TODO: add bucketsFilter
+                        buildSortStage(sortOrder, sortField),
+                        Aggregates.skip((page - 1) * pageSize),
+                        Aggregates.limit(pageSize)
+                )
+        );
+
+        return StreamSupport.stream(aggregateIterable.spliterator(), false)
+                .map(doc -> {
+                    final String value = doc.get(ID_FIELD_NAME).toString();
+                    final String title = value;//it is very likely that BE should fetch related entities and enrich second field of EntityFieldGroup class, instead of using value there
+                    return new EntityFieldBucket(value, title, doc.getInteger(COUNT_FIELD_NAME, 0));
+                })
+                .toList();
+    }
+
+    private int getTotalNumberOfBuckets(final String fieldName, final MongoCollection<Document> mongoCollection, final Bson queryFilter) {
+        final Document totalCountResults = mongoCollection.aggregate(
+                List.of(
+                        Aggregates.match(queryFilter),
+                        Aggregates.group("$" + fieldName),
+                        //TODO: add bucketsFilter
+                        Aggregates.count("number_of_groups")
+                )
+        ).first();
+
+        return totalCountResults != null ? totalCountResults.getInteger("number_of_groups", 0) : 0;
     }
 
     private Bson buildSortStage(final SortOrder sortOrder, final SortField sortField) {
         final List<String> sort = switch (sortField) {
-            case COUNT -> SORT_BY_ID_FIELDS;
+            case COUNT -> SORT_BY_COUNT_FIELDS;
             case VALUE -> SORT_BY_VALUE_FIELDS;
         };
         return switch (sortOrder) {

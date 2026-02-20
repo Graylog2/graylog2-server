@@ -6,6 +6,6 @@ import org.graylog2.database.PaginatedList;
 import java.util.List;
 
 //TODO: unify field names and this record name with Slices record from unmerged Jan's PR
-public record SliceByResponse(@JsonProperty("slices") List<EntityFieldGroup> slices,
-                              @JsonProperty("pagination") PaginatedList.PaginationInfo pagination) {
+public record EntityFieldBucketResponse(@JsonProperty("slices") List<EntityFieldBucket> slices,
+                                        @JsonProperty("pagination") PaginatedList.PaginationInfo pagination) {
 }
