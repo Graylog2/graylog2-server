@@ -34,10 +34,10 @@ type PaginatedResponse = {
   query: string;
 };
 export const KEY_PREFIX = ['streams', 'output', 'filters'];
-export const keyFn = (streamId: string, destinationType: string, pagination?: Pagination) => [
+export const keyFn = (streamId: string, destinationType?: string, pagination?: Pagination) => [
   ...KEY_PREFIX,
   streamId,
-  destinationType,
+  destinationType ?? 'all',
   pagination,
 ];
 const defaultParams = { page: 1, perPage: 10, query: '' };
@@ -69,7 +69,7 @@ export const fetchStreamOutputFilters = async (streamId: string, pagination: Pag
 
 const useStreamOutputFilters = (
   streamId: string,
-  destinationType: string,
+  destinationType: string | undefined,
   pagination: Pagination = defaultParams,
 ): {
   data: PaginatedList<StreamOutputFilterRule>;
@@ -82,7 +82,10 @@ const useStreamOutputFilters = (
 
     queryFn: () =>
       defaultOnError(
-        fetchStreamOutputFilters(streamId, { ...pagination, query: `destination_type:${destinationType}` }),
+        fetchStreamOutputFilters(
+          streamId,
+          { ...pagination, query: destinationType ? `destination_type:${destinationType}` : pagination.query },
+        ),
         'Loading stream output filters failed with status',
         'Could not load stream output filters',
       ),

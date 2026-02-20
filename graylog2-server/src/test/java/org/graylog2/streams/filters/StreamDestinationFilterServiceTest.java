@@ -93,6 +93,16 @@ class StreamDestinationFilterServiceTest {
 
     @Test
     @MongoDBFixtures("StreamDestinationFilterServiceTest-2024-07-01-1.json")
+    void countByStreamIds() {
+        final var countByStreamIds = service.countByStreamIds(List.of("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef2000"), id -> !"54e3deadbeefdeadbeef0001".equals(id));
+
+        assertThat(countByStreamIds)
+                .containsEntry("54e3deadbeefdeadbeef1000", 2L)
+                .containsEntry("54e3deadbeefdeadbeef2000", 1L);
+    }
+
+    @Test
+    @MongoDBFixtures("StreamDestinationFilterServiceTest-2024-07-01-1.json")
     void findByIdForStream() {
         assertThat(service.findByIdForStream("foo", "54e3deadbeefdeadbeef0000")).get().satisfies(dto -> {
             assertThat(dto.title()).isEqualTo("Test Filter 1");

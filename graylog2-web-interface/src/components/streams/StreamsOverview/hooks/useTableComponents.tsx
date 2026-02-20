@@ -22,6 +22,8 @@ import StreamActions from 'components/streams/StreamsOverview/StreamActions';
 import BulkActions from 'components/streams/StreamsOverview/BulkActions';
 import ExpandedRulesSection from 'components/streams/StreamsOverview/ExpandedRulesSection';
 import ExpandedRulesActions from 'components/streams/StreamsOverview/ExpandedRulesActions';
+import ExpandedDestinationFilterRulesSection from 'components/streams/StreamsOverview/ExpandedDestinationFilterRulesSection';
+import ExpandedDestinationFilterRulesActions from 'components/streams/StreamsOverview/ExpandedDestinationFilterRulesActions';
 import type { ExpandedSectionRenderer } from 'components/common/EntityDataTable/types';
 
 const useTableElements = ({
@@ -38,6 +40,14 @@ const useTableElements = ({
 
   const renderExpandedRules = useCallback((stream: Stream) => <ExpandedRulesSection stream={stream} />, []);
   const renderExpandedRulesActions = useCallback((stream: Stream) => <ExpandedRulesActions stream={stream} />, []);
+  const renderExpandedDestinationFilters = useCallback(
+    (stream: Stream) => <ExpandedDestinationFilterRulesSection stream={stream} />,
+    [],
+  );
+  const renderExpandedDestinationFiltersActions = useCallback(
+    (stream: Stream) => <ExpandedDestinationFilterRulesActions stream={stream} />,
+    [],
+  );
   const expandedSections = useMemo(
     () => ({
       rules: {
@@ -45,9 +55,20 @@ const useTableElements = ({
         content: renderExpandedRules,
         actions: renderExpandedRulesActions,
       },
+      destination_filters: {
+        title: 'Filter Rules',
+        content: renderExpandedDestinationFilters,
+        actions: renderExpandedDestinationFiltersActions,
+      },
       ...pluggableExpandedSections,
     }),
-    [pluggableExpandedSections, renderExpandedRules, renderExpandedRulesActions],
+    [
+      pluggableExpandedSections,
+      renderExpandedRules,
+      renderExpandedRulesActions,
+      renderExpandedDestinationFilters,
+      renderExpandedDestinationFiltersActions,
+    ],
   );
 
   return {
