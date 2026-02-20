@@ -53,15 +53,14 @@ public class MongoEntityFieldGroupingService implements EntityFieldGroupingServi
         final var userCanReadAllEntities = permissionsUtils.hasAllPermission(subject) ||
                 permissionsUtils.hasReadPermissionForWholeCollection(subject, collectionName);
 
-        final var queryFilterBson = !Strings.isNullOrEmpty(query)
-                ? Filters.regex(fieldName, query, "i")
-                : Filters.empty();
-
-        final var bucketsFilterBson = !Strings.isNullOrEmpty(bucketsFilter)
-                ? Filters.regex(ID_FIELD_NAME, bucketsFilter, "i")
-                : Filters.empty();
-
         if (userCanReadAllEntities) {
+            final var queryFilterBson = !Strings.isNullOrEmpty(query)
+                    ? Filters.regex(fieldName, query, "i")
+                    : Filters.empty();
+
+            final var bucketsFilterBson = !Strings.isNullOrEmpty(bucketsFilter)
+                    ? Filters.regex(ID_FIELD_NAME, bucketsFilter, "i")
+                    : Filters.empty();
             final int total = getTotalNumberOfBuckets(fieldName, mongoCollection, queryFilterBson, bucketsFilterBson);
             final List<EntityFieldBucket> paginatedAndSortedResults = getPage(fieldName, page, pageSize, sortOrder, sortField, mongoCollection, queryFilterBson, bucketsFilterBson);
 
