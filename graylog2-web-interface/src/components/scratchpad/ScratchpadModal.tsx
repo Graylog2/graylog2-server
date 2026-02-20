@@ -37,6 +37,13 @@ const STATUS_DEFAULT = '';
 
 type Position = { x: number; y: number };
 type ScratchpadSize = { width: string; height: string };
+type ScratchpadData = {
+  securityConfirmed?: boolean;
+  value?: string;
+  size?: ScratchpadSize;
+  position?: Position;
+  opened?: boolean;
+};
 
 const ContentArea = styled.div`
   display: flex;
@@ -104,7 +111,7 @@ const Scratchpad = () => {
   const textareaRef = useRef<HTMLTextAreaElement>();
   const statusTimeout = useRef<ReturnType<typeof setTimeout>>();
   const { setScratchpadVisibility, localStorageItem } = useContext(ScratchpadContext);
-  const scratchpadStore = Store.get(localStorageItem) || {};
+  const scratchpadStore = Store.get<ScratchpadData>(localStorageItem) || {};
   const [isSecurityWarningConfirmed, setSecurityWarningConfirmed] = useState<boolean>(
     scratchpadStore.securityConfirmed || false,
   );
@@ -115,8 +122,8 @@ const Scratchpad = () => {
   const [showStatusMessage, setShowStatusMessage] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
 
-  const writeData = (newData: Record<string, unknown>) => {
-    const currentStorage = Store.get(localStorageItem);
+  const writeData = (newData: Partial<ScratchpadData>) => {
+    const currentStorage = Store.get<ScratchpadData>(localStorageItem);
 
     Store.set(localStorageItem, { ...currentStorage, ...newData });
   };

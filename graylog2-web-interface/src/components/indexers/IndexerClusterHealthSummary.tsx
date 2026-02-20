@@ -33,10 +33,10 @@ const IndexerClusterHealthSummary = ({
   health: {
     status: string;
     shards: {
-      active: string;
-      initializing: string;
-      relocating: string;
-      unassigned: string;
+      active: number | string;
+      initializing: number | string;
+      relocating: number | string;
+      unassigned: number | string;
     };
   };
   name?: {

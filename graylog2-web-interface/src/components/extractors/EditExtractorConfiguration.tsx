@@ -30,7 +30,7 @@ import {
 import ExtractorUtils from 'util/ExtractorUtils';
 
 type Props = {
-  extractorType: any[];
+  extractorType: string;
   configuration: any;
   onChange: (...args: any[]) => void;
   exampleMessage?: string;

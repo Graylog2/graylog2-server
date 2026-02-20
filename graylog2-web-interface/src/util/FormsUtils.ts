@@ -1,0 +1,108 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import NumberUtils from 'util/NumberUtils';
+
+import createEvent from './CreateEvent';
+import { isValidURL } from './URLUtils';
+
+type InputElement = HTMLInputElement & { _valueTracker?: { setValue: (value: string) => void } };
+
+type ValidationRules = Record<string, unknown>;
+type ErrorMap = Record<string, string>;
+
+export const getValueFromInput = (input: HTMLInputElement): string | number | boolean | undefined => {
+  switch (input.type) {
+    case 'radio':
+      return input.value === 'true' || input.value === 'false' ? input.value === 'true' : input.value;
+    case 'checkbox':
+      return input.checked;
+    case 'number':
+      return input.value === '' || !NumberUtils.isNumber(input.value) ? undefined : Number(input.value);
+    default:
+      return input.value;
+  }
+};
+
+export const triggerInput = (input: InputElement): void => {
+  const tracker = input._valueTracker;
+  const event = createEvent('change');
+
+  (event as Event & { simulated: boolean }).simulated = true;
+
+  if (tracker) {
+    tracker.setValue('');
+  }
+
+  input.dispatchEvent(event);
+};
+
+export const formHasErrors = (errorMap: ErrorMap = {}): boolean => Object.keys(errorMap).length > 0;
+
+export const validateValue = (
+  fieldValue: unknown,
+  conditionType: string,
+  conditionValue: unknown,
+): string | undefined => {
+  switch (conditionType) {
+    case 'required':
+      if (!fieldValue || (fieldValue as { size?: number })?.size === 0) return 'Field is required.';
+      break;
+    case 'min':
+      if (Number(fieldValue) < Number(conditionValue)) return `Must be greater than ${conditionValue}.`;
+      break;
+    case 'max':
+      if (Number(fieldValue) > Number(conditionValue)) return `Must be smaller than ${conditionValue}.`;
+      break;
+    case 'url':
+      if (fieldValue) {
+        if (conditionValue && !isValidURL(String(fieldValue))) return 'Must be a URL.';
+        if (!conditionValue && isValidURL(String(fieldValue))) return 'Must not be a URL.';
+      }
+      break;
+    default:
+      return undefined;
+  }
+
+  return undefined;
+};
+
+export const validateField =
+  (validationRules: ValidationRules = {}) =>
+  (fieldValue: unknown): string | undefined => {
+    let error: string | undefined;
+
+    Object.entries(validationRules).some(([validationType, validationValue]) => {
+      const validationResult = validateValue(fieldValue, validationType, validationValue);
+
+      if (validationResult) {
+        error = validationResult;
+
+        return true;
+      }
+
+      return false;
+    });
+
+    return error;
+  };
+
+export default {
+  getValueFromInput,
+  triggerInput,
+  formHasErrors,
+  validateField,
+};

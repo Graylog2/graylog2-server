@@ -20,7 +20,7 @@ type SyncAction = (...args: any[]) => void;
 
 export type ListenableAction<R extends PromiseProvider> = R & {
   triggerPromise: R;
-  listen: (cb: (result: ExtractResultType<R>) => any) => () => void;
+  listen: (cb: (...args: Parameters<R>) => any) => () => void;
   completed: {
     (result: ExtractResultType<R>): void;
     listen: (cb: (result: ExtractResultType<R>) => any) => () => void;

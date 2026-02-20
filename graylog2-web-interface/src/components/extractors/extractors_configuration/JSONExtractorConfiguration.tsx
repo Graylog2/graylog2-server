@@ -112,7 +112,7 @@ class JSONExtractorConfiguration extends React.Component<Props, State> {
   };
 
   _getEffectiveConfiguration(configuration) {
-    return ExtractorUtils.getEffectiveConfiguration(this.DEFAULT_CONFIGURATION, configuration);
+    return ExtractorUtils.getEffectiveConfiguration(this.DEFAULT_CONFIGURATION, configuration) as Configuration;
   }
 
   _onChange(key) {

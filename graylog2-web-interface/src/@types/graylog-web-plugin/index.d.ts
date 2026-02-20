@@ -396,10 +396,10 @@ declare module 'graylog-web-plugin/plugin' {
     inputSetupWizard?: Array<InputSetupWizard>;
     // Global context providers allow to fetch and process data once
     // and provide the result for all components in your plugin.
-    globalContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>;
+    globalContextProviders?: Array<React.ComponentType<React.PropsWithChildren<{}>>>;
     // Difference between page context providers and global context providers
     // is that page context providers are rendered within the <App>.
-    pageContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>;
+    pageContextProviders?: Array<React.ComponentType<React.PropsWithChildren<{}>>>;
     routes?: Array<PluginRoute>;
     pages?: PluginPages;
     pageFooter?: Array<PluginPageFooter>;

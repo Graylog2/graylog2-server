@@ -67,7 +67,7 @@ const ViewEventDefinitionPage = () => {
       refetch
     ) {
       EventDefinitionsActions.get(params.definitionId).then(
-        (response) => {
+        (response: any) => {
           const eventDefinitionResp = response.event_definition;
 
           // Inject an internal "_is_scheduled" field to indicate if the event definition should be scheduled in the
@@ -94,7 +94,7 @@ const ViewEventDefinitionPage = () => {
       app_pathname: 'event-definition',
     });
 
-    EventDefinitionsActions.copy(eventDefinition).then((duplicatedEvent) => {
+    EventDefinitionsActions.copy(eventDefinition).then((duplicatedEvent: any) => {
       navigate(Routes.ALERTS.DEFINITIONS.edit(duplicatedEvent.id));
     });
   };

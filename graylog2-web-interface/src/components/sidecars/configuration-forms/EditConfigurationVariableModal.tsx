@@ -93,7 +93,7 @@ class EditConfigurationVariableModal extends React.Component<
   };
 
   _validateFormData = (nextFormData) => {
-    ConfigurationVariableActions.validate(nextFormData).then((validation) => {
+    ConfigurationVariableActions.validate(nextFormData).then((validation: any) => {
       this.setState({ validation_errors: validation.errors, error: validation.failed });
     });
   };

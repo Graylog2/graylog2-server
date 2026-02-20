@@ -74,7 +74,7 @@ class ConfigurationVariablesHelper extends React.Component<
   }
 
   _reloadVariables = () => {
-    ConfigurationVariableActions.all().then((configurationVariables) => {
+    ConfigurationVariableActions.all().then((configurationVariables: any) => {
       this.setState({ configurationVariables: configurationVariables });
     });
   };
@@ -102,7 +102,7 @@ class ConfigurationVariablesHelper extends React.Component<
   _handleDeleteCheck = (configVar) => () => {
     this.setState({ variableToDelete: configVar });
 
-    ConfigurationVariableActions.getConfigurations(configVar).then((response) => {
+    ConfigurationVariableActions.getConfigurations(configVar).then((response: any) => {
       // Variable still in use: Report error
       if (response.length > 0) {
         this.setState({ errorModalContent: _renderConfigList(response) });

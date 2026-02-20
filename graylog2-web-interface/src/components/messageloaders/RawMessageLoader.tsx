@@ -180,7 +180,7 @@ const parseRawMessage = (
 
   return Messages.parse(payload).then(
     (response) => MessageFormatter.formatResultMessage(response),
-    (error) => {
+    (error): undefined => {
       if (error.additional && error.additional.status === 400) {
         UserNotification.error(
           'Please ensure the selected codec and its configuration are right. ' +
@@ -188,10 +188,12 @@ const parseRawMessage = (
           'Could not load raw message',
         );
 
-        return;
+        return undefined;
       }
 
       UserNotification.error(`Loading raw message failed with status: ${error}`, 'Could not load raw message');
+
+      return undefined;
     },
   );
 };
@@ -271,11 +273,11 @@ const RawMessageLoader = ({
   };
 
   const _onMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setMessage(getValueFromInput(event.target));
+    setMessage(String(getValueFromInput(event.target)));
   };
 
   const _onRemoteAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRemoteAddress(getValueFromInput(event.target));
+    setRemoteAddress(String(getValueFromInput(event.target)));
   };
 
   const _onCodecConfigurationChange = (field: string, value: ConfigurationFieldValue) => {

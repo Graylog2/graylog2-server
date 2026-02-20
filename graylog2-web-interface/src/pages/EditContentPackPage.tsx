@@ -151,7 +151,7 @@ const EditContentPackPage = () => {
   };
 
   const _getEntities = (newSelectedEntities) => {
-    CatalogActions.getSelectedEntities(newSelectedEntities).then((result) => {
+    CatalogActions.getSelectedEntities(newSelectedEntities).then((result: any) => {
       const selectedContentPackEntities = Object.keys(newSelectedEntities)
         .reduce((acc, entityType) => acc.concat(newSelectedEntities[entityType]), [])
         .filter((e) => e instanceof Entity);

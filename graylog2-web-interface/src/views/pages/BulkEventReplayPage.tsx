@@ -32,7 +32,7 @@ const BulkEventReplayPage = () => {
   const params = useRoutingQuery();
   const replaySessionId = params[REPLAY_SESSION_ID_PARAM];
   const initialEventIds = useSessionInitialEventIds();
-  const returnUrl: string = Store.sessionGet(replaySessionId)?.returnUrl;
+  const returnUrl = Store.sessionGet<{ returnUrl?: string }>(replaySessionId as string)?.returnUrl;
   const { data: events, isFetched } = useEventsById(initialEventIds);
 
   const history = useHistory();
