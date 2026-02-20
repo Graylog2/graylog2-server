@@ -123,4 +123,8 @@ public class InputFailure implements Failure {
     public Object getMessageQueueId() {
         return null;
     }
+
+    public RawMessage getRawMessage() {
+        return rawMessage;
+    }
 }
