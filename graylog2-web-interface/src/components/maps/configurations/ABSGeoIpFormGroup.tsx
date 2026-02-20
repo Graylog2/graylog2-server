@@ -16,30 +16,37 @@
  */
 import * as React from 'react';
 import { useState, useEffect, useCallback } from 'react';
-import { useFormikContext } from 'formik';
+import { useFormikContext, Field } from 'formik';
 
-import { FormikFormGroup } from 'components/common';
-import type { GeoIpConfigType } from 'components/maps/configurations/types';
+import { FormikFormGroup, Select } from 'components/common';
+import type { GeoIpConfigType, AzureAuthType, EncryptedValue } from 'components/maps/configurations/types';
 import { Button, Input } from 'components/bootstrap';
+import ABSAutomaticAuthInfo from 'components/maps/configurations/ABSAutomaticAuthInfo';
+
+const AZURE_AUTH_TYPE_OPTIONS = [
+  { value: 'automatic', label: 'Automatic' },
+  { value: 'keysecret', label: 'Key & Secret' },
+];
 
 const ABSGeoIpFormGroup = () => {
   const { values, setFieldValue } = useFormikContext<GeoIpConfigType>();
   const isKeySet = values.azure_account_key && 'is_set' in values.azure_account_key;
   const [isCreate] = useState(() => !isKeySet);
   const [showResetPasswordButton, setShowResetPasswordButton] = useState(isKeySet);
+  const [authType, setAuthType] = useState<AzureAuthType>(values.azure_auth_type ?? 'automatic');
 
   const setAccessKey = useCallback(
-    (nextAccessKey) => {
+    (nextAccessKey: EncryptedValue | undefined) => {
       setFieldValue('azure_account_key', nextAccessKey);
     },
     [setFieldValue],
   );
 
   useEffect(() => {
-    if (isKeySet) {
+    if (isKeySet && authType === 'keysecret') {
       setAccessKey({ keep_value: true });
     }
-  }, [isKeySet, setAccessKey]);
+  }, [isKeySet, setAccessKey, authType]);
 
   const toggleAccountKeyReset = useCallback(() => {
     if (showResetPasswordButton) {
@@ -52,6 +59,20 @@ const ABSGeoIpFormGroup = () => {
     setAccessKey({ keep_value: true });
     setShowResetPasswordButton(true);
   }, [setAccessKey, showResetPasswordButton]);
+
+  const handleAuthTypeChange = useCallback(
+    (option: string) => {
+      const newAuthType = option as AzureAuthType;
+      setAuthType(newAuthType);
+      setFieldValue('azure_auth_type', newAuthType);
+
+      if (newAuthType === 'automatic') {
+        setFieldValue('azure_account', undefined);
+        setFieldValue('azure_account_key', undefined);
+      }
+    },
+    [setFieldValue],
+  );
 
   return (
     <>
@@ -72,39 +93,59 @@ const ABSGeoIpFormGroup = () => {
         labelClassName=""
         wrapperClassName=""
       />
-      <FormikFormGroup
-        name="azure_account"
-        type="text"
-        label="Azure account name"
-        placeholder="your-account-name"
-        help="The name of your Azure storage account."
-        required
-        labelClassName=""
-        wrapperClassName=""
-      />
-      {showResetPasswordButton ? (
-        <Input id="azure_account_reset" label="Azure Account Key" labelClassName="col-sm-3" wrapperClassName="col-sm-9">
-          <Button onClick={toggleAccountKeyReset}>Reset password</Button>
-        </Input>
-      ) : (
-        <Input
-          name="azure_account_key"
-          id="azure_account_key"
-          data-testid="azure-account-key-input"
-          type="password"
-          label="Azure account key"
-          onChange={({ target: { value } }) => setAccessKey({ set_value: value })}
-          buttonAfter={
-            !isCreate ? (
-              <Button type="button" onClick={toggleAccountKeyReset}>
-                Undo Reset
-              </Button>
-            ) : undefined
-          }
-          placeholder="****************"
-          help="The account key for your Azure storage account."
-          required
-        />
+      <Field>
+        {() => (
+          <Input id="azure-auth-type-select" label="Azure Authentication Type">
+            <Select
+              id="azureAuthenticationType"
+              inputId="azure-auth-type-input"
+              name="azure_auth_type"
+              placeholder="Select Authentication Type"
+              options={AZURE_AUTH_TYPE_OPTIONS}
+              onChange={handleAuthTypeChange}
+              value={authType}
+            />
+          </Input>
+        )}
+      </Field>
+      {authType === 'automatic' && <ABSAutomaticAuthInfo />}
+      {authType === 'keysecret' && (
+        <>
+          <FormikFormGroup
+            name="azure_account"
+            type="text"
+            label="Azure account name"
+            placeholder="your-account-name"
+            help="The name of your Azure storage account."
+            required
+            labelClassName=""
+            wrapperClassName=""
+          />
+          {showResetPasswordButton ? (
+            <Input id="azure_account_reset" label="Azure Account Key" labelClassName="col-sm-3" wrapperClassName="col-sm-9">
+              <Button onClick={toggleAccountKeyReset}>Reset password</Button>
+            </Input>
+          ) : (
+            <Input
+              name="azure_account_key"
+              id="azure_account_key"
+              data-testid="azure-account-key-input"
+              type="password"
+              label="Azure account key"
+              onChange={({ target: { value } }) => setAccessKey({ set_value: value })}
+              buttonAfter={
+                !isCreate ? (
+                  <Button type="button" onClick={toggleAccountKeyReset}>
+                    Undo Reset
+                  </Button>
+                ) : undefined
+              }
+              placeholder="****************"
+              help="The account key for your Azure storage account."
+              required
+            />
+          )}
+        </>
       )}
     </>
   );

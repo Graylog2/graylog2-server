@@ -29,6 +29,8 @@ export type EncryptedValue =
   | { keep_value: boolean }
   | { delete_value: boolean };
 
+export type AzureAuthType = 'automatic' | 'keysecret';
+
 export type GeoIpConfigType = {
   enabled: boolean;
   enforce_graylog_schema: boolean;
@@ -43,6 +45,7 @@ export type GeoIpConfigType = {
   azure_account_key?: EncryptedValue;
   azure_account?: string;
   azure_container?: string;
+  azure_auth_type?: AzureAuthType;
 };
 
 export type OptionType = {
