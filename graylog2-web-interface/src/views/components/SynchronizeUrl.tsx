@@ -41,7 +41,8 @@ const bindSearchParamsFromQueryThunk =
     const [newView] = result;
 
     if (newView !== view) {
-      await dispatch(updateView(newView, false));
+      // Update view, but don't create new search because this already happened in bindSearchParamsFromQuery
+      await dispatch(updateView(newView));
 
       return dispatch(executeActiveQuery());
     }
