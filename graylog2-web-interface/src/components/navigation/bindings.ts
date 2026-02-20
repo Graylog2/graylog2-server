@@ -92,6 +92,7 @@ const navigationBindings: PluginExports = {
               permissions: ['pipeline:read', 'pipeline_connection:read'],
             },
             { path: Routes.SYSTEM.SIDECARS.OVERVIEW, description: 'Sidecars', permissions: ['sidecars:read'] },
+            { path: Routes.SYSTEM.COLLECTORS.OVERVIEW, description: 'Collectors' },
           ],
           AppConfig.isCloud() && !AppConfig.isFeatureEnabled('cloud_inputs') ? [Routes.SYSTEM.INPUTS] : [],
         ),

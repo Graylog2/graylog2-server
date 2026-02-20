@@ -29,6 +29,7 @@ import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
+import org.graylog.collectors.CollectorsModule;
 import org.graylog.enterprise.EnterpriseModule;
 import org.graylog.events.EventsModule;
 import org.graylog.events.processor.EventDefinitionConfiguration;
@@ -53,6 +54,7 @@ import org.graylog.scheduler.JobSchedulerConfiguration;
 import org.graylog.scheduler.JobSchedulerModule;
 import org.graylog.security.SecurityModule;
 import org.graylog.security.certutil.CaModule;
+import org.graylog.security.pki.PkiModule;
 import org.graylog.tracing.TracingModule;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertConditionBindings;
@@ -97,6 +99,9 @@ import org.graylog2.messageprocessors.MessageProcessorModule;
 import org.graylog2.migrations.MigrationsModule;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.opamp.OpAmpConfiguration;
+import org.graylog2.database.MongoSequenceModule;
+import org.graylog2.opamp.OpAmpModule;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
@@ -152,6 +157,7 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
     private final ContentStreamConfiguration contentStreamConfiguration = new ContentStreamConfiguration();
     private final DnsLookupAdapterConfiguration dnsLookupAdapterConfiguration = new DnsLookupAdapterConfiguration();
     private final EventDefinitionConfiguration eventDefinitionConfiguration = new EventDefinitionConfiguration();
+    private final OpAmpConfiguration opAmpConfiguration = new OpAmpConfiguration();
 
     @Option(name = {"-l", "--local"}, description = "Run Graylog in local mode. Only interesting for Graylog developers.")
     private boolean local = false;
@@ -221,10 +227,14 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                 new DataTieringModule(),
                 new DatanodeMigrationBindings(),
                 new CaModule(),
+                new PkiModule(),
                 new TelemetryModule(),
                 new DataNodeModule(),
                 new McpServerModule(),
-                new QuickJumpModule(featureFlags)
+                new QuickJumpModule(featureFlags),
+                new MongoSequenceModule(),
+                new OpAmpModule(),
+                new CollectorsModule()
         );
 
         modules.add(new FieldTypeManagementModule());
@@ -252,7 +262,8 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                 telemetryConfiguration,
                 contentStreamConfiguration,
                 dnsLookupAdapterConfiguration,
-                eventDefinitionConfiguration);
+                eventDefinitionConfiguration,
+                opAmpConfiguration);
     }
 
     @Override

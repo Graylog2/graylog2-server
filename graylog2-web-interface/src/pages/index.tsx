@@ -102,6 +102,12 @@ const SidecarNewConfigurationPage = loadAsync(() => import('pages/SidecarNewConf
 const SidecarFailureTrackingPage = loadAsync(() => import('pages/SidecarFailureTrackingPage'));
 const SidecarsPage = loadAsync(() => import('pages/SidecarsPage'));
 const SidecarStatusPage = loadAsync(() => import('pages/SidecarStatusPage'));
+const CollectorsOverviewPage = loadAsync(() => import('pages/CollectorsOverviewPage'));
+const CollectorsFleetsPage = loadAsync(() => import('pages/CollectorsFleetsPage'));
+const CollectorsFleetDetailPage = loadAsync(() => import('pages/CollectorsFleetDetailPage'));
+const CollectorsInstancesPage = loadAsync(() => import('pages/CollectorsInstancesPage'));
+const CollectorsDeploymentPage = loadAsync(() => import('pages/CollectorsDeploymentPage'));
+const CollectorsSettingsPage = loadAsync(() => import('pages/CollectorsSettingsPage'));
 const SimulatorPage = loadAsync(() => import('./SimulatorPage'));
 const StartPage = loadAsync(() => import('./StartPage'));
 const StreamEditPage = loadAsync(() => import('./StreamEditPage'));
@@ -208,6 +214,12 @@ export {
   SidecarFailureTrackingPage,
   SidecarsPage,
   SidecarStatusPage,
+  CollectorsOverviewPage,
+  CollectorsFleetsPage,
+  CollectorsFleetDetailPage,
+  CollectorsInstancesPage,
+  CollectorsDeploymentPage,
+  CollectorsSettingsPage,
   SimulatorPage,
   StartPage,
   StreamEditPage,

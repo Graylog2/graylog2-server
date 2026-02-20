@@ -98,6 +98,8 @@ const webpackConfig = {
 // eslint-disable-next-line import/no-mutable-exports
 let defaultExport = webpackConfig;
 
+const urlHeader = 'X-Graylog-Server-URL';
+
 if (TARGET === 'start') {
   defaultExport = merge(webpackConfig, {
     devServer: {
@@ -109,15 +111,19 @@ if (TARGET === 'start') {
       },
       proxy: [
         {
-          context: ['/api', '/config.js', '/sso'],
+          context: ['/api', '/config.js', '/sso', '/.well-known', '/v1/opamp'],
           target: apiUrl,
+          ws: true,
           // Skip proxying for /api-browser - it's a frontend route, not an API endpoint
           bypass: (req) => (req.path.startsWith('/api-browser') ? req.path : null),
           onProxyReq: (proxyReq, req) => {
-            const existingHeader = proxyReq.getHeader('X-Graylog-Server-URL');
-            if (!existingHeader?.trim()) {
-              const serverUrl = `${req.protocol}://${req.get('host')}`;
-              proxyReq.setHeader('X-Graylog-Server-URL', serverUrl);
+            if (!proxyReq.getHeader(urlHeader)?.trim()) {
+              proxyReq.setHeader(urlHeader, `${req.protocol}://${req.get('host')}`);
+            }
+          },
+          onProxyReqWs: (proxyReq, req) => {
+            if (!proxyReq.getHeader(urlHeader)?.trim()) {
+              proxyReq.setHeader(urlHeader, req.headers.origin || `http://${req.headers.host}`);
             }
           },
         },

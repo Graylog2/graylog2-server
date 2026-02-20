@@ -263,7 +263,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
         handlers.put("connection-counter", () -> connectionCounter);
         if (tlsEnable) {
             LOG.info("Enabled TLS for input {}. key-file=\"{}\" cert-file=\"{}\"", input.toIdentifier(), tlsKeyFile, tlsCertFile);
-            handlers.put("tls", getSslHandlerCallable(input));
+            handlers.put("tls", createSslHandler(input));
         }
         handlers.putAll(getCustomChildChannelHandlers(input));
         if (aggregator != null) {
@@ -274,6 +274,10 @@ public abstract class AbstractTcpTransport extends NettyTransport {
         handlers.put("exception-logger", () -> new ExceptionLoggingChannelHandler(input, LOG, this.tcpKeepalive));
 
         return handlers;
+    }
+
+    protected Callable<? extends ChannelHandler> createSslHandler(MessageInput input) {
+        return getSslHandlerCallable(input);
     }
 
     private Callable<ChannelHandler> getSslHandlerCallable(MessageInput input) {
