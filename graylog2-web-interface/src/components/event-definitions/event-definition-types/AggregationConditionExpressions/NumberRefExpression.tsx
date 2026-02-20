@@ -15,13 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
+import * as Immutable from 'immutable';
+import styled, { css } from 'styled-components';
 
-import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
+import { defaultCompare as naturalSort, defaultCompare } from 'logic/DefaultCompare';
 import { Select } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import { percentileOptions, percentageStrategyOptions } from 'views/Constants';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type FieldType from 'views/logic/fieldtypes/FieldType';
+import { Properties, type Property } from 'views/logic/fieldtypes/FieldType';
+import FieldTypeIcon from 'views/components/sidebar/fields/FieldTypeIcon';
 
 const formatFunctions = (functions) =>
   functions.sort(naturalSort).map((fn) => ({ label: `${fn.toLowerCase()}()`, value: fn }));
@@ -32,12 +38,50 @@ type NumberRefExpressionProps = {
   aggregationFunctions: any[];
   eventDefinition: any;
   expression: any;
-  formattedFields: any[];
+  formattedFields: FieldTypeMapping[];
   onChange: (...args: any[]) => void;
   renderLabel: boolean;
   validation?: any;
   parent?: any;
 };
+
+// start - copied from FieldSelectBase.tsx
+const FieldName = styled.span`
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+`;
+
+const UnqualifiedOption = styled.span(
+  ({ theme }) => css`
+    color: ${theme.colors.gray[70]};
+  `,
+);
+
+type OptionRendererProps = {
+  label: string;
+  qualified: boolean;
+  type?: FieldType;
+};
+
+const optionRenderer = ({ label, qualified, type = undefined }: OptionRendererProps) => {
+  const children = (
+    <FieldName>
+      {type && (
+        <>
+          <FieldTypeIcon type={type} />{' '}
+        </>
+      )}
+      {label}
+    </FieldName>
+  );
+
+  return qualified ? <span>{children}</span> : <UnqualifiedOption>{children}</UnqualifiedOption>;
+};
+
+const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) =>
+  defaultCompare(label1, label2);
+// end - copied from FieldSelectBase.tsx
 
 const NumberRefExpression = ({
   aggregationFunctions,
@@ -117,6 +161,45 @@ const NumberRefExpression = ({
 
   const elements = ['percentage', 'percentile'].includes(series.type) ? 3 : 2;
 
+  // start - copied from MetricConfiguration.tsx
+  const hasProperty = (fieldType: FieldTypeMapping, properties: Array<Property>) => {
+    const fieldProperties = fieldType?.type?.properties ?? Immutable.Set();
+
+    return (
+      properties.map((property) => fieldProperties.contains(property)).find((result) => result === false) === undefined
+    );
+  };
+
+  const currentFunction = series.type;
+  const isPercentage = currentFunction === 'percentage';
+  const requiresNumericField =
+    (isPercentage && series.strategy === 'SUM') || !['card', 'count', 'latest', 'percentage'].includes(currentFunction);
+
+  const isFieldQualified = useCallback(
+    (field: FieldTypeMapping) => {
+      if (!requiresNumericField) {
+        return true;
+      }
+
+      return hasProperty(field, [Properties.Numeric]);
+    },
+    [requiresNumericField],
+  );
+
+  const fieldOptions = useMemo(
+    () =>
+      formattedFields
+        .map((field) => ({
+          label: `${field.name}`,
+          value: field.name,
+          type: field.value.type,
+          qualified: isFieldQualified(field),
+        }))
+        .sort(sortByLabel),
+    [isFieldQualified, formattedFields],
+  );
+  // end - copied from MetricConfiguration.tsx
+
   return (
     <Col md={6}>
       <FormGroup controlId="aggregation-function" validationState={validation.message ? 'error' : null}>
@@ -152,7 +235,8 @@ const NumberRefExpression = ({
               matchProp="label"
               placeholder="Select Field (Optional)"
               onChange={handleAggregationFieldChange}
-              options={formattedFields}
+              options={fieldOptions}
+              optionRenderer={optionRenderer}
               value={series.field}
               allowCreate
             />
