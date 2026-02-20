@@ -54,10 +54,6 @@ public class PaginationResultOS extends ChunkedQueryResultOS {
         final Hit<Map> lastHit = hits.getLast();
         final List<FieldValue> sortValues = lastHit.sort();
 
-        if (sortValues.isEmpty()) {
-            return null;
-        }
-
         final SearchRequest nextRequest = SearchRequest.of(builder -> initialSearchRequest.toBuilder().searchAfter(sortValues));
 
         return client.sync(c -> c.search(nextRequest, Map.class), "Unable to retrieve next chunk from search: ");
