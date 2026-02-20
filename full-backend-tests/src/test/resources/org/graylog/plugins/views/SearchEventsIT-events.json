@@ -1,0 +1,174 @@
+{
+  "documents": [
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "event-001"
+          }
+        },
+        {
+          "data": {
+            "id": "event-001",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "eventdef-001",
+            "timestamp": "2024-01-15 10:00:00.000",
+            "timestamp_processing": "2024-01-15 10:00:01.000",
+            "timerange_start": "2024-01-15 09:55:00.000",
+            "timerange_end": "2024-01-15 10:00:00.000",
+            "streams": ["000000000000000000000002"],
+            "source_streams": ["000000000000000000000001"],
+            "message": "High CPU usage detected",
+            "source": "graylog-server",
+            "key_tuple": [],
+            "key": "",
+            "priority": 2,
+            "scores": {},
+            "associated_assets": [],
+            "alert": false,
+            "fields": {},
+            "group_by_fields": {}
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "event-002"
+          }
+        },
+        {
+          "data": {
+            "id": "event-002",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "eventdef-001",
+            "timestamp": "2024-01-15 10:05:00.000",
+            "timestamp_processing": "2024-01-15 10:05:01.000",
+            "timerange_start": "2024-01-15 10:00:00.000",
+            "timerange_end": "2024-01-15 10:05:00.000",
+            "streams": ["000000000000000000000002"],
+            "source_streams": ["000000000000000000000001"],
+            "message": "High memory usage detected",
+            "source": "graylog-server",
+            "key_tuple": ["host1"],
+            "key": "host1",
+            "priority": 3,
+            "scores": {},
+            "associated_assets": [],
+            "alert": true,
+            "fields": {},
+            "group_by_fields": {}
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "event-003"
+          }
+        },
+        {
+          "data": {
+            "id": "event-003",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "eventdef-002",
+            "timestamp": "2024-01-15 10:10:00.000",
+            "timestamp_processing": "2024-01-15 10:10:01.000",
+            "timerange_start": "2024-01-15 10:05:00.000",
+            "timerange_end": "2024-01-15 10:10:00.000",
+            "streams": ["000000000000000000000002"],
+            "source_streams": ["000000000000000000000001"],
+            "message": "Disk space running low",
+            "source": "graylog-server",
+            "key_tuple": ["host2"],
+            "key": "host2",
+            "priority": 1,
+            "scores": {},
+            "associated_assets": [],
+            "alert": false,
+            "fields": {},
+            "group_by_fields": {}
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "event-004"
+          }
+        },
+        {
+          "data": {
+            "id": "event-004",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "eventdef-002",
+            "timestamp": "2024-01-15 10:15:00.000",
+            "timestamp_processing": "2024-01-15 10:15:01.000",
+            "timerange_start": "2024-01-15 10:10:00.000",
+            "timerange_end": "2024-01-15 10:15:00.000",
+            "streams": ["000000000000000000000002"],
+            "source_streams": ["000000000000000000000001"],
+            "message": "Network latency spike",
+            "source": "graylog-server",
+            "key_tuple": [],
+            "key": "",
+            "priority": 2,
+            "scores": {},
+            "associated_assets": [],
+            "alert": true,
+            "fields": {},
+            "group_by_fields": {}
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "gl-events_0",
+            "indexType": "message",
+            "indexId": "event-005"
+          }
+        },
+        {
+          "data": {
+            "id": "event-005",
+            "event_definition_type": "aggregation-v1",
+            "event_definition_id": "eventdef-003",
+            "timestamp": "2024-01-15 10:20:00.000",
+            "timestamp_processing": "2024-01-15 10:20:01.000",
+            "timerange_start": "2024-01-15 10:15:00.000",
+            "timerange_end": "2024-01-15 10:20:00.000",
+            "streams": ["000000000000000000000002"],
+            "source_streams": ["000000000000000000000001"],
+            "message": "Authentication failures exceeded threshold",
+            "source": "graylog-server",
+            "key_tuple": ["admin"],
+            "key": "admin",
+            "priority": 3,
+            "scores": {},
+            "associated_assets": [],
+            "alert": true,
+            "fields": {},
+            "group_by_fields": {}
+          }
+        }
+      ]
+    }
+  ]
+}
