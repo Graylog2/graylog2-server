@@ -21,8 +21,6 @@ import chroma from 'chroma-js';
 
 const Navbar = styled(BootstrapNavbar)(
   ({ theme }) => {
-    const { variant } = theme.colors;
-
     return css`
     position: relative;
     min-height: auto;
@@ -50,7 +48,7 @@ const Navbar = styled(BootstrapNavbar)(
 
         &:hover,
         &:focus {
-          color: ${variant.darker.default};
+          color: ${theme.colors.variant.darker.default};
           background-color: transparent;
         }
       }
@@ -62,7 +60,7 @@ const Navbar = styled(BootstrapNavbar)(
 
         &:hover,
         &:focus {
-          color: ${variant.darkest.default};
+          color: ${theme.colors.variant.darkest.default};
           background-color: transparent;
         }
       }
@@ -82,7 +80,7 @@ const Navbar = styled(BootstrapNavbar)(
         &,
         &:hover,
         &:focus {
-          color: ${variant.darkest.default};
+          color: ${theme.colors.variant.darkest.default};
           background-color: transparent;
         }
       }
@@ -94,7 +92,7 @@ const Navbar = styled(BootstrapNavbar)(
         > li > .btn-link {
           &:hover,
           &:focus {
-            color: ${variant.darker.default};
+            color: ${theme.colors.variant.darker.default};
             background-color: transparent;
           }
         }
@@ -102,23 +100,23 @@ const Navbar = styled(BootstrapNavbar)(
         .open .dropdown-menu {
           > li > a,
           > li > .btn-link {
-            color: ${variant.darkest.default};
+            color: ${theme.colors.variant.darkest.default};
 
             &:hover,
             &:focus {
-              color: ${variant.darker.default};
-              background-color: ${variant.lightest.default};
+              color: ${theme.colors.variant.darker.default};
+              background-color: ${theme.colors.variant.lightest.default};
             }
           }
 
           > .active > a,
           > .active > .btn-link {
-            color: ${variant.darkest.default};
+            color: ${theme.colors.variant.darkest.default};
             background-color: ${theme.colors.gray[90]};
 
             &:hover,
             &:focus {
-              color: ${variant.darkest.default};
+              color: ${theme.colors.variant.darkest.default};
               background-color: ${theme.colors.gray[80]};
             }
           }
@@ -138,7 +136,7 @@ const Navbar = styled(BootstrapNavbar)(
 
     .navbar-toggle {
       background-color: ${theme.colors.global.navigationBackground};
-      border-color: ${variant.dark.default};
+      border-color: ${theme.colors.variant.dark.default};
       transition:
         background-color 150ms ease-in-out,
         border-color 150ms ease-in-out;
@@ -180,8 +178,8 @@ const Navbar = styled(BootstrapNavbar)(
       &:hover,
       &:focus,
       &:not(.collapsed) {
-        background-color: ${variant.lighter.default};
-        border-color: ${variant.default};
+        background-color: ${theme.colors.variant.lighter.default};
+        border-color: ${theme.colors.variant.default};
 
         .icon-bar {
           background-color: ${theme.colors.text.primary};
@@ -195,19 +193,19 @@ const Navbar = styled(BootstrapNavbar)(
     }
 
     .navbar-link {
-      color: ${variant.default};
+      color: ${theme.colors.variant.default};
 
       &:hover {
-        color: ${chroma(variant.default as string).darken(0.25).css()};
+        color: ${chroma(theme.colors.variant.default as string).darken(0.25).css()};
       }
     }
 
     .btn-link {
-      color: ${variant.default};
+      color: ${theme.colors.variant.default};
 
       &:hover,
       &:focus {
-        color: ${variant.dark.default};
+        color: ${theme.colors.variant.dark.default};
       }
 
       &[disabled],
