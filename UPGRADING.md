@@ -1,5 +1,4 @@
-Upgrading to Graylog 7.1.x
-==========================
+# Upgrading to Graylog 7.1.x
 
 ## User Session Termination
 
@@ -20,12 +19,16 @@ This release includes frontend plugin API changes related to perspectives.
 The dedicated Security Events UI routes under `/security/security-events/*` have been removed in favor of the
 existing Alerts routes.
 
-If you have bookmarks, links, or runbooks pointing to the old routes, update them to:
+If you have bookmarks, links, or runbooks pointing to old routes, update them as follows:
 
-- `/alerts`
-- `/alerts/definitions`
-- `/alerts/notifications`
-- `/alerts/event-procedures/*`
+| Old route                                               | New route                             |
+| ------------------------------------------------------- | ------------------------------------- |
+| `/security/security-events/alerts`                      | `/alerts`                             |
+| `/security/security-events/definitions`                 | `/alerts/definitions`                 |
+| `/security/security-events/notifications`               | `/alerts/notifications`               |
+| `/security/security-events/event-procedures/procedures` | `/alerts/event-procedures/procedures` |
+| `/security/security-events/event-procedures/steps`      | `/alerts/event-procedures/steps`      |
+| `/security/security-events/event-procedure-action`      | `/alerts/event-procedure-action`      |
 
 ### External Authentication Services: Changed Default User Time Zone
 
@@ -47,7 +50,7 @@ be modified to instead use the underscore format.
 ## Configuration File Changes
 
 | Option | Action    | Description |
-|--------|-----------|-------------|
+| ------ | --------- | ----------- |
 | `tbd`  | **added** |             |
 
 ## Java API Changes
@@ -58,6 +61,6 @@ be modified to instead use the underscore format.
 
 The following REST API changes have been made.
 
-| Endpoint             | Description                        |
-|----------------------|------------------------------------|
-| `GET /<endpoint>`    | Description of the endpoint change |
+| Endpoint          | Description                        |
+| ----------------- | ---------------------------------- |
+| `GET /<endpoint>` | Description of the endpoint change |
