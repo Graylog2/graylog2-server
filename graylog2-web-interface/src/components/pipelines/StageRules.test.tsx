@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import userEvent from '@testing-library/user-event';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import StageRules from 'components/pipelines/StageRules';
@@ -108,6 +109,7 @@ describe('StageRules', () => {
     expect(screen.getByText('Description')).toBeInTheDocument();
     expect(screen.getByText('Throughput')).toBeInTheDocument();
     expect(screen.getByText('Errors')).toBeInTheDocument();
+    expect(screen.queryByText('Actions')).not.toBeInTheDocument();
 
     const firstRuleLink = screen.getByRole('link', { name: 'First Rule' });
     expect(firstRuleLink).toHaveAttribute('href', '/system/pipelines/rules/rule-1');
@@ -188,5 +190,80 @@ describe('StageRules', () => {
     render(<StageRules pipeline={mockPipeline} stage={mockStage} />);
 
     expect(screen.getByText('This stage has no rules yet. Click on edit to add some.')).toBeInTheDocument();
+  });
+
+  it('renders actions column and remove button for input wizard routing rules', async () => {
+    const onRemoveRule = jest.fn();
+
+    render(
+      <StageRules
+        pipeline={mockPipeline}
+        stage={mockStage}
+        rules={[
+          {
+            ...mockRules[0],
+            description: 'Input setup wizard routing rule',
+          },
+          mockRules[1],
+        ]}
+        canRemoveRoutingRules
+        onRemoveRule={onRemoveRule}
+      />,
+    );
+
+    expect(screen.getByText('Actions')).toBeInTheDocument();
+
+    const removeButton = screen.getByRole('button', { name: 'Remove First Rule' });
+
+    await userEvent.click(removeButton);
+
+    expect(onRemoveRule).toHaveBeenCalledTimes(1);
+    expect(onRemoveRule).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'rule-1',
+      }),
+    );
+    expect(screen.getAllByRole('button', { name: /Remove .* Rule/ })).toHaveLength(1);
+  });
+
+  it('disables remove button while a rule is being removed', () => {
+    render(
+      <StageRules
+        pipeline={mockPipeline}
+        stage={mockStage}
+        rules={[
+          {
+            ...mockRules[0],
+            description: 'Input setup wizard routing rule',
+          },
+        ]}
+        canRemoveRoutingRules
+        removingRuleId="rule-1"
+        onRemoveRule={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Remove First Rule' })).toBeDisabled();
+    expect(screen.getByText('Removing...')).toBeInTheDocument();
+  });
+
+  it('keeps action cells empty for non wizard and invalid rules even when removals are enabled', () => {
+    const stageWithInvalidRule: StageType = {
+      ...mockStage,
+      rules: ['rule-1', 'deleted-rule'],
+    };
+
+    render(
+      <StageRules
+        pipeline={mockPipeline}
+        stage={stageWithInvalidRule}
+        rules={[mockRules[0], undefined]}
+        canRemoveRoutingRules
+        onRemoveRule={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByText('Actions')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Remove .* Rule/ })).not.toBeInTheDocument();
   });
 });

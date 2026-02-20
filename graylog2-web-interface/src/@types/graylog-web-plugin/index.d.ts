@@ -260,6 +260,7 @@ declare module 'graylog-web-plugin/plugin' {
     notifications: 'read';
     outputs: 'create' | 'edit' | 'read' | 'terminate';
     pipeline: 'create' | 'delete' | 'edit' | 'read';
+    pipeline_rule: 'create' | 'delete' | 'edit' | 'read';
     pipeline_connection: 'edit' | 'read';
     processbuffer: 'dump';
     processing: 'changestate';

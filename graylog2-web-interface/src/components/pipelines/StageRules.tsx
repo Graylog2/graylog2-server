@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 
+import { Button } from 'components/bootstrap';
 import { DataTable, Icon } from 'components/common';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
@@ -28,7 +29,10 @@ import RuleDeprecationInfo from 'components/rules/RuleDeprecationInfo';
 type Props = {
   pipeline: PipelineType;
   stage: StageType;
-  rules?: Array<RuleType>;
+  rules?: Array<RuleType | undefined>;
+  canRemoveRoutingRules?: boolean;
+  removingRuleId?: string;
+  onRemoveRule?: (rule: RuleType) => void;
 };
 
 type InvalidRule = {
@@ -39,9 +43,21 @@ type InvalidRule = {
 };
 
 type RuleData = RuleType | InvalidRule;
+export const INPUT_SETUP_WIZARD_ROUTING_RULE_DESCRIPTION = 'Input setup wizard routing rule';
 
-const StageRules = ({ pipeline, stage, rules = [] }: Props) => {
-  const headers = ['Title', 'Description', 'Throughput', 'Errors'];
+export const isInputSetupWizardRoutingRule = (rule: RuleType | undefined): rule is RuleType =>
+  !!rule && rule.description === INPUT_SETUP_WIZARD_ROUTING_RULE_DESCRIPTION;
+const isInvalidRule = (rule: RuleData): rule is InvalidRule => 'isInvalid' in rule && rule.isInvalid;
+
+const StageRules = ({
+  pipeline,
+  stage,
+  rules = [],
+  canRemoveRoutingRules = false,
+  removingRuleId = undefined,
+  onRemoveRule = undefined,
+}: Props) => {
+  const headers = ['Title', 'Description', 'Throughput', 'Errors', ...(canRemoveRoutingRules ? ['Actions'] : [])];
 
   const headerCellFormatter = useCallback((header: string) => <th>{header}</th>, []);
 
@@ -70,7 +86,12 @@ const StageRules = ({ pipeline, stage, rules = [] }: Props) => {
   const ruleRowFormatter = useCallback(
     (ruleArg: RuleType | undefined, ruleIdx: number) => {
       const rule = getRuleData(ruleArg, ruleIdx);
-      const isInvalid = 'isInvalid' in rule && rule.isInvalid;
+      const isInvalid = isInvalidRule(rule);
+      const removableRule: RuleType | undefined = isInvalid ? undefined : rule;
+      const showRemoveAction =
+        canRemoveRoutingRules &&
+        isInputSetupWizardRoutingRule(removableRule) &&
+        typeof onRemoveRule === 'function';
 
       const ruleTitle = (() => {
         if (isInvalid) {
@@ -103,10 +124,24 @@ const StageRules = ({ pipeline, stage, rules = [] }: Props) => {
               <CounterRate showTotal suffix="errors/s" />
             </MetricContainer>
           </td>
+          {canRemoveRoutingRules && (
+            <td className="actions">
+              {showRemoveAction && (
+                <Button
+                  bsStyle="danger"
+                  bsSize="xsmall"
+                  disabled={Boolean(removingRuleId)}
+                  onClick={() => removableRule && onRemoveRule(removableRule)}
+                  title={`Remove ${removableRule.title}`}>
+                  {removingRuleId === removableRule.id ? 'Removing...' : 'Remove'}
+                </Button>
+              )}
+            </td>
+          )}
         </tr>
       );
     },
-    [getRuleData, getMetricName],
+    [canRemoveRoutingRules, getRuleData, getMetricName, onRemoveRule, removingRuleId],
   );
 
   return (
