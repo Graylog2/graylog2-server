@@ -53,13 +53,17 @@ public class MongoEntityFieldGroupingService implements EntityFieldGroupingServi
         final var userCanReadAllEntities = permissionsUtils.hasAllPermission(subject) ||
                 permissionsUtils.hasReadPermissionForWholeCollection(subject, collectionName);
 
-        final var queryFilter = !Strings.isNullOrEmpty(query)
+        final var queryFilterBson = !Strings.isNullOrEmpty(query)
                 ? Filters.regex(fieldName, query, "i")
                 : Filters.empty();
 
+        final var bucketsFilterBson = !Strings.isNullOrEmpty(bucketsFilter)
+                ? Filters.regex(ID_FIELD_NAME, bucketsFilter, "i")
+                : Filters.empty();
+
         if (userCanReadAllEntities) {
-            final int total = getTotalNumberOfBuckets(fieldName, mongoCollection, queryFilter);
-            final List<EntityFieldBucket> paginatedAndSortedResults = getPage(fieldName, page, pageSize, sortOrder, sortField, mongoCollection, queryFilter);
+            final int total = getTotalNumberOfBuckets(fieldName, mongoCollection, queryFilterBson, bucketsFilterBson);
+            final List<EntityFieldBucket> paginatedAndSortedResults = getPage(fieldName, page, pageSize, sortOrder, sortField, mongoCollection, queryFilterBson, bucketsFilterBson);
 
             return new EntityFieldBucketResponse(paginatedAndSortedResults,
                     PaginatedList.PaginationInfo.create(
@@ -81,12 +85,13 @@ public class MongoEntityFieldGroupingService implements EntityFieldGroupingServi
                                             final SortOrder sortOrder,
                                             final SortField sortField,
                                             final MongoCollection<Document> mongoCollection,
-                                            final Bson queryFilter) {
+                                            final Bson queryFilter,
+                                            final Bson bucketsFilter) {
         final AggregateIterable<Document> aggregateIterable = mongoCollection.aggregate(
                 List.of(
                         Aggregates.match(queryFilter),
                         Aggregates.group("$" + fieldName, Accumulators.sum(COUNT_FIELD_NAME, 1)),
-                        //TODO: add bucketsFilter
+                        Aggregates.match(bucketsFilter),
                         buildSortStage(sortOrder, sortField),
                         Aggregates.skip((page - 1) * pageSize),
                         Aggregates.limit(pageSize)
@@ -102,12 +107,15 @@ public class MongoEntityFieldGroupingService implements EntityFieldGroupingServi
                 .toList();
     }
 
-    private int getTotalNumberOfBuckets(final String fieldName, final MongoCollection<Document> mongoCollection, final Bson queryFilter) {
+    private int getTotalNumberOfBuckets(final String fieldName,
+                                        final MongoCollection<Document> mongoCollection,
+                                        final Bson queryFilter,
+                                        final Bson bucketsFilter) {
         final Document totalCountResults = mongoCollection.aggregate(
                 List.of(
                         Aggregates.match(queryFilter),
                         Aggregates.group("$" + fieldName),
-                        //TODO: add bucketsFilter
+                        Aggregates.match(bucketsFilter),
                         Aggregates.count("number_of_groups")
                 )
         ).first();
@@ -115,7 +123,8 @@ public class MongoEntityFieldGroupingService implements EntityFieldGroupingServi
         return totalCountResults != null ? totalCountResults.getInteger("number_of_groups", 0) : 0;
     }
 
-    private Bson buildSortStage(final SortOrder sortOrder, final SortField sortField) {
+    private Bson buildSortStage(final SortOrder sortOrder,
+                                final SortField sortField) {
         final List<String> sort = switch (sortField) {
             case COUNT -> SORT_BY_COUNT_FIELDS;
             case VALUE -> SORT_BY_VALUE_FIELDS;
