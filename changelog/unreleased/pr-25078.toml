@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix memory-leak when updating data-adapters and caches."
+
+issues = ["25077"]
+pulls = ["25078"]
