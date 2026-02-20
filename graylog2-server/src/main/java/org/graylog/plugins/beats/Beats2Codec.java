@@ -87,7 +87,7 @@ public class Beats2Codec extends AbstractCodec {
 
     @Nonnull
     private Message parseEvent(JsonNode event) {
-        final String beatsType = event.path("@metadata").path("beat").asText("beat");
+        final String beatsType = determineBeatsPrefix(event);
         final String rootPath = noBeatsPrefix ? "" : beatsType;
         final String message = event.path("message").asText("-");
         final String timestampField = event.path("@timestamp").asText();
@@ -125,6 +125,31 @@ public class Beats2Codec extends AbstractCodec {
         addFlattened(gelfMessage, rootPath, event);
         return gelfMessage;
     }
+
+    private String determineBeatsPrefix(JsonNode event) {
+        // 1. Try @metadata.beat
+        String beatsType = event.path("@metadata")
+                .path("beat")
+                .asText(null);
+
+        // 2. Try agent.type (Beats 7+/8+), or beat.type for older versions
+        if (beatsType == null || beatsType.isEmpty()) {
+            JsonNode agentNode = event.path("agent");
+            if (agentNode.isMissingNode()) {
+                // backwards compatibility for beats < 7.0
+                agentNode = event.path("beat");
+            }
+            beatsType = agentNode.path("type").asText(null);
+        }
+
+        // 3. Fallback to default
+        if (beatsType == null || beatsType.isEmpty()) {
+            beatsType = "beat";
+        }
+
+        return beatsType;
+    }
+
 
     private void addFlattened(Message message, String currentPath, JsonNode jsonNode) {
         if (jsonNode.isObject()) {
