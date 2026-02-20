@@ -29,6 +29,8 @@ import Spinner from 'components/common/Spinner';
 import type { MatchData } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
+import useCreateStreamRule from 'components/streamrules/hooks/useCreateStreamRule';
+import StartStreamAfterRuleCreateDialog from 'components/streamrules/StartStreamAfterRuleCreateDialog';
 
 import useStream from '../streams/hooks/useStream';
 
@@ -62,6 +64,16 @@ const StreamRulesEditor = ({ streamId, messageId = '', index = '' }: Props) => {
   const [message, setMessage] = useState<{ [fieldName: string]: unknown } | undefined>();
   const [matchData, setMatchData] = useState<MatchData | undefined>();
   const { data: stream, refetch } = useStream(streamId);
+  const {
+    onCreateStreamRule,
+    showStartStreamDialog,
+    onCancelStartStreamDialog,
+    onStartStream,
+    isStartingStream,
+  } = useCreateStreamRule({
+    streamId,
+    streamIsPaused: stream?.disabled ?? false,
+  });
 
   useEffect(() => {
     const refetchStrems = () => refetch();
@@ -85,8 +97,6 @@ const StreamRulesEditor = ({ streamId, messageId = '', index = '' }: Props) => {
       setMatchData(undefined);
     }
   };
-
-  const _onStreamRuleFormSubmit = (_streamRuleId: string, data) => StreamRulesStore.create(streamId, data, () => {});
 
   const _onAddStreamRule = (event) => {
     event.preventDefault();
@@ -124,7 +134,7 @@ const StreamRulesEditor = ({ streamId, messageId = '', index = '' }: Props) => {
               onClose={() => setShowStreamRuleForm(false)}
               submitButtonText="Create Rule"
               submitLoadingText="Creating Rule..."
-              onSubmit={_onStreamRuleFormSubmit}
+              onSubmit={onCreateStreamRule}
             />
           )}
         </div>
@@ -161,6 +171,13 @@ const StreamRulesEditor = ({ streamId, messageId = '', index = '' }: Props) => {
             <Button bsStyle="primary">I&apos;m done!</Button>
           </LinkContainer>
         </p>
+        <StartStreamAfterRuleCreateDialog
+          show={showStartStreamDialog}
+          streamTitle={stream.title}
+          onConfirm={onStartStream}
+          onCancel={onCancelStartStreamDialog}
+          isSubmitting={isStartingStream}
+        />
       </Col>
     </Row>
   );

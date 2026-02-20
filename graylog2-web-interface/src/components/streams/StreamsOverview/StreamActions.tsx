@@ -19,13 +19,12 @@ import { useState, useCallback } from 'react';
 
 import { ShareButton, IfPermitted, HoverForHelp } from 'components/common';
 import { Button, ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
-import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
+import type { Stream } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import Routes from 'routing/Routes';
 import { StartpageStore } from 'stores/users/StartpageStore';
 import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import EntityShareModal from 'components/permissions/EntityShareModal';
-import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import useCurrentUser from 'hooks/useCurrentUser';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -38,6 +37,8 @@ import UserNotification from 'util/UserNotification';
 import StreamDeleteModal from 'components/streams/StreamsOverview/StreamDeleteModal';
 import StreamModal from 'components/streams/StreamModal';
 import usePluggableEntitySharedActions from 'hooks/usePluggableEntitySharedActions';
+import useCreateStreamRule from 'components/streamrules/hooks/useCreateStreamRule';
+import StartStreamAfterRuleCreateDialog from 'components/streamrules/StartStreamAfterRuleCreateDialog';
 
 const DefaultStreamHelp = () => (
   <HoverForHelp displayLeftMargin>Action not available for the default stream</HoverForHelp>
@@ -129,18 +130,16 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
       });
   }, [deselectEntity, sendTelemetry, stream.id, stream.title, toggleDeleteModal]);
 
-  const onSaveStreamRule = useCallback(
-    (_streamRuleId: string, streamRule: StreamRule) =>
-      StreamRulesStore.create(stream.id, streamRule, () => {
-        sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_RULE_SAVED, {
-          app_pathname: 'streams',
-          app_action_value: 'stream-item-rule',
-        });
-
-        UserNotification.success('Stream rule was created successfully.', 'Success');
-      }),
-    [sendTelemetry, stream.id],
-  );
+  const {
+    onCreateStreamRule,
+    showStartStreamDialog,
+    onCancelStartStreamDialog,
+    onStartStream,
+    isStartingStream,
+  } = useCreateStreamRule({
+    streamId: stream.id,
+    streamIsPaused: stream.disabled,
+  });
 
   const onUpdate = useCallback(
     (newStream: Stream) =>
@@ -277,7 +276,7 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
           title="New Stream Rule"
           submitButtonText="Create Rule"
           submitLoadingText="Creating Rule..."
-          onSubmit={onSaveStreamRule}
+          onSubmit={onCreateStreamRule}
         />
       )}
       {showEntityShareModal && (
@@ -289,6 +288,13 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
           onClose={toggleEntityShareModal}
         />
       )}
+      <StartStreamAfterRuleCreateDialog
+        show={showStartStreamDialog}
+        streamTitle={stream.title}
+        onConfirm={onStartStream}
+        onCancel={onCancelStartStreamDialog}
+        isSubmitting={isStartingStream}
+      />
       {showDeleteModal && (
         <StreamDeleteModal
           streamTitle={stream.title}
