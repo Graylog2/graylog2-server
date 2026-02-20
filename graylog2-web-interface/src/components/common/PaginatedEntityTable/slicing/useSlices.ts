@@ -16,8 +16,8 @@
  */
 
 import { defaultCompare } from 'logic/DefaultCompare';
+import type { Slices, SliceRenderers } from 'components/common/PaginatedEntityTable/slicing/Slicing';
 
-import type { Slices } from './Slicing';
 import type { SortMode } from './SliceFilters';
 import useFetchSlices, { type FetchSlices } from './useFetchSlices';
 
@@ -52,10 +52,11 @@ type Props = {
   fetchSlices: FetchSlices;
   searchQuery: string;
   sortMode: SortMode;
+  sliceRenderers?: SliceRenderers;
 };
 
-const useSlices = ({ fetchSlices, searchQuery, sortMode }: Props) => {
-  const { slices, isLoading } = useFetchSlices(fetchSlices);
+const useSlices = ({ fetchSlices, searchQuery, sortMode, sliceRenderers = undefined }: Props) => {
+  const { slices, isLoading } = useFetchSlices(fetchSlices, sliceRenderers);
   const filteredSlices = slices.filter((slice) => matchesQuery(slice, searchQuery));
   const nonEmptySlices = filteredSlices.filter((slice) => slice.count > 0);
   const emptySlices = filteredSlices.filter((slice) => slice.count === 0);

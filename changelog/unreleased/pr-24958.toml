@@ -1,0 +1,6 @@
+type = "a"
+message = "Adding slicing. Base work for Open Source and Enterprise and additionally for Alert Type and Priority in the Alerts/Events table.for Open Source"
+
+issues = ["graylog-plugin-enterprise#12910","graylog-plugin-enterprise#12912"]
+pulls = ["24958"]
+

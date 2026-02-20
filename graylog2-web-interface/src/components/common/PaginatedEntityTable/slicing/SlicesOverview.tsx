@@ -27,6 +27,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import SliceFilters, { type SortMode } from './SliceFilters';
 import SliceList from './SliceList';
 import useSlices from './useSlices';
+import type { SliceRenderers } from './Slicing';
 import type { FetchSlices } from './useFetchSlices';
 
 const EmptySlicesHeader = styled.div(
@@ -53,7 +54,7 @@ type Props = {
   activeSlice: string | undefined;
   activeColumnTitle: string | undefined;
   onChangeSlicing: (sliceCol: string | undefined, slice?: string | undefined) => void;
-  sliceRenderers?: { [col: string]: (value: string | number) => React.ReactNode } | undefined;
+  sliceRenderers?: SliceRenderers;
   fetchSlices: FetchSlices;
   sortMode: SortMode;
   onSortModeChange: (mode: SortMode) => void;
@@ -77,6 +78,7 @@ const SlicesOverview = ({
     fetchSlices,
     searchQuery,
     sortMode,
+    sliceRenderers,
   });
   const onToggleEmptySlices = () => {
     setShowEmptySlices((current) => {

@@ -14,6 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.rest.resources.entities;
 
-export { default } from './Slicing';
-export type { SliceRenderer, SliceRenderers } from './Slicing';
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record Slice(@JsonProperty(FIELD_ID) String value, @JsonProperty(FIELD_TITLE) String title, @JsonProperty(FIELD_COUNT) Integer count) {
+    private static final String FIELD_ID = "value";
+    private static final String FIELD_TITLE = "title";
+    private static final String FIELD_COUNT = "count";
+}

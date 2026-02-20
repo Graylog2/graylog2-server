@@ -26,6 +26,7 @@ export const commonEventAttributes: Array<Attribute> = [
     filterable: true,
     id: 'priority',
     searchable: false,
+    sliceable: true,
     sortable: true,
     title: 'Priority',
     type: 'STRING',
@@ -108,6 +109,7 @@ export const eventsTableSpecificAttributes: Array<Attribute> = [
     title: 'Type',
     type: 'BOOLEAN',
     sortable: true,
+    sliceable: true,
     filterable: true,
     filter_options: [
       { value: 'false', title: 'Event' },

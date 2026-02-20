@@ -116,6 +116,21 @@ public class Indices implements GraylogRestApi {
         return new GraylogApiResponse(response);
     }
 
+    // lists all open indices
+    public List<String> listOpenIndices() {
+        final var response = given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .get("/system/indexer/indices/open");
+
+        if(response.statusCode() == 200) {
+            return new GraylogApiResponse(response.then()).properJSONPath().read("indices.*.index_name");
+        } else {
+            return List.of();
+        }
+    }
+
     // can be used as in "waitForIndexNames", does not fail if the index set does not exist/is not yet available
     public List<String> listOpenIndicesWithEmptyResultOnError(String indexSetId) {
         final var response = given()
@@ -129,6 +144,15 @@ public class Indices implements GraylogRestApi {
         } else {
             return List.of();
         }
+    }
+
+    public List<String> waitForIndex(final String name) throws ExecutionException, RetryException {
+        return RetryerBuilder.<List<String>>newBuilder()
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(30))
+                .retryIfResult(l -> l == null || l.isEmpty() || !l.contains(name))
+                .build()
+                .call(this::listOpenIndices);
     }
 
     public List<String> waitForIndexNames(String indexSetId) throws ExecutionException, RetryException {
