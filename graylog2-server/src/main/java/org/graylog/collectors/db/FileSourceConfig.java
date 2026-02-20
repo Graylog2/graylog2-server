@@ -22,8 +22,11 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.graylog.collectors.config.FilelogReceiverConfig;
+import org.graylog.collectors.config.OtlpReceiverConfig;
 
 import java.util.List;
+import java.util.Optional;
 
 @AutoValue
 @JsonTypeName(FileSourceConfig.TYPE_NAME)
@@ -57,6 +60,15 @@ public abstract class FileSourceConfig implements SourceConfig {
         if (readMode() == null || readMode().isBlank()) {
             throw new IllegalArgumentException("FileSourceConfig requires a non-blank read_mode");
         }
+    }
+
+    @Override
+    public Optional<OtlpReceiverConfig> toReceiverConfig(String id) {
+        return Optional.of(FilelogReceiverConfig.builder(id)
+                .startAt(readMode())
+                .include(paths())
+                .includeFilePath(true)
+                .build());
     }
 
     @AutoValue.Builder

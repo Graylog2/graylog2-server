@@ -22,8 +22,10 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.graylog.collectors.config.OtlpReceiverConfig;
 
 import java.util.List;
+import java.util.Optional;
 
 @AutoValue
 @JsonTypeName(WindowsEventLogSourceConfig.TYPE_NAME)
@@ -63,6 +65,11 @@ public abstract class WindowsEventLogSourceConfig implements SourceConfig {
         if (eventFormat() == null || eventFormat().isBlank()) {
             throw new IllegalArgumentException("WindowsEventLogSourceConfig requires a non-blank event_format");
         }
+    }
+
+    @Override
+    public Optional<OtlpReceiverConfig> toReceiverConfig(String id) {
+        return Optional.empty();
     }
 
     @AutoValue.Builder

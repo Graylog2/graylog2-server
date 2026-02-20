@@ -1,0 +1,52 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog.collectors.config;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+import jakarta.annotation.Nullable;
+
+/**
+ * Multiline configuration for otel collector receivers (filelog, tcplog, udplog).
+ */
+@AutoValue
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public abstract class OtelMultilineConfig {
+
+    @Nullable
+    @JsonProperty("line_start_pattern")
+    public abstract String lineStartPattern();
+
+    @Nullable
+    @JsonProperty("line_end_pattern")
+    public abstract String lineEndPattern();
+
+    public static Builder builder() {
+        return new AutoValue_OtelMultilineConfig.Builder();
+    }
+
+    @AutoValue.Builder
+    public abstract static class Builder {
+
+        public abstract Builder lineStartPattern(@Nullable String lineStartPattern);
+
+        public abstract Builder lineEndPattern(@Nullable String lineEndPattern);
+
+        public abstract OtelMultilineConfig build();
+    }
+}

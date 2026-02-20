@@ -21,6 +21,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.collectors.config.OtlpReceiverConfig;
+
+import java.util.Optional;
 
 @AutoValue
 @JsonTypeName(UdpSourceConfig.TYPE_NAME)
@@ -50,6 +53,11 @@ public abstract class UdpSourceConfig implements SourceConfig {
         if (port() < 1 || port() > 65535) {
             throw new IllegalArgumentException("UdpSourceConfig port must be between 1 and 65535");
         }
+    }
+
+    @Override
+    public Optional<OtlpReceiverConfig> toReceiverConfig(String id) {
+        return Optional.empty();
     }
 
     @AutoValue.Builder

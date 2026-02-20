@@ -21,6 +21,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.collectors.config.OtlpReceiverConfig;
+
+import java.util.Optional;
 
 @AutoValue
 @JsonTypeName(TcpSourceConfig.TYPE_NAME)
@@ -56,6 +59,11 @@ public abstract class TcpSourceConfig implements SourceConfig {
         if (framing() == null || framing().isBlank()) {
             throw new IllegalArgumentException("TcpSourceConfig requires a non-blank framing");
         }
+    }
+
+    @Override
+    public Optional<OtlpReceiverConfig> toReceiverConfig(String id) {
+        return Optional.empty();
     }
 
     @AutoValue.Builder

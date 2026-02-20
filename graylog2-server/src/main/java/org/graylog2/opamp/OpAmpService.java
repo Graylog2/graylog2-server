@@ -18,12 +18,13 @@ package org.graylog2.opamp;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.protobuf.ByteString;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import jakarta.ws.rs.core.MediaType;
 import opamp.proto.Anyvalue;
 import opamp.proto.Opamp;
 import opamp.proto.Opamp.AgentToServer;
@@ -36,10 +37,18 @@ import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.SourceService;
+import org.graylog.collectors.config.OtelCollectorConfig;
+import org.graylog.collectors.config.OtelPipelineConfig;
+import org.graylog.collectors.config.OtelServiceConfig;
+import org.graylog.collectors.config.OtlpExporterConfig;
+import org.graylog.collectors.config.OtlpGrpcExporterConfig;
+import org.graylog.collectors.config.OtlpHttpExporterConfig;
+import org.graylog.collectors.config.OtlpReceiverConfig;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CoalescedActions;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.CollectorInstanceReport;
+import org.graylog.collectors.db.SourceDTO;
 import org.graylog.collectors.db.TransactionMarker;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
@@ -48,6 +57,7 @@ import org.graylog2.opamp.enrollment.EnrollmentTokenService;
 import org.graylog2.opamp.transport.OpAmpAuthContext;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,10 +69,16 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toCollection;
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -70,6 +86,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @Singleton
 public class OpAmpService {
     private static final Logger LOG = LoggerFactory.getLogger(OpAmpService.class);
+    public static final String REMOTE_CONFIG_KEY = "collector.yaml";
 
     private final EnrollmentTokenService enrollmentTokenService;
     private final OpAmpCaService opAmpCaService;
@@ -78,10 +95,16 @@ public class OpAmpService {
     private final ClusterConfigService clusterConfigService;
     private final FleetTransactionLogService txnLogService;
     private final SourceService sourceService;
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper yamlObjectMapper;
 
     @Inject
-    public OpAmpService(EnrollmentTokenService enrollmentTokenService, OpAmpCaService opAmpCaService, CertificateService certificateService, CollectorInstanceService collectorInstanceService, ClusterConfigService clusterConfigService, FleetTransactionLogService txnLogService, SourceService sourceService, ObjectMapper objectMapper) {
+    public OpAmpService(EnrollmentTokenService enrollmentTokenService,
+                        OpAmpCaService opAmpCaService,
+                        CertificateService certificateService,
+                        CollectorInstanceService collectorInstanceService,
+                        ClusterConfigService clusterConfigService,
+                        FleetTransactionLogService txnLogService,
+                        SourceService sourceService) {
         this.enrollmentTokenService = enrollmentTokenService;
         this.opAmpCaService = opAmpCaService;
         this.certificateService = certificateService;
@@ -89,7 +112,7 @@ public class OpAmpService {
         this.clusterConfigService = clusterConfigService;
         this.txnLogService = txnLogService;
         this.sourceService = sourceService;
-        this.objectMapper = objectMapper;
+        this.yamlObjectMapper = new ObjectMapper(new YAMLFactory());
     }
 
     public Optional<OpAmpAuthContext> authenticate(String authHeader, OpAmpAuthContext.Transport transport) {
@@ -293,32 +316,46 @@ public class OpAmpService {
 
             final List<TransactionMarker> unprocessedMarkers = txnLogService.getUnprocessedMarkers(fleetId, instanceUid, lastProcessedTxnSeq);
             final CoalescedActions coalesced = txnLogService.coalesce(unprocessedMarkers);
-            LOG.debug("[{}/{}] {} unprocessed markers for this collector (last processed tnx id {}) coalesced to {}", instanceUid, sequenceNum, unprocessedMarkers.size(), lastProcessedTxnSeq, coalesced);
+            LOG.debug("[{}/{}] {} unprocessed markers for this collector (last processed tnx id {}) coalesced to {}",
+                    instanceUid, sequenceNum, unprocessedMarkers.size(), lastProcessedTxnSeq, coalesced);
 
+            final var configBuilder = OtelCollectorConfig.builder();
             if (coalesced.recomputeConfig()) {
+                // do this first. in case there's no configured endpoint we don't have to perform the more expensive stuff
+                final OtlpExporterConfig effectiveOtlpEndpoint = getEndpointConfig();
+
                 final var effectiveFleetId = (coalesced.newFleetId() == null) ? fleetId : coalesced.newFleetId();
                 LOG.debug("[{}/{}] Computing new collector config for fleet id {}", instanceUid, sequenceNum, effectiveFleetId);
 
-                final Opamp.AgentConfigMap.Builder configMapBuilder = Opamp.AgentConfigMap.newBuilder();
+                final Map<String, OtlpReceiverConfig> receiverConfigs = Maps.newHashMap();
                 try (final var sources = sourceService.streamAllByFleet(effectiveFleetId)) {
-                    sources.forEach(sourceDTO -> {
-                        try {
-                            configMapBuilder.putConfigMap(sourceDTO.id(),
-                                    Opamp.AgentConfigFile.newBuilder()
-                                            .setContentType(MediaType.APPLICATION_JSON)
-                                            .setBody(ByteString.copyFromUtf8(objectMapper.writeValueAsString(sourceDTO)))
-                                            .build()
-                            );
-                        } catch (JsonProcessingException e) {
-                            LOG.error("[{}/{}] Unable to serialize source configuration: {}", instanceUid, sequenceNum, sourceDTO.name(), e);
-                        }
-                    });
+                    sources.map(SourceDTO::toReceiverConfig)
+                            .flatMap(Optional::stream)
+                            .forEach(receiverConfig -> receiverConfigs.put(receiverConfig.name(), receiverConfig));
                 }
+                configBuilder.receivers(receiverConfigs);
+                configBuilder.exporters(Map.of(effectiveOtlpEndpoint.getName(), effectiveOtlpEndpoint));
+                configBuilder.service(OtelServiceConfig.builder()
+                                .pipelines(Map.of("logs", OtelPipelineConfig.builder()
+                                                .receivers(receiverConfigs.keySet())
+                                                .exporters(Set.of(effectiveOtlpEndpoint.getName()))
+                                        .build()))
+                        .build());
+                try {
+                    final String configYaml = yamlObjectMapper.writeValueAsString(configBuilder.build());
 
-                responseBuilder.setRemoteConfig(Opamp.AgentRemoteConfig.newBuilder()
-                        .setConfig(configMapBuilder)
-                        .setConfigHash(ByteString.copyFromUtf8("TODO")).build() // TODO consistent hashing
-                );
+                    responseBuilder.setRemoteConfig(Opamp.AgentRemoteConfig.newBuilder()
+                            .setConfig(Opamp.AgentConfigMap.newBuilder()
+                                    .putConfigMap(REMOTE_CONFIG_KEY, Opamp.AgentConfigFile.newBuilder()
+                                            .setContentType("application/yaml")
+                                            .setBody(ByteString.copyFromUtf8(configYaml))
+                                            .build())
+                                    .build())
+                            .setConfigHash(ByteString.copyFromUtf8(String.valueOf(coalesced.maxSeq()))).build() // TODO consistent hashing
+                    );
+                } catch (JsonProcessingException e) {
+                    LOG.error("[{}/{}] Remote config could not be serialized", instanceUid, sequenceNum, e);
+                }
             }
             if (coalesced.restart()) {
                 LOG.debug("[{}/{}] Scheduled restart", instanceUid, sequenceNum);
@@ -331,6 +368,31 @@ public class OpAmpService {
         }
 
         return responseBuilder.build();
+    }
+
+    @Nonnull
+    private OtlpExporterConfig getEndpointConfig() {
+        final CollectorsConfig collectorsConfig = clusterConfigService.get(CollectorsConfig.class);
+        if (collectorsConfig == null) {
+            throw new IllegalStateException("Unable to determine collector input config, cannot send remote config.");
+        }
+        var httpEndpoint = collectorsConfig.http();
+        var grpcEndpoint = collectorsConfig.grpc();
+        if (httpEndpoint == null && grpcEndpoint == null) {
+            throw new IllegalStateException("No collector input configured, cannot send remote config.");
+        }
+        // prefer grpc endpoint if available
+        if (grpcEndpoint != null && grpcEndpoint.enabled()) {
+            return OtlpGrpcExporterConfig.builder()
+                    .endpoint(f("%s:%s", grpcEndpoint.hostname(), grpcEndpoint.port()))
+                    .build();
+        }
+        if (httpEndpoint != null && httpEndpoint.enabled()) {
+            return OtlpHttpExporterConfig.builder()
+                    .endpoint(f("%s:%s", httpEndpoint.hostname(), httpEndpoint.port()))
+                    .build();
+        }
+        throw new IllegalStateException("No collector input enabled, cannot send remote config.");
     }
 
     @Nonnull

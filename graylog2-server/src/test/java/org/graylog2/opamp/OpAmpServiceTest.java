@@ -90,7 +90,7 @@ class OpAmpServiceTest {
         ).get();
 
         opAmpService = new OpAmpService(enrollmentTokenService, opAmpCaService, certificateService,
-                collectorInstanceService, clusterConfigService, fleetTransactionLogService, sourceService, objectMapper);
+                collectorInstanceService, clusterConfigService, fleetTransactionLogService, sourceService);
     }
 
     @Test

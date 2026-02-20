@@ -14,28 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.db;
+package org.graylog.collectors.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.graylog.collectors.config.OtlpReceiverConfig;
+import com.google.auto.value.AutoValue;
 
-import java.util.Optional;
+import java.util.Map;
 
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "type",
-        visible = true,
-        defaultImpl = UnknownSourceConfig.class)
-public interface SourceConfig {
-    String TYPE_FIELD = "type";
+@AutoValue
+public abstract class OtelServiceConfig {
 
-    @JsonProperty(TYPE_FIELD)
-    String type();
+    @JsonProperty("pipelines")
+    public abstract Map<String, OtelPipelineConfig> pipelines();
 
-    /** Validate this config. Throws IllegalArgumentException on invalid config. */
-    void validate();
+    public static Builder builder() {
+        return new AutoValue_OtelServiceConfig.Builder();
+    }
 
-    Optional<OtlpReceiverConfig> toReceiverConfig(String id);
+    @AutoValue.Builder
+    public abstract static class Builder {
+
+        public abstract Builder pipelines(Map<String, OtelPipelineConfig> pipelines);
+
+        public abstract OtelServiceConfig build();
+    }
 }

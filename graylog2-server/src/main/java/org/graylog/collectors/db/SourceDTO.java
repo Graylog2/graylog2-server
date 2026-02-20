@@ -21,7 +21,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.graylog.collectors.config.OtlpReceiverConfig;
 import org.graylog2.database.BuildableMongoEntity;
+
+import java.util.Optional;
 
 @AutoValue
 @JsonDeserialize(builder = SourceDTO.Builder.class)
@@ -50,6 +53,13 @@ public abstract class SourceDTO implements BuildableMongoEntity<SourceDTO, Sourc
 
     public static Builder builder() {
         return AutoValue_SourceDTO.Builder.create();
+    }
+
+    public Optional<OtlpReceiverConfig> toReceiverConfig() {
+        if (enabled()) {
+            return config().toReceiverConfig(id());
+        }
+        return Optional.empty();
     }
 
     @AutoValue.Builder

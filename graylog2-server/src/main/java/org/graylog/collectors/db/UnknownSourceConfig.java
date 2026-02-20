@@ -19,9 +19,11 @@ package org.graylog.collectors.db;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog.collectors.config.OtlpReceiverConfig;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class UnknownSourceConfig implements SourceConfig {
 
@@ -48,5 +50,10 @@ public class UnknownSourceConfig implements SourceConfig {
     @Override
     public void validate() {
         // Unknown configs are always valid — we preserve them as-is.
+    }
+
+    @Override
+    public Optional<OtlpReceiverConfig> toReceiverConfig(String id) {
+        return Optional.empty();
     }
 }

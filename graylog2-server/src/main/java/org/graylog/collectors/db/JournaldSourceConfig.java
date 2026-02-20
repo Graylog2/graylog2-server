@@ -22,6 +22,9 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.graylog.collectors.config.OtlpReceiverConfig;
+
+import java.util.Optional;
 
 @AutoValue
 @JsonTypeName(JournaldSourceConfig.TYPE_NAME)
@@ -49,6 +52,11 @@ public abstract class JournaldSourceConfig implements SourceConfig {
         if (priority() < 0 || priority() > 7) {
             throw new IllegalArgumentException("JournaldSourceConfig priority must be between 0 and 7");
         }
+    }
+
+    @Override
+    public Optional<OtlpReceiverConfig> toReceiverConfig(String id) {
+        return Optional.empty();
     }
 
     @AutoValue.Builder
