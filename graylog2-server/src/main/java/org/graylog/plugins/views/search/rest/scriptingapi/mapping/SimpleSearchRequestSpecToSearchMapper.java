@@ -16,28 +16,33 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.stream.Stream;
-
+import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
+import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.SearchRequestSpec;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.streams.StreamService;
 
-public interface SearchRequestSpecToSearchMapper {
-  
-    public static final String QUERY_ID = "scripting_api_temporary_query";
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
+public class SimpleSearchRequestSpecToSearchMapper implements SearchRequestSpecToSearchMapper {
     private final AggregationSpecToPivotMapper pivotCreator;
     private final MessagesSpecToMessageListMapper messageListCreator;
     private final Function<Collection<String>, Stream<String>> streamCategoryMapper;
 
     @Inject
-    public SearchRequestSpecToSearchMapper(final AggregationSpecToPivotMapper pivotCreator,
+    public SimpleSearchRequestSpecToSearchMapper(final AggregationSpecToPivotMapper pivotCreator,
                                            final MessagesSpecToMessageListMapper messageListCreator,
                                            StreamService streamService) {
         this.pivotCreator = pivotCreator;
@@ -53,12 +58,15 @@ public interface SearchRequestSpecToSearchMapper {
         return mapToSearch(aggregationRequestSpec, searchUser, pivotCreator);
     }
 
-    private <T extends SearchRequestSpec> Search mapToSearch(final T searchRequestSpec, final SearchUser searchUser, BiFunction<T, SearchUser, ? extends SearchType> searchTypeCreator) {
+    protected String getQueryString(final SearchRequestSpec searchRequestSpec) {
+        return searchRequestSpec.queryString();
+    }
 
+    private <T extends SearchRequestSpec> Search mapToSearch(final T searchRequestSpec, final SearchUser searchUser, Function<T, ? extends SearchType> searchTypeCreator) {
         Query query = Query.builder()
                 .id(QUERY_ID)
-                .searchTypes(Set.of(searchTypeCreator.apply(searchRequestSpec, searchUser)))
-                .query(ElasticsearchQueryString.ofNullable(searchRequestSpec.queryString()))
+                .searchTypes(Set.of(searchTypeCreator.apply(searchRequestSpec)))
+                .query(ElasticsearchQueryString.ofNullable(getQueryString(searchRequestSpec)))
                 .timerange(getTimerange(searchRequestSpec))
                 .build();
 
