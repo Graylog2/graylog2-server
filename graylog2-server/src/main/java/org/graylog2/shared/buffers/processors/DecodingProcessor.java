@@ -172,12 +172,15 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         }
 
         if (message.isPresent()) {
-            event.setMessage(postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, message.get(), decodeTime));
+            event.setMessage(postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, message.get(), decodeTime, raw.getPayload().length));
         } else if (messages != null && !messages.isEmpty()) {
             final List<Message> processedMessages = Lists.newArrayListWithCapacity(messages.size());
+            boolean first = true;
 
             for (final Message msg : messages) {
-                final Message processedMessage = postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, msg, decodeTime);
+                final long inputSize = first ? raw.getPayload().length : 0L;
+                first = false;
+                final Message processedMessage = postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, msg, decodeTime, inputSize);
 
                 if (processedMessage != null) {
                     processedMessages.add(processedMessage);
@@ -194,7 +197,8 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
                                        String inputIdOnCurrentNode,
                                        String baseMetricName,
                                        @Nonnull Message message,
-                                       long decodeTime) {
+                                       long decodeTime,
+                                       long inputSize) {
         if (!message.isComplete()) {
             metricRegistry.meter(name(baseMetricName, "incomplete")).mark();
             if (LOG.isDebugEnabled()) {
@@ -277,6 +281,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
 
         metricRegistry.meter(name(baseMetricName, "processedMessages")).mark();
         decodedTrafficCounter.inc(message.getSize());
+        message.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, inputSize);
         return message;
     }
 }

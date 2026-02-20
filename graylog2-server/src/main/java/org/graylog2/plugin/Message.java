@@ -124,6 +124,11 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     public static final String FIELD_GL2_ACCOUNTED_MESSAGE_SIZE = "gl2_accounted_message_size";
 
     /**
+     * Will be set to the raw input message size in bytes (payload size at the transport layer).
+     */
+    public static final String FIELD_GL2_INPUT_MESSAGE_SIZE = "gl2_input_message_size";
+
+    /**
      * This is the message ID. It will be set to a {@link de.huxhorn.sulky.ulid.ULID} during processing.
      * <p></p>
      * <b>Attention:</b> This is currently NOT the "_id" field which is used as ID for the document in Elasticsearch!
@@ -234,6 +239,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     private static final ImmutableSet<String> GRAYLOG_FIELDS = ImmutableSet.of(
             FIELD_GL2_ACCOUNTED_MESSAGE_SIZE,
+            FIELD_GL2_INPUT_MESSAGE_SIZE,
             FIELD_GL2_PROCESSING_ERROR,
             FIELD_GL2_PROCESSING_DURATION_MS,
             FIELD_GL2_PROCESSING_TIMESTAMP,
@@ -470,6 +476,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         obj.put(FIELD_SOURCE, getSource());
         obj.put(FIELD_STREAMS, getStreamIds());
         obj.put(FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, getSize());
+        obj.put(FIELD_GL2_INPUT_MESSAGE_SIZE, getField(FIELD_GL2_INPUT_MESSAGE_SIZE));
 
         final Object timestampValue = getField(FIELD_TIMESTAMP);
         DateTime dateTime = timestampValue == null ? fallbackForNullTimestamp() : convertToDateTime(timestampValue);

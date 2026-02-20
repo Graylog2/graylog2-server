@@ -47,12 +47,13 @@ public class TrafficCounterService implements TrafficUpdater {
     private static final String FIELD_DECODED = "decoded";
     private static final String FIELD_OUTPUT = "output";
     private static final String FIELD_INPUT = "input";
+    public static final String TRAFFIC_COLLECTION_NAME = "traffic";
 
     private final MongoCollection<TrafficDto> collection;
 
     @Inject
     public TrafficCounterService(final MongoCollections mongoCollections) {
-        collection = mongoCollections.collection("traffic", TrafficDto.class);
+        collection = mongoCollections.collection(TRAFFIC_COLLECTION_NAME, TrafficDto.class);
         collection.createIndex(Indexes.ascending(BUCKET), new IndexOptions().unique(true));
     }
 
@@ -176,7 +177,7 @@ public class TrafficCounterService implements TrafficUpdater {
         }
 
         public void aggregateToDaily() {
-            histograms.forEach((key, value) -> histograms.put(key, TrafficUpdater.aggregateToDaily(value)));
+            histograms.replaceAll((key, value) -> TrafficUpdater.aggregateToDaily(value));
         }
 
         public DateTime getFrom() {
