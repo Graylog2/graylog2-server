@@ -125,14 +125,14 @@ class DatanodeKeystoreTest {
     }
 
     @Test
-    void testInitWithSeflsignedCertificate(@TempDir Path tempDir) throws Exception {
+    void testInitWithSelfSignedCertificate(@TempDir Path tempDir) throws Exception {
         final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(DatanodeTestUtils.tempDirectories(tempDir), "foobar", this.eventBus);
 
         // Initially keystore doesn't exist
         Assertions.assertThat(datanodeKeystore.exists()).isFalse();
 
         // Create a self-signed certificate
-        final java.security.KeyStore keystore = datanodeKeystore.initWithSeflsignedCertificate();
+        final java.security.KeyStore keystore = datanodeKeystore.initWithSelfSignedCertificate();
 
         // Verify keystore was created and persisted
         Assertions.assertThat(datanodeKeystore.exists()).isTrue();
@@ -160,7 +160,7 @@ class DatanodeKeystoreTest {
     }
 
     @Test
-    void testInitWithSeflsignedCertificateReplacesExistingSignedCert(@TempDir Path tempDir) throws Exception {
+    void testInitWithSelfSignedCertificateReplacesExistingSignedCert(@TempDir Path tempDir) throws Exception {
         final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(DatanodeTestUtils.tempDirectories(tempDir), "foobar", this.eventBus);
 
         // Create initial keystore with a CA-signed certificate
@@ -180,7 +180,7 @@ class DatanodeKeystoreTest {
 
         // Reset to self-signed certificate
         receivedEvents.clear();
-        final java.security.KeyStore keystore = datanodeKeystore.initWithSeflsignedCertificate();
+        final java.security.KeyStore keystore = datanodeKeystore.initWithSelfSignedCertificate();
 
         // Verify the certificate is now self-signed
         Assertions.assertThat(datanodeKeystore.hasSignedCertificate()).isFalse();

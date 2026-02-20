@@ -84,7 +84,7 @@ public class DatanodeKeystoreInitService implements DatanodeBlockingInit {
                     datanodeKeystore.create(legacyKeystore.get());
                     legacyDatanodeKeystoreProvider.deleteLocalPrivateKey();
                 } else {
-                    datanodeKeystore.initWithSeflsignedCertificate();
+                    datanodeKeystore.initWithSelfSignedCertificate();
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
