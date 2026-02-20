@@ -34,6 +34,7 @@ import org.opensearch.client.opensearch._types.SortOrder;
 import org.opensearch.client.opensearch._types.query_dsl.QueryStringQuery;
 import org.opensearch.client.opensearch._types.query_dsl.TermsQuery;
 import org.opensearch.client.opensearch.core.msearch.MultiSearchItem;
+import org.opensearch.client.opensearch.core.search.Hit;
 
 import java.util.List;
 import java.util.Map;
@@ -109,6 +110,7 @@ public class OSEventList implements EventListStrategy {
 
     protected List<Map<String, Object>> extractResult(MultiSearchItem<JsonData> result) {
         return result.hits().hits().stream()
+                .map(Hit::source)
                 .map(serializationUtils::toMap)
                 .toList();
     }
@@ -118,7 +120,7 @@ public class OSEventList implements EventListStrategy {
     public SearchType.Result doExtractResult(Query query, EventList searchType, MultiSearchItem<JsonData> result,
                                              OSGeneratedQueryContext queryContext) {
         final List<CommonEventSummary> eventSummaries = extractResult(result).stream()
-                .map(rawEvent -> objectMapper.convertValue(rawEvent.get("_source"), EventDto.class))
+                .map(rawEvent -> objectMapper.convertValue(rawEvent, EventDto.class))
                 .map(EventSummary::parse)
                 .collect(Collectors.toList());
         final EventList.Result.Builder resultBuilder = EventList.Result.builder()
