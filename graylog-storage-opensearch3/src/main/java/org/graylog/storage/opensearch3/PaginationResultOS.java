@@ -51,46 +51,14 @@ public class PaginationResultOS extends ChunkedQueryResultOS {
             return null;
         }
 
-        final Hit<Map> lastHit = hits.get(hits.size() - 1);
+        final Hit<Map> lastHit = hits.getLast();
         final List<FieldValue> sortValues = lastHit.sort();
 
         if (sortValues.isEmpty()) {
             return null;
         }
 
-        final SearchRequest nextRequest = SearchRequest.of(builder -> {
-            // Copy all properties from the initial request
-            builder.index(initialSearchRequest.index());
-            builder.query(initialSearchRequest.query());
-            builder.ignoreUnavailable(initialSearchRequest.ignoreUnavailable());
-            builder.allowNoIndices(initialSearchRequest.allowNoIndices());
-            builder.expandWildcards(initialSearchRequest.expandWildcards());
-            builder.trackTotalHits(initialSearchRequest.trackTotalHits());
-
-            if (initialSearchRequest.source() != null) {
-                builder.source(initialSearchRequest.source());
-            }
-            if (initialSearchRequest.slice() != null) {
-                builder.slice(initialSearchRequest.slice());
-            }
-            if (initialSearchRequest.from() != null) {
-                builder.from(initialSearchRequest.from());
-            }
-            if (initialSearchRequest.size() != null) {
-                builder.size(initialSearchRequest.size());
-            }
-            if (initialSearchRequest.sort() != null) {
-                builder.sort(initialSearchRequest.sort());
-            }
-            if (initialSearchRequest.highlight() != null) {
-                builder.highlight(initialSearchRequest.highlight());
-            }
-
-            // Set search_after with the sort values from the last hit
-            builder.searchAfter(sortValues);
-
-            return builder;
-        });
+        final SearchRequest nextRequest = SearchRequest.of(builder -> initialSearchRequest.toBuilder().searchAfter(sortValues));
 
         return client.sync(c -> c.search(nextRequest, Map.class), "Unable to retrieve next chunk from search: ");
     }

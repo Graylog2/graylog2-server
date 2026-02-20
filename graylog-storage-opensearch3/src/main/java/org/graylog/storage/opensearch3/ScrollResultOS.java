@@ -29,23 +29,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class ScrollResultOS3 extends ChunkedQueryResultOS {
+public class ScrollResultOS extends ChunkedQueryResultOS {
     private static final String DEFAULT_SCROLL = "1m";
 
     private final String scroll;
 
     public interface Factory {
-        ScrollResultOS3 create(SearchResponse<Map> initialResult, @Assisted("query") String query, @Assisted("scroll") String scroll, List<String> fields, int limit);
+        ScrollResultOS create(SearchResponse<Map> initialResult, @Assisted("query") String query, @Assisted("scroll") String scroll, List<String> fields, int limit);
     }
 
     @AssistedInject
-    public ScrollResultOS3(ResultMessageFactory resultMessageFactory,
-                           OfficialOpensearchClient client,
-                           @Assisted SearchResponse<Map> initialResult,
-                           @Assisted("query") String query,
-                           @Assisted("scroll") String scroll,
-                           @Assisted List<String> fields,
-                           @Assisted int limit) {
+    public ScrollResultOS(ResultMessageFactory resultMessageFactory,
+                          OfficialOpensearchClient client,
+                          @Assisted SearchResponse<Map> initialResult,
+                          @Assisted("query") String query,
+                          @Assisted("scroll") String scroll,
+                          @Assisted List<String> fields,
+                          @Assisted int limit) {
         super(resultMessageFactory, client, initialResult, query, fields, limit);
         this.scroll = scroll;
     }
@@ -69,23 +69,21 @@ public class ScrollResultOS3 extends ChunkedQueryResultOS {
                 .scrollId(currentScrollId)
                 .scroll(time));
 
-        final SearchResponse<Map> response = client.sync(
+        return client.sync(
                 c -> c.scroll(scrollRequest, Map.class),
                 "Unable to retrieve next chunk from search: "
         );
-
-        return response;
     }
 
     @Override
     public void cancel() {
-        if (this.lastSearchResponse.scrollId() == null) {
+        final String scrollId = this.lastSearchResponse.scrollId();
+        if (scrollId == null) {
             // with ignore_unavailable=true and no available indices, response does not contain scrollId, there is nothing to cancel
             return;
         }
 
-        final ClearScrollRequest clearRequest = ClearScrollRequest.of(csr -> csr
-                .scrollId(List.of(this.lastSearchResponse.scrollId())));
+        final ClearScrollRequest clearRequest = ClearScrollRequest.of(csr -> csr.scrollId(scrollId));
 
         client.execute(
                 () -> client.sync(c -> c.clearScroll(clearRequest), "Unable to cancel scrolling search request"),

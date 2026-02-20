@@ -29,8 +29,7 @@ import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog.storage.opensearch3.OpenSearchClient;
 import org.graylog.storage.opensearch3.PlainJsonApi;
 import org.graylog.storage.opensearch3.Scroll;
-import org.graylog.storage.opensearch3.ScrollResultOS2;
-import org.graylog.storage.opensearch3.ScrollResultOS3;
+import org.graylog.storage.opensearch3.ScrollResultOS;
 import org.graylog.storage.opensearch3.SearchRequestFactory;
 import org.graylog.storage.opensearch3.SearchRequestFactoryOS;
 import org.graylog.storage.opensearch3.SearchesAdapterOS;
@@ -112,7 +111,7 @@ public class AdaptersOS implements Adapters {
     @Override
     public SearchesAdapter searchesAdapter() {
         final SearchRequestFactoryOS searchRequestFactoryOS = new SearchRequestFactoryOS(true, new IgnoreSearchFilters());
-        final ScrollResultOS3.Factory scrollResultFactory = (initialResult, query, scroll, fields, limit) -> new ScrollResultOS3(
+        final ScrollResultOS.Factory scrollResultFactory = (initialResult, query, scroll, fields, limit) -> new ScrollResultOS(
                 resultMessageFactory, officialOpensearchClient, initialResult, query, scroll, fields, limit
         );
         return new SearchesAdapterOS(client,

@@ -35,12 +35,12 @@ import java.util.Set;
 public class Scroll implements MultiChunkResultRetriever {
     private static final String DEFAULT_SCROLLTIME = "1m";
     private final OfficialOpensearchClient opensearchClient;
-    private final ScrollResultOS3.Factory scrollResultFactory;
+    private final ScrollResultOS.Factory scrollResultFactory;
     private final SearchRequestFactoryOS searchRequestFactory;
 
     @Inject
     public Scroll(OfficialOpensearchClient opensearchClient,
-                  ScrollResultOS3.Factory scrollResultFactory,
+                  ScrollResultOS.Factory scrollResultFactory,
                   SearchRequestFactoryOS searchRequestFactory) {
         this.opensearchClient = opensearchClient;
         this.scrollResultFactory = scrollResultFactory;

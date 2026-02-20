@@ -21,7 +21,7 @@ import org.graylog.events.search.MoreSearchAdapterIT;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.storage.opensearch3.MoreSearchAdapterOS;
 import org.graylog.storage.opensearch3.Scroll;
-import org.graylog.storage.opensearch3.ScrollResultOS3;
+import org.graylog.storage.opensearch3.ScrollResultOS;
 import org.graylog.storage.opensearch3.SearchRequestFactoryOS;
 import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
 import org.graylog.testing.elasticsearch.SearchInstance;
@@ -45,7 +45,7 @@ public class MoreSearchAdapterOSUsingScrollIT extends MoreSearchAdapterIT {
     protected MoreSearchAdapter createMoreSearchAdapter() {
         return new MoreSearchAdapterOS(openSearchInstance.getOfficialOpensearchClient(), true,
                 new Scroll(openSearchInstance.getOfficialOpensearchClient(),
-                        (initialResult, query, scroll, fields, limit) -> new ScrollResultOS3(
+                        (initialResult, query, scroll, fields, limit) -> new ScrollResultOS(
                                 resultMessageFactory, openSearchInstance.getOfficialOpensearchClient(), initialResult, query, scroll, fields, limit
                         ),
                         new SearchRequestFactoryOS(false, new IgnoreSearchFilters())
