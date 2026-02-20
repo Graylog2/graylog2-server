@@ -28,6 +28,45 @@ import supportedUnits from '../../../../../../graylog2-server/src/main/resources
 
 type UnitConversionAction = 'MULTIPLY' | 'DIVIDE';
 
+const ramSize = [
+  {
+    'type': 'base',
+    'abbrev': 'b',
+    'name': 'byte',
+    'unit_type': 'ram_size',
+  },
+  {
+    'type': 'derived',
+    'abbrev': 'KiB',
+    'name': 'kibibyte',
+    'unit_type': 'ram_size',
+    'conversion': {
+      'value': 1024,
+      'action': 'MULTIPLY',
+    },
+  },
+  {
+    'type': 'derived',
+    'abbrev': 'MiB',
+    'name': 'mebibyte',
+    'unit_type': 'ram_size',
+    'conversion': {
+      'value': 1048576,
+      'action': 'MULTIPLY',
+    },
+  },
+  {
+    'type': 'derived',
+    'abbrev': 'GiB',
+    'name': 'gibibyte',
+    'unit_type': 'ram_size',
+    'conversion': {
+      'value': 1073741824,
+      'action': 'MULTIPLY',
+    },
+  },
+];
+
 const sourceUnits = supportedUnits.units as FieldUnitTypesJson;
 export type UnitJson = {
   type: 'base' | 'derived';
@@ -70,9 +109,17 @@ const unitFromJson = (unitJson: UnitJson): Unit => ({
   conversion: unitJson.conversion,
   useInPrettier: isUnitUsableInPrettier(unitJson),
 });
-export const mappedUnitsFromJSON: FieldUnitTypes = <FieldUnitTypes>(
+
+export const mappedUnitsFromJSONForAggregation: FieldUnitTypes = <FieldUnitTypes>(
   mapValues(
     sourceUnits,
+    (unitsJson: Array<UnitJson>): Array<Unit> => unitsJson.map((unitJson: UnitJson): Unit => unitFromJson(unitJson)),
+  )
+);
+
+export const mappedUnitsFromJSON: FieldUnitTypes = <FieldUnitTypes>(
+  mapValues(
+    { ...sourceUnits, ram_size: ramSize },
     (unitsJson: Array<UnitJson>): Array<Unit> => unitsJson.map((unitJson: UnitJson): Unit => unitFromJson(unitJson)),
   )
 );

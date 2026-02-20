@@ -63,7 +63,7 @@ const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
         y: yValues,
         ...getHoverTemplateSettings({
           convertedValues: yValues,
-          unit: FieldUnit.fromJSON({ abbrev: 'b', unit_type: 'size' }),
+          unit: FieldUnit.fromJSON({ abbrev: 'b', unit_type: 'ram_size' }),
         }),
       },
     ],
@@ -122,14 +122,14 @@ const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
   const notZoomedLayout = useMemo<GeneratedLayout>(
     () => ({
       rangemode: 'tozero',
-      ...(getFormatSettingsByData('size', valuesToGetFormatSettings) as GeneratedLayout),
+      ...(getFormatSettingsByData('ram_size', valuesToGetFormatSettings) as GeneratedLayout),
     }),
     [valuesToGetFormatSettings],
   );
   const zoomedLayout = useMemo(
     () => ({
       rangemode: 'tozero',
-      ...(getFormatSettingsByData('size', yValues) as GeneratedLayout),
+      ...(getFormatSettingsByData('ram_size', yValues) as GeneratedLayout),
     }),
     [yValues],
   );
@@ -143,7 +143,7 @@ const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
       xaxis: {
         type: 'date',
         title: {
-          text: 'Time',
+          text: 'Time shown in UTC',
         },
       },
       hovermode: 'x',

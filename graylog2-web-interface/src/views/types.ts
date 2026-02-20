@@ -569,7 +569,7 @@ export interface WidgetCreator {
   icon: React.ComponentType<{}>;
 }
 
-export type FieldUnitType = 'size' | 'time' | 'percent';
+export type FieldUnitType = 'size' | 'time' | 'percent' | 'ram_size';
 
 export type DefaultAxisKey = typeof DEFAULT_AXIS_KEY;
 
