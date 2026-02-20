@@ -41,7 +41,7 @@ public class SliceByResource extends RestResource {
                                              @Parameter(name = "query")
                                              @QueryParam("query") @DefaultValue("") String query,
                                              @Parameter(name = "resultsFilter")
-                                             @QueryParam("query") @DefaultValue("") String resultsFilter,
+                                             @QueryParam("resultsFilter") @DefaultValue("") String resultsFilter,
                                              @Parameter(name = "page")
                                              @QueryParam("page") @DefaultValue("1") int page,
                                              @Parameter(name = "per_page")
