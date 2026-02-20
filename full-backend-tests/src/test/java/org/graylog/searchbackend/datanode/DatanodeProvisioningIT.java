@@ -106,8 +106,10 @@ public class DatanodeProvisioningIT {
     }
 
     @AfterEach
-    void tearDown() {
+    void tearDown() throws ExecutionException, RetryException {
         resetPreflight();
+        // Wait for datanodes to disconnect after reset to ensure clean state for next test
+        waitForDatanodesDisconnected();
     }
 
     @FullBackendTest
@@ -151,6 +153,26 @@ public class DatanodeProvisioningIT {
     private static IndexerJwtAuthToken createJwtAuthToken() {
         final IndexerJwtAuthTokenProvider provider = new IndexerJwtAuthTokenProvider(new JwtSecret(ContainerizedGraylogBackend.PASSWORD_SECRET), Duration.seconds(120), Duration.seconds(60), Duration.seconds(30), true, Clock.systemDefaultZone());
         return provider.get();
+    }
+
+    private void waitForDatanodesDisconnected() throws ExecutionException, RetryException {
+        try {
+            RetryerBuilder.<List<DatanodeStatus>>newBuilder()
+                    .retryIfResult(datanodes -> datanodes != null && !datanodes.isEmpty() && datanodes.stream().anyMatch(d -> Objects.equals(d.dataNodeStatus(), DataNodeStatus.AVAILABLE.name())))
+                    .withStopStrategy(StopStrategies.stopAfterDelay(60, TimeUnit.SECONDS))
+                    .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                    .withRetryListener(new RetryListener() {
+                        @Override
+                        public <V> void onRetry(Attempt<V> attempt) {
+                            log.info("Waiting for datanodes to disconnect, attempt {}", attempt.getAttemptNumber());
+                        }
+                    })
+                    .build()
+                    .call(this::getDatanodes);
+        } catch (ExecutionException | RetryException e) {
+            log.error("Datanodes did not disconnect in time\n" + apis.backend().getLogs());
+            throw e;
+        }
     }
 
     private List<DatanodeStatus> waitForDatanodesConnected() throws ExecutionException, RetryException {

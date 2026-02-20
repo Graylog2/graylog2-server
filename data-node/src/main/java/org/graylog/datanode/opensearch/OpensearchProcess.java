@@ -53,4 +53,6 @@ public interface OpensearchProcess extends ManagableProcess<OpensearchConfigurat
     boolean isManagerNode();
 
     List<String> configurationWarnings();
+
+    void removeConfiguration();
 }

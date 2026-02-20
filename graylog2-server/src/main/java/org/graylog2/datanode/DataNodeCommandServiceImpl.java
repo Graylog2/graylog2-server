@@ -84,6 +84,14 @@ public class DataNodeCommandServiceImpl implements DataNodeCommandService {
     }
 
     @Override
+    public DataNodeDto removeNodeConfiguration(String nodeId) throws NodeNotFoundException {
+        final DataNodeDto node = nodeService.byNodeId(nodeId);
+        DataNodeLifecycleEvent e = DataNodeLifecycleEvent.create(node.getNodeId(), DataNodeLifecycleTrigger.REMOVE_NODE_CONFIGURATION);
+        clusterEventBus.post(e);
+        return node;
+    }
+
+    @Override
     public DataNodeDto stopNode(String nodeId) throws NodeNotFoundException {
         final DataNodeDto node = nodeService.byNodeId(nodeId);
         if (node.getDataNodeStatus() != DataNodeStatus.AVAILABLE) {
