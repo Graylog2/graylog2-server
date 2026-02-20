@@ -158,7 +158,7 @@ public class DatanodeProvisioningIT {
     private void waitForDatanodesDisconnected() throws ExecutionException, RetryException {
         try {
             RetryerBuilder.<List<DatanodeStatus>>newBuilder()
-                    .retryIfResult(datanodes -> datanodes != null && !datanodes.isEmpty() && datanodes.stream().anyMatch(d -> d.dataNodeStatus() == DataNodeStatus.AVAILABLE.name()))
+                    .retryIfResult(datanodes -> datanodes != null && !datanodes.isEmpty() && datanodes.stream().anyMatch(d -> Objects.equals(d.dataNodeStatus(), DataNodeStatus.AVAILABLE.name())))
                     .withStopStrategy(StopStrategies.stopAfterDelay(60, TimeUnit.SECONDS))
                     .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                     .withRetryListener(new RetryListener() {
