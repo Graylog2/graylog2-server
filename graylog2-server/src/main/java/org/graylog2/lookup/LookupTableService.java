@@ -79,11 +79,11 @@ public class LookupTableService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(LookupTableService.class);
 
     private final LookupTableConfigService configService;
-    private final Map<String, LookupCache.Factory> cacheFactories;
-    private final Map<String, LookupDataAdapter.Factory> adapterFactories;
-    private final Map<String, LookupDataAdapter.Factory2> adapterFactories2;
-    private final Map<String, LookupDataAdapter.Factory2> systemAdapterFactories;
-    private final Map<String, LookupCache.Factory> systemCacheFactories;
+    private final Map<String, LookupCache.Factory<? extends LookupCache>> cacheFactories;
+    private final Map<String, LookupDataAdapter.Factory<? extends LookupDataAdapter>> adapterFactories;
+    private final Map<String, LookupDataAdapter.Factory2<? extends LookupDataAdapter>> adapterFactories2;
+    private final Map<String, LookupDataAdapter.Factory2<? extends LookupDataAdapter>> systemAdapterFactories;
+    private final Map<String, LookupCache.Factory<? extends LookupCache>> systemCacheFactories;
     private final ScheduledExecutorService scheduler;
     private final EventBus eventBus;
     private final LookupDataAdapterRefreshService adapterRefreshService;
@@ -98,11 +98,11 @@ public class LookupTableService extends AbstractIdleService {
 
     @Inject
     public LookupTableService(LookupTableConfigService configService,
-                              Map<String, LookupCache.Factory> cacheFactories,
-                              Map<String, LookupDataAdapter.Factory> adapterFactories,
-                              Map<String, LookupDataAdapter.Factory2> adapterFactories2,
-                              @SystemEntity Map<String, LookupDataAdapter.Factory2> systemAdapterFactories,
-                              @SystemEntity Map<String, LookupCache.Factory> systemCacheFactories,
+                              Map<String, LookupCache.Factory<? extends LookupCache>> cacheFactories,
+                              Map<String, LookupDataAdapter.Factory<? extends LookupDataAdapter>> adapterFactories,
+                              Map<String, LookupDataAdapter.Factory2<? extends LookupDataAdapter>> adapterFactories2,
+                              @SystemEntity Map<String, LookupDataAdapter.Factory2<? extends LookupDataAdapter>> systemAdapterFactories,
+                              @SystemEntity Map<String, LookupCache.Factory<? extends LookupCache>> systemCacheFactories,
                               @Named("daemonScheduler") ScheduledExecutorService scheduler,
                               EventBus eventBus) {
         this.configService = configService;
@@ -430,9 +430,9 @@ public class LookupTableService extends AbstractIdleService {
 
     protected LookupDataAdapter createAdapter(DataAdapterDto dto) {
         try {
-            final LookupDataAdapter.Factory2 systemFactory = systemAdapterFactories.get(dto.config().type());
-            final LookupDataAdapter.Factory2 factory2 = adapterFactories2.get(dto.config().type());
-            final LookupDataAdapter.Factory factory = adapterFactories.get(dto.config().type());
+            final LookupDataAdapter.Factory2<? extends LookupDataAdapter> systemFactory = systemAdapterFactories.get(dto.config().type());
+            final LookupDataAdapter.Factory2<? extends LookupDataAdapter> factory2 = adapterFactories2.get(dto.config().type());
+            final LookupDataAdapter.Factory<? extends LookupDataAdapter> factory = adapterFactories.get(dto.config().type());
             final LookupDataAdapter adapter;
 
             if (factory2 != null) {
