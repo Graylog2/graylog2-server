@@ -58,16 +58,17 @@ type EventDefinitionGetResponse = {
 };
 
 type EventDefinitionCopyResponse = {
+  id: string;
   title: string;
 };
 
 type EventDefinitionsActionsType = {
-  listAll: () => Promise<unknown>;
-  listPaginated: (params: { query?: string; page?: number; pageSize?: number }) => Promise<unknown>;
+  listAll: () => Promise<EventDefinitionListResponse>;
+  listPaginated: (params: { query?: string; page?: number; pageSize?: number }) => Promise<EventDefinitionListResponse>;
   searchPaginated: (newPage: number, newPerPage: number, newQuery: string, additional: unknown) => Promise<unknown>;
-  get: (eventDefinitionId: string) => Promise<unknown>;
+  get: (eventDefinitionId: string) => Promise<EventDefinitionGetResponse>;
   create: (newEventDefinition: Record<string, unknown>) => Promise<unknown>;
-  copy: (eventDefinition: Record<string, unknown>) => Promise<unknown>;
+  copy: (eventDefinition: Record<string, unknown>) => Promise<EventDefinitionCopyResponse>;
   update: (eventDefinitionId: string, updatedEventDefinition: Record<string, unknown>) => Promise<unknown>;
   delete: (eventDefinition: Record<string, unknown>) => Promise<unknown>;
   enable: (eventDefinition: Record<string, unknown>) => Promise<unknown>;

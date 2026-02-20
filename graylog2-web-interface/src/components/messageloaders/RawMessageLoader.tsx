@@ -273,11 +273,11 @@ const RawMessageLoader = ({
   };
 
   const _onMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setMessage(getValueFromInput(event.target) as string);
+    setMessage(String(getValueFromInput(event.target)));
   };
 
   const _onRemoteAddressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRemoteAddress(getValueFromInput(event.target) as string);
+    setRemoteAddress(String(getValueFromInput(event.target)));
   };
 
   const _onCodecConfigurationChange = (field: string, value: ConfigurationFieldValue) => {

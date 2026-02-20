@@ -20,6 +20,7 @@ import * as URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
+import type { Decorator, DecoratorType } from 'views/components/messagelist/decorators/Types';
 
 export type DecoratorSummary = {
   id: string;
@@ -31,9 +32,9 @@ export type DecoratorSummary = {
 };
 
 type DecoratorsActionsType = {
-  available: () => Promise<Record<string, unknown>>;
+  available: () => Promise<Record<string, DecoratorType>>;
   create: (request: unknown) => Promise<unknown>;
-  list: () => Promise<Array<DecoratorSummary>>;
+  list: () => Promise<Array<Decorator>>;
   remove: (decoratorId: string) => Promise<unknown>;
   update: (decoratorId: string, request: unknown) => Promise<unknown>;
 };

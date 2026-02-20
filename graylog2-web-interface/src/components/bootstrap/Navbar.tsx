@@ -21,7 +21,7 @@ import chroma from 'chroma-js';
 
 const Navbar = styled(BootstrapNavbar)(
   ({ theme }) => {
-    const variant = theme.colors.variant as Record<string, any>;
+    const { variant } = theme.colors;
 
     return css`
     position: relative;

@@ -17,11 +17,12 @@
 import Reflux from 'reflux';
 
 import type { RefluxActions } from 'stores/StoreTypes';
+import type { Stream } from 'logic/streams/types';
 import { singletonActions } from 'logic/singleton';
 
 export type ActionsType = {
   searchPaginated: (...args: Array<unknown>) => Promise<unknown>;
-  listStreams: (...args: Array<unknown>) => Promise<unknown>;
+  listStreams: () => Promise<Array<Stream>>;
   load: (...args: Array<unknown>) => Promise<unknown>;
   get: (...args: Array<unknown>) => Promise<unknown>;
   remove: (...args: Array<unknown>) => Promise<unknown>;

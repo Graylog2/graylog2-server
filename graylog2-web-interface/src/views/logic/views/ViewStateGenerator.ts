@@ -17,6 +17,7 @@
 import * as Immutable from 'immutable';
 
 import { DecoratorsActions } from 'stores/decorators/DecoratorsStore';
+import type { Decorator } from 'views/logic/widgets/MessagesWidgetConfig';
 
 import View from './View';
 import type { ViewType } from './View';
@@ -37,8 +38,6 @@ type ViewCreator = (
   streamCategory: string | string[] | undefined | null,
 ) => Promise<Result>;
 type DefaultWidgets = Record<ViewType, ViewCreator>;
-
-type Decorator = { stream: string | null; category: string | null };
 
 export const matchesDecoratorStream = (streamId: string | string[] | undefined | null) => {
   if (!streamId) {

@@ -20,13 +20,11 @@ import { singletonActions } from 'logic/singleton';
 import type { ReportedError } from 'logic/errors/ReportedErrors';
 
 type ErrorsActionsType = {
-  report: ((error: ReportedError) => void) & {
-    listen: (cb: (error: ReportedError) => void) => () => void;
-  };
+  report: (error: ReportedError) => Promise<void>;
 };
 
 const ErrorsActions = singletonActions('Errors', () =>
-  Reflux.createActions(['report']),
-) as unknown as ErrorsActionsType;
+  Reflux.createActions<ErrorsActionsType>({ report: { asyncResult: false } }),
+);
 
 export default ErrorsActions;
