@@ -30,6 +30,8 @@ import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import RuleDeprecationInfo from 'components/rules/RuleDeprecationInfo';
 import usePermissions from 'hooks/usePermissions';
 
+import PipelineProcessingErrors from './PipelineProcessingErrors';
+
 import ButtonToolbar from '../bootstrap/ButtonToolbar';
 import { Spinner } from '../common';
 
@@ -141,15 +143,19 @@ const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeleteP
           noConnectionsMessage={<em>Not connected</em>}
         />
       </StreamListTD>
+      <td>
+        <PipelineProcessingErrors pipeline={pipeline} />
+      </td>
       <td>{_formatStages()}</td>
       <td>
         <ButtonToolbar>
-          <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(id)}>
+          <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(id)} aria-label="Edit Pipeline">
             <Button disabled={!isPermitted('pipeline:edit')} bsSize="xsmall">
               Edit
             </Button>
           </LinkContainer>
           <Button
+            aria-label="Delete Pipeline"
             disabled={!isPermitted('pipeline:delete') || isNotDeletable}
             bsStyle="danger"
             bsSize="xsmall"
