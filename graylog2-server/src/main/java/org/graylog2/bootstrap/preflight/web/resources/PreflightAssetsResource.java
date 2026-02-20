@@ -63,6 +63,7 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 
 @Path("/")
 public class PreflightAssetsResource {
+    private static final String INDEX_FILE = "index.html";
     private final MimetypesFileTypeMap mimeTypes;
     private final LoadingCache<URI, FileSystem> fileSystemCache;
 
@@ -91,7 +92,7 @@ public class PreflightAssetsResource {
     @GET
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     public Response index(@Context Request request) {
-        return this.get(request, "index.html");
+        return this.get(request, INDEX_FILE);
     }
 
     @Path("/{filename}")
@@ -144,9 +145,11 @@ public class PreflightAssetsResource {
 
         final String contentType = firstNonNull(mimeTypes.getContentType(filename), MediaType.APPLICATION_OCTET_STREAM);
         final CacheControl cacheControl = new CacheControl();
-        cacheControl.setMaxAge((int) TimeUnit.DAYS.toSeconds(365));
-        cacheControl.setNoCache(false);
-        cacheControl.setPrivate(false);
+        if (!filename.equals(INDEX_FILE)) {
+            cacheControl.setMaxAge((int) TimeUnit.DAYS.toSeconds(365));
+            cacheControl.setNoCache(false);
+            cacheControl.setPrivate(false);
+        }
 
         return Response
                 .ok(fileContents, contentType)
