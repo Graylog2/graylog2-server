@@ -207,12 +207,7 @@ export const EventDefinitionsStore = singletonStore('core.EventDefinitions', () 
     searchPaginated(newPage: number, newPerPage: number, newQuery: string, additional: unknown) {
       const url = PaginationURL(`${this.sourceUrl}/paginated`, newPage, newPerPage, newQuery, additional);
       const promise = fetch<EventDefinitionSearchResponse>('GET', URLUtils.qualifyUrl(url)).then((response) => {
-        const {
-          elements,
-          query,
-          attributes,
-          pagination,
-        } = response;
+        const { elements, query, attributes, pagination } = response;
         const { count, total, page, per_page: perPage } = pagination;
 
         return {
@@ -233,14 +228,17 @@ export const EventDefinitionsStore = singletonStore('core.EventDefinitions', () 
       return promise;
     },
     get(eventDefinitionId: string) {
-      const promise = fetch<EventDefinitionGetResponse>('GET', this.eventDefinitionsUrl({ segments: [eventDefinitionId, 'with-context'] }));
+      const promise = fetch<EventDefinitionGetResponse>(
+        'GET',
+        this.eventDefinitionsUrl({ segments: [eventDefinitionId, 'with-context'] }),
+      );
 
       promise
         .then((response) => ({
-            eventDefinition: response.event_definition,
-            context: response.context,
-            is_mutable: response.is_mutable,
-          }))
+          eventDefinition: response.event_definition,
+          context: response.context,
+          is_mutable: response.is_mutable,
+        }))
         .catch((error: { status?: number; additional?: { body?: { message?: string } } }) => {
           if (error.status === 404) {
             UserNotification.error(
@@ -307,7 +305,10 @@ export const EventDefinitionsStore = singletonStore('core.EventDefinitions', () 
     },
 
     copy(eventDefinition: Record<string, unknown>) {
-      const promise = fetch<EventDefinitionCopyResponse>('POST', this.eventDefinitionsUrl({ segments: [String(eventDefinition.id), 'duplicate'] }));
+      const promise = fetch<EventDefinitionCopyResponse>(
+        'POST',
+        this.eventDefinitionsUrl({ segments: [String(eventDefinition.id), 'duplicate'] }),
+      );
 
       promise.then(
         (response) => {

@@ -33,7 +33,11 @@ const DecorationStats = {
   isFieldChangedByDecorator(message: MessageWithDecorationStats, fieldName: string): boolean {
     const decorationStats = message.decoration_stats;
 
-    return !!(decorationStats && decorationStats.changed_fields && decorationStats.changed_fields[fieldName] !== undefined);
+    return !!(
+      decorationStats &&
+      decorationStats.changed_fields &&
+      decorationStats.changed_fields[fieldName] !== undefined
+    );
   },
 
   isFieldDecorated(message: MessageWithDecorationStats, fieldName: string): boolean {

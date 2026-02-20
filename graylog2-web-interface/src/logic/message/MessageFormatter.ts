@@ -72,7 +72,14 @@ const MessageFormatter = {
     );
   },
 
-  formatMessage(id: string, index: string, message: MessageFields, fields: MessageFields, highlightRanges: any, decorationStats: any): FormattedMessage {
+  formatMessage(
+    id: string,
+    index: string,
+    message: MessageFields,
+    fields: MessageFields,
+    highlightRanges: any,
+    decorationStats: any,
+  ): FormattedMessage {
     const filteredFields = MessageFieldsFilter.filterFields(fields);
 
     return {

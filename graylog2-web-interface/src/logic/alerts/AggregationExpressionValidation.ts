@@ -61,7 +61,11 @@ const flattenValidationTree = (validationTree: ValidationNode, errors: Array<str
   return errors;
 };
 
-const validateExpressionTree = (expression: Expression, series: Array<Series>, validationTree: ValidationNode = {}): ValidationNode => {
+const validateExpressionTree = (
+  expression: Expression,
+  series: Array<Series>,
+  validationTree: ValidationNode = {},
+): ValidationNode => {
   switch (expression.expr) {
     case 'number':
       return Number.isFinite(expression.value) ? {} : { message: 'Threshold must be a valid number' };

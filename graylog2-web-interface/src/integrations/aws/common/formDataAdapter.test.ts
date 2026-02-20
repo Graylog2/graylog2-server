@@ -59,7 +59,9 @@ describe('formDataAdapter', () => {
 
     Object.entries(configuration).forEach(([key, value]) => {
       const formDataValue =
-        mappings[key] === 'key' || mappings[key] === 'secret' ? formData[mappings[key]] : formData[mappings[key]]?.value;
+        mappings[key] === 'key' || mappings[key] === 'secret'
+          ? formData[mappings[key]]
+          : formData[mappings[key]]?.value;
 
       expect(value).toEqual(formDataValue);
     });
@@ -98,7 +100,9 @@ describe('formDataAdapter', () => {
       }
 
       const formDataValue =
-        mappings[key] === 'key' || mappings[key] === 'secret' ? formData[mappings[key]] : formData[mappings[key]]?.value;
+        mappings[key] === 'key' || mappings[key] === 'secret'
+          ? formData[mappings[key]]
+          : formData[mappings[key]]?.value;
 
       expect(value).toEqual(formDataValue);
     });

@@ -50,7 +50,6 @@ export default class Constraint {
   toBuilder(): Builder {
     const { type, plugin, version } = this._value;
 
-    // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({ type, plugin, version }));
   }
 
@@ -90,7 +89,6 @@ export default class Constraint {
   }
 
   static builder(): Builder {
-    // eslint-disable-next-line no-use-before-define
     return new Builder().plugin('server');
   }
 }

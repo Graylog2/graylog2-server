@@ -48,7 +48,13 @@ const ExtractorUtils = {
   ExtractorTypes: ExtractorTypes,
   EXTRACTOR_TYPES: Object.keys(ExtractorTypes).map((type) => type.toLocaleLowerCase()),
 
-  getNewExtractorRoutes(sourceNodeId: string, sourceInputId: string, fieldName: string, messageIndex: string, messageId: string): Record<string, string> {
+  getNewExtractorRoutes(
+    sourceNodeId: string,
+    sourceInputId: string,
+    fieldName: string,
+    messageIndex: string,
+    messageId: string,
+  ): Record<string, string> {
     const routes: Record<string, string> = {};
 
     this.EXTRACTOR_TYPES.forEach((extractorType) => {
@@ -121,7 +127,10 @@ const ExtractorUtils = {
     }
   },
 
-  getEffectiveConfiguration(defaultConfiguration: ExtractorConfiguration, currentConfiguration: ExtractorConfiguration): ExtractorConfiguration {
+  getEffectiveConfiguration(
+    defaultConfiguration: ExtractorConfiguration,
+    currentConfiguration: ExtractorConfiguration,
+  ): ExtractorConfiguration {
     const effectiveConfiguration: ExtractorConfiguration = {};
 
     for (const key in defaultConfiguration) {

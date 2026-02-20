@@ -20,8 +20,7 @@ import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 
 const Navbar = styled(BootstrapNavbar)(
-  ({ theme }) => {
-    return css`
+  ({ theme }) => css`
     position: relative;
     min-height: auto;
     background-color: ${theme.colors.global.navigationBackground};
@@ -189,14 +188,18 @@ const Navbar = styled(BootstrapNavbar)(
 
     .navbar-collapse,
     .navbar-form {
-      border-color: ${chroma(theme.colors.gray[90] as string).darken(0.065).css()};
+      border-color: ${chroma(theme.colors.gray[90] as string)
+        .darken(0.065)
+        .css()};
     }
 
     .navbar-link {
       color: ${theme.colors.variant.default};
 
       &:hover {
-        color: ${chroma(theme.colors.variant.default as string).darken(0.25).css()};
+        color: ${chroma(theme.colors.variant.default as string)
+          .darken(0.25)
+          .css()};
       }
     }
 
@@ -223,8 +226,7 @@ const Navbar = styled(BootstrapNavbar)(
       padding: 0 15px !important;
       font-weight: bold;
     }
-  `;
-  },
+  `,
 );
 
 /** @component */

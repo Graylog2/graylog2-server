@@ -16,8 +16,8 @@
  */
 
 import type { PluginExports } from 'graylog-web-plugin/plugin';
-import type { SystemConfigurationComponentProps } from 'views/types';
 
+import type { SystemConfigurationComponentProps } from 'views/types';
 import AppConfig from 'util/AppConfig';
 
 import AwsPluginConfiguration from './components/AWSPluginConfiguration';

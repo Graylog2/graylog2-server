@@ -36,6 +36,10 @@ export const StyledJumbotron = styled(BootstrapJumbotron)(
   `,
 );
 
-const Jumbotron = forwardRef((props: React.ComponentPropsWithoutRef<typeof BootstrapJumbotron>, ref: React.Ref<any>) => <StyledJumbotron ref={ref} {...props} />);
+const Jumbotron = forwardRef(
+  (props: React.ComponentPropsWithoutRef<typeof BootstrapJumbotron>, ref: React.Ref<any>) => (
+    <StyledJumbotron ref={ref} {...props} />
+  ),
+);
 
 export default Jumbotron;

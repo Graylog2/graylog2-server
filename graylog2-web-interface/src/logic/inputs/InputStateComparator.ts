@@ -14,7 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-type InputState = 'CREATED' | 'INITIALIZED' | 'INVALID_CONFIGURATION' | 'STARTING' | 'RUNNING' | 'FAILED' | 'STOPPING' | 'STOPPED' | 'TERMINATED';
+type InputState =
+  | 'CREATED'
+  | 'INITIALIZED'
+  | 'INVALID_CONFIGURATION'
+  | 'STARTING'
+  | 'RUNNING'
+  | 'FAILED'
+  | 'STOPPING'
+  | 'STOPPED'
+  | 'TERMINATED';
 
 type StateMapping = Record<InputState, number>;
 

@@ -52,7 +52,11 @@ export const triggerInput = (input: InputElement): void => {
 
 export const formHasErrors = (errorMap: ErrorMap = {}): boolean => Object.keys(errorMap).length > 0;
 
-export const validateValue = (fieldValue: unknown, conditionType: string, conditionValue: unknown): string | undefined => {
+export const validateValue = (
+  fieldValue: unknown,
+  conditionType: string,
+  conditionValue: unknown,
+): string | undefined => {
   switch (conditionType) {
     case 'required':
       if (!fieldValue || (fieldValue as { size?: number })?.size === 0) return 'Field is required.';

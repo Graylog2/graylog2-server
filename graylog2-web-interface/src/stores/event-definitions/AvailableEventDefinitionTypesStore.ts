@@ -27,27 +27,29 @@ export const AvailableEventDefinitionTypesActions = singletonActions('core.Avail
   }),
 );
 
-export const AvailableEventDefinitionTypesStore: Store<unknown> = singletonStore('core.AvailableEventDefinitionTypes', () =>
-  Reflux.createStore({
-    listenables: [AvailableEventDefinitionTypesActions],
-    sourceUrl: '/events/entity_types',
-    entityTypes: undefined,
+export const AvailableEventDefinitionTypesStore: Store<unknown> = singletonStore(
+  'core.AvailableEventDefinitionTypes',
+  () =>
+    Reflux.createStore({
+      listenables: [AvailableEventDefinitionTypesActions],
+      sourceUrl: '/events/entity_types',
+      entityTypes: undefined,
 
-    init() {
-      this.get();
-    },
+      init() {
+        this.get();
+      },
 
-    getInitialState() {
-      return this.entityTypes;
-    },
+      getInitialState() {
+        return this.entityTypes;
+      },
 
-    get() {
-      const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl));
+      get() {
+        const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl));
 
-      promise.then((response: unknown) => {
-        this.entityTypes = response;
-        this.trigger(this.entityTypes);
-      });
-    },
-  }),
+        promise.then((response: unknown) => {
+          this.entityTypes = response;
+          this.trigger(this.entityTypes);
+        });
+      },
+    }),
 );

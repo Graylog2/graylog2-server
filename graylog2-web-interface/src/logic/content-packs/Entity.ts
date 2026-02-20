@@ -55,7 +55,15 @@ type EntityJSON = {
 export default class Entity {
   _value: EntityValue;
 
-  constructor(v: string, type: string, id: string, data: EntityData, fromServer: boolean = false, constraintValues: Array<ConstraintJSON | Constraint> = [], parameters: Array<EntityParameter> = []) {
+  constructor(
+    v: string,
+    type: string,
+    id: string,
+    data: EntityData,
+    fromServer: boolean = false,
+    constraintValues: Array<ConstraintJSON | Constraint> = [],
+    parameters: Array<EntityParameter> = [],
+  ) {
     const constraints = constraintValues.map((c) => {
       if (c instanceof Constraint) {
         return c;
@@ -156,7 +164,6 @@ export default class Entity {
   toBuilder(): Builder {
     const { v, type, id, data, constraints, fromServer, parameters } = this._value;
 
-    /* eslint-disable-next-line no-use-before-define */
     return new Builder(
       Map({
         v,
@@ -171,7 +178,6 @@ export default class Entity {
   }
 
   static builder(): Builder {
-    /* eslint-disable-next-line no-use-before-define */
     return new Builder();
   }
 
