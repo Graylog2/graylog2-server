@@ -28,7 +28,6 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { Button } from 'components/bootstrap';
 import { INPUT_SETUP_MODE_FEATURE_FLAG } from 'components/inputs/InputSetupWizard';
 import type { InputStates } from 'hooks/useInputsStates';
-import useIsInitialUnknownInputState from 'components/inputs/hooks/useIsInitialUnknownInputState';
 
 type Props = {
   input: Input;
@@ -41,7 +40,7 @@ const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
   const { pathname } = useLocation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
-  const isInitialUnknownState = useIsInitialUnknownInputState(inputStates, input.id);
+
   const startInput = () => {
     setIsLoading(true);
 
@@ -77,7 +76,7 @@ const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
     openWizard();
   };
 
-  if (inputSetupFeatureFlagIsEnabled && (isInputInSetupMode(inputStates, input.id) || isInitialUnknownState)) {
+  if (inputSetupFeatureFlagIsEnabled && isInputInSetupMode(inputStates, input.id)) {
     return (
       <Button bsStyle="warning" bsSize="xsmall" onClick={setupInput}>
         Set-up Input
