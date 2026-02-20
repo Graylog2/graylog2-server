@@ -118,7 +118,7 @@ public class OSEventList implements EventListStrategy {
     public SearchType.Result doExtractResult(Query query, EventList searchType, MultiSearchItem<JsonData> result,
                                              OSGeneratedQueryContext queryContext) {
         final List<CommonEventSummary> eventSummaries = extractResult(result).stream()
-                .map(rawEvent -> objectMapper.convertValue(rawEvent, EventDto.class))
+                .map(rawEvent -> objectMapper.convertValue(rawEvent.get("_source"), EventDto.class))
                 .map(EventSummary::parse)
                 .collect(Collectors.toList());
         final EventList.Result.Builder resultBuilder = EventList.Result.builder()
