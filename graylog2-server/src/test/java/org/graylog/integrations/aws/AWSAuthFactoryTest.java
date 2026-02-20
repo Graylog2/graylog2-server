@@ -30,7 +30,7 @@ public class AWSAuthFactoryTest {
     private AWSAuthFactory awsAuthFactory;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         awsAuthFactory = new AWSAuthFactory();
     }
 
@@ -68,5 +68,12 @@ public class AWSAuthFactoryTest {
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
                         awsAuthFactory.create(true, null, null, null, null))
                 .withMessageContaining("Access key is required.");
+    }
+
+    @Test
+    public void testCreateWithNullHttpClientBuilder() {
+        final AwsCredentialsProvider awsCredentialsProvider = awsAuthFactory.create(false, null, "key", "secret", null, null);
+        assertThat(awsCredentialsProvider).isExactlyInstanceOf(StaticCredentialsProvider.class);
+        assertThat("key").isEqualTo(awsCredentialsProvider.resolveCredentials().accessKeyId());
     }
 }
