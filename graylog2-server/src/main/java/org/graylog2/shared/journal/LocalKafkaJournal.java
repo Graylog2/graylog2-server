@@ -16,10 +16,7 @@
  */
 package org.graylog2.shared.journal;
 
-import com.codahale.metrics.Gauge;
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricFilter;
-import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.*;
 import com.codahale.metrics.Timer;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.common.annotations.VisibleForTesting;
@@ -33,7 +30,7 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.graylog.shaded.kafka09.common.KafkaException;
 import org.graylog.shaded.kafka09.common.OffsetOutOfRangeException;
 import org.graylog.shaded.kafka09.common.TopicAndPartition;
@@ -101,6 +98,7 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.graylog2.plugin.Tools.bytesToHex;
+import static org.graylog2.shared.metrics.MetricUtils.safelyRegister;
 
 @Singleton
 public class LocalKafkaJournal extends AbstractIdleService implements Journal {
@@ -379,7 +377,40 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
 
         if (LocalKafkaJournal.class.getName().equals(metricPrefix)) {
             registerLegacyMetrics();
+            //We want metrics with global names only registered for the LocalKafkaJournal, not all journals (data-lake, outputs etc):
+            registerAdditionalJournalMetrics(GlobalMetricNames.JOURNAL_GLOBAL_PREFIX);
         }
+
+        registerAdditionalJournalMetrics(this.metricPrefix);
+    }
+
+    /**
+     * Registers additional journal metrics that can be computed from journal state.
+     * These are currently the number segments, uncommitted entries, the size, size limit and the utilization ratio.
+     */
+    private void registerAdditionalJournalMetrics(final String metricPrefix) {
+        safelyRegister(metricRegistry,
+                name(metricPrefix, GlobalMetricNames.JOURNAL_SEGMENTS_SUFFIX),
+                (Gauge<Integer>) this::numberOfSegments);
+
+        registerUncommittedGauge(metricRegistry, name(metricPrefix, GlobalMetricNames.JOURNAL_UNCOMMITTED_ENTRIES_SUFFIX));
+
+        safelyRegister(metricRegistry,
+                name(metricPrefix, GlobalMetricNames.JOURNAL_SIZE_SUFFIX),
+                (Gauge<Long>) this::size);
+
+        safelyRegister(metricRegistry,
+                name(metricPrefix, GlobalMetricNames.JOURNAL_SIZE_LIMIT_SUFFIX),
+                (Gauge<Long>) () -> maxRetentionSize);
+
+        safelyRegister(metricRegistry,
+                name(metricPrefix, GlobalMetricNames.JOURNAL_UTILIZATION_RATIO_SUFFIX),
+                new RatioGauge() {
+                    @Override
+                    protected Ratio getRatio() {
+                        return Ratio.of(size(), maxRetentionSize);
+                    }
+                });
     }
 
     @Override
@@ -395,7 +426,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
                 .filter(entry -> entry.getKey().startsWith(LocalKafkaJournal.class.getName()))
                 .forEach(entry -> {
                     String legacyName = LEGACY_CLASS_NAME +
-                            StringUtils.removeStart(entry.getKey(), LocalKafkaJournal.class.getName());
+                            Strings.CS.removeStart(entry.getKey(), LocalKafkaJournal.class.getName());
                     try {
                         this.metricRegistry.register(legacyName, entry.getValue());
                     } catch (Exception e) {
@@ -456,23 +487,48 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
      * restarted independently (eg. the Forwarder).
      */
     private void teardownLogMetrics() {
-
-        this.metricRegistry.remove(name(metricPrefix, METER_WRITTEN_MESSAGES));
-        this.metricRegistry.remove(name(metricPrefix, METER_READ_MESSAGES));
-        this.metricRegistry.remove(name(metricPrefix, METER_WRITE_DISCARDED_MESSAGES));
-        this.metricRegistry.remove(name(metricPrefix, GAUGE_UNCOMMITTED_MESSAGES));
-        this.metricRegistry.remove(name(metricPrefix, TIMER_WRITE_TIME));
-        this.metricRegistry.remove(name(metricPrefix, TIMER_READ_TIME));
-        this.metricRegistry.remove(name(metricPrefix, METRIC_NAME_SIZE));
-        this.metricRegistry.remove(name(metricPrefix, METRIC_NAME_LOG_END_OFFSET));
-        this.metricRegistry.remove(name(metricPrefix, METRIC_NAME_NUMBER_OF_SEGMENTS));
-        this.metricRegistry.remove(name(metricPrefix, METRIC_NAME_UNFLUSHED_MESSAGES));
-        this.metricRegistry.remove(name(metricPrefix, METRIC_NAME_RECOVERY_POINT));
-        this.metricRegistry.remove(name(metricPrefix, METRIC_NAME_LAST_FLUSH_TIME));
+        removeAllMetrics(
+            name(metricPrefix, METER_WRITTEN_MESSAGES),
+            name(metricPrefix, METER_READ_MESSAGES),
+            name(metricPrefix, METER_WRITE_DISCARDED_MESSAGES),
+            name(metricPrefix, GAUGE_UNCOMMITTED_MESSAGES),
+            name(metricPrefix, TIMER_WRITE_TIME),
+            name(metricPrefix, TIMER_READ_TIME),
+            name(metricPrefix, METRIC_NAME_SIZE),
+            name(metricPrefix, METRIC_NAME_LOG_END_OFFSET),
+            name(metricPrefix, METRIC_NAME_NUMBER_OF_SEGMENTS),
+            name(metricPrefix, METRIC_NAME_UNFLUSHED_MESSAGES),
+            name(metricPrefix, METRIC_NAME_RECOVERY_POINT),
+            name(metricPrefix, METRIC_NAME_LAST_FLUSH_TIME)
+        );
         this.metricRegistry.remove(getOldestSegmentMetricName());
+
+        // Remove additional metrics
+        removeAllMetrics(
+            name(metricPrefix, GlobalMetricNames.JOURNAL_SEGMENTS_SUFFIX),
+            name(metricPrefix, GlobalMetricNames.JOURNAL_UNCOMMITTED_ENTRIES_SUFFIX),
+            name(metricPrefix, GlobalMetricNames.JOURNAL_SIZE_SUFFIX),
+            name(metricPrefix, GlobalMetricNames.JOURNAL_SIZE_LIMIT_SUFFIX),
+            name(metricPrefix, GlobalMetricNames.JOURNAL_UTILIZATION_RATIO_SUFFIX)
+        );
 
         if (LocalKafkaJournal.class.getName().equals(metricPrefix)) {
             this.metricRegistry.removeMatching(MetricFilter.startsWith(LEGACY_CLASS_NAME));
+
+            //Remove additional metrics from global namespace:
+            removeAllMetrics(
+                GlobalMetricNames.JOURNAL_SEGMENTS,
+                GlobalMetricNames.JOURNAL_UNCOMMITTED_ENTRIES,
+                GlobalMetricNames.JOURNAL_SIZE,
+                GlobalMetricNames.JOURNAL_SIZE_LIMIT,
+                GlobalMetricNames.JOURNAL_UTILIZATION_RATIO
+            );
+        }
+    }
+
+    private void removeAllMetrics(String... names) {
+        for (String name : names) {
+            this.metricRegistry.remove(name);
         }
     }
 
@@ -556,7 +612,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
             }
 
             // Flush the rest of the messages.
-            if (messages.size() > 0) {
+            if (!messages.isEmpty()) {
                 lastWriteOffset = flushMessages(messages, payloadSize);
             }
 
@@ -812,7 +868,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
                     kafkaLog.flush();
                 }
             } catch (Exception e) {
-                LOG.error("Error flushing topic " + topicAndPartition.topic(), e);
+                LOG.error("Error flushing topic {}", topicAndPartition.topic(), e);
             }
         }
     }
@@ -1017,10 +1073,9 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
                 // actually sync to disk
                 fos.getFD().sync();
             } catch (SyncFailedException e) {
-                LOG.error("Cannot sync " + committedReadOffsetFile.getAbsolutePath() + " to disk. Continuing anyway," +
-                        " but there is no guarantee that the file has been written.", e);
+                LOG.error("Cannot sync {} to disk. Continuing anyway, but there is no guarantee that the file has been written.", committedReadOffsetFile.getAbsolutePath(), e);
             } catch (IOException e) {
-                LOG.error("Cannot write " + committedReadOffsetFile.getAbsolutePath() + " to disk.", e);
+                LOG.error("Cannot write {} to disk.", committedReadOffsetFile.getAbsolutePath(), e);
             }
         }
     }
