@@ -19,6 +19,7 @@ package org.graylog.integrations.aws;
 import com.google.common.base.Preconditions;
 import jakarta.inject.Provider;
 import org.apache.commons.lang3.StringUtils;
+import org.graylog.aws.AWSProxyConfigurationProvider;
 import org.graylog.integrations.aws.resources.requests.AWSRequest;
 import org.graylog2.Configuration;
 import org.graylog2.security.encryption.EncryptedValue;
@@ -48,12 +49,15 @@ public class AWSClientBuilderUtil {
     private final Provider<AWSAuthFactory> authFactoryProvider;
     private final EncryptedValueService encryptedValueService;
     private final Configuration configuration;
+    private final AWSProxyConfigurationProvider proxyConfigurationProvider;
 
     @Inject
-    public AWSClientBuilderUtil(Provider<AWSAuthFactory> authFactoryProvider, EncryptedValueService encryptedValueService, Configuration configuration) {
+    public AWSClientBuilderUtil(Provider<AWSAuthFactory> authFactoryProvider, EncryptedValueService encryptedValueService,
+                                Configuration configuration, AWSProxyConfigurationProvider proxyConfigurationProvider) {
         this.authFactoryProvider = authFactoryProvider;
         this.encryptedValueService = encryptedValueService;
         this.configuration = configuration;
+        this.proxyConfigurationProvider = proxyConfigurationProvider;
     }
 
     public AwsCredentialsProvider createCredentialsProvider(AWSRequest request) {
@@ -63,6 +67,20 @@ public class AWSClientBuilderUtil {
                 request.awsAccessKeyId(),
                 decryptSecretAccessKey(request.awsSecretAccessKey()),
                 request.assumeRoleArn());
+    }
+
+    /**
+     * Creates an AWS credentials provider with proxy support on the STS client used for assume-role.
+     * Use this for inputs that support HTTP proxy (S3, Security Lake) but NOT for Kinesis.
+     */
+    public AwsCredentialsProvider createCredentialsProviderWithStsProxy(AWSRequest request) {
+        return authFactoryProvider.get().create(
+                configuration.isCloud(),
+                request.region(),
+                request.awsAccessKeyId(),
+                decryptSecretAccessKey(request.awsSecretAccessKey()),
+                request.assumeRoleArn(),
+                proxyConfigurationProvider.get());
     }
 
     /**
