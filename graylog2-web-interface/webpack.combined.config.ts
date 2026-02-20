@@ -14,20 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'fs';
+import * as path from 'path';
 
-const { globSync } = require('glob');
+import { globSync } from 'glob';
 
 const WEB_MODULES = path.resolve(__dirname, './web-modules.json');
 
 const configsFromWebModule = (webModulesFile) => {
-  const webModules = JSON.parse(fs.readFileSync(webModulesFile));
+  const webModules = JSON.parse(fs.readFileSync(webModulesFile).toString());
 
   return webModules.modules
     .map(({ path: p }) => p)
     .filter((_path) => _path.includes('graylog-plugin'))
-    .map((_path) => `${_path}/webpack.config.js`);
+    .map((_path) => `${_path}/webpack.config.ts`);
 };
 
 const configsFromGlob = () => {
@@ -49,12 +49,12 @@ const configsFromGlob = () => {
     .filter(isNotDependency);
 };
 
-// eslint-disable-next-line no-nested-ternary
-const pluginConfigFiles = process.env.disable_plugins === 'true'
-  ? []
-  : fs.existsSync(WEB_MODULES)
-    ? configsFromWebModule(WEB_MODULES)
-    : configsFromGlob();
+const pluginConfigFiles =
+  process.env.disable_plugins === 'true'
+    ? []
+    : fs.existsSync(WEB_MODULES)
+      ? configsFromWebModule(WEB_MODULES)
+      : configsFromGlob();
 
 if (pluginConfigFiles.some((config) => config.includes('graylog-plugin-cloud/server-plugin'))) {
   // @ts-ignore
@@ -63,9 +63,9 @@ if (pluginConfigFiles.some((config) => config.includes('graylog-plugin-cloud/ser
 
 process.env.web_src_path = path.resolve(__dirname);
 
-// eslint-disable-next-line import/no-dynamic-require
-const webpackConfig = require(path.resolve(__dirname, './webpack.config.js'));
-// eslint-disable-next-line import/no-dynamic-require,global-require
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const webpackConfig = require(path.resolve(__dirname, './webpack.config.ts'));
+// eslint-disable-next-line global-require,@typescript-eslint/no-require-imports
 const pluginConfigs = pluginConfigFiles.map((file) => require(file));
 
 const allConfigs = [webpackConfig, ...pluginConfigs];

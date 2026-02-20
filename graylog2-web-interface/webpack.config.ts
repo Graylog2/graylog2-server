@@ -14,15 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'fs';
+import * as path from 'path';
 
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { merge } = require('webpack-merge');
+import * as webpack from 'webpack';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import { merge } from 'webpack-merge';
+import './build-types';
 
-const supportedBrowsers = require('./supportedBrowsers');
-const core = require('./webpack/core');
+import supportedBrowsers from './supportedBrowsers';
+import * as core from './webpack/core';
 
 const ROOT_PATH = path.resolve(__dirname);
 const APP_PATH = path.resolve(ROOT_PATH, 'src');
@@ -30,7 +31,7 @@ const BUILD_PATH = path.resolve(ROOT_PATH, 'target/web/build');
 const TARGET = process.env.npm_lifecycle_event || 'build';
 process.env.BABEL_ENV = TARGET;
 
-// eslint-disable-next-line import/no-dynamic-require
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const BOOTSTRAPVARS = require(path.resolve(ROOT_PATH, 'public', 'stylesheets', 'bootstrap-config.json')).vars;
 const coreConfig = core.config(TARGET, APP_PATH, ROOT_PATH, ROOT_PATH, supportedBrowsers);
 
