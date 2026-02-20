@@ -193,4 +193,12 @@ public class DataNodeCommandServiceImplTest {
 
     }
 
+    @Test
+    public void removeNodeConfigurationPublishesClusterEvent() throws NodeNotFoundException {
+        final String testNodeId = "node";
+        nodeService.registerServer(buildTestNode(testNodeId, DataNodeStatus.AVAILABLE));
+        classUnderTest.removeNodeConfiguration(testNodeId);
+        verify(clusterEventBus).post(DataNodeLifecycleEvent.create(testNodeId, DataNodeLifecycleTrigger.REMOVE_NODE_CONFIGURATION));
+    }
+
 }
