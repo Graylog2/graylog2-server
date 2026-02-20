@@ -1,0 +1,74 @@
+{
+  "users": [
+    {
+      "_id": {"$oid": "507f1f77bcf86cd799439011"},
+      "username": "admin",
+      "role": "administrator",
+      "status": "active",
+      "department": "Engineering"
+    },
+    {
+      "_id": {"$oid": "507f1f77bcf86cd799439012"},
+      "username": "user1",
+      "role": "user",
+      "status": "active",
+      "department": "Engineering"
+    },
+    {
+      "_id": {"$oid": "507f1f77bcf86cd799439013"},
+      "username": "user2",
+      "role": "user",
+      "status": "active",
+      "department": "Engineering"
+    },
+    {
+      "_id": {"$oid": "507f1f77bcf86cd799439014"},
+      "username": "moderator",
+      "role": "moderator",
+      "status": "active",
+      "department": "Support"
+    },
+    {
+      "_id": {"$oid": "507f1f77bcf86cd799439015"},
+      "username": "analyst",
+      "role": "analyst",
+      "status": "active",
+      "department": "Analytics"
+    },
+    {
+      "_id": {"$oid": "507f1f77bcf86cd799439016"},
+      "username": "user3",
+      "role": "user",
+      "status": "inactive",
+      "department": "Sales"
+    },
+    {
+      "_id": {"$oid": "507f1f77bcf86cd799439017"},
+      "username": "developer1",
+      "role": "developer",
+      "status": "active",
+      "department": "Engineering"
+    },
+    {
+      "_id": {"$oid": "507f1f77bcf86cd799439018"},
+      "username": "developer2",
+      "role": "developer",
+      "status": "active",
+      "department": "Engineering"
+    },
+    {
+      "_id": {"$oid": "507f1f77bcf86cd799439019"},
+      "username": "analyst2",
+      "role": "analyst",
+      "status": "active",
+      "department": "Analytics"
+    },
+    {
+      "_id": {"$oid": "507f1f77bcf86cd799439020"},
+      "username": "admin_backup",
+      "role": "administrator",
+      "status": "inactive",
+      "department": "Engineering"
+    }
+  ]
+}

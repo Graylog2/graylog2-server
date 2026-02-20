@@ -23,10 +23,12 @@ import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.cluster.nodes.DataNodeClusterService;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodePaginatedService;
-import org.graylog2.cluster.nodes.ServerNodePaginatedService;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.nodes.ServerNodeClusterService;
 import org.graylog2.cluster.nodes.ServerNodeDto;
+import org.graylog2.cluster.nodes.ServerNodePaginatedService;
+import org.graylog2.database.grouping.EntityFieldGroupingService;
+import org.graylog2.database.grouping.MongoEntityFieldGroupingService;
 import org.graylog2.database.suggestions.EntitySuggestionService;
 import org.graylog2.database.suggestions.MongoEntitySuggestionService;
 import org.graylog2.indexer.IndexFailureService;
@@ -82,6 +84,7 @@ public class PersistenceServicesBindings extends AbstractModule {
         bind(InputStatusService.class).to(MongoInputStatusService.class).asEagerSingleton();
         bind(EntityListPreferencesService.class).to(EntityListPreferencesServiceImpl.class);
         bind(EntitySuggestionService.class).to(MongoEntitySuggestionService.class);
+        bind(EntityFieldGroupingService.class).to(MongoEntityFieldGroupingService.class);
         bind(EntityTitleService.class).to(EntityTitleServiceImpl.class);
         bind(DataStreamService.class).to(DataStreamServiceImpl.class);
     }
