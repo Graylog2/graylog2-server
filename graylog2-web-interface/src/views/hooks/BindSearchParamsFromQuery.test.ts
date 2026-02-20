@@ -73,6 +73,7 @@ describe('BindSearchParamsFromQuery should', () => {
     const [newView] = await bindSearchParamsFromQuery(input);
 
     expect(findMockQuery(newView).query.query_string).toBe('gl2_source_input:source-input-id');
+    expect(newView.search.id).not.toBe(view.search.id);
   });
 
   it('not update query string when no query param is provided', async () => {
