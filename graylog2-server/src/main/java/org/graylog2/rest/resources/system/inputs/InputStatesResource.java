@@ -90,6 +90,14 @@ public class InputStatesResource extends AbstractInputsResource {
     }
 
     @GET
+    @Path("/local")
+    @Timed
+    @Operation(summary = "Get runtime status of all inputs on this node (for cluster-wide filtering)")
+    public java.util.Map<String, String> getLocalStatuses() {
+        return this.inputRegistry.getStatusesByInputId();
+    }
+
+    @GET
     @Path("/{inputId}")
     @Timed
     @Operation(summary = "Get input state for specified input id on this node")

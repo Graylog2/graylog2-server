@@ -93,7 +93,10 @@ export type Attribute = {
   filter_options?: Array<{ value: string; title: string }>;
   filter_component?: React.ComponentType<FilterComponentProps>;
   related_collection?: string;
+  related_identifier?: string;
   related_property?: string;
+  related_display_fields?: Array<string>;
+  related_display_template?: string;
   sliceable?: boolean;
   permissions?: Array<Permission>;
 };

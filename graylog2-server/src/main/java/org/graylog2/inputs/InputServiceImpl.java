@@ -730,4 +730,13 @@ public class InputServiceImpl implements InputService {
         final Input updatedInput = input.withDesiredState(desiredState);
         saveWithoutEvents(updatedInput);
     }
+
+    @Override
+    public Set<String> findIdsByDesiredState(IOState.Type desiredState) {
+        final Set<String> result = new HashSet<>();
+        documentCollection.find(eq(InputImpl.FIELD_DESIRED_STATE, desiredState.toString()))
+                .projection(Projections.include("_id"))
+                .forEach(doc -> result.add(doc.getObjectId("_id").toHexString()));
+        return result;
+    }
 }

@@ -22,15 +22,16 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.permissions.EntityPermissions;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
+import org.graylog2.database.utils.CompositeDisplayFormatter;
 import org.graylog2.database.dbcatalog.DbEntityCatalogEntry;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntitiesTitleResponse;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityIdentifier;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleRequest;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
+import org.graylog2.search.SearchQueryField;
 
 import jakarta.inject.Inject;
 
@@ -39,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -114,32 +116,57 @@ public class EntityTitleServiceImpl implements EntityTitleService {
 
             final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collection);
 
+            final String idField = entities.get(0).effectiveIdentifierField();
+            final SearchQueryField.Type idType = entities.get(0).effectiveIdentifierType();
+            final Function<String, Object> converter = idType.getMongoValueConverter();
+
             Bson bsonFilter = Filters.or(
                     entities.stream()
-                            .map(e -> Filters.eq("_id", new ObjectId(e.id())))
+                            .map(e -> Filters.eq(idField, converter.apply(e.id())))
                             .collect(Collectors.toList())
             );
 
+            final List<String> displayFields = entities.get(0).displayFields();
+            final String displayTemplate = entities.get(0).displayTemplate();
+            final boolean useCompositeDisplay = displayFields != null && !displayFields.isEmpty();
+
+            Set<String> projectionFields = new HashSet<>();
+            projectionFields.add(idField);
+            projectionFields.add(titleField);
+            if (useCompositeDisplay) {
+                projectionFields.addAll(displayFields);
+            }
+
             final FindIterable<Document> documents = mongoCollection
                     .find(bsonFilter)
-                    .projection(Projections.include(titleField));
+                    .projection(Projections.include(projectionFields.toArray(new String[0])));
 
-            documents.forEach(doc ->
-                    {
-                        final String idAsString = doc.getObjectId("_id").toString();
-                        final boolean canReadTitle = checkCanReadTitle(permissions, dbEntityCatalogEntry.get().readPermission(), idAsString);
-                        titles.add(
-                                new EntityTitleResponse(
-                                        idAsString,
-                                        collection,
-                                        canReadTitle ? doc.getString(titleField) : TITLE_IF_NOT_PERMITTED
-                                )
-                        );
-                        if (!canReadTitle) {
-                            notPermitted.add(idAsString);
-                        }
-                    }
-            );
+            documents.forEach(doc -> {
+                final String idAsString;
+                if ("_id".equals(idField)) {
+                    idAsString = doc.getObjectId("_id").toString();
+                } else {
+                    Object val = doc.get(idField);
+                    idAsString = val != null ? val.toString() : null;
+                }
+                if (idAsString == null) {
+                    return;
+                }
+
+                final boolean canReadTitle = checkCanReadTitle(permissions, dbEntityCatalogEntry.get().readPermission(), idAsString);
+                final String title;
+                if (!canReadTitle) {
+                    title = TITLE_IF_NOT_PERMITTED;
+                } else if (useCompositeDisplay) {
+                    title = CompositeDisplayFormatter.format(doc, displayFields, displayTemplate);
+                } else {
+                    title = doc.getString(titleField);
+                }
+                titles.add(new EntityTitleResponse(idAsString, collection, title));
+                if (!canReadTitle) {
+                    notPermitted.add(idAsString);
+                }
+            });
         }
 
         if(adminIdAndUsersCollectionFound) {

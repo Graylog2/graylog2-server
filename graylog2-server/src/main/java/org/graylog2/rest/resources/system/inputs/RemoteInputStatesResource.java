@@ -30,6 +30,9 @@ public interface RemoteInputStatesResource {
     @GET("system/inputstates")
     Call<InputStatesList> list();
 
+    @GET("system/inputstates/local")
+    Call<java.util.Map<String, String>> getLocalStatuses();
+
     @PUT("system/inputstates/{inputId}")
     Call<InputCreated> start(@Path("inputId") String inputId);
 

@@ -17,7 +17,30 @@
 package org.graylog2.rest.resources.system.contentpacks.titles.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.search.SearchQueryField;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 public record EntityIdentifier(@JsonProperty("id") String id,
-                               @JsonProperty("type") String type) {
+                               @JsonProperty("type") String type,
+                               @JsonProperty("identifier_field") @Nullable String identifierField,
+                               @JsonProperty("identifier_type") @Nullable String identifierType,
+                               @JsonProperty("display_fields") @Nullable List<String> displayFields,
+                               @JsonProperty("display_template") @Nullable String displayTemplate) {
+
+    public EntityIdentifier(String id, String type) {
+        this(id, type, null, null, null, null);
+    }
+
+    public String effectiveIdentifierField() {
+        return identifierField != null ? identifierField : "_id";
+    }
+
+    public SearchQueryField.Type effectiveIdentifierType() {
+        if (identifierType == null) {
+            return SearchQueryField.Type.OBJECT_ID;
+        }
+        return SearchQueryField.Type.valueOf(identifierType);
+    }
 }

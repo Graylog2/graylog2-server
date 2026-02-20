@@ -22,6 +22,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog2.search.SearchQueryField;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -56,9 +57,21 @@ public abstract class EntityAttribute {
     @Nullable
     public abstract String relatedCollection();
 
+    @JsonProperty("related_identifier")
+    @Nullable
+    public abstract String relatedIdentifier();
+
     @JsonProperty("related_property")
     @Nullable
     public abstract String relatedProperty();
+
+    @JsonProperty("related_display_fields")
+    @Nullable
+    public abstract List<String> relatedDisplayFields();
+
+    @JsonProperty("related_display_template")
+    @Nullable
+    public abstract String relatedDisplayTemplate();
 
     @JsonProperty("filter_options")
     @Nullable
@@ -86,7 +99,13 @@ public abstract class EntityAttribute {
 
         public abstract Builder relatedCollection(String relatedCollection);
 
+        public abstract Builder relatedIdentifier(String relatedIdentifier);
+
         public abstract Builder relatedProperty(String relatedProperty);
+
+        public abstract Builder relatedDisplayFields(List<String> relatedDisplayFields);
+
+        public abstract Builder relatedDisplayTemplate(String relatedDisplayTemplate);
 
         public abstract Builder filterOptions(Set<FilterOption> filterOptions);
 

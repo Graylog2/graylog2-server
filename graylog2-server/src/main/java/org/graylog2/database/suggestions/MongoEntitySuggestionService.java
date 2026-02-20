@@ -27,13 +27,19 @@ import com.mongodb.client.model.Sorts;
 import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.utils.CompositeDisplayFormatter;
 import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.security.EntityPermissionsUtils;
 
+import javax.annotation.Nullable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -60,7 +66,24 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
 
     @Override
     public EntitySuggestionResponse suggest(final String collection,
+                                            final String targetColumn,
                                             final String valueColumn,
+                                            @Nullable final List<String> displayFields,
+                                            @Nullable final String displayTemplate,
+                                            final String query,
+                                            final int page,
+                                            final int perPage,
+                                            final Subject subject) {
+        return suggest(collection, targetColumn, valueColumn, displayFields, displayTemplate, null, query, page, perPage, subject);
+    }
+
+    @Override
+    public EntitySuggestionResponse suggest(final String collection,
+                                            final String targetColumn,
+                                            final String valueColumn,
+                                            @Nullable final List<String> displayFields,
+                                            @Nullable final String displayTemplate,
+                                            final SearchQueryField.Type identifierType,
                                             final String query,
                                             final int page,
                                             final int perPage,
@@ -71,13 +94,23 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
         final var isFirstPageAndSpecialCollection = isSpecialCollection && page == 1;
         final var fixNumberOfItemsToReadFromDB = isFirstPageAndSpecialCollection ? 1 : 0;
 
+        // Determine which fields to project
+        final Set<String> fieldsToProject = new HashSet<>();
+        fieldsToProject.add(targetColumn);
+
+        if (displayFields != null && !displayFields.isEmpty()) {
+            fieldsToProject.addAll(displayFields);
+        } else {
+            fieldsToProject.add(valueColumn);
+        }
+
         final var bsonFilter = !filterIsEmpty
                 ? Filters.regex(valueColumn, query, "i")
                 : Filters.empty();
 
         final var resultWithoutPagination = mongoCollection
                 .find(bsonFilter)
-                .projection(Projections.include(valueColumn))
+                .projection(Projections.include(fieldsToProject.toArray(new String[0])))
                 .sort(Sorts.ascending(valueColumn));
 
         final var userCanReadAllEntities = permissionsUtils.hasAllPermission(subject) || permissionsUtils.hasReadPermissionForWholeCollection(subject, collection);
@@ -89,15 +122,33 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                 ? mongoPaginate(resultWithoutPagination, perPage - fixNumberOfItemsToReadFromDB, skip)
                 : paginateWithPermissionCheck(resultWithoutPagination, perPage - fixNumberOfItemsToReadFromDB, skip, checkPermission)) {
 
-            final List<EntitySuggestion> staticEntry = isFirstPageAndSpecialCollection ? List.of(new EntitySuggestion(LOCAL_ADMIN_ID, "admin")) : List.of();
+            final List<EntitySuggestion> staticEntry = isFirstPageAndSpecialCollection ? List.of(new EntitySuggestion(LOCAL_ADMIN_ID, null, "admin")) : List.of();
 
             final Stream<EntitySuggestion> suggestionsFromDB = documents
-                    .map(doc ->
-                            new EntitySuggestion(
-                                    doc.getObjectId(ID_FIELD).toString(),
-                                    doc.getString(valueColumn)
-                            )
-                    );
+                    .map(doc -> {
+                        String displayValue;
+
+                        if (displayFields != null && !displayFields.isEmpty()) {
+                            displayValue = CompositeDisplayFormatter.format(doc, displayFields, displayTemplate);
+                        } else {
+                            displayValue = doc.getString(valueColumn);
+                        }
+
+                        // Extract targetColumn value as String
+                        final String targetValue;
+                        final Object rawValue = doc.get(targetColumn);
+                        if (rawValue instanceof ObjectId oid) {
+                            targetValue = oid.toHexString();
+                        } else {
+                            targetValue = rawValue != null ? rawValue.toString() : null;
+                        }
+
+                        return new EntitySuggestion(
+                                doc.getObjectId("_id").toHexString(),
+                                targetValue,
+                                displayValue
+                        );
+                    });
 
             suggestions = Streams.concat(staticEntry.stream(), suggestionsFromDB).toList();
         }
@@ -129,6 +180,17 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
     @MustBeClosed
     private Stream<Document> mongoPaginate(FindIterable<Document> result, int limit, int skip) {
         return MongoUtils.stream(result.limit(limit).skip(skip));
+    }
+
+    @Override
+    public EntitySuggestionResponse suggest(final String collection,
+                                            final String targetColumn,
+                                            final String valueColumn,
+                                            final String query,
+                                            final int page,
+                                            final int perPage,
+                                            final Subject subject) {
+        return suggest(collection, targetColumn, valueColumn, null, null, null, query, page, perPage, subject);
     }
 
 }
