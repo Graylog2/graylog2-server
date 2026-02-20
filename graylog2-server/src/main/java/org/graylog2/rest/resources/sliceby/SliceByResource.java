@@ -12,8 +12,8 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.database.grouping.EntityFieldBucketResponse;
 import org.graylog2.database.grouping.EntityFieldGroupingService;
-import org.graylog2.database.grouping.SliceByResponse;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
@@ -33,34 +33,34 @@ public class SliceByResource extends RestResource {
 
     @GET
     @Timed
-    @Operation(summary = "Get a paginated list of suggested entities")
-    public SliceByResponse getPage(@Parameter(name = "collection")
-                                   @QueryParam("collection") String collection,
-                                   @Parameter(name = "column")
-                                   @QueryParam("column") @DefaultValue("title") String column,
-                                   @Parameter(name = "page")
-                                   @QueryParam("page") @DefaultValue("1") int page,
-                                   @Parameter(name = "per_page")
-                                   @QueryParam("per_page") @DefaultValue("10") int perPage,
-                                   @Parameter(name = "query")
-                                   @QueryParam("query") @DefaultValue("") String query,
-                                   @Parameter(name = "sort_order")
-                                   @QueryParam("sort_order") @DefaultValue("DESC") EntityFieldGroupingService.SortOrder sortOrder,
-                                   @Parameter(name = "sort_field")
-                                   @QueryParam("sort_field") @DefaultValue("COUNT") EntityFieldGroupingService.SortField sortField) {
+    @Operation(summary = "Get slices for a given collection and field name")
+    public EntityFieldBucketResponse getPage(@Parameter(name = "collection")
+                                             @QueryParam("collection") String collection,
+                                             @Parameter(name = "column")
+                                             @QueryParam("column") @DefaultValue("title") String column,
+                                             @Parameter(name = "query")
+                                             @QueryParam("query") @DefaultValue("") String query,
+                                             @Parameter(name = "resultsFilter")
+                                             @QueryParam("query") @DefaultValue("") String resultsFilter,
+                                             @Parameter(name = "page")
+                                             @QueryParam("page") @DefaultValue("1") int page,
+                                             @Parameter(name = "per_page")
+                                             @QueryParam("per_page") @DefaultValue("10") int perPage,
+                                             @Parameter(name = "sort_order")
+                                             @QueryParam("sort_order") @DefaultValue("DESC") EntityFieldGroupingService.SortOrder sortOrder,
+                                             @Parameter(name = "sort_field")
+                                             @QueryParam("sort_field") @DefaultValue("COUNT") EntityFieldGroupingService.SortField sortField) {
 
-        return new SliceByResponse(
-                entitySuggestionService.groupByField(
-                        collection,
-                        column,
-                        query,
-                        "TBD",
-                        page,
-                        perPage,
-                        sortOrder,
-                        sortField,
-                        getSubject()),
-                null
-        );
+        return entitySuggestionService.groupByField(
+                collection,
+                column,
+                query,
+                resultsFilter,
+                page,
+                perPage,
+                sortOrder,
+                sortField,
+                getSubject());
+
     }
 }
