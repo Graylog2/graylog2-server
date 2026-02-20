@@ -21,5 +21,5 @@ public interface OpensearchNodeRole {
     String DATA = "data";
     String INGEST = "ingest";
     String REMOTE_CLUSTER_CLIENT = "remote_cluster_client";
-    String SEARCH = "search";
+    String WARM = "warm";
 }

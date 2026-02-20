@@ -1,0 +1,5 @@
+type = "f"
+message = "Upgrade of bundled OpenSearch in Datanode to 3.5.0."
+
+issues = ["25063"]
+pulls = ["25062"]

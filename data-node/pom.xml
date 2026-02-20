@@ -42,9 +42,9 @@
         <mainClass>org.graylog.datanode.bootstrap.Main</mainClass>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <opensearch.version>2.19.4</opensearch.version>
-        <opensearch.mac.jdk.version>21.0.7</opensearch.mac.jdk.version>
-        <opensearch.mac.jdk.build>6</opensearch.mac.jdk.build>
+        <opensearch.version>3.5.0</opensearch.version>
+        <opensearch.mac.jdk.version>25.0.2</opensearch.mac.jdk.version>
+        <opensearch.mac.jdk.build>10</opensearch.mac.jdk.build>
 
         <!--
            We don't need to sign anything in this module. This fixes a release build error related to setting
@@ -546,7 +546,7 @@
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-x64.tar.gz
                             </url>
                             <sha512>
-                                360f865a9e5f71f425e315c4d5e0a0b32a94debe461472210648edd7fb153211c89322597eb91e202fa360e1d79f5ef38ce35dc2c839f92654003d357a26afb4
+                                b83c4f1ef7f6fd19aaf1d281b68a1c64039090a95c8b082bccdab714fd012bd289830596c47db31bc604eed46b2e58ab3e2616e739172987c3991ea199011c7c
                             </sha512>
                             <outputFileName>opensearch-${opensearch.version}-linux-x64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
@@ -570,7 +570,7 @@
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-arm64.tar.gz
                             </url>
                             <sha512>
-                                8b000d75befa6eac73da6bccbd3b5f5f14448caf8a66585d8d5bf2b49f46b268e6388be12ae21b75372e23afe60bd5160366704f646c530cdf783bce7d697c40
+                                17bb9a809de88df1ad93e650c16f2b9a237f42ff4ff69e93136db2f43a9a9a948c13d7d6591be3d72afad224e6b88b1a70c5ed2b316e85fcebbb495edf008a14
                             </sha512>
                             <outputFileName>opensearch-${opensearch.version}-linux-aarch64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
@@ -596,7 +596,7 @@
                             <outputFileName>repository-s3-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                012f350310101913cb0358495e05e506b0ddef4b43d7f8c149d7c1643142ac2b9baa612b0e31e82f2bdd98379ffa14df8039ba894e5443faa278c1a7df00dcc8
+                                650ca522b42155fd68a07a17e719bceaf419b572e7c0f82c48787f465b6dcd510793e7ae0faf3225f4cb1867acbf5458a8ce8616e6c0d4aed189660884d882a8
                             </sha512>
                         </configuration>
                     </execution>
@@ -613,7 +613,7 @@
                             <outputFileName>repository-gcs-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                658c5726d5f8ef23d814db5f5fe101b87a1ebfbf10f869599ad2d350dc2bb91afa5e6002300032f671d4b6827a7e7ffb58b43f004e8953f74db70cde7be610d7
+                                748c46eb05870be9a928fde27bf52e4e832d80f858c4804ecccd84bfc99473fd3f4d7aa95d3c9e27e74518cac7351e0dfb3dd5fe148ce06a66a5498ec96337ee
                             </sha512>
                         </configuration>
                     </execution>
@@ -630,7 +630,7 @@
                             <outputFileName>repository-hdfs-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                3550e9d2477cc9222dd834e4671636d76a50b8f54664a10f54e0be93b7a923d2b47564eb78c58e0291fb7653e1806afb62300918c7fd6cd29f4655ce0f2a2164
+                                1e91ffbf746a65512af6c1d1183cbabcb0bfa53f4ce632dd05782ca18f3099c79a6812abafe4845b9d07163ea9b0449b1c535a91960ab007345e83651587f114
                             </sha512>
                         </configuration>
                     </execution>
@@ -647,7 +647,7 @@
                             <outputFileName>repository-azure-${opensearch.version}.zip</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch-plugins</outputDirectory>
                             <sha512>
-                                2b1661e061bc892aee54748a857d1c1d3a3269eb11a8ac789f3913ea067a70ea9cd9d24cd48f9dc344850dcac807775f66709104c1edf4804713d18d6e49f6d0
+                                3bde65ceb3694fc264fa9b063b9d6658b4814b2604ae8a52a10c0fb2d256657f884f12083478cff220bc2f981348f65f4f0bb25d786e177ae108c2091e22a9c6
                             </sha512>
                         </configuration>
                     </execution>
@@ -672,7 +672,9 @@
                                 -->
                                 <chmod dir="${project.build.directory}/opensearch"
                                        includes="opensearch-*/config/**"
-                                       perm="ugo+r"/>
+                                       perm="ugo+r"
+                                       parallel="false"
+                                />
                             </target>
                         </configuration>
                     </execution>
@@ -1008,10 +1010,10 @@
                                 </goals>
                                 <configuration>
                                     <url>
-                                        https://github.com/adoptium/temurin21-binaries/releases/download/jdk-${opensearch.mac.jdk.version}%2B${opensearch.mac.jdk.build}/OpenJDK21U-jdk_x64_mac_hotspot_${opensearch.mac.jdk.version}_${opensearch.mac.jdk.build}.tar.gz
+                                        https://github.com/adoptium/temurin25-binaries/releases/download/jdk-${opensearch.mac.jdk.version}%2B${opensearch.mac.jdk.build}/OpenJDK25U-jdk_x64_mac_hotspot_${opensearch.mac.jdk.version}_${opensearch.mac.jdk.build}.tar.gz
                                     </url>
                                     <sha512>
-                                        981de4ed6629975b84f2604dd2c601e66633691b1da835e0b8741c4712d5b24b51e757686624dc1b2492e61a9e9a27c8ac73bfc9e571d6e8c1c5db8ec6a4189c
+                                        76d05d952ea451e0f0872e20895d7e65eb501dcd60b7e376819a489e2a7fdc758dfccc098f5b17024bb8a8b633240d84a50021628ab7a5525abc7d3cd09765a4
                                     </sha512>
                                     <outputDirectory>
                                         ${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/jdk-mac
@@ -1033,10 +1035,10 @@
                                 </goals>
                                 <configuration>
                                     <url>
-                                        https://github.com/adoptium/temurin21-binaries/releases/download/jdk-${opensearch.mac.jdk.version}%2B${opensearch.mac.jdk.build}/OpenJDK21U-jdk_aarch64_mac_hotspot_${opensearch.mac.jdk.version}_${opensearch.mac.jdk.build}.tar.gz
+                                        https://github.com/adoptium/temurin25-binaries/releases/download/jdk-${opensearch.mac.jdk.version}%2B${opensearch.mac.jdk.build}/OpenJDK25U-jdk_aarch64_mac_hotspot_${opensearch.mac.jdk.version}_${opensearch.mac.jdk.build}.tar.gz
                                     </url>
                                     <sha512>
-                                        5bd61c1634daa5b6e0c473de6c0883ac2d29c0daa7101dd852113a5197b6cd60f790c0f7f53a64b2dbbb45f030ee4481c9d38745615a1a39b8efbef41e4b8115
+                                        f15a4ae987c1da6e9d12afafde3a95c5ac8c0f35617b6b49e9de1ba0d8eb886d6c1b3f6492dfa0de44996e5a5cde41e6240e05568ec563498a7471c8bd94c044
                                     </sha512>
                                     <outputDirectory>
                                         ${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/jdk-mac

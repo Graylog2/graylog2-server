@@ -24,5 +24,16 @@
 # JDK 9+ GC logging
 -Xlog:gc*,gc+age=trace,safepoint:file=/tmp/gc.log:utctime,pid,tags:filecount=32,filesize=64m
 
-# Explicitly allow security manager (https://bugs.openjdk.java.net/browse/JDK-8270380)
--Djava.security.manager=allow
+# JDK 20+ Incubating Vector Module for SIMD optimizations;
+# disabling may reduce performance on vector optimized lucene
+--add-modules=jdk.incubator.vector
+
+-javaagent:agent/opensearch-agent.jar
+--add-opens=java.base/java.nio=org.apache.arrow.memory.core,ALL-UNNAMED
+
+# For cases with high memory-mapped file counts, a lower value can improve stability and
+# prevent issues like "leaked" maps or performance degradation. A value of 1 effectively
+# disables the shared Arena pooling and uses a confined Arena for each MMapDirectory
+-Dorg.apache.lucene.store.MMapDirectory.sharedArenaMaxPermits=1
+
+-XX:+UseCompactObjectHeaders

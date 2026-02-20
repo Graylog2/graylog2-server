@@ -89,32 +89,32 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
             LOG.info("Searchable snapshots are configured, adding opensearch configuration");
             final DatanodeConfigurationPart.Builder builder = DatanodeConfigurationPart.builder();
 
-            final boolean searchRoleEnabled = searchRoleEnabled();
-            if (searchRoleEnabled) {
-                LOG.info("Search role enabled, validating usable space and adding search role to opensearch configuration");
+            final boolean warmRoleEnabled = warmRoleEnabled();
+            if (warmRoleEnabled) {
+                LOG.info("Warm role enabled, validating usable space and adding warm role to opensearch configuration");
                 validateUsableSpace();
-                builder.addNodeRole(OpensearchNodeRole.SEARCH);
+                builder.addNodeRole(OpensearchNodeRole.WARM);
             }
             return builder
-                    .properties(properties(searchRoleEnabled, enabledRepositories))
+                    .properties(properties(warmRoleEnabled, enabledRepositories))
                     .keystoreItems(keystoreItems(enabledRepositories))
                     .build();
-        } else if (searchRoleExplicitlyConfigured()) {
-            throw new OpensearchConfigurationException("Your configuration contains the search node role in node_roles but there is no" +
+        } else if (warmRoleExplicitlyConfigured()) {
+            throw new OpensearchConfigurationException("Your configuration contains the warm node role in node_roles but there is no" +
                     "snapshots repository configured. Please remove the role or provide path_repo or S3 repository credentials.");
         } else {
-            LOG.info("Opensearch snapshots not configured, skipping search role and cache configuration.");
+            LOG.info("Opensearch snapshots not configured, skipping warm role and cache configuration.");
             return DatanodeConfigurationPart.builder().build();
         }
     }
 
-    private boolean searchRoleExplicitlyConfigured() {
-        return localConfiguration.getNodeRoles() != null && localConfiguration.getNodeRoles().contains(OpensearchNodeRole.SEARCH);
+    private boolean warmRoleExplicitlyConfigured() {
+        return localConfiguration.getNodeRoles() != null && localConfiguration.getNodeRoles().contains(OpensearchNodeRole.WARM);
     }
 
-    private boolean searchRoleEnabled() {
+    private boolean warmRoleEnabled() {
         final boolean rolesNotConfigured = localConfiguration.getNodeRoles() == null || localConfiguration.getNodeRoles().isEmpty();
-        return rolesNotConfigured || localConfiguration.getNodeRoles().contains(OpensearchNodeRole.SEARCH);
+        return rolesNotConfigured || localConfiguration.getNodeRoles().contains(OpensearchNodeRole.WARM);
     }
 
     private void validateUsableSpace() throws OpensearchConfigurationException {
