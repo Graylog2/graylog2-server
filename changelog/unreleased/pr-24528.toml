@@ -1,0 +1,4 @@
+type = "c"
+message = "Improve performance of pipeline processing for large pipeline stage ranges."
+
+pulls = ["24528"]
