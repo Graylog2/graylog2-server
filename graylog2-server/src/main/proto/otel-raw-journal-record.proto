@@ -8,10 +8,12 @@ option java_outer_classname = "OTelJournal";
 import "opentelemetry/proto/resource/v1/resource.proto";
 import "opentelemetry/proto/common/v1/common.proto";
 import "opentelemetry/proto/logs/v1/logs.proto";
+import "opentelemetry/proto/trace/v1/trace.proto";
 
 message Record {
   oneof payload {
     Log log = 1;
+    Trace trace = 2;
   }
 }
 
@@ -21,4 +23,12 @@ message Log {
   opentelemetry.proto.common.v1.InstrumentationScope scope = 3;
   opentelemetry.proto.logs.v1.LogRecord log_record = 4;
   string log_record_schema_url = 5;
+}
+
+message Trace {
+  opentelemetry.proto.resource.v1.Resource resource = 1;
+  string resource_schema_url = 2;
+  opentelemetry.proto.common.v1.InstrumentationScope scope = 3;
+  opentelemetry.proto.trace.v1.Span span = 4;
+  string span_schema_url = 5;
 }

@@ -17,9 +17,13 @@
 package org.graylog.inputs.otel;
 
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
+import io.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import io.opentelemetry.proto.logs.v1.ResourceLogs;
 import io.opentelemetry.proto.logs.v1.ScopeLogs;
+import io.opentelemetry.proto.trace.v1.ResourceSpans;
+import io.opentelemetry.proto.trace.v1.ScopeSpans;
+import io.opentelemetry.proto.trace.v1.Span;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +42,26 @@ public class OTelJournalRecordFactory {
                                     .setScope(scopeLogs.getScope())
                                     .setLogRecord(logRecord)
                                     .setLogRecordSchemaUrl(scopeLogs.getSchemaUrl())
+                            ).build();
+                    journalRecords.add(journalRecord);
+                }
+            }
+        }
+        return journalRecords;
+    }
+
+    public List<OTelJournal.Record> createFromTraceRequest(ExportTraceServiceRequest request) {
+        final List<OTelJournal.Record> journalRecords = new ArrayList<>();
+        for (ResourceSpans resourceSpans : request.getResourceSpansList()) {
+            for (ScopeSpans scopeSpans : resourceSpans.getScopeSpansList()) {
+                for (Span span : scopeSpans.getSpansList()) {
+                    final var journalRecord = OTelJournal.Record.newBuilder()
+                            .setTrace(OTelJournal.Trace.newBuilder()
+                                    .setResource(resourceSpans.getResource())
+                                    .setResourceSchemaUrl(resourceSpans.getSchemaUrl())
+                                    .setScope(scopeSpans.getScope())
+                                    .setSpan(span)
+                                    .setSpanSchemaUrl(scopeSpans.getSchemaUrl())
                             ).build();
                     journalRecords.add(journalRecord);
                 }
