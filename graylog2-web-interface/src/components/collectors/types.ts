@@ -42,7 +42,7 @@ export type CollectorInstanceView = {
   status: 'online' | 'offline';
 };
 
-export type SourceType = 'file' | 'journald' | 'windows_event_log' | 'tcp' | 'udp';
+export type SourceType = 'file' | 'journald' | 'windows_event_log';
 
 export type SourceBase = {
   id: string;
@@ -71,24 +71,11 @@ export type WindowsEventLogSourceConfig = {
   query?: string;
 };
 
-export type TcpSourceConfig = {
-  bind_address: string;
-  port: number;
-  framing: 'newline' | 'octet_counting';
-};
-
-export type UdpSourceConfig = {
-  bind_address: string;
-  port: number;
-};
-
 export type FileSource = SourceBase & { type: 'file'; config: FileSourceConfig };
 export type JournaldSource = SourceBase & { type: 'journald'; config: JournaldSourceConfig };
 export type WindowsEventLogSource = SourceBase & { type: 'windows_event_log'; config: WindowsEventLogSourceConfig };
-export type TcpSource = SourceBase & { type: 'tcp'; config: TcpSourceConfig };
-export type UdpSource = SourceBase & { type: 'udp'; config: UdpSourceConfig };
 
-export type Source = FileSource | JournaldSource | WindowsEventLogSource | TcpSource | UdpSource;
+export type Source = FileSource | JournaldSource | WindowsEventLogSource ;
 
 export type EnrollmentToken = {
   id: string;

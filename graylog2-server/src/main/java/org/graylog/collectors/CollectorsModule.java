@@ -17,23 +17,21 @@
 package org.graylog.collectors;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.Multibinder;
+import org.graylog.collectors.db.FileSourceConfig;
+import org.graylog.collectors.db.JournaldSourceConfig;
+import org.graylog.collectors.db.WindowsEventLogSourceConfig;
 import org.graylog.collectors.input.CollectorIngestCodec;
 import org.graylog.collectors.input.CollectorIngestGrpcInput;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
 import org.graylog.collectors.input.transport.CollectorIngestGrpcTransport;
 import org.graylog.collectors.input.transport.CollectorIngestHttpTransport;
 import org.graylog.collectors.input.transport.CollectorIngestLogsService;
-import org.graylog.collectors.db.FileSourceConfig;
-import org.graylog.collectors.db.JournaldSourceConfig;
-import org.graylog.collectors.db.TcpSourceConfig;
-import org.graylog.collectors.db.UdpSourceConfig;
-import org.graylog.collectors.db.WindowsEventLogSourceConfig;
 import org.graylog.collectors.rest.CollectorInstancesResource;
 import org.graylog.collectors.rest.CollectorsConfigResource;
 import org.graylog.collectors.rest.FleetPermissions;
 import org.graylog.collectors.rest.FleetResource;
 import org.graylog.collectors.rest.SourceResource;
-import com.google.inject.multibindings.Multibinder;
 import org.graylog2.database.SequenceTopics;
 import org.graylog2.plugin.PluginModule;
 
@@ -71,7 +69,5 @@ public class CollectorsModule extends PluginModule {
         registerJacksonSubtype(FileSourceConfig.class);
         registerJacksonSubtype(JournaldSourceConfig.class);
         registerJacksonSubtype(WindowsEventLogSourceConfig.class);
-        registerJacksonSubtype(TcpSourceConfig.class);
-        registerJacksonSubtype(UdpSourceConfig.class);
     }
 }

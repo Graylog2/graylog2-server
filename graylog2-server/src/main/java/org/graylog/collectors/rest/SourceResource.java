@@ -41,6 +41,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.collectors.SourceService;
 import org.graylog.collectors.db.SourceDTO;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
@@ -128,10 +129,11 @@ public class SourceResource extends RestResource {
     @Timed
     @Operation(summary = "Create a new source in a fleet")
     @RequiresPermissions(FleetPermissions.SOURCE_CREATE)
+    // TODO: audit event
+    @NoAuditEvent("todo")
     public Response create(
             @Parameter(name = "fleetId") @PathParam("fleetId") String fleetId,
             @Valid @NotNull CreateSourceRequest request) {
-        // TODO: audit event
         final SourceDTO created;
         try {
             created = sourceService.create(fleetId, request.name(), request.description(), request.enabled(), request.config());
@@ -154,6 +156,8 @@ public class SourceResource extends RestResource {
     @Path("/{sourceId}")
     @Timed
     @Operation(summary = "Update a source")
+    // TODO: audit event
+    @NoAuditEvent("todo")
     public Response update(
             @Parameter(name = "fleetId") @PathParam("fleetId") String fleetId,
             @Parameter(name = "sourceId") @PathParam("sourceId") String sourceId,
@@ -179,6 +183,8 @@ public class SourceResource extends RestResource {
     @Path("/{sourceId}")
     @Timed
     @Operation(summary = "Delete a source")
+    // TODO: audit event
+    @NoAuditEvent("todo")
     public void delete(
             @Parameter(name = "fleetId") @PathParam("fleetId") String fleetId,
             @Parameter(name = "sourceId") @PathParam("sourceId") String sourceId) {

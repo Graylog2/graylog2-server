@@ -25,8 +25,6 @@ const sourceTypeLabels: Record<string, string> = {
   file: 'File',
   journald: 'Journald',
   windows_event_log: 'Windows Event Log',
-  tcp: 'TCP',
-  udp: 'UDP',
 };
 
 const customColumnRenderers = (): ColumnRenderers<Source> => ({

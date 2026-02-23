@@ -43,6 +43,7 @@ import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.SourceService;
 import org.graylog.collectors.db.FleetDTO;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
@@ -151,8 +152,9 @@ public class FleetResource extends RestResource {
     @Timed
     @Operation(summary = "Create a new fleet")
     @RequiresPermissions(FleetPermissions.FLEET_CREATE)
+    // TODO: audit event
+    @NoAuditEvent("todo")
     public Response create(@Valid @NotNull CreateFleetRequest request) {
-        // TODO: audit event
         final FleetDTO created = fleetService.create(request.name(), request.description(), request.targetVersion());
         final FleetResponse response = FleetResponse.fromDTO(created);
         final URI uri = getUriBuilderToSelf().path(FleetResource.class, "get")
@@ -164,9 +166,10 @@ public class FleetResource extends RestResource {
     @Path("/{fleetId}")
     @Timed
     @Operation(summary = "Update a fleet")
+    // TODO: audit event
+    @NoAuditEvent("todo")
     public FleetResponse update(@Parameter(name = "fleetId") @PathParam("fleetId") String fleetId, @Valid @NotNull UpdateFleetRequest request) {
         checkPermission(FleetPermissions.FLEET_EDIT, fleetId);
-        // TODO: audit event
         return fleetService.update(fleetId, request.name(), request.description(), request.targetVersion())
                 .map(FleetResponse::fromDTO)
                 .orElseThrow(() -> new NotFoundException("Fleet " + fleetId + " not found"));
@@ -176,9 +179,10 @@ public class FleetResource extends RestResource {
     @Path("/{fleetId}")
     @Timed
     @Operation(summary = "Delete a fleet")
+    // TODO: audit event
+    @NoAuditEvent("todo")
     public void delete(@Parameter(name = "fleetId") @PathParam("fleetId") String fleetId) {
         checkPermission(FleetPermissions.FLEET_DELETE, fleetId);
-        // TODO: audit event
         // TODO should this fail if there are still collectors using it? should a replacement fleed be required?
         if (!fleetService.delete(fleetId)) {
             throw new NotFoundException("Fleet " + fleetId + " not found");

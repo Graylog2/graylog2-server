@@ -20,7 +20,7 @@ import { useState } from 'react';
 import { Button, Input, SegmentedControl } from 'components/bootstrap';
 import Modal from 'components/bootstrap/Modal';
 
-import type { Source, SourceType, FileSourceConfig, JournaldSourceConfig, TcpSourceConfig, UdpSourceConfig, WindowsEventLogSourceConfig } from '../types';
+import type { Source, SourceType, FileSourceConfig, JournaldSourceConfig, WindowsEventLogSourceConfig } from '../types';
 
 type Props = {
   fleetId: string;
@@ -34,16 +34,12 @@ const sourceTypeLabels: Record<SourceType, string> = {
   file: 'File',
   journald: 'Journald',
   windows_event_log: 'WinEventLog',
-  tcp: 'TCP',
-  udp: 'UDP',
 };
 
-const defaultConfigs: Record<SourceType, FileSourceConfig | JournaldSourceConfig | TcpSourceConfig | UdpSourceConfig | WindowsEventLogSourceConfig> = {
+const defaultConfigs: Record<SourceType, FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig> = {
   file: { paths: [''], read_mode: 'end' },
   journald: { priority: 6 },
   windows_event_log: { channels: ['Application'], read_mode: 'end', event_format: 'json' },
-  tcp: { bind_address: '0.0.0.0', port: 5514, framing: 'newline' },
-  udp: { bind_address: '0.0.0.0', port: 5514 },
 };
 
 const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoading = false }: Props) => {
@@ -79,15 +75,6 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
   const updateJournaldConfig = (updates: Partial<JournaldSourceConfig>) => {
     setConfig((prev) => ({ ...prev, ...updates }));
   };
-
-  const updateTcpConfig = (updates: Partial<TcpSourceConfig>) => {
-    setConfig((prev) => ({ ...prev, ...updates }));
-  };
-
-  const updateUdpConfig = (updates: Partial<UdpSourceConfig>) => {
-    setConfig((prev) => ({ ...prev, ...updates }));
-  };
-
   const updateWindowsEventLogConfig = (updates: Partial<WindowsEventLogSourceConfig>) => {
     setConfig((prev) => ({ ...prev, ...updates }));
   };
@@ -148,71 +135,6 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
     );
   };
 
-  const renderTcpConfig = () => {
-    const tcpConfig = config as TcpSourceConfig;
-
-    return (
-      <>
-        <Input
-          id="tcp-bind-address"
-          type="text"
-          label="Bind Address"
-          value={tcpConfig.bind_address}
-          onChange={(e) => updateTcpConfig({ bind_address: e.target.value })}
-          required
-        />
-        <Input
-          id="tcp-port"
-          type="number"
-          label="Port"
-          value={tcpConfig.port}
-          onChange={(e) => updateTcpConfig({ port: Number(e.target.value) || 5514 })}
-          min={1}
-          max={65535}
-          required
-        />
-        <div>
-          <label htmlFor="tcp-framing">Framing</label>
-          <SegmentedControl
-            value={tcpConfig.framing}
-            onChange={(v) => updateTcpConfig({ framing: v as 'newline' | 'octet_counting' })}
-            data={[
-              { value: 'newline', label: 'Newline' },
-              { value: 'octet_counting', label: 'Octet Counting' },
-            ]}
-          />
-        </div>
-      </>
-    );
-  };
-
-  const renderUdpConfig = () => {
-    const udpConfig = config as UdpSourceConfig;
-
-    return (
-      <>
-        <Input
-          id="udp-bind-address"
-          type="text"
-          label="Bind Address"
-          value={udpConfig.bind_address}
-          onChange={(e) => updateUdpConfig({ bind_address: e.target.value })}
-          required
-        />
-        <Input
-          id="udp-port"
-          type="number"
-          label="Port"
-          value={udpConfig.port}
-          onChange={(e) => updateUdpConfig({ port: Number(e.target.value) || 5514 })}
-          min={1}
-          max={65535}
-          required
-        />
-      </>
-    );
-  };
-
   const renderWindowsEventLogConfig = () => {
     const winConfig = config as WindowsEventLogSourceConfig;
 
@@ -259,10 +181,6 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
         return renderFileConfig();
       case 'journald':
         return renderJournaldConfig();
-      case 'tcp':
-        return renderTcpConfig();
-      case 'udp':
-        return renderUdpConfig();
       case 'windows_event_log':
         return renderWindowsEventLogConfig();
       default:

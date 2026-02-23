@@ -35,9 +35,7 @@ class SourceDTOTest {
         objectMapper.registerSubtypes(
                 new NamedType(FileSourceConfig.class, FileSourceConfig.TYPE_NAME),
                 new NamedType(JournaldSourceConfig.class, JournaldSourceConfig.TYPE_NAME),
-                new NamedType(WindowsEventLogSourceConfig.class, WindowsEventLogSourceConfig.TYPE_NAME),
-                new NamedType(TcpSourceConfig.class, TcpSourceConfig.TYPE_NAME),
-                new NamedType(UdpSourceConfig.class, UdpSourceConfig.TYPE_NAME)
+                new NamedType(WindowsEventLogSourceConfig.class, WindowsEventLogSourceConfig.TYPE_NAME)
         );
     }
 
@@ -77,12 +75,12 @@ class SourceDTOTest {
     void typeIsDerivedFromConfig() {
         final var source = SourceDTO.builder()
                 .fleetId("fleet-1")
-                .name("TCP source")
-                .description("TCP listener")
-                .config(TcpSourceConfig.builder().bindAddress("0.0.0.0").port(5140).build())
+                .name("File")
+                .description("File reader")
+                .config(FileSourceConfig.builder().paths(List.of("/var/log/messages")).readMode("tail").build())
                 .build();
 
-        assertThat(source.config().type()).isEqualTo("tcp");
+        assertThat(source.config().type()).isEqualTo("file");
     }
 
     @Test

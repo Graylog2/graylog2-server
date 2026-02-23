@@ -36,9 +36,7 @@ class SourceConfigTest {
         objectMapper.registerSubtypes(
                 new NamedType(FileSourceConfig.class, FileSourceConfig.TYPE_NAME),
                 new NamedType(JournaldSourceConfig.class, JournaldSourceConfig.TYPE_NAME),
-                new NamedType(WindowsEventLogSourceConfig.class, WindowsEventLogSourceConfig.TYPE_NAME),
-                new NamedType(TcpSourceConfig.class, TcpSourceConfig.TYPE_NAME),
-                new NamedType(UdpSourceConfig.class, UdpSourceConfig.TYPE_NAME)
+                new NamedType(WindowsEventLogSourceConfig.class, WindowsEventLogSourceConfig.TYPE_NAME)
         );
     }
 
@@ -69,25 +67,6 @@ class SourceConfigTest {
     }
 
     @Test
-    void deserializeTcpSource() throws Exception {
-        final var json = """
-                {
-                    "type": "tcp",
-                    "bind_address": "0.0.0.0",
-                    "port": 5140
-                }
-                """;
-
-        final var config = objectMapper.readValue(json, SourceConfig.class);
-
-        assertThat(config).isInstanceOf(TcpSourceConfig.class);
-        final var tcpConfig = (TcpSourceConfig) config;
-        assertThat(tcpConfig.type()).isEqualTo("tcp");
-        assertThat(tcpConfig.bindAddress()).isEqualTo("0.0.0.0");
-        assertThat(tcpConfig.port()).isEqualTo(5140);
-    }
-
-    @Test
     void unknownTypeFallsBackToUnknownSourceConfig() throws Exception {
         final var json = """
                 {
@@ -111,11 +90,6 @@ class SourceConfigTest {
         assertThatThrownBy(config::validate).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Test
-    void tcpSourcePortValidation() {
-        final var config = TcpSourceConfig.builder().bindAddress("0.0.0.0").port(0).build();
-        assertThatThrownBy(config::validate).isInstanceOf(IllegalArgumentException.class);
-    }
 
     @Test
     void jsonRoundTrip() throws Exception {
@@ -145,14 +119,4 @@ class SourceConfigTest {
         assertThat(tree.get("type").asText()).isEqualTo("file");
     }
 
-    @Test
-    void tcpSerializationIncludesTypeField() throws Exception {
-        final var config = TcpSourceConfig.builder().bindAddress("0.0.0.0").port(5140).build();
-
-        final var json = objectMapper.writeValueAsString(config);
-        final var tree = objectMapper.readTree(json);
-
-        assertThat(tree.has("type")).isTrue();
-        assertThat(tree.get("type").asText()).isEqualTo("tcp");
-    }
 }
