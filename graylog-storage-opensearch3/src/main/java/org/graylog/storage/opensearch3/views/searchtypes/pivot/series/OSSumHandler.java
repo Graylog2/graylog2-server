@@ -17,21 +17,30 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.SumAggregationBuilder;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.SingleMetricAggregateBase;
 
-public class OSSumHandler extends OSBasicSeriesSpecHandler<Sum, org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Sum> {
+import java.util.Optional;
+
+public class OSSumHandler extends OSBasicSeriesSpecHandler<Sum> {
 
     @Override
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Sum sumSpec) {
-        final SumAggregationBuilder sum = AggregationBuilders.sum(name).field(sumSpec.field());
-        return SeriesAggregationBuilder.metric(sum);
+        var aggregation = Aggregation.builder().sum(s -> s.field(sumSpec.field()));
+        return SeriesAggregationBuilder.metric(new MutableNamedAggregationBuilder(name, aggregation));
     }
 
     @Override
-    protected Object getValueFromAggregationResult(final org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Sum sum,
+    protected Object getValueFromAggregationResult(final Aggregate agg,
                                                    final Sum seriesSpec) {
-        return sum.getValue();
+        return Optional.ofNullable(agg)
+                .filter(Aggregate::isSum)
+                .map(Aggregate::sum)
+                .map(SingleMetricAggregateBase::value)
+                .orElse(null);
     }
+
 }

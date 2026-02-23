@@ -30,9 +30,8 @@ import org.graylog.plugins.views.search.engine.monitoring.collection.NoOpStatsCo
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
-import org.graylog.storage.opensearch3.testing.TestMultisearchResponse;
+import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
+import org.graylog.storage.opensearch3.testing.TestMsearchResponse;
 import org.graylog.storage.opensearch3.views.searchtypes.OSMessageList;
 import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
 import org.graylog2.indexer.results.TestResultMessageFactory;
@@ -51,6 +50,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch.core.MsearchResponse;
+import org.opensearch.client.opensearch.core.SearchRequest;
 
 import java.util.Collections;
 import java.util.List;
@@ -60,16 +62,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.storage.opensearch3.views.ViewsUtils.indicesOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
-public class OpenSearchBackendUsingCorrectIndicesTest extends OpensearchMockedClientTestBase {
+public class OpenSearchBackendUsingCorrectIndicesTest extends OfficialOpensearchMockedClientTestBase {
+    private static final OSSerializationUtils serializationUtils = new OSSerializationUtils();
     private static Map<String, Provider<OSSearchTypeHandler<? extends SearchType>>> handlers = ImmutableMap.of(
             MessageList.NAME, () -> new OSMessageList(new LegacyDecoratorProcessor.Fake(),
-                    new TestResultMessageFactory(), false)
+                    new TestResultMessageFactory(), false, serializationUtils)
     );
 
     @Mock
@@ -85,17 +89,21 @@ public class OpenSearchBackendUsingCorrectIndicesTest extends OpensearchMockedCl
 
     @BeforeEach
     public void setupSUT() throws Exception {
-        final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulResponseWithSingleQuery.json");
+        final MsearchResponse<JsonData> response = TestMsearchResponse.fromFixture("successfulResponseWithSingleQuery.json");
         mockCancellableMSearch(response);
 
-        this.backend = new OpenSearchBackend(handlers,
+        this.backend = spy(new OpenSearchBackend(handlers,
                 client,
                 indexLookup,
                 ViewsUtils.createTestContextFactory(),
                 usedSearchFilters -> Collections.emptySet(),
                 new NoOpStatsCollector<>(),
                 mock(StreamService.class),
-                false);
+                false,
+                0,
+                0,
+                serializationUtils)
+        );
     }
 
     @BeforeEach
@@ -124,7 +132,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest extends OpensearchMockedCl
         final OSGeneratedQueryContext context = createContext(query);
         backend.doRun(job, query, context);
 
-        verify(client).cancellableMsearch(clientRequestCaptor.capture());
+        verify(backend).cancellableMsearch(clientRequestCaptor.capture());
 
         final List<SearchRequest> clientRequest = clientRequestCaptor.getValue();
         assertThat(clientRequest).isNotNull();
@@ -184,7 +192,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest extends OpensearchMockedCl
 
         backend.doRun(job, query, context);
 
-        verify(client).cancellableMsearch(clientRequestCaptor.capture());
+        verify(backend).cancellableMsearch(clientRequestCaptor.capture());
 
         final List<SearchRequest> clientRequest = clientRequestCaptor.getValue();
         assertThat(clientRequest).isNotNull();
@@ -205,7 +213,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest extends OpensearchMockedCl
 
         backend.doRun(job, query, context);
 
-        verify(client).cancellableMsearch(clientRequestCaptor.capture());
+        verify(backend).cancellableMsearch(clientRequestCaptor.capture());
 
         final List<SearchRequest> clientRequest = clientRequestCaptor.getValue();
         assertThat(clientRequest).isNotNull();

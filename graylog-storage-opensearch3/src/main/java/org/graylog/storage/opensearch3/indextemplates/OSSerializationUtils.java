@@ -18,8 +18,11 @@ package org.graylog.storage.opensearch3.indextemplates;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import jakarta.json.Json;
+import jakarta.json.JsonWriter;
 import jakarta.json.stream.JsonParser;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.json.JsonpDeserializer;
@@ -28,7 +31,9 @@ import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.core.msearch.RequestItem;
 
+import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -46,10 +51,61 @@ public class OSSerializationUtils {
         this.jsonpMapper = new JacksonJsonpMapper();
     }
 
-
-    public Map<String, Object> toMap(final PlainJsonSerializable openSearchSerializableObject) throws JsonProcessingException {
-        return this.jsonpMapper.objectMapper().readValue(openSearchSerializableObject.toJsonString(), new TypeReference<>() {});
+    public static Object valueNode(JsonNode jsonNode) {
+        if (jsonNode.isInt()) {
+            return jsonNode.asInt();
+        } else if (jsonNode.isLong()) {
+            return jsonNode.asLong();
+        } else if (jsonNode.isIntegralNumber()) {
+            return jsonNode.asLong();
+        } else if (jsonNode.isFloatingPointNumber()) {
+            return jsonNode.asDouble();
+        } else if (jsonNode.isBoolean()) {
+            return jsonNode.asBoolean();
+        } else if (jsonNode.isNull()) {
+            return null;
+        } else {
+            return jsonNode.asText();
+        }
     }
+
+    public Object toObject(JsonData jsonData) {
+        try {
+            return valueNode(jsonpMapper.objectMapper().readTree(toJson(jsonData)));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Map<String, Object> toMap(final JsonData openSearchSerializableObject) {
+        String json = toJson(openSearchSerializableObject);
+        return toMap(json);
+    }
+
+    private String toJson(final JsonData openSearchSerializableObject) {
+        try (
+                StringWriter writer = new StringWriter();
+                JsonWriter jsonWriter = Json.createWriter(writer)
+        ) {
+            jsonWriter.write(openSearchSerializableObject.toJson());
+            return writer.toString();
+        } catch (IOException e) {
+            throw new RuntimeException("Error serializing json", e);
+        }
+    }
+
+    public Map<String, Object> toMap(final PlainJsonSerializable openSearchSerializableObject) {
+        return toMap(openSearchSerializableObject.toJsonString());
+    }
+
+    public Map<String, Object> toMap(final String json) {
+        try {
+            return this.jsonpMapper.objectMapper().readValue(json, new TypeReference<>() {});
+        } catch (IOException e) {
+            throw new RuntimeException("Error serializing json", e);
+        }
+    }
+
 
     public Map<String, JsonData> toJsonDataMap(final Map<String, Object> map) {
         return map.entrySet()

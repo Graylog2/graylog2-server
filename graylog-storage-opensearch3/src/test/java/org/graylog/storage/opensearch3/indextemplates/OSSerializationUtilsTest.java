@@ -19,6 +19,7 @@ package org.graylog.storage.opensearch3.indextemplates;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.client.json.JsonData;
+import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.opensearch._types.ErrorCause;
 import org.opensearch.client.opensearch._types.ErrorResponse;
 import org.opensearch.client.opensearch._types.mapping.DynamicTemplate;
@@ -117,6 +118,12 @@ class OSSerializationUtilsTest {
     @Test
     void testToMapOnTypeMappingClass() throws Exception {
         final Map<String, Object> result = toTest.toMap(TEST_TYPE_MAPPING);
+        assertEquals(TEST_TYPE_MAPPING_IN_MAP_FORMAT, result);
+    }
+
+    @Test
+    void testToMapOnJsonData() throws Exception {
+        final Map<String, Object> result = toTest.toMap(JsonData.of(TEST_TYPE_MAPPING, new JacksonJsonpMapper()));
         assertEquals(TEST_TYPE_MAPPING_IN_MAP_FORMAT, result);
     }
 

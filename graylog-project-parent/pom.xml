@@ -294,13 +294,6 @@
             </dependency>
 
             <dependency>
-                <groupId>net.jcip</groupId>
-                <artifactId>jcip-annotations</artifactId>
-                <version>${jcip-annotations.version}</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
                 <groupId>org.graylog2</groupId>
                 <artifactId>gelfclient</artifactId>
                 <version>${gelfclient.version}</version>
@@ -390,11 +383,6 @@
                 <groupId>one.util</groupId>
                 <artifactId>streamex</artifactId>
                 <version>${streamex.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>info.leadinglight</groupId>
-                <artifactId>jdot</artifactId>
-                <version>${jdot.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.unboundid</groupId>
