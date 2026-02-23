@@ -84,5 +84,6 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20251003000000_AddMcpConfigurationMigration.class);
         addMigration(V20251222123500_CreatePipelineMetadata.class);
         addMigration(V20251103123300_MigrateEntityListPreferences.class);
+        addMigration(V20260223000000_RemovePerspectiveFromUserPreferences.class);
     }
 }
