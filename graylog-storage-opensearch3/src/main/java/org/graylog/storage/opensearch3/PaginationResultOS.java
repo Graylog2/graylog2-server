@@ -18,42 +18,45 @@ package org.graylog.storage.opensearch3;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
-import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.results.ResultMessageFactory;
+import org.opensearch.client.opensearch._types.FieldValue;
+import org.opensearch.client.opensearch.core.SearchRequest;
+import org.opensearch.client.opensearch.core.SearchResponse;
+import org.opensearch.client.opensearch.core.search.Hit;
 
 import javax.annotation.Nullable;
-import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
-public class PaginationResultOS2 extends ChunkedQueryResultOS2 {
+public class PaginationResultOS extends ChunkedQueryResultOS {
     private final SearchRequest initialSearchRequest;
 
     @AssistedInject
-    public PaginationResultOS2(ResultMessageFactory resultMessageFactory,
-                               OpenSearchClient client,
-                               SearchRequest initialSearchRequest,
-                               @Assisted SearchResponse initialResult,
-                               @Assisted("query") String query,
-                               @Assisted List<String> fields,
-                               @Assisted int limit) {
+    public PaginationResultOS(ResultMessageFactory resultMessageFactory,
+                              OfficialOpensearchClient client,
+                              SearchRequest initialSearchRequest,
+                              @Assisted SearchResponse<Map> initialResult,
+                              @Assisted("query") String query,
+                              @Assisted List<String> fields,
+                              @Assisted int limit) {
         super(resultMessageFactory, client, initialResult, query, fields, limit);
         this.initialSearchRequest = initialSearchRequest;
     }
 
     @Override
     @Nullable
-    protected SearchResponse nextSearchResult() {
-        final SearchSourceBuilder initialQuery = initialSearchRequest.source();
-        final SearchHit[] hits = lastSearchResponse.getHits().getHits();
-        if (hits == null || hits.length == 0) {
+    protected SearchResponse<Map> nextSearchResult() {
+        final List<Hit<Map>> hits = lastSearchResponse.hits().hits();
+        if (hits.isEmpty()) {
             return null;
         }
-        initialQuery.searchAfter(hits[hits.length - 1].getSortValues());
-        initialSearchRequest.source(initialQuery);
-        return client.search(initialSearchRequest, "Unable to retrieve next chunk from search: ");
+
+        final Hit<Map> lastHit = hits.getLast();
+        final List<FieldValue> sortValues = lastHit.sort();
+
+        final SearchRequest nextRequest = SearchRequest.of(builder -> initialSearchRequest.toBuilder().searchAfter(sortValues));
+
+        return client.sync(c -> c.search(nextRequest, Map.class), "Unable to retrieve next chunk from search: ");
     }
 
     @Override
@@ -67,5 +70,3 @@ public class PaginationResultOS2 extends ChunkedQueryResultOS2 {
     }
 
 }
-
-
