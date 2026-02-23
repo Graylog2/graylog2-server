@@ -19,6 +19,8 @@ package org.graylog2.opamp;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.protobuf.ByteString;
@@ -44,6 +46,7 @@ import org.graylog.collectors.config.OtlpExporterConfig;
 import org.graylog.collectors.config.OtlpGrpcExporterConfig;
 import org.graylog.collectors.config.OtlpHttpExporterConfig;
 import org.graylog.collectors.config.OtlpReceiverConfig;
+import org.graylog.collectors.config.TLSConfigurationSettings;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CoalescedActions;
 import org.graylog.collectors.db.CollectorInstanceDTO;
@@ -57,7 +60,6 @@ import org.graylog2.opamp.enrollment.EnrollmentTokenService;
 import org.graylog2.opamp.transport.OpAmpAuthContext;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,16 +71,12 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toCollection;
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -112,7 +110,9 @@ public class OpAmpService {
         this.clusterConfigService = clusterConfigService;
         this.txnLogService = txnLogService;
         this.sourceService = sourceService;
-        this.yamlObjectMapper = new ObjectMapper(new YAMLFactory());
+        this.yamlObjectMapper = new ObjectMapper(new YAMLFactory()
+                .enable(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE))
+                .registerModule(new Jdk8Module());
     }
 
     public Optional<OpAmpAuthContext> authenticate(String authHeader, OpAmpAuthContext.Transport transport) {
@@ -336,10 +336,10 @@ public class OpAmpService {
                 configBuilder.receivers(receiverConfigs);
                 configBuilder.exporters(Map.of(effectiveOtlpEndpoint.getName(), effectiveOtlpEndpoint));
                 configBuilder.service(OtelServiceConfig.builder()
-                                .pipelines(Map.of("logs", OtelPipelineConfig.builder()
-                                                .receivers(receiverConfigs.keySet())
-                                                .exporters(Set.of(effectiveOtlpEndpoint.getName()))
-                                        .build()))
+                        .pipelines(Map.of("logs", OtelPipelineConfig.builder()
+                                .receivers(receiverConfigs.keySet())
+                                .exporters(Set.of(effectiveOtlpEndpoint.getName()))
+                                .build()))
                         .build());
                 try {
                     final String configYaml = yamlObjectMapper.writeValueAsString(configBuilder.build());
@@ -381,15 +381,22 @@ public class OpAmpService {
         if (httpEndpoint == null && grpcEndpoint == null) {
             throw new IllegalStateException("No collector input configured, cannot send remote config.");
         }
+
+        final var clusterId = clusterConfigService.get(ClusterId.class);
+        final var caCert = opAmpCaService.getOpAmpCa().certificate();
+        final var tlsSettings = TLSConfigurationSettings.withCACert(clusterId.clusterId(), caCert);
+
         // prefer grpc endpoint if available
         if (grpcEndpoint != null && grpcEndpoint.enabled()) {
             return OtlpGrpcExporterConfig.builder()
                     .endpoint(f("%s:%s", grpcEndpoint.hostname(), grpcEndpoint.port()))
+                    .tls(tlsSettings)
                     .build();
         }
         if (httpEndpoint != null && httpEndpoint.enabled()) {
             return OtlpHttpExporterConfig.builder()
-                    .endpoint(f("%s:%s", httpEndpoint.hostname(), httpEndpoint.port()))
+                    .endpoint(f("https://%s:%s", httpEndpoint.hostname(), httpEndpoint.port()))
+                    .tls(tlsSettings)
                     .build();
         }
         throw new IllegalStateException("No collector input enabled, cannot send remote config.");

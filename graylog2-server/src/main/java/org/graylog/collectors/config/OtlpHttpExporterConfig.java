@@ -16,7 +16,6 @@
  */
 package org.graylog.collectors.config;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
@@ -37,6 +36,9 @@ public abstract class OtlpHttpExporterConfig implements OtlpExporterConfig {
     @JsonProperty("endpoint")
     public abstract String endpoint();
 
+    @JsonProperty("tls")
+    public abstract TLSConfigurationSettings tls();
+
     public static Builder builder() {
         return new AutoValue_OtlpHttpExporterConfig.Builder();
     }
@@ -45,6 +47,8 @@ public abstract class OtlpHttpExporterConfig implements OtlpExporterConfig {
     public abstract static class Builder {
 
         public abstract Builder endpoint(String endpoint);
+
+        public abstract Builder tls(TLSConfigurationSettings tls);
 
         public abstract OtlpHttpExporterConfig build();
     }

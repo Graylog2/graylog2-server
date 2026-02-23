@@ -36,6 +36,9 @@ public abstract class OtlpGrpcExporterConfig implements OtlpExporterConfig {
     @JsonProperty("endpoint")
     public abstract String endpoint();
 
+    @JsonProperty("tls")
+    public abstract TLSConfigurationSettings tls();
+
     public static Builder builder() {
         return new AutoValue_OtlpGrpcExporterConfig.Builder();
     }
@@ -44,6 +47,8 @@ public abstract class OtlpGrpcExporterConfig implements OtlpExporterConfig {
     public abstract static class Builder {
 
         public abstract Builder endpoint(String endpoint);
+
+        public abstract Builder tls(TLSConfigurationSettings tls);
 
         public abstract OtlpGrpcExporterConfig build();
     }

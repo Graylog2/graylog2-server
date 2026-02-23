@@ -24,4 +24,6 @@ public interface OtlpExporterConfig {
     String getName();
 
     String endpoint();
+
+    TLSConfigurationSettings tls();
 }
