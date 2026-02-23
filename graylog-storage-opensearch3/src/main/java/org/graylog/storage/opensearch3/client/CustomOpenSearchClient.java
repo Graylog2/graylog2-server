@@ -40,6 +40,12 @@ public class CustomOpenSearchClient extends OpenSearchClient {
      */
     @Override
     public <TDocument> SearchResponse<TDocument> search(SearchRequest request, Class<TDocument> tDocumentClass) throws IOException, OpenSearchException {
+
+        // msearch doesn't support scroll and slice, we can't switch to msearch in this case!
+        if (request.scroll() != null || request.slice() != null) {
+            return super.search(request, tDocumentClass);
+        }
+
         final MsearchResponse<TDocument> multiSearchResponse = super.msearch(req -> req.searches(OSSerializationUtils.toMsearch(request)), tDocumentClass);
         final MultiSearchResponseItem<TDocument> resp = multiSearchResponse.responses().getFirst();
         if (resp.isFailure()) {
