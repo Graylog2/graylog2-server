@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
  */
 public class OSSerializationUtils {
 
-    private static final JacksonJsonpMapper jsonpMapper = new JacksonJsonpMapper();
+    private static final JacksonJsonpMapper JSONP_MAPPER = new JacksonJsonpMapper();
 
     public static Object valueNode(JsonNode jsonNode) {
         if (jsonNode.isInt()) {
@@ -64,7 +64,7 @@ public class OSSerializationUtils {
 
     public static Object toObject(JsonData jsonData) {
         try {
-            return valueNode(jsonpMapper.objectMapper().readTree(toJson(jsonData)));
+            return valueNode(JSONP_MAPPER.objectMapper().readTree(toJson(jsonData)));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -93,7 +93,7 @@ public class OSSerializationUtils {
 
     public static Map<String, Object> toMap(final String json) {
         try {
-            return jsonpMapper.objectMapper().readValue(json, new TypeReference<>() {});
+            return JSONP_MAPPER.objectMapper().readValue(json, new TypeReference<>() {});
         } catch (IOException e) {
             throw new RuntimeException("Error serializing json", e);
         }
@@ -118,13 +118,13 @@ public class OSSerializationUtils {
         if (mapRepresentation == null) {
             return null;
         }
-        final String json = jsonpMapper.objectMapper().writeValueAsString(mapRepresentation);
+        final String json = JSONP_MAPPER.objectMapper().writeValueAsString(mapRepresentation);
         return fromJson(json, deserializer);
     }
 
     public static <T> T fromJson(final String json, final JsonpDeserializer<T> deserializer) {
-        final JsonParser parser = jsonpMapper.jsonProvider().createParser(new StringReader(json));
-        return deserializer.deserialize(parser, jsonpMapper);
+        final JsonParser parser = JSONP_MAPPER.jsonProvider().createParser(new StringReader(json));
+        return deserializer.deserialize(parser, JSONP_MAPPER);
     }
 
     public static RequestItem toMsearch(SearchRequest request) {
