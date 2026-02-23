@@ -29,7 +29,7 @@ export const usePluggableEventDetails = (eventId: string) => {
   const pluggableEventDetails = usePluginEntities('views.components.widgets.events.detailsComponent');
 
   return pluggableEventDetails
-    .filter((perspective) => (perspective.useCondition ? !!perspective.useCondition() : true))
+    .filter((component) => (component.useCondition ? !!component.useCondition() : true))
     .map(({ component: PluggableEventAction, key }) => <PluggableEventAction key={key} eventId={eventId} />);
 };
 

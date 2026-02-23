@@ -16,18 +16,10 @@
  */
 package org.graylog.storage.opensearch3.views.searchtypes.pivots;
 
-import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
-import org.graylog.shaded.opensearch2.org.apache.lucene.search.TotalHits;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
-import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHits;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Max;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Min;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.EffectiveTimeRangeExtractor;
@@ -47,9 +39,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch.core.msearch.MultiSearchItem;
+import org.opensearch.client.opensearch.core.search.HitsMetadata;
+import org.opensearch.client.opensearch.core.search.TotalHits;
+import org.opensearch.client.opensearch.core.search.TotalHitsRelation;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -63,7 +62,7 @@ public class OSPivotTest {
     @Mock
     private Pivot pivot;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private SearchResponse queryResult;
+    private MultiSearchItem<JsonData> queryResult;
     @Mock
     private OSGeneratedQueryContext queryContext;
 
@@ -81,29 +80,26 @@ public class OSPivotTest {
         DateTimeUtils.setCurrentMillisSystem();
     }
 
-    private Aggregations createTimestampRangeAggregations(Double min, Double max) {
-        final Min timestampMinAggregation = mock(Min.class);
-        when(timestampMinAggregation.getValue()).thenReturn(min);
-        when(timestampMinAggregation.getName()).thenReturn("timestamp-min");
-        final Max timestampMaxAggregation = mock(Max.class);
-        when(timestampMaxAggregation.getValue()).thenReturn(max);
-        when(timestampMaxAggregation.getName()).thenReturn("timestamp-max");
-
-        return new Aggregations(ImmutableList.of(timestampMinAggregation, timestampMaxAggregation));
+    private Map<String, Aggregate> createTimestampRangeAggregations(Double min, Double max) {
+        return Map.of(
+                "timestamp-min", Aggregate.builder().min(m -> m.value(min)).build(),
+                "timestamp-max", Aggregate.builder().max(m -> m.value(max)).build()
+        );
     }
 
-    private void returnDocumentCount(SearchResponse queryResult, long totalCount) {
-        final TotalHits totalHits = new TotalHits(totalCount, TotalHits.Relation.EQUAL_TO);
-        final SearchHits searchHits = new SearchHits(new SearchHit[0], totalHits, 0.0f);
-        when(queryResult.getHits()).thenReturn(searchHits);
+    private void returnDocumentCount(MultiSearchItem<JsonData> queryResult, long totalCount) {
+        HitsMetadata<JsonData> hits = mock(HitsMetadata.class);
+        TotalHits total = TotalHits.builder().value(totalCount).relation(TotalHitsRelation.Eq).build();
+        when(hits.total()).thenReturn(total);
+        when(queryResult.hits()).thenReturn(hits);
     }
 
     @Test
     public void searchResultIncludesDocumentCount() {
         final long documentCount = 424242;
         returnDocumentCount(queryResult, documentCount);
-        final Aggregations mockMetricAggregation = createTimestampRangeAggregations((double) new Date().getTime(), (double) new Date().getTime());
-        when(queryResult.getAggregations()).thenReturn(mockMetricAggregation);
+        final Map<String, Aggregate> mockMetricAggregation = createTimestampRangeAggregations((double) new Date().getTime(), (double) new Date().getTime());
+        when(queryResult.aggregations()).thenReturn(mockMetricAggregation);
         when(query.effectiveTimeRange(pivot)).thenReturn(RelativeRange.create(300));
 
         final SearchType.Result result = this.esPivot.doExtractResult(query, pivot, queryResult, queryContext);
@@ -123,8 +119,8 @@ public class OSPivotTest {
                 .build();
         final long documentCount = 424242;
         returnDocumentCount(queryResult, documentCount);
-        final Aggregations mockMetricAggregation = createTimestampRangeAggregations((double) new Date().getTime(), (double) new Date().getTime());
-        when(queryResult.getAggregations()).thenReturn(mockMetricAggregation);
+        final Map<String, Aggregate> mockMetricAggregation = createTimestampRangeAggregations((double) new Date().getTime(), (double) new Date().getTime());
+        when(queryResult.aggregations()).thenReturn(mockMetricAggregation);
         when(query.effectiveTimeRange(pivot)).thenReturn(RelativeRange.create(300));
 
         final SearchType.Result result = esPivot.doExtractResult(query, pivot, queryResult, null);
@@ -137,8 +133,8 @@ public class OSPivotTest {
         DateTimeUtils.setCurrentMillisFixed(1578584665408L);
         final long documentCount = 424242;
         returnDocumentCount(queryResult, documentCount);
-        final Aggregations mockMetricAggregation = createTimestampRangeAggregations((double) new Date().getTime(), (double) new Date().getTime());
-        when(queryResult.getAggregations()).thenReturn(mockMetricAggregation);
+        final Map<String, Aggregate> mockMetricAggregation = createTimestampRangeAggregations((double) new Date().getTime(), (double) new Date().getTime());
+        when(queryResult.aggregations()).thenReturn(mockMetricAggregation);
         when(query.effectiveTimeRange(pivot)).thenReturn(RelativeRange.create(300));
 
         final SearchType.Result result = this.esPivot.doExtractResult(query, pivot, queryResult, queryContext);
@@ -156,11 +152,11 @@ public class OSPivotTest {
         DateTimeUtils.setCurrentMillisFixed(1578584665408L);
         final long documentCount = 424242;
         returnDocumentCount(queryResult, documentCount);
-        final Aggregations mockMetricAggregation = createTimestampRangeAggregations(
+        final Map<String, Aggregate> mockMetricAggregation = createTimestampRangeAggregations(
                 (double) new Date(1547303022000L).getTime(),
                 (double) new Date(1578040943000L).getTime()
         );
-        when(queryResult.getAggregations()).thenReturn(mockMetricAggregation);
+        when(queryResult.aggregations()).thenReturn(mockMetricAggregation);
         when(query.effectiveTimeRange(pivot)).thenReturn(RelativeRange.create(0));
 
         final SearchType.Result result = this.esPivot.doExtractResult(query, pivot, queryResult, queryContext);

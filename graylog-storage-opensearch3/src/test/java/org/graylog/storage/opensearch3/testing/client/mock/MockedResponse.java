@@ -16,5 +16,17 @@
  */
 package org.graylog.storage.opensearch3.testing.client.mock;
 
-record MockedResponse(String method, String url, String body) {
+import java.io.InputStream;
+import java.nio.file.PathMatcher;
+
+public interface MockedResponse {
+    String method();
+    PathMatcher urlPattern();
+    InputStream newInputStream();
+    default boolean isError() {
+        return false;
+    }
+    default int responseCode() {
+        return 200; //ok
+    }
 }

@@ -14,11 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog.storage.opensearch3.testing.client.mock;
 
-import type { Perspective } from './types';
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
-declare module 'graylog-web-plugin/plugin' {
-  export interface PluginExports {
-    perspectives?: Array<Perspective>;
-  }
+record StringResponse(String method, java.nio.file.PathMatcher urlPattern, String body) implements MockedResponse {
+
+    @Override
+    public InputStream newInputStream() {
+        return new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
+    }
 }

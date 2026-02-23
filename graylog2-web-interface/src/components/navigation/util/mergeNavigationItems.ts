@@ -25,8 +25,7 @@ const _existingDropdownItemIndex = (
   }
 
   return existingNavigationItems.findIndex(
-    ({ description, perspective, children }) =>
-      newNavigationItem.description === description && newNavigationItem.perspective === perspective && children,
+    ({ description, children }) => newNavigationItem.description === description && children,
   );
 };
 

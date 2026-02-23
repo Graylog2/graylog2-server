@@ -8,6 +8,13 @@ Users will have to log in again.
 
 ## Breaking Changes
 
+### Plugins: Removal of Perspective Plugin API
+
+This release includes frontend plugin API changes related to perspectives.
+
+- The `perspectives` plugin export has been removed from core.
+- Plugin-provided `navigation` and `pageNavigation` entities no longer support the `perspective` key.
+
 ### External Authentication Services: Changed Default User Time Zone
 
 The authentication backends for Active Directory, LDAP, OIDC, Okta, and SAML previously set the time zone for

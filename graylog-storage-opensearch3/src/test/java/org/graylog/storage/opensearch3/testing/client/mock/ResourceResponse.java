@@ -14,20 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog.storage.opensearch3.testing.client.mock;
 
-import Routes from 'routing/Routes';
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
-import DefaultBrand from './DefaultBrand';
+public record ResourceResponse(String method, java.nio.file.PathMatcher urlPattern, URL resource) implements MockedResponse {
 
-const perspectivesBindings = {
-  perspectives: [
-    {
-      id: 'default',
-      title: 'General',
-      welcomeRoute: Routes.WELCOME,
-      brandComponent: DefaultBrand,
-    },
-  ],
-};
-
-export default perspectivesBindings;
+    @Override
+    public InputStream newInputStream() {
+        try {
+            return resource.openStream();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}

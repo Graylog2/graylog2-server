@@ -27,9 +27,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
-import org.graylog.storage.opensearch3.testing.TestMultisearchResponse;
+import org.graylog.storage.opensearch3.testing.TestMsearchResponse;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +35,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch.core.MsearchResponse;
+import org.opensearch.client.opensearch.core.SearchRequest;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -87,7 +88,7 @@ public class OpenSearchBackendMultiSearchTest extends OpenSearchBackendGenerated
 
     @Test
     public void everySearchTypeGeneratesOneESQuery() throws Exception {
-        final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
+        final MsearchResponse<JsonData> response = TestMsearchResponse.fromFixture("successfulMultiSearchResponse.json");
         mockCancellableMSearch(response);
 
         final OSGeneratedQueryContext queryContext = createContext(query);
@@ -98,7 +99,7 @@ public class OpenSearchBackendMultiSearchTest extends OpenSearchBackendGenerated
 
     @Test
     public void multiSearchResultsAreAssignedToSearchTypes() throws Exception {
-        final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
+        final MsearchResponse<JsonData> response = TestMsearchResponse.fromFixture("successfulMultiSearchResponse.json");
         mockCancellableMSearch(response);
 
         final OSGeneratedQueryContext queryContext = createContext(query);
@@ -125,7 +126,7 @@ public class OpenSearchBackendMultiSearchTest extends OpenSearchBackendGenerated
     public void oneFailingSearchTypeReturnsPartialResults() throws Exception {
         final OSGeneratedQueryContext queryContext = createContext(query);
 
-        final MultiSearchResponse response = TestMultisearchResponse.fromFixture("partiallySuccessfulMultiSearchResponse.json");
+        final MsearchResponse<JsonData> response = TestMsearchResponse.fromFixture("partiallySuccessfulMultiSearchResponse.json");
         mockCancellableMSearch(response);
 
         final QueryResult queryResult = this.openSearchBackend.doRun(searchJob, query, queryContext);
