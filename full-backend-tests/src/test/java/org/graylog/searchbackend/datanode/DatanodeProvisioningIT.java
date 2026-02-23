@@ -176,13 +176,10 @@ public class DatanodeProvisioningIT {
         try {
             RetryerBuilder.<List<DatanodeStatus>>newBuilder()
                     .retryIfResult(datanodes -> {
-                        if (datanodes == null || datanodes.isEmpty()) {
-                            return false; // No datanodes, we're done
-                        }
                         boolean hasAvailableNodes = datanodes.stream()
-                                .anyMatch(d -> Objects.equals(d.dataNodeStatus(), DataNodeStatus.AVAILABLE.name()));
+                                .anyMatch(d -> !Objects.equals(d.dataNodeStatus(), DataNodeStatus.UNCONFIGURED.name()));
                         if (hasAvailableNodes) {
-                            log.debug("Still have AVAILABLE datanodes: {}", datanodes);
+                            log.debug("Still have configured datanodes, waiting for cleanup: {}", datanodes);
                         }
                         return hasAvailableNodes;
                     })
