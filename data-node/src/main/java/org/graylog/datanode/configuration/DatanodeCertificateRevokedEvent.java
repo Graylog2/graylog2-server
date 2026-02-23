@@ -14,8 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datanode;
+package org.graylog.datanode.configuration;
 
-public enum DataNodeLifecycleTrigger {
-    REMOVE, RESET, STOP, START, REMOVED, STOPPED, STARTED, CLEAR, REQUEST_CSR, REQUEST_CSR_WITH_AUTOSTART, REVOKE_CERTIFICATE
+/**
+ * This event will be triggered every time a datanode private key or certificate changes. Other parts of the system,
+ * that use the keystore (opensearch process, jersey) should react to this event and refresh their security setups
+ */
+public record DatanodeCertificateRevokedEvent() {
 }

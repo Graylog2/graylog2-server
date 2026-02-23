@@ -198,7 +198,7 @@ public class DataNodeCommandServiceImplTest {
         final String testNodeId = "node";
         nodeService.registerServer(buildTestNode(testNodeId, DataNodeStatus.AVAILABLE));
         classUnderTest.removeNodeConfiguration(testNodeId);
-        verify(clusterEventBus).post(DataNodeLifecycleEvent.create(testNodeId, DataNodeLifecycleTrigger.REMOVE_NODE_CONFIGURATION));
+        verify(clusterEventBus).post(DataNodeLifecycleEvent.create(testNodeId, DataNodeLifecycleTrigger.REVOKE_CERTIFICATE));
     }
 
 }

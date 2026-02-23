@@ -108,15 +108,19 @@ public class DatanodeKeystore {
         }
     }
 
-    public synchronized KeyStore initWithSelfSignedCertificate() throws DatanodeKeystoreException {
+    public synchronized KeyStore revokeSignedCertificate() throws DatanodeKeystoreException {
+        final KeyStore cert = initWithSelfSignedCertificate();
+        eventBus.post(new DatanodeCertificateRevokedEvent());
+        return cert;
+    }
+
+    public KeyStore initWithSelfSignedCertificate() throws DatanodeKeystoreException {
         final CertRequest certRequest = CertRequest.selfSigned(DATANODE_KEY_ALIAS)
                 .isCA(false)
                 .validity(DEFAULT_SELFSIGNED_CERT_VALIDITY);
         try {
             final KeyPair selfsignedCert = CertificateGenerator.generate(certRequest);
-            final KeyStore result = create(selfsignedCert);
-            eventBus.post(new DatanodeCertificateChangedEvent());
-            return result;
+            return create(selfsignedCert);
         } catch (Exception e) {
             throw new DatanodeKeystoreException(e);
         }

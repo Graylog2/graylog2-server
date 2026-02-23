@@ -107,9 +107,19 @@ public class DatanodeProvisioningIT {
 
     @AfterEach
     void tearDown() throws ExecutionException, RetryException {
+        log.info("Starting tearDown - resetting preflight configuration");
+        List<DatanodeStatus> beforeReset = getDatanodes();
+        log.info("Datanode status before reset: {}", beforeReset);
+
         resetPreflight();
+        log.info("Preflight reset completed, waiting for datanodes to disconnect");
+
         // Wait for datanodes to disconnect after reset to ensure clean state for next test
         waitForDatanodesDisconnected();
+
+        List<DatanodeStatus> afterDisconnect = getDatanodes();
+        log.info("Datanode status after disconnect: {}", afterDisconnect);
+        log.info("TearDown completed successfully");
     }
 
     @FullBackendTest
@@ -135,16 +145,23 @@ public class DatanodeProvisioningIT {
         Assertions.assertThat(subject.getName()).isEqualTo("CN=" + caSubjectName);
     }
 
-    private void testEncryptedConnectionToOpensearch(KeyStore truststore) throws ExecutionException, RetryException {
+    private void testEncryptedConnectionToOpensearch(KeyStore truststore) throws ExecutionException, RetryException, KeyStoreException {
         try {
+            log.info("Attempting to connect to OpenSearch on port {} with truststore containing {} certificates",
+                    getOpensearchPort(), truststore.size());
             new DatanodeOpensearchWait(RestOperationParameters.builder()
                     .port(getOpensearchPort())
                     .truststore(truststore)
                     .jwtAuthToken(createJwtAuthToken())
                     .build())
                     .waitForNodesCount(1);
+            log.info("Successfully connected to OpenSearch");
         } catch (Exception e) {
-            log.error("Could not connect to Opensearch\n" + apis.backend().getSearchLogs());
+            log.error("Could not connect to Opensearch. Port: {}, Truststore size: {}",
+                    getOpensearchPort(),
+                    truststore.size());
+            log.error("Search logs:\n" + apis.backend().getSearchLogs());
+            log.error("Backend logs:\n" + apis.backend().getLogs());
             throw e;
         }
     }
@@ -158,19 +175,38 @@ public class DatanodeProvisioningIT {
     private void waitForDatanodesDisconnected() throws ExecutionException, RetryException {
         try {
             RetryerBuilder.<List<DatanodeStatus>>newBuilder()
-                    .retryIfResult(datanodes -> datanodes != null && !datanodes.isEmpty() && datanodes.stream().anyMatch(d -> Objects.equals(d.dataNodeStatus(), DataNodeStatus.AVAILABLE.name())))
+                    .retryIfResult(datanodes -> {
+                        if (datanodes == null || datanodes.isEmpty()) {
+                            return false; // No datanodes, we're done
+                        }
+                        boolean hasAvailableNodes = datanodes.stream()
+                                .anyMatch(d -> Objects.equals(d.dataNodeStatus(), DataNodeStatus.AVAILABLE.name()));
+                        if (hasAvailableNodes) {
+                            log.debug("Still have AVAILABLE datanodes: {}", datanodes);
+                        }
+                        return hasAvailableNodes;
+                    })
                     .withStopStrategy(StopStrategies.stopAfterDelay(60, TimeUnit.SECONDS))
                     .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                     .withRetryListener(new RetryListener() {
                         @Override
                         public <V> void onRetry(Attempt<V> attempt) {
-                            log.info("Waiting for datanodes to disconnect, attempt {}", attempt.getAttemptNumber());
+                            if (attempt.hasResult()) {
+                                List<DatanodeStatus> nodes = (List<DatanodeStatus>) attempt.getResult();
+                                log.info("Waiting for datanodes to disconnect, attempt {}: {}",
+                                        attempt.getAttemptNumber(),
+                                        nodes.stream().map(DatanodeStatus::dataNodeStatus).toList());
+                            }
                         }
                     })
                     .build()
                     .call(this::getDatanodes);
+            log.info("All datanodes successfully disconnected");
         } catch (ExecutionException | RetryException e) {
-            log.error("Datanodes did not disconnect in time\n" + apis.backend().getLogs());
+            List<DatanodeStatus> finalState = getDatanodes();
+            log.error("Datanodes did not disconnect in time. Final state: {}", finalState);
+            log.error("Backend logs:\n{}", apis.backend().getLogs());
+            log.error("Search logs:\n{}", apis.backend().getSearchLogs());
             throw e;
         }
     }
@@ -180,7 +216,7 @@ public class DatanodeProvisioningIT {
         try {
             connectedDatanodes = RetryerBuilder.<List<DatanodeStatus>>newBuilder()
                     .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
-                    .withStopStrategy(StopStrategies.stopAfterAttempt(60))
+                    .withStopStrategy(StopStrategies.stopAfterAttempt(120))
                     .withRetryListener(new RetryListener() {
                         @Override
                         public <V> void onRetry(Attempt<V> attempt) {

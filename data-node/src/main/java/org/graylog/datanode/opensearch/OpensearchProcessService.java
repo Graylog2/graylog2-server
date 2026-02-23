@@ -25,6 +25,7 @@ import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bootstrap.preflight.DatanodeDirectoriesLockfileCheck;
 import org.graylog.datanode.configuration.DatanodeCertificateRenewedEvent;
+import org.graylog.datanode.configuration.DatanodeCertificateRevokedEvent;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.configuration.DatanodeKeystoreException;
 import org.graylog.datanode.configuration.OpensearchConfigurationService;
@@ -95,10 +96,10 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                     this.processAutostart = true;
                     csrRequester.triggerCertificateSigningRequest();
                 }
-                case REMOVE_NODE_CONFIGURATION -> {
+                case REVOKE_CERTIFICATE -> {
+                    LOG.info("Removing datanode configuration and stopping process");
                     try {
-                        datanodeKeystore.initWithSelfSignedCertificate();
-                        stateMachine.fire(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED);
+                        datanodeKeystore.revokeSignedCertificate();
                     } catch (DatanodeKeystoreException e) {
                         throw new RuntimeException(e);
                     }
@@ -110,6 +111,11 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     @Subscribe
     public void handleCertificateChangeEvent(DatanodeCertificateRenewedEvent event) {
         stateMachine.fire(OpensearchEvent.CERTIFICATES_RELOAD);
+    }
+
+    @Subscribe
+    public void handleCertificateChangeEvent(DatanodeCertificateRevokedEvent event) {
+        stateMachine.fire(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED);
     }
 
     private void checkWritePreflightFinishedOnInsecureStartup() {

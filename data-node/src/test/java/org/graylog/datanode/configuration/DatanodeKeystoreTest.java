@@ -67,6 +67,12 @@ class DatanodeKeystoreTest {
         receivedEvents.add(event);
     }
 
+    @Subscribe
+    public void subscribe(DatanodeCertificateRevokedEvent event) {
+        // remember received events so we can verify them later
+        receivedEvents.add(event);
+    }
+
     @Test
     void testCreateRead(@TempDir Path tempDir) throws Exception {
         final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(DatanodeTestUtils.tempDirectories(tempDir), "foobar", this.eventBus);
@@ -99,7 +105,7 @@ class DatanodeKeystoreTest {
     @Test
     void testIntermediateCA(@TempDir Path tempDir) throws Exception {
         final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(DatanodeTestUtils.tempDirectories(tempDir), "foobar", this.eventBus);
-        datanodeKeystore.create( DatanodeTestUtils.generateKeyPair(Duration.ofDays(30)));
+        datanodeKeystore.create(DatanodeTestUtils.generateKeyPair(Duration.ofDays(30)));
 
         final KeyPair rootCa = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("root")
                 .isCA(true)
@@ -156,11 +162,11 @@ class DatanodeKeystoreTest {
         Assertions.assertThat(validityDays).isBetween(99L * 365 - 10, 99L * 365 + 10);
 
         // One event should be posted for self-signed certificate creation
-        Assertions.assertThat(this.receivedEvents).hasSize(1);
+        Assertions.assertThat(this.receivedEvents).isEmpty();
     }
 
     @Test
-    void testInitWithSelfSignedCertificateReplacesExistingSignedCert(@TempDir Path tempDir) throws Exception {
+    void testRevokeSignedCertificateReplacesExistingSignedCert(@TempDir Path tempDir) throws Exception {
         final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(DatanodeTestUtils.tempDirectories(tempDir), "foobar", this.eventBus);
 
         // Create initial keystore with a CA-signed certificate
@@ -180,7 +186,7 @@ class DatanodeKeystoreTest {
 
         // Reset to self-signed certificate
         receivedEvents.clear();
-        final java.security.KeyStore keystore = datanodeKeystore.initWithSelfSignedCertificate();
+        final java.security.KeyStore keystore = datanodeKeystore.revokeSignedCertificate();
 
         // Verify the certificate is now self-signed
         Assertions.assertThat(datanodeKeystore.hasSignedCertificate()).isFalse();
@@ -189,6 +195,8 @@ class DatanodeKeystoreTest {
         Assertions.assertThat(cert.getIssuerX500Principal()).isEqualTo(cert.getSubjectX500Principal());
 
         // One event should be posted when resetting to self-signed
-        Assertions.assertThat(this.receivedEvents).hasSize(1);
+        Assertions.assertThat(this.receivedEvents)
+                .hasSize(1)
+                .allSatisfy(e -> Assertions.assertThat(e).isInstanceOf(DatanodeCertificateRevokedEvent.class));
     }
 }
