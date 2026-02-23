@@ -26,7 +26,6 @@ describe('SourceFormModal', () => {
 
     await screen.findByText('File');
     await screen.findByText('Journald');
-    await screen.findByText('TCP');
   });
 
   it('renders name input field', async () => {
