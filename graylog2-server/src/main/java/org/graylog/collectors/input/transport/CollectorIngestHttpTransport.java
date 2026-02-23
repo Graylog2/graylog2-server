@@ -64,16 +64,16 @@ public class CollectorIngestHttpTransport extends OTelHttpTransport {
 
     @AssistedInject
     public CollectorIngestHttpTransport(@Assisted Configuration configuration,
-                                   EventLoopGroup eventLoopGroup,
-                                   EventLoopGroupFactory eventLoopGroupFactory,
-                                   NettyTransportConfiguration nettyTransportConfiguration,
-                                   ThroughputCounter throughputCounter,
-                                   LocalMetricRegistry localMetricRegistry,
-                                   TLSProtocolsConfiguration tlsConfiguration,
-                                   @Named("trusted_proxies") Set<IpSubnet> trustedProxies,
-                                   OTelJournalRecordFactory journalRecordFactory,
-                                   OpAmpCaService opAmpCaService,
-                                   ClusterConfigService clusterConfigService) {
+                                        EventLoopGroup eventLoopGroup,
+                                        EventLoopGroupFactory eventLoopGroupFactory,
+                                        NettyTransportConfiguration nettyTransportConfiguration,
+                                        ThroughputCounter throughputCounter,
+                                        LocalMetricRegistry localMetricRegistry,
+                                        TLSProtocolsConfiguration tlsConfiguration,
+                                        @Named("trusted_proxies") Set<IpSubnet> trustedProxies,
+                                        OTelJournalRecordFactory journalRecordFactory,
+                                        OpAmpCaService opAmpCaService,
+                                        ClusterConfigService clusterConfigService) {
         super(buildTransportConfig(clusterConfigService), eventLoopGroup, eventLoopGroupFactory,
                 nettyTransportConfiguration, throughputCounter, localMetricRegistry,
                 tlsConfiguration, trustedProxies, journalRecordFactory);
@@ -85,14 +85,15 @@ public class CollectorIngestHttpTransport extends OTelHttpTransport {
         final var config = clusterConfigService.get(CollectorsConfig.class);
         final int port = (config != null && config.http() != null) ? config.http().port() : DEFAULT_HTTP_PORT;
         return new Configuration(Map.of(
-                "bind_address", "0.0.0.0",
-                "port", port,
-                "tls_enable", true,
-                "max_chunk_size", 4 * 1024 * 1024,
-                "recv_buffer_size", 1048576,
-                "number_worker_threads", 4,
-                "tcp_keepalive", false,
-                "idle_writer_timeout", 60
+                OTelHttpTransport.CK_BIND_ADDRESS, "0.0.0.0",
+                OTelHttpTransport.CK_PORT, port,
+                OTelHttpTransport.CK_TLS_ENABLE, true,
+                OTelHttpTransport.CK_TLS_CLIENT_AUTH, OTelHttpTransport.TLS_CLIENT_AUTH_REQUIRED,
+                OTelHttpTransport.CK_MAX_CHUNK_SIZE, 4 * 1024 * 1024,
+                OTelHttpTransport.CK_RECV_BUFFER_SIZE, 1048576,
+                OTelHttpTransport.CK_NUMBER_WORKER_THREADS, 4,
+                OTelHttpTransport.CK_TCP_KEEPALIVE, false,
+                OTelHttpTransport.CK_IDLE_WRITER_TIMEOUT, 60
         ));
     }
 
