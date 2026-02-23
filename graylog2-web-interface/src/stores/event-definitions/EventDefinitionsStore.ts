@@ -18,7 +18,6 @@ import Reflux from 'reflux';
 import URI from 'urijs';
 import cloneDeep from 'lodash/cloneDeep';
 import concat from 'lodash/concat';
-import defaultTo from 'lodash/defaultTo';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
 
@@ -269,7 +268,7 @@ export const EventDefinitionsStore = singletonStore('core.EventDefinitions', () 
 
       clonedEventDefinition.config = omit(config, ['_is_scheduled']);
 
-      return { eventDefinition: clonedEventDefinition, isScheduled: defaultTo(_is_scheduled, true) };
+      return { eventDefinition: clonedEventDefinition, isScheduled: _is_scheduled ?? true };
     },
 
     create(newEventDefinition: Record<string, unknown>) {

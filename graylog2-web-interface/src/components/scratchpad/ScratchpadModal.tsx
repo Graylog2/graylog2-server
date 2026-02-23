@@ -144,6 +144,7 @@ const Scratchpad = () => {
     resetStatusTimer();
   };
 
+  // eslint-disable-next-line react-hooks/refs
   const handleChange = debounce(() => {
     const { value } = textareaRef.current;
 

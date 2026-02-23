@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
-import get from 'lodash/get';
 
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -72,7 +71,7 @@ export const EnterpriseStore = singletonStore('core.Enterprise', () =>
           return response;
         },
         (error: { message?: string; additional?: { body?: { message?: string } } }) => {
-          const errorMessage = get(error, 'additional.body.message', error.message);
+          const errorMessage = error?.additional?.body?.message ?? error.message;
 
           UserNotification.error(`Couldn't load license information: ${errorMessage}`, 'Error');
         },

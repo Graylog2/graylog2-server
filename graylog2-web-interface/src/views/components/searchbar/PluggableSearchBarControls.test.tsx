@@ -87,12 +87,14 @@ describe('PluggableSearchBarControls', () => {
     asMock(Store.get).mockReturnValue(true);
     const { container } = render(<PluggableSearchBarControls />);
 
+    // eslint-disable-next-line testing-library/no-node-access
     expect(container.children).toHaveLength(2);
   });
 
   it('should not render anything when there are no pluggable controls and `showLeftControls` is `false`', () => {
     const { container } = render(<PluggableSearchBarControls showLeftControls={false} />);
 
+    // eslint-disable-next-line testing-library/no-node-access
     expect(container.children).toHaveLength(2);
   });
 });

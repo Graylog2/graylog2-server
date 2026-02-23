@@ -29,7 +29,7 @@ const Store = {
 
     try {
       return JSON.parse(value) as T;
-    } catch (e) {
+    } catch (_e) {
       return value as T;
     }
   },

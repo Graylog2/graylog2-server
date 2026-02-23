@@ -46,14 +46,14 @@ const NumberUtils = {
   formatNumber(number: NumberInput): string {
     try {
       return numeral(this.normalizeNumber(number)).format('0,0.[00]');
-    } catch (e) {
+    } catch (_e) {
       return String(number);
     }
   },
   formatPercentage(percentage: NumberInput): string {
     try {
       return numeral(this.normalizeNumber(percentage)).format('0.00%');
-    } catch (e) {
+    } catch (_e) {
       return String(percentage);
     }
   },
@@ -64,7 +64,7 @@ const NumberUtils = {
 
     try {
       formattedNumber = numeral(this.normalizeNumber(number)).format('0.0ib');
-    } catch (e) {
+    } catch (_e) {
       formattedNumber = String(number);
     }
 

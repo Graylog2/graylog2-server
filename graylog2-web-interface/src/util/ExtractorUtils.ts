@@ -134,13 +134,13 @@ const ExtractorUtils = {
     const effectiveConfiguration: ExtractorConfiguration = {};
 
     for (const key in defaultConfiguration) {
-      if (defaultConfiguration.hasOwnProperty(key)) {
+      if (key in defaultConfiguration) {
         effectiveConfiguration[key] = defaultConfiguration[key];
       }
     }
 
     for (const key in currentConfiguration) {
-      if (currentConfiguration.hasOwnProperty(key)) {
+      if (key in currentConfiguration) {
         effectiveConfiguration[key] = currentConfiguration[key];
       }
     }

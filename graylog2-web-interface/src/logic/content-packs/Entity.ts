@@ -164,6 +164,7 @@ export default class Entity {
   toBuilder(): Builder {
     const { v, type, id, data, constraints, fromServer, parameters } = this._value;
 
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(
       Map({
         v,
@@ -178,6 +179,7 @@ export default class Entity {
   }
 
   static builder(): Builder {
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder();
   }
 

@@ -85,7 +85,7 @@ class EditConfigurationVariableModal extends React.Component<
   _getId = (prefixIdName) => {
     const { id } = this.state;
 
-    return `${prefixIdName} ${id}` || 'new';
+    return `${prefixIdName} ${id || 'new'}`;
   };
 
   _saved = () => {

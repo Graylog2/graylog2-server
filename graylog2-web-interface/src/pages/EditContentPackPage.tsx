@@ -95,6 +95,7 @@ const EditContentPackPage = () => {
       return result;
     }, {});
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedEntities(newSelectedEntities);
   }, [contentPack, entityCatalog, entityIndex]);
 
@@ -119,6 +120,7 @@ const EditContentPackPage = () => {
       return newResult;
     }, {});
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setAppliedParameter(newAppliedParameter);
   }, [contentPack]);
 
