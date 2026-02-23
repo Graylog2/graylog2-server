@@ -100,7 +100,7 @@ const Sidebar = ({
   const sidebarIsPinned = searchPreferencesLayout?.config.sidebar.isPinned || forceSideBarPinned;
   const initialSectionKey = sections[0].key;
   const [activeSectionKey, setActiveSectionKey] = useState<string | undefined>(
-    searchPreferencesLayout?.config.sidebar.isPinned ? initialSectionKey : null,
+    sidebarIsPinned ? initialSectionKey : null,
   );
   const activeSection = sections.find((section) => section.key === activeSectionKey);
 

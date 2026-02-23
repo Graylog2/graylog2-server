@@ -29,6 +29,7 @@ import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.nodes.TestDataNodeNodeClusterService;
+import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.plugin.Version;
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +48,7 @@ class DatanodeUpgradeServiceTest {
         nodeService.registerServer(buildTestNode("3", DataNodeStatus.AVAILABLE, Version.from(6, 2, 1), false));
 
         final DatanodeUpgradeService upgradeService = new DatanodeUpgradeService(
-                mockUpgradeAdapter(nodeService, "GREEN", ShardReplication.ALL),
+                mockUpgradeAdapter(nodeService, HealthStatus.Green, ShardReplication.ALL),
                 nodeService,
                 Version.from(6, 2, 1));
 
@@ -83,7 +84,7 @@ class DatanodeUpgradeServiceTest {
         nodeService.registerServer(buildTestNode("1", DataNodeStatus.AVAILABLE, datanodeVersion, true));
 
         final DatanodeUpgradeService upgradeService = new DatanodeUpgradeService(
-                mockUpgradeAdapter(nodeService, "GREEN", ShardReplication.ALL),
+                mockUpgradeAdapter(nodeService, HealthStatus.Green, ShardReplication.ALL),
                 nodeService,
                 serverVersion);
 
@@ -112,7 +113,7 @@ class DatanodeUpgradeServiceTest {
         nodeService.registerServer(buildTestNode("3", DataNodeStatus.AVAILABLE, Version.from(6, 1, 0), true));
 
         final DatanodeUpgradeService upgradeService = new DatanodeUpgradeService(
-                mockUpgradeAdapter(nodeService, "GREEN", ShardReplication.ALL),
+                mockUpgradeAdapter(nodeService, HealthStatus.Green, ShardReplication.ALL),
                 nodeService,
                 Version.from(6, 2, 1));
 
@@ -150,7 +151,7 @@ class DatanodeUpgradeServiceTest {
     }
 
     @Nonnull
-    private static DatanodeUpgradeServiceAdapter mockUpgradeAdapter(NodeService<DataNodeDto> nodeService, final String clusterStatus, final ShardReplication shardReplication) {
+    private static DatanodeUpgradeServiceAdapter mockUpgradeAdapter(NodeService<DataNodeDto> nodeService, final HealthStatus clusterStatus, final ShardReplication shardReplication) {
         final List<Node> nodes = nodeService.allActive().values().stream().map(DatanodeUpgradeServiceTest::toOpensearchNode).collect(Collectors.toList());
         final ManagerNode managerNode = nodeService.allActive().values().stream().filter(NodeDto::isLeader).findFirst().map(n -> new ManagerNode(n.getNodeId(), n.getHostname())).orElseThrow(() -> new IllegalStateException("No manager node found"));
         return new DatanodeUpgradeServiceAdapter() {
@@ -173,17 +174,12 @@ class DatanodeUpgradeServiceTest {
             }
 
             @Override
-            public void disableShardReplication() {
-
+            public FlushResponse disableShardReplication() {
+                return new FlushResponse(0, 0, 0);
             }
 
             @Override
-            public void enableShardReplication() {
-
-            }
-
-            @Override
-            public FlushResponse flush() {
+            public FlushResponse enableShardReplication() {
                 return new FlushResponse(0, 0, 0);
             }
         };

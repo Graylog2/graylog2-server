@@ -23,7 +23,7 @@ import { Spinner } from 'components/common';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import ErrorsActions from 'actions/errors/ErrorsActions';
-import EventDefinitionReplaySearch from 'components/event-definitions/EventDefinitionReplaySearch';
+import EventDefinitionReplaySearch from 'components/event-definitions/replay-search/EventDefinitionReplaySearch';
 import type FetchError from 'logic/errors/FetchError';
 
 export const onErrorHandler = (error: FetchError) => {

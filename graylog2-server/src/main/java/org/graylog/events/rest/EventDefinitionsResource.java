@@ -531,7 +531,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                      @Context UserContext userContext) {
         EventProcessorConfig oldConfig = dbService.get(toValidate.id()).map(EventDefinition::config).orElse(null);
         ValidationResult validationResult = toValidate.config().validate(userContext);
-        validationResult.addAll(toValidate.config().validate(oldConfig, eventDefinitionConfiguration));
+        validationResult.addAll(toValidate.config().validate(userContext, oldConfig, eventDefinitionConfiguration));
         return validationResult;
     }
 

@@ -32,11 +32,37 @@ export const Value = styled.div`
 const Title = styled.b`
   min-width: 85px;
 `;
-const EventAttribute = ({ children = null, title }: React.PropsWithChildren<{ title: string }>) => (
-  <Item key={title}>
-    <Title>{title}: </Title>
-    <Value title={title}>{children || <NoAttributeProvided name={title} />}</Value>
-  </Item>
-);
+const EventAttribute = ({
+  children = null,
+  title,
+  inRows = false,
+}: React.PropsWithChildren<{ title: string; inRows?: boolean }>) => {
+  if (inRows)
+    return (
+      <>
+        <tr key={title}>
+          <td colSpan={2}>
+            <Title>{title}</Title>
+          </td>
+        </tr>
+        <tr>
+          <td colSpan={2}>
+            <Value title={title}>{children || <NoAttributeProvided />}</Value>
+          </td>
+        </tr>
+      </>
+    );
+
+  return (
+    <tr key={title}>
+      <td>
+        <Title>{title}</Title>
+      </td>
+      <td>
+        <Value title={title}>{children || <NoAttributeProvided />}</Value>
+      </td>
+    </tr>
+  );
+};
 
 export default EventAttribute;

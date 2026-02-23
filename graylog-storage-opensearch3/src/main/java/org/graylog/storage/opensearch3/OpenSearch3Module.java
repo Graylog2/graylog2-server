@@ -83,8 +83,8 @@ public class OpenSearch3Module extends VersionAwareModule {
         bindForSupportedVersion(IndexFieldTypePollerAdapter.class).to(IndexFieldTypePollerAdapterOS.class);
         bindForSupportedVersion(IndexToolsAdapter.class).to(IndexToolsAdapterOS2.class);
         bindForSupportedVersion(MessagesAdapter.class).to(MessagesAdapterOS2.class);
-        bindForSupportedVersion(MultiChunkResultRetriever.class).to(PaginationOS2.class);
-        bindForSupportedVersion(MoreSearchAdapter.class).to(MoreSearchAdapterOS2.class);
+        bindForSupportedVersion(MultiChunkResultRetriever.class).to(PaginationOS.class);
+        bindForSupportedVersion(MoreSearchAdapter.class).to(MoreSearchAdapterOS.class);
         bindForSupportedVersion(NodeAdapter.class).to(NodeAdapterOS.class);
         bindForSupportedVersion(SearchesAdapter.class).to(SearchesAdapterOS.class);
         bindForSupportedVersion(V20170607164210_MigrateReopenedIndicesToAliases.ClusterState.class)
@@ -94,15 +94,15 @@ public class OpenSearch3Module extends VersionAwareModule {
 
         bindForSupportedVersion(QuerySuggestionsService.class).to(QuerySuggestionsOS2.class);
 
-        bindForSupportedVersion(ProxyRequestAdapter.class).to(ProxyRequestAdapterOS2.class);
+        bindForSupportedVersion(ProxyRequestAdapter.class).to(ProxyRequestAdapterOS.class);
 
-        install(new FactoryModuleBuilder().build(ScrollResultOS2.Factory.class));
+        install(new FactoryModuleBuilder().build(ScrollResultOS.Factory.class));
 
         bind(RestHighLevelClient.class).toProvider(RestClientProvider.class);
         bind(OfficialOpensearchClient.class).toProvider(OfficialOpensearchClientProvider.class).asEagerSingleton();
         bind(CredentialsProvider.class).toProvider(OSCredentialsProvider.class);
         bind(org.apache.hc.client5.http.auth.CredentialsProvider.class).toProvider(OpensearchCredentialsProvider.class);
-        bindForSupportedVersion(DatanodeUpgradeServiceAdapter.class).to(DatanodeUpgradeServiceAdapterOS2.class);
+        bindForSupportedVersion(DatanodeUpgradeServiceAdapter.class).to(DatanodeUpgradeServiceAdapterOS.class);
 
         Multibinder<SnifferBuilder> snifferBuilders = Multibinder.newSetBinder(binder(), SnifferBuilder.class);
         snifferBuilders.addBinding().to(OpensearchClusterSniffer.class);

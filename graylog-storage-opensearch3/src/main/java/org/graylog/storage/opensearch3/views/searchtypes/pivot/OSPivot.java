@@ -26,18 +26,15 @@ import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.HasAggregations;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.MaxAggregationBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.MinAggregationBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
+import org.graylog.storage.opensearch3.views.MutableSearchRequestBuilder;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
+import org.opensearch.client.opensearch.core.msearch.MultiSearchItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,12 +49,12 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
     private static final String AGG_NAME = "agg";
 
     private final Map<String, OSPivotBucketSpecHandler<? extends BucketSpec>> bucketHandlers;
-    private final Map<String, OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers;
+    private final Map<String, OSPivotSeriesSpecHandler<? extends SeriesSpec>> seriesHandlers;
     private final EffectiveTimeRangeExtractor effectiveTimeRangeExtractor;
 
     @Inject
     public OSPivot(Map<String, OSPivotBucketSpecHandler<? extends BucketSpec>> bucketHandlers,
-                   Map<String, OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers,
+                   Map<String, OSPivotSeriesSpecHandler<? extends SeriesSpec>> seriesHandlers,
                    EffectiveTimeRangeExtractor effectiveTimeRangeExtractor) {
         this.bucketHandlers = bucketHandlers;
         this.seriesHandlers = seriesHandlers;
@@ -67,7 +64,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
     @Override
     public void doGenerateQueryPart(Query query, Pivot pivot, OSGeneratedQueryContext queryContext) {
         LOG.debug("Generating aggregation for {}", pivot);
-        final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(pivot);
+        var searchSourceBuilder = queryContext.searchSourceBuilder(pivot);
 
         var generateRollups = pivot.rollup() || (pivot.rowGroups().isEmpty() && pivot.columnGroups().isEmpty());
 
@@ -79,10 +76,10 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
                     .forEach(searchSourceBuilder::aggregation);
         }
 
-        final BucketSpecHandler.CreatedAggregations<AggregationBuilder> createdAggregations = createPivots(BucketSpecHandler.Direction.Row, query, pivot, pivot.rowGroups(), queryContext);
-        final AggregationBuilder rootAggregation = createdAggregations.root();
-        final AggregationBuilder leafAggregation = createdAggregations.leaf();
-        final List<AggregationBuilder> metrics = createdAggregations.metrics();
+        final BucketSpecHandler.CreatedAggregations<MutableNamedAggregationBuilder> createdAggregations = createPivots(BucketSpecHandler.Direction.Row, query, pivot, pivot.rowGroups(), queryContext);
+        final MutableNamedAggregationBuilder rootAggregation = createdAggregations.root();
+        final MutableNamedAggregationBuilder leafAggregation = createdAggregations.leaf();
+        final List<MutableNamedAggregationBuilder> metrics = createdAggregations.metrics();
         seriesStream(pivot, queryContext, "metrics")
                 .forEach(result -> {
                     switch (result.placement()) {
@@ -97,13 +94,13 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
                 });
 
         if (!pivot.columnGroups().isEmpty()) {
-            final BucketSpecHandler.CreatedAggregations<AggregationBuilder> columnsAggregation = createPivots(BucketSpecHandler.Direction.Column, query, pivot, pivot.columnGroups(), queryContext);
-            final AggregationBuilder columnsRootAggregation = columnsAggregation.root();
-            final AggregationBuilder columnsLeafAggregation = columnsAggregation.leaf();
-            final List<AggregationBuilder> columnMetrics = columnsAggregation.metrics();
+            final BucketSpecHandler.CreatedAggregations<MutableNamedAggregationBuilder> columnsAggregation = createPivots(BucketSpecHandler.Direction.Column, query, pivot, pivot.columnGroups(), queryContext);
+            final MutableNamedAggregationBuilder columnsRootAggregation = columnsAggregation.root();
+            final MutableNamedAggregationBuilder columnsLeafAggregation = columnsAggregation.leaf();
+            final List<MutableNamedAggregationBuilder> columnMetrics = columnsAggregation.metrics();
             seriesStream(pivot, queryContext, "metrics")
                     .forEach(result -> {
-                        var aggregationBuilder = result.aggregationBuilder();
+                        final var aggregationBuilder = result.aggregationBuilder();
                         switch (result.placement()) {
                             case COLUMN -> columnsLeafAggregation.subAggregation(aggregationBuilder);
                             case METRIC -> columnMetrics.forEach(metric -> metric.subAggregation(aggregationBuilder));
@@ -123,23 +120,27 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         addTimeStampAggregations(searchSourceBuilder);
     }
 
-    private void addTimeStampAggregations(SearchSourceBuilder searchSourceBuilder) {
-        final MinAggregationBuilder startTimestamp = AggregationBuilders.min("timestamp-min").field("timestamp");
-        final MaxAggregationBuilder endTimestamp = AggregationBuilders.max("timestamp-max").field("timestamp");
+    private void addTimeStampAggregations(MutableSearchRequestBuilder searchSourceBuilder) {
+        final MutableNamedAggregationBuilder startTimestamp = new MutableNamedAggregationBuilder(
+                "timestamp-min",
+                Aggregation.builder().min(f -> f.field("timestamp")));
+        final MutableNamedAggregationBuilder endTimestamp = new MutableNamedAggregationBuilder(
+                "timestamp-max",
+                Aggregation.builder().max(f -> f.field("timestamp")));
         searchSourceBuilder.aggregation(startTimestamp);
         searchSourceBuilder.aggregation(endTimestamp);
     }
 
-    private BucketSpecHandler.CreatedAggregations<AggregationBuilder> createPivots(BucketSpecHandler.Direction direction, Query query, Pivot pivot, List<BucketSpec> pivots, OSGeneratedQueryContext queryContext) {
-        AggregationBuilder leaf = null;
-        AggregationBuilder root = null;
-        final List<AggregationBuilder> metrics = new ArrayList<>();
+    private BucketSpecHandler.CreatedAggregations<MutableNamedAggregationBuilder> createPivots(BucketSpecHandler.Direction direction, Query query, Pivot pivot, List<BucketSpec> pivots, OSGeneratedQueryContext queryContext) {
+        MutableNamedAggregationBuilder leaf = null;
+        MutableNamedAggregationBuilder root = null;
+        final List<MutableNamedAggregationBuilder> metrics = new ArrayList<>();
         for (BucketSpec bucketSpec : pivots) {
             final OSPivotBucketSpecHandler<? extends BucketSpec> bucketHandler = bucketHandlers.get(bucketSpec.type());
-            final BucketSpecHandler.CreatedAggregations<AggregationBuilder> bucketAggregations = bucketHandler.createAggregation(direction, AGG_NAME, pivot, bucketSpec, queryContext, query);
-            final AggregationBuilder aggregationRoot = bucketAggregations.root();
-            final AggregationBuilder aggregationLeaf = bucketAggregations.leaf();
-            final List<AggregationBuilder> aggregationMetrics = bucketAggregations.metrics();
+            final BucketSpecHandler.CreatedAggregations<MutableNamedAggregationBuilder> bucketAggregations = bucketHandler.createAggregation(direction, AGG_NAME, pivot, bucketSpec, queryContext, query);
+            final MutableNamedAggregationBuilder aggregationRoot = bucketAggregations.root();
+            final MutableNamedAggregationBuilder aggregationLeaf = bucketAggregations.leaf();
+            final List<MutableNamedAggregationBuilder> aggregationMetrics = bucketAggregations.metrics();
 
             metrics.addAll(aggregationMetrics);
             if (root == null && leaf == null) {
@@ -161,7 +162,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
                 .flatMap((seriesSpec) -> {
                     final String seriesName = queryContext.seriesName(seriesSpec, pivot);
                     LOG.debug("Adding {} series '{}' with name '{}'", reason, seriesSpec.type(), seriesName);
-                    final OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> esPivotSeriesSpecHandler = seriesHandlers.get(seriesSpec.type());
+                    final OSPivotSeriesSpecHandler<? extends SeriesSpec> esPivotSeriesSpecHandler = seriesHandlers.get(seriesSpec.type());
                     if (esPivotSeriesSpecHandler == null) {
                         throw new IllegalArgumentException("No series handler registered for: " + seriesSpec.type());
                     }
@@ -171,7 +172,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
 
     @WithSpan
     @Override
-    public SearchType.Result doExtractResult(Query query, Pivot pivot, SearchResponse queryResult, OSGeneratedQueryContext queryContext) {
+    public SearchType.Result doExtractResult(Query query, Pivot pivot, MultiSearchItem<JsonData> queryResult, OSGeneratedQueryContext queryContext) {
         final AbsoluteRange effectiveTimerange = this.effectiveTimeRangeExtractor.extract(queryResult, query, pivot);
 
         final var fieldsNames = pivot.rowGroups().stream().flatMap(bs -> bs.fields().stream());
@@ -186,12 +187,12 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
 
         pivot.name().ifPresent(resultBuilder::name);
 
-        final MultiBucketsAggregation.Bucket initialBucket = createInitialBucket(queryResult);
+        final InitialBucket initialBucket = InitialBucket.create(queryResult);
 
         retrieveBuckets(pivot, pivot.rowGroups(), initialBucket)
                 .forEach(tuple -> {
                     final ImmutableList<String> rowKeys = tuple.keys();
-                    final MultiBucketsAggregation.Bucket rowBucket = tuple.bucket();
+                    final MultiBucketBase rowBucket = tuple.bucket();
                     final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder()
                             .key(rowKeys)
                             .source("leaf");
@@ -205,7 +206,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
                                     final ImmutableList<String> columnKeys = columnBucketTuple.keys();
                                     colGroupNames.add(String.join(", ", Stream.concat(columnKeys.stream(), seriesNames.stream()).toList()));
 
-                                    final MultiBucketsAggregation.Bucket columnBucket = columnBucketTuple.bucket();
+                                    final MultiBucketBase columnBucket = columnBucketTuple.bucket();
 
                                     processSeries(rowBuilder, queryResult, contextWithRowBucket, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
                                 });
@@ -222,8 +223,8 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         return resultBuilder.columnNames(Stream.concat(fieldsNames, colGroupNames.stream().distinct().sorted()).toList()).build();
     }
 
-    private Stream<PivotBucket> retrieveBuckets(Pivot pivot, List<BucketSpec> pivots, MultiBucketsAggregation.Bucket initialBucket) {
-        Stream<PivotBucket> result = Stream.of(PivotBucket.create(ImmutableList.of(), initialBucket));
+    private Stream<PivotBucket> retrieveBuckets(Pivot pivot, List<BucketSpec> pivots, MultiBucketBase aggregations) {
+        Stream<PivotBucket> result = Stream.of(PivotBucket.create(ImmutableList.of(), aggregations));
 
         for (BucketSpec bucketSpec : pivots) {
             result = result.flatMap((tuple) -> {
@@ -235,21 +236,17 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         return result;
     }
 
-    private MultiBucketsAggregation.Bucket createInitialBucket(SearchResponse queryResult) {
-        return InitialBucket.create(queryResult);
-    }
-
     private void processSeries(PivotResult.Row.Builder rowBuilder,
-                               SearchResponse searchResult,
+                               MultiSearchItem<JsonData> searchResult,
                                OSGeneratedQueryContext queryContext,
                                Pivot pivot,
                                ArrayDeque<String> columnKeys,
-                               HasAggregations aggregation,
+                               MultiBucketBase aggregation,
                                boolean rollup,
                                String source) {
         pivot.series().forEach(seriesSpec -> {
-            final OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> seriesHandler = seriesHandlers.get(seriesSpec.type());
-            final Aggregation series = seriesHandler.extractAggregationFromResult(pivot, seriesSpec, aggregation, queryContext);
+            final OSPivotSeriesSpecHandler<? extends SeriesSpec> seriesHandler = seriesHandlers.get(seriesSpec.type());
+            final Aggregate series = seriesHandler.extractAggregationFromResult(pivot, seriesSpec, aggregation, queryContext);
             seriesHandler.handleResult(pivot, seriesSpec, searchResult, series, queryContext)
                     .map(value -> {
                         columnKeys.addLast(value.id());
@@ -261,7 +258,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         });
     }
 
-    private long extractDocumentCount(SearchResponse queryResult) {
-        return queryResult.getHits().getTotalHits().value;
+    private long extractDocumentCount(MultiSearchItem<JsonData> queryResult) {
+        return queryResult.hits().total().value();
     }
 }

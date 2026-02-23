@@ -1,0 +1,4 @@
+type = "c"
+message = "Update opensearch and its plugins in datanode to 2.19.4"
+
+pulls = ["24630"]

@@ -36,6 +36,10 @@ const StyledDayPicker = styled(DayPicker)(
     .rdp-chevron {
       fill: ${theme.colors.gray[60]};
     }
+
+    .rdp-months {
+      margin: 0 auto;
+    }
   `,
 );
 
