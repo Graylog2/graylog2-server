@@ -130,7 +130,7 @@ const Streams = ({ streams, streamIds, streamIdsWithMissingPermission }: Streams
     .sort((s1, s2) =>
       naturalSortIgnoreCase(typeof s1 === 'object' ? s1.title : s1, typeof s2 === 'object' ? s2.title : s2),
     )
-    .map((s) => <StreamOrId key={s} streamOrId={s} />);
+    .map((s) => <StreamOrId key={typeof s === 'object' ? s.id : s} streamOrId={s} />);
 
   return (
     <>
