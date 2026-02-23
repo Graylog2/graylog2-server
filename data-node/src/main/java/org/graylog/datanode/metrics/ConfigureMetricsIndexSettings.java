@@ -83,9 +83,9 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer<Opensea
         // finally starts (due to slow startup or limited resources) and then the source state is not starting,
         // as originally assumed. Instead, let's remember if we have already created a datastream once.
         if (destination == OpensearchState.AVAILABLE && process.isManagerNode()) {
-            LOGGER.info("Transition to AVAILABLE and manager process, tracer instance: {}", this);
+            LOGGER.debug("Transition to AVAILABLE and manager process, tracer instance: {}", this);
             process.openSearchClient().ifPresent(client -> {
-                LOGGER.info("Opensearch client available, tracer instance: {}, client: {}", this, client);
+                LOGGER.debug("Opensearch client available, tracer instance: {}, client: {}", this, client);
                 if (datastreamCreated.compareAndSet(false, true)) {
                     LOGGER.info("Initial creation of metric templates and datastreams, tracer instance: {}, client: {}", this, client);
                     createDatastream(client);
