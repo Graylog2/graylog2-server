@@ -40,11 +40,11 @@ import org.graylog2.shared.rest.resources.RestResource;
 @Produces(MediaType.APPLICATION_JSON)
 public class SliceByResource extends RestResource {
 
-    private final EntityFieldGroupingService entitySuggestionService;
+    private final EntityFieldGroupingService entityFieldGroupingService;
 
     @Inject
-    public SliceByResource(final EntityFieldGroupingService entitySuggestionService) {
-        this.entitySuggestionService = entitySuggestionService;
+    public SliceByResource(final EntityFieldGroupingService entityFieldGroupingService) {
+        this.entityFieldGroupingService = entityFieldGroupingService;
     }
 
     @GET
@@ -67,7 +67,7 @@ public class SliceByResource extends RestResource {
                                              @Parameter(name = "sort_field")
                                              @QueryParam("sort_field") @DefaultValue("COUNT") EntityFieldGroupingService.SortField sortField) {
 
-        return entitySuggestionService.groupByField(
+        return entityFieldGroupingService.groupByField(
                 collection,
                 column,
                 query,
