@@ -469,11 +469,10 @@ public class MessageTest {
 
     @Test
     public void toElasticsearchObjectAddsInputMessageSize() {
-        final Message message = new Message("message", "source", Tools.nowUTC());
-
+        final long inputMessageSize = 12345L;
+        message.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, inputMessageSize);
         final Map<String, Object> esObject = message.toElasticSearchObject(objectMapper, invalidTimestampMeter);
-
-        assertThat(esObject).containsKey("gl2_input_message_size");
+        assertThat(esObject.get(Message.FIELD_GL2_INPUT_MESSAGE_SIZE)).isEqualTo(inputMessageSize);
     }
 
     @Test

@@ -476,7 +476,6 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         obj.put(FIELD_SOURCE, getSource());
         obj.put(FIELD_STREAMS, getStreamIds());
         obj.put(FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, getSize());
-        obj.put(FIELD_GL2_INPUT_MESSAGE_SIZE, getField(FIELD_GL2_INPUT_MESSAGE_SIZE));
 
         final Object timestampValue = getField(FIELD_TIMESTAMP);
         DateTime dateTime = timestampValue == null ? fallbackForNullTimestamp() : convertToDateTime(timestampValue);
