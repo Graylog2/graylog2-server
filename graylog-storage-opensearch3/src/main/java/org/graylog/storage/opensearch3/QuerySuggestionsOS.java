@@ -25,9 +25,9 @@ import org.graylog.plugins.views.search.engine.suggestions.SuggestionRequest;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionResponse;
 import org.graylog2.plugin.Message;
 import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.BuiltinScriptLanguage;
 import org.opensearch.client.opensearch._types.ErrorCause;
 import org.opensearch.client.opensearch._types.ExpandWildcard;
-import org.opensearch.client.opensearch._types.BuiltinScriptLanguage;
 import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.Time;
@@ -142,11 +142,6 @@ public class QuerySuggestionsOS implements QuerySuggestionsService {
         };
     }
 
-    /**
-     * Unlike prefix query, this scripted implementation works also for numerical fields.
-     * TODO: would it make sense to switch between this scripted implementation and the standard prefix
-     * query based on our information about the field type? Would it be faster?
-     */
     private static Query getScriptedPrefixQuery(SuggestionRequest req) {
         return Query.of(q -> q.script(s -> s
                 .script(sc -> sc
