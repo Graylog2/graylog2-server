@@ -15,6 +15,7 @@
             "message": "Hi",
             "number": 1,
             "timestamp": "2015-03-03 01:00:00.000",
+            "alert": true,
             "streams": [
               "000000000000000000000001"
             ]
@@ -37,6 +38,8 @@
             "message": "Hi",
             "number": 2,
             "timestamp": "2016-03-03 01:00:00.000",
+            "alert": false,
+
             "streams": [
               "000000000000000000000001"
             ]
@@ -56,7 +59,7 @@
         {
           "data": {
             "source": "localhost",
-            "message": "Hi",
+            "message": "Hi","alert": true,
             "number": 3,
             "timestamp": "2017-03-03 01:00:00.000",
             "streams": [
@@ -81,6 +84,7 @@
             "message": "Hi",
             "number": 4,
             "timestamp": "2018-03-03 01:00:00.000",
+            "alert": false,
             "streams": [
               "000000000000000000000001"
             ]
@@ -103,8 +107,12 @@
             "message": "Ahoj",
             "number": 5,
             "timestamp": "2019-03-03 01:00:00.000",
+            "alert": false,
             "streams": [
               "000000000000000000000001"
+            ],
+            "source_streams": [
+              "source_stream_a"
             ]
           }
         }
@@ -125,8 +133,12 @@
             "message": "Ahoj",
             "number": 6,
             "timestamp": "2020-03-03 01:00:00.000",
+            "alert": false,
             "streams": [
               "000000000000000000000001"
+            ],
+            "source_streams": [
+              "forbidden_stream"
             ]
           }
         }
@@ -147,6 +159,7 @@
             "message": "Ahoj",
             "number": 7,
             "timestamp": "2021-03-03 01:00:00.000",
+            "alert": true,
             "streams": [
               "000000000000000000000001"
             ]
