@@ -142,7 +142,7 @@ public class QuerySuggestionsOS implements QuerySuggestionsService {
         };
     }
 
-    private static Query getScriptedPrefixQuery(SuggestionRequest req) {
+    private Query getScriptedPrefixQuery(SuggestionRequest req) {
         return Query.of(q -> q.script(s -> s
                 .script(sc -> sc
                         .inline(i -> i
@@ -159,9 +159,15 @@ public class QuerySuggestionsOS implements QuerySuggestionsService {
 
     private SuggestionError extractError(OpenSearchException exception) {
         final ErrorCause error = exception.response().error();
-        final ErrorCause cause = error.rootCause().stream().findFirst().orElse(error);
-        final String type = cause.type() != null ? cause.type() : "Aggregation error";
-        final String reason = cause.reason() != null ? cause.reason() : exception.getMessage();
+        String type = "Aggregation error";
+        String reason = exception.getMessage();
+        if (error != null) {
+            final ErrorCause cause = error.rootCause().stream().findFirst().orElse(error);
+            type = cause.type();
+            if (cause.reason() != null) {
+                reason = cause.reason();
+            }
+        }
         return SuggestionError.create(type, reason);
     }
 }

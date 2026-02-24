@@ -26,7 +26,6 @@ import org.graylog.storage.opensearch3.testing.OpenSearchTestServerExtension;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -77,12 +76,6 @@ class QuerySuggestionsOSIT {
         final IndexLookup indexLookup = mock(IndexLookup.class);
         when(indexLookup.indexNamesForStreamsInTimeRange(anyCollection(), any())).thenReturn(Set.of(TEST_INDEX));
         querySuggestions = new QuerySuggestionsOS(client, indexLookup);
-    }
-
-    @AfterEach
-    void tearDown() {
-        client.sync(c -> c.indices().delete(r -> r.index(TEST_INDEX).ignoreUnavailable(true)),
-                "Failed to delete test index");
     }
 
     private AbsoluteRange testTimeRange() {
