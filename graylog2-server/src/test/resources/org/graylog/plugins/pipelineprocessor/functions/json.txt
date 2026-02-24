@@ -20,4 +20,8 @@ then
   // Don't fail on nested input
   let nested_json = parse_json(to_string($message.nested_json));
   set_fields(to_map(nested_json));
+
+  // Parse with depth limit: nodes below the specified depth are removed
+  let depth_json = parse_json("{\"top\":\"val\",\"nested\":{\"inner\":\"ignored\"}}", 1);
+  set_fields(to_map(depth_json));
 end

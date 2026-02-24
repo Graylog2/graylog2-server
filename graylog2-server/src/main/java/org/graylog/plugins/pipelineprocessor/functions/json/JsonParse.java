@@ -45,7 +45,7 @@ public class JsonParse extends AbstractFunction<JsonNode> {
     public JsonParse(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper.copy().configure(ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER.mappedFeature(), true);
         valueParam = ParameterDescriptor.string("value").description("The string to parse as a JSON tree").build();
-        depthParam = ParameterDescriptor.integer("depth").optional().description("Number of levels to parse. Default: no limit").build();
+        depthParam = ParameterDescriptor.integer("depth").optional().description("Number of levels to parse. If > 0, container nodes below that level are deleted from the parsed tree. If omitted or 0, depth is unlimited.").build();
     }
 
     @Override
@@ -73,7 +73,7 @@ public class JsonParse extends AbstractFunction<JsonNode> {
                 .name(NAME)
                 .returnType(JsonNode.class)
                 .params(of(valueParam, depthParam))
-                .description("Parses a string as a JSON tree")
+                .description("Parses the value string as JSON, returning the resulting JSON tree. Optionally specify the number of levels to parse. If depth > 0, nodes below that level are deleted from the parsed tree. If omitted or set to 0, depth is unlimited.")
                 .build();
     }
 }
