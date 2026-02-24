@@ -188,18 +188,14 @@ const Navbar = styled(BootstrapNavbar)(
 
     .navbar-collapse,
     .navbar-form {
-      border-color: ${chroma(theme.colors.gray[90])
-        .darken(0.065)
-        .css()};
+      border-color: ${chroma(theme.colors.gray[90]).darken(0.065).css()};
     }
 
     .navbar-link {
       color: ${theme.colors.variant.default};
 
       &:hover {
-        color: ${chroma(theme.colors.variant.default)
-          .darken(0.25)
-          .css()};
+        color: ${chroma(theme.colors.variant.default).darken(0.25).css()};
       }
     }
 

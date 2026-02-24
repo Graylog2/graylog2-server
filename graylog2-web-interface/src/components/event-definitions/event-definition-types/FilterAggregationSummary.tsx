@@ -180,9 +180,7 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId = undefine
   const renderStreamCategories = () => {
     if (!streamCategories || streamCategories.length === 0) return null;
 
-    const renderedCategories = streamCategories.map((s) => (
-      <StreamOrId key={s} streamOrId={s} />
-    ));
+    const renderedCategories = streamCategories.map((s) => <StreamOrId key={s} streamOrId={s} />);
 
     return (
       <>
