@@ -21,7 +21,6 @@ import { getValueFromInput } from 'util/FormsUtils';
 import { Input, Button, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/bootstrap';
 import { ColorPickerPopover, TimezoneSelect } from 'components/common';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
-import type { SelectCallback } from 'components/bootstrap/types';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
 
@@ -88,9 +87,9 @@ const TeamsNotificationForm = ({ config, validation, onChange }: TeamsNotificati
     onChange(nextConfig);
   };
 
-  const handleBacklogSizeChange: SelectCallback = (event: { target: { name: string } }) => {
+  const handleBacklogSizeChange = (event: any) => {
     const { name } = event.target;
-    const value = getValueFromInput(event.target);
+    const value = Number(getValueFromInput(event.target));
 
     setBacklogSize(value);
     propagateChange(name, value);
@@ -114,7 +113,7 @@ const TeamsNotificationForm = ({ config, validation, onChange }: TeamsNotificati
     propagateChange('time_zone', nextValue);
   };
 
-  const handleChange = (event: { target: { name: any } }) => {
+  const handleChange = (event: any) => {
     const { name } = event.target;
     propagateChange(name, getValueFromInput(event.target));
   };

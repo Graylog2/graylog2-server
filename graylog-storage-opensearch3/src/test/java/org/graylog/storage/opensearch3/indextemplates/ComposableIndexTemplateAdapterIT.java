@@ -54,13 +54,13 @@ class ComposableIndexTemplateAdapterIT {
             13L,
             new Template.Settings(Map.of())
     );
-    
+
     private ComposableIndexTemplateAdapter toTest;
     private OpenSearchIndicesClient indicesClient;
 
     @BeforeEach
     void setUp(final OpenSearchInstance openSearchInstance) {
-        toTest = new ComposableIndexTemplateAdapter(openSearchInstance.getOfficialOpensearchClient(), new OSSerializationUtils());
+        toTest = new ComposableIndexTemplateAdapter(openSearchInstance.getOfficialOpensearchClient());
         indicesClient = openSearchInstance.getOfficialOpensearchClient().sync().indices();
     }
 
