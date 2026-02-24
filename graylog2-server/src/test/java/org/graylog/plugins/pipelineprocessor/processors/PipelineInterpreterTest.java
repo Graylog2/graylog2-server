@@ -44,7 +44,9 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversi
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.StreamCacheService;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
@@ -59,6 +61,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
+import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -415,6 +418,136 @@ public class PipelineInterpreterTest {
         // The second stage in both pipelines should not have been executed due to the "drop_message" call
         assertThat(actualMessage.getField("1-b")).isNull();
         assertThat(actualMessage.getField("2-b")).isNull();
+    }
+
+    /**
+     * Verifies that when a pipeline rule adds a new stream to a message (via {@code route_to_stream}),
+     * the interpreter re-processes the message through pipelines connected to the newly added stream.
+     * This exercises the {@code updateStreamBlacklist} code path where new streams are detected.
+     */
+    @Test
+    @SuppressForbidden("Allow using default thread factory")
+    public void testStreamAdditionTriggersReprocessing() {
+        final String secondStreamId = "second-stream-id";
+
+        // Set up two streams: default stream and a second stream
+        final Stream defaultStreamMock = mock(Stream.class);
+        when(defaultStreamMock.getId()).thenReturn(DEFAULT_STREAM_ID);
+        when(defaultStreamMock.isPaused()).thenReturn(false);
+        when(defaultStreamMock.getTitle()).thenReturn("Default Stream");
+
+        final Stream secondStream = mock(Stream.class);
+        when(secondStream.getId()).thenReturn(secondStreamId);
+        when(secondStream.isPaused()).thenReturn(false);
+        when(secondStream.getTitle()).thenReturn("Second Stream");
+
+        // Set up StreamCacheService so route_to_stream can resolve the second stream
+        final EventBus eventBus = mock(EventBus.class);
+        final StreamService streamService = mock(StreamService.class);
+        when(streamService.loadAllEnabled()).thenReturn(List.of(defaultStreamMock, secondStream));
+        final StreamCacheService streamCacheService = new StreamCacheService(eventBus, streamService, null);
+        streamCacheService.startAsync().awaitRunning();
+
+        // Pipeline 1 (on default stream): routes message to second stream and sets a field
+        // Pipeline 2 (on second stream): sets a field to prove it ran during re-processing
+        final RuleService ruleService = mock(MongoDbRuleService.class);
+        when(ruleService.loadAll()).thenReturn(ImmutableList.of(
+                RuleDao.create("route_rule", null, "route_rule", "route_rule",
+                        "rule \"route_rule\"\n" +
+                        "when true\n" +
+                        "then\n" +
+                        "  route_to_stream(id: \"" + secondStreamId + "\");\n" +
+                        "  set_field(\"pipeline1\", \"executed\");\n" +
+                        "end", null, null, null, null),
+                RuleDao.create("second_rule", null, "second_rule", "second_rule",
+                        """
+                        rule "second_rule"
+                        when true
+                        then
+                          set_field("pipeline2", "executed");
+                        end""", null, null, null, null)
+        ));
+
+        final PipelineService pipelineService = mock(MongoDbPipelineService.class);
+        when(pipelineService.loadAll()).thenReturn(ImmutableList.of(
+                PipelineDao.create("p1", null, "pipeline1", "description",
+                        """
+                        pipeline "pipeline1"
+                        stage 0 match all
+                            rule "route_rule";
+                        end
+                        """,
+                        Tools.nowUTC(), null),
+                PipelineDao.create("p2", null, "pipeline2", "description",
+                        """
+                        pipeline "pipeline2"
+                        stage 0 match all
+                            rule "second_rule";
+                        end
+                        """,
+                        Tools.nowUTC(), null)
+        ));
+
+        // Connect pipeline1 to default stream, pipeline2 to second stream
+        final PipelineStreamConnectionsService connectionsService = mock(MongoDbPipelineStreamConnectionsService.class);
+        when(connectionsService.loadAll()).thenReturn(Set.of(
+                PipelineConnections.create(null, DEFAULT_STREAM_ID, Set.of("p1")),
+                PipelineConnections.create(null, secondStreamId, Set.of("p2"))
+        ));
+
+        final Map<String, Function<?>> functions = ImmutableMap.of(
+                SetField.NAME, new SetField(),
+                RouteToStream.NAME, new RouteToStream(streamCacheService, () -> defaultStreamMock)
+        );
+
+        final FunctionRegistry functionRegistry = new FunctionRegistry(functions);
+        final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry);
+        final MetricRegistry metricRegistry = new MetricRegistry();
+        final RuleMetricsConfigService ruleMetricsConfigService = mock(RuleMetricsConfigService.class);
+        when(ruleMetricsConfigService.get()).thenReturn(RuleMetricsConfigDto.createDefault());
+
+        final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(
+                mock(Configuration.class),
+                ruleService,
+                pipelineService,
+                connectionsService,
+                parser,
+                (config, ruleParser) -> new PipelineResolver(ruleParser, config),
+                ruleMetricsConfigService,
+                metricRegistry,
+                mock(PipelineMetadataUpdater.class),
+                Executors.newScheduledThreadPool(1),
+                eventBus,
+                (currentPipelines, streamPipelineConnections, ruleMetricsConfig) ->
+                        new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, metricRegistry, 1, true)
+        );
+
+        final PipelineInterpreter interpreter = new PipelineInterpreter(
+                messageQueueAcknowledger,
+                metricRegistry,
+                stateUpdater);
+
+        // Create message on default stream only
+        final Message msg = messageFactory.createMessage("test message", "test", Tools.nowUTC());
+        msg.addStream(defaultStreamMock);
+
+        final Messages processed = interpreter.process(msg);
+        final List<Message> messages = ImmutableList.copyOf(processed);
+
+        assertThat(messages).hasSize(1);
+        final Message actualMessage = messages.get(0);
+
+        // Pipeline 1 (connected to default stream) should have executed
+        assertThat(actualMessage.getFieldAs(String.class, "pipeline1")).isEqualTo("executed");
+
+        // Pipeline 2 (connected to second stream) should have executed due to re-processing
+        // after route_to_stream added the second stream to the message
+        assertThat(actualMessage.getFieldAs(String.class, "pipeline2")).isEqualTo("executed");
+
+        // Message should be on both streams
+        final Set<String> streamIds = actualMessage.getStreams().stream()
+                .map(Stream::getId).collect(Collectors.toSet());
+        assertThat(streamIds).containsExactlyInAnyOrder(DEFAULT_STREAM_ID, secondStreamId);
     }
 
     @SuppressForbidden("Allow using default thread factory")

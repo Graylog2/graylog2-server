@@ -75,7 +75,7 @@ const usePluggableMessageActions = (id: string, index: string) => {
   const pluggableMenuActions = usePluginEntities('views.components.widgets.messageTable.messageActions');
 
   return pluggableMenuActions
-    .filter((perspective) => (perspective.useCondition ? !!perspective.useCondition() : true))
+    .filter((actions) => (actions.useCondition ? !!actions.useCondition() : true))
     .map(({ component: PluggableMenuAction, key }) => <PluggableMenuAction key={key} id={id} index={index} />);
 };
 

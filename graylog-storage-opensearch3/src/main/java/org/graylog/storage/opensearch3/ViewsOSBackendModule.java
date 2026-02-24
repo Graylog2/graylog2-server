@@ -46,7 +46,6 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch3.views.OpenSearchBackend;
 import org.graylog.storage.opensearch3.views.export.OpenSearchExportBackend;
@@ -130,7 +129,7 @@ public class ViewsOSBackendModule extends ViewsModule {
         pivotBucketHandlerBinder().addBinding(name).to(implementation);
     }
 
-    protected MapBinder<String, OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> pivotSeriesHandlerBinder() {
+    protected MapBinder<String, OSPivotSeriesSpecHandler<? extends SeriesSpec>> pivotSeriesHandlerBinder() {
         return MapBinder.newMapBinder(binder(),
                 TypeLiteral.get(String.class),
                 new TypeLiteral<>() {});
@@ -139,7 +138,7 @@ public class ViewsOSBackendModule extends ViewsModule {
 
     private void registerPivotSeriesHandler(
             String name,
-            Class<? extends OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> implementation
+            Class<? extends OSPivotSeriesSpecHandler<? extends SeriesSpec>> implementation
     ) {
         pivotSeriesHandlerBinder().addBinding(name).to(implementation);
     }
