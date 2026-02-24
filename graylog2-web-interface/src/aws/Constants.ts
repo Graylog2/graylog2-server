@@ -14,6 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export const PLUGIN_PACKAGE: string = 'org.graylog.aws';
-export const PLUGIN_CONFIG_CLASS_NAME: string = `${PLUGIN_PACKAGE}.config.AWSPluginConfiguration`;
-export const PLUGIN_API_ENDPOINT: string = `/plugins/${PLUGIN_PACKAGE}/config`;
+export const PLUGIN_PACKAGE = 'org.graylog.aws' as const;
+export const PLUGIN_CONFIG_CLASS_NAME = `${PLUGIN_PACKAGE}.config.AWSPluginConfiguration` as const;
+export const PLUGIN_API_ENDPOINT = `/plugins/${PLUGIN_PACKAGE}/config` as const;

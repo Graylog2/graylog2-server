@@ -188,7 +188,7 @@ const Navbar = styled(BootstrapNavbar)(
 
     .navbar-collapse,
     .navbar-form {
-      border-color: ${chroma(theme.colors.gray[90] as string)
+      border-color: ${chroma(theme.colors.gray[90])
         .darken(0.065)
         .css()};
     }
@@ -197,7 +197,7 @@ const Navbar = styled(BootstrapNavbar)(
       color: ${theme.colors.variant.default};
 
       &:hover {
-        color: ${chroma(theme.colors.variant.default as string)
+        color: ${chroma(theme.colors.variant.default)
           .darken(0.25)
           .css()};
       }

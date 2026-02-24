@@ -59,9 +59,9 @@ const TextField = ({ field, title, typeName, dirty = false, onChange, value = ''
     const inputValue = getValueFromInput(target);
 
     if (field.is_encrypted) {
-      onChange(title, { set_value: inputValue as string });
+      onChange(title, { set_value: String(inputValue) });
     } else {
-      onChange(title, inputValue as string);
+      onChange(title, String(inputValue));
     }
   };
 
