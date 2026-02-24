@@ -34,6 +34,7 @@ import org.opensearch.client.opensearch._types.SortOrder;
 import org.opensearch.client.opensearch._types.query_dsl.QueryStringQuery;
 import org.opensearch.client.opensearch._types.query_dsl.TermsQuery;
 import org.opensearch.client.opensearch.core.msearch.MultiSearchItem;
+import org.opensearch.client.opensearch.core.search.Hit;
 
 import java.util.List;
 import java.util.Map;
@@ -109,6 +110,7 @@ public class OSEventList implements EventListStrategy {
 
     protected List<Map<String, Object>> extractResult(MultiSearchItem<JsonData> result) {
         return result.hits().hits().stream()
+                .map(Hit::source)
                 .map(serializationUtils::toMap)
                 .toList();
     }
