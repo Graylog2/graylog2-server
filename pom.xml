@@ -129,7 +129,7 @@
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.47.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
-        <gcs.version>2.62.1</gcs.version>
+        <gcs.version>2.63.0</gcs.version>
         <azure-blob-storage.version>12.33.2</azure-blob-storage.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>5.0.2</geoip2.version>
@@ -174,7 +174,7 @@
         <okhttp.version>5.3.2</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.59.0</opentelemetry.version>
-        <opentelemetry-instrumentation.version>2.24.0</opentelemetry-instrumentation.version>
+        <opentelemetry-instrumentation.version>2.25.0</opentelemetry-instrumentation.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
@@ -211,9 +211,9 @@
         <assertj-core.version>3.27.7</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.3.0</awaitility.version>
-        <equalsverifier.version>4.3.1</equalsverifier.version>
+        <equalsverifier.version>4.4</equalsverifier.version>
         <guice-extension.version>1.2.1</guice-extension.version>
-        <junit-jupiter.version>6.0.2</junit-jupiter.version>
+        <junit-jupiter.version>6.0.3</junit-jupiter.version>
         <mockito.version>5.21.0</mockito.version>
         <restassured.version>6.0.0</restassured.version>
         <testcontainers.version>2.0.3</testcontainers.version>
@@ -765,7 +765,7 @@
                 <plugin>
                     <groupId>org.openrewrite.maven</groupId>
                     <artifactId>rewrite-maven-plugin</artifactId>
-                    <version>6.28.1</version>
+                    <version>6.29.0</version>
                     <configuration>
                         <!-- do not set <configLocation> here, otherwise it cannot be overridden by a system property later -->
                         <exclusions>
@@ -782,27 +782,27 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.72.8</version>
+                            <version>8.73.1</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-testing-frameworks</artifactId>
-                            <version>3.26.0</version>
+                            <version>3.27.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-migrate-java</artifactId>
-                            <version>3.26.0</version>
+                            <version>3.27.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-static-analysis</artifactId>
-                            <version>2.26.0</version>
+                            <version>2.27.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-joda</artifactId>
-                            <version>0.6.1</version>
+                            <version>0.6.2</version>
                         </dependency>
                     </dependencies>
                 </plugin>

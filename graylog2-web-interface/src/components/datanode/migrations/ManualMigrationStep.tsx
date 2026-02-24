@@ -23,10 +23,7 @@ import InPlaceMigration from 'components/datanode/migrations/InPlaceMigration';
 import useMigrationState from 'components/datanode/hooks/useMigrationState';
 import type { MigrationActions, StepArgs } from 'components/datanode/Types';
 import useTriggerMigrationState from 'components/datanode/hooks/useTriggerMigrationState';
-import {
-  IN_PLACE_MIGRATION_STEPS,
-  MIGRATION_STATE,
-} from 'components/datanode/Constants';
+import { IN_PLACE_MIGRATION_STEPS, MIGRATION_STATE } from 'components/datanode/Constants';
 import MigrationError from 'components/datanode/migrations/common/MigrationError';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -52,9 +49,9 @@ const ManualMigrationStep = () => {
     return onTriggerNextState({ step, args });
   };
 
-  const migrationTypeOptions = [
-    { label: 'In-Place migration', value: inPlaceMigrationAction },
-  ].filter((path) => currentStep.next_steps.includes(path.value));
+  const migrationTypeOptions = [{ label: 'In-Place migration', value: inPlaceMigrationAction }].filter((path) =>
+    currentStep.next_steps.includes(path.value),
+  );
 
   return (
     <>
