@@ -41,9 +41,9 @@ import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
+import org.graylog.storage.opensearch3.OSSerializationUtils;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog.storage.opensearch3.TimeRangeQueryFactory;
-import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
@@ -105,7 +105,6 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
     private final StreamService streamService;
     private final Optional<Integer> indexerMaxConcurrentSearches;
     private final Optional<Integer> indexerMaxConcurrentShardRequests;
-    private final OSSerializationUtils osSerializationUtils;
 
     @Inject
     public OpenSearchBackend(Map<String, Provider<OSSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
@@ -117,8 +116,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                              StreamService streamService,
                              @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard,
                              @Named("indexer_max_concurrent_searches") @Nullable Integer indexerMaxConcurrentSearches,
-                             @Named("indexer_max_concurrent_shard_requests") @Nullable Integer indexerMaxConcurrentShardRequests,
-                             OSSerializationUtils osSerializationUtils) {
+                             @Named("indexer_max_concurrent_shard_requests") @Nullable Integer indexerMaxConcurrentShardRequests) {
         this.openSearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.client = client;
         this.indexLookup = indexLookup;
@@ -128,7 +126,6 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
         this.executionStatsCollector = executionStatsCollector;
         this.streamService = streamService;
         this.allowLeadingWildcard = allowLeadingWildcard;
-        this.osSerializationUtils = osSerializationUtils;
         this.indexerMaxConcurrentSearches = Optional.ofNullable(indexerMaxConcurrentSearches);
         this.indexerMaxConcurrentShardRequests = Optional.ofNullable(indexerMaxConcurrentShardRequests);
     }
@@ -379,7 +376,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                                 builder.maxConcurrentShardRequests(maxShardRequests.longValue()));
                         return builder.build();
                     })
-                    .map(osSerializationUtils::toMsearch)
+                    .map(OSSerializationUtils::toMsearch)
                     .toList();
 
             MsearchRequest.Builder request = new MsearchRequest.Builder();
