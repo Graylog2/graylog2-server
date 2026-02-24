@@ -89,8 +89,7 @@ public class StatsApi {
     private JsonNode stats(Collection<String> indices,
                            Collection<String> metrics,
                            Consumer<Request> prepareRequest) {
-        final List<List<String>> batches = IndexNameBatching.partitionByJoinedLength(
-                indices, IndexNameBatching.MAX_INDICES_URL_LENGTH);
+        final List<List<String>> batches = IndexNameBatching.partitionByJoinedLength(indices);
 
         if (batches.size() <= 1) {
             return singleStats(indices, metrics, prepareRequest);

@@ -35,9 +35,21 @@ public final class IndexNameBatching {
      * Set below the 4096-byte HTTP line limit to leave room for the rest of the URL
      * (endpoint path, query parameters, etc.).
      */
-    public static final int MAX_INDICES_URL_LENGTH = 3000;
+    static final int MAX_INDICES_URL_LENGTH = 3000;
 
     private IndexNameBatching() {
+    }
+
+    /**
+     * Partitions index names into batches where each batch's comma-joined string does not
+     * exceed {@link #MAX_INDICES_URL_LENGTH}. A single index name that exceeds the limit
+     * is placed into its own batch (never dropped).
+     *
+     * @param items the index names to partition
+     * @return a list of batches; each batch is a non-empty list of index names
+     */
+    public static List<List<String>> partitionByJoinedLength(final Collection<String> items) {
+        return partitionByJoinedLength(items, MAX_INDICES_URL_LENGTH);
     }
 
     /**
@@ -49,7 +61,7 @@ public final class IndexNameBatching {
      * @param maxJoinedLength the maximum length of the comma-joined string for each batch
      * @return a list of batches; each batch is a non-empty list of index names
      */
-    public static List<List<String>> partitionByJoinedLength(final Collection<String> items, final int maxJoinedLength) {
+    static List<List<String>> partitionByJoinedLength(final Collection<String> items, final int maxJoinedLength) {
         final List<List<String>> batches = new ArrayList<>();
         if (items.isEmpty()) {
             return batches;

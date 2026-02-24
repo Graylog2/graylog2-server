@@ -96,8 +96,7 @@ class IndexNameBatchingTest {
                 .mapToObj(i -> "restored-archive-data-lake-68b002df50e89877d351cb83_" + (1758100000000L + i))
                 .toList();
 
-        final List<List<String>> result = IndexNameBatching.partitionByJoinedLength(
-                indices, IndexNameBatching.MAX_INDICES_URL_LENGTH);
+        final List<List<String>> result = IndexNameBatching.partitionByJoinedLength(indices);
 
         // All original indices should be preserved across batches
         final List<String> allFromBatches = result.stream().flatMap(List::stream).toList();

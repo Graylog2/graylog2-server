@@ -69,14 +69,12 @@ public class StatsApi {
     private Map<String, IndicesStats> batchedStats(Collection<String> indices,
                                                    List<IndicesStatsMetric> metrics,
                                                    boolean withShardLevel) {
-        final List<List<String>> batches = IndexNameBatching.partitionByJoinedLength(
-                indices, IndexNameBatching.MAX_INDICES_URL_LENGTH);
-
+        final List<List<String>> batches = IndexNameBatching.partitionByJoinedLength(indices);
         if (batches.size() <= 1) {
             return stats(indices, metrics, withShardLevel).indices();
         }
 
-        final Map<String, IndicesStats> merged = new HashMap<>();
+        final Map<String, IndicesStats> merged = new HashMap<>(batches.size());
         for (final List<String> batch : batches) {
             merged.putAll(stats(batch, metrics, withShardLevel).indices());
         }
@@ -91,7 +89,7 @@ public class StatsApi {
                 .metric(metrics);
         if (withShardLevel) {
 //            request.addParameter("ignore_unavailable", "true"); //TODO "ignore_unavailable" has no equivalent?
-            builder = builder.level(Level.Shards);
+            builder.level(Level.Shards);
         }
         final IndicesStatsRequest indicesStatsRequest = builder.build();
         final OpenSearchIndicesClient indicesClient = client.sync().indices();
