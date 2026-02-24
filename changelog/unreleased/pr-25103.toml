@@ -1,5 +1,4 @@
-type = "f"
-message = "Fix memory-leak when updating data-adapters and caches."
+type = "a"
+message = "Add range aggregation to ScriptingApi."
 
-issues = ["25077"]
-pulls = ["25078"]
+pulls = ["25103"]
