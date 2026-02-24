@@ -54,10 +54,20 @@ public class MongodbNodesServiceImpl implements MongodbNodesService {
         double storageUsedPercent = calculateStorageUsedPercent();
         Long slowQueryCount = getSlowQueryCount();
 
-        final List<MongodbNode> result = members.stream()
+        final List<MongodbNode> allNodes = members.stream()
                 .map(member -> toMongodbNode(member, version, serverStatus, primaryMember, storageUsedPercent, slowQueryCount))
                 .toList();
-        return new PaginatedList<>(result, members.size(), 1, members.size());
+
+        final int totalCount = allNodes.size();
+
+        // Apply pagination
+        final int offset = (page - 1) * perPage;
+        final List<MongodbNode> paginatedNodes = allNodes.stream()
+                .skip(offset)
+                .limit(perPage)
+                .toList();
+
+        return new PaginatedList<>(paginatedNodes, totalCount, page, perPage);
     }
 
     private MongodbNode toMongodbNode(Document member, String version, Document serverStatus, Document primaryMember,
