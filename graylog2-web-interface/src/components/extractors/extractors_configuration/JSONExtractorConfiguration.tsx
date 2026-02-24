@@ -93,7 +93,7 @@ class JSONExtractorConfiguration extends React.Component<Props, State> {
       const matches = [];
 
       for (const match in result.matches) {
-        if (result.matches.hasOwnProperty(match)) {
+        if (match in result.matches) {
           matches.push(<dt key={`${match}-name`}>{match}</dt>);
           matches.push(
             <dd key={`${match}-value`}>
@@ -112,7 +112,7 @@ class JSONExtractorConfiguration extends React.Component<Props, State> {
   };
 
   _getEffectiveConfiguration(configuration) {
-    return ExtractorUtils.getEffectiveConfiguration(this.DEFAULT_CONFIGURATION, configuration);
+    return ExtractorUtils.getEffectiveConfiguration(this.DEFAULT_CONFIGURATION, configuration) as Configuration;
   }
 
   _onChange(key) {

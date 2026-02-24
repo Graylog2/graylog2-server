@@ -50,7 +50,7 @@ const DashboardPropertiesModal = ({
 
   const _onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name } = event.target;
-    let value = FormsUtils.getValueFromInput(event.target);
+    let value = String(FormsUtils.getValueFromInput(event.target));
     const trimmedValue = value.trim();
 
     if (trimmedValue === '') {
