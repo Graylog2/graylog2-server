@@ -27,6 +27,7 @@ import { isPermitted } from 'util/PermissionsMixin';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import Routes from 'routing/Routes';
 import validateExpression from 'logic/alerts/AggregationExpressionValidation';
+import type { Expression } from 'logic/alerts/AggregationExpressionValidation';
 import type { Stream } from 'views/stores/StreamsStore';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
@@ -129,7 +130,7 @@ const Streams = ({ streams, streamIds, streamIdsWithMissingPermission }: Streams
     .sort((s1, s2) =>
       naturalSortIgnoreCase(typeof s1 === 'object' ? s1.title : s1, typeof s2 === 'object' ? s2.title : s2),
     )
-    .map((s) => <StreamOrId streamOrId={s} />);
+    .map((s) => <StreamOrId key={typeof s === 'object' ? s.id : s} streamOrId={s} />);
 
   return (
     <>
@@ -166,7 +167,7 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId = undefine
   const effectiveStreamIds = configStreams?.filter((s) => isPermitted(currentUser.permissions, `streams:read:${s}`));
   const streamIdsWithMissingPermission = configStreams?.filter((s) => !effectiveStreamIds.includes(s));
 
-  const validationResults = validateExpression(conditions.expression, series);
+  const validationResults = validateExpression(conditions?.expression as Expression | null, series);
 
   const renderCronExpression = (expression) => {
     if (expression) {
@@ -179,7 +180,9 @@ const FilterAggregationSummary = ({ config, currentUser, definitionId = undefine
   const renderStreamCategories = () => {
     if (!streamCategories || streamCategories.length === 0) return null;
 
-    const renderedCategories = streamCategories.map((s) => <StreamOrId streamOrId={s} />);
+    const renderedCategories = streamCategories.map((s) => (
+      <StreamOrId key={s} streamOrId={s} />
+    ));
 
     return (
       <>
