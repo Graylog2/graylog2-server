@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
-import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -92,7 +91,7 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
 
   const handleTypeChange = useCallback(
     (event: React.FormEvent<Radio>) => {
-      const nextConditionType = Number(FormsUtils.getValueFromInput(event.target));
+      const nextConditionType = Number(FormsUtils.getValueFromInput(event.target as HTMLInputElement));
 
       setConditionType(nextConditionType);
       let newExistingAggregationConfig;
@@ -164,11 +163,8 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
                   type="number"
                   bsStyle={validation.errors.event_limit ? 'error' : null}
                   help={
-                    get(
-                      validation,
-                      'errors.event_limit',
-                      'Maximum number of events to be created per execution of this event definition. Excess events will be suppressed.',
-                    ) as string
+                    (validation?.errors?.event_limit ??
+                      'Maximum number of events to be created per execution of this event definition. Excess events will be suppressed.') as string
                   }
                   value={eventDefinition.config.event_limit}
                   onChange={handleConfigChange}
