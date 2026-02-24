@@ -16,5 +16,13 @@
  */
 package org.graylog2.cluster.nodes;
 
-public record MongodbNode(String name, String role) {
+public record MongodbNode(
+        String name,
+        String role,
+        String version,
+        Integer status,
+        long replicationLag,
+        Long slowQueryCount,
+        double storageUsedPercent
+) {
 }
