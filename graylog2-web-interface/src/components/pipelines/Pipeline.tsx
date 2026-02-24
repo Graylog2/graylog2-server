@@ -139,7 +139,17 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
 
   return (
     <div>
-      {isManaged && <Alert bsStyle="warning">This pipeline is system managed</Alert>}
+      {isManaged && (
+        <Alert bsStyle="warning">
+          <p>This pipeline is system managed and can only be edited in a limited way.</p>
+          <p>Pipeline Rules may only be added to this Pipeline via the Input Wizard.</p>
+          <p>
+            Pipeline Rules in this Pipeline will be automatically renamed to reflect any changes to the corresponding
+            Input name.
+          </p>
+          <p>Pipeline Rules can be removed manually from this Pipeline, but not added manually.</p>
+        </Alert>
+      )}
       {_connectionsWarning()}
       <PipelineDetails pipeline={pipeline} onChange={onPipelineChange} disableEdit={isManaged} />
       <StyledRow className="row-sm">
