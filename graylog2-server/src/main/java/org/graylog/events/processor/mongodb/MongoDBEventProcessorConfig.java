@@ -80,6 +80,13 @@ public abstract class MongoDBEventProcessorConfig implements EventProcessorConfi
         return Collections.emptySet();
     }
 
+    @Override
+    public boolean isUserPresentable() {
+        // This type is an internal base type not intended for direct use via the API.
+        // Use specific subtypes (e.g., traffic-v1) instead.
+        return false;
+    }
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -174,6 +181,11 @@ public abstract class MongoDBEventProcessorConfig implements EventProcessorConfi
     public ValidationResult validate(UserContext userContext) {
         final ValidationResult validationResult = new ValidationResult();
 
+        // The mongodb-v1 type is an internal base type and must not be created directly via the API.
+        // Specific subtypes (e.g., traffic-v1) have their own configs and validation.
+        validationResult.addError("type",
+                "The mongodb-v1 event processor type cannot be created directly. Use a specific subtype instead.");
+
         // Validate collection name
         if (collectionName() == null || collectionName().trim().isEmpty()) {
             validationResult.addError(FIELD_COLLECTION_NAME,
@@ -191,9 +203,14 @@ public abstract class MongoDBEventProcessorConfig implements EventProcessorConfi
                     validationResult.addError(FIELD_AGGREGATION_PIPELINE,
                             "Aggregation pipeline must have at least one stage");
                 }
-                // Validate each stage is valid BSON
+                // Validate each stage is valid BSON and does not contain dangerous operators
                 for (JsonElement stage : pipeline) {
-                    Document.parse(stage.toString());
+                    final Document stageDoc = Document.parse(stage.toString());
+                    if (stageDoc.containsKey("$out") || stageDoc.containsKey("$merge")) {
+                        validationResult.addError(FIELD_AGGREGATION_PIPELINE,
+                                "Aggregation pipeline must not contain $out or $merge stages");
+                        break;
+                    }
                 }
             } catch (Exception e) {
                 validationResult.addError(FIELD_AGGREGATION_PIPELINE,

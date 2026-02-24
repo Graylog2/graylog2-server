@@ -16,41 +16,40 @@
  */
 package org.graylog.storage.opensearch3;
 
-import com.google.common.collect.Streams;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog2.indexer.results.ChunkedQueryResult;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ResultMessageFactory;
+import org.opensearch.client.opensearch.core.SearchResponse;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-public abstract class ChunkedQueryResultOS2 extends ChunkedQueryResult<OpenSearchClient, SearchResponse> {
+public abstract class ChunkedQueryResultOS extends ChunkedQueryResult<OfficialOpensearchClient, SearchResponse<Map>> {
 
     private final ResultMessageFactory resultMessageFactory;
 
-    public ChunkedQueryResultOS2(ResultMessageFactory resultMessageFactory, OpenSearchClient client,
-                                 SearchResponse initialResult, String query, List<String> fields, int limit) {
+    public ChunkedQueryResultOS(ResultMessageFactory resultMessageFactory, OfficialOpensearchClient client,
+                                SearchResponse<Map> initialResult, String query, List<String> fields, int limit) {
         super(client, initialResult, query, fields, limit);
         this.resultMessageFactory = resultMessageFactory;
     }
 
     @Override
-    protected List<ResultMessage> collectMessagesFromResult(SearchResponse result) {
-        return Streams.stream(result.getHits())
-                .map(hit -> resultMessageFactory.parseFromSource(hit.getId(), hit.getIndex(), hit.getSourceAsMap()))
+    protected List<ResultMessage> collectMessagesFromResult(SearchResponse<Map> result) {
+        return result.hits().hits().stream()
+                .map(hit -> resultMessageFactory.parseFromSource(hit.id(), hit.index(), hit.source()))
                 .collect(Collectors.toList());
     }
 
     @Override
-    protected long countTotalHits(SearchResponse response) {
-        return response.getHits().getTotalHits().value;
+    protected long countTotalHits(SearchResponse<Map> response) {
+        return response.hits().total().value();
     }
 
     @Override
-    protected long getTookMillisFromResponse(SearchResponse response) {
-        return response.getTook().getMillis();
+    protected long getTookMillisFromResponse(SearchResponse<Map> response) {
+        return response.took();
     }
 
 }
-
