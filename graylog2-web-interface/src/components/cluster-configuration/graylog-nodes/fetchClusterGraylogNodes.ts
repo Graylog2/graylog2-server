@@ -41,6 +41,14 @@ export const GRAYLOG_NODE_METRIC_NAMES = {
   cpuPercent: 'org.graylog2.system.cpu.percent',
 } as const;
 
+export const LOAD_BALANCER_STATUS = {
+  ALIVE: 'ALIVE',
+  DEAD: 'DEAD',
+  THROTTLED: 'THROTTLED',
+} as const;
+
+export type LoadBalancerStatus = typeof LOAD_BALANCER_STATUS[keyof typeof LOAD_BALANCER_STATUS];
+
 export type GraylogNode = {
   _id?: string;
   id: string;
@@ -51,7 +59,7 @@ export type GraylogNode = {
   last_seen?: string;
   is_leader: boolean;
   is_processing: boolean;
-  lb_status?: string;
+  lb_status?: LoadBalancerStatus;
   lifecycle?: string;
   cluster_id?: string;
   codename?: string;
