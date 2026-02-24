@@ -120,7 +120,7 @@ public class ConfigurationStateUpdater {
             try {
                 metadataUpdater.handleRuleChanges(event, state);
             } catch (Exception e) {
-                log.warn("Failed to update pipeline metadata for rule changes: {}", e.getMessage(), e);
+                log.warn("Failed to update pipeline metadata for rule changes: {} {}", event, e.getMessage());
             }
         }
         return state;
@@ -132,7 +132,7 @@ public class ConfigurationStateUpdater {
             try {
                 metadataUpdater.handlePipelineChanges(event, state);
             } catch (Exception e) {
-                log.warn("Failed to update pipeline metadata for pipeline changes: {}", e.getMessage(), e);
+                log.warn("Failed to update pipeline metadata for pipeline changes: {} {}", event, e.getMessage());
             }
         }
         return state;
@@ -144,7 +144,7 @@ public class ConfigurationStateUpdater {
             try {
                 metadataUpdater.handleConnectionChanges(event, state);
             } catch (Exception e) {
-                log.warn("Failed to update pipeline metadata for connection changes: {}", e.getMessage(), e);
+                log.warn("Failed to update pipeline metadata for connection changes: {} {}", event, e.getMessage());
             }
         }
         return state;
@@ -156,7 +156,7 @@ public class ConfigurationStateUpdater {
             try {
                 metadataUpdater.handleInputDeleted(event, state);
             } catch (Exception e) {
-                log.warn("Failed to update pipeline metadata for input deletion: {}", e.getMessage(), e);
+                log.warn("Failed to update pipeline metadata for input deletion: {} {}", event, e.getMessage());
             }
         }
         return state;
