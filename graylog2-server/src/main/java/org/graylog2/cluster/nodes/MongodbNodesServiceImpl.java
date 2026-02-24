@@ -19,11 +19,11 @@ package org.graylog2.cluster.nodes;
 import com.mongodb.MongoClient;
 import jakarta.inject.Inject;
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.search.SearchQuery;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class MongodbNodesServiceImpl implements MongodbNodesService {
     }
 
     @Override
-    public PaginatedList<MongodbNode> searchPaginated(SearchQuery searchQuery, Bson bsonSort, int page, int perPage) {
+    public PaginatedList<MongodbNode> searchPaginated(SearchQuery searchQuery, Comparator<MongodbNode> comparator, int page, int perPage) {
         Document replicaStatus = mongoConnection.getDatabase("admin").runCommand(new Document("replSetGetStatus", 1));
         Document serverStatus = mongoConnection.getDatabase("admin").runCommand(new Document("serverStatus", 1));
 
@@ -55,7 +55,8 @@ public class MongodbNodesServiceImpl implements MongodbNodesService {
         Long slowQueryCount = getSlowQueryCount();
 
         final List<MongodbNode> allNodes = members.stream()
-                .map(member -> toMongodbNode(member, version, serverStatus, primaryMember, storageUsedPercent, slowQueryCount))
+                .map(member -> toMongodbNode(member, version, primaryMember, storageUsedPercent, slowQueryCount))
+                .sorted(Comparator.nullsLast(comparator))
                 .toList();
 
         final int totalCount = allNodes.size();
@@ -70,7 +71,7 @@ public class MongodbNodesServiceImpl implements MongodbNodesService {
         return new PaginatedList<>(paginatedNodes, totalCount, page, perPage);
     }
 
-    private MongodbNode toMongodbNode(Document member, String version, Document serverStatus, Document primaryMember,
+    private MongodbNode toMongodbNode(Document member, String version, Document primaryMember,
                                       double storageUsedPercent, Long slowQueryCount) {
         String name = member.get("name", String.class);
         String role = member.get("stateStr", String.class);

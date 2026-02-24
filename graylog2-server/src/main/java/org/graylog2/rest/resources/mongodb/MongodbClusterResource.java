@@ -37,15 +37,16 @@ import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
-import org.graylog2.rest.resources.entities.FilterOption;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 @Tag(name = "System/Mongodb", description = "MongoDB Node discovery")
 @RequiresAuthentication
@@ -74,6 +75,16 @@ public class MongodbClusterResource extends RestResource {
             EntityAttribute.builder().id("storageUsedPercent").title("Storage Used (%)").type(SearchQueryField.Type.DOUBLE).sortable(true).build()
     );
 
+    private static final Map<String, Comparator<MongodbNode>> SORTING = Map.of(
+            "name", Comparator.comparing(MongodbNode::name),
+            "role", Comparator.comparing(MongodbNode::role),
+            "version", Comparator.comparing(MongodbNode::version),
+            "status", Comparator.comparing(MongodbNode::status),
+            "replicationLag", Comparator.comparing(MongodbNode::replicationLag),
+            "slowQueryCount", Comparator.comparing(MongodbNode::slowQueryCount),
+            "storageUsedPercent", Comparator.comparing(MongodbNode::storageUsedPercent)
+    );
+
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
             .build();
@@ -91,20 +102,36 @@ public class MongodbClusterResource extends RestResource {
                                                    @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                    @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                                    @Parameter(name = "sort",
-                                                             description = "The field to sort the result on",
-                                                             required = true,
-                                                             schema = @Schema(allowableValues = {"name", "role", "version", "status", "cpuUsage", "memoryUsage", "replicationLag", "slowQueryCount", "storageUsedPercent"}))
+                                                              description = "The field to sort the result on",
+                                                              required = true,
+                                                              schema = @Schema(allowableValues = {"name", "role", "version", "status", "cpuUsage", "memoryUsage", "replicationLag", "slowQueryCount", "storageUsedPercent"}))
                                                    @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
                                                    @Parameter(name = "order", description = "The sort direction",
-                                                             schema = @Schema(allowableValues = {"asc", "desc"}))
+                                                              schema = @Schema(allowableValues = {"asc", "desc"}))
                                                    @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order
 
     ) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
-        final PaginatedList<MongodbNode> result = mongodbNodesService.searchPaginated(searchQuery, order.toBsonSort(sort), page, perPage);
 
+        Comparator<MongodbNode> comparator = comparator(sort, order);
+
+        final PaginatedList<MongodbNode> result = mongodbNodesService.searchPaginated(searchQuery, comparator, page, perPage);
 
         return PageListResponse.create(query, result.pagination(),
                 result.grandTotal().orElse(0L), sort, order, result.stream().toList(), attributes, settings);
+    }
+
+    private Comparator<MongodbNode> comparator(String sort, SortOrder order) {
+        final Comparator<MongodbNode> sortFunction = SORTING.get(sort);
+
+        if (sortFunction == null) {
+            throw new IllegalArgumentException("Sort field " + sort + " not found");
+        }
+
+        if (order == SortOrder.ASCENDING) {
+            return sortFunction;
+        } else {
+            return sortFunction.reversed();
+        }
     }
 }

@@ -16,10 +16,11 @@
  */
 package org.graylog2.cluster.nodes;
 
-import org.bson.conversions.Bson;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.search.SearchQuery;
 
+import java.util.Comparator;
+
 public interface MongodbNodesService {
-    PaginatedList<MongodbNode> searchPaginated(SearchQuery searchQuery, Bson bsonSort, int page, int perPage);
+    PaginatedList<MongodbNode> searchPaginated(SearchQuery searchQuery, Comparator<MongodbNode> comparator, int page, int perPage);
 }
