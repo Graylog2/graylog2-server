@@ -176,8 +176,7 @@ class StatsApiTest {
                 .mapToObj(i -> "restored-archive-data-lake-68b002df50e89877d351cb83_" + (1758100000000L + i))
                 .toList();
 
-        final List<List<String>> batches = IndexNameBatching.partitionByJoinedLength(
-                indices, IndexNameBatching.MAX_INDICES_URL_LENGTH);
+        final List<List<String>> batches = IndexNameBatching.partitionByJoinedLength(indices);
         assertThat(batches.size()).isGreaterThan(1);
 
         // Return batch-specific responses based on the request's index list

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog2.indexer.indices.util.IndexNameBatching;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,7 +42,7 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 class StatsApiTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     @Mock
     private OpenSearchClient client;
@@ -76,8 +77,7 @@ class StatsApiTest {
                 .toList();
 
         // Verify these actually require multiple batches
-        final List<List<String>> batches = IndexNameBatching.partitionByJoinedLength(
-                indices, IndexNameBatching.MAX_INDICES_URL_LENGTH);
+        final List<List<String>> batches = IndexNameBatching.partitionByJoinedLength(indices);
         assertThat(batches.size()).isGreaterThan(1);
 
         // Each call to client.execute returns a response for the batch's indices
@@ -111,8 +111,7 @@ class StatsApiTest {
                 .mapToObj(i -> "restored-archive-data-lake-68b002df50e89877d351cb83_" + (1758100000000L + i))
                 .toList();
 
-        final List<List<String>> batches = IndexNameBatching.partitionByJoinedLength(
-                indices, IndexNameBatching.MAX_INDICES_URL_LENGTH);
+        final List<List<String>> batches = IndexNameBatching.partitionByJoinedLength(indices);
 
         final List<ObjectNode> batchResponses = new ArrayList<>();
         for (final List<String> batch : batches) {
