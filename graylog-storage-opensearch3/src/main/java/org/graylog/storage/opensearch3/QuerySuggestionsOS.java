@@ -31,6 +31,10 @@ import org.opensearch.client.opensearch._types.ExpandWildcard;
 import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.Time;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.AggregateVariant;
+import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
+import org.opensearch.client.opensearch._types.aggregations.TermsAggregateBase;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch._types.query_dsl.RangeQuery;
 import org.opensearch.client.opensearch.core.SearchRequest;
@@ -111,11 +115,20 @@ public class QuerySuggestionsOS implements QuerySuggestionsService {
     }
 
     private SuggestionResponse processResponse(SuggestionRequest req, SearchResponse<Void> result) {
-        final var fieldValuesAgg = result.aggregations().get("fieldvalues");
+
+        final Aggregate fieldValuesAgg = result.aggregations().get("fieldvalues");
         if (fieldValuesAgg != null) {
-            final var fieldValues = fieldValuesAgg.sterms();
+            AggregateVariant rawAggregation = fieldValuesAgg._get();
+            if (!(rawAggregation instanceof TermsAggregateBase<?> fieldValues)) {
+                throw new IllegalArgumentException("Aggregate must implement TermsAggregateBase");
+            }
             final List<SuggestionEntry> entries = fieldValues.buckets().array().stream()
-                    .map(b -> new SuggestionEntry(b.key(), b.docCount()))
+                    .map(b -> {
+                        if (!(b instanceof MultiBucketBase bucket)) {
+                            throw new IllegalArgumentException("Bucket must implement MultiBucketBase");
+                        }
+                        return new SuggestionEntry(OSSerializationUtils.getBucketKeyAsString(bucket), bucket.docCount());
+                    })
                     .collect(Collectors.toList());
 
             if (!entries.isEmpty()) {

@@ -61,15 +61,16 @@ class QuerySuggestionsOSIT {
                         .properties("source", p -> p.keyword(k -> k))
                         .properties("message", p -> p.text(t -> t))
                         .properties("streams", p -> p.keyword(k -> k))
+                        .properties("http_response_code", p -> p.integer(i -> i))
                         .properties("timestamp", p -> p.date(d -> d.format(GRAYLOG_DATE_FORMAT)))
                 )
         ), "Failed to create test index");
 
-        indexDocument(Map.of("source", "apache", "message", "request handled", "streams", Set.of(STREAM_ID), "timestamp", TIMESTAMP));
-        indexDocument(Map.of("source", "apache2", "message", "request timeout", "streams", Set.of(STREAM_ID), "timestamp", TIMESTAMP));
-        indexDocument(Map.of("source", "apache3", "message", "request error", "streams", Set.of(STREAM_ID), "timestamp", TIMESTAMP));
-        indexDocument(Map.of("source", "nginx", "message", "connection reset", "streams", Set.of(STREAM_ID), "timestamp", TIMESTAMP));
-        indexDocument(Map.of("source", "nginx2", "message", "connection refused", "streams", Set.of(STREAM_ID), "timestamp", TIMESTAMP));
+        indexDocument(Map.of("source", "apache", "message", "request handled", "streams", Set.of(STREAM_ID), "http_response_code", 200, "timestamp", TIMESTAMP));
+        indexDocument(Map.of("source", "apache2", "message", "request timeout", "streams", Set.of(STREAM_ID), "http_response_code", 500, "timestamp", TIMESTAMP));
+        indexDocument(Map.of("source", "apache3", "message", "request error", "streams", Set.of(STREAM_ID), "http_response_code", 404, "timestamp", TIMESTAMP));
+        indexDocument(Map.of("source", "nginx", "message", "connection reset", "streams", Set.of(STREAM_ID), "http_response_code", 204, "timestamp", TIMESTAMP));
+        indexDocument(Map.of("source", "nginx2", "message", "connection refused", "streams", Set.of(STREAM_ID), "http_response_code", 200, "timestamp", TIMESTAMP));
 
         client.sync(c -> c.indices().refresh(r -> r.index(TEST_INDEX)), "Failed to refresh index");
 
@@ -197,6 +198,25 @@ class QuerySuggestionsOSIT {
         assertThat(response.suggestions()).hasSize(3);
         assertThat(response.suggestions().stream().map(SuggestionEntry::getValue))
                 .containsExactlyInAnyOrder("apache", "apache2", "apache3");
+    }
+
+    @Test
+    void shouldWorkWithNumericFieldType() {
+        final SuggestionRequest request = SuggestionRequest.builder()
+                .field("http_response_code")
+                .input("20")
+                .fieldType(SuggestionFieldType.NUMERICAL)
+                .streams(Set.of(STREAM_ID))
+                .timerange(testTimeRange())
+                .size(10)
+                .build();
+
+        final SuggestionResponse response = querySuggestions.suggest(request, Duration.ofSeconds(10));
+
+        assertThat(response.suggestionError()).isEmpty();
+        assertThat(response.suggestions()).hasSize(2);
+        assertThat(response.suggestions().stream().map(SuggestionEntry::getValue))
+                .containsExactlyInAnyOrder("200", "204");
     }
 
     private void indexDocument(Map<String, Object> doc) {
