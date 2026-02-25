@@ -17,18 +17,19 @@
 import React from 'react';
 
 import { MetricsColumn, MetricsRow, StyledLabel } from '../../shared-components/NodeMetricsLayout';
+import { MongodbRole, MongodbStatus } from '../fetchClusterMongodbNodes';
 
 const STATUS_MAP: Record<number, { label: string; style: string }> = {
-  1: { label: 'PRIMARY', style: 'success' },
-  2: { label: 'SECONDARY', style: 'info' },
-  7: { label: 'ARBITER', style: 'default' },
-  0: { label: 'STARTUP', style: 'warning' },
-  3: { label: 'RECOVERING', style: 'warning' },
-  5: { label: 'STARTUP2', style: 'warning' },
-  6: { label: 'UNKNOWN', style: 'danger' },
-  8: { label: 'DOWN', style: 'danger' },
-  9: { label: 'ROLLBACK', style: 'warning' },
-  10: { label: 'REMOVED', style: 'danger' },
+  [MongodbStatus.PRIMARY]: { label: 'PRIMARY', style: 'success' },
+  [MongodbStatus.SECONDARY]: { label: 'SECONDARY', style: 'info' },
+  [MongodbStatus.ARBITER]: { label: 'ARBITER', style: 'default' },
+  [MongodbStatus.STARTUP]: { label: 'STARTUP', style: 'warning' },
+  [MongodbStatus.RECOVERING]: { label: 'RECOVERING', style: 'warning' },
+  [MongodbStatus.STARTUP2]: { label: 'STARTUP2', style: 'warning' },
+  [MongodbStatus.UNKNOWN]: { label: 'UNKNOWN', style: 'danger' },
+  [MongodbStatus.DOWN]: { label: 'DOWN', style: 'danger' },
+  [MongodbStatus.ROLLBACK]: { label: 'ROLLBACK', style: 'warning' },
+  [MongodbStatus.REMOVED]: { label: 'REMOVED', style: 'danger' },
 };
 
 type Props = {
@@ -41,9 +42,9 @@ const MongodbStatusCell = ({ status, role }: Props) => {
     return null;
   }
 
-  const isStandalone = role?.toUpperCase() === 'STANDALONE';
+  const isStandalone = role?.toUpperCase() === MongodbRole.STANDALONE;
   const statusInfo = isStandalone
-    ? { label: 'STANDALONE', style: 'success' }
+    ? { label: MongodbRole.STANDALONE, style: 'success' }
     : (STATUS_MAP[status] ?? { label: `UNKNOWN (${status})`, style: 'default' });
 
   return (

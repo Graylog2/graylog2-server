@@ -19,6 +19,7 @@ import React from 'react';
 import NumberUtils from 'util/NumberUtils';
 
 import { MetricPlaceholder, MetricsColumn, MetricsRow, StyledLabel } from '../../shared-components/NodeMetricsLayout';
+import { MongodbRole, type MongodbRoleType } from '../fetchClusterMongodbNodes';
 
 type Props = {
   replicationLag: number | undefined | null;
@@ -27,8 +28,38 @@ type Props = {
   dangerThreshold: number;
 };
 
+const MS_IN_SECOND = 1000;
+const SECONDS_IN_MINUTE = 60;
+const MS_IN_MINUTE = SECONDS_IN_MINUTE * MS_IN_SECOND;
+const NO_REPLICATION_LAG_ROLES: Set<MongodbRoleType> = new Set([
+  MongodbRole.PRIMARY,
+  MongodbRole.STANDALONE,
+  MongodbRole.ARBITER,
+]);
+
+export const formatReplicationLagMs = (replicationLagMs: number): string => {
+  if (replicationLagMs < MS_IN_SECOND) {
+    return `${NumberUtils.formatNumber(replicationLagMs)} ms`;
+  }
+
+  if (replicationLagMs < MS_IN_MINUTE) {
+    return `${NumberUtils.formatNumber(replicationLagMs / MS_IN_SECOND)} s`;
+  }
+
+  const wholeMinutes = Math.floor(replicationLagMs / MS_IN_MINUTE);
+  const remainingSeconds = (replicationLagMs % MS_IN_MINUTE) / MS_IN_SECOND;
+
+  if (remainingSeconds === 0) {
+    return `${NumberUtils.formatNumber(wholeMinutes)} min`;
+  }
+
+  return `${NumberUtils.formatNumber(wholeMinutes)} min ${NumberUtils.formatNumber(remainingSeconds)} s`;
+};
+
 const ReplicationLagCell = ({ replicationLag, role, warningThreshold, dangerThreshold }: Props) => {
-  if (role?.toUpperCase() === 'PRIMARY') {
+  const upperRole = role?.toUpperCase();
+
+  if (upperRole && NO_REPLICATION_LAG_ROLES.has(upperRole as MongodbRoleType)) {
     return (
       <MetricsColumn>
         <MetricsRow>
@@ -42,7 +73,8 @@ const ReplicationLagCell = ({ replicationLag, role, warningThreshold, dangerThre
     return <MetricPlaceholder />;
   }
 
-  const formatted = `${NumberUtils.formatNumber(replicationLag)} ms`;
+  const formatted = formatReplicationLagMs(replicationLag);
+  const exactValueTitle = `${NumberUtils.formatNumber(replicationLag)} ms`;
   const exceedsDanger = replicationLag >= dangerThreshold;
   const exceedsWarning = !exceedsDanger && replicationLag >= warningThreshold;
 
@@ -50,7 +82,7 @@ const ReplicationLagCell = ({ replicationLag, role, warningThreshold, dangerThre
     return (
       <MetricsColumn>
         <MetricsRow>
-          <span>{formatted}</span>
+          <span title={exactValueTitle}>{formatted}</span>
         </MetricsRow>
       </MetricsColumn>
     );
@@ -59,7 +91,7 @@ const ReplicationLagCell = ({ replicationLag, role, warningThreshold, dangerThre
   return (
     <MetricsColumn>
       <MetricsRow>
-        <StyledLabel bsStyle={exceedsDanger ? 'danger' : 'warning'} bsSize="xs">
+        <StyledLabel bsStyle={exceedsDanger ? 'danger' : 'warning'} bsSize="xs" title={exactValueTitle}>
           {formatted}
         </StyledLabel>
       </MetricsRow>

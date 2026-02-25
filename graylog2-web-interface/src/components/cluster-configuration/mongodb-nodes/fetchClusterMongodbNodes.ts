@@ -19,6 +19,30 @@ import PaginationURL from 'util/PaginationURL';
 import fetch from 'logic/rest/FetchProvider';
 import type { Attribute, PaginatedResponseType, SearchParams } from 'stores/PaginationTypes';
 
+export const MongodbRole = {
+  PRIMARY: 'PRIMARY',
+  SECONDARY: 'SECONDARY',
+  ARBITER: 'ARBITER',
+  STANDALONE: 'STANDALONE',
+} as const;
+
+export type MongodbRoleType = typeof MongodbRole[keyof typeof MongodbRole];
+
+export const MongodbStatus = {
+  STARTUP: 0,
+  PRIMARY: 1,
+  SECONDARY: 2,
+  RECOVERING: 3,
+  STARTUP2: 5,
+  UNKNOWN: 6,
+  ARBITER: 7,
+  DOWN: 8,
+  ROLLBACK: 9,
+  REMOVED: 10,
+} as const;
+
+export type MongodbStatusType = typeof MongodbStatus[keyof typeof MongodbStatus];
+
 export type MongodbNode = {
   id: string;
   name: string;
