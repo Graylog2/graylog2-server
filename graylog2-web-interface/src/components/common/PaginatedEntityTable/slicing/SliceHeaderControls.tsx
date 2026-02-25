@@ -87,7 +87,7 @@ const SliceHeaderControls = ({
       </DropdownButton>
       {activeSlice && (
         <Button bsStyle="link" bsSize="sm" onClick={() => onChangeSlicing(sliceCol, undefined)}>
-          Clear slice
+          Unselect slice
         </Button>
       )}
     </SliceHeader>
