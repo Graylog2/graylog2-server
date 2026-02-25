@@ -136,6 +136,74 @@ class SyslogTCPFramingRouterHandlerTest {
     }
 
     @Test
+    void testBufferReleasedAfterSuccessfulDecode() {
+        final ByteBuf buf = Unpooled.copiedBuffer("<45>Test\n", StandardCharsets.US_ASCII);
+        assertThat(buf.refCnt()).isEqualTo(1);
+
+        assertThat(channel.writeInbound(buf)).isTrue();
+
+        // The decoded frame holds a retained slice of the cumulation buffer.
+        // Reading and releasing it should free the underlying buffer entirely.
+        final ByteBuf result = channel.readInbound();
+        assertThat(result).isNotNull();
+        result.release();
+
+        assertThat(buf.refCnt()).isZero();
+    }
+
+    @Test
+    void testIncompleteFrameReleasedOnChannelClose() {
+        final ByteBuf buf = Unpooled.copiedBuffer("<45>partial", StandardCharsets.US_ASCII);
+        assertThat(buf.refCnt()).isEqualTo(1);
+
+        // No delimiter — frame is incomplete, buffer is held as cumulation
+        assertThat(channel.writeInbound(buf)).isFalse();
+        assertThat(buf.refCnt()).isEqualTo(1);
+
+        // Channel close triggers channelInactive → ByteToMessageDecoder releases cumulation
+        channel.close();
+        assertThat(buf.refCnt()).isZero();
+    }
+
+    @Test
+    void testMultipleMessagesBuffersReleased() {
+        final ByteBuf buf1 = Unpooled.copiedBuffer("<45>msg1\n", StandardCharsets.US_ASCII);
+        final ByteBuf buf2 = Unpooled.copiedBuffer("<45>msg2\n", StandardCharsets.US_ASCII);
+
+        assertThat(channel.writeInbound(buf1)).isTrue();
+        final ByteBuf result1 = channel.readInbound();
+        assertThat(result1).isNotNull();
+        result1.release();
+
+        assertThat(channel.writeInbound(buf2)).isTrue();
+        final ByteBuf result2 = channel.readInbound();
+        assertThat(result2).isNotNull();
+        result2.release();
+
+        assertThat(buf1.refCnt()).isZero();
+        assertThat(buf2.refCnt()).isZero();
+    }
+
+    @Test
+    void testMultiPartBuffersReleasedAfterDecode() {
+        final ByteBuf buf1 = Unpooled.copiedBuffer("<45>", StandardCharsets.US_ASCII);
+        final ByteBuf buf2 = Unpooled.copiedBuffer("Test 123\n", StandardCharsets.US_ASCII);
+
+        assertThat(channel.writeInbound(buf1)).isFalse();
+        assertThat(channel.writeInbound(buf2)).isTrue();
+
+        final ByteBuf result = channel.readInbound();
+        assertThat(result).isNotNull();
+        result.release();
+
+        // Both input segments should be released after the frame is decoded.
+        // buf1 is released when the cumulator expands to merge buf2.
+        // buf2 is released by the cumulator after copying its bytes.
+        assertThat(buf1.refCnt()).isZero();
+        assertThat(buf2.refCnt()).isZero();
+    }
+
+    @Test
     void testNotWorkingSyslogMessage() throws IOException {
         channel.finishAndReleaseAll();
         channel = new EmbeddedChannel(new SyslogTCPFramingRouterHandler(380000, Delimiters.lineDelimiter()));
