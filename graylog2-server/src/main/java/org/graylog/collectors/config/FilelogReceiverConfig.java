@@ -41,9 +41,32 @@ public abstract class FilelogReceiverConfig implements OtlpReceiverConfig {
     @JsonProperty("exclude")
     public abstract List<String> exclude();
 
-    @Nullable
+    @JsonProperty("include_file_name")
+    public abstract boolean includeFileName();
+
     @JsonProperty("include_file_path")
-    public abstract Boolean includeFilePath();
+    public abstract boolean includeFilePath();
+
+    @JsonProperty("include_file_name_resolved")
+    public abstract boolean includeFileNameResolved();
+
+
+    @JsonProperty("include_file_path_resolved")
+    public abstract boolean includeFilePathResolved();
+
+    @JsonProperty("include_file_owner_name")
+    public abstract boolean includeFileOwnerName();
+
+    @JsonProperty("include_file_owner_group_name")
+    public abstract boolean includeFileOwnerGroupName();
+
+    @JsonProperty("include_file_record_number")
+    public abstract boolean includeFileRecordNumber();
+
+    @JsonProperty("include_file_record_offset")
+    public abstract boolean includeFileRecordOffset();
+
+    // TODO: Configure offset storage - otherwise, offsets will only be tracked in memory!
 
     @Nullable
     @JsonProperty("start_at")
@@ -56,7 +79,14 @@ public abstract class FilelogReceiverConfig implements OtlpReceiverConfig {
     public static Builder builder(String id) {
         return new AutoValue_FilelogReceiverConfig.Builder()
                 .name(f("filelog/%s", id))
-                .includeFilePath(true);
+                .includeFileName(true)
+                .includeFilePath(true)
+                .includeFileNameResolved(true)
+                .includeFilePathResolved(true)
+                .includeFileOwnerName(true)
+                .includeFileOwnerGroupName(true)
+                .includeFileRecordNumber(true)
+                .includeFileRecordOffset(true);
     }
 
     @AutoValue.Builder
@@ -68,7 +98,21 @@ public abstract class FilelogReceiverConfig implements OtlpReceiverConfig {
 
         public abstract Builder exclude(@Nullable List<String> exclude);
 
-        public abstract Builder includeFilePath(@Nullable Boolean includeFilePath);
+        public abstract Builder includeFileName(boolean includeFileName);
+
+        public abstract Builder includeFilePath(boolean includeFilePath);
+
+        public abstract Builder includeFileNameResolved(boolean includeFileNameResolved);
+
+        public abstract Builder includeFilePathResolved(boolean includeFilePathResolved);
+
+        public abstract Builder includeFileOwnerName(boolean includeFileOwnerName);
+
+        public abstract Builder includeFileOwnerGroupName(boolean includeFileOwnerGroupName);
+
+        public abstract Builder includeFileRecordNumber(boolean includeFileRecordNumber);
+
+        public abstract Builder includeFileRecordOffset(boolean includeFileRecordOffset);
 
         public abstract Builder startAt(@Nullable String startAt);
 
