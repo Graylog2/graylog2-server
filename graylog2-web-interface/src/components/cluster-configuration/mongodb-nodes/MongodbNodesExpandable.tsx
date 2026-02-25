@@ -75,13 +75,12 @@ const MongodbNodesExpandable = ({
         keyFn={clusterMongodbNodesKeyFn}
         additionalAttributes={columnSchemas}
         columnRenderers={columnRenderers}
-        entityAttributesAreCamelCase={false}
         humanName="MongoDB Nodes"
         externalSearch={externalSearch}
         fetchOptions={fetchOptions}
         onDataLoaded={(data) => setTotalMongodbNodes(data.pagination?.total ?? data.list.length)}
         withoutURLParams
-      />
+        entityAttributesAreCamelCase />
     </ClusterNodesSectionWrapper>
   );
 };

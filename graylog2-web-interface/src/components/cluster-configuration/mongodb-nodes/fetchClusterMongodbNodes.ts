@@ -49,9 +49,9 @@ export type MongodbNode = {
   role: string;
   version: string;
   status: number;
-  replicationLag: number;
-  slowQueryCount: number | null;
-  storageUsedPercent: number;
+  replication_lag: number;
+  slow_query_count: number | null;
+  storage_used_percent: number;
 };
 
 export type MongodbNodesResponse = {
@@ -83,19 +83,10 @@ export const fetchMongodbNodes = async (
     }: {
       attributes: Array<Attribute>;
       pagination: PaginatedResponseType;
-      elements: Array<Record<string, unknown>>;
+      elements: Array<MongodbNode>;
     }) => ({
       attributes,
-      list: elements.map((node) => ({
-        id: node.name as string,
-        name: node.name as string,
-        role: node.role as string,
-        version: node.version as string,
-        status: node.status as number,
-        replicationLag: node.replication_lag as number,
-        slowQueryCount: node.slow_query_count as number | null,
-        storageUsedPercent: node.storage_used_percent as number,
-      })),
+      list: elements.map((node) => ({ ...node, id: node.name })),
       pagination,
     }),
   );

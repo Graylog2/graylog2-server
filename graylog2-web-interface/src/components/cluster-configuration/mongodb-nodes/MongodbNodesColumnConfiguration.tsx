@@ -74,7 +74,7 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
     replicationLag: {
       renderCell: (_value, entity) => (
         <ReplicationLagCell
-          replicationLag={entity.replicationLag}
+          replicationLag={entity.replication_lag}
           role={entity.role}
           warningThreshold={REPLICATION_LAG_WARNING_THRESHOLD_MS}
           dangerThreshold={REPLICATION_LAG_DANGER_THRESHOLD_MS}
@@ -84,7 +84,7 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
     },
     slowQueryCount: {
       renderCell: (_value, entity) => {
-        const count = entity.slowQueryCount;
+        const count = entity.slow_query_count;
 
         if (count == null) {
           return <SecondaryText><span>N/A</span></SecondaryText>;
@@ -97,7 +97,7 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
     storageUsedPercent: {
       renderCell: (_value, entity) => (
         <StorageUsedCell
-          storageUsedPercent={entity.storageUsedPercent}
+          storageUsedPercent={entity.storage_used_percent}
           warningThreshold={STORAGE_WARNING_THRESHOLD}
           dangerThreshold={STORAGE_DANGER_THRESHOLD}
         />
