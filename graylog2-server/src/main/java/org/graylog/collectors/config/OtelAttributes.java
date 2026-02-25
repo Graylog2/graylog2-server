@@ -16,14 +16,6 @@
  */
 package org.graylog.collectors.config;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog.collectors.config.operator.CollectorOperatorConfig;
-
-import java.util.List;
-
-public interface OtlpReceiverConfig {
-    String name();
-
-    @JsonProperty("operators")
-    List<CollectorOperatorConfig> operators();
+public class OtelAttributes {
+    public static final String COLLECTOR_RECEIVER_TYPE = "glc.receiver.type";
 }

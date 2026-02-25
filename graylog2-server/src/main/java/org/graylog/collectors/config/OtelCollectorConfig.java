@@ -19,7 +19,6 @@ package org.graylog.collectors.config;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
-import java.util.List;
 import java.util.Map;
 
 /**

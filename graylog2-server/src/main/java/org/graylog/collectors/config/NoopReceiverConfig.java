@@ -17,12 +17,20 @@
 package org.graylog.collectors.config;
 
 import com.google.auto.value.AutoValue;
+import org.graylog.collectors.config.operator.CollectorOperatorConfig;
+
+import java.util.List;
 
 /**
  * No-op receiver that we use to ensure the presence of at least one receiver in the Collector config.
  */
 @AutoValue
 public abstract class NoopReceiverConfig implements OtlpReceiverConfig {
+    @Override
+    public List<CollectorOperatorConfig> operators() {
+        return null;
+    }
+
     public static NoopReceiverConfig instance() {
         return new AutoValue_NoopReceiverConfig("noop");
     }

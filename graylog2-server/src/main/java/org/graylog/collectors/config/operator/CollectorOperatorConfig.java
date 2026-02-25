@@ -14,16 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.config;
+package org.graylog.collectors.config.operator;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog.collectors.config.operator.CollectorOperatorConfig;
 
-import java.util.List;
-
-public interface OtlpReceiverConfig {
-    String name();
-
-    @JsonProperty("operators")
-    List<CollectorOperatorConfig> operators();
+public interface CollectorOperatorConfig {
+    @JsonProperty("type")
+    String type();
 }
