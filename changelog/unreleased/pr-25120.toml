@@ -2,4 +2,4 @@ type = "f"
 message = "Fix memory leak for syslog input via TCP."
 
 issues = ["24336"]
-pulls = ["24525"]
+pulls = ["25120"]
