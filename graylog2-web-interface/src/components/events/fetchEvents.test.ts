@@ -24,9 +24,6 @@ import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import fetchEvents, { defaultTimeRange, parseFilters, parseTypeFilter } from './fetchEvents';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn());
-jest.mock('util/URLUtils', () => ({
-  qualifyUrl: jest.fn((path: string) => `http://localhost${path}`),
-}));
 
 describe('fetchEvents', () => {
   const THIRTY_DAYS_IN_SECONDS = 30 * 86400;
