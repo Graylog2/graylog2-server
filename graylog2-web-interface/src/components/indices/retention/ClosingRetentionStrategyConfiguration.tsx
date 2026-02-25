@@ -36,7 +36,7 @@ const ClosingRetentionStrategyConfiguration = ({
     const value = getValueFromInput(e.target);
     update[field] = value;
 
-    setMaxNumberOfIndices(value);
+    setMaxNumberOfIndices(value as number);
     updateConfig(update);
   };
 
