@@ -91,7 +91,7 @@ class HttpNotificationForm extends React.Component<
 
   handleSecretInputChange = (event) => {
     const { name } = event.target;
-    const inputValue = FormsUtils.getValueFromInput(event.target);
+    const inputValue = String(FormsUtils.getValueFromInput(event.target));
     const value = inputValue.length === 0 ? { delete_value: true } : { set_value: inputValue };
 
     this.setState({ [name]: inputValue });
