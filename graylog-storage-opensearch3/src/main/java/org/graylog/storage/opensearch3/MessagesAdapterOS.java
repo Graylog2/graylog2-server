@@ -235,7 +235,7 @@ public class MessagesAdapterOS implements MessagesAdapter {
 
     private IndexingResult indexingResultFromResponse(BulkResponseItem response, Indexable message) {
         if (response.error() != null) {
-            String errorMessage = f("OpenSearchException[OpenSearch exception [type=%s, reason=%s]]", response.error().type(), response.error().reason());
+            String errorMessage = f("OpenSearchException[OpenSearch exception [type=%s, reason=%s]];", response.error().type(), response.error().reason());
             return IndexingError.create(message, response.index(), errorTypeFromResponse(response), errorMessage);
         }
         return IndexingSuccess.create(message, response.index());
