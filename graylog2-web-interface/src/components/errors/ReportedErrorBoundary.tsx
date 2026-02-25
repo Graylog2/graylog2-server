@@ -79,7 +79,8 @@ const ReportedErrorBoundary = ({ children }: Props) => {
   const location = useLocation();
 
   useEffect(() => {
-    setReportedError(null);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setReportedError(undefined);
   }, [location]);
 
   return reportedError ? <ReportedErrorPage reportedError={reportedError} /> : <>{children}</>;

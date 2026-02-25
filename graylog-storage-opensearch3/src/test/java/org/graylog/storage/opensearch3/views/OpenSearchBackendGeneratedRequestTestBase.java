@@ -90,8 +90,7 @@ public class OpenSearchBackendGeneratedRequestTestBase extends OfficialOpensearc
                 mock(StreamService.class),
                 false,
                 1,
-                1,
-                null));
+                1));
     }
 
     SearchJob searchJobForQuery(Query query) {

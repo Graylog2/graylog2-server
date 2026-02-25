@@ -24,7 +24,6 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
-import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.views.MutableSearchRequestBuilder;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog.testing.jsonpath.JsonPathAssert;
@@ -57,9 +56,9 @@ public class OSMessageListTest {
     @SuppressWarnings("unchecked")
     public void includesCustomNameInResultIfPresent() {
         final OSMessageList esMessageList = new OSMessageList(new LegacyDecoratorProcessor.Fake(),
-                new TestResultMessageFactory(), false, new OSSerializationUtils());
+                new TestResultMessageFactory(), false);
         final MessageList messageList = someMessageList().toBuilder().name("customResult").build();
-        
+
         HitsMetadata<JsonData> hitsMetadata = (HitsMetadata<JsonData>) HitsMetadata.builder()
                 .total(TotalHits.builder().value(0).relation(TotalHitsRelation.Eq).build())
                 .hits(new ArrayList<>())
@@ -241,8 +240,8 @@ public class OSMessageListTest {
         OSMessageList sut = new OSMessageList(
                 new LegacyDecoratorProcessor.Fake(),
                 resultMessageFactory,
-                allowHighlighting,
-                new OSSerializationUtils());
+                allowHighlighting
+        );
 
         sut.doGenerateQueryPart(someQuery(), messageList, context);
 
