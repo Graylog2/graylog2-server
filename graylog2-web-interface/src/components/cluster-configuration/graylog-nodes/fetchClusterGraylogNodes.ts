@@ -47,7 +47,7 @@ export const LOAD_BALANCER_STATUS = {
   THROTTLED: 'THROTTLED',
 } as const;
 
-export type LoadBalancerStatus = typeof LOAD_BALANCER_STATUS[keyof typeof LOAD_BALANCER_STATUS];
+export type LoadBalancerStatus = (typeof LOAD_BALANCER_STATUS)[keyof typeof LOAD_BALANCER_STATUS];
 
 export type GraylogNode = {
   _id?: string;

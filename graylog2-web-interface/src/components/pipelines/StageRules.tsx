@@ -89,9 +89,7 @@ const StageRules = ({
       const isInvalid = isInvalidRule(rule);
       const removableRule: RuleType | undefined = isInvalid ? undefined : rule;
       const showRemoveAction =
-        canRemoveRoutingRules &&
-        isInputSetupWizardRoutingRule(removableRule) &&
-        typeof onRemoveRule === 'function';
+        canRemoveRoutingRules && isInputSetupWizardRoutingRule(removableRule) && typeof onRemoveRule === 'function';
 
       const ruleTitle = (() => {
         if (isInvalid) {
