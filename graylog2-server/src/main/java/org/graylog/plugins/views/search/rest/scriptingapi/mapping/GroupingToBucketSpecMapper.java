@@ -24,6 +24,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.TimeUnitInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 
+import java.util.List;
 import java.util.function.Function;
 
 public class GroupingToBucketSpecMapper implements Function<Grouping, BucketSpec> {
@@ -33,11 +34,7 @@ public class GroupingToBucketSpecMapper implements Function<Grouping, BucketSpec
     @Override
     public BucketSpec apply(final Grouping grouping) {
         if(grouping.ranges().isPresent()) {
-            return RangeBucket.builder()
-                    .field(grouping.requestedField().name())
-                    .type(RangeBucket.NAME)
-                    .ranges(grouping.ranges().get())
-                    .build();
+            return new RangeBucket(List.of(grouping.requestedField().name()), grouping.ranges().get());
         } else if(grouping.scaling().isPresent()) {
             return Time.builder()
                     .field(grouping.requestedField().name())

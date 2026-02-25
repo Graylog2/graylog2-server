@@ -33,6 +33,7 @@ import org.opensearch.client.opensearch._types.aggregations.RangeAggregate;
 import org.opensearch.client.opensearch._types.aggregations.RangeAggregation;
 
 import javax.annotation.Nonnull;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class OSRangeHandler extends OSPivotBucketSpecHandler<RangeBucket> {
@@ -48,8 +49,8 @@ public class OSRangeHandler extends OSPivotBucketSpecHandler<RangeBucket> {
                     .field(field);
             rangeBucket.ranges().forEach(r -> {
                 final AggregationRange.Builder range = new AggregationRange.Builder();
-                r.from().ifPresent(from -> range.from(JsonData.of(from)));
-                r.to().ifPresent(to -> range.to(JsonData.of(to)));
+                Optional.ofNullable(r.from()).ifPresent(from -> range.from(JsonData.of(from)));
+                Optional.ofNullable(r.to()).ifPresent(to -> range.to(JsonData.of(to)));
                 rangeBuilder.ranges(range.build());
             });
             rangeBuilder.keyed(false);

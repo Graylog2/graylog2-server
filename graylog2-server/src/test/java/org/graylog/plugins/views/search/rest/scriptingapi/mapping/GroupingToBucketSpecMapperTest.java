@@ -76,9 +76,9 @@ class GroupingToBucketSpecMapperTest {
     @Test
     void buildsRangeBucketSpecCorrectly() {
         final List<NumberRange> ranges = List.of(
-                NumberRange.create(null, 100.0),
-                NumberRange.create(100.0, 500.0),
-                NumberRange.create(500.0, null)
+                new NumberRange(null, 100.0),
+                new NumberRange(100.0, 500.0),
+                new NumberRange(500.0, null)
         );
         final Grouping grouping = new Grouping("took_ms", Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(ranges));
         final BucketSpec bucketSpec = toTest.apply(grouping);
@@ -93,21 +93,21 @@ class GroupingToBucketSpecMapperTest {
 
     @Test
     void throwsValidationExceptionWhenRangesAndLimitBothProvided() {
-        final List<NumberRange> ranges = List.of(NumberRange.create(null, 100.0));
+        final List<NumberRange> ranges = List.of(new NumberRange(null, 100.0));
         assertThrows(ValidationException.class,
                 () -> new Grouping("field", Optional.of(10), Optional.empty(), Optional.empty(), Optional.of(ranges)));
     }
 
     @Test
     void throwsValidationExceptionWhenRangesAndTimeunitBothProvided() {
-        final List<NumberRange> ranges = List.of(NumberRange.create(null, 100.0));
+        final List<NumberRange> ranges = List.of(new NumberRange(null, 100.0));
         assertThrows(ValidationException.class,
                 () -> new Grouping("field", Optional.empty(), Optional.of("1h"), Optional.empty(), Optional.of(ranges)));
     }
 
     @Test
     void throwsValidationExceptionWhenRangesAndScalingBothProvided() {
-        final List<NumberRange> ranges = List.of(NumberRange.create(null, 100.0));
+        final List<NumberRange> ranges = List.of(new NumberRange(null, 100.0));
         assertThrows(ValidationException.class,
                 () -> new Grouping("field", Optional.empty(), Optional.empty(), Optional.of(1.0), Optional.of(ranges)));
     }
