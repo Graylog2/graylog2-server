@@ -18,6 +18,7 @@ package org.graylog2.opamp;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -39,6 +40,7 @@ import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.SourceService;
+import org.graylog.collectors.config.NoopReceiverConfig;
 import org.graylog.collectors.config.OtelCollectorConfig;
 import org.graylog.collectors.config.OtelPipelineConfig;
 import org.graylog.collectors.config.OtelServiceConfig;
@@ -112,6 +114,7 @@ public class OpAmpService {
         this.sourceService = sourceService;
         this.yamlObjectMapper = new ObjectMapper(new YAMLFactory()
                 .enable(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE))
+                .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
                 .registerModule(new Jdk8Module());
     }
 
@@ -332,6 +335,11 @@ public class OpAmpService {
                     sources.map(SourceDTO::toReceiverConfig)
                             .flatMap(Optional::stream)
                             .forEach(receiverConfig -> receiverConfigs.put(receiverConfig.name(), receiverConfig));
+                }
+                if (receiverConfigs.isEmpty()) {
+                    // The Collector must at least have one receiver to avoid a startup error.
+                    final var noop = NoopReceiverConfig.instance();
+                    receiverConfigs.put(noop.name(), noop);
                 }
                 configBuilder.receivers(receiverConfigs);
                 configBuilder.exporters(Map.of(effectiveOtlpEndpoint.getName(), effectiveOtlpEndpoint));
