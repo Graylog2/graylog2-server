@@ -235,10 +235,23 @@ public class MessagesAdapterOS implements MessagesAdapter {
 
     private IndexingResult indexingResultFromResponse(BulkResponseItem response, Indexable message) {
         if (response.error() != null) {
-            String errorMessage = f("OpenSearchException[OpenSearch exception [type=%s, reason=%s]];", response.error().type(), response.error().reason());
+            String errorMessage = createErrorMessage(response.error());
             return IndexingError.create(message, response.index(), errorTypeFromResponse(response), errorMessage);
         }
         return IndexingSuccess.create(message, response.index());
+    }
+
+    private String createErrorMessage(ErrorCause error) {
+        StringBuilder errorMessage = new StringBuilder();
+        ErrorCause current = error;
+        while (current != null) {
+            errorMessage.append(f("OpenSearchException[OpenSearch exception [type=%s, reason=%s]];", current.type(), current.reason()));
+            current = current.causedBy();
+            if (current != null) {
+                errorMessage.append(" nested: ");
+            }
+        }
+        return errorMessage.toString();
     }
 
     private IndexingError.Type errorTypeFromResponse(BulkResponseItem item) {
