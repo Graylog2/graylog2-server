@@ -30,13 +30,7 @@ import org.graylog.inputs.otel.OTelJournalRecordFactory;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.journal.RawMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.net.InetSocketAddress;
-import java.util.Collections;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import static org.graylog.inputs.grpc.GrpcUtils.createThrottledStatusRuntimeException;
@@ -48,13 +42,6 @@ import static org.graylog.inputs.grpc.RemoteAddressProviderInterceptor.REMOTE_AD
  * in each journal record before writing to the Graylog journal.
  */
 public class CollectorIngestLogsService extends LogsServiceGrpc.LogsServiceImplBase {
-    private static final Logger LOG = LoggerFactory.getLogger(CollectorIngestLogsService.class);
-
-    // TODO: Replace with proper per-agent ingest metrics. Needs a cardinality-bounded
-    //  approach (e.g., aggregated by fleet, fixed-size ring buffer, periodic batch writes
-    //  to agent record). Remove these log statements once decided.
-    private final Set<String> recentlySeenAgents = Collections.newSetFromMap(new ConcurrentHashMap<>());
-
     private final OTelJournalRecordFactory journalRecordFactory;
     private final ThrottleableTransport2 transport;
     private final MessageInput input;
@@ -88,14 +75,6 @@ public class CollectorIngestLogsService extends LogsServiceGrpc.LogsServiceImplB
 
         // Get agent instance UID from context (set by AgentCertAuthInterceptor)
         final String instanceUid = AgentCertAuthInterceptor.AGENT_INSTANCE_UID.get();
-
-        if (instanceUid != null) {
-            if (recentlySeenAgents.add(instanceUid)) {
-                LOG.info("First OTLP data from agent {}", instanceUid);
-            }
-            LOG.debug("Received {} log resource(s) ({} bytes) from agent {}",
-                    request.getResourceLogsCount(), request.getSerializedSize(), instanceUid);
-        }
 
         final Function<byte[], RawMessage> createRawMessage;
         if (REMOTE_ADDRESS.get() instanceof InetSocketAddress address) {
