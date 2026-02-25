@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Clean up documents for failed job triggers."
+
+issues = ["23884"]
+pulls = ["24755"]

@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 import capitalize from 'lodash/capitalize';
 import { useNavigate } from 'react-router-dom';
 
-import { Icon, LinkToNode, Section } from 'components/common';
+import { Icon, LinkToNode, RelativeTime, Section } from 'components/common';
 import useParams from 'routing/useParams';
 import { Alert, Button, ListGroup, ListGroupItem } from 'components/bootstrap';
 import type {
@@ -136,6 +136,20 @@ const StyledSpan = styled.span`
   padding-left: ${({ theme }) => theme.spacings.xs};
 `;
 
+const NodeListItemContent = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacings.xs};
+    width: 100%;
+  `,
+);
+
+const NodeDetailsRow = styled.div`
+  display: flex;
+  align-items: flex-start;
+`;
+
 const TroubleshootingContainer = styled.div`
   max-height: 400px;
   overflow-y: scroll;
@@ -158,35 +172,37 @@ export const StyledList = styled.ul(
 
 const NodeListItem = ({
   detailedMessage,
+  lastFailedAt = undefined,
   nodeId,
 }: {
   detailedMessage: InputNodeStateInfo['detailed_message'];
+  lastFailedAt?: InputNodeStateInfo['last_failed_at'];
   nodeId: InputNodeStateInfo['node_id'];
 }) => {
-  if (!detailedMessage && !nodeId) return null;
-
-  if (nodeId) {
-    return (
-      <StyledListGroupItem>
-        <StyledTitle>Node ID:</StyledTitle> <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>{nodeId}</Link>
-        {detailedMessage && (
-          <>
-            <StyledTitle>Message:</StyledTitle>
-            <InputMessage>{detailedMessage}</InputMessage>
-          </>
-        )}
-      </StyledListGroupItem>
-    );
-  }
+  if (!detailedMessage && !nodeId && !lastFailedAt) return null;
 
   return (
     <StyledListGroupItem key={detailedMessage}>
-      {detailedMessage && (
-        <>
-          <StyledTitle>Message:</StyledTitle>
-          <InputMessage>{detailedMessage}</InputMessage>
-        </>
-      )}
+      <NodeListItemContent>
+        {nodeId && (
+          <NodeDetailsRow>
+            <StyledTitle>Node ID:</StyledTitle>
+            <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>{nodeId}</Link>
+          </NodeDetailsRow>
+        )}
+        {detailedMessage && (
+          <NodeDetailsRow>
+            <StyledTitle>Message:</StyledTitle>
+            <InputMessage>{detailedMessage}</InputMessage>
+          </NodeDetailsRow>
+        )}
+        {lastFailedAt && (
+          <NodeDetailsRow>
+            <StyledTitle>Last failed:</StyledTitle>
+            <RelativeTime dateTime={lastFailedAt} />
+          </NodeDetailsRow>
+        )}
+      </NodeListItemContent>
     </StyledListGroupItem>
   );
 };
@@ -207,8 +223,13 @@ const StateListItem = ({ inputNodeStates, state }: { inputNodeStates: InputNodeS
           <StyledTitle>{capitalize(state)}:</StyledTitle>
           {inputNodeStates.states[state].length}/{inputNodeStates.total} nodes
         </StyledListGroupItem>
-        {inputNodeStates.states[state].map(({ detailed_message, node_id }) => (
-          <NodeListItem key={node_id} detailedMessage={detailed_message} nodeId={node_id} />
+        {inputNodeStates.states[state].map(({ detailed_message, last_failed_at, node_id }) => (
+          <NodeListItem
+            key={node_id}
+            detailedMessage={detailed_message}
+            lastFailedAt={last_failed_at}
+            nodeId={node_id}
+          />
         ))}
       </>
     );
@@ -320,6 +341,12 @@ const InputDiagnosisPage = () => {
                 not running, click to see any associated error messages.
               </StyledP>
               <StyledListGroup>
+                {inputMetrics.failedStarts15mCount !== undefined && (
+                  <StyledListGroupItem>
+                    <StyledTitle>Failed starts (last 15min):</StyledTitle>
+                    {inputMetrics.failedStarts15mCount}
+                  </StyledListGroupItem>
+                )}
                 {Object.keys(inputNodeStates.states).map((state: InputState) => (
                   <StateListItem key={state} state={state} inputNodeStates={inputNodeStates} />
                 ))}

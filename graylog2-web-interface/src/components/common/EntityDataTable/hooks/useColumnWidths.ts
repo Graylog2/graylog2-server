@@ -25,7 +25,7 @@ import {
 
 import type { EntityBase, ColumnRenderersByAttribute } from '../types';
 
-const assignableTableWidth = ({
+const calculateAssignableWidth = ({
   scrollContainerWidth,
   actionsColMinWidth,
   bulkSelectColWidth,
@@ -70,7 +70,10 @@ const calculateColumnWidths = ({
     return total + width;
   }, 0);
 
-  const flexColWidth = assignableWidth / totalFlexColumns;
+  const hasFlexColumns = totalFlexColumns > 0;
+  const flexColWidth = hasFlexColumns ? assignableWidth / totalFlexColumns : 0;
+  const actionsColWidth =
+    !hasFlexColumns && assignableWidth > 0 ? assignableWidth + actionsColMinWidth : actionsColMinWidth;
 
   return {
     ...Object.fromEntries(
@@ -83,8 +86,9 @@ const calculateColumnWidths = ({
         return [id, !staticColumnWidths[id] && targetWidth < resolvedMinWidth ? resolvedMinWidth : targetWidth];
       }),
     ),
-    [ACTIONS_COL_ID]:
-      assignableWidth > 0 && !totalFlexColumns ? assignableWidth + actionsColMinWidth : actionsColMinWidth,
+    // When all data columns have static widths, the actions column acts as the elastic tail.
+    // It fills any remaining space so the table spans the container even without row actions.
+    [ACTIONS_COL_ID]: actionsColWidth,
     ...(bulkSelectColWidth ? { [BULK_SELECT_COL_ID]: bulkSelectColWidth } : {}),
   };
 };
@@ -148,7 +152,8 @@ const useColumnWidths = <Entity extends EntityBase>({
     }
 
     // Calculate available width for columns which do not have a static width
-    const assignableWidth = assignableTableWidth({
+    // Width that can be assigned to flex columns (or to the actions tail when there are none).
+    const assignableWidth = calculateAssignableWidth({
       actionsColMinWidth,
       columnIds,
       bulkSelectColWidth,

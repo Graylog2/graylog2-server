@@ -168,6 +168,16 @@ export default [
               message: 'Please use `components/bootstrap` instead.',
             },
             {
+              name: 'react-router-dom',
+              importNames: ['Link'],
+              message: 'Please use Link from `components/common/router` instead.',
+            },
+            {
+              name: 'react-router-dom',
+              importNames: ['useLocation'],
+              message: 'Please use `routing/useLocation` instead.',
+            },
+            {
               name: 'create-react-class',
               message: 'Please use an ES6 or functional component instead.',
             },

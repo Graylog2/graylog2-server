@@ -24,6 +24,8 @@ export const Container = styled.div`
   width: 100%;
 `;
 
+export type TypeAheadInputOnKeyDown = NonNullable<React.ComponentProps<typeof Input>['onKeyDown']>;
+
 export type TypeAheadInputRef = {
   getValue: () => string;
   clear: () => void;
@@ -35,6 +37,10 @@ type TypeAheadInputProps = {
   label: string;
   /** String that allows overriding the input form group */
   formGroupClassName?: string;
+  buttonAfter?: React.ReactElement | string;
+  onChange?: (value: string) => void;
+  onKeyDown?: TypeAheadInputOnKeyDown;
+  placeholder?: string;
 };
 
 /**
@@ -45,10 +51,25 @@ type TypeAheadInputProps = {
  */
 
 const TypeAheadInput = (
-  { id, label, formGroupClassName = undefined }: TypeAheadInputProps,
+  {
+    id,
+    label,
+    formGroupClassName = undefined,
+    buttonAfter = undefined,
+    onChange = undefined,
+    onKeyDown = undefined,
+    placeholder = undefined,
+  }: TypeAheadInputProps,
   ref: React.Ref<TypeAheadInputRef>,
 ) => {
   const [value, setValue] = useState('');
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const nextValue = event.target.value;
+
+    setValue(nextValue);
+    onChange?.(nextValue);
+  };
+
   useImperativeHandle(
     ref,
     () => ({
@@ -67,7 +88,10 @@ const TypeAheadInput = (
         formGroupClassName={formGroupClassName}
         label={label}
         value={value}
-        onChange={(e) => setValue(e.target.value)}
+        buttonAfter={buttonAfter}
+        placeholder={placeholder}
+        onKeyDown={onKeyDown}
+        onChange={handleChange}
       />
     </Container>
   );

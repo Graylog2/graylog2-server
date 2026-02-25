@@ -112,7 +112,7 @@ public interface IndicesAdapter {
 
     boolean exists(String indexName) throws IOException;
 
-    Set<String> indices(String indexWildcard, List<String> status, String id);
+    Set<String> indices(String indexWildcard, List<IndexStatus> status, String id);
 
     Optional<Long> storeSizeInBytes(String index);
 

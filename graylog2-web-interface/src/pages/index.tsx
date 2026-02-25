@@ -80,6 +80,7 @@ const LUTFormPage = loadAsync(() => import('./LUTFormPage'));
 const LUTDetailsPage = loadAsync(() => import('./LUTDetailsPage'));
 const NodeInputsPage = loadAsync(() => import('./NodeInputsPage'));
 const NotFoundPage = loadAsync(() => import('./NotFoundPage'));
+const ApiBrowserPage = loadAsync(() => import('./ApiBrowserPage'));
 const PipelineDetailsPage = loadAsync(() => import('./PipelineDetailsPage'));
 const PipelinesOverviewPage = loadAsync(() => import('./PipelinesOverviewPage'));
 const RoleDetailsPage = loadAsync(() => import('./RoleDetailsPage'));
@@ -184,6 +185,7 @@ export {
   LUTDetailsPage,
   NodeInputsPage,
   NotFoundPage,
+  ApiBrowserPage,
   PipelineDetailsPage,
   PipelinesOverviewPage,
   ProcessBufferDumpPage,

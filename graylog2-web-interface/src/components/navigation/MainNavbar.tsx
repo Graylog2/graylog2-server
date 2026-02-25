@@ -21,9 +21,7 @@ import type { PluginNavigation } from 'graylog-web-plugin';
 
 import { Nav } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
-import filterByPerspective from 'components/perspectives/util/filterByPerspective';
 import useCurrentUser from 'hooks/useCurrentUser';
-import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 import usePluginEntities from 'hooks/usePluginEntities';
 import NavigationItem from 'components/navigation/NavigationItem';
 import { DEFAULT_SECURITY_NAV_ITEM } from 'components/security/bindings';
@@ -49,7 +47,6 @@ const pluginLicenseValid = (navigationItems: Array<PluginNavigation>, descriptio
 
 const useNavigationItems = () => {
   const { permissions } = useCurrentUser();
-  const { activePerspective } = useActivePerspective();
   const allNavigationItems = usePluginEntities('navigation');
   const navigationItems = useMemo(() => mergeNavigationItems(allNavigationItems), [allNavigationItems]);
 
@@ -78,10 +75,8 @@ const useNavigationItems = () => {
       navigationItems.push(DEFAULT_SECURITY_NAV_ITEM);
     }
 
-    const itemsForActivePerspective = filterByPerspective(navigationItems, activePerspective?.id);
-
-    return sortNavigationItems<PluginNavigation>(itemsForActivePerspective);
-  }, [activePerspective?.id, navigationItems, permissions, securityLicenseInvalid]);
+    return sortNavigationItems<PluginNavigation>(navigationItems);
+  }, [navigationItems, permissions, securityLicenseInvalid]);
 };
 
 const MainNavbar = ({ pathname }: { pathname: string }) => {

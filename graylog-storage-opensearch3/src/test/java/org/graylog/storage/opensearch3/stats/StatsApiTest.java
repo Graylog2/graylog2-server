@@ -17,6 +17,7 @@
 package org.graylog.storage.opensearch3.stats;
 
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,7 +62,7 @@ class StatsApiTest {
     @BeforeEach
     void setUp() {
         doReturn(indicesClient).when(syncClient).indices();
-        final OfficialOpensearchClient client = new OfficialOpensearchClient(syncClient, asyncClient);
+        final OfficialOpensearchClient client = new OfficialOpensearchClient(syncClient, asyncClient, new ObjectMapperProvider().get());
         statsApi = new StatsApi(client);
     }
 

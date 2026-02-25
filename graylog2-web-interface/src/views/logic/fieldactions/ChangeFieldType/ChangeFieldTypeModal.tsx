@@ -17,9 +17,10 @@
 import React, { useMemo, useCallback, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import mapValues from 'lodash/mapValues';
+import { Formik, Form, Field } from 'formik';
 
-import { BootstrapModalForm, Alert, Input } from 'components/bootstrap';
-import { Select, Spinner } from 'components/common';
+import { Modal, Alert, Input } from 'components/bootstrap';
+import { Select, Spinner, FormikInput } from 'components/common';
 import StreamLink from 'components/streams/StreamLink';
 import IndexSetsTable from 'views/logic/fieldactions/ChangeFieldType/IndexSetsTable';
 import usePutFieldTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
@@ -35,6 +36,9 @@ import type { FieldTypePutResponse, FieldTypePutResponseJson } from 'views/logic
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import type { Stream } from 'logic/streams/types';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
+import ModalSubmit from 'components/common/ModalSubmit';
 
 const StyledSelect = styled(Select)`
   width: 400px;
@@ -49,7 +53,6 @@ const StyledLabel = styled.h5`
 const failureStreamId = '000000000000000000000004';
 
 type Props = {
-  show: boolean;
   onClose: () => void;
   onSubmitCallback?: (params: FieldTypePutResponse) => void;
   initialSelectedIndexSets: Array<string>;
@@ -59,7 +62,6 @@ type Props = {
     type?: string;
     fieldName?: string;
   };
-  initialSelectionDataLoaded?: boolean;
 };
 
 const FailureStreamLink = () => {
@@ -87,23 +89,23 @@ const FailureStreamLink = () => {
   );
 };
 
+export type FormValues = { field: string; field_type: string; rotate: boolean };
+
 const ChangeFieldTypeModal = ({
-  show,
   onSubmitCallback = undefined,
   initialSelectedIndexSets,
   onClose,
   showSelectionTable = true,
   showFieldSelect = false,
   initialData = { fieldName: undefined, type: undefined },
-  initialSelectionDataLoaded = true,
 }: Props) => {
-  const [{ fieldName, type }, setModalData] = useState<{ fieldName?: string; type?: string }>(initialData);
   const {
     data: { fieldTypes },
     isLoading: isLoadingFieldTypes,
   } = useFieldTypesForMappings();
   const sendTelemetry = useSendTelemetry();
-  const [rotated, setRotated] = useState(true);
+  const currentUser = useCurrentUser();
+  const hasFailureStreamAccess = isPermitted(currentUser.permissions, `streams:read:${failureStreamId}`);
   const fieldTypeOptions = useMemo(
     () =>
       Object.entries(fieldTypes)
@@ -115,14 +117,12 @@ const ChangeFieldTypeModal = ({
     [fieldTypes],
   );
 
-  const [indexSetSelection, setIndexSetSelection] = useState<Array<string>>();
+  const [indexSetSelection, setIndexSetSelection] = useState<Array<string>>(initialSelectedIndexSets);
 
   const { putFieldTypeMutation, isLoading: fieldTypeMutationIsLoading } = usePutFieldTypeMutation();
 
   const onSubmit = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
-
+    ({ rotate: rotated, field_type: type, field: fieldName }: FormValues) => {
       putFieldTypeMutation({
         indexSetSelection,
         newFieldType: type,
@@ -153,21 +153,14 @@ const ChangeFieldTypeModal = ({
         .then(() => onClose());
     },
     [
-      fieldName,
       indexSetSelection,
       initialSelectedIndexSets.length,
       onClose,
       onSubmitCallback,
       putFieldTypeMutation,
-      rotated,
       sendTelemetry,
-      type,
     ],
   );
-
-  const onChangeFieldType = useCallback((value: string) => {
-    setModalData((cur) => ({ ...cur, type: value }));
-  }, []);
 
   useEffect(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.CHANGE_FIELD_TYPE_OPENED, {
@@ -182,84 +175,137 @@ const ChangeFieldTypeModal = ({
     onClose();
   }, [onClose, sendTelemetry]);
 
-  useEffect(() => {
-    setIndexSetSelection(initialSelectedIndexSets);
-  }, [initialSelectedIndexSets, setIndexSetSelection]);
+  const initialValues = useMemo<FormValues>(
+    () => ({ field: initialData?.fieldName, field_type: initialData?.type, rotate: true }),
+    [initialData?.fieldName, initialData?.type],
+  );
 
   return (
-    <BootstrapModalForm
-      title={<span>Change {fieldName} Field Type</span>}
-      submitButtonText={fieldTypeMutationIsLoading ? 'Changing field type...' : 'Change field type'}
-      onSubmitForm={onSubmit}
-      onCancel={onCancel}
-      show={show}
-      bsSize="large"
-      submitButtonDisabled={fieldTypeMutationIsLoading || !indexSetSelection?.length}>
-      <div>
-        {showFieldSelect && (
-          <FieldSelect indexSetId={initialSelectedIndexSets[0]} onFieldChange={setModalData} field={fieldName} />
-        )}
-        <Alert bsStyle="warning">
-          Changing the type of the field <b>{fieldName}</b> can have a significant impact on the ingestion of future log
-          messages. If you declare a field to have a type which is incompatible with the logs you are ingesting, it can
-          lead to ingestion errors. It is recommended to enable{' '}
-          <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} displayIcon text="Failure Processing" /> and watch
-          the <FailureStreamLink /> stream closely afterwards.
-        </Alert>
-        <StyledLabel>{`Select Field Type For ${fieldName || 'Field'}`}</StyledLabel>
-        <Input id="field_type">
-          <StyledSelect
-            inputId="field_type"
-            options={fieldTypeOptions}
-            value={type}
-            onChange={onChangeFieldType}
-            placeholder="Select field type"
-            disabled={isLoadingFieldTypes}
-            aria-label="Select Field Type For Field"
-            required
-          />
-        </Input>
-        {showSelectionTable && initialSelectionDataLoaded && (
-          <>
-            <StyledLabel>Select Targeted Index Sets</StyledLabel>
+    <Formik onSubmit={onSubmit} initialValues={initialValues}>
+      {({ values: { field: fieldName, field_type: type } }) => (
+        <Form>
+          <Modal.Header>
+            <Modal.Title>
+              <span>Change {fieldName} Field Type</span>
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {showFieldSelect && (
+              <Field name="field">
+                {({ field: { value, name } }) => (
+                  <FieldSelect indexSetId={initialSelectedIndexSets[0]} name={name} field={value} />
+                )}
+              </Field>
+            )}
+            <Alert bsStyle="warning">
+              Changing the type of the field <b>{fieldName}</b> can have a significant impact on the ingestion of future
+              log messages. If you declare a field to have a type which is incompatible with the logs you are ingesting,
+              it can lead to ingestion errors.
+              {hasFailureStreamAccess && (
+                <>
+                  It is recommended to enable{' '}
+                  <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} displayIcon text="Failure Processing" />{' '}
+                  and watch the <FailureStreamLink /> stream closely afterwards.
+                </>
+              )}
+            </Alert>
+            <StyledLabel>{`Select Field Type For ${fieldName || 'Field'}`}</StyledLabel>
+            <Field name="field_type">
+              {({ field: { name, value, onChange } }) => (
+                <Input id={name}>
+                  <StyledSelect
+                    inputId={name}
+                    options={fieldTypeOptions}
+                    name={name}
+                    onChange={(newValue) => onChange({ target: { name, value: newValue } })}
+                    value={value}
+                    placeholder="Select field type"
+                    disabled={isLoadingFieldTypes}
+                    aria-label="Select Field Type For Field"
+                    required
+                  />
+                </Input>
+              )}
+            </Field>
+            {showSelectionTable && (
+              <>
+                <StyledLabel>Select Targeted Index Sets</StyledLabel>
+                <p>
+                  By default the {type ? <b>{type}</b> : 'selected'} field type will be set for the <b>{fieldName}</b>{' '}
+                  field in all index sets of the current message/search. You can select for which index sets you would
+                  like to make the change.
+                </p>
+                <IndexSetsTable
+                  field={fieldName}
+                  setIndexSetSelection={setIndexSetSelection}
+                  fieldTypes={fieldTypes}
+                  initialSelection={initialSelectedIndexSets}
+                />
+              </>
+            )}
+            <StyledLabel>Select Rotation Strategy</StyledLabel>
             <p>
-              By default the {type ? <b>{type}</b> : 'selected'} field type will be set for the <b>{fieldName}</b> field
-              in all index sets of the current message/search. You can select for which index sets you would like to
-              make the change.
+              To see and use the {type ? <b>{type}</b> : 'selected field type'} as a field type
+              {fieldName ? (
+                <>
+                  {' '}
+                  for <b>{fieldName}</b>
+                </>
+              ) : (
+                ''
+              )}
+              , you have to rotate indices. You can automatically rotate affected indices after submitting this form or
+              do that manually later.
             </p>
-            <IndexSetsTable
-              field={fieldName}
-              setIndexSetSelection={setIndexSetSelection}
-              fieldTypes={fieldTypes}
-              initialSelection={initialSelectedIndexSets}
+            <Field name="rotate">
+              {({ field: { name, onChange } }) => (
+                <FormikInput
+                  type="checkbox"
+                  label="Rotate affected indices after change"
+                  id={name}
+                  name={name}
+                  onChange={onChange}
+                />
+              )}
+            </Field>
+          </Modal.Body>
+          <Modal.Footer>
+            <ModalSubmit
+              disabledSubmit={fieldTypeMutationIsLoading || !indexSetSelection?.length}
+              onCancel={onCancel}
+              submitButtonText={fieldTypeMutationIsLoading ? 'Changing field type...' : 'Change field type'}
             />
-          </>
-        )}
-        <StyledLabel>Select Rotation Strategy</StyledLabel>
-        <p>
-          To see and use the {type ? <b>{type}</b> : 'selected field type'} as a field type
-          {fieldName ? (
-            <>
-              {' '}
-              for <b>{fieldName}</b>
-            </>
-          ) : (
-            ''
-          )}
-          , you have to rotate indices. You can automatically rotate affected indices after submitting this form or do
-          that manually later.
-        </p>
-        <Input
-          type="checkbox"
-          id="rotate"
-          name="rotate"
-          label="Rotate affected indices after change"
-          onChange={() => setRotated((cur) => !cur)}
-          checked={rotated}
-        />
-      </div>
-    </BootstrapModalForm>
+          </Modal.Footer>
+        </Form>
+      )}
+    </Formik>
   );
 };
 
-export default ChangeFieldTypeModal;
+const LoadingBarrier = ({
+  isLoading = false,
+  show,
+  onSubmitCallback = undefined,
+  initialSelectedIndexSets,
+  onClose,
+  showSelectionTable = true,
+  showFieldSelect = false,
+  initialData = { fieldName: undefined, type: undefined },
+}: Props & { isLoading?: boolean; show: boolean }) => (
+  <Modal show={show} bsSize="large" onHide={onClose}>
+    {isLoading ? (
+      <Spinner />
+    ) : (
+      <ChangeFieldTypeModal
+        onClose={onClose}
+        initialSelectedIndexSets={initialSelectedIndexSets}
+        onSubmitCallback={onSubmitCallback}
+        showSelectionTable={showSelectionTable}
+        showFieldSelect={showFieldSelect}
+        initialData={initialData}
+      />
+    )}
+  </Modal>
+);
+
+export default LoadingBarrier;

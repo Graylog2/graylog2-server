@@ -94,9 +94,19 @@ const SearchArea = styled(PageContentLayout)(() => {
 
 const ConnectedSidebar = (props: Omit<React.ComponentProps<typeof Sidebar>, 'results' | 'title'>) => {
   const results = useViewsSelector(selectCurrentQueryResults);
-  const title = useViewTitle();
+  const searchPageLayout = useSearchPageLayout();
+  const viewTitle = useViewTitle();
+  const title = searchPageLayout?.sidebar?.title ?? viewTitle;
 
-  return <Sidebar results={results} title={title} {...props} />;
+  return (
+    <Sidebar
+      results={results}
+      title={title}
+      sections={searchPageLayout?.sidebar?.sections}
+      contentColumnWidth={searchPageLayout?.sidebar?.contentColumnWidth}
+      {...props}
+    />
+  );
 };
 
 const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode }) => {

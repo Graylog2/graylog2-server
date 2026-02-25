@@ -33,15 +33,15 @@ const ChangeFieldType = ({ field, onClose }: ActionComponentProps) => {
 
   const { list, isLoading } = useInitialSelection();
 
-  return show ? (
+  return (
     <ChangeFieldTypeModal
       initialSelectedIndexSets={list}
       onClose={handleOnClose}
       initialData={{ fieldName: field }}
-      show
-      initialSelectionDataLoaded={!isLoading}
+      show={show}
+      isLoading={isLoading}
     />
-  ) : null;
+  );
 };
 
 const hasMappingPermission = (currentUser: User) => isPermitted(currentUser?.permissions, 'typemappings:edit');

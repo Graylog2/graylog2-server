@@ -40,16 +40,6 @@ class ContentPackEditParameter extends React.Component<
     parameterToEdit: undefined,
   };
 
-  static emptyParameter = {
-    name: '',
-    title: '',
-    description: '',
-    type: 'string',
-    default_value: '',
-  };
-
-  private titleInput: Input;
-
   constructor(props: ContentPackEditParameterProps) {
     super(props);
 
@@ -61,6 +51,16 @@ class ContentPackEditParameter extends React.Component<
       descrError: undefined,
     };
   }
+
+  static emptyParameter = {
+    name: '',
+    title: '',
+    description: '',
+    type: 'string',
+    default_value: '',
+  };
+
+  private titleInput: Input;
 
   addNewParameter = (e: React.FormEvent<HTMLFormElement>) => {
     if (e) {

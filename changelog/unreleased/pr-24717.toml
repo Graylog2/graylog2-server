@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix protocol version negotiation for MCP server."
+
+issues = ["24701"]
+pulls = ["24717"]

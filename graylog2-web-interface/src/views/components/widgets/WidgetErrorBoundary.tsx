@@ -27,13 +27,13 @@ type Props = {
 } & { [key: string]: any };
 
 export default class WidgetErrorBoundary extends React.Component<Props, State> {
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+
   constructor(props: Props) {
     super(props);
     this.state = {};
-  }
-
-  static getDerivedStateFromError(error: Error) {
-    return { error };
   }
 
   render() {

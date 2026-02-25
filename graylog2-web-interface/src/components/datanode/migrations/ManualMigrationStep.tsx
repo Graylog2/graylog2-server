@@ -23,12 +23,7 @@ import InPlaceMigration from 'components/datanode/migrations/InPlaceMigration';
 import useMigrationState from 'components/datanode/hooks/useMigrationState';
 import type { MigrationActions, StepArgs } from 'components/datanode/Types';
 import useTriggerMigrationState from 'components/datanode/hooks/useTriggerMigrationState';
-import {
-  IN_PLACE_MIGRATION_STEPS,
-  MIGRATION_STATE,
-  REMOTE_REINDEXING_MIGRATION_STEPS,
-} from 'components/datanode/Constants';
-import RemoteReindexingMigration from 'components/datanode/migrations/RemoteReindexingMigration';
+import { IN_PLACE_MIGRATION_STEPS, MIGRATION_STATE } from 'components/datanode/Constants';
 import MigrationError from 'components/datanode/migrations/common/MigrationError';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -37,24 +32,26 @@ const ManualMigrationStep = () => {
   const { currentStep } = useMigrationState();
   const { onTriggerNextState } = useTriggerMigrationState();
   const sendTelemetry = useSendTelemetry();
+  const inPlaceMigrationAction: MigrationActions = 'SELECT_ROLLING_UPGRADE_MIGRATION';
 
   const onMigrationStepChange = async (step: MigrationActions, args?: StepArgs = {}) =>
     onTriggerNextState({ step, args });
 
   const handleSelectMigrationType = async (step: MigrationActions, args?: StepArgs = {}) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.MIGRATION_TYPE_SELECTED, {
-      app_pathname: 'datanode',
-      app_section: 'migration',
-      event_details: { migration_type: step === 'SELECT_ROLLING_UPGRADE_MIGRATION' ? 'IN-PLACE' : 'REMOTE REINDEX' },
-    });
+    if (step === inPlaceMigrationAction) {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.MIGRATION_TYPE_SELECTED, {
+        app_pathname: 'datanode',
+        app_section: 'migration',
+        event_details: { migration_type: 'IN-PLACE' },
+      });
+    }
 
     return onTriggerNextState({ step, args });
   };
 
-  const migrationTypeOptions = [
-    { label: 'In-Place migration', value: 'SELECT_ROLLING_UPGRADE_MIGRATION' },
-    { label: 'Remote Re-indexing Migration', value: 'SELECT_REMOTE_REINDEX_MIGRATION' },
-  ].filter((path) => currentStep.next_steps.includes(path.value));
+  const migrationTypeOptions = [{ label: 'In-Place migration', value: inPlaceMigrationAction }].filter((path) =>
+    currentStep.next_steps.includes(path.value),
+  );
 
   return (
     <>
@@ -84,9 +81,6 @@ const ManualMigrationStep = () => {
       <MigrationError errorMessage={currentStep.error_message} />
       {currentStep && IN_PLACE_MIGRATION_STEPS.includes(currentStep.state) && (
         <InPlaceMigration onTriggerStep={onMigrationStepChange} currentStep={currentStep} />
-      )}
-      {currentStep && REMOTE_REINDEXING_MIGRATION_STEPS.includes(currentStep.state) && (
-        <RemoteReindexingMigration onTriggerStep={onMigrationStepChange} currentStep={currentStep} />
       )}
     </>
   );

@@ -71,7 +71,7 @@ public class IndexerOverviewService {
 
         return IndexerOverview.create(deflectorSummary,
                 IndexerClusterOverview.create(indexerClusterResource.clusterHealth(), indexerClusterResource.clusterName().name()),
-                MessageCountResponse.create(counts.total(indexSet)),
+                new MessageCountResponse(counts.total(indexSet)),
                 indicesSummaries);
     }
 

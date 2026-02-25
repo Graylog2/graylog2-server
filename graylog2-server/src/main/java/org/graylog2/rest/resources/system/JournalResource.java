@@ -18,8 +18,8 @@ package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
 import com.github.joschi.jadconfig.util.Size;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.shaded.kafka09.log.LogSegment;
@@ -45,7 +45,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
 @RequiresAuthentication
-@Api(value = "System/Journal", description = "Message journal information of this node.")
+@Tag(name = "System/Journal", description = "Message journal information of this node.")
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/system/journal")
 public class JournalResource extends RestResource {
@@ -63,7 +63,7 @@ public class JournalResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get current state of the journal on this node.")
+    @Operation(summary = "Get current state of the journal on this node.")
     @RequiresPermissions(RestPermissions.JOURNAL_READ)
     public JournalSummaryResponse show() {
         if (!journalEnabled) {

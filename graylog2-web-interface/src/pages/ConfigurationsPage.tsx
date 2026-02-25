@@ -18,8 +18,8 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { Navigate, Routes, Route, useResolvedPath } from 'react-router-dom';
 import URI from 'urijs';
-import type { CoreSystemConfiguration } from 'src/views/types';
 
+import type { CoreSystemConfiguration } from 'views/types';
 import ConfigletRow from 'pages/configurations/ConfigletRow';
 import { Col, Nav, NavItem } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Icon } from 'components/common';

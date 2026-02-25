@@ -30,7 +30,7 @@ import {
 import ExtractorUtils from 'util/ExtractorUtils';
 
 type Props = {
-  extractorType: any[];
+  extractorType: string;
   configuration: any;
   onChange: (...args: any[]) => void;
   exampleMessage?: string;
@@ -142,6 +142,7 @@ class EditExtractorConfiguration extends React.Component<
 
         break;
       default:
+        // eslint-disable-next-line no-console
         console.warn(`Unsupported extractor type ${this.props.extractorType}`);
     }
 

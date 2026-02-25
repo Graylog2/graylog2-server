@@ -46,16 +46,16 @@ import static org.mockito.Mockito.when;
 
 class PipelineMetadataUpdaterTest {
 
-    private MongoDbPipelineMetadataService pipelineMetadataService = mock(MongoDbPipelineMetadataService.class);
-    private MongoDbInputsMetadataService inputsMetadataService = mock(MongoDbInputsMetadataService.class);
-    private PipelineService pipelineService = mock(PipelineService.class);
+    private final MongoDbPipelineMetadataService pipelineMetadataService = mock(MongoDbPipelineMetadataService.class);
+    private final MongoDbInputsMetadataService inputsMetadataService = mock(MongoDbInputsMetadataService.class);
+    private final PipelineService pipelineService = mock(PipelineService.class);
     private PipelineMetadataUpdater updater;
 
-    private PipelineInterpreter.State state = mock(PipelineInterpreter.State.class);
-    private PipelineResolver resolver = mock(PipelineResolver.class);
-    private PipelineMetricRegistry metricRegistry = mock(PipelineMetricRegistry.class);
-    private PipelineAnalyzer pipelineAnalyzer = mock(PipelineAnalyzer.class);
-    private EventBus eventBus = mock(EventBus.class);
+    private final PipelineInterpreter.State state = mock(PipelineInterpreter.State.class);
+    private final PipelineResolver resolver = mock(PipelineResolver.class);
+    private final PipelineMetricRegistry metricRegistry = mock(PipelineMetricRegistry.class);
+    private final PipelineAnalyzer pipelineAnalyzer = mock(PipelineAnalyzer.class);
+    private final EventBus eventBus = mock(EventBus.class);
 
     @BeforeEach
     void setUp() throws NotFoundException {
