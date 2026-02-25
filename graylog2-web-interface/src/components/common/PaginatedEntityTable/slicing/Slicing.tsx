@@ -37,7 +37,7 @@ export type Slices = Array<Slice>;
 
 const Container = styled.div(
   ({ theme }) => css`
-    min-width: 300px;
+    width: 400px;
     border-right: 1px solid ${theme.colors.gray[90]};
     padding-right: ${theme.spacings.sm};
   `,
