@@ -19,8 +19,8 @@ package org.graylog.collectors.input;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import org.graylog.collectors.CollectorJournal;
+import org.graylog.collectors.input.debug.OtlpTrafficDump;
 import org.graylog.inputs.otel.OTelJournal;
-import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
@@ -40,8 +40,6 @@ import java.net.InetSocketAddress;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CollectorIngestCodecTest {
@@ -49,16 +47,13 @@ class CollectorIngestCodecTest {
     private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Mock
-    private OtlpTrafficDumpWriter dumpWriter;
-
-    @Mock
-    private FeatureFlags featureFlags;
+    private OtlpTrafficDump dumpWriter;
 
     private CollectorIngestCodec codec;
 
     @BeforeEach
     void setUp() {
-        codec = new CollectorIngestCodec(Configuration.EMPTY_CONFIGURATION, messageFactory, dumpWriter, featureFlags);
+        codec = new CollectorIngestCodec(Configuration.EMPTY_CONFIGURATION, messageFactory, dumpWriter);
     }
 
     @Test
@@ -306,25 +301,12 @@ class CollectorIngestCodecTest {
     }
 
     @Test
-    void dumpsRecordWhenFeatureFlagEnabled() {
-        when(featureFlags.isOn("collector_otlp_traffic_dump")).thenReturn(true);
-        final var enabledCodec = new CollectorIngestCodec(
-                Configuration.EMPTY_CONFIGURATION, messageFactory, dumpWriter, featureFlags);
-
+    void delegatesToDumpWriter() {
         final var collectorRecord = buildCollectorRecord("dump me", "agent-42");
-        final var rawMessage = new RawMessage(collectorRecord.toByteArray());
-        enabledCodec.decodeSafe(rawMessage);
-
-        verify(dumpWriter).write(collectorRecord);
-    }
-
-    @Test
-    void doesNotDumpWhenFeatureFlagDisabled() {
-        final var collectorRecord = buildCollectorRecord("no dump", "agent-99");
         final var rawMessage = new RawMessage(collectorRecord.toByteArray());
         codec.decodeSafe(rawMessage);
 
-        verifyNoInteractions(dumpWriter);
+        verify(dumpWriter).write(collectorRecord);
     }
 
     private static CollectorJournal.Record buildCollectorRecord(String body, String agentUid) {

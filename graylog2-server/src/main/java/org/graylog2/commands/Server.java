@@ -234,7 +234,7 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                 new QuickJumpModule(featureFlags),
                 new MongoSequenceModule(),
                 new OpAmpModule(),
-                new CollectorsModule()
+                new CollectorsModule(featureFlags)
         );
 
         modules.add(new FieldTypeManagementModule());

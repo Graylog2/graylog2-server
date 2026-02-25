@@ -14,8 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.input;
+package org.graylog.collectors.input.debug;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.protobuf.util.JsonFormat;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -36,15 +38,17 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static org.apache.logging.log4j.Level.INFO;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
- * Writes {@link CollectorJournal.Record} protobuf messages as NDJSON to a rotating file
- * for development debugging. Thread safety is handled by the underlying Log4j 2 appender.
+ * {@link OtlpTrafficDump} backed by a Log4j 2 {@link RollingFileAppender} that writes
+ * {@link CollectorJournal.Record} protobuf messages as NDJSON. The appender is created on
+ * {@link #startUp()} and torn down on {@link #shutDown()}.
  */
 @Singleton
-public class OtlpTrafficDumpWriter {
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(OtlpTrafficDumpWriter.class);
+public class OtlpTrafficDumpService extends AbstractIdleService implements OtlpTrafficDump {
+    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(OtlpTrafficDumpService.class);
 
     private static final String APPENDER_NAME = "otlp-traffic-dump";
     private static final String LOGGER_NAME = "otlp-traffic-dump";
@@ -55,37 +59,47 @@ public class OtlpTrafficDumpWriter {
     private static final int MAX_ROLLOVER_FILES = 20;
 
     private final JsonFormat.Printer jsonPrinter;
-    private final Logger dumpLogger;
-    private final Appender appender;
+    private final Path dumpDir;
     private final LoggerContext loggerContext;
 
+    private Appender appender;
+    private Logger dumpLogger;
+
     @Inject
-    public OtlpTrafficDumpWriter(PathConfiguration pathConfiguration) {
+    public OtlpTrafficDumpService(PathConfiguration pathConfiguration) {
         this(pathConfiguration.getDataDir().resolve(DUMP_DIR_NAME));
     }
 
-    // Visible for testing
-    OtlpTrafficDumpWriter(Path dumpDir) {
+    @VisibleForTesting
+    OtlpTrafficDumpService(Path dumpDir) {
         this.jsonPrinter = JsonFormat.printer().omittingInsignificantWhitespace();
+        this.dumpDir = dumpDir;
         this.loggerContext = (LoggerContext) LogManager.getContext(false);
-        this.appender = createAppender(dumpDir, loggerContext);
-        this.dumpLogger = createDumpLogger(loggerContext, appender);
     }
 
+    @Override
     public void write(CollectorJournal.Record record) {
         try {
-            final var json = jsonPrinter.print(record);
-            dumpLogger.info(json);
+            dumpLogger.info(jsonPrinter.print(record));
         } catch (Exception e) {
             LOG.warn("Failed to write OTLP traffic dump", e);
         }
     }
 
-    public void stop() {
+    @Override
+    protected void startUp() throws Exception {
+        this.appender = createAppender(dumpDir, loggerContext);
+        this.dumpLogger = createDumpLogger(loggerContext, appender);
+        LOG.info("OTLP traffic dump enabled, writing to {}", dumpDir);
+    }
+
+    @Override
+    protected void shutDown() throws Exception {
         appender.stop();
         final var config = loggerContext.getConfiguration();
         config.removeLogger(LOGGER_NAME);
         loggerContext.updateLoggers();
+        LOG.info("OTLP traffic dump stopped");
     }
 
     private static Appender createAppender(Path dumpDir, LoggerContext ctx) {
@@ -126,8 +140,8 @@ public class OtlpTrafficDumpWriter {
     private static Logger createDumpLogger(LoggerContext ctx, Appender appender) {
         final var config = ctx.getConfiguration();
 
-        final var loggerConfig = new LoggerConfig(LOGGER_NAME, org.apache.logging.log4j.Level.INFO, false);
-        loggerConfig.addAppender(appender, org.apache.logging.log4j.Level.INFO, null);
+        final var loggerConfig = new LoggerConfig(LOGGER_NAME, INFO, false);
+        loggerConfig.addAppender(appender, INFO, null);
         config.addLogger(LOGGER_NAME, loggerConfig);
         ctx.updateLoggers();
 

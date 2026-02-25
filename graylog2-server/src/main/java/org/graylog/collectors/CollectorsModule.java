@@ -24,7 +24,9 @@ import org.graylog.collectors.db.WindowsEventLogSourceConfig;
 import org.graylog.collectors.input.CollectorIngestCodec;
 import org.graylog.collectors.input.CollectorIngestGrpcInput;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
-import org.graylog.collectors.input.OtlpTrafficDumpWriter;
+import org.graylog.collectors.input.debug.NoOpOtlpTrafficDump;
+import org.graylog.collectors.input.debug.OtlpTrafficDump;
+import org.graylog.collectors.input.debug.OtlpTrafficDumpService;
 import org.graylog.collectors.input.transport.CollectorIngestGrpcTransport;
 import org.graylog.collectors.input.transport.CollectorIngestHttpTransport;
 import org.graylog.collectors.input.transport.CollectorIngestLogsService;
@@ -34,9 +36,18 @@ import org.graylog.collectors.rest.FleetPermissions;
 import org.graylog.collectors.rest.FleetResource;
 import org.graylog.collectors.rest.SourceResource;
 import org.graylog2.database.SequenceTopics;
+import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.PluginModule;
 
 public class CollectorsModule extends PluginModule {
+    private static final String OTLP_DUMP_FLAG = "collector_otlp_traffic_dump";
+
+    private final boolean otlpDumpEnabled;
+
+    public CollectorsModule(FeatureFlags featureFlags) {
+        this.otlpDumpEnabled = featureFlags.isOn(OTLP_DUMP_FLAG);
+    }
+
     @Override
     protected void configure() {
         // Fleet transaction log
@@ -49,7 +60,13 @@ public class CollectorsModule extends PluginModule {
         addTransport(CollectorIngestGrpcTransport.NAME, CollectorIngestGrpcTransport.class);
         addTransport(CollectorIngestHttpTransport.NAME, CollectorIngestHttpTransport.class);
         addCodec(CollectorIngestCodec.NAME, CollectorIngestCodec.class);
-        bind(OtlpTrafficDumpWriter.class);
+
+        if (otlpDumpEnabled) {
+            bind(OtlpTrafficDump.class).to(OtlpTrafficDumpService.class).asEagerSingleton();
+            addInitializer(OtlpTrafficDumpService.class);
+        } else {
+            bind(OtlpTrafficDump.class).to(NoOpOtlpTrafficDump.class);
+        }
 
         install(new FactoryModuleBuilder().build(CollectorIngestLogsService.Factory.class));
 

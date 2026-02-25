@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.input;
+package org.graylog.collectors.input.debug;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.opentelemetry.proto.common.v1.AnyValue;
@@ -30,22 +30,23 @@ import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class OtlpTrafficDumpWriterTest {
+class OtlpTrafficDumpServiceTest {
 
     @TempDir
     Path tempDir;
-    private OtlpTrafficDumpWriter writer;
+    private OtlpTrafficDumpService service;
 
     @BeforeEach
-    void setUp() {
-        writer = new OtlpTrafficDumpWriter(tempDir);
+    void setUp() throws Exception {
+        service = new OtlpTrafficDumpService(tempDir);
+        service.startUp();
     }
 
     @Test
     void writesCollectorRecordAsNdjsonLine() throws Exception {
         final var record = buildCollectorRecord("test message", "agent-1");
-        writer.write(record);
-        writer.stop();
+        service.write(record);
+        service.shutDown();
 
         final var dumpFile = tempDir.resolve("collector-otlp-dump.ndjson");
         assertThat(dumpFile).exists();
@@ -57,9 +58,9 @@ class OtlpTrafficDumpWriterTest {
 
     @Test
     void writesMultipleRecordsAsMultipleLines() throws Exception {
-        writer.write(buildCollectorRecord("msg1", "agent-1"));
-        writer.write(buildCollectorRecord("msg2", "agent-2"));
-        writer.stop();
+        service.write(buildCollectorRecord("msg1", "agent-1"));
+        service.write(buildCollectorRecord("msg2", "agent-2"));
+        service.shutDown();
 
         final var dumpFile = tempDir.resolve("collector-otlp-dump.ndjson");
         final var lines = Files.readAllLines(dumpFile);
@@ -68,10 +69,13 @@ class OtlpTrafficDumpWriterTest {
 
     @Test
     void createsDirectoryIfNotExists() throws Exception {
+        service.shutDown();
+
         final var nestedDir = tempDir.resolve("sub/dir");
-        final var writerInNested = new OtlpTrafficDumpWriter(nestedDir);
-        writerInNested.write(buildCollectorRecord("test", "agent-1"));
-        writerInNested.stop();
+        final var nestedService = new OtlpTrafficDumpService(nestedDir);
+        nestedService.startUp();
+        nestedService.write(buildCollectorRecord("test", "agent-1"));
+        nestedService.shutDown();
 
         assertThat(nestedDir.resolve("collector-otlp-dump.ndjson")).exists();
     }
@@ -79,8 +83,8 @@ class OtlpTrafficDumpWriterTest {
     @Test
     void outputIsValidJson() throws Exception {
         final var record = buildCollectorRecord("hello world", "agent-42");
-        writer.write(record);
-        writer.stop();
+        service.write(record);
+        service.shutDown();
 
         final var dumpFile = tempDir.resolve("collector-otlp-dump.ndjson");
         final var line = Files.readAllLines(dumpFile).getFirst();
