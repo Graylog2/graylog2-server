@@ -31,6 +31,18 @@ const SliceInner = styled.div`
   justify-content: space-between;
 `;
 
+const Title = styled.div`
+  word-break: break-word;
+`;
+
+const CountBadge = styled(Badge)`
+  overflow: visible;
+
+  .mantine-Badge-label {
+    overflow: visible;
+  }
+`;
+
 type Props = {
   slices: Slices;
   activeSlice: string | undefined;
@@ -57,8 +69,9 @@ const SliceList = ({
         onClick={() => onChangeSlicing(sliceCol, String(slice.value))}
         active={String(activeSlice) === String(slice.value)}>
         <SliceInner>
-          {sliceRenderers?.[sliceCol]?.render?.(slice.value) ?? slice.title ?? String(slice.value)}
-          <Badge>{slice.count}</Badge>
+          <Title>{sliceRenderers?.[sliceCol]?.render?.(slice.value) ?? slice.title ?? String(slice.value)}</Title>
+
+          <CountBadge>{slice.count}</CountBadge>
         </SliceInner>
       </ListGroupItem>
     ))}
