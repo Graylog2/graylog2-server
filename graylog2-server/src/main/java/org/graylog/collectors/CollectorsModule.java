@@ -24,6 +24,7 @@ import org.graylog.collectors.db.WindowsEventLogSourceConfig;
 import org.graylog.collectors.input.CollectorIngestCodec;
 import org.graylog.collectors.input.CollectorIngestGrpcInput;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
+import org.graylog.collectors.input.OtlpTrafficDumpWriter;
 import org.graylog.collectors.input.transport.CollectorIngestGrpcTransport;
 import org.graylog.collectors.input.transport.CollectorIngestHttpTransport;
 import org.graylog.collectors.input.transport.CollectorIngestLogsService;
@@ -48,6 +49,7 @@ public class CollectorsModule extends PluginModule {
         addTransport(CollectorIngestGrpcTransport.NAME, CollectorIngestGrpcTransport.class);
         addTransport(CollectorIngestHttpTransport.NAME, CollectorIngestHttpTransport.class);
         addCodec(CollectorIngestCodec.NAME, CollectorIngestCodec.class);
+        bind(OtlpTrafficDumpWriter.class);
 
         install(new FactoryModuleBuilder().build(CollectorIngestLogsService.Factory.class));
 
