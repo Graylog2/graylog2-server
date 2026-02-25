@@ -185,7 +185,8 @@ const deferred = () => {
   return { promise, resolve: resolve! };
 };
 
-const buildCurrentUser = (permissions: Array<Permission>) => mockDefaultUser.toBuilder().permissions(permissions).build();
+const buildCurrentUser = (permissions: Array<Permission>) =>
+  mockDefaultUser.toBuilder().permissions(permissions).build();
 
 describe('Stage', () => {
   let queryClient: QueryClient;
@@ -215,13 +216,25 @@ describe('Stage', () => {
 
     asMock(useCurrentUser).mockReturnValue(buildCurrentUser(['pipeline:edit']));
     rerender(
-      <Stage stage={stage} pipeline={makePipeline('Default Routing')} isLastStage onUpdate={jest.fn()} onDelete={jest.fn()} />,
+      <Stage
+        stage={stage}
+        pipeline={makePipeline('Default Routing')}
+        isLastStage
+        onUpdate={jest.fn()}
+        onDelete={jest.fn()}
+      />,
     );
     expect(screen.getByTestId('can-remove-routing-rules')).toHaveTextContent('false');
 
     asMock(useCurrentUser).mockReturnValue(buildCurrentUser(['pipeline:edit', 'pipeline_rule:delete']));
     rerender(
-      <Stage stage={stage} pipeline={makePipeline('Another Pipeline')} isLastStage onUpdate={jest.fn()} onDelete={jest.fn()} />,
+      <Stage
+        stage={stage}
+        pipeline={makePipeline('Another Pipeline')}
+        isLastStage
+        onUpdate={jest.fn()}
+        onDelete={jest.fn()}
+      />,
     );
     expect(screen.getByTestId('can-remove-routing-rules')).toHaveTextContent('false');
   });
