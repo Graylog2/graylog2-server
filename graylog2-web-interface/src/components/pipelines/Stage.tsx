@@ -55,8 +55,7 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete, disableEdit =
   );
 
   const canRemoveRoutingRules =
-    pipeline.title === DEFAULT_ROUTING_PIPELINE &&
-    isPermitted(currentUser.permissions, 'pipeline_rule:delete');
+    pipeline.title === DEFAULT_ROUTING_PIPELINE && isPermitted(currentUser.permissions, 'pipeline_rule:delete');
 
   const openRemoveRoutingRuleDialog = useCallback(
     (rule: RuleType) => {
@@ -178,7 +177,9 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete, disableEdit =
           onConfirm={confirmRemoveRoutingRule}
           onCancel={closeRemoveRoutingRuleDialog}
           btnConfirmText="Remove">
-          <span>Do you really want to remove routing rule <b>{rulePendingRemoval.title}</b>?</span>
+          <span>
+            Do you really want to remove routing rule <b>{rulePendingRemoval.title}</b>?
+          </span>
         </ConfirmDialog>
       )}
     </>
