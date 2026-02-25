@@ -16,10 +16,10 @@
  */
 package org.graylog.collectors.input.debug;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.protobuf.util.JsonFormat;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,7 +31,6 @@ import org.apache.logging.log4j.core.appender.rolling.SizeBasedTriggeringPolicy;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.graylog.collectors.CollectorJournal;
-import org.graylog2.configuration.PathConfiguration;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
@@ -66,14 +65,9 @@ public class OtlpTrafficDumpService extends AbstractIdleService implements OtlpT
     private Logger dumpLogger;
 
     @Inject
-    public OtlpTrafficDumpService(PathConfiguration pathConfiguration) {
-        this(pathConfiguration.getDataDir().resolve(DUMP_DIR_NAME));
-    }
-
-    @VisibleForTesting
-    OtlpTrafficDumpService(Path dumpDir) {
+    public OtlpTrafficDumpService(@Named("data_dir") Path dataDir) {
         this.jsonPrinter = JsonFormat.printer().omittingInsignificantWhitespace();
-        this.dumpDir = dumpDir;
+        this.dumpDir = dataDir.resolve(DUMP_DIR_NAME);
         this.loggerContext = (LoggerContext) LogManager.getContext(false);
     }
 

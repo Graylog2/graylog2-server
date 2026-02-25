@@ -32,6 +32,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class OtlpTrafficDumpServiceTest {
 
+    private static final String DUMP_FILE = "collector-otlp-dump/collector-otlp-dump.ndjson";
+
     @TempDir
     Path tempDir;
     private OtlpTrafficDumpService service;
@@ -48,7 +50,7 @@ class OtlpTrafficDumpServiceTest {
         service.write(record);
         service.shutDown();
 
-        final var dumpFile = tempDir.resolve("collector-otlp-dump.ndjson");
+        final var dumpFile = tempDir.resolve(DUMP_FILE);
         assertThat(dumpFile).exists();
         final var lines = Files.readAllLines(dumpFile);
         assertThat(lines).hasSize(1);
@@ -62,22 +64,22 @@ class OtlpTrafficDumpServiceTest {
         service.write(buildCollectorRecord("msg2", "agent-2"));
         service.shutDown();
 
-        final var dumpFile = tempDir.resolve("collector-otlp-dump.ndjson");
+        final var dumpFile = tempDir.resolve(DUMP_FILE);
         final var lines = Files.readAllLines(dumpFile);
         assertThat(lines).hasSize(2);
     }
 
     @Test
-    void createsDirectoryIfNotExists() throws Exception {
+    void createsDumpDirectoryIfNotExists() throws Exception {
         service.shutDown();
 
-        final var nestedDir = tempDir.resolve("sub/dir");
-        final var nestedService = new OtlpTrafficDumpService(nestedDir);
+        final var dataDir = tempDir.resolve("sub/dir");
+        final var nestedService = new OtlpTrafficDumpService(dataDir);
         nestedService.startUp();
         nestedService.write(buildCollectorRecord("test", "agent-1"));
         nestedService.shutDown();
 
-        assertThat(nestedDir.resolve("collector-otlp-dump.ndjson")).exists();
+        assertThat(dataDir.resolve("collector-otlp-dump/collector-otlp-dump.ndjson")).exists();
     }
 
     @Test
@@ -86,7 +88,7 @@ class OtlpTrafficDumpServiceTest {
         service.write(record);
         service.shutDown();
 
-        final var dumpFile = tempDir.resolve("collector-otlp-dump.ndjson");
+        final var dumpFile = tempDir.resolve(DUMP_FILE);
         final var line = Files.readAllLines(dumpFile).getFirst();
         final var om = new ObjectMapper();
         om.readTree(line);
