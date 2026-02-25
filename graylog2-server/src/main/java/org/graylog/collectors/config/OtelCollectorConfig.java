@@ -31,6 +31,9 @@ import java.util.Map;
 @AutoValue
 public abstract class OtelCollectorConfig {
 
+    // TODO: Add file_storage extension for persisting file offsets, and exporter sending queue
+    // TODO: Add resourcedetection processor to add resource attributes like OS name, version, etc.
+
     @JsonProperty("receivers")
     public abstract Map<String, OtlpReceiverConfig> receivers();
 
