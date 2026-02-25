@@ -20,6 +20,7 @@ import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import org.graylog.collectors.CollectorJournal;
 import org.graylog.inputs.otel.OTelJournal;
+import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
@@ -29,21 +30,35 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class CollectorIngestCodecTest {
 
     private final MessageFactory messageFactory = new TestMessageFactory();
+
+    @Mock
+    private OtlpTrafficDumpWriter dumpWriter;
+
+    @Mock
+    private FeatureFlags featureFlags;
+
     private CollectorIngestCodec codec;
 
     @BeforeEach
     void setUp() {
-        codec = new CollectorIngestCodec(Configuration.EMPTY_CONFIGURATION, messageFactory);
+        codec = new CollectorIngestCodec(Configuration.EMPTY_CONFIGURATION, messageFactory, dumpWriter, featureFlags);
     }
 
     @Test
@@ -288,5 +303,47 @@ class CollectorIngestCodecTest {
         assertThatThrownBy(() -> codec.decodeSafe(rawMessage))
                 .isInstanceOf(InputProcessingException.class)
                 .hasMessageContaining("Error parsing");
+    }
+
+    @Test
+    void dumpsRecordWhenFeatureFlagEnabled() {
+        when(featureFlags.isOn("collector_otlp_traffic_dump")).thenReturn(true);
+        final var enabledCodec = new CollectorIngestCodec(
+                Configuration.EMPTY_CONFIGURATION, messageFactory, dumpWriter, featureFlags);
+
+        final var collectorRecord = buildCollectorRecord("dump me", "agent-42");
+        final var rawMessage = new RawMessage(collectorRecord.toByteArray());
+        enabledCodec.decodeSafe(rawMessage);
+
+        verify(dumpWriter).write(collectorRecord);
+    }
+
+    @Test
+    void doesNotDumpWhenFeatureFlagDisabled() {
+        final var collectorRecord = buildCollectorRecord("no dump", "agent-99");
+        final var rawMessage = new RawMessage(collectorRecord.toByteArray());
+        codec.decodeSafe(rawMessage);
+
+        verifyNoInteractions(dumpWriter);
+    }
+
+    private static CollectorJournal.Record buildCollectorRecord(String body, String agentUid) {
+        final var logRecord = LogRecord.newBuilder()
+                .setBody(AnyValue.newBuilder().setStringValue(body))
+                .setTimeUnixNano(1700000000000000000L)
+                .build();
+
+        final var log = OTelJournal.Log.newBuilder()
+                .setLogRecord(logRecord)
+                .build();
+
+        final var otelRecord = OTelJournal.Record.newBuilder()
+                .setLog(log)
+                .build();
+
+        return CollectorJournal.Record.newBuilder()
+                .setOtelRecord(otelRecord)
+                .setCollectorInstanceUid(agentUid)
+                .build();
     }
 }

@@ -23,6 +23,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.graylog.collectors.CollectorJournal;
 import org.graylog.inputs.otel.OTelJournal;
+import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
@@ -48,13 +49,22 @@ import java.util.Optional;
 public class CollectorIngestCodec implements Codec {
     public static final String NAME = "CollectorIngest";
 
+    private static final String FEATURE_FLAG = "collector_otlp_traffic_dump";
+
     private final Configuration configuration;
     private final MessageFactory messageFactory;
+    private final OtlpTrafficDumpWriter dumpWriter;
+    private final boolean debugDumpEnabled;
 
     @Inject
-    public CollectorIngestCodec(@Assisted Configuration configuration, MessageFactory messageFactory) {
+    public CollectorIngestCodec(@Assisted Configuration configuration,
+                                MessageFactory messageFactory,
+                                OtlpTrafficDumpWriter dumpWriter,
+                                FeatureFlags featureFlags) {
         this.configuration = configuration;
         this.messageFactory = messageFactory;
+        this.dumpWriter = dumpWriter;
+        this.debugDumpEnabled = featureFlags.isOn(FEATURE_FLAG);
     }
 
     @FactoryClass
@@ -86,6 +96,10 @@ public class CollectorIngestCodec implements Codec {
         } catch (InvalidProtocolBufferException e) {
             throw InputProcessingException.create(
                     "Error parsing Collector Ingest message", ExceptionUtils.getRootCause(e), rawMessage);
+        }
+
+        if (debugDumpEnabled) {
+            dumpWriter.write(collectorRecord);
         }
 
         final OTelJournal.Record otelRecord = collectorRecord.getOtelRecord();
