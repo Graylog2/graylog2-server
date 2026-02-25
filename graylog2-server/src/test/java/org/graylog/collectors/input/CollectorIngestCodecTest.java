@@ -53,7 +53,7 @@ class CollectorIngestCodecTest {
 
     @BeforeEach
     void setUp() {
-        codec = new CollectorIngestCodec(Configuration.EMPTY_CONFIGURATION, messageFactory, dumpWriter);
+        codec = new CollectorIngestCodec(Configuration.EMPTY_CONFIGURATION, messageFactory, dumpWriter, Map.of());
     }
 
     @Test

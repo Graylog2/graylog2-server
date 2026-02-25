@@ -20,6 +20,9 @@ import io.opentelemetry.proto.logs.v1.LogRecord;
 
 import java.util.Map;
 
+/**
+ * Processor for OpenTelemetry log records. Maps OTel attributes to GIM fields.
+ */
 public interface LogRecordProcessor {
     Map<String, Object> process(LogRecord logRecord);
 }
