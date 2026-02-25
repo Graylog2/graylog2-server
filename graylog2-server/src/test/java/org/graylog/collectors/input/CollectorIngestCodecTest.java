@@ -21,6 +21,7 @@ import io.opentelemetry.proto.logs.v1.LogRecord;
 import org.graylog.collectors.CollectorJournal;
 import org.graylog.collectors.input.debug.OtlpTrafficDump;
 import org.graylog.inputs.otel.OTelJournal;
+import org.graylog.schema.VendorFields;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
@@ -162,7 +163,7 @@ class CollectorIngestCodecTest {
         final var decoded = codec.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
-        assertThat(decoded.get().getField("level")).isEqualTo("ERROR");
+        assertThat(decoded.get().getField(VendorFields.VENDOR_EVENT_SEVERITY)).isEqualTo("ERROR");
     }
 
     @Test
