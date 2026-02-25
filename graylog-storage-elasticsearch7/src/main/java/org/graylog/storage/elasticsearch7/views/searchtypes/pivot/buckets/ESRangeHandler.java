@@ -44,15 +44,13 @@ public class ESRangeHandler extends ESPivotBucketSpecHandler<RangeBucket> {
         for (final String field : rangeBucket.fields()) {
             final RangeAggregationBuilder builder = AggregationBuilders.range(name).field(field);
             rangeBucket.ranges().forEach(r -> {
-                final Double from = r.from().orElse(null);
-                final Double to = r.to().orElse(null);
-                if (from != null && to != null) {
-                    builder.addRange(from, to);
-                } else if (to != null) {
-                    builder.addUnboundedTo(to);
-                } else if (from != null) {
-                    builder.addUnboundedFrom(from);
-                }
+                r.from().ifPresentOrElse(
+                        from -> r.to().ifPresentOrElse(
+                                to -> builder.addRange(from, to),
+                                () -> builder.addUnboundedFrom(from)
+                        ),
+                        () -> r.to().ifPresent(builder::addUnboundedTo)
+                );
             });
             builder.keyed(false);
 
