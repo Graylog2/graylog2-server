@@ -71,7 +71,7 @@ public abstract class FilelogReceiverConfig implements OtlpReceiverConfig {
 
     @Override
     public List<CollectorOperatorConfig> operators() {
-        return List.of(AddOperatorConfig.of(OtelAttributes.COLLECTOR_RECEIVER_TYPE, RECEIVER_TYPE));
+        return List.of(AddOperatorConfig.forAttribute(OtelAttributes.COLLECTOR_RECEIVER_TYPE, RECEIVER_TYPE));
     }
 
     // TODO: Configure offset storage - otherwise, offsets will only be tracked in memory!

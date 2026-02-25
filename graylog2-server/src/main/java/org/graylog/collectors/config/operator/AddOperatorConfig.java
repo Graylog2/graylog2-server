@@ -22,6 +22,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ValueNode;
 import com.google.auto.value.AutoValue;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 @AutoValue
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 public abstract class AddOperatorConfig implements CollectorOperatorConfig {
@@ -38,15 +40,15 @@ public abstract class AddOperatorConfig implements CollectorOperatorConfig {
     @JsonProperty("value")
     public abstract ValueNode value();
 
-    public static AddOperatorConfig of(String field, String value) {
-        return new AutoValue_AddOperatorConfig(field, OM.convertValue(value, ValueNode.class));
+    public static AddOperatorConfig forAttribute(String field, String value) {
+        return new AutoValue_AddOperatorConfig(f("attributes[\"%s\"]", field), OM.convertValue(value, ValueNode.class));
     }
 
-    public static AddOperatorConfig of(String field, Number value) {
-        return new AutoValue_AddOperatorConfig(field, OM.convertValue(value, ValueNode.class));
+    public static AddOperatorConfig forAttribute(String field, Number value) {
+        return new AutoValue_AddOperatorConfig(f("attributes[\"%s\"]", field), OM.convertValue(value, ValueNode.class));
     }
 
-    public static AddOperatorConfig of(String field, boolean value) {
-        return new AutoValue_AddOperatorConfig(field, OM.convertValue(value, ValueNode.class));
+    public static AddOperatorConfig forAttribute(String field, boolean value) {
+        return new AutoValue_AddOperatorConfig(f("attributes[\"%s\"]", field), OM.convertValue(value, ValueNode.class));
     }
 }
