@@ -129,26 +129,28 @@ class SyslogTCPFramingRouterHandlerTest {
         assertThatExceptionOfType(DecoderException.class)
                 .isThrownBy(() -> channel.writeInbound(buf));
 
-        // Buffer is properly released even after running into an exception
+        // With auto-release disabled, the buffer is held by ByteToMessageDecoder's internal
+        // cumulation until the channel becomes inactive. Close the channel to trigger cleanup.
+        channel.close();
         assertThat(buf.refCnt()).isZero();
     }
 
     @Test
     void testNotWorkingSyslogMessage() throws IOException {
+        channel.finishAndReleaseAll();
         channel = new EmbeddedChannel(new SyslogTCPFramingRouterHandler(380000, Delimiters.lineDelimiter()));
         try (final InputStream is = this.getClass().getResourceAsStream("not_working_syslog_msg_1.txt")) {
             if (is != null) {
                 final byte[] bytes = is.readAllBytes();
-                final String expected = new String(bytes, StandardCharsets.US_ASCII).substring(0, bytes.length - 2);
+                final String expected = new String(bytes, StandardCharsets.US_ASCII).substring(0, bytes.length - 1);
                 final ByteBuf buf = Unpooled.copiedBuffer(bytes);
                 assertThat(channel.writeInbound(buf)).isTrue();
                 final ByteBuf result = channel.readInbound();
-                final String actual = result.readCharSequence(result.maxCapacity() - 1, StandardCharsets.US_ASCII).toString();
+                final String actual = result.readCharSequence(result.readableBytes(), StandardCharsets.US_ASCII).toString();
                 assertThat(actual).isEqualTo(expected);
             } else {
                 fail("Cannot find file.");
             }
         }
-
     }
 }

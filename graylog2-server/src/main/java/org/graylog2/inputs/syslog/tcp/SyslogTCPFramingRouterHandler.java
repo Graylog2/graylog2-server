@@ -20,18 +20,20 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
-
-import java.util.Collection;
-import java.util.LinkedList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SyslogTCPFramingRouterHandler extends SimpleChannelInboundHandler<ByteBuf> {
+    private static final Logger LOG = LoggerFactory.getLogger(SyslogTCPFramingRouterHandler.class);
+
     private final int maxFrameLength;
     private final ByteBuf[] delimiter;
-    private final Collection<ByteBuf> retainedBuffers = new LinkedList<>();
     private ChannelInboundHandler handler = null;
 
     public SyslogTCPFramingRouterHandler(int maxFrameLength, ByteBuf[] delimiter) {
+        super(false); // Disable auto-release — downstream handler owns the buffer
         this.maxFrameLength = maxFrameLength;
         this.delimiter = delimiter;
     }
@@ -48,38 +50,28 @@ public class SyslogTCPFramingRouterHandler extends SimpleChannelInboundHandler<B
                     handler = new DelimiterBasedFrameDecoder(maxFrameLength, delimiter);
                 }
             }
-            // Retain message for possible next frame.
-            retainedBuffers.add(msg.retain());
             handler.channelRead(ctx, msg);
         } else {
             ctx.fireChannelRead(msg);
         }
-
-        // In case the TCP-connection is kept open for a long time, and there's some traffic happening,
-        // we can skim through the retained buffers we keep track of and forget the ones that are freed already.
-        // This does not help for long, idle connections and gigantic frames.
-        retainedBuffers.removeIf(buf -> buf.refCnt() == 0);
-    }
-
-    private void cleanup() {
-        for (ByteBuf buf : retainedBuffers) {
-            if (buf.refCnt() > 0) {
-                buf.release();
-            }
-        }
-        retainedBuffers.clear();
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        cleanup();
-        super.channelInactive(ctx);
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        cleanup();
-        super.exceptionCaught(ctx, cause);
+        if (handler != null) {
+            try {
+                // Forward lifecycle event so ByteToMessageDecoder releases its internal
+                // cumulation buffer. This may throw if the remaining data cannot be decoded
+                // (e.g. incomplete syslog frame at connection close), but the cumulation is
+                // released in the finally block of ByteToMessageDecoder.channelInputClosed
+                // regardless. That method also fires channelInactive downstream.
+                handler.channelInactive(ctx);
+            } catch (DecoderException e) {
+                LOG.debug("Failed to decode remaining data on channel close", e);
+            }
+        } else {
+            super.channelInactive(ctx);
+        }
     }
 
     private boolean usesOctetCountFraming(ByteBuf message) {
