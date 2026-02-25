@@ -48,6 +48,7 @@ import org.opensearch.client.opensearch.indices.analyze.AnalyzeToken;
 import org.opensearch.client.transport.httpclient5.ResponseException;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -163,10 +164,12 @@ public class MessagesAdapterOS implements MessagesAdapter {
     }
 
     private ChunkedBulkIndexer.CircuitBreakerException.Durability durabilityFrom(ErrorCause openSearchException) {
-        return Optional.ofNullable(openSearchException.metadata().get("opensearch.durability"))
-                .map(durability -> {
-                            return ChunkedBulkIndexer.CircuitBreakerException.Durability.Transient;
-                        }
+        return Optional.ofNullable(openSearchException.metadata().get("durability"))
+                .map(durability ->
+                        Arrays.stream(ChunkedBulkIndexer.CircuitBreakerException.Durability.values())
+                                .filter(d -> d.name().equalsIgnoreCase(durability.toString()))
+                                .findFirst()
+                                .orElse(ChunkedBulkIndexer.CircuitBreakerException.Durability.Permanent)
                 )
                 .orElse(ChunkedBulkIndexer.CircuitBreakerException.Durability.Permanent);
     }
