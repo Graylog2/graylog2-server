@@ -58,7 +58,7 @@ class LegacyIndexTemplateAdapterIT {
 
     @BeforeEach
     void setUp(final OpenSearchInstance openSearchInstance) {
-        toTest = new LegacyIndexTemplateAdapter(openSearchInstance.getOfficialOpensearchClient(), new OSSerializationUtils());
+        toTest = new LegacyIndexTemplateAdapter(openSearchInstance.getOfficialOpensearchClient());
         indicesClient = openSearchInstance.getOfficialOpensearchClient().sync().indices();
     }
 

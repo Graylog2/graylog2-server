@@ -20,6 +20,7 @@ import userEvent from '@testing-library/user-event';
 
 import suppressConsole from 'helpers/suppressConsole';
 import ErrorsActions from 'actions/errors/ErrorsActions';
+import type { ReportedError } from 'logic/errors/ReportedErrors';
 import { createReactError, createUnauthorizedError, createNotFoundError } from 'logic/errors/ReportedErrors';
 import FetchError from 'logic/errors/FetchError';
 import { Link } from 'components/common/router';
@@ -33,7 +34,7 @@ jest.mock('routing/withLocation', () => (Component) => (props) => (
 ));
 jest.mock('brand-customization/useProductName');
 
-const triggerError: typeof ErrorsActions.report = async (error) => {
+const triggerError = async (error: ReportedError) => {
   await suppressConsole(() => {
     ErrorsActions.report(error);
   });
@@ -72,10 +73,13 @@ describe('ReportedErrorBoundary', () => {
     it('displays reported error with an unknown type', async () => {
       const response = { status: 404, body: { message: 'The error message' } };
 
-      await triggerError({
+      const unknownError = {
         ...createNotFoundError(new FetchError('The error message', response.status, response)),
-        type: 'UnknownReportedError',
-      });
+        type: 'UnknownReportedError' as const,
+      };
+
+      // @ts-expect-error intentionally passing invalid type to test fallback error page
+      await triggerError(unknownError);
 
       await screen.findByText('Something went wrong');
       await screen.findByText(/The error message/);

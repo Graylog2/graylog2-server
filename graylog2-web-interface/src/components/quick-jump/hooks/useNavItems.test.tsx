@@ -21,8 +21,6 @@ import { renderHookWithDataRouter } from 'wrappedTestingLibrary/hooks';
 import { usePluginExports } from 'views/test/testPlugins';
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import { adminUser } from 'fixtures/users';
-import PerspectivesContext from 'components/perspectives/contexts/PerspectivesContext';
-import { defaultPerspective } from 'fixtures/perspectives';
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 
 import useNavItems from './useNavItems';
@@ -44,14 +42,7 @@ const Wrapper = ({ children }: { children: React.ReactNode }) => (
       setScratchpadVisibility: jest.fn(),
       toggleScratchpadVisibility: jest.fn(),
     }}>
-    <PerspectivesContext.Provider
-      value={{
-        activePerspective: defaultPerspective,
-        availablePerspectives: [defaultPerspective],
-        setActivePerspective: () => {},
-      }}>
-      <CurrentUserContext.Provider value={adminUser}>{children}</CurrentUserContext.Provider>
-    </PerspectivesContext.Provider>
+    <CurrentUserContext.Provider value={adminUser}>{children}</CurrentUserContext.Provider>
   </ScratchpadContext.Provider>
 );
 
