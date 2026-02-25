@@ -35,6 +35,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @AutoValue
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class FilelogReceiverConfig implements OtlpReceiverConfig {
+    public static final String RECEIVER_TYPE = "filelog";
 
     @JsonProperty("include")
     public abstract List<String> include();
@@ -70,7 +71,7 @@ public abstract class FilelogReceiverConfig implements OtlpReceiverConfig {
 
     @Override
     public List<CollectorOperatorConfig> operators() {
-        return List.of(AddOperatorConfig.of(OtelAttributes.COLLECTOR_RECEIVER_TYPE, "filelog"));
+        return List.of(AddOperatorConfig.of(OtelAttributes.COLLECTOR_RECEIVER_TYPE, RECEIVER_TYPE));
     }
 
     // TODO: Configure offset storage - otherwise, offsets will only be tracked in memory!

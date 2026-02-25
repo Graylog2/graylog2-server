@@ -19,11 +19,17 @@ package org.graylog.collectors.input;
 import com.google.common.net.InetAddresses;
 import com.google.inject.assistedinject.Assisted;
 import com.google.protobuf.InvalidProtocolBufferException;
+import io.opentelemetry.proto.common.v1.AnyValue;
+import io.opentelemetry.proto.common.v1.KeyValue;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.graylog.collectors.CollectorJournal;
+import org.graylog.collectors.config.OtelAttributes;
 import org.graylog.collectors.input.debug.OtlpTrafficDump;
+import org.graylog.collectors.input.processor.LogRecordProcessor;
 import org.graylog.inputs.otel.OTelJournal;
+import org.graylog.schema.EventFields;
+import org.graylog.schema.VendorFields;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
@@ -39,7 +45,11 @@ import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -47,19 +57,23 @@ import java.util.Optional;
  * Extracts body as message, timestamp, and severityText as level from the journal record.
  */
 public class CollectorIngestCodec implements Codec {
+    private static final Logger LOG = LoggerFactory.getLogger(CollectorIngestCodec.class);
     public static final String NAME = "CollectorIngest";
 
     private final Configuration configuration;
     private final MessageFactory messageFactory;
     private final OtlpTrafficDump dumpWriter;
+    private final Map<String, LogRecordProcessor> processors;
 
     @Inject
     public CollectorIngestCodec(@Assisted Configuration configuration,
                                 MessageFactory messageFactory,
-                                OtlpTrafficDump dumpWriter) {
+                                OtlpTrafficDump dumpWriter,
+                                Map<String, LogRecordProcessor> processors) {
         this.configuration = configuration;
         this.messageFactory = messageFactory;
         this.dumpWriter = dumpWriter;
+        this.processors = processors;
     }
 
     @FactoryClass
@@ -114,18 +128,40 @@ public class CollectorIngestCodec implements Codec {
         final Message message = messageFactory.createMessage(body, source, timestamp);
 
         if (!logRecord.getSeverityText().isEmpty()) {
-            message.addField("level", logRecord.getSeverityText());
+            message.addField(VendorFields.VENDOR_EVENT_SEVERITY, logRecord.getSeverityText());
         }
+        if (logRecord.getSeverityNumberValue() > 0) {
+            message.addField(VendorFields.VENDOR_EVENT_SEVERITY_LEVEL, logRecord.getSeverityNumberValue());
+        }
+        if (logRecord.getTimeUnixNano() > 0) {
+            message.addField(EventFields.EVENT_CREATED, dateTimeFromNano(logRecord.getTimeUnixNano()));
+        }
+        if (logRecord.getObservedTimeUnixNano() > 0) {
+            message.addField(EventFields.EVENT_RECEIVED_TIME, dateTimeFromNano(logRecord.getObservedTimeUnixNano()));
+        }
+
+        logRecord.getAttributesList()
+                .stream()
+                .filter(a -> OtelAttributes.COLLECTOR_RECEIVER_TYPE.equals(a.getKey()))
+                .map(KeyValue::getValue)
+                .map(AnyValue::getStringValue)
+                .map(processors::get).filter(Objects::nonNull)
+                .findFirst()
+                .ifPresent(logRecordProcessor -> message.addFields(logRecordProcessor.process(logRecord)));
 
         return Optional.of(message);
     }
 
+    private DateTime dateTimeFromNano(long ts) {
+        return new DateTime(ts / 1_000_000L, DateTimeZone.UTC);
+    }
+
     private Optional<DateTime> timestamp(io.opentelemetry.proto.logs.v1.LogRecord logRecord) {
         if (logRecord.getTimeUnixNano() > 0) {
-            return Optional.of(new DateTime(logRecord.getTimeUnixNano() / 1_000_000L, DateTimeZone.UTC));
+            return Optional.of(dateTimeFromNano(logRecord.getTimeUnixNano()));
         }
         if (logRecord.getObservedTimeUnixNano() > 0) {
-            return Optional.of(new DateTime(logRecord.getObservedTimeUnixNano() / 1_000_000L, DateTimeZone.UTC));
+            return Optional.of(dateTimeFromNano(logRecord.getObservedTimeUnixNano()));
         }
         return Optional.empty();
     }

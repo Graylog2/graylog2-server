@@ -35,6 +35,8 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @AutoValue
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class JournaldReceiverConfig implements OtlpReceiverConfig {
+    public static final String RECEIVER_TYPE = "journald";
+
     public enum Priority {
         @JsonProperty("emerg")
         EMERG,
@@ -67,7 +69,7 @@ public abstract class JournaldReceiverConfig implements OtlpReceiverConfig {
 
     @Override
     public List<CollectorOperatorConfig> operators() {
-        return List.of(AddOperatorConfig.of(OtelAttributes.COLLECTOR_RECEIVER_TYPE, "journald"));
+        return List.of(AddOperatorConfig.of(OtelAttributes.COLLECTOR_RECEIVER_TYPE, RECEIVER_TYPE));
     }
 
     public static Builder builder(String id) {
