@@ -56,13 +56,12 @@ public class OSRangeHandler extends OSPivotBucketSpecHandler<RangeBucket> {
 
             queryContext.recordNameForPivotSpec(pivot, rangeBucket, name);
 
-            if (root == null && leaf == null) {
+            if (root == null) {
                 root = builder;
-                leaf = builder;
             } else {
                 leaf.subAggregation(builder);
-                leaf = builder;
             }
+            leaf = builder;
         }
 
         return CreatedAggregations.create(root, leaf);

@@ -61,13 +61,12 @@ public class OSRangeHandler extends OSPivotBucketSpecHandler<RangeBucket> {
                     Aggregation.builder().range(rangeBuilder.build())
             );
 
-            if (root == null && leaf == null) {
+            if (root == null) {
                 root = builder;
-                leaf = builder;
             } else {
                 leaf.subAggregation(builder);
-                leaf = builder;
             }
+            leaf = builder;
         }
 
         return CreatedAggregations.create(root, leaf);
