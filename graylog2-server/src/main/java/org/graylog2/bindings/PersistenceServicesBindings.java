@@ -18,6 +18,7 @@ package org.graylog2.bindings;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.cluster.nodes.DataNodeClusterService;
@@ -29,6 +30,9 @@ import org.graylog2.cluster.nodes.ServerNodePaginatedService;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.nodes.ServerNodeClusterService;
 import org.graylog2.cluster.nodes.ServerNodeDto;
+import org.graylog2.cluster.nodes.mongodb.MongodbNodesProvider;
+import org.graylog2.cluster.nodes.mongodb.ReplicaSetMongodbNodes;
+import org.graylog2.cluster.nodes.mongodb.StandaloneNodeMongodbNodes;
 import org.graylog2.database.suggestions.EntitySuggestionService;
 import org.graylog2.database.suggestions.MongoEntitySuggestionService;
 import org.graylog2.indexer.IndexFailureService;
@@ -72,6 +76,11 @@ public class PersistenceServicesBindings extends AbstractModule {
         bind(new TypeLiteral<NodeService<ServerNodeDto>>() {}).to(ServerNodeClusterService.class);
         bind(new TypeLiteral<NodeService<DataNodeDto>>() {}).to(DataNodeClusterService.class);
         bind(DataNodePaginatedService.class).asEagerSingleton();
+
+        Multibinder<MongodbNodesProvider> mongodbNodesProviderBinder = Multibinder.newSetBinder(binder(), MongodbNodesProvider.class);
+        mongodbNodesProviderBinder.addBinding().to(ReplicaSetMongodbNodes.class);
+        mongodbNodesProviderBinder.addBinding().to(StandaloneNodeMongodbNodes.class);
+
         bind(MongodbNodesService.class).to(MongodbNodesServiceImpl.class).asEagerSingleton();
         bind(ServerNodePaginatedService.class).asEagerSingleton();
         bind(IndexRangeService.class).to(MongoIndexRangeService.class).asEagerSingleton();
