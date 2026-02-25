@@ -55,6 +55,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class MessagesAdapterOS implements MessagesAdapter {
     static final String INDEX_BLOCK_ERROR = "cluster_block_exception";
@@ -147,7 +148,17 @@ public class MessagesAdapterOS implements MessagesAdapter {
     }
 
     private OpenSearchException toOpenSearchException(ResponseException re) {
-        String json = re.getMessage().split("\n")[1];
+        String[] split = re.getMessage().split("\n");
+        if (split.length != 2) {
+            return new OpenSearchException(ErrorResponse.of(r -> r
+                    .status(re.status())
+                    .error(cause -> cause
+                            .type("unknown")
+                            .reason(re.getMessage())
+                    )
+            ));
+        }
+        String json = split[1];
         return new OpenSearchException(OSSerializationUtils.fromJson(json, ErrorResponse._DESERIALIZER));
     }
 
@@ -221,7 +232,8 @@ public class MessagesAdapterOS implements MessagesAdapter {
 
     private IndexingResult indexingResultFromResponse(BulkResponseItem response, Indexable message) {
         if (response.error() != null) {
-            return IndexingError.create(message, response.index(), errorTypeFromResponse(response), response.error().reason());
+            String errorMessage = f("OpenSearchException[OpenSearch exception [type=%s, reason=%s]]", response.error().type(), response.error().reason());
+            return IndexingError.create(message, response.index(), errorTypeFromResponse(response), errorMessage);
         }
         return IndexingSuccess.create(message, response.index());
     }
