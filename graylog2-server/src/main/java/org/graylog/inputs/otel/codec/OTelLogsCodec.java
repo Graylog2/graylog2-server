@@ -131,10 +131,6 @@ public class OTelLogsCodec {
             convertKvList("otel_scope_attributes", scope.getAttributesList())
                     .forEach(f -> fieldMap.put(f.getKey(), f.getValue()));
         }
-        convertKvList("otel_resource_attributes", log.getResource().getAttributesList())
-                .forEach(f -> fieldMap.put(f.getKey(), f.getValue()));
-        convertKvList("otel_attributes", logRecord.getAttributesList())
-                .forEach(f -> fieldMap.put(f.getKey(), f.getValue()));
         Stream.concat(
                 convertKvList("otel_resource_attributes", log.getResource().getAttributesList()),
                 convertKvList("otel_attributes", logRecord.getAttributesList())
