@@ -370,8 +370,8 @@ class InMemoryFieldGroupingServiceTest {
 
         assertEquals(
                 List.of(
-                        new EntityFieldBucket("developer", "user", 2),
-                        new EntityFieldBucket("user", "developer", 2),
+                        new EntityFieldBucket("user", "user", 2),
+                        new EntityFieldBucket("developer", "developer", 2),
                         new EntityFieldBucket("moderator", "moderator", 1)
                 ),
                 result.slices()
