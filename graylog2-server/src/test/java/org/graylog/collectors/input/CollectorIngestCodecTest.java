@@ -17,11 +17,16 @@
 package org.graylog.collectors.input;
 
 import io.opentelemetry.proto.common.v1.AnyValue;
+import io.opentelemetry.proto.common.v1.KeyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import org.graylog.collectors.CollectorJournal;
+import org.graylog.collectors.config.OtelAttributes;
 import org.graylog.collectors.input.debug.OtlpTrafficDump;
 import org.graylog.inputs.otel.OTelJournal;
+import org.graylog.inputs.otel.codec.OTelTypeConverter;
+import org.graylog.schema.EventFields;
 import org.graylog.schema.VendorFields;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
@@ -51,11 +56,13 @@ class CollectorIngestCodecTest {
     @Mock
     private OtlpTrafficDump dumpWriter;
 
+    private OTelTypeConverter typeConverter;
     private CollectorIngestCodec codec;
 
     @BeforeEach
     void setUp() {
-        codec = new CollectorIngestCodec(Configuration.EMPTY_CONFIGURATION, messageFactory, dumpWriter, Map.of());
+        typeConverter = new OTelTypeConverter(new ObjectMapperProvider().get());
+        codec = new CollectorIngestCodec(Configuration.EMPTY_CONFIGURATION, messageFactory, dumpWriter, typeConverter, Map.of());
     }
 
     @Test
@@ -309,6 +316,64 @@ class CollectorIngestCodecTest {
         codec.decodeSafe(rawMessage);
 
         verify(dumpWriter).write(collectorRecord);
+    }
+
+    @Test
+    void nonStringBodyIsConvertedToString() {
+        final var logRecord = LogRecord.newBuilder()
+                .setBody(AnyValue.newBuilder().setIntValue(42))
+                .setTimeUnixNano(1700000000000000000L)
+                .build();
+
+        final var log = OTelJournal.Log.newBuilder()
+                .setLogRecord(logRecord)
+                .build();
+
+        final var otelRecord = OTelJournal.Record.newBuilder()
+                .setLog(log)
+                .build();
+
+        final var collectorRecord = CollectorJournal.Record.newBuilder()
+                .setOtelRecord(otelRecord)
+                .build();
+
+        final var rawMessage = new RawMessage(collectorRecord.toByteArray());
+        final var decoded = codec.decodeSafe(rawMessage);
+
+        assertThat(decoded).isPresent();
+        assertThat(decoded.get().getMessage()).isEqualTo("42");
+    }
+
+    @Test
+    void setsReceiverTypeField() {
+        final var codecWithProcessor = new CollectorIngestCodec(
+                Configuration.EMPTY_CONFIGURATION, messageFactory, dumpWriter, typeConverter,
+                Map.of("filelog", logRecord -> Map.of(EventFields.EVENT_LOG_NAME, "test.log")));
+
+        final var logRecord = LogRecord.newBuilder()
+                .setBody(AnyValue.newBuilder().setStringValue("test"))
+                .setTimeUnixNano(1700000000000000000L)
+                .addAttributes(KeyValue.newBuilder()
+                        .setKey(OtelAttributes.COLLECTOR_RECEIVER_TYPE)
+                        .setValue(AnyValue.newBuilder().setStringValue("filelog")))
+                .build();
+
+        final var log = OTelJournal.Log.newBuilder()
+                .setLogRecord(logRecord)
+                .build();
+        final var otelRecord = OTelJournal.Record.newBuilder()
+                .setLog(log)
+                .build();
+        final var collectorRecord = CollectorJournal.Record.newBuilder()
+                .setOtelRecord(otelRecord)
+                .build();
+
+        final var rawMessage = new RawMessage(collectorRecord.toByteArray());
+        final var decoded = codecWithProcessor.decodeSafe(rawMessage);
+
+        assertThat(decoded).isPresent();
+        assertThat(decoded.get().getField("gl2_collector_receiver_type")).isEqualTo("filelog");
+        assertThat(decoded.get().getField(EventFields.EVENT_LOG_NAME)).isEqualTo("test.log");
     }
 
     private static CollectorJournal.Record buildCollectorRecord(String body, String agentUid) {

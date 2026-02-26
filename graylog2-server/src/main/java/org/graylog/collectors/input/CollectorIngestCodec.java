@@ -25,6 +25,7 @@ import org.graylog.collectors.CollectorJournal;
 import org.graylog.collectors.input.debug.OtlpTrafficDump;
 import org.graylog.collectors.input.processor.LogRecordProcessor;
 import org.graylog.inputs.otel.OTelJournal;
+import org.graylog.inputs.otel.codec.OTelTypeConverter;
 import org.graylog.schema.EventFields;
 import org.graylog.schema.VendorFields;
 import org.graylog2.plugin.Message;
@@ -62,16 +63,19 @@ public class CollectorIngestCodec implements Codec {
     private final Configuration configuration;
     private final MessageFactory messageFactory;
     private final OtlpTrafficDump dumpWriter;
+    private final OTelTypeConverter typeConverter;
     private final Map<String, LogRecordProcessor> processors;
 
     @Inject
     public CollectorIngestCodec(@Assisted Configuration configuration,
                                 MessageFactory messageFactory,
                                 OtlpTrafficDump dumpWriter,
+                                OTelTypeConverter typeConverter,
                                 Map<String, LogRecordProcessor> processors) {
         this.configuration = configuration;
         this.messageFactory = messageFactory;
         this.dumpWriter = dumpWriter;
+        this.typeConverter = typeConverter;
         this.processors = processors;
     }
 
@@ -132,7 +136,7 @@ public class CollectorIngestCodec implements Codec {
             return Optional.empty();
         }
 
-        final String body = logRecord.getBody().getStringValue();
+        final String body = typeConverter.toString(logRecord.getBody(), "body").orElse("");
         final String source = source(rawMessage.getRemoteAddress());
         final DateTime timestamp = timestamp(logRecord).orElse(rawMessage.getTimestamp());
 
