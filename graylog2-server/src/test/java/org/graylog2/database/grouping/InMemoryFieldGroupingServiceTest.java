@@ -539,6 +539,59 @@ class InMemoryFieldGroupingServiceTest {
         );
     }
 
+    @Test
+    void includesMissingValueBucket() {
+        mockUserWithFullPermissions();
+
+        // Group by "team" field - some users have no team
+        EntityFieldBucketResponse result = service.groupByField(
+                "users", "team", "", "", 1, 10, SortOrder.DESC, SortField.COUNT, subject
+        );
+
+        // Users with teams:
+        // - Backend Team (507f1f77bcf86cd799439021): admin, moderator, developer1 = 3
+        // - Frontend Team (507f1f77bcf86cd799439022): user1, developer2 = 2
+        // Users without team: user2, analyst, user3, analyst2, admin_backup = 5
+        assertEquals(3, result.slices().size());
+        assertEquals(3, result.pagination().total());
+
+        assertEquals(
+                List.of(
+                        new EntityFieldBucket("", "", 5), // missing team
+                        new EntityFieldBucket("507f1f77bcf86cd799439021", "507f1f77bcf86cd799439021", 3), // Backend Team
+                        new EntityFieldBucket("507f1f77bcf86cd799439022", "507f1f77bcf86cd799439022", 2)  // Frontend Team
+                ),
+                result.slices()
+        );
+    }
+
+    @Test
+    void missingValueBucketWorksWithPermissionFiltering() {
+        // User can only read users without team (IDs: 13, 15, 16, 19, 20)
+        mockPermissionCheck(doc -> List.of(
+                "507f1f77bcf86cd799439013", // user2 - no team
+                "507f1f77bcf86cd799439015", // analyst - no team
+                "507f1f77bcf86cd799439016", // user3 - no team
+                "507f1f77bcf86cd799439019", // analyst2 - no team
+                "507f1f77bcf86cd799439020"  // admin_backup - no team
+        ).contains(doc.getObjectId("_id").toString()));
+
+        EntityFieldBucketResponse result = service.groupByField(
+                "users", "team", "", "", 1, 10, SortOrder.DESC, SortField.COUNT, subject
+        );
+
+        // All 5 users have no team
+        assertEquals(1, result.slices().size());
+        assertEquals(1, result.pagination().total());
+
+        assertEquals(
+                List.of(
+                        new EntityFieldBucket("", "", 5)
+                ),
+                result.slices()
+        );
+    }
+
     private void mockUserWithFullPermissions() {
         Mockito.doReturn((Predicate<Document>) doc -> true).when(entityPermissionsUtils).createPermissionCheck(subject, "users");
     }

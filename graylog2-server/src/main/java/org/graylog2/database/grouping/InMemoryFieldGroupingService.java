@@ -73,9 +73,13 @@ public class InMemoryFieldGroupingService implements EntityFieldGroupingService 
 
         final Map<String, Long> groupCounts = StreamSupport.stream(documents.spliterator(), false)
                 .filter(permissionCheck)
-                .filter(doc -> doc.containsKey(fieldName) && doc.get(fieldName) != null)
                 .collect(Collectors.groupingBy(
-                        doc -> doc.get(fieldName).toString(),
+                        doc -> {
+                            if (!doc.containsKey(fieldName) || doc.get(fieldName) == null) {
+                                return "";
+                            }
+                            return doc.get(fieldName).toString();
+                        },
                         Collectors.counting()
                 ));
 
