@@ -19,12 +19,10 @@ package org.graylog2.database.grouping;
 import com.google.common.base.Strings;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.shared.security.EntityPermissionsUtils;
@@ -32,7 +30,6 @@ import org.graylog2.shared.security.EntityPermissionsUtils;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -61,21 +58,15 @@ public class InMemoryFieldGroupingService implements EntityFieldGroupingService 
                                                   final Subject subject) {
         final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collectionName);
 
-        final Bson queryFilter = !Strings.isNullOrEmpty(query)
-                ? Filters.regex(fieldName, query, "i")
-                : Filters.empty();
-
         final FindIterable<Document> documents = mongoCollection
-                .find(queryFilter)
+                .find(buildQueryFilterBson(fieldName, query))
                 .projection(Projections.include(fieldName));
 
-        final Predicate<Document> permissionCheck = permissionsUtils.createPermissionCheck(subject, collectionName);
-
         final Map<String, Long> groupCounts = StreamSupport.stream(documents.spliterator(), false)
-                .filter(permissionCheck)
+                .filter(permissionsUtils.createPermissionCheck(subject, collectionName))
                 .collect(Collectors.groupingBy(
                         doc -> {
-                            if (!doc.containsKey(fieldName) || doc.get(fieldName) == null) {
+                            if (docHasNoValueForField(fieldName, doc)) {
                                 return "";
                             }
                             return doc.get(fieldName).toString();
@@ -87,14 +78,10 @@ public class InMemoryFieldGroupingService implements EntityFieldGroupingService 
                 ? Pattern.compile(bucketsFilter, Pattern.CASE_INSENSITIVE)
                 : null;
 
-        final List<EntityFieldBucket> allBuckets = groupCounts.entrySet().stream()
+        final List<EntityFieldBucket> sortedBuckets = groupCounts.entrySet().stream()
                 .filter(entry -> bucketsPattern == null || bucketsPattern.matcher(entry.getKey()).find())
                 .map(entry -> new EntityFieldBucket(entry.getKey(), entry.getKey(), entry.getValue()))
-                .toList();
-
-        final Comparator<EntityFieldBucket> comparator = buildComparator(sortOrder, sortField);
-        final List<EntityFieldBucket> sortedBuckets = allBuckets.stream()
-                .sorted(comparator)
+                .sorted(buildComparator(sortOrder, sortField))
                 .toList();
 
         final int total = sortedBuckets.size();
@@ -108,6 +95,10 @@ public class InMemoryFieldGroupingService implements EntityFieldGroupingService 
                 paginatedBuckets,
                 PaginatedList.PaginationInfo.create(total, paginatedBuckets.size(), page, pageSize)
         );
+    }
+
+    private boolean docHasNoValueForField(final String fieldName, final Document doc) {
+        return !doc.containsKey(fieldName) || doc.get(fieldName) == null;
     }
 
     private Comparator<EntityFieldBucket> buildComparator(final SortOrder sortOrder, final SortField sortField) {

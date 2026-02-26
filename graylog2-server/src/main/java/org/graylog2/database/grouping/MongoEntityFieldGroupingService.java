@@ -64,9 +64,7 @@ public class MongoEntityFieldGroupingService implements EntityFieldGroupingServi
                 permissionsUtils.hasReadPermissionForWholeCollection(subject, collectionName);
 
         if (userCanReadAllEntities) {
-            final var queryFilterBson = !Strings.isNullOrEmpty(query)
-                    ? Filters.regex(fieldName, query, "i")
-                    : Filters.empty();
+            final var queryFilterBson = buildQueryFilterBson(fieldName, query);
 
             final var bucketsFilterBson = !Strings.isNullOrEmpty(bucketsFilter)
                     ? Filters.regex(ID_FIELD_NAME, bucketsFilter, "i")

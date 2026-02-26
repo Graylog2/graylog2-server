@@ -16,7 +16,9 @@
  */
 package org.graylog2.database.grouping;
 
+import com.google.common.base.Strings;
 import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
 import org.apache.shiro.subject.Subject;
 import org.bson.conversions.Bson;
@@ -39,6 +41,12 @@ public interface EntityFieldGroupingService {
                                            SortOrder sortOrder,
                                            SortField sortField,
                                            Subject subject);
+
+    default Bson buildQueryFilterBson(final String fieldName, final String query) {
+        return !Strings.isNullOrEmpty(query)
+                ? Filters.regex(fieldName, query, "i")
+                : Filters.empty();
+    }
 
     default Bson buildSortStage(final SortOrder sortOrder,
                                 final SortField sortField) {
