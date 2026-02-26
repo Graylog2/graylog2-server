@@ -69,4 +69,21 @@ public class AWSAuthFactoryTest {
                         awsAuthFactory.create(true, null, null, null, null))
                 .withMessageContaining("Access key is required.");
     }
+
+    @Test
+    public void testSixArgCreateWithNullProxy() {
+        // Non-STS path: 6-arg create with null proxy should behave like 5-arg create
+        final AwsCredentialsProvider provider = awsAuthFactory.create(false, null, "key", "secret", null, null);
+        assertThat(provider).isExactlyInstanceOf(StaticCredentialsProvider.class);
+        assertThat("key").isEqualTo(provider.resolveCredentials().accessKeyId());
+    }
+
+    @Test
+    public void testFiveArgDelegatesToSixArg() {
+        // Both overloads should return equivalent results for the non-STS path
+        final AwsCredentialsProvider fiveArg = awsAuthFactory.create(false, null, "key", "secret", null);
+        final AwsCredentialsProvider sixArg = awsAuthFactory.create(false, null, "key", "secret", null, null);
+        assertThat(fiveArg).isExactlyInstanceOf(sixArg.getClass());
+        assertThat(fiveArg.resolveCredentials().accessKeyId()).isEqualTo(sixArg.resolveCredentials().accessKeyId());
+    }
 }
