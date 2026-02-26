@@ -310,8 +310,15 @@ class InMemoryFieldGroupingServiceTest {
 
     @Test
     void filtersDocumentsByPermissions() {
-        // User can only read Engineering department users
-        mockPermissionCheck(doc -> "Engineering".equals(doc.getString("department")));
+        // User can only read Engineering department users (IDs: 11, 12, 13, 17, 18, 20)
+        mockPermissionCheck(doc -> List.of(
+                "507f1f77bcf86cd799439011", // admin - administrator
+                "507f1f77bcf86cd799439012", // user1 - user
+                "507f1f77bcf86cd799439013", // user2 - user
+                "507f1f77bcf86cd799439017", // developer1 - developer
+                "507f1f77bcf86cd799439018", // developer2 - developer
+                "507f1f77bcf86cd799439020"  // admin_backup - administrator
+        ).contains(doc.getObjectId("_id").toString()));
 
         EntityFieldBucketResponse result = service.groupByField(
                 "users", "role", "", "", 1, 10, SortOrder.DESC, SortField.COUNT, subject
@@ -357,8 +364,17 @@ class InMemoryFieldGroupingServiceTest {
 
     @Test
     void permissionFilteringWorksWithQueryFilter() {
-        // User can only read active users
-        mockPermissionCheck(doc -> "active".equals(doc.getString("status")));
+        // User can only read active users (IDs: 11, 12, 13, 14, 15, 17, 18, 19 - excludes 16, 20 which are inactive)
+        mockPermissionCheck(doc -> List.of(
+                "507f1f77bcf86cd799439011", // admin - administrator
+                "507f1f77bcf86cd799439012", // user1 - user
+                "507f1f77bcf86cd799439013", // user2 - user
+                "507f1f77bcf86cd799439014", // moderator - moderator
+                "507f1f77bcf86cd799439015", // analyst - analyst
+                "507f1f77bcf86cd799439017", // developer1 - developer
+                "507f1f77bcf86cd799439018", // developer2 - developer
+                "507f1f77bcf86cd799439019"  // analyst2 - analyst
+        ).contains(doc.getObjectId("_id").toString()));
 
         // Query for roles containing "e" (developer, user, moderator)
         EntityFieldBucketResponse result = service.groupByField(
@@ -380,8 +396,13 @@ class InMemoryFieldGroupingServiceTest {
 
     @Test
     void permissionFilteringWorksWithBucketsFilter() {
-        // User can only read developers and analysts
-        mockPermissionCheck(doc -> List.of("developer", "analyst").contains(doc.getString("role")));
+        // User can only read developers and analysts (IDs: 15, 17, 18, 19)
+        mockPermissionCheck(doc -> List.of(
+                "507f1f77bcf86cd799439015", // analyst - analyst
+                "507f1f77bcf86cd799439017", // developer1 - developer
+                "507f1f77bcf86cd799439018", // developer2 - developer
+                "507f1f77bcf86cd799439019"  // analyst2 - analyst
+        ).contains(doc.getObjectId("_id").toString()));
 
         // Filter buckets containing "dev"
         EntityFieldBucketResponse result = service.groupByField(
@@ -400,8 +421,15 @@ class InMemoryFieldGroupingServiceTest {
 
     @Test
     void permissionFilteringAffectsPagination() {
-        // User can only read Engineering department
-        mockPermissionCheck(doc -> "Engineering".equals(doc.getString("department")));
+        // User can only read Engineering department (IDs: 11, 12, 13, 17, 18, 20)
+        mockPermissionCheck(doc -> List.of(
+                "507f1f77bcf86cd799439011", // admin - administrator
+                "507f1f77bcf86cd799439012", // user1 - user
+                "507f1f77bcf86cd799439013", // user2 - user
+                "507f1f77bcf86cd799439017", // developer1 - developer
+                "507f1f77bcf86cd799439018", // developer2 - developer
+                "507f1f77bcf86cd799439020"  // admin_backup - administrator
+        ).contains(doc.getObjectId("_id").toString()));
 
         // Page size 2, page 1
         EntityFieldBucketResponse page1 = service.groupByField(
@@ -450,8 +478,18 @@ class InMemoryFieldGroupingServiceTest {
 
     @Test
     void permissionFilteringCanRemoveEntireBucket() {
-        // User can read everyone except moderator
-        mockPermissionCheck(doc -> !"moderator".equals(doc.getString("role")));
+        // User can read everyone except moderator (exclude ID 14)
+        mockPermissionCheck(doc -> List.of(
+                "507f1f77bcf86cd799439011", // admin - administrator
+                "507f1f77bcf86cd799439012", // user1 - user
+                "507f1f77bcf86cd799439013", // user2 - user
+                "507f1f77bcf86cd799439015", // analyst - analyst
+                "507f1f77bcf86cd799439016", // user3 - user
+                "507f1f77bcf86cd799439017", // developer1 - developer
+                "507f1f77bcf86cd799439018", // developer2 - developer
+                "507f1f77bcf86cd799439019", // analyst2 - analyst
+                "507f1f77bcf86cd799439020"  // admin_backup - administrator
+        ).contains(doc.getObjectId("_id").toString()));
 
         EntityFieldBucketResponse result = service.groupByField(
                 "users", "role", "", "", 1, 10, SortOrder.DESC, SortField.COUNT, subject

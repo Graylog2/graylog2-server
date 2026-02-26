@@ -20,6 +20,7 @@ import com.google.common.base.Strings;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
 import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
 import org.bson.Document;
@@ -66,7 +67,9 @@ public class InMemoryFieldGroupingService implements EntityFieldGroupingService 
                 : Filters.empty();
 
         // Fetch all matching documents
-        final FindIterable<Document> documents = mongoCollection.find(queryFilter);
+        final FindIterable<Document> documents = mongoCollection
+                .find(queryFilter)
+                .projection(Projections.include(fieldName));
 
         // Create permission check predicate
         final Predicate<Document> permissionCheck = permissionsUtils.createPermissionCheck(subject, collectionName);
