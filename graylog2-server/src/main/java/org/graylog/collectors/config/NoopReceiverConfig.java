@@ -16,6 +16,7 @@
  */
 package org.graylog.collectors.config;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.auto.value.AutoValue;
 import org.graylog.collectors.config.operator.CollectorOperatorConfig;
 
@@ -25,6 +26,7 @@ import java.util.List;
  * No-op receiver that we use to ensure the presence of at least one receiver in the Collector config.
  */
 @AutoValue
+@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public abstract class NoopReceiverConfig implements OtlpReceiverConfig {
     @Override
     public List<CollectorOperatorConfig> operators() {
@@ -32,6 +34,6 @@ public abstract class NoopReceiverConfig implements OtlpReceiverConfig {
     }
 
     public static NoopReceiverConfig instance() {
-        return new AutoValue_NoopReceiverConfig("noop");
+        return new AutoValue_NoopReceiverConfig("nop");
     }
 }
