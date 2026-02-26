@@ -62,7 +62,7 @@ const usePaginationQueryParameter = (
       setQueryParams({
         page: newPage,
         pageSize: syncPageSizeFromQuery ? newPageSize : undefined,
-      }, 'replaceIn');
+      });
     },
     [page, pageSize, setQueryParams, syncPageSizeFromQuery],
   );

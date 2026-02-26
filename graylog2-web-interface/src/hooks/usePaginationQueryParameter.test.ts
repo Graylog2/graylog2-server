@@ -54,7 +54,7 @@ describe('usePaginationQueryParameter custom hook', () => {
 
     act(() => result.current.setPagination({ page: 4 }));
 
-    expect(setQueryParams).toHaveBeenCalledWith({ page: 4, pageSize: 10 }, 'replaceIn');
+    expect(setQueryParams).toHaveBeenCalledWith({ page: 4, pageSize: 10 });
   });
 
   it('should set <pageSize> query parameter with the value sent in setPagination and initialize the <page> query parameter', () => {
@@ -62,7 +62,7 @@ describe('usePaginationQueryParameter custom hook', () => {
 
     act(() => result.current.setPagination({ pageSize: DEFAULT_PAGE_SIZES[1] }));
 
-    expect(setQueryParams).toHaveBeenCalledWith({ page: DEFAULT_PAGE, pageSize: DEFAULT_PAGE_SIZES[1] }, 'replaceIn');
+    expect(setQueryParams).toHaveBeenCalledWith({ page: DEFAULT_PAGE, pageSize: DEFAULT_PAGE_SIZES[1] });
   });
 
   it('should get the page value from <page> query parameter', () => {
@@ -98,7 +98,7 @@ describe('usePaginationQueryParameter custom hook', () => {
 
     act(() => result.current.resetPage());
 
-    expect(setQueryParams).toHaveBeenCalledWith({ page: DEFAULT_PAGE, pageSize: 50 }, 'replaceIn');
+    expect(setQueryParams).toHaveBeenCalledWith({ page: DEFAULT_PAGE, pageSize: 50 });
   });
 
   it('should always use provided page size and not update pageSize query param, when syncPageSizeFromQuery is false', () => {
@@ -108,7 +108,7 @@ describe('usePaginationQueryParameter custom hook', () => {
 
     act(() => result.current.setPagination({ page: 4, pageSize: 100 }));
 
-    expect(setQueryParams).toHaveBeenCalledWith({ page: 4, pageSize: undefined }, 'replaceIn');
+    expect(setQueryParams).toHaveBeenCalledWith({ page: 4, pageSize: undefined });
   });
 
   it('should update page without replacing unrelated query params like filters', () => {
@@ -117,6 +117,6 @@ describe('usePaginationQueryParameter custom hook', () => {
 
     act(() => result.current.setPagination({ page: 1 }));
 
-    expect(setQueryParams).toHaveBeenCalledWith({ page: 1, pageSize: 10 }, 'replaceIn');
+    expect(setQueryParams).toHaveBeenCalledWith({ page: 1, pageSize: 10 });
   });
 });
