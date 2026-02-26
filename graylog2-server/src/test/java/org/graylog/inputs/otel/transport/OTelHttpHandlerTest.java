@@ -24,6 +24,7 @@ import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
@@ -164,6 +165,30 @@ class OTelHttpHandlerTest {
         final FullHttpResponse response = channel.readOutbound();
         assertThat(response.status()).isEqualTo(HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE);
         verifyNoInteractions(input);
+        response.release();
+    }
+
+    @Test
+    void keepAliveRequestKeepsChannelOpen() throws Exception {
+        final EmbeddedChannel channel = createChannel();
+        final ExportLogsServiceRequest request = createTestRequest();
+
+        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
+                HttpVersion.HTTP_1_1, HttpMethod.POST, "/v1/logs",
+                Unpooled.wrappedBuffer(request.toByteArray()));
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/x-protobuf");
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, request.toByteArray().length);
+        httpRequest.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+
+        channel.writeInbound(httpRequest);
+
+        final FullHttpResponse response = channel.readOutbound();
+        assertThat(response.status()).isEqualTo(HttpResponseStatus.OK);
+        assertThat(response.headers().get(HttpHeaderNames.CONNECTION))
+                .isEqualToIgnoringCase(HttpHeaderValues.KEEP_ALIVE.toString());
+        assertThat(channel.isOpen()).isTrue();
+
+        verify(input, times(1)).processRawMessage(any());
         response.release();
     }
 

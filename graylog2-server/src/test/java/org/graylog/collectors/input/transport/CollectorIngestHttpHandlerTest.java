@@ -16,19 +16,17 @@
  */
 package org.graylog.collectors.input.transport;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.google.protobuf.util.JsonFormat;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
-import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import io.opentelemetry.proto.logs.v1.ResourceLogs;
@@ -43,8 +41,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -85,33 +81,6 @@ class CollectorIngestHttpHandlerTest {
     }
 
     @Test
-    void protobufRequestWithAgentIdentityReturns200() throws InvalidProtocolBufferException {
-        final String agentUid = "test-agent-001";
-        final EmbeddedChannel channel = createChannel(agentUid);
-        final ExportLogsServiceRequest request = createTestRequest();
-
-        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
-                HttpVersion.HTTP_1_1, HttpMethod.POST, "/v1/logs",
-                Unpooled.wrappedBuffer(request.toByteArray()));
-        httpRequest.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/x-protobuf");
-        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, request.toByteArray().length);
-
-        channel.writeInbound(httpRequest);
-
-        final FullHttpResponse response = channel.readOutbound();
-        assertThat(response.status()).isEqualTo(HttpResponseStatus.OK);
-        assertThat(response.headers().get(HttpHeaderNames.CONTENT_TYPE)).isEqualTo("application/x-protobuf");
-
-        final byte[] responseBytes = new byte[response.content().readableBytes()];
-        response.content().readBytes(responseBytes);
-        final ExportLogsServiceResponse exportResponse = ExportLogsServiceResponse.parseFrom(responseBytes);
-        assertThat(exportResponse.getPartialSuccess().getRejectedLogRecords()).isEqualTo(0);
-
-        verify(input, times(1)).processRawMessage(any());
-        response.release();
-    }
-
-    @Test
     void collectorInstanceUidIsEmbeddedInJournalRecord() throws Exception {
         final String agentUid = "agent-uid-42";
         final EmbeddedChannel channel = createChannel(agentUid);
@@ -134,89 +103,6 @@ class CollectorIngestHttpHandlerTest {
         assertThat(record.getCollectorInstanceUid()).isEqualTo(agentUid);
 
         final FullHttpResponse response = channel.readOutbound();
-        response.release();
-    }
-
-    @Test
-    void jsonRequestWithAgentIdentityReturns200() throws Exception {
-        final String agentUid = "json-agent-001";
-        final EmbeddedChannel channel = createChannel(agentUid);
-        final ExportLogsServiceRequest request = createTestRequest();
-        final String json = JsonFormat.printer().print(request);
-
-        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
-                HttpVersion.HTTP_1_1, HttpMethod.POST, "/v1/logs",
-                Unpooled.wrappedBuffer(json.getBytes(StandardCharsets.UTF_8)));
-        httpRequest.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json");
-        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, json.getBytes(StandardCharsets.UTF_8).length);
-
-        channel.writeInbound(httpRequest);
-
-        final FullHttpResponse response = channel.readOutbound();
-        assertThat(response.status()).isEqualTo(HttpResponseStatus.OK);
-        assertThat(response.headers().get(HttpHeaderNames.CONTENT_TYPE)).isEqualTo("application/json");
-
-        final String responseJson = response.content().toString(StandardCharsets.UTF_8);
-        assertThat(responseJson).contains("partialSuccess");
-
-        // Verify collector instance UID was embedded
-        final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
-        verify(input, times(1)).processRawMessage(captor.capture());
-        final CollectorJournal.Record record = CollectorJournal.Record.parseFrom(captor.getValue().getPayload());
-        assertThat(record.getCollectorInstanceUid()).isEqualTo(agentUid);
-
-        response.release();
-    }
-
-    @Test
-    void getRequestReturns405() {
-        final EmbeddedChannel channel = createChannel("some-agent");
-
-        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
-                HttpVersion.HTTP_1_1, HttpMethod.GET, "/v1/logs");
-        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, 0);
-
-        channel.writeInbound(httpRequest);
-
-        final FullHttpResponse response = channel.readOutbound();
-        assertThat(response.status()).isEqualTo(HttpResponseStatus.METHOD_NOT_ALLOWED);
-        verifyNoInteractions(input);
-        response.release();
-    }
-
-    @Test
-    void wrongPathReturns404() {
-        final EmbeddedChannel channel = createChannel("some-agent");
-
-        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
-                HttpVersion.HTTP_1_1, HttpMethod.POST, "/v1/wrong-path",
-                Unpooled.wrappedBuffer(new byte[0]));
-        httpRequest.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/x-protobuf");
-        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, 0);
-
-        channel.writeInbound(httpRequest);
-
-        final FullHttpResponse response = channel.readOutbound();
-        assertThat(response.status()).isEqualTo(HttpResponseStatus.NOT_FOUND);
-        verifyNoInteractions(input);
-        response.release();
-    }
-
-    @Test
-    void unsupportedContentTypeReturns415() {
-        final EmbeddedChannel channel = createChannel("some-agent");
-
-        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
-                HttpVersion.HTTP_1_1, HttpMethod.POST, "/v1/logs",
-                Unpooled.wrappedBuffer("test".getBytes(StandardCharsets.UTF_8)));
-        httpRequest.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain");
-        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, 4);
-
-        channel.writeInbound(httpRequest);
-
-        final FullHttpResponse response = channel.readOutbound();
-        assertThat(response.status()).isEqualTo(HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE);
-        verifyNoInteractions(input);
         response.release();
     }
 
@@ -253,6 +139,31 @@ class CollectorIngestHttpHandlerTest {
         }
 
         final FullHttpResponse response = channel.readOutbound();
+        response.release();
+    }
+
+    @Test
+    void keepAliveRequestKeepsChannelOpen() throws Exception {
+        final String agentUid = "keep-alive-agent";
+        final EmbeddedChannel channel = createChannel(agentUid);
+        final ExportLogsServiceRequest request = createTestRequest();
+
+        final FullHttpRequest httpRequest = new DefaultFullHttpRequest(
+                HttpVersion.HTTP_1_1, HttpMethod.POST, "/v1/logs",
+                Unpooled.wrappedBuffer(request.toByteArray()));
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/x-protobuf");
+        httpRequest.headers().set(HttpHeaderNames.CONTENT_LENGTH, request.toByteArray().length);
+        httpRequest.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+
+        channel.writeInbound(httpRequest);
+
+        final FullHttpResponse response = channel.readOutbound();
+        assertThat(response.status()).isEqualTo(HttpResponseStatus.OK);
+        assertThat(response.headers().get(HttpHeaderNames.CONNECTION))
+                .isEqualToIgnoringCase(HttpHeaderValues.KEEP_ALIVE.toString());
+        assertThat(channel.isOpen()).isTrue();
+
+        verify(input, times(1)).processRawMessage(any());
         response.release();
     }
 

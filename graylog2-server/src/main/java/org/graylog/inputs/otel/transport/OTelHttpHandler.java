@@ -25,8 +25,10 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsPartialSuccess;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
@@ -40,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class OTelHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     private static final Logger LOG = LoggerFactory.getLogger(OTelHttpHandler.class);
@@ -48,7 +51,7 @@ public class OTelHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest
     public static final String PROTOBUF_CONTENT_TYPE = "application/x-protobuf";
     public static final String JSON_CONTENT_TYPE = "application/json";
 
-    private final OTelJournalRecordFactory journalRecordFactory;
+    protected final OTelJournalRecordFactory journalRecordFactory;
     private final MessageInput input;
 
     public OTelHttpHandler(OTelJournalRecordFactory journalRecordFactory, MessageInput input) {
@@ -58,16 +61,18 @@ public class OTelHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) {
+        final boolean keepAlive = HttpUtil.isKeepAlive(request);
+
         // 1. Validate method
         if (!HttpMethod.POST.equals(request.method())) {
-            sendError(ctx, HttpResponseStatus.METHOD_NOT_ALLOWED);
+            sendError(ctx, HttpResponseStatus.METHOD_NOT_ALLOWED, keepAlive);
             return;
         }
 
         // 2. Validate path
         final String uri = request.uri();
         if (!LOGS_PATH.equals(uri) && !uri.startsWith(LOGS_PATH + "?")) {
-            sendError(ctx, HttpResponseStatus.NOT_FOUND);
+            sendError(ctx, HttpResponseStatus.NOT_FOUND, keepAlive);
             return;
         }
 
@@ -76,12 +81,17 @@ public class OTelHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest
         final boolean isProtobuf = contentType != null && contentType.startsWith(PROTOBUF_CONTENT_TYPE);
         final boolean isJson = contentType != null && contentType.startsWith(JSON_CONTENT_TYPE);
         if (!isProtobuf && !isJson) {
-            sendError(ctx, HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE);
+            sendError(ctx, HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE, keepAlive);
+            return;
+        }
+
+        // 4. Subclass validation hook
+        if (!validateRequest(ctx, request)) {
             return;
         }
 
         try {
-            // 4. Parse request
+            // 5. Parse request
             final ExportLogsServiceRequest exportRequest;
             if (isProtobuf) {
                 final byte[] bytes = new byte[request.content().readableBytes()];
@@ -94,28 +104,36 @@ public class OTelHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest
                 exportRequest = builder.build();
             }
 
-            // 5. Create journal records and process
-            final Function<byte[], RawMessage> createRawMessage;
-            if (ctx.channel().remoteAddress() instanceof InetSocketAddress address) {
-                createRawMessage = bytes -> new RawMessage(bytes, address);
-            } else {
-                createRawMessage = RawMessage::new;
-            }
+            // 6. Create journal records and process
+            createJournalRecords(ctx, exportRequest).forEach(input::processRawMessage);
 
-            journalRecordFactory.createFromRequest(exportRequest).stream()
-                    .map(AbstractMessageLite::toByteArray)
-                    .map(createRawMessage)
-                    .forEach(input::processRawMessage);
-
-            // 6. Send success response
-            sendSuccess(ctx, isProtobuf);
+            // 7. Send success response
+            sendSuccess(ctx, isProtobuf, keepAlive);
         } catch (Exception e) {
             LOG.debug("Failed to parse OTLP request", e);
-            sendError(ctx, HttpResponseStatus.BAD_REQUEST);
+            sendError(ctx, HttpResponseStatus.BAD_REQUEST, keepAlive);
         }
     }
 
-    private void sendSuccess(ChannelHandlerContext ctx, boolean protobuf) {
+    protected boolean validateRequest(ChannelHandlerContext ctx, FullHttpRequest request) {
+        return true;
+    }
+
+    protected Stream<RawMessage> createJournalRecords(ChannelHandlerContext ctx,
+                                                      ExportLogsServiceRequest exportRequest) {
+        final Function<byte[], RawMessage> createRawMessage;
+        if (ctx.channel().remoteAddress() instanceof InetSocketAddress address) {
+            createRawMessage = bytes -> new RawMessage(bytes, address);
+        } else {
+            createRawMessage = RawMessage::new;
+        }
+
+        return journalRecordFactory.createFromRequest(exportRequest).stream()
+                .map(AbstractMessageLite::toByteArray)
+                .map(createRawMessage);
+    }
+
+    private void sendSuccess(ChannelHandlerContext ctx, boolean protobuf, boolean keepAlive) {
         final ExportLogsServiceResponse response = ExportLogsServiceResponse.newBuilder()
                 .setPartialSuccess(ExportLogsPartialSuccess.newBuilder()
                         .setRejectedLogRecords(0)
@@ -133,7 +151,7 @@ public class OTelHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest
                 responseContentType = JSON_CONTENT_TYPE;
             } catch (Exception e) {
                 LOG.error("Failed to serialize OTLP JSON response", e);
-                sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+                sendError(ctx, HttpResponseStatus.INTERNAL_SERVER_ERROR, keepAlive);
                 return;
             }
         }
@@ -143,13 +161,19 @@ public class OTelHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest
                 Unpooled.wrappedBuffer(body));
         httpResponse.headers().set(HttpHeaderNames.CONTENT_TYPE, responseContentType);
         httpResponse.headers().set(HttpHeaderNames.CONTENT_LENGTH, body.length);
-        ctx.writeAndFlush(httpResponse).addListener(ChannelFutureListener.CLOSE);
+        httpResponse.headers().set(HttpHeaderNames.CONNECTION,
+                keepAlive ? HttpHeaderValues.KEEP_ALIVE : HttpHeaderValues.CLOSE);
+        ctx.writeAndFlush(httpResponse)
+                .addListener(keepAlive ? ChannelFutureListener.CLOSE_ON_FAILURE : ChannelFutureListener.CLOSE);
     }
 
-    private void sendError(ChannelHandlerContext ctx, HttpResponseStatus status) {
+    protected void sendError(ChannelHandlerContext ctx, HttpResponseStatus status, boolean keepAlive) {
         final DefaultFullHttpResponse response = new DefaultFullHttpResponse(
                 HttpVersion.HTTP_1_1, status);
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, 0);
-        ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+        response.headers().set(HttpHeaderNames.CONNECTION,
+                keepAlive ? HttpHeaderValues.KEEP_ALIVE : HttpHeaderValues.CLOSE);
+        ctx.writeAndFlush(response)
+                .addListener(keepAlive ? ChannelFutureListener.CLOSE_ON_FAILURE : ChannelFutureListener.CLOSE);
     }
 }
