@@ -27,8 +27,10 @@ import com.amazonaws.services.securitytoken.AWSSecurityTokenService;
 import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder;
 import com.amazonaws.services.securitytoken.model.GetCallerIdentityRequest;
 import com.google.common.base.Preconditions;
+import okhttp3.HttpUrl;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.aws.config.AWSPluginConfiguration;
+import org.graylog.aws.config.Proxy;
 import org.graylog2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,15 +56,26 @@ public class AWSAuthProvider implements AWSCredentialsProvider {
                            @Nullable String secretKey,
                            @Nullable String region,
                            @Nullable String assumeRoleArn) {
+        this(configuration, awsConfig, accessKey, secretKey, region, assumeRoleArn, null);
+    }
+
+    public AWSAuthProvider(Configuration configuration,
+                           AWSPluginConfiguration awsConfig,
+                           @Nullable String accessKey,
+                           @Nullable String secretKey,
+                           @Nullable String region,
+                           @Nullable String assumeRoleArn,
+                           @Nullable HttpUrl proxyUrl) {
         this.configuration = configuration;
-        this.credentials = this.resolveAuthentication(awsConfig, accessKey, secretKey, region, assumeRoleArn);
+        this.credentials = this.resolveAuthentication(awsConfig, accessKey, secretKey, region, assumeRoleArn, proxyUrl);
     }
 
     private AWSCredentialsProvider resolveAuthentication(AWSPluginConfiguration config,
                                                          @Nullable String accessKey,
                                                          @Nullable String secretKey,
                                                          @Nullable String region,
-                                                         @Nullable String assumeRoleArn) {
+                                                         @Nullable String assumeRoleArn,
+                                                         @Nullable HttpUrl proxyUrl) {
 
         AWSCredentialsProvider awsCredentials = configuration.isCloud() ?
                 getCloudAwsCredentialsProvider(accessKey, secretKey) :
@@ -70,7 +83,7 @@ public class AWSAuthProvider implements AWSCredentialsProvider {
 
         if (!isNullOrEmpty(assumeRoleArn) && !isNullOrEmpty(region)) {
             LOG.debug("Creating cross account assume role credentials");
-            return this.getSTSCredentialsProvider(awsCredentials, region, assumeRoleArn);
+            return this.getSTSCredentialsProvider(awsCredentials, region, assumeRoleArn, proxyUrl);
         } else {
             return awsCredentials;
         }
@@ -97,11 +110,15 @@ public class AWSAuthProvider implements AWSCredentialsProvider {
         return new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey));
     }
 
-    private AWSCredentialsProvider getSTSCredentialsProvider(AWSCredentialsProvider awsCredentials, String region, String assumeRoleArn) {
-        AWSSecurityTokenService stsClient = AWSSecurityTokenServiceClientBuilder.standard()
+    private AWSCredentialsProvider getSTSCredentialsProvider(AWSCredentialsProvider awsCredentials, String region,
+                                                              String assumeRoleArn, @Nullable HttpUrl proxyUrl) {
+        final AWSSecurityTokenServiceClientBuilder stsBuilder = AWSSecurityTokenServiceClientBuilder.standard()
                 .withRegion(region)
-                .withCredentials(awsCredentials)
-                .build();
+                .withCredentials(awsCredentials);
+        if (proxyUrl != null) {
+            stsBuilder.withClientConfiguration(Proxy.forAWS(proxyUrl));
+        }
+        final AWSSecurityTokenService stsClient = stsBuilder.build();
         String roleSessionName = f("API_KEY_%s@ACCOUNT_%s",
                 awsCredentials.getCredentials().getAWSAccessKeyId(),
                 stsClient.getCallerIdentity(new GetCallerIdentityRequest()).getAccount());
