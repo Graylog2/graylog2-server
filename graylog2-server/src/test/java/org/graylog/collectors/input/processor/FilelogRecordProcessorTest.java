@@ -43,7 +43,6 @@ class FilelogRecordProcessorTest {
         final var result = processor.process(logRecord);
 
         assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.of(
-                "gl2_collector_receiver_type", "filelog",
                 EventFields.EVENT_LOG_NAME, "graylog.log",
                 EventFields.EVENT_LOG_PATH, "/var/log/graylog/graylog.log"
         ));
