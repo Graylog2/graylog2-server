@@ -17,7 +17,6 @@
 package org.graylog2.rest.resources.mongodb;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.ImmutableMap;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -29,24 +28,25 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.cluster.nodes.MongodbNode;
-import org.graylog2.cluster.nodes.MongodbNodesService;
+import org.graylog2.cluster.nodes.mongodb.MongodbNode;
+import org.graylog2.utilities.lucene.InMemorySearchEngine;
+import org.graylog2.utilities.lucene.LuceneInMemorySearchEngine;
+import org.graylog2.cluster.nodes.mongodb.MongodbNodesProvider;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
-import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
-import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import java.util.Comparator;
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
+import java.util.Set;
 
 @Tag(name = "System/Mongodb", description = "MongoDB Node discovery")
 @RequiresAuthentication
@@ -54,18 +54,10 @@ import java.util.Map;
 @Produces(MediaType.APPLICATION_JSON)
 public class MongodbClusterResource extends RestResource {
 
-    private final MongodbNodesService mongodbNodesService;
-    private final SearchQueryParser searchQueryParser;
-
-    private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
-            .put("name", SearchQueryField.create("name", SearchQueryField.Type.STRING))
-            .put("role", SearchQueryField.create("role", SearchQueryField.Type.STRING))
-            .put("version", SearchQueryField.create("version", SearchQueryField.Type.STRING))
-            .build();
-
     private static final String DEFAULT_SORT_FIELD = "name";
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
+            EntityAttribute.builder().id("id").title("ID").type(SearchQueryField.Type.STRING).sortable(true).searchable(true).build(),
             EntityAttribute.builder().id("name").title("Node Name").type(SearchQueryField.Type.STRING).sortable(true).searchable(true).build(),
             EntityAttribute.builder().id("role").title("Role").type(SearchQueryField.Type.STRING).sortable(true).searchable(true).build(),
             EntityAttribute.builder().id("version").title("Version").type(SearchQueryField.Type.STRING).sortable(true).searchable(true).build(),
@@ -75,25 +67,26 @@ public class MongodbClusterResource extends RestResource {
             EntityAttribute.builder().id("storageUsedPercent").title("Storage Used (%)").type(SearchQueryField.Type.DOUBLE).sortable(true).build()
     );
 
-    private static final Map<String, Comparator<MongodbNode>> SORTING = Map.of(
-            "name", Comparator.comparing(MongodbNode::name),
-            "role", Comparator.comparing(MongodbNode::role),
-            "version", Comparator.comparing(MongodbNode::version),
-            "status", Comparator.comparing(MongodbNode::status),
-            "replicationLag", Comparator.comparing(MongodbNode::replicationLag),
-            "slowQueryCount", Comparator.comparing(MongodbNode::slowQueryCount),
-            "storageUsedPercent", Comparator.comparing(MongodbNode::storageUsedPercent)
-    );
-
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
             .build();
 
+
+    private final InMemorySearchEngine<MongodbNode> mongodbNodesSearchService;
+
     @Inject
-    public MongodbClusterResource(MongodbNodesService mongodbNodesService) {
-        this.mongodbNodesService = mongodbNodesService;
-        this.searchQueryParser = new SearchQueryParser("name", SEARCH_FIELD_MAPPING);
+    public MongodbClusterResource(Set<MongodbNodesProvider> providers) {
+        this.mongodbNodesSearchService = new LuceneInMemorySearchEngine<>(DEFAULT_SORT_FIELD, attributes, () -> retrieveMongodbNodes(providers));
     }
+
+    private List<MongodbNode> retrieveMongodbNodes(Set<MongodbNodesProvider> providers) {
+        return providers.stream()
+                .filter(MongodbNodesProvider::available)
+                .findFirst()
+                .map(MongodbNodesProvider::allNodes)
+                .orElseThrow(() -> new IllegalStateException("No available Mongodb nodes"));
+    }
+
 
     @GET
     @Timed
@@ -110,28 +103,9 @@ public class MongodbClusterResource extends RestResource {
                                                               schema = @Schema(allowableValues = {"asc", "desc"}))
                                                    @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order
 
-    ) {
-        final SearchQuery searchQuery = searchQueryParser.parse(query);
-
-        Comparator<MongodbNode> comparator = comparator(sort, order);
-
-        final PaginatedList<MongodbNode> result = mongodbNodesService.searchPaginated(searchQuery, comparator, page, perPage);
-
+    ) throws QueryNodeException, IOException {
+        final PaginatedList<MongodbNode> result = mongodbNodesSearchService.search(query, sort, order, page, perPage);
         return PageListResponse.create(query, result.pagination(),
                 result.grandTotal().orElse(0L), sort, order, result.stream().toList(), attributes, settings);
-    }
-
-    private Comparator<MongodbNode> comparator(String sort, SortOrder order) {
-        final Comparator<MongodbNode> sortFunction = SORTING.get(sort);
-
-        if (sortFunction == null) {
-            throw new IllegalArgumentException("Sort field " + sort + " not found");
-        }
-
-        if (order == SortOrder.ASCENDING) {
-            return sortFunction;
-        } else {
-            return sortFunction.reversed();
-        }
     }
 }

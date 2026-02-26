@@ -14,13 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.nodes;
+package org.graylog2.utilities.lucene;
 
+import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.search.SearchQuery;
+import org.graylog2.rest.models.SortOrder;
 
-import java.util.Comparator;
+import java.io.IOException;
 
-public interface MongodbNodesService {
-    PaginatedList<MongodbNode> searchPaginated(SearchQuery searchQuery, Comparator<MongodbNode> comparator, int page, int perPage);
+public interface InMemorySearchEngine<T extends  InMemorySearchableEntity> {
+    PaginatedList<T> search(String queryString, String sortField, SortOrder sortOrder, int page, int perPage) throws IOException, QueryNodeException;
 }

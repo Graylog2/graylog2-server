@@ -21,14 +21,13 @@ import com.mongodb.connection.ClusterDescription;
 import com.mongodb.connection.ClusterType;
 import jakarta.inject.Inject;
 import org.bson.Document;
-import org.graylog2.cluster.nodes.MongodbNode;
 import org.graylog2.database.MongoConnection;
 
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-public class StandaloneNodeMongodbNodes implements  MongodbNodesProvider {
+public class StandaloneNodeMongodbNodes implements MongodbNodesProvider {
 
     private final MongoClient mongoConnection;
 
@@ -56,7 +55,7 @@ public class StandaloneNodeMongodbNodes implements  MongodbNodesProvider {
         Long slowQueryCount = getSlowQueryCount();
 
         // For standalone nodes: role is "STANDALONE", status is 1 (primary equivalent), no replication lag
-        return new MongodbNode(host, "STANDALONE", version, 1, 0, slowQueryCount, storageUsedPercent);
+        return new MongodbNode("0", host, "STANDALONE", version, 0, slowQueryCount, storageUsedPercent);
     }
 
     private double calculateStorageUsedPercent() {

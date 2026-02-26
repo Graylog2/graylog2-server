@@ -21,7 +21,6 @@ import com.mongodb.connection.ClusterDescription;
 import com.mongodb.connection.ClusterType;
 import jakarta.inject.Inject;
 import org.bson.Document;
-import org.graylog2.cluster.nodes.MongodbNode;
 import org.graylog2.database.MongoConnection;
 
 import java.util.Date;
@@ -68,10 +67,9 @@ public class ReplicaSetMongodbNodes implements MongodbNodesProvider {
 
     private MongodbNode toMongodbNode(Document member, String version, Document primaryMember,
                                       double storageUsedPercent, Long slowQueryCount) {
+        int id = member.get("_id", Integer.class);
         String name = member.get("name", String.class);
         String role = member.get("stateStr", String.class);
-        Integer status = member.getInteger("state");
-
 
         // Replication lag - compare optime with primary
         long replicationLag = 0;
@@ -84,7 +82,7 @@ public class ReplicaSetMongodbNodes implements MongodbNodesProvider {
                 }
             }
         }
-        return new MongodbNode(name, role, version, status, replicationLag, slowQueryCount, storageUsedPercent);
+        return new MongodbNode(String.valueOf(id), name, role, version, replicationLag, slowQueryCount, storageUsedPercent);
     }
 
     private double calculateStorageUsedPercent() {

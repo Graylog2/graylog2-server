@@ -14,11 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.nodes.mongodb;
+package org.graylog2.utilities.lucene;
 
-import java.util.List;
-
-public interface MongodbNodesProvider {
-    List<MongodbNode> allNodes();
-    boolean available();
+public interface InMemorySearchableEntity {
+    void buildLuceneDoc(LuceneDocBuilder builder);
 }

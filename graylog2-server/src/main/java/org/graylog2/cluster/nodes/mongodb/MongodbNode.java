@@ -14,15 +14,30 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.nodes;
+package org.graylog2.cluster.nodes.mongodb;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.graylog2.utilities.lucene.InMemorySearchableEntity;
+import org.graylog2.utilities.lucene.LuceneDocBuilder;
 
 public record MongodbNode(
+        String id,
         String name,
         String role,
         String version,
-        Integer status,
         long replicationLag,
         Long slowQueryCount,
         double storageUsedPercent
-) {
+) implements InMemorySearchableEntity {
+
+    @JsonIgnore
+    @Override
+    public void buildLuceneDoc(LuceneDocBuilder builder) {
+        builder.stringVal("id", id);
+        builder.stringVal("name", name);
+        builder.stringVal("role", role);
+        builder.longVal("replicationLag", replicationLag);
+        builder.longVal("slowQueryCount", slowQueryCount);
+        builder.doubleVal("storageUsedPercent", storageUsedPercent);
+    }
 }
