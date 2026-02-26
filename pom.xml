@@ -699,12 +699,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.4</version>
+                    <version>3.5.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.5.4</version>
+                    <version>3.5.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -781,7 +781,7 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.73.1</version>
+                            <version>8.73.2</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>

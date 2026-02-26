@@ -14,6 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const req = require.context('./', true, /.[jt]s(x)?$/);
+import URI from 'urijs';
 
-req.keys().forEach(req);
+import AppConfig from 'util/AppConfig';
+
+declare let __webpack_public_path__: string;
+
+// The webpack-dev-server serves the assets from "/"
+const assetPrefix = AppConfig.gl2DevMode() ? '/' : '/assets/';
+
+// If app prefix was not set, we need to tell webpack to load chunks from root instead of the relative URL path
+// eslint-disable-next-line prefer-const
+__webpack_public_path__ = URI.joinPaths(AppConfig.gl2AppPathPrefix(), assetPrefix).path() || assetPrefix;
