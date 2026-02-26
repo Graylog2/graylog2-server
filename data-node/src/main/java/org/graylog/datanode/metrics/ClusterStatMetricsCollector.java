@@ -20,13 +20,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog.storage.opensearch3.OfficialOpensearchClient;
+import org.graylog.storage.opensearch3.PlainJsonApi;
+import org.opensearch.client.opensearch.generic.Requests;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,51 +35,50 @@ public class ClusterStatMetricsCollector {
 
     Logger log = LoggerFactory.getLogger(ClusterStatMetricsCollector.class);
 
-    private final RestHighLevelClient client;
+    private final OfficialOpensearchClient client;
     private final ObjectMapper objectMapper;
 
-    public ClusterStatMetricsCollector(RestHighLevelClient client, ObjectMapper objectMapper) {
+    public ClusterStatMetricsCollector(OfficialOpensearchClient client, ObjectMapper objectMapper) {
         this.client = client;
         this.objectMapper = objectMapper;
     }
 
     public Map<String, Object> getClusterMetrics(Map<String, Object> previousMetrics) {
-        Request clusterStatRequest = new Request("GET", "_stats");
-        try {
-            Response response = client.getLowLevelClient().performRequest(clusterStatRequest);
-            JsonNode responseNode = objectMapper.readValue(response.getEntity().getContent(), JsonNode.class);
+        org.opensearch.client.opensearch.generic.Request nodeStatRequest = Requests.builder()
+                .method("GET")
+                .endpoint("_stats")
+                .build();
+        PlainJsonApi api = new PlainJsonApi(objectMapper, null, client);
+        JsonNode responseNode = api.performRequest(nodeStatRequest, "Error retrieving cluster metrics");
+        
+        if (responseNode != null) {
+            DocumentContext statContext = JsonPath.parse(responseNode.toString());
 
-            if (responseNode != null) {
-                DocumentContext statContext = JsonPath.parse(responseNode.toString());
+            Map<String, Object> metrics = new HashMap<>();
 
-                Map<String, Object> metrics = new HashMap<>();
-
-                Arrays.stream(ClusterStatMetrics.values())
-                        .filter(m -> Objects.nonNull(m.getClusterStat()))
-                        .forEach(metric -> {
-                            String fieldName = metric.getFieldName();
-                            try {
-                                Object value = statContext.read(metric.getClusterStat());
-                                if (value instanceof Number current && metric.isRateMetric() && previousMetrics.containsKey(fieldName)) {
-                                    Number previous = (Number) previousMetrics.get(fieldName);
-                                    long rate = current.longValue() - previous.longValue();
-                                    if (rate > 0) {
-                                        metrics.put(metric.getRateFieldName(), rate);
-                                    }
+            Arrays.stream(ClusterStatMetrics.values())
+                    .filter(m -> Objects.nonNull(m.getClusterStat()))
+                    .forEach(metric -> {
+                        String fieldName = metric.getFieldName();
+                        try {
+                            Object value = statContext.read(metric.getClusterStat());
+                            if (value instanceof Number current && metric.isRateMetric() && previousMetrics.containsKey(fieldName)) {
+                                Number previous = (Number) previousMetrics.get(fieldName);
+                                long rate = current.longValue() - previous.longValue();
+                                if (rate > 0) {
+                                    metrics.put(metric.getRateFieldName(), rate);
                                 }
-                                metrics.put(fieldName, value);
-                            } catch (Exception e) {
-                                log.error("Could not retrieve cluster metric {}", fieldName);
                             }
-                        });
+                            metrics.put(fieldName, value);
+                        } catch (Exception e) {
+                            log.error("Could not retrieve cluster metric {}", fieldName);
+                        }
+                    });
 
-                return metrics;
-            }
-
-            throw new IOException("No cluster stats returned");
-        } catch (IOException e) {
-            log.error("Error retrieving cluster stats", e);
+            return metrics;
         }
+
+        log.error("No cluster stats returned");
         return Map.of();
     }
 }

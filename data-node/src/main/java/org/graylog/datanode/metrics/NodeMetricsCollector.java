@@ -22,13 +22,13 @@ import com.jayway.jsonpath.Criteria;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.Filter;
 import com.jayway.jsonpath.JsonPath;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog.storage.opensearch3.OfficialOpensearchClient;
+import org.graylog.storage.opensearch3.PlainJsonApi;
+import org.opensearch.client.opensearch.generic.Request;
+import org.opensearch.client.opensearch.generic.Requests;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,10 +38,10 @@ public class NodeMetricsCollector {
 
     Logger log = LoggerFactory.getLogger(NodeMetricsCollector.class);
 
-    private final RestHighLevelClient client;
+    private final OfficialOpensearchClient client;
     private final ObjectMapper objectMapper;
 
-    public NodeMetricsCollector(RestHighLevelClient client, ObjectMapper objectMapper) {
+    public NodeMetricsCollector(OfficialOpensearchClient client, ObjectMapper objectMapper) {
         this.client = client;
         this.objectMapper = objectMapper;
     }
@@ -49,7 +49,10 @@ public class NodeMetricsCollector {
     public Map<String, Object> getNodeMetrics(String node) {
         Map<String, Object> metrics = new HashMap<>();
 
-        Request nodeStatRequest = new Request("GET", "_nodes/" + node + "/stats");
+        Request nodeStatRequest = Requests.builder()
+                .method("GET")
+                .endpoint("_nodes/" + node + "/stats")
+                .build();
         final DocumentContext nodeContext = getNodeContextFromRequest(node, nodeStatRequest);
 
         if (Objects.nonNull(nodeContext)) {
@@ -68,19 +71,17 @@ public class NodeMetricsCollector {
     }
 
     private DocumentContext getNodeContextFromRequest(String node, Request nodeStatRequest) {
-        try {
-            Response response = client.getLowLevelClient().performRequest(nodeStatRequest);
-            Filter nodeFilter = Filter.filter(Criteria.where("name").eq(node));
-            Object nodeStatNode = JsonPath.read(response.getEntity().getContent(), "$['nodes'][*][?]", nodeFilter);
+        PlainJsonApi api = new PlainJsonApi(objectMapper, null, client);
+        JsonNode response = api.performRequest(nodeStatRequest, "Error retrieving node stats for node " + node);
 
-            if (nodeStatNode != null) {
-                JsonNode nodeStats = objectMapper.convertValue(nodeStatNode, JsonNode.class);
-                return JsonPath.parse(nodeStats.get(0).toString());
-            }
-            throw new IOException("No node stats returned for node");
-        } catch (IOException e) {
-            log.error("Error retrieving node stats for node {}", node, e);
+        Filter nodeFilter = Filter.filter(Criteria.where("name").eq(node));
+        Object nodeStatNode = JsonPath.read(response, "$['nodes'][*][?]", nodeFilter);
+
+        if (nodeStatNode != null) {
+            JsonNode nodeStats = objectMapper.convertValue(nodeStatNode, JsonNode.class);
+            return JsonPath.parse(nodeStats.get(0).toString());
         }
+        log.error("No node stats returned for node {}", node);
         return null;
     }
 

@@ -19,7 +19,7 @@ package org.graylog.datanode.metrics;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpEntity;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +45,7 @@ public class NodeMetricsCollectorTest {
 
     NodeMetricsCollector collector;
     @Mock
-    RestHighLevelClient client;
+    OfficialOpensearchClient client;
 
     @BeforeEach
     public void setUp() throws IOException {
@@ -54,7 +54,6 @@ public class NodeMetricsCollectorTest {
         when(response.getEntity()).thenReturn(entity);
         when(entity.getContent()).thenReturn(new ByteArrayInputStream(nodeStatResponse.getBytes(Charset.defaultCharset())));
         RestClient lowLevelClient = mock(RestClient.class);
-        when(client.getLowLevelClient()).thenReturn(lowLevelClient);
         when(lowLevelClient.performRequest(any())).thenReturn(response);
         this.collector = new NodeMetricsCollector(client, new ObjectMapperProvider().get());
     }

@@ -28,20 +28,18 @@ import org.graylog.datanode.metrics.NodeMetricsCollector;
 import org.graylog.datanode.metrics.NodeStatMetrics;
 import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
-import org.graylog.shaded.opensearch2.org.joda.time.DateTime;
-import org.graylog.shaded.opensearch2.org.joda.time.DateTimeZone;
-import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
-import org.graylog.shaded.opensearch2.org.opensearch.core.action.ActionListener;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
+import org.graylog.storage.opensearch3.OSSerializationUtils;
+import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog2.plugin.periodical.Periodical;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.SortOrder;
+import org.opensearch.client.opensearch._types.query_dsl.Query;
+import org.opensearch.client.opensearch.core.IndexRequest;
+import org.opensearch.client.opensearch.core.IndexResponse;
+import org.opensearch.client.opensearch.core.SearchRequest;
+import org.opensearch.client.opensearch.core.SearchResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +52,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MetricsCollector extends Periodical {
@@ -133,10 +132,9 @@ public class MetricsCollector extends Periodical {
     @Override
     public void doRun() {
         if (process.isInState(OpensearchState.AVAILABLE)) {
-            process.restClient().ifPresent(client -> {
+            process.openSearchClient().ifPresent(client -> {
                 this.nodeStatMetricsCollector = new NodeMetricsCollector(client, objectMapper);
                 this.clusterStatMetricsCollector = new ClusterStatMetricsCollector(client, objectMapper);
-                final IndexRequest indexRequest = new IndexRequest(configuration.getMetricsStream());
                 Map<String, Object> metrics = new HashMap<String, Object>();
                 metrics.put(configuration.getMetricsTimestamp(), new DateTime(DateTimeZone.UTC));
                 String node = configuration.getDatanodeNodeName();
@@ -144,14 +142,20 @@ public class MetricsCollector extends Periodical {
                 addJvmMetrics(metrics);
                 Map<String, Object> nodeMetrics = nodeStatMetricsCollector.getNodeMetrics(node);
                 metrics.putAll(nodeMetrics);
-                indexRequest.source(metrics);
-                indexDocument(client, indexRequest);
+                final Map<String, Object> finalMetrics = metrics;
+                indexDocument(client, IndexRequest.of(i -> i
+                        .index(configuration.getMetricsStream())
+                        .document(finalMetrics)
+                ));
 
                 if (process.isManagerNode()) {
                     metrics = new HashMap<>(clusterStatMetricsCollector.getClusterMetrics(getPreviousMetricsForCluster(client)));
                     metrics.put(configuration.getMetricsTimestamp(), new DateTime(DateTimeZone.UTC));
-                    indexRequest.source(metrics);
-                    indexDocument(client, indexRequest);
+                    final Map<String, Object> clusterMetrics = metrics;
+                    indexDocument(client, IndexRequest.of(i -> i
+                            .index(configuration.getMetricsStream())
+                            .document(clusterMetrics)
+                    ));
                 }
 
                 nodeMetrics.forEach((key, value) -> {
@@ -192,39 +196,41 @@ public class MetricsCollector extends Periodical {
         return 100 * (float) memoryUsage.getUsed() / memoryUsage.getCommitted();
     }
 
-    private Map<String, Object> getPreviousMetricsForCluster(RestHighLevelClient client) {
-        SearchRequest searchRequest = new SearchRequest(configuration.getMetricsStream());
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        searchSourceBuilder.query(QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery("node")));  // You can adjust the query based on your requirements
-        searchSourceBuilder.size(1);  // Retrieve only one document
-        searchSourceBuilder.sort(SortBuilders.fieldSort(configuration.getMetricsTimestamp()).order(SortOrder.DESC));  // Sort by timestamp in descending order
-        searchRequest.source(searchSourceBuilder);
-        SearchResponse searchResponse = null;
+    private Map<String, Object> getPreviousMetricsForCluster(OfficialOpensearchClient client) {
+        SearchRequest searchRequest = SearchRequest.of(r -> r
+                .index(configuration.getMetricsStream())
+                .query(Query.of(q -> q.bool(b -> b.must(Query.of(q2 -> q2.exists(e -> e.field("node")))))))
+                .size(1)
+                .sort(sort -> sort.field(f -> f
+                                .field(configuration.getMetricsTimestamp())
+                                .order(SortOrder.Desc)
+                        )
+                )
+        );
+        SearchResponse<JsonData> searchResponse = null;
         try {
-            searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+            searchResponse = client.syncWithoutErrorMapping().search(searchRequest, JsonData.class);
         } catch (IOException e) {
             LOG.error("Could not retrieve previous metrics", e);
         }
 
-        if (Objects.nonNull(searchResponse) && searchResponse.getHits().getTotalHits().value > 0) {
+        if (Objects.nonNull(searchResponse) && searchResponse.hits().total().value() > 0) {
             // Retrieve the first hit (latest document) from the search response
-            return searchResponse.getHits().getAt(0).getSourceAsMap();
+            return OSSerializationUtils.toMap(searchResponse.hits().hits().getFirst());
         } else {
             LOG.info("No previous metrics for cluster");
         }
         return Map.of();
     }
 
-    private static void indexDocument(RestHighLevelClient client, IndexRequest indexRequest) {
-        client.indexAsync(indexRequest, RequestOptions.DEFAULT, new ActionListener<IndexResponse>() {
-            @Override
-            public void onResponse(IndexResponse indexResponse) {
+    private static void indexDocument(OfficialOpensearchClient client, IndexRequest<Object> indexRequest) {
+        try {
+            CompletableFuture<IndexResponse> response = client.asyncWithoutErrorMapping().index(indexRequest);
+            if (response.isCompletedExceptionally()) {
+                LOG.error("Error indexing metrics");
             }
-
-            @Override
-            public void onFailure(Exception e) {
-                LOG.error("Error indexing metrics", e);
-            }
-        });
+        } catch (IOException e) {
+            LOG.error("Error indexing metrics", e);
+        }
     }
 }

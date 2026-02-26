@@ -16,7 +16,9 @@
  */
 package org.graylog.datanode.opensearch;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.EventBus;
@@ -26,32 +28,21 @@ import jakarta.inject.Inject;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.io.FileUtils;
-import org.apache.http.client.utils.URIBuilder;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.opensearch.cli.OpensearchCommandLineProcess;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
-import org.graylog.datanode.opensearch.rest.OpensearchRestClient;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog.datanode.periodicals.ClusterStateResponse;
 import org.graylog.datanode.process.ProcessInformation;
 import org.graylog.datanode.process.ProcessListener;
-import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchStatusException;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.client.ClusterClient;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
-import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
-import org.graylog.storage.opensearch2.OpenSearchClient;
+import org.graylog.storage.opensearch3.ClusterAdapterOS;
+import org.graylog.storage.opensearch3.OfficialOpensearchClient;
+import org.graylog.storage.opensearch3.OfficialOpensearchClientProvider;
+import org.graylog.storage.opensearch3.PlainJsonApi;
+import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
 import org.graylog2.datanode.DataNodeLifecycleTrigger;
 import org.graylog2.datanode.DataNodeNotficationEvent;
@@ -60,16 +51,16 @@ import org.graylog2.notifications.Notification;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.security.TrustManagerAggregator;
-import org.graylog2.shared.SuppressForbidden;
+import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
+import org.opensearch.client.opensearch.generic.Request;
+import org.opensearch.client.opensearch.generic.Requests;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import oshi.SystemInfo;
 import oshi.hardware.GlobalMemory;
 
 import javax.annotation.Nonnull;
-import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import java.io.IOException;
 import java.net.URI;
 import java.security.KeyStore;
 import java.util.List;
@@ -92,8 +83,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<OpensearchConfiguration> opensearchConfiguration = Optional.empty();
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private Optional<RestHighLevelClient> restClient = Optional.empty();
-    private Optional<OpenSearchClient> openSearchClient = Optional.empty();
+    private Optional<OfficialOpensearchClient> openSearchClient = Optional.empty();
 
     private final OpensearchStateMachine processState;
 
@@ -134,13 +124,6 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         eventBus.register(this);
     }
 
-    private RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
-
-        final TrustManager trustManager = createAggregatedTrustManager(configuration.trustStore());
-
-        return OpensearchRestClient.build(configuration, datanodeConfiguration, trustManager);
-    }
-
     /**
      * We have to combine the system-wide trust manager with a manager that trusts certificates used to secure
      * the datanode's opensearch process.
@@ -163,11 +146,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         return stderr.stream().toList();
     }
 
-    public Optional<RestHighLevelClient> restClient() {
-        return restClient;
-    }
-
-    public Optional<OpenSearchClient> openSearchClient() {
+    public Optional<OfficialOpensearchClient> openSearchClient() {
         return openSearchClient;
     }
 
@@ -177,13 +156,8 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
 
     @Override
     public URI getOpensearchBaseUrl() {
-        final String baseUrl = opensearchConfiguration.map(OpensearchConfiguration::getRestBaseUrl)
-                .map(httpHost -> new URIBuilder()
-                        .setHost(httpHost.getHostName())
-                        .setPort(httpHost.getPort())
-                        .setScheme(httpHost.getSchemeName()).toString())
-                .orElse(""); // Empty address will cause problems for opensearch clients. Has to be filtered out in IndexerDiscoveryProvider
-        return URI.create(baseUrl);
+        return opensearchConfiguration.map(OpensearchConfiguration::getRestBaseUrl)
+                .orElse(URI.create("")); // Empty address will cause problems for opensearch clients. Has to be filtered out in IndexerDiscoveryProvider
     }
 
     @Override
@@ -280,8 +254,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
                     commandLineProcess = new OpensearchCommandLineProcess(config, this);
                     commandLineProcess.start();
 
-                    restClient = Optional.of(createRestClient(config));
-                    openSearchClient = restClient.map(c -> new OpenSearchClient(c, objectMapper));
+                    createOpenSearchClient(config);
                     checkConfiguredHeap();
 
                     }),
@@ -289,27 +262,40 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
             );
     }
 
+    private void createOpenSearchClient(OpensearchConfiguration config) {
+        URI host = config.getRestBaseUrl();
+        ElasticsearchClientConfiguration clientConfiguration = new ElasticsearchClientConfiguration();
+        TrustManagerAndSocketFactoryProvider tmProvider;
+        try {
+            tmProvider = new TrustManagerAndSocketFactoryProvider(
+                    createAggregatedTrustManager(config.trustStore())
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        OfficialOpensearchClientProvider provider = new OfficialOpensearchClientProvider(
+                List.of(host),
+                datanodeConfiguration.indexerJwtAuthToken(),
+                null,
+                clientConfiguration,
+                objectMapper,
+                tmProvider
+
+        );
+        this.openSearchClient = Optional.of(provider.get());
+    }
+
     /**
      * reset allocation exclude status on restart to allow removed nodes to rejoin the cluster
      */
     private void checkAllocationEnabledStatus() {
-        if (restClient().isPresent()) {
-            ClusterClient clusterClient = restClient().get().cluster();
-            try {
-                final ClusterGetSettingsResponse settings =
-                        clusterClient.getSettings(new ClusterGetSettingsRequest(), RequestOptions.DEFAULT);
-                final String setting = settings.getSetting(CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING);
-                if (nodeName.equals(setting)) {
-                    ClusterUpdateSettingsRequest updateSettings = new ClusterUpdateSettingsRequest();
-                    updateSettings.transientSettings(Settings.builder()
-                            .putNull(CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING)
-                            .build());
-                    clusterClient.putSettings(updateSettings, RequestOptions.DEFAULT);
-                }
-                allocationExcludeChecked = true;
-            } catch (IOException e) {
-                throw new RuntimeException("Error getting cluster settings from OpenSearch", e);
+        if (openSearchClient().isPresent()) {
+            ClusterAdapterOS clusterAdapter = new ClusterAdapterOS(openSearchClient().get(), Duration.seconds(30));
+            final String setting = clusterAdapter.getClusterSetting(CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING);
+            if (nodeName.equalsIgnoreCase(setting)) {
+                clusterAdapter.updateClusterSetting(CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING, null, false);
             }
+            allocationExcludeChecked = true;
         }
     }
 
@@ -317,17 +303,11 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     @Override
     public synchronized void stop() {
         stopProcess();
-        stopRestClient();
+        stopClient();
     }
 
-    private void stopRestClient() {
-        restClient().ifPresent(client -> {
-            try {
-                client.close();
-            } catch (IOException e) {
-                LOG.warn("Failed to close rest client", e);
-            }
-        });
+    private void stopClient() {
+        openSearchClient().ifPresent(OfficialOpensearchClient::close);
     }
 
     private void stopProcess() {
@@ -339,27 +319,21 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     @Override
     public void remove() {
         LOG.info("Starting removal of OpenSearch node");
-        restClient().ifPresent(client -> {
-            final ClusterClient clusterClient = client.cluster();
-            ClusterUpdateSettingsRequest settings = new ClusterUpdateSettingsRequest();
-            settings.transientSettings(Settings.builder()
-                    .put(CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING, nodeName)
-                    .build());
-            try {
-                final ClusterUpdateSettingsResponse response =
-                        clusterClient.putSettings(settings, RequestOptions.DEFAULT);
-                if (response.isAcknowledged()) {
-                    allocationExcludeChecked = false; // reset to rejoin cluster in case of failure
-                    @SuppressWarnings("resource")
-                    final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor(
-                            new ThreadFactoryBuilder().setNameFormat("datanode-removal").build());
-                    executorService.scheduleAtFixedRate(() -> checkRemovalStatus(executorService), 10, 10, TimeUnit.SECONDS);
-                } else {
-                    throw new RuntimeException("Failed to exclude node from cluster allocation");
-                }
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to exclude node from cluster allocation", e);
+        openSearchClient().ifPresent(client -> {
+            ClusterAdapterOS clusterAdapter = new ClusterAdapterOS(client, Duration.seconds(30));
+            boolean ack = clusterAdapter
+                    .updateClusterSetting(CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING, nodeName, false);
+
+            if (ack) {
+                allocationExcludeChecked = false; // reset to rejoin cluster in case of failure
+                @SuppressWarnings("resource")
+                final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor(
+                        new ThreadFactoryBuilder().setNameFormat("datanode-removal").build());
+                executorService.scheduleAtFixedRate(() -> checkRemovalStatus(executorService), 10, 10, TimeUnit.SECONDS);
+            } else {
+                throw new RuntimeException("Failed to exclude node from cluster allocation");
             }
+
         });
     }
 
@@ -367,21 +341,15 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
      * started by onRemove() to check if all shards have been relocated
      */
     void checkRemovalStatus(ScheduledExecutorService executorService) {
-        final Optional<RestHighLevelClient> restClient = restClient();
-        if (restClient.isPresent()) {
-            try {
-                final ClusterClient clusterClient = restClient.get().cluster();
-                final ClusterHealthResponse health = clusterClient
-                        .health(new ClusterHealthRequest(), RequestOptions.DEFAULT);
-                if (health.getRelocatingShards() == 0) {
+        if (openSearchClient().isPresent()) {
+            ClusterAdapterOS clusterAdapter = new ClusterAdapterOS(openSearchClient().get(), Duration.seconds(30));
+            clusterAdapter.clusterHealthStats().ifPresent(health -> {
+                if (health.shards().relocating() == 0) {
                     onEvent(OpensearchEvent.PROCESS_STOPPED);
                     executorService.shutdown();
                     eventBus.post(DataNodeLifecycleEvent.create(nodeId.getNodeId(), DataNodeLifecycleTrigger.REMOVED));
                 }
-            } catch (IOException | OpenSearchStatusException e) {
-                executorService.shutdown();
-                throw new RuntimeException("Error checking removal status", e);
-            }
+            });
         }
     }
 
@@ -437,7 +405,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
 
     @Override
     public boolean isManagerNode() {
-        return restClient()
+        return openSearchClient()
                 .flatMap(this::requestClusterState)
                 .map(r -> r.nodes().get(r.clusterManagerNode()))
                 .map(managerNode -> configuration.getDatanodeNodeName().equals(managerNode.name()))
@@ -449,15 +417,15 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         return opensearchConfiguration.map(OpensearchConfiguration::warnings).orElse(List.of());
     }
 
-    private Optional<ClusterStateResponse> requestClusterState(RestHighLevelClient client) {
-        try {
-            final Response response = client.getLowLevelClient().performRequest(new Request("GET", "_cluster/state/"));
-            final ClusterStateResponse state = objectMapper.readValue(response.getEntity().getContent(), ClusterStateResponse.class);
-            return Optional.of(state);
-        } catch (IOException e) {
-            LOG.warn("Failed to obtain cluster state response", e);
-            return Optional.empty();
-        }
+    private Optional<ClusterStateResponse> requestClusterState(OfficialOpensearchClient client) {
+        Request request = Requests.builder()
+                .method("GET")
+                .endpoint("/_cluster/state")
+                .build();
+        PlainJsonApi api = new PlainJsonApi(objectMapper, null, client);
+        JsonNode jsonNode = api.performRequest(request, "Failed to obtain cluster state response");
+        ClusterStateResponse state = objectMapper.convertValue(jsonNode, ClusterStateResponse.class);
+        return Optional.of(state);
     }
 
 }
