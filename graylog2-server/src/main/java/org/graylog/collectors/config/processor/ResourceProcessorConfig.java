@@ -42,6 +42,7 @@ public abstract class ResourceProcessorConfig implements CollectorProcessorConfi
 
     public static Builder builder(String id) {
         return new AutoValue_ResourceProcessorConfig.Builder()
+                .id(id)
                 .name(f("resource/%s", id));
     }
 
@@ -51,6 +52,8 @@ public abstract class ResourceProcessorConfig implements CollectorProcessorConfi
 
     @AutoValue.Builder
     public abstract static class Builder {
+        public abstract Builder id(String id);
+
         public abstract Builder name(String name);
 
         public abstract Builder attributes(List<Attribute> attributes);

@@ -365,7 +365,10 @@ public class OpAmpService {
                         .collect(Collectors.toMap(e -> f("logs/%s", e.getKey()), e -> OtelPipelineConfig.builder()
                                 .receivers(e.getValue().stream().map(OtlpReceiverConfig::name).collect(Collectors.toSet()))
                                 .exporters(Set.of(effectiveOtlpEndpoint.getName()))
-                                .processors(receiverProcessors.keySet())
+                                .processors(receiverProcessors.values().stream()
+                                        .filter(config -> e.getKey().equals(config.id()))
+                                        .map(CollectorProcessorConfig::name)
+                                        .collect(Collectors.toSet()))
                                 .build()));
 
                 configBuilder.service(OtelServiceConfig.builder()
