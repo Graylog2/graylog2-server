@@ -19,6 +19,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import { Badge, ListGroup, ListGroupItem } from 'components/bootstrap';
+import { formatReadableNumber } from 'util/NumberFormatting';
 
 import type { SliceRenderers, Slices } from './Slicing';
 
@@ -71,7 +72,7 @@ const SliceList = ({
         <SliceInner>
           <Title>{sliceRenderers?.[sliceCol]?.render?.(slice.value) ?? slice.title ?? String(slice.value)}</Title>
 
-          <CountBadge>{slice.count}</CountBadge>
+          <CountBadge title={Number(slice.count)}>{formatReadableNumber(slice.count)}</CountBadge>
         </SliceInner>
       </ListGroupItem>
     ))}
