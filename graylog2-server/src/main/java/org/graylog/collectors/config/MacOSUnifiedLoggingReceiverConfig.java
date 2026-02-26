@@ -21,11 +21,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
-import org.graylog.collectors.config.operator.AddOperatorConfig;
-import org.graylog.collectors.config.operator.CollectorOperatorConfig;
 
 import java.time.Duration;
-import java.util.List;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -53,6 +50,10 @@ public abstract class MacOSUnifiedLoggingReceiverConfig implements OtlpReceiverC
         SYSLOG,
         @JsonProperty("compact")
         COMPACT
+    }
+
+    public String type() {
+        return RECEIVER_TYPE;
     }
 
     @Nullable
@@ -84,11 +85,6 @@ public abstract class MacOSUnifiedLoggingReceiverConfig implements OtlpReceiverC
     @Nullable
     @JsonProperty("format")
     public abstract Format format();
-
-    @Override
-    public List<CollectorOperatorConfig> operators() {
-        return List.of(AddOperatorConfig.forAttribute(OtelAttributes.COLLECTOR_RECEIVER_TYPE, RECEIVER_TYPE));
-    }
 
     public static Builder builder(String id) {
         return new AutoValue_MacOSUnifiedLoggingReceiverConfig.Builder()
