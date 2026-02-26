@@ -16,9 +16,8 @@
  */
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
-import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
-import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
+import org.graylog.storage.opensearch3.OSSerializationUtils;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
@@ -28,13 +27,6 @@ import java.util.Map;
 import java.util.Optional;
 
 public class OSPercentilesHandler extends OSBasicSeriesSpecHandler<Percentile> {
-
-    private final OSSerializationUtils serializationUtils;
-
-    @Inject
-    public OSPercentilesHandler(OSSerializationUtils serializationUtils) {
-        this.serializationUtils = serializationUtils;
-    }
 
     @Override
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Percentile percentileSpec) {
@@ -54,7 +46,7 @@ public class OSPercentilesHandler extends OSBasicSeriesSpecHandler<Percentile> {
                         .filter(e -> Double.parseDouble(e.getKey()) == percentileSpec.percentile())
                         .findFirst()
                         .map(Map.Entry::getValue)
-                        .map(serializationUtils::toObject)
+                        .map(OSSerializationUtils::toObject)
                 );
     }
 }
