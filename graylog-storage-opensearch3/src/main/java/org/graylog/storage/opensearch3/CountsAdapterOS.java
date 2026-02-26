@@ -63,6 +63,10 @@ public class CountsAdapterOS implements CountsAdapter {
         SearchCommand searchCommand = SearchCommand.from(
                 SearchesConfig.builder()
                         .query(query)
+                        .offset(0)
+                        .limit(1)
+                        .range(range)
+                        .filter(filter)
                         .build()
         );
         final SearchRequest.Builder builder = searchRequestFactory.create(searchCommand);
