@@ -16,8 +16,10 @@
  */
 package org.graylog.datanode.metrics;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.jayway.jsonpath.Criteria;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.Filter;
@@ -38,12 +40,12 @@ public class NodeMetricsCollector {
 
     Logger log = LoggerFactory.getLogger(NodeMetricsCollector.class);
 
-    private final OfficialOpensearchClient client;
     private final ObjectMapper objectMapper;
+    private final PlainJsonApi plainJsonApi;
 
     public NodeMetricsCollector(OfficialOpensearchClient client, ObjectMapper objectMapper) {
-        this.client = client;
         this.objectMapper = objectMapper;
+        this.plainJsonApi = new PlainJsonApi(objectMapper, null, client);
     }
 
     public Map<String, Object> getNodeMetrics(String node) {
@@ -70,12 +72,21 @@ public class NodeMetricsCollector {
         return metrics;
     }
 
+    @VisibleForTesting
+    PlainJsonApi plainJsonApi() {
+        return plainJsonApi;
+    }
+
     private DocumentContext getNodeContextFromRequest(String node, Request nodeStatRequest) {
-        PlainJsonApi api = new PlainJsonApi(objectMapper, null, client);
-        JsonNode response = api.performRequest(nodeStatRequest, "Error retrieving node stats for node " + node);
+        JsonNode response = plainJsonApi().performRequest(nodeStatRequest, "Error retrieving node stats for node " + node);
 
         Filter nodeFilter = Filter.filter(Criteria.where("name").eq(node));
-        Object nodeStatNode = JsonPath.read(response, "$['nodes'][*][?]", nodeFilter);
+        Object nodeStatNode = null;
+        try {
+            nodeStatNode = JsonPath.read(objectMapper.writeValueAsString(response), "$['nodes'][*][?]", nodeFilter);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
         if (nodeStatNode != null) {
             JsonNode nodeStats = objectMapper.convertValue(nodeStatNode, JsonNode.class);
