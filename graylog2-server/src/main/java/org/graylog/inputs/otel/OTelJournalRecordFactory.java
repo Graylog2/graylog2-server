@@ -17,9 +17,12 @@
 package org.graylog.inputs.otel;
 
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
+import io.opentelemetry.proto.common.v1.AnyValue;
+import io.opentelemetry.proto.common.v1.KeyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import io.opentelemetry.proto.logs.v1.ResourceLogs;
 import io.opentelemetry.proto.logs.v1.ScopeLogs;
+import org.graylog.collectors.config.OtelAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,10 +32,18 @@ public class OTelJournalRecordFactory {
     public List<OTelJournal.Record> createFromRequest(ExportLogsServiceRequest request) {
         final List<OTelJournal.Record> journalRecords = new ArrayList<>();
         for (ResourceLogs resourceLogs : request.getResourceLogsList()) {
+            final var receiverType = resourceLogs.getResource().getAttributesList()
+                    .stream()
+                    .filter(a -> OtelAttributes.COLLECTOR_RECEIVER_TYPE.equals(a.getKey()))
+                    .map(KeyValue::getValue)
+                    .map(AnyValue::getStringValue)
+                    .findFirst();
+
             for (ScopeLogs scopeLogs : resourceLogs.getScopeLogsList()) {
                 for (LogRecord logRecord : scopeLogs.getLogRecordsList()) {
                     final var journalRecord = OTelJournal.Record.newBuilder()
                             .setLog(OTelJournal.Log.newBuilder()
+                                    .setCollectorReceiverType(receiverType.orElse(""))
                                     .setResource(resourceLogs.getResource())
                                     .setResourceSchemaUrl(resourceLogs.getSchemaUrl())
                                     .setScope(scopeLogs.getScope())

@@ -19,8 +19,6 @@ package org.graylog.collectors.input;
 import com.google.common.net.InetAddresses;
 import com.google.inject.assistedinject.Assisted;
 import com.google.protobuf.InvalidProtocolBufferException;
-import io.opentelemetry.proto.common.v1.AnyValue;
-import io.opentelemetry.proto.common.v1.KeyValue;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.graylog.collectors.CollectorJournal;
@@ -49,9 +47,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
@@ -122,6 +120,18 @@ public class CollectorIngestCodec implements Codec {
     private Optional<Message> decodeLog(OTelJournal.Record record, String instanceUid, RawMessage rawMessage) {
         final var log = record.getLog();
         final var logRecord = log.getLogRecord();
+        final var receiverType = log.getCollectorReceiverType();
+
+        if (isBlank(receiverType)) {
+            LOG.warn("No collector receiver type found for log record {}", log.getLogRecord());
+            return Optional.empty();
+        }
+
+        final var processor = processors.get(receiverType);
+        if (processor == null) {
+            LOG.warn("No collector processor found for receiver type: {}", receiverType);
+            return Optional.empty();
+        }
 
         final String body = logRecord.getBody().getStringValue();
         final String source = source(rawMessage.getRemoteAddress());
@@ -153,14 +163,7 @@ public class CollectorIngestCodec implements Codec {
             }
         });
 
-        logRecord.getAttributesList()
-                .stream()
-                .filter(a -> OtelAttributes.COLLECTOR_RECEIVER_TYPE.equals(a.getKey()))
-                .map(KeyValue::getValue)
-                .map(AnyValue::getStringValue)
-                .map(processors::get).filter(Objects::nonNull)
-                .findFirst()
-                .ifPresent(logRecordProcessor -> message.addFields(logRecordProcessor.process(logRecord)));
+        message.addFields(processor.process(logRecord));
 
         return Optional.of(message);
     }
