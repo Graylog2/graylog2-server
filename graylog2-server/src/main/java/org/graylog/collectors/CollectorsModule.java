@@ -20,8 +20,10 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog.collectors.config.FilelogReceiverConfig;
+import org.graylog.collectors.config.MacOSUnifiedLoggingReceiverConfig;
 import org.graylog.collectors.db.FileSourceConfig;
 import org.graylog.collectors.db.JournaldSourceConfig;
+import org.graylog.collectors.db.MacOSUnifiedLoggingSourceConfig;
 import org.graylog.collectors.db.WindowsEventLogSourceConfig;
 import org.graylog.collectors.input.CollectorIngestCodec;
 import org.graylog.collectors.input.CollectorIngestGrpcInput;
@@ -31,6 +33,7 @@ import org.graylog.collectors.input.debug.OtlpTrafficDump;
 import org.graylog.collectors.input.debug.OtlpTrafficDumpService;
 import org.graylog.collectors.input.processor.FilelogRecordProcessor;
 import org.graylog.collectors.input.processor.LogRecordProcessor;
+import org.graylog.collectors.input.processor.MacOSUnifiedLoggingRecordProcessor;
 import org.graylog.collectors.input.transport.CollectorIngestGrpcTransport;
 import org.graylog.collectors.input.transport.CollectorIngestHttpTransport;
 import org.graylog.collectors.input.transport.CollectorIngestLogsService;
@@ -68,6 +71,7 @@ public class CollectorsModule extends PluginModule {
         final var logRecordProcessorBinder = MapBinder.newMapBinder(binder(), String.class, LogRecordProcessor.class);
 
         logRecordProcessorBinder.addBinding(FilelogReceiverConfig.RECEIVER_TYPE).to(FilelogRecordProcessor.class);
+        logRecordProcessorBinder.addBinding(MacOSUnifiedLoggingReceiverConfig.RECEIVER_TYPE).to(MacOSUnifiedLoggingRecordProcessor.class);
 
         if (otlpDumpEnabled) {
             bind(OtlpTrafficDump.class).to(OtlpTrafficDumpService.class).asEagerSingleton();
@@ -95,6 +99,7 @@ public class CollectorsModule extends PluginModule {
         // SourceConfig Jackson subtypes
         registerJacksonSubtype(FileSourceConfig.class);
         registerJacksonSubtype(JournaldSourceConfig.class);
+        registerJacksonSubtype(MacOSUnifiedLoggingSourceConfig.class);
         registerJacksonSubtype(WindowsEventLogSourceConfig.class);
     }
 }
