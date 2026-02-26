@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const req = require.context('./', true, /.[jt]s(x)?$/);
+package org.graylog.plugins.views.search.searchtypes.pivot.buckets;
 
-req.keys().forEach(req);
+import javax.annotation.Nullable;
+
+public record NumberRange(@Nullable Double from, @Nullable Double to) {}
