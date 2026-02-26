@@ -17,7 +17,6 @@
 package org.graylog.collectors.input.processor;
 
 import io.opentelemetry.proto.logs.v1.LogRecord;
-import org.graylog.collectors.config.OtelAttributes;
 import org.graylog.schema.EventFields;
 
 import java.util.HashMap;
@@ -30,8 +29,6 @@ public class FilelogRecordProcessor implements LogRecordProcessor {
 
         for (final var attr : logRecord.getAttributesList()) {
             switch (attr.getKey()) {
-                case OtelAttributes.COLLECTOR_RECEIVER_TYPE ->
-                        result.put("gl2_collector_receiver_type", attr.getValue().getStringValue());
                 case "log.file.name" -> {
                     final var name = attr.getValue().getStringValue();
                     result.put(EventFields.EVENT_LOG_NAME, name);

@@ -52,6 +52,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 /**
  * A codec for Collector Ingest inputs that produces minimal field mapping (no {@code otel_*} prefixed fields).
  * Extracts body as message, timestamp, and severityText as level from the journal record.
@@ -111,13 +113,13 @@ public class CollectorIngestCodec implements Codec {
 
         final OTelJournal.Record otelRecord = collectorRecord.getOtelRecord();
         return switch (otelRecord.getPayloadCase()) {
-            case LOG -> decodeLog(otelRecord, rawMessage);
+            case LOG -> decodeLog(otelRecord, collectorRecord.getCollectorInstanceUid(), rawMessage);
             case PAYLOAD_NOT_SET -> throw InputProcessingException.create(
                     "Error handling Collector Ingest message. No payload set.", rawMessage);
         };
     }
 
-    private Optional<Message> decodeLog(OTelJournal.Record record, RawMessage rawMessage) {
+    private Optional<Message> decodeLog(OTelJournal.Record record, String instanceUid, RawMessage rawMessage) {
         final var log = record.getLog();
         final var logRecord = log.getLogRecord();
 
@@ -126,6 +128,10 @@ public class CollectorIngestCodec implements Codec {
         final DateTime timestamp = timestamp(logRecord).orElse(rawMessage.getTimestamp());
 
         final Message message = messageFactory.createMessage(body, source, timestamp);
+
+        if (isNotBlank(instanceUid)) {
+            message.addField(Message.FIELD_GL2_SOURCE_COLLECTOR, instanceUid);
+        }
 
         if (!logRecord.getSeverityText().isEmpty()) {
             message.addField(VendorFields.VENDOR_EVENT_SEVERITY, logRecord.getSeverityText());
@@ -139,6 +145,13 @@ public class CollectorIngestCodec implements Codec {
         if (logRecord.getObservedTimeUnixNano() > 0) {
             message.addField(EventFields.EVENT_RECEIVED_TIME, dateTimeFromNano(logRecord.getObservedTimeUnixNano()));
         }
+
+        log.getResource().getAttributesList().forEach(attr -> {
+            switch (attr.getKey()) {
+                case OtelAttributes.COLLECTOR_RECEIVER_TYPE ->
+                        message.addField("gl2_collector_receiver_type", attr.getValue().getStringValue());
+            }
+        });
 
         logRecord.getAttributesList()
                 .stream()

@@ -16,20 +16,17 @@
  */
 package org.graylog.collectors.config;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.google.auto.value.AutoValue;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog.collectors.config.operator.CollectorOperatorConfig;
+
+import java.util.List;
 
 /**
- * No-op receiver that we use to ensure the presence of at least one receiver in the Collector config.
+ * Interface for stanza-based OpenTelemetry collector receivers.
  */
-@AutoValue
-@JsonInclude(JsonInclude.Include.NON_ABSENT)
-public abstract class NoopReceiverConfig implements OtlpReceiverConfig {
-    public String type() {
-        return "nop";
-    }
-
-    public static NoopReceiverConfig instance() {
-        return new AutoValue_NoopReceiverConfig("nop");
+public interface CollectorStanzaReceiver {
+    @JsonProperty("operators")
+    default List<CollectorOperatorConfig> operators() {
+        return List.of();
     }
 }

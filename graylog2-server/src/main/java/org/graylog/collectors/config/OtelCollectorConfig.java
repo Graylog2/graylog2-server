@@ -18,6 +18,7 @@ package org.graylog.collectors.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.collectors.config.processor.CollectorProcessorConfig;
 
 import java.util.Map;
 
@@ -39,6 +40,9 @@ public abstract class OtelCollectorConfig {
     @JsonProperty("exporters")
     public abstract Map<String, OtlpExporterConfig> exporters();
 
+    @JsonProperty("processors")
+    public abstract Map<String, CollectorProcessorConfig> processors();
+
     @JsonProperty("service")
     public abstract OtelServiceConfig service();
 
@@ -52,6 +56,8 @@ public abstract class OtelCollectorConfig {
         public abstract Builder receivers(Map<String, OtlpReceiverConfig> receivers);
 
         public abstract Builder exporters(Map<String, OtlpExporterConfig> exporters);
+
+        public abstract Builder processors(Map<String, CollectorProcessorConfig> processors);
 
         public abstract Builder service(OtelServiceConfig service);
 

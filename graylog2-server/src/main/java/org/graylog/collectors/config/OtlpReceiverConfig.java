@@ -16,14 +16,12 @@
  */
 package org.graylog.collectors.config;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog.collectors.config.operator.CollectorOperatorConfig;
-
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public interface OtlpReceiverConfig {
+    @JsonIgnore
     String name();
 
-    @JsonProperty("operators")
-    List<CollectorOperatorConfig> operators();
+    @JsonIgnore
+    String type();
 }

@@ -20,8 +20,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
-import org.graylog.collectors.config.operator.AddOperatorConfig;
-import org.graylog.collectors.config.operator.CollectorOperatorConfig;
 
 import java.util.List;
 
@@ -34,8 +32,12 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  */
 @AutoValue
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public abstract class FilelogReceiverConfig implements OtlpReceiverConfig {
+public abstract class FilelogReceiverConfig implements OtlpReceiverConfig, CollectorStanzaReceiver {
     public static final String RECEIVER_TYPE = "filelog";
+
+    public String type() {
+        return RECEIVER_TYPE;
+    }
 
     @JsonProperty("include")
     public abstract List<String> include();
@@ -53,7 +55,6 @@ public abstract class FilelogReceiverConfig implements OtlpReceiverConfig {
     @JsonProperty("include_file_name_resolved")
     public abstract boolean includeFileNameResolved();
 
-
     @JsonProperty("include_file_path_resolved")
     public abstract boolean includeFilePathResolved();
 
@@ -68,11 +69,6 @@ public abstract class FilelogReceiverConfig implements OtlpReceiverConfig {
 
     @JsonProperty("include_file_record_offset")
     public abstract boolean includeFileRecordOffset();
-
-    @Override
-    public List<CollectorOperatorConfig> operators() {
-        return List.of(AddOperatorConfig.forAttribute(OtelAttributes.COLLECTOR_RECEIVER_TYPE, RECEIVER_TYPE));
-    }
 
     // TODO: Configure offset storage - otherwise, offsets will only be tracked in memory!
 

@@ -49,6 +49,8 @@ import org.graylog.collectors.config.OtlpGrpcExporterConfig;
 import org.graylog.collectors.config.OtlpHttpExporterConfig;
 import org.graylog.collectors.config.OtlpReceiverConfig;
 import org.graylog.collectors.config.TLSConfigurationSettings;
+import org.graylog.collectors.config.processor.CollectorProcessorConfig;
+import org.graylog.collectors.config.processor.ResourceProcessorConfig;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CoalescedActions;
 import org.graylog.collectors.db.CollectorInstanceDTO;
@@ -79,6 +81,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toCollection;
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -336,6 +340,11 @@ public class OpAmpService {
                             .flatMap(Optional::stream)
                             .forEach(receiverConfig -> receiverConfigs.put(receiverConfig.name(), receiverConfig));
                 }
+
+                // We don't want the noop receiver in the groups.
+                final var receiverGroups = receiverConfigs.values().stream()
+                        .collect(Collectors.groupingBy(OtlpReceiverConfig::type));
+
                 if (receiverConfigs.isEmpty()) {
                     // The Collector must at least have one receiver to avoid a startup error.
                     final var noop = NoopReceiverConfig.instance();
@@ -343,11 +352,24 @@ public class OpAmpService {
                 }
                 configBuilder.receivers(receiverConfigs);
                 configBuilder.exporters(Map.of(effectiveOtlpEndpoint.getName(), effectiveOtlpEndpoint));
-                configBuilder.service(OtelServiceConfig.builder()
-                        .pipelines(Map.of("logs", OtelPipelineConfig.builder()
-                                .receivers(receiverConfigs.keySet())
+
+                final Map<String, CollectorProcessorConfig> receiverProcessors = receiverGroups.keySet().stream()
+                        .map(component -> ResourceProcessorConfig.builder(component)
+                                .attributes(List.of(ResourceProcessorConfig.collectorComponentAttribute(component)))
+                                .build())
+                        .collect(Collectors.toMap(CollectorProcessorConfig::name, Function.identity()));
+
+                configBuilder.processors(receiverProcessors);
+
+                final var pipelines = receiverGroups.entrySet().stream()
+                        .collect(Collectors.toMap(e -> f("logs/%s", e.getKey()), e -> OtelPipelineConfig.builder()
+                                .receivers(e.getValue().stream().map(OtlpReceiverConfig::name).collect(Collectors.toSet()))
                                 .exporters(Set.of(effectiveOtlpEndpoint.getName()))
-                                .build()))
+                                .processors(receiverProcessors.keySet())
+                                .build()));
+
+                configBuilder.service(OtelServiceConfig.builder()
+                        .pipelines(pipelines)
                         .build());
                 try {
                     final String configYaml = yamlObjectMapper.writeValueAsString(configBuilder.build());

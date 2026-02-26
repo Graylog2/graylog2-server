@@ -17,5 +17,5 @@
 package org.graylog.collectors.config;
 
 public class OtelAttributes {
-    public static final String COLLECTOR_RECEIVER_TYPE = "glc.receiver.type";
+    public static final String COLLECTOR_RECEIVER_TYPE = "collector.receiver.type";
 }

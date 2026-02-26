@@ -14,22 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.config;
+package org.graylog.collectors.config.processor;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.google.auto.value.AutoValue;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-/**
- * No-op receiver that we use to ensure the presence of at least one receiver in the Collector config.
- */
-@AutoValue
-@JsonInclude(JsonInclude.Include.NON_ABSENT)
-public abstract class NoopReceiverConfig implements OtlpReceiverConfig {
-    public String type() {
-        return "nop";
-    }
-
-    public static NoopReceiverConfig instance() {
-        return new AutoValue_NoopReceiverConfig("nop");
-    }
+public interface CollectorProcessorConfig {
+    @JsonIgnore
+    String name();
 }
