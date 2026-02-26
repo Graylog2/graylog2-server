@@ -27,6 +27,7 @@ import com.mongodb.client.model.Sorts;
 import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
@@ -37,6 +38,7 @@ import org.graylog2.shared.security.EntityPermissionsUtils;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -104,14 +106,27 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
             fieldsToProject.add(valueColumn);
         }
 
-        final var bsonFilter = !filterIsEmpty
-                ? Filters.regex(valueColumn, query, "i")
-                : Filters.empty();
+        final Bson bsonFilter;
+        if (filterIsEmpty) {
+            bsonFilter = Filters.empty();
+        } else if (displayFields != null && !displayFields.isEmpty()) {
+            final Set<String> searchFields = new LinkedHashSet<>(displayFields);
+            searchFields.add(valueColumn);
+            bsonFilter = Filters.or(searchFields.stream()
+                    .map(field -> Filters.regex(field, query, "i"))
+                    .toList());
+        } else {
+            bsonFilter = Filters.regex(valueColumn, query, "i");
+        }
+
+        final String sortColumn = (displayFields != null && !displayFields.isEmpty())
+                ? displayFields.getFirst()
+                : valueColumn;
 
         final var resultWithoutPagination = mongoCollection
                 .find(bsonFilter)
                 .projection(Projections.include(fieldsToProject.toArray(new String[0])))
-                .sort(Sorts.ascending(valueColumn));
+                .sort(Sorts.ascending(sortColumn));
 
         final var userCanReadAllEntities = permissionsUtils.hasAllPermission(subject) || permissionsUtils.hasReadPermissionForWholeCollection(subject, collection);
         final var skip = Math.max(0, (page - 1) * perPage - fixNumberOfItemsToReadFromDB);

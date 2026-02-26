@@ -14,26 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect, useMemo } from 'react';
+import URI from 'urijs';
 
-import type { InputStates } from 'hooks/useInputsStates';
+import AppConfig from 'util/AppConfig';
 
-const useIsInitialUnknownInputState = (inputStates: InputStates, inputId: string) => {
-  const seenInputIds = useMemo(() => new Set<string>(), []);
+declare let __webpack_public_path__: string;
 
-  useEffect(() => {
-    if (!inputStates) {
-      return;
-    }
+// The webpack-dev-server serves the assets from "/"
+const assetPrefix = AppConfig.gl2DevMode() ? '/' : '/assets/';
 
-    Object.keys(inputStates).forEach((id) => {
-      seenInputIds.add(id);
-    });
-  }, [inputStates, seenInputIds]);
-
-  const hasKnownState = !!inputStates?.[inputId];
-
-  return !hasKnownState && !seenInputIds.has(inputId);
-};
-
-export default useIsInitialUnknownInputState;
+// If app prefix was not set, we need to tell webpack to load chunks from root instead of the relative URL path
+// eslint-disable-next-line prefer-const
+__webpack_public_path__ = URI.joinPaths(AppConfig.gl2AppPathPrefix(), assetPrefix).path() || assetPrefix;

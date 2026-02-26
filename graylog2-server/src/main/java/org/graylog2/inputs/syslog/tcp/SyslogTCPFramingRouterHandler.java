@@ -20,15 +20,20 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
-import io.netty.util.ReferenceCountUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SyslogTCPFramingRouterHandler extends SimpleChannelInboundHandler<ByteBuf> {
+    private static final Logger LOG = LoggerFactory.getLogger(SyslogTCPFramingRouterHandler.class);
+
     private final int maxFrameLength;
     private final ByteBuf[] delimiter;
     private ChannelInboundHandler handler = null;
 
     public SyslogTCPFramingRouterHandler(int maxFrameLength, ByteBuf[] delimiter) {
+        super(false); // Disable auto-release — downstream handler owns the buffer
         this.maxFrameLength = maxFrameLength;
         this.delimiter = delimiter;
     }
@@ -45,16 +50,27 @@ public class SyslogTCPFramingRouterHandler extends SimpleChannelInboundHandler<B
                     handler = new DelimiterBasedFrameDecoder(maxFrameLength, delimiter);
                 }
             }
-            try {
-                handler.channelRead(ctx, ReferenceCountUtil.retain(msg));
-            } catch (Exception e) {
-                // Because we've retained the buffer, we must release it in case of an exception to avoid memory leaks
-                ReferenceCountUtil.release(msg);
-                throw e;
-            }
-
+            handler.channelRead(ctx, msg);
         } else {
             ctx.fireChannelRead(msg);
+        }
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        if (handler != null) {
+            try {
+                // Forward lifecycle event so ByteToMessageDecoder releases its internal
+                // cumulation buffer. This may throw if the remaining data cannot be decoded
+                // (e.g. incomplete syslog frame at connection close), but the cumulation is
+                // released in the finally block of ByteToMessageDecoder.channelInputClosed
+                // regardless. That method also fires channelInactive downstream.
+                handler.channelInactive(ctx);
+            } catch (DecoderException e) {
+                LOG.debug("Failed to decode remaining data on channel close", e);
+            }
+        } else {
+            super.channelInactive(ctx);
         }
     }
 

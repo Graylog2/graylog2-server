@@ -14,13 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import URI from 'urijs';
+package org.graylog.plugins.views.search.searchtypes.pivot.buckets;
 
-import AppConfig from 'util/AppConfig';
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 
-// The webpack-dev-server serves the assets from "/"
-const assetPrefix = AppConfig.gl2DevMode() ? '/' : '/assets/';
+import java.util.List;
 
-// If app prefix was not set, we need to tell webpack to load chunks from root instead of the relative URL path
-// eslint-disable-next-line no-undef
-__webpack_public_path__ = URI.joinPaths(AppConfig.gl2AppPathPrefix(), assetPrefix).path() || assetPrefix;
+@JsonTypeName(RangeBucket.NAME)
+public record RangeBucket(List<String> fields, List<NumberRange> ranges) implements BucketSpec {
+    public static final String NAME = "range";
+
+    @Override
+    public String type() {
+        return NAME;
+    }
+}
