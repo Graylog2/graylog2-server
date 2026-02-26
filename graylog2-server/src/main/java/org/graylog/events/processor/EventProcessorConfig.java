@@ -102,6 +102,17 @@ public interface EventProcessorConfig extends ContentPackable<EventProcessorConf
     }
 
     /**
+     * Provides the replay inputs for this configuration if it supports replaying searches directly from an event
+     * definition.
+     *
+     * @return the replay information or empty if not supported
+     */
+    @JsonIgnore
+    default Optional<EventDefinitionReplayInfo> replayInfo() {
+        return Optional.empty();
+    }
+
+    /**
      * Returns whether this config type is allowed to be exported in a Content Pack.
      *
      * @return whether the config type can be exported in a Content Pack

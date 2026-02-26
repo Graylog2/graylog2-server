@@ -164,6 +164,12 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     @JsonProperty(FIELD_EVENT_SUMMARY_TEMPLATE)
     public abstract String eventSummaryTemplate();
 
+    @JsonProperty("replay_info")
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
+    public Optional<EventDefinitionReplayInfo> replayInfo() {
+        return config().replayInfo();
+    }
+
     public static Builder builder() {
         return Builder.create();
     }

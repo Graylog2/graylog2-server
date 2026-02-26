@@ -255,14 +255,21 @@ export const UseCreateViewForEvent = ({
   eventDefinition: EventDefinition;
   aggregations: Array<EventDefinitionAggregation>;
 }) => {
+  const definitionReplayInfo = eventDefinition?.replay_info;
   const queryStringFromGrouping = concatQueryStrings(
     Object.entries(eventData?.group_by_fields ?? {}).map(([field, value]) => predicate(field, escape(value))),
     { withBrackets: false },
   );
-  const eventQueryString = eventData?.replay_info?.query ?? eventDefinition?.config?.query ?? '';
-  const streams = eventData?.replay_info?.streams ?? eventDefinition?.config?.streams ?? [];
+  const definitionQuery = definitionReplayInfo?.query ?? eventDefinition?.config?.query ?? '';
+  const eventQueryString = eventData?.replay_info?.query ?? definitionQuery;
+  const streams =
+    eventData?.replay_info?.streams ?? definitionReplayInfo?.streams ?? eventDefinition?.config?.streams ?? [];
   const streamCategories =
-    eventData?.replay_info?.stream_categories ?? eventDefinition?.config?.stream_categories ?? [];
+    eventData?.replay_info?.stream_categories ??
+    definitionReplayInfo?.stream_categories ??
+    eventDefinition?.config?.stream_categories ??
+    [];
+  const definitionSearchWithin = definitionReplayInfo?.search_within_ms ?? eventDefinition?.config?.search_within_ms ?? 0;
   const timeRange: TimeRange = eventData
     ? {
         type: 'absolute',
@@ -271,20 +278,20 @@ export const UseCreateViewForEvent = ({
       }
     : {
         type: 'relative',
-        range: (eventDefinition?.config?.search_within_ms ?? 0) / 1000,
+        range: definitionSearchWithin / 1000,
       };
   const queryString: QueryString = {
     type: 'elasticsearch',
     query_string: eventData
       ? concatQueryStrings([eventQueryString, queryStringFromGrouping])
-      : (eventDefinition?.config?.query ?? ''),
+      : definitionQuery,
   };
 
   const queryParameters = eventDefinition?.config?.query_parameters ?? [];
 
   const groupBy = eventDefinition?.config?.group_by ?? [];
 
-  const searchFilters = eventDefinition?.config?.filters ?? [];
+  const searchFilters = definitionReplayInfo?.filters ?? eventDefinition?.config?.filters ?? [];
 
   return useMemo(
     () =>
