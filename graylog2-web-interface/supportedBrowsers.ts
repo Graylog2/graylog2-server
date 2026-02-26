@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const browserslist = require('browserslist');
+import * as browserslist from 'browserslist';
 
 const targets = browserslist('defaults, not ie 11, chrome 68');
 
@@ -29,11 +29,9 @@ const productMapping = {
   safari: 'safari',
 };
 
-const mapProductAndVersion = (product, version) => {
+const mapProductAndVersion = (product: string, version: string) => {
   const mappedProduct = productMapping[product];
-  const mappedVersion = version.includes('-')
-    ? version.split('-')[0]
-    : version;
+  const mappedVersion = version.includes('-') ? version.split('-')[0] : version;
 
   return `${mappedProduct}${mappedVersion}`;
 };
@@ -43,4 +41,4 @@ const mappedTargets = targets
   .filter(([product]) => supportedProducts.includes(product))
   .map(([product, version]) => mapProductAndVersion(product, version));
 
-module.exports = mappedTargets;
+export default mappedTargets;
