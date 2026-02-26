@@ -22,7 +22,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.graylog.collectors.CollectorJournal;
-import org.graylog.collectors.config.OtelAttributes;
 import org.graylog.collectors.input.debug.OtlpTrafficDump;
 import org.graylog.collectors.input.processor.LogRecordProcessor;
 import org.graylog.inputs.otel.OTelJournal;
@@ -139,6 +138,8 @@ public class CollectorIngestCodec implements Codec {
 
         final Message message = messageFactory.createMessage(body, source, timestamp);
 
+        message.addField("gl2_collector_receiver_type", receiverType);
+
         if (isNotBlank(instanceUid)) {
             message.addField(Message.FIELD_GL2_SOURCE_COLLECTOR, instanceUid);
         }
@@ -155,13 +156,6 @@ public class CollectorIngestCodec implements Codec {
         if (logRecord.getObservedTimeUnixNano() > 0) {
             message.addField(EventFields.EVENT_RECEIVED_TIME, dateTimeFromNano(logRecord.getObservedTimeUnixNano()));
         }
-
-        log.getResource().getAttributesList().forEach(attr -> {
-            switch (attr.getKey()) {
-                case OtelAttributes.COLLECTOR_RECEIVER_TYPE ->
-                        message.addField("gl2_collector_receiver_type", attr.getValue().getStringValue());
-            }
-        });
 
         message.addFields(processor.process(logRecord));
 
