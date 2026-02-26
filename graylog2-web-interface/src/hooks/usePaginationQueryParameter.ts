@@ -17,7 +17,6 @@
 import { useCallback } from 'react';
 
 import { useQueryParams, NumberParam } from 'routing/QueryParams';
-import useQuery from 'routing/useQuery';
 
 export const DEFAULT_PAGE = 1;
 export const DEFAULT_PAGE_SIZES = [10, 20, 50, 100];
@@ -34,8 +33,7 @@ const usePaginationQueryParameter = (
   propsPageSize: number = DEFAULT_PAGE_SIZES[0],
   syncPageSizeFromQuery: boolean = true,
 ): PaginationQueryParameterResult => {
-  const { page: pageQueryParameter, pageSize: pageSizeQueryParameter } = useQuery();
-  const [, setQueryParams] = useQueryParams({
+  const [{ page: pageQueryParameter, pageSize: pageSizeQueryParameter }, setQueryParams] = useQueryParams({
     page: NumberParam,
     pageSize: NumberParam,
   });
@@ -64,7 +62,7 @@ const usePaginationQueryParameter = (
       setQueryParams({
         page: newPage,
         pageSize: syncPageSizeFromQuery ? newPageSize : undefined,
-      });
+      }, 'replaceIn');
     },
     [page, pageSize, setQueryParams, syncPageSizeFromQuery],
   );
