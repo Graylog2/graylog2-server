@@ -170,6 +170,31 @@ class MongoEntitySuggestionServiceTest {
 
     @Test
     @MongoDBFixtures("composite-display-fixtures.json")
+    void testCompositeDisplayFilterByNodeId() {
+        doReturn(true).when(entityPermissionsUtils).hasAllPermission(subject);
+
+        final var result = toTest.suggest(
+                "nodes",
+                "node_id",
+                "hostname",
+                List.of("node_id", "hostname"),
+                "{node_id} ({hostname})",
+                "node-uuid-123",
+                1,
+                10,
+                subject
+        );
+
+        assertThat(result.pagination().count()).isEqualTo(1);
+
+        final var suggestions = result.suggestions();
+        assertThat(suggestions).hasSize(1);
+        assertThat(suggestions.get(0).targetId()).isEqualTo("node-uuid-123");
+        assertThat(suggestions.get(0).value()).isEqualTo("node-uuid-123 (webserver1)");
+    }
+
+    @Test
+    @MongoDBFixtures("composite-display-fixtures.json")
     void testBackwardCompatibilityWithoutDisplayFields() {
         doReturn(true).when(entityPermissionsUtils).hasAllPermission(subject);
 
