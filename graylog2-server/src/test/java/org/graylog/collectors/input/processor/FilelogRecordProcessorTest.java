@@ -19,7 +19,6 @@ package org.graylog.collectors.input.processor;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.common.v1.KeyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
-import org.graylog.collectors.config.OtelAttributes;
 import org.graylog.schema.EventFields;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +33,6 @@ class FilelogRecordProcessorTest {
     @Test
     void mapsSupportedAttributes() {
         final var logRecord = LogRecord.newBuilder()
-                .addAttributes(stringAttribute(OtelAttributes.COLLECTOR_RECEIVER_TYPE, "filelog"))
                 .addAttributes(stringAttribute("log.file.name", "graylog.log"))
                 .addAttributes(stringAttribute("log.file.path", "/var/log/graylog/graylog.log"))
                 .addAttributes(stringAttribute("log.file.owner.name", "graylog"))

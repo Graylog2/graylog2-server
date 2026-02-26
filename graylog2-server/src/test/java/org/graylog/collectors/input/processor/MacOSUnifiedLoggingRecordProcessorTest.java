@@ -19,10 +19,7 @@ package org.graylog.collectors.input.processor;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.common.v1.KeyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
-import org.graylog.collectors.config.OtelAttributes;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,33 +28,13 @@ class MacOSUnifiedLoggingRecordProcessorTest {
     private final MacOSUnifiedLoggingRecordProcessor processor = new MacOSUnifiedLoggingRecordProcessor();
 
     @Test
-    void mapsReceiverTypeAttribute() {
+    void returnsEmptyMap() {
         final var logRecord = LogRecord.newBuilder()
-                .addAttributes(stringAttribute(OtelAttributes.COLLECTOR_RECEIVER_TYPE, "macosunifiedlogging"))
+                .addAttributes(KeyValue.newBuilder()
+                        .setKey("some.attribute")
+                        .setValue(AnyValue.newBuilder().setStringValue("some value")))
                 .build();
 
-        final var result = processor.process(logRecord);
-
-        assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.of(
-                "gl2_collector_receiver_type", "macosunifiedlogging"
-        ));
-    }
-
-    @Test
-    void returnsEmptyMapWhenNoSupportedAttributesExist() {
-        final var logRecord = LogRecord.newBuilder()
-                .addAttributes(stringAttribute("some.other.attribute", "value"))
-                .build();
-
-        final var result = processor.process(logRecord);
-
-        assertThat(result).isEmpty();
-    }
-
-    private static KeyValue stringAttribute(String key, String value) {
-        return KeyValue.newBuilder()
-                .setKey(key)
-                .setValue(AnyValue.newBuilder().setStringValue(value).build())
-                .build();
+        assertThat(processor.process(logRecord)).isEmpty();
     }
 }

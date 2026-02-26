@@ -17,23 +17,13 @@
 package org.graylog.collectors.input.processor;
 
 import io.opentelemetry.proto.logs.v1.LogRecord;
-import org.graylog.collectors.config.OtelAttributes;
 
-import java.util.HashMap;
 import java.util.Map;
 
+// TODO: Remove this processor if no macOS Unified Logging-specific attribute handling is needed.
 public class MacOSUnifiedLoggingRecordProcessor implements LogRecordProcessor {
     @Override
     public Map<String, Object> process(LogRecord logRecord) {
-        final Map<String, Object> result = new HashMap<>();
-
-        for (final var attr : logRecord.getAttributesList()) {
-            switch (attr.getKey()) {
-                case OtelAttributes.COLLECTOR_RECEIVER_TYPE ->
-                        result.put("gl2_collector_receiver_type", attr.getValue().getStringValue());
-            }
-        }
-
-        return result;
+        return Map.of();
     }
 }
