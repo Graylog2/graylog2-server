@@ -46,6 +46,7 @@ import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
@@ -152,13 +153,13 @@ public class LuceneInMemorySearchEngine<U extends InMemorySearchableEntity> impl
         Map<String, PointsConfig> pointsConfig = new HashMap<>();
         attributes.stream()
                 .filter(a -> a.type() == SearchQueryField.Type.INT)
-                .forEach(a -> pointsConfig.put(a.id(), new PointsConfig(NumberFormat.getIntegerInstance(), Integer.class)));
+                .forEach(a -> pointsConfig.put(a.id(), new PointsConfig(NumberFormat.getIntegerInstance(Locale.ROOT), Integer.class)));
         attributes.stream()
                 .filter(a -> a.type() == SearchQueryField.Type.LONG)
-                .forEach(a -> pointsConfig.put(a.id(), new PointsConfig(NumberFormat.getNumberInstance(), Long.class)));
+                .forEach(a -> pointsConfig.put(a.id(), new PointsConfig(NumberFormat.getNumberInstance(Locale.ROOT), Long.class)));
         attributes.stream()
                 .filter(a -> a.type() == SearchQueryField.Type.DOUBLE)
-                .forEach(a -> pointsConfig.put(a.id(), new PointsConfig(NumberFormat.getNumberInstance(), Double.class)));
+                .forEach(a -> pointsConfig.put(a.id(), new PointsConfig(NumberFormat.getNumberInstance(Locale.ROOT), Double.class)));
         return pointsConfig;
     }
 
