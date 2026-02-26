@@ -21,11 +21,15 @@ import com.google.common.eventbus.EventBus;
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
+import org.graylog.storage.opensearch3.ClusterAdapterOS;
+import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog2.datanode.DataNodeNotficationEvent;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
+import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,12 +44,17 @@ import oshi.hardware.VirtualMemory;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ScheduledExecutorService;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @MockitoSettings(strictness = Strictness.WARN)
@@ -67,6 +76,10 @@ public class OpensearchProcessImplTest {
     private final NodeId nodeId = new SimpleNodeId(nodeName);
     @Mock
     private EventBus eventBus;
+    @Mock
+    private ClusterAdapterOS clusterAdapter;
+    @Mock
+    private OfficialOpensearchClient client;
 
     @Mock
     ClusterEventBus clusterEventBus;
@@ -77,48 +90,49 @@ public class OpensearchProcessImplTest {
         when(configuration.getDatanodeNodeName()).thenReturn(nodeName);
         this.opensearchProcess = spy(new OpensearchProcessImpl(datanodeConfiguration, trustmManager, configuration,
                 objectMapper, processState, nodeId, eventBus, clusterEventBus));
+        when(opensearchProcess.openSearchClient()).thenReturn(Optional.of(client));
+        when(opensearchProcess.clusterAdapter()).thenReturn(clusterAdapter);
     }
 
 
     @Test
-    public void testResetAllocation() throws IOException {
-//        Settings settings = Settings.builder()
-//                .put(OpensearchProcessImpl.CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING, nodeName)
-//                .build();
-//        when(clusterClient.getSettings(any(), any())).thenReturn(new ClusterGetSettingsResponse(null, settings, null));
-//        opensearchProcess.available();
-//
-//        ArgumentCaptor<ClusterUpdateSettingsRequest> settingsRequest =
-//                ArgumentCaptor.forClass(ClusterUpdateSettingsRequest.class);
-//        verify(clusterClient).putSettings(settingsRequest.capture(), eq(RequestOptions.DEFAULT));
-//        assertNull(settingsRequest.getValue()
-//                .transientSettings()
-//                .get(OpensearchProcessImpl.CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING)
-//        );
-//        assertTrue(opensearchProcess.allocationExcludeChecked);
+    public void testResetAllocation() {
+        when(clusterAdapter.getClusterSetting(OpensearchProcessImpl.CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING))
+                .thenReturn(nodeName);
+        opensearchProcess.available();
+
+        verify(clusterAdapter).updateClusterSetting(
+                OpensearchProcessImpl.CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING,
+                null,
+                false
+        );
+
+        assertTrue(opensearchProcess.allocationExcludeChecked);
     }
 
     @Test
     public void testResetAllocationUnneccessary() throws IOException {
-//        Settings settings = Settings.builder()
-//                .put(OpensearchProcessImpl.CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING, "notmynodename")
-//                .build();
-//        when(clusterClient.getSettings(any(), any())).thenReturn(new ClusterGetSettingsResponse(null, settings, null));
-//        opensearchProcess.available();
-//        verify(clusterClient).getSettings(any(), any());
-//        verifyNoMoreInteractions(clusterClient);
-//        assertTrue(opensearchProcess.allocationExcludeChecked);
+        when(clusterAdapter.getClusterSetting(OpensearchProcessImpl.CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING))
+                .thenReturn("notMyNodeName");
+        opensearchProcess.available();
+        opensearchProcess.available();
+        verify(clusterAdapter).getClusterSetting(any());
+        verifyNoMoreInteractions(clusterAdapter);
+        assertTrue(opensearchProcess.allocationExcludeChecked);
     }
 
     @Test
     public void testShutdownWhenRemovedSuccessfully() throws IOException {
-//        ClusterHealthResponse health = mock(ClusterHealthResponse.class);
-//        when(health.getRelocatingShards()).thenReturn(0);
-//        when(clusterClient.health(any(), any())).thenReturn(health);
-//        final ScheduledExecutorService executor = mock(ScheduledExecutorService.class);
-//        opensearchProcess.checkRemovalStatus(executor);
-//        verify(processState).fire(OpensearchEvent.PROCESS_STOPPED);
-//        verify(executor).shutdown();
+        ClusterHealth health = ClusterHealth.create("green",
+                ClusterHealth.ShardStatus.create(
+                        1, 0, 0, 0
+                )); // relocating shards  are important for the removal
+        when(clusterAdapter.clusterHealthStats()).thenReturn(Optional.of(health));
+
+        final ScheduledExecutorService executor = mock(ScheduledExecutorService.class);
+        opensearchProcess.checkRemovalStatus(executor);
+        verify(processState).fire(OpensearchEvent.PROCESS_STOPPED);
+        verify(executor).shutdown();
     }
 
     @Test

@@ -79,11 +79,13 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessImpl.class);
     private static final long MEMORY_RATIO_THRESHOLD = 2;
+    private static final int CLUSTER_REQUEST_TIMEOUT = 30;
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<OpensearchConfiguration> opensearchConfiguration = Optional.empty();
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<OfficialOpensearchClient> openSearchClient = Optional.empty();
+    private ClusterAdapterOS clusterAdapter;
 
     private final OpensearchStateMachine processState;
 
@@ -283,6 +285,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
 
         );
         this.openSearchClient = Optional.of(provider.get());
+        this.clusterAdapter = new ClusterAdapterOS(openSearchClient.get(), Duration.seconds(CLUSTER_REQUEST_TIMEOUT));
     }
 
     /**
@@ -290,10 +293,9 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
      */
     private void checkAllocationEnabledStatus() {
         if (openSearchClient().isPresent()) {
-            ClusterAdapterOS clusterAdapter = new ClusterAdapterOS(openSearchClient().get(), Duration.seconds(30));
-            final String setting = clusterAdapter.getClusterSetting(CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING);
+            final String setting = clusterAdapter().getClusterSetting(CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING);
             if (nodeName.equalsIgnoreCase(setting)) {
-                clusterAdapter.updateClusterSetting(CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING, null, false);
+                clusterAdapter().updateClusterSetting(CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING, null, false);
             }
             allocationExcludeChecked = true;
         }
@@ -316,12 +318,16 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         }
     }
 
+    @VisibleForTesting
+    public ClusterAdapterOS clusterAdapter() {
+        return clusterAdapter;
+    }
+
     @Override
     public void remove() {
         LOG.info("Starting removal of OpenSearch node");
         openSearchClient().ifPresent(client -> {
-            ClusterAdapterOS clusterAdapter = new ClusterAdapterOS(client, Duration.seconds(30));
-            boolean ack = clusterAdapter
+            boolean ack = clusterAdapter()
                     .updateClusterSetting(CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING, nodeName, false);
 
             if (ack) {
@@ -342,8 +348,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
      */
     void checkRemovalStatus(ScheduledExecutorService executorService) {
         if (openSearchClient().isPresent()) {
-            ClusterAdapterOS clusterAdapter = new ClusterAdapterOS(openSearchClient().get(), Duration.seconds(30));
-            clusterAdapter.clusterHealthStats().ifPresent(health -> {
+            clusterAdapter().clusterHealthStats().ifPresent(health -> {
                 if (health.shards().relocating() == 0) {
                     onEvent(OpensearchEvent.PROCESS_STOPPED);
                     executorService.shutdown();
