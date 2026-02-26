@@ -111,7 +111,7 @@ export const getConcatenatedQuery = (query: string, streamId: string) => {
   return `(${query}) AND source_streams:${streamId}`;
 };
 
-export const defaultTimeRange: RelativeTimeRange = { type: 'relative', range: 6 * 30 * 86400 } as const;
+export const defaultTimeRange: RelativeTimeRange = { type: 'relative', range: 30 * 86400 } as const;
 export const fetchEventsHistogram = async (searchParams: SearchParams) => {
   const { timerange, filter } = parseFilters(searchParams.filters, defaultTimeRange);
 
