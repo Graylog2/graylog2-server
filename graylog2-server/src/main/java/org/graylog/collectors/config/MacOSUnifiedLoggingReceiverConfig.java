@@ -18,6 +18,7 @@ package org.graylog.collectors.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
 import org.graylog.collectors.config.operator.AddOperatorConfig;
@@ -72,10 +73,12 @@ public abstract class MacOSUnifiedLoggingReceiverConfig implements OtlpReceiverC
 
     @Nullable
     @JsonProperty("max_poll_interval")
+    @JsonSerialize(using = GoDurationSerializer.class)
     public abstract Duration maxPollInterval();
 
     @Nullable
     @JsonProperty("max_log_age")
+    @JsonSerialize(using = GoDurationSerializer.class)
     public abstract Duration maxLogAge();
 
     @Nullable

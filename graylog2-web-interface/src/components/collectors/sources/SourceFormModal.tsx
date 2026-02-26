@@ -20,7 +20,7 @@ import { useState } from 'react';
 import { Button, Input, SegmentedControl } from 'components/bootstrap';
 import Modal from 'components/bootstrap/Modal';
 
-import type { Source, SourceType, FileSourceConfig, JournaldSourceConfig, WindowsEventLogSourceConfig } from '../types';
+import type { Source, SourceType, FileSourceConfig, JournaldSourceConfig, WindowsEventLogSourceConfig, MacOSUnifiedLoggingSourceConfig } from '../types';
 
 type Props = {
   fleetId: string;
@@ -34,12 +34,14 @@ const sourceTypeLabels: Record<SourceType, string> = {
   file: 'File',
   journald: 'Journald',
   windows_event_log: 'WinEventLog',
+  macos_unified_logging: 'macOS Unified Log',
 };
 
-const defaultConfigs: Record<SourceType, FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig> = {
+const defaultConfigs: Record<SourceType, FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig | MacOSUnifiedLoggingSourceConfig> = {
   file: { paths: [''], read_mode: 'end' },
   journald: { priority: 6 },
   windows_event_log: { channels: ['Application'], read_mode: 'end', event_format: 'json' },
+  macos_unified_logging: {},
 };
 
 const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoading = false }: Props) => {
@@ -76,6 +78,9 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
     setConfig((prev) => ({ ...prev, ...updates }));
   };
   const updateWindowsEventLogConfig = (updates: Partial<WindowsEventLogSourceConfig>) => {
+    setConfig((prev) => ({ ...prev, ...updates }));
+  };
+  const updateMacOSUnifiedLoggingConfig = (updates: Partial<MacOSUnifiedLoggingSourceConfig>) => {
     setConfig((prev) => ({ ...prev, ...updates }));
   };
 
@@ -175,6 +180,37 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
     );
   };
 
+  const renderMacOSUnifiedLoggingConfig = () => {
+    const macConfig = config as MacOSUnifiedLoggingSourceConfig;
+
+    return (
+      <>
+        <Input
+          id="macos-predicate"
+          type="text"
+          label="Predicate"
+          help="Optional NSPredicate filter expression (e.g., process == &quot;kernel&quot;)"
+          value={macConfig.predicate || ''}
+          onChange={(e) => updateMacOSUnifiedLoggingConfig({ predicate: e.target.value || undefined })}
+        />
+        <div>
+          <label htmlFor="macos-format">Format</label>
+          <SegmentedControl
+            value={macConfig.format || 'ndjson'}
+            onChange={(v) => updateMacOSUnifiedLoggingConfig({ format: v as MacOSUnifiedLoggingSourceConfig['format'] })}
+            data={[
+              { value: 'ndjson', label: 'NDJSON' },
+              { value: 'json', label: 'JSON' },
+              { value: 'default', label: 'Default' },
+              { value: 'syslog', label: 'Syslog' },
+              { value: 'compact', label: 'Compact' },
+            ]}
+          />
+        </div>
+      </>
+    );
+  };
+
   const renderConfigSection = () => {
     switch (sourceType) {
       case 'file':
@@ -183,6 +219,8 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
         return renderJournaldConfig();
       case 'windows_event_log':
         return renderWindowsEventLogConfig();
+      case 'macos_unified_logging':
+        return renderMacOSUnifiedLoggingConfig();
       default:
         return null;
     }

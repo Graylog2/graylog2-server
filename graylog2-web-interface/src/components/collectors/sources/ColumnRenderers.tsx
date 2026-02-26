@@ -25,6 +25,7 @@ const sourceTypeLabels: Record<string, string> = {
   file: 'File',
   journald: 'Journald',
   windows_event_log: 'Windows Event Log',
+  macos_unified_logging: 'macOS Unified Log',
 };
 
 const customColumnRenderers = (): ColumnRenderers<Source> => ({
