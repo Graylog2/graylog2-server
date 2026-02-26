@@ -59,8 +59,11 @@ export type FileSourceConfig = {
   multiline?: { pattern: string; negate: boolean };
 };
 
+export type JournaldPriority = 'emerg' | 'alert' | 'crit' | 'err' | 'warning' | 'notice' | 'info' | 'debug'
+
 export type JournaldSourceConfig = {
-  priority: number;
+  priority: JournaldPriority;
+  read_mode: 'beginning' | 'end';
   match_pattern?: string;
 };
 
@@ -79,7 +82,10 @@ export type MacOSUnifiedLoggingSourceConfig = {
 export type FileSource = SourceBase & { type: 'file'; config: FileSourceConfig };
 export type JournaldSource = SourceBase & { type: 'journald'; config: JournaldSourceConfig };
 export type WindowsEventLogSource = SourceBase & { type: 'windows_event_log'; config: WindowsEventLogSourceConfig };
-export type MacOSUnifiedLoggingSource = SourceBase & { type: 'macos_unified_logging'; config: MacOSUnifiedLoggingSourceConfig };
+export type MacOSUnifiedLoggingSource = SourceBase & {
+  type: 'macos_unified_logging';
+  config: MacOSUnifiedLoggingSourceConfig;
+};
 
 export type Source = FileSource | JournaldSource | WindowsEventLogSource | MacOSUnifiedLoggingSource;
 

@@ -22,8 +22,11 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.graylog.collectors.config.JournaldReceiverConfig;
 import org.graylog.collectors.config.OtlpReceiverConfig;
 
+import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @AutoValue
@@ -36,12 +39,14 @@ public abstract class JournaldSourceConfig implements SourceConfig {
     @JsonProperty(TYPE_FIELD)
     public abstract String type();
 
-    @JsonProperty("priority")
-    public abstract int priority();
+    @JsonProperty("read_mode")
+    public abstract String readMode();
 
-    @Nullable
+    @JsonProperty("priority")
+    public abstract String priority();
+
     @JsonProperty("match_pattern")
-    public abstract String matchPattern();
+    public abstract Optional<String> matchPattern();
 
     public static Builder builder() {
         return Builder.create();
@@ -49,28 +54,41 @@ public abstract class JournaldSourceConfig implements SourceConfig {
 
     @Override
     public void validate() {
-        if (priority() < 0 || priority() > 7) {
-            throw new IllegalArgumentException("JournaldSourceConfig priority must be between 0 and 7");
+        try {
+            JournaldReceiverConfig.Priority.valueOf(priority().toUpperCase(Locale.ROOT));
+            JournaldReceiverConfig.StartAt.valueOf(readMode().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("JournaldSourceConfig: " + e.getMessage());
         }
     }
 
     @Override
     public Optional<OtlpReceiverConfig> toReceiverConfig(String id) {
-        return Optional.empty();
+        return Optional.of(JournaldReceiverConfig.builder(id)
+                .startAt(JournaldReceiverConfig.StartAt.valueOf(readMode().toUpperCase(Locale.ROOT)))
+                .priority(JournaldReceiverConfig.Priority.valueOf(priority().toUpperCase(Locale.ROOT)))
+                .matches(matchPattern().map(List::of).orElse(null))
+                .build());
     }
 
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_JournaldSourceConfig.Builder().type(TYPE_NAME).priority(6);
+            return new AutoValue_JournaldSourceConfig.Builder()
+                    .type(TYPE_NAME)
+                    .priority("INFO")
+                    .readMode("end");
         }
 
         @JsonProperty(TYPE_FIELD)
         public abstract Builder type(String type);
 
+        @JsonProperty("read_mode")
+        public abstract Builder readMode(String readMode);
+
         @JsonProperty("priority")
-        public abstract Builder priority(int priority);
+        public abstract Builder priority(String priority);
 
         @JsonProperty("match_pattern")
         public abstract Builder matchPattern(@Nullable String matchPattern);

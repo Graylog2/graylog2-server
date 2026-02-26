@@ -20,7 +20,15 @@ import { useState } from 'react';
 import { Button, Input, SegmentedControl } from 'components/bootstrap';
 import Modal from 'components/bootstrap/Modal';
 
-import type { Source, SourceType, FileSourceConfig, JournaldSourceConfig, WindowsEventLogSourceConfig, MacOSUnifiedLoggingSourceConfig } from '../types';
+import type {
+  Source,
+  SourceType,
+  FileSourceConfig,
+  JournaldSourceConfig,
+  WindowsEventLogSourceConfig,
+  MacOSUnifiedLoggingSourceConfig,
+  JournaldPriority
+} from '../types';
 
 type Props = {
   fleetId: string;
@@ -37,9 +45,12 @@ const sourceTypeLabels: Record<SourceType, string> = {
   macos_unified_logging: 'macOS Unified Log',
 };
 
-const defaultConfigs: Record<SourceType, FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig | MacOSUnifiedLoggingSourceConfig> = {
+const defaultConfigs: Record<
+  SourceType,
+  FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig | MacOSUnifiedLoggingSourceConfig
+> = {
   file: { paths: [''], read_mode: 'end' },
-  journald: { priority: 6 },
+  journald: { read_mode: 'end', priority: 'info' },
   windows_event_log: { channels: ['Application'], read_mode: 'end', event_format: 'json' },
   macos_unified_logging: {},
 };
@@ -50,7 +61,7 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
   const [name, setName] = useState(source?.name || '');
   const [description, setDescription] = useState(source?.description || '');
   const [enabled, setEnabled] = useState(source?.enabled ?? true);
-  const [config, setConfig] = useState<typeof defaultConfigs[SourceType]>(
+  const [config, setConfig] = useState<(typeof defaultConfigs)[SourceType]>(
     source?.config || defaultConfigs[sourceType],
   );
 
@@ -118,16 +129,34 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
 
     return (
       <>
-        <Input
-          id="journald-priority"
-          type="number"
-          label="Priority"
-          help="Log priority level (0-7)"
-          value={journaldConfig.priority}
-          onChange={(e) => updateJournaldConfig({ priority: Number(e.target.value) || 6 })}
-          min={0}
-          max={7}
-        />
+        <div>
+          <label htmlFor="file-read-mode">Read Mode</label>
+          <SegmentedControl
+            value={journaldConfig.read_mode}
+            onChange={(v) => updateJournaldConfig({ read_mode: v as 'beginning' | 'end' })}
+            data={[
+              { value: 'end', label: 'From end (tail)' },
+              { value: 'beginning', label: 'From beginning' },
+            ]}
+          />
+        </div>
+        <div>
+          <label htmlFor="journald-priority">Priority</label>
+          <SegmentedControl
+            value={journaldConfig.priority}
+            onChange={(v) => updateJournaldConfig({ priority: v as JournaldPriority })}
+            data={[
+              { value: 'emerg', label: 'EMERG' },
+              { value: 'alert', label: 'ALERT' },
+              { value: 'crit', label: 'CRIT' },
+              { value: 'err', label: 'ERR' },
+              { value: 'warning', label: 'WARNING' },
+              { value: 'notice', label: 'NOTICE' },
+              { value: 'info', label: 'INFO' },
+              { value: 'debug', label: 'DEBUG' },
+            ]}
+          />
+        </div>
         <Input
           id="journald-match-pattern"
           type="text"
@@ -151,7 +180,14 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
           label="Channels"
           help="Comma-separated channel names (e.g., Security, Application)"
           value={winConfig.channels.join(', ')}
-          onChange={(e) => updateWindowsEventLogConfig({ channels: e.target.value.split(',').map((c) => c.trim()).filter(Boolean) })}
+          onChange={(e) =>
+            updateWindowsEventLogConfig({
+              channels: e.target.value
+                .split(',')
+                .map((c) => c.trim())
+                .filter(Boolean),
+            })
+          }
           required
         />
         <div>
@@ -189,7 +225,7 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
           id="macos-predicate"
           type="text"
           label="Predicate"
-          help="Optional NSPredicate filter expression (e.g., process == &quot;kernel&quot;)"
+          help='Optional NSPredicate filter expression (e.g., process == "kernel")'
           value={macConfig.predicate || ''}
           onChange={(e) => updateMacOSUnifiedLoggingConfig({ predicate: e.target.value || undefined })}
         />
@@ -197,7 +233,9 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
           <label htmlFor="macos-format">Format</label>
           <SegmentedControl
             value={macConfig.format || 'ndjson'}
-            onChange={(v) => updateMacOSUnifiedLoggingConfig({ format: v as MacOSUnifiedLoggingSourceConfig['format'] })}
+            onChange={(v) =>
+              updateMacOSUnifiedLoggingConfig({ format: v as MacOSUnifiedLoggingSourceConfig['format'] })
+            }
             data={[
               { value: 'ndjson', label: 'NDJSON' },
               { value: 'json', label: 'JSON' },
@@ -266,9 +304,12 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
         {renderConfigSection()}
       </Modal.Body>
       <Modal.Footer>
-        <Button bsStyle="default" onClick={onClose}>Cancel</Button>
-        {' '}
-        <Button bsStyle="primary" onClick={handleSave} disabled={!name || isLoading}>Save Source</Button>
+        <Button bsStyle="default" onClick={onClose}>
+          Cancel
+        </Button>{' '}
+        <Button bsStyle="primary" onClick={handleSave} disabled={!name || isLoading}>
+          Save Source
+        </Button>
       </Modal.Footer>
     </Modal>
   );

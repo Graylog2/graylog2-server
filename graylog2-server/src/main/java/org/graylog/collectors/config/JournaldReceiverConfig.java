@@ -35,6 +35,13 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public abstract class JournaldReceiverConfig implements OtlpReceiverConfig, CollectorStanzaReceiver {
     public static final String RECEIVER_TYPE = "journald";
 
+    public enum StartAt {
+        @JsonProperty("beginning")
+        BEGINNING,
+        @JsonProperty("end")
+        END
+    }
+
     public enum Priority {
         @JsonProperty("emerg")
         EMERG,
@@ -67,12 +74,12 @@ public abstract class JournaldReceiverConfig implements OtlpReceiverConfig, Coll
 
     // Available options: "beginning", "end"
     @JsonProperty("start_at")
-    public abstract String startAt();
+    public abstract StartAt startAt();
 
     public static Builder builder(String id) {
         return new AutoValue_JournaldReceiverConfig.Builder()
                 .name(f("journald/%s", id))
-                .startAt("end")
+                .startAt(StartAt.END)
                 .priority(Priority.INFO);
     }
 
@@ -84,7 +91,7 @@ public abstract class JournaldReceiverConfig implements OtlpReceiverConfig, Coll
 
         public abstract Builder matches(@Nullable List<String> matches);
 
-        public abstract Builder startAt(String startAt);
+        public abstract Builder startAt(StartAt startAt);
 
         public abstract JournaldReceiverConfig build();
     }
