@@ -71,8 +71,7 @@ class OTelLogsCodecTest {
 
     @BeforeEach
     void setUp() {
-        final var objectMapper = new ObjectMapperProvider().get();
-        codec = new OTelLogsCodec(messageFactory, objectMapper, new OTelTypeConverter(objectMapper));
+        codec = new OTelLogsCodec(messageFactory, new OTelTypeConverter(new ObjectMapperProvider().get()));
     }
 
     // Uses a modified official example that was copied from

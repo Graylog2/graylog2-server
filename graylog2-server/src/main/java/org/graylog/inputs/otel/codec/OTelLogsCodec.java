@@ -16,7 +16,6 @@
  */
 package org.graylog.inputs.otel.codec;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.InetAddresses;
 import com.google.protobuf.ByteString;
 import io.opentelemetry.proto.common.v1.AnyValue;
@@ -54,13 +53,11 @@ public class OTelLogsCodec {
     private static final ByteString INVALID_SPAN_ID = ByteString.copyFrom(new byte[8]);
 
     private final MessageFactory messageFactory;
-    private final ObjectMapper objectMapper;
     private final OTelTypeConverter typeConverter;
 
     @Inject
-    public OTelLogsCodec(MessageFactory messageFactory, ObjectMapper objectMapper, OTelTypeConverter typeConverter) {
+    public OTelLogsCodec(MessageFactory messageFactory, OTelTypeConverter typeConverter) {
         this.messageFactory = messageFactory;
-        this.objectMapper = objectMapper;
         this.typeConverter = typeConverter;
     }
 
@@ -189,9 +186,11 @@ public class OTelLogsCodec {
         if (valueCases.isEmpty()) {
             return Optional.empty();
         }
+        // contains arrays or maps? -> serialize the whole structure as json
         if (valueCases.contains(ARRAY_VALUE) || valueCases.contains(KVLIST_VALUE)) {
             return typeConverter.toJson(typeConverter.toJavaList(arrayValue), key);
         }
+        // contains just a single primitive type? -> keep it, but with individual type conversions applied
         if (valueCases.size() == 1) {
             return Optional.of(
                     arrayValue.getValuesList().stream()
@@ -199,6 +198,7 @@ public class OTelLogsCodec {
                             .map(Map.Entry::getValue)
                             .toList());
         }
+        // contains mixed primitive types? -> convert to a list of stringified elements
         return Optional.of(arrayValue.getValuesList().stream()
                 .flatMap(v -> typeConverter.toString(v, key).stream())
                 .toList());
