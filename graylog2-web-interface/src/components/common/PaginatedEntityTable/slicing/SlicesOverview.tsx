@@ -48,6 +48,11 @@ const EmptySlicesLabel = styled.span`
   gap: 4px;
 `;
 
+const Slices = styled.div`
+  max-height: 700px;
+  overflow: auto;
+`;
+
 type Props = {
   appSection: string;
   sliceCol: string | undefined;
@@ -112,38 +117,40 @@ const SlicesOverview = ({
         sortMode={sortMode}
         onSortModeChange={onSortModeChange}
       />
-      <SliceList
-        slices={visibleNonEmptySlices}
-        activeSlice={activeSlice}
-        sliceCol={sliceCol}
-        onChangeSlicing={onChangeSlicing}
-        sliceRenderers={sliceRenderers}
-        listTestId="slices-list"
-      />
-      <EmptySlicesHeader>
-        {hasEmptySlices ? (
-          <Button
-            bsStyle="link"
-            bsSize="sm"
-            onClick={onToggleEmptySlices}
-            title={showEmptySlices ? 'Hide empty slices' : 'Show empty slices'}>
-            {showEmptySlices ? 'Hide empty slices' : 'Show empty slices'} ({emptySliceCount})
-          </Button>
-        ) : (
-          <EmptySlicesLabel>Empty slices (0)</EmptySlicesLabel>
-        )}
-      </EmptySlicesHeader>
-      {showEmptySlices && visibleEmptySlices.length > 0 && (
+      <Slices>
         <SliceList
-          slices={visibleEmptySlices}
+          slices={visibleNonEmptySlices}
           activeSlice={activeSlice}
           sliceCol={sliceCol}
           onChangeSlicing={onChangeSlicing}
           sliceRenderers={sliceRenderers}
-          keyPrefix="empty-"
-          listTestId="empty-slices-list"
+          listTestId="slices-list"
         />
-      )}
+        <EmptySlicesHeader>
+          {hasEmptySlices ? (
+            <Button
+              bsStyle="link"
+              bsSize="sm"
+              onClick={onToggleEmptySlices}
+              title={showEmptySlices ? 'Hide empty slices' : 'Show empty slices'}>
+              {showEmptySlices ? 'Hide empty slices' : 'Show empty slices'} ({emptySliceCount})
+            </Button>
+          ) : (
+            <EmptySlicesLabel>Empty slices (0)</EmptySlicesLabel>
+          )}
+        </EmptySlicesHeader>
+        {showEmptySlices && visibleEmptySlices.length > 0 && (
+          <SliceList
+            slices={visibleEmptySlices}
+            activeSlice={activeSlice}
+            sliceCol={sliceCol}
+            onChangeSlicing={onChangeSlicing}
+            sliceRenderers={sliceRenderers}
+            keyPrefix="empty-"
+            listTestId="empty-slices-list"
+          />
+        )}
+      </Slices>
     </>
   );
 };

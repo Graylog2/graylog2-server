@@ -19,6 +19,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import { Badge, ListGroup, ListGroupItem } from 'components/bootstrap';
+import { formatReadableNumber } from 'util/NumberFormatting';
 
 import type { SliceRenderers, Slices } from './Slicing';
 
@@ -29,6 +30,18 @@ const StyledListGroup = styled(ListGroup)`
 const SliceInner = styled.div`
   display: flex;
   justify-content: space-between;
+`;
+
+const Title = styled.div`
+  word-break: break-word;
+`;
+
+const CountBadge = styled(Badge)`
+  overflow: visible;
+
+  .mantine-Badge-label {
+    overflow: visible;
+  }
 `;
 
 type Props = {
@@ -57,8 +70,9 @@ const SliceList = ({
         onClick={() => onChangeSlicing(sliceCol, String(slice.value))}
         active={String(activeSlice) === String(slice.value)}>
         <SliceInner>
-          {sliceRenderers?.[sliceCol]?.render?.(slice.value) ?? slice.title ?? String(slice.value)}
-          <Badge>{slice.count}</Badge>
+          <Title>{sliceRenderers?.[sliceCol]?.render?.(slice.value) ?? slice.title ?? String(slice.value)}</Title>
+
+          <CountBadge title={String(slice.count)}>{formatReadableNumber(slice.count)}</CountBadge>
         </SliceInner>
       </ListGroupItem>
     ))}
