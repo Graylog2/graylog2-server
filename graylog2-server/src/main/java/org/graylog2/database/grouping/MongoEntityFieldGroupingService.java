@@ -22,7 +22,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Sorts;
 import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
 import org.bson.Document;
@@ -39,11 +38,6 @@ import java.util.stream.StreamSupport;
 public class MongoEntityFieldGroupingService implements EntityFieldGroupingService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoEntityFieldGroupingService.class);
-
-    static final String COUNT_FIELD_NAME = "count";
-    static final String ID_FIELD_NAME = "_id";
-    static final List<String> SORT_BY_COUNT_FIELDS = List.of(COUNT_FIELD_NAME, ID_FIELD_NAME);
-    static final List<String> SORT_BY_VALUE_FIELDS = SORT_BY_COUNT_FIELDS.reversed();
 
     private final MongoConnection mongoConnection;
     private final EntityPermissionsUtils permissionsUtils;
@@ -77,7 +71,7 @@ public class MongoEntityFieldGroupingService implements EntityFieldGroupingServi
             final var bucketsFilterBson = !Strings.isNullOrEmpty(bucketsFilter)
                     ? Filters.regex(ID_FIELD_NAME, bucketsFilter, "i")
                     : Filters.empty();
-            
+
             final int total = getTotalNumberOfBuckets(fieldName, mongoCollection, queryFilterBson, bucketsFilterBson);
             final List<EntityFieldBucket> paginatedAndSortedResults = getPage(fieldName, page, pageSize, sortOrder, sortField, mongoCollection, queryFilterBson, bucketsFilterBson);
 
@@ -139,15 +133,4 @@ public class MongoEntityFieldGroupingService implements EntityFieldGroupingServi
         return totalCountResults != null ? totalCountResults.getInteger("number_of_groups", 0) : 0;
     }
 
-    private Bson buildSortStage(final SortOrder sortOrder,
-                                final SortField sortField) {
-        final List<String> sort = switch (sortField) {
-            case COUNT -> SORT_BY_COUNT_FIELDS;
-            case VALUE -> SORT_BY_VALUE_FIELDS;
-        };
-        return switch (sortOrder) {
-            case ASC -> Aggregates.sort(Sorts.ascending(sort));
-            case DESC -> Aggregates.sort(Sorts.descending(sort));
-        };
-    }
 }

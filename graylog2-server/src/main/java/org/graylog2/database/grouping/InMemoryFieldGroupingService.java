@@ -1,0 +1,36 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog2.database.grouping;
+
+import org.apache.shiro.subject.Subject;
+
+
+public class InMemoryFieldGroupingService implements EntityFieldGroupingService {
+
+    @Override
+    public EntityFieldBucketResponse groupByField(final String collectionName,
+                                                  final String fieldName,
+                                                  final String query,
+                                                  final String bucketsFilter,
+                                                  final int page,
+                                                  final int pageSize,
+                                                  final SortOrder sortOrder,
+                                                  final SortField sortField,
+                                                  final Subject subject) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+}
