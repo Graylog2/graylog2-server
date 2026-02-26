@@ -5,14 +5,16 @@
       "username": "admin",
       "role": "administrator",
       "status": "active",
-      "department": "Engineering"
+      "department": "Engineering",
+      "team": {"$oid": "507f1f77bcf86cd799439021"}
     },
     {
       "_id": {"$oid": "507f1f77bcf86cd799439012"},
       "username": "user1",
       "role": "user",
       "status": "active",
-      "department": "Engineering"
+      "department": "Engineering",
+      "team": {"$oid": "507f1f77bcf86cd799439022"}
     },
     {
       "_id": {"$oid": "507f1f77bcf86cd799439013"},
@@ -26,7 +28,8 @@
       "username": "moderator",
       "role": "moderator",
       "status": "active",
-      "department": "Support"
+      "department": "Support",
+      "team": {"$oid": "507f1f77bcf86cd799439021"}
     },
     {
       "_id": {"$oid": "507f1f77bcf86cd799439015"},
@@ -47,14 +50,16 @@
       "username": "developer1",
       "role": "developer",
       "status": "active",
-      "department": "Engineering"
+      "department": "Engineering",
+      "team": {"$oid": "507f1f77bcf86cd799439021"}
     },
     {
       "_id": {"$oid": "507f1f77bcf86cd799439018"},
       "username": "developer2",
       "role": "developer",
       "status": "active",
-      "department": "Engineering"
+      "department": "Engineering",
+      "team": {"$oid": "507f1f77bcf86cd799439022"}
     },
     {
       "_id": {"$oid": "507f1f77bcf86cd799439019"},
@@ -69,6 +74,16 @@
       "role": "administrator",
       "status": "inactive",
       "department": "Engineering"
+    }
+  ],
+  "teams": [
+    {
+      "_id": {"$oid": "507f1f77bcf86cd799439021"},
+      "name": "Backend Team"
+    },
+    {
+      "_id": {"$oid": "507f1f77bcf86cd799439022"},
+      "name": "Frontend Team"
     }
   ]
 }
