@@ -61,20 +61,16 @@ public class InMemoryFieldGroupingService implements EntityFieldGroupingService 
                                                   final Subject subject) {
         final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collectionName);
 
-        // Build MongoDB query filter
         final Bson queryFilter = !Strings.isNullOrEmpty(query)
                 ? Filters.regex(fieldName, query, "i")
                 : Filters.empty();
 
-        // Fetch all matching documents
         final FindIterable<Document> documents = mongoCollection
                 .find(queryFilter)
                 .projection(Projections.include(fieldName));
 
-        // Create permission check predicate
         final Predicate<Document> permissionCheck = permissionsUtils.createPermissionCheck(subject, collectionName);
 
-        // Filter documents by permissions and group by field
         final Map<String, Long> groupCounts = StreamSupport.stream(documents.spliterator(), false)
                 .filter(permissionCheck)
                 .filter(doc -> doc.containsKey(fieldName) && doc.get(fieldName) != null)
@@ -83,7 +79,6 @@ public class InMemoryFieldGroupingService implements EntityFieldGroupingService 
                         Collectors.counting()
                 ));
 
-        // Apply buckets filter
         final Pattern bucketsPattern = !Strings.isNullOrEmpty(bucketsFilter)
                 ? Pattern.compile(bucketsFilter, Pattern.CASE_INSENSITIVE)
                 : null;
@@ -93,13 +88,11 @@ public class InMemoryFieldGroupingService implements EntityFieldGroupingService 
                 .map(entry -> new EntityFieldBucket(entry.getKey(), entry.getKey(), entry.getValue()))
                 .toList();
 
-        // Sort buckets
         final Comparator<EntityFieldBucket> comparator = buildComparator(sortOrder, sortField);
         final List<EntityFieldBucket> sortedBuckets = allBuckets.stream()
                 .sorted(comparator)
                 .toList();
 
-        // Apply pagination
         final int total = sortedBuckets.size();
         final int skip = (page - 1) * pageSize;
         final List<EntityFieldBucket> paginatedBuckets = sortedBuckets.stream()
