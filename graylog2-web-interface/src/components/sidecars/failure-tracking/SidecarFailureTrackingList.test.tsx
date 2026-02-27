@@ -18,8 +18,6 @@ import userEvent from '@testing-library/user-event';
 import * as React from 'react';
 import { screen, render, waitFor } from 'wrappedTestingLibrary';
 
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
-
 import SidecarFailureTrackingList from './SidecarFailureTrackingList';
 
 import type { Collector, SidecarSummary } from '../types';
@@ -75,20 +73,18 @@ const toggleShowInactive = jest.fn();
 
 const renderSUT = (sidecarsList: Array<SidecarSummary> = [], collectorsList: Array<Collector> = []) =>
   render(
-    <DefaultQueryParamProvider>
-      <SidecarFailureTrackingList
-        sidecars={sidecarsList}
-        collectors={collectorsList}
-        pagination={pagination}
-        query={query}
-        onlyActive={onlyActive}
-        sort={sort}
-        onPageChange={handlePageChange}
-        onQueryChange={handleQueryChange}
-        onSortChange={handleSortChange}
-        toggleShowInactive={toggleShowInactive}
-      />
-    </DefaultQueryParamProvider>,
+    <SidecarFailureTrackingList
+      sidecars={sidecarsList}
+      collectors={collectorsList}
+      pagination={pagination}
+      query={query}
+      onlyActive={onlyActive}
+      sort={sort}
+      onPageChange={handlePageChange}
+      onQueryChange={handleQueryChange}
+      onSortChange={handleSortChange}
+      toggleShowInactive={toggleShowInactive}
+    />,
   );
 
 describe('SidecarFailureTrackingList', () => {
