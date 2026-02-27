@@ -225,22 +225,6 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
           value={macConfig.predicate || ''}
           onChange={(e) => updateMacOSUnifiedLoggingConfig({ predicate: e.target.value || undefined })}
         />
-        <div>
-          <label htmlFor="macos-format">Format</label>
-          <SegmentedControl
-            value={macConfig.format || 'ndjson'}
-            onChange={(v) =>
-              updateMacOSUnifiedLoggingConfig({ format: v as MacOSUnifiedLoggingSourceConfig['format'] })
-            }
-            data={[
-              { value: 'ndjson', label: 'NDJSON' },
-              { value: 'json', label: 'JSON' },
-              { value: 'default', label: 'Default' },
-              { value: 'syslog', label: 'Syslog' },
-              { value: 'compact', label: 'Compact' },
-            ]}
-          />
-        </div>
       </>
     );
   };

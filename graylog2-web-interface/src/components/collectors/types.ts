@@ -75,7 +75,6 @@ export type WindowsEventLogSourceConfig = {
 
 export type MacOSUnifiedLoggingSourceConfig = {
   predicate?: string;
-  format?: 'default' | 'ndjson' | 'json' | 'syslog' | 'compact';
 };
 
 export type FileSource = SourceBase & { type: 'file'; config: FileSourceConfig };

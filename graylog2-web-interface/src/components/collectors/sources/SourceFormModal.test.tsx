@@ -49,4 +49,13 @@ describe('SourceFormModal', () => {
 
     await screen.findByLabelText(/file path/i);
   });
+
+  it('does not show format selector for macOS unified log source', async () => {
+    render(<SourceFormModal fleetId="fleet-1" onClose={jest.fn()} onSave={jest.fn()} />);
+
+    await userEvent.click(await screen.findByText('macOS Unified Log'));
+
+    expect(screen.queryByLabelText(/format/i)).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/predicate/i)).toBeInTheDocument();
+  });
 });
