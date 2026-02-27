@@ -14,20 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+// eslint-disable-next-line no-restricted-imports
+import { Link as RouterLink } from 'react-router-dom';
 
-import { Link } from 'components/common';
-import Routes from 'routing/Routes';
-import type { Stream } from 'views/stores/StreamsStore';
-
-type Props = {
-  stream: Stream;
-};
-
-const StreamLink = ({ stream }: Props) => {
-  const route = Routes.stream_search(stream.id);
-
-  return <Link to={route}>{stream.title}</Link>;
-};
-
-export default StreamLink;
+export default RouterLink;

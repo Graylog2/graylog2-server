@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
 import HideOnCloud from 'util/conditional/HideOnCloud';

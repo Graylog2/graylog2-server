@@ -22,7 +22,7 @@ import StageRules from 'components/pipelines/StageRules';
 import type { PipelineType, StageType } from 'components/pipelines/types';
 import type { RuleType } from 'stores/rules/RulesStore';
 
-jest.mock('components/common/router', () => ({
+jest.mock('components/common', () => ({
   Link: ({ children, to }: { children: React.ReactNode; to: string }) => <a href={to}>{children}</a>,
 }));
 

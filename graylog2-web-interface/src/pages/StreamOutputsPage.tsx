@@ -17,9 +17,8 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
-import { Link } from 'components/common/router';
+import { Link, ContentHeadRow, DocumentTitle, Spinner } from 'components/common';
 import { Col } from 'components/bootstrap';
-import { ContentHeadRow, DocumentTitle, Spinner } from 'components/common';
 import OutputsComponent from 'components/outputs/OutputsComponent';
 import Routes from 'routing/Routes';
 import useCurrentUser from 'hooks/useCurrentUser';
