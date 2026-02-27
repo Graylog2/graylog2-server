@@ -18,6 +18,7 @@ package org.graylog.events.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
+import jakarta.ws.rs.ForbiddenException;
 import org.graylog.events.context.EventDefinitionContextService;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.DBEventDefinitionService;
@@ -28,20 +29,22 @@ import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.audit.AuditEventSender;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import jakarta.ws.rs.ForbiddenException;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class EventDefinitionsResourceTest {
 
     static String CONFIG_TYPE_1 = "type_1";
@@ -64,14 +67,16 @@ public class EventDefinitionsResourceTest {
     AuditEventSender auditEventSender;
     @Mock
     ObjectMapper objectMapper;
+    @Mock
+    EntitySharesService entitySharesService;
 
     EventDefinitionsResource resource;
 
-    @Before
+    @BeforeEach
     public void setup() {
         resource = new EventDefinitionsResource(
                 dbService, eventDefinitionHandler, contextService, engine, recentActivityService,
-                auditEventSender, objectMapper, new DefaultEventResolver(), new EventDefinitionConfiguration());
+                auditEventSender, objectMapper, new DefaultEventResolver(), new EventDefinitionConfiguration(), entitySharesService);
         when(config1.type()).thenReturn(CONFIG_TYPE_1);
         when(config2.type()).thenReturn(CONFIG_TYPE_2);
     }

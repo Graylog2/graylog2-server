@@ -27,7 +27,7 @@ import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 
-public class BooleanConversion extends AbstractFunction<Boolean> {
+public class BooleanConversion extends AbstractConversion<Boolean> {
     public static final String NAME = "to_bool";
 
     private final ParameterDescriptor<Object, Object> valueParam;
@@ -43,7 +43,7 @@ public class BooleanConversion extends AbstractFunction<Boolean> {
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
         final Object value = valueParam.required(args, context);
         if (value == null) {
-            return defaultParam.optional(args, context).orElse(false);
+            return defaultToNull(args, context) ? null : defaultParam.optional(args, context).orElse(false);
         }
         return Boolean.parseBoolean(String.valueOf(value));
     }
@@ -53,7 +53,7 @@ public class BooleanConversion extends AbstractFunction<Boolean> {
         return FunctionDescriptor.<Boolean>builder()
                 .name(NAME)
                 .returnType(Boolean.class)
-                .params(of(valueParam, defaultParam))
+                .params(of(valueParam, defaultParam, defaultToNullParam))
                 .description("Converts a value to a boolean value using its string representation")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Convert to boolean")

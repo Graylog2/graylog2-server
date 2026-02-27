@@ -16,26 +16,26 @@
  */
 import React from 'react';
 import numeral from 'numeral';
-import isEmpty from 'lodash/isEmpty';
 
-import useAppSelector from 'stores/useAppSelector';
-import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 import { Timestamp } from 'components/common';
 
-const ExecutionInfo = () => {
-  const result = useAppSelector(selectCurrentQueryResults);
+type Props = {
+  duration: number | undefined;
+  executedAt: string | undefined;
+  total?: number | undefined;
+  showTotal?: boolean;
+  executionFinished: boolean;
+};
 
-  if (isEmpty(result)) {
+const ExecutionInfo = ({ duration, executedAt, total = undefined, showTotal = true, executionFinished }: Props) => {
+  if (!executionFinished) {
     return <i>No query executed yet.</i>;
   }
 
-  const total = result?.searchTypes && Object.values(result?.searchTypes)?.find((e) => e.total)?.total;
-
   return (
     <i>
-      Query executed in{' '}
-      {numeral(result?.duration).format('0,0')}ms at <Timestamp dateTime={result?.timestamp} />
-      {' '}Total results: {numeral(total).format('0,0')}
+      Query executed in {numeral(duration).format('0,0')}ms at <Timestamp dateTime={executedAt} />{' '}
+      {showTotal && <>Total results: {numeral(total).format('0,0')}</>}
     </i>
   );
 };

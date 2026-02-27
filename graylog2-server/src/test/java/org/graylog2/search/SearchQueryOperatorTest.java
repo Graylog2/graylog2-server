@@ -33,7 +33,7 @@ class SearchQueryOperatorTest {
         @Test
         void withRegexpMetaCharacters() {
             // Using regexp meta characters should now throw an exception
-            operator.buildQuery("hello", "foo\\");
+            operator.buildBson("hello", "foo\\");
         }
     }
 }

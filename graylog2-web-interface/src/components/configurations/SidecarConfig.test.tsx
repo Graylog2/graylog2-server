@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import MockStore from 'helpers/mocking/StoreMock';
 
@@ -34,17 +35,20 @@ let mockUpdate;
 jest.mock('stores/configurations/ConfigurationsStore', () => {
   mockUpdate = jest.fn().mockReturnValue(Promise.resolve());
 
-  return ({
-    ConfigurationsStore: MockStore(['getInitialState', () => ({
-      configuration: {
-        'org.graylog.plugins.sidecar.system.SidecarConfiguration': mockConfig,
-      },
-    })]),
+  return {
+    ConfigurationsStore: MockStore([
+      'getInitialState',
+      () => ({
+        configuration: {
+          'org.graylog.plugins.sidecar.system.SidecarConfiguration': mockConfig,
+        },
+      }),
+    ]),
     ConfigurationsActions: {
       list: jest.fn(() => Promise.resolve()),
       update: mockUpdate,
     },
-  });
+  };
 });
 
 describe('SidecarConfig', () => {
@@ -55,18 +59,25 @@ describe('SidecarConfig', () => {
 
     const editButton = await screen.findByRole('button', { name: /edit configuration/i });
 
-    fireEvent.click(editButton);
+    await userEvent.click(editButton);
 
-    fireEvent.click(await screen.findByRole('checkbox', {
-      name: /override sidecar configuration/i,
-      hidden: true,
-    }));
+    await userEvent.click(
+      await screen.findByRole('checkbox', {
+        name: /override sidecar configuration/i,
+      }),
+    );
 
-    fireEvent.click(await screen.findByRole('button', {
-      name: /update configuration/i,
-      hidden: true,
-    }));
+    await userEvent.click(
+      await screen.findByRole('button', {
+        name: /update configuration/i,
+      }),
+    );
 
-    await waitFor(() => { expect(mockUpdate).toHaveBeenCalledWith('org.graylog.plugins.sidecar.system.SidecarConfiguration', expect.objectContaining({ sidecar_configuration_override: true })); });
+    await waitFor(() => {
+      expect(mockUpdate).toHaveBeenCalledWith(
+        'org.graylog.plugins.sidecar.system.SidecarConfiguration',
+        expect.objectContaining({ sidecar_configuration_override: true }),
+      );
+    });
   });
 });

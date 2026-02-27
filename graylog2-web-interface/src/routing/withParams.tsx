@@ -16,18 +16,21 @@
  */
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
-import type { Subtract } from 'utility-types';
 
-type ParamsContext = {
+export type ParamsContext = {
   params: {
     [key: string]: string | null | undefined;
   };
 };
 
-const withParams = <Props extends ParamsContext>(Component: React.ComponentType<Props>): React.ComponentType<Subtract<Props, ParamsContext>> => (props) => {
-  const params = useParams();
+const withParams =
+  <Props extends ParamsContext>(
+    Component: React.ComponentType<Props>,
+  ): React.ComponentType<Omit<Props, keyof ParamsContext>> =>
+  (props) => {
+    const params = useParams();
 
-  return <Component {...props as Props} params={params} />;
-};
+    return <Component {...(props as Props)} params={params} />;
+  };
 
 export default withParams;

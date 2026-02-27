@@ -16,37 +16,38 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { type PipelineType } from 'stores/pipelines/PipelinesStore';
-import UserNotification from 'util/UserNotification';
 import { PipelinesPipelines } from '@graylog/server-api';
-import type FetchError from 'logic/errors/FetchError';
+
+import type { PipelineType } from 'components/pipelines/types';
+import { defaultOnError } from 'util/conditional/onError';
+
+export const PIPELINES_QUERY_KEY = ['pipelines'];
 
 type Options = {
-  enabled: boolean,
-}
+  enabled: boolean;
+};
 
-const usePipelines = ({ enabled }: Options = { enabled: true }) : {
-  data: Array<PipelineType>,
-  refetch: () => void,
-  isInitialLoading: boolean,
+const usePipelines = (
+  { enabled }: Options = { enabled: true },
+): {
+  data: Array<PipelineType>;
+  refetch: () => void;
+  isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading } = useQuery<Array<PipelineType>, FetchError>(
-    ['pipelines'],
-    () => PipelinesPipelines.getAll(),
-    {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading pipelines failed with status: ${errorThrown}`,
-          'Could not load pipelines');
-      },
-      enabled,
-    },
-  );
+  const { data, refetch, isInitialLoading } = useQuery({
+    queryKey: PIPELINES_QUERY_KEY,
 
-  return ({
+    queryFn: () =>
+      defaultOnError(PipelinesPipelines.getAll(), 'Loading pipelines failed with status', 'Could not load pipelines'),
+
+    enabled,
+  });
+
+  return {
     data: data ?? [],
     refetch,
     isInitialLoading,
-  });
+  };
 };
 
 export default usePipelines;

@@ -15,15 +15,25 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
 
 import { SystemJobsList } from 'components/systemjobs';
 import { Col, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import connect from 'stores/connect';
 import { SystemJobsActions, SystemJobsStore } from 'stores/systemjobs/SystemJobsStore';
+import useProductName from 'brand-customization/useProductName';
 
-const SystemJobsComponent = ({ jobs }) => {
+type SystemJobsComponentProps = {
+  jobs?: Record<
+    string,
+    {
+      jobs?: any[];
+    }
+  >;
+};
+
+const SystemJobsComponent = ({ jobs = undefined }: SystemJobsComponentProps) => {
+  const productName = useProductName();
   useEffect(() => {
     SystemJobsActions.list();
     const interval = setInterval(SystemJobsActions.list, 2000);
@@ -46,7 +56,7 @@ const SystemJobsComponent = ({ jobs }) => {
       <Col md={12}>
         <h2>System jobs</h2>
         <p className="description">
-          A system job is a long-running task a graylog-server node executes for maintenance reasons. Some jobs
+          A system job is a long-running task a {productName} server node executes for maintenance reasons. Some jobs
           provide progress information or can be stopped.
         </p>
 
@@ -56,18 +66,6 @@ const SystemJobsComponent = ({ jobs }) => {
   );
 };
 
-SystemJobsComponent.propTypes = {
-  jobs: PropTypes.objectOf(
-    PropTypes.shape({
-      jobs: PropTypes.array,
-    }),
-  ),
-};
-
-SystemJobsComponent.defaultProps = {
-  jobs: undefined,
-};
-
-export default connect(SystemJobsComponent,
-  { systemJobsStore: SystemJobsStore },
-  ({ systemJobsStore }) => ({ jobs: (systemJobsStore as any).jobs }));
+export default connect(SystemJobsComponent, { systemJobsStore: SystemJobsStore }, ({ systemJobsStore }) => ({
+  jobs: (systemJobsStore as any).jobs,
+}));

@@ -16,18 +16,16 @@
  */
 package org.graylog2.notifications;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.graylog2.cluster.Node;
 import org.graylog2.plugin.database.Persisted;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
+import java.util.Locale;
 import java.util.Map;
 
 public interface Notification extends Persisted {
-    // Some pre-defined detail keys
-    final String KEY_TITLE = "title";
-    final String KEY_DESCRIPTION = "description";
-
     Notification addType(Type type);
 
     Notification addKey(String key);
@@ -86,6 +84,7 @@ public interface Notification extends Persisted {
         ES_NODE_DISK_WATERMARK_LOW,
         ES_NODE_DISK_WATERMARK_HIGH,
         ES_NODE_DISK_WATERMARK_FLOOD_STAGE,
+        ES_SHARD_ALLOCATION_MAXIMUM,
         ES_VERSION_MISMATCH,
         LEGACY_LDAP_CONFIG_MIGRATION,
         MULTI_LEADER,
@@ -94,14 +93,25 @@ public interface Notification extends Persisted {
         SEARCH_ERROR,
         SIDECAR_STATUS_UNKNOWN,
         CERTIFICATE_NEEDS_RENEWAL,
-        EVENT_LIMIT_REACHED,
         DRAWDOWN_LICENSE_ERROR,
         REMOTE_REINDEX_RUNNING,
         REMOTE_REINDEX_FINISHED,
-        DATA_TIERING_ROLLOVER_ERROR
+        DATA_NODE_VERSION_MISMATCH,
+        DATA_TIERING_ROLLOVER_ERROR,
+        DATA_NODE_HEAP_WARNING;
+
+        @JsonValue
+        public String json() {
+            return this.name().toLowerCase(Locale.ROOT);
+        }
     }
 
     enum Severity {
-        NORMAL, URGENT
+        NORMAL, URGENT;
+
+        @JsonValue
+        public String json() {
+            return this.name().toLowerCase(Locale.ROOT);
+        }
     }
 }

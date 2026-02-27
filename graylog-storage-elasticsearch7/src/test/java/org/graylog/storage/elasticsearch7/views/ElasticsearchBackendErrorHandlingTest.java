@@ -31,12 +31,14 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSe
 import org.graylog.storage.elasticsearch7.testing.TestMultisearchResponse;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.graylog2.streams.StreamService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.Set;
@@ -47,9 +49,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchMockedClientTestBase {
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock
     protected IndexLookup indexLookup;
@@ -62,7 +64,7 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchMockedCl
     static abstract class DummyHandler implements ESSearchTypeHandler<SearchType> {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.backend = new ElasticsearchBackend(
                 ImmutableMap.of(
@@ -73,6 +75,7 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchMockedCl
                 ViewsUtils.createTestContextFactory(),
                 usedSearchFilters -> Collections.emptySet(),
                 new NoOpStatsCollector<>(),
+                mock(StreamService.class),
                 false);
         when(indexLookup.indexNamesForStreamsInTimeRange(any(), any())).thenReturn(Collections.emptySet());
 

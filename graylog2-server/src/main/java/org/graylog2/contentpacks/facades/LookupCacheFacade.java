@@ -20,7 +20,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
 import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -39,13 +41,14 @@ import org.graylog2.lookup.db.DBCacheService;
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
+import org.graylog2.shared.security.RestPermissions;
 
-import jakarta.inject.Inject;
-
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils.toReferenceMap;
 import static org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils.toValueMap;
@@ -163,9 +166,11 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
 
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
-        return cacheService.findAll().stream()
-                .map(this::createExcerpt)
-                .collect(Collectors.toSet());
+        try (Stream<CacheDto> cacheStream = cacheService.streamAll()) {
+            return cacheStream
+                    .map(this::createExcerpt)
+                    .collect(Collectors.toSet());
+        }
     }
 
     @Override
@@ -177,5 +182,10 @@ public class LookupCacheFacade implements EntityFacade<CacheDto> {
     @Override
     public boolean usesScopedEntities() {
         return true;
+    }
+
+    @Override
+    public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
+        return EntityPermissions.of(RestPermissions.LOOKUP_TABLES_CREATE);
     }
 }

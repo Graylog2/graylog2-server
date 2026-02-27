@@ -16,39 +16,40 @@
  */
 package org.graylog2.streams;
 
+import com.github.rholder.retry.RetryException;
 import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static io.restassured.RestAssured.given;
 import static org.graylog2.rest.models.tools.responses.PageListResponse.ELEMENTS_FIELD_NAME;
 import static org.hamcrest.Matchers.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class StreamsIT {
     private static final String STREAMS_RESOURCE = "/streams";
 
-    private final GraylogApis api;
-    private final List<String> createdStreamsIds;
-
-    public StreamsIT(GraylogApis api) {
-        this.api = api;
-        this.createdStreamsIds = new ArrayList<>();
-    }
+    private static GraylogApis api;
+    private final List<String> createdStreamsIds = new ArrayList<>();
+    private final List<String> createdIndexSetIds = new ArrayList<>();
 
     @BeforeAll
-    void beforeAll() {
+    void beforeAll(GraylogApis graylogApis) throws ExecutionException, RetryException {
+        api = graylogApis;
         final String defaultIndexSetId = api.indices().defaultIndexSetId();
         final String newIndexSetId = api.indices().createIndexSet("Test Indices", "Some test indices", "streamstest");
         final String newIndexSetId2 = api.indices().createIndexSet("More Test Indices", "Some more test indices", "moretest");
+        this.createdIndexSetIds.add(newIndexSetId);
+        this.createdIndexSetIds.add(newIndexSetId2);
         createdStreamsIds.add(api.streams().createStream("New Stream", newIndexSetId));
         createdStreamsIds.add(api.streams().createStream("New Stream 2", defaultIndexSetId));
         createdStreamsIds.add(api.streams().createStream("New Stream 3", newIndexSetId2));
@@ -58,7 +59,13 @@ public class StreamsIT {
         createdStreamsIds.add(api.streams().createStream("sorttest: 12345", defaultIndexSetId, false));
     }
 
-    @ContainerMatrixTest
+    @AfterAll
+    void afterAll() {
+        createdStreamsIds.forEach(streamId -> api.streams().deleteStream(streamId));
+        createdIndexSetIds.forEach(indexSetId -> api.indices().deleteIndexSet(indexSetId, true));
+    }
+
+    @FullBackendTest
     void bulkPauseAndResumeWorksCorrectly() {
         //Testing pause and resume in the same test, as other test checks sorting by status, so I want to bring back original situation
 
@@ -103,7 +110,7 @@ public class StreamsIT {
         api.streams().getStream(createdStreamsIds.get(3)).body("disabled", equalTo(false));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void sortByIndexSetTitle() {
         paginatedByFieldWithOrder("New", "title", "asc")
                 .assertThat()
@@ -119,7 +126,7 @@ public class StreamsIT {
                 .body(ELEMENTS_FIELD_NAME + "*.title", equalTo(List.of("New Stream", "New Stream 3", "New Stream 2")));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void sortByTitleCaseInsensitive() {
         paginatedByFieldWithOrder("sorttest", "title", "asc")
                 .assertThat()
@@ -129,7 +136,7 @@ public class StreamsIT {
                 .body(ELEMENTS_FIELD_NAME + "*.title", equalTo(List.of("sorttest: ZZZZZZ", "sorttest: aaaaa", "sorttest: 12345")));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void sortByStatus() {
         paginatedByFieldWithOrder("sorttest", "disabled", "asc")
                 .assertThat()

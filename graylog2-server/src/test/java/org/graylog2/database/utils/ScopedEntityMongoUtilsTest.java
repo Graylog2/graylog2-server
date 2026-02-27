@@ -16,11 +16,9 @@
  */
 package org.graylog2.database.utils;
 
-import com.mongodb.client.MongoCollection;
 import org.graylog.testing.mongodb.MongoDBExtension;
-import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScope;
@@ -43,8 +41,7 @@ public class ScopedEntityMongoUtilsTest {
     private ScopedEntityMongoUtils<ScopedDTO> scopedEntityMongoUtils;
 
     @BeforeEach
-    void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider objectMapperProvider) {
-        MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongoDBTestService.mongoConnection());
+    void setUp(MongoCollections mongoCollections) {
         collection = mongoCollections.collection("test", ScopedDTO.class);
         EntityScopeService scopeService = new EntityScopeService(Set.of(
                 new DefaultEntityScope(),
@@ -62,6 +59,7 @@ public class ScopedEntityMongoUtilsTest {
         final String id = scopedEntityMongoUtils.create(defaultScoped);
         final ScopedDTO updated = ScopedDTO.builder().id(id).name("updated").scope(DefaultEntityScope.NAME).build();
         assertThat(scopedEntityMongoUtils.update(updated)).isEqualTo(updated);
+        assertThat(scopedEntityMongoUtils.upsert(updated)).isEqualTo(updated);
         assertThat(scopedEntityMongoUtils.deleteById(id)).isTrue();
     }
 
@@ -74,10 +72,13 @@ public class ScopedEntityMongoUtilsTest {
         final ScopedDTO updated = ScopedDTO.builder().id(id).name("updated").scope(ImmutableScope.NAME).build();
         assertThatThrownBy(() -> scopedEntityMongoUtils.update(updated))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> scopedEntityMongoUtils.upsert(updated))
+                .isExactlyInstanceOf(IllegalArgumentException.class);
         assertThat(collection.find(idEq(id)).first()).isEqualTo(immutableScoped.toBuilder().id(id).build());
         assertThatThrownBy(() -> scopedEntityMongoUtils.deleteById(id))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
         assertThat(scopedEntityMongoUtils.forceDelete(id)).isEqualTo(1L);
+        assertThat(scopedEntityMongoUtils.forceUpdate(updated)).isEqualTo(updated);
     }
 
     @Test
@@ -88,6 +89,7 @@ public class ScopedEntityMongoUtilsTest {
         final String id = scopedEntityMongoUtils.create(cannotDelete);
         final ScopedDTO updated = ScopedDTO.builder().id(id).name("updated").scope(NonDeletableScope.NAME).build();
         assertThat(scopedEntityMongoUtils.update(updated)).isEqualTo(updated);
+        assertThat(scopedEntityMongoUtils.upsert(updated)).isEqualTo(updated);
         assertThatThrownBy(() -> scopedEntityMongoUtils.deleteById(id))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
         assertThat(scopedEntityMongoUtils.forceDelete(id)).isEqualTo(1L);
@@ -102,6 +104,8 @@ public class ScopedEntityMongoUtilsTest {
         final ScopedDTO updated = ScopedDTO.builder().id(id).name("updated").scope(PermanentScope.NAME).build();
         assertThatThrownBy(() -> scopedEntityMongoUtils.update(updated))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> scopedEntityMongoUtils.upsert(updated))
+                .isExactlyInstanceOf(IllegalArgumentException.class);
         assertThat(collection.find(idEq(id)).first()).isEqualTo(permanentScoped.toBuilder().id(id).build());
         assertThatThrownBy(() -> scopedEntityMongoUtils.deleteById(id))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
@@ -115,6 +119,15 @@ public class ScopedEntityMongoUtilsTest {
         assertThatThrownBy(() -> scopedEntityMongoUtils.create(invalidScoped))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
         assertThat(collection.countDocuments()).isEqualTo(0L);
+    }
+
+    @Test
+    void testScopeModificationDisallowed() {
+        final ScopedDTO nonDeletableScope = ScopedDTO.builder().name("test").scope(NonDeletableScope.NAME).build();
+        final String id = scopedEntityMongoUtils.create(nonDeletableScope);
+        final ScopedDTO updated = ScopedDTO.builder().id(id).name("updated").scope(DefaultEntityScope.NAME).build();
+        assertThatThrownBy(() -> scopedEntityMongoUtils.update(updated))
+                .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     static class ImmutableScope extends EntityScope {

@@ -17,10 +17,12 @@
 import type { SearchesConfig } from 'components/search/SearchConfig';
 import useClusterConfig from 'hooks/useClusterConfig';
 
-type Result = { config: SearchesConfig, refresh: () => void };
+type Result = { config: SearchesConfig; refresh: () => void };
 
 const useSearchConfiguration = (): Result => {
-  const { data: config, refetch } = useClusterConfig<SearchesConfig>('org.graylog2.indexer.searches.SearchesClusterConfig');
+  const { data: config, refetch } = useClusterConfig<SearchesConfig>(
+    'org.graylog2.indexer.searches.SearchesClusterConfig',
+  );
 
   return { config, refresh: refetch };
 };

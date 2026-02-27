@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.sidecar.rest.models.SidecarSummary;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.rest.models.SortOrder;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -47,7 +48,7 @@ public abstract class SidecarListResponse {
 
     @Nullable
     @JsonProperty
-    public abstract String order();
+    public abstract SortOrder order();
 
     @JsonProperty
     public abstract Collection<SidecarSummary> sidecars();
@@ -62,7 +63,7 @@ public abstract class SidecarListResponse {
                                              @JsonProperty("total") long total,
                                              @JsonProperty("only_active") Boolean onlyActive,
                                              @JsonProperty("sort") @Nullable String sort,
-                                             @JsonProperty("order") @Nullable String order,
+                                             @JsonProperty("order") @Nullable SortOrder order,
                                              @JsonProperty("sidecars") Collection<SidecarSummary> sidecars,
                                              @JsonProperty("filters") @Nullable Map<String, String> filters) {
         return new AutoValue_SidecarListResponse(query, paginationInfo, total, onlyActive, sort, order, sidecars, filters);
@@ -73,7 +74,7 @@ public abstract class SidecarListResponse {
                                              @JsonProperty("total") long total,
                                              @JsonProperty("only_active") Boolean onlyActive,
                                              @JsonProperty("sort") @Nullable String sort,
-                                             @JsonProperty("order") @Nullable String order,
+                                             @JsonProperty("order") @Nullable SortOrder order,
                                              @JsonProperty("sidecars") Collection<SidecarSummary> sidecars) {
         return create(query, paginationInfo, total, onlyActive, sort, order, sidecars, null);
     }

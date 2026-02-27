@@ -17,12 +17,14 @@
 package org.graylog2.periodical;
 
 import com.google.common.collect.ImmutableMap;
+import jakarta.annotation.Nonnull;
+import jakarta.inject.Provider;
 import org.graylog2.datatiering.DataTieringOrchestrator;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
@@ -30,14 +32,16 @@ import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.system.activities.NullActivityWriter;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
-import jakarta.inject.Provider;
+import java.util.Set;
 
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -45,9 +49,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class IndexRotationThreadTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
     @Mock
     private IndexSet indexSet;
@@ -64,8 +68,8 @@ public class IndexRotationThreadTest {
     @Mock
     private DataTieringOrchestrator dataTieringOrchestrator;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp() {
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
     }
 
@@ -86,7 +90,8 @@ public class IndexRotationThreadTest {
                 new NullActivityWriter(),
                 nodeId,
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build(),
-                dataTieringOrchestrator);
+                dataTieringOrchestrator
+        );
         when(indexSetConfig.rotationStrategyClass()).thenReturn("strategy");
 
         rotationThread.checkForRotation(indexSet);
@@ -106,12 +111,37 @@ public class IndexRotationThreadTest {
                 new NullActivityWriter(),
                 nodeId,
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build(),
-                dataTieringOrchestrator);
+                dataTieringOrchestrator
+        );
         when(indexSetConfig.rotationStrategyClass()).thenReturn("strategy");
 
         rotationThread.checkForRotation(indexSet);
 
         verify(indexSet, never()).cycle();
+    }
+
+    private IndexSet mockIndexSet(String indexSetTitle, boolean writable, RotationStrategy testableRotationStrategy) {
+        final IndexSet indexSet = Mockito.mock(IndexSet.class);
+        final IndexSetConfig config = Mockito.mock(IndexSetConfig.class);
+        Mockito.when(config.isWritable()).thenReturn(writable);
+        Mockito.when(config.rotationStrategyClass()).thenReturn(testableRotationStrategy.getStrategyName());
+        Mockito.when(config.title()).thenReturn(indexSetTitle);
+        Mockito.when(config.id()).thenReturn(indexSetTitle);
+        Mockito.when(indexSet.getConfig()).thenReturn(config);
+        return indexSet;
+    }
+
+    private Cluster mockCluster(boolean connected) {
+        final Cluster cluster = Mockito.mock(Cluster.class);
+        Mockito.when(cluster.isConnected()).thenReturn(connected);
+        return cluster;
+    }
+
+    @Nonnull
+    private IndexSetRegistry mockIndexSetRegistry(IndexSet... indexSets) {
+        final IndexSetRegistry registry = Mockito.mock(IndexSetRegistry.class);
+        Mockito.when(registry.getAllIndexSets()).thenReturn(Set.of(indexSets));
+        return registry;
     }
 
     @Test
@@ -127,7 +157,8 @@ public class IndexRotationThreadTest {
                 new NullActivityWriter(),
                 nodeId,
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build(),
-                dataTieringOrchestrator);
+                dataTieringOrchestrator
+        );
         rotationThread.doRun();
 
         verify(indexSet, never()).cycle();

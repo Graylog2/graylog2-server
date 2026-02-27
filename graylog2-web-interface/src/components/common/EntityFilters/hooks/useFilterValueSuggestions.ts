@@ -14,12 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import PaginationURL from 'util/PaginationURL';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
+import { defaultOnError } from 'util/conditional/onError';
 
 const DEFAULT_DATA = {
   pagination: {
@@ -29,20 +29,32 @@ const DEFAULT_DATA = {
 };
 
 type SearchParams = {
-  page: number,
-  pageSize: number,
-  query: string,
-}
+  page: number;
+  pageSize: number;
+  query: string;
+};
 
 type PaginatedSuggestions = {
-  pagination: { total: number }
-  suggestions: Array<{ id: string, value: string }>,
-}
+  pagination: { total: number };
+  suggestions: Array<{ id: string; target_id?: string; value: string }>;
+};
 
-const fetchFilterValueSuggestions = async (collection: string, { query, page, pageSize }: SearchParams, collectionProperty: string = 'title'): Promise<PaginatedSuggestions | undefined> => {
+const fetchFilterValueSuggestions = async (
+  collection: string,
+  { query, page, pageSize }: SearchParams,
+  relatedIdentifier: string,
+  displayFields?: string[],
+  displayTemplate?: string,
+  identifierType?: string,
+  collectionProperty: string = 'title',
+): Promise<PaginatedSuggestions | undefined> => {
   const additional = {
     collection,
+    identifier: relatedIdentifier,
     column: collectionProperty,
+    ...(displayFields && displayFields.length > 0 && { display_fields: displayFields.join(',') }),
+    ...(displayTemplate && { display_template: displayTemplate }),
+    ...(identifierType && { identifier_type: identifierType }),
   };
   const url = PaginationURL('entity_suggestions', page, pageSize, query, additional);
 
@@ -52,23 +64,32 @@ const fetchFilterValueSuggestions = async (collection: string, { query, page, pa
 const useFilterValueSuggestions = (
   attributeId: string,
   collection: string,
+  relatedIdentifier: string,
   searchParams: SearchParams,
   collectionProperty: string,
+  displayFields?: string[],
+  displayTemplate?: string,
+  identifierType?: string,
 ): {
-  data: PaginatedSuggestions | undefined
-  isInitialLoading: boolean
+  data: PaginatedSuggestions | undefined;
+  isInitialLoading: boolean;
 } => {
   if (!collection) {
     throw Error(`Attribute meta data for attribute "${attributeId}" is missing related collection.`);
   }
 
-  const { data, isInitialLoading } = useQuery(['filters', 'suggestions', searchParams], () => fetchFilterValueSuggestions(collection, searchParams, collectionProperty), {
-    onError: (errorThrown) => {
-      UserNotification.error(`Loading suggestions for filter failed with status: ${errorThrown}`,
-        'Could not load filter suggestions');
-    },
+  const { data, isInitialLoading } = useQuery({
+    queryKey: ['filters', 'suggestions', collection, collectionProperty, relatedIdentifier, identifierType, searchParams, displayFields, displayTemplate],
+
+    queryFn: () =>
+      defaultOnError(
+        fetchFilterValueSuggestions(collection, searchParams, relatedIdentifier, displayFields, displayTemplate, identifierType, collectionProperty),
+        'Loading suggestions for filter failed with status',
+        'Could not load filter suggestions',
+      ),
+
     retry: 0,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 
   return {

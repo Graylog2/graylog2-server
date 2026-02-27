@@ -20,28 +20,26 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.List;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class IndexInfo {
 
-    @JsonProperty
+    @JsonProperty("index_name")
     public abstract String indexName();
 
-    @JsonProperty
+    @JsonProperty("primary_shards")
     public abstract IndexStats primaryShards();
 
-    @JsonProperty
+    @JsonProperty("all_shards")
     public abstract IndexStats allShards();
 
-    @JsonProperty
+    @JsonProperty("routing")
     public abstract List<ShardRouting> routing();
 
-    @JsonProperty
+    @JsonProperty("is_reopened")
     public abstract boolean isReopened();
 
     @JsonCreator

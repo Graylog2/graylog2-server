@@ -17,12 +17,11 @@
 package org.graylog2.lookup;
 
 import com.google.common.base.Suppliers;
-import org.graylog.grn.GRN;
-import org.graylog2.contentpacks.ContentPackService;
-import org.graylog2.contentpacks.model.entities.EntityExcerpt;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.graylog.grn.GRN;
+import org.graylog2.contentpacks.ContentPackEntityResolver;
+import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 
 import java.util.Map;
 import java.util.Optional;
@@ -38,7 +37,7 @@ public class Catalog {
     private final Supplier<Map<String, EntityExcerpt>> memoizedExcerptSupplier;
 
     @Inject
-    public Catalog(ContentPackService contentPackService) {
+    public Catalog(ContentPackEntityResolver contentPackService) {
         /*
          * TODO: This approach does not perform and should be replaced.
          * It was implemented as a quick improvement for even worse approach, where getEntityExcerpts() could be invoked for each entry retrieval.

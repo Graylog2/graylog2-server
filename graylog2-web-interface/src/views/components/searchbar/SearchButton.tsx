@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
@@ -24,41 +23,51 @@ import QueryValidationActions from 'views/actions/QueryValidationActions';
 import type { IconName } from 'components/common/Icon';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 
 export const SEARCH_BUTTON_WIDTH = '64';
 
-const StyledButton = styled(Button)<{ $dirty: boolean }>(({ theme, $dirty }) => css`
-  position: relative;
-  min-width: ${SEARCH_BUTTON_WIDTH}px;
+const StyledButton = styled(Button)<{ $dirty: boolean }>(
+  ({ theme, $dirty }) => css`
+    position: relative;
+    min-width: ${SEARCH_BUTTON_WIDTH}px;
 
-  &&&.disabled {
-    color: ${theme.utils.contrastingColor(theme.colors.variant.success)};
-  }
-
-  ${$dirty ? css`
-    &::after {
-      position: absolute;
-      content: '';
-      height: 16px;
-      width: 16px;
-      top: -5px;
-      right: -6px;
-      border-radius: 50%;
-      background-color: ${theme.colors.variant.warning};
+    &&&.disabled {
+      color: ${theme.utils.contrastingColor(theme.colors.variant.success)};
     }
-` : ''}
-`);
+
+    ${$dirty
+      ? css`
+          &::after {
+            position: absolute;
+            content: '';
+            height: 16px;
+            width: 16px;
+            top: -5px;
+            right: -6px;
+            border-radius: 50%;
+            background-color: ${theme.colors.variant.warning};
+          }
+        `
+      : ''}
+  `,
+);
 
 type Props = {
-  disabled: boolean,
-  glyph: IconName,
-  dirty: boolean,
-  displaySpinner?: boolean,
+  dirty?: boolean;
+  disabled?: boolean;
+  displaySpinner?: boolean;
+  glyph?: IconName;
+  onClick?: (e: MouseEvent) => void;
 };
 
-const onButtonClick = (e: MouseEvent, disabled: Boolean, triggerTelemetry: () => void) => {
+const onButtonClick = (
+  e: MouseEvent,
+  disabled: boolean,
+  triggerTelemetry: () => void,
+  onClick?: (e: MouseEvent) => void,
+) => {
+  onClick?.(e);
+
   if (disabled) {
     e.preventDefault();
     QueryValidationActions.displayValidationErrors();
@@ -67,15 +76,19 @@ const onButtonClick = (e: MouseEvent, disabled: Boolean, triggerTelemetry: () =>
   triggerTelemetry();
 };
 
-const SearchButton = ({ dirty, disabled, glyph, displaySpinner }: Props) => {
+const SearchButton = ({
+  dirty = false,
+  disabled = false,
+  glyph = 'search',
+  displaySpinner = false,
+  onClick = undefined,
+}: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const location = useLocation();
   const className = disabled ? 'disabled' : '';
   const title = dirty ? 'Perform search (changes were made after last search execution)' : 'Perform Search';
 
   const triggerTelemetry = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_BUTTON_CLICKED, {
-      app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'search-bar',
       app_action_value: 'search-button',
       event_details: {
@@ -85,29 +98,16 @@ const SearchButton = ({ dirty, disabled, glyph, displaySpinner }: Props) => {
   };
 
   return (
-    <StyledButton onClick={(e) => onButtonClick(e, disabled, triggerTelemetry)}
-                  title={title}
-                  className={className}
-                  type="submit"
-                  bsStyle="success"
-                  $dirty={dirty}>
+    <StyledButton
+      onClick={(e) => onButtonClick(e, disabled, triggerTelemetry, onClick)}
+      title={title}
+      className={className}
+      type="submit"
+      bsStyle="primary"
+      $dirty={dirty && !displaySpinner}>
       {displaySpinner ? <Spinner delay={0} text="" /> : <Icon name={glyph} size="lg" />}
     </StyledButton>
   );
-};
-
-SearchButton.defaultProps = {
-  disabled: false,
-  displaySpinner: false,
-  dirty: false,
-  glyph: 'search',
-};
-
-SearchButton.propTypes = {
-  disabled: PropTypes.bool,
-  displaySpinner: PropTypes.bool,
-  dirty: PropTypes.bool,
-  glyph: PropTypes.string,
 };
 
 export default SearchButton;

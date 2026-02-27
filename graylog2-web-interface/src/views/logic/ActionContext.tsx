@@ -20,10 +20,12 @@ import { useContext, useMemo } from 'react';
 import type { ActionContexts } from 'views/types';
 import { singleton } from 'logic/singleton';
 
-const ActionContext = singleton('contexts.ActionContext', () => React.createContext<ActionContexts>({} as ActionContexts));
+const ActionContext = singleton('contexts.ActionContext', () =>
+  React.createContext<ActionContexts>({} as ActionContexts),
+);
 
 type Props = {
-  children: React.ReactNode,
+  children: React.ReactNode;
   value: Partial<ActionContexts>;
 };
 
@@ -32,11 +34,7 @@ const AdditionalContext = {
     const contexts = useContext(ActionContext);
     const newActionContextValue = useMemo(() => ({ ...contexts, ...value }), [contexts, value]);
 
-    return (
-      <ActionContext.Provider value={newActionContextValue}>
-        {children}
-      </ActionContext.Provider>
-    );
+    return <ActionContext.Provider value={newActionContextValue}>{children}</ActionContext.Provider>;
   },
   Consumer: ActionContext.Consumer,
 };

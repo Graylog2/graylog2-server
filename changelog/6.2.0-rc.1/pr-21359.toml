@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix error when clicking the Replay search link in event definition summary in edit modal on security events page"
+
+issues = ["graylog-plugin-enterprise#9289"]
+pulls = ["21359"]

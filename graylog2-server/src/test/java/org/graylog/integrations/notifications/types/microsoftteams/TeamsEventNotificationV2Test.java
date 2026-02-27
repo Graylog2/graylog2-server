@@ -16,7 +16,6 @@
  */
 package org.graylog.integrations.notifications.types.microsoftteams;
 
-import com.floreysoft.jmte.Engine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -27,9 +26,11 @@ import org.graylog.events.notifications.EventNotificationService;
 import org.graylog.events.notifications.NotificationDto;
 import org.graylog.events.notifications.NotificationTestData;
 import org.graylog.events.notifications.PermanentEventNotificationException;
+import org.graylog.events.notifications.TemplateModelProvider;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.integrations.notifications.types.util.RequestClient;
+import org.graylog2.bindings.providers.JsonSafeEngineProvider;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
@@ -40,26 +41,31 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class TeamsEventNotificationV2Test {
 
     // Code under test
@@ -67,6 +73,106 @@ public class TeamsEventNotificationV2Test {
 
     private final NodeId nodeId = new SimpleNodeId("12345");
     private final MessageFactory messageFactory = new TestMessageFactory();
+    private final String defaultTemplate = """
+            {  "type": "message",
+              "attachments": [
+                {
+                  "contentType": "application/vnd.microsoft.card.adaptive",
+                  "content": {
+                    "type": "AdaptiveCard",
+                    "version": "1.6",
+                    "msTeams": { "width": "full" },
+                    "body": [
+                      {
+                        "type": "TextBlock",
+                        "size": "Large",
+                        "weight": "Bolder",
+                        "text": "${event_definition_title} triggered",
+                        "style": "heading",
+                        "fontType": "Default"
+                      },
+                      {
+                        "type": "TextBlock",
+                        "text": "${event_definition_description}",
+                        "wrap": true
+                      },
+                      {
+                        "type": "TextBlock",
+                        "text": "Event Details",
+                        "wrap": true
+                      },
+                      {
+                        "type": "FactSet",
+                        "facts": [
+                          {
+                            "title": "Type",
+                            "value": "${event_definition_type}"
+                          },
+                          {
+                            "title": "Timestamp",
+                            "value": "${event.timestamp_processing}"
+                          },
+                          {
+                            "title": "Message",
+                            "value": "${event.message}"
+                          },
+                          {
+                            "title": "Source",
+                            "value": "${event.source}"
+                          },
+                          {
+                            "title": "Key",
+                            "value": "${event.key}"
+                          },
+                          {
+                            "title": "Priority",
+                            "value": "${event.priority}"
+                          },
+                          {
+                            "title": "Alert",
+                            "value": "${event.alert}"
+                          },
+                          {
+                            "title": "Timerange Start",
+                            "value": "${event.timerange_start}"
+                          },
+                          {
+                            "title": "Timerange End",
+                            "value": "${event.timerange_end}"
+                          }
+                        ]
+                      }${if event.fields},
+                      {
+                        "type": "TextBlock",
+                        "text": "Event Fields",
+                        "weight": "bolder",
+                        "size": "medium"
+                      },
+                      {
+                        "type": "FactSet",
+                        "facts": [${foreach event.fields field}
+                          { "title": "${field.key}", "value": "${field.value}" }${if last_field}${else},${end}${end}
+                        ]
+                      }${end}${if backlog},
+                      {
+                        "type": "TextBlock",
+                        "text": "Backlog",
+                        "weight": "bolder",
+                        "size": "medium"
+                      },
+                      {
+                        "type": "FactSet",
+                        "facts": [${foreach backlog message}
+                          { "title": "Message", "value": "${message.message}" }${if last_message}${else},${end}${end}
+                        ]
+                      }${end}
+                    ],
+                    "$schema": "[http://adaptivecards.io/schemas/adaptive-card.json](https://link.edgepilot.com/s/8e5962e4/2Jj9cedkLka5KIsBRuMOIg?u=http://adaptivecards.io/schemas/adaptive-card.json)",
+                    "rtl": false
+                  }
+                }
+              ]
+            }""";
 
     @Mock
     NotificationService mockNotificationService;
@@ -80,7 +186,7 @@ public class TeamsEventNotificationV2Test {
     private TeamsEventNotificationConfigV2 notificationConfig;
     private EventNotificationContext eventNotificationContext;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         getDummyTeamsNotificationConfig();
         eventNotificationContext = NotificationTestData.getDummyContext(getNotificationDto(), "unit_tests").toBuilder().build();
@@ -88,24 +194,30 @@ public class TeamsEventNotificationV2Test {
         when(notificationCallbackService.getBacklogForEvent(eventNotificationContext)).thenReturn(messageSummaries);
 
         teamsEventNotification = new TeamsEventNotificationV2(notificationCallbackService,
-                new ObjectMapperProvider(),
-                Engine.createEngine(),
+                new JsonSafeEngineProvider().get(),
                 mockNotificationService,
                 nodeId,
                 mockrequestClient,
-                new HttpConfiguration());
+                new TemplateModelProvider(CustomizationConfig.empty(), new ObjectMapperProvider(), new HttpConfiguration()));
     }
 
     @Test
-    public void testEscapedQuotes() {
+    public void testEscapedQuotes() throws PermanentEventNotificationException {
         if (eventNotificationContext.eventDefinition().isPresent()) {
             EventDefinitionDto definition = eventNotificationContext.eventDefinition().get();
             definition = definition.toBuilder().description("A Description with \"Double Quotes\"").build();
             eventNotificationContext = eventNotificationContext.toBuilder().eventDefinition(definition).build();
         }
-        List<MessageSummary> messageSummaries = generateMessageSummaries(50);
-        Map<String, Object> customMessageModel = teamsEventNotification.getCustomMessageModel(eventNotificationContext, notificationConfig.type(), messageSummaries, DateTimeZone.UTC);
-        assertThat(customMessageModel.get("event_definition_description")).isEqualTo("A Description with \\\"Double Quotes\\\"");
+        when(notificationCallbackService.getBacklogForEvent(any())).thenReturn(generateMessageSummariesWithDoubleQuotes(5));
+        TeamsEventNotificationConfigV2 config = TeamsEventNotificationConfigV2.builder()
+                .adaptiveCard(defaultTemplate)
+                .backlogSize(5)
+                .timeZone(DateTimeZone.UTC)
+                .webhookUrl("http://localhost:12345")
+                .build();
+        String body = teamsEventNotification.generateBody(eventNotificationContext, config);
+        assertThat(body).contains("A Description with \\\"Double Quotes\\\"");
+        assertThat(body).contains("Test message1 with \\\"Double Quotes\\\"");
     }
 
     @Test
@@ -122,27 +234,33 @@ public class TeamsEventNotificationV2Test {
         assertThat(customMessageModel.get("job_trigger_id")).isEqualTo("<unknown>");
     }
 
-    @Test(expected = EventNotificationException.class)
-    public void executeWithInvalidWebhookUrl() throws EventNotificationException {
-        givenGoodNotificationService();
-        givenTeamsClientThrowsPermException();
-        // When execute is called with an invalid webhook URL, we expect an event notification exception.
-        teamsEventNotification.execute(eventNotificationContext);
+    @Test
+    public void executeWithInvalidWebhookUrl() {
+        assertThrows(EventNotificationException.class, () -> {
+            givenGoodNotificationService();
+            givenTeamsClientThrowsPermException();
+            // When execute is called with an invalid webhook URL, we expect an event notification exception.
+            teamsEventNotification.execute(eventNotificationContext);
+        });
     }
 
-    @Test(expected = EventNotificationException.class)
-    public void executeWithNullEventTimerange() throws EventNotificationException {
-        EventNotificationContext yetAnotherContext = getEventNotificationContextToSimulateNullPointerException();
-        assertThat(yetAnotherContext.event().timerangeStart().isPresent()).isFalse();
-        assertThat(yetAnotherContext.event().timerangeEnd().isPresent()).isFalse();
-        assertThat(yetAnotherContext.notificationConfig().type()).isEqualTo(TeamsEventNotificationConfigV2.TYPE_NAME);
-        teamsEventNotification.execute(yetAnotherContext);
+    @Test
+    public void executeWithNullEventTimerange() {
+        assertThrows(EventNotificationException.class, () -> {
+            EventNotificationContext yetAnotherContext = getEventNotificationContextToSimulateNullPointerException();
+            assertThat(yetAnotherContext.event().timerangeStart().isPresent()).isFalse();
+            assertThat(yetAnotherContext.event().timerangeEnd().isPresent()).isFalse();
+            assertThat(yetAnotherContext.notificationConfig().type()).isEqualTo(TeamsEventNotificationConfigV2.TYPE_NAME);
+            teamsEventNotification.execute(yetAnotherContext);
+        });
     }
 
-    @Test(expected = PermanentEventNotificationException.class)
+    @Test
     public void buildCustomMessageWithInvalidTemplate() throws EventNotificationException {
-        notificationConfig = buildInvalidTemplate();
-        teamsEventNotification.generateBody(eventNotificationContext, notificationConfig);
+        assertThrows(PermanentEventNotificationException.class, () -> {
+            notificationConfig = buildInvalidTemplate();
+            teamsEventNotification.generateBody(eventNotificationContext, notificationConfig);
+        });
     }
 
     @Test
@@ -241,6 +359,15 @@ public class TeamsEventNotificationV2Test {
         List<MessageSummary> messageSummaries = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             MessageSummary summary = new MessageSummary("graylog_" + i, messageFactory.createMessage("Test message_" + i + " : with a colon and another colon : just for good measure", "source" + i, new DateTime(2020, 9, 6, 17, 0, DateTimeZone.UTC)));
+            messageSummaries.add(summary);
+        }
+        return ImmutableList.copyOf(messageSummaries);
+    }
+
+    private ImmutableList<MessageSummary> generateMessageSummariesWithDoubleQuotes(int size) {
+        List<MessageSummary> messageSummaries = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            MessageSummary summary = new MessageSummary("graylog_" + i, messageFactory.createMessage("Test message" + i + " with \"Double Quotes\"", "source" + i, new DateTime(2020, 9, 6, 17, 0, DateTimeZone.UTC)));
             messageSummaries.add(summary);
         }
         return ImmutableList.copyOf(messageSummaries);

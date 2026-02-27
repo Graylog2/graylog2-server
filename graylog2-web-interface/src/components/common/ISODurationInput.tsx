@@ -14,8 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { Input } from 'components/bootstrap';
 import * as ISODurationUtils from 'util/ISODurationUtils';
@@ -24,104 +23,66 @@ import * as ISODurationUtils from 'util/ISODurationUtils';
  * Displays an `Input` component for ISO8601 durations.
  */
 type Props = {
-  id: string,
-  duration: string,
-  update: (newDuration: string) => void,
-  label: string,
-  help: string,
-  validator?: (newDuration: number) => boolean,
-  errorText?: string,
-  autoFocus?: boolean,
-  required?: boolean,
-  disabled?: boolean,
-}
-type State = {
-  duration: string,
-}
+  id: string;
+  duration: string;
+  update: (newDuration: string) => void;
+  label?: string;
+  help?: string;
+  validator?: (newDuration: number) => boolean;
+  errorText?: string;
+  autoFocus?: boolean;
+  required?: boolean;
+  disabled?: boolean;
+};
 
-interface DurationInput {
-  getValue(): string;
-}
+const ISODurationInput = ({
+  id,
+  duration: propDuration,
+  update,
+  label = 'Duration',
+  help = 'as ISO8601 Duration',
+  validator = () => true,
+  errorText = 'invalid',
+  autoFocus = false,
+  required = false,
+  disabled = false,
+}: Props) => {
+  const [duration, setDuration] = useState(propDuration);
 
-class ISODurationInput extends React.Component<Props, State> {
-  static propTypes = {
-    /** Input id */
-    id: PropTypes.string.isRequired,
-    /** Value to show in the Input. */
-    duration: PropTypes.string.isRequired,
-    /** Callback that will receive the validated duration when the input changes. */
-    update: PropTypes.func.isRequired,
-    /** Input label. */
-    label: PropTypes.string,
-    /** Input help text. */
-    help: PropTypes.string,
-    /**
-     * Function that validates the duration. It receives the duration in milliseconds and the duration itself as
-     * arguments, and must return `true` if the duration is valid or `false` if not. Only valid durations are propagated
-     * after the input changes.
-     */
-    validator: PropTypes.func,
-    /** Text to display when duration is invalid. */
-    errorText: PropTypes.string,
-    /** Specify that the Input should have input focus when the page loads. */
-    autoFocus: PropTypes.bool,
-    /** Specify that the Input is required to submit the form. */
-    required: PropTypes.bool,
-    /** Specify that the Input is disabled or not */
-    disabled: PropTypes.bool,
-  };
+  useEffect(() => {
+    setDuration(propDuration);
+  }, [propDuration]);
 
-  private isoDuration: DurationInput;
+  const handleChange = (event: React.ChangeEvent) => {
+    let validDuration = (event.target as any).value;
 
-  static defaultProps = {
-    label: 'Duration',
-    help: 'as ISO8601 Duration',
-    validator: () => true,
-    errorText: 'invalid',
-    autoFocus: false,
-    required: false,
-    disabled: false,
-  };
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      duration: this.props.duration,
-    };
-  }
-
-  _onUpdate = () => {
-    let duration = this.isoDuration.getValue().toUpperCase();
-
-    if (!duration.startsWith('P')) {
-      duration = `P${duration}`;
+    if (!validDuration.startsWith('P')) {
+      validDuration = `P${validDuration}`;
     }
 
-    this.setState({ duration: duration });
+    setDuration(validDuration);
 
-    if (ISODurationUtils.isValidDuration(duration, this.props.validator)) {
+    if (ISODurationUtils.isValidDuration(validDuration, validator)) {
       // Only propagate state if the config is valid.
-      this.props.update(duration);
+      update(validDuration);
     }
   };
 
-  render() {
-    return (
-      <Input id={this.props.id}
-             type="text"
-             ref={(isoDuration: DurationInput) => { this.isoDuration = isoDuration; }}
-             label={this.props.label}
-             onChange={this._onUpdate}
-             value={this.state.duration}
-             help={this.props.help}
-             addonAfter={ISODurationUtils.humanizeDuration(this.state.duration, this.props.validator, this.props.errorText)}
-             bsStyle={ISODurationUtils.durationStyle(this.state.duration, this.props.validator)}
-             autoFocus={this.props.autoFocus}
-             required={this.props.required}
-             disabled={this.props.disabled} />
-    );
-  }
-}
+  return (
+    <Input
+      id={id}
+      type="text"
+      label={label}
+      onChange={handleChange}
+      value={duration}
+      help={help}
+      addonAfter={ISODurationUtils.humanizeDuration(duration, validator, errorText)}
+      bsStyle={ISODurationUtils.durationStyle(duration, validator)}
+      autoFocus={autoFocus}
+      required={required}
+      disabled={disabled}
+    />
+  );
+};
 
 export default ISODurationInput;

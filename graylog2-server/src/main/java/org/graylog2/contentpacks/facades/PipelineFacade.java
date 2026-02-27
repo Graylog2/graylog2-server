@@ -24,6 +24,7 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
@@ -33,8 +34,10 @@ import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.MissingNativeEntityException;
+import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -53,8 +56,6 @@ import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -102,7 +103,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
         final Set<ValueReference> connectedStreams = connectedStreams(pipelineDao.id(), entityDescriptorIds);
         final PipelineEntity pipelineEntity = PipelineEntity.create(
                 ValueReference.of(pipelineDao.title()),
-                ValueReference.of(pipelineDao.description()),
+                ValueReference.ofNullable(pipelineDao.description()),
                 ValueReference.of(pipelineDao.source()),
                 connectedStreams);
         final JsonNode data = objectMapper.convertValue(pipelineEntity, JsonNode.class);
@@ -165,7 +166,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
             if (stream instanceof Stream) {
                 streams.add((Stream) stream);
             } else {
-                if (EntityDescriptorIds.isSystemStreamDescriptor(descriptor)) {
+                if (ModelTypes.STREAM_V1.equals(descriptor.type()) && streamService.getSystemStreamIds(true).contains(descriptor.id().id())) {
                     try {
                         streams.add(streamService.load(descriptor.id().id()));
                     } catch (NotFoundException e) {
@@ -340,5 +341,10 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
                 .map(Optional::get)
                 .map(RuleDao::id)
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
+        return EntityPermissions.of(PipelineRestPermissions.PIPELINE_CREATE);
     }
 }

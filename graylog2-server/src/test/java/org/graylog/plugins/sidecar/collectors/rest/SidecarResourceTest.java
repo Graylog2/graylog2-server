@@ -18,6 +18,7 @@ package org.graylog.plugins.sidecar.collectors.rest;
 
 import com.google.common.collect.Lists;
 import org.graylog.plugins.sidecar.collectors.rest.resources.RestResourceBaseTest;
+import org.graylog.plugins.sidecar.common.SidecarPluginConfiguration;
 import org.graylog.plugins.sidecar.filter.ActiveSidecarFilter;
 import org.graylog.plugins.sidecar.mapper.SidecarStatusMapper;
 import org.graylog.plugins.sidecar.rest.models.NodeDetails;
@@ -30,14 +31,16 @@ import org.graylog.plugins.sidecar.services.EtagService;
 import org.graylog.plugins.sidecar.services.SidecarService;
 import org.graylog.plugins.sidecar.system.SidecarConfiguration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.shared.users.UserManagementService;
 import org.joda.time.Period;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.EntityTag;
 import jakarta.ws.rs.core.Response;
@@ -45,15 +48,17 @@ import jakarta.ws.rs.core.Response;
 import java.util.List;
 
 import static org.graylog.plugins.sidecar.collectors.rest.assertj.ResponseAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(value = MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class SidecarResourceTest extends RestResourceBaseTest {
     private SidecarResource resource;
     private List<Sidecar> sidecars;
@@ -76,7 +81,10 @@ public class SidecarResourceTest extends RestResourceBaseTest {
     @Mock
     private SidecarConfiguration sidecarConfiguration;
 
-    @Before
+    @Mock
+    UserManagementService userManagementService;
+
+    @BeforeEach
     public void setUp() throws Exception {
         this.sidecars = getDummyCollectorList();
         when(clusterConfigService.getOrDefault(SidecarConfiguration.class, SidecarConfiguration.defaultConfiguration())).thenReturn(sidecarConfiguration);
@@ -87,14 +95,18 @@ public class SidecarResourceTest extends RestResourceBaseTest {
                 actionService,
                 clusterConfigService,
                 statusMapper,
-                etagService);
+                etagService,
+                userManagementService,
+                new SidecarPluginConfiguration());
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void testGetNotExisting() throws Exception {
-        final SidecarSummary response = this.resource.get("Nonexisting");
+        assertThrows(NotFoundException.class, () -> {
+            final SidecarSummary response = this.resource.get("Nonexisting");
 
-        assertNull(response);
+            assertNull(response);
+        });
     }
 
     @Test
@@ -151,7 +163,7 @@ public class SidecarResourceTest extends RestResourceBaseTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void testRegisterInvalidCollectorId() throws Exception {
         final RegistrationRequest invalid = RegistrationRequest.create(
                 "nodeName",
@@ -173,7 +185,7 @@ public class SidecarResourceTest extends RestResourceBaseTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void testRegisterInvalidNodeId() throws Exception {
         final RegistrationRequest invalid = RegistrationRequest.create(
                 "",
@@ -195,7 +207,7 @@ public class SidecarResourceTest extends RestResourceBaseTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void testRegisterMissingNodeDetails() throws Exception {
         final RegistrationRequest invalid = RegistrationRequest.create(
                 "nodeName",
@@ -209,7 +221,7 @@ public class SidecarResourceTest extends RestResourceBaseTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void testRegisterMissingOperatingSystem() throws Exception {
         final RegistrationRequest invalid = RegistrationRequest.create(
                 "nodeName",

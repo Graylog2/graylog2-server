@@ -19,9 +19,11 @@ package org.graylog.events.notifications.types;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.floreysoft.jmte.Engine;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -37,15 +39,14 @@ import org.graylog.events.notifications.EventNotificationService;
 import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog2.jackson.TypeReferences;
-import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.bindings.providers.ParameterizedHttpClientProvider;
-import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
-import org.graylog2.system.urlwhitelist.UrlWhitelistService;
+import org.graylog2.system.urlallowlist.UrlAllowlistNotificationService;
+import org.graylog2.system.urlallowlist.UrlAllowlistService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +55,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -97,25 +97,28 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
     private final EventsConfigurationProvider configurationProvider;
     private final ParameterizedHttpClientProvider parameterizedHttpClientProvider;
     private final Engine templateEngine;
+    private final Engine jsonTemplateEngine;
     private final NotificationService notificationService;
     private final NodeId nodeId;
 
     @Inject
     public HTTPEventNotificationV2(EventNotificationService notificationCallbackService, ObjectMapperProvider objectMapperProvider,
-                                   UrlWhitelistService whitelistService,
-                                   UrlWhitelistNotificationService urlWhitelistNotificationService,
+                                   UrlAllowlistService allowlistService,
+                                   UrlAllowlistNotificationService urlAllowlistNotificationService,
                                    EncryptedValueService encryptedValueService,
                                    EventsConfigurationProvider configurationProvider,
                                    Engine templateEngine,
+                                   @Named("JsonSafe") Engine jsonTemplateEngine,
                                    NotificationService notificationService,
                                    NodeId nodeId,
                                    final ParameterizedHttpClientProvider parameterizedHttpClientProvider) {
-        super(whitelistService, urlWhitelistNotificationService, encryptedValueService);
+        super(allowlistService, urlAllowlistNotificationService, encryptedValueService, notificationService, nodeId);
         this.notificationCallbackService = notificationCallbackService;
         this.objectMapperProvider = objectMapperProvider;
         this.configurationProvider = configurationProvider;
         this.parameterizedHttpClientProvider = parameterizedHttpClientProvider;
         this.templateEngine = templateEngine;
+        this.jsonTemplateEngine = jsonTemplateEngine;
         this.notificationService = notificationService;
         this.nodeId = nodeId;
     }
@@ -124,7 +127,7 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
      * Depending on the configuration, either a default HTTP client will be returned or an instance
      * with {@link org.graylog2.shared.bindings.providers.TcpKeepAliveSocketFactory} configured.
      */
-    private OkHttpClient selectClient(HTTPEventNotificationConfigV2 notificationConfig) {
+    OkHttpClient selectClient(HTTPEventNotificationConfigV2 notificationConfig) {
         final boolean withKeepAlive = configurationProvider.get().notificationsKeepAliveProbe();
         return parameterizedHttpClientProvider.get(withKeepAlive, notificationConfig.skipTLSVerification());
     }
@@ -147,11 +150,11 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
             body = buildRequestBody(modelData, config);
         } catch (JsonProcessingException processingErr) {
             errorMessage = "Unable to serialize notification";
-            createSystemErrorNotification(errorMessage + "for notification [" + ctx.notificationId() + "]");
+            createSystemErrorNotification(errorMessage, ctx);
             throw new PermanentEventNotificationException(errorMessage, processingErr);
         } catch (UnsupportedEncodingException encodingErr) {
             errorMessage = "Unable to URL encode notification body";
-            createSystemErrorNotification(errorMessage + "for notification [" + ctx.notificationId() + "]");
+            createSystemErrorNotification(errorMessage, ctx);
             throw new PermanentEventNotificationException(errorMessage, encodingErr);
         }
 
@@ -167,24 +170,20 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
         try (final Response r = httpClient.newCall(builder.build()).execute()) {
             if (!r.isSuccessful()) {
                 final String errorDetail = r.body() == null ? " URL: " + config.url() : " " + r.body().string();
-                errorMessage = "Expected successful HTTP response [2xx] but got [" + r.code() + "]." + errorDetail;
-                createSystemErrorNotification(errorMessage + " for notification [" + ctx.notificationId() + "]");
+                final int status = r.code();
+                if (HTTPUtils.isRetryableStatus(status)) {
+                    errorMessage = buildRetryMessage(status) + errorDetail;
+                    createSystemErrorNotification(errorMessage, ctx);
+                    throw new TemporaryEventNotificationException(errorMessage);
+                }
+                errorMessage = "Expected successful HTTP response [2xx] but got [" + status + "]." + errorDetail;
+                createSystemErrorNotification(errorMessage, ctx);
                 throw new PermanentEventNotificationException(errorMessage);
             }
         } catch (IOException e) {
-            createSystemErrorNotification("Error: " + e.getMessage() + " for notification [" + ctx.notificationId() + "]");
+            createSystemErrorNotification("Error: " + e.getMessage(), ctx);
             throw new PermanentEventNotificationException(e.getMessage());
         }
-    }
-
-    private void createSystemErrorNotification(String message) {
-        final Notification systemNotification = notificationService.buildNow()
-                .addNode(nodeId.getNodeId())
-                .addType(Notification.Type.GENERIC)
-                .addSeverity(Notification.Severity.URGENT)
-                .addDetail("title", "Custom HTTP Notification Failed")
-                .addDetail("description", message);
-        notificationService.publishIfFirst(systemNotification);
     }
 
     private MediaType getMediaType(HTTPEventNotificationConfigV2.ContentType contentType) {
@@ -215,28 +214,7 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
         final ObjectMapper objectMapper = objectMapperProvider.getForTimeZone(config.timeZone());
         final Map<String, Object> modelMap = objectMapper.convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
         if (!Strings.isNullOrEmpty(bodyTemplate)) {
-            if (config.contentType().equals(HTTPEventNotificationConfigV2.ContentType.FORM_DATA)) {
-                final String[] parts = bodyTemplate.split("&");
-                body = Arrays.stream(parts)
-                        .map(part -> {
-                            final int equalsIndex = part.indexOf("=");
-                            final String encodedKey = urlEncode(part.substring(0, equalsIndex));
-                            final String encodedValue = equalsIndex < part.length() - 1 ?
-                                    urlEncode(templateEngine.transform(part.substring(equalsIndex + 1), modelMap)) : "";
-                            return encodedKey + "=" + encodedValue;
-                        })
-                        .collect(Collectors.joining("&"));
-            } else {
-                Map<String, Object> escapedModelMap = new HashMap<>();
-                modelMap.forEach((k, v) -> {
-                    if (v instanceof String str) {
-                        escapedModelMap.put(k, str.replace("\"", "\\\""));
-                    } else {
-                        escapedModelMap.put(k, v);
-                    }
-                });
-                body = templateEngine.transform(bodyTemplate, escapedModelMap);
-            }
+            body = transformBody(bodyTemplate, config.contentType(), modelMap);
         } else {
             if (config.contentType().equals(HTTPEventNotificationConfigV2.ContentType.FORM_DATA)) {
                 final Map<String, Object> eventMap = objectMapper.convertValue(modelData.event(), TypeReferences.MAP_STRING_OBJECT);
@@ -245,6 +223,29 @@ public class HTTPEventNotificationV2 extends HTTPNotification implements EventNo
                 body = objectMapper.writeValueAsString(modelData);
             }
         }
+        return body;
+    }
+
+    @VisibleForTesting
+    String transformBody(String bodyTemplate, HTTPEventNotificationConfigV2.ContentType contentType, Map<String, Object> modelMap) {
+        final String body;
+        if (contentType.equals(HTTPEventNotificationConfigV2.ContentType.FORM_DATA)) {
+            final String[] parts = bodyTemplate.split("&");
+            body = Arrays.stream(parts)
+                    .map(part -> {
+                        final int equalsIndex = part.indexOf("=");
+                        final String encodedKey = urlEncode(part.substring(0, equalsIndex));
+                        final String encodedValue = equalsIndex < part.length() - 1 ?
+                                urlEncode(templateEngine.transform(part.substring(equalsIndex + 1), modelMap)) : "";
+                        return encodedKey + "=" + encodedValue;
+                    })
+                    .collect(Collectors.joining("&"));
+        } else if (contentType.equals(HTTPEventNotificationConfigV2.ContentType.JSON)) {
+            body = jsonTemplateEngine.transform(bodyTemplate, modelMap);
+        } else {
+            body = templateEngine.transform(bodyTemplate, modelMap);
+        }
+
         return body;
     }
 

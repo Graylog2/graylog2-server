@@ -105,7 +105,8 @@ public abstract class PivotEntity implements SearchTypeEntity {
                 .columnGroups(of())
                 .filters(Collections.emptyList())
                 .sort(of())
-                .streams(Collections.emptySet());
+                .streams(Collections.emptySet())
+                .streamCategories(Collections.emptySet());
     }
 
     @AutoValue.Builder
@@ -115,7 +116,8 @@ public abstract class PivotEntity implements SearchTypeEntity {
             return builder()
                     .filters(Collections.emptyList())
                     .sort(Collections.emptyList())
-                    .streams(Collections.emptySet());
+                    .streams(Collections.emptySet())
+                    .streamCategories(Collections.emptySet());
         }
 
         @JsonProperty
@@ -168,6 +170,10 @@ public abstract class PivotEntity implements SearchTypeEntity {
         public abstract Builder streams(Set<String> streams);
 
         @Override
+        @JsonProperty
+        public abstract Builder streamCategories(Set<String> streamCategories);
+
+        @Override
         public abstract PivotEntity build();
     }
 
@@ -177,6 +183,7 @@ public abstract class PivotEntity implements SearchTypeEntity {
         var columnGroups = columnLimit().map(columnLimit -> applyGroupLimit(columnGroups(), columnLimit)).orElse(columnGroups());
         return Pivot.builder()
                 .streams(mappedStreams(nativeEntities))
+                .streamCategories(streamCategories())
                 .name(name().orElse(null))
                 .sort(sort())
                 .timerange(timerange().orElse(null))

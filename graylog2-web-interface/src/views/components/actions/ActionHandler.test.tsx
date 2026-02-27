@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
@@ -49,8 +49,8 @@ describe('ActionHandler', () => {
 
     expect(handler).toBeDefined();
 
-    return handler({ queryId: 'foo', field: 'bar', value: 42, type: FieldType.Unknown, contexts: {} })
-      .then(() => {
+    return handler({ queryId: 'foo', field: 'bar', value: 42, type: FieldType.Unknown, contexts: {} }).then(
+      async () => {
         expect(setActionComponents).toHaveBeenCalled();
         expect(setState).toHaveBeenCalled();
 
@@ -59,14 +59,11 @@ describe('ActionHandler', () => {
         expect(Object.entries(state)).toHaveLength(1);
 
         const Component = state[Object.keys(state)[0]];
-        const component = mount(Component);
+        render(Component);
 
-        expect(component).toHaveProp('field', 'bar');
-        expect(component).toHaveProp('queryId', 'foo');
-        expect(component).toHaveProp('value', 42);
-        expect(component).toHaveProp('onClose');
-        expect(component).toMatchSnapshot();
-      });
+        await screen.findByText(/hello world/i);
+      },
+    );
   });
 
   it('supplied onClose removes component from state', () => {
@@ -80,15 +77,14 @@ describe('ActionHandler', () => {
     };
     const handler = createHandlerFor(jest.fn(), actionDefinition, setActionComponents);
 
-    return handler({ queryId: 'foo', field: 'bar', value: 42, type: FieldType.Unknown, contexts: {} })
-      .then(() => {
-        const state: ActionComponents = setState.mock.calls[0][0];
-        const component: { props: ActionComponentProps } = Object.values(state)[0];
-        const { onClose } = component.props;
+    return handler({ queryId: 'foo', field: 'bar', value: 42, type: FieldType.Unknown, contexts: {} }).then(() => {
+      const state: ActionComponents = setState.mock.calls[0][0];
+      const component: { props: ActionComponentProps } = Object.values(state)[0];
+      const { onClose } = component.props;
 
-        onClose();
+      onClose();
 
-        expect(setState).toHaveBeenLastCalledWith({});
-      });
+      expect(setState).toHaveBeenLastCalledWith({});
+    });
   });
 });

@@ -14,57 +14,65 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
 import { EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
+import { defaultOnError } from 'util/conditional/onError';
 
 type Options = {
-  enabled: boolean,
-}
+  enabled: boolean;
+};
 
-export const fetchEventNotifications = (searchParams: SearchParams) => EventNotificationsStore.searchPaginated(
-  searchParams.page,
-  searchParams.pageSize,
-  searchParams.query,
-  { sort: searchParams?.sort.attributeId, order: searchParams?.sort.direction },
-).then(({ elements, pagination, attributes }) => ({
-  list: elements,
-  pagination,
-  attributes,
-}));
+export const fetchEventNotifications = (searchParams: SearchParams): Promise<EventNotificationsResult> =>
+  EventNotificationsStore.searchPaginated(searchParams.page, searchParams.pageSize, searchParams.query, {
+    sort: searchParams?.sort.attributeId,
+    order: searchParams?.sort.direction,
+  }).then(({ elements, pagination, attributes }) => ({
+    list: elements,
+    pagination,
+    attributes,
+  }));
 
-export const keyFn = (searchParams?: SearchParams | undefined) => (['eventNotifications', 'overview', ...(searchParams ? [searchParams] : [])]);
+export const keyFn = (searchParams?: SearchParams | undefined) => [
+  'eventNotifications',
+  'overview',
+  ...(searchParams ? [searchParams] : []),
+];
 
-const useEventNotifications = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
-  data: {
-    list: Array<EventNotification>,
-    pagination: { total: number }
-    attributes: Array<{ id: string, title: string, sortable: boolean }>
-  } | undefined,
-  refetch: () => void,
-  isInitialLoading: boolean,
+type EventNotificationsResult = {
+  list: Array<EventNotification>;
+  pagination: { total: number };
+  attributes: Array<{ id: string; title: string; sortable: boolean }>;
+};
+
+const useEventNotifications = (
+  searchParams: SearchParams,
+  { enabled }: Options = { enabled: true },
+): {
+  data: EventNotificationsResult | undefined;
+  refetch: () => void;
+  isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading } = useQuery(
-    keyFn(searchParams),
-    () => fetchEventNotifications(searchParams),
-    {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading event notifications failed with status: ${errorThrown}`,
-          'Could not load event notifications');
-      },
-      keepPreviousData: true,
-      enabled,
-    },
-  );
+  const { data, refetch, isInitialLoading } = useQuery({
+    queryKey: keyFn(searchParams),
 
-  return ({
+    queryFn: () =>
+      defaultOnError(
+        fetchEventNotifications(searchParams),
+        'Loading event notifications failed with status',
+        'Could not load event notifications',
+      ),
+    placeholderData: keepPreviousData,
+    enabled,
+  });
+
+  return {
     data,
     refetch,
     isInitialLoading,
-  });
+  };
 };
 
 export default useEventNotifications;

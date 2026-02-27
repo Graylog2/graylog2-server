@@ -37,17 +37,20 @@ import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RuleMetricsConfigChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
+import org.graylog2.Configuration;
+import org.graylog2.rest.resources.system.inputs.InputDeletedEvent;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 @Singleton
 public class ConfigurationStateUpdater {
-    private static final RateLimitedLog log = getRateLimitedLog(ConfigurationStateUpdater.class);
+    private static final RateLimitedLog log = createDefaultRateLimitedLog(ConfigurationStateUpdater.class);
 
+    private final Configuration configuration;
     private final RuleMetricsConfigService ruleMetricsConfigService;
     private final ScheduledExecutorService scheduler;
     private final EventBus serverEventBus;
@@ -58,18 +61,22 @@ public class ConfigurationStateUpdater {
     private final AtomicReference<PipelineInterpreter.State> latestState = new AtomicReference<>();
     private final PipelineResolver pipelineResolver;
     private final PipelineMetricRegistry pipelineMetricRegistry;
+    private final PipelineMetadataUpdater metadataUpdater;
 
     @Inject
-    public ConfigurationStateUpdater(RuleService ruleService,
+    public ConfigurationStateUpdater(Configuration configuration,
+                                     RuleService ruleService,
                                      PipelineService pipelineService,
                                      PipelineStreamConnectionsService pipelineStreamConnectionsService,
                                      PipelineRuleParser pipelineRuleParser,
                                      PipelineResolver.Factory pipelineResolverFactory,
                                      RuleMetricsConfigService ruleMetricsConfigService,
                                      MetricRegistry metricRegistry,
+                                     PipelineMetadataUpdater metadataUpdater,
                                      @Named("daemonScheduler") ScheduledExecutorService scheduler,
                                      EventBus serverEventBus,
                                      PipelineInterpreter.State.Factory stateFactory) {
+        this.configuration = configuration;
         this.ruleMetricsConfigService = ruleMetricsConfigService;
         this.scheduler = scheduler;
         this.serverEventBus = serverEventBus;
@@ -85,6 +92,7 @@ public class ConfigurationStateUpdater {
                 pipelineRuleParser
         );
         this.pipelineMetricRegistry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
+        this.metadataUpdater = metadataUpdater;
 
         // listens to cluster wide Rule, Pipeline and pipeline stream connection changes
         serverEventBus.register(this);
@@ -104,6 +112,55 @@ public class ConfigurationStateUpdater {
         return newState;
     }
 
+    // Metadata updates are best-effort: metadata is a derived cache rebuilt from scratch on every
+    // restart, so a failed incremental update will be corrected on next boot.
+    private PipelineInterpreter.State reloadAndSave(RulesChangedEvent event) {
+        final PipelineInterpreter.State state = reloadAndSave();
+        if (configuration.isLeader()) { // avoid duplicate work and possible inconsistencies
+            try {
+                metadataUpdater.handleRuleChanges(event, state);
+            } catch (Exception e) {
+                log.warn("Failed to update pipeline metadata for rule changes: {} {}", event, e.getMessage());
+            }
+        }
+        return state;
+    }
+
+    private PipelineInterpreter.State reloadAndSave(PipelinesChangedEvent event) {
+        final PipelineInterpreter.State state = reloadAndSave();
+        if (configuration.isLeader()) { // avoid duplicate work and possible inconsistencies
+            try {
+                metadataUpdater.handlePipelineChanges(event, state);
+            } catch (Exception e) {
+                log.warn("Failed to update pipeline metadata for pipeline changes: {} {}", event, e.getMessage());
+            }
+        }
+        return state;
+    }
+
+    private PipelineInterpreter.State reloadAndSave(PipelineConnectionsChangedEvent event) {
+        final PipelineInterpreter.State state = reloadAndSave();
+        if (configuration.isLeader()) { // avoid duplicate work and possible inconsistencies
+            try {
+                metadataUpdater.handleConnectionChanges(event, state);
+            } catch (Exception e) {
+                log.warn("Failed to update pipeline metadata for connection changes: {} {}", event, e.getMessage());
+            }
+        }
+        return state;
+    }
+
+    private PipelineInterpreter.State reloadAndSave(InputDeletedEvent event) {
+        final PipelineInterpreter.State state = reloadAndSave();
+        if (configuration.isLeader()) { // avoid duplicate work and possible inconsistencies
+            try {
+                metadataUpdater.handleInputDeleted(event, state);
+            } catch (Exception e) {
+                log.warn("Failed to update pipeline metadata for input deletion: {} {}", event, e.getMessage());
+            }
+        }
+        return state;
+    }
 
     /**
      * Can be used to inspect or use the current state of the pipeline system.
@@ -118,12 +175,12 @@ public class ConfigurationStateUpdater {
     // TODO avoid reloading everything on every change, certain changes can get away with doing less work
     @Subscribe
     public void handleRuleChanges(RulesChangedEvent event) {
-        event.deletedRuleIds().forEach(id -> {
-            log.debug("Invalidated rule {}", id);
-            pipelineMetricRegistry.removeRuleMetrics(id);
+        event.deletedRules().forEach(ref -> {
+            log.debug("Invalidated rule {}", ref.id());
+            pipelineMetricRegistry.removeRuleMetrics(ref.id());
         });
-        event.updatedRuleIds().forEach(id -> log.debug("Refreshing rule {}", id));
-        scheduler.schedule(() -> serverEventBus.post(reloadAndSave()), 0, TimeUnit.SECONDS);
+        event.updatedRules().forEach(ref -> log.debug("Refreshing rule {}", ref.id()));
+        scheduler.schedule(() -> serverEventBus.post(reloadAndSave(event)), 0, TimeUnit.SECONDS);
     }
 
     @Subscribe
@@ -133,13 +190,13 @@ public class ConfigurationStateUpdater {
             pipelineMetricRegistry.removePipelineMetrics(id);
         });
         event.updatedPipelineIds().forEach(id -> log.debug("Refreshing pipeline {}", id));
-        scheduler.schedule(() -> serverEventBus.post(reloadAndSave()), 0, TimeUnit.SECONDS);
+        scheduler.schedule(() -> serverEventBus.post(reloadAndSave(event)), 0, TimeUnit.SECONDS);
     }
 
     @Subscribe
     public void handlePipelineConnectionChanges(PipelineConnectionsChangedEvent event) {
         log.debug("Pipeline stream connection changed: {}", event);
-        scheduler.schedule(() -> serverEventBus.post(reloadAndSave()), 0, TimeUnit.SECONDS);
+        scheduler.schedule(() -> serverEventBus.post(reloadAndSave(event)), 0, TimeUnit.SECONDS);
     }
 
     @Subscribe
@@ -151,5 +208,11 @@ public class ConfigurationStateUpdater {
     public void handleRuleMetricsConfigChange(RuleMetricsConfigChangedEvent event) {
         log.debug("Rule metrics config changed: {}", event);
         scheduler.schedule(() -> serverEventBus.post(reloadAndSave()), 0, TimeUnit.SECONDS);
+    }
+
+    @Subscribe
+    public void handleInputDeleted(InputDeletedEvent event) {
+        log.debug("Input deleted: {}", event);
+        scheduler.schedule(() -> serverEventBus.post(reloadAndSave(event)), 0, TimeUnit.SECONDS);
     }
 }

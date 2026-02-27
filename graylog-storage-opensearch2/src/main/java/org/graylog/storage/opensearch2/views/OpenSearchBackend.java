@@ -61,6 +61,8 @@ import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.search.QueryStringUtils;
+import org.graylog2.streams.StreamService;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +79,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearchBackend.class);
@@ -89,6 +90,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
     private final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
     private final boolean allowLeadingWildcard;
     private final StatsCollector<QueryExecutionStats> executionStatsCollector;
+    private final StreamService streamService;
 
     @Inject
     public OpenSearchBackend(Map<String, Provider<OSSearchTypeHandler<? extends SearchType>>> elasticsearchSearchTypeHandlers,
@@ -97,6 +99,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                              OSGeneratedQueryContext.Factory queryContextFactory,
                              UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper,
                              StatsCollector<QueryExecutionStats> executionStatsCollector,
+                             StreamService streamService,
                              @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
         this.openSearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.client = client;
@@ -105,11 +108,12 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
         this.queryContextFactory = queryContextFactory;
         this.usedSearchFiltersToQueryStringsMapper = usedSearchFiltersToQueryStringsMapper;
         this.executionStatsCollector = executionStatsCollector;
+        this.streamService = streamService;
         this.allowLeadingWildcard = allowLeadingWildcard;
     }
 
-    private QueryBuilder translateQueryString(String queryString) {
-        return (queryString.isEmpty() || queryString.trim().equals("*"))
+    private QueryBuilder translateQueryString(final String queryString) {
+        return QueryStringUtils.isEmptyOrMatchAllQueryString(queryString)
                 ? QueryBuilders.matchAllQuery()
                 : QueryBuilders.queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcard);
     }
@@ -230,6 +234,11 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
     }
 
     @Override
+    public Optional<String> streamTitle(String streamId) {
+        return Optional.ofNullable(streamService.streamTitleFromCache(streamId));
+    }
+
+    @Override
     @WithSpan
     public QueryResult doRun(SearchJob job, Query query, OSGeneratedQueryContext queryContext) {
         if (query.searchTypes().isEmpty()) {
@@ -272,10 +281,11 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                     }
                     return searchRequest;
                 })
+                .map(request -> request.preference(job.getId()))
                 .toList();
 
         final PlainActionFuture<MultiSearchResponse> mSearchFuture = client.cancellableMsearch(searches);
-        job.setSearchEngineTaskFuture(mSearchFuture);
+        job.setQueryExecutionFuture(query.id(), mSearchFuture);
         final List<MultiSearchResponse.Item> results = getResults(mSearchFuture, searches.size());
 
         for (SearchType searchType : query.searchTypes()) {
@@ -306,7 +316,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                 queryContext.addError(SearchTypeErrorParser.parse(query, searchTypeId, e));
             } else {
                 try {
-                    final SearchType.Result searchTypeResult = handler.extractResult(job, query, searchType, multiSearchResponse.getResponse(), queryContext);
+                    final SearchType.Result searchTypeResult = handler.extractResult(query, searchType, multiSearchResponse.getResponse(), queryContext);
                     if (searchTypeResult != null) {
                         resultsMap.put(searchTypeId, searchTypeResult);
                     }
@@ -336,6 +346,28 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
         }
     }
 
+    private boolean isMaxClauseCountException(Throwable throwable) {
+       var found = throwable.getMessage().contains("[type=too_many_clauses,");
+
+       if(!found && throwable.getCause() != null) {
+           return isMaxClauseCountException(throwable.getCause());
+       }
+
+       return found;
+    }
+
+    private final static int MAX_MSG_LENGTH = 1024;
+
+    private String mapExceptionToErrorMessage(Throwable throwable) {
+        if(isMaxClauseCountException(throwable)) {
+            return "Your query exceeded the maxClauseCount setting of OpenSearch. This is probably due to a custom parameter filled from a lookup table. Please check you query and settings.";
+        }
+
+        // in case of the default, return the message cut down to a reasonable length so that it's shown appropriately in the FE
+        final var msg = throwable.getMessage();
+        return msg != null && msg.length() > MAX_MSG_LENGTH ?  msg.substring(0, MAX_MSG_LENGTH) + "..." : msg;
+    }
+
     private Optional<ElasticsearchException> checkForFailedShards(MultiSearchResponse.Item multiSearchResponse) {
         if (multiSearchResponse.isFailure()) {
             return Optional.of(new ElasticsearchException(multiSearchResponse.getFailureMessage(), multiSearchResponse.getFailure()));
@@ -358,7 +390,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
 
             final List<String> errors = shardFailures
                     .stream()
-                    .map(Throwable::getMessage)
+                    .map(this::mapExceptionToErrorMessage)
                     .distinct()
                     .toList();
             return Optional.of(new ElasticsearchException("Unable to perform search query: ", errors));

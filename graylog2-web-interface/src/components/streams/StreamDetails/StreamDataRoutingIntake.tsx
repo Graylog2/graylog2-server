@@ -15,66 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
 
-import { type Stream } from 'stores/streams/StreamsStore';
-import { Alert, Table } from 'components/bootstrap';
-import DetailsStreamRule from 'components/streamrules/DetailsStreamRule';
-import { IfPermitted, Section } from 'components/common';
-import CreateStreamRuleButton from 'components/streamrules/CreateStreamRuleButton';
+import StreamRules from 'components/streams/StreamDetails/StreamDataRoutingIntake/StreamRules';
+import StreamConnectedPipelines from 'components/streams/StreamDetails/StreamDataRoutingIntake/StreamConnectedPipelines';
+import type { Stream } from 'stores/streams/StreamsStore';
 
 type Props = {
-  stream: Stream,
-}
-
-export const Headline = styled.h2(({ theme }) => css`
-  margin-top: ${theme.spacings.sm};
-  margin-bottom: ${theme.spacings.xs};
-`);
-
-const StreamDataRoutingInstake = ({ stream }: Props) => {
-  const hasStreamRules = !!stream.rules?.length;
-  const isDefaultStream = stream.is_default;
-  const isNotEditable = !stream.is_editable;
-
-  return (
-    <>
-      <Alert bsStyle="default">
-        Stream Rules take effect first in the default processing order, and are used to direct messages from Inputs into Streams.
-        Any message that meets the criteria of the Stream Rule(s) will be directed into this Stream.
-      </Alert>
-
-      <Section title="Stream rules"
-               actions={(
-                 <IfPermitted permissions={`streams:edit:${stream.id}`}>
-                   <CreateStreamRuleButton bsStyle="success"
-                                           disabled={isDefaultStream || isNotEditable}
-                                           streamId={stream.id} />
-                 </IfPermitted>
-             )}>
-        <Table condensed striped hover>
-          <thead>
-            <tr>
-              <th colSpan={2}>Rule</th>
-            </tr>
-          </thead>
-          <tbody>
-            {hasStreamRules && stream.rules.map((streamRule) => (
-              <DetailsStreamRule key={streamRule.id}
-                                 stream={stream}
-                                 streamRule={streamRule} />
-            ))}
-
-            {!hasStreamRules && (
-            <tr>
-              <td>No rules defined.</td>
-            </tr>
-            )}
-          </tbody>
-        </Table>
-      </Section>
-    </>
-  );
+  stream: Stream;
 };
 
-export default StreamDataRoutingInstake;
+const StreamDataRoutingIntake = ({ stream }: Props) => (
+  <>
+    <StreamRules stream={stream} />
+    <StreamConnectedPipelines stream={stream} />
+  </>
+);
+
+export default StreamDataRoutingIntake;

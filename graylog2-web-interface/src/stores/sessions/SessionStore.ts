@@ -24,24 +24,22 @@ import { singletonStore, singletonActions } from 'logic/singleton';
 import type CancellablePromise from 'logic/rest/CancellablePromise';
 
 type SessionActionsType = {
-  login: (username: string, password: string, host: string) => Promise<unknown>,
-  logout: () => Promise<unknown>,
-  validate: () => CancellablePromise<unknown>,
-}
-export const SessionActions = singletonActions(
-  'core.Session',
-  () => Reflux.createActions<SessionActionsType>({
+  login: (username: string, password: string, host: string) => Promise<unknown>;
+  logout: () => Promise<unknown>;
+  validate: () => CancellablePromise<unknown>;
+};
+export const SessionActions = singletonActions('core.Session', () =>
+  Reflux.createActions<SessionActionsType>({
     login: { asyncResult: true },
     logout: { asyncResult: true },
     validate: { asyncResult: true },
   }),
 );
 
-export type SessionStoreState = { username: string, validatingSession: boolean };
+export type SessionStoreState = { username: string; validatingSession: boolean };
 
-export const SessionStore = singletonStore(
-  'core.Session',
-  () => Reflux.createStore<SessionStoreState>({
+export const SessionStore = singletonStore('core.Session', () =>
+  Reflux.createStore<SessionStoreState>({
     listenables: [SessionActions],
     sourceUrl: '/system/sessions',
     username: undefined,
@@ -55,21 +53,17 @@ export const SessionStore = singletonStore(
     },
 
     login(username: string, password: string, host: string) {
-      const builder = new Builder('POST', qualifyUrl(this.sourceUrl))
-        .json({ username, password, host });
-      const promise = builder.build()
-        .then((response) => ({ username: response?.username }));
+      const builder = new Builder('POST', qualifyUrl(this.sourceUrl)).json({ username, password, host });
+      const promise = builder.build().then((response) => ({ username: response?.username }));
 
       SessionActions.login.promise(promise);
     },
     logout() {
-      const promise = new Builder('DELETE', qualifyUrl(`${this.sourceUrl}/`))
-        .build()
-        .then((resp) => {
-          if (resp.ok || resp.status === 401) {
-            this._removeSession();
-          }
-        }, this._removeSession);
+      const promise = new Builder('DELETE', qualifyUrl(`${this.sourceUrl}/`)).build().then((resp) => {
+        if (resp.ok || resp.status === 401) {
+          this._removeSession();
+        }
+      }, this._removeSession);
 
       SessionActions.logout.promise(promise);
     },
@@ -101,9 +95,7 @@ export const SessionStore = singletonStore(
       SessionActions.validate.promise(promise);
     },
     _validateSession() {
-      return new Builder('GET', qualifyUrl(ApiRoutes.SessionsApiController.validate().url))
-        .json()
-        .build();
+      return new Builder('GET', qualifyUrl(ApiRoutes.SessionsApiController.validate().url)).json().build();
     },
 
     _removeSession() {

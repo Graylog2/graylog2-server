@@ -20,8 +20,10 @@ import QueryHelper from 'components/common/QueryHelper';
 
 const queryExample = (
   <p>
-    Find role with a name containing manager:<br />
-    <kbd>name:manager</kbd><br />
+    Find role with a name containing manager:
+    <br />
+    <kbd>name:manager</kbd>
+    <br />
   </p>
 );
 const RolesQueryHelper = () => (

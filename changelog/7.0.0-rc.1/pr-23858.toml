@@ -1,0 +1,4 @@
+type = "f"
+message = "Switch URL parser for Link Decorator to fix parsing bugs for allowed domain names."
+
+pulls = ["23858"]

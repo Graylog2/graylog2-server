@@ -1,0 +1,5 @@
+type = "a"
+message = "During content pack installations, entity permissions are checked before entity creation. Example: For installation of a content pack containing a stream, the user installing the content pack must have streams:create"
+
+issues = ["graylog-plugin-enterprise#10479"]
+pulls = ["22570"]

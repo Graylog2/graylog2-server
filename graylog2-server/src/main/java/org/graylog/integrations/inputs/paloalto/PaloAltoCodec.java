@@ -29,6 +29,7 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -37,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 public class PaloAltoCodec implements Codec {
 
@@ -64,9 +66,8 @@ public class PaloAltoCodec implements Codec {
                 configuration.getString(CK_TRAFFIC_TEMPLATE, PaloAltoTemplateDefaults.TRAFFIC_TEMPLATE));
     }
 
-    @Nullable
     @Override
-    public Message decode(@Nonnull RawMessage rawMessage) {
+    public Optional<Message> decodeSafe(@Nonnull RawMessage rawMessage) {
         String s = new String(rawMessage.getPayload(), StandardCharsets.UTF_8);
         LOG.trace("Received raw message: {}", s);
 
@@ -74,35 +75,33 @@ public class PaloAltoCodec implements Codec {
         // previously existing PA inputs after updating will not have a Time Zone configured, default to UTC
         DateTimeZone timezone = timezoneID != null ? DateTimeZone.forID(timezoneID) : DateTimeZone.UTC;
         LOG.trace("Configured time zone: {}", timezone);
-        PaloAltoMessageBase p = parser.parse(s, timezone);
+        try {
+            PaloAltoMessageBase p = parser.parse(s, timezone);
+            Message message = messageFactory.createMessage(p.payload(), p.source(), p.timestamp());
 
-        // Return when error occurs parsing syslog header.
-        if (p == null) {
-            return null;
+            switch (p.panType()) {
+                case "THREAT":
+                    final PaloAltoTypeParser parserThreat = new PaloAltoTypeParser(templates.getThreatMessageTemplate());
+                    message.addFields(parserThreat.parseFields(p.fields(), timezone));
+                    break;
+                case "SYSTEM":
+                    final PaloAltoTypeParser parserSystem = new PaloAltoTypeParser(templates.getSystemMessageTemplate());
+                    message.addFields(parserSystem.parseFields(p.fields(), timezone));
+                    break;
+                case "TRAFFIC":
+                    final PaloAltoTypeParser parserTraffic = new PaloAltoTypeParser(templates.getTrafficMessageTemplate());
+                    message.addFields(parserTraffic.parseFields(p.fields(), timezone));
+                    break;
+                default:
+                    LOG.error("Unsupported PAN type [{}]. Not adding any parsed fields.", p.panType());
+            }
+
+            LOG.trace("Successfully processed [{}] message with [{}] fields.", p.panType(), message.getFieldCount());
+
+            return Optional.of(message);
+        } catch (Exception e) {
+            throw InputProcessingException.create("Could not decode PaloAlto9x message.", e, rawMessage, s);
         }
-
-        Message message = messageFactory.createMessage(p.payload(), p.source(), p.timestamp());
-
-        switch (p.panType()) {
-            case "THREAT":
-                final PaloAltoTypeParser parserThreat = new PaloAltoTypeParser(templates.getThreatMessageTemplate());
-                message.addFields(parserThreat.parseFields(p.fields(), timezone));
-                break;
-            case "SYSTEM":
-                final PaloAltoTypeParser parserSystem = new PaloAltoTypeParser(templates.getSystemMessageTemplate());
-                message.addFields(parserSystem.parseFields(p.fields(), timezone));
-                break;
-            case "TRAFFIC":
-                final PaloAltoTypeParser parserTraffic = new PaloAltoTypeParser(templates.getTrafficMessageTemplate());
-                message.addFields(parserTraffic.parseFields(p.fields(), timezone));
-                break;
-            default:
-                LOG.error("Unsupported PAN type [{}]. Not adding any parsed fields.", p.panType());
-        }
-
-        LOG.trace("Successfully processed [{}] message with [{}] fields.", p.panType(), message.getFieldCount());
-
-        return message;
     }
 
     @Override

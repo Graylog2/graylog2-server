@@ -15,38 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import useParams from 'routing/useParams';
 import useEventDefinition from 'hooks/useEventDefinition';
 import { Spinner } from 'components/common';
-import SearchPage from 'views/pages/SearchPage';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
-import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
-import useCreateViewForEventDefinition from 'views/logic/views/UseCreateViewForEventDefinition';
-import EventInfoBar from 'components/event-definitions/replay-search/EventInfoBar';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import ErrorsActions from 'actions/errors/ErrorsActions';
-import useCreateSearch from 'views/hooks/useCreateSearch';
-import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
+import EventDefinitionReplaySearch from 'components/event-definitions/replay-search/EventDefinitionReplaySearch';
+import type FetchError from 'logic/errors/FetchError';
 
-const EventView = () => {
-  const { eventDefinition, aggregations } = useAlertAndEventDefinitionData();
-  const _view = useCreateViewForEventDefinition({ eventDefinition, aggregations });
-  const view = useCreateSearch(_view);
-  const searchPageLayout = useMemo(() => ({
-    infoBar: { component: EventInfoBar },
-  }), []);
-
-  return (
-    <SearchPageLayoutProvider value={searchPageLayout}>
-      <SearchPage view={view}
-                  isNew />
-    </SearchPageLayoutProvider>
-  );
-};
-
-export const onErrorHandler = (error) => {
+export const onErrorHandler = (error: FetchError) => {
   if (error.status === 404) {
     ErrorsActions.report(createFromFetchError(error));
   }
@@ -54,8 +34,8 @@ export const onErrorHandler = (error) => {
 
 const EventDefinitionReplaySearchPage = () => {
   const [isNotificationLoaded, setIsNotificationLoaded] = useState(false);
-  const { definitionId } = useParams<{ definitionId?: string }>();
-  const { isLoading: EDIsLoading, isFetched: EDIsFetched } = useEventDefinition(definitionId, { onErrorHandler });
+  const { definitionId } = useParams<{ alertId?: string; definitionId?: string }>();
+  const { isLoading: EDIsLoading, isFetched: EDIsFetched, data } = useEventDefinition(definitionId, { onErrorHandler });
 
   useEffect(() => {
     EventNotificationsActions.listAll().then(() => setIsNotificationLoaded(true));
@@ -63,7 +43,7 @@ const EventDefinitionReplaySearchPage = () => {
 
   const isLoading = EDIsLoading || !EDIsFetched || !isNotificationLoaded;
 
-  return isLoading ? <Spinner /> : <EventView />;
+  return isLoading ? <Spinner /> : <EventDefinitionReplaySearch eventDefinitionMappedData={data} />;
 };
 
 export default EventDefinitionReplaySearchPage;

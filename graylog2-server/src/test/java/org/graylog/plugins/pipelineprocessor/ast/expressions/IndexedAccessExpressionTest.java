@@ -25,8 +25,8 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -37,7 +37,7 @@ public class IndexedAccessExpressionTest {
     private EvaluationContext context;
     private MessageFactory messageFactory = new TestMessageFactory();
 
-    @Before
+    @BeforeEach
     public void setup() {
         context = new EvaluationContext(messageFactory.createMessage("test message", "test", DateTime.parse("2010-07-30T16:03:25Z")));
     }

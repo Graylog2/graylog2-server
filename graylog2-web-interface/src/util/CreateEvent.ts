@@ -18,7 +18,7 @@
 const createEvent = (type: string) => {
   const options = { bubbles: true, cancelable: true };
 
-  if (typeof (Event) === 'function') {
+  if (typeof Event === 'function') {
     return new Event(type, options);
   }
 

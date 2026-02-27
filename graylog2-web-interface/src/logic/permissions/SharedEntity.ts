@@ -15,44 +15,43 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import type { $PropertyType } from 'utility-types';
 
 import type { SharedEntityType } from 'logic/permissions/types';
 
 import Grantee from './Grantee';
 
 type InternalState = {
-  id: $PropertyType<SharedEntityType, 'id'>,
-  owners: Immutable.List<Grantee>,
-  title: $PropertyType<SharedEntityType, 'title'>,
-  type: $PropertyType<SharedEntityType, 'type'>,
+  id: SharedEntityType['id'];
+  owners: Immutable.List<Grantee>;
+  title: SharedEntityType['title'];
+  type: SharedEntityType['type'];
 };
 
 export default class SharedEntity {
   _value: InternalState;
 
   constructor(
-    id: $PropertyType<InternalState, 'id'>,
-    owners: $PropertyType<InternalState, 'owners'>,
-    title: $PropertyType<InternalState, 'title'>,
-    type: $PropertyType<InternalState, 'type'>,
+    id: InternalState['id'],
+    owners: InternalState['owners'],
+    title: InternalState['title'],
+    type: InternalState['type'],
   ) {
     this._value = { id, owners, title, type };
   }
 
-  get id(): $PropertyType<InternalState, 'id'> {
+  get id(): InternalState['id'] {
     return this._value.id;
   }
 
-  get owners(): $PropertyType<InternalState, 'owners'> {
+  get owners(): InternalState['owners'] {
     return this._value.owners;
   }
 
-  get title(): $PropertyType<InternalState, 'title'> {
+  get title(): InternalState['title'] {
     return this._value.title;
   }
 
-  get type(): $PropertyType<InternalState, 'type'> {
+  get type(): InternalState['type'] {
     return this._value.type;
   }
 
@@ -73,13 +72,7 @@ export default class SharedEntity {
     const { id, owners, title, type } = value;
     const formattedOwners = Immutable.fromJS(owners.map((o) => Grantee.fromJSON(o)));
 
-    return SharedEntity
-      .builder()
-      .id(id)
-      .owners(formattedOwners)
-      .title(title)
-      .type(type)
-      .build();
+    return SharedEntity.builder().id(id).owners(formattedOwners).title(title).type(type).build();
   }
 
   static builder(): Builder {
@@ -97,19 +90,19 @@ class Builder {
     this.value = value;
   }
 
-  id(value: $PropertyType<InternalState, 'id'>): Builder {
+  id(value: InternalState['id']): Builder {
     return new Builder(this.value.set('id', value));
   }
 
-  owners(value: $PropertyType<InternalState, 'owners'>): Builder {
+  owners(value: InternalState['owners']): Builder {
     return new Builder(this.value.set('owners', value));
   }
 
-  title(value: $PropertyType<InternalState, 'title'>): Builder {
+  title(value: InternalState['title']): Builder {
     return new Builder(this.value.set('title', value));
   }
 
-  type(value: $PropertyType<InternalState, 'type'>): Builder {
+  type(value: InternalState['type']): Builder {
     return new Builder(this.value.set('type', value));
   }
 

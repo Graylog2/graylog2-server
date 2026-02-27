@@ -21,14 +21,17 @@ import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import FieldType, { FieldTypes } from './FieldType';
 import FieldTypeMapping from './FieldTypeMapping';
 
-const typePreservingFunctions = ['avg', 'min', 'max', 'percentile'];
+const typePreservingFunctions = ['avg', 'min', 'max', 'percentile', 'latest'];
 const constantTypeFunctions = {
   card: FieldTypes.LONG,
   count: FieldTypes.LONG,
   percentage: FieldTypes.PERCENTAGE,
 };
 
-const inferTypeForSeries = (series: Series, types: (FieldTypeMappingsList | Array<FieldTypeMapping>)): FieldTypeMapping => {
+const inferTypeForSeries = (
+  series: Series,
+  types: FieldTypeMappingsList | Array<FieldTypeMapping>,
+): FieldTypeMapping => {
   const definition = parseSeries(series.function);
   const newMapping = (type: FieldType) => FieldTypeMapping.create(series.function, type);
 
@@ -43,7 +46,7 @@ const inferTypeForSeries = (series: Series, types: (FieldTypeMappingsList | Arra
   }
 
   if (typePreservingFunctions.includes(type)) {
-    const mapping = types?.find((t: FieldTypeMapping) => (t.name === field));
+    const mapping = types?.find((t: FieldTypeMapping) => t.name === field);
 
     if (!mapping) {
       return newMapping(FieldType.Unknown);

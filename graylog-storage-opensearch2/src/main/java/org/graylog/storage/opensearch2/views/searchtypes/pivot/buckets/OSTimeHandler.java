@@ -37,7 +37,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 import java.util.stream.Stream;
 
 public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
@@ -51,6 +50,8 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
     public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, Time timeSpec, OSGeneratedQueryContext queryContext, Query query) {
         AggregationBuilder root = null;
         AggregationBuilder leaf = null;
+        final var timeZone = queryContext.timezone().toTimeZone().toZoneId();
+
         final Interval interval = timeSpec.interval();
         final TimeRange timerange = query.timerange();
         if (interval instanceof AutoInterval autoInterval
@@ -59,7 +60,8 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
                 final AutoDateHistogramAggregationBuilder builder = new AutoDateHistogramAggregationBuilder(name)
                         .field(timeField)
                         .setNumBuckets((int) (BASE_NUM_BUCKETS / autoInterval.scaling()))
-                        .format(DATE_TIME_FORMAT);
+                        .format(DATE_TIME_FORMAT)
+                        .timeZone(timeZone);
 
                 if (root == null && leaf == null) {
                     root = builder;
@@ -72,11 +74,14 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
         } else {
             for (String timeField : timeSpec.fields()) {
                 final DateHistogramInterval dateHistogramInterval = new DateHistogramInterval(interval.toDateInterval(query.effectiveTimeRange(pivot)).toString());
-                final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);
+                final var ordering = orderListForPivot(pivot, queryContext, defaultOrder, query);
                 final DateHistogramAggregationBuilder builder = AggregationBuilders.dateHistogram(name)
                         .field(timeField)
-                        .order(ordering)
-                        .format(DATE_TIME_FORMAT);
+                        .order(ordering.orders())
+                        .format(DATE_TIME_FORMAT)
+                        .timeZone(timeZone);
+
+                ordering.sortingAggregations().forEach(builder::subAggregation);
 
                 setInterval(builder, dateHistogramInterval);
 

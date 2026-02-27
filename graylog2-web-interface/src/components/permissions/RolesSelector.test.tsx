@@ -46,14 +46,23 @@ describe('RolesSelector', () => {
   });
 
   it('renders the roles select and button', async () => {
-    render(<RolesSelector assignedRolesIds={Immutable.Set([''])} identifier={(role) => role.name} onSubmit={jest.fn()} />);
+    render(
+      <RolesSelector assignedRolesIds={Immutable.Set([''])} identifier={(role) => role.name} onSubmit={jest.fn()} />,
+    );
 
     await screen.findByText(/search for roles/i);
     await screen.findByRole('button', { name: /assign role/i });
   });
 
   it('does not render the button when submitOnSelect=true', async () => {
-    render(<RolesSelector assignedRolesIds={Immutable.Set([''])} identifier={(role) => role.name} onSubmit={jest.fn()} submitOnSelect />);
+    render(
+      <RolesSelector
+        assignedRolesIds={Immutable.Set([''])}
+        identifier={(role) => role.name}
+        onSubmit={jest.fn()}
+        submitOnSelect
+      />,
+    );
 
     const submitButton = screen.queryByRole('button', { name: /assign role/i });
 

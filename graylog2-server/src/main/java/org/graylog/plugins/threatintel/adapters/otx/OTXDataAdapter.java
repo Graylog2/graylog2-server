@@ -34,6 +34,11 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -41,25 +46,16 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import org.apache.commons.validator.routines.InetAddressValidator;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.lookup.LookupResult;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-
-import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.MediaType;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -290,8 +286,12 @@ public class OTXDataAdapter extends LookupDataAdapter {
     }
 
     public static class Descriptor extends LookupDataAdapter.Descriptor<Config> {
-        public Descriptor() {
+        private final CustomizationConfig customizationConfig;
+
+        @Inject
+        public Descriptor(CustomizationConfig customizationConfig) {
             super(NAME, Config.class);
+            this.customizationConfig = customizationConfig;
         }
 
         @Override
@@ -300,7 +300,7 @@ public class OTXDataAdapter extends LookupDataAdapter {
                     .type(NAME)
                     .indicator(OTX_INDICATOR_IP_AUTO_DETECT)
                     .apiUrl("https://otx.alienvault.com")
-                    .httpUserAgent("Graylog Threat Intelligence Plugin - https://github.com/Graylog2/graylog-plugin-threatintel")
+                    .httpUserAgent("%1$s Threat Intelligence".formatted(customizationConfig.productName()))
                     .httpConnectTimeout(10000)
                     .httpWriteTimeout(10000)
                     .httpReadTimeout(60000)
@@ -309,7 +309,6 @@ public class OTXDataAdapter extends LookupDataAdapter {
     }
 
     @AutoValue
-    @WithBeanGetter
     @JsonAutoDetect
     @JsonDeserialize(builder = Config.Builder.class)
     @JsonTypeName(NAME)

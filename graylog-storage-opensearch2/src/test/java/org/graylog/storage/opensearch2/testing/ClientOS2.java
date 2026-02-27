@@ -23,6 +23,7 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.collect.Streams;
+import org.apache.commons.io.IOUtils;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
@@ -30,6 +31,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settin
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.alias.IndicesAliasesRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.alias.IndicesAliasesRequest.AliasActions;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.open.OpenIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.refresh.RefreshRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.template.delete.DeleteIndexTemplateRequest;
@@ -51,27 +53,25 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexTemp
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.IndexTemplateMetadata;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComposableIndexTemplateRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
-import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.ComposableIndexTemplate;
-import org.graylog.shaded.opensearch2.org.opensearch.common.compress.CompressedXContent;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.Client;
-import org.graylog2.indexer.indices.Template;
+import org.graylog.testing.elasticsearch.IndexState;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -95,7 +95,7 @@ public class ClientOS2 implements Client {
 
     @Override
     public void createIndex(String index, int shards, int replicas) {
-        LOG.debug("Creating index " + index);
+        LOG.warn("Creating index " + index);
         final CreateIndexRequest createIndexRequest = new CreateIndexRequest(index);
         createIndexRequest.settings(
                 Settings.builder()
@@ -109,6 +109,7 @@ public class ClientOS2 implements Client {
     @Override
     public void deleteIndices(String... indices) {
         for (String index : indices) {
+            LOG.warn("Deleting index {}", index);
             if (indicesExists(index)) {
                 final DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(index);
                 client.execute((c, requestOptions) -> c.indices().delete(deleteIndexRequest, requestOptions));
@@ -200,69 +201,6 @@ public class ClientOS2 implements Client {
         );
     }
 
-    private boolean composableTemplateExists(String templateName) {
-        var request = new GetComposableIndexTemplateRequest("");
-        var result = client.execute((c, requestOptions) -> c.indices().getIndexTemplate(request, requestOptions));
-        return result.getIndexTemplates()
-                .keySet()
-                .stream()
-                .anyMatch(indexTemplate -> indexTemplate.equals(templateName));
-    }
-
-    private boolean legacyTemplateExists(String templateName) {
-        var request = new GetIndexTemplatesRequest("*");
-        var result = client.execute((c, requestOptions) -> c.indices().getIndexTemplate(request, requestOptions));
-        return result.getIndexTemplates()
-                .stream()
-                .anyMatch(indexTemplate -> indexTemplate.name().equals(templateName));
-    }
-
-    @Override
-    public boolean templateExists(String templateName) {
-        return featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? composableTemplateExists(templateName) : legacyTemplateExists(templateName);
-    }
-
-    private void putComposableTemplate(String templateName, Template template) {
-        var serializedMapping = serialize(template.mappings());
-        var settings = org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings.builder().loadFromMap(template.settings()).build();
-        var osTemplate = new org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Template(settings, serializedMapping, null);
-        var indexTemplate = new ComposableIndexTemplate(template.indexPatterns(), osTemplate, null, template.order(), null, null);
-        var request = new PutComposableIndexTemplateRequest()
-                .name(templateName)
-                .indexTemplate(indexTemplate);
-        client.execute((c, requestOptions) -> c.indices().putIndexTemplate(request, requestOptions),
-                "Unable to put template " + templateName);
-    }
-
-    private void putLegacyTemplate(String templateName, Template template) {
-        var source = Map.of(
-                "index_patterns", template.indexPatterns(),
-                "mappings", template.mappings(),
-                "settings", template.settings(),
-                "order", template.order()
-        );
-        var request = new PutIndexTemplateRequest(templateName).source(source);
-        client.execute((c, requestOptions) -> c.indices().putTemplate(request, requestOptions),
-                "Unable to put template " + templateName);
-    }
-
-    @Override
-    public void putTemplate(String templateName, Template template) {
-        if (featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE)) {
-            putComposableTemplate(templateName, template);
-        } else {
-            putLegacyTemplate(templateName, template);
-        }
-    }
-
-    private CompressedXContent serialize(Object obj) {
-        try {
-            return new CompressedXContent(objectMapper.writeValueAsString(obj));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private void deleteComposableTemplates(String... templates) {
         for (String template : templates) {
             var deleteIndexTemplateRequest = new DeleteComposableIndexTemplateRequest(template);
@@ -277,8 +215,8 @@ public class ClientOS2 implements Client {
         }
     }
 
-    @Override
-    public void deleteTemplates(String... templates) {
+
+    private void deleteTemplates(String... templates) {
         if (featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE)) {
             deleteComposableTemplates(templates);
         } else {
@@ -321,7 +259,7 @@ public class ClientOS2 implements Client {
 
     @Override
     public void cleanUp() {
-        LOG.debug("Removing indices: " + String.join(",", existingIndices()));
+        LOG.warn("Removing indices: " + String.join(",", existingIndices()));
         deleteDataStreams();
         deleteIndices(existingIndices());
         deleteTemplates(existingTemplates());
@@ -403,7 +341,11 @@ public class ClientOS2 implements Client {
     }
 
     @Override
-    public void updateMapping(String index, Map<String, Object> mapping) {
+    public void updateMappingMeta(String index, String key, Object value) {
+        updateMapping(index, Map.of("_meta", Map.of(key, value)));
+    }
+
+    private void updateMapping(String index, Map<String, Object> mapping) {
         final PutMappingRequest request = new PutMappingRequest(index)
                 .source(mapping);
 
@@ -412,13 +354,18 @@ public class ClientOS2 implements Client {
     }
 
     @Override
-    public Map<String, Object> getMapping(String index) {
+    public  <T> T getMappingMetaValue(String index, String key, Class<T> type) {
         final GetMappingsRequest request = new GetMappingsRequest().indices(index);
 
         final GetMappingsResponse result = client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions),
                 "Couldn't read mapping of index " + index);
+        final Map<String, Object> indexMapping = result.mappings().get(index).getSourceAsMap();
 
-        return result.mappings().get(index).sourceAsMap();
+        //noinspection unchecked
+        return (T) Optional.ofNullable(indexMapping.get("_meta"))
+                .map(o -> (Map<String, Object>) o)
+                .map(meta -> meta.get(key))
+                .orElse(null);
     }
 
     private void waitForResult(Callable<Boolean> task) {
@@ -461,5 +408,22 @@ public class ClientOS2 implements Client {
     @Override
     public void putFieldMapping(String index, String field, String type) {
         updateMapping(index, Collections.singletonMap("properties", Collections.singletonMap(field, Collections.singletonMap("type", type))));
+    }
+
+    @Override
+    public IndexState getStatus(String indexName) {
+        return client.execute((restHighLevelClient, requestOptions) -> {
+            final Response statusResponse = restHighLevelClient.getLowLevelClient().performRequest(new Request("GET", "_cat/indices/" + indexName + "/?h=status"));
+            try (final InputStream is = statusResponse.getEntity().getContent()) {
+                String result = IOUtils.toString(is, StandardCharsets.UTF_8);
+                return IndexState.valueOf(result.trim().toUpperCase(Locale.ROOT));
+            }
+        });
+    }
+
+    @Override
+    public void openIndex(String indexName) {
+        final OpenIndexRequest openIndexRequest = new OpenIndexRequest(indexName);
+        client.execute((c, requestOptions) -> c.indices().open(openIndexRequest, requestOptions));
     }
 }

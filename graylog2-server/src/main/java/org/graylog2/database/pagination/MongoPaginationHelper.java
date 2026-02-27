@@ -21,6 +21,7 @@ import org.bson.conversions.Bson;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.database.PaginatedList;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 /**
@@ -47,6 +48,17 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
      * @return A new pagination helper with the setting applied
      */
     MongoPaginationHelper<T> sort(Bson sort);
+
+    /**
+     * Sets the projection BSON to apply to the query.
+     * It will limit the number of fields retrieved from MongoDB for each document.
+     * Keep in mind that you can only exclude fields that are optional in related MongoEntity
+     * and you are responsible for ensuring that excluded fields are not needed in your use case.
+     *
+     * @param projection the projection BSON, which may be null.
+     * @return A new pagination helper with the setting applied
+     */
+    MongoPaginationHelper<T> projection(Bson projection);
 
     /**
      * Sets the page size.
@@ -81,6 +93,19 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
      * @return A new pagination helper with the setting applied
      */
     MongoPaginationHelper<T> collation(Collation collation);
+
+    MongoPaginationHelper<T> pipeline(List<Bson> pipeline);
+
+    /**
+     * Specifies whether to include the entity source metadata in the result. For this to work properly when set to
+     * true, T must implement {@link org.graylog2.database.entities.SourcedMongoEntity}. Otherwise, there will never
+     * be any source metadata included in the result.
+     *
+     * @param includeSourceMetadata true if T should include the source metadata, false otherwise.
+     *                              By default, this is false.
+     * @return A new pagination helper with the setting applied
+     */
+    MongoPaginationHelper<T> includeSourceMetadata(boolean includeSourceMetadata);
 
     /**
      * Perform the MongoDB request and return the specified page.

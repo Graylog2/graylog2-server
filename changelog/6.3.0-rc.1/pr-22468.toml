@@ -1,0 +1,5 @@
+type = "a" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Adds a permission to restrict creation of specified input types."
+
+issues = ["graylog-plugin-enterprise#10477"]
+pulls = ["22468"]

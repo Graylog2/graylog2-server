@@ -20,46 +20,46 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class DBGrantServiceTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private DBGrantService dbService;
-    private GRNRegistry grnRegistry = GRNRegistry.createWithBuiltinTypes();
+    private final GRNRegistry grnRegistry = GRNRegistry.createWithBuiltinTypes();
 
-    @Before
-    public void setUp() throws Exception {
-        final MongoJackObjectMapperProvider mapper = new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
-        this.dbService = new DBGrantService(mongodb.mongoConnection(), mapper, grnRegistry);
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) throws Exception {
+        this.dbService = new DBGrantService(mongoCollections);
     }
 
     @Test
     @MongoDBFixtures("grants.json")
     public void test() {
-        assertThat(dbService.streamAll().collect(Collectors.toSet()).size()).isEqualTo(6);
+        try (Stream<GrantDTO> grantDTOStream = dbService.streamAll()) {
+            assertThat(grantDTOStream.collect(Collectors.toSet()).size()).isEqualTo(6);
+        }
     }
 
     @Test

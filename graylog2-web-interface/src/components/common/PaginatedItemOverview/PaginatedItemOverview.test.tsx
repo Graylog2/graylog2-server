@@ -39,11 +39,13 @@ const emptyPaginatedResponse: PaginatedListType = {
 };
 
 const simplePaginatedResponse: PaginatedListType = {
-  list: Immutable.List<DescriptiveItem>([{
-    id: '1',
-    name: 'Foo',
-    description: 'Bar',
-  }]),
+  list: Immutable.List<DescriptiveItem>([
+    {
+      id: '1',
+      name: 'Foo',
+      description: 'Bar',
+    },
+  ]),
   pagination: {
     query: '',
     page: 1,
@@ -82,9 +84,11 @@ describe('<PaginatedItemOverview>', () => {
     );
 
     render(
-      <PaginatedItemOverview onLoad={() => Promise.resolve({} as PaginatedListType)}
-                             overrideList={emptyPaginatedResponse}
-                             resultsWrapperComponent={myWrapper} />,
+      <PaginatedItemOverview
+        onLoad={() => Promise.resolve({} as PaginatedListType)}
+        overrideList={emptyPaginatedResponse}
+        resultsWrapperComponent={myWrapper}
+      />,
     );
 
     await screen.findByText(/my custom wrapper/i);
@@ -93,9 +97,7 @@ describe('<PaginatedItemOverview>', () => {
   });
 
   it('uses default item component', async () => {
-    const { rerender } = render(
-      <PaginatedItemOverview onLoad={() => Promise.resolve(simplePaginatedResponse)} />,
-    );
+    const { rerender } = render(<PaginatedItemOverview onLoad={() => Promise.resolve(simplePaginatedResponse)} />);
 
     const itemName = simplePaginatedResponse.list.get(0).name;
 
@@ -104,8 +106,7 @@ describe('<PaginatedItemOverview>', () => {
     expect(screen.queryByTitle(`Remove ${itemName}`)).not.toBeInTheDocument();
 
     rerender(
-      <PaginatedItemOverview onLoad={() => Promise.resolve(simplePaginatedResponse)}
-                             onDeleteItem={jest.fn()} />,
+      <PaginatedItemOverview onLoad={() => Promise.resolve(simplePaginatedResponse)} onDeleteItem={jest.fn()} />,
     );
 
     await screen.findByText(simplePaginatedResponse.list.get(0).name, { exact: false });
@@ -122,9 +123,11 @@ describe('<PaginatedItemOverview>', () => {
     );
 
     const { rerender } = render(
-      <PaginatedItemOverview onLoad={() => Promise.resolve(simplePaginatedResponse)}
-                             overrideList={simplePaginatedResponse}
-                             overrideItemComponent={itemComponent} />,
+      <PaginatedItemOverview
+        onLoad={() => Promise.resolve(simplePaginatedResponse)}
+        overrideList={simplePaginatedResponse}
+        overrideItemComponent={itemComponent}
+      />,
     );
 
     await screen.findByText(/custom item component/i);
@@ -133,10 +136,12 @@ describe('<PaginatedItemOverview>', () => {
     expect(screen.queryByRole('button', { name: 'Delete' })).not.toBeInTheDocument();
 
     rerender(
-      <PaginatedItemOverview onLoad={() => Promise.resolve(simplePaginatedResponse)}
-                             overrideList={simplePaginatedResponse}
-                             onDeleteItem={jest.fn()}
-                             overrideItemComponent={itemComponent} />,
+      <PaginatedItemOverview
+        onLoad={() => Promise.resolve(simplePaginatedResponse)}
+        overrideList={simplePaginatedResponse}
+        onDeleteItem={jest.fn()}
+        overrideItemComponent={itemComponent}
+      />,
     );
 
     await screen.findByText(/custom item component/i);

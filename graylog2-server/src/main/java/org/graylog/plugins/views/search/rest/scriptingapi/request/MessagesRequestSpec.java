@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 public record MessagesRequestSpec(@JsonProperty("query") String queryString,
                                   @JsonProperty("streams") Set<String> streams,
+                                  @JsonProperty("stream_categories") Set<String> streamCategories,
                                   @JsonProperty("timerange") TimeRange timerange,
                                   @JsonProperty("sort") String sort,
                                   @JsonProperty("sort_order") SortSpec.Direction sortOrder,
@@ -57,6 +58,9 @@ public record MessagesRequestSpec(@JsonProperty("query") String queryString,
         }
         if (streams == null) {
             streams = Set.of();
+        }
+        if (streamCategories == null) {
+            streamCategories = Set.of();
         }
         if (from < 0) {
             from = DEFAULT_FROM;

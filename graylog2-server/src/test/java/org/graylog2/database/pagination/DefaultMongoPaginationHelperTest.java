@@ -17,16 +17,17 @@
 package org.graylog2.database.pagination;
 
 import com.google.common.collect.Lists;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Collation;
 import com.mongodb.client.model.CollationCaseFirst;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.database.PaginatedList;
@@ -37,6 +38,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -58,14 +60,11 @@ class DefaultMongoPaginationHelperTest {
                     .map(name -> new DTO(new ObjectId().toHexString(), name))
                     .toList();
 
-    private MongoCollections mongoCollections;
-    private MongoCollection<DTO> collection;
     private MongoPaginationHelper<DTO> paginationHelper;
 
     @BeforeEach
-    void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider objectMapperProvider) {
-        mongoCollections = new MongoCollections(objectMapperProvider, mongoDBTestService.mongoConnection());
-        collection = mongoCollections.collection("test", DTO.class);
+    void setUp(MongoCollections mongoCollections) {
+        final MongoCollection<DTO> collection = mongoCollections.collection("test", DTO.class);
         paginationHelper = new DefaultMongoPaginationHelper<>(collection);
 
         collection.insertMany(DTOs);
@@ -74,12 +73,12 @@ class DefaultMongoPaginationHelperTest {
     @Test
     void testFilter() {
         final Bson filter = Filters.in("name", "A", "B", "C");
-        final PaginatedList<DTO> filterdPage = paginationHelper.filter(filter).page(1);
-        assertThat(filterdPage)
+        final PaginatedList<DTO> filteredPage = paginationHelper.filter(filter).page(1);
+        assertThat(filteredPage)
                 .isEqualTo(paginationHelper.filter(filter).page(1, alwaysTrue()))
                 .containsExactlyElementsOf(DTOs.subList(0, 3));
 
-        assertThat(filterdPage.pagination()).satisfies(pagination -> {
+        assertThat(filteredPage.pagination()).satisfies(pagination -> {
             assertThat(pagination.total()).isEqualTo(3);
             assertThat(pagination.page()).isEqualTo(1);
             assertThat(pagination.perPage()).isEqualTo(0);
@@ -114,13 +113,41 @@ class DefaultMongoPaginationHelperTest {
     }
 
     @Test
+    void testProjection() {
+        final Bson filter = Filters.in("name", "A", "B", "C");
+        var page = paginationHelper.filter(filter)
+                .projection(Projections.excludeId())
+                .sort(ascending("name"))
+                .perPage(5)
+                .page(1);
+
+        assertThat(page)
+                .hasSize(3)
+                .containsExactly(
+                        new DTO(null, "A"),
+                        new DTO(null, "B"),
+                        new DTO(null, "C")
+                );
+
+        page = paginationHelper.filter(filter)
+                .projection(Projections.exclude("name"))
+                .sort(ascending("name"))
+                .perPage(5)
+                .page(1);
+
+        assertThat(page)
+                .hasSize(3)
+                .allSatisfy((Consumer<DTO>) dto -> assertThat(dto.name()).isNull());
+    }
+
+    @Test
     void testPerPage() {
         assertThat(paginationHelper.page(1))
                 .isEqualTo(paginationHelper.perPage(0).page(1))
                 .isEqualTo(paginationHelper.perPage(0).page(1, alwaysTrue()))
                 .containsExactlyElementsOf(DTOs);
 
-        final MongoPaginationHelper<DTO> helper = paginationHelper.perPage(8);
+        final var helper = paginationHelper.perPage(8);
 
         assertThat(helper.page(1)).containsExactlyElementsOf(DTOs.subList(0, 8));
         assertThat(helper.page(1, alwaysTrue())).containsExactlyElementsOf(DTOs.subList(0, 8));

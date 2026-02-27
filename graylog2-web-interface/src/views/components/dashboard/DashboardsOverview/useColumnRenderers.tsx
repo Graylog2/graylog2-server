@@ -16,6 +16,7 @@
  */
 import React, { useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import startCase from 'lodash/startCase';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
@@ -24,47 +25,64 @@ import TitleCell from 'views/components/dashboard/DashboardsOverview/TitleCell';
 import FavoriteIcon from 'views/components/FavoriteIcon';
 import { createGRN } from 'logic/permissions/GRN';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 
-const DashboardFavoriteItem = ({ favorite, dashboardId }: { favorite: boolean, dashboardId: string }) => {
+const DashboardFavoriteItem = ({ favorite, dashboardId }: { favorite: boolean; dashboardId: string }) => {
   const queryClient = useQueryClient();
   const { searchParams } = useTableFetchContext();
 
   return (
-    <FavoriteIcon isFavorite={favorite}
-                  grn={createGRN('dashboard', dashboardId)}
-                  onChange={(newValue) => {
-                    queryClient.setQueriesData(['dashboards', 'overview', searchParams], (cur: {
-                      list: Readonly<Array<View>>,
-                      pagination: { total: number }
-                    }) => ({
-                      ...cur,
-                      list: cur.list.map((view) => {
-                        if (view.id === dashboardId) {
-                          return view.toBuilder().favorite(newValue).build();
-                        }
+    <FavoriteIcon
+      isFavorite={favorite}
+      grn={createGRN('dashboard', dashboardId)}
+      onChange={(newValue) => {
+        queryClient.setQueriesData(
+          { queryKey: ['dashboards', 'overview', searchParams] },
+          (cur: { list: Readonly<Array<View>>; pagination: { total: number } }) => ({
+            ...cur,
+            list: cur.list.map((view) => {
+              if (view.id === dashboardId) {
+                return view.toBuilder().favorite(newValue).build();
+              }
 
-                        return view;
-                      }),
-                    }
-                    ));
-                  }} />
+              return view;
+            }),
+          }),
+        );
+      }}
+    />
   );
 };
 
-export const useColumnRenderers = () => {
+export const useColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByAttribute<View>) => {
   const requirementsProvided = usePluginEntities('views.requires.provided');
-  const customColumnRenderers: ColumnRenderers<View> = useMemo(() => ({
-    attributes: {
-      title: {
-        renderCell: (_title: string, dashboard) => <TitleCell dashboard={dashboard} requirementsProvided={requirementsProvided} />,
+  const customColumnRenderers: ColumnRenderers<View> = useMemo(
+    () => ({
+      attributes: {
+        title: {
+          renderCell: (_title: string, dashboard: View) => (
+            <TitleCell dashboard={dashboard} requirementsProvided={requirementsProvided} />
+          ),
+        },
+        '_entity_source.source': {
+          renderCell: (_title: string, dashboard: View) => (
+            <span>
+              {dashboard._value.entitySource
+                ? startCase(dashboard._value.entitySource.source.toString().toLowerCase())
+                : 'User Defined'}
+            </span>
+          ),
+        },
+        favorite: {
+          renderCell: (favorite: boolean, dashboard: View) => (
+            <DashboardFavoriteItem dashboardId={dashboard.id} favorite={favorite} />
+          ),
+        },
+        ...(pluggableColumnRenderers || {}),
       },
-      favorite: {
-        renderCell: (favorite: boolean, dashboard) => (
-          <DashboardFavoriteItem dashboardId={dashboard.id} favorite={favorite} />
-        ),
-      },
-    },
-  }), [requirementsProvided]);
+    }),
+    [requirementsProvided, pluggableColumnRenderers],
+  );
 
   return customColumnRenderers;
 };

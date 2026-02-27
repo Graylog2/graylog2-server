@@ -36,12 +36,12 @@ class MajorVersionConverterTest {
     @Test
     void convertEncodedValue() {
         final SearchVersion version = converter.convertFrom("OPENSEARCH:1.2.0");
-        assertThat(version).isEqualTo(SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, Version.valueOf("1.2.0")));
+        assertThat(version).isEqualTo(SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, Version.parse("1.2.0")));
     }
 
     @Test
     void testConvertToString() {
-        final String converted = converter.convertTo(SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, Version.valueOf("1.2.0")));
+        final String converted = converter.convertTo(SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, Version.parse("1.2.0")));
         assertThat(converted).isEqualTo("OPENSEARCH:1.2.0");
     }
 }

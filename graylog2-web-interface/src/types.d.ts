@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 declare module '*.css' {
-  interface CSSClasses { [key: string]: any }
+  interface CSSClasses {
+    [key: string]: any;
+  }
   const classes: CSSClasses;
   export default classes;
 }

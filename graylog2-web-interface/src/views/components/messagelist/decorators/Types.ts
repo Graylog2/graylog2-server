@@ -20,9 +20,9 @@ export type { Decorator } from 'views/logic/widgets/MessagesWidgetConfig';
 export type RequestedConfiguration = {};
 
 export type DecoratorType = {
-  type: string,
-  name: string,
-  human_name: string,
-  requested_configuration: RequestedConfiguration,
-  link_to_docs: string,
+  type: string;
+  name: string;
+  human_name: string;
+  requested_configuration: RequestedConfiguration;
+  link_to_docs: string;
 };

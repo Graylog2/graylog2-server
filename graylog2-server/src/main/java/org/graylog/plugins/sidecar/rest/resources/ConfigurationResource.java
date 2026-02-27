@@ -20,9 +20,32 @@ import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.CacheControl;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.EntityTag;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.sidecar.audit.SidecarAuditEventTypes;
@@ -46,36 +69,14 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationResult;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.CacheControl;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.EntityTag;
-import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,9 +86,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "Sidecar/Configurations", description = "Manage/Render collector configurations", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Sidecar/Configurations", description = "Manage/Render collector configurations")
 @Path("/sidecar/configurations")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -124,17 +125,17 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @GET
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "List all configurations")
-    public ConfigurationListResponse listConfigurations(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                        @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                        @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                                        @ApiParam(name = "sort",
-                                                                  value = "The field to sort the result on",
+    @Operation(summary = "List all configurations")
+    public ConfigurationListResponse listConfigurations(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                        @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                        @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                        @Parameter(name = "sort",
+                                                                  description = "The field to sort the result on",
                                                                   required = true,
-                                                                  allowableValues = "name,id,collector_id")
+                                                                  schema = @Schema(allowableValues = {"name", "id", "collector_id"}))
                                                         @DefaultValue(Configuration.FIELD_NAME) @QueryParam("sort") String sort,
-                                                        @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                                        @DefaultValue("asc") @QueryParam("order") String order) {
+                                                        @Parameter(name = "order", description = "The sort direction", schema = @Schema(allowableValues = {"asc", "desc"}))
+                                                        @DefaultValue("asc") @QueryParam("order") SortOrder order) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         final PaginatedList<Configuration> configurations = this.configurationService.findPaginated(searchQuery, page, perPage, sort, order);
         final long total = this.configurationService.count();
@@ -149,8 +150,8 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @Path("/{id}")
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Show configuration details")
-    public Configuration getConfigurations(@ApiParam(name = "id", required = true)
+    @Operation(summary = "Show configuration details")
+    public Configuration getConfigurations(@Parameter(name = "id", required = true)
                                            @PathParam("id") String id) {
         final Configuration configuration = this.configurationService.find(id);
         if (configuration == null) {
@@ -163,8 +164,8 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @Path("/{id}/sidecars")
     @RequiresPermissions({SidecarRestPermissions.CONFIGURATIONS_READ, SidecarRestPermissions.SIDECARS_READ})
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Show sidecars using the given configuration")
-    public ConfigurationSidecarsResponse getConfigurationSidecars(@ApiParam(name = "id", required = true)
+    @Operation(summary = "Show sidecars using the given configuration")
+    public ConfigurationSidecarsResponse getConfigurationSidecars(@Parameter(name = "id", required = true)
                                                                   @PathParam("id") String id) {
         final Configuration configuration = this.configurationService.find(id);
         if (configuration == null) {
@@ -182,8 +183,8 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @NoAuditEvent("Validation only")
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Validates configuration parameters")
-    public ValidationResult validateConfiguration(@Valid @ApiParam("configuration") Configuration toValidate) {
+    @Operation(summary = "Validates configuration parameters")
+    public ValidationResult validateConfiguration(@Valid @Parameter(name = "configuration") Configuration toValidate) {
         return validate(toValidate);
     }
 
@@ -192,11 +193,11 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @Path("/render/{sidecarId}/{configurationId}")
     @Produces(MediaType.APPLICATION_JSON)
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
-    @ApiOperation(value = "Render configuration template")
+    @Operation(summary = "Render configuration template")
     public Response renderConfiguration(@Context HttpHeaders httpHeaders,
-                                        @ApiParam(name = "sidecarId", required = true)
+                                        @Parameter(name = "sidecarId", required = true)
                                         @PathParam("sidecarId") String sidecarId,
-                                        @ApiParam(name = "configurationId", required = true)
+                                        @Parameter(name = "configurationId", required = true)
                                         @PathParam("configurationId") String configurationId) throws RenderTemplateException, JsonProcessingException {
         String ifNoneMatch = httpHeaders.getHeaderString("If-None-Match");
         boolean etagCached = false;
@@ -245,9 +246,9 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @Path("/render/preview")
     @Produces(MediaType.APPLICATION_JSON)
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
-    @ApiOperation(value = "Render preview of a configuration template")
+    @Operation(summary = "Render preview of a configuration template")
     @NoAuditEvent("this is not changing any data")
-    public ConfigurationPreviewRenderResponse renderConfiguration(@ApiParam(name = "JSON body", required = true)
+    public ConfigurationPreviewRenderResponse renderConfiguration(@RequestBody(required = true)
                                                                   @Valid @NotNull ConfigurationPreviewRequest request) {
         try {
             String preview = this.configurationService.renderPreview(request.template());
@@ -260,9 +261,9 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @POST
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_CREATE)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Create new configuration")
+    @Operation(summary = "Create new configuration")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_CREATE)
-    public Response createConfiguration(@ApiParam(name = "JSON body", required = true)
+    public Response createConfiguration(@RequestBody(required = true)
                                         @Valid @NotNull Configuration request) {
         final Configuration configuration = configurationFromRequest(null, request);
         final ValidationResult validationResult = validate(configuration);
@@ -274,9 +275,9 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
         if (!config.tags().isEmpty()) {
             final String os = Optional.ofNullable(collectorService.find(request.collectorId()))
                     .map(Collector::nodeOperatingSystem).orElse("");
-            sidecarService.findByTagsAndOS(config.tags(), os)
-                    .map(Sidecar::nodeId)
-                    .forEach(etagService::invalidateRegistration);
+            try (final var stream = sidecarService.findByTagsAndOS(config.tags(), os)) {
+                stream.map(Sidecar::nodeId).forEach(etagService::invalidateRegistration);
+            }
         }
 
         return Response.ok().entity(config).build();
@@ -285,9 +286,9 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @POST
     @Path("/{id}/{name}")
     @RequiresPermissions({SidecarRestPermissions.CONFIGURATIONS_READ, SidecarRestPermissions.CONFIGURATIONS_CREATE})
-    @ApiOperation(value = "Copy a configuration")
+    @Operation(summary = "Copy a configuration")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_CLONE)
-    public Response copyConfiguration(@ApiParam(name = "id", required = true)
+    public Response copyConfiguration(@Parameter(name = "id", required = true)
                                       @PathParam("id") String id,
                                       @PathParam("name") String name) throws NotFoundException {
         final Configuration configuration = configurationService.copyConfiguration(id, name);
@@ -303,11 +304,11 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @Path("/{id}")
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_UPDATE)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Update a configuration")
+    @Operation(summary = "Update a configuration")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_UPDATE)
-    public Response updateConfiguration(@ApiParam(name = "id", required = true)
+    public Response updateConfiguration(@Parameter(name = "id", required = true)
                                         @PathParam("id") String id,
-                                        @ApiParam(name = "JSON body", required = true)
+                                        @RequestBody(required = true)
                                         @Valid @NotNull Configuration request) {
         final Configuration previousConfiguration = configurationService.find(id);
         if (previousConfiguration == null) {
@@ -332,9 +333,9 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
             final Set<String> tags = Sets.symmetricDifference(previousConfiguration.tags(), updatedConfiguration.tags());
             final String os = Optional.ofNullable(collectorService.find(request.collectorId()))
                     .map(Collector::nodeOperatingSystem).orElse("");
-            sidecarService.findByTagsAndOS(tags, os)
-                    .map(Sidecar::nodeId)
-                    .forEach(etagService::invalidateRegistration);
+            try (final var stream = sidecarService.findByTagsAndOS(tags, os)) {
+                stream.map(Sidecar::nodeId).forEach(etagService::invalidateRegistration);
+            }
         }
 
         return Response.ok().entity(configurationService.save(updatedConfiguration)).build();
@@ -344,9 +345,9 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @Path("/{id}")
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_DELETE)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Delete a configuration")
+    @Operation(summary = "Delete a configuration")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_DELETE)
-    public Response deleteConfiguration(@ApiParam(name = "id", required = true)
+    public Response deleteConfiguration(@Parameter(name = "id", required = true)
                                         @PathParam("id") String id) {
         if (isConfigurationInUse(id)) {
             throw new BadRequestException("Configuration still in use, cannot delete.");

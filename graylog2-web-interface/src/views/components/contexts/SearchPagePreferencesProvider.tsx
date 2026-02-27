@@ -21,9 +21,9 @@ import SearchPagePreferencesContext from './SearchPagePreferencesContext';
 import SearchPagePreferencesState from './SearchPagePreferencesState';
 
 type Props = {
-  children: React.ReactNode
-  setPreference: (stateKey: string, value: boolean) => void,
-  getPreference: (stateKey: string, defaultValue: boolean) => boolean,
+  children: React.ReactNode;
+  setPreference: (stateKey: string, value: boolean) => void;
+  getPreference: (stateKey: string, defaultValue: boolean) => boolean;
 };
 
 const SearchPagePreferencesStateProvider = ({ getPreference, setPreference, children }: Props) => {
@@ -33,10 +33,10 @@ const SearchPagePreferencesStateProvider = ({ getPreference, setPreference, chil
     };
     const actions = { toggleSidebarPinning: () => setPreference('sidebarIsPinned', !config.sidebar.isPinned) };
 
-    return ({
+    return {
       config,
       actions,
-    });
+    };
   }, [getPreference, setPreference]);
 
   return (

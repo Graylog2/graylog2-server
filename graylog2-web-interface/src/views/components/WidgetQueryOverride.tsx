@@ -17,8 +17,8 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import type { ElasticsearchQueryString } from 'views/logic/queries/Query';
 import { Button } from 'components/bootstrap';
+import type { QueryString } from 'views/logic/queries/types';
 
 import BasicQueryInput from './searchbar/queryinput/AsyncBasicQueryInput';
 
@@ -34,22 +34,24 @@ const Wrapper = styled.div`
   }
 `;
 
-const QueryInfo = styled.div(({ theme }) => css`
-  margin-left: 10px;
-  border: 1px dashed ${theme.colors.input.border};
-  display: flex;
-  align-items: center;
-  width: 100%;
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 4px;
-  padding: 0 5px;
-  min-height: 34px;
-  border-left: 0;
+const QueryInfo = styled.div(
+  ({ theme }) => css`
+    margin-left: 10px;
+    border: 1px dashed ${theme.colors.input.border};
+    display: flex;
+    align-items: center;
+    width: 100%;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    padding: 0 5px;
+    min-height: 34px;
+    border-left: 0;
 
-  .query {
-    flex: 1;
-  }
-`);
+    .query {
+      flex: 1;
+    }
+  `,
+);
 
 const StyledBasicQueryInput = styled(BasicQueryInput)`
   &&.ace-queryinput {
@@ -62,18 +64,14 @@ const ResetButton = styled(Button)`
 `;
 
 type Props = {
-  value: ElasticsearchQueryString,
-  onReset: () => void
+  value: QueryString;
+  onReset: () => void;
 };
 
 const WidgetQueryOverride = ({ value, onReset }: Props) => (
   <Wrapper>
     <QueryInfo>
-      <StyledBasicQueryInput disabled
-                             value={value.query_string}
-                             height={34}
-                             wrapEnabled={false}
-                             maxLines={1} />
+      <StyledBasicQueryInput disabled value={value.query_string} height={34} wrapEnabled={false} maxLines={1} />
       <ResetButton bsSize="xs" bsStyle="primary" onClick={onReset} data-testid="reset-global-query">
         Reset Global Filter
       </ResetButton>

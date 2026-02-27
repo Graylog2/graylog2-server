@@ -19,6 +19,7 @@ package org.graylog2.alarmcallbacks;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
+import jakarta.inject.Inject;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -35,13 +36,12 @@ import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.system.urlwhitelist.UrlWhitelistService;
-
-import jakarta.inject.Inject;
+import org.graylog2.system.urlallowlist.UrlAllowlistService;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -54,14 +54,14 @@ public class HTTPAlarmCallback implements AlarmCallback {
     private final OkHttpClient httpClient;
     private final ObjectMapper objectMapper;
     private Configuration configuration;
-    private final UrlWhitelistService whitelistService;
+    private final UrlAllowlistService allowlistService;
 
     @Inject
     public HTTPAlarmCallback(final OkHttpClient httpClient, final ObjectMapper objectMapper,
-                             UrlWhitelistService whitelistService) {
+                             UrlAllowlistService allowlistService) {
         this.httpClient = httpClient;
         this.objectMapper = objectMapper;
-        this.whitelistService = whitelistService;
+        this.allowlistService = allowlistService;
     }
 
     @Override
@@ -88,8 +88,8 @@ public class HTTPAlarmCallback implements AlarmCallback {
             throw new AlarmCallbackException("Malformed URL: " + url);
         }
 
-        if (!whitelistService.isWhitelisted(url)) {
-            throw new AlarmCallbackException("URL <" + url + "> is not whitelisted.");
+        if (!allowlistService.isAllowlisted(url)) {
+            throw new AlarmCallbackException("URL <" + url + "> is not allowlisted.");
         }
 
         final Request request = new Request.Builder()
@@ -135,13 +135,13 @@ public class HTTPAlarmCallback implements AlarmCallback {
         }
 
         try {
-            new URL(url);
-        } catch (MalformedURLException e) {
+            var ignored = new URI(url).toURL();
+        } catch (MalformedURLException | URISyntaxException | IllegalArgumentException e) {
             throw new ConfigurationException("Malformed URL '" + url + "'", e);
         }
 
-        if (!whitelistService.isWhitelisted(url)) {
-            throw new ConfigurationException("URL <" + url + "> is not whitelisted.");
+        if (!allowlistService.isAllowlisted(url)) {
+            throw new ConfigurationException("URL <" + url + "> is not allowlisted.");
         }
     }
 }

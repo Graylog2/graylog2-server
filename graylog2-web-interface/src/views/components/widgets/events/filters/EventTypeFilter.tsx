@@ -19,9 +19,9 @@ import * as React from 'react';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
 
 type Props = {
-  onSelect: (value: string) => void,
-  selectedValues: Array<string>
-}
+  onSelect: (value: string) => void;
+  selectedValues: Array<string>;
+};
 
 const EventTypeFilter = ({ onSelect, selectedValues }: Props) => {
   const disabledAlertOption = selectedValues.includes('true');
@@ -29,12 +29,10 @@ const EventTypeFilter = ({ onSelect, selectedValues }: Props) => {
 
   return (
     <ListGroup className="no-bm">
-      <ListGroupItem onClick={() => !disabledAlertOption && onSelect('true')}
-                     disabled={disabledAlertOption}>
+      <ListGroupItem onClick={() => !disabledAlertOption && onSelect('true')} disabled={disabledAlertOption}>
         Alert
       </ListGroupItem>
-      <ListGroupItem onClick={() => !disabledEventOption && onSelect('false')}
-                     disabled={disabledEventOption}>
+      <ListGroupItem onClick={() => !disabledEventOption && onSelect('false')} disabled={disabledEventOption}>
         Event
       </ListGroupItem>
     </ListGroup>

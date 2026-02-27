@@ -19,51 +19,56 @@ package org.graylog2.cluster.nodes;
 import com.mongodb.DBCollection;
 import org.assertj.core.api.Assertions;
 import org.bson.types.ObjectId;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.net.URI;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class ServerNodeClusterServiceTest {
     public static final int STALE_LEADER_TIMEOUT_MS = 2000;
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private static final URI TRANSPORT_URI = URI.create("http://10.0.0.1:12900");
     private static final String LOCAL_CANONICAL_HOSTNAME = Tools.getLocalCanonicalHostname();
     private static final String NODE_ID = "28164cbe-4ad9-4c9c-a76e-088655aa7889";
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
+    private static final boolean IS_PROCESSING = true;
+    private static final Lifecycle LIFECYCLE = Lifecycle.RUNNING;
 
     @Mock
     private Configuration configuration;
     private final NodeId nodeId = new SimpleNodeId(NODE_ID);
 
     private ServerNodeClusterService nodeService;
+    private MongoCollections mongoCollections;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) throws Exception {
+        this.mongoCollections = mongoCollections;
         Mockito.when(configuration.getStaleLeaderTimeout()).thenReturn(STALE_LEADER_TIMEOUT_MS);
         this.nodeService =
-                new ServerNodeClusterService(mongodb.mongoConnection(), configuration);
+                new ServerNodeClusterService(mongoCollections.connection(), configuration);
     }
 
     @Test
@@ -78,6 +83,8 @@ public class ServerNodeClusterServiceTest {
                 .setLeader(true)
                 .setTransportAddress(TRANSPORT_URI.toString())
                 .setHostname(LOCAL_CANONICAL_HOSTNAME)
+                .setProcessing(IS_PROCESSING)
+                .setLifecycle(LIFECYCLE)
                 .build());
 
         final Node node = nodeService.byNodeId(nodeId);
@@ -102,10 +109,12 @@ public class ServerNodeClusterServiceTest {
                 .setLeader(true)
                 .setTransportAddress(TRANSPORT_URI.toString())
                 .setHostname(LOCAL_CANONICAL_HOSTNAME)
+                .setProcessing(IS_PROCESSING)
+                .setLifecycle(LIFECYCLE)
                 .build());
 
         @SuppressWarnings("deprecation")
-        final DBCollection collection = mongodb.mongoConnection().getDatabase().getCollection("nodes");
+        final DBCollection collection = mongoCollections.connection().getDatabase().getCollection("nodes");
 
         assertThat(collection.count())
                 .describedAs("There should only be one node")
@@ -127,6 +136,8 @@ public class ServerNodeClusterServiceTest {
                 .setLeader(true)
                 .setTransportAddress(TRANSPORT_URI.toString())
                 .setHostname(LOCAL_CANONICAL_HOSTNAME)
+                .setProcessing(IS_PROCESSING)
+                .setLifecycle(LIFECYCLE)
                 .build());
         assertThat(nodeService.allActive().keySet()).containsExactly(nodeId.getNodeId());
 
@@ -139,6 +150,8 @@ public class ServerNodeClusterServiceTest {
                 .setLeader(true)
                 .setTransportAddress(TRANSPORT_URI.toString())
                 .setHostname(LOCAL_CANONICAL_HOSTNAME)
+                .setProcessing(IS_PROCESSING)
+                .setLifecycle(LIFECYCLE)
                 .build());
 
         final ServerNodeDto node = nodeService.byNodeId(nodeId);

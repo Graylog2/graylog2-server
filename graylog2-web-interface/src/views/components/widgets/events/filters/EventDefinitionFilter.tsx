@@ -20,10 +20,10 @@ import { Select, Spinner } from 'components/common';
 import useEventDefinitions from 'components/event-definitions/hooks/useEventDefinitions';
 
 type Props = {
-  value: string | undefined,
-  onSelect: (newValue: string) => void,
-  selectedValues: Array<string>,
-}
+  value: string | undefined;
+  onSelect: (newValue: string) => void;
+  selectedValues: Array<string>;
+};
 
 const EventDefinitionFilter = ({ value, onSelect, selectedValues }: Props) => {
   const { data: eventDefinitions, isInitialLoading: isLoadingEventDefinitions } = useEventDefinitions({
@@ -44,12 +44,14 @@ const EventDefinitionFilter = ({ value, onSelect, selectedValues }: Props) => {
   }
 
   return (
-    <Select placeholder="Select event definition"
-            clearable={false}
-            menuIsOpen
-            options={eventDefinitionOptions}
-            onChange={onSelect}
-            value={value} />
+    <Select
+      placeholder="Select event definition"
+      clearable={false}
+      menuIsOpen
+      options={eventDefinitionOptions}
+      onChange={onSelect}
+      value={value}
+    />
   );
 };
 

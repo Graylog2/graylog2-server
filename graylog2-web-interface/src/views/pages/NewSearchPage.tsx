@@ -35,17 +35,19 @@ const useParametersFromStore = () => {
 
   return useMemo(() => {
     if (sessionId) {
-      const searchDataFromStore = Store.get(sessionId);
-      Store.delete(sessionId);
+      const searchDataFromStore = Store.get<string>(sessionId as string);
+      Store.delete(sessionId as string);
 
       const searchData = searchDataFromStore ? JSON.parse(searchDataFromStore) : undefined;
 
       if (searchData?.parameters) {
         return {
           parameters: searchData.parameters.map((param) => Parameter.fromJSON(param)),
-          parameterBindings: Immutable.Map<string, ParameterBinding>(Object.entries<ParameterBindingJsonRepresentation>(searchData.parameterBindings ?? {}).map(
-            ([paramName, paramBinding]) => ([paramName, ParameterBinding.fromJSON(paramBinding)]),
-          )),
+          parameterBindings: Immutable.Map<string, ParameterBinding>(
+            Object.entries<ParameterBindingJsonRepresentation>(searchData.parameterBindings ?? {}).map(
+              ([paramName, paramBinding]) => [paramName, ParameterBinding.fromJSON(paramBinding)],
+            ),
+          ),
         };
       }
     }
@@ -56,8 +58,14 @@ const useParametersFromStore = () => {
 
 const NewSearchPage = () => {
   const { parameters, parameterBindings } = useParametersFromStore();
-  const { timeRange, queryString, streams } = useSearchURLQueryParams();
-  const viewPromise = useCreateSavedSearch({ streamId: streams, timeRange, queryString, parameters });
+  const { timeRange, queryString, streams, streamCategories } = useSearchURLQueryParams();
+  const viewPromise = useCreateSavedSearch({
+    streamId: streams,
+    streamCategory: streamCategories,
+    timeRange,
+    queryString,
+    parameters,
+  });
   const view = useCreateSearch(viewPromise);
 
   return <SearchPage view={view} executionState={SearchExecutionState.create(parameterBindings)} isNew />;

@@ -27,22 +27,39 @@ import GroupSyncSection from './GroupSyncSection';
 
 describe('<GroupSyncSection />', () => {
   it('should display info if enterprise plugin does not exist', () => {
-    render(<GroupSyncSection authenticationBackend={exampleAuthBackend as DirectoryServiceBackend} roles={Immutable.List()} />);
+    render(
+      <GroupSyncSection
+        authenticationBackend={exampleAuthBackend as DirectoryServiceBackend}
+        roles={Immutable.List()}
+      />,
+    );
 
     expect(screen.getByText('Enterprise Feature')).toBeInTheDocument();
     expect(screen.getByText('Group Synchronization')).toBeInTheDocument();
   });
 
   it('should display enterprise group sync section', () => {
-    PluginStore.register(new PluginManifest({}, {
-      'authentication.enterprise.directoryServices.groupSync': [{
-        components: {
-          GroupSyncSection: () => <>GroupSyncSection</>,
+    PluginStore.register(
+      new PluginManifest(
+        {},
+        {
+          'authentication.enterprise.directoryServices.groupSync': [
+            {
+              components: {
+                GroupSyncSection: () => <>GroupSyncSection</>,
+              },
+            } as unknown as DirectoryServicesGroupSync,
+          ],
         },
-      } as unknown as DirectoryServicesGroupSync],
-    }));
+      ),
+    );
 
-    render(<GroupSyncSection authenticationBackend={exampleAuthBackend as DirectoryServiceBackend} roles={Immutable.List()} />);
+    render(
+      <GroupSyncSection
+        authenticationBackend={exampleAuthBackend as DirectoryServiceBackend}
+        roles={Immutable.List()}
+      />,
+    );
 
     expect(screen.getByText('GroupSyncSection')).toBeInTheDocument();
   });

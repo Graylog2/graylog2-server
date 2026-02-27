@@ -17,9 +17,8 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.google.common.collect.ImmutableSet;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -30,6 +29,9 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.ExplainResults;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
+import org.graylog.plugins.views.search.explain.DataRoutedStream;
+import org.graylog.plugins.views.search.explain.StreamQueryExplainer;
+import org.graylog.plugins.views.search.explain.StreamQueryInfo;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.validation.QueryValidationService;
 import org.graylog.plugins.views.search.validation.ValidationMessage;
@@ -38,62 +40,101 @@ import org.graylog.plugins.views.search.validation.ValidationResponse;
 import org.graylog.plugins.views.search.validation.ValidationStatus;
 import org.graylog.plugins.views.search.validation.ValidationType;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.streams.StreamService;
 
+import java.time.Instant;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsLast;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+import static org.graylog.plugins.views.search.ExplainResults.IndexRangeResult.fromIndexRange;
 
 @RequiresAuthentication
-@Api(value = "Search/Validation", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Search/Validation")
 @Path("/search/validate")
 public class QueryValidationResource extends RestResource implements PluginRestResource {
 
     private final QueryValidationService queryValidationService;
-
+    private final Optional<StreamQueryExplainer> optionalStreamQueryExplainer;
     private final IndexLookup indexLookup;
+    private final StreamService streamService;
 
     @Inject
     public QueryValidationResource(final QueryValidationService queryValidationService,
-                                   final IndexLookup indexLookup) {
+                                   final Optional<StreamQueryExplainer> optionalStreamQueryExplainer,
+                                   final IndexLookup indexLookup,
+                                   final StreamService streamService) {
         this.queryValidationService = queryValidationService;
+        this.optionalStreamQueryExplainer = optionalStreamQueryExplainer;
         this.indexLookup = indexLookup;
+        this.streamService = streamService;
     }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation("Validate a search query")
+    @Operation(summary = "Validate a search query")
     @NoAuditEvent("Only validating query structure, not changing any data")
     public ValidationResponseDTO validateQuery(
-            @ApiParam(name = "validationRequest") final ValidationRequestDTO validationRequest,
+            @io.swagger.v3.oas.annotations.Parameter(name = "validationRequest") final ValidationRequestDTO validationRequest,
             @Context final SearchUser searchUser
     ) {
         ValidationRequest request = prepareRequest(validationRequest, searchUser);
         final ValidationResponse response = queryValidationService.validate(request);
-        Set<ExplainResults.IndexRangeResult> searchedIndexRanges = indexRanges(request);
+        final Set<ExplainResults.IndexRangeResult> searchedIndexRanges = indexRanges(request);
+        final Optional<Set<String>> requestedStreams = validationRequest.streams();
+        final Set<String> readableStreams = request.streams();
+        final Set<DataRoutedStream> dataRoutedStreams = checkForDataRoutedStreams(requestedStreams, readableStreams, request.timerange(), request.isEmptyQuery());
+        final boolean hasDataRoutedStreams = dataRoutedStreams != null && !dataRoutedStreams.isEmpty();
+        final Optional<TimeRange> requestedRangeAsAbsolut = validationRequest.timerange().map(timeRange -> AbsoluteRange.create(timeRange.getFrom(), timeRange.getTo()));
         return ValidationResponseDTO.create(
-                toStatus(response.status(), containsWarmIndices(searchedIndexRanges)),
+                toStatus(response.status(), containsWarmIndices(searchedIndexRanges), hasDataRoutedStreams),
                 toExplanations(response),
-                searchedIndexRanges);
+                searchedIndexRanges,
+                dataRoutedStreams,
+                requestedRangeAsAbsolut);
     }
 
     private boolean containsWarmIndices(Set<ExplainResults.IndexRangeResult> searchedIndexRanges) {
         return searchedIndexRanges.stream().anyMatch(ExplainResults.IndexRangeResult::isWarmTiered);
     }
 
+    Set<DataRoutedStream> checkForDataRoutedStreams(Optional<Set<String>> requestedStreams, Set<String> readableStreams, TimeRange timeRange, boolean isEmptyQuery) {
+        return optionalStreamQueryExplainer.map(streamQueryExplainer -> {
+            Instant from = timeRange.getFrom().toInstant().toDate().toInstant();
+            Instant to = timeRange.getTo().toInstant().toDate().toInstant();
+            StreamQueryInfo query = new StreamQueryInfo(requestedStreams, readableStreams, from, to, isEmptyQuery);
+            return optionalStreamQueryExplainer.get().explain(query);
+        }).orElse(Set.of());
+    }
+
     private ValidationRequest prepareRequest(ValidationRequestDTO validationRequest, SearchUser searchUser) {
+        // Combine stream IDs mapped from streamCategories and stream IDs from the validationRequest before calling
+        // readableOrAllIfEmpty to ensure all possible requested streams are added first.
+        final Set<String> streamsAndMappedCategories = validationRequest.streams().orElse(new HashSet<>());
+        if (validationRequest.streamCategories().isPresent()) {
+            streamsAndMappedCategories.addAll(searchUser.streams().loadStreamsWithCategories(validationRequest.streamCategories().get()));
+        }
+        ImmutableSet.Builder<String> allRequestedStreams = ImmutableSet.<String>builder()
+                .addAll(searchUser.streams().readableOrAllIfEmpty(streamsAndMappedCategories));
+
         final ValidationRequest.Builder q = ValidationRequest.Builder.builder()
                 .query(validationRequest.query())
                 .timerange(validationRequest.timerange().orElse(defaultTimeRange()))
-                .streams(searchUser.streams().readableOrAllIfEmpty(validationRequest.streams()))
+                .streams(allRequestedStreams.build())
                 .parameters(resolveParameters(validationRequest))
                 .validationMode(validationRequest.validationMode().toInternalRepresentation());
 
@@ -102,8 +143,13 @@ public class QueryValidationResource extends RestResource implements PluginRestR
     }
 
     private Set<ExplainResults.IndexRangeResult> indexRanges(ValidationRequest request) {
+        final Set<String> streamTitles = request.streams().stream()
+                .map(streamService::streamTitleFromCache)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
         return indexLookup.indexRangesForStreamsInTimeRange(request.streams(), request.timerange()).stream()
-                .map(ExplainResults.IndexRangeResult::fromIndexRange)
+                .map(indexRange -> fromIndexRange(indexRange, streamTitles))
                 .collect(Collectors.toSet());
     }
 
@@ -113,15 +159,23 @@ public class QueryValidationResource extends RestResource implements PluginRestR
                 .collect(toImmutableSet());
     }
 
-    private ValidationStatusDTO toStatus(final ValidationStatus status, boolean hasWarmIndices) {
+    private ValidationStatusDTO toStatus(final ValidationStatus status, boolean hasWarmIndices, boolean hasDataRoutedStreams) {
         ValidationStatusDTO validationStatusDTO = switch (status) {
             case WARNING -> ValidationStatusDTO.WARNING;
             case ERROR -> ValidationStatusDTO.ERROR;
             default -> ValidationStatusDTO.OK;
         };
-        if (validationStatusDTO == ValidationStatusDTO.OK) {
-            return hasWarmIndices ? ValidationStatusDTO.WARNING : ValidationStatusDTO.OK;
+
+        boolean isOk = validationStatusDTO == ValidationStatusDTO.OK;
+
+        if (isOk && hasWarmIndices) {
+            return ValidationStatusDTO.WARNING;
         }
+
+        if (isOk && hasDataRoutedStreams) {
+            return ValidationStatusDTO.INFO;
+        }
+
         return validationStatusDTO;
     }
 

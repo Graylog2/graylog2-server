@@ -20,7 +20,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import usePluginEntities from 'hooks/usePluginEntities';
 
 type Props = {
-  children: React.ReactElement,
+  children: React.ReactElement;
 };
 
 const MessageTableProviders = ({ children }: Props) => {
@@ -30,13 +30,14 @@ const MessageTableProviders = ({ children }: Props) => {
     return children;
   }
 
-  return contextProviders.reduce((nestedChildren, MessageTableContextProvider) => (
-    <ErrorBoundary FallbackComponent={() => nestedChildren}>
-      <MessageTableContextProvider>
-        {nestedChildren}
-      </MessageTableContextProvider>
-    </ErrorBoundary>
-  ), children);
+  return contextProviders.reduce(
+    (nestedChildren, MessageTableContextProvider) => (
+      <ErrorBoundary FallbackComponent={() => nestedChildren}>
+        <MessageTableContextProvider>{nestedChildren}</MessageTableContextProvider>
+      </ErrorBoundary>
+    ),
+    children,
+  );
 };
 
 export default MessageTableProviders;

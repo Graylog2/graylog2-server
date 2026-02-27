@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import trim from 'lodash/trim';
 
 import type { IconName } from 'components/common/Icon';
@@ -23,17 +22,17 @@ import type { IconName } from 'components/common/Icon';
 import Icon from './Icon';
 
 type Props = {
-  href?: string,
-  children: React.ReactNode,
-  target?: string,
-  iconName?: IconName,
-  className?: string,
+  href?: string;
+  children: React.ReactNode;
+  target?: string;
+  iconName?: IconName;
+  className?: string;
 };
 
 /**
  * Component that renders a link to an external resource.
  */
-const ExternalLink = ({ children, className, href, iconName, target }: Props) => {
+const ExternalLink = ({ children, className = '', href = '', iconName = 'open_in_new', target = '_blank' }: Props) => {
   const content = (
     <span>
       {children}
@@ -52,26 +51,6 @@ const ExternalLink = ({ children, className, href, iconName, target }: Props) =>
       {content}
     </a>
   );
-};
-
-ExternalLink.defaultProps = {
-  href: '',
-  target: '_blank',
-  iconName: 'open_in_new',
-  className: '',
-};
-
-ExternalLink.propTypes = {
-  /** Link to the external location. If this is not defined, the component does not render a `<a />` element but only the text and the icon. */
-  href: PropTypes.string,
-  /** Text for the link. (should be one line) */
-  children: PropTypes.node.isRequired,
-  /** Browser window target attribute for the link. */
-  target: PropTypes.string,
-  /** FontAwesome icon class name to use for the indicator icon. */
-  iconName: PropTypes.string,
-  /** Class name for the link. Can be used to change the styling of the link. */
-  className: PropTypes.string,
 };
 
 export default ExternalLink;

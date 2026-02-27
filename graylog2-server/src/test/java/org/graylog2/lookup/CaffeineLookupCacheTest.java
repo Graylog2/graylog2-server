@@ -20,19 +20,21 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.github.benmanes.caffeine.cache.Ticker;
-import com.google.common.testing.FakeTicker;
 import org.assertj.core.api.Assertions;
 import org.graylog2.lookup.caches.CaffeineLookupCache;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
 import org.graylog2.plugin.lookup.LookupCacheKey;
 import org.graylog2.plugin.lookup.LookupResult;
-import org.junit.Rule;
-import org.junit.Test;
+import org.graylog2.utilities.FakeTicker;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
+import java.time.Duration;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -41,9 +43,9 @@ import static org.graylog2.plugin.lookup.LookupResult.EMPTY_LOOKUP_RESULT;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class CaffeineLookupCacheTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     MetricRegistry registry;
@@ -99,8 +101,8 @@ public class CaffeineLookupCacheTest {
     @SuppressWarnings("UnstableApiUsage")
     @Test
     public void ttlEmpty() throws Exception {
-        FakeTicker ticker = new FakeTicker();
-        LookupCache cache = buildCache(ticker::read, 60, 600, 10);
+        FakeTicker ticker = new FakeTicker(Duration.ZERO);
+        LookupCache cache = buildCache(ticker, 60, 600, 10);
         LookupResult lr1 = LookupResult.empty();
         LookupResult lr2 = LookupResult.single("x");
         when(loader.call()).thenReturn(lr1).thenReturn(lr2);
@@ -108,11 +110,11 @@ public class CaffeineLookupCacheTest {
         LookupResult value1 = cache.get(LookupCacheKey.createFromJSON("x", "y"), loader);
         Assertions.assertThat(value1.singleValue()).isNull();
 
-        ticker.advance(3, TimeUnit.SECONDS);
+        ticker.advance(Duration.ofSeconds(3));
         LookupResult value2 = cache.get(LookupCacheKey.createFromJSON("x", "y"), loader);
         Assertions.assertThat(value2.singleValue()).isNull();
 
-        ticker.advance(10, TimeUnit.SECONDS);
+        ticker.advance(Duration.ofSeconds(10));
         LookupResult value3 = cache.get(LookupCacheKey.createFromJSON("x", "y"), loader);
         Assertions.assertThat(value3.singleValue()).isEqualTo("x");
     }

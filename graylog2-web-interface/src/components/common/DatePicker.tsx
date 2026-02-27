@@ -14,113 +14,81 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React, { useMemo } from 'react';
-import type { DayModifiers } from 'react-day-picker';
-import DayPicker from 'react-day-picker';
+import type { Modifiers } from 'react-day-picker';
+import { DayPicker } from 'react-day-picker';
 import styled, { css } from 'styled-components';
-
-import 'react-day-picker/lib/style.css';
+import 'react-day-picker/style.css';
 
 import { isValidDate, toDateObject, adjustFormat } from 'util/DateTime';
 
-const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
-  width: 100%;
+const StyledDayPicker = styled(DayPicker)(
+  ({ theme }) => css`
+    width: 100%;
 
-  .DayPicker-Day {
-    min-width: 34px;
-    max-width: 34px;
-    min-height: 34px;
-    max-height: 34px;
-    
-    &--selected:not(.DayPicker-Day--disabled, .DayPicker-Day--outside) {
-      background-color: ${theme.colors.variant.lighter.primary};
-      color: ${theme.colors.variant.darkest.primary};
-    }
-    
-    &--today {
-      color: ${theme.colors.variant.info};
-    }
-    
-    &:focus {
-      outline-color: ${theme.colors.variant.primary};
-    }
-  }
-  
-  &:not(.DayPicker--interactionDisabled) .DayPicker-Day:not(.DayPicker-Day--disabled, .DayPicker-Day--selected, .DayPicker-Day--outside) {
-    &:focus {
-      outline-color: ${theme.colors.variant.primary};
-    }
-    
-    &:hover {
-      background-color: ${theme.colors.variant.lightest.primary};
-      color: ${theme.colors.variant.darker.primary};
-    }
-  }
-`);
+    --rdp-accent-color: ${theme.colors.variant.primary};
+    --rdp-disabled-opacity: 0.4;
+    --rdp-day-width: 34px;
+    --rdp-day-height: 34px;
+    --rdp-day_button-width: 34px;
+    --rdp-day_button-height: 34px;
 
-const useSelectedDate = (date: string | undefined) => useMemo(() => {
-  const isDateValid = !date || isValidDate(toDateObject(date, ['date']));
+    .rdp-chevron {
+      fill: ${theme.colors.gray[60]};
+    }
 
-  if (isDateValid) {
-    return date;
-  }
+    .rdp-months {
+      margin: 0 auto;
+    }
+  `,
+);
 
-  return undefined;
-}, [date]);
+const useSelectedDate = (date: string | undefined) =>
+  useMemo(() => {
+    const isDateValid = !date || isValidDate(toDateObject(date, ['date']));
+
+    if (isDateValid) {
+      return date;
+    }
+
+    return undefined;
+  }, [date]);
 
 type Props = {
-  date?: string | undefined,
-  onChange: (day: Date, modifiers: DayModifiers, event: React.MouseEvent<HTMLDivElement>) => void,
-  fromDate?: Date,
-  showOutsideDays?: boolean,
+  date?: string | undefined;
+  onChange: (day: Date, modifiers: Modifiers, event: React.MouseEvent<HTMLDivElement>) => void;
+  fromDate?: Date;
+  showOutsideDays?: boolean;
 };
 
-const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
+const DatePicker = ({ date = undefined, fromDate = undefined, onChange, showOutsideDays = false }: Props) => {
   const selectedDate = useSelectedDate(date);
 
-  const modifiers = useMemo(() => ({
-    selected: (moddedDate: Date) => {
-      if (!selectedDate) {
-        return false;
-      }
+  const modifiers = useMemo(
+    () => ({
+      selected: (moddedDate: Date) => {
+        if (!selectedDate) {
+          return false;
+        }
 
-      return selectedDate === adjustFormat(moddedDate, 'date');
-    },
-    disabled: {
-      before: new Date(fromDate),
-    },
-  }), [fromDate, selectedDate]);
+        return selectedDate === adjustFormat(moddedDate, 'date');
+      },
+      disabled: {
+        before: new Date(fromDate),
+      },
+    }),
+    [fromDate, selectedDate],
+  );
 
   return (
-    <StyledDayPicker initialMonth={selectedDate ? toDateObject(selectedDate).toDate() : undefined}
-                     onDayClick={onChange}
-                     modifiers={modifiers}
-                     showOutsideDays={showOutsideDays} />
+    <StyledDayPicker
+      defaultMonth={selectedDate ? toDateObject(selectedDate).toDate() : undefined}
+      onDayClick={onChange}
+      modifiers={modifiers}
+      timeZone="UTC"
+      showOutsideDays={showOutsideDays}
+    />
   );
-};
-
-DatePicker.propTypes = {
-  /** Initial date to select in the date picker. */
-  date: PropTypes.oneOfType([
-    PropTypes.object,
-    PropTypes.string,
-  ]),
-  /**
-   * Callback that will be called when user picks a date. It will receive the new selected day,
-   * `react-day-picker`'s modifiers, and the original event as arguments.
-   */
-  onChange: PropTypes.func.isRequired,
-  /** Earliest date possible to select in the date picker. */
-  fromDate: PropTypes.instanceOf(Date),
-  /** Earliest date possible to select in the date picker. */
-  showOutsideDays: PropTypes.bool,
-};
-
-DatePicker.defaultProps = {
-  date: undefined,
-  fromDate: undefined,
-  showOutsideDays: false,
 };
 
 export default DatePicker;

@@ -9,7 +9,7 @@ class FormExample extends React.Component {
     this.handleChange = this.handleChange.bind(this);
 
     this.state = {
-      value: ''
+      value: '',
     };
   }
 
@@ -31,10 +31,12 @@ class FormExample extends React.Component {
         <FormGroup validationState={this.getValidationState()}>
           <InputGroup>
             <InputGroup.Addon>@</InputGroup.Addon>
-            <FormControl type="text"
-                         value={this.state.value}
-                         placeholder="Example w/ Validation"
-                         onChange={this.handleChange} />
+            <FormControl
+              type="text"
+              value={this.state.value}
+              placeholder="Example w/ Validation"
+              onChange={this.handleChange}
+            />
           </InputGroup>
         </FormGroup>
         <FormGroup>
@@ -72,11 +74,7 @@ class FormExample extends React.Component {
         <FormGroup>
           <InputGroup>
             <FormControl type="text" />
-            <DropdownButton
-              componentClass={InputGroup.Button}
-              id="input-dropdown-addon"
-              title="Action"
-            >
+            <DropdownButton componentClass={InputGroup.Button} id="input-dropdown-addon" title="Action">
               <MenuItem key="1">Item</MenuItem>
             </DropdownButton>
           </InputGroup>
@@ -100,8 +98,8 @@ class FormExample extends React.Component {
         </FormGroup>
       </form>
     );
-  };
-};
+  }
+}
 
-<FormExample />
+<FormExample />;
 ```

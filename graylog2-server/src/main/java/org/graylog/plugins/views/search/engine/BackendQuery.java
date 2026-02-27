@@ -16,8 +16,12 @@
  */
 package org.graylog.plugins.views.search.engine;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+
+import java.util.Set;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -30,4 +34,7 @@ public interface BackendQuery {
     String type();
 
     String queryString();
+
+    @JsonIgnore
+    Set<Class<? extends SearchType>> supportedSearchTypes();
 }

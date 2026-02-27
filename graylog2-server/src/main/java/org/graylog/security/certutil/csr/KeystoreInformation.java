@@ -16,15 +16,13 @@
  */
 package org.graylog.security.certutil.csr;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 
 public interface KeystoreInformation {
 
-    KeyStore loadKeystore() throws Exception;
+    KeyStore loadKeystore() throws IOException, GeneralSecurityException;
 
     char[] password();
-
-    default String passwordAsString() {
-        return new String(password());
-    }
 }

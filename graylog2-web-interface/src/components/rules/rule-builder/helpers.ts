@@ -16,9 +16,8 @@
  */
 import type { BlockDict, RuleBuilderRule } from './types';
 
-const getDictForFunction = (dict: BlockDict[], functionName: string) : BlockDict | undefined => (
-  dict?.find((entry) => entry.name === functionName)
-);
+const getDictForFunction = (dict: BlockDict[], functionName: string): BlockDict | undefined =>
+  dict?.find((entry) => entry.name === functionName);
 
 const jsonifyText = (text: string): string => {
   try {
@@ -27,17 +26,20 @@ const jsonifyText = (text: string): string => {
     return text;
   } catch {
     try {
-      const rawMessageToJson = `{"${
-        text
-          .trim()
-          .replace(/^\s*\n/gm, '')
-          .replace(/"/g, '\\"')
-          .split('\n')
-          .map((line) => line.trim().split(':').map((keyValue) => keyValue.trim()))
-          .filter((keyValue) => keyValue[0] && keyValue[1])
-          .map((keyValue) => `${keyValue[0].replace(/\\"/g, '').trim()}":"${keyValue.slice(1).join(':').trim()}`)
-          .join('","')
-      }"}`;
+      const rawMessageToJson = `{"${text
+        .trim()
+        .replace(/^\s*\n/gm, '')
+        .replace(/"/g, '\\"')
+        .split('\n')
+        .map((line) =>
+          line
+            .trim()
+            .split(':')
+            .map((keyValue) => keyValue.trim()),
+        )
+        .filter((keyValue) => keyValue[0] && keyValue[1])
+        .map((keyValue) => `${keyValue[0].replace(/\\"/g, '').trim()}":"${keyValue.slice(1).join(':').trim()}`)
+        .join('","')}"}`;
 
       JSON.parse(rawMessageToJson);
 
@@ -51,11 +53,11 @@ const jsonifyText = (text: string): string => {
 const hasRuleBuilderErrors = (rule: RuleBuilderRule): boolean => {
   if (rule?.rule_builder?.errors?.length > 0) return true;
 
-  if (rule?.rule_builder?.actions?.some(((action) => action.errors?.length > 0))) {
+  if (rule?.rule_builder?.actions?.some((action) => action.errors?.length > 0)) {
     return true;
   }
 
-  if (rule?.rule_builder?.conditions?.some(((condition) => condition.errors?.length > 0))) {
+  if (rule?.rule_builder?.conditions?.some((condition) => condition.errors?.length > 0)) {
     return true;
   }
 

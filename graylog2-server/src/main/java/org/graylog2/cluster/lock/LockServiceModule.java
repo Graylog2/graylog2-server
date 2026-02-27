@@ -24,7 +24,6 @@ public class LockServiceModule extends PluginModule {
     @Override
     protected void configure() {
         bind(LockService.class).to(MongoLockService.class).in(Scopes.SINGLETON);
-
         install(new FactoryModuleBuilder().build(RefreshingLockService.Factory.class));
     }
 }

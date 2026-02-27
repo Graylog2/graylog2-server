@@ -1,32 +1,129 @@
-name: Build the repository
+name: "Open Build"
 
-on: 
+on:
   pull_request:
 
 # Cancel running build when new ref gets pushed.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: "${{ github.workflow }}-${{ github.ref }}"
   cancel-in-progress: true
 
+defaults:
+  run:
+    shell: "bash"
+
+
+env:
+  MAVEN_ARGS: >
+    --show-version
+    --batch-mode
+    --fail-fast
+    --update-snapshots
+    --no-transfer-progress
+  MAVEN_OPTS: >
+    -DtrimStackTrace=false
+    -Djansi.force=true
+    -Dmaven.wagon.http.retryHandler.class=standard
+    -Dmaven.wagon.http.retryHandler.count=3
+    -Dmaven.wagon.http.pool=false
+    -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+    -Dhttp.keepAlive=false
+  JAVA_OPTS: "-Xmx6g"
+  TIMEOUT_MULTIPLIER: "2.0"
+  GRAYLOG_IT_PROXIED_REQUESTS_TIMEOUT: "30s"
+
 jobs:
-  build:
-    runs-on: ubuntu-latest-4-cores-public
-    strategy:
-      matrix:
-        java-version: [ 17 ]
+  build-artifacts:
+    name: "Artifacts"
+    runs-on: "runs-on=${{ github.run_id }}-build-artifacts/runner=ubuntu-4-core"
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK ${{ matrix.java-version }}
-        uses: actions/setup-java@v3
+      - uses: "actions/checkout@v5"
+
+      - name: "Set up JDK"
+        uses: "actions/setup-java@v5"
         with:
-          java-version: ${{ matrix.java-version }}
-          distribution: temurin
-      - name: License check
-        run: ./mvnw -B --fail-fast license:check
-      - name: Build with Maven
-        run: ./mvnw -B --fail-fast -Pedantic -Dspotbugs.skip -Dmaven.wagon.http.retryHandler.class=standard -Dmaven.wagon.http.retryHandler.count=3 -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 verify javadoc:javadoc
+          java-version: "21"
+          distribution: "temurin"
+
+      - name: "Build with Maven"
+        run: "./mvnw -Pedantic clean -Dspotbugs.skip -DskipTests package javadoc:javadoc"
         env:
-          JAVA_OPTS: -Xmx6G
-          TIMEOUT_MULTIPLIER: 2.0
+          NODE_OPTIONS: "--max-old-space-size=8192"
 
+  frontend-tests:
+    name: "Frontend Tests"
+    runs-on: "runs-on=${{ github.run_id }}-frontend-tests/runner=ubuntu-4-core"
 
+    steps:
+      - uses: "actions/checkout@v5"
+
+      - name: "Set up JDK"
+        uses: "actions/setup-java@v5"
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      - name: "Build with Maven"
+        run: "./mvnw -Pedantic -Dspotbugs.skip -Dmaven.test.skip -Dskip.datanode -Dcyclonedx.skip clean test"
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"
+
+  backend-tests:
+    name: "Backend Tests"
+    runs-on: "runs-on=${{ github.run_id }}-backend-tests/runner=ubuntu-4-core"
+
+    steps:
+      - uses: "actions/checkout@v5"
+
+      - name: "Set up JDK"
+        uses: "actions/setup-java@v5"
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      - name: "Build with Maven"
+        run: "./mvnw -Pedantic -Dspotbugs.skip -Dskip.web.build -Dassembly.skipAssembly -Dcyclonedx.skip clean verify -DexcludedGroups=full-backend-test"
+
+  full-backend-tests:
+    name: "Full Backend Tests"
+    runs-on: "runs-on=${{ github.run_id }}-full-backend-tests/runner=ubuntu-4-core"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          # Latest OpenSearch and MongoDB
+          - search-server-distribution: "OpenSearch"
+            search-server-version: "2.19.3"
+            mongodb-version: "8.0"
+
+          # Data Node
+          - search-server-distribution: "DataNode"
+            mongodb-version: "7.0"
+
+    steps:
+      - uses: "actions/checkout@v5"
+
+      - name: "Set up JDK"
+        uses: "actions/setup-java@v5"
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      - name: "Build with Maven"
+        run: >
+          ./mvnw
+          -Pedantic
+          -Dspotbugs.skip
+          -Dskip.web.tests
+          -Dcyclonedx.skip
+          -Dskip.artifact.assembly
+          clean
+          verify
+          -Dgroups=full-backend-test
+          -Dtest.integration.search-server.distribution=${{ matrix.service.search-server-distribution || '' }}
+          -Dtest.integration.search-server.version=${{ matrix.service.search-server-version || '' }}
+          -Dtest.integration.mongodb.version=${{ matrix.service.mongodb-version || '' }}
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"

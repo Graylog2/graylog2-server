@@ -1,18 +1,18 @@
 ```js
-import createReactClass from 'create-react-class';
 import { Button } from 'components/bootstrap';
 
-const ColorPickerOverlayExample = createReactClass({
-  getInitialState() {
-    return {
+class ColorPickerOverlayExample extends React.Component {
+  constructor(props) {
+    this.state = {
       color: undefined,
     };
-  },
+    this.handleColorChange = this.handleColorChange.bind(this);
+  }
 
   handleColorChange(color, _, hidePopover) {
     hidePopover();
     this.setState({ color: color });
-  },
+  }
 
   render() {
     const { color } = this.state;
@@ -20,15 +20,17 @@ const ColorPickerOverlayExample = createReactClass({
     return (
       <div>
         <p>{color ? `You picked ${color}.` : 'Pick a color'}</p>
-        <ColorPickerPopover id="example-color-picker"
-                            placement="right"
-                            color={color}
-                            triggerNode={<Button bsStyle="primary">Toggle color picker</Button>}
-                            onChange={this.handleColorChange} />
+        <ColorPickerPopover
+          id="example-color-picker"
+          placement="right"
+          color={color}
+          triggerNode={<Button bsStyle="primary">Toggle color picker</Button>}
+          onChange={this.handleColorChange}
+        />
       </div>
     );
-  },
-});
+  }
+}
 
-<ColorPickerOverlayExample />
+<ColorPickerOverlayExample />;
 ```

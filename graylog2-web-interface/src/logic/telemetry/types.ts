@@ -19,7 +19,7 @@ import type { ExtractObjectValues } from 'util/UtilityTypes';
 import type { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 export interface EventTypes {
-  core: ExtractObjectValues<typeof TELEMETRY_EVENT_TYPE>
+  core: ExtractObjectValues<typeof TELEMETRY_EVENT_TYPE>;
 }
 
 export type EventType = EventTypes[keyof EventTypes];

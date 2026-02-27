@@ -14,11 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import PropTypes from 'prop-types';
+import type * as React from 'react';
+import type { Permissions, Permission } from 'graylog-web-plugin/plugin';
 
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 
 /**
  * Wrapper component that renders its children only if the current user fulfills certain permissions.
@@ -26,61 +25,29 @@ import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
  */
 
 type Props = {
-  children: React.ReactNode,
-  permissions: string | Array<string>,
-  anyPermissions?: boolean,
+  children: React.ReactNode;
+  permissions: Permissions;
+  anyPermissions?: boolean;
 };
 
-const _checkPermissions = (permissions, anyPermissions, currentUser) => {
-  if (anyPermissions) {
-    return isAnyPermitted(currentUser.permissions, permissions);
+const _checkPermissions = (
+  permissions: Permissions,
+  anyPermissions: boolean,
+  isPermitted: (permission: Permission) => boolean,
+) => {
+  if (Array.isArray(permissions)) {
+    return anyPermissions ? permissions.find(isPermitted) : permissions.every(isPermitted);
   }
 
-  return isPermitted(currentUser.permissions, permissions);
+  return isPermitted(permissions);
 };
 
-const IfPermitted = ({ children, permissions, anyPermissions, ...rest }: Props) => {
-  const currentUser = useCurrentUser();
+const IfPermitted = ({ children, permissions, anyPermissions = false }: Props) => {
+  const { isPermitted } = usePermissions();
 
-  if ((!permissions || permissions.length === 0) || (currentUser && _checkPermissions(permissions, anyPermissions, currentUser))) {
-    return (
-      <>
-        {
-          React.Children.map(children, (child) => {
-            if (React.isValidElement(child)) {
-              const presentProps = (child && child.props) ? Object.keys(child.props) : [];
-              // do not overwrite existing props
-              const filteredRest = Object.entries(rest)
-                .filter((entry) => !presentProps.includes(entry[0]))
-                .reduce((obj, [k, v]) => ({ ...obj, [k]: v }), {});
-
-              return React.cloneElement(child, filteredRest);
-            }
-
-            return child;
-          })
-        }
-      </>
-    );
-  }
-
-  return null;
-};
-
-IfPermitted.propTypes = {
-  /** Children to render if user has permissions. */
-  children: PropTypes.node.isRequired,
-  /** Permissions the current user must fulfill. By default, the user must have all permissions that are passed in this prop. */
-  permissions: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.arrayOf(PropTypes.string),
-  ]).isRequired,
-  /** This flag controls which permissions the user must fulfill: (all, at least one). */
-  anyPermissions: PropTypes.bool,
-};
-
-IfPermitted.defaultProps = {
-  anyPermissions: false,
+  return !permissions || permissions.length === 0 || _checkPermissions(permissions, anyPermissions, isPermitted)
+    ? children
+    : null;
 };
 
 /** @component */

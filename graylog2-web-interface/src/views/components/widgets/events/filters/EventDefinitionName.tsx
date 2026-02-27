@@ -24,11 +24,11 @@ import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 
 type Props = {
-  eventDefinitionId: string,
-  displayAsLink?: boolean,
-}
+  eventDefinitionId: string;
+  displayAsLink?: boolean;
+};
 
-const EventDefinitionName = ({ eventDefinitionId, displayAsLink }: Props) => {
+const EventDefinitionName = ({ eventDefinitionId, displayAsLink = true }: Props) => {
   const currentUser = useCurrentUser();
   const canViewDefinition = isPermitted(currentUser.permissions, `eventdefinitions:read:${eventDefinitionId}`);
   const { data: eventDefinition, isFetching } = useEventDefinition(eventDefinitionId, canViewDefinition);
@@ -39,7 +39,6 @@ const EventDefinitionName = ({ eventDefinitionId, displayAsLink }: Props) => {
   }
 
   if (!displayAsLink || !canViewDefinition) {
-    // eslint-disable-next-line react/jsx-no-useless-fragment
     return <>{title}</>;
   }
 
@@ -52,10 +51,6 @@ const EventDefinitionName = ({ eventDefinitionId, displayAsLink }: Props) => {
   }
 
   return null;
-};
-
-EventDefinitionName.defaultProps = {
-  displayAsLink: true,
 };
 
 export default EventDefinitionName;

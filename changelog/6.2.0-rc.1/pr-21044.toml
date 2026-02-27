@@ -1,0 +1,4 @@
+type = "added"
+message = "Allow sorting events/alerts based on aggregation time range."
+
+pulls = ["21044"]

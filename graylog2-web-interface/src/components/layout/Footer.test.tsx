@@ -24,9 +24,12 @@ import Footer from './Footer';
 
 jest.mock('stores/system/SystemStore', () => ({
   SystemStore: MockStore(
-    ['getInitialState', () => ({
-      system: { version: '23.42.0-SNAPSHOT+SPECIALFEATURE', hostname: 'hopper.local' },
-    })],
+    [
+      'getInitialState',
+      () => ({
+        system: { version: '23.42.0-SNAPSHOT+SPECIALFEATURE', hostname: 'hopper.local' },
+      }),
+    ],
     ['jvm', jest.fn(() => Promise.resolve({ info: 'SomeJDK v12.0.0' }))],
   ),
 }));
@@ -55,11 +58,16 @@ describe('Footer', () => {
   });
 
   it('can be customized with a plugin', async () => {
-    asMock(PluginStore.exports).mockImplementation((type) => ({
-      pageFooter: [{
-        component: () => <>&copy;My custom Footer</>,
-      }],
-    }[type]));
+    asMock(PluginStore.exports).mockImplementation(
+      (type) =>
+        ({
+          pageFooter: [
+            {
+              component: () => <>&copy;My custom Footer</>,
+            },
+          ],
+        })[type],
+    );
 
     const { findByText } = render(<Footer />);
 

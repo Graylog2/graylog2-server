@@ -29,8 +29,9 @@ import org.graylog.plugins.threatintel.whois.ip.parsers.WhoisParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class WhoisIpLookup {
 
@@ -52,31 +53,38 @@ public class WhoisIpLookup {
     }
 
     public WhoisIpLookupResult run(String ip) throws Exception {
-        return run(this.defaultRegistry, ip);
+        try {
+            return run(this.defaultRegistry, ip);
+        } catch (WhoisLookupException e) {
+            // Since recursive calls are used to follow redirects, extract the root cause of the exception to find the
+            // initial error, and then rethrow it only once.
+            final WhoisLookupException rootCause = (WhoisLookupException) e.getCause();
+            final InternetRegistry rootCauseRegistry = rootCause.getRegistry();
+            final String error = f("Could not lookup WHOIS information for [%s] at [%s].", ip, rootCauseRegistry);
+            final WhoisLookupException whoisLookupException = new WhoisLookupException(error, e.getCause(), rootCauseRegistry);
+            if (!LOG.isTraceEnabled()) {
+                LOG.error(error);
+            }
+            else {
+                // Only include stack trace in debug mode. Avoids spamming logs with stack traces, since the stacktrace
+                // was not included in the past.
+                LOG.error(error, whoisLookupException);
+            }
+            throw whoisLookupException;
+        }
     }
 
     public WhoisIpLookupResult run(InternetRegistry registry, String ip) throws Exception {
         // Figure out the right response parser for the registry we are asking.
-        WhoisParser parser;
-        switch(registry) {
-            case AFRINIC:
-                parser = new AFRINICResponseParser();
-                break;
-            case APNIC:
-                parser = new APNICResponseParser();
-                break;
-            case ARIN:
-                parser = new ARINResponseParser();
-                break;
-            case LACNIC:
-                parser = new LACNICResponseParser();
-                break;
-            case RIPENCC:
-                parser = new RIPENCCResponseParser();
-                break;
-            default:
-                throw new RuntimeException("No parser implemented for [" + registry.name() + "] responses.");
-        }
+        WhoisParser parser = switch (registry) {
+            case AFRINIC -> new AFRINICResponseParser();
+            case APNIC -> new APNICResponseParser();
+            case ARIN -> new ARINResponseParser();
+            case LACNIC -> new LACNICResponseParser();
+            case RIPENCC -> new RIPENCCResponseParser();
+            default -> throw new RuntimeException("No parser implemented for [" + registry.name() + "] responses. " +
+                    "This is a bug.");
+        };
 
         final WhoisClient whoisClient = new WhoisClient();
         try {
@@ -97,9 +105,9 @@ public class WhoisIpLookup {
             whoisClient.disconnect();
 
             // Handle registry redirect.
-            if(parser.isRedirect()) {
+            if (parser.isRedirect()) {
                 // STAND BACK FOR STACKOVERFLOWEXCEPTION
-                if(registry.equals(parser.getRegistryRedirect())) {
+                if (registry.equals(parser.getRegistryRedirect())) {
                     /*
                      *                ,--._,--.
                      *              ,'  ,'   ,-`.
@@ -126,9 +134,8 @@ public class WhoisIpLookup {
             }
 
             return new WhoisIpLookupResult(parser.getOrganization(), parser.getCountryCode());
-        } catch (IOException e) {
-            LOG.error("Could not lookup WHOIS information for [{}] at [{}].", ip, registry.toString());
-            throw e;
+        } catch (Exception e) {
+            throw new WhoisLookupException(e, registry);
         } finally {
             if (whoisClient.isConnected()) {
                 whoisClient.disconnect();

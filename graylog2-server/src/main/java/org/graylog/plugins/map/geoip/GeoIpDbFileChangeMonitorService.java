@@ -21,11 +21,15 @@ import com.codahale.metrics.UniformReservoir;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+import org.graylog.plugins.map.config.CloudDownloadException;
 import org.graylog.plugins.map.config.DatabaseType;
 import org.graylog.plugins.map.config.DatabaseVendorType;
+import org.graylog.plugins.map.config.GeoIpFileService;
+import org.graylog.plugins.map.config.GeoIpFileServiceFactory;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
-import org.graylog.plugins.map.config.S3DownloadException;
-import org.graylog.plugins.map.config.S3GeoIpFileService;
 import org.graylog2.cluster.ClusterConfigChangedEvent;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -35,10 +39,6 @@ import org.graylog2.plugin.validate.ConfigValidationException;
 import org.graylog2.rest.resources.system.GeoIpResolverConfigValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Singleton;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -71,7 +71,7 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
 
     private final ScheduledExecutorService scheduler;
     private final GeoIpResolverConfigValidator geoIpResolverConfigValidator;
-    private final S3GeoIpFileService s3GeoIpFileService;
+    private final GeoIpFileServiceFactory geoIpFileServiceFactory;
     private final NotificationService notificationService;
 
     private final ClusterConfigService clusterConfigService;
@@ -86,13 +86,13 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
                                            EventBus eventBus,
                                            ClusterConfigService clusterConfigService,
                                            GeoIpVendorResolverService geoIpVendorResolverService,
-                                           S3GeoIpFileService s3GeoIpFileService,
+                                           GeoIpFileServiceFactory geoIpFileServiceFactory,
                                            NotificationService notificationService) {
         this.scheduler = Objects.requireNonNull(scheduler);
         this.eventBus = Objects.requireNonNull(eventBus);
-        this.s3GeoIpFileService = Objects.requireNonNull(s3GeoIpFileService);
+        this.geoIpFileServiceFactory = Objects.requireNonNull(geoIpFileServiceFactory);
         this.clusterConfigService = Objects.requireNonNull(clusterConfigService);
-        this.geoIpResolverConfigValidator = new GeoIpResolverConfigValidator(geoIpVendorResolverService, s3GeoIpFileService, clusterConfigService);
+        this.geoIpResolverConfigValidator = new GeoIpResolverConfigValidator(geoIpVendorResolverService, geoIpFileServiceFactory, clusterConfigService);
         this.notificationService = notificationService;
     }
 
@@ -136,32 +136,34 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
         if (config == null) {
             config = getCurrentConfig();
         }
+        final GeoIpFileService geoIpFileService = geoIpFileServiceFactory.create(config);
+
         Map<DatabaseType, FileInfo.Change> changes = new EnumMap<>(DatabaseType.class);
-        // If using S3 for database file storage, check to see if the files are new
-        if (config.useS3() && s3GeoIpFileService.fileRefreshRequired(config)) {
+        // If using cloud for database file storage, check to see if the files are new
+        if ((geoIpFileService.isCloud()) && geoIpFileService.fileRefreshRequired(config)) {
             try {
                 // Download the new files to a temporary location to be validated
-                LOG.debug("Pulling DB files from S3");
-                s3GeoIpFileService.downloadFilesToTempLocation(config);
+                LOG.debug("Pulling DB files from the cloud");
+                geoIpFileService.downloadFilesToTempLocation(config);
                 GeoIpResolverConfig tempConfig = config.toBuilder()
-                        .cityDbPath(s3GeoIpFileService.getTempCityFile())
-                        .asnDbPath(config.asnDbPath().isEmpty() ? "" : s3GeoIpFileService.getTempAsnFile())
+                        .cityDbPath(geoIpFileService.getTempCityFile())
+                        .asnDbPath(config.asnDbPath().isEmpty() ? "" : geoIpFileService.getTempAsnFile())
                         .build();
                 Timer timer = new Timer(new UniformReservoir());
                 geoIpResolverConfigValidator.validateGeoIpLocationResolver(tempConfig, timer);
                 geoIpResolverConfigValidator.validateGeoIpAsnResolver(tempConfig, timer);
 
                 // Now that the new files have passed validation, move them to the active file location
-                s3GeoIpFileService.moveTempFilesToActive();
-                LOG.debug("Pulled new files from S3");
+                geoIpFileService.moveTempFilesToActive();
+                LOG.debug("Pulled new files from the cloud");
             } catch (IllegalArgumentException | IllegalStateException validationError) {
-                String message = "Geo Processor DB files from S3 failed validation. Upload valid files to S3. Leaving old files in place on disk.";
+                String message = "Geo Processor DB files from the cloud failed validation. Upload valid files. Leaving old files in place on disk.";
                 sendFailedSyncNotification(message);
                 LOG.error(message);
-                s3GeoIpFileService.cleanupTempFiles();
+                geoIpFileService.cleanupTempFiles();
                 return changes;
-            } catch (S3DownloadException | IOException e) {
-                String message = "Failed to download Geo Processor DB files from S3. Unable to refresh. Leaving old files in place on disk.";
+            } catch (CloudDownloadException | IOException e) {
+                String message = "Failed to download Geo Processor DB files from the cloud. Unable to refresh. Leaving old files in place on disk.";
                 sendFailedSyncNotification(message);
                 LOG.error(message);
                 return changes;
@@ -190,23 +192,24 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
             config = getCurrentConfig();
 
             if (config.enabled()) {
+                final GeoIpFileService geoIpFileService = geoIpFileServiceFactory.create(config);
                 reScheduleRefreshIfNeeded();
                 String asnFile = config.asnDbPath();
                 String cityFile = config.cityDbPath();
-                if (config.useS3()) {
-                    cityFile = s3GeoIpFileService.getActiveCityFile();
-                    asnFile = s3GeoIpFileService.getActiveAsnFile();
-                    if (s3GeoIpFileService.fileRefreshRequired(config)) {
+                if (geoIpFileService.isCloud()) {
+                    cityFile = geoIpFileService.getActiveCityFile();
+                    asnFile = geoIpFileService.getActiveAsnFile();
+                    if (geoIpFileService.fileRefreshRequired(config)) {
                         try {
                             // This should only be true in multi-Graylog-node environments if the processor config is
                             // changed on a different Graylog node. The files may not yet exist on-disk on this node and
                             // will need to be downloaded first. The files have already been validated on the original node.
-                            if (s3GeoIpFileService.fileRefreshRequired(config)) {
-                                s3GeoIpFileService.downloadFilesToTempLocation(config);
-                                s3GeoIpFileService.moveTempFilesToActive();
+                            if (geoIpFileService.fileRefreshRequired(config)) {
+                                geoIpFileService.downloadFilesToTempLocation(config);
+                                geoIpFileService.moveTempFilesToActive();
                             }
-                        } catch (S3DownloadException | IOException e) {
-                            String commonMessage = "Failed to pull new Geo-Location Processor database files from S3.";
+                        } catch (CloudDownloadException | IOException e) {
+                            String commonMessage = "Failed to pull new Geo-Location Processor database files from the cloud.";
                             sendFailedSyncNotification(commonMessage + " Geo-Location Processor may not be functional on all nodes.");
                             LOG.error("{} Geo-Location Processor will not be functional on this node.", commonMessage);
                             return;
@@ -281,7 +284,7 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
         final Notification notification = notificationService.buildNow()
                 .addType(Notification.Type.GENERIC)
                 .addSeverity(Notification.Severity.NORMAL)
-                .addDetail("title", "Geo-Location Processor S3 Sync Failure")
+                .addDetail("title", "Geo-Location Processor cloud Sync Failure")
                 .addDetail("description", description);
         notificationService.publishIfFirst(notification);
     }

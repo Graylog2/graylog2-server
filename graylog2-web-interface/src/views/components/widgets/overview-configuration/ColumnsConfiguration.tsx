@@ -23,54 +23,47 @@ import ColumnSelect from './ColumnSelect';
 import SelectedColumnsList from './SelectedColumnsList';
 
 type Props = {
-  columnTitle: (column: string) => string,
-  columns: Array<string>,
-  createSelectPlaceholder?: string,
-  displaySortableListOverlayInPortal?: boolean,
-  menuPortalTarget?: HTMLElement,
-  name: string,
-  testPrefix?: string,
-}
+  columnTitle: (column: string) => string;
+  columns: Array<string>;
+  createSelectPlaceholder?: string;
+  displaySortableListOverlayInPortal?: boolean;
+  name: string;
+};
 
 const ColumnsConfiguration = ({
   columnTitle,
   columns,
-  createSelectPlaceholder,
-  displaySortableListOverlayInPortal,
-  menuPortalTarget,
+  createSelectPlaceholder = 'Add a column',
+  displaySortableListOverlayInPortal = false,
   name,
-  testPrefix,
 }: Props) => (
   <Field name={name}>
     {({ field: { value, onChange } }) => (
       <>
-        <SelectedColumnsList testPrefix={testPrefix}
-                             selectedColumns={value.toArray()}
-                             columnTitle={columnTitle}
-                             displayOverlayInPortal={displaySortableListOverlayInPortal}
-                             onChange={(newColumns) => onChange({ target: { value: Immutable.OrderedSet(newColumns), name } })} />
-        <ColumnSelect id="column-create-select"
-                      columnTitle={columnTitle}
-                      columns={columns}
-                      onChange={(newColumn) => onChange({ target: { value: Immutable.OrderedSet([...value.toArray(), newColumn]), name } })}
-                      clearable={false}
-                      persistSelection={false}
-                      name="column-create-select"
-                      value={undefined}
-                      menuPortalTarget={menuPortalTarget}
-                      excludedColumns={value}
-                      placeholder={createSelectPlaceholder}
-                      ariaLabel={createSelectPlaceholder} />
+        <SelectedColumnsList
+          selectedColumns={value.toArray()}
+          columnTitle={columnTitle}
+          displayOverlayInPortal={displaySortableListOverlayInPortal}
+          onChange={(newColumns) => onChange({ target: { value: Immutable.OrderedSet(newColumns), name } })}
+        />
+        <ColumnSelect
+          id="column-create-select"
+          columnTitle={columnTitle}
+          columns={columns}
+          onChange={(newColumn) =>
+            onChange({ target: { value: Immutable.OrderedSet([...value.toArray(), newColumn]), name } })
+          }
+          clearable={false}
+          persistSelection={false}
+          name="column-create-select"
+          value={undefined}
+          excludedColumns={value}
+          placeholder={createSelectPlaceholder}
+          ariaLabel={createSelectPlaceholder}
+        />
       </>
     )}
   </Field>
 );
-
-ColumnsConfiguration.defaultProps = {
-  createSelectPlaceholder: 'Add a column',
-  displaySortableListOverlayInPortal: false,
-  menuPortalTarget: undefined,
-  testPrefix: '',
-};
 
 export default ColumnsConfiguration;

@@ -52,16 +52,19 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
     private static final String KEY_SEPARATOR_CHARACTER = "\u2E31";
     private static final String KEY_SEPARATOR_PHRASE = " + \"" + KEY_SEPARATOR_CHARACTER + "\" + ";
     private static final String AGG_NAME = "agg";
-    private static final ImmutableList<String> MISSING_BUCKET_KEYS = ImmutableList.of(MissingBucketConstants.MISSING_BUCKET_NAME);
-    private static final BucketOrder defaultOrder = BucketOrder.count(false);
+    public static final BucketOrder DEFAULT_ORDER = BucketOrder.count(false);
+    public static final String SORT_HELPER = "sort_helper";
 
     @Nonnull
     @Override
     public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, Values bucketSpec, OSGeneratedQueryContext queryContext, Query query) {
-        final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);
+        final var ordering = orderListForPivot(pivot, queryContext, DEFAULT_ORDER, query);
         final int limit = bucketSpec.limit();
         final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(bucketSpec.fields(), pivot.sort());
-        final AggregationBuilder termsAggregation = createTerms(orderedBuckets, ordering, limit, bucketSpec.skipEmptyValues());
+        final var termsAggregation = createTerms(orderedBuckets, limit);
+
+        termsAggregation.order(ordering.orders());
+        ordering.sortingAggregations().forEach(termsAggregation::subAggregation);
 
         final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets, bucketSpec.skipEmptyValues())
                 .subAggregation(termsAggregation);
@@ -77,15 +80,14 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
                 .otherBucket(true);
     }
 
-    private AggregationBuilder createTerms(List<String> valueBuckets, List<BucketOrder> ordering, int limit, boolean skipEmptyValues) {
-        return createScriptedTerms(valueBuckets, ordering, limit);
+    private TermsAggregationBuilder createTerms(List<String> valueBuckets, int limit) {
+        return createScriptedTerms(valueBuckets, limit);
     }
 
-    private TermsAggregationBuilder createScriptedTerms(List<String> buckets, List<BucketOrder> ordering, int limit) {
+    private TermsAggregationBuilder createScriptedTerms(List<String> buckets, int limit) {
         return AggregationBuilders.terms(AGG_NAME)
                 .script(scriptForPivots(buckets))
-                .size(limit)
-                .order(ordering.isEmpty() ? List.of(BucketOrder.count(false)) : ordering);
+                .size(limit);
     }
 
     private Script scriptForPivots(Collection<String> pivots) {

@@ -1,0 +1,4 @@
+type = "a"
+message = "Remove Data Node beta banner"
+
+pulls = ["20388"]

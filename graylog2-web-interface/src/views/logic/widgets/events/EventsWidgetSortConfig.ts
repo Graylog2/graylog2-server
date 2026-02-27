@@ -20,13 +20,13 @@ import type { DirectionJson } from 'views/logic/aggregationbuilder/Direction';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 
 export type EventsWidgetSortConfigJSON = {
-  field: string,
-  direction: DirectionJson,
+  field: string;
+  direction: DirectionJson;
 };
 
 type InternalState = {
-  field: string,
-  direction: Direction,
+  field: string;
+  direction: Direction;
 };
 
 export default class EventsWidgetSortConfig {
@@ -57,10 +57,7 @@ export default class EventsWidgetSortConfig {
     const { field, direction } = value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder()
-      .field(field)
-      .direction(Direction.fromJSON(direction))
-      .build();
+    return new Builder().field(field).direction(Direction.fromJSON(direction)).build();
   }
 
   toBuilder(): Builder {

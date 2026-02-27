@@ -16,7 +16,9 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import { adminUser } from 'fixtures/users';
 import MockStore from 'helpers/mocking/StoreMock';
@@ -82,11 +84,12 @@ const trafficResponse = {
 jest.mock('hooks/useCurrentUser');
 
 jest.mock('stores/cluster/ClusterTrafficStore', () => ({
-  ClusterTrafficStore: MockStore(
-    ['getInitialState', jest.fn(() => ({
+  ClusterTrafficStore: MockStore([
+    'getInitialState',
+    jest.fn(() => ({
       traffic: undefined,
-    }))],
-  ),
+    })),
+  ]),
   ClusterTrafficActions: {
     getTraffic: jest.fn((_days: number) => ({ traffic: undefined })),
   },
@@ -94,8 +97,9 @@ jest.mock('stores/cluster/ClusterTrafficStore', () => ({
 
 describe('GraylogClusterOverview', () => {
   beforeEach(() => {
-    const currentUserWithPermissions = adminUser.toBuilder()
-      .permissions(Immutable.List(['licenses:read']))
+    const currentUserWithPermissions = adminUser
+      .toBuilder()
+      .permissions(Immutable.List<Permission>(['licenses:read']))
       .build();
 
     asMock(useCurrentUser).mockReturnValue(currentUserWithPermissions);
@@ -124,7 +128,7 @@ describe('GraylogClusterOverview', () => {
     const { getByLabelText } = render(<GraylogClusterOverview />);
     const graphDaysSelect = getByLabelText('Days');
 
-    fireEvent.change(graphDaysSelect, { target: { value: 365 } });
+    await userEvent.selectOptions(graphDaysSelect, '365');
 
     await waitFor(() => expect(ClusterTrafficActions.getTraffic).toHaveBeenCalledWith(365));
 

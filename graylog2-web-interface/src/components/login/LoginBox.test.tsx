@@ -21,7 +21,11 @@ import LoginBox from './LoginBox';
 
 describe('LoginBox', () => {
   it('renders a button after the input if buttonAfter is passed', async () => {
-    render(<LoginBox><button type="button">Click me</button></LoginBox>);
+    render(
+      <LoginBox>
+        <button type="button">Click me</button>
+      </LoginBox>,
+    );
 
     await screen.findByRole('button', { name: 'Click me' });
   });

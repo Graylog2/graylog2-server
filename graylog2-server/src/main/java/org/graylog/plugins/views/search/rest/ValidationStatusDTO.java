@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.rest;
 
 public enum ValidationStatusDTO {
     OK,
+    INFO,
     WARNING,
     ERROR
 }

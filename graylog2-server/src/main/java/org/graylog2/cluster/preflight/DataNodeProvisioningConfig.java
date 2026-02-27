@@ -21,14 +21,8 @@ public class DataNodeProvisioningConfig {
     @Deprecated
     public enum State {
         UNCONFIGURED, // first start of a DataNode
-        CONFIGURED, // the DataNode has been configured by the Preflight UI
-        CSR, // DataNode created the CSR
-        SIGNED, // Graylog CA signed the CSR
-        STORED, // Certificate is combined with private key and stored in Mongo
-        STARTUP_PREPARED, // All configuration has been written
-        STARTUP_TRIGGER, // Startup of the OpenSearch process requested from Graylog
-        STARTUP_REQUESTED, // Startup of the OpenSearch process requested
-        CONNECTING, // connectivity check running until error or connected
+        PROVISIONED, // All configuration has been written
+        STARTING, // connectivity check running until error or connected
         CONNECTED, // DataNode started with the certificate
         ERROR // sh*t happened
     }

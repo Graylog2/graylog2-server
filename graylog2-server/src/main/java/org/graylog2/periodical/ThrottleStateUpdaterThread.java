@@ -18,9 +18,10 @@ package org.graylog2.periodical;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.RatioGauge;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.common.eventbus.EventBus;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.GlobalMetricNames;
@@ -32,9 +33,6 @@ import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.journal.LocalKafkaJournal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import static org.graylog2.shared.metrics.MetricUtils.safelyRegister;
 
@@ -80,13 +78,16 @@ public class ThrottleStateUpdaterThread extends Periodical {
         this.notificationService = notificationService;
         this.serverStatus = serverStatus;
         // leave this.journal null, we'll say "don't start" in that case, see startOnThisNode() below.
-        if (journal instanceof LocalKafkaJournal) {
-            this.journal = (LocalKafkaJournal) journal;
+        if (journal instanceof LocalKafkaJournal kafkaJournal) {
+            this.journal = kafkaJournal;
         } else {
             this.journal = null;
         }
         throttleState = new ThrottleState();
 
+        // Note: JOURNAL_SEGMENTS, JOURNAL_UNCOMMITTED_ENTRIES, JOURNAL_SIZE, JOURNAL_SIZE_LIMIT,
+        // and JOURNAL_UTILIZATION_RATIO are now registered in LocalKafkaJournal
+        // The append- and read-rate cannot be moved there, as this thread keeps track of the previous values.
         safelyRegister(metricRegistry,
                 GlobalMetricNames.JOURNAL_APPEND_RATE,
                 new Gauge<Long>() {
@@ -101,50 +102,6 @@ public class ThrottleStateUpdaterThread extends Periodical {
                     @Override
                     public Long getValue() {
                         return throttleState.readEventsPerSec;
-                    }
-                });
-        safelyRegister(metricRegistry,
-                GlobalMetricNames.JOURNAL_SEGMENTS,
-                new Gauge<Integer>() {
-                    @Override
-                    public Integer getValue() {
-                        if (ThrottleStateUpdaterThread.this.journal == null) {
-                            return 0;
-                        }
-                        return ThrottleStateUpdaterThread.this.journal.numberOfSegments();
-                    }
-                });
-        safelyRegister(metricRegistry,
-                GlobalMetricNames.JOURNAL_UNCOMMITTED_ENTRIES,
-                new Gauge<Long>() {
-                    @Override
-                    public Long getValue() {
-                        return throttleState.uncommittedJournalEntries;
-                    }
-                });
-        final Gauge<Long> sizeGauge = safelyRegister(metricRegistry,
-                GlobalMetricNames.JOURNAL_SIZE,
-                new Gauge<Long>() {
-                    @Override
-                    public Long getValue() {
-                        return throttleState.journalSize;
-                    }
-                });
-        final Gauge<Long> sizeLimitGauge = safelyRegister(metricRegistry,
-                GlobalMetricNames.JOURNAL_SIZE_LIMIT,
-                new Gauge<Long>() {
-                    @Override
-                    public Long getValue() {
-                        return throttleState.journalSizeLimit;
-                    }
-                });
-        safelyRegister(metricRegistry,
-                GlobalMetricNames.JOURNAL_UTILIZATION_RATIO,
-                new RatioGauge() {
-                    @Override
-                    protected Ratio getRatio() {
-                        return Ratio.of(sizeGauge.getValue(),
-                                sizeLimitGauge.getValue());
                     }
                 });
     }
@@ -236,7 +193,7 @@ public class ThrottleStateUpdaterThread extends Periodical {
         eventBus.post(throttleState);
 
         // Abusing the current thread to send notifications from KafkaJournal in the graylog2-shared module
-        final double journalUtilizationPercentage = throttleState.journalSizeLimit > 0 ? (throttleState.journalSize * 100) / throttleState.journalSizeLimit : 0.0;
+        final double journalUtilizationPercentage = journal.getJournalUtilization().orElse(0.0);
 
         if (journalUtilizationPercentage > LocalKafkaJournal.NOTIFY_ON_UTILIZATION_PERCENTAGE) {
             Notification notification = notificationService.buildNow()

@@ -22,12 +22,13 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.graph.MutableGraph;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsesSearchFilters;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.ModelId;
+import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.WidgetEntity;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -43,7 +44,6 @@ import static org.graylog2.contentpacks.facades.StreamReferenceFacade.getStreamE
 
 @AutoValue
 @JsonDeserialize(builder = WidgetDTO.Builder.class)
-@WithBeanGetter
 public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSearchFilters {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TYPE = "type";
@@ -53,6 +53,9 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSe
     public static final String FIELD_TIMERANGE = "timerange";
     public static final String FIELD_QUERY = "query";
     public static final String FIELD_STREAMS = "streams";
+    public static final String FIELD_STREAM_CATEGORIES = "stream_categories";
+    public static final String FIELD_DESCRIPTION = "description";
+    public static final String FIELD_CONTEXT = "context";
 
     @JsonProperty(FIELD_ID)
     public abstract String id();
@@ -77,8 +80,20 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSe
     @JsonProperty(FIELD_STREAMS)
     public abstract Set<String> streams();
 
+    @JsonProperty(FIELD_STREAM_CATEGORIES)
+    @Nullable
+    public abstract Set<String> streamCategories();
+
     @JsonProperty(FIELD_CONFIG)
     public abstract WidgetConfigDTO config();
+
+    @JsonProperty(FIELD_DESCRIPTION)
+    @Nullable
+    public abstract String description();
+
+    @JsonProperty(FIELD_CONTEXT)
+    @Nullable
+    public abstract String context();
 
     public static Builder builder() {
         return Builder.builder();
@@ -109,6 +124,9 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSe
         @JsonProperty(FIELD_STREAMS)
         public abstract Builder streams(Set<String> streams);
 
+        @JsonProperty(FIELD_STREAM_CATEGORIES)
+        public abstract Builder streamCategories(@Nullable Set<String> streamCategories);
+
         @JsonProperty(FIELD_CONFIG)
         @JsonTypeInfo(
                 use = JsonTypeInfo.Id.NAME,
@@ -118,13 +136,20 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSe
                 defaultImpl = UnknownWidgetConfigDTO.class)
         public abstract Builder config(WidgetConfigDTO config);
 
+        @JsonProperty(FIELD_DESCRIPTION)
+        public abstract Builder description(@Nullable String description);
+
+        @JsonProperty(FIELD_CONTEXT)
+        public abstract Builder context(@Nullable String context);
+
         public abstract WidgetDTO build();
 
         @JsonCreator
         static Builder builder() {
             return new AutoValue_WidgetDTO.Builder()
                     .streams(Collections.emptySet())
-                    .filters(Collections.emptyList());
+                    .filters(Collections.emptyList())
+                    .streamCategories(Collections.emptySet());
         }
     }
 
@@ -137,10 +162,13 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSe
                 .collect(Collectors.toSet());
         final WidgetEntity.Builder builder = WidgetEntity.builder()
                 .id(this.id())
+                .description(this.description())
+                .context(this.context())
                 .config(this.config())
                 .filter(this.filter())
                 .filters(filters().stream().map(filter -> filter.toContentPackEntity(entityDescriptorIds)).toList())
                 .streams(mappedStreams)
+                .streamCategories(streamCategories())
                 .type(this.type());
         if (this.query().isPresent()) {
             builder.query(this.query().get());
@@ -153,6 +181,13 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSe
 
     @Override
     public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
+        streams().forEach(streamId -> {
+            final EntityDescriptor depStream = EntityDescriptor.builder()
+                    .id(ModelId.of(streamId))
+                    .type(ModelTypes.STREAM_REF_V1)
+                    .build();
+            mutableGraph.putEdge(entityDescriptor, depStream);
+        });
         filters().forEach(filter -> filter.resolveNativeEntity(entityDescriptor, mutableGraph));
     }
 }

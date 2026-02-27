@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import upperCase from 'lodash/upperCase';
 
@@ -24,12 +24,11 @@ import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import usePluginEntities from 'hooks/usePluginEntities';
 import generateId from 'logic/generateId';
 import useView from 'views/hooks/useView';
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { addWidget } from 'views/logic/slices/widgetActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 const modalTitle = 'Create new widget';
 
@@ -40,73 +39,82 @@ const WidgetList = styled.div`
   gap: 0.7rem;
 `;
 
-const CreateWidgetButton = styled(Button)(({ theme }) => css`
-  background-color: transparent;
-  border-color: ${theme.colors.variant.gray};
-  border-radius: 4px;
-  height: 8rem;
-  width: 8rem;
-`);
+const CreateWidgetButton = styled(Button)(
+  ({ theme }) => css`
+    background-color: transparent;
+    border-color: ${theme.colors.variant.gray};
+    border-radius: 4px;
+    height: 8rem;
+    width: 8rem;
+  `,
+);
 
 const ButtonInner = styled.div`
   display: flex;
   flex-flow: column nowrap;
   align-items: center;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
   white-space: break-spaces;
   text-align: center;
   gap: 0.3rem;
 `;
 
-const HugeIcon = styled.div(({ theme }) => css`
-  font-size: ${theme.fonts.size.huge};
-`);
+const HugeIcon = styled.div(
+  ({ theme }) => css`
+    font-size: ${theme.fonts.size.huge};
+  `,
+);
 
 type Props = {
-  onCancel: () => void,
-  position: WidgetPosition,
-}
+  onCancel: () => void;
+  position: WidgetPosition;
+};
 
 const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
   const creators = usePluginEntities('widgetCreators');
   const view = useView();
-  const dispatch = useAppDispatch();
-  const location = useLocation();
+  const dispatch = useViewsDispatch();
   const sendTelemetry = useSendTelemetry();
+  const { setWidgetEditing } = useContext(WidgetFocusContext);
 
-  const widgetButtons = useMemo(() => creators.map(({ title, func, icon: WidgetIcon }) => {
-    const onClick = async () => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_CREATE[upperCase(title).replace(/ /g, '_')], {
-        app_pathname: getPathnameWithoutId(location.pathname),
-        app_section: 'search-widget',
-      });
+  const widgetButtons = useMemo(
+    () =>
+      creators.map(({ title, func, icon: WidgetIcon }) => {
+        const onClick = async () => {
+          sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_CREATE[upperCase(title).replace(/ /g, '_')], {
+            app_section: 'search-widget',
+          });
 
-      const newId = generateId();
-      const newWidget = func({ view }).toBuilder().id(newId).build();
+          const newId = generateId();
+          const newWidget = func({ view }).toBuilder().id(newId).build();
 
-      return dispatch(addWidget(newWidget, position));
-    };
+          const result = await dispatch(addWidget(newWidget, position));
+          await setWidgetEditing(newId);
 
-    return (
-      <CreateWidgetButton key={title} type="button" title={`Create ${title} Widget`} onClick={onClick}>
-        <ButtonInner>
-          <HugeIcon><WidgetIcon /></HugeIcon>
-          {title}
-        </ButtonInner>
-      </CreateWidgetButton>
-    );
-  }), [creators, dispatch, location.pathname, position, sendTelemetry, view]);
+          return result;
+        };
+
+        return (
+          <CreateWidgetButton key={title} type="button" title={`Create ${title} Widget`} onClick={onClick}>
+            <ButtonInner>
+              <HugeIcon>
+                <WidgetIcon />
+              </HugeIcon>
+              {title}
+            </ButtonInner>
+          </CreateWidgetButton>
+        );
+      }),
+    [creators, dispatch, position, sendTelemetry, setWidgetEditing, view],
+  );
 
   return (
-    <Modal onHide={onCancel}
-           show>
-      <Modal.Header closeButton>
+    <Modal onHide={onCancel} show>
+      <Modal.Header>
         <Modal.Title>{modalTitle}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <WidgetList>
-          {widgetButtons}
-        </WidgetList>
+        <WidgetList>{widgetButtons}</WidgetList>
       </Modal.Body>
       <Modal.Footer>
         <Button type="button" onClick={onCancel}>

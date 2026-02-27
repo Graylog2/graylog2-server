@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.indexset;
 
+import jakarta.inject.Inject;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
@@ -23,9 +24,8 @@ import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldTypeSummary;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetIdAndType;
 import org.graylog2.streams.StreamService;
-
-import jakarta.inject.Inject;
 
 import java.util.Comparator;
 import java.util.List;
@@ -89,6 +89,7 @@ public class IndexSetFieldTypeSummaryService {
                 .map(indexSetService::get)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
+                .filter(IndexSetConfig::canHaveCustomFieldMappings)
                 .sorted(getComparator(sort, order))
                 .skip((long) (page - 1) * perPage)
                 .limit(perPage)
@@ -104,6 +105,8 @@ public class IndexSetFieldTypeSummaryService {
                 .filter(indexSetPermissionPredicate)
                 .map(indexSetService::get)
                 .filter(Optional::isPresent)
+                .map(Optional::get)
+                .filter(IndexSetConfig::canHaveCustomFieldMappings)
                 .count();
 
         return PageListResponse.create("",
@@ -119,6 +122,22 @@ public class IndexSetFieldTypeSummaryService {
                 ATTRIBUTES,
                 ENTITY_DEFAULTS);
 
+    }
+
+    public List<IndexSetIdAndType> getIdsAndTypesOfIndexSetsWhereFieldTypeChangeIsAllowed(final Set<String> streamIds,
+                                                                                          final Predicate<String> indexSetPermissionPredicate) {
+        //There is a potential to improve performance by introducing a complicated aggregation pipeline joining multiple Mongo collections, especially if permission restrictions were simplified or sorting not necessary.
+        //For now simpler solution has been used in the implementation.
+        final Set<String> indexSetsIds = streamService.indexSetIdsByIds(streamIds);
+
+        return indexSetsIds.stream()
+                .filter(indexSetPermissionPredicate)
+                .map(indexSetService::get)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .filter(IndexSetConfig::canHaveCustomFieldMappings)
+                .map(indexSetConfig -> new IndexSetIdAndType(indexSetConfig.id(), indexSetConfig.indexTemplateType().orElse(""))
+                ).collect(Collectors.toList());
     }
 
     private Comparator<IndexSetConfig> getComparator(final String sort,

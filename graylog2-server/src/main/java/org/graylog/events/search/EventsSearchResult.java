@@ -53,6 +53,17 @@ public abstract class EventsSearchResult {
         return new AutoValue_EventsSearchResult.Builder();
     }
 
+    public static EventsSearchResult empty() {
+        return EventsSearchResult.builder()
+                .parameters(EventsSearchParameters.empty())
+                .events(List.of())
+                .usedIndices(Set.of())
+                .totalEvents(0)
+                .duration(0)
+                .context(EventsSearchResult.Context.create(Map.of(), Map.of()))
+                .build();
+    }
+
     @AutoValue.Builder
     public static abstract class Builder {
         public abstract Builder events(List<Event> events);

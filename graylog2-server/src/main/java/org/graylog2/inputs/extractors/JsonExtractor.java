@@ -22,7 +22,6 @@ import com.google.auto.value.AutoValue;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.ConfigurationException;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.plugin.inputs.Converter;
@@ -174,7 +173,6 @@ public class JsonExtractor extends Extractor {
     }
 
     @AutoValue
-    @WithBeanGetter
     protected abstract static class Entry {
         public abstract String key();
 

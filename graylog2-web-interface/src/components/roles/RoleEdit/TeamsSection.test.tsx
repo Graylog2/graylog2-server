@@ -30,11 +30,16 @@ describe('<TeamsSection />', () => {
   });
 
   it('should display enterprise role teams assignment plugin', async () => {
-    PluginStore.register(new PluginManifest({}, {
-      teams: {
-        RoleTeamsAssignment: () => <>RoleTeamsAssignment</>,
-      },
-    }));
+    PluginStore.register(
+      new PluginManifest(
+        {},
+        {
+          teams: {
+            RoleTeamsAssignment: () => <>RoleTeamsAssignment</>,
+          },
+        },
+      ),
+    );
 
     render(<TeamsSection role={exampleRole} />);
 

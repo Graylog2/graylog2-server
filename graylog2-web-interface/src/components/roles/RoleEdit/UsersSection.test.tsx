@@ -14,11 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
 
+import selectEvent from 'helpers/selectEvent';
 import { alertsManager as exampleRole } from 'fixtures/roles';
 import { alice, bob, charlie } from 'fixtures/userOverviews';
 import mockAction from 'helpers/mocking/MockAction';
@@ -69,10 +70,9 @@ describe('UsersSection', () => {
     render(<UsersSection role={exampleRole} />);
 
     const assignUserButton = await screen.findByRole('button', { name: 'Assign User' });
-    const usersSelector = screen.getByLabelText('Search for users');
-    await selectEvent.select(usersSelector, bob.username);
+    await selectEvent.chooseOption('Search for users', bob.username);
 
-    fireEvent.click(assignUserButton);
+    await userEvent.click(assignUserButton);
 
     await waitFor(() => expect(AuthzRolesActions.addMembers).toHaveBeenCalledTimes(1));
 
@@ -83,18 +83,22 @@ describe('UsersSection', () => {
     render(<UsersSection role={exampleRole} />);
 
     const filterInput = await screen.findByPlaceholderText('Enter query to filter');
-    fireEvent.change(filterInput, { target: { value: 'name of an assigned user' } });
+    await userEvent.type(filterInput, 'name of an assigned user');
 
     await waitFor(() => expect(AuthzRolesActions.loadUsersForRole).toHaveBeenCalledTimes(2));
 
-    expect(AuthzRolesActions.loadUsersForRole).toHaveBeenCalledWith(exampleRole.id, exampleRole.name, { page: 1, perPage: 5, query: 'name of an assigned user' });
+    expect(AuthzRolesActions.loadUsersForRole).toHaveBeenCalledWith(exampleRole.id, exampleRole.name, {
+      page: 1,
+      perPage: 5,
+      query: 'name of an assigned user',
+    });
   });
 
   it('should unassign a user', async () => {
     render(<UsersSection role={exampleRole} />);
 
     const assignUserButton = await screen.findByRole('button', { name: `Remove ${alice.username}` });
-    fireEvent.click(assignUserButton);
+    await userEvent.click(assignUserButton);
 
     await waitFor(() => expect(AuthzRolesActions.removeMember).toHaveBeenCalledWith(exampleRole.id, alice.username));
   });

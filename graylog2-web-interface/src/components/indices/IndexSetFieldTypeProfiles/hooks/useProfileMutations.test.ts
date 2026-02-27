@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook, act } from 'wrappedTestingLibrary/hooks';
+import { renderHook, act, waitFor } from 'wrappedTestingLibrary/hooks';
 import omit from 'lodash/omit';
 
 import asMock from 'helpers/mocking/AsMock';
@@ -26,13 +26,6 @@ import { formValuesProfile1, requestBodyProfile1JSON } from 'fixtures/indexSetFi
 
 const urlPrefix = '/system/indices/index_sets/profiles';
 
-const logger = {
-  // eslint-disable-next-line no-console
-  log: console.log,
-  // eslint-disable-next-line no-console
-  warn: console.warn,
-  error: () => {},
-};
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 jest.mock('util/UserNotification', () => ({
@@ -50,7 +43,7 @@ describe('useProfileMutations', () => {
     it('should run fetch and display UserNotification', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve({}));
 
-      const { result, waitFor } = renderHook(() => useProfileMutations(), { queryClientOptions: { logger } });
+      const { result } = renderHook(() => useProfileMutations());
 
       act(() => {
         result.current.editProfile(requestBody);
@@ -58,21 +51,29 @@ describe('useProfileMutations', () => {
 
       await waitFor(() => expect(fetch).toHaveBeenCalledWith('PUT', putUrl, requestBodyJSON));
 
-      await waitFor(() => expect(UserNotification.success).toHaveBeenCalledWith('Index set field type profile has been successfully updated.', 'Success!'));
+      await waitFor(() =>
+        expect(UserNotification.success).toHaveBeenCalledWith(
+          'Index set field type profile has been successfully updated.',
+          'Success!',
+        ),
+      );
     });
 
     it('should display notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useProfileMutations(), { queryClientOptions: { logger } });
+      const { result } = renderHook(() => useProfileMutations());
 
       act(() => {
         result.current.editProfile(requestBody).catch(() => {});
       });
 
-      await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
-        'Updating index set field type profile failed with status: Error: Error',
-        'Could not update index set field type profile'));
+      await waitFor(() =>
+        expect(UserNotification.error).toHaveBeenCalledWith(
+          'Updating index set field type profile failed with status: Error: Error',
+          'Could not update index set field type profile',
+        ),
+      );
     });
   });
 
@@ -85,7 +86,7 @@ describe('useProfileMutations', () => {
     it('should run fetch and display UserNotification', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve({}));
 
-      const { result, waitFor } = renderHook(() => useProfileMutations(), { queryClientOptions: { logger } });
+      const { result } = renderHook(() => useProfileMutations());
 
       act(() => {
         result.current.createProfile(requestBody);
@@ -93,21 +94,29 @@ describe('useProfileMutations', () => {
 
       await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', postUrl, requestBodyJSON));
 
-      await waitFor(() => expect(UserNotification.success).toHaveBeenCalledWith('Index set field type profile has been successfully created.', 'Success!'));
+      await waitFor(() =>
+        expect(UserNotification.success).toHaveBeenCalledWith(
+          'Index set field type profile has been successfully created.',
+          'Success!',
+        ),
+      );
     });
 
     it('should display notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useProfileMutations(), { queryClientOptions: { logger } });
+      const { result } = renderHook(() => useProfileMutations());
 
       act(() => {
         result.current.createProfile(requestBody).catch(() => {});
       });
 
-      await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
-        'Creating index set field type profile failed with status: Error: Error',
-        'Could not create index set field type profile'));
+      await waitFor(() =>
+        expect(UserNotification.error).toHaveBeenCalledWith(
+          'Creating index set field type profile failed with status: Error: Error',
+          'Could not create index set field type profile',
+        ),
+      );
     });
   });
 
@@ -117,7 +126,7 @@ describe('useProfileMutations', () => {
     it('should run fetch and display UserNotification', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve({}));
 
-      const { result, waitFor } = renderHook(() => useProfileMutations(), { queryClientOptions: { logger } });
+      const { result } = renderHook(() => useProfileMutations());
 
       act(() => {
         result.current.deleteProfile('111');
@@ -125,21 +134,29 @@ describe('useProfileMutations', () => {
 
       await waitFor(() => expect(fetch).toHaveBeenCalledWith('DELETE', deleteUrl));
 
-      await waitFor(() => expect(UserNotification.success).toHaveBeenCalledWith('Index set field type profile has been successfully deleted.', 'Success!'));
+      await waitFor(() =>
+        expect(UserNotification.success).toHaveBeenCalledWith(
+          'Index set field type profile has been successfully deleted.',
+          'Success!',
+        ),
+      );
     });
 
     it('should display notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useProfileMutations(), { queryClientOptions: { logger } });
+      const { result } = renderHook(() => useProfileMutations());
 
       act(() => {
         result.current.deleteProfile('111').catch(() => {});
       });
 
-      await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
-        'Deleting index set field type profile failed with status: Error: Error',
-        'Could not delete index set field type profile'));
+      await waitFor(() =>
+        expect(UserNotification.error).toHaveBeenCalledWith(
+          'Deleting index set field type profile failed with status: Error: Error',
+          'Could not delete index set field type profile',
+        ),
+      );
     });
   });
 });

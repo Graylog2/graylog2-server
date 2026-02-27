@@ -24,8 +24,8 @@ import org.graylog.grn.GRNTypes;
 import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.plugin.security.Permission;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,7 +43,7 @@ class UserSummaryTest {
             "Dampf",
             "Hans Dampf",
             ImmutableList.of(new CaseSensitiveWildcardPermission("dashboard:create:123")),
-            ImmutableList.of(GRNPermission.create(RestPermissions.ENTITY_OWN, grnRegistry.newGRN(GRNTypes.STREAM, "1234"))),
+            ImmutableList.of((GRNPermission) Permission.ENTITY_OWN.toShiroPermission(grnRegistry.newGRN(GRNTypes.STREAM, "1234"))),
             null,
             null,
             null,

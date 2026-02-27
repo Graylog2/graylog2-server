@@ -48,9 +48,9 @@ public class TestUser {
 
     public User build() {
         final User user = Mockito.mock(User.class);
-        Mockito.when(user.getName()).thenReturn(username);
-        Mockito.when(user.getId()).thenReturn(id);
-        Mockito.when(user.isLocalAdmin()).thenReturn(isLocalAdmin);
+        Mockito.lenient().when(user.getName()).thenReturn(username);
+        Mockito.lenient().when(user.getId()).thenReturn(id);
+        Mockito.lenient().when(user.isLocalAdmin()).thenReturn(isLocalAdmin);
         return user;
     }
 }

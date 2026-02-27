@@ -15,29 +15,33 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import RangeInput from './RangeInput';
 
 // eslint-disable-next-line compat/compat
-window.ResizeObserver = window.ResizeObserver
-    || jest.fn().mockImplementation(() => ({
-      disconnect: jest.fn(),
-      observe: jest.fn(),
-      unobserve: jest.fn(),
-    }));
+window.ResizeObserver =
+  window.ResizeObserver ||
+  jest.fn().mockImplementation(() => ({
+    disconnect: jest.fn(),
+    observe: jest.fn(),
+    unobserve: jest.fn(),
+  }));
 
 describe('<RangeInput />', () => {
   const SUT = (onAfterChange: (value) => void) => (
-    <RangeInput label="Range"
-                id="range"
-                labelClassName="col-sm-3"
-                wrapperClassName="col-sm-9"
-                value={[1, 4]}
-                min={1}
-                step={1}
-                max={100}
-                onAfterChange={(value) => onAfterChange(value)} />
+    <RangeInput
+      label="Range"
+      id="range"
+      labelClassName="col-sm-3"
+      wrapperClassName="col-sm-9"
+      value={[1, 4]}
+      min={1}
+      step={1}
+      max={100}
+      onAfterChange={(value) => onAfterChange(value)}
+    />
   );
 
   it('should render RangeInput', () => {
@@ -50,12 +54,12 @@ describe('<RangeInput />', () => {
     const updateConfig = jest.fn();
 
     render(SUT(updateConfig));
-    const thumb2 = screen.getByText(/4/i);
+    const [, thumb2] = screen.getAllByRole('slider');
 
-    fireEvent.focus(thumb2);
+    await userEvent.click(thumb2);
+    expect(thumb2).toHaveFocus();
+    await userEvent.keyboard('{arrowright>}');
 
-    fireEvent.keyDown(thumb2, { key: 'ArrowRight' });
-
-    expect(screen.getByText(/5/i)).toBeVisible();
+    await waitFor(() => expect(thumb2).toHaveAttribute('aria-valuenow', '5'));
   });
 });

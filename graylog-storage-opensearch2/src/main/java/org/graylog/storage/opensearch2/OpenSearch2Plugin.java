@@ -16,27 +16,28 @@
  */
 package org.graylog.storage.opensearch2;
 
+import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.storage.SearchVersion;
 
-import jakarta.inject.Inject;
-
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.github.zafarkhaja.semver.Version.forIntegers;
 import static org.graylog2.indexer.Constants.COMPOSABLE_INDEX_TEMPLATES_FEATURE;
+import static org.graylog2.indexer.Constants.USE_OPENSEARCH3_CLIENT_FEATURE;
 
 public class OpenSearch2Plugin implements Plugin {
     public static final Set<SearchVersion> SUPPORTED_OS_VERSIONS = ImmutableSet.of(
-            SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, forIntegers(2, 0, 0)),
-            SearchVersion.create(SearchVersion.Distribution.DATANODE, forIntegers(5, 0, 0))
+            SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, Version.of(2, 0, 0)),
+            SearchVersion.create(SearchVersion.Distribution.DATANODE, Version.of(5, 0, 0))
     );
 
     @Inject
@@ -49,6 +50,12 @@ public class OpenSearch2Plugin implements Plugin {
 
     @Override
     public Collection<PluginModule> modules() {
+
+        var useOpensearch3Client = featureFlags.isOn(USE_OPENSEARCH3_CLIENT_FEATURE);
+        if (useOpensearch3Client) {
+            return Collections.emptySet();
+        }
+
         var useComposableIndexTemplates = featureFlags.isOn(COMPOSABLE_INDEX_TEMPLATES_FEATURE);
         return SUPPORTED_OS_VERSIONS.stream()
                 .flatMap(version -> Stream.of(

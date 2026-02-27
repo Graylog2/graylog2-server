@@ -20,37 +20,39 @@ import styled, { css } from 'styled-components';
 
 import { INPUT_BORDER_RADIUS } from 'theme/constants';
 
-const FormControl = styled(BootstrapFormControl)(({ theme }) => css`
-  &.form-control {
-    border-radius: ${INPUT_BORDER_RADIUS};
-  }
-
-  &.form-control:not([type='range']) {
-    color: ${theme.colors.input.color};
-    background-color: ${theme.colors.input.background};
-    border-color: ${theme.colors.input.border};
-
-    &::placeholder {
-      color: ${theme.colors.input.placeholder};
+const FormControl = styled(BootstrapFormControl)(
+  ({ theme }) => css`
+    &.form-control {
+      border-radius: ${INPUT_BORDER_RADIUS};
     }
 
-    &:focus {
-      border-color: ${theme.colors.input.borderFocus};
-      box-shadow: ${theme.colors.input.boxShadow};
-    }
+    &.form-control:not([type='range']) {
+      color: ${theme.colors.input.color};
+      background-color: ${theme.colors.input.background};
+      border-color: ${theme.colors.input.border};
 
-    &[disabled],
-    &[readonly],
-    fieldset[disabled] & {
-      background-color: ${theme.colors.input.backgroundDisabled};
-      color: ${theme.colors.input.colorDisabled};
-    }
+      &::placeholder {
+        color: ${theme.colors.input.placeholder};
+      }
 
-    ~ .form-control-feedback.glyphicon {
-      display: none;
+      &:focus {
+        border-color: ${theme.colors.input.borderFocus};
+        box-shadow: ${theme.colors.input.boxShadow};
+      }
+
+      &[disabled],
+      &[readonly],
+      fieldset[disabled] & {
+        background-color: ${theme.colors.input.backgroundDisabled};
+        color: ${theme.colors.input.colorDisabled};
+      }
+
+      ~ .form-control-feedback.glyphicon {
+        display: none;
+      }
     }
-  }
-`);
+  `,
+);
 
 FormControl.Static = BootstrapFormControl.Static;
 FormControl.Feedback = BootstrapFormControl.Feedback;

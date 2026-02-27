@@ -18,11 +18,11 @@ package org.graylog.storage.opensearch2;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.openssl.PEMParser;
 
-import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.security.MessageDigest;
@@ -117,7 +117,7 @@ public record AggregatedConnectionResponse(Map<String, ConnectionCheckResponse> 
             byte[] der = cert.getEncoded();
             md.update(der);
             byte[] digest = md.digest();
-            String digestHex = DatatypeConverter.printHexBinary(digest);
+            String digestHex = Hex.encodeHexString(digest);
             return digestHex.toLowerCase(Locale.ROOT);
         } catch (CertificateEncodingException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);

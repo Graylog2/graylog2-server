@@ -80,12 +80,12 @@ class MaxMindIpLocationResolverTest {
 
         assertTrue(optInfo.isPresent());
         GeoLocationInformation info = optInfo.get();
-        assertEquals(country.getName(), info.countryName());
-        assertEquals(country.getIsoCode(), info.countryIsoCode());
-        assertEquals(city.getName(), info.cityName());
-        assertEquals(location.getLatitude(), info.latitude());
-        assertEquals(location.getLongitude(), info.longitude());
-        assertEquals(location.getTimeZone(), info.timeZone());
+        assertEquals(country.name(), info.countryName());
+        assertEquals(country.isoCode(), info.countryIsoCode());
+        assertEquals(city.name(), info.cityName());
+        assertEquals(location.latitude(), info.latitude());
+        assertEquals(location.longitude(), info.longitude());
+        assertEquals(location.timeZone(), info.timeZone());
 
     }
 
@@ -137,7 +137,7 @@ class MaxMindIpLocationResolverTest {
     @Test
     void testCityResponseWithNullLongLat() throws IOException, GeoIp2Exception {
 
-        Location location = new Location(null, null, null, null, null, null, "America/Chicago");
+        Location location = new Location(null, null, null, null, null, "America/Chicago");
         CityResponse cityResponse = createCityResponse(createCountry(), createCity(), location);
 
         when(resolver.getCityResponse(any(InetAddress.class))).thenReturn(cityResponse);
@@ -168,6 +168,6 @@ class MaxMindIpLocationResolverTest {
     }
 
     private static Location createLocation() {
-        return new Location(10, 10_000_000, 16.766945605833932, -3.003387490676568, 1, 1, "N/A");
+        return new Location(10, 10_000_000, 16.766945605833932, -3.003387490676568, 1, "N/A");
     }
 }

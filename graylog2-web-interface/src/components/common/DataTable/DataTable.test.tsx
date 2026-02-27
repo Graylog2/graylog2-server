@@ -14,141 +14,154 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import * as React from 'react';
+import { render, screen } from 'wrappedTestingLibrary';
 import cloneDeep from 'lodash/cloneDeep';
-import { act } from 'react-dom/test-utils';
+import userEvent from '@testing-library/user-event';
 
 import DataTable from 'components/common/DataTable';
-import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 
-const rowFormatter = (row) => <tr><td>{row.title}</td></tr>;
+const rowFormatter = (row: { title: string }) => (
+  <tr>
+    <td>{row.title}</td>
+  </tr>
+);
 
-const simulateTypeAheadFilter = (wrapper, filterText) => {
-  const filter = wrapper.find(TypeAheadDataFilter);
-
-  act(() => {
-    filter.instance().setState({ filterText: filterText });
-  });
-
-  act(() => {
-    filter.instance().filterData();
-  });
+const simulateTypeAheadFilter = async (filterText: string) => {
+  const filterInput = await screen.findByRole('textbox', { name: /filter/i });
+  await userEvent.clear(filterInput);
+  await userEvent.type(filterInput, filterText);
+  await userEvent.click(await screen.findByRole('button', { name: /filter/i }));
 };
 
-const filterRows = (rows, filterText) => rows.filter((row) => row.title.match(filterText));
+const rows = [{ title: 'Row 1' }, { title: 'Row 2' }, { title: 'Foo 3' }];
+const filterRows = (_rows: typeof rows, filterText: RegExp) => _rows.filter((row) => row.title.match(filterText));
+
+const numberOfRows = () => screen.findAllByRole('cell');
 
 describe('<DataTable />', () => {
-  const rows = [
-    { title: 'Row 1' },
-    { title: 'Row 2' },
-    { title: 'Foo 3' },
-  ];
+  it('should render with no rows', async () => {
+    render(<DataTable id="myDataTable" headers={['One']} rows={[]} dataRowFormatter={rowFormatter} />);
 
-  it('should render with no rows', () => {
-    const wrapper = mount(<DataTable id="myDataTable" headers={['One']} rows={[]} dataRowFormatter={rowFormatter} />);
-
-    expect(wrapper.find('table')).toHaveLength(0);
-    expect(wrapper.text()).toContain('No data available.');
+    await screen.findByText(/no data available/i);
   });
 
-  it('should render with rows', () => {
-    const wrapper = mount(
+  it('should render with rows', async () => {
+    render(<DataTable id="myDataTable" headers={['One']} rows={rows} dataRowFormatter={rowFormatter} />);
+
+    await screen.findByRole('cell', { name: /row 1/i });
+    await screen.findByRole('cell', { name: /row 2/i });
+    await screen.findByRole('cell', { name: /foo 3/i });
+  });
+
+  it('should update rendered rows when array changes', async () => {
+    const { rerender } = render(
       <DataTable id="myDataTable" headers={['One']} rows={rows} dataRowFormatter={rowFormatter} />,
     );
 
-    expect(wrapper.find('tbody tr')).toHaveLength(rows.length);
-  });
-
-  it('should update rendered rows when array changes', () => {
-    const wrapper = mount(
-      <DataTable id="myDataTable" headers={['One']} rows={rows} dataRowFormatter={rowFormatter} />,
-    );
-
-    expect(wrapper.find('tbody tr')).toHaveLength(rows.length);
+    expect(await numberOfRows()).toHaveLength(rows.length);
 
     const [, ...nextRows] = rows;
 
     expect(nextRows).toHaveLength(rows.length - 1);
 
-    wrapper.setProps({ rows: nextRows });
+    rerender(<DataTable id="myDataTable" headers={['One']} rows={nextRows} dataRowFormatter={rowFormatter} />);
 
-    expect(wrapper.find('tbody tr')).toHaveLength(rows.length - 1);
+    expect(await numberOfRows()).toHaveLength(rows.length - 1);
   });
 
-  it('should filter rows', () => {
-    const wrapper = mount(
-      <DataTable id="myDataTable" headers={['One']} rows={rows} dataRowFormatter={rowFormatter} filterKeys={['title']} />,
+  it('should filter rows', async () => {
+    render(
+      <DataTable
+        id="myDataTable"
+        headers={['One']}
+        rows={rows}
+        dataRowFormatter={rowFormatter}
+        filterKeys={['title']}
+      />,
     );
 
-    expect(wrapper.find('tbody tr')).toHaveLength(rows.length);
+    expect(await numberOfRows()).toHaveLength(rows.length);
 
     const filteredRows = filterRows(rows, /Row/);
 
     expect(filteredRows).toHaveLength(rows.length - 1);
 
-    simulateTypeAheadFilter(wrapper, 'Row');
-    wrapper.update();
+    await simulateTypeAheadFilter('Row');
 
-    expect(wrapper.state('filteredRows')).toEqual(filteredRows);
-    expect(wrapper.find('tbody tr')).toHaveLength(rows.length - 1);
+    expect(await numberOfRows()).toHaveLength(rows.length - 1);
   });
 
-  it('should keep filter when row in props change', () => {
-    const wrapper = mount(
-      <DataTable id="myDataTable" headers={['One']} rows={rows} dataRowFormatter={rowFormatter} filterKeys={['title']} />,
+  it('should keep filter when row in props change', async () => {
+    const { rerender } = render(
+      <DataTable
+        id="myDataTable"
+        headers={['One']}
+        rows={rows}
+        dataRowFormatter={rowFormatter}
+        filterKeys={['title']}
+      />,
     );
 
-    expect(wrapper.find('tbody tr')).toHaveLength(rows.length);
+    expect(await numberOfRows()).toHaveLength(rows.length);
 
     const filteredRows = filterRows(rows, /Row/);
 
-    simulateTypeAheadFilter(wrapper, 'Row');
-    wrapper.update();
+    await simulateTypeAheadFilter('Row');
 
-    expect(wrapper.state('filteredRows')).toEqual(filteredRows);
-    expect(wrapper.find('tbody tr')).toHaveLength(filteredRows.length);
+    expect(await numberOfRows()).toHaveLength(filteredRows.length);
 
     const nextRows = rows.concat([{ title: 'Row 4' }]);
 
-    wrapper.setProps({ rows: nextRows });
-    const nextFilteredRows = filterRows(nextRows, /Row/);
-
-    // Length is the same as before, filtering is done by a children and needs an update
-    expect(wrapper.find('tbody tr')).toHaveLength(filteredRows.length);
-
-    wrapper.update();
-
-    expect(wrapper.find('tbody tr')).toHaveLength(nextFilteredRows.length);
-  });
-
-  it('should not try to render removed rows', () => {
-    const wrapper = mount(
-      <DataTable id="myDataTable" headers={['One']} rows={rows} dataRowFormatter={rowFormatter} filterKeys={['title']} />,
+    rerender(
+      <DataTable
+        id="myDataTable"
+        headers={['One']}
+        rows={nextRows}
+        dataRowFormatter={rowFormatter}
+        filterKeys={['title']}
+      />,
     );
 
-    expect(wrapper.find('tbody tr')).toHaveLength(rows.length);
+    const nextFilteredRows = filterRows(nextRows, /Row/);
+
+    expect(await numberOfRows()).toHaveLength(nextFilteredRows.length);
+  });
+
+  it('should not try to render removed rows', async () => {
+    const { rerender } = render(
+      <DataTable
+        id="myDataTable"
+        headers={['One']}
+        rows={rows}
+        dataRowFormatter={rowFormatter}
+        filterKeys={['title']}
+      />,
+    );
+
+    expect(await numberOfRows()).toHaveLength(rows.length);
 
     const filteredRows = filterRows(rows, /Row/);
 
-    simulateTypeAheadFilter(wrapper, 'Row');
-    wrapper.update();
+    await simulateTypeAheadFilter('Row');
 
-    expect(wrapper.state('filteredRows')).toEqual(filteredRows);
-    expect(wrapper.find('tbody tr')).toHaveLength(filteredRows.length);
+    expect(await numberOfRows()).toHaveLength(filteredRows.length);
 
     // Ensure this also works with deep comparison
     const clonedRows = cloneDeep(filteredRows);
     const [, ...nextRows] = clonedRows;
 
-    wrapper.setProps({ rows: nextRows });
+    rerender(
+      <DataTable
+        id="myDataTable"
+        headers={['One']}
+        rows={nextRows}
+        dataRowFormatter={rowFormatter}
+        filterKeys={['title']}
+      />,
+    );
     const nextFilteredRows = filterRows(nextRows, /Row/);
 
-    // Check that we don't render the row we deleted, even if filtering is done by a children and needs an update
-    expect(wrapper.find('tbody tr')).toHaveLength(nextFilteredRows.length);
-
-    wrapper.update();
-
-    expect(wrapper.find('tbody tr')).toHaveLength(nextFilteredRows.length);
+    expect(await numberOfRows()).toHaveLength(nextFilteredRows.length);
   });
 });

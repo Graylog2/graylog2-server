@@ -38,7 +38,7 @@ export const activeIndicatorStyles = (theme: DefaultTheme) => css`
 const Container = styled.div`
   display: inline;
   position: relative;
-  
+
   &${indicatorPseudoElement} {
     content: ' ';
     position: absolute;
@@ -53,9 +53,7 @@ const Container = styled.div`
  * This component provides styling for navigation item states like active and hover.
  */
 const NavItemStateIndicator = ({ children }: { children: React.ReactNode }) => (
-  <Container className={indicatorClassName}>
-    {children}
-  </Container>
+  <Container className={indicatorClassName}>{children}</Container>
 );
 
 export default NavItemStateIndicator;

@@ -25,6 +25,7 @@ import com.google.common.collect.Maps;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
+import org.graylog.plugins.views.search.searchtypes.SearchEngineSearchType;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -85,6 +86,10 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
     @JsonProperty
     Set<String> streams();
 
+    @Nullable
+    @JsonProperty
+    Set<String> streamCategories();
+
     SearchType applyExecutionContext(SearchTypeExecutionState executionState);
 
     default SearchType withQuery(BackendQuery query) {
@@ -110,6 +115,10 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
                 .orElse(this);
     }
 
+    default boolean hasStreamCategories() {
+        return streamCategories() != null && !streamCategories().isEmpty();
+    }
+
     SearchTypeBuilder toBuilder();
 
     /**
@@ -117,6 +126,11 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
      * <p>
      * The frontend components then make use of the structured data to display it.
      */
+    @JsonTypeInfo(
+            use = JsonTypeInfo.Id.NAME,
+            include = JsonTypeInfo.As.EXISTING_PROPERTY,
+            property = "type",
+            visible = true)
     interface Result {
         @JsonProperty("id")
         String id();
@@ -132,7 +146,7 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
     }
 
     @JsonAutoDetect
-    class Fallback implements SearchType {
+    class Fallback implements SearchEngineSearchType {
 
         @JsonProperty
         private String type;
@@ -163,6 +177,10 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
 
         @JsonProperty
         private Set<String> streams;
+
+        @Nullable
+        @JsonProperty
+        private Set<String> streamCategories;
 
         @Override
         public String type() {
@@ -202,6 +220,11 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
         @Override
         public Set<String> streams() {
             return this.streams == null ? Collections.emptySet() : this.streams;
+        }
+
+        @Override
+        public Set<String> streamCategories() {
+            return this.streamCategories == null ? Collections.emptySet() : this.streamCategories;
         }
 
         @Override
@@ -282,6 +305,11 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
 
                 @Override
                 public SearchTypeBuilder filter(@Nullable Filter filter) {
+                    return this;
+                }
+
+                @Override
+                public SearchTypeBuilder streams(Set<String> streams) {
                     return this;
                 }
             };

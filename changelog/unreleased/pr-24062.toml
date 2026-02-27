@@ -1,0 +1,5 @@
+type = "f" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Enable opensearch certificate hot reloading in datanode"
+
+issues = ["23606"]
+pulls = ["24062"]

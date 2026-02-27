@@ -22,8 +22,8 @@ import type { MissingDependencies, GranteesList } from 'logic/permissions/Entity
 import { Alert } from 'components/bootstrap';
 
 type Props = {
-  missingDependencies: MissingDependencies,
-  availableGrantees: GranteesList,
+  missingDependencies: MissingDependencies;
+  availableGrantees: GranteesList;
 };
 
 const Container = styled(Alert)`
@@ -46,28 +46,35 @@ const _cap = StringUtils.capitalizeFirstLetter;
 const DependenciesWarning = ({ missingDependencies, availableGrantees }: Props) => (
   <Container bsStyle="danger" title="There are missing dependencies for the current set of collaborators">
     <List>
-      {missingDependencies.entrySeq().map(([granteeGRN, dependencyList]) => {
-        const grantee = availableGrantees.find((selectedGrantee) => selectedGrantee.id === granteeGRN);
+      {missingDependencies
+        .entrySeq()
+        .map(([granteeGRN, dependencyList]) => {
+          const grantee = availableGrantees.find((selectedGrantee) => selectedGrantee.id === granteeGRN);
 
-        return (grantee && (
-        <li key={grantee.id}>
-          {_cap(grantee.type)} <i>{grantee.title}</i> needs access to
-          {dependencyList.map((dependency) => (
-            <List key={dependency.id}>
-              <li>
-                {_cap(dependency.type)}: <i>{dependency.title}</i><br />
-                Owners: {dependency.owners.map((owner, key) => (
-                  <span key={owner.id}>
-                    {_cap(owner.type)} <i>{owner.title}</i>
-                    {key !== dependency.owners.size - 1 && ', '}
-                  </span>
+          return (
+            grantee && (
+              <li key={grantee.id}>
+                {_cap(grantee.type)} <i>{grantee.title}</i> needs access to
+                {dependencyList.map((dependency) => (
+                  <List key={dependency.id}>
+                    <li>
+                      {_cap(dependency.type)}: <i>{dependency.title}</i>
+                      <br />
+                      Owners:{' '}
+                      {dependency.owners.map((owner, key) => (
+                        <span key={owner.id}>
+                          {_cap(owner.type)} <i>{owner.title}</i>
+                          {key !== dependency.owners.size - 1 && ', '}
+                        </span>
+                      ))}
+                    </li>
+                  </List>
                 ))}
               </li>
-            </List>
-          ))}
-        </li>
-        ));
-      }).toArray()}
+            )
+          );
+        })
+        .toArray()}
     </List>
   </Container>
 );

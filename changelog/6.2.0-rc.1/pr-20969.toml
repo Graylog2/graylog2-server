@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fixing route for AWS integration when path prefix is present."
+
+pulls = ["20969"]

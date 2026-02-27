@@ -25,10 +25,10 @@ type ApplySearchControlsChanges = (widget: Widget) => Widget | undefined;
 type ApplyElementConfigurationChanges = (widgetConfig: WidgetConfig) => WidgetConfig | undefined;
 
 type WidgetEditApplyAllChangesContextValue = {
-  applyAllWidgetChanges: () => Promise<Widgets | void>,
-  bindApplyElementConfigurationChanges: (updateFn: ApplyElementConfigurationChanges) => void,
-  bindApplySearchControlsChanges: (updateFn: ApplySearchControlsChanges) => void,
-}
+  applyAllWidgetChanges: () => Promise<Widgets | void>;
+  bindApplyElementConfigurationChanges: (updateFn: ApplyElementConfigurationChanges) => void;
+  bindApplySearchControlsChanges: (updateFn: ApplySearchControlsChanges) => void;
+};
 
 const WidgetEditApplyAllChangesContext = React.createContext<WidgetEditApplyAllChangesContextValue>({
   applyAllWidgetChanges: () => Promise.resolve(),

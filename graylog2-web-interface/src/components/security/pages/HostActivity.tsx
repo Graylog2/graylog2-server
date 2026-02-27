@@ -22,12 +22,14 @@ import TeaserSearch from 'components/security/teaser/TeaserSearch';
 import viewJson from 'components/security/teaser/sample-dashboards/host_activity_view.json';
 import searchJson from 'components/security/teaser/sample-dashboards/host_activity_search.json';
 import resultJson from 'components/security/teaser/sample-dashboards/host_activity_results.json';
+import type { SearchJson } from 'views/logic/search/Search';
 
 const hotspots = [
   {
     positionX: '50%',
     positionY: '120px',
-    description: 'Get a top-level view of your high, medium, and low alert counts with trending information to know if this is a normal day at the office . . . or not.',
+    description:
+      'Get a top-level view of your high, medium, and low alert counts with trending information to know if this is a normal day at the office . . . or not.',
   },
   {
     positionX: '40%',
@@ -47,13 +49,19 @@ const hotspots = [
   {
     positionX: '80%',
     positionY: '1730px',
-    description: 'Message counts by event source give you a daily view of regular patterns in data, spikes outside the norm will trigger investigations as to why.',
+    description:
+      'Message counts by event source give you a daily view of regular patterns in data, spikes outside the norm will trigger investigations as to why.',
   },
 ];
 
 const HostActivity = () => (
   <DocumentTitle title="Host activity">
-    <TeaserSearch viewJson={viewJson} searchJson={searchJson} searchJobResult={resultJson} hotspots={hotspots} />
+    <TeaserSearch
+      viewJson={viewJson}
+      searchJson={searchJson as SearchJson}
+      searchJobResult={resultJson}
+      hotspots={hotspots}
+    />
   </DocumentTitle>
 );
 

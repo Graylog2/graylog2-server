@@ -16,12 +16,13 @@
  */
 import * as React from 'react';
 import { useEffect } from 'react';
-import PropTypes from 'prop-types';
+
+import useProductName from 'brand-customization/useProductName';
 
 type Props = {
-  title: React.ReactNode,
-  children: React.ReactNode,
-}
+  title: React.ReactNode;
+  children: React.ReactNode;
+};
 
 /**
  * React component that modifies the page `document.title` dynamically. When the component is unmounted, it
@@ -36,25 +37,17 @@ type Props = {
  * ```
  */
 const DocumentTitle = ({ children, title }: Props) => {
-  const DEFAULT_TITLE = 'Graylog';
+  const productName = useProductName();
 
   useEffect(() => {
     document.title = `${document.title} - ${title}`;
 
-    return () => { document.title = DEFAULT_TITLE; };
-  }, [title]);
+    return () => {
+      document.title = productName;
+    };
+  }, [productName, title]);
 
   return <>{children}</>;
-};
-
-DocumentTitle.propTypes = {
-  /** Title to prepend to the page `document.title`. */
-  title: PropTypes.string.isRequired,
-  /** Children to be rendered. */
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.element),
-    PropTypes.element,
-  ]).isRequired,
 };
 
 export default DocumentTitle;

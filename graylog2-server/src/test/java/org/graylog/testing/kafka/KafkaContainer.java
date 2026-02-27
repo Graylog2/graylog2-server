@@ -49,7 +49,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  */
 public class KafkaContainer extends GenericContainer<KafkaContainer> {
     public enum Version {
-        V34("3.4.0");
+        V34("3.7.0");
 
         private final String version;
 
@@ -90,37 +90,36 @@ public class KafkaContainer extends GenericContainer<KafkaContainer> {
 
     @SuppressWarnings("resource")
     private KafkaContainer(Version version, Network network) {
-        super(DockerImageName.parse(f("bitnami/kafka:%s", version.getVersion())));
+        super(DockerImageName.parse(f("apache/kafka:%s", version.getVersion())));
         this.network = network;
 
         withExposedPorts(9092);
         withNetwork(requireNonNull(network, "network cannot be null"));
 
         withEnv("KAFKA_HEAP_OPTS", "-Xmx256m -Xms256m");
-        withEnv("ALLOW_PLAINTEXT_LISTENER", "yes");
         withEnv("KAFKA_KRAFT_CLUSTER_ID", generateKraftClusterId());
-        withEnv("KAFKA_CFG_NODE_ID", "1");
-        withEnv("KAFKA_CFG_CONTROLLER_QUORUM_VOTERS", "1@127.0.0.1:9093");
-        withEnv("KAFKA_CFG_PROCESS_ROLES", "broker,controller");
-        withEnv("KAFKA_CFG_CONTROLLER_LISTENER_NAMES", "CONTROLLER");
-        withEnv("KAFKA_CFG_LISTENERS", "EXTERNAL://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,INTERNAL://0.0.0.0:9094");
-        withEnv("KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP", "EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT");
-        withEnv("KAFKA_CFG_INTER_BROKER_LISTENER_NAME", "INTERNAL");
+        withEnv("KAFKA_NODE_ID", "1");
+        withEnv("KAFKA_CONTROLLER_QUORUM_VOTERS", "1@127.0.0.1:9093");
+        withEnv("KAFKA_PROCESS_ROLES", "broker,controller");
+        withEnv("KAFKA_CONTROLLER_LISTENER_NAMES", "CONTROLLER");
+        withEnv("KAFKA_LISTENERS", "EXTERNAL://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,INTERNAL://0.0.0.0:9094");
+        withEnv("KAFKA_LISTENER_SECURITY_PROTOCOL_MAP", "EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT");
+        withEnv("KAFKA_INTER_BROKER_LISTENER_NAME", "INTERNAL");
 
         // The following settings speed up group rebalancing. Without it, it can take several seconds before a
         // consumer receives the first message.
-        withEnv("KAFKA_CFG_GROUP_INITIAL_REBALANCE_DELAY_MS", "0");
-        withEnv("KAFKA_CFG_OFFSETS_TOPIC_NUM_PARTITIONS", "1");
-        withEnv("KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR", "1");
-        withEnv("KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR", "1");
-        withEnv("KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR", "1");
+        withEnv("KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS", "0");
+        withEnv("KAFKA_OFFSETS_TOPIC_NUM_PARTITIONS", "1");
+        withEnv("KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR", "1");
+        withEnv("KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR", "1");
+        withEnv("KAFKA_TRANSACTION_STATE_LOG_MIN_ISR", "1");
 
         // Override the default entrypoint, so we only start Kafka once our listeners files is written.
         withCreateContainerCmdModifier(cmd -> cmd.withEntrypoint("sh"));
         withCommand("-c",
                 // The EXTERNAL listener must use the mapped host port for port 9092. We only know this once the
                 // container is started, so we have to set the advertised.listeners in the command script.
-                f("while [ ! -f %s ]; do sleep 0.1; done; export KAFKA_CFG_ADVERTISED_LISTENERS=\"$(cat %s)\"; /entrypoint.sh /run.sh",
+                f("while [ ! -f %s ]; do sleep 0.1; done; export KAFKA_ADVERTISED_LISTENERS=\"$(cat %s)\"; /etc/kafka/docker/run",
                         KAFKA_ADVERTISED_LISTENERS_FILE, KAFKA_ADVERTISED_LISTENERS_FILE)
         );
 

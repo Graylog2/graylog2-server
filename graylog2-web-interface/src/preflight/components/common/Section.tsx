@@ -25,7 +25,7 @@ import Row from 'preflight/components/common/Row';
 import { Title } from 'preflight/components/common';
 
 type ContainerType = BoxProps & {
-  theme: DefaultTheme,
+  theme: DefaultTheme;
   component: any;
 };
 
@@ -34,25 +34,29 @@ const TitleActionContainer = styled(Box)`
   justify-content: flex-end;
   gap: 5px;
 `;
-const SubsectionContainer = styled(Box)<React.PropsWithChildren<ContainerType>>(({ theme }: ContainerType) => css`
-  padding: ${theme.spacings.md};
-  margin-bottom: ${theme.spacings.xs};
-`);
+const SubsectionContainer = styled(Box)<React.PropsWithChildren<ContainerType>>(
+  ({ theme }: ContainerType) => css`
+    padding: ${theme.spacings.md};
+    margin-bottom: ${theme.spacings.xs};
+  `,
+);
 
-const SectionContainer = styled(SubsectionContainer)(({ theme }: ContainerType) => css`
-  background-color: ${theme.colors.global.contentBackground};
-  border: 1px solid ${theme.colors.variant.lighter.default};
-  border-radius: 4px;
-`);
+const SectionContainer = styled(SubsectionContainer)(
+  ({ theme }: ContainerType) => css`
+    background-color: ${theme.colors.global.contentBackground};
+    border: 1px solid ${theme.colors.variant.lighter.default};
+    border-radius: 4px;
+  `,
+);
 
 type Props = {
-  title: React.ReactNode,
-  actions?: React.ReactNode,
-  titleOrder?: TitleOrder
-  dataTestid?: string,
+  title: React.ReactNode;
+  actions?: React.ReactNode;
+  titleOrder?: TitleOrder;
+  dataTestid?: string;
 };
 
-const SectionHeader = ({ title, actions, titleOrder }: Props) => (
+const SectionHeader = ({ title, actions = undefined, titleOrder = 2 }: Props) => (
   <Row>
     <Col span={{ base: 12, lg: 6, md: 6 }}>
       <Title order={titleOrder}>{title}</Title>
@@ -63,33 +67,29 @@ const SectionHeader = ({ title, actions, titleOrder }: Props) => (
   </Row>
 );
 
-SectionHeader.defaultProps = {
-  actions: undefined,
-  titleOrder: 2,
-};
-
-export const Subsection = ({ title, children, actions, titleOrder }: React.PropsWithChildren<Props>) => (
+export const Subsection = ({
+  title,
+  children = undefined,
+  actions = undefined,
+  titleOrder = undefined,
+}: React.PropsWithChildren<Props>) => (
   <SubsectionContainer component="section">
     <SectionHeader title={title} actions={actions} titleOrder={titleOrder} />
     {children}
   </SubsectionContainer>
 );
 
-Subsection.defaultProps = {
-  actions: undefined,
-  titleOrder: undefined,
-};
-
-const Section = ({ title, children, actions, titleOrder, dataTestid }: React.PropsWithChildren<Props>) => (
+const Section = ({
+  title,
+  children = undefined,
+  actions = undefined,
+  titleOrder = undefined,
+  dataTestid = undefined,
+}: React.PropsWithChildren<Props>) => (
   <SectionContainer component="section" data-testid={dataTestid}>
     <SectionHeader title={title} actions={actions} titleOrder={titleOrder} />
     {children}
   </SectionContainer>
 );
-
-Section.defaultProps = {
-  actions: undefined,
-  titleOrder: undefined,
-};
 
 export default Section;

@@ -21,11 +21,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.mongojack.Id;
 
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = TestScopedEntity.Builder.class)
-public abstract class TestScopedEntity extends ScopedEntity {
+public abstract class TestScopedEntity implements ScopedEntity<TestScopedEntity.Builder> {
 
     public static final String TITLE = "title";
 
@@ -40,12 +41,21 @@ public abstract class TestScopedEntity extends ScopedEntity {
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public abstract static class Builder extends AbstractBuilder<Builder> {
+    public abstract static class Builder implements ScopedEntity.Builder<Builder> {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_TestScopedEntity.Builder()
                     .scope(DefaultEntityScope.NAME);
         }
+
+        @Override
+        @Id
+        @JsonProperty(FIELD_ID)
+        public abstract Builder id(String id);
+
+        @Override
+        @JsonProperty(FIELD_SCOPE)
+        public abstract Builder scope(String scope);
 
         @JsonProperty(TITLE)
         public abstract Builder title(String title);

@@ -18,18 +18,19 @@ package org.graylog2.plugin.inputs;
 
 import com.google.common.eventbus.EventBus;
 import org.graylog2.plugin.IOState;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class IOStateTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Test
     public void testNotEqualIfDifferentInput() throws Exception {
@@ -37,8 +38,8 @@ public class IOStateTest {
         MessageInput messageInput1 = mock(MessageInput.class);
         MessageInput messageInput2 = mock(MessageInput.class);
 
-        IOState<MessageInput> inputState1 = new IOState<>(eventBus, messageInput1);
-        IOState<MessageInput> inputState2 = new IOState<>(eventBus, messageInput2);
+        IOState<MessageInput> inputState1 = new IOState<>(eventBus, messageInput1, IOState.Type.SETUP);
+        IOState<MessageInput> inputState2 = new IOState<>(eventBus, messageInput2, IOState.Type.SETUP);
 
         assertFalse(inputState1.equals(inputState2));
         assertFalse(inputState2.equals(inputState1));

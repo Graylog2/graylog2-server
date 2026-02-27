@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Centralized view of Graylog cluster components"
+
+issues = ["20997"]
+pulls = ["21058"]

@@ -16,25 +16,24 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import type { ListField as ListFieldType } from 'components/configurationforms/types';
 import { MultiSelect } from 'components/common';
 import { Input } from 'components/bootstrap';
-import { optionalMarker } from 'components/configurationforms/FieldHelpers';
+import { optionableLabel } from 'components/configurationforms/FieldHelpers';
 
 type Props = {
-  autoFocus?: boolean,
-  field: ListFieldType,
-  onChange: (title: string, value: Array<string>, dirty?: boolean) => void,
-  title: string,
-  typeName: string,
-  value: Array<string> | string,
+  autoFocus?: boolean;
+  field: ListFieldType;
+  onChange: (title: string, value: Array<string>, dirty?: boolean) => void;
+  title: string;
+  typeName: string;
+  value?: Array<string> | string;
 };
 
-const ListField = ({ autoFocus, field, onChange, title, typeName, value }: Props) => {
+const ListField = ({ autoFocus = false, field, onChange, title, typeName, value = undefined }: Props) => {
   const handleChange = (nextValue) => {
-    const values = (nextValue === '' ? [] : nextValue.split(','));
+    const values = nextValue === '' ? [] : nextValue.split(',');
 
     onChange(title, values);
   };
@@ -42,43 +41,29 @@ const ListField = ({ autoFocus, field, onChange, title, typeName, value }: Props
   const isRequired = !field.is_optional;
   const allowCreate = field.attributes.includes('allow_create');
   const options = field.additional_info?.values || {};
-  const formattedOptions = Object.entries(options)
-    .map(([label, optionValue]) => ({ value: optionValue, label: label }));
-
-  const label = <>{field.human_name} {optionalMarker(field)}</>;
+  const formattedOptions = Object.entries(options).map(([label, optionValue]) => ({
+    value: optionValue,
+    label: label,
+  }));
 
   const selectValue = Array.isArray(value) ? value.join(',') : value;
 
   return (
-    <Input id={`${typeName}-${title}`}
-           label={label}
-           help={field.description}>
-      <MultiSelect inputId={`${typeName}-${title}`}
-                   name={`configuration[${title}]`}
-                   required={isRequired}
-                   autoFocus={autoFocus}
-                   className="list-field-select"
-                   options={formattedOptions}
-                   value={selectValue}
-                   placeholder={`${allowCreate ? 'Add' : 'Select'} ${field.human_name}`}
-                   onChange={handleChange}
-                   allowCreate={allowCreate} />
+    <Input id={`${typeName}-${title}`} label={optionableLabel(field)} help={field.description}>
+      <MultiSelect
+        inputId={`${typeName}-${title}`}
+        name={`configuration[${title}]`}
+        required={isRequired}
+        autoFocus={autoFocus}
+        className="list-field-select"
+        options={formattedOptions}
+        value={selectValue}
+        placeholder={`${allowCreate ? 'Add' : 'Select'} ${field.human_name}`}
+        onChange={handleChange}
+        allowCreate={allowCreate}
+      />
     </Input>
   );
-};
-
-ListField.propTypes = {
-  autoFocus: PropTypes.bool,
-  field: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  typeName: PropTypes.string.isRequired,
-  value: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
-};
-
-ListField.defaultProps = {
-  autoFocus: false,
-  value: undefined,
 };
 
 export default ListField;

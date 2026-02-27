@@ -18,18 +18,19 @@ package org.graylog.aws.auth;
 
 import org.graylog.aws.config.AWSPluginConfiguration;
 import org.graylog2.Configuration;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class AWSAuthProviderTest {
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock
     private Configuration systemConfiguration;

@@ -28,7 +28,8 @@
       "offset" : 0,
       "query" : null,
       "timerange" : null,
-      "streams" : [ ]
+      "streams" : [ ],
+      "stream_categories" : [ ]
     }, {
       "id" : "0000016e-b690-4271-0000-016eb690426f",
       "series" : [ {
@@ -44,6 +45,7 @@
       "timerange" : null,
       "rollup" : true,
       "streams" : [ ],
+      "stream_categories" : [ ],
       "row_groups" : [ {
         "field" : "timestamp",
         "interval" : {

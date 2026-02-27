@@ -15,14 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import { Pluralize } from 'components/common';
 
 import type { TimeBasedSizeOptimizingStrategyConfig } from './TimeBasedSizeOptimizingStrategyConfiguration';
 import { durationToRoundedDays } from './TimeBasedSizeOptimizingStrategyConfiguration';
 
-const TimeBasedSizeOptimizingStrategySummary = ({ config: { index_lifetime_max, index_lifetime_min } }: {config: TimeBasedSizeOptimizingStrategyConfig}) => {
+const TimeBasedSizeOptimizingStrategySummary = ({
+  config: { index_lifetime_max, index_lifetime_min },
+}: {
+  config: TimeBasedSizeOptimizingStrategyConfig;
+}) => {
   const minLifetimeAsDays = durationToRoundedDays(index_lifetime_min);
   const maxLifetimeAsDays = durationToRoundedDays(index_lifetime_max);
 
@@ -32,16 +35,18 @@ const TimeBasedSizeOptimizingStrategySummary = ({ config: { index_lifetime_max, 
         <dt>Index rotation strategy:</dt>
         <dd>Index Time Size Optimizing</dd>
         <dt>Minimum lifetime:</dt>
-        <dd>{index_lifetime_min} ({minLifetimeAsDays} <Pluralize singular="day" plural="days" value={minLifetimeAsDays} /> )</dd>
+        <dd>
+          {index_lifetime_min} ({minLifetimeAsDays} <Pluralize singular="day" plural="days" value={minLifetimeAsDays} />{' '}
+          )
+        </dd>
         <dt>Maximum lifetime:</dt>
-        <dd>{index_lifetime_max} ({maxLifetimeAsDays} <Pluralize singular="day" plural="days" value={maxLifetimeAsDays} />)</dd>
+        <dd>
+          {index_lifetime_max} ({maxLifetimeAsDays} <Pluralize singular="day" plural="days" value={maxLifetimeAsDays} />
+          )
+        </dd>
       </dl>
     </div>
   );
-};
-
-TimeBasedSizeOptimizingStrategySummary.propTypes = {
-  config: PropTypes.object.isRequired,
 };
 
 export default TimeBasedSizeOptimizingStrategySummary;

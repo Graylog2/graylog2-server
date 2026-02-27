@@ -19,17 +19,15 @@ package org.graylog2.rest.resources.streams.outputs;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class AvailableOutputSummary {
-    @JsonProperty
+    @JsonProperty("name")
     public abstract String name();
 
-    @JsonProperty
+    @JsonProperty("type")
     public abstract String type();
 
     @JsonProperty("human_name")
@@ -38,7 +36,7 @@ public abstract class AvailableOutputSummary {
     @JsonProperty("link_to_docs")
     public abstract String linkToDocs();
 
-    @JsonProperty
+    @JsonProperty("requested_configuration")
     public abstract ConfigurationRequest requestedConfiguration();
 
     public static AvailableOutputSummary create(String name, String type, String humanName, String linkToDocs, ConfigurationRequest requestedConfiguration) {

@@ -26,24 +26,25 @@ import DefaultProviders from 'DefaultProviders';
 import PreflightWrappingContainer from '../PreflightWrappingContainer';
 import WrappingContainer from '../WrappingContainer';
 
-export const renderWithWrapper = (Component: React.ReactElement<any>, options?: RenderOptions) => render(Component, {
-  wrapper: WrappingContainer,
-  ...options,
-});
+export const renderWithWrapper = (Component: React.ReactElement<any>, options?: RenderOptions) =>
+  render(Component, {
+    wrapper: WrappingContainer,
+    ...options,
+  });
 
-export const renderWithDataRouter = (element: React.ReactElement<any>, options?: RenderOptions) => render((
-  <RouterProvider router={createMemoryRouter([{ path: '/', element }])} />
-), {
-  wrapper: DefaultProviders,
-  ...options,
-});
+export const renderWithDataRouter = (element: React.ReactElement<any>, options?: RenderOptions) =>
+  render(<RouterProvider router={createMemoryRouter([{ path: '/', element }])} />, {
+    wrapper: DefaultProviders,
+    ...options,
+  });
 
-export const renderPreflightWithWrapper = (Component: React.ReactElement<any>, options?: RenderOptions) => render(Component, {
-  wrapper: PreflightWrappingContainer,
-  ...options,
-});
+export const renderPreflightWithWrapper = (Component: React.ReactElement<any>, options?: RenderOptions) =>
+  render(Component, {
+    wrapper: PreflightWrappingContainer,
+    ...options,
+  });
 
-export function asElement<T extends new(...args: any) => any> (elem: any, elementType: T): InstanceType<T> {
+export function asElement<T extends new (...args: any) => any>(elem: any, elementType: T): InstanceType<T> {
   if (elem && elem instanceof elementType) {
     // @ts-ignore
     return elem as T;
@@ -53,9 +54,15 @@ export function asElement<T extends new(...args: any) => any> (elem: any, elemen
   throw new Error(`Unable to cast ${elem?.constructor?.name ?? 'unknown'} to ${name}!`);
 }
 
-export * from '@testing-library/react';
+export type { Matcher } from '@testing-library/react';
 export {
-  renderWithWrapper as render,
-  renderPreflightWithWrapper as renderPreflight,
-  render as renderUnwrapped,
-};
+  act,
+  cleanup,
+  renderHook,
+  screen,
+  fireEvent,
+  within,
+  waitFor,
+  waitForElementToBeRemoved,
+} from '@testing-library/react';
+export { renderWithWrapper as render, renderPreflightWithWrapper as renderPreflight, render as renderUnwrapped };

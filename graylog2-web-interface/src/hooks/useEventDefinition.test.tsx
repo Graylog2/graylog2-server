@@ -15,10 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 
-import { mockEventDefinitionTwoAggregations, mockedMappedAggregation } from 'helpers/mocking/EventAndEventDefinitions_mock';
+import {
+  mockEventDefinitionTwoAggregations,
+  mockedMappedAggregation,
+} from 'helpers/mocking/EventAndEventDefinitions_mock';
 import suppressConsole from 'helpers/suppressConsole';
 import UserNotification from 'util/UserNotification';
 import asMock from 'helpers/mocking/AsMock';
@@ -37,10 +40,12 @@ jest.mock('util/UserNotification', () => ({
 jest.mock('views/logic/Widgets', () => ({
   ...jest.requireActual('views/logic/Widgets'),
   widgetDefinition: () => ({
-    searchTypes: () => [{
-      type: 'AGGREGATION',
-      typeDefinition: {},
-    }],
+    searchTypes: () => [
+      {
+        type: 'AGGREGATION',
+        typeDefinition: {},
+      },
+    ],
   }),
 }));
 
@@ -51,11 +56,7 @@ const queryClient = new QueryClient({
     },
   },
 });
-const wrapper = ({ children }) => (
-  <QueryClientProvider client={queryClient}>
-    {children}
-  </QueryClientProvider>
-);
+const wrapper = ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 
 describe('useEventDefinition', () => {
   afterEach(() => {
@@ -64,9 +65,11 @@ describe('useEventDefinition', () => {
 
   it('should run fetch and store mapped response', async () => {
     asMock(fetch).mockImplementation(() => Promise.resolve(mockEventDefinitionTwoAggregations));
-    const { result, waitFor } = renderHook(() => useEventDefinition(mockEventDefinitionTwoAggregations.id), { wrapper });
+    const { result } = renderHook(() => useEventDefinition(mockEventDefinitionTwoAggregations.id), {
+      wrapper,
+    });
 
-    await waitFor(() => result.current.isFetched);
+    await waitFor(() => expect(result.current.isFetched).toBeTruthy());
 
     expect(fetch).toHaveBeenCalledWith('GET', definitionUrl);
 
@@ -79,11 +82,14 @@ describe('useEventDefinition', () => {
     await suppressConsole(async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { waitFor } = renderHook(() => useEventDefinition(mockEventDefinitionTwoAggregations.id), { wrapper });
+      renderHook(() => useEventDefinition(mockEventDefinitionTwoAggregations.id), { wrapper });
 
-      await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
-        'Loading event definition failed with status: Error: Error',
-        'Could not load event definition'));
+      await waitFor(() =>
+        expect(UserNotification.error).toHaveBeenCalledWith(
+          'Loading event definition failed with status: Error: Error',
+          'Could not load event definition',
+        ),
+      );
     });
   });
 });

@@ -16,13 +16,14 @@
  */
 package org.graylog2.periodical;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.datatiering.DataTieringOrchestrator;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.Cluster;
-import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
@@ -30,9 +31,6 @@ import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
 
 import java.util.Map;
 
@@ -49,8 +47,6 @@ public class IndexRetentionThread extends Periodical {
     private final Map<String, Provider<RetentionStrategy>> retentionStrategyMap;
     private final DataTieringOrchestrator dataTieringOrchestrator;
 
-    private final RemoteReindexingMigrationAdapter migrationService;
-
     @Inject
     public IndexRetentionThread(ElasticsearchConfiguration configuration,
                                 IndexSetRegistry indexSetRegistry,
@@ -58,7 +54,7 @@ public class IndexRetentionThread extends Periodical {
                                 NodeId nodeId,
                                 NotificationService notificationService,
                                 Map<String, Provider<RetentionStrategy>> retentionStrategyMap,
-                                DataTieringOrchestrator dataTieringOrchestrator, RemoteReindexingMigrationAdapter migrationService) {
+                                DataTieringOrchestrator dataTieringOrchestrator) {
         this.configuration = configuration;
         this.indexSetRegistry = indexSetRegistry;
         this.cluster = cluster;
@@ -66,30 +62,26 @@ public class IndexRetentionThread extends Periodical {
         this.notificationService = notificationService;
         this.retentionStrategyMap = retentionStrategyMap;
         this.dataTieringOrchestrator = dataTieringOrchestrator;
-        this.migrationService = migrationService;
     }
 
     @Override
     public void doRun() {
         if (!cluster.isConnected()) {
-            LOG.info("Skipping index retention checks because the Elasticsearch cluster is unreachable");
+            LOG.warn("Skipping index retention checks because the Elasticsearch cluster is unreachable");
             return;
         }
         if (!cluster.isHealthy()) {
-            LOG.info("Skipping index retention checks because the Elasticsearch cluster is unhealthy: {}, Index Registry is up: {}", cluster.health().isPresent() ? cluster.health().get() : "unknown", cluster.indexSetRegistryIsUp());
+            LOG.warn("Skipping index retention checks because the Elasticsearch cluster is unhealthy: {}, Index Registry is up: {}",
+                    cluster.health().isPresent() ? cluster.health().get() : "unknown", cluster.indexSetRegistryIsUp());
             return;
         }
 
-        for (final IndexSet indexSet : indexSetRegistry) {
+        for (final IndexSet indexSet : indexSetRegistry.getAllIndexSets()) {
             if (!indexSet.getConfig().isWritable()) {
                 LOG.debug("Skipping non-writable index set <{}> ({})", indexSet.getConfig().id(), indexSet.getConfig().title());
                 continue;
             }
 
-            if(isCurrentlyMigrated(indexSet)) {
-                LOG.info("Index set <{}> is currently being migrated, skipping retention", indexSet.getConfig().title());
-                continue;
-            }
 
             final IndexSetConfig config = indexSet.getConfig();
             if (config.dataTieringConfig() != null) {
@@ -101,16 +93,12 @@ public class IndexRetentionThread extends Periodical {
                     LOG.warn("Retention strategy \"{}\" not found, not running index retention!", config.retentionStrategyClass());
                     retentionProblemNotification("Index Retention Problem!",
                             "Index retention strategy " + config.retentionStrategyClass() + " not found! Please fix your index retention configuration!");
-                    continue;
+                    return;
                 }
 
                 retentionStrategyProvider.get().retain(indexSet);
             }
         }
-    }
-
-    private boolean isCurrentlyMigrated(IndexSet indexSet) {
-        return migrationService.isMigrationRunning(indexSet);
     }
 
     private void retentionProblemNotification(String title, String description) {

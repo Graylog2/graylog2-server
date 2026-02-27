@@ -19,24 +19,26 @@ package org.graylog.plugins.views.search.views;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityRegistrar;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,12 +52,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class ViewServiceUsesViewRequirementsTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock
     private ClusterConfigService clusterConfigService;
@@ -67,25 +67,27 @@ public class ViewServiceUsesViewRequirementsTest {
     private ViewRequirements.Factory viewRequirementsFactory;
 
     private ViewService viewService;
+    private MongoCollections mongoCollections;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) throws Exception {
+        this.mongoCollections = mongoCollections;
         final var mapper = new ObjectMapperProvider();
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(mapper.get());
-        final MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongodb.mongoConnection());
         this.viewService = new ViewService(
                 clusterConfigService,
                 viewRequirementsFactory,
-                mock(EntityOwnershipService.class),
+                mock(EntityRegistrar.class),
                 mock(ViewSummaryService.class),
+                mock(EntitySourceService.class),
                 mongoCollections);
         when(viewRequirementsFactory.create(any(ViewDTO.class))).then(invocation -> new ViewRequirements(Collections.emptySet(), invocation.getArgument(0)));
         this.searchUser = TestSearchUser.builder().build();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
-        mongodb.mongoConnection().getMongoDatabase().drop();
+        mongoCollections.mongoConnection().getMongoDatabase().drop();
     }
 
     @Test
@@ -174,6 +176,7 @@ public class ViewServiceUsesViewRequirementsTest {
 
     @Test
     @MongoDBFixtures("views.json")
+    @SuppressWarnings("MustBeClosedChecker")
     public void streamAllReturnsViewWithViewRequirements() {
         final List<ViewDTO> views = viewService.streamAll().collect(Collectors.toList());
 
@@ -185,6 +188,7 @@ public class ViewServiceUsesViewRequirementsTest {
 
     @Test
     @MongoDBFixtures("views.json")
+    @SuppressWarnings("MustBeClosedChecker")
     public void streamByIdsReturnsViewWithViewRequirements() {
         final List<ViewDTO> views = viewService.streamByIds(
                 ImmutableSet.of("5ced4df1d6e8104c16f50e00", "5ced4a4485b52a86b96a0a63")

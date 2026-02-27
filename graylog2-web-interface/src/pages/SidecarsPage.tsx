@@ -15,52 +15,48 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
 
 import { Link } from 'components/common/router';
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
-import UsersDomain from 'domainActions/users/UsersDomain';
 import SidecarListContainer from 'components/sidecars/sidecars/SidecarListContainer';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
-import type User from 'logic/users/User';
+import useBasicSidecarUser from 'components/sidecars/hooks/useBasicSidecarUser';
 
 const SidecarsPage = () => {
-  const [sidecarUser, setSidecarUser] = useState<User | undefined>();
   const currentUser = useCurrentUser();
-  const canCreateSidecarUserTokens = isPermitted(currentUser?.permissions, ['users:tokenlist:graylog-sidecar']);
-
-  useEffect(() => {
-    if (canCreateSidecarUserTokens) {
-      UsersDomain.loadByUsername('graylog-sidecar').then((result) => setSidecarUser(result));
-    }
-  }, [canCreateSidecarUserTokens]);
+  const canCreateSidecarUserTokens = isPermitted(currentUser?.permissions, ['users:tokencreate:graylog-sidecar']);
+  const canReadSidecarUser = isPermitted(currentUser?.permissions, ['users:read:graylog-sidecar']);
+  const shouldFetchSidecarUser = canCreateSidecarUserTokens && canReadSidecarUser;
+  const { data: sidecarUser } = useBasicSidecarUser({ enabled: shouldFetchSidecarUser });
 
   return (
     <DocumentTitle title="Sidecars">
       <SidecarsPageNavigation />
-      <PageHeader title="Sidecars Overview"
-                  documentationLink={{
-                    title: 'Sidecar documentation',
-                    path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
-                  }}>
+      <PageHeader
+        title="Sidecars Overview"
+        documentationLink={{
+          title: 'Sidecar documentation',
+          path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+        }}>
         <span>
-          The Graylog sidecars can reliably forward contents of log files or Windows EventLog from your servers.
-          {canCreateSidecarUserTokens && (
-            sidecarUser ? (
+          Sidecars can reliably forward contents of log files or Windows EventLog from your servers.
+          {canCreateSidecarUserTokens &&
+            (sidecarUser ? (
               <span>
                 <br />
                 Do you need an API token for a sidecar?&ensp;
                 <Link to={Routes.SYSTEM.USERS.TOKENS.edit(sidecarUser.id)}>
-                  Create or reuse a token for the <em>graylog-sidecar</em> user
+                  Create or reuse a token for the <em>{sidecarUser.username}</em> user
                 </Link>
               </span>
-            ) : <Spinner />
-          )}
+            ) : (
+              <Spinner />
+            ))}
         </span>
       </PageHeader>
 

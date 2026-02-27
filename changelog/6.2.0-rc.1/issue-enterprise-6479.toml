@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Sorting pivot values numerically when field is numeric."
+
+issues = ["Graylog2/graylog-plugin-enterprise#6479"]
+pulls = ["20918"]

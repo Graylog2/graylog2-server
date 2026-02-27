@@ -51,10 +51,11 @@ public interface SeriesSpec extends PivotSpec {
     SeriesSpec withId(String id);
 
     /**
-     * Override if your series are based on "stats" or "extended stats" aggregation,
-     * to give exact name of the subfield of those aggregations which represents the series.
+     * Override if your series are based on multi-value metrics aggregation (i.e. "stats", "extended stats", "percentile"),
+     * to give the exact name of the subfield of those aggregations which represents the series.
+     * For other series - just use the default implementation, returning empty optional.
      */
-    default Optional<String> statsSubfieldName() {
+    default Optional<String> multiValueAggSubfieldName() {
         return Optional.empty();
     }
 

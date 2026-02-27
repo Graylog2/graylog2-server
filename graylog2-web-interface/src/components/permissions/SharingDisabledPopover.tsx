@@ -19,11 +19,11 @@ import * as React from 'react';
 import HoverForHelp from 'components/common/HoverForHelp';
 
 type Props = {
-  type: string,
-  description?: string,
+  type: string;
+  description?: string;
 };
 
-const SharingDisabledPopover = ({ type, description }: Props) => {
+const SharingDisabledPopover = ({ type, description = undefined }: Props) => {
   const getReadableType = (_type: string) => _type.replaceAll('_', ' ');
 
   return (
@@ -31,10 +31,6 @@ const SharingDisabledPopover = ({ type, description }: Props) => {
       {description || `Only owners of this ${getReadableType(type)} are allowed to share it.`}
     </HoverForHelp>
   );
-};
-
-SharingDisabledPopover.defaultProps = {
-  description: undefined,
 };
 
 export default SharingDisabledPopover;

@@ -16,24 +16,21 @@
  */
 package org.graylog2.jersey;
 
-import com.google.common.collect.ImmutableMap;
+import jakarta.ws.rs.core.Configuration;
+import jakarta.ws.rs.ext.Provider;
 import org.glassfish.jersey.server.model.ModelProcessor;
 import org.glassfish.jersey.server.model.Resource;
 import org.glassfish.jersey.server.model.ResourceModel;
+import org.graylog2.configuration.HttpConfiguration;
+import org.graylog2.shared.rest.NonApiResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import jakarta.ws.rs.core.Configuration;
-import jakarta.ws.rs.ext.Provider;
-
-import java.util.Map;
-import java.util.Optional;
+import static java.util.Objects.requireNonNull;
 
 @Provider
 public class PrefixAddingModelProcessor implements ModelProcessor {
-    private final Map<String, String> packagePrefixes;
-
-    public PrefixAddingModelProcessor(Map<String, String> packagePrefixes) {
-        this.packagePrefixes = ImmutableMap.copyOf(packagePrefixes);
-    }
+    private static final Logger LOG = LoggerFactory.getLogger(PrefixAddingModelProcessor.class);
 
     @Override
     public ResourceModel processResourceModel(ResourceModel model, Configuration config) {
@@ -41,28 +38,35 @@ public class PrefixAddingModelProcessor implements ModelProcessor {
         final ResourceModel.Builder resourceModelBuilder = new ResourceModel.Builder(false);
         for (final Resource resource : model.getResources()) {
             for (Class<?> handlerClass : resource.getHandlerClasses()) {
-                final String packageName = handlerClass.getPackage().getName();
+                if (handlerClass.isAnnotationPresent(NonApiResource.class)) {
+                    final var prefix = requireNonNull(handlerClass.getAnnotation(NonApiResource.class)).prefix();
 
-                final Optional<String> packagePrefix = packagePrefixes.entrySet().stream()
-                        .filter(entry -> packageName.startsWith(entry.getKey()))
-                        .sorted((o1, o2) -> -o1.getKey().compareTo(o2.getKey()))
-                        .map(Map.Entry::getValue)
-                        .findFirst();
+                    if (prefix.isBlank()) {
+                        throw new IllegalArgumentException("API path prefix can't be blank");
+                    }
 
-                if (packagePrefix.isPresent()) {
-                    final String prefixedPath = prefixPath(packagePrefix.get(), resource.getPath());
-                    final Resource newResource = Resource.builder(resource)
-                            .path(prefixedPath)
-                            .build();
-
-                    resourceModelBuilder.addResource(newResource);
+                    if ("/".equals(prefix)) {
+                        LOG.debug("Prefix is /, not adding prefix to resource: {} ({})", resource.getName(), resource.getPath());
+                        resourceModelBuilder.addResource(resource);
+                    } else {
+                        LOG.debug("Adding prefix <{}> to resource: {} ({})", prefix, resource.getName(), resource.getPath());
+                        resourceModelBuilder.addResource(resourceWithPrefix(resource, prefix));
+                    }
                 } else {
-                    resourceModelBuilder.addResource(resource);
+                    final var prefix = HttpConfiguration.PATH_API;
+                    LOG.debug("Adding prefix <{}> to resource: {} ({})", prefix, resource.getName(), resource.getPath());
+                    resourceModelBuilder.addResource(resourceWithPrefix(resource, prefix));
                 }
             }
         }
 
         return resourceModelBuilder.build();
+    }
+
+    private Resource resourceWithPrefix(Resource resource, String prefix) {
+        return Resource.builder(resource)
+                .path(prefixPath(prefix, resource.getPath()))
+                .build();
     }
 
     private String prefixPath(String prefix, String path) {

@@ -92,6 +92,8 @@ abstract class Pivot implements SearchType {
 
         abstract Builder streams(Set<String> streams);
 
+        abstract Builder streamCategories(Set<String> streamCategories);
+
         abstract Pivot build();
     }
 }

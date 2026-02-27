@@ -23,12 +23,12 @@ import com.jayway.jsonpath.JsonPath;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.Period;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TimeBasedRotationStrategyConfigTest {
     @Test

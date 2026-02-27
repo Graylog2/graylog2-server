@@ -16,11 +16,11 @@
  */
 package org.graylog2.plugin;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class VersionTest {
     @Test
@@ -45,40 +45,6 @@ public class VersionTest {
         assertFalse(Version.from(0, 20, 0).equals(Version.from(0, 20, 1)));
         assertFalse(Version.from(0, 20, 0, "preview.1").equals(Version.from(0, 20, 0, "preview.2")));
         assertFalse(Version.from(0, 20, 0).equals(null));
-    }
-
-    @Test
-    @SuppressWarnings("deprecation")
-    public void testGreaterMinor() throws Exception {
-        Version v = Version.from(0, 20, 0);
-
-        assertTrue(v.greaterMinor(Version.from(0, 19, 0)));
-        assertTrue(v.greaterMinor(Version.from(0, 18, 2)));
-        assertTrue(v.greaterMinor(Version.from(0, 19, 9001)));
-
-        assertFalse(v.greaterMinor(Version.from(0, 20, 0)));
-        assertFalse(v.greaterMinor(Version.from(1, 0, 0)));
-        assertFalse(v.greaterMinor(Version.from(1, 0, 9001)));
-        assertFalse(v.greaterMinor(Version.from(1, 20, 0)));
-        assertFalse(v.greaterMinor(Version.from(1, 1, 0)));
-        assertFalse(v.greaterMinor(Version.from(3, 2, 1)));
-
-        assertTrue(v.greaterMinor(Version.from(0, 19, 0, "rc.1")));
-
-        v = Version.from(1, 5, 0);
-
-        assertTrue(v.greaterMinor(Version.from(0, 19, 0)));
-        assertTrue(v.greaterMinor(Version.from(1, 0, 0)));
-        assertTrue(v.greaterMinor(Version.from(0, 19, 9001)));
-
-        assertFalse(v.greaterMinor(Version.from(1, 6, 0)));
-        assertFalse(v.greaterMinor(Version.from(3, 0, 0)));
-        assertFalse(v.greaterMinor(Version.from(1, 5, 9001)));
-        assertFalse(v.greaterMinor(Version.from(1, 20, 0)));
-        assertFalse(v.greaterMinor(Version.from(1, 20, 5)));
-        assertFalse(v.greaterMinor(Version.from(3, 2, 1)));
-
-        assertTrue(v.greaterMinor(Version.from(0, 19, 0, "rc.1")));
     }
 
     @Test

@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.graph.MutableGraph;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
@@ -68,7 +67,6 @@ import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStr
 
 @AutoValue
 @JsonDeserialize(builder = WidgetEntity.Builder.class)
-@WithBeanGetter
 public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TYPE = "type";
@@ -78,6 +76,9 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
     public static final String FIELD_TIMERANGE = "timerange";
     public static final String FIELD_QUERY = "query";
     public static final String FIELD_STREAMS = "streams";
+    public static final String FIELD_STREAM_CATEGORIES = "stream_categories";
+    public static final String FIELD_DESCRIPTION = "description";
+    public static final String FIELD_CONTEXT = "context";
 
     @JsonProperty(FIELD_ID)
     public abstract String id();
@@ -101,8 +102,19 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
     @JsonProperty(FIELD_STREAMS)
     public abstract Set<String> streams();
 
+    @JsonProperty(FIELD_STREAM_CATEGORIES)
+    public abstract Set<String> streamCategories();
+
     @JsonProperty(FIELD_CONFIG)
     public abstract WidgetConfigDTO config();
+
+    @JsonProperty(FIELD_DESCRIPTION)
+    @Nullable
+    public abstract String description();
+
+    @JsonProperty(FIELD_CONTEXT)
+    @Nullable
+    public abstract String context();
 
     public static Builder builder() {
         return Builder.builder();
@@ -131,6 +143,9 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
         @JsonProperty(FIELD_STREAMS)
         public abstract Builder streams(Set<String> streams);
 
+        @JsonProperty(FIELD_STREAM_CATEGORIES)
+        public abstract Builder streamCategories(Set<String> streamCategories);
+
         @JsonProperty(FIELD_CONFIG)
         @JsonTypeInfo(
                 use = JsonTypeInfo.Id.NAME,
@@ -139,12 +154,19 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
                 visible = true)
         public abstract Builder config(WidgetConfigDTO config);
 
+        @JsonProperty(FIELD_DESCRIPTION)
+        public abstract Builder description(@Nullable String description);
+
+        @JsonProperty(FIELD_CONTEXT)
+        public abstract Builder context(@Nullable String context);
+
         public abstract WidgetEntity build();
 
         @JsonCreator
         static Builder builder() {
             return new AutoValue_WidgetEntity.Builder()
                     .streams(Collections.emptySet())
+                    .streamCategories(Collections.emptySet())
                     .filters(Collections.emptyList());
         }
     }
@@ -152,6 +174,8 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
     @Override
     public WidgetDTO toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
         final WidgetDTO.Builder widgetBuilder = WidgetDTO.builder()
+                .description(this.description())
+                .context(this.context())
                 .config(this.config())
                 .filter(this.filter())
                 .filters(filters().stream().map(filter -> filter.toNativeEntity(parameters, nativeEntities)).toList())
@@ -168,6 +192,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
                                         "Invalid type for stream Stream for event definition: " + object.getClass());
                             }
                         }).collect(Collectors.toSet()))
+                .streamCategories(this.streamCategories())
                 .type(this.type());
         if (this.query().isPresent()) {
             widgetBuilder.query(this.query().get());
@@ -194,6 +219,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
         final PivotEntity.Builder pivotBuilder = PivotEntity.builder()
                 .name("chart")
                 .streams(streams())
+                .streamCategories(streamCategories())
                 .rollup(true)
                 .sort(toSortSpec(config))
                 .rowGroups(toRowGroups(config))
@@ -220,11 +246,11 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
 
     private List<SortSpec> toSortSpec(AggregationConfigDTO config) {
         return config.sort().stream().map(sortConfig -> {
-           final PivotSortConfig pivotSortConfig = (PivotSortConfig) sortConfig;
-           final SortSpec.Direction dir = pivotSortConfig.direction().equals(SortConfigDTO.Direction.Ascending)
+            final PivotSortConfig pivotSortConfig = (PivotSortConfig) sortConfig;
+            final SortSpec.Direction dir = pivotSortConfig.direction().equals(SortConfigDTO.Direction.Ascending)
                     ? SortSpec.Direction.Ascending
                     : SortSpec.Direction.Descending;
-           return PivotSort.create(PivotSort.Type, pivotSortConfig.field(), dir);
+            return PivotSort.create(PivotSort.Type, pivotSortConfig.field(), dir);
         }).collect(Collectors.toList());
 
     }

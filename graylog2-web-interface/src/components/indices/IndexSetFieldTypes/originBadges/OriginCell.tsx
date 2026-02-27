@@ -23,8 +23,8 @@ import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 import OriginBadge from './OriginBadge';
 
 type Props = {
-  origin: FieldTypeOrigin,
-}
+  origin: FieldTypeOrigin;
+};
 
 const OriginCell = ({ origin }: Props) => {
   const { attributes } = useTableFetchContext();

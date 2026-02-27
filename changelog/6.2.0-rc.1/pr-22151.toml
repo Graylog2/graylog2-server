@@ -1,0 +1,5 @@
+type="f"
+message="Avoid resetting widget editor on slow network connections."
+
+issues=["Graylog2/graylog-plugin-enterprise#6663"]
+pulls=["22151"]

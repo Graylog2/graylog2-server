@@ -17,38 +17,57 @@
 package org.graylog2.contentpacks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.io.Resources;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ContentPackV1;
 import org.graylog2.contentpacks.model.ModelId;
+import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.graylog2.streams.StreamService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 public class ContentPackPersistenceServiceTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
+
+    @Mock
+    private StreamService mockStreamService;
+
+    @Mock
+    private Stream mockStream;
 
     private ContentPackPersistenceService contentPackPersistenceService;
+    private ObjectMapper objectMapper;
 
-    @Before
-    public void setUp() throws Exception {
-        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-        final MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) throws Exception {
+        objectMapper = new ObjectMapperProvider().get();
 
-        contentPackPersistenceService = new ContentPackPersistenceService(
-                mongoJackObjectMapperProvider,
-                mongodb.mongoConnection(), null);
+        contentPackPersistenceService = new ContentPackPersistenceService(mongoCollections, mockStreamService);
     }
 
     @Test
@@ -207,5 +226,49 @@ public class ContentPackPersistenceServiceTest {
 
         assertThat(deletedContentPacks).isEqualTo(0);
         assertThat(contentPacks).hasSize(5);
+    }
+
+    @Test
+    public void filterMissingResourcesAndInsertDashboardWithStream() throws IOException {
+        final URL resourceUrl = Resources.getResource(this.getClass(), "content_pack_with_dashboard_with_stream.json");
+        final ContentPack contentPack = objectMapper.readValue(resourceUrl, ContentPack.class);
+
+        when(mockStream.getTitle()).thenReturn("Stream A");
+        when(mockStreamService.loadAll()).thenReturn(List.of(mockStream));
+        final ContentPackV1 filteredPack = (ContentPackV1) contentPackPersistenceService.filterMissingResourcesAndInsert(contentPack).get();
+
+        filteredPack.entities()
+                .stream()
+                .filter(entity -> "dashboard".equals(entity.type().name()) && "2".equals(entity.type().version()))
+                .map(entity -> ((EntityV1) entity).data().findValue("search"))
+                .map(node -> node.findValue("queries"))
+                .map(node -> node.findValue("search_types"))
+                .forEach(node -> {
+                    final ArrayNode streams = (ArrayNode) node.findValue("streams");
+                    assertThat(streams.size()).isEqualTo(1);
+                    assertThat(streams.get(0).asText()).isEqualTo("06f3a308-cd97-4495-80a0-5dc150adedcf");
+                });
+    }
+
+    @Test
+    public void filterMissingResourcesAndInsertDashboardWithStreamReference() throws IOException {
+        final URL resourceUrl = Resources.getResource(this.getClass(), "content_pack_with_dashboard_with_stream_reference.json");
+        final ContentPack contentPack = objectMapper.readValue(resourceUrl, ContentPack.class);
+
+        when(mockStream.getTitle()).thenReturn("Stream A");
+        when(mockStreamService.loadAll()).thenReturn(List.of(mockStream));
+        final ContentPackV1 filteredPack = (ContentPackV1) contentPackPersistenceService.filterMissingResourcesAndInsert(contentPack).get();
+
+        filteredPack.entities()
+                .stream()
+                .filter(entity -> "dashboard".equals(entity.type().name()) && "2".equals(entity.type().version()))
+                .map(entity -> ((EntityV1) entity).data().findValue("search"))
+                .map(node -> node.findValue("queries"))
+                .map(node -> node.findValue("search_types"))
+                .forEach(node -> {
+                    final ArrayNode streams = (ArrayNode) node.findValue("streams");
+                    assertThat(streams.size()).isEqualTo(1);
+                    assertThat(streams.get(0).asText()).isEqualTo("06f3a308-cd97-4495-80a0-5dc150adedcf");
+                });
     }
 }

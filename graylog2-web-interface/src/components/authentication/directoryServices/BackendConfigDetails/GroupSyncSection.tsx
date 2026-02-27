@@ -28,36 +28,32 @@ import EditLinkButton from './EditLinkButton';
 import { STEP_KEY as GROUP_SYNC_KEY } from '../BackendWizard/GroupSyncStep';
 
 type Props = {
-  authenticationBackend: DirectoryServiceBackend,
-  excludedFields?: {[ inputName: string ]: boolean },
-  roles: Immutable.List<Role>,
+  authenticationBackend: DirectoryServiceBackend;
+  excludedFields?: { [inputName: string]: boolean };
+  roles: Immutable.List<Role>;
 };
 
-const GroupSyncSection = ({ authenticationBackend, roles, excludedFields }: Props) => {
+const GroupSyncSection = ({ authenticationBackend, roles, excludedFields = undefined }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const GroupSyncSectionPlugin = enterpriseGroupSyncPlugin?.components.GroupSyncSection;
 
   if (!GroupSyncSectionPlugin) {
     return (
-      <SectionComponent title="Group Synchronization"
-                        headerActions={(
-                          <EditLinkButton authenticationBackendId={authenticationBackend.id}
-                                          stepKey={GROUP_SYNC_KEY} />
-                      )}>
+      <SectionComponent
+        title="Group Synchronization"
+        headerActions={<EditLinkButton authenticationBackendId={authenticationBackend.id} stepKey={GROUP_SYNC_KEY} />}>
         <EnterprisePluginNotFound featureName="group synchronization" />
       </SectionComponent>
     );
   }
 
   return (
-    <GroupSyncSectionPlugin authenticationBackend={authenticationBackend}
-                            excludedFields={excludedFields}
-                            roles={roles} />
+    <GroupSyncSectionPlugin
+      authenticationBackend={authenticationBackend}
+      excludedFields={excludedFields}
+      roles={roles}
+    />
   );
-};
-
-GroupSyncSection.defaultProps = {
-  excludedFields: undefined,
 };
 
 export default GroupSyncSection;

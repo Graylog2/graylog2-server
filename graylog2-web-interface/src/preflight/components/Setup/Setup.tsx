@@ -17,7 +17,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import Alert from 'components/bootstrap/Alert';
 import DocsHelper from 'util/DocsHelper';
 import Section from 'preflight/components/common/Section';
 import DataNodesOverview from 'preflight/components/Setup/DataNodesOverview';
@@ -29,22 +28,23 @@ const P = styled.p`
 `;
 
 type Props = {
-  setIsWaitingForStartup: React.Dispatch<React.SetStateAction<boolean>>,
-}
+  setIsWaitingForStartup: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
 const Setup = ({ setIsWaitingForStartup }: Props) => (
   <>
-    <Alert bsStyle="warning">
-      Data Node is currently in beta. Feel free to check it out and tell us about your experience!
-    </Alert>
     <Section title="Welcome!" titleOrder={1} dataTestid="welcome-section">
       <P>
-        It looks like you are starting Graylog for the first time and have not configured a data node.<br />
+        It looks like you are starting Graylog for the first time and have not configured a data node.
+        <br />
         Data nodes allow you to index and search through all the messages in your Graylog message database.
       </P>
       <P>
-        You can either implement a <DocumentationLink page={DocsHelper.PAGES.GRAYLOG_DATA_NODE} text="Graylog data node" /> (recommended) or you can configure an <DocumentationLink page={DocsHelper.PAGES.OPEN_SEARCH_SETUP} text="OpenSearch" /> node manually.
-        For the manual OpenSearch configuration you need to adjust the Graylog configuration and restart the Graylog server. After the restart this page will not show up again.
+        You can either implement a{' '}
+        <DocumentationLink page={DocsHelper.PAGES.GRAYLOG_DATA_NODE} text="Graylog data node" /> (recommended) or you
+        can configure an <DocumentationLink page={DocsHelper.PAGES.OPEN_SEARCH_SETUP} text="OpenSearch" /> node
+        manually. For the manual OpenSearch configuration you need to adjust the Graylog configuration and restart the
+        Graylog server. After the restart this page will not show up again.
       </P>
     </Section>
     <Section title="Graylog Data Nodes" titleOrder={2}>

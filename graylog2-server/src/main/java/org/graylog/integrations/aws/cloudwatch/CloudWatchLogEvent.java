@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 /**
  * A single CloudWatch log event.
@@ -36,7 +35,6 @@ import org.graylog.autovalue.WithBeanGetter;
  */
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class CloudWatchLogEvent {
 
     private static final String ID = "id";

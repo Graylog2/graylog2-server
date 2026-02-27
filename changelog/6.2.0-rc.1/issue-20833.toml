@@ -1,0 +1,5 @@
+type = "f"
+message = "Hiding zoom-out notifier when zooming in on graph."
+
+issues = ["20833"]
+pulls = ["21850"]

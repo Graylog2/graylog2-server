@@ -32,20 +32,20 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-public class MongoDbIndexTools<T> {
+public class MongoDbIndexTools {
 
     static final String COLLATION_KEY = "collation";
     static final String INDEX_DOCUMENT_KEY = "key";
 
-    private final MongoCollection<T> db;
+    private final MongoCollection<Document> db;
 
-    public MongoDbIndexTools(final MongoCollection<T> db) {
+    public MongoDbIndexTools(final MongoCollection<Document> db) {
         this.db = db;
     }
 
     // MongoDB Indexes cannot be altered once created.
     public static void ensureTTLIndex(MongoCollection<Document> collection, Duration ttl, String fieldUpdatedAt) {
-        final IndexOptions indexOptions = new IndexOptions().expireAfter(ttl.getSeconds(), TimeUnit.SECONDS);
+        final IndexOptions indexOptions = new IndexOptions().expireAfter(ttl.toSeconds(), TimeUnit.SECONDS);
         final Bson updatedAtKey = Indexes.ascending(fieldUpdatedAt);
         for (Document document : collection.listIndexes()) {
             final Set<String> keySet = document.get(INDEX_DOCUMENT_KEY, Document.class).keySet();
@@ -114,11 +114,13 @@ public class MongoDbIndexTools<T> {
         if (existingIndices == null) {
             return Optional.empty();
         }
-        return MongoUtils.stream(existingIndices)
-                .filter(info ->
-                        info.get(INDEX_DOCUMENT_KEY, Document.class).containsKey(sortField)
-                )
-                .findFirst();
+        try (final var stream = MongoUtils.stream(existingIndices)) {
+            return stream
+                    .filter(info ->
+                            info.get(INDEX_DOCUMENT_KEY, Document.class).containsKey(sortField)
+                    )
+                    .findFirst();
+        }
     }
 
     public void createUniqueIndex(final String field) {

@@ -33,15 +33,27 @@ const CenteredButton = styled(Button)`
   align-items: center;
 `;
 
-type FilterValueDropdownProps = {
-  attribute: Attribute,
-  allActiveFilters: Filters | undefined,
-  filter: Filter,
-  filterValueRenderer: (value: Filter['value'], title: string) => React.ReactNode | undefined,
-  onChangeFilter: (attributeId: string, prevValue: string, newFilter: Filter) => void,
-}
+const FilterValueButton = styled(CenteredButton)<{ $isConflicting: boolean }>`
+  text-decoration: ${({ $isConflicting }) => ($isConflicting ? 'line-through' : 'none')};
+`;
 
-const FilterValueDropdown = ({ attribute, allActiveFilters, onChangeFilter, filterValueRenderer, filter }: FilterValueDropdownProps) => {
+type FilterValueDropdownProps = {
+  attribute: Attribute;
+  allActiveFilters: Filters | undefined;
+  filter: Filter;
+  filterValueRenderer: (value: Filter['value'], title: string) => React.ReactNode | undefined;
+  onChangeFilter: (attributeId: string, prevValue: string, newFilter: Filter) => void;
+  isConflicting: boolean;
+};
+
+const FilterValueDropdown = ({
+  attribute,
+  allActiveFilters,
+  onChangeFilter,
+  filterValueRenderer,
+  filter,
+  isConflicting,
+}: FilterValueDropdownProps) => {
   const [show, setShowDropdown] = useState(false);
   const { value, title } = filter;
 
@@ -49,39 +61,48 @@ const FilterValueDropdown = ({ attribute, allActiveFilters, onChangeFilter, filt
     setShowDropdown((cur) => !cur);
   };
 
-  const onSubmit = (newFilter: { title: string, value: string }) => {
+  const _onClose = () => {
+    setShowDropdown(false);
+  };
+
+  const onSubmit = (newFilter: { title: string; value: string }) => {
     onChangeFilter(attribute.id, value, { value: newFilter.value, title: newFilter.title });
     _onToggle();
   };
 
   return (
-    <OverlayDropdown show={show}
-                     closeOnSelect={false}
-                     toggleChild={(
-                       <CenteredButton bsSize="xsmall" title="Change filter value">
-                         {filterValueRenderer ? filterValueRenderer(value, title) : title}
-                       </CenteredButton>
-                     )}
-                     placement="bottom"
-                     onToggle={_onToggle}
-                     dropdownZIndex={1050}>
-      <FilterConfiguration attribute={attribute}
-                           filterValueRenderer={filterValueRenderer}
-                           onSubmit={onSubmit}
-                           filter={filter}
-                           allActiveFilters={allActiveFilters} />
+    <OverlayDropdown
+      show={show}
+      closeOnSelect={false}
+      toggleChild={
+        <FilterValueButton bsSize="xsmall" title="Change filter value" $isConflicting={isConflicting}>
+          {filterValueRenderer ? filterValueRenderer(value, title) : title}
+        </FilterValueButton>
+      }
+      placement="bottom"
+      onToggle={_onToggle}
+      onClose={_onClose}
+      dropdownZIndex={1050}>
+      <FilterConfiguration
+        attribute={attribute}
+        filterValueRenderer={filterValueRenderer}
+        onSubmit={onSubmit}
+        filter={filter}
+        allActiveFilters={allActiveFilters}
+      />
     </OverlayDropdown>
   );
 };
 
 type Props = {
-  attribute: Attribute,
-  filter: Filter,
-  allActiveFilters: Filters | undefined
-  filterValueRenderer: (value: string, title: string) => React.ReactNode | undefined,
-  onChangeFilter: (attributeId: string, prevValue: string, newFilter: Filter) => void,
-  onDeleteFilter: (attributeId: string, filterId: string) => void,
-}
+  attribute: Attribute;
+  filter: Filter;
+  allActiveFilters: Filters | undefined;
+  filterValueRenderer: (value: string, title: string) => React.ReactNode | undefined;
+  onChangeFilter: (attributeId: string, prevValue: string, newFilter: Filter) => void;
+  onDeleteFilter: (attributeId: string, filterId: string) => void;
+  isConflicting: boolean;
+};
 
 const ActiveFilter = ({
   attribute,
@@ -90,6 +111,7 @@ const ActiveFilter = ({
   filterValueRenderer,
   onDeleteFilter,
   onChangeFilter,
+  isConflicting,
 }: Props) => {
   const { value, title } = filter;
 
@@ -103,16 +125,23 @@ const ActiveFilter = ({
   return (
     <Container className="btn-group" data-testid={`${attribute.id}-filter-${value}`}>
       {attribute.type === 'BOOLEAN' && (
-        <CenteredButton bsSize="xsmall" onClick={onChangeBooleanValue} title="Change filter value">
+        <FilterValueButton
+          bsSize="xsmall"
+          onClick={onChangeBooleanValue}
+          title="Change filter value"
+          $isConflicting={isConflicting}>
           {filterValueRenderer ? filterValueRenderer(value, title) : title}
-        </CenteredButton>
+        </FilterValueButton>
       )}
       {attribute.type !== 'BOOLEAN' && (
-        <FilterValueDropdown onChangeFilter={onChangeFilter}
-                             attribute={attribute}
-                             filter={filter}
-                             allActiveFilters={allActiveFilters}
-                             filterValueRenderer={filterValueRenderer} />
+        <FilterValueDropdown
+          onChangeFilter={onChangeFilter}
+          attribute={attribute}
+          filter={filter}
+          allActiveFilters={allActiveFilters}
+          filterValueRenderer={filterValueRenderer}
+          isConflicting={isConflicting}
+        />
       )}
       <CenteredButton bsSize="xsmall" onClick={() => onDeleteFilter(attribute.id, value)} title="Delete filter">
         <Icon name="close" />

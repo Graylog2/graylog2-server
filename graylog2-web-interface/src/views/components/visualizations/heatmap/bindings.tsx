@@ -16,7 +16,9 @@
  */
 import type { VisualizationType } from 'views/types';
 import HeatmapVisualization from 'views/components/visualizations/heatmap/HeatmapVisualization';
-import HeatmapVisualizationConfig, { COLORSCALES } from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
+import HeatmapVisualizationConfig, {
+  COLORSCALES,
+} from 'views/logic/aggregationbuilder/visualizations/HeatmapVisualizationConfig';
 import { defaultCompare } from 'logic/DefaultCompare';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 import {
@@ -25,13 +27,13 @@ import {
 } from 'views/components/visualizations/validations';
 
 type HeatMapVisualizationConfigFormValues = {
-  colorScale: typeof COLORSCALES[number],
-  reverseScale: boolean,
-  autoScale: boolean,
-  zMin: number,
-  zMax: number
-  useSmallestAsDefault: boolean,
-  defaultValue: number,
+  colorScale: (typeof COLORSCALES)[number];
+  reverseScale: boolean;
+  autoScale: boolean;
+  zMin: number;
+  zMax: number;
+  useSmallestAsDefault: boolean;
+  defaultValue: number;
 };
 
 const validate = (formValues: WidgetConfigFormValues) => {
@@ -51,63 +53,104 @@ const validate = (formValues: WidgetConfigFormValues) => {
     errors.push('At least one metric must be configured.');
   }
 
-  return errors.length > 0
-    ? { type: errors.join(' ') }
-    : {};
+  return errors.length > 0 ? { type: errors.join(' ') } : {};
 };
 
-const heatmap: VisualizationType<typeof HeatmapVisualization.type, HeatmapVisualizationConfig, HeatMapVisualizationConfigFormValues> = {
+const heatmap: VisualizationType<
+  typeof HeatmapVisualization.type,
+  HeatmapVisualizationConfig,
+  HeatMapVisualizationConfigFormValues
+> = {
   type: HeatmapVisualization.type,
   displayName: 'Heatmap',
   component: HeatmapVisualization,
   config: {
-    fromConfig: ({ autoScale, colorScale, reverseScale, defaultValue, useSmallestAsDefault, zMax, zMin }: HeatmapVisualizationConfig = HeatmapVisualizationConfig.empty()) => ({
-      autoScale, colorScale, reverseScale, defaultValue, useSmallestAsDefault, zMax, zMin,
+    fromConfig: (
+      {
+        autoScale,
+        colorScale,
+        reverseScale,
+        defaultValue,
+        useSmallestAsDefault,
+        zMax,
+        zMin,
+      }: HeatmapVisualizationConfig = HeatmapVisualizationConfig.empty(),
+    ) => ({
+      autoScale,
+      colorScale,
+      reverseScale,
+      defaultValue,
+      useSmallestAsDefault,
+      zMax,
+      zMin,
     }),
-    toConfig: ({ autoScale = false, colorScale, reverseScale = false, useSmallestAsDefault, zMax, zMin, defaultValue }: HeatMapVisualizationConfigFormValues) => {
+    toConfig: ({
+      autoScale = false,
+      colorScale,
+      reverseScale = false,
+      useSmallestAsDefault,
+      zMax,
+      zMin,
+      defaultValue,
+    }: HeatMapVisualizationConfigFormValues) => {
       const [finalZMin, finalZMax] = autoScale ? [undefined, undefined] : [zMin, zMax];
 
-      return HeatmapVisualizationConfig
-        .create(colorScale, reverseScale, autoScale, finalZMin, finalZMax, useSmallestAsDefault, defaultValue);
+      return HeatmapVisualizationConfig.create(
+        colorScale,
+        reverseScale,
+        autoScale,
+        finalZMin,
+        finalZMax,
+        useSmallestAsDefault,
+        defaultValue,
+      );
     },
     createConfig: () => ({ colorScale: 'Viridis', autoScale: true }),
-    fields: [{
-      name: 'colorScale',
-      title: 'Color Scale',
-      required: true,
-      type: 'select',
-      options: [...COLORSCALES].sort(defaultCompare),
-    }, {
-      name: 'reverseScale',
-      type: 'boolean',
-      title: 'Reverse Scale',
-    }, {
-      name: 'autoScale',
-      type: 'boolean',
-      title: 'Auto Scale',
-    }, {
-      name: 'zMin',
-      type: 'numeric',
-      title: 'Min',
-      required: true,
-      isShown: (values: HeatMapVisualizationConfigFormValues) => !values?.autoScale,
-    }, {
-      name: 'zMax',
-      type: 'numeric',
-      title: 'Max',
-      required: true,
-      isShown: (values: HeatMapVisualizationConfigFormValues) => !values?.autoScale,
-    }, {
-      name: 'useSmallestAsDefault',
-      type: 'boolean',
-      title: 'Use smallest as default',
-    }, {
-      name: 'defaultValue',
-      type: 'numeric',
-      title: 'Default Value',
-      isShown: (values: HeatMapVisualizationConfigFormValues) => !values?.useSmallestAsDefault,
-      required: false,
-    }],
+    fields: [
+      {
+        name: 'colorScale',
+        title: 'Color Scale',
+        required: true,
+        type: 'select',
+        options: [...COLORSCALES].sort(defaultCompare),
+      },
+      {
+        name: 'reverseScale',
+        type: 'boolean',
+        title: 'Reverse Scale',
+      },
+      {
+        name: 'autoScale',
+        type: 'boolean',
+        title: 'Auto Scale',
+      },
+      {
+        name: 'zMin',
+        type: 'numeric',
+        title: 'Min',
+        required: true,
+        isShown: (values: HeatMapVisualizationConfigFormValues) => !values?.autoScale,
+      },
+      {
+        name: 'zMax',
+        type: 'numeric',
+        title: 'Max',
+        required: true,
+        isShown: (values: HeatMapVisualizationConfigFormValues) => !values?.autoScale,
+      },
+      {
+        name: 'useSmallestAsDefault',
+        type: 'boolean',
+        title: 'Use smallest as default',
+      },
+      {
+        name: 'defaultValue',
+        type: 'numeric',
+        title: 'Default Value',
+        isShown: (values: HeatMapVisualizationConfigFormValues) => !values?.useSmallestAsDefault,
+        required: false,
+      },
+    ],
   },
   validate,
 };

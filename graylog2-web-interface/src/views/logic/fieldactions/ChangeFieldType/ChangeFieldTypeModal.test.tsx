@@ -15,20 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
+import selectEvent from 'helpers/selectEvent';
 import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import useFieldTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
-import useFieldTypeUsages from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
+import { fetchFieldTypeUsages } from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 import type { Attributes } from 'stores/PaginationTypes';
-import suppressConsole from 'helpers/suppressConsole';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
@@ -41,18 +41,21 @@ const renderChangeFieldTypeModal = ({
   showSelectionTable = undefined,
   initialFieldType = undefined,
   initialSelectedIndexSets = ['id-1', 'id-2'],
-}) => render(
-  <TestStoreProvider>
-    <ChangeFieldTypeModal onClose={onClose}
-                          initialData={{
-                            fieldName: field,
-                            type: initialFieldType,
-                          }}
-                          show={show}
-                          initialSelectedIndexSets={initialSelectedIndexSets}
-                          showSelectionTable={showSelectionTable} />
-  </TestStoreProvider>,
-);
+}) =>
+  render(
+    <TestStoreProvider>
+      <ChangeFieldTypeModal
+        onClose={onClose}
+        initialData={{
+          fieldName: field,
+          type: initialFieldType,
+        }}
+        show={show}
+        initialSelectedIndexSets={initialSelectedIndexSets}
+        showSelectionTable={showSelectionTable}
+      />
+    </TestStoreProvider>,
+  );
 const attributes: Attributes = [
   {
     id: 'index_set_id',
@@ -95,25 +98,22 @@ const fieldTypeUsages = [
     types: ['int'],
   },
 ];
-const paginatedFieldUsage = ({
-  data: {
-    list: fieldTypeUsages,
-    pagination: {
-      total: 2,
-      page: 1,
-      perPage: 5,
-      count: 1,
-    },
-    attributes,
+const paginatedFieldUsage = {
+  list: fieldTypeUsages,
+  pagination: {
+    total: 2,
+    page: 1,
+    perPage: 5,
+    count: 1,
   },
-  refetch: () => {
-  },
-  isInitialLoading: false,
-  isLoading: false,
-});
+  attributes,
+};
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation', () => jest.fn());
-jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages', () => jest.fn());
+jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages', () => ({
+  ...jest.requireActual('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages'),
+  fetchFieldTypeUsages: jest.fn(() => async () => {}),
+}));
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation', () => jest.fn());
 
@@ -125,12 +125,15 @@ jest.mock('stores/indices/IndexSetsStore', () => ({
   IndexSetsActions: {
     list: jest.fn(),
   },
-  IndexSetsStore: MockStore(['getInitialState', () => ({
-    indexSets: [
-      { id: 'id-1', title: 'Index Title 1' },
-      { id: 'id-2', title: 'Index Title 2' },
-    ],
-  })]),
+  IndexSetsStore: MockStore([
+    'getInitialState',
+    () => ({
+      indexSets: [
+        { id: 'id-1', title: 'Index Title 1' },
+        { id: 'id-2', title: 'Index Title 2' },
+      ],
+    }),
+  ]),
 }));
 
 describe('ChangeFieldTypeModal', () => {
@@ -165,16 +168,19 @@ describe('ChangeFieldTypeModal', () => {
     });
 
     asMock(useFieldTypeMutation).mockReturnValue({ isLoading: false, putFieldTypeMutation: putFieldTypeMutationMock });
-    asMock(useFieldTypeUsages).mockReturnValue(paginatedFieldUsage);
+    asMock(fetchFieldTypeUsages).mockResolvedValue(paginatedFieldUsage);
 
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
         ...layoutPreferences,
-        displayedAttributes: ['index_set_title',
-          'stream_titles',
-          'types'],
+        attributes: {
+          index_set_title: { status: 'show' },
+          stream_titles: { status: 'show' },
+          types: { status: 'show' },
+        },
       },
       isInitialLoading: false,
+      refetch: () => {},
     });
   });
 
@@ -187,12 +193,7 @@ describe('ChangeFieldTypeModal', () => {
   it('Shows type options', async () => {
     renderChangeFieldTypeModal({});
 
-    await suppressConsole(async () => {
-      const typeSelect = await screen.findByLabelText(/select field type for field/i);
-      selectEvent.openMenu(typeSelect);
-    });
-
-    await screen.findByText('Boolean');
+    await selectEvent.assertOptionExists('select field type for field', 'Boolean');
   });
 
   it('Shows index sets data', async () => {
@@ -209,44 +210,44 @@ describe('ChangeFieldTypeModal', () => {
   it('run putFieldTypeMutationMock with selected type and indexes', async () => {
     renderChangeFieldTypeModal({});
 
-    const typeSelect = await screen.findByLabelText(/select field type for field/i);
-    selectEvent.openMenu(typeSelect);
-    await selectEvent.select(typeSelect, 'Number(int)');
+    await selectEvent.chooseOption('select field type for field', 'Number(int)');
 
     const submit = await screen.findByTitle(/change field type/i);
 
     const rowCheckboxes = await screen.findAllByTitle(/deselect entity/i);
-    fireEvent.click(rowCheckboxes[1]);
-    fireEvent.click(submit);
+    await userEvent.click(rowCheckboxes[1]);
+    await userEvent.click(submit);
 
-    await waitFor(() => expect(putFieldTypeMutationMock).toHaveBeenCalledWith({
-      indexSetSelection: ['id-1'],
-      newFieldType: 'int',
-      rotated: true,
-      field: 'field',
-    }));
+    await waitFor(() =>
+      expect(putFieldTypeMutationMock).toHaveBeenCalledWith({
+        indexSetSelection: ['id-1'],
+        newFieldType: 'int',
+        rotated: true,
+        field: 'field',
+      }),
+    );
   });
 
   it('run putFieldTypeMutationMock with selected type and indexes when showSelectionTable false', async () => {
     renderChangeFieldTypeModal({ initialSelectedIndexSets: ['id-2'] });
 
-    const typeSelect = await screen.findByLabelText(/select field type for field/i);
-    selectEvent.openMenu(typeSelect);
-    await selectEvent.select(typeSelect, 'Number(int)');
+    await selectEvent.chooseOption('select field type for field', 'Number(int)');
 
     const submit = await screen.findByTitle(/change field type/i);
 
-    fireEvent.click(submit);
+    await userEvent.click(submit);
 
-    await waitFor(() => expect(putFieldTypeMutationMock).toHaveBeenCalledWith({
-      indexSetSelection: ['id-2'],
-      newFieldType: 'int',
-      rotated: true,
-      field: 'field',
-    }));
+    await waitFor(() =>
+      expect(putFieldTypeMutationMock).toHaveBeenCalledWith({
+        indexSetSelection: ['id-2'],
+        newFieldType: 'int',
+        rotated: true,
+        field: 'field',
+      }),
+    );
   });
 
-  it('Doesn\'t shows index sets data when showSelectionTable false', async () => {
+  it("Doesn't shows index sets data when showSelectionTable false", async () => {
     renderChangeFieldTypeModal({ showSelectionTable: false });
 
     expect(screen.queryByText('Stream Title 1')).not.toBeInTheDocument();

@@ -25,9 +25,9 @@ import useStreamOutputMutation from 'hooks/useStreamOutputMutations';
 import { keyFn } from 'hooks/useStreamOutputs';
 
 type Props = {
-  output: Output,
-  streamId: string,
-}
+  output: Output;
+  streamId: string;
+};
 
 const RemoveOutputButton = ({ output, streamId }: Props) => {
   const [showConfirmRemove, setShowConfirmRemove] = useState(false);
@@ -35,21 +35,21 @@ const RemoveOutputButton = ({ output, streamId }: Props) => {
   const queryClient = useQueryClient();
 
   const onConfirmRemoveOutput = () => {
-    removeStreamOutput({ streamId, outputId: output.id }).then(() => queryClient.invalidateQueries(keyFn(streamId)));
+    removeStreamOutput({ streamId, outputId: output.id }).then(() =>
+      queryClient.invalidateQueries({ queryKey: keyFn(streamId) }),
+    );
   };
 
   return (
     <>
-      <Button bsStyle="link"
-              bsSize="xsmall"
-              onClick={() => setShowConfirmRemove(true)}
-              title="Edit Output">
+      <Button bsStyle="link" bsSize="xsmall" onClick={() => setShowConfirmRemove(true)} title="Edit Output">
         <Icon name="delete" type="regular" />
       </Button>
-      <ConfirmDialog show={showConfirmRemove}
-                     onConfirm={onConfirmRemoveOutput}
-                     onCancel={() => setShowConfirmRemove(false)}
-                     title="Remove Output">
+      <ConfirmDialog
+        show={showConfirmRemove}
+        onConfirm={onConfirmRemoveOutput}
+        onCancel={() => setShowConfirmRemove(false)}
+        title="Remove Output">
         <p>Do you really want to remove this output from the stream?</p>
       </ConfirmDialog>
     </>

@@ -25,12 +25,16 @@ const block = buildRuleBlock();
 
 describe('RuleBuilderBlock', () => {
   it('renders RuleBlockForm when no block exists', async () => {
-    render(<RuleBuilderBlock type="action"
-                             blockDict={actionsBlockDict}
-                             order={1}
-                             addBlock={jest.fn()}
-                             updateBlock={jest.fn()}
-                             deleteBlock={jest.fn()} />);
+    render(
+      <RuleBuilderBlock
+        type="action"
+        blockDict={actionsBlockDict}
+        order={1}
+        addBlock={jest.fn()}
+        updateBlock={jest.fn()}
+        deleteBlock={jest.fn()}
+      />,
+    );
 
     expect(screen.getByText(/Add action/i)).toBeInTheDocument();
   });
@@ -38,13 +42,15 @@ describe('RuleBuilderBlock', () => {
   it('renders RuleBlockDisplay when a block exists', async () => {
     render(
       <RuleBuilderProvider>
-        <RuleBuilderBlock type="action"
-                          blockDict={actionsBlockDict}
-                          block={block}
-                          order={1}
-                          addBlock={jest.fn()}
-                          updateBlock={jest.fn()}
-                          deleteBlock={jest.fn()} />
+        <RuleBuilderBlock
+          type="action"
+          blockDict={actionsBlockDict}
+          block={block}
+          order={1}
+          addBlock={jest.fn()}
+          updateBlock={jest.fn()}
+          deleteBlock={jest.fn()}
+        />
       </RuleBuilderProvider>,
     );
 

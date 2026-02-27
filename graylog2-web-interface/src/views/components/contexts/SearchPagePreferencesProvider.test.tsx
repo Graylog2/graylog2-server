@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, fireEvent } from 'wrappedTestingLibrary';
+import { render } from 'wrappedTestingLibrary';
 import { defaultUser } from 'defaultMockValues';
+import userEvent from '@testing-library/user-event';
 
 import { adminUser, alice } from 'fixtures/users';
 import asMock from 'helpers/mocking/AsMock';
@@ -61,13 +62,11 @@ describe('SearchPagePreferencesProvider', () => {
 
   const view = createSearch().toBuilder().type(View.Type.Search).build();
 
-  const SimpleProvider = ({ children }: { children: (value: SearchPreferencesLayout) => React.ReactNode}) => (
+  const SimpleProvider = ({ children }: { children: (value: SearchPreferencesLayout) => React.ReactNode }) => (
     <TestStoreProvider view={view}>
       <CurrentUserPreferencesProvider>
         <SearchPagePreferencesProvider>
-          <SearchPagePreferencesContext.Consumer>
-            {children}
-          </SearchPagePreferencesContext.Consumer>
+          <SearchPagePreferencesContext.Consumer>{children}</SearchPagePreferencesContext.Consumer>
         </SearchPagePreferencesProvider>
       </CurrentUserPreferencesProvider>
     </TestStoreProvider>
@@ -77,9 +76,15 @@ describe('SearchPagePreferencesProvider', () => {
     <SimpleProvider>
       {(searchPagePreferences) => {
         if (!searchPagePreferences) return '';
-        const { actions: { toggleSidebarPinning } } = searchPagePreferences;
+        const {
+          actions: { toggleSidebarPinning },
+        } = searchPagePreferences;
 
-        return (<button type="button" onClick={() => toggleSidebarPinning()}>Toggle sidebar pinning</button>);
+        return (
+          <button type="button" onClick={() => toggleSidebarPinning()}>
+            Toggle sidebar pinning
+          </button>
+        );
       }}
     </SimpleProvider>
   );
@@ -87,11 +92,7 @@ describe('SearchPagePreferencesProvider', () => {
   const renderSUT = () => {
     const consume = jest.fn();
 
-    render(
-      <SimpleProvider>
-        {consume}
-      </SimpleProvider>,
-    );
+    render(<SimpleProvider>{consume}</SimpleProvider>);
 
     return consume;
   };
@@ -99,32 +100,58 @@ describe('SearchPagePreferencesProvider', () => {
   it('provides default search page preference state with empty preference store', () => {
     const consume = renderSUT();
 
-    expect(consume).toHaveBeenCalledWith(expect.objectContaining({ config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: false }) }) }));
+    expect(consume).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: false }) }),
+      }),
+    );
   });
 
   it('provides default search page preference state if user does not exists', () => {
     asMock(useCurrentUser).mockReturnValue({} as User);
     const consume = renderSUT();
 
-    expect(consume).toHaveBeenCalledWith(expect.objectContaining({ config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: false }) }) }));
+    expect(consume).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: false }) }),
+      }),
+    );
   });
 
   it('provides default search page preference state if user has no preferences', () => {
-    asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().preferences({} as PreferencesMap).build());
+    asMock(useCurrentUser).mockReturnValue(
+      adminUser
+        .toBuilder()
+        .preferences({} as PreferencesMap)
+        .build(),
+    );
 
     const consume = renderSUT();
 
-    expect(consume).toHaveBeenCalledWith(expect.objectContaining({ config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: false }) }) }));
+    expect(consume).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: false }) }),
+      }),
+    );
   });
 
   it('provides search page preferences based on user preferences', () => {
-    asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().preferences({
-      searchSidebarIsPinned: true,
-    } as PreferencesMap).build());
+    asMock(useCurrentUser).mockReturnValue(
+      adminUser
+        .toBuilder()
+        .preferences({
+          searchSidebarIsPinned: true,
+        } as PreferencesMap)
+        .build(),
+    );
 
     const consume = renderSUT();
 
-    expect(consume).toHaveBeenCalledWith(expect.objectContaining({ config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: true }) }) }));
+    expect(consume).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: true }) }),
+      }),
+    );
   });
 
   it('provides search page preference state based on local storage for system admin', () => {
@@ -138,14 +165,18 @@ describe('SearchPagePreferencesProvider', () => {
 
     const consume = renderSUT();
 
-    expect(consume).toHaveBeenCalledWith(expect.objectContaining({ config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: true }) }) }));
+    expect(consume).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: true }) }),
+      }),
+    );
   });
 
-  it('should update user preferences on state change', () => {
+  it('should update user preferences on state change', async () => {
     asMock(useCurrentUser).mockReturnValue(alice);
     const { getByText } = render(<ProviderWithToggleButton />);
 
-    fireEvent.click(getByText('Toggle sidebar pinning'));
+    await userEvent.click(getByText('Toggle sidebar pinning'));
 
     expect(PreferencesActions.saveUserPreferences).toHaveBeenCalledTimes(1);
 
@@ -160,12 +191,12 @@ describe('SearchPagePreferencesProvider', () => {
     );
   });
 
-  it('should update local storage on preference state change for system admin', () => {
+  it('should update local storage on preference state change for system admin', async () => {
     asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().readOnly(true).build());
 
     const { getByText } = render(<ProviderWithToggleButton />);
 
-    fireEvent.click(getByText('Toggle sidebar pinning'));
+    await userEvent.click(getByText('Toggle sidebar pinning'));
 
     expect(Store.set).toHaveBeenCalledTimes(1);
 

@@ -18,6 +18,7 @@ import { useMemo } from 'react';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-const usePluginEntities = <S extends keyof PluginExports>(entityKey: S) => useMemo(() => PluginStore.exports(entityKey), [entityKey]);
+const usePluginEntities = <S extends keyof PluginExports>(entityKey: S) =>
+  useMemo(() => PluginStore.exports(entityKey), [entityKey]);
 
 export default usePluginEntities;

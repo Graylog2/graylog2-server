@@ -24,17 +24,26 @@ import { EnterpriseActions } from 'stores/enterprise/EnterpriseStore';
 import IndexerFailuresComponent from './IndexerFailuresComponent';
 
 const IndexerSystemOverviewComponent = () => {
-  const [loadIndexerFailuresComponent, setLoadIndexerFailuresComponent] = useState(<Spinner text="Looking for Index Failures..." />);
+  const [loadIndexerFailuresComponent, setLoadIndexerFailuresComponent] = useState(
+    <Spinner text="Looking for Index Failures..." />,
+  );
 
   const pluginSystemOverview = usePluginEntities('systemOverview');
   const EnterpriseIndexerFailures = pluginSystemOverview?.[0]?.component;
 
   useEffect(() => {
     if (EnterpriseIndexerFailures) {
-      EnterpriseActions.getLicenseInfo().then((response) => {
-        setLoadIndexerFailuresComponent(response.license_info.license_status === 'installed' ? <EnterpriseIndexerFailures /> : <IndexerFailuresComponent />);
+      EnterpriseActions.getLicenseInfo().then((response: any) => {
+        setLoadIndexerFailuresComponent(
+          response.license_info.license_status === 'installed' ? (
+            <EnterpriseIndexerFailures />
+          ) : (
+            <IndexerFailuresComponent />
+          ),
+        );
       });
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoadIndexerFailuresComponent(<IndexerFailuresComponent />);
     }
   }, [EnterpriseIndexerFailures, setLoadIndexerFailuresComponent]);

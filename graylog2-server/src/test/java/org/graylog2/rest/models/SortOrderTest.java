@@ -36,11 +36,15 @@ class SortOrderTest {
         assertThat(SortOrder.fromString("asc"))
                 .isEqualTo(SortOrder.fromString("ASC"))
                 .isEqualTo(SortOrder.fromString("asC"))
+                .isEqualTo(SortOrder.fromString("ASCENDING"))
+                .isEqualTo(SortOrder.fromString("asCEndING"))
                 .isEqualTo(ASCENDING);
 
         assertThat(SortOrder.fromString("desc"))
                 .isEqualTo(SortOrder.fromString("DESC"))
                 .isEqualTo(SortOrder.fromString("deSc"))
+                .isEqualTo(SortOrder.fromString("DESCENDING"))
+                .isEqualTo(SortOrder.fromString("deSCenDINg"))
                 .isEqualTo(DESCENDING);
 
         assertThatThrownBy(() -> SortOrder.fromString("sideways"))
@@ -71,7 +75,17 @@ class SortOrderTest {
                 .isEqualTo(new TestRecord(ASCENDING));
 
         assertThat(objectMapper.readValue("""
+                        {"order":"ascending"}
+                """, TestRecord.class))
+                .isEqualTo(new TestRecord(ASCENDING));
+
+        assertThat(objectMapper.readValue("""
                         {"order":"dEsc"}
+                """, TestRecord.class))
+                .isEqualTo(new TestRecord(DESCENDING));
+
+        assertThat(objectMapper.readValue("""
+                        {"order":"dEscending"}
                 """, TestRecord.class))
                 .isEqualTo(new TestRecord(DESCENDING));
 

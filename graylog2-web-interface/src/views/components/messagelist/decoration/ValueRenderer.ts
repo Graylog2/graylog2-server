@@ -16,10 +16,12 @@
  */
 import type * as React from 'react';
 
-export type ValueRendererProps = {
-  field: string,
-  value: any,
-  children?: React.ReactNode,
+import type FieldType from 'views/logic/fieldtypes/FieldType';
+
+export type ValueRendererProps = React.PropsWithChildren & {
+  field: string;
+  value: any;
+  type?: FieldType;
 };
 
 export type ValueRenderer = React.ComponentType<ValueRendererProps>;

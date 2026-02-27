@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import org.bson.types.ObjectId;
@@ -29,6 +30,7 @@ import org.graylog2.contentpacks.model.constraints.Constraint;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.parameters.Parameter;
+import org.graylog2.security.html.HTMLSanitizerConverter;
 
 import javax.annotation.Nullable;
 import java.net.URI;
@@ -69,6 +71,7 @@ public abstract class LegacyContentPack implements ContentPack {
 
     @JsonView(ContentPackView.HttpView.class)
     @JsonProperty(FIELD_DESCRIPTION)
+    @JsonSerialize(converter = HTMLSanitizerConverter.class)
     public abstract String description();
 
     @JsonView(ContentPackView.HttpView.class)

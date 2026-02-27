@@ -16,6 +16,10 @@
  */
 package org.graylog2.bootstrap.preflight.web.resources;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -84,7 +88,7 @@ public class PreflightResource {
 
     public record DataNode(String nodeId, String transportAddress, DataNodeProvisioningConfig.State status,
                            String errorMsg,
-                           String hostname, String shortNodeId, DataNodeStatus dataNodeStatus) {}
+                           String hostname, String shortNodeId, @JsonProperty(DataNodeDto.FIELD_DATANODE_STATUS) DataNodeStatus dataNodeStatus) {}
 
     @GET
     @Path("/data_nodes")
@@ -106,8 +110,8 @@ public class PreflightResource {
     public ProvisioningState getProvisioningState(DataNodeDto n) {
         return switch (n.getDataNodeStatus()) {
             case AVAILABLE -> verifyActualConnection(n);
-            case STARTING -> new ProvisioningState(DataNodeProvisioningConfig.State.CONNECTING);
-            case PREPARED -> new ProvisioningState(DataNodeProvisioningConfig.State.STARTUP_PREPARED);
+            case STARTING -> new ProvisioningState(DataNodeProvisioningConfig.State.STARTING);
+            case PREPARED -> new ProvisioningState(DataNodeProvisioningConfig.State.PROVISIONED);
             case UNAVAILABLE -> new ProvisioningState(DataNodeProvisioningConfig.State.ERROR);
             default -> new ProvisioningState(DataNodeProvisioningConfig.State.UNCONFIGURED);
         };
@@ -115,7 +119,7 @@ public class PreflightResource {
 
     private ProvisioningState verifyActualConnection(DataNodeDto n) {
         final ConnectionCheckResult result = datanodeConnectivityCheck.probe(n);
-        final DataNodeProvisioningConfig.State state = result.succeeded() ? DataNodeProvisioningConfig.State.CONNECTED : DataNodeProvisioningConfig.State.CONNECTING;
+        final DataNodeProvisioningConfig.State state = result.succeeded() ? DataNodeProvisioningConfig.State.CONNECTED : DataNodeProvisioningConfig.State.STARTING;
         return new ProvisioningState(state, result.errorMessage());
     }
 
@@ -149,7 +153,10 @@ public class PreflightResource {
     @Path("/ca/upload")
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     @NoAuditEvent("No Auditing during preflight")
-    public Response uploadCA(@FormDataParam("password") String password, @FormDataParam("files") List<FormDataBodyPart> bodyParts) {
+    public Response uploadCA(
+            @Parameter(name = "password") @FormDataParam("password") String password,
+            @Parameter(name = "files", array = @ArraySchema(schema = @Schema(type = "string", format = "binary")))
+            @FormDataParam("files") List<FormDataBodyPart> bodyParts) {
         try {
             caKeystore.createFromUpload(password, bodyParts);
             return Response.ok().build();

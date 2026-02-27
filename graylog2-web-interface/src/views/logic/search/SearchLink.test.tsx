@@ -34,37 +34,25 @@ describe('SearchLink', () => {
   });
 
   it('includes the query string', () => {
-    const result = SearchLink.builder()
-      .query(createElasticsearchQueryString('foo:bar'))
-      .build()
-      .toURL();
+    const result = SearchLink.builder().query(createElasticsearchQueryString('foo:bar')).build().toURL();
 
     expect(result).toEqual(`${urlPrefix}?q=foo%3Abar`);
   });
 
   it('includes the time range', () => {
-    const result = SearchLink.builder()
-      .timerange({ type: 'relative', from: 300 })
-      .build()
-      .toURL();
+    const result = SearchLink.builder().timerange({ type: 'relative', from: 300 }).build().toURL();
 
     expect(result).toEqual(`${urlPrefix}?rangetype=relative&from=300`);
   });
 
   it('includes the streams', () => {
-    const result = SearchLink.builder()
-      .streams(['stream1', 'otherstream', 'weird:stream:name'])
-      .build()
-      .toURL();
+    const result = SearchLink.builder().streams(['stream1', 'otherstream', 'weird:stream:name']).build().toURL();
 
     expect(result).toEqual(`${urlPrefix}?streams=stream1%2Cotherstream%2Cweird%3Astream%3Aname`);
   });
 
   it('includes the id of a highlighted message2', () => {
-    const result = SearchLink.builder()
-      .highlightedMessage('f24c4629-e047-41b7-b3d2-1d30228ea532')
-      .build()
-      .toURL();
+    const result = SearchLink.builder().highlightedMessage('f24c4629-e047-41b7-b3d2-1d30228ea532').build().toURL();
 
     expect(result).toEqual(`${urlPrefix}?highlightMessage=f24c4629-e047-41b7-b3d2-1d30228ea532`);
   });
@@ -91,11 +79,11 @@ describe('SearchLink', () => {
       .toURL();
 
     expect(result).toEqual(
-      `${urlPrefix}/aGreatSearch?`
-      + 'rangetype=keyword&keyword=yesterday'
-      + '&q=_exists_%3Anf_version+AND+threat%3A%22true%22+AND+nf_src_address_city_name%3A%22Berlin%22'
-      + '&highlightMessage=cd3b6032-4afe-42bd-9166-80ee28eac6c0'
-      + '&streams=oneStream%2CanotherStream',
+      `${urlPrefix}/aGreatSearch?` +
+        'rangetype=keyword&keyword=yesterday' +
+        '&q=_exists_%3Anf_version+AND+threat%3A%22true%22+AND+nf_src_address_city_name%3A%22Berlin%22' +
+        '&highlightMessage=cd3b6032-4afe-42bd-9166-80ee28eac6c0' +
+        '&streams=oneStream%2CanotherStream',
     );
   });
 });

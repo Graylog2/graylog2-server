@@ -16,21 +16,31 @@
  */
 package org.graylog2.database.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
-import com.mongodb.client.MongoCollection;
+import com.google.errorprone.annotations.MustBeClosed;
+import com.mongodb.ErrorCategory;
+import com.mongodb.MongoException;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoIterable;
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.ReplaceOptions;
+import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.InsertOneResult;
 import jakarta.annotation.Nonnull;
 import org.bson.BsonValue;
+import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.graylog2.database.BuildableMongoEntity;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoEntity;
-import org.graylog2.database.jackson.CustomJacksonCodecRegistry;
-import org.mongojack.InitializationRequiredForTransformation;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -43,16 +53,9 @@ import java.util.stream.Stream;
  */
 public class MongoUtils<T extends MongoEntity> {
     private final MongoCollection<T> collection;
-    private final ObjectMapper objectMapper;
-    private final CustomJacksonCodecRegistry codecRegistry;
 
-    public MongoUtils(MongoCollection<T> delegate, ObjectMapper objectMapper) {
+    public MongoUtils(MongoCollection<T> delegate) {
         this.collection = delegate;
-        this.objectMapper = objectMapper;
-
-        codecRegistry = new CustomJacksonCodecRegistry(
-                objectMapper,
-                collection.getCodecRegistry());
     }
 
     /**
@@ -102,6 +105,28 @@ public class MongoUtils<T extends MongoEntity> {
     }
 
     /**
+     * Create a query constraint to match a field against an {@link ObjectId}.
+     *
+     * @param fieldName the field to check
+     * @param id        the String value of the ObjectId
+     * @return the filter
+     */
+    public static Bson objectIdEq(@Nonnull String fieldName, @Nonnull String id) {
+        return objectIdEq(fieldName, new ObjectId(id));
+    }
+
+    /**
+     * Create a query constraint to match a field against an {@link ObjectId}.
+     *
+     * @param fieldName the field to check
+     * @param objectId  the ObjectId
+     * @return the filter
+     */
+    public static Bson objectIdEq(@Nonnull String fieldName, @Nonnull ObjectId objectId) {
+        return Filters.eq(fieldName, objectId);
+    }
+
+    /**
      * Create a query constraint to match a document's ID against the given list of Hex strings.
      *
      * @param ids Collection of hex string representations of an {@link ObjectId}
@@ -131,9 +156,20 @@ public class MongoUtils<T extends MongoEntity> {
      * @param <T>           document type of the underlying collection
      * @return A stream that should be used in a try-with-resources statement or closed manually to free underlying resources.
      */
+    @MustBeClosed
     public static <T> Stream<T> stream(@Nonnull MongoIterable<T> mongoIterable) {
         final var cursor = mongoIterable.cursor();
         return Streams.stream(cursor).onClose(cursor::close);
+    }
+
+    /**
+     * Checks if the given {@link MongoException} represents a duplicate key error by checking its error code.
+     *
+     * @param e Exception that has been thrown by a MongoDB operation
+     * @return true if the exception represents a duplicate key error, false otherwise
+     */
+    public static boolean isDuplicateKeyError(MongoException e) {
+        return ErrorCategory.fromErrorCode(e.getCode()) == ErrorCategory.DUPLICATE_KEY;
     }
 
     /**
@@ -157,6 +193,16 @@ public class MongoUtils<T extends MongoEntity> {
     }
 
     /**
+     * Convenience method to look up documents  matching the given collection of IDs.
+     *
+     * @param ids Hex string representation of documents' {@link ObjectId}s.
+     * @return A {@link FindIterable} containing all available documents in the collection, which match the given ids.
+     */
+    public FindIterable<T> getByIds(Collection<String> ids) {
+        return collection.find(stringIdsIn(ids));
+    }
+
+    /**
      * Convenience method to delete a single document identified by its ID.
      *
      * @param id the document's id.
@@ -177,22 +223,52 @@ public class MongoUtils<T extends MongoEntity> {
     }
 
     /**
-     * Utility method to help moving away from the deprecated MongoJack Bson objects, like
-     * {@link org.mongojack.DBQuery.Query}. These objects require initialization before they can be used as regular
-     * {@link org.bson.conversions.Bson} objects with the MongoDB driver.
+     * Saves an entity by either inserting or replacing the document.
      * <p>
-     * The {@link org.mongojack.JacksonMongoCollection} would usually take care of that, but because we cannot use it,
-     * and instead use a regular {@link org.mongojack.MongoCollection}, we have to use this method.
+     * This method exists to avoid the repeated implementation of this functionality during migration from the old
+     * MongoJack API.
+     * <p>
+     * <b> For new code, prefer implementing a separate "create" and "update" path instead.</b>
      *
-     * @deprecated This method is only meant as an interim solution. Rewrite your deprecated MongoJack objects so that
-     * you don't have to use it.
+     * @param entity Entity to be saved, with the #id() property optionally set.
+     * @return Saved entity with the #id() property guaranteed to be present.
      */
-    @Deprecated
-    public void initializeLegacyMongoJackBsonObject(InitializationRequiredForTransformation mongoJackBsonObject) {
-        mongoJackBsonObject.initialize(
-                objectMapper,
-                objectMapper.constructType(collection.getDocumentClass()),
-                codecRegistry);
+    public T save(BuildableMongoEntity<T, ?> entity) {
+        // going through the builder is a bit more work but avoids an unsafe cast to T
+        final var orig = entity.toBuilder().build();
+        final var id = orig.id();
+        if (id == null) {
+            final var insertedId = insertedIdAsString(collection.insertOne(orig));
+            return entity.toBuilder().id(insertedId).build();
+        } else {
+            collection.replaceOne(idEq(id), orig, new ReplaceOptions().upsert(true));
+            return orig;
+        }
     }
 
+    /**
+     * Counts the number of documents for each distinct value of the given field.
+     *
+     * @param field the field to group by.
+     * @return Map of field values to their respective counts.
+     */
+    public Map<String, Long> countByField(String field) {
+        final Map<String, Long> counts = new HashMap<>();
+        final String countField = "count";
+
+        collection.aggregate(
+                List.of(Aggregates.group("$" + field, Accumulators.sum(countField, 1))),
+                Document.class
+        ).forEach(doc -> {
+            Object id = doc.get("_id");
+            if (id != null) {
+                counts.put(id.toString(), doc.getInteger(countField).longValue());
+            }
+        });
+        return counts;
+    }
+
+    public static Bson removeEmbedded(String fieldName, String key, String value) {
+        return Updates.pull(fieldName, new Document(key, value));
+    }
 }

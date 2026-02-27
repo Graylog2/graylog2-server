@@ -15,30 +15,38 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import AddToQueryHandler from 'views/logic/valueactions/AddToQueryHandler';
-import useAppDispatch from 'stores/useAppDispatch';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 
-const handleAddToQuery = (dispatch: AppDispatch, queryId: string, id: string, fieldType: FieldType) => {
+const handleAddToQuery = (dispatch: ViewsDispatch, queryId: string, id: string, fieldType: FieldType) => {
   const field: string = 'associated_assets';
 
   return dispatch(AddToQueryHandler({ queryId, field, value: id, type: fieldType }));
 };
 
-const FormatAssetList = ({ associated_assets, fieldType }: { associated_assets: string[], fieldType: FieldType }) => {
+const FormatAssetList = ({ associated_assets, fieldType }: { associated_assets: string[]; fieldType: FieldType }) => {
   const pluggableAssetListComponent = usePluginEntities('views.components.assetInformationActions');
   const queryId = useActiveQueryId();
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
 
-  const assetsList = React.useMemo(() => pluggableAssetListComponent.map(
-    ({ component: PluggableAssetListItem }) => (
-      <PluggableAssetListItem identifiers={associated_assets} addToQuery={(id) => handleAddToQuery(dispatch, queryId, id, fieldType)} />
-    ),
-  ), [pluggableAssetListComponent, associated_assets, dispatch, queryId, fieldType]);
+  const assetsList = useMemo(
+    () =>
+      pluggableAssetListComponent.map(({ component: PluggableAssetListItem }) => (
+        <PluggableAssetListItem
+          key={associated_assets[0]}
+          assetIds={associated_assets}
+          direction="col"
+          addToQuery={(id) => handleAddToQuery(dispatch, queryId, id, fieldType)}
+        />
+      )),
+    [pluggableAssetListComponent, associated_assets, dispatch, queryId, fieldType],
+  );
 
   if (associated_assets.length === 0) {
     return null;
@@ -46,11 +54,8 @@ const FormatAssetList = ({ associated_assets, fieldType }: { associated_assets: 
 
   return (
     <div>
-      <dt>Associated Assets</dt>
       {assetsList.map((assetElement) => (
-        <div key={assetElement.props.identifiers[0]}>
-          {assetElement}
-        </div>
+        <div key={assetElement.props.assetIds[0]}>{assetElement}</div>
       ))}
     </div>
   );

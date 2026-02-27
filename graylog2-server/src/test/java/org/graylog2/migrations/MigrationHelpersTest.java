@@ -18,30 +18,38 @@ package org.graylog2.migrations;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoWriteException;
+import com.mongodb.ServerAddress;
+import com.mongodb.WriteError;
+import org.bson.BsonDocument;
 import org.graylog.testing.TestUserService;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.security.hashing.BCryptPasswordAlgorithm;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.RoleService;
+import org.graylog2.users.UserConfiguration;
 import org.graylog2.users.UserImpl;
 import org.graylog2.users.UserServiceImpl;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.Set;
@@ -55,12 +63,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class MigrationHelpersTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Mock
     public UserService userService;
@@ -68,11 +74,15 @@ public class MigrationHelpersTest {
     public RoleService roleService;
     @Mock
     public RoleRemover roleRemover;
+    @Mock
+    public ClusterConfigService configService;
 
     private MigrationHelpers migrationHelpers;
+    private MongoConnection mongoConnection;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) throws Exception {
+        this.mongoConnection = mongoCollections.connection();
         this.migrationHelpers = new MigrationHelpers(roleService, userService, roleRemover);
     }
 
@@ -176,7 +186,10 @@ public class MigrationHelpersTest {
     @Test
     public void ensureBuiltinRoleWithSaveError() throws Exception {
         when(roleService.load("test-role")).thenThrow(NotFoundException.class);
-        when(roleService.save(any(Role.class))).thenThrow(DuplicateKeyException.class); // Throw database error
+        final var duplicateKeyException = new MongoWriteException(
+                new WriteError(11000, "", new BsonDocument()), new ServerAddress(), Collections.emptySet()
+        );
+        when(roleService.save(any(Role.class))).thenThrow(duplicateKeyException);
 
         assertThat(migrationHelpers.ensureBuiltinRole("test-role", "description", ImmutableSet.of("a", "b")))
                 .isNull();
@@ -189,6 +202,7 @@ public class MigrationHelpersTest {
         when(userService.load("test-user")).thenReturn(null);
         when(userService.create()).thenReturn(newUser(permissions));
         when(userService.save(any(User.class))).thenReturn("new-id");
+        when(configService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
 
         assertThat(migrationHelpers.ensureUser("test-user", "pass", "Test", "User",
                                                "test@example.com", ImmutableSet.of("54e3deadbeefdeadbeef0001",
@@ -206,7 +220,7 @@ public class MigrationHelpersTest {
             assertThat(user.getEmail()).describedAs("user email").isEqualTo("test@example.com");
             assertThat(user.isReadOnly()).describedAs("user is read-only").isFalse();
             assertThat(user.getPermissions()).describedAs("user permissions")
-                    .containsOnlyElementsOf(permissions.userSelfEditPermissions("test-user"));
+                    .containsOnlyElementsOf(permissions.userSelfEditPermissions("test-user", false));
             assertThat(user.getRoleIds()).describedAs("user roles").containsOnly(
                     "54e3deadbeefdeadbeef0001",
                     "54e3deadbeefdeadbeef0002"
@@ -229,6 +243,7 @@ public class MigrationHelpersTest {
 
         when(userService.load("test-user")).thenReturn(existingUser);
         when(userService.save(any(User.class))).thenReturn("new-id");
+        when(configService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
 
         assertThat(migrationHelpers.ensureUser("test-user", "pass", "Test", "User",
                                                "test@example.com", ImmutableSet.of("54e3deadbeefdeadbeef0001",
@@ -246,7 +261,7 @@ public class MigrationHelpersTest {
             assertThat(user.getEmail()).describedAs("user email").isEqualTo("test@example.com");
             assertThat(user.isReadOnly()).describedAs("user is read-only").isFalse();
             assertThat(user.getPermissions()).describedAs("user permissions")
-                    .containsOnlyElementsOf(permissions.userSelfEditPermissions("test-user"));
+                    .containsOnlyElementsOf(permissions.userSelfEditPermissions("test-user", false));
             assertThat(user.getRoleIds()).describedAs("user roles").containsOnly(
                     "54e3deadbeefdeadbeef0001",
                     "54e3deadbeefdeadbeef0002"
@@ -262,6 +277,7 @@ public class MigrationHelpersTest {
         when(userService.load("test-user")).thenReturn(null);
         when(userService.create()).thenReturn(newUser(permissions));
         when(userService.save(any(User.class))).thenThrow(ValidationException.class);
+        when(configService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
 
         assertThat(migrationHelpers.ensureUser("test-user", "pass", "Test", "User",
                                                "test@example.com", ImmutableSet.of("54e3deadbeefdeadbeef0001",
@@ -273,7 +289,7 @@ public class MigrationHelpersTest {
     @MongoDBFixtures("duplicated-users.json")
     public void ensureUserWithDuplicates() throws ValidationException {
 
-        final TestUserService testUserService = new TestUserService(mongodb.mongoConnection());
+        final TestUserService testUserService = new TestUserService(mongoConnection, configService);
         migrationHelpers = new MigrationHelpers(roleService, testUserService, roleRemover);
 
         assertThat(testUserService.loadAll()).hasSize(2);
@@ -291,6 +307,6 @@ public class MigrationHelpersTest {
         final BCryptPasswordAlgorithm passwordAlgorithm = new BCryptPasswordAlgorithm(10);
         final PasswordAlgorithmFactory passwordAlgorithmFactory = new PasswordAlgorithmFactory(Collections.emptyMap(), passwordAlgorithm);
 
-        return new UserImpl(passwordAlgorithmFactory, permissions, mock(ClusterConfigService.class), ImmutableMap.of());
+        return new UserImpl(passwordAlgorithmFactory, permissions, configService, new ObjectMapperProvider().get(), ImmutableMap.of());
     }
 }

@@ -48,7 +48,6 @@ import org.graylog2.plugin.MessageCollection;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.shared.metrics.MetricUtils;
@@ -62,7 +61,6 @@ import javax.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -73,10 +71,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class PipelineInterpreter implements MessageProcessor {
-    private static final RateLimitedLog log = getRateLimitedLog(PipelineInterpreter.class);
+    private static final RateLimitedLog log = createDefaultRateLimitedLog(PipelineInterpreter.class);
 
     private final MessageQueueAcknowledger messageQueueAcknowledger;
     private final Meter filteredOutMessages;
@@ -141,9 +140,7 @@ public class PipelineInterpreter implements MessageProcessor {
             for (Message message : currentSet) {
                 final String msgId = message.getId();
 
-                // this makes a copy of the list, which is mutated later in updateStreamBlacklist
-                // it serves as a worklist, to keep track of which <msg, stream> tuples need to be re-run again
-                final Set<String> initialStreamIds = message.getStreams().stream().map(Stream::getId).collect(Collectors.toSet());
+                final ImmutableSet<String> initialStreamIds = message.getStreamsUnmodifiable().stream().map(Stream::getId).collect(ImmutableSet.toImmutableSet());
 
                 final ImmutableSet<Pipeline> pipelinesToRun = selectPipelines(interpreterListener,
                         processingBlacklist,
@@ -191,10 +188,10 @@ public class PipelineInterpreter implements MessageProcessor {
     // <msgid, stream> that should not be run again (which prevents re-running pipelines over and over again)
     private boolean updateStreamBlacklist(Set<Tuple2<String, String>> processingBlacklist,
                                           Message message,
-                                          Set<String> initialStreamIds) {
+                                          ImmutableSet<String> initialStreamIds) {
         boolean addedStreams = false;
-        for (Stream stream : message.getStreams()) {
-            if (!initialStreamIds.remove(stream.getId())) {
+        for (Stream stream : message.getStreamsUnmodifiable()) {
+            if (!initialStreamIds.contains(stream.getId())) {
                 addedStreams = true;
             } else {
                 // only add pre-existing streams to blacklist, this has the effect of only adding already processed streams,
@@ -206,11 +203,10 @@ public class PipelineInterpreter implements MessageProcessor {
     }
 
     // determine which pipelines should be executed give the stream-pipeline connections and the current message
-    // the initialStreamIds are not mutated, but are being passed for efficiency, as they are used later in #process()
     private ImmutableSet<Pipeline> selectPipelines(InterpreterListener interpreterListener,
                                                    Set<Tuple2<String, String>> processingBlacklist,
                                                    Message message,
-                                                   Set<String> initialStreamIds,
+                                                   ImmutableSet<String> initialStreamIds,
                                                    ImmutableSetMultimap<String, Pipeline> streamConnection) {
         final String msgId = message.getId();
 
@@ -471,10 +467,6 @@ public class PipelineInterpreter implements MessageProcessor {
         public String className() {
             return PipelineInterpreter.class.getCanonicalName();
         }
-    }
-
-    public static RateLimitedLog getRateLimitedLog(final Class<?> clazz) {
-        return RateLimitedLogFactory.createRateLimitedLog(clazz, 5, Duration.ofSeconds(10));
     }
 
     public static class State {

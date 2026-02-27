@@ -16,25 +16,24 @@
  */
 package org.graylog2.security.realm;
 
+import jakarta.inject.Inject;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAccount;
-import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.rest.models.system.sessions.SessionUtils;
 import org.graylog2.security.headerauth.HTTPHeaderAuthConfig;
 import org.graylog2.shared.security.SessionIdToken;
 import org.graylog2.shared.security.ShiroRequestHeadersBinder;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Optional;
 
@@ -51,7 +50,7 @@ public class SessionAuthenticator extends AuthenticatingRealm {
         this.userService = userService;
         this.clusterConfigService = clusterConfigService;
         // this realm either rejects a session, or allows the associated user implicitly
-        setCredentialsMatcher(new AllowAllCredentialsMatcher());
+        setCredentialsMatcher(new ServiceValidatedCredentialsMatcher());
         setAuthenticationTokenClass(SessionIdToken.class);
         setCachingEnabled(false);
     }
@@ -78,12 +77,13 @@ public class SessionAuthenticator extends AuthenticatingRealm {
             LOG.debug("Found session for userId {}", userId);
         }
 
-        final String sessionUsername = (String) session.getAttribute(HTTPHeaderAuthenticationRealm.SESSION_AUTH_HEADER);
-        if (sessionUsername != null) {
-            final HTTPHeaderAuthConfig httpHeaderConfig = loadHTTPHeaderConfig();
+        // If trusted header authentication is enabled, ensure that the username in the session still matches the
+        // username in the header. If there is a mismatch, the session will be terminated.
+        final HTTPHeaderAuthConfig httpHeaderConfig = loadHTTPHeaderConfig();
+        if (httpHeaderConfig.enabled()) {
+            final String sessionUsername = (String) session.getAttribute(SessionUtils.USERNAME_SESSION_KEY);
             final Optional<String> usernameHeader = ShiroRequestHeadersBinder.getHeaderFromThreadContext(httpHeaderConfig.usernameHeader());
-
-            if (httpHeaderConfig.enabled() && usernameHeader.isPresent() && !usernameHeader.get().equalsIgnoreCase(sessionUsername)) {
+            if (usernameHeader.isPresent() && !usernameHeader.get().equalsIgnoreCase(sessionUsername)) {
                 LOG.warn("Terminating session where user <{}> does not match trusted HTTP header <{}>.", sessionUsername, usernameHeader.get());
                 session.stop();
                 return null;
@@ -98,7 +98,7 @@ public class SessionAuthenticator extends AuthenticatingRealm {
         }
         ThreadContext.bind(subject);
 
-        return new SimpleAccount(user.getId(), null, "session authenticator");
+        return new SimpleAccount(user.getId(), ServiceValidatedCredentialsMatcher.AUTHENTICATED, "session authenticator");
     }
 
     private HTTPHeaderAuthConfig loadHTTPHeaderConfig() {

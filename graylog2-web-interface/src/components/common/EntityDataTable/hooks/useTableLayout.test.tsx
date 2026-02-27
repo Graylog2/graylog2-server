@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 
 import asMock from 'helpers/mocking/AsMock';
@@ -32,68 +32,80 @@ const queryClient = new QueryClient({
   },
 });
 
-const wrapper = ({ children }) => (
-  <QueryClientProvider client={queryClient}>
-    {children}
-  </QueryClientProvider>
-);
+const wrapper = ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 jest.mock('util/UserNotification', () => ({ error: jest.fn() }));
 jest.mock('./useUserLayoutPreferences');
 
-describe('useUserSearchFilterQuery hook', () => {
+describe('useTableLayout hook', () => {
   const defaultLayout = {
     defaultSort: { attributeId: 'description', direction: 'asc' } as const,
     defaultPageSize: 20,
     defaultDisplayedAttributes: ['title'],
+    defaultColumnOrder: ['title'],
   };
-
-  beforeEach(() => {
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
-  });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('should provide user layout preferences', async () => {
-    const { result } = renderHook(() => useTableLayout({
-      entityTableId: 'streams',
-      ...defaultLayout,
-    }), { wrapper });
+    const { result } = renderHook(
+      () =>
+        useTableLayout({
+          entityTableId: 'streams',
+          ...defaultLayout,
+        }),
+      { wrapper },
+    );
 
     expect(result.current.layoutConfig).toEqual({
-      displayedAttributes: layoutPreferences.displayedAttributes,
+      attributes: layoutPreferences.attributes,
+      order: undefined,
       sort: layoutPreferences.sort,
       pageSize: layoutPreferences.perPage,
     });
   });
 
   it('should return defaults when there are no user layout preferences', async () => {
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: undefined, isInitialLoading: false });
+    asMock(useUserLayoutPreferences).mockReturnValue({ data: undefined, isInitialLoading: false, refetch: () => {} });
 
-    const { result } = renderHook(() => useTableLayout({
-      entityTableId: 'streams',
-      ...defaultLayout,
-    }), { wrapper });
+    const { result } = renderHook(
+      () =>
+        useTableLayout({
+          entityTableId: 'streams',
+          ...defaultLayout,
+        }),
+      { wrapper },
+    );
 
     expect(result.current.layoutConfig).toEqual({
-      displayedAttributes: defaultLayout.defaultDisplayedAttributes,
+      attributes: undefined,
+      order: undefined,
       sort: defaultLayout.defaultSort,
       pageSize: defaultLayout.defaultPageSize,
     });
   });
 
   it('should merge user preferences with defaults', async () => {
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: { perPage: layoutPreferences.perPage }, isInitialLoading: false });
-    const { result } = renderHook(() => useTableLayout({
-      entityTableId: 'streams',
-      ...defaultLayout,
-    }), { wrapper });
+    asMock(useUserLayoutPreferences).mockReturnValue({
+      data: { perPage: layoutPreferences.perPage },
+      isInitialLoading: false,
+      refetch: () => {},
+    });
+    const { result } = renderHook(
+      () =>
+        useTableLayout({
+          entityTableId: 'streams',
+          ...defaultLayout,
+        }),
+      { wrapper },
+    );
 
     expect(result.current.layoutConfig).toEqual({
-      displayedAttributes: defaultLayout.defaultDisplayedAttributes,
+      attributes: undefined,
+      order: undefined,
       sort: defaultLayout.defaultSort,
       pageSize: layoutPreferences.perPage,
     });

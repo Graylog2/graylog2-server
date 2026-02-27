@@ -16,53 +16,25 @@
  */
 package org.graylog.scheduler;
 
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.FindOneAndUpdateOptions;
-import com.mongodb.client.model.ReturnDocument;
-import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
-import org.bson.BsonDocument;
-import org.bson.BsonDocumentWriter;
-import org.bson.codecs.EncoderContext;
-import org.bson.types.ObjectId;
-import org.graylog2.database.MongoCollections;
-
-import static java.util.Objects.requireNonNull;
-import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
- * The {@link DBJobDefinitionService} is still using the old mongojack version, so we can't implement a
- * {@code findOrCreate} method and have to use this custom service until the class is migrated to the new mongojack
- * version.
- * TODO: Remove once DBJobDefinitionService is migrated to the new mongojack version.
+ * @deprecated Use {@link DBJobDefinitionService} instead.
  */
+@Deprecated(since = "6.1.0")
 public class DBCustomJobDefinitionService {
-    private final MongoCollection<JobDefinitionDto> db;
+    private final DBJobDefinitionService delegate;
 
     @Inject
-    public DBCustomJobDefinitionService(MongoCollections collections) {
-        this.db = collections.collection(DBJobDefinitionService.COLLECTION_NAME, JobDefinitionDto.class);
+    public DBCustomJobDefinitionService(DBJobDefinitionService dbJobDefinitionService) {
+        this.delegate = dbJobDefinitionService;
     }
 
+    /**
+     * @deprecated Use {@link DBJobDefinitionService#findOrCreate(JobDefinitionDto)} instead.
+     */
+    @Deprecated(since = "6.1.0")
     public JobDefinitionDto findOrCreate(JobDefinitionDto dto) {
-        var jobDefinitionId = new ObjectId(requireNonNull(dto.id(), "Job definition ID cannot be null"));
-
-        final var codec = db.getCodecRegistry().get(JobDefinitionDto.class);
-        try (final var writer = new BsonDocumentWriter(new BsonDocument())) {
-            // Convert the DTO class to a Bson object, so we can use it with $setOnInsert
-            codec.encode(writer, dto, EncoderContext.builder().build());
-
-            return db.findOneAndUpdate(
-                    Filters.and(
-                            Filters.eq("_id", jobDefinitionId),
-                            Filters.eq(f("%s.%s", JobDefinitionDto.FIELD_CONFIG, JobDefinitionConfig.TYPE_FIELD), dto.config().type())
-                    ),
-                    Updates.setOnInsert(writer.getDocument()),
-                    new FindOneAndUpdateOptions()
-                            .returnDocument(ReturnDocument.AFTER)
-                            .upsert(true)
-            );
-        }
+        return delegate.findOrCreate(dto);
     }
 }

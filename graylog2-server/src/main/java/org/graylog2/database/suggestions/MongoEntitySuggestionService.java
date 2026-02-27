@@ -17,6 +17,8 @@
 package org.graylog2.database.suggestions;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Streams;
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -25,16 +27,28 @@ import com.mongodb.client.model.Sorts;
 import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
 import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.utils.CompositeDisplayFormatter;
 import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.security.EntityPermissionsUtils;
 
+import javax.annotation.Nullable;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
+import static org.graylog2.users.UserImpl.COLLECTION_NAME;
+import static org.graylog2.users.UserImpl.LocalAdminUser.LOCAL_ADMIN_ID;
+import static org.graylog2.users.UserImpl.USERNAME;
 
 public class MongoEntitySuggestionService implements EntitySuggestionService {
 
@@ -48,43 +62,120 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
         this.permissionsUtils = permissionsUtils;
     }
 
+    private boolean addAdminToSuggestions(final String collection, final String valueColumn, final boolean filterIsEmpty, final String query) {
+        return COLLECTION_NAME.equals(collection) && USERNAME.equals(valueColumn) && (filterIsEmpty || LOCAL_ADMIN_ID.contains(query.toLowerCase(Locale.ENGLISH)));
+    }
+
     @Override
     public EntitySuggestionResponse suggest(final String collection,
+                                            final String targetColumn,
                                             final String valueColumn,
+                                            @Nullable final List<String> displayFields,
+                                            @Nullable final String displayTemplate,
+                                            final String query,
+                                            final int page,
+                                            final int perPage,
+                                            final Subject subject) {
+        return suggest(collection, targetColumn, valueColumn, displayFields, displayTemplate, null, query, page, perPage, subject);
+    }
+
+    @Override
+    public EntitySuggestionResponse suggest(final String collection,
+                                            final String targetColumn,
+                                            final String valueColumn,
+                                            @Nullable final List<String> displayFields,
+                                            @Nullable final String displayTemplate,
+                                            final SearchQueryField.Type identifierType,
                                             final String query,
                                             final int page,
                                             final int perPage,
                                             final Subject subject) {
         final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collection);
+        final boolean filterIsEmpty = Strings.isNullOrEmpty(query);
+        final boolean isSpecialCollection = addAdminToSuggestions(collection, valueColumn, filterIsEmpty, query);
+        final var isFirstPageAndSpecialCollection = isSpecialCollection && page == 1;
+        final var fixNumberOfItemsToReadFromDB = isFirstPageAndSpecialCollection ? 1 : 0;
 
-        final var bsonFilter = !Strings.isNullOrEmpty(query)
-                ? Filters.regex(valueColumn, query, "i")
-                : Filters.empty();
+        // Determine which fields to project
+        final Set<String> fieldsToProject = new HashSet<>();
+        fieldsToProject.add(targetColumn);
+
+        if (displayFields != null && !displayFields.isEmpty()) {
+            fieldsToProject.addAll(displayFields);
+        } else {
+            fieldsToProject.add(valueColumn);
+        }
+
+        final Bson bsonFilter;
+        if (filterIsEmpty) {
+            bsonFilter = Filters.empty();
+        } else if (displayFields != null && !displayFields.isEmpty()) {
+            final Set<String> searchFields = new LinkedHashSet<>(displayFields);
+            searchFields.add(valueColumn);
+            bsonFilter = Filters.or(searchFields.stream()
+                    .map(field -> Filters.regex(field, query, "i"))
+                    .toList());
+        } else {
+            bsonFilter = Filters.regex(valueColumn, query, "i");
+        }
+
+        final String sortColumn = (displayFields != null && !displayFields.isEmpty())
+                ? displayFields.getFirst()
+                : valueColumn;
 
         final var resultWithoutPagination = mongoCollection
                 .find(bsonFilter)
-                .projection(Projections.include(valueColumn))
-                .sort(Sorts.ascending(valueColumn));
+                .projection(Projections.include(fieldsToProject.toArray(new String[0])))
+                .sort(Sorts.ascending(sortColumn));
 
         final var userCanReadAllEntities = permissionsUtils.hasAllPermission(subject) || permissionsUtils.hasReadPermissionForWholeCollection(subject, collection);
-        final var skip = (page - 1) * perPage;
+        final var skip = Math.max(0, (page - 1) * perPage - fixNumberOfItemsToReadFromDB);
         final var checkPermission = permissionsUtils.createPermissionCheck(subject, collection);
-        final var documents = userCanReadAllEntities
-                ? mongoPaginate(resultWithoutPagination, perPage, skip)
-                : paginateWithPermissionCheck(resultWithoutPagination, perPage, skip, checkPermission);
 
-        final List<EntitySuggestion> suggestions = documents
-                .map(doc ->
-                        new EntitySuggestion(
-                                doc.getObjectId(ID_FIELD).toString(),
-                                doc.getString(valueColumn)
-                        )
-                )
-                .toList();
+        final List<EntitySuggestion> suggestions;
+        try (final var documents = userCanReadAllEntities
+                ? mongoPaginate(resultWithoutPagination, perPage - fixNumberOfItemsToReadFromDB, skip)
+                : paginateWithPermissionCheck(resultWithoutPagination, perPage - fixNumberOfItemsToReadFromDB, skip, checkPermission)) {
 
-        final long total = userCanReadAllEntities
-                ? mongoCollection.countDocuments(bsonFilter)
-                : MongoUtils.stream(mongoCollection.find(bsonFilter).projection(Projections.include(ID_FIELD))).filter(checkPermission).count();
+            final List<EntitySuggestion> staticEntry = isFirstPageAndSpecialCollection ? List.of(new EntitySuggestion(LOCAL_ADMIN_ID, null, "admin")) : List.of();
+
+            final Stream<EntitySuggestion> suggestionsFromDB = documents
+                    .map(doc -> {
+                        String displayValue;
+
+                        if (displayFields != null && !displayFields.isEmpty()) {
+                            displayValue = CompositeDisplayFormatter.format(doc, displayFields, displayTemplate);
+                        } else {
+                            displayValue = doc.getString(valueColumn);
+                        }
+
+                        // Extract targetColumn value as String
+                        final String targetValue;
+                        final Object rawValue = doc.get(targetColumn);
+                        if (rawValue instanceof ObjectId oid) {
+                            targetValue = oid.toHexString();
+                        } else {
+                            targetValue = rawValue != null ? rawValue.toString() : null;
+                        }
+
+                        return new EntitySuggestion(
+                                doc.getObjectId("_id").toHexString(),
+                                targetValue,
+                                displayValue
+                        );
+                    });
+
+            suggestions = Streams.concat(staticEntry.stream(), suggestionsFromDB).toList();
+        }
+
+        final long total;
+        if (userCanReadAllEntities) {
+            total = mongoCollection.countDocuments(bsonFilter);
+        } else {
+            try (final var stream = MongoUtils.stream(mongoCollection.find(bsonFilter).projection(Projections.include(ID_FIELD)))) {
+                total = stream.filter(checkPermission).count();
+            }
+        }
 
         return new EntitySuggestionResponse(suggestions,
                 PaginatedList.PaginationInfo.create((int) total,
@@ -93,6 +184,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                         perPage));
     }
 
+    @MustBeClosed
     private Stream<Document> paginateWithPermissionCheck(FindIterable<Document> result, int limit, int skip, Predicate<Document> checkPermission) {
         return MongoUtils.stream(result)
                 .filter(checkPermission)
@@ -100,8 +192,20 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                 .skip(skip);
     }
 
+    @MustBeClosed
     private Stream<Document> mongoPaginate(FindIterable<Document> result, int limit, int skip) {
         return MongoUtils.stream(result.limit(limit).skip(skip));
+    }
+
+    @Override
+    public EntitySuggestionResponse suggest(final String collection,
+                                            final String targetColumn,
+                                            final String valueColumn,
+                                            final String query,
+                                            final int page,
+                                            final int perPage,
+                                            final Subject subject) {
+        return suggest(collection, targetColumn, valueColumn, null, null, null, query, page, perPage, subject);
     }
 
 }

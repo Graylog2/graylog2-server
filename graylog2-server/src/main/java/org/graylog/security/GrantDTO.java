@@ -21,24 +21,21 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
+import jakarta.validation.constraints.NotNull;
 import org.graylog.grn.GRN;
+import org.graylog2.database.BuildableMongoEntity;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-
-import jakarta.validation.constraints.NotNull;
-
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 @JsonDeserialize(builder = GrantDTO.Builder.class)
-public abstract class GrantDTO {
+public abstract class GrantDTO implements BuildableMongoEntity<GrantDTO, GrantDTO.Builder> {
     private static final String FIELD_ID = "id";
     static final String FIELD_GRANTEE = "grantee";
     static final String FIELD_CAPABILITY = "capability";
@@ -96,7 +93,7 @@ public abstract class GrantDTO {
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public abstract static class Builder {
+    public abstract static class Builder implements BuildableMongoEntity.Builder<GrantDTO, Builder> {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_GrantDTO.Builder()

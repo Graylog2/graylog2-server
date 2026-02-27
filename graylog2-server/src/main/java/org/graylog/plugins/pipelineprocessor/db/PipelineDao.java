@@ -19,26 +19,25 @@ package org.graylog.plugins.pipelineprocessor.db;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.ImmutableSystemScope;
+import org.graylog2.database.entities.ScopedEntity;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 
+import static org.graylog.plugins.pipelineprocessor.rest.PipelineResource.GL_INPUT_ROUTING_PIPELINE;
+
 @AutoValue
-public abstract class PipelineDao {
+public abstract class PipelineDao implements ScopedEntity<PipelineDao.Builder> {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_SOURCE = "source";
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_MODIFIED_AT = "modified_at";
-
-    @JsonProperty(FIELD_ID)
-    @Nullable
-    @Id
-    @ObjectId
-    public abstract String id();
 
     @JsonProperty
     public abstract String title();
@@ -59,20 +58,27 @@ public abstract class PipelineDao {
     public abstract DateTime modifiedAt();
 
     public static Builder builder() {
-        return new AutoValue_PipelineDao.Builder();
+        return new AutoValue_PipelineDao.Builder().scope(DefaultEntityScope.NAME);
     }
 
     public abstract Builder toBuilder();
 
     @JsonCreator
-    public static PipelineDao create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
-                                        @JsonProperty(FIELD_TITLE)  String title,
-                                        @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
-                                        @JsonProperty(FIELD_SOURCE) String source,
-                                        @Nullable @JsonProperty(FIELD_CREATED_AT) DateTime createdAt,
-                                        @Nullable @JsonProperty(FIELD_MODIFIED_AT) DateTime modifiedAt) {
+    public static PipelineDao create(@Id @ObjectId @JsonProperty(FIELD_ID) @Nullable String id,
+                                     @JsonProperty(FIELD_SCOPE) @Nullable String scope,
+                                     @JsonProperty(FIELD_TITLE) String title,
+                                     @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
+                                     @JsonProperty(FIELD_SOURCE) String source,
+                                     @Nullable @JsonProperty(FIELD_CREATED_AT) DateTime createdAt,
+                                     @Nullable @JsonProperty(FIELD_MODIFIED_AT) DateTime modifiedAt) {
+        if (title.equalsIgnoreCase(GL_INPUT_ROUTING_PIPELINE)) {
+            scope = ImmutableSystemScope.NAME;
+        } else if (scope == null) {
+            scope = DefaultEntityScope.NAME;
+        }
         return builder()
                 .id(id)
+                .scope(scope)
                 .title(title)
                 .description(description)
                 .source(source)
@@ -82,10 +88,12 @@ public abstract class PipelineDao {
     }
 
     @AutoValue.Builder
-    public abstract static class Builder {
+    public abstract static class Builder implements ScopedEntity.Builder<Builder> {
         public abstract PipelineDao build();
 
         public abstract Builder id(String id);
+
+        public abstract Builder scope(String scope);
 
         public abstract Builder title(String title);
 

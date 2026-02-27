@@ -25,11 +25,11 @@ export interface CustomCommandContext {
 export type CustomCommandExec = (editor: Editor, context: CustomCommandContext) => void;
 
 export type CustomCommand = {
-  usages: Array<Usage>,
-  name: string,
+  usages: Array<Usage>;
+  name: string;
   bindKey: {
-    mac: string,
-    win: string,
-  },
-  exec: CustomCommandExec,
-}
+    mac: string;
+    win: string;
+  };
+  exec: CustomCommandExec;
+};

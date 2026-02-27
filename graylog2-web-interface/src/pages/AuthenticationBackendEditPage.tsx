@@ -28,12 +28,17 @@ import type AuthenticationBackend from 'logic/authentication/AuthenticationBacke
 
 type Props = {
   params: {
-    backendId: string,
-  },
-  location: Location,
+    backendId: string;
+  };
+  location: Location;
 };
 
-const AuthenticationBackendEditPage = ({ params: { backendId }, location: { query: { initialStepKey } } }: Props) => {
+const AuthenticationBackendEditPage = ({
+  params: { backendId },
+  location: {
+    query: { initialStepKey },
+  },
+}: Props) => {
   const [authBackend, setAuthBackend] = useState<AuthenticationBackend | undefined>();
 
   useEffect(() => {

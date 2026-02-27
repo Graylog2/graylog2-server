@@ -18,11 +18,15 @@ package org.graylog.integrations.aws.cloudwatch;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FlowLogMessageTest {
+
+    public static final String TEST_STREAM_ARN = "arn:aws:kinesis:ap-northeast-1:517803882956:stream/graylog2";
 
     @Test
     public void testFromPartsDoesNotFailWithMissingIntegerFields() {
@@ -44,8 +48,8 @@ public class FlowLogMessageTest {
         };
 
         final KinesisLogEntry logEvent = KinesisLogEntry.create("kinesisStream", "helloGroup", "helloStream",
-                                                                DateTime.now(DateTimeZone.UTC),
-                                                                String.join(" ", strings));
+                DateTime.now(DateTimeZone.UTC),
+                String.join(" ", strings), "123456789", TEST_STREAM_ARN, new ArrayList<>());
         final FlowLogMessage m = FlowLogMessage.fromLogEvent(logEvent);
 
         assertEquals(m.getDestinationPort(), 0);
@@ -74,8 +78,8 @@ public class FlowLogMessageTest {
         };
 
         final KinesisLogEntry logEvent = KinesisLogEntry.create("kinesisStream", "helloGroup", "helloStream",
-                                                                DateTime.now(DateTimeZone.UTC),
-                                                                String.join(" ", strings));
+                DateTime.now(DateTimeZone.UTC),
+                String.join(" ", strings), "123456789", TEST_STREAM_ARN, new ArrayList<>());
         final FlowLogMessage m = FlowLogMessage.fromLogEvent(logEvent);
 
         assertEquals(m.getBytes(), 0);

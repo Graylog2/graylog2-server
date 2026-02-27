@@ -18,6 +18,7 @@ package org.graylog.security.certutil;
 
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.security.certutil.console.CommandLineConsole;
 import org.graylog.security.certutil.console.SystemConsole;
@@ -80,7 +81,9 @@ public class CertutilCert implements CliCommand {
         try {
             char[] password = console.readPassword(PROMPT_ENTER_CA_PASSWORD);
             KeyStore caKeystore = KeyStore.getInstance(PKCS12);
-            caKeystore.load(new FileInputStream(caKeystorePath.toFile()), password);
+            try (FileInputStream fis = new FileInputStream(caKeystorePath.toFile())) {
+                caKeystore.load(fis, password);
+            }
 
             final Key caPrivateKey = caKeystore.getKey(CA_KEY_ALIAS, password);
 
@@ -112,7 +115,9 @@ public class CertutilCert implements CliCommand {
 
             char[] nodeKeystorePassword = console.readPassword(PROMPT_ENTER_CERTIFICATE_PASSWORD);
 
-            nodeKeystore.setKeyEntry(CertConstants.DATANODE_KEY_ALIAS, nodePair.privateKey(), nodeKeystorePassword,
+            // This will be the only key in the keystore, we don't care much about the alias. To make sure we are
+            // not dependent on a specific alias, we can generate a random alphabetic sequence.
+            nodeKeystore.setKeyEntry(RandomStringUtils.secure().nextAlphabetic(10), nodePair.privateKey(), nodeKeystorePassword,
                     new X509Certificate[]{nodePair.certificate(), caPair.certificate()});
 
 
@@ -131,4 +136,5 @@ public class CertutilCert implements CliCommand {
         }
 
     }
+
 }

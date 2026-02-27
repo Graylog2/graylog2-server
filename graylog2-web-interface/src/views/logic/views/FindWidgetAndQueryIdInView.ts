@@ -22,18 +22,26 @@ import type ViewState from './ViewState';
 
 import type Widget from '../widgets/Widget';
 
-const FindWidgetAndQueryIdInView = (widgetId: WidgetId, view: View): [Widget, QueryId] | undefined | null => view.state.reduce((foundWidget: [Widget, QueryId] | undefined | null, state: ViewState, queryId: QueryId): [Widget, QueryId] | undefined | null => {
-  if (foundWidget) {
-    return foundWidget;
-  }
+const FindWidgetAndQueryIdInView = (widgetId: WidgetId, view: View): [Widget, QueryId] | undefined | null =>
+  view.state.reduce(
+    (
+      foundWidget: [Widget, QueryId] | undefined | null,
+      state: ViewState,
+      queryId: QueryId,
+    ): [Widget, QueryId] | undefined | null => {
+      if (foundWidget) {
+        return foundWidget;
+      }
 
-  const widget = state.widgets.find((w) => w.id === widgetId);
+      const widget = state.widgets.find((w) => w.id === widgetId);
 
-  if (widget) {
-    return [widget, queryId];
-  }
+      if (widget) {
+        return [widget, queryId];
+      }
 
-  return undefined;
-}, undefined);
+      return undefined;
+    },
+    undefined,
+  );
 
 export default FindWidgetAndQueryIdInView;

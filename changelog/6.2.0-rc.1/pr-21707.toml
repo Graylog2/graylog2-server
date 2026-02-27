@@ -1,0 +1,5 @@
+type = "a"
+message = "Add support for overriding opensearch configuration options in data node using a configuration file specified as opensearch_configuration_overrides_file in datanode.conf. Please note that we only recommend changing certain properties. All others will emit warnings on data node startup."
+
+issues = []
+pulls = ["21707"]

@@ -22,10 +22,7 @@ import { singletonActions, singletonStore } from 'logic/singleton';
 import OriginalStreamsStore from 'stores/streams/StreamsStore';
 import { SessionActions } from 'stores/sessions/SessionStore';
 
-export const StreamsActions = singletonActions(
-  'views.Streams',
-  () => Reflux.createActions(['refresh'] as const),
-);
+export const StreamsActions = singletonActions('views.Streams', () => Reflux.createActions(['refresh'] as const));
 
 /* As the current implementation of the `StreamsStore` is not holding a state, using it requires to query the
    streams list for every component using it over and over again. This simple Reflux store is supposed to query the
@@ -36,9 +33,8 @@ export type StreamsStoreState = {
   streams: Array<Stream>;
 };
 
-export const StreamsStore: Store<StreamsStoreState> = singletonStore(
-  'views.Streams',
-  () => Reflux.createStore({
+export const StreamsStore: Store<StreamsStoreState> = singletonStore('views.Streams', () =>
+  Reflux.createStore({
     listenables: [StreamsActions],
     streams: [],
     init() {

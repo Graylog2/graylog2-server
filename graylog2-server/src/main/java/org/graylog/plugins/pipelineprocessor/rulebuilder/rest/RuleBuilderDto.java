@@ -22,8 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
 import org.joda.time.DateTime;
-import org.mongojack.Id;
-import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -64,7 +62,7 @@ public abstract class RuleBuilderDto {
     public abstract String simulatorMessage();
 
     @JsonCreator
-    public static RuleBuilderDto create(@JsonProperty("id") @Id @ObjectId @Nullable String id,
+    public static RuleBuilderDto create(@JsonProperty("id") @Nullable String id,
                                         @JsonProperty("title") String title,
                                         @JsonProperty("description") @Nullable String description,
                                         @JsonProperty("source") @Nullable String source,

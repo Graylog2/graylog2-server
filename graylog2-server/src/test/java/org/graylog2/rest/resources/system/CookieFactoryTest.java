@@ -22,16 +22,15 @@ import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.ext.RuntimeDelegate;
+import org.apache.shiro.session.mgt.SimpleSession;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.graylog2.configuration.HttpConfiguration;
-import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -41,23 +40,22 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CookieFactoryTest {
 
-    @Mock
-    SessionResponse sessionResponse;
+    SimpleSession session;
 
     @Mock
     ContainerRequest containerRequest;
 
     @BeforeEach
     void setUp() {
-        when(sessionResponse.getAuthenticationToken()).thenReturn("secret-auth-value");
-        when(sessionResponse.validUntil()).thenReturn(new Date());
+        this.session = new SimpleSession("localhost");
+        session.setId("secret-auth-value");
         when(containerRequest.getHeaders()).thenReturn(new MultivaluedHashMap<>());
     }
 
     @Test
     void defaultPath() {
         final CookieFactory cookieFactory = new CookieFactory(new HttpConfiguration());
-        final NewCookie cookie = cookieFactory.createAuthenticationCookie(sessionResponse, containerRequest);
+        final NewCookie cookie = cookieFactory.createAuthenticationCookie(session, containerRequest);
 
         assertThat(cookie.getPath()).isEqualTo("/");
     }
@@ -72,7 +70,7 @@ class CookieFactoryTest {
         System.out.println(httpConfiguration.getHttpExternalUri());
 
         final CookieFactory cookieFactory = new CookieFactory(httpConfiguration);
-        final NewCookie cookie = cookieFactory.createAuthenticationCookie(sessionResponse, containerRequest);
+        final NewCookie cookie = cookieFactory.createAuthenticationCookie(session, containerRequest);
 
         assertThat(cookie.getPath()).isEqualTo("/path/from/config/");
     }
@@ -83,7 +81,7 @@ class CookieFactoryTest {
                 List.of("http://graylog.local/path/from/request/"));
 
         final CookieFactory cookieFactory = new CookieFactory(new HttpConfiguration());
-        final NewCookie cookie = cookieFactory.createAuthenticationCookie(sessionResponse, containerRequest);
+        final NewCookie cookie = cookieFactory.createAuthenticationCookie(session, containerRequest);
 
         assertThat(cookie.getPath()).isEqualTo("/path/from/request/");
     }
@@ -94,8 +92,7 @@ class CookieFactoryTest {
                 List.of("http://graylog.local/path/;authentication=overridden-auth-value;"));
 
         final CookieFactory cookieFactory = new CookieFactory(new HttpConfiguration());
-        final NewCookie cookie = cookieFactory.createAuthenticationCookie(sessionResponse, containerRequest);
-
+        final NewCookie cookie = cookieFactory.createAuthenticationCookie(session, containerRequest);
 
         final String cookieString =
                 RuntimeDelegate.getInstance().createHeaderDelegate(NewCookie.class).toString(cookie);

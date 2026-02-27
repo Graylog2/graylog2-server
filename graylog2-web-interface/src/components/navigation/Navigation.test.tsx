@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import type { Location } from 'history';
 import { defaultUser } from 'defaultMockValues';
 
@@ -24,8 +23,6 @@ import mockComponent from 'helpers/mocking/MockComponent';
 import { asMock } from 'helpers/mocking';
 import Navigation from 'components/navigation/Navigation';
 import useCurrentUser from 'hooks/useCurrentUser';
-import PerspectivesBindings from 'components/perspectives/bindings';
-import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
 import useLocation from 'routing/useLocation';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 
@@ -36,11 +33,11 @@ jest.mock('routing/withLocation', () => (x) => x);
 jest.mock('routing/useLocation', () => jest.fn(() => ({ pathname: '' })));
 
 describe('Navigation', () => {
-  const SUT = () => <HotkeysProvider><PerspectivesProvider><Navigation /></PerspectivesProvider></HotkeysProvider>;
-
-  beforeAll(() => {
-    PluginStore.register(new PluginManifest({}, PerspectivesBindings));
-  });
+  const SUT = () => (
+    <HotkeysProvider>
+      <Navigation />
+    </HotkeysProvider>
+  );
 
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
@@ -52,7 +49,6 @@ describe('Navigation', () => {
 
     await screen.findByRole('link', { name: /throughput/i });
     await screen.findByRole('button', { name: /help/i });
-    await screen.findByRole('link', { name: /welcome/i });
     await screen.findByRole('button', { name: /user menu for administrator/i });
   });
 });

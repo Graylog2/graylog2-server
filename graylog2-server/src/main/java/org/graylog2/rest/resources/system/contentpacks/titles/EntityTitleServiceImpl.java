@@ -22,15 +22,16 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.permissions.EntityPermissions;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
+import org.graylog2.database.utils.CompositeDisplayFormatter;
 import org.graylog2.database.dbcatalog.DbEntityCatalogEntry;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntitiesTitleResponse;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityIdentifier;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleRequest;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
+import org.graylog2.search.SearchQueryField;
 
 import jakarta.inject.Inject;
 
@@ -39,11 +40,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 import static org.graylog2.database.DbEntity.NO_TITLE;
 import static org.graylog2.rest.resources.system.contentpacks.titles.model.EntitiesTitleResponse.EMPTY_RESPONSE;
+import static org.graylog2.users.UserImpl.COLLECTION_NAME;
+import static org.graylog2.users.UserImpl.LocalAdminUser.LOCAL_ADMIN_ID;
 
 public class EntityTitleServiceImpl implements EntityTitleService {
 
@@ -77,54 +81,97 @@ public class EntityTitleServiceImpl implements EntityTitleService {
         return entitiesTitleResponse.orElse(EMPTY_RESPONSE);
     }
 
+    private boolean matchesAdminIdAndUsersCollection(final EntityIdentifier entity) {
+        return entity.id().equals(LOCAL_ADMIN_ID) && entity.type().equals(COLLECTION_NAME);
+    }
+
+    private boolean notMatchesAdminIdAndUsersCollection(final EntityIdentifier entity) {
+        return !matchesAdminIdAndUsersCollection(entity);
+    }
+
     private EntitiesTitleResponse getTitlesForEntitiesFromSingleCollection(final EntityPermissions permissions,
                                                                            final String collection,
-                                                                           final List<EntityIdentifier> entities) {
+                                                                           final List<EntityIdentifier> en) {
         final Optional<DbEntityCatalogEntry> dbEntityCatalogEntry = this.entitiesCatalog.getByCollectionName(collection);
-        if (dbEntityCatalogEntry.isEmpty() || entities.isEmpty()) {
+        if (dbEntityCatalogEntry.isEmpty() || en.isEmpty()) {
             return EMPTY_RESPONSE;
         }
 
-        final String titleField = dbEntityCatalogEntry.get().titleField();
-        if (titleField.equals(NO_TITLE)) {
-            return new EntitiesTitleResponse(
-                    entities.stream()
-                            .map(e -> new EntityTitleResponse(e.id(), e.type(), NO_TITLE))
-                            .collect(Collectors.toSet()),
-                    Set.of()
-            );
-        }
-
-        final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collection);
-
-        Bson bsonFilter = Filters.or(
-                entities.stream()
-                        .map(e -> Filters.eq("_id", new ObjectId(e.id())))
-                        .collect(Collectors.toList())
-        );
-
-        final FindIterable<Document> documents = mongoCollection
-                .find(bsonFilter)
-                .projection(Projections.include(titleField));
+        boolean adminIdAndUsersCollectionFound = en.stream().anyMatch(this::matchesAdminIdAndUsersCollection);
+        List<EntityIdentifier> entities = adminIdAndUsersCollectionFound ? en.stream().filter(this::notMatchesAdminIdAndUsersCollection).toList() : en;
 
         final Set<EntityTitleResponse> titles = new HashSet<>();
         final Set<String> notPermitted = new HashSet<>();
-        documents.forEach(doc ->
-                {
-                    final String idAsString = doc.getObjectId("_id").toString();
-                    final boolean canReadTitle = checkCanReadTitle(permissions, dbEntityCatalogEntry.get().readPermission(), idAsString);
-                    titles.add(
-                            new EntityTitleResponse(
-                                    idAsString,
-                                    collection,
-                                    canReadTitle ? doc.getString(titleField) : TITLE_IF_NOT_PERMITTED
-                            )
-                    );
-                    if (!canReadTitle) {
-                        notPermitted.add(idAsString);
-                    }
+
+        if(!entities.isEmpty()) {
+            final String titleField = dbEntityCatalogEntry.get().titleField();
+            if (titleField.equals(NO_TITLE)) {
+                return new EntitiesTitleResponse(
+                        entities.stream()
+                                .map(e -> new EntityTitleResponse(e.id(), e.type(), NO_TITLE))
+                                .collect(Collectors.toSet()),
+                        Set.of()
+                );
+            }
+
+            final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collection);
+
+            final String idField = entities.get(0).effectiveIdentifierField();
+            final SearchQueryField.Type idType = entities.get(0).effectiveIdentifierType();
+            final Function<String, Object> converter = idType.getMongoValueConverter();
+
+            Bson bsonFilter = Filters.or(
+                    entities.stream()
+                            .map(e -> Filters.eq(idField, converter.apply(e.id())))
+                            .collect(Collectors.toList())
+            );
+
+            final List<String> displayFields = entities.get(0).displayFields();
+            final String displayTemplate = entities.get(0).displayTemplate();
+            final boolean useCompositeDisplay = displayFields != null && !displayFields.isEmpty();
+
+            Set<String> projectionFields = new HashSet<>();
+            projectionFields.add(idField);
+            projectionFields.add(titleField);
+            if (useCompositeDisplay) {
+                projectionFields.addAll(displayFields);
+            }
+
+            final FindIterable<Document> documents = mongoCollection
+                    .find(bsonFilter)
+                    .projection(Projections.include(projectionFields.toArray(new String[0])));
+
+            documents.forEach(doc -> {
+                final String idAsString;
+                if ("_id".equals(idField)) {
+                    idAsString = doc.getObjectId("_id").toString();
+                } else {
+                    Object val = doc.get(idField);
+                    idAsString = val != null ? val.toString() : null;
                 }
-        );
+                if (idAsString == null) {
+                    return;
+                }
+
+                final boolean canReadTitle = checkCanReadTitle(permissions, dbEntityCatalogEntry.get().readPermission(), idAsString);
+                final String title;
+                if (!canReadTitle) {
+                    title = TITLE_IF_NOT_PERMITTED;
+                } else if (useCompositeDisplay) {
+                    title = CompositeDisplayFormatter.format(doc, displayFields, displayTemplate);
+                } else {
+                    title = doc.getString(titleField);
+                }
+                titles.add(new EntityTitleResponse(idAsString, collection, title));
+                if (!canReadTitle) {
+                    notPermitted.add(idAsString);
+                }
+            });
+        }
+
+        if(adminIdAndUsersCollectionFound) {
+            titles.add(new EntityTitleResponse(LOCAL_ADMIN_ID, collection, "Administrator"));
+        }
 
         return new EntitiesTitleResponse(titles, notPermitted);
     }

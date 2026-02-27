@@ -73,6 +73,8 @@ abstract class MessageList implements SearchType {
 
         abstract Builder streams(Set<String> streams);
 
+        abstract Builder streamCategories(Set<String> streamCategories);
+
         abstract Builder limit(int limit);
 
         abstract Builder offset(int offset);

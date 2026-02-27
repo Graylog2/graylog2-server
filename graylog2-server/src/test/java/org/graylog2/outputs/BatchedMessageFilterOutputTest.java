@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import jakarta.annotation.Nonnull;
 import org.graylog.testing.messages.MessagesExtension;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.ImmutableMessage;
 import org.graylog2.outputs.filter.AllOutputsFilter;
@@ -36,6 +36,7 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
+import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -75,6 +76,8 @@ class BatchedMessageFilterOutputTest {
     private IndexSet indexSet;
     @Mock(extraInterfaces = MessageOutput.class)
     private FilteredMessageOutput targetOutput1;
+    @Mock
+    private GracefulShutdownService gracefulShutdownService;
 
     private static final int MESSAGES_PER_BATCH = 3;
 
@@ -88,7 +91,7 @@ class BatchedMessageFilterOutputTest {
     void setUp(MessageFactory messageFactory) {
         this.messageFactory = messageFactory;
         this.objectMapper = new ObjectMapperProvider().get();
-        when(indexSet.getWriteIndexAlias()).thenReturn("graylog_deflector");
+        lenient().when(indexSet.getWriteIndexAlias()).thenReturn("graylog_deflector");
         lenient().when(defaultStream.getIndexSet()).thenReturn(indexSet);
     }
 
@@ -129,6 +132,7 @@ class BatchedMessageFilterOutputTest {
                 cluster,
                 acknowledger,
                 buffer,
+                gracefulShutdownService,
                 outputFlushInterval,
                 shutdownTimeoutMs,
                 Executors.newSingleThreadScheduledExecutor()

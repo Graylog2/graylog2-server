@@ -18,10 +18,9 @@
 package org.graylog.plugins.map.geoip;
 
 import com.codahale.metrics.Timer;
+import jakarta.inject.Inject;
 import org.graylog.plugins.map.config.DatabaseVendorType;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
-
-import jakarta.inject.Inject;
 
 /**
  * A service to create a {@link GeoIpResolver} for a given configuration file and {@link DatabaseVendorType}.
@@ -35,26 +34,18 @@ public class GeoIpVendorResolverService {
     }
 
     public GeoIpResolver<GeoLocationInformation> createCityResolver(GeoIpResolverConfig config, Timer timer) {
-
-        switch (config.databaseVendorType()) {
-            case IPINFO:
-                return resolverFactory.createIpInfoCityResolver(timer, config.cityDbPath(), config.enabled());
-            case MAXMIND:
-                return resolverFactory.createMaxMindCityResolver(timer, config.cityDbPath(), config.enabled());
-            default:
-                throw new IllegalArgumentException(config.databaseVendorType().name());
-        }
+        return switch (config.databaseVendorType()) {
+            case IPINFO -> resolverFactory.createIpInfoCityResolver(timer, config.cityDbPath(), config.enabled());
+            case MAXMIND -> resolverFactory.createMaxMindCityResolver(timer, config.cityDbPath(), config.enabled());
+            default -> throw new IllegalArgumentException(config.databaseVendorType().name());
+        };
     }
 
     public GeoIpResolver<GeoAsnInformation> createAsnResolver(GeoIpResolverConfig config, Timer timer) {
-
-        switch (config.databaseVendorType()) {
-            case IPINFO:
-                return resolverFactory.createIpInfoAsnResolver(timer, config.asnDbPath(), config.enabled());
-            case MAXMIND:
-                return resolverFactory.createMaxMindAsnResolver(timer, config.asnDbPath(), config.enabled());
-            default:
-                throw new IllegalArgumentException(config.databaseVendorType().name());
-        }
+        return switch (config.databaseVendorType()) {
+            case IPINFO -> resolverFactory.createIpInfoAsnResolver(timer, config.asnDbPath(), config.enabled());
+            case MAXMIND -> resolverFactory.createMaxMindAsnResolver(timer, config.asnDbPath(), config.enabled());
+            default -> throw new IllegalArgumentException(config.databaseVendorType().name());
+        };
     }
 }

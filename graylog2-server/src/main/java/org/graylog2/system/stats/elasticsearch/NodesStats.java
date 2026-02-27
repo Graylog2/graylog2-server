@@ -19,32 +19,30 @@ package org.graylog2.system.stats.elasticsearch;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class NodesStats {
-    @JsonProperty
+    @JsonProperty("total")
     public abstract int total();
 
-    @JsonProperty
+    @JsonProperty("master_only")
     public abstract int masterOnly();
 
-    @JsonProperty
+    @JsonProperty("data_only")
     public abstract int dataOnly();
 
-    @JsonProperty
+    @JsonProperty("master_data")
     public abstract int masterData();
 
-    @JsonProperty
+    @JsonProperty("client")
     public abstract int client();
 
     public static NodesStats create(int total,
-                                   int masterOnly,
-                                   int dataOnly,
-                                   int masterData,
-                                   int client) {
+                                    int masterOnly,
+                                    int dataOnly,
+                                    int masterData,
+                                    int client) {
         return new AutoValue_NodesStats(total, masterOnly, dataOnly, masterData, client);
     }
 }

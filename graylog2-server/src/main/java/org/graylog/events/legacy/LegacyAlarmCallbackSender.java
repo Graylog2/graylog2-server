@@ -19,10 +19,8 @@ package org.graylog.events.legacy;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.mongodb.BasicDBObject;
-import org.bson.types.ObjectId;
+import jakarta.inject.Inject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorConfig;
@@ -33,9 +31,7 @@ import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallbackConfigurationException;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallbackException;
 import org.graylog2.plugin.configuration.ConfigurationException;
-import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
@@ -43,11 +39,7 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class LegacyAlarmCallbackSender {
     private static final Logger LOG = LoggerFactory.getLogger(LegacyAlarmCallbackSender.class);
@@ -117,7 +109,7 @@ public class LegacyAlarmCallbackSender {
 
         if (streams.isMissingNode() || !streams.isArray()) {
             LOG.debug("Couldn't find streams in event processor config: {}", eventProcessorConfig);
-            return MissingStream.create();
+            return missingStream();
         }
 
         if (streams.size() > 1) {
@@ -129,28 +121,20 @@ public class LegacyAlarmCallbackSender {
             return streamService.load(streamId);
         } catch (NotFoundException e) {
             LOG.error("Couldn't load stream <{}> from database", streamId, e);
-            return MissingStream.create();
+            return missingStream();
         }
     }
 
-    private static class MissingStream extends StreamImpl {
-        static Stream create() {
-            final ImmutableMap<String, Object> fields = ImmutableMap.<String, Object>builder()
-                    .put("_id", new ObjectId("5400deadbeefdeadbeefaffe"))
-                    .put(StreamImpl.FIELD_TITLE, "Missing stream")
-                    .put(StreamImpl.FIELD_DESCRIPTION, "We could find a stream")
-                    .put(StreamImpl.FIELD_RULES, ImmutableList.<StreamRule>of())
-                    .put(StreamImpl.FIELD_OUTPUTS, ImmutableSet.<Output>of())
-                    .put(StreamImpl.FIELD_CREATED_AT, DateTime.now(DateTimeZone.UTC))
-                    .put(StreamImpl.FIELD_CREATOR_USER_ID, "admin")
-                    .put(StreamImpl.EMBEDDED_ALERT_CONDITIONS, ImmutableList.<BasicDBObject>of())
-                    .build();
-
-            return new MissingStream(fields);
-        }
-
-        private MissingStream(Map<String, Object> fields) {
-            super(new ObjectId(), fields, Collections.emptyList(), Collections.emptySet(), null);
-        }
+    private static Stream missingStream() {
+        return StreamImpl.builder()
+                .id("5400deadbeefdeadbeefaffe")
+                .title("Missing stream")
+                .description("We could find a stream")
+                .rules(ImmutableList.of())
+                .outputObjects(ImmutableSet.of())
+                .createdAt(DateTime.now(DateTimeZone.UTC))
+                .creatorUserId("admin")
+                .alertConditions(ImmutableList.of())
+                .build();
     }
 }

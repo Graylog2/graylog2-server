@@ -16,17 +16,17 @@
  */
 package org.graylog2.lookup.db;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog2.lookup.LookupTableConfigService;
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.dto.LookupTableDto;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 @Singleton
 public class DBLookupTableConfigService implements LookupTableConfigService {
@@ -50,36 +50,50 @@ public class DBLookupTableConfigService implements LookupTableConfigService {
 
     @Override
     public Collection<LookupTableDto> loadAllTables() {
-        return dbTables.findAll();
+        try (Stream<LookupTableDto> lookupTableStream = dbTables.streamAll()) {
+            return lookupTableStream.toList();
+        }
     }
 
     @Override
     public Collection<LookupTableDto> findTablesForDataAdapterIds(Set<String> ids) {
-        return dbTables.findByDataAdapterIds(ids);
+        try (Stream<LookupTableDto> lookupTableStream = dbTables.streamByDataAdapterIds(ids)) {
+            return lookupTableStream.toList();
+        }
     }
 
     @Override
     public Collection<LookupTableDto> findTablesForCacheIds(Set<String> ids) {
-        return dbTables.findByCacheIds(ids);
+        try (Stream<LookupTableDto> lookupTableStream = dbTables.streamByCacheIds(ids)) {
+            return lookupTableStream.toList();
+        }
     }
 
     @Override
     public Collection<DataAdapterDto> loadAllDataAdapters() {
-        return dbAdapters.findAll();
+        try (Stream<DataAdapterDto> dataAdapterStream = dbAdapters.streamAll()) {
+            return dataAdapterStream.toList();
+        }
     }
 
     @Override
     public Collection<DataAdapterDto> findDataAdaptersForIds(Set<String> ids) {
-        return dbAdapters.findByIds(ids);
+        try (Stream<DataAdapterDto> dataAdapterStream = dbAdapters.streamByIds(ids)) {
+            return dataAdapterStream.toList();
+        }
     }
 
     @Override
     public Collection<CacheDto> loadAllCaches() {
-        return dbCaches.findAll();
+        try (Stream<CacheDto> cacheStream = dbCaches.streamAll()) {
+            return cacheStream.toList();
+        }
     }
 
     @Override
     public Collection<CacheDto> findCachesForIds(Set<String> ids) {
-        return dbCaches.findByIds(ids);
+        try (Stream<CacheDto> cacheStream = dbCaches.streamAll()) {
+            return cacheStream.toList();
+        }
     }
 }

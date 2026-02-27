@@ -20,9 +20,14 @@ import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -63,13 +68,16 @@ import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.plugins.views.startpage.StartPageService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog.security.shares.CreateEntityRequest;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.source.EntitySource;
+import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.bulk.AuditParams;
@@ -82,6 +90,7 @@ import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -93,9 +102,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Locale.ENGLISH;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "Views", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Views")
 @Path("/views")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
@@ -116,6 +125,8 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final StartPageService startPageService;
     private final RecentActivityService recentActivityService;
     private final BulkExecutor<ViewDTO, SearchUser> bulkExecutor;
+    private final EntitySharesService entitySharesService;
+    private final EntitySourceService entitySourceService;
 
     @Inject
     public ViewsResource(ViewService dbService,
@@ -126,7 +137,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                          SearchFilterVisibilityChecker searchFilterVisibilityChecker,
                          ReferencedSearchFiltersHelper referencedSearchFiltersHelper,
                          AuditEventSender auditEventSender,
-                         ObjectMapper objectMapper) {
+                         ObjectMapper objectMapper,
+                         EntitySharesService entitySharesService,
+                         EntitySourceService entitySourceService) {
         this.dbService = dbService;
         this.startPageService = startPageService;
         this.recentActivityService = recentActivityService;
@@ -137,20 +150,23 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         this.searchFilterVisibilityChecker = searchFilterVisibilityChecker;
         this.referencedSearchFiltersHelper = referencedSearchFiltersHelper;
         this.bulkExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
-
-
+        this.entitySharesService = entitySharesService;
+        this.entitySourceService = entitySourceService;
     }
 
     @GET
-    @ApiOperation("Get a list of all views")
-    public PaginatedResponse<ViewDTO> views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                            @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                            @ApiParam(name = "sort",
-                                                      value = "The field to sort the result on",
+    @Operation(summary = "Get a list of all views")
+    public PaginatedResponse<ViewDTO> views(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                            @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                            @Parameter(name = "sort",
+                                                      description = "The field to sort the result on",
                                                       required = true,
-                                                      allowableValues = "id,title,created_at") @DefaultValue(ViewDTO.FIELD_TITLE) @QueryParam("sort") String sortField,
-                                            @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") SortOrder order,
-                                            @ApiParam(name = "query") @QueryParam("query") String query,
+                                                      schema = @Schema(allowableValues = {"id", "title", "created_at", "last_updated_at", "owner", "description", "summary"}))
+                                            @DefaultValue(ViewDTO.FIELD_TITLE) @QueryParam("sort") String sortField,
+                                            @Parameter(name = "order", description = "The sort direction",
+                                                      schema = @Schema(allowableValues = {"asc", "desc"}))
+                                            @DefaultValue("asc") @QueryParam("order") SortOrder order,
+                                            @Parameter(name = "query") @QueryParam("query") String query,
                                             @Context SearchUser searchUser) {
 
         if (!ViewDTO.SORT_FIELDS.contains(sortField.toLowerCase(ENGLISH))) {
@@ -176,8 +192,8 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
     @GET
     @Path("{id}")
-    @ApiOperation("Get a single view")
-    public ViewDTO get(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id, @Context SearchUser searchUser) {
+    @Operation(summary = "Get a single view")
+    public ViewDTO get(@Parameter(name = "id") @PathParam("id") @NotEmpty String id, @Context SearchUser searchUser) {
         if ("default".equals(id)) {
             // If the user is not permitted to access the default view, return a 404
             return dbService.getDefault()
@@ -224,15 +240,38 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         }
     }
 
+    @POST
+    @Operation(summary = "Create a new view")
+    @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
+    public ViewDTO create(@RequestBody(required = true) @Valid @NotNull(message = "View is mandatory") CreateEntityRequest<ViewDTO> createEntityRequest,
+                          @Context UserContext userContext,
+                          @Context SearchUser searchUser) {
+        return createView(createEntityRequest, userContext, searchUser);
+    }
 
     @POST
-    @ApiOperation("Create a new view")
+    @Operation(summary = "Duplicate an existing view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
-    public ViewDTO create(@ApiParam @Valid @NotNull(message = "View is mandatory") ViewDTO dto,
-                          @Context UserContext userContext,
-                          @Context SearchUser searchUser) throws ValidationException {
-        if (dto.type().equals(ViewDTO.Type.DASHBOARD) && !searchUser.canCreateDashboards()) {
-            throw new ForbiddenException("User is not allowed to create new dashboards.");
+    @Path("{id}")
+    public ViewDTO duplicate(@Parameter(name = "id") @PathParam("id") @NotEmpty String existingViewId,
+                             @RequestBody(required = true) @Valid @NotNull(message = "View is mandatory") CreateEntityRequest<ViewDTO> createEntityRequest,
+                             @Context UserContext userContext,
+                             @Context SearchUser searchUser) {
+        final ViewDTO dto = createView(createEntityRequest, userContext, searchUser);
+        // Save a link to the original view this one was cloned from
+        entitySourceService.create(EntitySource.builder()
+                .entityId(dto.id())
+                .parentId(existingViewId)
+                .entityType(EntitySource.VIEW_TYPE)
+                .build()
+        );
+        return dto;
+    }
+
+    private ViewDTO createView(CreateEntityRequest<ViewDTO> createEntityRequest, UserContext userContext, SearchUser searchUser) {
+        final ViewDTO dto = createEntityRequest.entity();
+        if (!searchUser.canCreateView(dto)) {
+            throw new ForbiddenException("User is not allowed to create view of type " + dto.type());
         }
 
         validateIntegrity(dto, searchUser, true);
@@ -240,7 +279,16 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         final User user = userContext.getUser();
         var result = dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
         recentActivityService.create(result.id(), result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
+        updateViewSharing(createEntityRequest, searchUser, result);
+
         return result;
+    }
+
+    private void updateViewSharing(CreateEntityRequest<ViewDTO> createEntityRequest, SearchUser searchUser, ViewDTO dto) {
+        createEntityRequest.shareRequest().ifPresent(shareRequest -> {
+            final var grnType = dto.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
+            entitySharesService.updateEntityShares(grnType, dto.id(), shareRequest, searchUser.getUser());
+        });
     }
 
     private void validateIntegrity(ViewDTO dto, SearchUser searchUser, boolean newCreation) {
@@ -248,7 +296,6 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                 .orElseThrow(() -> new BadRequestException("Search " + dto.searchId() + " not available"));
 
         validateSearchProperties(dto, search);
-
 
         if (!newCreation) {
             final ViewDTO originalView = dbService.get(dto.id()).orElseThrow(() -> new BadRequestException("Cannot update a view that does not exist : id = " + dto.id()));
@@ -341,28 +388,34 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
     @PUT
     @Path("{id}")
-    @ApiOperation("Update view")
+    @Operation(summary = "Update view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_UPDATE)
-    public ViewDTO update(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id,
-                          @ApiParam @Valid ViewDTO dto,
+    public ViewDTO update(@Parameter(name = "id") @PathParam("id") @NotEmpty String id,
+                          @RequestBody(required = true) @Valid CreateEntityRequest<ViewDTO> createEntityRequest,
                           @Context SearchUser searchUser) {
+        final ViewDTO dto = createEntityRequest.entity();
         final ViewDTO updatedDTO = dto.toBuilder().id(id).build();
-        if (!searchUser.canUpdateView(updatedDTO)) {
-            throw new ForbiddenException("Not allowed to edit " + summarize(updatedDTO) + ".");
-        }
-
-        validateIntegrity(updatedDTO, searchUser, false);
+        validateDto(updatedDTO, searchUser);
 
         var result = dbService.update(updatedDTO);
         recentActivityService.update(result.id(), result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
+        updateViewSharing(createEntityRequest, searchUser, result);
+
         return result;
+    }
+
+    private void validateDto(ViewDTO dto, SearchUser searchUser) {
+        if (!searchUser.canUpdateView(dto)) {
+            throw new ForbiddenException("Not allowed to edit " + summarize(dto) + ".");
+        }
+        validateIntegrity(dto, searchUser, false);
     }
 
     @PUT
     @Path("{id}/default")
-    @ApiOperation("Configures the view as default view")
+    @Operation(summary = "Configures the view as default view")
     @AuditEvent(type = ViewsAuditEventTypes.DEFAULT_VIEW_SET)
-    public void setDefault(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id) {
+    public void setDefault(@Parameter(name = "id") @PathParam("id") @NotEmpty String id) {
         checkPermission(ViewsRestPermissions.VIEW_READ, id);
         checkPermission(ViewsRestPermissions.DEFAULT_VIEW_SET);
         dbService.saveDefault(loadView(id));
@@ -370,9 +423,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
     @DELETE
     @Path("{id}")
-    @ApiOperation("Delete view")
+    @Operation(summary = "Delete view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_DELETE)
-    public ViewDTO delete(@ApiParam(name = "id") @PathParam("id") @NotEmpty String id,
+    public ViewDTO delete(@Parameter(name = "id") @PathParam("id") @NotEmpty String id,
                           @Context SearchUser searchUser) {
         final ViewDTO view = loadView(id);
         if (!searchUser.canDeleteView(view)) {
@@ -389,9 +442,13 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Path("/bulk_delete")
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
-    @ApiOperation(value = "Delete a bulk of views", response = BulkOperationResponse.class)
+    @Operation(summary = "Delete a bulk of views")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Deletion successful",
+                    content = @Content(schema = @Schema(implementation = BulkOperationResponse.class)))
+    })
     @NoAuditEvent("Audit events triggered manually")
-    public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
+    public Response bulkDelete(@Parameter(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
                                @Context final SearchUser searchUser) {
 
         final BulkOperationResponse response = bulkExecutor.executeBulkOperation(bulkOperationRequest,

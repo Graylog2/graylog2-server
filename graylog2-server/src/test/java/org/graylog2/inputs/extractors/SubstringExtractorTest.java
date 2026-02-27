@@ -22,14 +22,15 @@ import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Extractor;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SubstringExtractorTest extends AbstractExtractorTest {
     private final MessageFactory messageFactory = new TestMessageFactory();
@@ -129,29 +130,39 @@ public class SubstringExtractorTest extends AbstractExtractorTest {
         assertEquals("fullyCutByExtractor", msg.getField("somefield"));
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void testDoesNotInitializeOnNullConfigMap() throws Exception {
-        new SubstringExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", null, "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        assertThrows(ConfigurationException.class, () -> {
+            new SubstringExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", null, "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        });
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void testDoesNotInitializeOnNullStartValue() throws Exception {
-        new SubstringExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config(null, 2), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        assertThrows(ConfigurationException.class, () -> {
+            new SubstringExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config(null, 2), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        });
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void testDoesNotInitializeOnNullEndValue() throws Exception {
-        new SubstringExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config(1, null), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        assertThrows(ConfigurationException.class, () -> {
+            new SubstringExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config(1, null), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        });
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void testDoesNotInitializeOnStringStartValue() throws Exception {
-        new SubstringExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config("1", 2), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        assertThrows(ConfigurationException.class, () -> {
+            new SubstringExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config("1", 2), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        });
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void testDoesNotInitializeOnStringEndValue() throws Exception {
-        new SubstringExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config(1, "2"), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        assertThrows(ConfigurationException.class, () -> {
+            new SubstringExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config(1, "2"), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        });
     }
 
     @Test

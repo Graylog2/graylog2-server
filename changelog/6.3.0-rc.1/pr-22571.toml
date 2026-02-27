@@ -1,0 +1,4 @@
+type = "c"
+message = "Changed default AdaptiveCard schema version to 1.5 from 1.6 in Microsoft Teams Notification v2 template."
+
+pulls = ["22571"]

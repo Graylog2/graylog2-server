@@ -16,8 +16,9 @@
  */
 import * as React from 'react';
 
+import { singleton } from 'logic/singleton';
 import type Widget from 'views/logic/widgets/Widget';
 
 const WidgetContext = React.createContext<Widget | undefined>(undefined);
 
-export default WidgetContext;
+export default singleton('contexts.WidgetContext', () => WidgetContext);

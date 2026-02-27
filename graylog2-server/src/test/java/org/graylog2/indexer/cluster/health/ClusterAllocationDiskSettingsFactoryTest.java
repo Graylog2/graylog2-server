@@ -16,9 +16,10 @@
  */
 package org.graylog2.indexer.cluster.health;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ClusterAllocationDiskSettingsFactoryTest {
 
@@ -93,8 +94,9 @@ public class ClusterAllocationDiskSettingsFactoryTest {
         assertThat(settings.ThresholdEnabled()).isFalse();
     }
 
-    @Test(expected = Exception.class)
-    public void throwExceptionWhenMixedSettings() throws Exception {
-        ClusterAllocationDiskSettingsFactory.create(true, "10Gb", "10%", "");
+    @Test
+    public void throwExceptionWhenMixedSettings() {
+        assertThrows(Exception.class, () ->
+            ClusterAllocationDiskSettingsFactory.create(true, "10Gb", "10%", ""));
     }
 }

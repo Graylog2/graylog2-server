@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix missing Query Parameters in Event Definitions in Content Packs."
+
+issues = ["Graylog2/graylog-plugin-enterprise#9274"]
+pulls = ["21349"]

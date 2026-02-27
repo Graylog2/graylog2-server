@@ -21,7 +21,12 @@ import type { AdditionalQueries } from 'util/PaginationURL';
 
 // Temporary file to mock api responses
 
-const searchPaginatedEntitySharesResponse = (page: number, perPage: number, query: string, additionalQueries?: AdditionalQueries) => {
+const searchPaginatedEntitySharesResponse = (
+  page: number,
+  perPage: number,
+  query: string,
+  additionalQueries?: AdditionalQueries,
+) => {
   const mockedEntities = new Array(perPage).fill({
     id: 'grn::::stream:57bc9188e62a2373778d9e03',
     type: 'stream',
@@ -68,7 +73,12 @@ const availableEntityTypes = {
   stream: 'Stream',
   dashboard: 'Dashboard',
   search: 'Saved Search',
+  search_filter: 'Search Filter',
   event_definition: 'Event Definition',
+  event_procedure: 'Event Procedure',
+  notification: 'Notification',
+  report: 'Report',
+  sigma_rule: 'Sigma Rule',
 };
 
 const availableCapabilities = {

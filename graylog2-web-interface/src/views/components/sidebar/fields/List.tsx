@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { FixedSizeList } from 'react-window';
+import { List as VirtualList, type RowComponentProps } from 'react-window';
 import type { List as ImmutableList } from 'immutable';
 import styled from 'styled-components';
 
@@ -33,13 +33,17 @@ const DynamicHeight = styled(ElementDimensions)`
 `;
 
 type Props = {
-  activeQueryFields: ImmutableList<FieldTypeMapping>,
-  allFields: ImmutableList<FieldTypeMapping>,
-  currentGroup: string,
-  filter: string | undefined | null,
+  activeQueryFields: ImmutableList<FieldTypeMapping>;
+  allFields: ImmutableList<FieldTypeMapping>;
+  currentGroup: string;
+  filter: string | undefined | null;
 };
 
-const _fieldsToShow = (fields: ImmutableList<FieldTypeMapping>, allFields: ImmutableList<FieldTypeMapping>, currentGroup: string = 'all'): ImmutableList<FieldTypeMapping> => {
+const _fieldsToShow = (
+  fields: ImmutableList<FieldTypeMapping>,
+  allFields: ImmutableList<FieldTypeMapping>,
+  currentGroup: string = 'all',
+): ImmutableList<FieldTypeMapping> => {
   const isNotReservedField = (f: FieldTypeMapping) => !isFilteredField(f.name);
 
   switch (currentGroup) {
@@ -53,6 +57,21 @@ const _fieldsToShow = (fields: ImmutableList<FieldTypeMapping>, allFields: Immut
   }
 };
 
+type RowProps = {
+  fieldList: ImmutableList<FieldTypeMapping>;
+  activeQueryFields: ImmutableList<FieldTypeMapping>;
+  selectedQuery: string;
+};
+
+const RowComponent = ({ index, style, fieldList, activeQueryFields, selectedQuery }: RowComponentProps<RowProps>) => (
+  <ListItem
+    fieldType={fieldList.get(index)}
+    selectedQuery={selectedQuery}
+    activeQueryFields={activeQueryFields}
+    style={style}
+  />
+);
+
 const List = ({ filter, activeQueryFields, allFields, currentGroup }: Props) => {
   const activeQuery = useActiveQueryId();
 
@@ -60,11 +79,14 @@ const List = ({ filter, activeQueryFields, allFields, currentGroup }: Props) => 
     return <span>No field information available.</span>;
   }
 
-  const fieldFilter = filter ? ((field) => field.name.toLocaleUpperCase().includes(filter.toLocaleUpperCase())) : () => true;
+  const fieldFilter = filter
+    ? (field: { name: string }) => field.name.toLocaleUpperCase().includes(filter.toLocaleUpperCase())
+    : () => true;
   const fieldsToShow = _fieldsToShow(activeQueryFields, allFields, currentGroup);
   const fieldList = fieldsToShow
     .filter(fieldFilter)
-    .sortBy((field) => field.name.toLocaleUpperCase());
+    .sortBy((field) => field.name.toLocaleUpperCase())
+    .toList();
 
   if (fieldList.isEmpty()) {
     return <i>No fields to show. Try changing your filter term or select a different field set above.</i>;
@@ -73,17 +95,17 @@ const List = ({ filter, activeQueryFields, allFields, currentGroup }: Props) => 
   return (
     <DynamicHeight>
       {({ width, height }) => (
-        <FixedSizeList height={height || DEFAULT_HEIGHT_PX}
-                       width={width}
-                       itemCount={fieldList.size}
-                       itemSize={20}>
-          {({ index, style }) => (
-            <ListItem fieldType={fieldList.get(index)}
-                      selectedQuery={activeQuery}
-                      activeQueryFields={activeQueryFields}
-                      style={style} />
-          )}
-        </FixedSizeList>
+        <VirtualList
+          style={{ height: height || DEFAULT_HEIGHT_PX, width }}
+          rowComponent={RowComponent}
+          rowCount={fieldList.size}
+          rowHeight={20}
+          rowProps={{
+            fieldList,
+            activeQueryFields,
+            selectedQuery: activeQuery,
+          }}
+        />
       )}
     </DynamicHeight>
   );

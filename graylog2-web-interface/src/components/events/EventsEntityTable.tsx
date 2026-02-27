@@ -1,0 +1,83 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import * as React from 'react';
+
+import { Events } from '@graylog/server-api';
+
+import useTableElements from 'components/events/events/hooks/useTableComponents';
+import { eventsTableElements } from 'components/events/Constants';
+import eventsSliceRenderers from 'components/events/SliceRenderers';
+import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
+import FilterValueRenderers from 'components/events/FilterValueRenderers';
+import fetchEvents, { keyFn, parseFilters, getConcatenatedQuery } from 'components/events/fetchEvents';
+import type { SearchParams } from 'stores/PaginationTypes';
+import type { Event, EventsAdditionalData } from 'components/events/events/types';
+import useQuery from 'routing/useQuery';
+import CustomColumnRenderers from 'components/events/events/ColumnRenderers';
+import EventsRefreshControls from 'components/events/events/EventsRefreshControls';
+import QueryHelper from 'components/common/QueryHelper';
+import EventsWidgets from 'components/events/EventsWidgets';
+import EventsRefreshProvider from 'components/events/EventsRefreshProvider';
+import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
+
+const additionalSearchFields = {
+  key: 'The key of the event',
+};
+
+const EventsEntityTable = () => {
+  const { stream_id: streamId } = useQuery();
+  const _fetchEvents = (searchParams: SearchParams) => fetchEvents(searchParams, streamId as string);
+  const { entityActions, expandedSections, bulkSelection } = useTableElements({
+    defaultLayout: eventsTableElements.defaultLayout,
+  });
+
+  const _fetchSlices = (column: string, query: string, filters: UrlQueryFilters) => {
+    const { filter, timerange } = parseFilters(filters);
+
+    return Events.slices({
+      include_all: false,
+      slice_column: column,
+      query: getConcatenatedQuery(query, streamId as string),
+      filter,
+      timerange,
+    });
+  };
+
+  return (
+    <EventsRefreshProvider>
+      <PaginatedEntityTable<Event, EventsAdditionalData>
+        humanName="events"
+        queryHelpComponent={<QueryHelper entityName="event" fieldMap={additionalSearchFields} />}
+        entityActions={entityActions}
+        tableLayout={eventsTableElements.defaultLayout}
+        fetchEntities={_fetchEvents}
+        fetchSlices={_fetchSlices}
+        sliceRenderers={eventsSliceRenderers}
+        keyFn={keyFn}
+        expandedSectionRenderers={expandedSections}
+        entityAttributesAreCamelCase={false}
+        filterValueRenderers={FilterValueRenderers}
+        columnRenderers={CustomColumnRenderers}
+        bulkSelection={bulkSelection}
+        topRightCol={<EventsRefreshControls />}
+        middleSection={EventsWidgets}
+      />
+    </EventsRefreshProvider>
+  );
+};
+
+export default EventsEntityTable;

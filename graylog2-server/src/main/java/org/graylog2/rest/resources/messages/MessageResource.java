@@ -19,11 +19,12 @@ package org.graylog2.rest.resources.messages;
 import com.codahale.metrics.annotation.Timed;
 import com.eaio.uuid.UUID;
 import com.google.common.net.InetAddresses;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.ws.rs.BadRequestException;
@@ -40,7 +41,8 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.IndexNotFoundException;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.results.ResultMessage;
@@ -54,27 +56,25 @@ import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.rest.models.messages.requests.MessageParseRequest;
 import org.graylog2.rest.models.messages.responses.MessageTokens;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "Messages", description = "Single messages", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Messages", description = "Single messages")
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/messages")
 public class MessageResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(MessageResource.class);
-
     private final Messages messages;
     private final CodecFactory codecFactory;
     private final IndexSetRegistry indexSetRegistry;
@@ -92,14 +92,15 @@ public class MessageResource extends RestResource {
     @GET
     @Path("/{index}/{messageId}")
     @Timed
-    @ApiOperation(value = "Get a single message.")
+    @Operation(summary = "Get a single message.")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Specified index does not exist."),
-            @ApiResponse(code = 404, message = "Message does not exist.")
+            @ApiResponse(responseCode = "200", description = "Returns the message", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "Specified index does not exist."),
+            @ApiResponse(responseCode = "404", description = "Message does not exist.")
     })
-    public ResultMessage search(@ApiParam(name = "index", value = "The index this message is stored in.", required = true)
+    public ResultMessage search(@Parameter(name = "index", description = "The index this message is stored in.", required = true)
                                 @PathParam("index") String index,
-                                @ApiParam(name = "messageId", required = true)
+                                @Parameter(name = "messageId", required = true)
                                 @PathParam("messageId") String messageId) throws IOException {
         checkPermission(RestPermissions.MESSAGES_READ, messageId);
         try {
@@ -109,9 +110,9 @@ public class MessageResource extends RestResource {
 
             return resultMessage;
         } catch (DocumentNotFoundException e) {
-            final String msg = "Message " + messageId + " does not exist in index " + index;
-            LOG.error(msg, e);
-            throw new NotFoundException(msg, e);
+            throw new NotFoundException("Message " + messageId + " does not exist in index " + index, e);
+        } catch (IndexNotFoundException e) {
+            throw new NotFoundException("Index " + index + " does not exist.", e);
         }
     }
 
@@ -137,13 +138,14 @@ public class MessageResource extends RestResource {
     @Path("/parse")
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Parse a raw message")
+    @Operation(summary = "Parse a raw message")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Specified codec does not exist."),
-            @ApiResponse(code = 400, message = "Could not decode message.")
+            @ApiResponse(responseCode = "200", description = "Returns parsed message", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "Specified codec does not exist."),
+            @ApiResponse(responseCode = "400", description = "Could not decode message.")
     })
     @NoAuditEvent("only used to parse a test message")
-    public ResultMessage parse(@ApiParam(name = "JSON body", required = true) MessageParseRequest request) {
+    public ResultMessage parse(@RequestBody(required = true) MessageParseRequest request) {
         Codec codec;
         try {
             final Configuration configuration = new Configuration(request.configuration());
@@ -161,17 +163,14 @@ public class MessageResource extends RestResource {
     }
 
     private Message decodeMessage(Codec codec, ResolvableInetSocketAddress remoteAddress, RawMessage rawMessage) {
-        Message message;
+        Optional<Message> messageOpt;
         try {
-            message = codec.decode(rawMessage);
-
+            messageOpt = codec.decodeSafe(rawMessage);
         } catch (Exception e) {
             throw new BadRequestException("Could not decode message");
         }
 
-        if (message == null) {
-            throw new BadRequestException("Could not decode message");
-        }
+        Message message = messageOpt.orElseThrow(() -> new BadRequestException("Could not decode message"));
 
         // Ensure the decoded Message has a source, otherwise creating a ResultMessage will fail
         if (isNullOrEmpty(message.getSource())) {
@@ -191,18 +190,19 @@ public class MessageResource extends RestResource {
     @GET
     @Path("/{index}/analyze")
     @Timed
-    @ApiOperation(value = "Analyze a message string",
-                  notes = "Returns what tokens/terms a message string (message or full_message) is split to.")
+    @Operation(summary = "Analyze a message string",
+                  description = "Returns what tokens/terms a message string (message or full_message) is split to.")
     @RequiresPermissions(RestPermissions.MESSAGES_ANALYZE)
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Specified index does not exist."),
+            @ApiResponse(responseCode = "200", description = "Returns tokens", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "Specified index does not exist."),
     })
     public MessageTokens analyze(
-            @ApiParam(name = "index", value = "The index the message containing the string is stored in.", required = true)
+            @Parameter(name = "index", description = "The index the message containing the string is stored in.", required = true)
             @PathParam("index") String index,
-            @ApiParam(name = "analyzer", value = "The analyzer to use.")
+            @Parameter(name = "analyzer", description = "The analyzer to use.")
             @QueryParam("analyzer") @Nullable String analyzer,
-            @ApiParam(name = "string", value = "The string to analyze.", required = true)
+            @Parameter(name = "string", description = "The string to analyze.", required = true)
             @QueryParam("string") @NotEmpty String string) throws IOException {
 
         final String indexAnalyzer = indexSetRegistry.getForIndex(index)

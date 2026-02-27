@@ -1,0 +1,5 @@
+type = "f"
+message = "Show the datanode upgrade list when we wait for a node to be upgraded"
+
+pulls = ["22037"]
+issues = ["22004"]

@@ -32,11 +32,12 @@ const renderCreateDefinitionAction = ({
   type = FieldType.create('STRING'),
   value = 'value',
   contexts = mockedContexts,
-}) => render(
-  <AdditionalContext.Provider value={contexts}>
-    <CreateEventDefinition onClose={onClose} queryId={queryId} field={field} type={type} value={value} />
-  </AdditionalContext.Provider>,
-);
+}) =>
+  render(
+    <AdditionalContext.Provider value={contexts}>
+      <CreateEventDefinition onClose={onClose} queryId={queryId} field={field} type={type} value={value} />
+    </AdditionalContext.Provider>,
+  );
 
 jest.mock('views/logic/valueactions/createEventDefinition/hooks/useModalData', () => jest.fn());
 jest.mock('views/logic/valueactions/createEventDefinition/hooks/useMappedData', () => jest.fn());

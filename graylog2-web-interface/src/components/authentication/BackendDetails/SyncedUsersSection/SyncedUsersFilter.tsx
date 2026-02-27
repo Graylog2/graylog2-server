@@ -21,7 +21,7 @@ import { SearchForm } from 'components/common';
 import UserQueryHelper from 'components/users/UsersQueryHelper';
 
 type Props = {
-  onSearch: (query: string) => void,
+  onSearch: (query: string) => void;
 };
 
 const Container = styled.div`
@@ -30,10 +30,12 @@ const Container = styled.div`
 
 const SyncedUsersFilter = ({ onSearch }: Props) => (
   <Container>
-    <SearchForm onReset={() => onSearch('')}
-                onSearch={onSearch}
-                queryHelpComponent={<UserQueryHelper />}
-                topMargin={0} />
+    <SearchForm
+      onReset={() => onSearch('')}
+      onSearch={onSearch}
+      queryHelpComponent={<UserQueryHelper />}
+      topMargin={0}
+    />
   </Container>
 );
 

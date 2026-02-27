@@ -21,21 +21,16 @@ import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersExc
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(Parameterized.class)
 public class AutoIntervalTest {
-    private final String result;
-    private final String expectedResult;
 
-    @Parameterized.Parameters(name = "{3}: Range of {0} should be {2} for scaling of {1}")
     public static Collection<Object[]> data() throws InvalidRangeParametersException {
         return Arrays.asList(new Object[][] {
                 // Scaling Factor of 0.5
@@ -80,14 +75,9 @@ public class AutoIntervalTest {
         });
     }
 
-    public AutoIntervalTest(TimeRange range, double scalingFactor, String expectedResult, String description) {
-        final AutoInterval autoInterval = AutoInterval.create(scalingFactor);
-        this.result = autoInterval.toDateInterval(range).toString();
-        this.expectedResult = expectedResult;
-    }
-
-    @Test
-    public void test() throws Exception {
-        assertThat(result).isEqualTo(expectedResult);
+    @MethodSource("data")
+    @ParameterizedTest(name = "{3}: Range of {0} should be {2} for scaling of {1}")
+    public void test(TimeRange range, double scalingFactor, String expectedResult, String description) throws Exception {
+        assertThat(AutoInterval.create(scalingFactor).toDateInterval(range).toString()).describedAs(description).isEqualTo(expectedResult);
     }
 }

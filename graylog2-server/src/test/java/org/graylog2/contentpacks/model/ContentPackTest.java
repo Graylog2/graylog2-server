@@ -37,8 +37,8 @@ import org.graylog2.contentpacks.model.parameters.StringParameter;
 import org.graylog2.jackson.AutoValueSubtypeResolver;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URI;
@@ -55,7 +55,7 @@ public class ContentPackTest {
 
     private ObjectMapper objectMapper;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         objectMapper = new ObjectMapperProvider().get();
         objectMapper.setSubtypeResolver(new AutoValueSubtypeResolver());
@@ -90,7 +90,7 @@ public class ContentPackTest {
                 .vendor("Graylog, Inc.")
                 .url(URI.create("https://www.graylog.org"))
                 .createdAt(DateTime.parse("2018-12-17T16:18:12.000Z"))
-                .serverVersion(Version.valueOf("3.0.0-alpha.6-SNAPSHOT"))
+                .serverVersion(Version.parse("3.0.0-alpha.6-SNAPSHOT"))
                 .parameters(ImmutableSet.of(
                         BooleanParameter.builder().name("MY_BOOLEAN").title("My Boolean").description("Some description").build(),
                         DoubleParameter.builder().name("MY_DOUBLE").title("My Double").description("Some description").defaultValue(Optional.of(12.34D)).build(),

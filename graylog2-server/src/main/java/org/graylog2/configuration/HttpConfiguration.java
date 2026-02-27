@@ -20,6 +20,8 @@ import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ParameterException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.ValidatorMethod;
+import com.github.joschi.jadconfig.documentation.Documentation;
+import com.github.joschi.jadconfig.documentation.DocumentationSection;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
 import com.google.common.annotations.VisibleForTesting;
@@ -38,57 +40,132 @@ import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+@DocumentationSection(heading = "HTTP settings", description = "")
 public class HttpConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(HttpConfiguration.class);
 
     private static final int GRAYLOG_DEFAULT_PORT = 9000;
 
     public static final String OVERRIDE_HEADER = "X-Graylog-Server-URL";
-    public static final String PATH_WEB = "";
-    public static final String PATH_API = "api/";
+    public static final String API_PREFIX = "api";
+    public static final String PATH_API = API_PREFIX + "/";
 
+    @Documentation("""
+            ## HTTP bind address
+
+            The network interface used by the Graylog HTTP interface.
+
+            This network interface must be accessible by all Graylog nodes in the cluster and by all clients
+            using the Graylog web interface.
+
+            If the port is omitted, Graylog will use port 9000 by default.
+
+            Default: 127.0.0.1:9000
+            IPv6 example: http_bind_address = [2001:db8::1]:9000
+            """)
     @Parameter(value = "http_bind_address", required = true)
     private HostAndPort httpBindAddress = HostAndPort.fromParts("127.0.0.1", GRAYLOG_DEFAULT_PORT);
 
+    @Documentation("""
+            ## HTTP publish URI
+
+            The HTTP URI of this Graylog node which is used to communicate with the other Graylog nodes in the cluster and by all
+            clients using the Graylog web interface.
+
+            The URI will be published in the cluster discovery APIs, so that other Graylog nodes will be able to find and connect to this Graylog node.
+
+            This configuration setting has to be used if this Graylog node is available on another network interface than $http_bind_address,
+            for example if the machine has multiple network interfaces or is behind a NAT gateway.
+
+            If $http_bind_address contains a wildcard IPv4 address (0.0.0.0), the first non-loopback IPv4 address of this machine will be used.
+            This configuration setting *must not* contain a wildcard address!
+
+            Default: http://$http_bind_address/
+            """)
     @Parameter(value = "http_publish_uri", validator = URIAbsoluteValidator.class)
     private URI httpPublishUri;
 
+    @Documentation("""
+            ## Enable CORS headers for HTTP interface
+
+            This allows browsers to make Cross-Origin requests from any origin.
+            This is disabled for security reasons and typically only needed if running graylog
+            with a separate server for frontend development.
+
+            Default: false
+            """)
     @Parameter(value = "http_enable_cors")
     private boolean httpEnableCors = false;
 
+    @Documentation("""
+            ## Enable GZIP support for HTTP interface
+
+            This compresses API responses and therefore helps to reduce
+            overall round trip times. This is enabled by default. Uncomment the next line to disable it.
+            """)
     @Parameter(value = "http_enable_gzip")
     private boolean httpEnableGzip = true;
 
+    @Documentation("The maximum size of the HTTP request headers in bytes.")
     @Parameter(value = "http_max_header_size", required = true, validator = PositiveIntegerValidator.class)
     private int httpMaxHeaderSize = 8192;
 
+    @Documentation("The size of the thread pool used exclusively for serving the HTTP interface.")
     @Parameter(value = "http_thread_pool_size", required = true, validator = PositiveIntegerValidator.class)
     private int httpThreadPoolSize = 64;
 
+    @Documentation("tbd")
     @Parameter(value = "http_selector_runners_count", required = true, validator = PositiveIntegerValidator.class)
     private int httpSelectorRunnersCount = 1;
 
+    @Documentation("""
+            ## Enable HTTPS support for the HTTP interface
+
+            This secures the communication with the HTTP interface with TLS to prevent request forgery and eavesdropping.
+
+            Default: false
+            """)
     @Parameter(value = "http_enable_tls")
     private boolean httpEnableTls = false;
 
+    @Documentation("The X.509 certificate chain file in PEM format to use for securing the HTTP interface.")
     @Parameter(value = "http_tls_cert_file")
     private Path httpTlsCertFile;
 
+    @Documentation("The PKCS#8 private key file in PEM format to use for securing the HTTP interface.")
     @Parameter(value = "http_tls_key_file")
     private Path httpTlsKeyFile;
 
+    @Documentation("The password to unlock the private key used for securing the HTTP interface.")
     @Parameter(value = "http_tls_key_password")
     private String httpTlsKeyPassword;
 
+    @Documentation("""
+            ## External Graylog URI
+
+            The public URI of Graylog which will be used by the Graylog web interface to communicate with the Graylog REST API.
+
+            The external Graylog URI usually has to be specified, if Graylog is running behind a reverse proxy or load-balancer
+            and it will be used to generate URLs addressing entities in the Graylog REST API (see $http_bind_address).
+
+            When using Graylog Collector, this URI will be used to receive heartbeat messages and must be accessible for all collectors.
+
+            This setting can be overridden on a per-request basis with the "X-Graylog-Server-URL" HTTP request header.
+
+            Default: $http_publish_uri
+            """)
     @Parameter(value = "http_external_uri")
     private URI httpExternalUri;
 
+    @Documentation("tbd")
     @Parameter(value = "http_allow_embedding")
     private boolean httpAllowEmbedding = false;
 
+    @Documentation("tbd")
     @Parameter(value = "http_cookie_secure_override")
     private boolean httpCookieSecureOverride = false;
 
+    @Documentation("tbd")
     @Parameter(value = "http_cookie_same_site_strict")
     private boolean httpCookieSameSiteStrict = true;
 

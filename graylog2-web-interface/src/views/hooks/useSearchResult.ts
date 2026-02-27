@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useAppSelector from 'stores/useAppSelector';
+import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectSearchExecutionResult } from 'views/logic/slices/searchExecutionSelectors';
 
-const useSearchResult = () => useAppSelector(selectSearchExecutionResult);
+const useSearchResult = () => useViewsSelector(selectSearchExecutionResult);
 export default useSearchResult;

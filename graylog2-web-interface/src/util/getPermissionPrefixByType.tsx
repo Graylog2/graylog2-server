@@ -15,35 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import EntityPermissionsMapperBinder from 'logic/permissions/EntityPermissionsMapper';
+
 const assertUnreachable = (type: string): never => {
   throw new Error(`Can't find prefix for type: ${type ?? '(undefined)'}`);
 };
 
-const supportedTypes = new Set([
-  'user',
-  'team',
-  'dashboard',
-  'event_definition',
-  'notification',
-  'search',
-  'stream',
-  'search_filter',
-  'report',
-  'role',
-  'output',
-]);
-
-const typePrefixCornerCasesMap = {
-  event_definition: 'eventdefinitions:',
-  notification: 'eventnotifications:',
-  search: 'view:',
-  report: 'report:',
-};
-
-const getPermissionPrefixByType = (type: string, throwErrorOnUnknown = true) => {
-  if (supportedTypes.has(type)) return typePrefixCornerCasesMap[type] ?? `${type}s:`;
-
-  return throwErrorOnUnknown ? assertUnreachable(type) : `(unsupported type ${type})`;
-};
+const getPermissionPrefixByType = (type: string, id: string) =>
+  EntityPermissionsMapperBinder.mapToPrefix(type, id) || assertUnreachable(type);
 
 export default getPermissionPrefixByType;

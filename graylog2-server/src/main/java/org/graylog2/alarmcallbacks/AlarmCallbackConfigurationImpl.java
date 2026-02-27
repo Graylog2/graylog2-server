@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
@@ -29,7 +30,7 @@ import java.util.Map;
 @AutoValue
 @JsonAutoDetect
 public abstract class AlarmCallbackConfigurationImpl implements AlarmCallbackConfiguration {
-    static final String FIELD_ID = "_id";
+    static final String FIELD_ID = "id";
     static final String FIELD_STREAM_ID = "stream_id";
     static final String FIELD_TYPE = "type";
     static final String FIELD_TITLE = "title";
@@ -70,18 +71,7 @@ public abstract class AlarmCallbackConfigurationImpl implements AlarmCallbackCon
     public abstract Builder toBuilder();
 
     @JsonCreator
-    public static AlarmCallbackConfigurationImpl create(@JsonProperty(FIELD_ID) String id,
-                                                        @JsonProperty(FIELD_STREAM_ID) String streamId,
-                                                        @JsonProperty(FIELD_TYPE) String type,
-                                                        @JsonProperty(FIELD_TITLE) @Nullable String title,
-                                                        @JsonProperty(FIELD_CONFIGURATION) Map<String, Object> configuration,
-                                                        @JsonProperty(FIELD_CREATED_AT) Date createdAt,
-                                                        @JsonProperty(FIELD_CREATOR_USER_ID) String creatorUserId,
-                                                        @Nullable @JsonProperty("id") String redundantId) {
-        return create(id, streamId, type, title, configuration, createdAt, creatorUserId);
-    }
-
-    public static AlarmCallbackConfigurationImpl create(@JsonProperty(FIELD_ID) String id,
+    public static AlarmCallbackConfigurationImpl create(@JsonProperty(FIELD_ID) @Id @ObjectId String id,
                                                         @JsonProperty(FIELD_STREAM_ID) String streamId,
                                                         @JsonProperty(FIELD_TYPE) String type,
                                                         @JsonProperty(FIELD_TITLE) @Nullable String title,

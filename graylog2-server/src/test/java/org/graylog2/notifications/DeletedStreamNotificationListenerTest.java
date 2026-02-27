@@ -35,7 +35,7 @@ class DeletedStreamNotificationListenerTest {
         final NotificationService notificationService = mockNotificationService("123", "456");
         new DeletedStreamNotificationListener(eventBus, notificationService);
 
-        eventBus.post(StreamDeletedEvent.create("123"));
+        eventBus.post(new StreamDeletedEvent("123", "stream title"));
 
         final ArgumentCaptor<Notification> argumentCaptor = ArgumentCaptor.forClass(Notification.class);
         Mockito.verify(notificationService, Mockito.times(1)).destroy(argumentCaptor.capture());

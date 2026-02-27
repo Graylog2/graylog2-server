@@ -43,7 +43,7 @@ public abstract class SumOfSquares implements SeriesSpec, HasField {
     public abstract String field();
 
     @Override
-    public Optional<String> statsSubfieldName() {
+    public Optional<String> multiValueAggSubfieldName() {
         return Optional.of("sum_of_squares");
     }
 

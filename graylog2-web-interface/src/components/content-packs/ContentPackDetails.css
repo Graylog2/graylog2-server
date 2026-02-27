@@ -1,12 +1,12 @@
 .deflist {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 .deflist dt {
-    float: left;
-    clear: left;
+  float: left;
+  clear: left;
 }
 
 .deflist dd {
-    margin-left: 160px;
+  margin-left: 160px;
 }

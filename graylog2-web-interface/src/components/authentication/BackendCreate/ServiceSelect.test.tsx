@@ -15,14 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
-import selectEvent from 'react-select-event';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
-import 'components/authentication/bindings'; // Bind all authentication plugins
+import authBindings from 'components/authentication/bindings';
 import Routes from 'routing/Routes';
 import useHistory from 'routing/useHistory';
 import { asMock } from 'helpers/mocking';
 import mockHistory from 'helpers/mocking/mockHistory';
+import selectEvent from 'helpers/selectEvent';
+import { usePluginExports } from 'views/test/testPlugins';
 
 import ServiceSelect from './ServiceSelect';
 
@@ -31,36 +33,40 @@ jest.mock('routing/useHistory');
 describe('ServiceSelect', () => {
   let history;
 
+  usePluginExports(authBindings);
+
   beforeEach(() => {
     history = mockHistory();
     asMock(useHistory).mockReturnValue(history);
   });
 
   it('should redirect correctly after selecting LDAP', async () => {
-    const { getByLabelText, getByRole } = render(<ServiceSelect />);
+    render(<ServiceSelect />);
 
-    const serviceSelect = getByLabelText('Select a service');
-    const submitButton = getByRole('button', { name: 'Get started' });
-    await selectEvent.openMenu(serviceSelect);
-    await selectEvent.select(serviceSelect, 'LDAP');
+    await selectEvent.chooseOption('Select a service', 'LDAP');
 
-    fireEvent.click(submitButton);
+    const submitButton = await screen.findByRole('button', { name: 'Get started' });
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(history.push).toHaveBeenCalledTimes(1));
-    await waitFor(() => expect(history.push).toHaveBeenCalledWith(Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend('ldap')));
+    await waitFor(() =>
+      expect(history.push).toHaveBeenCalledWith(Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend('ldap')),
+    );
   });
 
   it('should redirect correctly after selecting active directory', async () => {
-    const { getByLabelText, getByRole } = render(<ServiceSelect />);
+    render(<ServiceSelect />);
 
-    const serviceSelect = getByLabelText('Select a service');
-    const submitButton = getByRole('button', { name: 'Get started' });
-    await selectEvent.openMenu(serviceSelect);
-    await selectEvent.select(serviceSelect, 'Active Directory');
+    await selectEvent.chooseOption('Select a service', 'Active Directory');
 
-    fireEvent.click(submitButton);
+    const submitButton = await screen.findByRole('button', { name: 'Get started' });
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(history.push).toHaveBeenCalledTimes(1));
-    await waitFor(() => expect(history.push).toHaveBeenCalledWith(Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend('active-directory')));
+    await waitFor(() =>
+      expect(history.push).toHaveBeenCalledWith(
+        Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend('active-directory'),
+      ),
+    );
   });
 });

@@ -22,14 +22,13 @@ import type { List as ImmutableList } from 'immutable';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { Button } from 'components/bootstrap';
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import List from './List';
 import FieldGroup from './FieldGroup';
 
 type Props = {
-  activeQueryFields: ImmutableList<FieldTypeMapping>,
-  allFields: ImmutableList<FieldTypeMapping>,
+  activeQueryFields: ImmutableList<FieldTypeMapping>;
+  allFields: ImmutableList<FieldTypeMapping>;
 };
 
 const Container = styled.div`
@@ -78,14 +77,16 @@ const FieldsOverview = ({ allFields, activeQueryFields }: Props) => {
       <div>
         <FilterForm onSubmit={(e) => e.preventDefault()}>
           <FilterInputWrapper className="form-group has-feedback">
-            <FilterInput id="common-search-form-query-input"
-                         className="query form-control"
-                         onChange={handleSearch}
-                         value={filter || ''}
-                         placeholder="Filter fields"
-                         type="text"
-                         autoComplete="off"
-                         spellCheck="false" />
+            <FilterInput
+              id="common-search-form-query-input"
+              className="query form-control"
+              onChange={handleSearch}
+              value={filter || ''}
+              placeholder="Filter fields"
+              type="text"
+              autoComplete="off"
+              spellCheck="false"
+            />
           </FilterInputWrapper>
           <div className="form-group">
             <Button type="reset" className="reset-button" onClick={handleSearchReset}>
@@ -95,49 +96,47 @@ const FieldsOverview = ({ allFields, activeQueryFields }: Props) => {
         </FilterForm>
         <FieldGroups>
           List fields of{' '}
-          <FieldGroup selected={currentGroup === 'current'}
-                      group="current"
-                      text="current query"
-                      title="This shows fields which occur in your current query."
-                      onSelect={setCurrentGroup} />
+          <FieldGroup
+            selected={currentGroup === 'current'}
+            group="current"
+            text="current query"
+            title="This shows fields which occur in your current query."
+            onSelect={setCurrentGroup}
+          />
           {', '}
-          <FieldGroup selected={currentGroup === 'all'}
-                      group="all"
-                      text="all"
-                      title="This shows all fields, but no reserved (gl2_*) fields."
-                      onSelect={setCurrentGroup} />
+          <FieldGroup
+            selected={currentGroup === 'all'}
+            group="all"
+            text="all"
+            title="This shows all fields, but no reserved (gl2_*) fields."
+            onSelect={setCurrentGroup}
+          />
           {' or '}
-          <FieldGroup onSelect={setCurrentGroup}
-                      selected={currentGroup === 'allreserved'}
-                      group="allreserved"
-                      text="all including reserved"
-                      title="This shows all fields, including reserved (gl2_*) fields." />
+          <FieldGroup
+            onSelect={setCurrentGroup}
+            selected={currentGroup === 'allreserved'}
+            group="allreserved"
+            text="all including reserved"
+            title="This shows all fields, including reserved (gl2_*) fields."
+          />
           {' fields.'}
         </FieldGroups>
         <hr />
       </div>
-      <List filter={filter}
-            activeQueryFields={activeQueryFields}
-            allFields={allFields}
-            currentGroup={currentGroup} />
+      <List filter={filter} activeQueryFields={activeQueryFields} allFields={allFields} currentGroup={currentGroup} />
     </Container>
   );
 };
 
-const FieldsOverviewWithContext = (props) => {
-  const activeQuery = useActiveQueryId();
+const FieldsOverviewWithContext = (props: Omit<Props, 'allFields' | 'activeQueryFields'>) => (
+  <FieldTypesContext.Consumer>
+    {(fieldTypes) => {
+      const allFields = fieldTypes?.all;
+      const activeQueryFields = fieldTypes?.currentQuery;
 
-  return (
-    <FieldTypesContext.Consumer>
-      {(fieldTypes) => {
-        const allFields = fieldTypes?.all;
-        const queryFields = fieldTypes?.queryFields;
-        const activeQueryFields = queryFields?.get(activeQuery, allFields);
-
-        return <FieldsOverview {...props} allFields={allFields} activeQueryFields={activeQueryFields} />;
-      }}
-    </FieldTypesContext.Consumer>
-  );
-};
+      return <FieldsOverview {...props} allFields={allFields} activeQueryFields={activeQueryFields} />;
+    }}
+  </FieldTypesContext.Consumer>
+);
 
 export default FieldsOverviewWithContext;

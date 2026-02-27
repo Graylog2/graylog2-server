@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix boolean condition on when to call query validation during search filter creation."
+
+issues = ["graylog-plugin-enterprise#11303"]
+pulls = ["23187"]

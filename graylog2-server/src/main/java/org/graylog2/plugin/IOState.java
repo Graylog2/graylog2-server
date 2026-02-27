@@ -34,6 +34,7 @@ public class IOState<T extends Stoppable> {
 
     public enum Type {
         CREATED,
+        SETUP,
         INITIALIZED,
         INVALID_CONFIGURATION,
         STARTING,
@@ -47,9 +48,10 @@ public class IOState<T extends Stoppable> {
     }
 
     protected T stoppable;
-    private EventBus eventbus;
+    private final EventBus eventbus;
     protected Type state;
     protected DateTime startedAt;
+    protected DateTime lastFailedAt;
     protected String detailedMessage;
 
     @AssistedInject
@@ -63,6 +65,7 @@ public class IOState<T extends Stoppable> {
         this.state = state;
         this.stoppable = stoppable;
         this.startedAt = Tools.nowUTC();
+        this.lastFailedAt = null;
     }
 
     public T getStoppable() {
@@ -78,13 +81,10 @@ public class IOState<T extends Stoppable> {
     }
 
     public boolean canBeStarted() {
-        switch (getState()) {
-            case RUNNING:
-            case STARTING:
-                return false;
-            default:
-                return true;
-        }
+        return switch (getState()) {
+            case RUNNING, STARTING -> false;
+            default -> true;
+        };
     }
 
     public void setState(Type state, String detailedMessage) {
@@ -95,6 +95,10 @@ public class IOState<T extends Stoppable> {
         }
         final IOStateChangedEvent<T> evt = IOStateChangedEvent.create(this.state, state, this);
         this.state = state;
+        if (state == Type.FAILED) {
+            this.lastFailedAt = Tools.nowUTC();
+        }
+
         this.eventbus.post(evt);
     }
 
@@ -104,6 +108,10 @@ public class IOState<T extends Stoppable> {
 
     public DateTime getStartedAt() {
         return startedAt;
+    }
+
+    public DateTime getLastFailedAt() {
+        return lastFailedAt;
     }
 
     public void setStartedAt(DateTime startedAt) {
@@ -124,6 +132,7 @@ public class IOState<T extends Stoppable> {
                 "stoppable=" + stoppable +
                 ", state=" + state +
                 ", startedAt=" + startedAt +
+                ", lastFailedAt=" + lastFailedAt +
                 ", detailedMessage='" + detailedMessage + '\'' +
                 '}';
     }

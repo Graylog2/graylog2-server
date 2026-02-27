@@ -18,12 +18,17 @@ package org.graylog2.indexer.indexset;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.Subscribe;
+import com.mongodb.client.model.Filters;
 import org.bson.types.ObjectId;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.buffers.processors.fakestreams.FakeStream;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.NonDeletableSystemScope;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
 import org.graylog2.indexer.indexset.events.IndexSetDeletedEvent;
@@ -39,31 +44,32 @@ import org.graylog2.security.SafeClasses;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.streams.StreamService;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mongojack.DBQuery;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
+import static org.graylog2.indexer.indexset.IndexSetConfig.DEFAULT_FIELD_TYPE_REFRESH_INTERVAL;
+import static org.graylog2.indexer.template.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class MongoIndexSetServiceTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
@@ -76,19 +82,20 @@ public class MongoIndexSetServiceTest {
     private StreamService streamService;
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) {
         clusterEventBus = new ClusterEventBus();
-        clusterConfigService = new ClusterConfigServiceImpl(objectMapperProvider, mongodb.mongoConnection(),
+        clusterConfigService = new ClusterConfigServiceImpl(objectMapperProvider, mongoCollections.mongoConnection(),
                 nodeId, new RestrictedChainingClassLoader(
                 new ChainingClassLoader(getClass().getClassLoader()), SafeClasses.allGraylogInternal()),
                 clusterEventBus);
-        indexSetService = new MongoIndexSetService(mongodb.mongoConnection(), objectMapperProvider, streamService, clusterConfigService, clusterEventBus);
+        final EntityScopeService entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope(), new NonDeletableSystemScope()));
+        indexSetService = new MongoIndexSetService(mongoCollections, streamService, clusterConfigService, clusterEventBus, entityScopeService);
     }
 
     @Test
     @MongoDBFixtures("MongoIndexSetServiceTest.json")
-    public void getWithStringId() throws Exception {
+    public void getWithStringId() {
         final Optional<IndexSetConfig> indexSetConfig = indexSetService.get("57f3d721a43c2d59cb750001");
         assertThat(indexSetConfig)
                 .isPresent()
@@ -117,7 +124,7 @@ public class MongoIndexSetServiceTest {
 
     @Test
     @MongoDBFixtures("MongoIndexSetServiceTest.json")
-    public void getReturnsExistingIndexSetConfig() throws Exception {
+    public void getReturnsExistingIndexSetConfig() {
         final Optional<IndexSetConfig> indexSetConfig = indexSetService.get(new ObjectId("57f3d721a43c2d59cb750001"));
         assertThat(indexSetConfig)
                 .isPresent()
@@ -145,14 +152,14 @@ public class MongoIndexSetServiceTest {
     }
 
     @Test
-    public void getReturnsAbsentOptionalIfIndexSetConfigDoesNotExist() throws Exception {
+    public void getReturnsAbsentOptionalIfIndexSetConfigDoesNotExist() {
         final Optional<IndexSetConfig> indexSetConfig = indexSetService.get(new ObjectId("57f3d3f0a43c2d595eb0a348"));
         assertThat(indexSetConfig).isEmpty();
     }
 
     @Test
     @MongoDBFixtures("MongoIndexSetServiceTest.json")
-    public void getDefault() throws Exception {
+    public void getDefault() {
         clusterConfigService.write(DefaultIndexSetConfig.create("57f3d721a43c2d59cb750002"));
 
         final IndexSetConfig indexSetConfig = indexSetService.getDefault();
@@ -161,31 +168,32 @@ public class MongoIndexSetServiceTest {
         assertThat(indexSetConfig.id()).isEqualTo("57f3d721a43c2d59cb750002");
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     @MongoDBFixtures("MongoIndexSetServiceTest.json")
-    public void getDefaultWithoutDefault() throws Exception {
-        indexSetService.getDefault();
+    public void getDefaultWithoutDefault() {
+        assertThrows(IllegalStateException.class, () ->
+            indexSetService.getDefault());
     }
 
     @Test
     @MongoDBFixtures("MongoIndexSetServiceTest.json")
-    public void findOne() throws Exception {
-        final Optional<IndexSetConfig> config3 = indexSetService.findOne(DBQuery.is("title", "Test 2"));
+    public void findOne() {
+        final Optional<IndexSetConfig> config3 = indexSetService.findOne(Filters.eq("title", "Test 2"));
         assertThat(config3).isPresent();
         assertThat(config3.get().id()).isEqualTo("57f3d721a43c2d59cb750002");
 
-        final Optional<IndexSetConfig> config4 = indexSetService.findOne(DBQuery.is("title", "__yolo"));
+        final Optional<IndexSetConfig> config4 = indexSetService.findOne(Filters.eq("title", "__yolo"));
         assertThat(config4).isNotPresent();
     }
 
     @Test
     @MongoDBFixtures("MongoIndexSetServiceTest.json")
-    public void findAll() throws Exception {
+    public void findAll() {
         final List<IndexSetConfig> configs = indexSetService.findAll();
 
         assertThat(configs)
                 .isNotEmpty()
-                .hasSize(3)
+                .hasSize(4)
                 .containsExactly(
                         IndexSetConfig.create(
                                 "57f3d721a43c2d59cb750001",
@@ -243,12 +251,35 @@ public class MongoIndexSetServiceTest {
                                 EVENT_TEMPLATE_TYPE,
                                 1,
                                 false
+                        ),
+                        IndexSetConfig.create(
+                                "57f3d721a43c2d59cb750004",
+                                NonDeletableSystemScope.NAME,
+                                "Test 4",
+                                "Index with system scope - not deletable",
+                                true, null,
+                                "test_4",
+                                null, null,
+                                1,
+                                0,
+                                MessageCountRotationStrategy.class.getCanonicalName(),
+                                MessageCountRotationStrategyConfig.create(2500),
+                                NoopRetentionStrategy.class.getCanonicalName(),
+                                NoopRetentionStrategyConfig.create(25),
+                                ZonedDateTime.of(2016, 10, 4, 18, 0, 0, 0, ZoneOffset.UTC),
+                                "standard",
+                                "test_4",
+                                EVENT_TEMPLATE_TYPE,
+                                1,
+                                false,
+                                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL,
+                                null, null, null, null
                         )
                 );
     }
 
     @Test
-    public void save() throws Exception {
+    public void save() {
         final IndexSetCreatedSubscriber subscriber = new IndexSetCreatedSubscriber();
         clusterEventBus.registerClusterEventSubscriber(subscriber);
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
@@ -283,7 +314,7 @@ public class MongoIndexSetServiceTest {
 
     @Test
     @MongoDBFixtures("MongoIndexSetServiceTest.json")
-    public void deleteWithStringId() throws Exception {
+    public void deleteWithStringId() {
         final IndexSetDeletedSubscriber subscriber = new IndexSetDeletedSubscriber();
         clusterEventBus.registerClusterEventSubscriber(subscriber);
 
@@ -298,7 +329,7 @@ public class MongoIndexSetServiceTest {
 
     @Test
     @MongoDBFixtures("MongoIndexSetServiceTest.json")
-    public void deleteRemovesExistingIndexSetConfig() throws Exception {
+    public void deleteRemovesExistingIndexSetConfig() {
         final IndexSetDeletedSubscriber subscriber = new IndexSetDeletedSubscriber();
         clusterEventBus.registerClusterEventSubscriber(subscriber);
 
@@ -313,40 +344,53 @@ public class MongoIndexSetServiceTest {
 
     @Test
     @MongoDBFixtures("MongoIndexSetServiceTest.json")
-    public void deleteDoesNothingIfIndexSetConfigDoesNotExist() throws Exception {
+    public void deleteDoesNothingIfIndexSetConfigDoesNotExist() {
         final IndexSetDeletedSubscriber subscriber = new IndexSetDeletedSubscriber();
         clusterEventBus.registerClusterEventSubscriber(subscriber);
 
         final int deletedEntries = indexSetService.delete("57f3d721a43c2d59cb750009");
-        assertThat(deletedEntries).isEqualTo(0);
+        assertThat(deletedEntries).isZero();
         assertThat(indexSetService.get("57f3d721a43c2d59cb750001")).isPresent();
         assertThat(indexSetService.get("57f3d721a43c2d59cb750009")).isEmpty();
-        assertThat(indexSetService.findAll()).hasSize(3);
+        assertThat(indexSetService.findAll()).hasSize(4);
 
+        assertThat(subscriber.getEvents()).isEmpty();
+    }
+
+
+    @Test
+    @MongoDBFixtures("MongoIndexSetServiceTest.json")
+    public void deleteThrowsIfInvalidScope() {
+        final IndexSetDeletedSubscriber subscriber = new IndexSetDeletedSubscriber();
+        clusterEventBus.registerClusterEventSubscriber(subscriber);
+
+        int deletedEntries = indexSetService.delete("57f3d721a43c2d59cb750004");
+
+        assertThat(deletedEntries).isZero();
+        assertThat(indexSetService.findAll()).hasSize(4);
         assertThat(subscriber.getEvents()).isEmpty();
     }
 
     @Test
     @MongoDBFixtures("MongoIndexSetServiceTest.json")
-    public void deleteWithAssignedStreams() throws Exception {
+    public void deleteWithAssignedStreams() {
         final IndexSetDeletedSubscriber subscriber = new IndexSetDeletedSubscriber();
         clusterEventBus.registerClusterEventSubscriber(subscriber);
 
         final FakeStream stream1 = new FakeStream("Test stream 1");
 
         final String streamId = "57f3d721a43c2d59cb750001";
-        stream1.setIndexSetId(streamId);
-
         when(streamService.loadAllWithIndexSet(streamId)).thenReturn(Collections.singletonList(stream1));
 
         final int deletedEntries = indexSetService.delete(streamId);
-        assertThat(deletedEntries).isEqualTo(0);
+        assertThat(deletedEntries).isZero();
         assertThat(indexSetService.get(streamId)).isPresent();
-        assertThat(indexSetService.findAll()).hasSize(3);
+        assertThat(indexSetService.findAll()).hasSize(4);
 
         assertThat(subscriber.getEvents()).isEmpty();
     }
 
+    @ExtendWith(MongoDBExtension.class)
     private static class IndexSetCreatedSubscriber {
         private final List<IndexSetCreatedEvent> events = new CopyOnWriteArrayList<>();
 
@@ -360,6 +404,7 @@ public class MongoIndexSetServiceTest {
         }
     }
 
+    @ExtendWith(MongoDBExtension.class)
     private static class IndexSetDeletedSubscriber {
         private final List<IndexSetDeletedEvent> events = new CopyOnWriteArrayList<>();
 

@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix header styling of copy widget to dashboard modal."
+
+pulls = ["23181"]

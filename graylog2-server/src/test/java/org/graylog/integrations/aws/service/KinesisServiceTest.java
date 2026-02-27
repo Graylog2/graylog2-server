@@ -22,7 +22,7 @@ import org.graylog.integrations.aws.AWSLogMessage;
 import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.AWSTestingUtils;
 import org.graylog.integrations.aws.resources.requests.AWSRequestImpl;
-import org.graylog.integrations.aws.resources.requests.KinesisHealthCheckRequest;
+import org.graylog.integrations.aws.resources.requests.KinesisRequest;
 import org.graylog.integrations.aws.resources.requests.KinesisNewStreamRequest;
 import org.graylog.integrations.aws.resources.responses.KinesisHealthCheckResponse;
 import org.graylog.integrations.aws.resources.responses.KinesisNewStreamResponse;
@@ -31,12 +31,13 @@ import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.iam.IamClientBuilder;
@@ -67,13 +68,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class KinesisServiceTest {
 
     private static final String TEST_STREAM_1 = "test-stream-1";
@@ -83,9 +86,6 @@ public class KinesisServiceTest {
     private static final int SHARD_COUNT = 1;
     private static final String STREAM_ARN = "test-stream-arn";
 
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
-    
     @Mock
     private KinesisClient kinesisClient;
     @Mock
@@ -95,7 +95,7 @@ public class KinesisServiceTest {
 
     private KinesisService kinesisService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         kinesisService = new KinesisService(
                 mock(IamClientBuilder.class),
@@ -138,7 +138,7 @@ public class KinesisServiceTest {
         assertEquals(AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS, response.inputType());
         Map<String, Object> fields = response.messageFields();
         assertEquals(AWSTestingUtils.CLOUD_WATCH_TIMESTAMP, fields.get("timestamp"));
-        assertEquals(21, fields.size());
+        assertEquals(22, fields.size());
         assertEquals(6, fields.get("protocol_number"));
         assertEquals("TCP", fields.get("protocol"));
         assertEquals(1L, fields.get("packets"));
@@ -154,7 +154,7 @@ public class KinesisServiceTest {
         assertEquals(AWSMessageType.KINESIS_CLOUDWATCH_RAW, response.inputType());
         Map<String, Object> fields = response.messageFields();
         assertEquals(AWSTestingUtils.CLOUD_WATCH_TIMESTAMP, fields.get("timestamp"));
-        assertEquals(7, fields.size());
+        assertEquals(8, fields.size());
     }
 
     @Test
@@ -167,7 +167,7 @@ public class KinesisServiceTest {
         assertEquals(AWSMessageType.KINESIS_RAW, response.inputType());
         Map<String, Object> fields = response.messageFields();
         assertEquals(new DateTime("2000-01-01T01:01:01.000Z", DateTimeZone.UTC), fields.get("timestamp"));
-        assertEquals(5, fields.size());
+        assertEquals(7, fields.size());
     }
 
     private KinesisHealthCheckResponse executeHealthCheckTest(byte[] payloadData, Instant recordArrivalTime) throws IOException, ExecutionException {
@@ -193,13 +193,49 @@ public class KinesisServiceTest {
                 .thenReturn(GetRecordsResponse.builder().records(record).millisBehindLatest(10000L).build())
                 .thenReturn(GetRecordsResponse.builder().records(record).millisBehindLatest(0L).build());
 
-        KinesisHealthCheckRequest request = KinesisHealthCheckRequest.builder()
+        KinesisRequest request = KinesisRequest.builder()
                 .region(Region.EU_WEST_1.id())
                 .awsAccessKeyId("a-key")
                 .awsSecretAccessKey(encryptedValue)
                 .streamName(TEST_STREAM_1).build();
         return kinesisService.healthCheck(request);
     }
+
+    @Test
+    public void healthCheckReturnsWarningWhenStreamIsEmpty() throws ExecutionException, IOException {
+
+        when(awsClientBuilderUtil.buildClient(any(KinesisClientBuilder.class), any())).thenReturn(kinesisClient);
+
+        when(kinesisClient.listStreams(isA(ListStreamsRequest.class)))
+                .thenReturn(ListStreamsResponse.builder()
+                        .streamNames(TEST_STREAM_1)
+                        .hasMoreStreams(false)
+                        .build());
+
+        Shard shard = Shard.builder().shardId("shardId-000000000000").build();
+        when(kinesisClient.listShards(isA(ListShardsRequest.class)))
+                .thenReturn(ListShardsResponse.builder().shards(shard).build());
+
+        when(kinesisClient.getShardIterator(isA(GetShardIteratorRequest.class)))
+                .thenReturn(GetShardIteratorResponse.builder().shardIterator("shardIterator").build());
+
+        when(kinesisClient.getRecords(isA(GetRecordsRequest.class)))
+                .thenReturn(GetRecordsResponse.builder().records(new ArrayList<>()).millisBehindLatest(0L).build());
+
+        KinesisRequest request = KinesisRequest.builder()
+                .region(TEST_REGION)
+                .awsAccessKeyId("dummy-access-key")
+                .awsSecretAccessKey(encryptedValue)
+                .streamName(TEST_STREAM_1)
+                .build();
+
+        KinesisHealthCheckResponse response = kinesisService.healthCheck(request);
+
+        assertEquals(AWSMessageType.KINESIS_RAW, response.inputType());
+        assertNotNull(response.messageFields());
+        assertEquals(0, response.messageFields().size());
+    }
+
 
     @Test
     public void testGetStreams() throws ExecutionException {

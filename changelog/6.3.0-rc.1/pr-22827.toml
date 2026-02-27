@@ -1,0 +1,4 @@
+type = "r"
+message = "Removed faulty \"input won't be saved\" warning on the final setup wizard page of the Cloudwatch/Kinesis input."
+
+pulls = ["11016"]
