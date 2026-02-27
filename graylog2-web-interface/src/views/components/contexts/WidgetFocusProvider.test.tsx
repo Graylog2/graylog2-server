@@ -118,7 +118,7 @@ describe('WidgetFocusProvider', () => {
   });
 
   it('should update url on widget focus close', async () => {
-    asMock(useLocation).mockReturnValueOnce({
+    asMock(useLocation).mockReturnValue({
       ...emptyLocation,
       search: '?focusedId=widget-id&focusing=true',
     });
