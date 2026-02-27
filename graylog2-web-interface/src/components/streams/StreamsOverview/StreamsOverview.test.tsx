@@ -26,7 +26,6 @@ import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/us
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
 import { streamRuleTypes } from 'fixtures/streamRuleTypes';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import StreamsOverview from './StreamsOverview';
 
@@ -76,12 +75,7 @@ const paginatedStreams = (exampleStream = stream) => ({
 });
 
 describe('StreamsOverview', () => {
-  const renderSut = () =>
-    render(
-      <DefaultQueryParamProvider>
-        <StreamsOverview indexSets={indexSets} />
-      </DefaultQueryParamProvider>,
-    );
+  const renderSut = () => render(<StreamsOverview indexSets={indexSets} />);
 
   beforeEach(() => {
     asMock(useUserLayoutPreferences).mockReturnValue({

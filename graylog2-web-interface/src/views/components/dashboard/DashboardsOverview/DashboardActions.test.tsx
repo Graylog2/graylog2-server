@@ -32,7 +32,6 @@ import type { ContextValue } from 'components/common/PaginatedEntityTable/TableF
 import TableFetchContext from 'components/common/PaginatedEntityTable/TableFetchContext';
 import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 import { deleteView } from 'views/api/views';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 jest.mock('hooks/useCurrentUser');
 jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
@@ -71,11 +70,7 @@ describe('DashboardActions', () => {
   const simpleDashboard = simpleView();
   const menuIsHidden = () => expect(screen.queryByRole('menu')).not.toBeInTheDocument();
   const renderSUT = (props: React.ComponentProps<typeof DashboardActions> = { dashboard: simpleDashboard }) =>
-    render(
-      <DefaultQueryParamProvider>
-        <DashboardActions {...props} />
-      </DefaultQueryParamProvider>,
-    );
+    render(<DashboardActions {...props} />);
 
   const clickDashboardAction = async (action: string) => {
     userEvent.click(await screen.findByRole('button', { name: /more/i }));
