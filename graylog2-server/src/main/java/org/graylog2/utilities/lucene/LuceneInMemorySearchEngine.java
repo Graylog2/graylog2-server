@@ -30,6 +30,7 @@ import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
 import org.apache.lucene.queryparser.flexible.standard.config.PointsConfig;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
@@ -40,6 +41,8 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.search.SearchQueryField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.NumberFormat;
@@ -52,6 +55,8 @@ import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 public class LuceneInMemorySearchEngine<U extends InMemorySearchableEntity> implements InMemorySearchEngine<U> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(LuceneInMemorySearchEngine.class);
 
     private final String defaultField;
     private final List<EntityAttribute> attributes;
@@ -74,7 +79,7 @@ public class LuceneInMemorySearchEngine<U extends InMemorySearchableEntity> impl
             final List<U> entries = datasource.get();
             indexEntries(entries, directory, config);
 
-            Query query = queryParser.parse(wrapEmptyQuery(queryString), defaultField);
+            Query query = safeQuery(queryString);
 
             try (IndexReader reader = DirectoryReader.open(directory)) {
                 IndexSearcher searcher = new IndexSearcher(reader);
@@ -90,6 +95,16 @@ public class LuceneInMemorySearchEngine<U extends InMemorySearchableEntity> impl
                 final int totalCount = Math.toIntExact(results.totalHits.value);
                 return new PaginatedList<>(searchResults, totalCount, page, perPage);
             }
+        }
+    }
+
+    private Query safeQuery(String queryString) throws QueryNodeException {
+        try {
+            return queryParser.parse(wrapEmptyQuery(queryString), defaultField);
+        } catch (QueryNodeException e) {
+            LOG.debug("Failed to parse query {}", queryString);
+            // fallback for unparseable and unfinished queries like "key:"
+            return new MatchAllDocsQuery();
         }
     }
 
