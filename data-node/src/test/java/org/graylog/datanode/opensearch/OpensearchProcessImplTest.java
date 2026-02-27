@@ -111,7 +111,7 @@ public class OpensearchProcessImplTest {
     }
 
     @Test
-    public void testResetAllocationUnneccessary() throws IOException {
+    public void testResetAllocationUnnecessary() throws IOException {
         when(clusterAdapter.getClusterSetting(OpensearchProcessImpl.CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING))
                 .thenReturn("notMyNodeName");
         opensearchProcess.available();
