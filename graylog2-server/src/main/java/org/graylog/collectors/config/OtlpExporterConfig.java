@@ -17,13 +17,43 @@
 package org.graylog.collectors.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import java.time.Duration;
 
 public interface OtlpExporterConfig {
 
     @JsonIgnore
     String getName();
 
+    @JsonProperty("endpoint")
     String endpoint();
 
+    @JsonProperty("tls")
     TLSConfigurationSettings tls();
+
+    @JsonProperty("timeout")
+    @JsonSerialize(using = GoDurationSerializer.class)
+    Duration timeout();
+
+    @JsonProperty("retry_on_failure")
+    ExporterRetryOnFailure retryOnFailure();
+
+    @JsonProperty("sending_queue")
+    ExporterSendingQueue sendingQueue();
+
+    interface Builder<T, B> {
+        B endpoint(String endpoint);
+
+        B tls(TLSConfigurationSettings tls);
+
+        B timeout(Duration timeout);
+
+        B retryOnFailure(ExporterRetryOnFailure retryOnFailure);
+
+        B sendingQueue(ExporterSendingQueue sendingQueue);
+
+        T build();
+    }
 }

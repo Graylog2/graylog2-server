@@ -17,13 +17,14 @@
 package org.graylog.collectors.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import java.time.Duration;
+
 /**
- * Otel collector otlp (gRPC) exporter configuration.
+ * OTel collector OTLP gRPC exporter configuration.
  *
- * @see <a href="https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter/otlpexporter">otlp exporter</a>
+ * @see <a href="https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter/otlpexporter">OTLP gRPC exporter</a>
  */
 @AutoValue
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -33,23 +34,14 @@ public abstract class OtlpGrpcExporterConfig implements OtlpExporterConfig {
         return "otlp_grpc";
     }
 
-    @JsonProperty("endpoint")
-    public abstract String endpoint();
-
-    @JsonProperty("tls")
-    public abstract TLSConfigurationSettings tls();
-
     public static Builder builder() {
-        return new AutoValue_OtlpGrpcExporterConfig.Builder();
+        return new AutoValue_OtlpGrpcExporterConfig.Builder()
+                .timeout(Duration.ofSeconds(5))
+                .retryOnFailure(ExporterRetryOnFailure.createDefault())
+                .sendingQueue(ExporterSendingQueue.createDefault());
     }
 
     @AutoValue.Builder
-    public abstract static class Builder {
-
-        public abstract Builder endpoint(String endpoint);
-
-        public abstract Builder tls(TLSConfigurationSettings tls);
-
-        public abstract OtlpGrpcExporterConfig build();
+    public abstract static class Builder implements OtlpExporterConfig.Builder<OtlpGrpcExporterConfig, Builder> {
     }
 }
