@@ -22,6 +22,7 @@ import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
+import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiService;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedException;
@@ -41,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -81,15 +83,47 @@ public class EventsSearchService extends AbstractEventsSearchService {
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * returns the slices for the slice-by functionality for the Alerts/Events table. Used in the core Events/Alerts table
+     *
+     * @param request
+     * @param subject
+     * @param searchUser
+     * @return
+     */
     public Slices slices(final EventsSlicesRequest request, final Subject subject, final SearchUser searchUser) {
-        // we cover two use cases, if you only want the slices from the resultset that will also be shown in the entity table, we re-use query and timerange for that. Otherwise, we query "all"
+        // we cover two use cases by the include_all flag: if you only want the slices calculated from the resultset that will also be shown in the entity table, we re-use query and timerange for that. Otherwise, we query the table for "all" possible slices
         final var query = request.includeAll() ? "" : request.query();
         final var timeRange = request.includeAll() ? RelativeRange.allTime() : request.timerange();
         final var filter = buildFilter(EventsSearchParameters.builder().query(query).timerange(timeRange).filter(request.filter()).build());
 
         final var queryString = filter.isEmpty() ? query : query.isEmpty() ? filter : query + " AND " + filter;
 
-        return slices(queryString, timeRange, subject, searchUser, request.sliceColumn(), request.includeAll());
+        return this.slices(queryString, timeRange, subject, searchUser, request.sliceColumn(), request.includeAll());
+    }
+
+    /**
+     * Used inside this service for the core Events/Alerts table but also is a provided method, re-used from the enterprise/security part of Graylog
+     */
+    public Slices slices(String query, TimeRange timeRange, Subject subject, SearchUser searchUser, final String slicingColumn, final boolean includeAll) {
+        try {
+            final var slices = scriptingApiService.executeAggregation(
+                            new AggregationRequestSpec(query, allowedEventStreams(subject), Set.of(), timeRange, List.of(new Grouping(slicingColumn, Integer.MAX_VALUE)), List.of(new Metric("count", slicingColumn))),
+                            searchUser
+                    )
+                    .datarows()
+                    .stream()
+                    .map(r -> mapAggregationResultsToSlice(slicingColumn, r))
+                    .toList();
+
+            final var filtered = includeAll
+                    ? addMissingOptions(slices, slicingColumn)
+                    : slices.stream().filter(s -> !MissingBucketConstants.MISSING_BUCKET_NAME.equals(s.value())).toList();
+
+            return new Slices(filtered);
+        } catch (QueryFailedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -112,7 +146,8 @@ public class EventsSearchService extends AbstractEventsSearchService {
 
     /**
      * In the Open Source part, we only map priority and type, both of which are augmented in the FE regarding the title.
-     * So we only need a simple mapping function
+     * So we only need a simple mapping function here.
+     *
      * @param slicingColumn
      * @param result
      * @return Slice
@@ -165,6 +200,7 @@ public class EventsSearchService extends AbstractEventsSearchService {
         return fixedList;
     }
 
+    // when slicing, add missing keys that don't exist in the data but you still want to show with cardinality 0
     private List<Slice> addMissingOptions(final List<Slice> slices, final String slicingColumn) {
         return switch (slicingColumn) {
             case FIELD_ALERT -> handleAlertColumn(slices);
@@ -174,24 +210,21 @@ public class EventsSearchService extends AbstractEventsSearchService {
     }
 
     /**
-     * finding all slices for a particular column in the Indexer
+     * Returns all assets grouped by asset id and the cardinality from the events in the Indexer.
+     *
+     * @param query
+     * @param timeRange
+     * @param subject
+     * @param searchUser
+     * @return
      */
-    public Slices slices(String query, TimeRange timeRange, Subject subject, SearchUser searchUser, final String slicingColumn, final boolean includeAll) {
+    public Map<String, Integer> findGroupedAssets(final String query, final TimeRange timeRange, final Subject subject, SearchUser searchUser) {
         try {
-            final var slices = scriptingApiService.executeAggregation(
-                            new AggregationRequestSpec(query, allowedEventStreams(subject), Set.of(), timeRange, List.of(new Grouping(slicingColumn, Integer.MAX_VALUE)), List.of(new Metric("count", slicingColumn))),
+            return scriptingApiService.executeAggregation(
+                            new AggregationRequestSpec(query, allowedEventStreams(subject), Set.of(), timeRange, List.of(new Grouping("associated_assets", Integer.MAX_VALUE)), List.of(new Metric("count", null))),
                             searchUser
-                    )
-                    .datarows()
-                    .stream()
-                    .map(r -> mapAggregationResultsToSlice(slicingColumn, r))
-                    .toList();
-
-            final var filtered = includeAll
-                    ? addMissingOptions(slices, slicingColumn)
-                    : slices.stream().filter(s -> !"(Empty Value)".equals(s.value())).toList();
-
-            return new Slices(filtered);
+                )
+                .datarows().stream().collect(Collectors.toMap( r -> r.getFirst().toString(), r -> Integer.valueOf(r.getLast().toString())));
         } catch (QueryFailedException e) {
             throw new RuntimeException(e);
         }
