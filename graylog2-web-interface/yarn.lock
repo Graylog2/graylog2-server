@@ -8413,7 +8413,7 @@ escodegen@^2.1.0:
     eslint "9.39.2"
     eslint-config-prettier "10.1.5"
     eslint-import-resolver-webpack "0.13.10"
-    eslint-plugin-compat "6.1.0"
+    eslint-plugin-compat "6.2.0"
     eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
     eslint-plugin-import "2.32.0"
     eslint-plugin-jest "29.15.0"
@@ -8462,10 +8462,10 @@ eslint-module-utils@^2.12.1:
   dependencies:
     debug "^3.2.7"
 
-eslint-plugin-compat@6.1.0:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-compat/-/eslint-plugin-compat-6.1.0.tgz#57ccea87d381f7dff7cc004a0dffc34136dd1f13"
-  integrity sha512-xiwHz7mj6+Zj7NWOO/uaWdrQ6zP0zL5CPyKVCNlB4JaoUFeYPYwejf5toqyHGlXzhuPUdCpg31uBRiWqcgiS0A==
+eslint-plugin-compat@6.2.0:
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-compat/-/eslint-plugin-compat-6.2.0.tgz#06eadbd954bb95e740c80aca27cd00cdad3b0b3c"
+  integrity sha512-Ihz4zAeHKzyksDDUTObrYQxaqnV/pFlAiZoWkMuWM9XGf4O191ReQFYv516zcs9QVJ2vX+MMpqr1yEfTkXVETQ==
   dependencies:
     "@mdn/browser-compat-data" "^6.1.1"
     ast-metadata-inferer "^0.8.1"
@@ -14546,9 +14546,9 @@ react-window-infinite-loader@^2.0.1:
   integrity sha512-+Deq2JkxfDr5N6WAwKQJLECiBARZ1yvVv9rElSXPO6yaMt3YTIs2y8TpsH67lIWGYFMnESvO6mgvETEZuCCjuw==
 
 react-window@^2.2.5:
-  version "2.2.6"
-  resolved "https://registry.yarnpkg.com/react-window/-/react-window-2.2.6.tgz#00ca174346b5146d3c33a752d888181250c71d9f"
-  integrity sha512-v89O08xRdpCaEuf380B39D1C/0KgUDZA59xft6SVAjzjz/xQxSyXrgDWHymIsYI6TMrqE8WO+G0/PB9AGE8VNA==
+  version "2.2.7"
+  resolved "https://registry.yarnpkg.com/react-window/-/react-window-2.2.7.tgz#7f3d31695d4323701b7e80dfc9bbbe1d4a0c160f"
+  integrity sha512-SH5nvfUQwGHYyriDUAOt7wfPsfG9Qxd6OdzQxl5oQ4dsSsUicqQvjV7dR+NqZ4coY0fUn3w1jnC5PwzIUWEg5w==
 
 react@18.3.1:
   version "18.3.1"
