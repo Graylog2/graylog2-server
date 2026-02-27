@@ -35,15 +35,13 @@ import ViewState from 'views/logic/views/ViewState';
 import { setNewWidget } from 'views/logic/slices/widgetsSlice';
 import useLocation from 'routing/useLocation';
 
+jest.mock('routing/useLocation');
+
 const mockNavigate = jest.fn();
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => mockNavigate,
-  useLocation: jest.fn(() => ({
-    pathname: '',
-    search: '',
-  })),
 }));
 
 jest.mock('views/stores/useViewsDispatch');
