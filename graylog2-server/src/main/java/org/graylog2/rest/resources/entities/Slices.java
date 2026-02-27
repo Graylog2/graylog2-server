@@ -14,19 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import type { PropsWithChildren } from 'react';
-import { QueryParamProvider } from 'use-query-params';
-import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
+package org.graylog2.rest.resources.entities;
 
-const queryParamOptions = {
-  enableBatching: true,
-};
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-const DefaultQueryParamProvider = ({ children }: PropsWithChildren) => (
-  <QueryParamProvider adapter={ReactRouter6Adapter} options={queryParamOptions}>
-    {children}
-  </QueryParamProvider>
-);
+import java.util.List;
 
-export default DefaultQueryParamProvider;
+public record Slices(@JsonProperty(FIELD_SLICES) List<Slice> slices) {
+    private static final String FIELD_SLICES = "slices";
+}
