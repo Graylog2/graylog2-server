@@ -21,6 +21,7 @@ import userEvent from '@testing-library/user-event';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
 import { DATA_ADAPTERS, ERROR_STATE } from 'components/lookup-tables/fixtures';
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import { attributes } from './constants';
 import DataAdapterList from './index';
@@ -62,10 +63,6 @@ jest.mock('hooks/useScopePermissions', () => ({
   }),
 }));
 
-jest.mock('routing/QueryParams', () => ({
-  useQueryParam: () => [undefined, () => {}],
-}));
-
 jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
   useFetchDataAdapters: () => ({
     fetchPaginatedDataAdapters: mockFetchPaginatedCaches,
@@ -81,10 +78,16 @@ jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
 }));
 
 const moreActionsName = { name: new RegExp(`More Actions for ${DATA_ADAPTERS[0].name}`, 'i') };
+const renderSUT = () =>
+  render(
+    <DefaultQueryParamProvider>
+      <DataAdapterList />
+    </DefaultQueryParamProvider>,
+  );
 
 describe('Data Adapter List', () => {
   it('should render a list of data adapters', async () => {
-    render(<DataAdapterList />);
+    renderSUT();
 
     await screen.findByText(/0 adapter title/i);
     screen.getByText(/0 adapter description/i);
@@ -92,19 +95,19 @@ describe('Data Adapter List', () => {
   });
 
   it('should show a warning icon on tables with errors', async () => {
-    render(<DataAdapterList />);
+    renderSUT();
 
     await screen.findByTestId('data-adapter-problem', { exact: true }, { timeout: 1500 });
   });
 
   it('should show an actions menu', async () => {
-    render(<DataAdapterList />);
+    renderSUT();
 
     await screen.findByRole('button', moreActionsName);
   });
 
   it('should be able to edit a data adapter', async () => {
-    render(<DataAdapterList />);
+    renderSUT();
 
     userEvent.click(await screen.findByRole('button', moreActionsName));
 
@@ -112,7 +115,7 @@ describe('Data Adapter List', () => {
   });
 
   it('should be able to delete a data adapter', async () => {
-    render(<DataAdapterList />);
+    renderSUT();
 
     userEvent.click(await screen.findByRole('button', moreActionsName));
     userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));

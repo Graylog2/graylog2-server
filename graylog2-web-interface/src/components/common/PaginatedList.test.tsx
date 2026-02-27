@@ -16,41 +16,53 @@
  */
 import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
-import type { Location } from 'history';
 import userEvent from '@testing-library/user-event';
 
-import useLocation from 'routing/useLocation';
+import { useQueryParams } from 'routing/QueryParams';
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import { asMock } from 'helpers/mocking';
 
 import PaginatedList from './PaginatedList';
 
-jest.mock('routing/useLocation', () => jest.fn(() => ({ search: '' })));
+const setQueryParams = jest.fn();
+
+jest.mock('routing/QueryParams', () => ({
+  ...jest.requireActual('routing/QueryParams'),
+  useQueryParams: jest.fn(),
+}));
 
 describe('PaginatedList', () => {
+  const renderSUT = (component: React.ReactElement) =>
+    render(<DefaultQueryParamProvider>{component}</DefaultQueryParamProvider>);
+
+  beforeEach(() => {
+    asMock(useQueryParams).mockImplementation(() => [{}, jest.fn()]);
+  });
+
   it('should display Pagination', () => {
-    const { getByText } = render(
+    renderSUT(
       <PaginatedList totalItems={100} onChange={() => {}}>
         <div>The list</div>
       </PaginatedList>,
     );
 
-    expect(getByText('The list')).not.toBeNull();
-    expect(getByText('1')).not.toBeNull();
+    expect(screen.getByText('The list')).not.toBeNull();
+    expect(screen.getByText('1')).not.toBeNull();
   });
 
   it('should not dived by 0 if pageSize is 0 Pagination', () => {
-    const { getByText } = render(
+    renderSUT(
       <PaginatedList totalItems={100} pageSize={0} onChange={() => {}}>
         <div>The list</div>
       </PaginatedList>,
     );
 
-    expect(getByText('The list')).not.toBeNull();
+    expect(screen.getByText('The list')).not.toBeNull();
   });
 
   it('should not display Pagination, when context is not interactive', () => {
-    const { queryByText } = render(
+    const { queryByText } = renderSUT(
       <InteractiveContext.Provider value={false}>
         <PaginatedList totalItems={100} onChange={() => {}}>
           <div>The list</div>
@@ -64,7 +76,7 @@ describe('PaginatedList', () => {
 
   it('should reset current page on page size change', async () => {
     const onChangeStub = jest.fn();
-    const { getByRole } = render(
+    const { getByRole } = renderSUT(
       <PaginatedList totalItems={200} onChange={onChangeStub} activePage={3}>
         <div>The list</div>
       </PaginatedList>,
@@ -88,12 +100,9 @@ describe('PaginatedList', () => {
   describe('with state based on URL query params', () => {
     it('should set <page> query parameter as active page', async () => {
       const currentPage = 4;
+      asMock(useQueryParams).mockImplementation(() => [{ page: currentPage }, setQueryParams]);
 
-      asMock(useLocation).mockReturnValue({
-        search: `?page=${currentPage}`,
-      } as Location);
-
-      const { findByTestId } = render(
+      const { findByTestId } = renderSUT(
         <PaginatedList totalItems={200} onChange={() => {}} activePage={3}>
           <div>The list</div>
         </PaginatedList>,
@@ -109,7 +118,7 @@ describe('PaginatedList', () => {
 
   describe('with internal state', () => {
     it('should update active page, when prop changes', async () => {
-      const { findByTestId, rerender } = render(
+      const { findByTestId, rerender } = renderSUT(
         <PaginatedList totalItems={200} onChange={() => {}} activePage={3} useQueryParameter={false}>
           <div>The list</div>
         </PaginatedList>,
@@ -121,9 +130,11 @@ describe('PaginatedList', () => {
       expect(activePageElement[0].textContent).toContain('3');
 
       rerender(
-        <PaginatedList totalItems={200} onChange={() => {}} activePage={1} useQueryParameter={false}>
-          <div>The list</div>
-        </PaginatedList>,
+        <DefaultQueryParamProvider>
+          <PaginatedList totalItems={200} onChange={() => {}} activePage={1} useQueryParameter={false}>
+            <div>The list</div>
+          </PaginatedList>
+        </DefaultQueryParamProvider>,
       );
 
       await findByTestId('graylog-pagination');
