@@ -1,4 +1,4 @@
-Please follow the instructions on the graylog-project repo: ([https://www.graylog.org/get-involved/](https://github.com/Graylog2/graylog-project))
+Please follow the [instructions on the graylog-project repo](https://github.com/Graylog2/graylog-project).
 
 #### Code of Conduct
 
