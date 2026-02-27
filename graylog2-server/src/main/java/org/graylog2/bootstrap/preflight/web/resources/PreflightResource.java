@@ -174,13 +174,13 @@ public class PreflightResource {
         clusterConfigService.remove(RenewalPolicy.class);
         nodeService.allActive().values().stream()
                 .filter(n -> n.getDataNodeStatus() == DataNodeStatus.AVAILABLE)
-                .forEach(this::stopNode);
+                .forEach(this::revokeCertificate);
     }
 
-    private void stopNode(DataNodeDto node) {
+    private void revokeCertificate(DataNodeDto node) {
         try {
-            dataNodeCommandService.stopNode(node.getNodeId());
-            dataNodeCommandService.removeNodeConfiguration(node.getNodeId());
+            // revoking certificate will automatically stop the process and destroy its configuration
+            dataNodeCommandService.revokeCertificate(node.getNodeId());
         } catch (NodeNotFoundException e) {
             throw new RuntimeException(e);
         }

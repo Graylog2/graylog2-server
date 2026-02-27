@@ -194,10 +194,10 @@ public class DataNodeCommandServiceImplTest {
     }
 
     @Test
-    public void removeNodeConfigurationPublishesClusterEvent() throws NodeNotFoundException {
+    public void revokeCertificatePublishesClusterEvent() throws NodeNotFoundException {
         final String testNodeId = "node";
         nodeService.registerServer(buildTestNode(testNodeId, DataNodeStatus.AVAILABLE));
-        classUnderTest.removeNodeConfiguration(testNodeId);
+        classUnderTest.revokeCertificate(testNodeId);
         verify(clusterEventBus).post(DataNodeLifecycleEvent.create(testNodeId, DataNodeLifecycleTrigger.REVOKE_CERTIFICATE));
     }
 
