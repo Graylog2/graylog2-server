@@ -26,13 +26,14 @@ import org.graylog.schema.ServiceFields;
 import org.graylog.schema.UserFields;
 import org.graylog.schema.VendorFields;
 import org.graylog2.plugin.Message;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.time.DateTimeException;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -84,7 +85,7 @@ public class JournaldRecordProcessor implements LogRecordProcessor {
 
         Long sourceRealtimeTimestampMicros = null;
         Long realtimeTimestampMicros = null;
-        String syslogTimestamp = null;
+        DateTime syslogTimestamp = null;
 
         for (final var field : logRecord.getBody().getKvlistValue().getValuesList()) {
             final var fieldValue = field.getValue();
@@ -392,9 +393,9 @@ public class JournaldRecordProcessor implements LogRecordProcessor {
         putByPrecedence(result, UserFields.USER_SESSION_ID, toStringValue(auditSessionId), systemdSessionId);
         putByPrecedence(result, AssociatedFields.ASSOCIATED_SESSION_ID, bootId, streamId);
         putByPrecedence(result, "host_device", udevSysname, kernelDevice);
-        putByPrecedence(result, "vendor_event_timestamp",
-                formatEpochMicros(sourceRealtimeTimestampMicros),
-                formatEpochMicros(realtimeTimestampMicros),
+        putDateTimeByPrecedence(result, "vendor_event_timestamp",
+                dateTimeFromEpochMicros(sourceRealtimeTimestampMicros),
+                dateTimeFromEpochMicros(realtimeTimestampMicros),
                 syslogTimestamp);
 
         return result;
@@ -561,17 +562,24 @@ public class JournaldRecordProcessor implements LogRecordProcessor {
         }
     }
 
-    private static String formatEpochMicros(Long micros) {
+    private static void putDateTimeByPrecedence(Map<String, Object> target, String fieldName, DateTime... candidates) {
+        for (final var value : candidates) {
+            if (value != null) {
+                target.put(fieldName, value);
+                return;
+            }
+        }
+    }
+
+    private static DateTime dateTimeFromEpochMicros(Long micros) {
         if (micros == null) {
             return null;
         }
 
-        final long seconds = micros / 1_000_000;
-        final long nanos = (micros % 1_000_000) * 1_000;
-        return Instant.ofEpochSecond(seconds, nanos).toString();
+        return new DateTime(micros / 1_000L, DateTimeZone.UTC);
     }
 
-    private static String formatSyslogTimestamp(String value) {
+    private static DateTime formatSyslogTimestamp(String value) {
         if (value == null || value.isBlank()) {
             return null;
         }
@@ -582,7 +590,7 @@ public class JournaldRecordProcessor implements LogRecordProcessor {
         try {
             parsedDateTime = LocalDateTime.parse(normalized, SYSLOG_TIMESTAMP_FORMATTER);
         } catch (DateTimeParseException ignored) {
-            return value;
+            return null;
         }
 
         final var now = ZonedDateTime.now(ZoneOffset.UTC);
@@ -590,14 +598,14 @@ public class JournaldRecordProcessor implements LogRecordProcessor {
         try {
             candidateWithCurrentYear = parsedDateTime.withYear(now.getYear()).atZone(ZoneOffset.UTC);
         } catch (DateTimeException ignored) {
-            return value;
+            return null;
         }
 
         var candidate = candidateWithCurrentYear;
         if (candidate.isAfter(now.plusDays(1))) {
             candidate = candidate.minusYears(1);
         }
-        return candidate.toInstant().toString();
+        return new DateTime(candidate.toInstant().toEpochMilli(), DateTimeZone.UTC);
     }
 
     private static String toStringValue(Long value) {
