@@ -21,5 +21,4 @@ message Log {
   opentelemetry.proto.common.v1.InstrumentationScope scope = 3;
   opentelemetry.proto.logs.v1.LogRecord log_record = 4;
   string log_record_schema_url = 5;
-  string collector_receiver_type = 6;
 }
