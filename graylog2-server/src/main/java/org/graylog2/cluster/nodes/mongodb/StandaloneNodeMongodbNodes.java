@@ -48,6 +48,11 @@ public class StandaloneNodeMongodbNodes implements MongodbNodesProvider {
         String version = serverStatus.getString("version");
         String host = serverStatus.getString("host");
 
+        Document connections = serverStatus.get("connections", Document.class);
+        final Integer availableConnections = connections.getInteger("available");
+        final Integer currentConnections = connections.getInteger("current");
+        final double connectionsPercent = 100.0d / availableConnections * currentConnections;
+
         // Get storage information
         double storageUsedPercent = calculateStorageUsedPercent();
 
@@ -55,7 +60,7 @@ public class StandaloneNodeMongodbNodes implements MongodbNodesProvider {
         Long slowQueryCount = getSlowQueryCount();
 
         // For standalone nodes: role is "STANDALONE", status is 1 (primary equivalent), no replication lag
-        return new MongodbNode("0", host, "STANDALONE", version, 0, slowQueryCount, storageUsedPercent);
+        return new MongodbNode("0", host, "STANDALONE", version, 0, slowQueryCount, storageUsedPercent, availableConnections, currentConnections, connectionsPercent);
     }
 
     private double calculateStorageUsedPercent() {

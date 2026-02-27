@@ -27,7 +27,10 @@ public record MongodbNode(
         String version,
         long replicationLag,
         Long slowQueryCount,
-        double storageUsedPercent
+        double storageUsedPercent,
+        Integer availableConnections,
+        Integer currentConnections,
+        double connectionsUsedPercent
 ) implements InMemorySearchableEntity {
 
     @JsonIgnore
@@ -39,5 +42,8 @@ public record MongodbNode(
         builder.longVal("replicationLag", replicationLag);
         builder.longVal("slowQueryCount", slowQueryCount);
         builder.doubleVal("storageUsedPercent", storageUsedPercent);
+        builder.intVal("availableConnections", availableConnections);
+        builder.intVal("currentConnections", currentConnections);
+        builder.doubleVal("connectionsUsedPercent", connectionsUsedPercent);
     }
 }

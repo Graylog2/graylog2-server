@@ -17,6 +17,8 @@
 package org.graylog2.cluster.nodes.mongodb;
 
 import com.mongodb.MongoClient;
+import com.mongodb.ReadConcern;
+import com.mongodb.client.MongoClients;
 import com.mongodb.connection.ClusterDescription;
 import com.mongodb.connection.ClusterType;
 import jakarta.inject.Inject;
@@ -33,15 +35,21 @@ public class ReplicaSetMongodbNodes implements MongodbNodesProvider {
     @Inject
     public ReplicaSetMongodbNodes(MongoConnection mongoConnection) {
         this.mongoConnection = mongoConnection.connect();
+
+        Document command = new Document("profile", 1)
+                .append("slowms", 100);
+
+        this.mongoConnection.getDatabase("admin").runCommand(command);
+
     }
 
     @Override
     public List<MongodbNode> allNodes() {
         Document replicaStatus = mongoConnection.getDatabase("admin").runCommand(new Document("replSetGetStatus", 1));
-        Document serverStatus = mongoConnection.getDatabase("admin").runCommand(new Document("serverStatus", 1));
+        //Document serverStatus = mongoConnection.getDatabase("admin").runCommand(new Document("serverStatus", 1));
 
         // TODO: can each replica member run different mongo version?
-        final String version = serverStatus.getString("version");
+        //final String version = serverStatus.getString("version");
         final List<Document> members = (List<Document>) replicaStatus.get("members");
 
         // Find primary's optime for replication lag calculation
@@ -54,7 +62,8 @@ public class ReplicaSetMongodbNodes implements MongodbNodesProvider {
         Long slowQueryCount = getSlowQueryCount();
 
         return members.stream()
-                .map(member -> toMongodbNode(member, version, primaryMember, storageUsedPercent, slowQueryCount))
+                .parallel()
+                .map(member -> toMongodbNode(member, primaryMember, storageUsedPercent, slowQueryCount))
                 .toList();
     }
 
@@ -65,24 +74,39 @@ public class ReplicaSetMongodbNodes implements MongodbNodesProvider {
         return clusterType == ClusterType.REPLICA_SET;
     }
 
-    private MongodbNode toMongodbNode(Document member, String version, Document primaryMember,
+    private MongodbNode toMongodbNode(Document member, Document primaryMember,
                                       double storageUsedPercent, Long slowQueryCount) {
-        int id = member.get("_id", Integer.class);
-        String name = member.get("name", String.class);
-        String role = member.get("stateStr", String.class);
 
-        // Replication lag - compare optime with primary
-        long replicationLag = 0;
-        if (primaryMember != null && !member.equals(primaryMember)) {
-            if (member.containsKey("optimeDate") && primaryMember.containsKey("optimeDate")) {
-                Date memberOptime = member.getDate("optimeDate");
-                Date primaryOptime = primaryMember.getDate("optimeDate");
-                if (memberOptime != null && primaryOptime != null) {
-                    replicationLag = primaryOptime.getTime() - memberOptime.getTime();
+        String name = member.get("name", String.class);
+
+        String uri = "mongodb://" + name + "/?directConnection=true";
+        try (com.mongodb.client.MongoClient nodeClient = MongoClients.create(uri)) {
+
+            Document status = nodeClient
+                    .getDatabase("admin")
+                    .runCommand(new Document("serverStatus", 1));
+
+            Document connections = status.get("connections", Document.class);
+            final Integer availableConnections = connections.getInteger("available");
+            final Integer currentConnections = connections.getInteger("current");
+            final double connectionsPercent = 100.0d / availableConnections * currentConnections;
+
+            int id = member.get("_id", Integer.class);
+            String role = member.get("stateStr", String.class);
+
+            // Replication lag - compare optime with primary
+            long replicationLag = 0;
+            if (primaryMember != null && !member.equals(primaryMember)) {
+                if (member.containsKey("optimeDate") && primaryMember.containsKey("optimeDate")) {
+                    Date memberOptime = member.getDate("optimeDate");
+                    Date primaryOptime = primaryMember.getDate("optimeDate");
+                    if (memberOptime != null && primaryOptime != null) {
+                        replicationLag = primaryOptime.getTime() - memberOptime.getTime();
+                    }
                 }
             }
+            return new MongodbNode(String.valueOf(id), name, role, status.getString("version"), replicationLag, slowQueryCount, storageUsedPercent, availableConnections, currentConnections, connectionsPercent);
         }
-        return new MongodbNode(String.valueOf(id), name, role, version, replicationLag, slowQueryCount, storageUsedPercent);
     }
 
     private double calculateStorageUsedPercent() {
