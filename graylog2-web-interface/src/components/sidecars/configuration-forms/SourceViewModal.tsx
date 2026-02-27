@@ -38,11 +38,6 @@ class SourceViewModal extends React.Component<
     templateString: undefined,
   };
 
-  static initialState = {
-    source: undefined,
-    name: undefined,
-  };
-
   constructor(props) {
     super(props);
     this.state = SourceViewModal.initialState;
@@ -57,6 +52,11 @@ class SourceViewModal extends React.Component<
       this._loadConfiguration();
     }
   }
+
+  static initialState = {
+    source: undefined,
+    name: undefined,
+  };
 
   resetState = () => {
     this.setState(SourceViewModal.initialState);

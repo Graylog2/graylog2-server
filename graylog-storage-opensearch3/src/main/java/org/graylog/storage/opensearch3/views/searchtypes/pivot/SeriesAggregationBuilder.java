@@ -16,8 +16,6 @@
  */
 package org.graylog.storage.opensearch3.views.searchtypes.pivot;
 
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
-
 enum Placement {
     ROOT,
     ROW,
@@ -25,20 +23,21 @@ enum Placement {
     METRIC
 }
 
-public record SeriesAggregationBuilder(AggregationBuilder aggregationBuilder, Placement placement) {
-    public static SeriesAggregationBuilder root(AggregationBuilder aggregationBuilder) {
+public record SeriesAggregationBuilder(MutableNamedAggregationBuilder aggregationBuilder,
+                                       Placement placement) {
+    public static SeriesAggregationBuilder root(MutableNamedAggregationBuilder aggregationBuilder) {
         return new SeriesAggregationBuilder(aggregationBuilder, Placement.ROOT);
     }
 
-    public static SeriesAggregationBuilder metric(AggregationBuilder aggregationBuilder) {
+    public static SeriesAggregationBuilder metric(MutableNamedAggregationBuilder aggregationBuilder) {
         return new SeriesAggregationBuilder(aggregationBuilder, Placement.METRIC);
     }
 
-    public static SeriesAggregationBuilder row(AggregationBuilder aggregationBuilder) {
+    public static SeriesAggregationBuilder row(MutableNamedAggregationBuilder aggregationBuilder) {
         return new SeriesAggregationBuilder(aggregationBuilder, Placement.ROW);
     }
 
-    public static SeriesAggregationBuilder column(AggregationBuilder aggregationBuilder) {
+    public static SeriesAggregationBuilder column(MutableNamedAggregationBuilder aggregationBuilder) {
         return new SeriesAggregationBuilder(aggregationBuilder, Placement.COLUMN);
     }
 }

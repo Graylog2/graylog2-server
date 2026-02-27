@@ -59,6 +59,11 @@ const createPaginatedSearches = (count = 1) => {
         title: 'Description',
         sortable: true,
       },
+      {
+        id: 'favorite',
+        title: 'Favorite',
+        sortable: true,
+      },
     ],
     list: views,
   };

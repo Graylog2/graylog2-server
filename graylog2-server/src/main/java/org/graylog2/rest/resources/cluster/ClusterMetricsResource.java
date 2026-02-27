@@ -17,11 +17,11 @@
 package org.graylog2.rest.resources.cluster;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.cluster.NodeService;
@@ -50,7 +50,7 @@ import java.time.Duration;
 import java.util.concurrent.ExecutorService;
 
 @RequiresAuthentication
-@Api(value = "Cluster/Metrics", description = "Cluster-wide Internal Graylog metrics")
+@Tag(name = "Cluster/Metrics", description = "Cluster-wide Internal Graylog metrics")
 @Path("/cluster/metrics")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterMetricsResource extends ProxiedResource {
@@ -73,12 +73,13 @@ public class ClusterMetricsResource extends ProxiedResource {
     @POST
     @Timed
     @Path("/multiple")
-    @ApiOperation(value = "Get all metrics of all nodes in the cluster")
+    @Operation(summary = "Get all metrics of all nodes in the cluster")
     @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Malformed body")
+            @ApiResponse(responseCode = "200", description = "Success"),
+            @ApiResponse(responseCode = "400", description = "Malformed body")
     })
     @NoAuditEvent("only used to retrieve metrics of all nodes")
-    public void multipleMetricsAllNodes(@ApiParam(name = "Requested metrics", required = true)
+    public void multipleMetricsAllNodes(@Parameter(name = "Requested metrics", required = true)
                                         @Valid @NotNull MetricsReadRequest request,
                                         @Suspended AsyncResponse asyncResponse) {
 

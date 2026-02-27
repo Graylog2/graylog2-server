@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useContext, useMemo, useState } from 'react';
 
 const ErrorsContext = React.createContext(null);
 
@@ -23,12 +24,12 @@ type ProviderProps = {
 };
 
 export function ErrorsProvider({ children }: ProviderProps) {
-  const [errors, setErrors] = React.useState<{ lutErrors: unknown; cacheErrors: unknown; adapterErrors: unknown }>();
-  const value = React.useMemo(() => ({ errors, setErrors }), [errors, setErrors]);
+  const [errors, setErrors] = useState<{ lutErrors: unknown; cacheErrors: unknown; adapterErrors: unknown }>();
+  const value = useMemo(() => ({ errors, setErrors }), [errors, setErrors]);
 
   return <ErrorsContext.Provider value={value}>{children}</ErrorsContext.Provider>;
 }
 
 export function useErrorsContext() {
-  return React.useContext(ErrorsContext);
+  return useContext(ErrorsContext);
 }

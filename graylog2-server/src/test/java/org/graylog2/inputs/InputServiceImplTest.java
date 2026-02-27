@@ -56,6 +56,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 
@@ -344,6 +345,45 @@ public class InputServiceImplTest {
         assertThat(paginated).isNotNull();
         assertThat(paginated.pagination().total()).isEqualTo(3);
         assertThat((long) paginated.size()).isEqualTo(2);
+    }
+
+    @Test
+    @MongoDBFixtures("InputServiceImplTest.json")
+    void testStaticFields() {
+        assertThat(inputService.getStaticFields("54e3deadbeefdeadbeef0002")).isEmpty();
+        List<Map.Entry<String, String>> staticFields = inputService.getStaticFields("54e3deadbeefdeadbeef0003");
+        assertThat(staticFields).isNotNull().hasSize(1).isEqualTo(List.of(Map.entry("static_field", "foo")));
+    }
+
+    @Test
+    public void findIdsByDesiredState() throws Exception {
+        InputImpl stoppedInput = InputImpl.builder()
+                .setTitle("stopped input")
+                .setType("prototype")
+                .setCreatorUserId("admin")
+                .setCreatedAt(Tools.nowUTC())
+                .setConfiguration(Map.of("k", "v"))
+                .setPersistedDesiredState(IOState.Type.STOPPED)
+                .setGlobal(true)
+                .build();
+        String stoppedId = inputService.save(stoppedInput);
+
+        InputImpl runningInput = InputImpl.builder()
+                .setTitle("running input")
+                .setType("prototype")
+                .setCreatorUserId("admin")
+                .setCreatedAt(Tools.nowUTC())
+                .setConfiguration(Map.of("k", "v"))
+                .setPersistedDesiredState(IOState.Type.RUNNING)
+                .setGlobal(true)
+                .build();
+        String runningInputId = inputService.save(runningInput);
+
+        Set<String> stoppedIds = inputService.findIdsByDesiredState(IOState.Type.STOPPED);
+        assertThat(stoppedIds).containsExactly(stoppedId);
+
+        Set<String> runningIds = inputService.findIdsByDesiredState(IOState.Type.RUNNING);
+        assertThat(runningIds).containsExactly(runningInputId);
     }
 
     private InputImpl createTestInput() {

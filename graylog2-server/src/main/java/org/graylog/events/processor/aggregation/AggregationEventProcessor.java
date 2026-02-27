@@ -16,12 +16,9 @@
  */
 package org.graylog.events.processor.aggregation;
 
-import com.floreysoft.jmte.Engine;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
@@ -59,16 +56,11 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
-import static org.graylog.events.event.EventDto.FIELD_EVENT_DEFINITION_ID;
-import static org.graylog.events.notifications.EventNotificationModelData.FIELD_EVENT_DEFINITION_DESCRIPTION;
-import static org.graylog.events.notifications.EventNotificationModelData.FIELD_EVENT_DEFINITION_TITLE;
-import static org.graylog.events.notifications.EventNotificationModelData.FIELD_EVENT_DEFINITION_TYPE;
 import static org.graylog.events.search.MoreSearch.luceneEscape;
 
 public class AggregationEventProcessor implements EventProcessor {
@@ -88,7 +80,6 @@ public class AggregationEventProcessor implements EventProcessor {
     private final Messages messages;
     private final PermittedStreams permittedStreams;
     private final AggregationSearchUtils aggregationSearchUtils;
-    private final Engine templateEngine;
 
     @Inject
     public AggregationEventProcessor(@Assisted EventDefinition eventDefinition,
@@ -100,8 +91,7 @@ public class AggregationEventProcessor implements EventProcessor {
                                      Messages messages,
                                      PermittedStreams permittedStreams,
                                      Set<EventQuerySearchTypeSupplier> eventQueryModifiers,
-                                     MessageFactory messageFactory,
-                                     Engine templateEngine) {
+                                     MessageFactory messageFactory) {
         this.eventDefinition = eventDefinition;
         this.config = (AggregationEventProcessorConfig) eventDefinition.config();
         this.dependencyCheck = dependencyCheck;
@@ -110,7 +100,6 @@ public class AggregationEventProcessor implements EventProcessor {
         this.eventStreamService = eventStreamService;
         this.messages = messages;
         this.permittedStreams = permittedStreams;
-        this.templateEngine = templateEngine;
         // If this is a simple Filter search there is no need to initialize aggregationSearchUtils
         this.aggregationSearchUtils = config.series().isEmpty() ? null : new AggregationSearchUtils(
                 eventDefinition,
@@ -119,8 +108,7 @@ public class AggregationEventProcessor implements EventProcessor {
                 aggregationSearchFactory,
                 eventStreamService,
                 messageFactory,
-                permittedStreams,
-                templateEngine
+                permittedStreams
         );
     }
 
@@ -254,15 +242,6 @@ public class AggregationEventProcessor implements EventProcessor {
             for (final ResultMessage resultMessage : messages) {
                 final Message msg = resultMessage.getMessage();
                 final Event event = eventFactory.createEvent(eventDefinition, msg.getTimestamp(), eventDefinition.title());
-                final String customEventSummary = eventDefinition.eventSummaryTemplate();
-                if (!Strings.isNullOrEmpty(customEventSummary)) {
-                    final Map<String, Object> templateFields = Maps.newHashMap(msg.getFields());
-                    templateFields.put(FIELD_EVENT_DEFINITION_ID, eventDefinition.id());
-                    templateFields.put(FIELD_EVENT_DEFINITION_TITLE, eventDefinition.title());
-                    templateFields.put(FIELD_EVENT_DEFINITION_TYPE, eventDefinition.config().type());
-                    templateFields.put(FIELD_EVENT_DEFINITION_DESCRIPTION, eventDefinition.description());
-                    event.setMessage(templateEngine.transform(customEventSummary, templateFields));
-                }
                 event.setOriginContext(EventOriginContext.elasticsearchMessage(resultMessage.getIndex(), msg.getId()));
 
                 // Ensure the event has values in the "source_streams" field for permission checks to work

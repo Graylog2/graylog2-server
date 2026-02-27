@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState, useMemo } from 'react';
 import styled from 'styled-components';
 
 import useProductName from 'brand-customization/useProductName';
@@ -55,16 +56,16 @@ type Props = {
 function TestLookup({ table }: Props) {
   const { errors } = useErrorsContext();
   const lutError = errors?.lutErrors[table.name];
-  const [lookupKey, setLookupKey] = React.useState<{ value: string; valid: boolean }>(INIT_INPUT);
-  const [lookupResult, setLookupResult] = React.useState<any>(null);
-  const [previewSize, setPreviewSize] = React.useState<number>(5);
+  const [lookupKey, setLookupKey] = useState<{ value: string; valid: boolean }>(INIT_INPUT);
+  const [lookupResult, setLookupResult] = useState<any>(null);
+  const [previewSize, setPreviewSize] = useState<number>(5);
   const productName = useProductName();
   const { testLookupTableKey } = useTestLookupTableKey();
   const {
     lookupPreview: { results, total, supported },
   } = useFetchLookupPreview(table.id, !lutError, previewSize);
 
-  const dataPreview = React.useMemo(() => {
+  const dataPreview = useMemo(() => {
     if (total === 0) return 'No results to show';
 
     return JSON.stringify(results, null, 2);
@@ -110,10 +111,7 @@ function TestLookup({ table }: Props) {
     }
   };
 
-  const showResults = React.useMemo(
-    () => !lutError && (lookupResult || supported),
-    [lutError, lookupResult, supported],
-  );
+  const showResults = useMemo(() => !lutError && (lookupResult || supported), [lutError, lookupResult, supported]);
 
   return (
     <Col $gap="sm">

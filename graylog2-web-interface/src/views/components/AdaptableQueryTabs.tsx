@@ -23,7 +23,7 @@ import { OrderedSet } from 'immutable';
 import UserNotification from 'util/UserNotification';
 import type { QueryId } from 'views/logic/queries/Query';
 import type QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
-import { Nav, NavItem, DropdownButton, MenuItem } from 'components/bootstrap';
+import { Nav, NavItem, MenuItem } from 'components/bootstrap';
 import { Icon, IconButton } from 'components/common';
 import QueryTitle from 'views/components/queries/QueryTitle';
 import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabsConfiguration';
@@ -47,6 +47,7 @@ import useCurrentQueryId from 'views/logic/queries/useCurrentQueryId';
 import useView from 'views/hooks/useView';
 import useIsNew from 'views/hooks/useIsNew';
 import { updateView, getView } from 'views/api/views';
+import { MoreActionsMenu } from 'components/common/MoreActions';
 
 import type { QueryTabsProps } from './QueryTabs';
 
@@ -143,17 +144,15 @@ const QueryTab = styled(NavItem)`
 
 const MoreTabsLi = ({ menuItems }: { menuItems: OrderedSet<React.ReactNode> }) => (
   <li className={MORE_TABS_LI_CLASS}>
-    <DropdownButton
-      title={<Icon name="more_horiz" />}
+    <MoreActionsMenu
       className={MORE_TABS_BUTTON_CLASS}
       id="query-tabs-more"
       aria-label="More Dashboard Pages"
-      noCaret
       bsStyle="link"
       keepMounted
       pullRight>
       {menuItems.toArray()}
-    </DropdownButton>
+    </MoreActionsMenu>
   </li>
 );
 

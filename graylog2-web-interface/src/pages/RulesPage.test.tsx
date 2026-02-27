@@ -19,10 +19,9 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import { usePluginExports } from 'views/test/testPlugins';
 import { prefixUrl } from 'routing/Routes';
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import RulesPage from './RulesPage';
-
-jest.mock('components/perspectives/hooks/useActivePerspective');
 
 const rulesPlugin = {
   entityCreators: [
@@ -36,9 +35,15 @@ const rulesPlugin = {
 };
 describe('RulesPage', () => {
   usePluginExports(rulesPlugin);
+  const renderSUT = () =>
+    render(
+      <DefaultQueryParamProvider>
+        <RulesPage />
+      </DefaultQueryParamProvider>,
+    );
 
   it('should show create rule button', async () => {
-    render(<RulesPage />);
+    renderSUT();
 
     await screen.findByRole('link', { name: /Create Rule/i });
   });

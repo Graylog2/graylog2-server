@@ -39,5 +39,13 @@ public interface IndexRangeService {
 
     IndexRange calculateRange(String index);
 
+    /**
+     * Recalculates and saves the index range for the specified index.
+     *
+     * @param index the name of the index to recalculate the range for
+     * @return true if the operation was successful, false otherwise
+     */
+    boolean calculateRangeAndSave(String index);
+
     IndexRange createUnknownRange(String index);
 }

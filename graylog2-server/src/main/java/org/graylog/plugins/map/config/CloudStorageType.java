@@ -23,7 +23,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum CloudStorageType {
     S3("s3"),
-    GCS("gcs");
+    GCS("gcs"),
+    ABS("abs");
 
     private final String name;
 
@@ -40,6 +41,7 @@ public enum CloudStorageType {
         return switch (name) {
             case "s3" -> S3;
             case "gcs" -> GCS;
+            case "abs" -> ABS;
             default -> throw new IllegalArgumentException("Unknown cloud storage: " + name);
         };
     }

@@ -69,6 +69,8 @@ export type SearchParams<T = string> = {
   pageSize: number;
   query: string;
   sort: Sort<T>;
+  sliceCol?: string | undefined;
+  slice?: string;
   filters?: UrlQueryFilters;
 };
 
@@ -91,7 +93,11 @@ export type Attribute = {
   filter_options?: Array<{ value: string; title: string }>;
   filter_component?: React.ComponentType<FilterComponentProps>;
   related_collection?: string;
+  related_identifier?: string;
   related_property?: string;
+  related_display_fields?: Array<string>;
+  related_display_template?: string;
+  sliceable?: boolean;
   permissions?: Array<Permission>;
 };
 

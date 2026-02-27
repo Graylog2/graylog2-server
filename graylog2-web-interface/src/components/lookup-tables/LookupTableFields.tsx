@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useEffect } from 'react';
 import memoize from 'lodash/memoize';
 import type { Permission } from 'graylog-web-plugin/plugin';
 
@@ -57,7 +58,7 @@ const LookupTableFields = ({
   const lookupTables = useStore(LookupTablesStore);
   const currentUser = useCurrentUser();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS)) {
       return;
     }

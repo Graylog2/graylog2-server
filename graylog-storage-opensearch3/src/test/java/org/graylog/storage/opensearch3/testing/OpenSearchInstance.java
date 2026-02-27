@@ -145,7 +145,10 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 ImmutableList.of(URI.create(protocol + this.getHttpHostAddress())),
                 IndexerJwtAuthToken.disabled(),
                 createCredentialsProvider(),
-                getElasticsearchClientConfiguration()
+                getElasticsearchClientConfiguration(),
+                new ObjectMapperProvider().get(),
+                getTrustManagerAndSocketFactoryProvider()
+
         ).get();
     }
 

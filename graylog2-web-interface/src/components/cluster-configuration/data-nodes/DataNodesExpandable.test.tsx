@@ -28,6 +28,7 @@ jest.mock('components/common/PaginatedEntityTable', () => ({
   default: jest.fn(({ humanName }) => <div>Paginated {humanName}</div>),
   useTableFetchContext: jest.fn(),
 }));
+jest.mock('brand-customization/useProductName', () => jest.fn(() => 'Graylog'));
 
 describe('<DataNodesExpandable />', () => {
   beforeEach(() => {

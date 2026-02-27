@@ -17,21 +17,29 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Cardinality;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.CardinalityAggregationBuilder;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.CardinalityAggregate;
 
-public class OSCardinalityHandler extends OSBasicSeriesSpecHandler<Cardinality, org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Cardinality> {
+import java.util.Optional;
+
+public class OSCardinalityHandler extends OSBasicSeriesSpecHandler<Cardinality> {
 
     @Override
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Cardinality cardinalitySpec) {
-        final CardinalityAggregationBuilder card = AggregationBuilders.cardinality(name).field(cardinalitySpec.field());
-        return SeriesAggregationBuilder.metric(card);
+        return SeriesAggregationBuilder.metric(new MutableNamedAggregationBuilder(name,
+                Aggregation.builder().cardinality(a -> a.field(cardinalitySpec.field()))));
     }
 
     @Override
-    protected Object getValueFromAggregationResult(final org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Cardinality cardinality,
+    protected Object getValueFromAggregationResult(final Aggregate agg,
                                                    final Cardinality cardinalitySpec) {
-        return cardinality.getValue();
+        return Optional.ofNullable(agg)
+                .filter(Aggregate::isCardinality)
+                .map(Aggregate::cardinality)
+                .map(CardinalityAggregate::value)
+                .orElse(null);
     }
 }

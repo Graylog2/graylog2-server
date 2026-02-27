@@ -15,13 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+
+import { Events } from '@graylog/server-api';
 
 import useTableElements from 'components/events/events/hooks/useTableComponents';
 import { eventsTableElements } from 'components/events/Constants';
+import eventsSliceRenderers from 'components/events/SliceRenderers';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import FilterValueRenderers from 'components/events/FilterValueRenderers';
-import fetchEvents, { keyFn } from 'components/events/fetchEvents';
+import fetchEvents, { keyFn, parseFilters, getConcatenatedQuery } from 'components/events/fetchEvents';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import useQuery from 'routing/useQuery';
@@ -30,6 +32,7 @@ import EventsRefreshControls from 'components/events/events/EventsRefreshControl
 import QueryHelper from 'components/common/QueryHelper';
 import EventsWidgets from 'components/events/EventsWidgets';
 import EventsRefreshProvider from 'components/events/EventsRefreshProvider';
+import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
 const additionalSearchFields = {
   key: 'The key of the event',
@@ -37,13 +40,22 @@ const additionalSearchFields = {
 
 const EventsEntityTable = () => {
   const { stream_id: streamId } = useQuery();
-  const _fetchEvents = useCallback(
-    (searchParams: SearchParams) => fetchEvents(searchParams, streamId as string),
-    [streamId],
-  );
+  const _fetchEvents = (searchParams: SearchParams) => fetchEvents(searchParams, streamId as string);
   const { entityActions, expandedSections, bulkSelection } = useTableElements({
     defaultLayout: eventsTableElements.defaultLayout,
   });
+
+  const _fetchSlices = (column: string, query: string, filters: UrlQueryFilters) => {
+    const { filter, timerange } = parseFilters(filters);
+
+    return Events.slices({
+      include_all: false,
+      slice_column: column,
+      query: getConcatenatedQuery(query, streamId as string),
+      filter,
+      timerange,
+    });
+  };
 
   return (
     <EventsRefreshProvider>
@@ -53,6 +65,8 @@ const EventsEntityTable = () => {
         entityActions={entityActions}
         tableLayout={eventsTableElements.defaultLayout}
         fetchEntities={_fetchEvents}
+        fetchSlices={_fetchSlices}
+        sliceRenderers={eventsSliceRenderers}
         keyFn={keyFn}
         expandedSectionRenderers={expandedSections}
         entityAttributesAreCamelCase={false}

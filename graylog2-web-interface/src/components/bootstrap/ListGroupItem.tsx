@@ -92,16 +92,10 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(
         color: ${theme.colors.variant.darkest.default};
       }
 
-      &:hover:not(.disabled),
-      &:focus:not(.disabled) {
+      &:hover:not(.disabled):not(.active),
+      &:focus:not(.disabled):not(.active) {
         color: inherit;
         background-color: ${theme.utils.colorLevel(theme.colors.global.contentBackground, 10)};
-
-        &.active {
-          color: ${theme.colors.variant.darkest.default};
-          background-color: ${theme.colors.variant.lightest.default};
-          border-color: ${theme.colors.variant.lightest.default};
-        }
 
         .list-group-item-heading {
           color: ${theme.utils.readableColor(theme.colors.variant.lightest.default)};

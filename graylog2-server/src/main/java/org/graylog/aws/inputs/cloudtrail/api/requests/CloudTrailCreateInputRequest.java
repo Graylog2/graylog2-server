@@ -32,6 +32,7 @@ public abstract class CloudTrailCreateInputRequest implements CloudTrailRequest 
     private static final String POLLING_INTERVAL = "polling_interval";
     private static final String OVERRIDE_SOURCE = "override_source";
     private static final String SQS_MESSAGE_BATCH_SIZE = "sqs_message_batch_size";
+    private static final String INCLUDE_FULL_MESSAGE_JSON = "include_full_message_json";
 
     @JsonProperty(NAME)
     public abstract String name();
@@ -47,6 +48,9 @@ public abstract class CloudTrailCreateInputRequest implements CloudTrailRequest 
 
     @JsonProperty(SQS_MESSAGE_BATCH_SIZE)
     public abstract int sqsMessageBatchSize();
+
+    @JsonProperty(INCLUDE_FULL_MESSAGE_JSON)
+    public abstract boolean includeFullMessageJson();
 
     @AutoValue.Builder
     public static abstract class Builder implements CloudTrailRequest.Builder<Builder> {
@@ -70,6 +74,9 @@ public abstract class CloudTrailCreateInputRequest implements CloudTrailRequest 
 
         @JsonProperty(SQS_MESSAGE_BATCH_SIZE)
         public abstract Builder sqsMessageBatchSize(int sqsMessageBatchSize);
+
+        @JsonProperty(INCLUDE_FULL_MESSAGE_JSON)
+        public abstract Builder includeFullMessageJson(boolean includeFullMessageJson);
 
         public abstract CloudTrailCreateInputRequest build();
     }

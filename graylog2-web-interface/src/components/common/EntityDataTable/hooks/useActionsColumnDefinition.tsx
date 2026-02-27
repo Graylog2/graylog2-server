@@ -16,7 +16,7 @@
  */
 
 import * as React from 'react';
-import { useCallback, useMemo, useLayoutEffect } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 import type { Row } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import styled, { css } from 'styled-components';
@@ -63,7 +63,7 @@ const ActionCell = <Entity extends EntityBase>({
   onWidthChange: (rowId: string, width: number) => void;
   parentBgColor: string | undefined;
 }) => {
-  const ref = React.useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     if (ref.current) {
@@ -130,6 +130,7 @@ const useActionsColumnDefinition = <Entity extends EntityBase>({
         enableHiding: false,
         enablePinning: true,
         enableResizing: false,
+        // The actions/tail column is always present. We only hide its content when there are no row actions.
         header: hasRowActions ? header : undefined,
         cell: hasRowActions ? cell : undefined,
         meta: {

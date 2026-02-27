@@ -16,6 +16,7 @@
  */
 import type { SyntheticEvent } from 'react';
 import * as React from 'react';
+import { useMemo } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
 
@@ -129,7 +130,7 @@ const EventDefinitionForm = ({
     currentUser,
   };
 
-  const canEditCondition = React.useMemo(
+  const canEditCondition = useMemo(
     () => canEdit || eventDefinition._scope.toUpperCase() === 'ILLUMINATE',
     [canEdit, eventDefinition._scope],
   );

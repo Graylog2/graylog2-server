@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 import { useFormikContext } from 'formik';
 import type { FormikErrors } from 'formik';
 
@@ -56,7 +57,7 @@ const AdapterConfigFormFields = React.forwardRef(({ validationErrors }: Props, c
     setFieldValue(`config.${name}`, updatedValue);
   };
 
-  const ConfigForm = React.useMemo(() => plugin?.formComponent, [plugin]);
+  const ConfigForm = useMemo(() => plugin?.formComponent, [plugin]);
 
   if (!plugin) return null;
 

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import URI from 'urijs';
 
@@ -37,7 +37,7 @@ const EditEventDefinitionPage = () => {
   const params = useParams<{ definitionId?: string }>();
   const { step } = useQuery();
   const currentUser = useCurrentUser();
-  const [eventDefinition, setEventDefinition] = React.useState<EventDefinition>(undefined);
+  const [eventDefinition, setEventDefinition] = useState<EventDefinition>(undefined);
   const history = useHistory();
   const navigate = useNavigate();
 
@@ -45,10 +45,10 @@ const EditEventDefinitionPage = () => {
     navigate(Routes.ALERTS.DEFINITIONS.LIST);
   }, [navigate]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
       EventDefinitionsActions.get(params.definitionId).then(
-        (response) => {
+        (response: any) => {
           const eventDefinitionResponse = response.event_definition;
 
           // Inject an internal "_is_scheduled" field to indicate if the event definition should be scheduled in the

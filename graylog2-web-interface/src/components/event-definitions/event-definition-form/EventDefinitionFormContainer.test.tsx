@@ -208,12 +208,6 @@ jest.mock('hooks/useScopePermissions');
 jest.mock('hooks/useCurrentUser');
 jest.mock('hooks/usePluginEntities');
 
-jest.mock('components/perspectives/hooks/useActivePerspective', () => () => ({
-  id: 'security',
-  title: 'Security',
-  welcomeRoute: '/security',
-}));
-
 describe('EventDefinitionFormContainer', () => {
   beforeEach(() => {
     asMock(useLocation).mockImplementation(() => ({

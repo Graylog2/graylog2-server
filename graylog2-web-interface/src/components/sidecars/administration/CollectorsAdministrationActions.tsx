@@ -82,6 +82,7 @@ const CollectorsAdministrationActions = ({
         configurations={configurations}
         selectedSidecarCollectorPairs={selectedSidecarCollectorPairs}
         onConfigurationSelectionChange={onConfigurationSelectionChange}
+        onSubmitConfigurationModal={() => setShowConfigurationModal(false)}
         show={showConfigurationModal}
         onCancel={onCancelConfigurationModal}
       />

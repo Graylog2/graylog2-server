@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { formatNumber, formatPercentage, formatTrend } from './NumberFormatting';
+import { formatNumber, formatPercentage, formatReadableNumber, formatTrend } from './NumberFormatting';
 
 // eslint-disable-next-line jest/valid-expect
 const expectFormattedNumber = (num: number) => expect(formatNumber(num));
@@ -82,6 +82,18 @@ describe('NumberFormatting', () => {
       expectFormattedPercentage(0.023).toEqual('0.023%');
       expectFormattedPercentage(0.0236).toEqual('0.024%');
       expectFormattedPercentage(0.000818).toEqual('0.00082%');
+    });
+  });
+
+  describe('formatReadableNumber', () => {
+    it('formats numbers below 1000 without compact suffix', () => {
+      expect(formatReadableNumber(999)).toEqual('999');
+    });
+
+    it('formats thousands and millions in compact readable form', () => {
+      expect(formatReadableNumber(1000)).toEqual('1k');
+      expect(formatReadableNumber(1000000)).toEqual('1m');
+      expect(formatReadableNumber(1234567)).toEqual('1.2m');
     });
   });
 });

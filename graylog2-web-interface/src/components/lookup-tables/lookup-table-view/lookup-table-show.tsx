@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 import styled from 'styled-components';
 
 import { Col as BSCol, Alert } from 'components/bootstrap';
@@ -44,7 +45,7 @@ type Props = {
 function LookupTableShow({ table, cache = undefined, dataAdapter = undefined }: Props) {
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
 
-  const canEdit = React.useMemo(
+  const canEdit = useMemo(
     () => !loadingScopePermissions && scopePermissions.is_mutable,
     [loadingScopePermissions, scopePermissions],
   );

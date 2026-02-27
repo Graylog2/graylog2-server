@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
@@ -48,7 +49,7 @@ const TitleCol = ({ lut, children }: { lut: LookupTableEntity; children: string 
   const tableErrorText = errors?.lutErrors[lut.name];
   const navigate = useNavigate();
 
-  const onClick = React.useCallback(() => {
+  const onClick = useCallback(() => {
     navigate(Routes.SYSTEM.LOOKUPTABLES.show(lut.name));
   }, [navigate, lut.name]);
 
@@ -64,7 +65,7 @@ const CacheCol = ({ cacheId, caches }: { cacheId: string; caches: CachesMap }) =
   const { errors } = useErrorsContext();
   const navigate = useNavigate();
 
-  const onClick = React.useCallback(() => {
+  const onClick = useCallback(() => {
     navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.show(caches?.[cacheId]?.name));
   }, [cacheId, caches, navigate]);
 
@@ -84,7 +85,7 @@ const DataAdapterCol = ({ dataAdapterId, dataAdapters }: { dataAdapterId: string
   const { errors } = useErrorsContext();
   const navigate = useNavigate();
 
-  const onClick = React.useCallback(() => {
+  const onClick = useCallback(() => {
     navigate(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(dataAdapters?.[dataAdapterId]?.name));
   }, [dataAdapterId, dataAdapters, navigate]);
 
