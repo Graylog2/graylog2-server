@@ -47,11 +47,6 @@ const fetchFilterValueSuggestions = async (
   displayTemplate?: string,
   identifierType?: string,
   collectionProperty: string = 'title',
-  relatedIdentifier: string,
-  displayFields?: string[],
-  displayTemplate?: string,
-  identifierType?: string,
-  collectionProperty: string = 'title',
 ): Promise<PaginatedSuggestions | undefined> => {
   const additional = {
     collection,

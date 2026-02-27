@@ -22,9 +22,6 @@ import org.graylog2.search.SearchQueryField;
 import javax.annotation.Nullable;
 import java.util.List;
 
-import javax.annotation.Nullable;
-import java.util.List;
-
 public interface EntitySuggestionService {
 
     EntitySuggestionResponse suggest(final String collection,
