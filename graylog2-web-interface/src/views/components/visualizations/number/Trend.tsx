@@ -163,7 +163,7 @@ const Trend = (
     : '--';
 
   return (
-    <Background $trend={backgroundTrend} data-testid="trend-background" data-trend={backgroundTrend}>
+    <Background $trend={backgroundTrend} data-testid="trend-background">
       <TextContainer $trend={backgroundTrend} ref={ref}>
         <StyledIcon name={trendIcon} $trend={backgroundTrend} data-testid="trend-icon" />{' '}
         <span data-testid="trend-value" title={`Previous value: ${previousConverted}`}>
