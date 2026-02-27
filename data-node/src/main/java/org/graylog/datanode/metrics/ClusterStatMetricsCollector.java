@@ -17,12 +17,9 @@
 package org.graylog.datanode.metrics;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.annotations.VisibleForTesting;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
-import org.graylog.storage.opensearch3.PlainJsonApi;
 import org.opensearch.client.opensearch.generic.Requests;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,19 +31,11 @@ import java.util.Objects;
 
 public class ClusterStatMetricsCollector {
 
+    private final OfficialOpensearchClient client;
     Logger log = LoggerFactory.getLogger(ClusterStatMetricsCollector.class);
 
-    private final ObjectMapper objectMapper;
-    private final PlainJsonApi plainJsonApi;
-
-    public ClusterStatMetricsCollector(OfficialOpensearchClient client, ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-        this.plainJsonApi = new PlainJsonApi(objectMapper, null, client);
-    }
-
-    @VisibleForTesting
-    PlainJsonApi plainJsonApi() {
-        return plainJsonApi;
+    public ClusterStatMetricsCollector(OfficialOpensearchClient client) {
+        this.client = client;
     }
 
     public Map<String, Object> getClusterMetrics(Map<String, Object> previousMetrics) {
@@ -54,7 +43,7 @@ public class ClusterStatMetricsCollector {
                 .method("GET")
                 .endpoint("_stats")
                 .build();
-        JsonNode responseNode = plainJsonApi().performRequest(nodeStatRequest, "Error retrieving cluster metrics");
+        JsonNode responseNode = client.performRequest(nodeStatRequest, "Error retrieving cluster metrics");
 
         if (responseNode != null) {
             DocumentContext statContext = JsonPath.parse(responseNode.toString());

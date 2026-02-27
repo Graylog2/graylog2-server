@@ -466,6 +466,14 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.graylog</groupId>
+            <artifactId>graylog-storage-opensearch3</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
 
     </dependencies>
 

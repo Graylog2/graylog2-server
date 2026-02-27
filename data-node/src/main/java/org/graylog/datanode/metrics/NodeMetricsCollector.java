@@ -38,14 +38,13 @@ import java.util.Objects;
 
 public class NodeMetricsCollector {
 
+    private final OfficialOpensearchClient client;
+    private final ObjectMapper objectMapper;
     Logger log = LoggerFactory.getLogger(NodeMetricsCollector.class);
 
-    private final ObjectMapper objectMapper;
-    private final PlainJsonApi plainJsonApi;
-
     public NodeMetricsCollector(OfficialOpensearchClient client, ObjectMapper objectMapper) {
+        this.client = client;
         this.objectMapper = objectMapper;
-        this.plainJsonApi = new PlainJsonApi(objectMapper, null, client);
     }
 
     public Map<String, Object> getNodeMetrics(String node) {
@@ -72,16 +71,11 @@ public class NodeMetricsCollector {
         return metrics;
     }
 
-    @VisibleForTesting
-    PlainJsonApi plainJsonApi() {
-        return plainJsonApi;
-    }
-
     private DocumentContext getNodeContextFromRequest(String node, Request nodeStatRequest) {
-        JsonNode response = plainJsonApi().performRequest(nodeStatRequest, "Error retrieving node stats for node " + node);
+        JsonNode response = client.performRequest(nodeStatRequest, "Error retrieving node stats for node " + node);
 
         Filter nodeFilter = Filter.filter(Criteria.where("name").eq(node));
-        Object nodeStatNode = null;
+        Object nodeStatNode;
         try {
             nodeStatNode = JsonPath.read(objectMapper.writeValueAsString(response), "$['nodes'][*][?]", nodeFilter);
         } catch (JsonProcessingException e) {

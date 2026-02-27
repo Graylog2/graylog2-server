@@ -16,45 +16,30 @@
  */
 package org.graylog.datanode.metrics;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
-import org.graylog.storage.opensearch3.PlainJsonApi;
+import org.graylog.storage.opensearch3.testing.client.mock.ServerlessOpenSearchClient;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 public class NodeMetricsCollectorTest {
 
-    private final String NODENAME = "datanode1";
+    private static final String NODENAME = "datanode1";
 
     NodeMetricsCollector collector;
-    @Mock
-    OfficialOpensearchClient client;
 
     @BeforeEach
     public void setUp() throws IOException {
-        ObjectMapper objectMapper = new ObjectMapperProvider().get();
-        this.collector = spy(new NodeMetricsCollector(client, objectMapper));
-        PlainJsonApi jsonApi = mock(PlainJsonApi.class);
-        JsonNode json = objectMapper.readTree(nodeStatResponse);
-        when(jsonApi.performRequest(any(), anyString())).thenReturn(json);
-        when(collector.plainJsonApi()).thenReturn(jsonApi);
+        final OfficialOpensearchClient client = ServerlessOpenSearchClient.builder()
+                .stubResponse("GET", "_nodes/" + NODENAME + "/stats", nodeStatResponse)
+                .build();
+        this.collector = new NodeMetricsCollector(client, new ObjectMapperProvider().get());
     }
 
     @Test
@@ -1069,7 +1054,7 @@ public class NodeMetricsCollectorTest {
                     }
                 }
             }
-                        """;
+            """;
 
 
 }

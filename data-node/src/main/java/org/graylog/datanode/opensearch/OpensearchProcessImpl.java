@@ -41,7 +41,6 @@ import org.graylog.datanode.process.ProcessListener;
 import org.graylog.storage.opensearch3.ClusterAdapterOS;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog.storage.opensearch3.OfficialOpensearchClientProvider;
-import org.graylog.storage.opensearch3.PlainJsonApi;
 import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
 import org.graylog2.datanode.DataNodeLifecycleTrigger;
@@ -427,8 +426,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
                 .method("GET")
                 .endpoint("/_cluster/state")
                 .build();
-        PlainJsonApi api = new PlainJsonApi(objectMapper, null, client);
-        JsonNode jsonNode = api.performRequest(request, "Failed to obtain cluster state response");
+        JsonNode jsonNode = client.performRequest(request, "Failed to obtain cluster state response");
         ClusterStateResponse state = objectMapper.convertValue(jsonNode, ClusterStateResponse.class);
         return Optional.of(state);
     }

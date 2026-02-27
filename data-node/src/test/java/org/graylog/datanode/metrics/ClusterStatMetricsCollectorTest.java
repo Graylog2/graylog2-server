@@ -16,43 +16,27 @@
  */
 package org.graylog.datanode.metrics;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
-import org.graylog.storage.opensearch3.PlainJsonApi;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog.storage.opensearch3.testing.client.mock.ServerlessOpenSearchClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 public class ClusterStatMetricsCollectorTest {
 
     ClusterStatMetricsCollector collector;
-    @Mock
-    OfficialOpensearchClient client;
 
     @BeforeEach
     public void setUp() throws IOException {
-        ObjectMapper objectMapper = new ObjectMapperProvider().get();
-        this.collector = spy(new ClusterStatMetricsCollector(client, objectMapper));
-        PlainJsonApi jsonApi = mock(PlainJsonApi.class);
-        JsonNode json = objectMapper.readTree(clusterStatResponse);
-        when(jsonApi.performRequest(any(), anyString())).thenReturn(json);
-        when(collector.plainJsonApi()).thenReturn(jsonApi);
+        final OfficialOpensearchClient client = ServerlessOpenSearchClient.builder()
+                .stubResponse("GET", "_stats", clusterStatResponse)
+                .build();
+        this.collector = new ClusterStatMetricsCollector(client);
     }
 
     @Test
