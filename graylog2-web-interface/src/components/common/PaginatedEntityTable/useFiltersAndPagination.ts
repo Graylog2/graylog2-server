@@ -52,14 +52,17 @@ export const useWithURLParams = (layoutConfig: LayoutConfig) => {
     [urlPagination, setUrlQueryFilters],
   );
 
+  const onChangeSlicing = (newSliceCol: string | undefined, newSlice?: string) => {
+    urlPagination.resetPage();
+    setSliceCol(newSliceCol);
+    setSlice(newSlice);
+  };
+
   return {
     fetchOptions,
     setQuery: setUrlQuery,
     onChangeFilters,
-    onChangeSlicing: (newSliceCol: string | undefined, newSlice?: string) => {
-      setSliceCol(newSliceCol);
-      setSlice(newSlice);
-    },
+    onChangeSlicing,
     paginationState: urlPagination,
   };
 };
@@ -100,6 +103,7 @@ export const useWithLocalState = (layoutConfig: LayoutConfig) => {
   const onChangeSlicing = useCallback((sliceCol: string | undefined, slice?: string | undefined) => {
     setTransientFetchOptions((cur) => ({
       ...cur,
+      page: DEFAULT_PAGE,
       sliceCol,
       slice,
     }));

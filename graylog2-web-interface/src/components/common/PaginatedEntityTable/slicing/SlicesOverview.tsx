@@ -27,6 +27,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import SliceFilters, { type SortMode } from './SliceFilters';
 import SliceList from './SliceList';
 import useSlices from './useSlices';
+import type { SliceRenderers } from './Slicing';
 import type { FetchSlices } from './useFetchSlices';
 
 const EmptySlicesHeader = styled.div(
@@ -47,13 +48,18 @@ const EmptySlicesLabel = styled.span`
   gap: 4px;
 `;
 
+const Slices = styled.div`
+  max-height: 700px;
+  overflow: auto;
+`;
+
 type Props = {
   appSection: string;
   sliceCol: string | undefined;
   activeSlice: string | undefined;
   activeColumnTitle: string | undefined;
   onChangeSlicing: (sliceCol: string | undefined, slice?: string | undefined) => void;
-  sliceRenderers?: { [col: string]: (value: string | number) => React.ReactNode } | undefined;
+  sliceRenderers?: SliceRenderers;
   fetchSlices: FetchSlices;
   sortMode: SortMode;
   onSortModeChange: (mode: SortMode) => void;
@@ -77,6 +83,7 @@ const SlicesOverview = ({
     fetchSlices,
     searchQuery,
     sortMode,
+    sliceRenderers,
   });
   const onToggleEmptySlices = () => {
     setShowEmptySlices((current) => {
@@ -110,38 +117,40 @@ const SlicesOverview = ({
         sortMode={sortMode}
         onSortModeChange={onSortModeChange}
       />
-      <SliceList
-        slices={visibleNonEmptySlices}
-        activeSlice={activeSlice}
-        sliceCol={sliceCol}
-        onChangeSlicing={onChangeSlicing}
-        sliceRenderers={sliceRenderers}
-        listTestId="slices-list"
-      />
-      <EmptySlicesHeader>
-        {hasEmptySlices ? (
-          <Button
-            bsStyle="link"
-            bsSize="sm"
-            onClick={onToggleEmptySlices}
-            title={showEmptySlices ? 'Hide empty slices' : 'Show empty slices'}>
-            {showEmptySlices ? 'Hide empty slices' : 'Show empty slices'} ({emptySliceCount})
-          </Button>
-        ) : (
-          <EmptySlicesLabel>Empty slices (0)</EmptySlicesLabel>
-        )}
-      </EmptySlicesHeader>
-      {showEmptySlices && visibleEmptySlices.length > 0 && (
+      <Slices>
         <SliceList
-          slices={visibleEmptySlices}
+          slices={visibleNonEmptySlices}
           activeSlice={activeSlice}
           sliceCol={sliceCol}
           onChangeSlicing={onChangeSlicing}
           sliceRenderers={sliceRenderers}
-          keyPrefix="empty-"
-          listTestId="empty-slices-list"
+          listTestId="slices-list"
         />
-      )}
+        <EmptySlicesHeader>
+          {hasEmptySlices ? (
+            <Button
+              bsStyle="link"
+              bsSize="sm"
+              onClick={onToggleEmptySlices}
+              title={showEmptySlices ? 'Hide empty slices' : 'Show empty slices'}>
+              {showEmptySlices ? 'Hide empty slices' : 'Show empty slices'} ({emptySliceCount})
+            </Button>
+          ) : (
+            <EmptySlicesLabel>Empty slices (0)</EmptySlicesLabel>
+          )}
+        </EmptySlicesHeader>
+        {showEmptySlices && visibleEmptySlices.length > 0 && (
+          <SliceList
+            slices={visibleEmptySlices}
+            activeSlice={activeSlice}
+            sliceCol={sliceCol}
+            onChangeSlicing={onChangeSlicing}
+            sliceRenderers={sliceRenderers}
+            keyPrefix="empty-"
+            listTestId="empty-slices-list"
+          />
+        )}
+      </Slices>
     </>
   );
 };

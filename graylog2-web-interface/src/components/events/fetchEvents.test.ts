@@ -163,7 +163,7 @@ describe('fetchEvents', () => {
       });
     });
 
-    it('sends defaultTimeRange when no timestamp filter is provided', async () => {
+    it('sends 30 days timerange when no timestamp filter is provided', async () => {
       await fetchEvents(baseSearchParams, undefined);
 
       expect(fetch).toHaveBeenCalledWith(
