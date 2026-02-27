@@ -22,12 +22,14 @@ import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
+import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiService;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedException;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Grouping;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.NumberRange;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -113,6 +115,7 @@ public class EventsSearchService extends AbstractEventsSearchService {
     /**
      * In the Open Source part, we only map priority and type, both of which are augmented in the FE regarding the title.
      * So we only need a simple mapping function
+     *
      * @param slicingColumn
      * @param result
      * @return Slice
@@ -123,18 +126,18 @@ public class EventsSearchService extends AbstractEventsSearchService {
 
     // the alert can either be true or false
     List<Slice> handleAlertColumn(final List<Slice> slices) {
-        if(slices.size() == 2) {
+        if (slices.size() == 2) {
             return slices;
         }
 
-        final var TRUE = new Slice( "true", null, 0);
-        final var FALSE = new Slice( "false", null, 0);
+        final var TRUE = new Slice("true", null, 0);
+        final var FALSE = new Slice("false", null, 0);
 
-        if(slices.isEmpty()) {
+        if (slices.isEmpty()) {
             return List.of(TRUE, FALSE);
         }
 
-        if(slices.getFirst().value().equals("true")) {
+        if (slices.getFirst().value().equals("true")) {
             return List.of(slices.getFirst(), FALSE);
         } else {
             return List.of(TRUE, slices.getFirst());
@@ -143,16 +146,16 @@ public class EventsSearchService extends AbstractEventsSearchService {
 
     // priority can be 1 (low) to 4 (critical), see EventDefinitionPriority.ts
     List<Slice> handlePriorityColumn(final List<Slice> slices) {
-        if(slices.size() == 4) {
+        if (slices.size() == 4) {
             return slices;
         }
 
-        final var LOW = new Slice( "1", null, 0);
-        final var MEDIUM = new Slice( "2", null, 0);
-        final var HIGH = new Slice( "3", null, 0);
-        final var CRITICAL = new Slice( "4", null, 0);
+        final var LOW = new Slice("1", null, 0);
+        final var MEDIUM = new Slice("2", null, 0);
+        final var HIGH = new Slice("3", null, 0);
+        final var CRITICAL = new Slice("4", null, 0);
 
-        if(slices.isEmpty()) {
+        if (slices.isEmpty()) {
             return List.of(LOW, MEDIUM, HIGH, CRITICAL);
         }
 
@@ -165,10 +168,34 @@ public class EventsSearchService extends AbstractEventsSearchService {
         return fixedList;
     }
 
+    List<Slice> handleRiskScoreColumn(final List<Slice> slices) {
+        if (slices.size() == 4) {
+            return slices;
+        }
+
+        final var _1 = new Slice("*-25.0", "0-25.0", 0);
+        final var _2 = new Slice("25.0-50.0", "25.0-50.0", 0);
+        final var _3 = new Slice("50.0-75.0", "50.0-75.0", 0);
+        final var _4 = new Slice("75.0-*", "75.0-100.0", 0);
+
+        if (slices.isEmpty()) {
+            return List.of(_1, _2, _3, _4);
+        }
+
+        List<Slice> fixedList = new ArrayList<>();
+        fixedList.add(slices.stream().filter(s -> s.value().equals(_1.value())).findAny().orElse(_1));
+        fixedList.add(slices.stream().filter(s -> s.value().equals(_2.value())).findAny().orElse(_2));
+        fixedList.add(slices.stream().filter(s -> s.value().equals(_3.value())).findAny().orElse(_3));
+        fixedList.add(slices.stream().filter(s -> s.value().equals(_4.value())).findAny().orElse(_4));
+
+        return fixedList;
+    }
+
     private List<Slice> addMissingOptions(final List<Slice> slices, final String slicingColumn) {
         return switch (slicingColumn) {
             case FIELD_ALERT -> handleAlertColumn(slices);
             case FIELD_PRIORITY -> handlePriorityColumn(slices);
+            case RISK_SCORE -> handleRiskScoreColumn(slices);
             default -> slices;
         };
     }
@@ -190,6 +217,41 @@ public class EventsSearchService extends AbstractEventsSearchService {
             final var filtered = includeAll
                     ? addMissingOptions(slices, slicingColumn)
                     : slices.stream().filter(s -> !"(Empty Value)".equals(s.value())).toList();
+
+            return new Slices(filtered);
+        } catch (QueryFailedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static final String RISK_SCORE = "event.scores.normalized_risk";
+    // The 4 buckets we want to slice Risk Scores into
+    final static List<NumberRange> ranges = List.of(new NumberRange(null, 25.0), new NumberRange(25.0, 50.0), new NumberRange(50.0, 75.0), new NumberRange(75.0, null));
+
+    /**
+     * Risk Score slicing needs special attention because we want to use a range aggregation in OpenSearch
+     *
+     * @param query
+     * @param timeRange
+     * @param subject
+     * @param searchUser
+     * @param includeAll
+     * @return
+     */
+    public Slices slicesForRiskScore(final String query, final TimeRange timeRange, final Subject subject, final SearchUser searchUser, final boolean includeAll) {
+        try {
+            final var slices = scriptingApiService.executeAggregation(
+                            new AggregationRequestSpec(query, allowedEventStreams(subject), Set.of(), timeRange, List.of(new Grouping(RISK_SCORE, ranges)), List.of(new Metric("count", RISK_SCORE))),
+                            searchUser
+                    )
+                    .datarows()
+                    .stream()
+                    .map(r -> mapAggregationResultsToSlice(RISK_SCORE, r))
+                    .toList();
+
+            final var filtered = includeAll
+                    ? addMissingOptions(slices, RISK_SCORE)
+                    : slices.stream().filter(s -> !MissingBucketConstants.MISSING_BUCKET_NAME.equals(s.value())).toList();
 
             return new Slices(filtered);
         } catch (QueryFailedException e) {
