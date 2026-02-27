@@ -226,9 +226,11 @@ public class MetricsCollector extends Periodical {
     private static void indexDocument(OfficialOpensearchClient client, IndexRequest<Object> indexRequest) {
         try {
             CompletableFuture<IndexResponse> response = client.asyncWithoutErrorMapping().index(indexRequest);
-            if (response.isCompletedExceptionally()) {
-                LOG.error("Error indexing metrics");
-            }
+            response.whenComplete((indexResponse, throwable) -> {
+                if (Objects.nonNull(throwable)) {
+                    LOG.error("Error indexing metrics");
+                }
+            });
         } catch (IOException e) {
             LOG.error("Error indexing metrics", e);
         }
