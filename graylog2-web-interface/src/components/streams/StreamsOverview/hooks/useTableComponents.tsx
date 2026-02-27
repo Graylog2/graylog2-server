@@ -40,14 +40,6 @@ const useTableElements = ({
 
   const renderExpandedRules = useCallback((stream: Stream) => <ExpandedRulesSection stream={stream} />, []);
   const renderExpandedRulesActions = useCallback((stream: Stream) => <ExpandedRulesActions stream={stream} />, []);
-  const renderExpandedDestinationFilters = useCallback(
-    (stream: Stream) => <ExpandedDestinationFilterRulesSection stream={stream} />,
-    [],
-  );
-  const renderExpandedDestinationFiltersActions = useCallback(
-    (stream: Stream) => <ExpandedDestinationFilterRulesActions stream={stream} />,
-    [],
-  );
   const expandedSections = useMemo(
     () => ({
       rules: {
@@ -57,18 +49,12 @@ const useTableElements = ({
       },
       destination_filters: {
         title: 'Filter Rules',
-        content: renderExpandedDestinationFilters,
-        actions: renderExpandedDestinationFiltersActions,
+        content: (stream: Stream) => <ExpandedDestinationFilterRulesSection stream={stream} />,
+        actions: (stream: Stream) => <ExpandedDestinationFilterRulesActions stream={stream} />,
       },
       ...pluggableExpandedSections,
     }),
-    [
-      pluggableExpandedSections,
-      renderExpandedRules,
-      renderExpandedRulesActions,
-      renderExpandedDestinationFilters,
-      renderExpandedDestinationFiltersActions,
-    ],
+    [pluggableExpandedSections, renderExpandedRules, renderExpandedRulesActions],
   );
 
   return {

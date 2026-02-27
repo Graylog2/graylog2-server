@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef, useCallback } from 'react';
+import { useRef } from 'react';
 
 import type { Stream } from 'stores/streams/StreamsStore';
 import { CountBadge } from 'components/common';
@@ -31,10 +31,6 @@ const DestinationFilterRulesCell = ({ stream }: Props) => {
   const { toggleSection, expandedSections } = useExpandedSections();
   const hasFilterRules = !stream.is_default && stream.is_editable;
   const { data: destinationFilterRuleCount } = useStreamDestinationFilterRuleCount(stream.id, hasFilterRules);
-  const toggleFilterRulesSection = useCallback(
-    () => toggleSection(stream.id, 'destination_filters'),
-    [stream.id, toggleSection],
-  );
 
   if (!hasFilterRules) {
     return null;
@@ -45,7 +41,7 @@ const DestinationFilterRulesCell = ({ stream }: Props) => {
   return (
     <CountBadge
       count={destinationFilterRuleCount}
-      onClick={toggleFilterRulesSection}
+      onClick={() => toggleSection(stream.id, 'destination_filters')}
       ref={buttonRef}
       title={`${destinationFilterRulesSectionIsOpen ? 'Hide' : 'Show'} filter rules`}
     />

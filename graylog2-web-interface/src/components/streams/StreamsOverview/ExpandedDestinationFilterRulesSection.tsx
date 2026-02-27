@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
 import * as Immutable from 'immutable';
 
@@ -70,15 +70,12 @@ const ExpandedDestinationFilterRulesSection = ({ stream }: Props) => {
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const { data: paginatedFilters, isLoading } = useStreamOutputFilters(stream.id, undefined, pagination);
 
-  const onPaginationChange = useCallback(
-    (newPage: number, newPerPage: number) =>
-      setPagination((currentPagination) => ({
-        ...currentPagination,
-        page: newPage,
-        perPage: newPerPage,
-      })),
-    [],
-  );
+  const onPaginationChange = (newPage: number, newPerPage: number) =>
+    setPagination((currentPagination) => ({
+      ...currentPagination,
+      page: newPage,
+      perPage: newPerPage,
+    }));
 
   if (isLoading && !paginatedFilters) {
     return <Spinner />;
