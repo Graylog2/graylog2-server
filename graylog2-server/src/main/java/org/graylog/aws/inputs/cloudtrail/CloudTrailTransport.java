@@ -148,7 +148,8 @@ public class CloudTrailTransport extends ThrottleableTransport2 {
                 input.getConfiguration().getString(CK_ACCESS_KEY),
                 encryptedValueService.decrypt(input.getConfiguration().getEncryptedValue(CK_SECRET_KEY)),
                 input.getConfiguration().getString(CK_AWS_SQS_REGION),
-                input.getConfiguration().getString(CK_ASSUME_ROLE_ARN)
+                input.getConfiguration().getString(CK_ASSUME_ROLE_ARN),
+                proxyUrl
         );
 
         subscriber = new CloudTrailSubscriber(
