@@ -199,7 +199,7 @@ public class MetricsCollector extends Periodical {
     private Map<String, Object> getPreviousMetricsForCluster(OfficialOpensearchClient client) {
         SearchRequest searchRequest = SearchRequest.of(r -> r
                 .index(configuration.getMetricsStream())
-                .query(Query.of(q -> q.bool(b -> b.must(Query.of(q2 -> q2.exists(e -> e.field("node")))))))
+                .query(Query.of(q -> q.bool(b -> b.mustNot(Query.of(q2 -> q2.exists(e -> e.field("node")))))))
                 .size(1)
                 .sort(sort -> sort.field(f -> f
                                 .field(configuration.getMetricsTimestamp())
