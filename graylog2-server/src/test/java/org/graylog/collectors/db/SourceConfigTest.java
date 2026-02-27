@@ -126,8 +126,7 @@ class SourceConfigTest {
         final var json = """
                 {
                     "type": "macos_unified_logging",
-                    "predicate": "subsystem == 'com.apple.example'",
-                    "format": "ndjson"
+                    "predicate": "subsystem == 'com.apple.example'"
                 }
                 """;
 
@@ -137,7 +136,6 @@ class SourceConfigTest {
         final var macConfig = (MacOSUnifiedLoggingSourceConfig) config;
         assertThat(macConfig.type()).isEqualTo("macos_unified_logging");
         assertThat(macConfig.predicate()).isEqualTo("subsystem == 'com.apple.example'");
-        assertThat(macConfig.format()).isEqualTo(MacOSUnifiedLoggingReceiverConfig.Format.NDJSON);
     }
 
     @Test
@@ -153,7 +151,6 @@ class SourceConfigTest {
         assertThat(config).isInstanceOf(MacOSUnifiedLoggingSourceConfig.class);
         final var macConfig = (MacOSUnifiedLoggingSourceConfig) config;
         assertThat(macConfig.predicate()).isNull();
-        assertThat(macConfig.format()).isNull();
     }
 
     @Test
@@ -168,20 +165,7 @@ class SourceConfigTest {
         final var receiver = (MacOSUnifiedLoggingReceiverConfig) receiverConfig.get();
         assertThat(receiver.name()).isEqualTo("macosunifiedlogging/test-id");
         assertThat(receiver.predicate()).isEqualTo("subsystem == 'com.apple.example'");
-        assertThat(receiver.format()).isEqualTo(MacOSUnifiedLoggingReceiverConfig.Format.NDJSON);
-    }
-
-    @Test
-    void macOSUnifiedLoggingToReceiverConfigWithFormatOverride() {
-        final var config = MacOSUnifiedLoggingSourceConfig.builder()
-                .format(MacOSUnifiedLoggingReceiverConfig.Format.DEFAULT)
-                .build();
-
-        final var receiverConfig = config.toReceiverConfig("test-id");
-
-        assertThat(receiverConfig).isPresent();
-        final var receiver = (MacOSUnifiedLoggingReceiverConfig) receiverConfig.get();
-        assertThat(receiver.format()).isEqualTo(MacOSUnifiedLoggingReceiverConfig.Format.DEFAULT);
+        assertThat(receiver.format()).isEqualTo("ndjson");
     }
 
     @Test

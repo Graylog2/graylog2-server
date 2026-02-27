@@ -41,10 +41,6 @@ public abstract class MacOSUnifiedLoggingSourceConfig implements SourceConfig {
     @JsonProperty("predicate")
     public abstract String predicate();
 
-    @Nullable
-    @JsonProperty("format")
-    public abstract MacOSUnifiedLoggingReceiverConfig.Format format();
-
     public static Builder builder() {
         return Builder.create();
     }
@@ -58,9 +54,6 @@ public abstract class MacOSUnifiedLoggingSourceConfig implements SourceConfig {
     public Optional<OtlpReceiverConfig> toReceiverConfig(String id) {
         final var builder = MacOSUnifiedLoggingReceiverConfig.builder(id)
                 .predicate(predicate());
-        if (format() != null) {
-            builder.format(format());
-        }
         return Optional.of(builder.build());
     }
 
@@ -77,9 +70,6 @@ public abstract class MacOSUnifiedLoggingSourceConfig implements SourceConfig {
 
         @JsonProperty("predicate")
         public abstract Builder predicate(@Nullable String predicate);
-
-        @JsonProperty("format")
-        public abstract Builder format(@Nullable MacOSUnifiedLoggingReceiverConfig.Format format);
 
         public abstract MacOSUnifiedLoggingSourceConfig build();
     }

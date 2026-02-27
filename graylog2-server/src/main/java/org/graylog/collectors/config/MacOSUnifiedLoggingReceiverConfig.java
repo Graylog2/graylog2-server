@@ -36,22 +36,6 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public abstract class MacOSUnifiedLoggingReceiverConfig implements OtlpReceiverConfig {
     public static final String RECEIVER_TYPE = "macosunifiedlogging";
 
-    // Only the JSON and NDJSON formats cause the receiver to populate the OTel log record's
-    // Timestamp and Severity fields (parsed from the JSON output of the macOS `log` CLI).
-    // Text formats (default, syslog, compact) only set ObservedTimestamp (collection time).
-    public enum Format {
-        @JsonProperty("default")
-        DEFAULT,
-        @JsonProperty("ndjson")
-        NDJSON,
-        @JsonProperty("json")
-        JSON,
-        @JsonProperty("syslog")
-        SYSLOG,
-        @JsonProperty("compact")
-        COMPACT
-    }
-
     public String type() {
         return RECEIVER_TYPE;
     }
@@ -82,16 +66,16 @@ public abstract class MacOSUnifiedLoggingReceiverConfig implements OtlpReceiverC
     @JsonSerialize(using = GoDurationSerializer.class)
     public abstract Duration maxLogAge();
 
-    @Nullable
     @JsonProperty("format")
-    public abstract Format format();
+    public String format() {
+        return "ndjson";
+    }
 
     public static Builder builder(String id) {
         return new AutoValue_MacOSUnifiedLoggingReceiverConfig.Builder()
                 .name(f("macosunifiedlogging/%s", id))
                 .maxPollInterval(Duration.ofSeconds(30))
-                .maxLogAge(Duration.ofHours(24))
-                .format(Format.NDJSON);
+                .maxLogAge(Duration.ofHours(24));
     }
 
     @AutoValue.Builder
@@ -110,8 +94,6 @@ public abstract class MacOSUnifiedLoggingReceiverConfig implements OtlpReceiverC
         public abstract Builder maxPollInterval(@Nullable Duration maxPollInterval);
 
         public abstract Builder maxLogAge(@Nullable Duration maxLogAge);
-
-        public abstract Builder format(@Nullable Format format);
 
         public abstract MacOSUnifiedLoggingReceiverConfig build();
     }
