@@ -143,7 +143,7 @@ public class InputFacadeTest {
         final ExtractorFactory extractorFactory = new ExtractorFactory(metricRegistry, grokPatternRegistry, lookupTableService);
         final ConverterFactory converterFactory = new ConverterFactory(lookupTableService);
         inputService = new InputServiceImpl(mongoCollections, extractorFactory, converterFactory, messageInputFactory, clusterEventBus, new ObjectMapperProvider().get());
-        final InputRegistry inputRegistry = new InputRegistry();
+        final InputRegistry inputRegistry = new InputRegistry(clusterBus);
         Set<PluginMetaData> pluginMetaData = new HashSet<>();
         Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories = new HashMap<>();
         final FakeHttpMessageInput.Factory fakeHttpMessageInputFactory = mock(FakeHttpMessageInput.Factory.class);
