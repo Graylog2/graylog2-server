@@ -24,6 +24,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.handler.ssl.SslContext;
 import jakarta.inject.Named;
 import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.input.CollectorJournalRecordFactory;
 import org.graylog.inputs.otel.OTelJournalRecordFactory;
 import org.graylog.inputs.otel.transport.OTelHttpTransport;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
@@ -60,7 +61,7 @@ public class CollectorIngestHttpTransport extends OTelHttpTransport {
     static final int DEFAULT_HTTP_PORT = 14401;
 
     private final OpAmpCaService opAmpCaService;
-    private final OTelJournalRecordFactory journalRecordFactory;
+    private final CollectorJournalRecordFactory collectorRecordFactory;
 
     @AssistedInject
     public CollectorIngestHttpTransport(@Assisted Configuration configuration,
@@ -71,14 +72,14 @@ public class CollectorIngestHttpTransport extends OTelHttpTransport {
                                         LocalMetricRegistry localMetricRegistry,
                                         TLSProtocolsConfiguration tlsConfiguration,
                                         @Named("trusted_proxies") Set<IpSubnet> trustedProxies,
-                                        OTelJournalRecordFactory journalRecordFactory,
+                                        CollectorJournalRecordFactory collectorRecordFactory,
                                         OpAmpCaService opAmpCaService,
                                         ClusterConfigService clusterConfigService) {
         super(buildTransportConfig(clusterConfigService), eventLoopGroup, eventLoopGroupFactory,
                 nettyTransportConfiguration, throughputCounter, localMetricRegistry,
-                tlsConfiguration, trustedProxies, journalRecordFactory);
+                tlsConfiguration, trustedProxies, new OTelJournalRecordFactory());
         this.opAmpCaService = opAmpCaService;
-        this.journalRecordFactory = journalRecordFactory;
+        this.collectorRecordFactory = collectorRecordFactory;
     }
 
     private static Configuration buildTransportConfig(ClusterConfigService clusterConfigService) {
@@ -117,7 +118,7 @@ public class CollectorIngestHttpTransport extends OTelHttpTransport {
         handlers.putAll(super.getCustomChildChannelHandlers(input));
 
         // Replace the http-handler with the collector ingest variant that enforces agent identity
-        handlers.replace("http-handler", () -> new CollectorIngestHttpHandler(journalRecordFactory, input));
+        handlers.replace("http-handler", () -> new CollectorIngestHttpHandler(collectorRecordFactory, input));
 
         return handlers;
     }

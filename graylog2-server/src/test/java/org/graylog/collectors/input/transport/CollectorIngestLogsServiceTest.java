@@ -24,8 +24,8 @@ import io.grpc.stub.StreamObserver;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse;
 import org.graylog.collectors.CollectorJournal;
+import org.graylog.collectors.input.CollectorJournalRecordFactory;
 import org.graylog.inputs.otel.OTelGrpcInput;
-import org.graylog.inputs.otel.OTelJournalRecordFactory;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.journal.RawMessage;
@@ -57,7 +57,7 @@ class CollectorIngestLogsServiceTest {
 
     @BeforeEach
     void setUp() {
-        logsService = new CollectorIngestLogsService(transport, input, new OTelJournalRecordFactory());
+        logsService = new CollectorIngestLogsService(transport, input, new CollectorJournalRecordFactory());
     }
 
     @Test
@@ -72,25 +72,7 @@ class CollectorIngestLogsServiceTest {
         verify(input).processRawMessage(captor.capture());
 
         final CollectorJournal.Record record = parseCollectorJournalRecord(captor.getValue().getPayload());
-        assertThat(record.hasCollectorInstanceUid()).isTrue();
         assertThat(record.getCollectorInstanceUid()).isEqualTo(expectedUid);
-
-        verify(responseObserver).onNext(eq(ExportLogsServiceResponse.newBuilder().build()));
-        verify(responseObserver).onCompleted();
-    }
-
-    @Test
-    void exportDoesNotSetCollectorInstanceUidWhenAbsentFromContext() throws IOException {
-        final var request = buildLogsRequest();
-
-        // Run without setting AGENT_INSTANCE_UID in context
-        logsService.export(request, responseObserver);
-
-        final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
-        verify(input).processRawMessage(captor.capture());
-
-        final CollectorJournal.Record record = parseCollectorJournalRecord(captor.getValue().getPayload());
-        assertThat(record.hasCollectorInstanceUid()).isFalse();
 
         verify(responseObserver).onNext(eq(ExportLogsServiceResponse.newBuilder().build()));
         verify(responseObserver).onCompleted();

@@ -17,10 +17,8 @@
 package org.graylog.collectors.input;
 
 import io.opentelemetry.proto.common.v1.AnyValue;
-import io.opentelemetry.proto.common.v1.KeyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import org.graylog.collectors.CollectorJournal;
-import org.graylog.collectors.config.OtelAttributes;
 import org.graylog.collectors.input.debug.OtlpTrafficDump;
 import org.graylog.inputs.otel.OTelJournal;
 import org.graylog.inputs.otel.codec.OTelTypeConverter;
@@ -51,6 +49,9 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 class CollectorIngestCodecTest {
 
+    private static final String TEST_RECEIVER_TYPE = "filelog";
+    private static final String TEST_INSTANCE_UID = "test-agent";
+
     private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Mock
@@ -62,7 +63,8 @@ class CollectorIngestCodecTest {
     @BeforeEach
     void setUp() {
         typeConverter = new OTelTypeConverter(new ObjectMapperProvider().get());
-        codec = new CollectorIngestCodec(Configuration.EMPTY_CONFIGURATION, messageFactory, dumpWriter, typeConverter, Map.of());
+        codec = new CollectorIngestCodec(Configuration.EMPTY_CONFIGURATION, messageFactory,
+                dumpWriter, typeConverter, Map.of(TEST_RECEIVER_TYPE, logRecord -> Map.of()));
     }
 
     @Test
@@ -82,6 +84,8 @@ class CollectorIngestCodecTest {
 
         final var collectorRecord = CollectorJournal.Record.newBuilder()
                 .setOtelRecord(otelRecord)
+                .setCollectorReceiverType(TEST_RECEIVER_TYPE)
+                .setCollectorInstanceUid(TEST_INSTANCE_UID)
                 .build();
 
         final var rawMessage = new RawMessage(collectorRecord.toByteArray());
@@ -109,6 +113,8 @@ class CollectorIngestCodecTest {
 
         final var collectorRecord = CollectorJournal.Record.newBuilder()
                 .setOtelRecord(otelRecord)
+                .setCollectorReceiverType(TEST_RECEIVER_TYPE)
+                .setCollectorInstanceUid(TEST_INSTANCE_UID)
                 .build();
 
         final var rawMessage = new RawMessage(collectorRecord.toByteArray());
@@ -136,6 +142,8 @@ class CollectorIngestCodecTest {
 
         final var collectorRecord = CollectorJournal.Record.newBuilder()
                 .setOtelRecord(otelRecord)
+                .setCollectorReceiverType(TEST_RECEIVER_TYPE)
+                .setCollectorInstanceUid(TEST_INSTANCE_UID)
                 .build();
 
         final var rawMessage = new RawMessage(collectorRecord.toByteArray());
@@ -164,6 +172,8 @@ class CollectorIngestCodecTest {
 
         final var collectorRecord = CollectorJournal.Record.newBuilder()
                 .setOtelRecord(otelRecord)
+                .setCollectorReceiverType(TEST_RECEIVER_TYPE)
+                .setCollectorInstanceUid(TEST_INSTANCE_UID)
                 .build();
 
         final var rawMessage = new RawMessage(collectorRecord.toByteArray());
@@ -191,6 +201,8 @@ class CollectorIngestCodecTest {
 
         final var collectorRecord = CollectorJournal.Record.newBuilder()
                 .setOtelRecord(otelRecord)
+                .setCollectorReceiverType(TEST_RECEIVER_TYPE)
+                .setCollectorInstanceUid(TEST_INSTANCE_UID)
                 .build();
 
         final var rawMessage = new RawMessage(collectorRecord.toByteArray());
@@ -220,7 +232,8 @@ class CollectorIngestCodecTest {
 
         final var collectorRecord = CollectorJournal.Record.newBuilder()
                 .setOtelRecord(otelRecord)
-                .setCollectorInstanceUid("agent-123")
+                .setCollectorReceiverType(TEST_RECEIVER_TYPE)
+                .setCollectorInstanceUid(TEST_INSTANCE_UID)
                 .build();
 
         final var rawMessage = new RawMessage(collectorRecord.toByteArray());
@@ -248,6 +261,8 @@ class CollectorIngestCodecTest {
 
         final var collectorRecord = CollectorJournal.Record.newBuilder()
                 .setOtelRecord(otelRecord)
+                .setCollectorReceiverType(TEST_RECEIVER_TYPE)
+                .setCollectorInstanceUid(TEST_INSTANCE_UID)
                 .build();
 
         final var rawMessage = new RawMessage(collectorRecord.toByteArray());
@@ -264,6 +279,8 @@ class CollectorIngestCodecTest {
 
         final var collectorRecord = CollectorJournal.Record.newBuilder()
                 .setOtelRecord(otelRecord)
+                .setCollectorReceiverType(TEST_RECEIVER_TYPE)
+                .setCollectorInstanceUid(TEST_INSTANCE_UID)
                 .build();
 
         final var rawMessage = new RawMessage(collectorRecord.toByteArray());
@@ -290,6 +307,8 @@ class CollectorIngestCodecTest {
 
         final var collectorRecord = CollectorJournal.Record.newBuilder()
                 .setOtelRecord(otelRecord)
+                .setCollectorReceiverType(TEST_RECEIVER_TYPE)
+                .setCollectorInstanceUid(TEST_INSTANCE_UID)
                 .build();
 
         final var rawMessage = new RawMessage(collectorRecord.toByteArray(),
@@ -335,6 +354,8 @@ class CollectorIngestCodecTest {
 
         final var collectorRecord = CollectorJournal.Record.newBuilder()
                 .setOtelRecord(otelRecord)
+                .setCollectorReceiverType(TEST_RECEIVER_TYPE)
+                .setCollectorInstanceUid(TEST_INSTANCE_UID)
                 .build();
 
         final var rawMessage = new RawMessage(collectorRecord.toByteArray());
@@ -353,9 +374,6 @@ class CollectorIngestCodecTest {
         final var logRecord = LogRecord.newBuilder()
                 .setBody(AnyValue.newBuilder().setStringValue("test"))
                 .setTimeUnixNano(1700000000000000000L)
-                .addAttributes(KeyValue.newBuilder()
-                        .setKey(OtelAttributes.COLLECTOR_RECEIVER_TYPE)
-                        .setValue(AnyValue.newBuilder().setStringValue("filelog")))
                 .build();
 
         final var log = OTelJournal.Log.newBuilder()
@@ -366,6 +384,8 @@ class CollectorIngestCodecTest {
                 .build();
         final var collectorRecord = CollectorJournal.Record.newBuilder()
                 .setOtelRecord(otelRecord)
+                .setCollectorReceiverType("filelog")
+                .setCollectorInstanceUid(TEST_INSTANCE_UID)
                 .build();
 
         final var rawMessage = new RawMessage(collectorRecord.toByteArray());
@@ -393,6 +413,7 @@ class CollectorIngestCodecTest {
         return CollectorJournal.Record.newBuilder()
                 .setOtelRecord(otelRecord)
                 .setCollectorInstanceUid(agentUid)
+                .setCollectorReceiverType(TEST_RECEIVER_TYPE)
                 .build();
     }
 }

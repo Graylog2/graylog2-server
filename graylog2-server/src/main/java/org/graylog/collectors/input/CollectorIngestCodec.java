@@ -50,7 +50,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * A codec for Collector Ingest inputs that produces minimal field mapping (no {@code otel_*} prefixed fields).
@@ -114,19 +113,19 @@ public class CollectorIngestCodec implements Codec {
 
         final OTelJournal.Record otelRecord = collectorRecord.getOtelRecord();
         return switch (otelRecord.getPayloadCase()) {
-            case LOG -> decodeLog(otelRecord, collectorRecord.getCollectorInstanceUid(), rawMessage);
+            case LOG -> decodeLog(collectorRecord, rawMessage);
             case PAYLOAD_NOT_SET -> throw InputProcessingException.create(
                     "Error handling Collector Ingest message. No payload set.", rawMessage);
         };
     }
 
-    private Optional<Message> decodeLog(OTelJournal.Record record, String instanceUid, RawMessage rawMessage) {
-        final var log = record.getLog();
-        final var logRecord = log.getLogRecord();
-        final var receiverType = log.getCollectorReceiverType();
+    private Optional<Message> decodeLog(CollectorJournal.Record collectorRecord, RawMessage rawMessage) {
+        final var logRecord = collectorRecord.getOtelRecord().getLog().getLogRecord();
+        final var receiverType = collectorRecord.getCollectorReceiverType();
+        final var instanceUid = collectorRecord.getCollectorInstanceUid();
 
         if (isBlank(receiverType)) {
-            LOG.warn("No collector receiver type found for log record {}", log.getLogRecord());
+            LOG.warn("No collector receiver type found for log record {}", logRecord);
             return Optional.empty();
         }
 
@@ -144,7 +143,7 @@ public class CollectorIngestCodec implements Codec {
 
         message.addField("gl2_collector_receiver_type", receiverType);
 
-        if (isNotBlank(instanceUid)) {
+        if (!instanceUid.isEmpty()) {
             message.addField(Message.FIELD_GL2_SOURCE_COLLECTOR, instanceUid);
         }
 

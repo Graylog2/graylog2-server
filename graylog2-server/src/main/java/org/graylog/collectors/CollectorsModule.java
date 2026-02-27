@@ -28,6 +28,7 @@ import org.graylog.collectors.db.WindowsEventLogSourceConfig;
 import org.graylog.collectors.input.CollectorIngestCodec;
 import org.graylog.collectors.input.CollectorIngestGrpcInput;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
+
 import org.graylog.collectors.input.debug.NoOpOtlpTrafficDump;
 import org.graylog.collectors.input.debug.OtlpTrafficDump;
 import org.graylog.collectors.input.debug.OtlpTrafficDumpService;

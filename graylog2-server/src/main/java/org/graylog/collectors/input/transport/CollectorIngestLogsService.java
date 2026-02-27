@@ -25,11 +25,11 @@ import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse;
 import io.opentelemetry.proto.collector.logs.v1.LogsServiceGrpc;
 import jakarta.inject.Inject;
-import org.graylog.collectors.CollectorJournal;
-import org.graylog.inputs.otel.OTelJournalRecordFactory;
+import org.graylog.collectors.input.CollectorJournalRecordFactory;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.journal.RawMessage;
+
 import java.net.InetSocketAddress;
 import java.util.function.Function;
 
@@ -42,14 +42,14 @@ import static org.graylog.inputs.grpc.RemoteAddressProviderInterceptor.REMOTE_AD
  * in each journal record before writing to the Graylog journal.
  */
 public class CollectorIngestLogsService extends LogsServiceGrpc.LogsServiceImplBase {
-    private final OTelJournalRecordFactory journalRecordFactory;
+    private final CollectorJournalRecordFactory journalRecordFactory;
     private final ThrottleableTransport2 transport;
     private final MessageInput input;
 
     @Inject
     public CollectorIngestLogsService(@Assisted ThrottleableTransport2 transport,
                                 @Assisted MessageInput input,
-                                OTelJournalRecordFactory journalRecordFactory) {
+                                CollectorJournalRecordFactory journalRecordFactory) {
         this.transport = transport;
         this.input = input;
         this.journalRecordFactory = journalRecordFactory;
@@ -73,7 +73,6 @@ public class CollectorIngestLogsService extends LogsServiceGrpc.LogsServiceImplB
             return;
         }
 
-        // Get agent instance UID from context (set by AgentCertAuthInterceptor)
         final String instanceUid = AgentCertAuthInterceptor.AGENT_INSTANCE_UID.get();
 
         final Function<byte[], RawMessage> createRawMessage;
@@ -83,15 +82,7 @@ public class CollectorIngestLogsService extends LogsServiceGrpc.LogsServiceImplB
             createRawMessage = RawMessage::new;
         }
 
-        journalRecordFactory.createFromRequest(request).stream()
-                .map(otelRecord -> {
-                    final var builder = CollectorJournal.Record.newBuilder()
-                            .setOtelRecord(otelRecord);
-                    if (instanceUid != null) {
-                        builder.setCollectorInstanceUid(instanceUid);
-                    }
-                    return builder.build();
-                })
+        journalRecordFactory.createFromRequest(request, instanceUid).stream()
                 .map(AbstractMessageLite::toByteArray)
                 .map(createRawMessage)
                 .forEach(input::processRawMessage);

@@ -32,7 +32,7 @@ import io.opentelemetry.proto.logs.v1.LogRecord;
 import io.opentelemetry.proto.logs.v1.ResourceLogs;
 import io.opentelemetry.proto.logs.v1.ScopeLogs;
 import org.graylog.collectors.CollectorJournal;
-import org.graylog.inputs.otel.OTelJournalRecordFactory;
+import org.graylog.collectors.input.CollectorJournalRecordFactory;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,11 +54,11 @@ class CollectorIngestHttpHandlerTest {
     @Mock
     private MessageInput input;
 
-    private OTelJournalRecordFactory journalRecordFactory;
+    private CollectorJournalRecordFactory collectorRecordFactory;
 
     @BeforeEach
     void setUp() {
-        journalRecordFactory = new OTelJournalRecordFactory();
+        collectorRecordFactory = new CollectorJournalRecordFactory();
     }
 
     @Test
@@ -99,7 +99,6 @@ class CollectorIngestHttpHandlerTest {
 
         final RawMessage rawMessage = captor.getValue();
         final CollectorJournal.Record record = CollectorJournal.Record.parseFrom(rawMessage.getPayload());
-        assertThat(record.hasCollectorInstanceUid()).isTrue();
         assertThat(record.getCollectorInstanceUid()).isEqualTo(agentUid);
 
         final FullHttpResponse response = channel.readOutbound();
@@ -169,7 +168,7 @@ class CollectorIngestHttpHandlerTest {
 
     private EmbeddedChannel createChannel(String agentInstanceUid) {
         final EmbeddedChannel channel = new EmbeddedChannel(
-                new CollectorIngestHttpHandler(journalRecordFactory, input));
+                new CollectorIngestHttpHandler(collectorRecordFactory, input));
         if (agentInstanceUid != null) {
             channel.attr(AgentCertChannelHandler.AGENT_INSTANCE_UID).set(agentInstanceUid);
         }
