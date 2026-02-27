@@ -20,6 +20,7 @@ import userEvent from '@testing-library/user-event';
 
 import type { SearchParams } from 'stores/PaginationTypes';
 import TableFetchContext, { type ContextValue } from 'components/common/PaginatedEntityTable/TableFetchContext';
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import Slicing from './index';
 
@@ -55,15 +56,17 @@ describe('Slicing', () => {
     };
 
     return render(
-      <TableFetchContext.Provider value={contextValue}>
-        <Slicing
-          appSection="test-app-section"
-          columnSchemas={columnSchemas}
-          onChangeSlicing={() => {}}
-          fetchSlices={() => Promise.resolve({ slices: [] })}
-          {...props}
-        />
-      </TableFetchContext.Provider>,
+      <DefaultQueryParamProvider>
+        <TableFetchContext.Provider value={contextValue}>
+          <Slicing
+            appSection="test-app-section"
+            columnSchemas={columnSchemas}
+            onChangeSlicing={() => {}}
+            fetchSlices={() => Promise.resolve({ slices: [] })}
+            {...props}
+          />
+        </TableFetchContext.Provider>
+      </DefaultQueryParamProvider>,
     );
   };
 
@@ -98,8 +101,8 @@ describe('Slicing', () => {
     const button = await screen.findByRole('button', { name: /status/i });
     await userEvent.click(button);
 
-    const menuItem = await screen.findByRole('menuitem', { name: /no slicing/i });
-    await userEvent.click(menuItem);
+    const noSlicingButton = await screen.findByRole('button', { name: /no slicing/i });
+    await userEvent.click(noSlicingButton);
 
     expect(onChangeSlicing).toHaveBeenCalledWith(undefined, undefined);
   });

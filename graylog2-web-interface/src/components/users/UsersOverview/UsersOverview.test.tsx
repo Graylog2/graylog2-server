@@ -25,6 +25,7 @@ import asMock from 'helpers/mocking/AsMock';
 import mockAction from 'helpers/mocking/MockAction';
 import { UsersActions } from 'stores/users/UsersStore';
 import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import UsersOverview from './UsersOverview';
 
@@ -54,12 +55,18 @@ const clickMoreActions = async (username: string) => {
 const extendedTimeout = applyTimeoutMultiplier(30000);
 
 describe('UsersOverview', () => {
+  const renderSUT = () => render(
+    <DefaultQueryParamProvider>
+      <UsersOverview />
+    </DefaultQueryParamProvider>,
+  );
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('should display table header', async () => {
-    render(<UsersOverview />);
+    renderSUT();
     const headers = ['Username', 'Full name', 'E-Mail Address', 'Client Address', 'Role', 'Actions'];
 
     // wait until list is displayed
@@ -73,7 +80,7 @@ describe('UsersOverview', () => {
   it(
     'should search users',
     async () => {
-      render(<UsersOverview />);
+      renderSUT();
       const searchInput = await screen.findByPlaceholderText('Enter search query...');
 
       await userEvent.type(searchInput, 'username:bob');
@@ -92,7 +99,7 @@ describe('UsersOverview', () => {
       ${bob}           | ${bob.username}
       ${adminOverview} | ${adminOverview.username}
     `('$username', async ({ user }) => {
-      render(<UsersOverview />);
+      renderSUT();
       const attributes = ['username', 'fullName', 'email', 'clientAddress'];
       // wait until list is displayed
       await screen.findByText('Users');
@@ -119,7 +126,7 @@ describe('UsersOverview', () => {
       async () => {
         const loadUsersPaginatedPromise = Promise.resolve({ ...paginatedUsers, list: modifiableUsersList });
         asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(loadUsersPaginatedPromise);
-        render(<UsersOverview />);
+        renderSUT();
 
         await clickMoreActions(modifiableUser.fullName);
         const deleteButton = await screen.findByTitle(`Delete user ${modifiableUser.fullName}`);
@@ -147,7 +154,7 @@ describe('UsersOverview', () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(
         Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }),
       );
-      render(<UsersOverview />);
+      renderSUT();
 
       await waitFor(() => expect(screen.queryByTitle(`Delete user ${readOnlyUser.fullName}`)).not.toBeInTheDocument());
     });
@@ -155,10 +162,10 @@ describe('UsersOverview', () => {
     it(
       'see edit and edit tokens link for a modifiable user',
       async () => {
-        asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(
-          Promise.resolve({ ...paginatedUsers, list: modifiableUsersList }),
-        );
-        render(<UsersOverview />);
+      asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(
+        Promise.resolve({ ...paginatedUsers, list: modifiableUsersList }),
+      );
+        renderSUT();
 
         await screen.findByTitle(`Edit user ${modifiableUser.fullName}`);
 
@@ -175,7 +182,7 @@ describe('UsersOverview', () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(
         Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }),
       );
-      render(<UsersOverview />);
+      renderSUT();
 
       await waitFor(() => expect(screen.queryByTitle(`Edit user ${readOnlyUser.fullName}`)).not.toBeInTheDocument());
     });
@@ -184,7 +191,7 @@ describe('UsersOverview', () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(
         Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }),
       );
-      render(<UsersOverview />);
+      renderSUT();
 
       await screen.findByTitle(`Edit tokens of user ${readOnlyUser.fullName}`);
     });

@@ -133,7 +133,7 @@ const fetchEvents = (
   searchParams: SearchParams,
   streamId: string,
 ): Promise<PaginatedResponse<Event, EventsAdditionalData>> => {
-  const { filter, timerange } = parseFilters(searchParams.filters);
+  const { filter, timerange } = parseFilters(searchParams.filters, defaultTimeRange);
 
   return fetch('POST', url, {
     query: getConcatenatedQuery(searchParams.query, streamId),
