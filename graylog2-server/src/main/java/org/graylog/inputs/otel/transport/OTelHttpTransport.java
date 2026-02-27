@@ -21,7 +21,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.EventLoopGroup;
 import jakarta.inject.Named;
-import org.graylog.inputs.otel.OTelJournalRecordFactory;
+
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.transports.AbstractHttpTransport;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
@@ -49,8 +49,6 @@ public class OTelHttpTransport extends AbstractHttpTransport {
     // The inherited 64 KB default is too small for typical OTLP log batches.
     static final int DEFAULT_OTLP_MAX_CHUNK_SIZE = 4 * 1024 * 1024;
 
-    private final OTelJournalRecordFactory journalRecordFactory;
-
     @AssistedInject
     public OTelHttpTransport(@Assisted Configuration configuration,
                              EventLoopGroup eventLoopGroup,
@@ -59,18 +57,16 @@ public class OTelHttpTransport extends AbstractHttpTransport {
                              ThroughputCounter throughputCounter,
                              LocalMetricRegistry localMetricRegistry,
                              TLSProtocolsConfiguration tlsConfiguration,
-                             @Named("trusted_proxies") Set<IpSubnet> trustedProxies,
-                             OTelJournalRecordFactory journalRecordFactory) {
+                             @Named("trusted_proxies") Set<IpSubnet> trustedProxies) {
         super(configuration, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration,
                 throughputCounter, localMetricRegistry, tlsConfiguration, trustedProxies, OTelHttpHandler.LOGS_PATH);
-        this.journalRecordFactory = journalRecordFactory;
     }
 
     @Override
     protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getCustomChildChannelHandlers(MessageInput input) {
         final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers =
                 new LinkedHashMap<>(super.getCustomChildChannelHandlers(input));
-        handlers.replace("http-handler", () -> new OTelHttpHandler(journalRecordFactory, input));
+        handlers.replace("http-handler", () -> new OTelHttpHandler(input));
         handlers.remove("http-bulk-newline-decoder");
         return handlers;
     }

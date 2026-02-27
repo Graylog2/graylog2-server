@@ -227,7 +227,7 @@ class OTelLogsCodecTest {
                 Resources.toString(Resources.getResource(
                         OTelGrpcInput.class, filename), StandardCharsets.UTF_8),
                 requestBuilder);
-        return new OTelJournalRecordFactory().createFromRequest(requestBuilder.build()).stream()
+        return OTelJournalRecordFactory.createFromRequest(requestBuilder.build()).stream()
                 .map(OTelJournal.Record::getLog).findFirst().orElseThrow();
     }
 }

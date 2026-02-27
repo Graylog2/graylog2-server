@@ -32,7 +32,7 @@ import io.opentelemetry.proto.logs.v1.LogRecord;
 import io.opentelemetry.proto.logs.v1.ResourceLogs;
 import io.opentelemetry.proto.logs.v1.ScopeLogs;
 import org.graylog.collectors.CollectorJournal;
-import org.graylog.collectors.input.CollectorJournalRecordFactory;
+
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,12 +54,6 @@ class CollectorIngestHttpHandlerTest {
     @Mock
     private MessageInput input;
 
-    private CollectorJournalRecordFactory collectorRecordFactory;
-
-    @BeforeEach
-    void setUp() {
-        collectorRecordFactory = new CollectorJournalRecordFactory();
-    }
 
     @Test
     void rejectsRequestWithoutAgentIdentity() {
@@ -168,7 +162,7 @@ class CollectorIngestHttpHandlerTest {
 
     private EmbeddedChannel createChannel(String agentInstanceUid) {
         final EmbeddedChannel channel = new EmbeddedChannel(
-                new CollectorIngestHttpHandler(collectorRecordFactory, input));
+                new CollectorIngestHttpHandler(input));
         if (agentInstanceUid != null) {
             channel.attr(AgentCertChannelHandler.AGENT_INSTANCE_UID).set(agentInstanceUid);
         }

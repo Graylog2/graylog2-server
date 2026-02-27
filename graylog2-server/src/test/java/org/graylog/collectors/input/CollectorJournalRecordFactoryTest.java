@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CollectorJournalRecordFactoryTest {
-    private final CollectorJournalRecordFactory factory = new CollectorJournalRecordFactory();
 
     @Test
     void setsInstanceUidAndReceiverType() {
@@ -44,7 +43,7 @@ class CollectorJournalRecordFactoryTest {
                                         .setBody(AnyValue.newBuilder().setStringValue("hello")))))
                 .build();
 
-        final var records = factory.createFromRequest(request, "agent-42");
+        final var records = CollectorJournalRecordFactory.createFromRequest(request, "agent-42");
 
         assertThat(records).hasSize(1);
         final var record = records.get(0);
@@ -62,7 +61,7 @@ class CollectorJournalRecordFactoryTest {
                                         .setBody(AnyValue.newBuilder().setStringValue("no receiver type")))))
                 .build();
 
-        final var records = factory.createFromRequest(request, "agent-1");
+        final var records = CollectorJournalRecordFactory.createFromRequest(request, "agent-1");
 
         assertThat(records).hasSize(1);
         assertThat(records.get(0).getCollectorReceiverType()).isEmpty();
@@ -89,7 +88,7 @@ class CollectorJournalRecordFactoryTest {
                                         .setBody(AnyValue.newBuilder().setStringValue("macos log")))))
                 .build();
 
-        final var records = factory.createFromRequest(request, "agent-1");
+        final var records = CollectorJournalRecordFactory.createFromRequest(request, "agent-1");
 
         assertThat(records).hasSize(2);
         assertThat(records.get(0).getCollectorReceiverType()).isEqualTo("filelog");

@@ -23,7 +23,6 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import org.graylog.collectors.input.CollectorJournalRecordFactory;
-import org.graylog.inputs.otel.OTelJournalRecordFactory;
 import org.graylog.inputs.otel.transport.OTelHttpHandler;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
@@ -45,11 +44,8 @@ import java.util.stream.Stream;
 public class CollectorIngestHttpHandler extends OTelHttpHandler {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorIngestHttpHandler.class);
 
-    private final CollectorJournalRecordFactory collectorRecordFactory;
-
-    public CollectorIngestHttpHandler(CollectorJournalRecordFactory collectorRecordFactory, MessageInput input) {
-        super(new OTelJournalRecordFactory(), input);
-        this.collectorRecordFactory = collectorRecordFactory;
+    public CollectorIngestHttpHandler(MessageInput input) {
+        super(input);
     }
 
     @Override
@@ -75,7 +71,7 @@ public class CollectorIngestHttpHandler extends OTelHttpHandler {
             createRawMessage = RawMessage::new;
         }
 
-        return collectorRecordFactory.createFromRequest(exportRequest, instanceUid).stream()
+        return CollectorJournalRecordFactory.createFromRequest(exportRequest, instanceUid).stream()
                 .map(AbstractMessageLite::toByteArray)
                 .map(createRawMessage);
     }

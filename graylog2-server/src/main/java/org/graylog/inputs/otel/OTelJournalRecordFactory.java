@@ -23,7 +23,9 @@ import java.util.List;
 
 public class OTelJournalRecordFactory {
 
-    public List<OTelJournal.Record> createFromRequest(ExportLogsServiceRequest request) {
+    private OTelJournalRecordFactory() {}
+
+    public static List<OTelJournal.Record> createFromRequest(ExportLogsServiceRequest request) {
         final List<OTelJournal.Record> records = new ArrayList<>();
         for (final var resourceLogs : request.getResourceLogsList()) {
             for (final var scopeLogs : resourceLogs.getScopeLogsList()) {

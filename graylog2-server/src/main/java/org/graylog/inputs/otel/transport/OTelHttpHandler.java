@@ -51,11 +51,9 @@ public class OTelHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest
     public static final String PROTOBUF_CONTENT_TYPE = "application/x-protobuf";
     public static final String JSON_CONTENT_TYPE = "application/json";
 
-    protected final OTelJournalRecordFactory journalRecordFactory;
     private final MessageInput input;
 
-    public OTelHttpHandler(OTelJournalRecordFactory journalRecordFactory, MessageInput input) {
-        this.journalRecordFactory = journalRecordFactory;
+    public OTelHttpHandler(MessageInput input) {
         this.input = input;
     }
 
@@ -128,7 +126,7 @@ public class OTelHttpHandler extends SimpleChannelInboundHandler<FullHttpRequest
             createRawMessage = RawMessage::new;
         }
 
-        return journalRecordFactory.createFromRequest(exportRequest).stream()
+        return OTelJournalRecordFactory.createFromRequest(exportRequest).stream()
                 .map(AbstractMessageLite::toByteArray)
                 .map(createRawMessage);
     }

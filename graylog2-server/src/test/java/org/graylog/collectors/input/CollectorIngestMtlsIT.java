@@ -66,7 +66,6 @@ import org.graylog.collectors.input.transport.AgentCertTransportFilter;
 import org.graylog.collectors.input.transport.CollectorIngestHttpHandler;
 import org.graylog.collectors.input.transport.CollectorIngestLogsService;
 import org.graylog.inputs.grpc.RemoteAddressProviderInterceptor;
-import org.graylog.inputs.otel.OTelJournalRecordFactory;
 import org.graylog.security.pki.Algorithm;
 import org.graylog.security.pki.CertificateBuilder;
 import org.graylog.security.pki.CertificateEntry;
@@ -280,7 +279,7 @@ class CollectorIngestMtlsIT {
             verify(input).processRawMessage(captor.capture());
 
             final CollectorJournal.Record record = CollectorJournal.Record.parseFrom(captor.getValue().getPayload());
-            assertThat(record.hasCollectorInstanceUid()).isTrue();
+
             assertThat(record.getCollectorInstanceUid()).isEqualTo(AGENT_INSTANCE_UID);
         } finally {
             channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
@@ -380,7 +379,6 @@ class CollectorIngestMtlsIT {
         verify(input).processRawMessage(captor.capture());
 
         final CollectorJournal.Record record = CollectorJournal.Record.parseFrom(captor.getValue().getPayload());
-        assertThat(record.hasCollectorInstanceUid()).isTrue();
         assertThat(record.getCollectorInstanceUid()).isEqualTo(AGENT_INSTANCE_UID);
     }
 
@@ -426,7 +424,7 @@ class CollectorIngestMtlsIT {
         ).build();
 
         final CollectorIngestLogsService logsService = new CollectorIngestLogsService(
-                transport, input, new OTelJournalRecordFactory());
+                transport, input);
 
         grpcServer = NettyServerBuilder
                 .forAddress(new InetSocketAddress("127.0.0.1", 0))
@@ -465,8 +463,6 @@ class CollectorIngestMtlsIT {
                 .trustManager(InsecureTrustManagerFactory.INSTANCE)
                 .build();
 
-        final OTelJournalRecordFactory journalRecordFactory = new OTelJournalRecordFactory();
-
         final ServerBootstrap bootstrap = new ServerBootstrap()
                 .group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
@@ -478,7 +474,7 @@ class CollectorIngestMtlsIT {
                         pipeline.addLast("agent-cert-handler", new AgentCertChannelHandler());
                         pipeline.addLast("http-codec", new HttpServerCodec());
                         pipeline.addLast("http-aggregator", new HttpObjectAggregator(1024 * 1024));
-                        pipeline.addLast("http-handler", new CollectorIngestHttpHandler(journalRecordFactory, input));
+                        pipeline.addLast("http-handler", new CollectorIngestHttpHandler(input));
                     }
                 });
 

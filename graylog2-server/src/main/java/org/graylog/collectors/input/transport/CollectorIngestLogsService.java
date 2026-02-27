@@ -42,17 +42,14 @@ import static org.graylog.inputs.grpc.RemoteAddressProviderInterceptor.REMOTE_AD
  * in each journal record before writing to the Graylog journal.
  */
 public class CollectorIngestLogsService extends LogsServiceGrpc.LogsServiceImplBase {
-    private final CollectorJournalRecordFactory journalRecordFactory;
     private final ThrottleableTransport2 transport;
     private final MessageInput input;
 
     @Inject
     public CollectorIngestLogsService(@Assisted ThrottleableTransport2 transport,
-                                @Assisted MessageInput input,
-                                CollectorJournalRecordFactory journalRecordFactory) {
+                                @Assisted MessageInput input) {
         this.transport = transport;
         this.input = input;
-        this.journalRecordFactory = journalRecordFactory;
     }
 
     public interface Factory {
@@ -82,7 +79,7 @@ public class CollectorIngestLogsService extends LogsServiceGrpc.LogsServiceImplB
             createRawMessage = RawMessage::new;
         }
 
-        journalRecordFactory.createFromRequest(request, instanceUid).stream()
+        CollectorJournalRecordFactory.createFromRequest(request, instanceUid).stream()
                 .map(AbstractMessageLite::toByteArray)
                 .map(createRawMessage)
                 .forEach(input::processRawMessage);

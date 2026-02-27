@@ -36,7 +36,7 @@ import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import io.opentelemetry.proto.logs.v1.ResourceLogs;
 import io.opentelemetry.proto.logs.v1.ScopeLogs;
-import org.graylog.inputs.otel.OTelJournalRecordFactory;
+
 import org.graylog2.plugin.inputs.MessageInput;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,12 +58,6 @@ class OTelHttpHandlerTest {
     @Mock
     private MessageInput input;
 
-    private OTelJournalRecordFactory journalRecordFactory;
-
-    @BeforeEach
-    void setUp() {
-        journalRecordFactory = new OTelJournalRecordFactory();
-    }
 
     @Test
     void postProtobufRequestReturns200WithProtobufResponse() throws InvalidProtocolBufferException {
@@ -212,7 +206,7 @@ class OTelHttpHandlerTest {
     }
 
     private EmbeddedChannel createChannel() {
-        return new EmbeddedChannel(new OTelHttpHandler(journalRecordFactory, input));
+        return new EmbeddedChannel(new OTelHttpHandler(input));
     }
 
     private ExportLogsServiceRequest createTestRequest() {

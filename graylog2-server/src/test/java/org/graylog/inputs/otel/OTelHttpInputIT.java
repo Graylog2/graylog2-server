@@ -77,8 +77,6 @@ class OTelHttpInputIT {
         workerGroup = new NioEventLoopGroup(2);
         httpClient = HttpClient.newBuilder().build();
 
-        final OTelJournalRecordFactory journalRecordFactory = new OTelJournalRecordFactory();
-
         final ServerBootstrap bootstrap = new ServerBootstrap()
                 .group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
@@ -88,7 +86,7 @@ class OTelHttpInputIT {
                         final ChannelPipeline pipeline = ch.pipeline();
                         pipeline.addLast("http-codec", new HttpServerCodec());
                         pipeline.addLast("http-aggregator", new HttpObjectAggregator(1024 * 1024));
-                        pipeline.addLast("http-handler", new OTelHttpHandler(journalRecordFactory, input));
+                        pipeline.addLast("http-handler", new OTelHttpHandler(input));
                     }
                 });
 

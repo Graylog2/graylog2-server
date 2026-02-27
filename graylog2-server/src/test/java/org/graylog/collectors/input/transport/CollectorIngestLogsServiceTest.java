@@ -24,7 +24,7 @@ import io.grpc.stub.StreamObserver;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse;
 import org.graylog.collectors.CollectorJournal;
-import org.graylog.collectors.input.CollectorJournalRecordFactory;
+
 import org.graylog.inputs.otel.OTelGrpcInput;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
@@ -57,7 +57,7 @@ class CollectorIngestLogsServiceTest {
 
     @BeforeEach
     void setUp() {
-        logsService = new CollectorIngestLogsService(transport, input, new CollectorJournalRecordFactory());
+        logsService = new CollectorIngestLogsService(transport, input);
     }
 
     @Test

@@ -27,8 +27,10 @@ import java.util.List;
 
 public class CollectorJournalRecordFactory {
 
-    public List<CollectorJournal.Record> createFromRequest(ExportLogsServiceRequest request,
-                                                            String instanceUid) {
+    private CollectorJournalRecordFactory() {}
+
+    public static List<CollectorJournal.Record> createFromRequest(ExportLogsServiceRequest request,
+                                                                  String instanceUid) {
         final List<CollectorJournal.Record> records = new ArrayList<>();
         for (final var resourceLogs : request.getResourceLogsList()) {
             final var receiverType = extractReceiverType(resourceLogs);
@@ -51,7 +53,7 @@ public class CollectorJournalRecordFactory {
         return records;
     }
 
-    private String extractReceiverType(ResourceLogs resourceLogs) {
+    private static String extractReceiverType(ResourceLogs resourceLogs) {
         for (final var attr : resourceLogs.getResource().getAttributesList()) {
             if (OtelAttributes.COLLECTOR_RECEIVER_TYPE.equals(attr.getKey())) {
                 return attr.getValue().getStringValue();
