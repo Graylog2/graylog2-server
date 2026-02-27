@@ -21,6 +21,7 @@ const { merge } = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const TARGET = process.env.npm_lifecycle_event || 'build';
+const isProd = TARGET.startsWith('build');
 
 function getPluginFullName(fqcn) {
   return `plugin.${fqcn}`;
@@ -54,7 +55,7 @@ function PluginWebpackConfig(defaultRootPath, fqcn, _options, additionalConfig) 
   const config = merge(
     {
       name: fullPluginName,
-      dependencies: ['vendor'],
+      dependencies: isProd ? ['vendor', 'commons'] : ['vendor'],
       entry: {
         [fullPluginName]: options.entry_path,
       },
