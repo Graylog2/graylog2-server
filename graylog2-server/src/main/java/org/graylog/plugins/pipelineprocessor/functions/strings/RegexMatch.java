@@ -60,10 +60,14 @@ public class RegexMatch extends AbstractFunction<RegexMatch.RegexMatchResult> {
         final List<String> groupNames =
                 (List<String>) optionalGroupNames.optional(args, context).orElse(Collections.emptyList());
 
-        final Matcher matcher = regex.matcher(value);
-        final boolean matches = matcher.find();
+        try {
+            final Matcher matcher = regex.matcher(value);
+            final boolean matches = matcher.find();
 
-        return new RegexMatchResult(matches, matcher.toMatchResult(), groupNames);
+            return new RegexMatchResult(matches, matcher.toMatchResult(), groupNames);
+        } catch (StackOverflowError e) {
+            throw new IllegalStateException("Stack overflow during regex pattern matching");
+        }
 
     }
 

@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix Unable to set new illuminate packs after previously setting illuminate packs on an input of the same type."
+
+issues = ["24668"]
+pulls = ["24715"]

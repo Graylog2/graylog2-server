@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Add notification if index rotation fails due to maximum number of shards reached and warn when approaching the limit."
+
+issues = ["Graylog2/graylog-plugin-enterprise#10015"]
+pulls = ["22228"]

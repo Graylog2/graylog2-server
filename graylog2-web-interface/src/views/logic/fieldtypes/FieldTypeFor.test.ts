@@ -22,8 +22,7 @@ describe('FieldTypeFor', () => {
   it('returns `FieldType.Unknown` if field type is not found', () => {
     expect(fieldTypeFor('', [])).toEqual(FieldType.Unknown);
 
-    expect(fieldTypeFor('bar', [FieldTypeMapping.create('foo', FieldTypes.LONG())]))
-      .toEqual(FieldType.Unknown);
+    expect(fieldTypeFor('bar', [FieldTypeMapping.create('foo', FieldTypes.LONG())])).toEqual(FieldType.Unknown);
   });
 
   it('returns `FieldType.Unknown` if field types are `undefined`', () => {
@@ -31,23 +30,20 @@ describe('FieldTypeFor', () => {
   });
 
   it('returns type of field if present', () => {
-    expect(fieldTypeFor('foo', [FieldTypeMapping.create('foo', FieldTypes.LONG())]))
-      .toEqual(FieldTypes.LONG());
+    expect(fieldTypeFor('foo', [FieldTypeMapping.create('foo', FieldTypes.LONG())])).toEqual(FieldTypes.LONG());
   });
 
   it('returns inferred type of function if series is passed', () => {
-    expect(fieldTypeFor('avg(foo)', [FieldTypeMapping.create('foo', FieldTypes.LONG())]))
-      .toEqual(FieldTypes.LONG());
+    expect(fieldTypeFor('avg(foo)', [FieldTypeMapping.create('foo', FieldTypes.LONG())])).toEqual(FieldTypes.LONG());
 
-    expect(fieldTypeFor('card(foo)', [FieldTypeMapping.create('foo', FieldTypes.STRING())]))
-      .toEqual(FieldTypes.LONG());
+    expect(fieldTypeFor('card(foo)', [FieldTypeMapping.create('foo', FieldTypes.STRING())])).toEqual(FieldTypes.LONG());
   });
 
   it('returns inferred type (long) for `count() and sum()`', () => {
-    expect(fieldTypeFor('count()', []))
-      .toEqual(FieldTypes.LONG());
+    expect(fieldTypeFor('count()', [])).toEqual(FieldTypes.LONG());
 
-    expect(fieldTypeFor('sum(foo-bar)', [FieldTypeMapping.create('foo-bar', FieldTypes.LONG())]))
-      .toEqual(FieldTypes.FLOAT());
+    expect(fieldTypeFor('sum(foo-bar)', [FieldTypeMapping.create('foo-bar', FieldTypes.LONG())])).toEqual(
+      FieldTypes.FLOAT(),
+    );
   });
 });

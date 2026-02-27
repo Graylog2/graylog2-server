@@ -40,9 +40,11 @@ public class JsonMappingExceptionMapper implements ExceptionMapper<JsonMappingEx
     public Response toResponse(JsonMappingException e) {
         final var errorPath = errorPath(e);
         final var location = e.getLocation();
-        final String message = errorWithJsonPath(e, errorPath);
+        final var lineNr = location != null ? location.getLineNr() : -1;
+        final var columnNr = location != null ? location.getColumnNr() : -1;
+        final String message = errorWithJsonPath(e, errorPath, lineNr, columnNr);
         final var referencePath = referencePath(e);
-        final var apiError = RequestError.create(message, location.getLineNr(), location.getColumnNr(), errorPath, referencePath);
+        final var apiError = RequestError.create(message, lineNr, columnNr, errorPath, referencePath);
         return status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(apiError).build();
     }
 
@@ -71,10 +73,10 @@ public class JsonMappingExceptionMapper implements ExceptionMapper<JsonMappingEx
                 .collect(Collectors.joining("."));
     }
 
-    private String errorWithJsonPath(final JsonMappingException e, String path) {
-        final var location = "[" + e.getLocation().getLineNr() + ", " + e.getLocation().getColumnNr() + "]";
+    private String errorWithJsonPath(final JsonMappingException e, String path, int lineNr, int columnNr) {
+        final var location = lineNr >= 0 && columnNr >= 0 ? "[" + lineNr + ", " + columnNr + "]" : "";
         final var quotedPath = "\"" + path + "\"";
-        final var messagePrefix = "Error at " + quotedPath + " " + location;
+        final var messagePrefix = "Error at " + quotedPath + (location.isEmpty() ? "" : " " + location);
 
 
         if (e instanceof PropertyBindingException propertyBindingException) {

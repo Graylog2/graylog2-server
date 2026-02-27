@@ -1,0 +1,2 @@
+type = "s"
+message = "Fixed authentication issue for HTTP inputs. [GHSA-q7g5-jq6p-6wvx](https://github.com/Graylog2/graylog2-server/security/advisories/GHSA-q7g5-jq6p-6wvx)"

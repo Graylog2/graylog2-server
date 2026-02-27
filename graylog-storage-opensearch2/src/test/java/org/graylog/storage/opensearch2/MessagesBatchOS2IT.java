@@ -18,12 +18,12 @@ package org.graylog.storage.opensearch2;
 
 import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
 import org.graylog.storage.opensearch2.testing.OpenSearchInstanceBuilder;
+import org.graylog.testing.elasticsearch.SearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.messages.MessagesBatchIT;
-import org.junit.Rule;
 
 public class MessagesBatchOS2IT extends MessagesBatchIT {
-    @Rule
+    @SearchInstance
     public final OpenSearchInstance openSearchInstance = OpenSearchInstanceBuilder.builder()
             .heapSize("256m")
             // Disable the real memory circuit breaker because it has issues with JDK 21. Turning it off relaxes

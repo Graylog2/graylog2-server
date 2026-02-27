@@ -67,7 +67,7 @@ class DataNodeEntityTest {
         assertThat(jsonNode.path("id").asText()).isEqualTo(id);
         assertThat(jsonNode.path("is_master").asBoolean()).isEqualTo(true);
         assertThat(jsonNode.path("short_node_id").asText()).isEqualTo("2d4cff7a");
-        assertThat(jsonNode.path("data_node_status").asText()).isEqualTo(DataNodeStatus.AVAILABLE.name());
+        assertThat(jsonNode.path("datanode_status").asText()).isEqualTo(DataNodeStatus.AVAILABLE.name());
 
         assertThat(node.toDto()).isEqualTo(DataNodeDto.Builder.builder()
                 .setLastSeen(new DateTime(lastSeen.toEpochSecond() * 1000, DateTimeZone.UTC))

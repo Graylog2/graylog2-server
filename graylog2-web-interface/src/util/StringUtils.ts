@@ -29,8 +29,11 @@ const StringUtils = {
 
     return this.tempDocument.textContent;
   },
+  escapeRegExp(str: string) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  },
   pluralize(number: string | number, singular: string, plural: string) {
-    return (number === 1 || number === '1' ? singular : plural);
+    return number === 1 || number === '1' ? singular : plural;
   },
   stringify(text) {
     return (typeof text === 'object' ? JSON.stringify(text) : String(text)) || '';
@@ -39,7 +42,11 @@ const StringUtils = {
     return text.replace(/\s/g, newCharacter);
   },
   toTitleCase(str: string, splitCharacter: string = ' ') {
-    return str.toLowerCase().split(splitCharacter).map((word) => (`${word.charAt(0).toUpperCase()}${word.slice(1)}`)).join(' ');
+    return str
+      .toLowerCase()
+      .split(splitCharacter)
+      .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
+      .join(' ');
   },
   truncateWithEllipses(text = '', maxLength = 10, end = '...') {
     if (text.length > maxLength) {
@@ -48,7 +55,7 @@ const StringUtils = {
 
     return text;
   },
-  getRecursiveChildText(reactNode: string|React.ReactNode) {
+  getRecursiveChildText(reactNode: string | React.ReactNode) {
     if (typeof reactNode === 'string') {
       return reactNode;
     }

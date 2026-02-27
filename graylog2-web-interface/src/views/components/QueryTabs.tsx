@@ -17,8 +17,6 @@
 import * as React from 'react';
 import { useRef } from 'react';
 import type * as Immutable from 'immutable';
-import PropTypes from 'prop-types';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import { Col, Row } from 'components/bootstrap';
 import type { QueryId } from 'views/logic/queries/Query';
@@ -30,12 +28,12 @@ import QueryTitleEditModal from './queries/QueryTitleEditModal';
 import AdaptableQueryTabs from './AdaptableQueryTabs';
 
 export interface QueryTabsProps {
-  onRemove: (queryId: string) => Promise<void | ViewState>,
-  onSelect: (queryId: string) => void,
-  onTitleChange: (queryId: string, newTitle: string) => void,
-  queries: Immutable.OrderedSet<QueryId>,
-  titles: Immutable.Map<string, string>,
-  dashboardId: string,
+  onRemove: (queryId: string) => Promise<void | ViewState>;
+  onSelect: (queryId: string) => void;
+  onTitleChange: (queryId: string, newTitle: string) => void;
+  queries: Immutable.OrderedSet<QueryId>;
+  titles: Immutable.Map<string, string>;
+  dashboardId: string;
 }
 
 const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, titles, dashboardId }: QueryTabsProps) => {
@@ -46,16 +44,22 @@ const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, titles, dashboa
     <Row>
       <Col>
         <ElementDimensions>
-          {({ width }) => (width ? (
-            <AdaptableQueryTabs maxWidth={width}
-                                queries={queries}
-                                dashboardId={dashboardId}
-                                titles={titles}
-                                onRemove={onRemove}
-                                onSelect={onSelect}
-                                queryTitleEditModal={queryTitleEditModal}
-                                onTitleChange={onTitleChange} />
-          ) : <div />)}
+          {({ width }) =>
+            width ? (
+              <AdaptableQueryTabs
+                maxWidth={width}
+                queries={queries}
+                dashboardId={dashboardId}
+                titles={titles}
+                onRemove={onRemove}
+                onSelect={onSelect}
+                queryTitleEditModal={queryTitleEditModal}
+                onTitleChange={onTitleChange}
+              />
+            ) : (
+              <div />
+            )
+          }
         </ElementDimensions>
 
         {/*
@@ -63,19 +67,13 @@ const QueryTabs = ({ onRemove, onSelect, onTitleChange, queries, titles, dashboa
           due to the react bootstrap tabs keybindings.
           The input would always lose the focus when using the arrow keys.
         */}
-        <QueryTitleEditModal onTitleChange={(newTitle: string) => onTitleChange(activeQueryId, newTitle)}
-                             ref={queryTitleEditModal} />
+        <QueryTitleEditModal
+          onTitleChange={(newTitle: string) => onTitleChange(activeQueryId, newTitle)}
+          ref={queryTitleEditModal}
+        />
       </Col>
     </Row>
   );
-};
-
-QueryTabs.propTypes = {
-  onRemove: PropTypes.func.isRequired,
-  onSelect: PropTypes.func.isRequired,
-  onTitleChange: PropTypes.func.isRequired,
-  queries: ImmutablePropTypes.orderedSetOf(PropTypes.string).isRequired,
-  titles: PropTypes.object.isRequired,
 };
 
 export default QueryTabs;

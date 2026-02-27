@@ -20,16 +20,14 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class NodeSummary {
-    @JsonProperty
+    @JsonProperty("cluster_id")
     public abstract String clusterId();
 
-    @JsonProperty
+    @JsonProperty("node_id")
     public abstract String nodeId();
 
     @Deprecated
@@ -41,16 +39,16 @@ public abstract class NodeSummary {
     @JsonProperty("is_leader")
     public abstract boolean isLeader();
 
-    @JsonProperty
+    @JsonProperty("transport_address")
     public abstract String transportAddress();
 
-    @JsonProperty
+    @JsonProperty("last_seen")
     public abstract String lastSeen();
 
-    @JsonProperty
+    @JsonProperty("short_node_id")
     public abstract String shortNodeId();
 
-    @JsonProperty
+    @JsonProperty("hostname")
     public abstract String hostname();
 
     @JsonCreator

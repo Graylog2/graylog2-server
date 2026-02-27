@@ -20,32 +20,22 @@ type Fixture = { [key: string]: Rows };
 export const oneRowPivotOneColumnPivot: Fixture = {
   chart: [
     {
-      key: [
-        'index',
-      ],
+      key: ['index'],
       values: [
         {
-          key: [
-            'PostsController',
-            'count()',
-          ],
+          key: ['PostsController', 'count()'],
           value: 6863,
           rollup: false,
           source: 'col-leaf',
         },
         {
-          key: [
-            'UsersController',
-            'count()',
-          ],
+          key: ['UsersController', 'count()'],
           value: 475,
           rollup: false,
           source: 'col-leaf',
         },
         {
-          key: [
-            'count()',
-          ],
+          key: ['count()'],
           value: 7338,
           rollup: true,
           source: 'row-leaf',
@@ -54,23 +44,16 @@ export const oneRowPivotOneColumnPivot: Fixture = {
       source: 'leaf',
     },
     {
-      key: [
-        'show',
-      ],
+      key: ['show'],
       values: [
         {
-          key: [
-            'PostsController',
-            'count()',
-          ],
+          key: ['PostsController', 'count()'],
           value: 2276,
           rollup: false,
           source: 'col-leaf',
         },
         {
-          key: [
-            'count()',
-          ],
+          key: ['count()'],
           value: 2276,
           rollup: true,
           source: 'row-leaf',
@@ -79,23 +62,16 @@ export const oneRowPivotOneColumnPivot: Fixture = {
       source: 'leaf',
     },
     {
-      key: [
-        'login',
-      ],
+      key: ['login'],
       values: [
         {
-          key: [
-            'LoginController',
-            'count()',
-          ],
+          key: ['LoginController', 'count()'],
           value: 1925,
           rollup: false,
           source: 'col-leaf',
         },
         {
-          key: [
-            'count()',
-          ],
+          key: ['count()'],
           value: 1925,
           rollup: true,
           source: 'row-leaf',
@@ -104,23 +80,16 @@ export const oneRowPivotOneColumnPivot: Fixture = {
       source: 'leaf',
     },
     {
-      key: [
-        'edit',
-      ],
+      key: ['edit'],
       values: [
         {
-          key: [
-            'PostsController',
-            'count()',
-          ],
+          key: ['PostsController', 'count()'],
           value: 340,
           rollup: false,
           source: 'col-leaf',
         },
         {
-          key: [
-            'count()',
-          ],
+          key: ['count()'],
           value: 340,
           rollup: true,
           source: 'row-leaf',
@@ -132,9 +101,7 @@ export const oneRowPivotOneColumnPivot: Fixture = {
       key: [],
       values: [
         {
-          key: [
-            'count()',
-          ],
+          key: ['count()'],
           value: 11879,
           rollup: true,
           source: 'row-inner',
@@ -148,14 +115,10 @@ export const oneRowPivotOneColumnPivot: Fixture = {
 export const oneRowPivot: Fixture = {
   chart: [
     {
-      key: [
-        'index',
-      ],
+      key: ['index'],
       values: [
         {
-          key: [
-            'count()',
-          ],
+          key: ['count()'],
           value: 7482,
           rollup: true,
           source: 'row-leaf',
@@ -164,14 +127,10 @@ export const oneRowPivot: Fixture = {
       source: 'leaf',
     },
     {
-      key: [
-        'show',
-      ],
+      key: ['show'],
       values: [
         {
-          key: [
-            'count()',
-          ],
+          key: ['count()'],
           value: 2211,
           rollup: true,
           source: 'row-leaf',
@@ -180,14 +139,10 @@ export const oneRowPivot: Fixture = {
       source: 'leaf',
     },
     {
-      key: [
-        'login',
-      ],
+      key: ['login'],
       values: [
         {
-          key: [
-            'count()',
-          ],
+          key: ['count()'],
           value: 1865,
           rollup: true,
           source: 'row-leaf',
@@ -196,14 +151,10 @@ export const oneRowPivot: Fixture = {
       source: 'leaf',
     },
     {
-      key: [
-        'edit',
-      ],
+      key: ['edit'],
       values: [
         {
-          key: [
-            'count()',
-          ],
+          key: ['count()'],
           value: 323,
           rollup: true,
           source: 'row-leaf',
@@ -215,9 +166,7 @@ export const oneRowPivot: Fixture = {
       key: [],
       values: [
         {
-          key: [
-            'count()',
-          ],
+          key: ['count()'],
           value: 11881,
           rollup: true,
           source: 'row-inner',

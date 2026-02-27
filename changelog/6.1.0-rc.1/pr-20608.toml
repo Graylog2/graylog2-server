@@ -1,0 +1,5 @@
+type = "f"
+message = "Added datanode permissions"
+
+pulls = ["20608"]
+issues = ["graylog-plugin-enterprise#8779"]

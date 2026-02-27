@@ -27,7 +27,7 @@ export const initState: State = {
   showDetails: false,
 };
 
-const updateIfHas = (possibleKeys: Checked, updates:Checked): Checked => {
+const updateIfHas = (possibleKeys: Checked, updates: Checked): Checked => {
   const newState = { ...possibleKeys };
 
   Object.entries(updates).forEach(([key, value]) => {
@@ -39,63 +39,68 @@ const updateIfHas = (possibleKeys: Checked, updates:Checked): Checked => {
   return newState;
 };
 
-const reducer = (state: State, action: { type: string, payload?: Checked, possibleKeys: Checked}): State => {
+const reducer = (state: State, action: { type: string; payload?: Checked; possibleKeys: Checked }): State => {
   const { type, payload, possibleKeys } = action;
 
   switch (type) {
     case 'SET_ALL_STRATEGY':
-      return ({
+      return {
         strategy: 'ALL',
         showDetails: state.showDetails,
         checked: updateIfHas(possibleKeys, { searchFilterQuery: false, queryWithReplacedParams: false }),
-      });
+      };
     case 'SET_EXACT_STRATEGY':
-      return ({
+      return {
         strategy: 'EXACT',
         showDetails: state.showDetails,
         checked: possibleKeys,
-      });
+      };
     case 'SET_ROW_STRATEGY':
-      return ({
+      return {
         strategy: 'ROW',
         showDetails: state.showDetails,
         checked: updateIfHas(possibleKeys, { columnValuePath: false, columnGroupBy: false }),
-      });
+      };
     case 'SET_COL_STRATEGY':
-      return ({
+      return {
         strategy: 'COL',
         showDetails: state.showDetails,
         checked: updateIfHas(possibleKeys, { rowValuePath: false, rowGroupBy: false }),
-      });
+      };
     case 'SET_CUSTOM_STRATEGY':
-      return ({
+      return {
         strategy: 'CUSTOM',
         showDetails: true,
         checked: state.checked,
-      });
+      };
     case 'UPDATE_CHECKED_ITEMS':
-      return ({
+      return {
         strategy: 'CUSTOM',
         showDetails: state.showDetails,
         checked: updateIfHas(state.checked, payload),
-      });
+      };
     case 'TOGGLE_SHOW_DETAILS':
-      return ({
+      return {
         strategy: state.strategy,
         showDetails: !state.showDetails,
         checked: state.checked,
-      });
+      };
     default:
       return state;
   }
 };
 
-const useModalReducer = (modalData : ModalData): [State, ({ type, payload }: { type: string, payload?: Checked }) => void] => {
+const useModalReducer = (
+  modalData: ModalData,
+): [State, ({ type, payload }: { type: string; payload?: Checked }) => void] => {
   const [state, dispatch] = useReducer(reducer, initState);
-  const dispatchWithData = useCallback(({ type, payload }: { type: string, payload?: Checked }) => {
-    const possibleKeys = mapValues(modalData, (v) => !!v);
-    dispatch({ type, payload, possibleKeys });
-  }, [modalData]);
+  const dispatchWithData = useCallback(
+    ({ type, payload }: { type: string; payload?: Checked }) => {
+      const possibleKeys = mapValues(modalData, (v) => !!v);
+      dispatch({ type, payload, possibleKeys });
+    },
+    [modalData],
+  );
 
   useEffect(() => {
     dispatchWithData({ type: 'SET_EXACT_STRATEGY' });

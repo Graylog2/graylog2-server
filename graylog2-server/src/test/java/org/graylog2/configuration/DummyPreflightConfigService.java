@@ -17,25 +17,26 @@
 package org.graylog2.configuration;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.graylog2.bootstrap.preflight.PreflightConfig;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.bootstrap.preflight.PreflightConstants;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 public class DummyPreflightConfigService implements PreflightConfigService {
 
-    private PreflightConfigResult result;
+    private final AtomicReference<PreflightConfigResult> result = new AtomicReference<>();
     private final String initialPassword = RandomStringUtils.randomAlphabetic(PreflightConstants.INITIAL_PASSWORD_LENGTH);
 
     @Override
-    public PreflightConfig setConfigResult(PreflightConfigResult result) {
-        this.result = result;
-        return new PreflightConfig(result);
+    public ConfigResultState setConfigResult(PreflightConfigResult result) {
+        final PreflightConfigResult oldValue = this.result.getAndSet(result);
+        return oldValue == null ? ConfigResultState.CREATED : ConfigResultState.UPDATED;
     }
 
     @Override
     public PreflightConfigResult getPreflightConfigResult() {
-        return result;
+        return result.get();
     }
 
     @Override

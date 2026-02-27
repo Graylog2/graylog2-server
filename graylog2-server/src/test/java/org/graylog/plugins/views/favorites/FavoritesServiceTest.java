@@ -33,7 +33,6 @@ import org.graylog.testing.TestUserServiceExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.users.events.UserDeletedEvent;
@@ -64,7 +63,7 @@ public class FavoritesServiceTest {
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb,
-               MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
+               MongoCollections mongoCollections,
                GRNRegistry grnRegistry,
                TestUserService testUserService) {
 
@@ -92,13 +91,14 @@ public class FavoritesServiceTest {
 
         this.testUserService = testUserService;
         this.grnRegistry = grnRegistry;
-        this.favoritesService = new FavoritesService(new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()),
+        this.favoritesService = new FavoritesService(mongoCollections,
                 new EventBus(),
                 null,
                 grnRegistry);
     }
 
     @Test
+    @SuppressWarnings("MustBeClosedChecker")
     public void testRemoveOnUserDeletion() {
         var _1 = grnRegistry.newGRN(GRNTypes.DASHBOARD, "1");
         var _2 = grnRegistry.newGRN(GRNTypes.SEARCH, "2");
@@ -115,6 +115,7 @@ public class FavoritesServiceTest {
     }
 
     @Test
+    @SuppressWarnings("MustBeClosedChecker")
     public void testRemoveOnEntityDeletion() {
         var _1 = grnRegistry.newGRN(GRNTypes.DASHBOARD, "1");
         var _2 = grnRegistry.newGRN(GRNTypes.SEARCH, "2");

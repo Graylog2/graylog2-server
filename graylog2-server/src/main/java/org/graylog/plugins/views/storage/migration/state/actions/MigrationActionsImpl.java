@@ -20,7 +20,6 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
 import org.graylog.security.certutil.CaKeystore;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
@@ -31,16 +30,11 @@ import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.datanode.DataNodeCommandService;
 import org.graylog2.datanode.DatanodeStartType;
-import org.graylog2.indexer.datanode.RemoteReindexRequest;
-import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
-import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.resources.datanodes.DatanodeResolver;
 import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
-import org.graylog2.shared.utilities.StringUtils;
 import org.graylog2.storage.providers.ElasticsearchVersionProvider;
 import org.graylog2.system.processing.control.ClusterProcessingControl;
 import org.graylog2.system.processing.control.ClusterProcessingControlFactory;
@@ -48,14 +42,8 @@ import org.graylog2.system.processing.control.RemoteProcessingControlResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class MigrationActionsImpl implements MigrationActions {
     private static final Logger LOG = LoggerFactory.getLogger(MigrationActionsImpl.class);
@@ -69,40 +57,30 @@ public class MigrationActionsImpl implements MigrationActions {
     private final MigrationStateMachineContext stateMachineContext;
     private final DataNodeCommandService dataNodeCommandService;
 
-    private final RemoteReindexingMigrationAdapter migrationService;
     private final MetricRegistry metricRegistry;
 
     private final DatanodeRestApiProxy datanodeProxy;
     private final ElasticsearchVersionProvider searchVersionProvider;
-    private final List<URI> elasticsearchHosts;
-
-    private final NotificationService notificationService;
 
     @Inject
     public MigrationActionsImpl(@Assisted MigrationStateMachineContext stateMachineContext,
                                 final ClusterConfigService clusterConfigService, NodeService<DataNodeDto> nodeService,
                                 final CaKeystore caKeystore, DataNodeCommandService dataNodeCommandService,
-                                RemoteReindexingMigrationAdapter migrationService,
                                 final ClusterProcessingControlFactory clusterProcessingControlFactory,
                                 final PreflightConfigService preflightConfigService,
                                 final MetricRegistry metricRegistry,
                                 final DatanodeRestApiProxy datanodeProxy,
-                                ElasticsearchVersionProvider searchVersionProvider,
-                                @Named("elasticsearch_hosts") List<URI> elasticsearchHosts,
-                                NotificationService notificationService) {
+                                ElasticsearchVersionProvider searchVersionProvider) {
         this.stateMachineContext = stateMachineContext;
         this.clusterConfigService = clusterConfigService;
         this.nodeService = nodeService;
         this.caKeystore = caKeystore;
         this.dataNodeCommandService = dataNodeCommandService;
         this.clusterProcessingControlFactory = clusterProcessingControlFactory;
-        this.migrationService = migrationService;
         this.preflightConfigService = preflightConfigService;
         this.metricRegistry = metricRegistry;
         this.datanodeProxy = datanodeProxy;
         this.searchVersionProvider = searchVersionProvider;
-        this.elasticsearchHosts = elasticsearchHosts;
-        this.notificationService = notificationService;
     }
 
 
@@ -116,8 +94,15 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public boolean isOldClusterStopped() {
-        // TODO: add real test
-        return true;
+        final Map<String, OpensearchLockCheckResult> results = datanodeProxy.remoteInterface(DatanodeResolver.ALL_NODES_KEYWORD, DatanodeOpensearchClusterCheckResource.class, DatanodeOpensearchClusterCheckResource::checkLocks);
+        final boolean anyLocked = results.values().stream().anyMatch(v -> v.locks().stream().anyMatch(OpensearchNodeLock::locked));
+
+        if (anyLocked) {
+            results.forEach((key, value) -> value.locks().stream()
+                    .filter(OpensearchNodeLock::locked)
+                    .forEach(v -> LOG.info("Data directory of datanode {} is still locked by another Opensearch process. Lock file: {}", key, v.path().toAbsolutePath())));
+        }
+        return !anyLocked;
     }
 
     @Override
@@ -129,11 +114,6 @@ public class MigrationActionsImpl implements MigrationActions {
     @Override
     public boolean directoryCompatibilityCheckOk() {
         return stateMachineContext.getExtendedState(MigrationStateMachineContext.KEY_COMPATIBILITY_CHECK_PASSED, Boolean.class).orElse(false);
-    }
-
-    @Override
-    public void reindexUpgradeSelected() {
-
     }
 
     @Override
@@ -149,27 +129,15 @@ public class MigrationActionsImpl implements MigrationActions {
     }
 
     @Override
-    public void startMessageProcessing() {
-        final String authToken = (String) stateMachineContext.getExtendedState(MigrationStateMachineContext.AUTH_TOKEN_KEY);
-        final ClusterProcessingControl<RemoteProcessingControlResource> control = clusterProcessingControlFactory.create(authToken);
-        LOG.info("Resuming message processing.");
-        control.resumeGraylogMessageProcessing();
+    public boolean caExists() {
+        return caKeystore.exists();
     }
 
     @Override
-    public boolean caDoesNotExist() {
-        return !caKeystore.exists();
+    public boolean renewalPolicyExists() {
+        return this.clusterConfigService.get(RenewalPolicy.class) != null;
     }
 
-    @Override
-    public boolean renewalPolicyDoesNotExist() {
-        return this.clusterConfigService.get(RenewalPolicy.class) == null;
-    }
-
-    @Override
-    public boolean caAndRenewalPolicyExist() {
-        return !caDoesNotExist() && !renewalPolicyDoesNotExist();
-    }
 
     @Override
     public boolean compatibleDatanodesRunning() {
@@ -200,14 +168,6 @@ public class MigrationActionsImpl implements MigrationActions {
     }
 
     @Override
-    public void provisionAndStartDataNodes() {
-        final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
-        activeDataNodes.values().stream()
-                .filter(node -> node.getDataNodeStatus() != DataNodeStatus.AVAILABLE)
-                .forEach(nodeDto -> triggerCSR(nodeDto, DatanodeStartType.AUTOMATICALLY));
-    }
-
-    @Override
     public boolean provisioningFinished() {
         return nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE);
     }
@@ -232,39 +192,18 @@ public class MigrationActionsImpl implements MigrationActions {
     }
 
     @Override
-    public boolean dataNodeStartupFinished() {
-        boolean dataNodesAvailable = nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE);
-        if (dataNodesAvailable) { // set preflight config to FINISHED to be sure that a Graylog restart will connect to the data nodes
-            var preflight = preflightConfigService.getPreflightConfigResult();
-            if (preflight == null || !preflight.equals(PreflightConfigResult.FINISHED)) {
-                preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
-            }
-        }
-        return dataNodesAvailable;
+    public boolean allDatanodesAvailable() {
+        final Map<String, DataNodeDto> activeNodes = nodeService.allActive();
+        return !activeNodes.isEmpty() && activeNodes.values()
+                .stream()
+                .allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE);
     }
 
-    @Override
-    public void startRemoteReindex() {
-        final String allowlist = stateMachineContext.getActionArgumentOpt("allowlist", String.class).orElse(null);
-        String host = StringUtils.requireNonBlank(stateMachineContext.getActionArgument("hostname", String.class), "hostname has to be provided");
-        if (host.endsWith("/")) {
-            host = host.substring(0, host.length() - 1);
+    public void setPreflightFinished() {
+        var preflight = preflightConfigService.getPreflightConfigResult();
+        if (preflight == null || !preflight.equals(PreflightConfigResult.FINISHED)) {
+            preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
         }
-        final URI hostname = URI.create(host);
-        final String user = stateMachineContext.getActionArgumentOpt("user", String.class).orElse(null);
-        final String password = stateMachineContext.getActionArgumentOpt("password", String.class).orElse(null);
-        final List<String> indices = stateMachineContext.getActionArgumentOpt("indices", List.class).orElse(Collections.emptyList()); // todo: generics!
-        final boolean trustUnknownCerts = stateMachineContext.getActionArgumentOpt("trust_unknown_certs", Boolean.class).orElse(false);
-        final int threadsCount = stateMachineContext.getActionArgumentOpt("threads", Integer.class).orElse(4);
-        final String migrationID = migrationService.start(new RemoteReindexRequest(allowlist, hostname, user, password, indices, threadsCount, trustUnknownCerts));
-        stateMachineContext.addExtendedState(MigrationStateMachineContext.KEY_MIGRATION_ID, migrationID);
-    }
-
-    @Override
-    public void requestMigrationStatus() {
-        stateMachineContext.getExtendedState(MigrationStateMachineContext.KEY_MIGRATION_ID, String.class)
-                .map(migrationService::status)
-                .ifPresent(status -> stateMachineContext.setResponse(status));
     }
 
     @Override
@@ -278,36 +217,10 @@ public class MigrationActionsImpl implements MigrationActions {
     }
 
     @Override
-    public void verifyRemoteIndexerConnection() {
-        final URI hostname = Objects.requireNonNull(URI.create(stateMachineContext.getActionArgument("hostname", String.class)), "hostname has to be provided");
-        final String user = stateMachineContext.getActionArgumentOpt("user", String.class).orElse(null);
-        final String password = stateMachineContext.getActionArgumentOpt("password", String.class).orElse(null);
-        final boolean trustUnknownCerts = stateMachineContext.getActionArgumentOpt("trust_unknown_certs", Boolean.class).orElse(false);
-        final String allowlist = stateMachineContext.getActionArgumentOpt("allowlist", String.class).orElse(null);
-        stateMachineContext.setResponse(migrationService.checkConnection(hostname, user, password, allowlist, trustUnknownCerts));
-    }
-
-    @Override
     public boolean isCompatibleInPlaceMigrationVersion() {
         return !searchVersionProvider.get().isElasticsearch();
     }
 
-    @Override
-    public void getElasticsearchHosts() {
-        stateMachineContext.setResponse(Map.of(
-                "elasticsearch_hosts", elasticsearchHosts.stream().map(URI::toString).collect(Collectors.joining(",")),
-                "allowlist_hosts", elasticsearchHosts.stream().map(host -> host.getHost() + ":" + host.getPort()).collect(Collectors.joining(","))
-        ));
-    }
-
-    @Override
-    public boolean isRemoteReindexingFinished() {
-        return Optional.ofNullable(stateMachineContext)
-                .flatMap(ctx -> ctx.getExtendedState(MigrationStateMachineContext.KEY_MIGRATION_ID, String.class))
-                .map(migrationService::status)
-                .filter(m -> m.status() == RemoteReindexingMigrationAdapter.Status.FINISHED)
-                .isPresent();
-    }
 
     @Override
     public void stopDatanodes() {
@@ -320,10 +233,5 @@ public class MigrationActionsImpl implements MigrationActions {
                         // we don't care, we tried and hope for the best
                     }
                 });
-    }
-
-    @Override
-    public void finishRemoteReindexMigration() {
-        notificationService.destroyAllByType(Notification.Type.REMOTE_REINDEX_FINISHED);
     }
 }

@@ -16,16 +16,20 @@
  */
 package org.graylog2.shared.bindings;
 
+import com.codahale.metrics.InstrumentedScheduledExecutorService;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import org.graylog2.periodical.Periodicals;
 import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class SchedulerBindings extends AbstractModule {
     private static final Logger LOG = LoggerFactory.getLogger(SchedulerBindings.class);
@@ -33,27 +37,57 @@ public class SchedulerBindings extends AbstractModule {
 
     @Override
     protected void configure() {
-        // TODO Add instrumentation to ExecutorService and ThreadFactory
-        final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE,
-                new ThreadFactoryBuilder()
-                        .setNameFormat("scheduled-%d")
-                        .setDaemon(false)
-                        .setUncaughtExceptionHandler(new Tools.LogUncaughtExceptionHandler(LOG))
-                        .build()
-        );
 
-        bind(ScheduledExecutorService.class).annotatedWith(Names.named("scheduler")).toInstance(scheduler);
+        bind(ScheduledExecutorService.class).annotatedWith(Names.named("scheduler"))
+                .toProvider(SchedulerProvider.class)
+                .asEagerSingleton();
 
-        // TODO Add instrumentation to ExecutorService and ThreadFactory
-        final ScheduledExecutorService daemonScheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE,
-                new ThreadFactoryBuilder()
-                        .setNameFormat("scheduled-daemon-%d")
-                        .setDaemon(true)
-                        .setUncaughtExceptionHandler(new Tools.LogUncaughtExceptionHandler(LOG))
-                        .build()
-        );
+        bind(ScheduledExecutorService.class).annotatedWith(Names.named("daemonScheduler"))
+                .toProvider(DaemonSchedulerProvider.class)
+                .asEagerSingleton();
 
-        bind(ScheduledExecutorService.class).annotatedWith(Names.named("daemonScheduler")).toInstance(daemonScheduler);
-        bind(Periodicals.class).toInstance(new Periodicals(scheduler, daemonScheduler));
+        bind(Periodicals.class).asEagerSingleton();
+    }
+
+    private static InstrumentedScheduledExecutorService buildScheduledExecutorService(String name,
+                                                                                      boolean daemon,
+                                                                                      MetricRegistry metricRegistry) {
+        final var metricsPrefix = "org.graylog2.shared-thread-pools." + name;
+        final var threadFactory = new ThreadFactoryBuilder()
+                .setNameFormat(name + "-%d")
+                .setDaemon(daemon)
+                .setUncaughtExceptionHandler(new Tools.LogUncaughtExceptionHandler(LOG))
+                .build();
+        final var executor = new ScheduledThreadPoolExecutor(SCHEDULED_THREADS_POOL_SIZE, threadFactory);
+        return new InstrumentedScheduledExecutorService(executor, metricRegistry, metricsPrefix + "-executor");
+    }
+
+    public static class SchedulerProvider implements Provider<ScheduledExecutorService> {
+        private final MetricRegistry metricRegistry;
+
+        @Inject
+        public SchedulerProvider(MetricRegistry metricRegistry) {
+            this.metricRegistry = metricRegistry;
+        }
+
+        @Override
+        public ScheduledExecutorService get() {
+            return buildScheduledExecutorService("scheduled", false, metricRegistry);
+        }
+    }
+
+    public static class DaemonSchedulerProvider implements Provider<ScheduledExecutorService> {
+        private final MetricRegistry metricRegistry;
+
+        @Inject
+        public DaemonSchedulerProvider(MetricRegistry metricRegistry) {
+            this.metricRegistry = metricRegistry;
+        }
+
+        @Override
+        public ScheduledExecutorService get() {
+            return buildScheduledExecutorService("scheduled-daemon", true, metricRegistry);
+        }
+
     }
 }

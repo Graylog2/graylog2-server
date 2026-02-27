@@ -1,0 +1,5 @@
+type = "f"
+message = "Filters system event definitions from list of entities that can be exported in a content pack."
+
+pulls = ["21206"]
+issues = ["21166"]

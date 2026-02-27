@@ -20,9 +20,9 @@ import styled from 'styled-components';
 import { OverlayTrigger, Icon } from 'components/common';
 
 type Props = {
-  errorText: string,
-  title: string,
-  placement: 'bottom' | 'top' | 'right' | 'left',
+  errorText: string;
+  title?: string;
+  placement?: 'bottom' | 'top' | 'right' | 'left';
 };
 
 const StyledSpan = styled.span`
@@ -32,7 +32,7 @@ const StyledSpan = styled.span`
 const ErrorPopover = ({ errorText, title = 'Error', placement = 'bottom' }: Props) => (
   <OverlayTrigger trigger={['hover', 'focus']} placement={placement} overlay={errorText} title={title} width={400}>
     <StyledSpan>
-      <Icon name="warning" className="text-danger" />
+      <Icon name="warning" className="text-danger" data-testid={title.toLowerCase().replaceAll(' ', '-')} />
     </StyledSpan>
   </OverlayTrigger>
 );

@@ -28,28 +28,33 @@ export const NUMBER_MODE = 'Number';
 export type VisualizationType = typeof LIST_MODE | typeof NUMBER_MODE;
 
 export type Filter = {
-  field: string,
-  value: Array<string>,
-}
+  field: string;
+  value: Array<string>;
+};
 
 type InternalState = {
-  fields: Immutable.OrderedSet<string>,
-  filters: Immutable.OrderedSet<Filter>,
-  sort: EventsWidgetSortConfig,
-  mode: VisualizationType,
+  fields: Immutable.OrderedSet<string>;
+  filters: Immutable.OrderedSet<Filter>;
+  sort: EventsWidgetSortConfig;
+  mode: VisualizationType;
 };
 
 export type EventsWidgetConfigJSON = {
-  fields: Array<string>,
-  filters: Array<Filter>,
-  sort: EventsWidgetSortConfigJSON,
-  mode: VisualizationType,
+  fields: Array<string>;
+  filters: Array<Filter>;
+  sort: EventsWidgetSortConfigJSON;
+  mode: VisualizationType;
 };
 
 export default class EventsWidgetConfig extends WidgetConfig {
   _value: InternalState;
 
-  static defaultFields: InternalState['fields'] = Immutable.OrderedSet(['message', 'event_definition_id', 'alert', 'timestamp']);
+  static defaultFields: InternalState['fields'] = Immutable.OrderedSet([
+    'message',
+    'event_definition_id',
+    'alert',
+    'timestamp',
+  ]);
 
   static defaultSort: InternalState['sort'] = new EventsWidgetSortConfig('timestamp', Direction.Descending);
 
@@ -84,16 +89,11 @@ export default class EventsWidgetConfig extends WidgetConfig {
 
   toBuilder() {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Immutable.Map((this._value)));
+    return new Builder(Immutable.Map(this._value));
   }
 
   toJSON() {
-    const {
-      fields = Immutable.OrderedSet(),
-      filters = Immutable.OrderedSet(),
-      sort,
-      mode,
-    } = this._value;
+    const { fields = Immutable.OrderedSet(), filters = Immutable.OrderedSet(), sort, mode } = this._value;
 
     return {
       fields: fields.toArray(),
@@ -105,15 +105,18 @@ export default class EventsWidgetConfig extends WidgetConfig {
 
   static builder(): Builder {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder()
-      .fields(Immutable.OrderedSet())
-      .filters(Immutable.OrderedSet());
+    return new Builder().fields(Immutable.OrderedSet()).filters(Immutable.OrderedSet());
   }
 
   static fromJSON(value: EventsWidgetConfigJSON) {
     const { fields, filters, sort, mode } = value;
 
-    return new EventsWidgetConfig(Immutable.OrderedSet(fields), Immutable.OrderedSet(filters), EventsWidgetSortConfig.fromJSON(sort), mode);
+    return new EventsWidgetConfig(
+      Immutable.OrderedSet(fields),
+      Immutable.OrderedSet(filters),
+      EventsWidgetSortConfig.fromJSON(sort),
+      mode,
+    );
   }
 
   static createDefault() {

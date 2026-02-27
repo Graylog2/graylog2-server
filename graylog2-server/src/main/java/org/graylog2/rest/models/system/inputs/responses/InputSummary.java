@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
@@ -28,30 +27,39 @@ import java.util.Map;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class InputSummary {
-    @JsonProperty
+    @JsonProperty("title")
     public abstract String title();
-    @JsonProperty
+
+    @JsonProperty("global")
     public abstract Boolean global();
-    @JsonProperty
+
+    @JsonProperty("name")
     public abstract String name();
-    @JsonProperty
+
+    @JsonProperty("content_pack")
     @Nullable
     public abstract String contentPack();
+
     @JsonProperty("id")
     public abstract String inputId();
-    @JsonProperty
+
+    @JsonProperty("created_at")
     public abstract DateTime createdAt();
-    @JsonProperty
+
+    @JsonProperty("type")
     public abstract String type();
-    @JsonProperty
+
+    @JsonProperty("creator_user_id")
     public abstract String creatorUserId();
-    @JsonProperty
+
+    @JsonProperty("attributes")
     public abstract Map<String, Object> attributes();
-    @JsonProperty
+
+    @JsonProperty("static_fields")
     public abstract Map<String, String> staticFields();
-    @JsonProperty
+
+    @JsonProperty("node")
     @Nullable
     public abstract String node();
 

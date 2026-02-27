@@ -14,15 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useState } from 'react';
 import type { ColorScheme } from '@graylog/sawmill';
 
-import { useStore } from 'stores/connect';
 import Store from 'logic/local-storage/Store';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
-import { PreferencesStore } from 'stores/users/PreferencesStore';
 import type { UserPreferences } from 'contexts/UserPreferencesContext';
-import UserPreferencesContext from 'contexts/UserPreferencesContext';
+import usePersistedSetting from 'hooks/usePersistedSetting';
 
 import useBrowserColorSchemePreference from './useBrowserColorSchemePreference';
 
@@ -48,19 +45,17 @@ const fromLegacyColorSchemeName = (legacyColorScheme: LegacyColorScheme): ColorS
   return legacyColorScheme;
 };
 
-const getInitialThemeMode = (
-  {
-    userPreferencesThemeMode,
-    browserThemePreference,
-    initialThemeModeOverride,
-    userIsLoggedIn,
-  }: {
-    userPreferencesThemeMode: UserPreferences[typeof PREFERENCES_THEME_MODE],
-    browserThemePreference: ColorScheme,
-    initialThemeModeOverride: ColorScheme,
-    userIsLoggedIn: boolean,
-  },
-) => {
+const getInitialThemeMode = ({
+  userPreferencesThemeMode,
+  browserThemePreference,
+  initialThemeModeOverride,
+  userIsLoggedIn,
+}: {
+  userPreferencesThemeMode: UserPreferences[typeof PREFERENCES_THEME_MODE];
+  browserThemePreference: ColorScheme;
+  initialThemeModeOverride: ColorScheme;
+  userIsLoggedIn: boolean;
+}) => {
   if (initialThemeModeOverride) {
     return initialThemeModeOverride;
   }
@@ -74,37 +69,32 @@ const getInitialThemeMode = (
   return userThemePreference ?? browserThemePreference ?? DEFAULT_THEME_MODE;
 };
 
-const usePreferredColorScheme = (initialThemeModeOverride: ColorScheme, userIsLoggedIn: boolean): [ColorScheme, (newThemeMode: ColorScheme) => void] => {
+const usePreferredColorScheme = (
+  initialThemeModeOverride: ColorScheme,
+  userIsLoggedIn: boolean,
+): [ColorScheme, (newThemeMode: ColorScheme) => void] => {
   const browserThemePreference = useBrowserColorSchemePreference();
+  const [themeMode, setThemeMode] = usePersistedSetting(PREFERENCES_THEME_MODE);
 
-  const { userIsReadOnly, username } = useStore(CurrentUserStore, (userStore) => ({
-    username: userStore.currentUser?.username,
-    userIsReadOnly: userStore.currentUser?.read_only ?? true,
-  }));
-
-  const userPreferences = useContext(UserPreferencesContext);
-  const [currentThemeMode, setCurrentThemeMode] = useState<ColorScheme>(
-    () => getInitialThemeMode({
-      userPreferencesThemeMode: userPreferences[PREFERENCES_THEME_MODE],
+  const [currentThemeMode, setCurrentThemeMode] = useState<ColorScheme>(() =>
+    getInitialThemeMode({
+      userPreferencesThemeMode: themeMode,
       browserThemePreference,
       initialThemeModeOverride,
       userIsLoggedIn,
     }),
   );
 
-  const changeCurrentThemeMode = useCallback((newThemeMode: ColorScheme) => {
-    setCurrentThemeMode(newThemeMode);
+  const changeCurrentThemeMode = useCallback(
+    (newThemeMode: ColorScheme) => {
+      setCurrentThemeMode(newThemeMode);
 
-    if (userIsLoggedIn) {
-      Store.set(PREFERENCES_THEME_MODE, newThemeMode);
-
-      if (!userIsReadOnly) {
-        const nextPreferences = { ...userPreferences, [PREFERENCES_THEME_MODE]: newThemeMode };
-
-        PreferencesStore.saveUserPreferences(username, nextPreferences);
+      if (userIsLoggedIn) {
+        setThemeMode(newThemeMode);
       }
-    }
-  }, [userIsLoggedIn, userIsReadOnly, userPreferences, username]);
+    },
+    [setThemeMode, userIsLoggedIn],
+  );
 
   return [currentThemeMode, changeCurrentThemeMode];
 };

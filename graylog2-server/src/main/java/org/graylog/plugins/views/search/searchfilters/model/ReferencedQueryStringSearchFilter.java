@@ -111,6 +111,8 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
     @Override
     public InlineQueryStringSearchFilter toInlineRepresentation() {
         return InlineQueryStringSearchFilter.builder()
+                // create a new ID for the inlined filter on purpose, so it's not the same as the global one. if you later inline the same global filter a 2nd time, it would crash/overwrite your first 
+                .id(new org.bson.types.ObjectId().toHexString())
                 .queryString(this.queryString())
                 .description(this.description())
                 .negation(this.negation())

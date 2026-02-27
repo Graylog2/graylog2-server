@@ -20,28 +20,26 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class OsStats {
     public static final double[] EMPTY_LOAD = new double[0];
 
-    @JsonProperty
+    @JsonProperty("load_average")
     @SuppressWarnings("mutable")
     public abstract double[] loadAverage();
 
-    @JsonProperty
+    @JsonProperty("uptime")
     public abstract long uptime();
 
-    @JsonProperty
+    @JsonProperty("processor")
     public abstract Processor processor();
 
-    @JsonProperty
+    @JsonProperty("memory")
     public abstract Memory memory();
 
-    @JsonProperty
+    @JsonProperty("swap")
     public abstract Swap swap();
 
     @JsonCreator

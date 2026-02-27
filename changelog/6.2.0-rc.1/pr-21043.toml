@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix line wrapping in new sidecar default configurations for filebeat."
+
+pulls = ["21043"]

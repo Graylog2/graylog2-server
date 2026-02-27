@@ -18,21 +18,24 @@ import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Row, Col } from 'components/bootstrap';
-import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
+import {
+  RotationStrategySummary,
+  RetentionStrategySummary,
+} from 'components/indices/IndexMaintenanceStrategiesSummary';
 import { DataTieringSummary, DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 type Props = {
-  indexSet: IndexSet
-}
+  indexSet: IndexSet;
+};
 
-const IndicesConfiguration = ({ indexSet } : Props) => {
+const IndicesConfiguration = ({ indexSet }: Props) => {
   if (!indexSet.writable) {
     return (
       <Row>
         <Col md={12}>
-          Index set is not writable and will not be included in index rotation and retention.
-          It is also not possible to assign it to a stream.
+          Index set is not writable and will not be included in index rotation and retention. It is also not possible to
+          assign it to a stream.
         </Col>
       </Row>
     );
@@ -54,19 +57,18 @@ const IndicesConfiguration = ({ indexSet } : Props) => {
     return (
       <Row>
         <Col md={6}>
-          <IndexMaintenanceStrategiesSummary config={rotationConfig}
-                                             pluginExports={PluginStore.exports('indexRotationConfig')} />
+          <RotationStrategySummary config={rotationConfig} />
         </Col>
         <Col md={6}>
-          <IndexMaintenanceStrategiesSummary config={retentionConfig}
-                                             rotationStrategyClass={rotationConfig.strategy}
-                                             pluginExports={PluginStore.exports('indexRetentionConfig')} />
+          <RetentionStrategySummary config={retentionConfig} rotationStrategyClass={rotationConfig.strategy} />
         </Col>
       </Row>
     );
   }
 
-  const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => (plugin.type === DATA_TIERING_TYPE.HOT_WARM));
+  const dataTieringPlugin = PluginStore.exports('dataTiering').find(
+    (plugin) => plugin.type === DATA_TIERING_TYPE.HOT_WARM,
+  );
 
   return (
     <Row>

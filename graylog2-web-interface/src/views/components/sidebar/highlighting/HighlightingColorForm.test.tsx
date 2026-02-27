@@ -26,7 +26,6 @@ import FieldType, { Properties } from 'views/logic/fieldtypes/FieldType';
 describe('HighlightingColorForm', () => {
   const field = FieldTypeMapping.create('foo', FieldType.create('number', [Properties.Numeric]));
 
-  // eslint-disable-next-line react/prop-types
   const SimpleForm = ({ value = undefined, ...rest }) => (
     <Formik initialValues={{ color: value }} onSubmit={() => {}}>
       <HighlightingColorForm field={field} {...rest} />

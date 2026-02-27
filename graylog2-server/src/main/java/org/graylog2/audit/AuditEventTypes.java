@@ -44,6 +44,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String CONTENT_PACK_DELETE_REV = PREFIX + "content_pack:delete_rev";
     public static final String CONTENT_PACK_INSTALL = PREFIX + "content_pack:install";
     public static final String CONTENT_PACK_UNINSTALL = PREFIX + "content_pack:uninstall";
+    public static final String CONTENT_PACK_ENTITY_CREATE = PREFIX + "content_pack_entity:create";
+    public static final String CONTENT_PACK_ENTITY_DELETE = PREFIX + "content_pack_entity:delete";
     public static final String DASHBOARD_CREATE = PREFIX + "dashboard:create";
     public static final String DASHBOARD_DELETE = PREFIX + "dashboard:delete";
     public static final String DASHBOARD_UPDATE = PREFIX + "dashboard:update";
@@ -56,6 +58,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String DATANODE_RESET = PREFIX + "data_node:reset";
     public static final String DATANODE_STOP = PREFIX + "data_node:stop";
     public static final String DATANODE_START = PREFIX + "data_node:start";
+    public static final String DATANODE_START_REPLICATION = PREFIX + "data_node:start_replication";
+    public static final String DATANODE_STOP_REPLICATION = PREFIX + "data_node:stop_replication";
     public static final String ES_INDEX_CLOSE = PREFIX + "es_index:close";
     public static final String ES_INDEX_CREATE = PREFIX + "es_index:create";
     public static final String ES_INDEX_DELETE = PREFIX + "es_index:delete";
@@ -74,6 +78,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String EXTRACTOR_CREATE = PREFIX + "extractor:create";
     public static final String EXTRACTOR_DELETE = PREFIX + "extractor:delete";
     public static final String EXTRACTOR_ORDER_UPDATE = PREFIX + "extractor_order:update";
+    public static final String FAVORITE_FIELDS_UPDATE = PREFIX + "favorite_fields:update";
     public static final String FIELD_TYPE_MAPPING_CREATE = PREFIX + "field_type_mapping:create";
     public static final String FIELD_TYPE_MAPPING_DELETE = PREFIX + "field_type_mapping:delete";
     public static final String FIELD_TYPE_POLLING_TRIGGERED = PREFIX + "field_type_polling:trigger";
@@ -114,6 +119,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String MESSAGE_INPUT_DELETE = PREFIX + "message_input:delete";
     public static final String MESSAGE_INPUT_START = PREFIX + "message_input:start";
     public static final String MESSAGE_INPUT_STOP = PREFIX + "message_input:stop";
+    public static final String MESSAGE_INPUT_SETUP = PREFIX + "message_input:setup";
     public static final String MESSAGE_INPUT_UPDATE = PREFIX + "message_input:update";
     public static final String MESSAGE_OUTPUT_CREATE = PREFIX + "message_output:create";
     public static final String MESSAGE_OUTPUT_DELETE = PREFIX + "message_output:delete";
@@ -129,6 +135,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String NODE_SHUTDOWN_INITIATE = PREFIX + "node_shutdown:initiate";
     public static final String NODE_STARTUP_COMPLETE = PREFIX + "node_startup:complete";
     public static final String NODE_STARTUP_INITIATE = PREFIX + "node_startup:initiate";
+    public static final String ROLE_AUTHZ_DELETE = PREFIX + "role_authz_membership:delete";
+    public static final String ROLE_AUTHZ_UPDATE = PREFIX + "role_authz_membership:update";
     public static final String ROLE_CREATE = PREFIX + "role:create";
     public static final String ROLE_DELETE = PREFIX + "role:delete";
     public static final String ROLE_MEMBERSHIP_DELETE = PREFIX + "role_membership:delete";
@@ -163,7 +171,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String SYSTEM_JOB_ACKNOWLEDGE = PREFIX + "system_job:acknowledge";
     public static final String SYSTEM_NOTIFICATION_CREATE = PREFIX + "system_notification:create";
     public static final String SYSTEM_NOTIFICATION_DELETE = PREFIX + "system_notification:delete";
-    public static final String URL_WHITELIST_UPDATE = PREFIX + "url_whitelist:update";
+    public static final String URL_ALLOWLIST_UPDATE = PREFIX + "url_allowlist:update";
     public static final String USER_ACCESS_TOKEN_CREATE = PREFIX + "user_access_token:create";
     public static final String USER_ACCESS_TOKEN_DELETE = PREFIX + "user_access_token:delete";
     public static final String USER_CREATE = PREFIX + "user:create";
@@ -173,8 +181,20 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String USER_PERMISSIONS_DELETE = PREFIX + "user_permissions:delete";
     public static final String USER_PREFERENCES_UPDATE = PREFIX + "user_preferences:update";
     public static final String USER_UPDATE = PREFIX + "user:update";
+    public static final String USER_ROLES_UPDATE = PREFIX + "user_roles:update";
     public static final String TELEMETRY_USER_SETTINGS_UPDATE = PREFIX + "telemetry_user_settings:update";
     public static final String CONTENT_STREAM_USER_SETTINGS_UPDATE = PREFIX + "content_stream_user_settings:update";
+
+    // must be private, otherwise the sanity check test in AuditCoverageTest picks it up and fails
+    private static final String MCP_PREFIX = "mcp_server" + ":";
+    public static final String MCP_PROTOCOL_INITIALIZE = MCP_PREFIX + "protocol:initialize";
+    public static final String MCP_RESOURCE_LIST = MCP_PREFIX + "resource:list";
+    public static final String MCP_RESOURCE_READTEMPLATES = MCP_PREFIX + "resource:read_templates";
+    public static final String MCP_RESOURCE_READ = MCP_PREFIX + "resource:read";
+    public static final String MCP_PROMPT_LIST = MCP_PREFIX + "prompt:list";
+    public static final String MCP_PROMPT_GET = MCP_PREFIX + "prompt:get";
+    public static final String MCP_TOOL_LIST = MCP_PREFIX + "tool:list";
+    public static final String MCP_TOOL_CALL = MCP_PREFIX + "tool:call";
 
     private static final ImmutableSet<String> EVENT_TYPES = ImmutableSet.<String>builder()
             .add(ALARM_CALLBACK_CREATE)
@@ -196,6 +216,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(CONTENT_PACK_DELETE_REV)
             .add(CONTENT_PACK_INSTALL)
             .add(CONTENT_PACK_UNINSTALL)
+            .add(CONTENT_PACK_ENTITY_CREATE)
+            .add(CONTENT_PACK_ENTITY_DELETE)
             .add(DASHBOARD_CREATE)
             .add(DASHBOARD_DELETE)
             .add(DASHBOARD_UPDATE)
@@ -208,6 +230,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(DATANODE_RESET)
             .add(DATANODE_STOP)
             .add(DATANODE_START)
+            .add(DATANODE_START_REPLICATION)
+            .add(DATANODE_STOP_REPLICATION)
             .add(DATANODE_API_REQUEST)
             .add(ES_INDEX_CLOSE)
             .add(ES_INDEX_CREATE)
@@ -228,6 +252,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(EXTRACTOR_DELETE)
             .add(EXTRACTOR_ORDER_UPDATE)
             .add(EXTRACTOR_UPDATE)
+            .add(FAVORITE_FIELDS_UPDATE)
             .add(FIELD_TYPE_MAPPING_CREATE)
             .add(FIELD_TYPE_MAPPING_DELETE)
             .add(FIELD_TYPE_POLLING_TRIGGERED)
@@ -266,6 +291,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(MESSAGE_INPUT_DELETE)
             .add(MESSAGE_INPUT_START)
             .add(MESSAGE_INPUT_STOP)
+            .add(MESSAGE_INPUT_SETUP)
             .add(MESSAGE_INPUT_UPDATE)
             .add(MESSAGE_OUTPUT_CREATE)
             .add(MESSAGE_OUTPUT_DELETE)
@@ -281,6 +307,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(NODE_SHUTDOWN_INITIATE)
             .add(NODE_STARTUP_COMPLETE)
             .add(NODE_STARTUP_INITIATE)
+            .add(ROLE_AUTHZ_DELETE)
+            .add(ROLE_AUTHZ_UPDATE)
             .add(ROLE_CREATE)
             .add(ROLE_DELETE)
             .add(ROLE_MEMBERSHIP_DELETE)
@@ -314,7 +342,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(SYSTEM_JOB_ACKNOWLEDGE)
             .add(SYSTEM_NOTIFICATION_CREATE)
             .add(SYSTEM_NOTIFICATION_DELETE)
-            .add(URL_WHITELIST_UPDATE)
+            .add(URL_ALLOWLIST_UPDATE)
             .add(USER_ACCESS_TOKEN_CREATE)
             .add(USER_ACCESS_TOKEN_DELETE)
             .add(USER_CREATE)
@@ -324,9 +352,18 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(USER_PERMISSIONS_DELETE)
             .add(USER_PREFERENCES_UPDATE)
             .add(USER_UPDATE)
+            .add(USER_ROLES_UPDATE)
             .add(TELEMETRY_USER_SETTINGS_UPDATE)
             .add(CONTENT_STREAM_USER_SETTINGS_UPDATE)
             .add(CERTIFICATE_RENEWAL_MANUALLY_INITIATED)
+            .add(MCP_PROTOCOL_INITIALIZE)
+            .add(MCP_RESOURCE_LIST)
+            .add(MCP_RESOURCE_READ)
+            .add(MCP_RESOURCE_READTEMPLATES)
+            .add(MCP_TOOL_LIST)
+            .add(MCP_TOOL_CALL)
+            .add(MCP_PROMPT_LIST)
+            .add(MCP_PROMPT_GET)
             .build();
 
     @Override

@@ -15,20 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { Modal } from 'components/bootstrap';
 import ModalSubmit from 'components/common/ModalSubmit';
 
 type Props = {
-  show?: boolean,
-  onConfirm: (event) => void,
-  onCancel?: () => void,
-  title: string | React.ReactNode,
-  children: React.ReactNode,
-  btnConfirmDisabled?: boolean,
-  btnConfirmText?: React.ReactNode,
-  hideCancelButton?: boolean,
+  btnConfirmDisabled?: boolean;
+  btnConfirmText?: React.ReactNode;
+  children: React.ReactNode;
+  hideCancelButton?: boolean;
+  isAsyncSubmit?: boolean;
+  isSubmitting?: boolean;
+  onCancel?: () => void;
+  onConfirm: () => void;
+  show?: boolean;
+  submitLoadingText?: string;
+  title: string | React.ReactNode;
 };
 
 /**
@@ -36,80 +38,54 @@ type Props = {
  * cancel or confirm.
  */
 const ConfirmDialog = ({
-  show,
-  title,
+  btnConfirmDisabled = false,
+  btnConfirmText = 'Confirm',
   children,
-  onCancel,
+  hideCancelButton = false,
+  isAsyncSubmit = undefined,
+  isSubmitting = undefined,
+  onCancel = () => {},
   onConfirm,
-  btnConfirmDisabled,
-  btnConfirmText,
-  hideCancelButton,
+  show = false,
+  submitLoadingText = undefined,
+  title,
 }: Props) => {
   const onHide = hideCancelButton ? onConfirm : onCancel;
 
+  const submit = hideCancelButton ? (
+    <ModalSubmit
+      autoFocus
+      onSubmit={onConfirm}
+      submitButtonType="button"
+      disabledSubmit={btnConfirmDisabled}
+      submitButtonText={btnConfirmText}
+    />
+  ) : (
+    <ModalSubmit
+      autoFocus
+      disabledSubmit={btnConfirmDisabled}
+      displayCancel
+      isAsyncSubmit={isAsyncSubmit}
+      isSubmitting={isSubmitting}
+      onCancel={onCancel}
+      onSubmit={onConfirm}
+      submitButtonText={btnConfirmText}
+      submitButtonType="button"
+      submitLoadingText={submitLoadingText}
+    />
+  );
+
   return (
-    <Modal show={show} onHide={onHide}>
-      <Modal.Header closeButton>
+    <Modal show={show} onHide={onHide} isConfirmDialog>
+      <Modal.Header>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
 
-      <Modal.Body>
-        {children}
-      </Modal.Body>
+      <Modal.Body>{children}</Modal.Body>
 
-      <Modal.Footer>
-        <ModalSubmit onCancel={onCancel}
-                     onSubmit={onConfirm}
-                     submitButtonType="button"
-                     disabledSubmit={btnConfirmDisabled}
-                     submitButtonText={btnConfirmText}
-                     displayCancel={!hideCancelButton as any} />
-      </Modal.Footer>
+      <Modal.Footer>{submit}</Modal.Footer>
     </Modal>
   );
-};
-
-ConfirmDialog.propTypes = {
-  /** Indicates whether the dialog should be shown by default or not. */
-  show: PropTypes.bool,
-  /** Indicates whether the dialog should render the cancel button by default or not. */
-  hideCancelButton: PropTypes.bool,
-  /** Title to use in the modal. */
-  title: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.element,
-  ]).isRequired,
-  /** Text or element to use in the confirmation button. */
-  btnConfirmText: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.element,
-  ]),
-  /** Indicates whether the confirm button should be disabled or not. */
-  btnConfirmDisabled: PropTypes.bool,
-  /** Function to call when the action is not confirmed. The function does not receive any arguments. */
-  onCancel: PropTypes.func,
-  /**
-   * Function to call when the action is confirmed. The function receives a callback function to close the modal
-   * dialog box as first argument.
-   */
-  onConfirm: PropTypes.func.isRequired,
-  /**
-   * React elements to display in the modal body. This should be the information the user has
-   * to confirm in order to proceed with the operation.
-   */
-  children: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.element,
-  ]).isRequired,
-};
-
-ConfirmDialog.defaultProps = {
-  btnConfirmText: 'Confirm',
-  btnConfirmDisabled: false,
-  show: false,
-  hideCancelButton: false,
-  onCancel: () => {
-  },
 };
 
 export default ConfirmDialog;

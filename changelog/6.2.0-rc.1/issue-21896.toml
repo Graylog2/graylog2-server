@@ -1,0 +1,5 @@
+type = "f"
+message = "IndexerDiscoveryProvider is now providing only AVAILABLE data nodes to prevent hitting starting indexers."
+
+pulls = ["22128"]
+issues = ["21896"]

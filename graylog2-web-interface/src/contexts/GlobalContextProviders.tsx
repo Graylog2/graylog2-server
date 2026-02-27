@@ -20,7 +20,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import usePluginEntities from 'hooks/usePluginEntities';
 
 type Props = {
-  children: React.ReactElement,
+  children: React.ReactElement;
 };
 
 const GlobalContextProviders = ({ children }: Props) => {
@@ -30,13 +30,14 @@ const GlobalContextProviders = ({ children }: Props) => {
     return children;
   }
 
-  return contextProviders.reduce((nestedChildren, GlobalContextProvider) => (
-    <ErrorBoundary FallbackComponent={() => nestedChildren}>
-      <GlobalContextProvider>
-        {nestedChildren}
-      </GlobalContextProvider>
-    </ErrorBoundary>
-  ), children);
+  return contextProviders.reduce(
+    (nestedChildren, GlobalContextProvider) => (
+      <ErrorBoundary FallbackComponent={() => nestedChildren}>
+        <GlobalContextProvider>{nestedChildren}</GlobalContextProvider>
+      </ErrorBoundary>
+    ),
+    children,
+  );
 };
 
 export default GlobalContextProviders;

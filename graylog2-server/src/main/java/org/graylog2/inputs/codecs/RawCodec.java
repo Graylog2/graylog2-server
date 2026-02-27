@@ -33,6 +33,7 @@ import org.graylog2.plugin.journal.RawMessage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 @Codec(name = "raw", displayName = "Raw String")
 public class RawCodec extends AbstractCodec {
@@ -45,10 +46,9 @@ public class RawCodec extends AbstractCodec {
         this.messageFactory = messageFactory;
     }
 
-    @Nullable
     @Override
-    public Message decode(@Nonnull RawMessage raw) {
-        return messageFactory.createMessage(new String(raw.getPayload(), charset), null, raw.getTimestamp());
+    public Optional<Message> decodeSafe(@Nonnull RawMessage raw) {
+        return Optional.of(messageFactory.createMessage(new String(raw.getPayload(), charset), null, raw.getTimestamp()));
     }
 
     @Nullable

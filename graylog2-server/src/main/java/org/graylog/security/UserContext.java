@@ -16,18 +16,22 @@
  */
 package org.graylog.security;
 
+import jakarta.inject.Inject;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.authz.permission.AllPermission;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 import org.graylog.grn.GRN;
-import org.graylog.security.permissions.GRNPermission;
+import org.graylog.util.uuid.ConcurrentUUID;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.plugin.security.Permission;
+import org.graylog2.shared.rest.RequestIdFilter;
+import org.graylog2.shared.security.ShiroRequestHeadersBinder;
 import org.graylog2.shared.users.UserService;
-
-import jakarta.inject.Inject;
 
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -35,7 +39,7 @@ import java.util.concurrent.Callable;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-public class UserContext implements HasUser {
+public class UserContext implements HasUser, HasPermissions {
     private final UserService userService;
     private final String userId;
     private final Subject subject;
@@ -52,7 +56,7 @@ public class UserContext implements HasUser {
          * Create a UserContext from the currently accessible Shiro Subject available to the calling code depending on runtime environment.
          * This should only be called from within an existing Shiro context.
          * If a UserContext is needed from an environment where there is no existing context,
-         * the code can be run using: {@link UserContext#runAs(String username, Callable)}
+         * the code can be run using: {@link UserContext#runAs(String username, UserService userService, Callable)}
          *
          * @return a user context reflecting the currently executing user.
          * @throws UserContextMissingException
@@ -78,35 +82,41 @@ public class UserContext implements HasUser {
     /**
      * Build a temporary Shiro Subject and run the callable within that context
      *
-     * @param username The username of the subject
-     * @param callable The callable to be executed
-     * @param <T>      The return type of the callable.
+     * @param username    The username of the subject
+     * @param userService The userService to resolve the userId from the username
+     * @param callable    The callable to be executed
+     * @param <T>         The return type of the callable.
      * @return whatever the callable returns.
      */
-    public static <T> T runAs(String username, Callable<T> callable) {
+    public static <T> T runAs(String username, UserService userService, Callable<T> callable) {
+        User user = userService.load(username);
+        if (user == null) {
+            throw new IllegalArgumentException("Unknown user <" + username + ">");
+        }
         final Subject subject = new Subject.Builder()
-                .principals(new SimplePrincipalCollection(username, "runAs-context"))
+                .principals(new SimplePrincipalCollection(user.getId(), "runAs-context"))
                 .authenticated(true)
                 .sessionCreationEnabled(false)
                 .buildSubject();
 
-        return subject.execute(callable);
+        return subject.execute(wrapWithRequestHeader(callable));
+
     }
 
-    /**
-     * Build a temporary Shiro Subject and run the callable within that context
-     *
-     * @param username The username of the subject
-     * @param runnable The runnable to be executed
-     */
-    public static void runAs(String username, Runnable runnable) {
-        final Subject subject = new Subject.Builder()
-                .principals(new SimplePrincipalCollection(username, "runAs-context"))
-                .authenticated(true)
-                .sessionCreationEnabled(false)
-                .buildSubject();
-
-        subject.execute(runnable);
+    private static <T> Callable<T> wrapWithRequestHeader(Callable<T> callable) {
+        // temporarily add "X-Request-Id" header to suppress warning in org.graylog2.security.realm.MongoDbAuthorizationRealm
+        return () -> {
+            final MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+            headers.putSingle(RequestIdFilter.X_REQUEST_ID, ConcurrentUUID.generateRandomUuid().toString());
+            ThreadContext.put(ShiroRequestHeadersBinder.REQUEST_HEADERS, headers);
+            try {
+                return callable.call();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            } finally {
+                ThreadContext.remove(ShiroRequestHeadersBinder.REQUEST_HEADERS);
+            }
+        };
     }
 
     public UserContext(String userId, Subject subject, UserService userService) {
@@ -125,7 +135,7 @@ public class UserContext implements HasUser {
     }
 
     protected boolean isOwner(GRN entity) {
-        return subject.isPermitted(GRNPermission.create(RestPermissions.ENTITY_OWN, entity));
+        return subject.isPermitted(Permission.ENTITY_OWN.toShiroPermission(entity));
     }
 
     /**

@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.database.MongoEntity;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
@@ -29,7 +30,7 @@ import javax.annotation.Nullable;
 
 @AutoValue
 @JsonDeserialize(builder = ProcessingStatusDto.Builder.class)
-public abstract class ProcessingStatusDto {
+public abstract class ProcessingStatusDto implements MongoEntity {
     private static final String FIELD_ID = "id";
     static final String FIELD_NODE_ID = "node_id";
     static final String FIELD_NODE_LIFECYCLE_STATUS = "node_lifecycle_status";

@@ -20,9 +20,9 @@ import * as React from 'react';
 import userEvent from '@testing-library/user-event';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import Immutable from 'immutable';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import { asMock } from 'helpers/mocking';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import OriginalDashboardActions from 'views/components/dashboard/DashboardsOverview/DashboardActions';
 import { simpleView } from 'views/test/ViewFixtures';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -30,14 +30,15 @@ import { adminUser } from 'fixtures/users';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import type { ContextValue } from 'components/common/PaginatedEntityTable/TableFetchContext';
 import TableFetchContext from 'components/common/PaginatedEntityTable/TableFetchContext';
+import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
+import { deleteView } from 'views/api/views';
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 jest.mock('hooks/useCurrentUser');
 jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
 
-jest.mock('views/stores/ViewManagementStore', () => ({
-  ViewManagementActions: {
-    delete: jest.fn(() => Promise.resolve()),
-  },
+jest.mock('views/api/views', () => ({
+  deleteView: jest.fn(() => Promise.resolve()),
 }));
 
 const mockSearchParams = {
@@ -50,33 +51,41 @@ const mockSearchParams = {
   },
 } as const;
 
-const mockContextValue = { searchParams: mockSearchParams, refetch: jest.fn(), attributes: [] };
+const mockContextValue = {
+  searchParams: mockSearchParams,
+  refetch: jest.fn(),
+  attributes: [],
+  entityTableId: 'entity-table',
+};
 
-const DashboardActions = ({ contextValue, ...props }: React.ComponentProps<typeof OriginalDashboardActions> & { contextValue?: ContextValue }) => (
+const DashboardActions = ({
+  contextValue = undefined,
+  ...props
+}: React.ComponentProps<typeof OriginalDashboardActions> & { contextValue?: ContextValue }) => (
   <TableFetchContext.Provider value={contextValue ?? mockContextValue}>
     <OriginalDashboardActions {...props} />
   </TableFetchContext.Provider>
 );
 
-DashboardActions.defaultProps = {
-  contextValue: undefined,
-};
-
 describe('DashboardActions', () => {
-  let oldWindowConfirm;
-
   const simpleDashboard = simpleView();
   const menuIsHidden = () => expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+  const renderSUT = (props: React.ComponentProps<typeof DashboardActions> = { dashboard: simpleDashboard }) =>
+    render(
+      <DefaultQueryParamProvider>
+        <DashboardActions {...props} />
+      </DefaultQueryParamProvider>,
+    );
 
   const clickDashboardAction = async (action: string) => {
     userEvent.click(await screen.findByRole('button', { name: /more/i }));
-    userEvent.click(await screen.findByRole('button', { name: action }));
+    userEvent.click(await screen.findByRole('menuitem', { name: action }));
     await waitFor(() => menuIsHidden());
   };
 
+  useWindowConfirmMock();
+
   beforeEach(() => {
-    oldWindowConfirm = window.confirm;
-    window.confirm = jest.fn();
     asMock(useCurrentUser).mockReturnValue(adminUser);
 
     asMock(useSelectedEntities).mockReturnValue({
@@ -85,42 +94,43 @@ describe('DashboardActions', () => {
       selectEntity: () => {},
       deselectEntity: () => {},
       toggleEntitySelect: () => {},
+      isSomeRowsSelected: false,
+      isAllRowsSelected: false,
     });
-  });
-
-  afterEach(() => {
-    window.confirm = oldWindowConfirm;
   });
 
   it('does not delete dashboard when user clicks cancel', async () => {
     asMock(window.confirm).mockReturnValue(false);
 
-    render(<DashboardActions dashboard={simpleDashboard} />);
+    renderSUT();
 
     await clickDashboardAction('Delete');
 
     await waitFor(() => expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete "Foo"?'));
 
-    expect(ViewManagementActions.delete).not.toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
+    expect(deleteView).not.toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
   });
 
   it('deletes dashboard when user confirms deletion', async () => {
     asMock(window.confirm).mockReturnValue(true);
 
-    render(<DashboardActions dashboard={simpleDashboard} />);
+    renderSUT();
 
     await clickDashboardAction('Delete');
 
     await waitFor(() => expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete "Foo"?'));
 
-    expect(ViewManagementActions.delete).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
+    expect(deleteView).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
   });
 
   it('does not display more actions dropdown when user has no permissions for deletion and there are no pluggable actions', async () => {
-    const currentUser = adminUser.toBuilder().permissions(Immutable.List([`view:read:${simpleDashboard.id}`])).build();
+    const currentUser = adminUser
+      .toBuilder()
+      .permissions(Immutable.List<Permission>([`view:read:${simpleDashboard.id}`]))
+      .build();
     asMock(useCurrentUser).mockReturnValue(currentUser);
 
-    render(<DashboardActions dashboard={simpleDashboard} />);
+    renderSUT();
 
     await screen.findByRole('button', { name: /share/i });
 
@@ -138,8 +148,8 @@ describe('DashboardActions', () => {
 
     beforeEach(() => {
       PluginStore.register(plugin);
-      asMock(ViewManagementActions.delete).mockClear();
-      asMock(ViewManagementActions.delete).mockImplementation((view) => Promise.resolve(view));
+      asMock(deleteView).mockClear();
+      asMock(deleteView).mockImplementation(() => Promise.resolve());
     });
 
     afterEach(() => {
@@ -147,11 +157,11 @@ describe('DashboardActions', () => {
     });
 
     it('triggers hook when deleting dashboard', async () => {
-      render(<DashboardActions dashboard={simpleDashboard} />);
+      renderSUT();
 
       await clickDashboardAction('Delete');
 
-      await waitFor(() => expect(ViewManagementActions.delete).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' })));
+      await waitFor(() => expect(deleteView).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' })));
 
       expect(deletingDashboard).toHaveBeenCalledWith(simpleDashboard);
     });
@@ -161,11 +171,11 @@ describe('DashboardActions', () => {
         ...mockContextValue,
         refetch: jest.fn(),
       };
-      render(<DashboardActions dashboard={simpleDashboard} contextValue={contextValue} />);
+      renderSUT({ dashboard: simpleDashboard, contextValue });
 
       await clickDashboardAction('Delete');
 
-      await waitFor(() => expect(ViewManagementActions.delete).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' })));
+      await waitFor(() => expect(deleteView).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' })));
 
       expect(contextValue.refetch).toHaveBeenCalled();
     });
@@ -173,20 +183,20 @@ describe('DashboardActions', () => {
     it('does not delete dashboard when hook returns false', async () => {
       asMock(deletingDashboard).mockResolvedValue(false);
 
-      render(<DashboardActions dashboard={simpleDashboard} />);
+      renderSUT();
 
       await clickDashboardAction('Delete');
 
       await waitFor(() => expect(deletingDashboard).toHaveBeenCalledWith(simpleDashboard));
 
-      expect(ViewManagementActions.delete).not.toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
+      expect(deleteView).not.toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
     });
 
     it('resorts to default behavior when hook returns `null`', async () => {
       asMock(deletingDashboard).mockReturnValue(null);
       asMock(window.confirm).mockReturnValue(true);
 
-      render(<DashboardActions dashboard={simpleDashboard} />);
+      renderSUT();
 
       await clickDashboardAction('Delete');
 
@@ -194,15 +204,17 @@ describe('DashboardActions', () => {
 
       expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete "Foo"?');
 
-      expect(ViewManagementActions.delete).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
+      expect(deleteView).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
     });
 
     it('resorts to default behavior when hook throws error', async () => {
       const error = Error('Boom!');
-      asMock(deletingDashboard).mockImplementation(() => { throw error; });
+      asMock(deletingDashboard).mockImplementation(() => {
+        throw error;
+      });
       asMock(window.confirm).mockReturnValue(true);
 
-      render(<DashboardActions dashboard={simpleDashboard} />);
+      renderSUT();
 
       /* eslint-disable no-console */
       const oldConsoleTrace = console.trace;
@@ -210,7 +222,9 @@ describe('DashboardActions', () => {
 
       await clickDashboardAction('Delete');
 
-      await waitFor(() => expect(console.trace).toHaveBeenCalledWith('Exception occurred in deletion confirmation hook: ', error));
+      await waitFor(() =>
+        expect(console.trace).toHaveBeenCalledWith('Exception occurred in deletion confirmation hook: ', error),
+      );
       console.trace = oldConsoleTrace;
       /* eslint-enable no-console */
 
@@ -218,7 +232,7 @@ describe('DashboardActions', () => {
 
       expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete "Foo"?');
 
-      expect(ViewManagementActions.delete).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
+      expect(deleteView).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
     });
   });
 });

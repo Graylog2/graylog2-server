@@ -20,16 +20,14 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class GrokTestRequest {
-    @JsonProperty
+    @JsonProperty("string")
     public abstract String string();
 
-    @JsonProperty
+    @JsonProperty("pattern")
     public abstract String pattern();
 
     @JsonProperty("named_captures_only")

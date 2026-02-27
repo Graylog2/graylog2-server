@@ -22,20 +22,22 @@ import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class MessageOutputFactoryTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private final Map<String, MessageOutput.Factory<? extends MessageOutput>> availableOutputs;
     private final Map<String, MessageOutput.Factory2<? extends MessageOutput>> availableOutputs2;
@@ -47,19 +49,21 @@ public class MessageOutputFactoryTest {
         this.availableOutputs2 = Maps.newHashMap();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.messageOutputFactory = new MessageOutputFactory(availableOutputs, availableOutputs2);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testNonExistentOutputType() throws MessageOutputConfigurationException {
-        final String outputType = "non.existent";
-        final Output output = mock(Output.class);
-        when(output.getType()).thenReturn(outputType);
-        final Stream stream = mock(Stream.class);
-        final Configuration configuration = mock(Configuration.class);
+        assertThrows(IllegalArgumentException.class, () -> {
+            final String outputType = "non.existent";
+            final Output output = mock(Output.class);
+            when(output.getType()).thenReturn(outputType);
+            final Stream stream = mock(Stream.class);
+            final Configuration configuration = mock(Configuration.class);
 
-        messageOutputFactory.fromStreamOutput(output, stream, configuration);
+            messageOutputFactory.fromStreamOutput(output, stream, configuration);
+        });
     }
 }

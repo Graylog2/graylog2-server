@@ -45,6 +45,10 @@ public abstract class PipelineSource {
     @ObjectId
     public abstract String id();
 
+    @JsonProperty("_scope")
+    @Nullable
+    public abstract String scope();
+
     @JsonProperty("title")
     @Nullable
     public abstract String title();
@@ -71,6 +75,10 @@ public abstract class PipelineSource {
     @Nullable
     public abstract Set<ParseError> errors();
 
+    @JsonProperty("has_deprecated_functions")
+    @Nullable
+    public abstract Boolean hasDeprecatedFunctions();
+
     public static Builder builder() {
         return new AutoValue_PipelineSource.Builder();
     }
@@ -78,25 +86,32 @@ public abstract class PipelineSource {
     public abstract Builder toBuilder();
 
     @JsonCreator
-    public static PipelineSource create(@JsonProperty("id") @Id @ObjectId @Nullable String id,
+    public static PipelineSource create(@Nullable @JsonProperty("id") @Id @ObjectId String id,
+                                        @Nullable @JsonProperty("_scope") String scope,
                                         @JsonProperty("title") String title,
-                                        @JsonProperty("description") @Nullable String description,
+                                        @Nullable @JsonProperty("description") String description,
                                         @JsonProperty("source") String source,
                                         @Nullable @JsonProperty("stages") List<StageSource> stages,
                                         @Nullable @JsonProperty("created_at") DateTime createdAt,
                                         @Nullable @JsonProperty("modified_at") DateTime modifiedAt) {
         return builder()
                 .id(id)
+                .scope(scope)
                 .title(title)
                 .description(description)
                 .source(source)
                 .createdAt(createdAt)
                 .modifiedAt(modifiedAt)
                 .stages(stages == null ? Collections.emptyList() : stages)
+                .hasDeprecatedFunctions(null)
                 .build();
     }
 
     public static PipelineSource fromDao(PipelineRuleParser parser, PipelineDao dao) {
+        return fromDao(parser, dao, null);
+    }
+
+    public static PipelineSource fromDao(PipelineRuleParser parser, PipelineDao dao, Boolean hasDeprecatedFunctions) {
         Set<ParseError> errors = null;
         Pipeline pipeline = null;
         try {
@@ -115,6 +130,7 @@ public abstract class PipelineSource {
 
         return builder()
                 .id(dao.id())
+                .scope(dao.scope())
                 .title(dao.title())
                 .description(dao.description())
                 .source(dao.source())
@@ -122,6 +138,7 @@ public abstract class PipelineSource {
                 .modifiedAt(dao.modifiedAt())
                 .stages(stageSources)
                 .errors(errors)
+                .hasDeprecatedFunctions(hasDeprecatedFunctions)
                 .build();
     }
 
@@ -130,6 +147,8 @@ public abstract class PipelineSource {
         public abstract PipelineSource build();
 
         public abstract Builder id(String id);
+
+        public abstract Builder scope(String scope);
 
         public abstract Builder title(String title);
 
@@ -144,5 +163,7 @@ public abstract class PipelineSource {
         public abstract Builder stages(List<StageSource> stages);
 
         public abstract Builder errors(Set<ParseError> errors);
+
+        public abstract Builder hasDeprecatedFunctions(Boolean hasDeprecatedFunctions);
     }
 }

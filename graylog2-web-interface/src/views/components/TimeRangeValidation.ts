@@ -35,7 +35,11 @@ const rangeLimitError = 'Range is outside limit duration.';
 const dateLimitError = 'Date is outside limit duration.';
 const timeRangeError = 'The "Until" date must come after the "From" date.';
 
-const exceedsDuration = (dateTime: DateTime, limitDuration: number, formatTime: (dateTime: DateTime, format: string) => string) => {
+const exceedsDuration = (
+  dateTime: DateTime,
+  limitDuration: number,
+  formatTime: (dateTime: DateTime, format: string) => string,
+) => {
   if (limitDuration === 0) {
     return false;
   }
@@ -45,10 +49,14 @@ const exceedsDuration = (dateTime: DateTime, limitDuration: number, formatTime: 
   return moment(dateTime).isBefore(durationLimit);
 };
 
-const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: number, formatTime: (dateTime: DateTime, format: string) => string) => {
+const validateAbsoluteTimeRange = (
+  timeRange: AbsoluteTimeRange,
+  limitDuration: number,
+  formatTime: (dateTime: DateTime, format: string) => string,
+) => {
   let errors: {
-    from?: string,
-    to?: string,
+    from?: string;
+    to?: string;
   } = {};
 
   if (!isValidDate(timeRange.from)) {
@@ -71,7 +79,7 @@ const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: 
 };
 
 const validateRelativeTimeRangeWithEnd = (timeRange: RelativeTimeRangeWithEnd, limitDuration: number) => {
-  let errors: { from?: string, to?: string } = {};
+  let errors: { from?: string; to?: string } = {};
 
   if (limitDuration > 0) {
     if (timeRange.from > limitDuration || !timeRange.from) {
@@ -101,7 +109,8 @@ const validateRelativeTimeRangeWithEnd = (timeRange: RelativeTimeRangeWithEnd, l
 const debouncedTestNaturalDate = debounceWithPromise(ToolsStore.testNaturalDate, 350);
 
 const validateKeywordTimeRange = async (
-  timeRange: KeywordTimeRange, limitDuration: number,
+  timeRange: KeywordTimeRange,
+  limitDuration: number,
   formatTime: (dateTime: DateTime, format: string) => string,
   userTimezone: string,
   testKeyword: boolean,

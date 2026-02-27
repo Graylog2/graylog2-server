@@ -19,11 +19,9 @@ import type { TextProps } from '@mantine/core';
 import { Text as MantineText } from '@mantine/core';
 
 type Props = {
-  children: string,
+  children: string;
 } & TextProps;
 
-const Text = ({ ...props }: Props) => (
-  <MantineText {...props} />
-);
+const Text = ({ ...props }: Props) => <MantineText {...props} />;
 
 export default Text;

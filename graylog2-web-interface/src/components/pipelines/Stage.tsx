@@ -14,56 +14,107 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Col, Button } from 'components/bootstrap';
-import { EntityListItem, Spinner } from 'components/common';
+import { ConfirmDialog, EntityListItem, Spinner } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
-import type { PipelineType, StageType } from 'stores/pipelines/PipelinesStore';
+import type { PipelineType, StageType } from 'components/pipelines/types';
 import { useStore } from 'stores/connect';
-import { RulesStore } from 'stores/rules/RulesStore';
+import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
 import type { RuleType } from 'stores/rules/RulesStore';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
+import { PIPELINE_QUERY_KEY } from 'hooks/usePipeline';
 
 import StageForm from './StageForm';
-import StageRules from './StageRules';
+import StageRules, { INPUT_SETUP_WIZARD_ROUTING_RULE_DESCRIPTION } from './StageRules';
+
+const DEFAULT_ROUTING_PIPELINE = 'Default Routing';
 
 type Props = {
-  stage: StageType,
-  pipeline: PipelineType,
-  isLastStage: boolean,
-  onUpdate: (nextStage: StageType, callback: () => void) => void,
-  onDelete: () => void,
+  stage: StageType;
+  pipeline: PipelineType;
+  isLastStage: boolean;
+  onUpdate: (nextStage: StageType, callback: () => void) => void;
+  onDelete: () => void;
+  disableEdit?: boolean;
 };
 
-const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete }: Props) => {
+const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete, disableEdit = false }: Props) => {
   const currentUser = useCurrentUser();
+  const queryClient = useQueryClient();
   const { rules: allRules }: { rules: RuleType[] } = useStore(RulesStore);
+  const [removingRuleId, setRemovingRuleId] = useState<string | undefined>(undefined);
+  const [rulePendingRemoval, setRulePendingRemoval] = useState<RuleType | undefined>(undefined);
 
-  const suffix = `Contains ${(stage.rules.length === 1 ? '1 rule' : `${stage.rules.length} rules`)}`;
+  const stageRules = useMemo(
+    () => stage.rules.map((name) => allRules?.find((rule) => rule.title === name)),
+    [allRules, stage.rules],
+  );
+
+  const canRemoveRoutingRules =
+    pipeline.title === DEFAULT_ROUTING_PIPELINE && isPermitted(currentUser.permissions, 'pipeline_rule:delete');
+
+  const openRemoveRoutingRuleDialog = useCallback(
+    (rule: RuleType) => {
+      if (removingRuleId) return;
+      if (!rule?.id || rule.description !== INPUT_SETUP_WIZARD_ROUTING_RULE_DESCRIPTION) return;
+      setRulePendingRemoval(rule);
+    },
+    [removingRuleId],
+  );
+
+  const closeRemoveRoutingRuleDialog = useCallback(() => {
+    setRulePendingRemoval(undefined);
+  }, []);
+
+  const confirmRemoveRoutingRule = useCallback(() => {
+    if (removingRuleId) return;
+    if (!rulePendingRemoval?.id || rulePendingRemoval.description !== INPUT_SETUP_WIZARD_ROUTING_RULE_DESCRIPTION)
+      return;
+
+    const ruleToDelete = rulePendingRemoval;
+
+    setRulePendingRemoval(undefined);
+    setRemovingRuleId(ruleToDelete.id);
+    RulesActions.delete(ruleToDelete)
+      .then(() => queryClient.invalidateQueries({ queryKey: [...PIPELINE_QUERY_KEY, pipeline.id] }))
+      .finally(() => setRemovingRuleId(undefined));
+  }, [pipeline.id, queryClient, removingRuleId, rulePendingRemoval]);
+
+  const suffix = `Contains ${stage.rules.length === 1 ? '1 rule' : `${stage.rules.length} rules`}`;
 
   const throughput = (
-    <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${pipeline.id}.stage.${stage.stage}.executed`}>
+    <MetricContainer
+      name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${pipeline.id}.stage.${stage.stage}.executed`}>
       <CounterRate showTotal={false} prefix="Throughput: " suffix="msg/s" />
     </MetricContainer>
   );
 
   const actions = [
-    <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')}
-            key={`delete-stage-${stage}`}
-            bsStyle="danger"
-            onClick={onDelete}>
+    <Button
+      disabled={!isPermitted(currentUser.permissions, 'pipeline:edit') || disableEdit}
+      key={`delete-stage-${stage}`}
+      bsStyle="danger"
+      onClick={onDelete}>
       Delete
     </Button>,
-    <StageForm key={`edit-stage-${stage}`} pipeline={pipeline} stage={stage} save={onUpdate} />,
+    <StageForm
+      key={`edit-stage-${stage}`}
+      pipeline={pipeline}
+      stage={stage}
+      save={onUpdate}
+      disableEdit={disableEdit}
+    />,
   ];
 
   let description;
 
   if (isLastStage) {
-    description = 'There are no further stages in this pipeline. Once rules in this stage are applied, the pipeline will have finished processing.';
+    description =
+      'There are no further stages in this pipeline. Once rules in this stage are applied, the pipeline will have finished processing.';
   } else {
     let matchText;
 
@@ -84,8 +135,7 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete }: Props) => {
 
     description = (
       <span>
-        Messages satisfying <strong>{matchText}</strong>{' '}
-        in this stage, will continue to the next stage.
+        Messages satisfying <strong>{matchText}</strong> in this stage, will continue to the next stage.
       </span>
     );
   }
@@ -98,29 +148,42 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete }: Props) => {
     </span>
   );
 
-  const content = (allRules
-    ? (
-      <StageRules pipeline={pipeline}
-                  stage={stage}
-                  rules={stage.rules.map((name) => allRules.filter((r) => r.title === name)[0])} />
-    )
-    : <Spinner />);
+  const content = allRules ? (
+    <StageRules
+      pipeline={pipeline}
+      stage={stage}
+      rules={stageRules}
+      canRemoveRoutingRules={canRemoveRoutingRules}
+      removingRuleId={removingRuleId}
+      onRemoveRule={openRemoveRoutingRuleDialog}
+    />
+  ) : (
+    <Spinner />
+  );
 
   return (
-    <EntityListItem title={`Stage ${stage.stage}`}
-                    titleSuffix={suffix}
-                    actions={actions}
-                    description={block}
-                    contentRow={<Col md={12}>{content}</Col>} />
+    <>
+      <EntityListItem
+        title={`Stage ${stage.stage}`}
+        titleSuffix={suffix}
+        actions={actions}
+        description={block}
+        contentRow={<Col md={12}>{content}</Col>}
+      />
+      {rulePendingRemoval && (
+        <ConfirmDialog
+          title="Remove Routing Rule"
+          show
+          onConfirm={confirmRemoveRoutingRule}
+          onCancel={closeRemoveRoutingRuleDialog}
+          btnConfirmText="Remove">
+          <span>
+            Do you really want to remove routing rule <b>{rulePendingRemoval.title}</b>?
+          </span>
+        </ConfirmDialog>
+      )}
+    </>
   );
-};
-
-Stage.propTypes = {
-  stage: PropTypes.object.isRequired,
-  pipeline: PropTypes.object.isRequired,
-  isLastStage: PropTypes.bool.isRequired,
-  onUpdate: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
 };
 
 export default Stage;

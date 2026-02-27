@@ -19,15 +19,10 @@ import * as React from 'react';
 import { TimeUnit } from 'components/common';
 import type { LookupTableCache } from 'logic/lookup-tables/types';
 
-import {
-  SummaryContainer,
-  SummaryRow,
-  Title,
-  Value,
-} from './SummaryComponents.styled';
+import { SummaryContainer, SummaryRow, Title, Value } from './SummaryComponents.styled';
 
 type Props = {
-  cache: LookupTableCache,
+  cache: LookupTableCache;
 };
 
 const CaffeineCacheSummary = ({ cache }: Props) => (
@@ -39,22 +34,19 @@ const CaffeineCacheSummary = ({ cache }: Props) => (
     <SummaryRow>
       <Title>Expire after access:</Title>
       <Value style={{ borderBottom: '1px solid #eee' }}>
-        <TimeUnit value={cache.config.expire_after_access}
-                  unit={cache.config.expire_after_access_unit} />
+        <TimeUnit value={cache.config.expire_after_access} unit={cache.config.expire_after_access_unit} />
       </Value>
     </SummaryRow>
     <SummaryRow>
       <Title>Expire after write:</Title>
       <Value>
-        <TimeUnit value={cache.config.expire_after_write}
-                  unit={cache.config.expire_after_write_unit} />
+        <TimeUnit value={cache.config.expire_after_write} unit={cache.config.expire_after_write_unit} />
       </Value>
     </SummaryRow>
     <SummaryRow>
       <Title>TTL for empty results:</Title>
       <Value>
-        <TimeUnit value={cache.config.ttl_empty || 0}
-                  unit={cache.config.ttl_empty_unit || 'SECONDS'} />
+        <TimeUnit value={cache.config.ttl_empty || 0} unit={cache.config.ttl_empty_unit || 'SECONDS'} />
       </Value>
     </SummaryRow>
   </SummaryContainer>

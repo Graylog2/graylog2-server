@@ -40,11 +40,7 @@ describe('CustomMenuList', () => {
   });
 
   it('Check if List component rendered for number of items more than 1000', () => {
-    render(
-      <CustomMenuList>
-        {getChildrenList(1001)}
-      </CustomMenuList>,
-    );
+    render(<CustomMenuList>{getChildrenList(1001)}</CustomMenuList>);
 
     const list = screen.getAllByTestId('react-window-list-item');
 

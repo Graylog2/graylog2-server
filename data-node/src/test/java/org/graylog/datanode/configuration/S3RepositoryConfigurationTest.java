@@ -21,6 +21,7 @@ import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import org.assertj.core.api.Assertions;
+import org.graylog.datanode.configuration.snapshots.S3RepositoryConfiguration;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;

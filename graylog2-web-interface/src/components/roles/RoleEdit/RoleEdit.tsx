@@ -26,7 +26,7 @@ import ProfileSection from '../RoleDetails/ProfileSection';
 import SectionGrid from '../../common/Section/SectionGrid';
 
 type Props = {
-  role: Role | null | undefined,
+  role: Role | null | undefined;
 };
 
 const RoleEdit = ({ role }: Props) => {
@@ -41,7 +41,7 @@ const RoleEdit = ({ role }: Props) => {
       </div>
       <div>
         <UsersSection role={role} />
-        <IfPermitted permissions="teams:edit">
+        <IfPermitted permissions="team:edit">
           <TeamsSection role={role} />
         </IfPermitted>
       </div>

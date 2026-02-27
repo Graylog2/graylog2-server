@@ -60,6 +60,7 @@ import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.plugin.security.PluginPermissions;
 import org.graylog2.plugin.validate.ClusterConfigValidator;
+import org.graylog2.shared.rest.resources.csp.CSPResources;
 import org.graylog2.streams.StreamDeletionGuard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,11 +68,13 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
+import java.util.Set;
 
 public abstract class Graylog2Module extends AbstractModule {
     private static final Logger LOG = LoggerFactory.getLogger(Graylog2Module.class);
 
     public static final String SYSTEM_REST_RESOURCES = "systemRestResources";
+    public static final String DB_ENTITIES = "dbEntities";
 
     protected void installTransport(
             MapBinder<String, Transport.Factory<? extends Transport>> mapBinder,
@@ -539,5 +542,21 @@ public abstract class Graylog2Module extends AbstractModule {
 
     protected Multibinder<StreamDeletionGuard> streamDeletionGuardBinder() {
         return Multibinder.newSetBinder(binder(), StreamDeletionGuard.class);
+    }
+
+    protected Multibinder<Class<?>> dbEntitiesBinder() {
+        return Multibinder.newSetBinder(binder(), new TypeLiteral<>() {}, Names.named(DB_ENTITIES));
+    }
+
+    protected Set<Object> getConfigurationBeans() {
+        return Set.of();
+    }
+
+    protected Multibinder<CSPResources.ResourceProvider> cspResourceProviderBinder() {
+        return Multibinder.newSetBinder(binder(), CSPResources.ResourceProvider.class);
+    }
+
+    protected void addCspResourceProvider(Class<? extends CSPResources.ResourceProvider> providerClass) {
+        cspResourceProviderBinder().addBinding().to(providerClass);
     }
 }

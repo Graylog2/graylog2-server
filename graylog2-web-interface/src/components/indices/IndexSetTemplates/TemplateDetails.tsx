@@ -15,26 +15,34 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Col, Row } from 'components/bootstrap';
-import { Section, Icon } from 'components/common';
-import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
-import { DataTieringSummary, DATA_TIERING_TYPE, prepareDataTieringInitialValues, DataTieringVisualisation } from 'components/indices/data-tiering';
+import { Section, StatusIcon } from 'components/common';
+import {
+  RotationStrategySummary,
+  RetentionStrategySummary,
+} from 'components/indices/IndexMaintenanceStrategiesSummary';
+import {
+  DataTieringSummary,
+  DATA_TIERING_TYPE,
+  prepareDataTieringInitialValues,
+  DataTieringVisualisation,
+} from 'components/indices/data-tiering';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
-import { indexSetTemplatePropType } from 'components/indices/IndexSetTemplates/types';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 type Props = {
-  template: IndexSetTemplate,
-  showDescription?: boolean
-}
+  template: IndexSetTemplate;
+  showDescription?: boolean;
+};
 
-const FlexWrapper = styled(Col)(({ theme }) => css`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacings.md};
+const FlexWrapper = styled(Col)(
+  ({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacings.md};
 
     dl {
       margin-bottom: 0;
@@ -54,24 +62,31 @@ const FlexWrapper = styled(Col)(({ theme }) => css`
     dl > dd:last-child {
       margin-bottom: 0;
     }
-`);
+  `,
+);
 
-const RotationSummaryWrapper = styled.div(({ theme }) => css`
-  margin-bottom: ${theme.spacings.sm};
-`);
+const RotationSummaryWrapper = styled.div(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.sm};
+  `,
+);
 
-const WarmTierSummaryWrapper = styled.div(({ theme }) => css`
-  margin-top: ${theme.spacings.sm};
-`);
+const WarmTierSummaryWrapper = styled.div(
+  ({ theme }) => css`
+    margin-top: ${theme.spacings.sm};
+  `,
+);
 
-const Grid = styled.div(({ theme }) => css`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-auto-rows: 1fr;
-  grid-gap: ${theme.spacings.md};
-`);
+const Grid = styled.div(
+  ({ theme }) => css`
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 1fr;
+    gap: ${theme.spacings.md};
+  `,
+);
 
-const formatRefreshInterval = (intervalInMs : number) => {
+const formatRefreshInterval = (intervalInMs: number) => {
   const intervalInSeconds = intervalInMs / 1000;
 
   if (intervalInSeconds > 60) {
@@ -81,12 +96,10 @@ const formatRefreshInterval = (intervalInMs : number) => {
   return `${intervalInSeconds} seconds`;
 };
 
-const TemplateDetails = ({
-  template,
-  showDescription,
-}: Props) => {
-  const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => (plugin.type === DATA_TIERING_TYPE.HOT_WARM));
-  const dataTieringConfig = prepareDataTieringInitialValues(template.index_set_config.data_tiering, PluginStore);
+const TemplateDetails = ({ template, showDescription = false }: Props) => {
+  const dataTieringPlugins = usePluginEntities('dataTiering');
+  const dataTieringPlugin = dataTieringPlugins.find((plugin) => plugin.type === DATA_TIERING_TYPE.HOT_WARM);
+  const dataTieringConfig = prepareDataTieringInitialValues(template.index_set_config.data_tiering, PluginStore, false);
 
   return (
     <Row>
@@ -94,41 +107,44 @@ const TemplateDetails = ({
         {!template.index_set_config.use_legacy_rotation && (
           <Row>
             <Col md={12}>
-              <DataTieringVisualisation minDays={dataTieringConfig.index_lifetime_min}
-                                        maxDays={dataTieringConfig.index_lifetime_max}
-                                        minDaysInHot={dataTieringConfig.index_hot_lifetime_min}
-                                        warmTierEnabled={dataTieringConfig.warm_tier_enabled}
-                                        archiveData={dataTieringConfig.archive_before_deletion} />
+              <DataTieringVisualisation
+                minDays={dataTieringConfig.index_lifetime_min}
+                maxDays={dataTieringConfig.index_lifetime_max}
+                minDaysInHot={dataTieringConfig.index_hot_lifetime_min}
+                warmTierEnabled={dataTieringConfig.warm_tier_enabled}
+                archiveData={dataTieringConfig.archive_before_deletion}
+              />
             </Col>
           </Row>
         )}
 
         {template.description && showDescription && (
-        <Row>
-          <Col md={12}>
-            <Section title="Description">
-              <p>{template.description}</p>
-            </Section>
-          </Col>
-        </Row>
+          <Row>
+            <Col md={12}>
+              <Section title="Description">
+                <p>{template.description}</p>
+              </Section>
+            </Col>
+          </Row>
         )}
         <Row>
           <Col md={12}>
             <Grid>
-
               <Section title="Details">
                 <dl>
                   <dt>Index Analyzer:</dt>
                   <dd>{template.index_set_config.index_analyzer}</dd>
-                  <dt>Shards:</dt>
+                  <dt>Index Shards:</dt>
                   <dd>{template.index_set_config.shards}</dd>
-                  <dt>Replicas:</dt>
+                  <dt>Index Replica:</dt>
                   <dd>{template.index_set_config.replicas}</dd>
-                  <dt>Max. number of segments:</dt>
+                  <dt>Maximum Number of Segments:</dt>
                   <dd>{template.index_set_config.index_optimization_max_num_segments}</dd>
-                  <dt>Index optimization after rotation:</dt>
-                  <dd><Icon name={template.index_set_config.index_optimization_disabled ? 'cancel' : 'check_circle'} /></dd>
-                  <dt>Field type refresh interval:</dt>
+                  <dt>Index Optimization after Rotation:</dt>
+                  <dd>
+                    <StatusIcon active={!template.index_set_config.index_optimization_disabled} />
+                  </dd>
+                  <dt>Field Type Refresh Interval:</dt>
                   <dd>{formatRefreshInterval(template.index_set_config.field_type_refresh_interval)}</dd>
                 </dl>
               </Section>
@@ -136,26 +152,28 @@ const TemplateDetails = ({
                 {template.index_set_config.use_legacy_rotation ? (
                   <>
                     <RotationSummaryWrapper>
-                      <IndexMaintenanceStrategiesSummary config={{
-                        strategy: template.index_set_config.rotation_strategy_class,
-                        config: template.index_set_config.rotation_strategy,
-                      }}
-                                                         pluginExports={PluginStore.exports('indexRotationConfig')} />
+                      <RotationStrategySummary
+                        config={{
+                          strategy: template.index_set_config.rotation_strategy_class,
+                          config: template.index_set_config.rotation_strategy,
+                        }}
+                      />
                     </RotationSummaryWrapper>
-                    <IndexMaintenanceStrategiesSummary config={{
-                      strategy: template.index_set_config.retention_strategy_class,
-                      config: template.index_set_config.retention_strategy,
-                    }}
-                                                       rotationStrategyClass={template.index_set_config.rotation_strategy_class}
-                                                       pluginExports={PluginStore.exports('indexRetentionConfig')} />
+                    <RetentionStrategySummary
+                      config={{
+                        strategy: template.index_set_config.retention_strategy_class,
+                        config: template.index_set_config.retention_strategy,
+                      }}
+                      rotationStrategyClass={template.index_set_config.rotation_strategy_class}
+                    />
                   </>
                 ) : (
                   <>
                     <DataTieringSummary config={template.index_set_config.data_tiering} />
                     {dataTieringPlugin && (
-                    <WarmTierSummaryWrapper>
-                      <dataTieringPlugin.TiersSummary config={template.index_set_config.data_tiering} />
-                    </WarmTierSummaryWrapper>
+                      <WarmTierSummaryWrapper>
+                        <dataTieringPlugin.TiersSummary config={template.index_set_config.data_tiering} />
+                      </WarmTierSummaryWrapper>
                     )}
                   </>
                 )}
@@ -166,15 +184,6 @@ const TemplateDetails = ({
       </FlexWrapper>
     </Row>
   );
-};
-
-TemplateDetails.propTypes = {
-  template: indexSetTemplatePropType.isRequired,
-  showDescription: PropTypes.bool,
-};
-
-TemplateDetails.defaultProps = {
-  showDescription: false,
 };
 
 export default TemplateDetails;

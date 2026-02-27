@@ -16,107 +16,93 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import { useMemo } from 'react';
+import type { Header, HeaderGroup, ColumnPinningPosition } from '@tanstack/react-table';
+import { flexRender } from '@tanstack/react-table';
 
-import SortIcon from 'components/streams/StreamsOverview/SortIcon';
-import type { Sort } from 'stores/PaginationTypes';
+import {
+  columnTransformVar,
+  columnOpacityVar,
+  columnWidthVar,
+  columnTransition,
+  displayScrollRightIndicatorVar,
+} from 'components/common/EntityDataTable/CSSVariables';
+import { ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
+import ScrollShadow from 'theme/box-shadows/ScrollShadow';
 
-import BulkSelectHead from './BulkSelectHead';
-import type { Column, ColumnRenderer, EntityBase, ColumnRenderersByAttribute } from './types';
+import type { EntityBase, ColumnMetaContext } from './types';
 
-const Thead = styled.thead(({ theme }) => css`
-  background-color: ${theme.colors.global.contentBackground};
-`);
+const Thead = styled.thead(
+  ({ theme }) => css`
+    background-color: ${theme.colors.global.contentBackground};
+  `,
+);
 
-export const Th = styled.th<{ $width: number | undefined }>(({ $width, theme }) => css`
-  width: ${$width ? `${$width}px` : 'auto'};
-  background-color: ${theme.colors.table.head.background};
-`);
+export const Th = styled.th<{
+  $colId: string;
+  $hidePadding: boolean;
+  $pinningPosition: ColumnPinningPosition;
+}>(
+  ({ $colId, $hidePadding, $pinningPosition, theme }) => css`
+    width: var(${columnWidthVar($colId)});
+    opacity: var(${columnOpacityVar($colId)}, 1);
+    transform: var(${columnTransformVar($colId)}, translate3d(0, 0, 0));
+    background-color: ${theme.colors.table.head.background};
+    transition: var(${columnTransition()}, none);
+    height: 100%; // required to be able to use height: 100% in child elements
+    ${$pinningPosition
+      ? css`
+          position: sticky;
+          ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;
+        `
+      : ''}
 
-const TableHeader = <Entity extends EntityBase>({
-  activeSort,
-  column,
-  columnRenderer,
-  onSortChange,
-  colWidth,
-}: {
-  activeSort: Sort,
-  column: Column
-  columnRenderer: ColumnRenderer<Entity> | undefined
-  onSortChange: (newSort: Sort) => void,
-  colWidth: number
-}) => {
-  const content = useMemo(
-    () => (typeof columnRenderer?.renderHeader === 'function' ? columnRenderer.renderHeader(column) : column.title),
-    [column, columnRenderer],
-  );
+    ${$hidePadding &&
+    css`
+      && {
+        padding: 0;
+      }
+    `}
+
+    ${$colId === ACTIONS_COL_ID &&
+    css`
+      position: sticky;
+      ${ScrollShadow('left')}
+      &::before {
+        display: var(${displayScrollRightIndicatorVar}, none);
+      }
+    `}
+  `,
+);
+
+const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header<Entity, unknown> }) => {
+  const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
 
   return (
-    <Th $width={colWidth}>
-      {content}
-
-      {column.sortable && (
-        <SortIcon onChange={onSortChange}
-                  column={column}
-                  activeSort={activeSort} />
-      )}
+    <Th
+      key={header.id}
+      colSpan={header.colSpan}
+      $colId={header.column.id}
+      $hidePadding={columnMeta?.hideCellPadding}
+      $pinningPosition={header.column.getIsPinned()}>
+      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
     </Th>
   );
 };
 
-const ActionsHead = styled(Th)<{ $width: number | undefined }>(({ $width }) => css`
-  text-align: right;
-  width: ${$width ? `${$width}px` : 'auto'};
-`);
-
-const TableHead = <Entity extends EntityBase>({
-  actionsColWidth,
-  activeSort,
-  columns,
-  columnsOrder,
-  columnRenderersByAttribute,
-  columnsWidths,
-  data,
-  displayActionsCol,
-  displayBulkSelectCol,
-  onSortChange,
-}: {
-  actionsColWidth: number | undefined,
-  activeSort: Sort,
-  columns: Array<Column>,
-  columnsWidths: { [columnId: string]: number },
-  columnsOrder: Array<string>,
-  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>,
-  data: Readonly<Array<Entity>>,
-  displayActionsCol: boolean,
-  displayBulkSelectCol: boolean,
-  onSortChange: (newSort: Sort) => void,
-}) => {
-  const sortedColumns = useMemo(
-    () => columns.sort((col1, col2) => columnsOrder.indexOf(col1.id) - columnsOrder.indexOf(col2.id)),
-    [columns, columnsOrder],
-  );
-
-  return (
-    <Thead>
-      <tr>
-        {displayBulkSelectCol && <BulkSelectHead data={data} />}
-        {sortedColumns.map((column) => {
-          const columnRenderer = columnRenderersByAttribute[column.id];
-
-          return (
-            <TableHeader<Entity> columnRenderer={columnRenderer}
-                                 column={column}
-                                 colWidth={columnsWidths[column.id]}
-                                 onSortChange={onSortChange}
-                                 activeSort={activeSort}
-                                 key={column.title} />
-          );
-        })}
-        {displayActionsCol ? <ActionsHead $width={actionsColWidth}>Actions</ActionsHead> : null}
-      </tr>
-    </Thead>
-  );
+type Props<Entity extends EntityBase> = {
+  headerGroups: Array<HeaderGroup<Entity>>;
 };
+
+const TableHead = <Entity extends EntityBase>({ headerGroups }: Props<Entity>) => (
+  <Thead>
+    {headerGroups.map((headerGroup) => (
+      <tr key={headerGroup.id}>
+        {headerGroup.headers.map((header) => (
+          <TableHeaderCell key={header.id} header={header} />
+        ))}
+      </tr>
+    ))}
+  </Thead>
+);
 
 export default TableHead;

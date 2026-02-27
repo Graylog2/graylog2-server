@@ -21,21 +21,21 @@ import type { ExportSettings } from 'views/components/ExportSettingsContext';
 import ExportSettingsContext from 'views/components/ExportSettingsContext';
 
 type Props = {
-  children: React.ReactNode,
+  children: React.ReactNode;
 };
 
 const ExportSettingsContextProvider = ({ children }: Props) => {
   const [exportSettings, setExportSettings] = useState<ExportSettings>();
 
-  const exportSettingsContextValue = useMemo(() => ({
-    settings: exportSettings, setSettings: setExportSettings,
-  }), [exportSettings]);
-
-  return (
-    <ExportSettingsContext.Provider value={exportSettingsContextValue}>
-      {children}
-    </ExportSettingsContext.Provider>
+  const exportSettingsContextValue = useMemo(
+    () => ({
+      settings: exportSettings,
+      setSettings: setExportSettings,
+    }),
+    [exportSettings],
   );
+
+  return <ExportSettingsContext.Provider value={exportSettingsContextValue}>{children}</ExportSettingsContext.Provider>;
 };
 
 export default ExportSettingsContextProvider;

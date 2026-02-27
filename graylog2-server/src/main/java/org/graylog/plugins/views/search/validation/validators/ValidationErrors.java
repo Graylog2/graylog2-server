@@ -41,18 +41,16 @@ public class ValidationErrors {
     private static final Pattern regexPosition = Pattern.compile(".*at line (\\d+), column (\\d+).", Pattern.MULTILINE | Pattern.DOTALL);
 
     public static List<ValidationMessage> create(SearchException searchException) {
-        if (searchException.error() instanceof UnboundParameterError) {
-            final UnboundParameterError error = (UnboundParameterError) searchException.error();
+        if (searchException.error() instanceof final UnboundParameterError error) {
             return paramsToValidationMessages(
                     ValidationStatus.ERROR,
                     error.allUnknownParameters(),
                     ValidationType.UNDECLARED_PARAMETER,
                     param -> "Unbound required parameter used: " + param.name()
             );
-        } else if (searchException.error() instanceof EmptyParameterError) {
-            final EmptyParameterError error = (EmptyParameterError) searchException.error();
+        } else if (searchException.error() instanceof final EmptyParameterError error) {
             return paramsToValidationMessages(
-                    ValidationStatus.WARNING,
+                    ValidationStatus.ERROR,
                     Collections.singleton(error.getParameterUsage()),
                     ValidationType.EMPTY_PARAMETER,
                     param -> error.description());

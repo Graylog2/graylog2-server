@@ -25,7 +25,10 @@ const useCurrentStream = () => {
   const { widget, message } = useContext(ActionContext);
   const currentQuery = useCurrentQuery();
 
-  return useMemo(() => message?.fields?.streams ?? widget?.streams ?? filtersToStreamSet(currentQuery.filter).toJS() ?? [], [message?.fields?.streams, currentQuery.filter, widget?.streams]);
+  return useMemo(
+    () => message?.fields?.streams ?? widget?.streams ?? filtersToStreamSet(currentQuery.filter).toJS() ?? [],
+    [message?.fields?.streams, currentQuery.filter, widget?.streams],
+  );
 };
 
 export default useCurrentStream;

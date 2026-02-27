@@ -22,12 +22,13 @@ import org.graylog.integrations.aws.resources.requests.AWSRequestImpl;
 import org.graylog.integrations.aws.resources.responses.LogGroupsResponse;
 import org.graylog.integrations.aws.service.CloudWatchService;
 import org.graylog2.security.encryption.EncryptedValue;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClient;
 import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClientBuilder;
@@ -39,17 +40,16 @@ import software.amazon.awssdk.services.cloudwatchlogs.paginators.DescribeLogGrou
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class CloudWatchServiceTest {
-
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private CloudWatchLogsClient cloudWatchLogsClient;
@@ -62,7 +62,7 @@ public class CloudWatchServiceTest {
 
     private CloudWatchService cloudWatchService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         cloudWatchService = new CloudWatchService(mock(CloudWatchLogsClientBuilder.class), awsClientBuilderUtil);
     }
@@ -93,8 +93,8 @@ public class CloudWatchServiceTest {
         final LogGroupsResponse logGroupsResponse = cloudWatchService.getLogGroupNames(awsRequest);
 
         // Inspect the log groups returned and verify the contents and size.
-        assertEquals("The number of groups should be because the two responses " +
-                "with 3 groups each were provided.", 6, logGroupsResponse.total());
+        assertEquals(6, logGroupsResponse.total(), "The number of groups should be because the two responses " +
+                "with 3 groups each were provided.");
 
         // Loop example to verify presence of a specific log group.
         boolean foundGroup = false;

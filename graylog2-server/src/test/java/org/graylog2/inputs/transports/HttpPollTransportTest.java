@@ -24,7 +24,7 @@ import okio.Buffer;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.security.encryption.EncryptedValueService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import java.io.IOException;
@@ -40,8 +40,8 @@ import static org.graylog2.inputs.transports.HttpPollTransport.GET;
 import static org.graylog2.inputs.transports.HttpPollTransport.POST;
 import static org.graylog2.inputs.transports.HttpPollTransport.PUT;
 import static org.graylog2.inputs.transports.HttpPollTransport.parseHeaders;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>

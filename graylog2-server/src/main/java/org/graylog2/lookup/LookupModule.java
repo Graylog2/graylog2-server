@@ -27,10 +27,11 @@ import org.graylog2.lookup.caches.CaffeineLookupCache;
 import org.graylog2.lookup.caches.NullCache;
 import org.graylog2.lookup.db.DBLookupTableConfigService;
 import org.graylog2.plugin.inject.Graylog2Module;
+import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.system.SystemEntity;
-import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
-import org.graylog2.system.urlwhitelist.UrlWhitelistService;
+import org.graylog2.system.urlallowlist.UrlAllowlistNotificationService;
+import org.graylog2.system.urlallowlist.UrlAllowlistService;
 
 public class LookupModule extends Graylog2Module {
     private final Configuration configuration;
@@ -41,13 +42,14 @@ public class LookupModule extends Graylog2Module {
 
     @Override
     protected void configure() {
-        serviceBinder().addBinding().to(UrlWhitelistService.class).in(Scopes.SINGLETON);
-        binder().bind(UrlWhitelistNotificationService.class).in(Scopes.SINGLETON);
+        serviceBinder().addBinding().to(UrlAllowlistService.class).in(Scopes.SINGLETON);
+        binder().bind(UrlAllowlistNotificationService.class).in(Scopes.SINGLETON);
         binder().bind(AllowedAuxiliaryPathChecker.class).in(Scopes.SINGLETON);
 
         bind(LookupTableConfigService.class).to(DBLookupTableConfigService.class).asEagerSingleton();
         // Triggering map binder once, so it does not break injection when no instance is bound.
         MapBinder.newMapBinder(binder(), String.class, LookupDataAdapter.Factory2.class, SystemEntity.class);
+        MapBinder.newMapBinder(binder(), String.class, LookupCache.Factory.class, SystemEntity.class);
         serviceBinder().addBinding().to(LookupTableService.class).asEagerSingleton();
 
         installLookupCache(NullCache.NAME,

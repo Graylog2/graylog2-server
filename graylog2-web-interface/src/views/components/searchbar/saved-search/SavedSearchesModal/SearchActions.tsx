@@ -23,12 +23,14 @@ import { IfPermitted, ShareButton } from 'components/common';
 import type View from 'views/logic/views/View';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 
 const onDelete = (
   e: React.MouseEvent<HTMLButtonElement>,
   savedSearch: View,
-  deleteSavedSearch: (search: View) => Promise<View>,
-  activeSavedSearchId: string, refetch: () => void,
+  deleteSavedSearch: (search: View) => Promise<void>,
+  activeSavedSearchId: string,
+  refetch: () => void,
   deselectEntity: (searchId: string) => void,
 ) => {
   e.stopPropagation();
@@ -46,41 +48,42 @@ const onDelete = (
 };
 
 type Props = {
-  search: View,
-  onDeleteSavedSearch: (search: View) => Promise<View>,
-  activeSavedSearchId: string,
-  refetch: () => void,
-}
+  search: View;
+  onDeleteSavedSearch: (search: View) => Promise<void>;
+  activeSavedSearchId: string;
+};
 
-const SearchActions = ({ search, onDeleteSavedSearch, activeSavedSearchId, refetch }: Props) => {
+const SearchActions = ({ search, onDeleteSavedSearch, activeSavedSearchId }: Props) => {
   const { deselectEntity } = useSelectedEntities();
+  const { refetch } = useTableFetchContext();
   const [showShareModal, setShowShareModal] = useState(false);
+
   const toggleEntityShareModal = useCallback(() => {
     setShowShareModal((cur) => !cur);
   }, []);
 
   return (
     <>
-      <ShareButton bsSize="xsmall"
-                   entityId={search.id}
-                   entityType="search"
-                   onClick={() => setShowShareModal(true)} />
+      <ShareButton bsSize="xsmall" entityId={search.id} entityType="search" onClick={() => setShowShareModal(true)} />
       <IfPermitted permissions={[`view:edit:${search.id}`, 'view:edit']} anyPermissions>
-        <Button onClick={(e) => onDelete(e, search, onDeleteSavedSearch, activeSavedSearchId, refetch, deselectEntity)}
-                role="button"
-                bsSize="xsmall"
-                bsStyle="danger"
-                title={`Delete search ${search.title}`}
-                tabIndex={0}>
+        <Button
+          onClick={(e) => onDelete(e, search, onDeleteSavedSearch, activeSavedSearchId, refetch, deselectEntity)}
+          role="button"
+          bsSize="xsmall"
+          bsStyle="danger"
+          title={`Delete search ${search.title}`}
+          tabIndex={0}>
           Delete
         </Button>
       </IfPermitted>
       {showShareModal && (
-        <EntityShareModal entityId={search.id}
-                          entityType="search"
-                          entityTitle={search.title}
-                          description="Search for a User or Team to add as collaborator on this search."
-                          onClose={toggleEntityShareModal} />
+        <EntityShareModal
+          entityId={search.id}
+          entityType="search"
+          entityTitle={search.title}
+          description="Search for a User or Team to add as collaborator on this search."
+          onClose={toggleEntityShareModal}
+        />
       )}
     </>
   );

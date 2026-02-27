@@ -18,12 +18,17 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import GeoIpResolverConfig from 'components/maps/configurations/GeoIpResolverConfig';
 
-PluginStore.register(new PluginManifest({}, {
-  systemConfigurations: [
+PluginStore.register(
+  new PluginManifest(
+    {},
     {
-      component: GeoIpResolverConfig,
-      displayName: 'Geo-Location Processor',
-      configType: 'org.graylog.plugins.map.config.GeoIpResolverConfig',
+      systemConfigurations: [
+        {
+          component: GeoIpResolverConfig,
+          displayName: 'Geo-Location Processor',
+          configType: 'org.graylog.plugins.map.config.GeoIpResolverConfig',
+        },
+      ],
     },
-  ],
-}));
+  ),
+);

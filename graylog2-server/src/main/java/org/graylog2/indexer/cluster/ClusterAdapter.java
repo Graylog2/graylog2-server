@@ -18,12 +18,14 @@ package org.graylog2.indexer.cluster;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
+import org.graylog2.indexer.cluster.health.ClusterShardAllocation;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.graylog2.system.stats.elasticsearch.ClusterStats;
 import org.graylog2.system.stats.elasticsearch.NodeInfo;
+import org.graylog2.system.stats.elasticsearch.NodeOSInfo;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
 
 import java.util.Collection;
@@ -35,6 +37,8 @@ public interface ClusterAdapter {
     Optional<HealthStatus> health();
 
     Set<NodeFileDescriptorStats> fileDescriptorStats();
+
+    ClusterShardAllocation clusterShardAllocation();
 
     Set<NodeDiskUsageStats> diskUsageStats();
 
@@ -57,6 +61,8 @@ public interface ClusterAdapter {
     PendingTasksStats pendingTasks();
 
     Map<String, NodeInfo> nodesInfo();
+
+    Map<String, NodeOSInfo> nodesHostInfo();
 
     ShardStats shardStats();
 

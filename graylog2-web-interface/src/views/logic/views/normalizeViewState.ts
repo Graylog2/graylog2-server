@@ -25,10 +25,7 @@ const normalizeViewState = (viewState: ViewStateType) => {
   const widgetById = keyBy(widgets.toArray(), 'id');
   const normalizedWidgetPositions = normalizeWidgetPositions(widgetPositions, widgetById);
 
-  return viewState
-    .toBuilder()
-    .widgetPositions(normalizedWidgetPositions)
-    .build();
+  return viewState.toBuilder().widgetPositions(normalizedWidgetPositions).build();
 };
 
 export default normalizeViewState;

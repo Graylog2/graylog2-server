@@ -23,13 +23,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
+import jakarta.validation.constraints.NotNull;
+import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog.plugins.views.search.searchtypes.SearchEngineSearchType;
 
 import javax.annotation.Nullable;
-
-import jakarta.validation.constraints.NotNull;
-
 import java.util.Optional;
+import java.util.Set;
 
 @AutoValue
 @JsonAutoDetect
@@ -64,6 +65,11 @@ public abstract class ElasticsearchQueryString implements BackendQuery {
     @JsonProperty
     @Override
     public abstract String queryString();
+
+    @JsonIgnore
+    public Set<Class<? extends SearchType>> supportedSearchTypes() {
+        return Set.of(SearchEngineSearchType.class);
+    }
 
     @JsonIgnore
     public boolean isEmpty() {

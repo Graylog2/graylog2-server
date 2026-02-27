@@ -19,7 +19,7 @@ import Widget from 'views/logic/widgets/Widget';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import Series from 'views/logic/aggregationbuilder/Series';
 import TitleTypes from 'views/stores/TitleTypes';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { GetState } from 'views/types';
 import { addWidget } from 'views/logic/slices/widgetActions';
 import { setTitle } from 'views/logic/slices/titlesActions';
@@ -31,34 +31,27 @@ import duplicateCommonWidgetSettings from './DuplicateCommonWidgetSettings';
 const NUMERIC_FIELD_SERIES = ['count', 'sum', 'avg', 'min', 'max', 'stddev', 'variance', 'card', 'percentile'];
 const NONNUMERIC_FIELD_SERIES = ['count', 'card'];
 
-const handler = ({
-  field,
-  type,
-  contexts: { widget: origWidget = Widget.empty() },
-}: ActionHandlerArguments<{ widget?: Widget }>) => (dispatch: AppDispatch, getState: GetState) => {
-  const activeQuery = selectActiveQuery(getState());
-  const series = ((type && type.isNumeric()) ? NUMERIC_FIELD_SERIES : NONNUMERIC_FIELD_SERIES)
-    .map((f) => {
-      if (f === 'percentile') {
-        return `${f}(${field},95)`;
-      }
+const handler =
+  ({ field, type, contexts: { widget: origWidget = Widget.empty() } }: ActionHandlerArguments<{ widget?: Widget }>) =>
+  (dispatch: ViewsDispatch, getState: GetState) => {
+    const activeQuery = selectActiveQuery(getState());
+    const series = (type && type.isNumeric() ? NUMERIC_FIELD_SERIES : NONNUMERIC_FIELD_SERIES)
+      .map((f) => {
+        if (f === 'percentile') {
+          return `${f}(${field},95)`;
+        }
 
-      return `${f}(${field})`;
-    })
-    .map(Series.forFunction);
-  const config = AggregationWidgetConfig.builder()
-    .series(series)
-    .visualization('table')
-    .rollup(true)
-    .build();
-  const widgetBuilder = AggregationWidget.builder()
-    .newId()
-    .config(config);
+        return `${f}(${field})`;
+      })
+      .map(Series.forFunction);
+    const config = AggregationWidgetConfig.builder().series(series).visualization('table').rollup(true).build();
+    const widgetBuilder = AggregationWidget.builder().newId().config(config);
 
-  const widget = duplicateCommonWidgetSettings(widgetBuilder, origWidget).build();
+    const widget = duplicateCommonWidgetSettings(widgetBuilder, origWidget).build();
 
-  return dispatch(addWidget(widget))
-    .then(() => dispatch(setTitle(activeQuery, TitleTypes.Widget, widget.id, `Field Statistics for ${field}`)));
-};
+    return dispatch(addWidget(widget)).then(() =>
+      dispatch(setTitle(activeQuery, TitleTypes.Widget, widget.id, `Field Statistics for ${field}`)),
+    );
+  };
 
 export default handler;

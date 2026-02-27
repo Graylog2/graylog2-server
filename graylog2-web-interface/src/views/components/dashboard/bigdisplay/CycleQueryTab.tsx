@@ -16,20 +16,20 @@
  */
 import { useEffect } from 'react';
 
-import useAppDispatch from 'stores/useAppDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { selectQuery } from 'views/logic/slices/viewSlice';
 import useView from 'views/hooks/useView';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 type Props = {
-  interval: number,
-  tabs?: Array<number> | undefined | null,
+  interval: number;
+  tabs?: Array<number> | undefined | null;
 };
 
-const CycleQueryTab = ({ interval, tabs }: Props) => {
+const CycleQueryTab = ({ interval, tabs = undefined }: Props) => {
   const view = useView();
   const activeQuery = useActiveQueryId();
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
 
   useEffect(() => {
     const cycleInterval = setInterval(() => {
@@ -37,7 +37,12 @@ const CycleQueryTab = ({ interval, tabs }: Props) => {
         return;
       }
 
-      const queryTabs = tabs || view.search.queries.toIndexedSeq().map((_, v) => v).toJS();
+      const queryTabs =
+        tabs ||
+        view.search.queries
+          .toIndexedSeq()
+          .map((_, v) => v)
+          .toJS();
       const currentQueryIndex = view.search.queries.toIndexedSeq().findIndex((q) => q.id === activeQuery);
       const currentTabIndex = queryTabs.indexOf(currentQueryIndex);
       const nextQueryIndex = queryTabs[(currentTabIndex + 1) % queryTabs.length];
@@ -52,10 +57,6 @@ const CycleQueryTab = ({ interval, tabs }: Props) => {
   }, [interval, view, activeQuery, tabs, dispatch]);
 
   return null;
-};
-
-CycleQueryTab.defaultProps = {
-  tabs: undefined,
 };
 
 export default CycleQueryTab;

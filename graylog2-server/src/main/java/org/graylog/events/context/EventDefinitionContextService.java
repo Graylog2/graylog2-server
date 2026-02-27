@@ -19,6 +19,9 @@ package org.graylog.events.context;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
+import com.mongodb.client.model.Filters;
+import jakarta.inject.Inject;
+import org.bson.conversions.Bson;
 import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventProcessorExecutionJob;
@@ -29,9 +32,6 @@ import org.graylog.scheduler.JobTriggerData;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.JobTriggerStatus;
 import org.joda.time.DateTime;
-import org.mongojack.DBQuery;
-
-import jakarta.inject.Inject;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -80,10 +80,10 @@ public class EventDefinitionContextService {
     }
 
     private long getQueuedNotifications(EventDefinitionDto eventDefinition) {
-        final DBQuery.Query query = DBQuery.and(
-                DBQuery.is("status", JobTriggerStatus.RUNNABLE),
-                DBQuery.is("data.type", EventNotificationExecutionJob.TYPE_NAME),
-                DBQuery.is("data.event_dto.event_definition_id", eventDefinition.id()));
+        final Bson query = Filters.and(
+                Filters.eq("status", JobTriggerStatus.RUNNABLE),
+                Filters.eq("data.type", EventNotificationExecutionJob.TYPE_NAME),
+                Filters.eq("data.event_dto.event_definition_id", eventDefinition.id()));
 
         return jobTriggerService.countByQuery(query);
     }

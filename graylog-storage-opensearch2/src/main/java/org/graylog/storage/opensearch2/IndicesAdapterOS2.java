@@ -43,11 +43,15 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CloseIndexRe
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteAliasRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.AliasMetadata;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
+import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.XContentFactory;
+import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.XContentHelper;
+import org.graylog.shaded.opensearch2.org.opensearch.core.common.bytes.BytesReference;
+import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.ToXContent;
+import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.XContentBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.BulkByScrollResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.ReindexRequest;
@@ -69,6 +73,8 @@ import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
+import org.graylog2.indexer.indices.IndexStatus;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.indices.ShardsInfo;
@@ -109,6 +115,11 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     private final CatApi catApi;
     private final ClusterStateApi clusterStateApi;
     private final IndexTemplateAdapter indexTemplateAdapter;
+
+    // this is the maximum amount of bytes that the index list is supposed to fill in a request,
+    // it assumes that these don't need url encoding. If we exceed the maximum, we request settings for all indices
+    // and filter after wards
+    private final int MAX_INDICES_URL_LENGTH = 3000;
 
     @Inject
     public IndicesAdapterOS2(OpenSearchClient client,
@@ -168,12 +179,9 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
     private CreateIndexRequest createIndexRequest(String index,
-                                                   IndexSettings indexSettings,
-                                                   @Nullable Map<String, Object> mapping) {
-        final Map<String, Object> settings = new HashMap<>();
-        settings.put("number_of_shards", indexSettings.shards());
-        settings.put("number_of_replicas", indexSettings.replicas());
-        CreateIndexRequest request = new CreateIndexRequest(index).settings(settings);
+                                                  IndexSettings indexSettings,
+                                                  @Nullable Map<String, Object> mapping) {
+        CreateIndexRequest request = new CreateIndexRequest(index).settings(indexSettings.map());
         if (mapping != null) {
             request = request.mapping(mapping);
         }
@@ -203,11 +211,30 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
                 .indices(index)
                 .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
 
-        final GetMappingsResponse result = client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions),
+        return client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions).mappings().get(index).sourceAsMap(),
                 "Couldn't read mapping of index " + index);
-
-        return result.mappings().get(index).sourceAsMap();
     }
+
+    @Override
+    public Map<String, Object> getStructuredIndexSettings(@Nonnull String index) {
+
+        final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
+                .indices(index)
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
+
+        return client.execute((c, requestOptions) -> {
+            final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
+            final Settings settings = settingsResponse.getIndexToSettings().get(index);
+            final XContentBuilder xContentBuilder = XContentFactory.jsonBuilder();
+            xContentBuilder.startObject();
+            settings.toXContent(xContentBuilder, ToXContent.EMPTY_PARAMS);
+            xContentBuilder.endObject();
+            final BytesReference bytes = BytesReference.bytes(xContentBuilder);
+
+            return XContentHelper.convertToMap(bytes, true, xContentBuilder.contentType()).v2();
+        }, "Couldn't read settings of index " + index);
+    }
+
 
     @Override
     public void updateIndexMetaData(@Nonnull String index, @Nonnull Map<String, Object> metadata, boolean mergeExisting) {
@@ -334,16 +361,6 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
                 "Unable to close index " + index);
     }
 
-    @Override
-    public long numberOfMessages(String index) {
-        final JsonNode result = statsApi.indexStats(index);
-        final JsonNode count = result.path("_all").path("primaries").path("docs").path("count");
-        if (count.isMissingNode()) {
-            throw new RuntimeException("Unable to extract count from response.");
-        }
-        return count.asLong();
-    }
-
     private GetSettingsResponse settingsFor(String indexOrAlias) {
         final GetSettingsRequest request = new GetSettingsRequest().indices(indexOrAlias)
                 .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN_CLOSED);
@@ -420,19 +437,23 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
         return catApi.getShardsInfo(indexName);
     }
 
+
     @Override
     public IndicesBlockStatus getIndicesBlocksStatus(final List<String> indices) {
         if (indices == null || indices.isEmpty()) {
             throw new IllegalArgumentException("Expecting list of indices with at least one index present.");
         }
-        final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
-                .indices(indices.toArray(new String[]{}))
+
+        final GetSettingsRequest request = new GetSettingsRequest()
                 .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
-                .names(new String[]{});
+                .names("index.blocks.read", "index.blocks.write", "index.blocks.metadata", "index.blocks.read_only", "index.blocks.read_only_allow_delete");
+
+        final var maxLengthExceeded = String.join(",", indices).length() > MAX_INDICES_URL_LENGTH;
+        final GetSettingsRequest getSettingsRequest = maxLengthExceeded ? request : request.indices(indices.toArray(new String[]{}));
 
         return client.execute((c, requestOptions) -> {
             final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
-            return BlockSettingsParser.parseBlockSettings(settingsResponse);
+            return BlockSettingsParser.parseBlockSettings(settingsResponse, maxLengthExceeded ? Optional.of(indices) : Optional.empty());
         });
     }
 
@@ -449,8 +470,15 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
     @Override
-    public Set<String> indices(String indexWildcard, List<String> status, String indexSetId) {
-        return catApi.indices(indexWildcard, status, "Couldn't get index list for index set <" + indexSetId + ">");
+    public Set<String> indices(String indexWildcard, List<IndexStatus> status, String indexSetId) {
+        return catApi.indices(indexWildcard, status.stream().map(this::toStatusName).toList(), "Couldn't get index list for index set <" + indexSetId + ">");
+    }
+
+    private String toStatusName(IndexStatus status) {
+        return switch (status) {
+            case OPEN -> "open";
+            case CLOSED -> "close";
+        };
     }
 
     @Override

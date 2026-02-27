@@ -1,0 +1,5 @@
+type="a"
+message="Added new Configuration to define default for allowing access tokens for external users."
+
+issues=["21322"]
+pulls=["21438"]

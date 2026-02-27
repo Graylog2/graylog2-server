@@ -1,0 +1,5 @@
+type = "f"
+message = "Handle path prefix when serving web interface assets."
+
+issues = ["21015"]
+pulls = ["21104"]

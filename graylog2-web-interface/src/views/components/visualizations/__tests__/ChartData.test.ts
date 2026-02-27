@@ -42,13 +42,15 @@ describe('Chart helper functions', () => {
     it('should properly extract series from simplest fixture with one series and one row pivot', () => {
       const input = readFixture('ChartData.test.simplest.json');
       const result = chartData(input, { widgetConfig: config, chartType: 'dummy', formatTime });
-      const expectedResult = [{
-        name: 'count()',
-        type: 'dummy',
-        x: ['index', 'show', 'login', 'edit'],
-        y: [27142, 7826, 6626, 1246],
-        originalName: 'count()',
-      }];
+      const expectedResult = [
+        {
+          name: 'count()',
+          type: 'dummy',
+          x: ['index', 'show', 'login', 'edit'],
+          y: [27142, 7826, 6626, 1246],
+          originalName: 'count()',
+        },
+      ];
 
       expect(result).toHaveLength(1);
       expect(result).toEqual(expectedResult);
@@ -57,13 +59,15 @@ describe('Chart helper functions', () => {
     it('should properly extract series from simplest fixture and include provided chart type', () => {
       const input = readFixture('ChartData.test.simplest.json');
       const result = chartData(input, { widgetConfig: config, chartType: 'bar', formatTime });
-      const expectedResult = [{
-        name: 'count()',
-        type: 'bar',
-        x: ['index', 'show', 'login', 'edit'],
-        y: [27142, 7826, 6626, 1246],
-        originalName: 'count()',
-      }];
+      const expectedResult = [
+        {
+          name: 'count()',
+          type: 'bar',
+          x: ['index', 'show', 'login', 'edit'],
+          y: [27142, 7826, 6626, 1246],
+          originalName: 'count()',
+        },
+      ];
 
       expect(result).toHaveLength(1);
       expect(result).toEqual(expectedResult);
@@ -72,31 +76,34 @@ describe('Chart helper functions', () => {
     it('should remove non-present data points and leave order of values intact', () => {
       const input = readFixture('ChartData.test.withHoles.json');
       const result = chartData(input, { widgetConfig: config, chartType: 'bar', formatTime });
-      const expectedResult = [{
-        name: 'count()',
-        type: 'bar',
-        x: [
-          '2018-05-28T11:48:00.000Z',
-          '2018-05-28T11:49:00.000Z',
-          '2018-05-28T11:50:00.000Z',
-          '2018-05-28T11:52:00.000Z',
-          '2018-05-28T11:53:00.000Z',
-        ],
-        y: [7813, 8657, 8645, 8630, 702],
-        originalName: 'count()',
-      }, {
-        name: 'sum(took_ms)',
-        type: 'bar',
-        x: [
-          '2018-05-28T11:48:00.000Z',
-          '2018-05-28T11:50:00.000Z',
-          '2018-05-28T11:51:00.000Z',
-          '2018-05-28T11:52:00.000Z',
-          '2018-05-28T11:53:00.000Z',
-        ],
-        y: [587008, 646728, 792102, 579708, 62596],
-        originalName: 'sum(took_ms)',
-      }];
+      const expectedResult = [
+        {
+          name: 'count()',
+          type: 'bar',
+          x: [
+            '2018-05-28T11:48:00.000Z',
+            '2018-05-28T11:49:00.000Z',
+            '2018-05-28T11:50:00.000Z',
+            '2018-05-28T11:52:00.000Z',
+            '2018-05-28T11:53:00.000Z',
+          ],
+          y: [7813, 8657, 8645, 8630, 702],
+          originalName: 'count()',
+        },
+        {
+          name: 'sum(took_ms)',
+          type: 'bar',
+          x: [
+            '2018-05-28T11:48:00.000Z',
+            '2018-05-28T11:50:00.000Z',
+            '2018-05-28T11:51:00.000Z',
+            '2018-05-28T11:52:00.000Z',
+            '2018-05-28T11:53:00.000Z',
+          ],
+          y: [587008, 646728, 792102, 579708, 62596],
+          originalName: 'sum(took_ms)',
+        },
+      ];
 
       expect(result).toHaveLength(2);
       expect(result).toEqual(expectedResult);
@@ -105,19 +112,21 @@ describe('Chart helper functions', () => {
     it('should not remove data points with a value of zero', () => {
       const input = readFixture('ChartData.test.withZeros.json');
       const result = chartData(input, { widgetConfig: config, chartType: 'bar', formatTime });
-      const expectedResult = [{
-        name: 'count()',
-        type: 'bar',
-        x: [
-          '2018-05-28T11:48:00.000Z',
-          '2018-05-28T11:49:00.000Z',
-          '2018-05-28T11:50:00.000Z',
-          '2018-05-28T11:52:00.000Z',
-          '2018-05-28T11:53:00.000Z',
-        ],
-        y: [7813, 0, 0, 0, 702],
-        originalName: 'count()',
-      }];
+      const expectedResult = [
+        {
+          name: 'count()',
+          type: 'bar',
+          x: [
+            '2018-05-28T11:48:00.000Z',
+            '2018-05-28T11:49:00.000Z',
+            '2018-05-28T11:50:00.000Z',
+            '2018-05-28T11:52:00.000Z',
+            '2018-05-28T11:53:00.000Z',
+          ],
+          y: [7813, 0, 0, 0, 702],
+          originalName: 'count()',
+        },
+      ];
 
       expect(result).toHaveLength(1);
       expect(result).toEqual(expectedResult);
@@ -126,16 +135,15 @@ describe('Chart helper functions', () => {
     it('should remove data points with a value of null or undefined', () => {
       const input = readFixture('ChartData.test.withNullAndUndefined.json');
       const result = chartData(input, { widgetConfig: config, chartType: 'bar', formatTime });
-      const expectedResult = [{
-        name: 'count()',
-        type: 'bar',
-        x: [
-          '2018-05-28T11:48:00.000Z',
-          '2018-05-28T11:53:00.000Z',
-        ],
-        y: [7813, 702],
-        originalName: 'count()',
-      }];
+      const expectedResult = [
+        {
+          name: 'count()',
+          type: 'bar',
+          x: ['2018-05-28T11:48:00.000Z', '2018-05-28T11:53:00.000Z'],
+          y: [7813, 702],
+          originalName: 'count()',
+        },
+      ];
 
       expect(result).toHaveLength(1);
       expect(result).toEqual(expectedResult);
@@ -161,12 +169,22 @@ describe('Chart helper functions', () => {
 
     it('should allow passing a format series function to modify the series structure', () => {
       const input = readFixture('ChartData.test.oneColumOneRowPivot.json');
-      const generatorFunction: Generator = ({ type, name, labels: x, values: y, data: z }) => ({ type, name, x, y, z, originalName: name });
+      const generatorFunction: Generator = ({ type, name, labels: x, values: y, data: z }) => ({
+        type,
+        name,
+        x,
+        y,
+        z,
+        originalName: name,
+      });
 
       const formatSeriesCustom = ({
         valuesBySeries,
         xLabels,
-      }: { valuesBySeries: ValuesBySeries, xLabels: Array<any> }): ExtractedSeries => {
+      }: {
+        valuesBySeries: ValuesBySeries;
+        xLabels: Array<any>;
+      }): ExtractedSeries => {
         // In this example we want to create only one series, with a z value, which contains all series data
         const z: Array<any> = Object.values(valuesBySeries).map((series) => {
           const newSeries = fill(Array(xLabels.length), null);
@@ -175,12 +193,7 @@ describe('Chart helper functions', () => {
         });
         const yLabels = Object.keys(valuesBySeries);
 
-        return [[
-          'XYZ Chart',
-          xLabels,
-          yLabels,
-          z,
-        ]];
+        return [['XYZ Chart', xLabels, yLabels, z]];
       };
 
       const result = chartData(input, {

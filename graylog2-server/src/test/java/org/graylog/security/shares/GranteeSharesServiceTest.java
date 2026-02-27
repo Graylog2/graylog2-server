@@ -19,7 +19,6 @@ package org.graylog.security.shares;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNDescriptor;
 import org.graylog.grn.GRNDescriptorService;
-import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
@@ -27,9 +26,8 @@ import org.graylog.security.entities.EntityDescriptor;
 import org.graylog.testing.GRNExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.rest.PaginationParameters;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -55,15 +53,14 @@ class GranteeSharesServiceTest {
     private GRNDescriptorService grnDescriptorService;
 
     @BeforeEach
-    void setUp(MongoDBTestService mongodb,
-               MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
-               GRNRegistry grnRegistry,
+    void setUp(MongoCollections mongoCollections,
                @Mock GRNDescriptorService grnDescriptorService,
                @Mock GranteeService granteeService) {
         this.grnDescriptorService = grnDescriptorService;
-        final DBGrantService dbGrantService = new DBGrantService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, grnRegistry);
+        final DBGrantService dbGrantService = new DBGrantService(mongoCollections);
         when(granteeService.getGranteeAliases(any(GRN.class))).thenAnswer(a -> Collections.singleton(a.getArgument(0)));
-        this.granteeSharesService = new GranteeSharesService(dbGrantService, grnDescriptorService, granteeService);
+        this.granteeSharesService = new GranteeSharesService(dbGrantService, grnDescriptorService, granteeService,
+                new PluggableEntityService(Collections.emptySet()));
     }
 
     @DisplayName("Paginated shares for a user")

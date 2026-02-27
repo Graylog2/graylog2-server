@@ -16,6 +16,8 @@
  */
 package org.graylog.plugins.views.search.db;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
@@ -25,13 +27,11 @@ import org.joda.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SearchesCleanUpJob extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(SearchesCleanUpJob.class);
@@ -104,7 +104,9 @@ public class SearchesCleanUpJob extends Periodical {
 
     private Set<String> findReferencedSearchIds() {
         final HashSet<String> toKeepViewIds = new HashSet<>();
-        toKeepViewIds.addAll(viewSummaryService.streamAll().map(ViewSummaryDTO::searchId).collect(Collectors.toSet()));
+        try (final Stream<ViewSummaryDTO> stream = viewSummaryService.streamAll()) {
+            toKeepViewIds.addAll(stream.map(ViewSummaryDTO::searchId).collect(Collectors.toSet()));
+        }
         toKeepViewIds.addAll(viewResolvers
                 .values().stream().flatMap(vr -> vr.getSearchIds().stream()).collect(Collectors.toSet()));
         toKeepViewIds.addAll(staticReferencedSearches.stream().map(StaticReferencedSearch::id).toList());

@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 
 import Spinner from 'components/common/Spinner';
 

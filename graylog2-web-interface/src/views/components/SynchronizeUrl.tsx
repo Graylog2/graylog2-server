@@ -16,24 +16,37 @@
  */
 import { useEffect } from 'react';
 
-import type { Location } from 'routing/withLocation';
-import withLocation from 'routing/withLocation';
-import { useSyncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
+import useSyncWithQueryParameters from 'views/hooks/useSyncWithQueryParameters';
 import bindSearchParamsFromQuery from 'views/hooks/BindSearchParamsFromQuery';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
+import useViewsDispatch from 'views/stores/useViewsDispatch';
 import type { RootState } from 'views/types';
 import { selectView } from 'views/logic/slices/viewSelectors';
-import useAppDispatch from 'stores/useAppDispatch';
 import { selectSearchExecutionState } from 'views/logic/slices/searchExecutionSelectors';
+import useLocation from 'routing/useLocation';
+import useQuery from 'routing/useQuery';
+import { updateView } from 'views/logic/slices/viewSlice';
 
-const bindSearchParamsFromQueryThunk = (query: { [key: string]: unknown; }) => (_dispatch: AppDispatch, getState: () => RootState) => {
-  const view = selectView(getState());
-  const executionState = selectSearchExecutionState(getState());
-  bindSearchParamsFromQuery({ view, query, retry: () => Promise.resolve(), executionState });
-};
+const bindSearchParamsFromQueryThunk =
+  (query: { [key: string]: unknown }) => async (dispatch: ViewsDispatch, getState: () => RootState) => {
+    const view = selectView(getState());
+    const executionState = selectSearchExecutionState(getState());
+
+    const result = await bindSearchParamsFromQuery({ view, query, retry: () => Promise.resolve(), executionState });
+
+    if (!result) {
+      return Promise.resolve();
+    }
+
+    const [newView] = result;
+
+    if (newView !== view) {
+      return dispatch(updateView(newView, true));
+    }
+  };
 
 const useBindSearchParamsFromQuery = (query: { [key: string]: unknown }) => {
-  const dispatch = useAppDispatch();
+  const dispatch = useViewsDispatch();
 
   useEffect(() => {
     dispatch(bindSearchParamsFromQueryThunk(query));
@@ -41,17 +54,13 @@ const useBindSearchParamsFromQuery = (query: { [key: string]: unknown }) => {
   }, [query]);
 };
 
-type Props = {
-  location: Location,
-};
-
-const SynchronizeUrl = ({ location }: Props) => {
-  const { pathname, search } = location;
-  const query = `${pathname}${search}`;
-  useBindSearchParamsFromQuery(location.query);
-  useSyncWithQueryParameters(query);
+const SynchronizeUrl = () => {
+  const { pathname, search } = useLocation();
+  const query = useQuery();
+  useBindSearchParamsFromQuery(query);
+  useSyncWithQueryParameters(`${pathname}${search}`);
 
   return null;
 };
 
-export default withLocation(SynchronizeUrl);
+export default SynchronizeUrl;

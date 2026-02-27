@@ -18,13 +18,9 @@ import React, { useMemo } from 'react';
 import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 
-import {
-  PaginatedEntityTable,
-} from 'components/common';
+import { PaginatedEntityTable } from 'components/common';
 import type { Sort } from 'stores/PaginationTypes';
-import type {
-  IndexSetFieldTypeProfile,
-} from 'components/indices/IndexSetFieldTypeProfiles/types';
+import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
 import { fetchIndexSetFieldTypeProfiles, keyFn } from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfiles';
 import useCustomColumnRenderers from 'components/indices/IndexSetFieldTypeProfiles/helpers/useCustomColumnRenderers';
 import profileActions from 'components/indices/IndexSetFieldTypeProfiles/helpers/profileActions';
@@ -37,6 +33,7 @@ export const DEFAULT_LAYOUT = {
   defaultPageSize: 20,
   defaultSort: { attributeId: 'name', direction: 'asc' } as Sort,
   defaultDisplayedAttributes: ['name', 'description', 'custom_field_mappings', 'index_set_ids'],
+  defaultColumnOrder: ['name', 'description', 'custom_field_mappings', 'index_set_ids'],
 };
 
 const expandedSections = {
@@ -48,24 +45,23 @@ const expandedSections = {
   },
 };
 
-const COLUMNS_ORDER = ['name', 'description', 'custom_field_mappings', 'index_set_ids'];
-
 const ProfilesList = () => {
   const { indexSets } = useStore(IndexSetsStore);
   const normalizedIndexSetsTitles = useMemo(() => mapValues(keyBy(indexSets, 'id'), 'title'), [indexSets]);
   const customColumnRenderers = useCustomColumnRenderers(normalizedIndexSetsTitles);
 
   return (
-    <PaginatedEntityTable<IndexSetFieldTypeProfile> humanName="index set profiles"
-                                                    columnsOrder={COLUMNS_ORDER}
-                                                    entityActions={profileActions}
-                                                    tableLayout={DEFAULT_LAYOUT}
-                                                    fetchEntities={fetchIndexSetFieldTypeProfiles}
-                                                    keyFn={keyFn}
-                                                    entityAttributesAreCamelCase
-                                                    expandedSectionsRenderer={expandedSections}
-                                                    columnRenderers={customColumnRenderers}
-                                                    searchPlaceholder="Search for profile name" />
+    <PaginatedEntityTable<IndexSetFieldTypeProfile>
+      humanName="index set profiles"
+      entityActions={profileActions}
+      tableLayout={DEFAULT_LAYOUT}
+      fetchEntities={fetchIndexSetFieldTypeProfiles}
+      keyFn={keyFn}
+      entityAttributesAreCamelCase
+      expandedSectionRenderers={expandedSections}
+      columnRenderers={customColumnRenderers}
+      searchPlaceholder="Search for profile name"
+    />
   );
 };
 

@@ -14,8 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import * as Immutable from 'immutable';
 import { Formik, Form } from 'formik';
@@ -29,18 +28,16 @@ import PaginatedItem from 'components/common/PaginatedItemOverview/PaginatedItem
 import RolesSelector from 'components/permissions/RolesSelector';
 import { Alert, Col, Row, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import { UsersActions } from 'stores/users/UsersStore';
-import debounceWithPromise from 'views/logic/debounceWithPromise';
 import { FormSubmit, IfPermitted, NoSearchResult, ReadOnlyFormGroup } from 'components/common';
-import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useIsGlobalTimeoutEnabled from 'hooks/useIsGlobalTimeoutEnabled';
 import { Link } from 'components/common/router';
 import { Headline } from 'components/common/Section/SectionComponent';
+import useProductName from 'brand-customization/useProductName';
+import usePasswordComplexityConfig from 'components/users/usePasswordComplexityConfig';
+import type { PasswordComplexityConfigType } from 'stores/configurations/ConfigurationsStore';
 
 import TimezoneFormGroup from './TimezoneFormGroup';
 import TimeoutFormGroup from './TimeoutFormGroup';
@@ -63,114 +60,92 @@ const isCloud = AppConfig.isCloud();
 
 const oktaUserForm = isCloud ? PluginStore.exports('cloud')[0].oktaUserForm : null;
 
-const _onSubmit = (history: HistoryFunction, formData, roles, setSubmitError) => {
-  let data = { ...formData, roles: roles.toJS(), permissions: [] };
-  delete data.password_repeat;
-
-  if (isCloud && oktaUserForm) {
-    const { onCreate } = oktaUserForm;
-    data = onCreate(data);
-  } else {
-    data.username = data.username.trim();
-  }
-
-  setSubmitError(null);
-
-  return UsersDomain.create(data).then(() => {
-    history.push(Routes.SYSTEM.USERS.OVERVIEW);
-  }, (error) => setSubmitError(error));
-};
-
-const _validateUsername = async (username: string) => {
-  const user = await UsersActions.loadByUsername(username).catch(() => {});
-
-  if (user) {
-    return { username: 'Username is already taken' };
-  }
-
-  return {};
-};
-
-const debounceTimeoutMs = 600;
-const debouncedValidateUsername = debounceWithPromise(_validateUsername, debounceTimeoutMs);
-
-const _validate = async (values) => {
-  let errors = {};
-
-  const { password, password_repeat: passwordRepeat, username } = values;
-
-  if (username) {
-    errors = { ...errors, ...(await debouncedValidateUsername(username)) };
-  }
-
-  if (isCloud && oktaUserForm) {
-    const { validations: { password: validateCloudPasswords } } = oktaUserForm;
-
-    errors = validateCloudPasswords(errors, password, passwordRepeat);
-  } else {
-    errors = validatePasswords(errors, password, passwordRepeat);
-  }
-
-  return errors;
-};
-
 type RequestError = { additional: { res: { text: string } } };
 
-const PasswordGroup = () => {
+type PasswordGroupProps = {
+  passwordComplexityConfig: PasswordComplexityConfigType;
+};
+
+const PasswordGroup = ({ passwordComplexityConfig }: PasswordGroupProps) => {
   if (isCloud && oktaUserForm) {
-    const { fields: { password: CloudPasswordFormGroup } } = oktaUserForm;
+    const {
+      fields: { password: CloudPasswordFormGroup },
+    } = oktaUserForm;
 
     return <CloudPasswordFormGroup />;
   }
 
-  return <PasswordFormGroup />;
+  return <PasswordFormGroup passwordComplexityConfig={passwordComplexityConfig} />;
 };
 
 const UserNameGroup = () => {
   if (isCloud && oktaUserForm) {
-    const { fields: { username: CloudUserNameFormGroup } } = oktaUserForm;
+    const {
+      fields: { username: CloudUserNameFormGroup },
+    } = oktaUserForm;
 
     return CloudUserNameFormGroup && <CloudUserNameFormGroup />;
   }
 
-  return (
-    <UsernameFormGroup />
-  );
+  return <UsernameFormGroup />;
 };
 
 const EmailGroup = () => {
   if (isCloud && oktaUserForm) {
-    const { fields: { email: CloudEmailFormGroup } } = oktaUserForm;
+    const {
+      fields: { email: CloudEmailFormGroup },
+    } = oktaUserForm;
 
     return CloudEmailFormGroup && <CloudEmailFormGroup />;
   }
 
-  return (
-    <EmailFormGroup />
-  );
+  return <EmailFormGroup />;
 };
 
 const UserCreate = () => {
+  const productName = useProductName();
   const initialRole = {
     name: 'Reader',
-    description: 'Grants basic permissions for every Graylog user (built-in)',
+    description: `Grants basic permissions for every ${productName} user (built-in)`,
     id: '',
   };
-  const [user, setUser] = useState(User.empty().toBuilder().roles(Immutable.Set([initialRole.name])).build());
+  const [user, setUser] = useState(
+    User.empty()
+      .toBuilder()
+      .roles(Immutable.Set([initialRole.name]))
+      .build(),
+  );
+
   const [submitError, setSubmitError] = useState<RequestError | undefined>();
   const [selectedRoles, setSelectedRoles] = useState<Immutable.Set<DescriptiveItem>>(Immutable.Set([initialRole]));
   const history = useHistory();
-  const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
   const isGlobalTimeoutEnabled = useIsGlobalTimeoutEnabled();
+  const passwordComplexityConfig = usePasswordComplexityConfig();
+
+  const validate = (values) => {
+    let errors = {};
+
+    const { password, password_repeat: passwordRepeat } = values;
+
+    if (isCloud && oktaUserForm) {
+      const {
+        validations: { password: validateCloudPasswords },
+      } = oktaUserForm;
+
+      errors = validateCloudPasswords(errors, password, passwordRepeat);
+    } else {
+      errors = validatePasswords(errors, password, passwordRepeat, passwordComplexityConfig);
+    }
+
+    return errors;
+  };
 
   const _onAssignRole = (roles: Immutable.Set<DescriptiveItem>) => {
     setSelectedRoles(selectedRoles.union(roles));
     const roleNames = roles.map((r) => r.name);
 
-    return Promise.resolve(
-      setUser(user.toBuilder().roles(user.roles.union(roleNames)).build()),
-    );
+    return Promise.resolve(setUser(user.toBuilder().roles(user.roles.union(roleNames)).build()));
   };
 
   const _onUnassignRole = (role: DescriptiveItem) => {
@@ -179,7 +154,8 @@ const UserCreate = () => {
   };
 
   const _handleCancel = () => history.push(Routes.SYSTEM.USERS.OVERVIEW);
-  const hasValidRole = selectedRoles.size > 0 && selectedRoles.filter((role) => role.name === 'Reader' || role.name === 'Admin');
+  const hasValidRole =
+    selectedRoles.size > 0 && selectedRoles.filter((role) => role.name === 'Reader' || role.name === 'Admin');
 
   const showSubmitError = (errors) => {
     if (isCloud && oktaUserForm) {
@@ -191,22 +167,39 @@ const UserCreate = () => {
     return errors?.additional?.res?.text;
   };
 
-  const onSubmit = (data) => {
-    _onSubmit(history, data, user.roles, setSubmitError);
+  const handleFormSubmit = (formData, roles) => {
+    let data = { ...formData, roles: roles.toJS(), permissions: [] };
+    delete data.password_repeat;
 
+    if (isCloud && oktaUserForm) {
+      const { onCreate } = oktaUserForm;
+      data = onCreate(data);
+    } else {
+      data.username = data.username.trim();
+    }
+
+    setSubmitError(null);
+
+    return UsersDomain.create(data).then(
+      () => {
+        history.push(Routes.SYSTEM.USERS.OVERVIEW);
+      },
+      (error) => setSubmitError(error),
+    );
+  };
+
+  const onSubmit = (data) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.USERS.USER_CREATED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'user-create-form',
     });
+
+    return handleFormSubmit(data, user.roles);
   };
 
   return (
     <Row className="content">
       <Col lg={8}>
-        <Formik onSubmit={onSubmit}
-                validate={_validate}
-                validateOnBlur={false}
-                initialValues={{}}>
+        <Formik onSubmit={onSubmit} validate={validate} validateOnBlur={false} initialValues={{}}>
           {({ isSubmitting, isValidating, isValid }) => (
             <Form className="form form-horizontal">
               <div>
@@ -219,17 +212,18 @@ const UserCreate = () => {
               <div>
                 <Headline>Settings</Headline>
                 {isGlobalTimeoutEnabled ? (
-                  <GlobalTimeoutMessage label="Sessions Timeout"
-                                        value={(
-                                          <NoSearchResult>User session timeout is not editable because
-                                            the
-                                            <IfPermitted permissions={['clusterconfigentry:read']}>
-                                              <Link to={Routes.SYSTEM.CONFIGURATIONS}>
-                                                global session timeout
-                                              </Link>
-                                            </IfPermitted> is enabled.
-                                          </NoSearchResult>
-                                        )} />
+                  <GlobalTimeoutMessage
+                    label="Sessions Timeout"
+                    value={
+                      <NoSearchResult>
+                        User session timeout is not editable because the
+                        <IfPermitted permissions={['clusterconfigentry:read']}>
+                          <Link to={Routes.SYSTEM.CONFIGURATIONS}>global session timeout</Link>
+                        </IfPermitted>{' '}
+                        is enabled.
+                      </NoSearchResult>
+                    }
+                  />
                 ) : (
                   <TimeoutFormGroup />
                 )}
@@ -238,30 +232,33 @@ const UserCreate = () => {
               </div>
               <div>
                 <Headline>Roles</Headline>
-                <Input id="roles-selector-input"
-                       labelClassName="col-sm-3"
-                       wrapperClassName="col-sm-9"
-                       label="Assign Roles">
-                  <RolesSelector onSubmit={_onAssignRole}
-                                 assignedRolesIds={user.roles}
-                                 identifier={(role) => role.name}
-                                 submitOnSelect />
+                <Input
+                  id="roles-selector-input"
+                  labelClassName="col-sm-3"
+                  wrapperClassName="col-sm-9"
+                  label="Assign Roles">
+                  <RolesSelector
+                    onSubmit={_onAssignRole}
+                    assignedRolesIds={user.roles}
+                    identifier={(role) => role.name}
+                    submitOnSelect
+                  />
                 </Input>
 
-                <Input id="selected-roles-overview"
-                       labelClassName="col-sm-3"
-                       wrapperClassName="col-sm-9"
-                       label="Selected Roles">
+                <Input
+                  id="selected-roles-overview"
+                  labelClassName="col-sm-3"
+                  wrapperClassName="col-sm-9"
+                  label="Selected Roles">
                   <>
-                    {selectedRoles.map((role) => (
-                      <PaginatedItem item={role}
-                                     onDeleteItem={(data) => _onUnassignRole(data)}
-                                     key={role.id} />
-                    ))}
+                    {selectedRoles
+                      .map((role) => (
+                        <PaginatedItem item={role} onDeleteItem={(data) => _onUnassignRole(data)} key={role.id} />
+                      ))
+                      .toArray()}
                     {!hasValidRole && (
                       <Alert bsStyle="danger">
-                        You need to select at least one of
-                        the <em>Reader</em> or <em>Admin</em> roles.
+                        You need to select at least one of the <em>Reader</em> or <em>Admin</em> roles.
                       </Alert>
                     )}
                   </>
@@ -269,7 +266,7 @@ const UserCreate = () => {
               </div>
               <div>
                 <Headline>Password</Headline>
-                <PasswordGroup />
+                <PasswordGroup passwordComplexityConfig={passwordComplexityConfig} />
               </div>
               {submitError && (
                 <Row>
@@ -282,12 +279,14 @@ const UserCreate = () => {
               )}
               <Row>
                 <Col md={9} mdOffset={3}>
-                  <FormSubmit disabledSubmit={!isValid || !hasValidRole || isValidating}
-                              submitButtonText="Create user"
-                              submitLoadingText="Creating user..."
-                              isSubmitting={isSubmitting}
-                              isAsyncSubmit
-                              onCancel={_handleCancel} />
+                  <FormSubmit
+                    disabledSubmit={!isValid || !hasValidRole || isValidating}
+                    submitButtonText="Create user"
+                    submitLoadingText="Creating user..."
+                    isSubmitting={isSubmitting}
+                    isAsyncSubmit
+                    onCancel={_handleCancel}
+                  />
                 </Col>
               </Row>
             </Form>

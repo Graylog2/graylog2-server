@@ -19,8 +19,8 @@ package org.graylog.scheduler;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.primitives.Ints;
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.AggregateIterable;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
@@ -36,12 +36,12 @@ import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
-import org.mongojack.DBQuery;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,6 +52,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.mongodb.client.model.Filters.and;
@@ -84,7 +85,7 @@ public class DBJobTriggerService {
     public static final String COLLECTION_NAME = "scheduler_triggers";
     private static final String FIELD_ID = "_id";
     static final String FIELD_JOB_DEFINITION_ID = JobTriggerDto.FIELD_JOB_DEFINITION_ID;
-    private static final String FIELD_LOCK_OWNER = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_OWNER;
+    public static final String FIELD_LOCK_OWNER = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_OWNER;
     private static final String FIELD_LAST_LOCK_OWNER = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_LAST_OWNER;
     private static final String FIELD_PROGRESS = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_PROGRESS;
     private static final String FIELD_LAST_LOCK_TIME = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_LAST_LOCK_TIME;
@@ -93,14 +94,14 @@ public class DBJobTriggerService {
     private static final String FIELD_END_TIME = JobTriggerDto.FIELD_END_TIME;
     private static final String FIELD_STATUS = JobTriggerDto.FIELD_STATUS;
     private static final String FIELD_SCHEDULE = JobTriggerDto.FIELD_SCHEDULE;
-    private static final String FIELD_DATA = JobTriggerDto.FIELD_DATA;
+    public static final String FIELD_DATA = JobTriggerDto.FIELD_DATA;
     private static final String FIELD_UPDATED_AT = JobTriggerDto.FIELD_UPDATED_AT;
     private static final String FIELD_CONCURRENCY_RESCHEDULE_COUNT = JobTriggerDto.FIELD_CONCURRENCY_RESCHEDULE_COUNT;
     private static final String FIELD_TRIGGERED_AT = JobTriggerDto.FIELD_TRIGGERED_AT;
     private static final String FIELD_CONSTRAINTS = JobTriggerDto.FIELD_CONSTRAINTS;
     private static final String FIELD_LAST_EXECUTION_DURATION = JobTriggerDto.FIELD_EXECUTION_DURATION;
     private static final String FIELD_IS_CANCELLED = JobTriggerDto.FIELD_IS_CANCELLED;
-    private static final String FIELD_JOB_DEFINITION_TYPE = JobTriggerDto.FIELD_JOB_DEFINITION_TYPE;
+    public static final String FIELD_JOB_DEFINITION_TYPE = JobTriggerDto.FIELD_JOB_DEFINITION_TYPE;
 
     private final String nodeId;
     private final JobSchedulerClock clock;
@@ -109,17 +110,32 @@ public class DBJobTriggerService {
     private final MongoCollection<JobTriggerDto> collection;
     private final MongoUtils<JobTriggerDto> mongoUtils;
 
+    /**
+     * Creates a new job trigger service for user job triggers. Use {@link DBSystemJobTriggerService} for system job triggers.
+     */
     @Inject
     public DBJobTriggerService(MongoCollections mongoCollections,
                                NodeId nodeId,
                                JobSchedulerClock clock,
                                SchedulerCapabilitiesService schedulerCapabilitiesService,
                                @Named(LOCK_EXPIRATION_DURATION) Duration lockExpirationDuration) {
+        this(mongoCollections, COLLECTION_NAME, nodeId, clock, schedulerCapabilitiesService, lockExpirationDuration);
+    }
+
+    /**
+     * Should only be used by subclasses.
+     */
+    protected DBJobTriggerService(MongoCollections mongoCollections,
+                                  String collectionName,
+                                  NodeId nodeId,
+                                  JobSchedulerClock clock,
+                                  SchedulerCapabilitiesService schedulerCapabilitiesService,
+                                  Duration lockExpirationDuration) {
         this.nodeId = nodeId.getNodeId();
         this.clock = clock;
         this.schedulerCapabilitiesService = schedulerCapabilitiesService;
         this.lockExpirationDuration = lockExpirationDuration;
-        this.collection = mongoCollections.collection(COLLECTION_NAME, JobTriggerDto.class);
+        this.collection = mongoCollections.collection(collectionName, JobTriggerDto.class);
         this.mongoUtils = mongoCollections.utils(collection);
 
         collection.createIndex(Indexes.ascending(FIELD_JOB_DEFINITION_ID));
@@ -130,6 +146,8 @@ public class DBJobTriggerService {
         collection.createIndex(Indexes.ascending(FIELD_NEXT_TIME));
         collection.createIndex(Indexes.ascending(FIELD_CONSTRAINTS));
         collection.createIndex(Indexes.ascending(FIELD_JOB_DEFINITION_TYPE));
+        collection.createIndex(Indexes.ascending(FIELD_UPDATED_AT));
+        collection.createIndex(Indexes.ascending(FIELD_SCHEDULE + "." + JobSchedule.TYPE_FIELD));
     }
 
     @SuppressWarnings("unused")
@@ -145,12 +163,13 @@ public class DBJobTriggerService {
     }
 
     /**
-     * Loads all existing records and returns them.
+     * Streams all existing records and returns the stream.
      *
-     * @return list of records
+     * @return stream of records
      */
-    public List<JobTriggerDto> all() {
-        return stream(collection.find().sort(descending(FIELD_ID))).toList();
+    @MustBeClosed
+    public Stream<JobTriggerDto> streamAll() {
+        return stream(collection.find().sort(descending(FIELD_ID)));
     }
 
     /**
@@ -171,24 +190,27 @@ public class DBJobTriggerService {
      * @return One found job trigger
      */
     public Optional<JobTriggerDto> getOneForJob(String jobDefinitionId) {
-        final List<JobTriggerDto> triggers = getAllForJob(jobDefinitionId);
-        // We are currently expecting only one trigger per job definition. This will most probably change in the
-        // future once we extend our scheduler usage.
-        // TODO: Don't throw exception when there is more than one trigger for a job definition.
-        //       To be able to do this, we need some kind of label system to make sure we can differentiate between
-        //       automatically created triggers (e.g. by event definition) and manually created ones.
-        if (triggers.size() > 1) {
-            throw new IllegalStateException("More than one trigger for job definition <" + jobDefinitionId + ">");
+        try (final Stream<JobTriggerDto> triggerStream = streamAllForJob(jobDefinitionId)) {
+            final List<JobTriggerDto> triggers = triggerStream.toList();
+            // We are currently expecting only one trigger per job definition. This will most probably change in the
+            // future once we extend our scheduler usage.
+            // TODO: Don't throw exception when there is more than one trigger for a job definition.
+            //       To be able to do this, we need some kind of label system to make sure we can differentiate between
+            //       automatically created triggers (e.g. by event definition) and manually created ones.
+            if (triggers.size() > 1) {
+                throw new IllegalStateException("More than one trigger for job definition <" + jobDefinitionId + ">");
+            }
+            return triggers.stream().findFirst();
         }
-        return triggers.stream().findFirst();
     }
 
-    public List<JobTriggerDto> getAllForJob(String jobDefinitionId) {
+    @MustBeClosed
+    public Stream<JobTriggerDto> streamAllForJob(String jobDefinitionId) {
         if (isNullOrEmpty(jobDefinitionId)) {
             throw new IllegalArgumentException("jobDefinitionId cannot be null or empty");
         }
 
-        return stream(collection.find(eq(FIELD_JOB_DEFINITION_ID, jobDefinitionId))).toList();
+        return stream(collection.find(eq(FIELD_JOB_DEFINITION_ID, jobDefinitionId)));
     }
 
     /**
@@ -209,8 +231,11 @@ public class DBJobTriggerService {
                 .collect(Collectors.toSet());
 
         final var filter = in(FIELD_JOB_DEFINITION_ID, queryValues);
-        final Map<String, List<JobTriggerDto>> groupedTriggers = StreamEx.of(stream(collection.find(filter)))
-                .groupingBy(JobTriggerDto::jobDefinitionId);
+        final Map<String, List<JobTriggerDto>> groupedTriggers;
+        try (final var stream = stream(collection.find(filter));
+             final var streamEx = StreamEx.of(stream)) {
+            groupedTriggers = streamEx.groupingBy(JobTriggerDto::jobDefinitionId);
+        }
 
         // We are currently expecting only one trigger per job definition. This will most probably change in the
         // future once we extend our scheduler usage.
@@ -235,7 +260,7 @@ public class DBJobTriggerService {
      * @throws NullPointerException when the trigger or trigger ID is null
      */
     public JobTriggerDto getOrCreate(JobTriggerDto trigger) {
-        return mongoUtils.getOrCreate(requireNonNull(trigger, "trigger cannot be null"));
+        return collection.getOrCreate(requireNonNull(trigger, "trigger cannot be null"));
     }
 
     /**
@@ -319,7 +344,8 @@ public class DBJobTriggerService {
                 eq(FIELD_LOCK_OWNER, null),
                 or(
                         eq(FIELD_STATUS, JobTriggerStatus.COMPLETE),
-                        eq(FIELD_STATUS, JobTriggerStatus.CANCELLED)
+                        eq(FIELD_STATUS, JobTriggerStatus.CANCELLED),
+                        eq(FIELD_STATUS, JobTriggerStatus.ERROR)
                 ),
                 eq(FIELD_SCHEDULE + "." + JobSchedule.TYPE_FIELD, OnceJobSchedule.TYPE_NAME),
                 lt(FIELD_UPDATED_AT, clock.nowUTC().minus(unit.toMillis(timeValue)))
@@ -335,20 +361,8 @@ public class DBJobTriggerService {
         return Ints.saturatedCast(collection.deleteMany(query).getDeletedCount());
     }
 
-    @Deprecated
-    public int deleteByQuery(DBQuery.Query query) {
-        mongoUtils.initializeLegacyMongoJackBsonObject(query);
-        return deleteByQuery((Bson) query);
-    }
-
     public long countByQuery(Bson query) {
         return collection.countDocuments(query);
-    }
-
-    @Deprecated
-    public long countByQuery(DBQuery.Query query) {
-        mongoUtils.initializeLegacyMongoJackBsonObject(query);
-        return countByQuery((Bson) query);
     }
 
     /**
@@ -545,27 +559,15 @@ public class DBJobTriggerService {
         return Optional.ofNullable(collection.findOneAndUpdate(query, update));
     }
 
-    @Deprecated
-    public Optional<JobTriggerDto> cancelTriggerByQuery(DBQuery.Query query) {
-        mongoUtils.initializeLegacyMongoJackBsonObject(query);
-        return cancelTriggerByQuery((Bson) query);
-    }
-
-
     /**
-     * Find triggers by using the provided query. Use judiciously!
+     * Stream triggers by using the provided query. Use judiciously!
      *
      * @param query The query
-     * @return All found JobTriggers
+     * @return Stream of all found JobTriggers
      */
-    public List<JobTriggerDto> findByQuery(Bson query) {
-        return stream(collection.find(query).sort(descending(FIELD_UPDATED_AT))).toList();
-    }
-
-    @Deprecated
-    public List<JobTriggerDto> findByQuery(DBQuery.Query query) {
-        mongoUtils.initializeLegacyMongoJackBsonObject(query);
-        return findByQuery((Bson) query);
+    @MustBeClosed
+    public Stream<JobTriggerDto> streamByQuery(Bson query) {
+        return stream(collection.find(query).sort(descending(FIELD_UPDATED_AT)));
     }
 
     private record OverdueTrigger(@JsonProperty("_id") String type, @JsonProperty("count") long count) {}
@@ -599,6 +601,8 @@ public class DBJobTriggerService {
                 )
         ), OverdueTrigger.class);
 
-        return stream(result).collect(Collectors.toMap(OverdueTrigger::type, OverdueTrigger::count));
+        try (final var stream = stream(result)) {
+            return stream.collect(Collectors.toMap(OverdueTrigger::type, OverdueTrigger::count));
+        }
     }
 }

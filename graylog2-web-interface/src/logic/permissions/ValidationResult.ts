@@ -15,41 +15,40 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import type { $PropertyType } from 'utility-types';
 
 import type { GRN } from './types';
 
 type Errors = {
-  selectedGranteeCapabilities: Immutable.List<string>,
+  selectedGranteeCapabilities: Immutable.List<string>;
 };
 
 type ErrorContext = {
-  selectedGranteeCapabilities: Immutable.List<GRN>,
+  selectedGranteeCapabilities: Immutable.List<GRN>;
 };
 
 type InternalState = {
-  errors: Errors,
-  errorContext: ErrorContext,
-  failed: boolean,
+  errors: Errors;
+  errorContext: ErrorContext;
+  failed: boolean;
 };
 
 export type ValidationResultJSON = {
   errors: {
-    selected_grantee_capabilities: string[],
-  },
+    selected_grantee_capabilities: string[];
+  };
   error_context: {
-    selected_grantee_capabilities: string[],
-  },
-  failed: boolean,
+    selected_grantee_capabilities: string[];
+  };
+  failed: boolean;
 };
 
 export default class ValidationResult {
   _value: InternalState;
 
   constructor(
-    errors: $PropertyType<InternalState, 'errors'>,
-    errorContext: $PropertyType<InternalState, 'errorContext'>,
-    failed: $PropertyType<InternalState, 'failed'>,
+    errors: InternalState['errors'],
+    errorContext: InternalState['errorContext'],
+    failed: InternalState['failed'],
   ) {
     this._value = {
       errors,
@@ -71,24 +70,22 @@ export default class ValidationResult {
   }
 
   toBuilder() {
-    const {
-      errors,
-      errorContext,
-      failed,
-    } = this._value;
+    const { errors, errorContext, failed } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Immutable.Map({
-      errors,
-      errorContext,
-      failed,
-    }));
+    return new Builder(
+      Immutable.Map({
+        errors,
+        errorContext,
+        failed,
+      }),
+    );
   }
 
   static create(
-    errors: $PropertyType<InternalState, 'errors'>,
-    errorContext: $PropertyType<InternalState, 'errorContext'>,
-    failed: $PropertyType<InternalState, 'failed'>,
+    errors: InternalState['errors'],
+    errorContext: InternalState['errorContext'],
+    failed: InternalState['failed'],
   ) {
     return new ValidationResult(errors, errorContext, failed);
   }
@@ -147,15 +144,15 @@ class Builder {
     this.value = value;
   }
 
-  errors(value: $PropertyType<InternalState, 'errors'>) {
+  errors(value: InternalState['errors']) {
     return new Builder(this.value.set('errors', value));
   }
 
-  errorContext(value: $PropertyType<InternalState, 'errorContext'>) {
+  errorContext(value: InternalState['errorContext']) {
     return new Builder(this.value.set('errorContext', value));
   }
 
-  failed(value: $PropertyType<InternalState, 'failed'>) {
+  failed(value: InternalState['failed']) {
     return new Builder(this.value.set('failed', value));
   }
 

@@ -29,7 +29,7 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
 }));
 
 jest.mock('hooks/useSearchConfiguration', () => () => ({
-  config: { ...mockSearchClusterConfig, query_time_range_limit: undefined },
+  config: mockSearchClusterConfig,
   refresh: () => {},
 }));
 
@@ -46,12 +46,18 @@ const selectRangePreset = async (optionLabel: string) => {
 
 describe('TimeRangeFilterButtons', () => {
   type SUTProps = Partial<React.ComponentProps<typeof TimeRangeFilterButtons>> & {
-    onSubmit?: () => void
-  }
+    onSubmit?: () => void;
+  };
 
   const SUTTimeRangeFilterButtons = ({ onSubmit = () => {}, ...props }: SUTProps) => (
     <Formik initialValues={{ selectedFields: [] }} onSubmit={onSubmit}>
-      <TimeRangeFilterButtons toggleShow={() => {}} onPresetSelectOpen={() => {}} setCurrentTimeRange={() => {}} {...props} />
+      <TimeRangeFilterButtons
+        limitDuration={0}
+        toggleShow={() => {}}
+        onPresetSelectOpen={() => {}}
+        setCurrentTimeRange={() => {}}
+        {...props}
+      />
     </Formik>
   );
 

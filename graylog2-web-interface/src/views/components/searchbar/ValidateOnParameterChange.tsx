@@ -21,8 +21,8 @@ import { useEffect, useRef } from 'react';
 import type Parameter from 'views/logic/parameters/Parameter';
 
 type Props = {
-  parameters: Immutable.Set<Parameter> | undefined,
-}
+  parameters: Immutable.Set<Parameter> | undefined;
+};
 
 const ValidateFormOnParameterChange = ({ parameters }: Props) => {
   const { validateForm } = useFormikContext();

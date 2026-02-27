@@ -26,7 +26,6 @@ import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.map.config.DatabaseVendorType;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
 import org.graylog2.database.MongoConnection;
@@ -123,7 +122,6 @@ public class V20211221144300_GeoIpResolverConfigMigration extends Migration {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public abstract static class MigrationCompletion {
 
         @JsonCreator

@@ -18,11 +18,12 @@ package org.graylog.events.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.BadRequestException;
@@ -50,6 +51,8 @@ import org.graylog.events.notifications.types.EmailEventNotificationConfig;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog.security.shares.CreateEntityRequest;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -68,6 +71,7 @@ import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -79,10 +83,10 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.security.RestPermissions.USERS_LIST;
 
-@Api(value = "Events/Notifications", description = "Manage event notifications", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Events/Notifications", description = "Manage event notifications")
 @Path("/events/notifications")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -111,36 +115,39 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     private final NotificationResourceHandler resourceHandler;
     private final EmailConfiguration emailConfiguration;
     private final RecentActivityService recentActivityService;
+    private final EntitySharesService entitySharesService;
 
     @Inject
     public EventNotificationsResource(DBNotificationService dbNotificationService,
                                       Set<AlarmCallback> availableLegacyAlarmCallbacks,
                                       NotificationResourceHandler resourceHandler,
                                       EmailConfiguration emailConfiguration,
-                                      RecentActivityService recentActivityService) {
+                                      RecentActivityService recentActivityService,
+                                      EntitySharesService entitySharesService) {
         this.dbNotificationService = dbNotificationService;
         this.availableLegacyAlarmCallbacks = availableLegacyAlarmCallbacks;
         this.resourceHandler = resourceHandler;
         this.searchQueryParser = new SearchQueryParser(NotificationDto.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.emailConfiguration = emailConfiguration;
         this.recentActivityService = recentActivityService;
-
+        this.entitySharesService = entitySharesService;
     }
 
     @GET
     @Timed
     @Path("/paginated")
-    @ApiOperation(value = "Get a paginated list of event notifications")
+    @Operation(summary = "Get a paginated list of event notifications")
     @Produces(MediaType.APPLICATION_JSON)
-    public PageListResponse<NotificationDto> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                     @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                     @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                                     @ApiParam(name = "sort",
-                                                               value = "The field to sort the result on",
+    public PageListResponse<NotificationDto> getPage(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                     @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                     @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                     @Parameter(name = "sort",
+                                                               description = "The field to sort the result on",
                                                                required = true,
-                                                               allowableValues = "title,description,type")
+                                                               schema = @Schema(allowableValues = {"title", "description", "type"}))
                                                      @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
-                                                     @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                     @Parameter(name = "order", description = "The sort direction",
+                                                                schema = @Schema(allowableValues = {"asc", "desc"}))
                                                      @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         if ("type".equals(sort)) {
@@ -156,11 +163,11 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     }
 
     @GET
-    @ApiOperation("List all available notifications")
+    @Operation(summary = "List all available notifications")
     @Deprecated
-    public PaginatedResponse<NotificationDto> listNotifications(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                                @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                                @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query) {
+    public PaginatedResponse<NotificationDto> listNotifications(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                                @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                                @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         final PaginatedList<NotificationDto> result = dbNotificationService.searchPaginated(searchQuery, notification -> {
             return isPermitted(RestPermissions.EVENT_NOTIFICATIONS_READ, notification.id());
@@ -170,18 +177,19 @@ public class EventNotificationsResource extends RestResource implements PluginRe
 
     @GET
     @Path("/{notificationId}")
-    @ApiOperation("Get a notification")
-    public NotificationDto get(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId) {
+    @Operation(summary = "Get a notification")
+    public NotificationDto get(@Parameter(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_READ, notificationId);
         return dbNotificationService.get(notificationId)
                 .orElseThrow(() -> new NotFoundException("Notification " + notificationId + " doesn't exist"));
     }
 
     @POST
-    @ApiOperation("Create new notification definition")
+    @Operation(summary = "Create new notification definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_CREATE)
     @RequiresPermissions(RestPermissions.EVENT_NOTIFICATIONS_CREATE)
-    public Response create(@ApiParam(name = "JSON Body") NotificationDto dto, @Context UserContext userContext) {
+    public Response create(@Parameter(name = "JSON Body") CreateEntityRequest<NotificationDto> createEntityRequest, @Context UserContext userContext) {
+        final NotificationDto dto = createEntityRequest.entity();
         final ValidationResult validationResult = dto.validate();
         validateEmailConfiguration(dto, validationResult);
         if (validationResult.failed()) {
@@ -189,15 +197,20 @@ public class EventNotificationsResource extends RestResource implements PluginRe
         }
         var entity = resourceHandler.create(dto, java.util.Optional.ofNullable(userContext.getUser()));
         recentActivityService.create(entity.id(), GRNTypes.EVENT_NOTIFICATION, userContext.getUser());
+
+        createEntityRequest.shareRequest().ifPresent(shareRequest -> {
+            entitySharesService.updateEntityShares(GRNTypes.EVENT_NOTIFICATION, entity.id(), shareRequest, userContext.getUser());
+        });
+
         return Response.ok().entity(entity).build();
     }
 
     @PUT
     @Path("/{notificationId}")
-    @ApiOperation("Update existing notification")
+    @Operation(summary = "Update existing notification")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_UPDATE)
-    public Response update(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId,
-                           @ApiParam(name = "JSON Body") NotificationDto dto,
+    public Response update(@Parameter(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId,
+                           @Parameter(name = "JSON Body") NotificationDto dto,
                            @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_EDIT, notificationId);
         if (dbNotificationService.get(notificationId).isEmpty()) {
@@ -219,8 +232,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     }
 
     private void validateEmailConfiguration(NotificationDto dto, ValidationResult validationResult) {
-        if (dto.config() instanceof EmailEventNotificationConfig) {
-            EmailEventNotificationConfig emailEventNotificationConfig = (EmailEventNotificationConfig) dto.config();
+        if (dto.config() instanceof final EmailEventNotificationConfig emailEventNotificationConfig) {
             if (!emailConfiguration.isEnabled()) {
                 validationResult.addError("config", "Email transport is not configured in graylog.conf");
             }
@@ -249,9 +261,9 @@ public class EventNotificationsResource extends RestResource implements PluginRe
 
     @DELETE
     @Path("/{notificationId}")
-    @ApiOperation("Delete a notification")
+    @Operation(summary = "Delete a notification")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_DELETE)
-    public void delete(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId,
+    public void delete(@Parameter(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId,
                        @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_DELETE, notificationId);
         dbNotificationService.get(notificationId).ifPresent(n ->
@@ -263,13 +275,14 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @POST
     @Timed
     @Path("/{notificationId}/test")
-    @ApiOperation(value = "Send a test alert for a given event notification")
+    @Operation(summary = "Send a test alert for a given event notification")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Event notification not found."),
-            @ApiResponse(code = 500, message = "Error while testing event notification")
+            @ApiResponse(responseCode = "200", description = "Success"),
+            @ApiResponse(responseCode = "404", description = "Event notification not found."),
+            @ApiResponse(responseCode = "500", description = "Error while testing event notification")
     })
     @NoAuditEvent("only used to test event notifications")
-    public Response test(@ApiParam(name = "notificationId", value = "The event notification id to send a test alert for.", required = true)
+    public Response test(@Parameter(name = "notificationId", description = "The event notification id to send a test alert for.", required = true)
                          @PathParam("notificationId") @NotBlank String notificationId) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_EDIT, notificationId);
         final NotificationDto notificationDto =
@@ -284,13 +297,14 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @Timed
     @Path("/test")
     @RequiresPermissions(RestPermissions.EVENT_NOTIFICATIONS_CREATE)
-    @ApiOperation(value = "Send a test alert for a given event notification")
+    @Operation(summary = "Send a test alert for a given event notification")
     @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Event notification is invalid."),
-            @ApiResponse(code = 500, message = "Error while testing event notification")
+            @ApiResponse(responseCode = "200", description = "Success"),
+            @ApiResponse(responseCode = "400", description = "Event notification is invalid."),
+            @ApiResponse(responseCode = "500", description = "Error while testing event notification")
     })
     @NoAuditEvent("only used to test event notifications")
-    public Response test(@ApiParam(name = "JSON Body") NotificationDto dto) {
+    public Response test(@Parameter(name = "JSON Body") NotificationDto dto) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_CREATE);
         final ValidationResult validationResult = dto.validate();
         if (validationResult.failed()) {
@@ -304,7 +318,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
 
     @GET
     @Path("/legacy/types")
-    @ApiOperation("List all available legacy alarm callback types")
+    @Operation(summary = "List all available legacy alarm callback types")
     public Response legacyTypes() {
         final ImmutableMap.Builder<String, Map<String, Object>> typesBuilder = ImmutableMap.builder();
 
@@ -320,8 +334,8 @@ public class EventNotificationsResource extends RestResource implements PluginRe
 
     // This is used to add user auto-completion to EmailAlarmCallback when the current user has permissions to list users
     private ConfigurationRequest getConfigurationRequest(AlarmCallback callback) {
-        if (callback instanceof EmailAlarmCallback && isPermitted(USERS_LIST)) {
-            return ((EmailAlarmCallback) callback).getEnrichedRequestedConfiguration();
+        if (callback instanceof EmailAlarmCallback emailAlarmCallback && isPermitted(USERS_LIST)) {
+            return emailAlarmCallback.getEnrichedRequestedConfiguration();
         }
         return callback.getRequestedConfiguration();
     }

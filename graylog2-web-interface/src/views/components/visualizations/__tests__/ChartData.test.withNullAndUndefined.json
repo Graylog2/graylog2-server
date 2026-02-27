@@ -1,13 +1,9 @@
 [
   {
-    "key": [
-      "2018-05-28T11:48:00.000Z"
-    ],
+    "key": ["2018-05-28T11:48:00.000Z"],
     "values": [
       {
-        "key": [
-          "count()"
-        ],
+        "key": ["count()"],
         "value": 7813,
         "rollup": true,
         "source": "row-leaf"
@@ -16,14 +12,10 @@
     "source": "leaf"
   },
   {
-    "key": [
-      "2018-05-28T11:49:00.000Z"
-    ],
+    "key": ["2018-05-28T11:49:00.000Z"],
     "values": [
       {
-        "key": [
-          "count()"
-        ],
+        "key": ["count()"],
         "value": null,
         "rollup": true,
         "source": "row-leaf"
@@ -32,14 +24,10 @@
     "source": "leaf"
   },
   {
-    "key": [
-      "2018-05-28T11:50:00.000Z"
-    ],
+    "key": ["2018-05-28T11:50:00.000Z"],
     "values": [
       {
-        "key": [
-          "count()"
-        ],
+        "key": ["count()"],
         "rollup": true,
         "source": "row-leaf"
       }
@@ -47,14 +35,10 @@
     "source": "leaf"
   },
   {
-    "key": [
-      "2018-05-28T11:52:00.000Z"
-    ],
+    "key": ["2018-05-28T11:52:00.000Z"],
     "values": [
       {
-        "key": [
-          "count()"
-        ],
+        "key": ["count()"],
         "value": null,
         "rollup": true,
         "source": "row-leaf"
@@ -63,14 +47,10 @@
     "source": "leaf"
   },
   {
-    "key": [
-      "2018-05-28T11:53:00.000Z"
-    ],
+    "key": ["2018-05-28T11:53:00.000Z"],
     "values": [
       {
-        "key": [
-          "count()"
-        ],
+        "key": ["count()"],
         "value": 702,
         "rollup": true,
         "source": "row-leaf"
@@ -82,9 +62,7 @@
     "key": [],
     "values": [
       {
-        "key": [
-          "count()"
-        ],
+        "key": ["count()"],
         "value": 8515,
         "rollup": true,
         "source": "row-inner"

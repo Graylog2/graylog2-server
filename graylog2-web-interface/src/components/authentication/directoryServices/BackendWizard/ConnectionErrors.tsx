@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Alert } from 'components/bootstrap';
@@ -30,32 +29,27 @@ export const Title = styled.div`
   margin-bottom: 5px;
 `;
 
-const ErrorsList = styled.ul(({ theme }) => `
+const ErrorsList = styled.ul(
+  ({ theme }) => `
   font-family: ${theme.fonts.family.monospace};
   list-style: initial;
   padding-left: 20px;
-`);
+`,
+);
 
 type Props = {
-  errors: Array<string>,
-  message: string,
+  errors: Array<string>;
+  message?: string;
 };
 
-const ConnectionErrors = ({ errors, message }: Props) => (
+const ConnectionErrors = ({ errors, message = 'There was an error' }: Props) => (
   <NotificationContainer bsStyle="danger" title={message}>
     <ErrorsList>
-      {errors.map((error) => <li key={String(error)}>{String(error)}</li>)}
+      {errors.map((error) => (
+        <li key={String(error)}>{String(error)}</li>
+      ))}
     </ErrorsList>
   </NotificationContainer>
 );
-
-ConnectionErrors.propTypes = {
-  errors: PropTypes.arrayOf(PropTypes.string).isRequired,
-  message: PropTypes.string,
-};
-
-ConnectionErrors.defaultProps = {
-  message: 'There was an error',
-};
 
 export default ConnectionErrors;

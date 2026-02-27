@@ -8,14 +8,19 @@ const { spacings } = useTheme();
 
 const SpacingExample = () => (
   <>
-    {Object.keys(spacings).map((space) => space !== 'px' && (
-      <div key={space} style={{display:'flex',alignItems: 'center', marginBottom: 12}}>
-        <div key={space} style={{height: spacings[space], width:spacings[space], backgroundColor: '#eee'}} />
-        <span style={{paddingLeft: 12}}>spacings.{space}  ({spacings[space]} / {spacings.px[space] || space}px)</span>
-      </div>
-    ))}
+    {Object.keys(spacings).map(
+      (space) =>
+        space !== 'px' && (
+          <div key={space} style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
+            <div key={space} style={{ height: spacings[space], width: spacings[space], backgroundColor: '#eee' }} />
+            <span style={{ paddingLeft: 12 }}>
+              spacings.{space} ({spacings[space]} / {spacings.px[space] || space}px)
+            </span>
+          </div>
+        ),
+    )}
   </>
 );
 
-<SpacingExample />
+<SpacingExample />;
 ```

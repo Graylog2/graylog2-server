@@ -31,15 +31,15 @@ const SecureIcon: React.ComponentType<{ name: 'lock' | 'lock_open' }> = styled(I
 `;
 
 type NodeProps = {
-  status: DataNodeStatus,
-  nodeId: string,
-  transportAddress: string,
+  status: DataNodeStatus;
+  nodeId: string;
+  transportAddress: string;
 };
 
 const isSecure = (address: string) => address?.toLocaleLowerCase().startsWith('https://');
 
 const colorByState = (status: DataNodeStatus, address: string) => {
-  if (status === 'CONNECTING') {
+  if (status === 'STARTING') {
     return 'yellow';
   }
 
@@ -55,13 +55,19 @@ const colorByState = (status: DataNodeStatus, address: string) => {
 };
 
 const lockIcon = (address: string) => (isSecure(address) ? 'lock' : 'lock_open');
-const isConnecting = (status: DataNodeStatus) => status === 'CONNECTING';
+const isConnecting = (status: DataNodeStatus) => status === 'STARTING';
 const ConnectingSpinner = () => <Spinner text="" />;
 
 const DataNodeBadge = ({ nodeId, transportAddress, status }: NodeProps) => (
   <NodeId color={colorByState(status, transportAddress)} title="Short node id">
-    <SecureIcon name={lockIcon(transportAddress)} />{nodeId}
-    {isConnecting(status) ? <>{' '}<ConnectingSpinner /></> : null}
+    <SecureIcon name={lockIcon(transportAddress)} />
+    {nodeId}
+    {isConnecting(status) ? (
+      <>
+        {' '}
+        <ConnectingSpinner />
+      </>
+    ) : null}
   </NodeId>
 );
 

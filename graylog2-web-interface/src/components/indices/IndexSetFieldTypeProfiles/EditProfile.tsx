@@ -31,42 +31,55 @@ import useProfileMutations from 'components/indices/IndexSetFieldTypeProfiles/ho
 import Routes from 'routing/Routes';
 
 type Props = {
-  profile: IndexSetFieldTypeProfile,
-}
+  profile: IndexSetFieldTypeProfile;
+};
 
-const EditProfile = ({
-  profile,
-}: Props) => {
+const EditProfile = ({ profile }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { editProfile } = useProfileMutations();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
 
-  const onSubmit = useCallback((newProfile: IndexSetFieldTypeProfileForm) => {
-    editProfile({ profile: newProfile, id: profile.id }).then(() => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.EDIT, {
-        app_pathname: telemetryPathName,
-        app_action_value: { mappingsQuantity: newProfile?.customFieldMappings?.length },
-      });
+  const onSubmit = useCallback(
+    (newProfile: IndexSetFieldTypeProfileForm) => {
+      editProfile({ profile: newProfile, id: profile.id }).then(() => {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.EDIT, {
+          app_pathname: telemetryPathName,
+          app_action_value: { mappingsQuantity: newProfile?.customFieldMappings?.length },
+        });
 
-      navigate(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW);
-    });
-  }, [editProfile, navigate, profile.id, sendTelemetry, telemetryPathName]);
+        navigate(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW);
+      });
+    },
+    [editProfile, navigate, profile.id, sendTelemetry, telemetryPathName],
+  );
 
   useEffect(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.EDIT_OPENED, { app_pathname: telemetryPathName, app_action_value: 'create-new-index-set-field-type-profile-opened' });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.EDIT_OPENED, {
+      app_pathname: telemetryPathName,
+      app_action_value: 'create-new-index-set-field-type-profile-opened',
+    });
   }, [sendTelemetry, telemetryPathName]);
 
   const onCancel = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.EDIT_CANCELED, { app_pathname: telemetryPathName, app_action_value: 'create-new-index-set-field-type-profile-canceled' });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.EDIT_CANCELED, {
+      app_pathname: telemetryPathName,
+      app_action_value: 'create-new-index-set-field-type-profile-canceled',
+    });
     navigate(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW);
   }, [navigate, sendTelemetry, telemetryPathName]);
 
   const initialValues = useMemo(() => omit(profile, ['id', 'indexSetIds']), [profile]);
 
   return (
-    <ProfileForm onCancel={onCancel} submitButtonText="Update profile" submitLoadingText="Updating profile..." onSubmit={onSubmit} initialValues={initialValues} />
+    <ProfileForm
+      onCancel={onCancel}
+      submitButtonText="Update profile"
+      submitLoadingText="Updating profile..."
+      onSubmit={onSubmit}
+      initialValues={initialValues}
+    />
   );
 };
 

@@ -26,7 +26,11 @@ import PriorityName from 'components/events/events/PriorityName';
 const filterComponents: FilterComponents = [
   {
     configuration: (selectedValues, editValue: string, onChange: (newValue: string) => void) => (
-      <EventDefinitionFilter value={editValue} onSelect={(newValue) => onChange(newValue)} selectedValues={selectedValues} />
+      <EventDefinitionFilter
+        value={editValue}
+        onSelect={(newValue) => onChange(newValue)}
+        selectedValues={selectedValues}
+      />
     ),
     attribute: 'event_definition_id',
     renderValue: (value) => <EventDefinitionName eventDefinitionId={value} displayAsLink={false} />,

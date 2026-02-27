@@ -1,0 +1,5 @@
+type="f"
+message="In cloud env display only node name instead of name with link in message details on the search page."
+
+issues=["20464"]
+pulls=["20505"]

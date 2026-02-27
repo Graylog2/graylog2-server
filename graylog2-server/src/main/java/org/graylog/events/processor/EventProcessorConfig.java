@@ -23,6 +23,7 @@ import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.scheduler.JobDefinitionConfig;
 import org.graylog.scheduler.clock.JobSchedulerClock;
+import org.graylog.security.UserContext;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.plugin.rest.ValidationResult;
@@ -77,7 +78,18 @@ public interface EventProcessorConfig extends ContentPackable<EventProcessorConf
      * @return the validation result
      */
     @JsonIgnore
-    ValidationResult validate();
+    default ValidationResult validate(UserContext userContext,
+                                      @Nullable EventProcessorConfig oldEventProcessorConfig,
+                                      EventDefinitionConfiguration eventDefinitionConfiguration) {
+        return validate(oldEventProcessorConfig, eventDefinitionConfiguration);
+    }
+
+    /**
+     * Validates the event processor configuration.
+     *
+     * @return the validation result
+     */
+    ValidationResult validate(UserContext userContext);
 
     /**
      * Returns the permissions that are required to create the event processor configuration. (e.g. stream permissions)
@@ -128,7 +140,7 @@ public interface EventProcessorConfig extends ContentPackable<EventProcessorConf
         }
 
         @Override
-        public ValidationResult validate() {
+        public ValidationResult validate(UserContext userContext) {
             throw new UnsupportedOperationException();
         }
 

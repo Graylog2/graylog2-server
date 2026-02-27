@@ -16,27 +16,30 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import StandardFooter from './StandardFooter';
 
-const StyledFooter = styled.footer(({ theme }) => css`
-  text-align: center;
-  font-size: ${theme.fonts.size.small};
-  color: ${theme.colors.gray[70]};
-  height: 20px;
+const StyledFooter = styled.footer(
+  ({ theme }) => css`
+    text-align: center;
+    font-size: ${theme.fonts.size.small};
+    color: ${theme.colors.gray[70]};
+    height: 20px;
 
-  /* This combination of padding and box-sizing is required to fix a firefox flexbox bug */
-  box-sizing: content-box;
-  padding-bottom: ${theme.spacings.sm};
+    /* This combination of padding and box-sizing is required to fix a firefox flexbox bug */
+    box-sizing: content-box;
+    padding-bottom: ${theme.spacings.sm};
 
-  @media print {
-    display: none;
-  }
-`);
+    @media print {
+      display: none;
+    }
+  `,
+);
 
 const Footer = () => {
-  const customFooter = PluginStore.exports('pageFooter');
+  const customFooter = usePluginEntities('pageFooter');
 
   if (customFooter.length === 1) {
     const CustomFooter = customFooter[0].component;
@@ -54,7 +57,5 @@ const Footer = () => {
     </StyledFooter>
   );
 };
-
-Footer.propTypes = {};
 
 export default Footer;

@@ -19,8 +19,7 @@ package org.graylog.plugins.views.startpage.lastOpened;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.mongodb.DuplicateKeyException;
-import com.mongodb.client.MongoCollection;
+import com.mongodb.MongoException;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
@@ -28,6 +27,7 @@ import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.startpage.recentActivities.ActivityType;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityEvent;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.users.events.UserDeletedEvent;
@@ -53,14 +53,17 @@ public class LastOpenedService {
     }
 
     Optional<LastOpenedForUserDTO> findForUser(final String userId) {
-        return MongoUtils.stream(this.db.find(Filters.eq(LastOpenedForUserDTO.FIELD_USER_ID, userId))).findAny();
+        return Optional.ofNullable(this.db.find(Filters.eq(LastOpenedForUserDTO.FIELD_USER_ID, userId)).first());
     }
 
     public void create(final LastOpenedForUserDTO lastOpenedItems) {
         try {
             db.insertOne(lastOpenedItems);
-        } catch (DuplicateKeyException e) {
-            throw new IllegalStateException("Unable to create a last opened collection, collection with this id already exists : " + lastOpenedItems.id());
+        } catch (MongoException e) {
+            if (MongoUtils.isDuplicateKeyError(e)) {
+                throw new IllegalStateException("Unable to create record of last opened items. Record with this id already exists : " + lastOpenedItems.id());
+            }
+            throw e;
         }
     }
 

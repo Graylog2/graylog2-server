@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix displaying very small percentages."
+
+issues = ["21185"]
+pulls = ["21368"]

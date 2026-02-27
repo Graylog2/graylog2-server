@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix Alerts & events search input is removing input values while typing."
+
+issues = ["19009"]
+pulls = ["20516"]

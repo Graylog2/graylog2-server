@@ -16,10 +16,12 @@
  */
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
+import { useFormikContext } from 'formik';
 
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 import useIndexSetFieldTypesAll from 'views/logic/fieldactions/ChangeFieldType/hooks/useIndexSetFieldTypesAll';
+import type { FormValues } from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 
 const StyledLabel = styled.h5`
   font-weight: bold;
@@ -31,34 +33,43 @@ const StyledSelect = styled(Select)`
 `;
 
 type Props = {
-  indexSetId: string,
-  onFieldChange: (param: {
-    fieldName: string,
-    type: string
-  }) => void,
-  field: string,
-}
+  indexSetId: string;
+  field: string;
+  name: string;
+};
 
-const FieldSelect = ({ indexSetId, onFieldChange, field }: Props) => {
-  const { data: { options, currentTypes }, isLoading } = useIndexSetFieldTypesAll(indexSetId);
+const FieldSelect = ({ indexSetId, field, name }: Props) => {
+  const { setFieldValue } = useFormikContext<FormValues>();
 
-  const _onFieldChange = useCallback((value: string) => {
-    onFieldChange({ fieldName: value, type: currentTypes?.[value] });
-  }, [currentTypes, onFieldChange]);
+  const {
+    data: { options, currentTypes },
+    isLoading,
+  } = useIndexSetFieldTypesAll(indexSetId);
+
+  const _onFieldChange = useCallback(
+    (value: string) => {
+      setFieldValue(name, value);
+      setFieldValue('field_type', currentTypes?.[value]);
+    },
+    [currentTypes, name, setFieldValue],
+  );
 
   return (
     <>
       <StyledLabel>Select Field</StyledLabel>
-      <Input id="field">
-        <StyledSelect inputId="field"
-                      options={options}
-                      value={field}
-                      onChange={_onFieldChange}
-                      placeholder="Select or type the field"
-                      disabled={isLoading}
-                      inputProps={{ 'aria-label': 'Select Field' }}
-                      required
-                      allowCreate />
+      <Input id={name}>
+        <StyledSelect
+          inputId={name}
+          name={name}
+          options={options}
+          value={field}
+          onChange={_onFieldChange}
+          placeholder="Select or type the field"
+          disabled={isLoading}
+          aria-label="Select Field"
+          required
+          allowCreate
+        />
       </Input>
     </>
   );

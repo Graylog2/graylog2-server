@@ -28,11 +28,13 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.nio.charset.StandardCharsets;
 
@@ -40,12 +42,13 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class PaloAlto11xCodecTest {
     private static final String TEST_SOURCE = "Test Source";
     private static final DateTime TEST_DATE_TIME = DateTime.now(DateTimeZone.UTC);
@@ -66,7 +69,7 @@ public class PaloAlto11xCodecTest {
     RawMessage in;
     Message out;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.cut = new PaloAlto11xCodec(mockConfig, mockRawParser, messageFactory);
     }
@@ -109,7 +112,7 @@ public class PaloAlto11xCodecTest {
 
     // WHENs
     private void whenDecodeIsCalled() {
-        out = cut.decode(in);
+        out = cut.decodeSafe(in).get();
     }
 
     private void thenOutputMessageContainsExpectedFields(boolean shouldContainFullMessage) {

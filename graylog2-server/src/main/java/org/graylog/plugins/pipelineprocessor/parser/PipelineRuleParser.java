@@ -102,7 +102,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import static com.google.common.collect.ImmutableSortedSet.orderedBy;
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.toList;
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 public class PipelineRuleParser {
 
@@ -115,7 +115,7 @@ public class PipelineRuleParser {
         this.functionRegistry = functionRegistry;
     }
 
-    private static final RateLimitedLog log = getRateLimitedLog(PipelineRuleParser.class);
+    private static final RateLimitedLog log = createDefaultRateLimitedLog(PipelineRuleParser.class);
 
     public static final ParseTreeWalker WALKER = ParseTreeWalker.DEFAULT;
 
@@ -511,10 +511,18 @@ public class PipelineRuleParser {
             exprs.put(ctx, expr);
         }
 
+        /**
+         * Handle chars like strings.
+         * There is no dedicated char type for Graylog rules and, strictly speaking, we should error out. But we have
+         * been silently allowing (and ignoring) chars for 10 years.To not break existing rules, we continue to allow
+         * them. Except now we actually honor the expression value.
+         */
         @Override
         public void exitChar(RuleLangParser.CharContext ctx) {
-            // TODO
-            super.exitChar(ctx);
+            final String text = unescape(unquote(ctx.getText(), '\''));
+            final StringExpression expr = new StringExpression(ctx.getStart(), text);
+            log.trace("CHAR: ctx {} => {}", ctx, expr);
+            exprs.put(ctx, expr);
         }
 
         @Override

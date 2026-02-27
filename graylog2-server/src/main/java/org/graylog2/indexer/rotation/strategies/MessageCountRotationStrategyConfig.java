@@ -20,14 +20,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
-
 import jakarta.validation.constraints.Min;
+import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class MessageCountRotationStrategyConfig implements RotationStrategyConfig {
     private static final int DEFAULT_MAX_DOCS_PER_INDEX = 20_000_000;
 
@@ -40,7 +37,6 @@ public abstract class MessageCountRotationStrategyConfig implements RotationStra
         return new AutoValue_MessageCountRotationStrategyConfig(type, maxDocsPerIndex);
     }
 
-    @JsonCreator
     public static MessageCountRotationStrategyConfig create(@JsonProperty("max_docs_per_index") @Min(1) int maxDocsPerIndex) {
         return create(MessageCountRotationStrategyConfig.class.getCanonicalName(), maxDocsPerIndex);
     }

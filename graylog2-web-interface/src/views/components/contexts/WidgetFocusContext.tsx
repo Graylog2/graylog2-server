@@ -19,31 +19,31 @@ import * as React from 'react';
 import { singleton } from 'logic/singleton';
 
 export type WidgetFocusingState = {
-  id: string,
-  editing: false,
-  focusing: true,
-}
+  id: string;
+  editing: false;
+  focusing: true;
+};
 
 export type WidgetEditingState = {
-  id: string,
-  editing: true,
-  focusing: true,
-}
+  id: string;
+  editing: true;
+  focusing: true;
+};
 
 type InitialState = {
-  id: undefined,
-  editing: false,
-  focusing: false,
-}
+  id: undefined;
+  editing: false;
+  focusing: false;
+};
 
 export type FocusContextState = WidgetFocusingState | WidgetEditingState | InitialState;
 
 export type WidgetFocusContextType = {
-  focusedWidget: FocusContextState | undefined,
-  setWidgetFocusing: (widgetId: string) => void,
-  setWidgetEditing: (widgetId: string) => void,
-  unsetWidgetFocusing: () => void,
-  unsetWidgetEditing: () => void,
+  focusedWidget: FocusContextState | undefined;
+  setWidgetFocusing: (widgetId: string) => void;
+  setWidgetEditing: (widgetId: string) => void;
+  unsetWidgetFocusing: () => void;
+  unsetWidgetEditing: () => void;
 };
 
 const defaultContext = {

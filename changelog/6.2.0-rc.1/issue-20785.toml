@@ -1,0 +1,5 @@
+type = "c"
+message = "Removed noisy system notification when event limit is exceeded."
+
+issues = ["20785"]
+pulls = ["21080"]

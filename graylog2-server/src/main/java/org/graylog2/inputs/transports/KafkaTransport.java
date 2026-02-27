@@ -105,7 +105,7 @@ public class KafkaTransport extends ThrottleableTransport {
     );
 
     private static final String DEFAULT_OFFSET_RESET = "largest";
-    private static final String DEFAULT_GROUP_ID = "graylog2";
+    private static final String DEFAULT_GROUP_ID = "myapp-consumer-group";
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaTransport.class);
 
@@ -507,7 +507,7 @@ public class KafkaTransport extends ThrottleableTransport {
             cr.addField(new BooleanField(CK_LEGACY,
                     "Legacy mode",
                     false,
-                    "Use old ZooKeeper-based consumer API. (Used before Graylog 3.3)",
+                    "Use old ZooKeeper-based consumer API.",
                     10
             ));
             cr.addField(new TextField(
@@ -571,7 +571,7 @@ public class KafkaTransport extends ThrottleableTransport {
                     CK_CUSTOM_PROPERTIES,
                     "Custom Kafka properties",
                     "",
-                    "A newline separated list of Kafka properties. (e.g.: \"ssl.keystore.location=/etc/graylog/server/kafka.keystore.jks\").",
+                    "A newline separated list of Kafka properties. (e.g.: \"ssl.keystore.location=/etc/kafka/client/kafka.keystore.jks\").",
                     ConfigurationField.Optional.OPTIONAL,
                     ConfigurationField.PLACE_AT_END_POSITION,
                     TextField.Attribute.TEXTAREA,

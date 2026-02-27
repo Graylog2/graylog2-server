@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Always retry index creation with default settings/mappings for restore or retrieval."
+
+issues = ["Graylog2/graylog-plugin-enterprise#10126"]
+pulls = ["22155"]

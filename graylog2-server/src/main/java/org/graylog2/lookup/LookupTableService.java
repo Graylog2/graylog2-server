@@ -23,6 +23,9 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.Service;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.dto.LookupTableDto;
@@ -35,6 +38,7 @@ import org.graylog2.lookup.events.LookupTablesDeleted;
 import org.graylog2.lookup.events.LookupTablesUpdated;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
+import org.graylog2.plugin.lookup.LookupPreview;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.system.SystemEntity;
 import org.graylog2.utilities.LoggingServiceListener;
@@ -43,11 +47,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Singleton;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -84,6 +83,7 @@ public class LookupTableService extends AbstractIdleService {
     private final Map<String, LookupDataAdapter.Factory> adapterFactories;
     private final Map<String, LookupDataAdapter.Factory2> adapterFactories2;
     private final Map<String, LookupDataAdapter.Factory2> systemAdapterFactories;
+    private final Map<String, LookupCache.Factory> systemCacheFactories;
     private final ScheduledExecutorService scheduler;
     private final EventBus eventBus;
     private final LookupDataAdapterRefreshService adapterRefreshService;
@@ -102,6 +102,7 @@ public class LookupTableService extends AbstractIdleService {
                               Map<String, LookupDataAdapter.Factory> adapterFactories,
                               Map<String, LookupDataAdapter.Factory2> adapterFactories2,
                               @SystemEntity Map<String, LookupDataAdapter.Factory2> systemAdapterFactories,
+                              @SystemEntity Map<String, LookupCache.Factory> systemCacheFactories,
                               @Named("daemonScheduler") ScheduledExecutorService scheduler,
                               EventBus eventBus) {
         this.configService = configService;
@@ -109,6 +110,7 @@ public class LookupTableService extends AbstractIdleService {
         this.adapterFactories = adapterFactories;
         this.adapterFactories2 = adapterFactories2;
         this.systemAdapterFactories = systemAdapterFactories;
+        this.systemCacheFactories = systemCacheFactories;
         this.scheduler = scheduler;
         this.eventBus = eventBus;
         this.adapterRefreshService = new LookupDataAdapterRefreshService(scheduler, liveTables);
@@ -178,7 +180,7 @@ public class LookupTableService extends AbstractIdleService {
         private final DataAdapterDto dto;
         private final LookupDataAdapter adapter;
         private final CountDownLatch latch;
-        private final Consumer<LookupDataAdapter> replacedAdapterConsumer;
+        private Consumer<LookupDataAdapter> replacedAdapterConsumer;
 
         public DataAdapterListener(DataAdapterDto dto, LookupDataAdapter adapter, CountDownLatch latch) {
             this(dto, adapter, latch, replacedAdapter -> {
@@ -205,6 +207,7 @@ public class LookupTableService extends AbstractIdleService {
                 }
             } finally {
                 latch.countDown();
+                cleanup();
             }
         }
 
@@ -214,15 +217,31 @@ public class LookupTableService extends AbstractIdleService {
                 LOG.warn("Unable to start data adapter {}: {}", dto.name(), getRootCauseMessage(failure));
             } finally {
                 latch.countDown();
+                cleanup();
             }
+        }
+
+        private void cleanup() {
+            // Whenever the service this listener is listening to terminates (regardless of failing or succeeding), we
+            // need to clean up the reference to the Consumer for the previous adapter. Otherwise, we would always keep it
+            // from being garbage-collected, resulting is a chain of all Data-Adapters of this type ever started on this
+            // instance. See https://github.com/Graylog2/graylog2-server/issues/25077 for details
+            LOG.debug("Cleaning up data adapter listener {}.", dto.name());
+
+            this.replacedAdapterConsumer = null;
+        }
+
+        @VisibleForTesting
+        boolean isReplacedAdapterConsumerSet() {
+            return replacedAdapterConsumer != null;
         }
     }
 
-    private class CacheListener extends Service.Listener {
+    protected class CacheListener extends Service.Listener {
         private final CacheDto dto;
         private final LookupCache cache;
         private final CountDownLatch latch;
-        private final Consumer<LookupCache> replacedCacheConsumer;
+        private Consumer<LookupCache> replacedCacheConsumer;
 
         public CacheListener(CacheDto dto, LookupCache cache, CountDownLatch latch) {
             this(dto, cache, latch, replacedCache -> {
@@ -249,6 +268,7 @@ public class LookupTableService extends AbstractIdleService {
                 }
             } finally {
                 latch.countDown();
+                cleanup();
             }
         }
 
@@ -258,7 +278,22 @@ public class LookupTableService extends AbstractIdleService {
                 LOG.warn("Unable to start cache {}: {}", dto.name(), getRootCauseMessage(failure));
             } finally {
                 latch.countDown();
+                cleanup();
             }
+        }
+
+        private void cleanup() {
+            // Whenever the service this listener is listening to terminates (regardless of failing or succeeding), we
+            // need to clean up the reference to the Consumer for the previous cache. Otherwise, we would always keep it
+            // from being garbage-collected, resulting is a chain of all Caches of this type ever started on this
+            // instance. See https://github.com/Graylog2/graylog2-server/issues/25077 for details.
+            LOG.debug("Cleaning up cache listener {}", dto.name());
+            this.replacedCacheConsumer = null;
+        }
+
+        @VisibleForTesting
+        boolean isReplacedCacheConsumerSet() {
+            return replacedCacheConsumer != null;
         }
     }
 
@@ -451,12 +486,17 @@ public class LookupTableService extends AbstractIdleService {
     private LookupCache createCache(CacheDto dto) {
         try {
             final LookupCache.Factory<? extends LookupCache> factory = cacheFactories.get(dto.config().type());
-            if (factory == null) {
+            final LookupCache.Factory<? extends LookupCache> systemFactory = systemCacheFactories.get(dto.config().type());
+            final LookupCache cache;
+            if (factory != null) {
+                cache = factory.create(dto.id(), dto.name(), dto.config());
+            } else if (systemFactory != null) {
+                cache = systemFactory.create(dto.id(), dto.name(), dto.config());
+            } else {
                 LOG.warn("Unable to load cache {} of type {}, missing a factory. Is a required plugin missing?", dto.name(), dto.config().type());
                 // TODO system notification
                 return null;
             }
-            final LookupCache cache = factory.create(dto.id(), dto.name(), dto.config());
             cache.addListener(new LoggingServiceListener(
                             "Cache",
                             String.format(Locale.ENGLISH, "%s/%s [@%s]", dto.name(), dto.id(), objectId(cache)),
@@ -725,6 +765,22 @@ public class LookupTableService extends AbstractIdleService {
                 return LookupResult.withError();
             }
             return lookupTable.assignTtl(requireValidKey(key), ttlSec);
+        }
+
+        public boolean supportsPreview() {
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+            if (lookupTable == null) {
+                return false;
+            }
+            return lookupTable.supportsPreview();
+        }
+
+        public LookupPreview getPreview(int size) {
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+            if (lookupTable == null) {
+                return LookupPreview.empty();
+            }
+            return lookupTable.getPreview(size);
         }
     }
 }

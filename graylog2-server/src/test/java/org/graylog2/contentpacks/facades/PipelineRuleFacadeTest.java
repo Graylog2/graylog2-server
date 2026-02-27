@@ -22,9 +22,8 @@ import com.google.common.graph.Graph;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.DivergingEntityConfigurationException;
 import org.graylog2.contentpacks.model.ModelId;
@@ -39,12 +38,15 @@ import org.graylog2.contentpacks.model.entities.PipelineRuleEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.DeletableSystemScope;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -54,22 +56,23 @@ import java.util.concurrent.Executors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@ExtendWith(MongoDBExtension.class)
 public class PipelineRuleFacadeTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     private RuleService ruleService;
     private PipelineRuleFacade facade;
+    private EntityScopeService entityScopeService;
 
-    @Before
+    @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
-    public void setUp() throws Exception {
+    public void setUp(MongoCollections mongoCollections) throws Exception {
+        entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope(), new DeletableSystemScope()));
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
         ruleService = new MongoDbRuleService(
-                new MongoCollections(new MongoJackObjectMapperProvider(objectMapper), mongodb.mongoConnection()),
-                clusterEventBus);
+                mongoCollections,
+                clusterEventBus, entityScopeService);
 
         facade = new PipelineRuleFacade(objectMapper, ruleService);
     }
@@ -95,6 +98,26 @@ public class PipelineRuleFacadeTest {
         assertThat(ruleEntity.title()).isEqualTo(ValueReference.of("title"));
         assertThat(ruleEntity.description()).isEqualTo(ValueReference.of("description"));
         assertThat(ruleEntity.source().asString(Collections.emptyMap())).startsWith("rule \"debug\"\n");
+    }
+
+    @Test
+    public void exportEntity_descriptionNull() {
+        final RuleDao pipelineRule = RuleDao.builder()
+                .id("id")
+                .title("title")
+                .description(null)
+                .source("rule \"debug\"\nwhen\n  true\nthen\n  debug($message.message);\nend")
+                .build();
+
+        final EntityDescriptor descriptor = EntityDescriptor.create("id", ModelTypes.PIPELINE_RULE_V1);
+        final Entity entity = facade.exportNativeEntity(pipelineRule, EntityDescriptorIds.of(descriptor));
+
+        assertThat(entity).isInstanceOf(EntityV1.class);
+        assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE_RULE_V1);
+
+        final EntityV1 entityV1 = (EntityV1) entity;
+        final PipelineRuleEntity ruleEntity = objectMapper.convertValue(entityV1.data(), PipelineRuleEntity.class);
+        assertThat(ruleEntity.description()).isNull();
     }
 
     @Test

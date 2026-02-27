@@ -23,32 +23,38 @@ import { Well } from 'components/bootstrap';
 import styles from '../event-notification-types/EmailNotificationSummary.css';
 
 type Props = {
-  notification: HttpEventNotificationV2,
-}
+  notification: HttpEventNotificationV2;
+};
 
-const HttpNotificationDetailsV2 = ({ notification } : Props) => {
+const HttpNotificationDetailsV2 = ({ notification }: Props) => {
   const apiKeySet: boolean = notification.config.api_secret?.is_set;
   const apiSentAs: string = notification.config.api_key_as_header ? 'Header' : 'Query Parameter';
 
   return (
     <>
       <ReadOnlyFormGroup label="URL" value={notification.config.url} />
-      <ReadOnlyFormGroup label="Basic Authentication" value={notification.config.basic_auth?.is_set ? '******' : null} />
+      <ReadOnlyFormGroup
+        label="Basic Authentication"
+        value={notification.config.basic_auth?.is_set ? '******' : null}
+      />
       <ReadOnlyFormGroup label="API Key/Secret Sent As" value={apiKeySet ? apiSentAs : null} />
       <ReadOnlyFormGroup label="API Key" value={notification.config.api_key} />
       <ReadOnlyFormGroup label="API Secret" value={apiKeySet ? '******' : null} />
       <ReadOnlyFormGroup label="Method" value={notification.config.method} />
-      {notification.config.time_zone && (<ReadOnlyFormGroup label="Time Zone" value={notification.config.time_zone} />)}
+      {notification.config.time_zone && <ReadOnlyFormGroup label="Time Zone" value={notification.config.time_zone} />}
       {notification.config.content_type && (
-      <ReadOnlyFormGroup label="Content Type" value={notification.config.content_type} />)}
-      {notification.config.headers && (<ReadOnlyFormGroup label="Headers" value={notification.config.headers} />)}
+        <ReadOnlyFormGroup label="Content Type" value={notification.config.content_type} />
+      )}
+      {notification.config.headers && <ReadOnlyFormGroup label="Headers" value={notification.config.headers} />}
       {notification.config.body_template && (
-      <ReadOnlyFormGroup label="Body Template"
-                         value={(
-                           <Well bsSize="small" className={styles.bodyPreview}>
-                             {notification.config.body_template}
-                           </Well>
-                         )} />
+        <ReadOnlyFormGroup
+          label="Body Template"
+          value={
+            <Well bsSize="small" className={styles.bodyPreview}>
+              {notification.config.body_template}
+            </Well>
+          }
+        />
       )}
     </>
   );

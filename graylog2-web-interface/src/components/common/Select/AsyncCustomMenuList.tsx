@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import InfiniteLoader from 'react-window-infinite-loader';
+import { useRef } from 'react';
+import { useInfiniteLoader } from 'react-window-infinite-loader';
 import styled from 'styled-components';
 
 import { WindowList } from 'components/common/Select/CustomMenuList';
@@ -38,25 +39,24 @@ const AsyncCustomMenuList = ({
   children,
   selectProps: { loadOptions, total },
 }: {
-  children: Array<React.ReactNode>,
-  selectProps: { loadOptions: () => void, total: number }
+  children: Array<React.ReactNode>;
+  selectProps: { loadOptions: (startIndex: number, stopIndex: number) => Promise<void>; total: number };
 }) => {
   const items = children?.length ? children : [getNoOptionMessage()];
+  const listRef = useRef(null);
+
+  const onRowsRendered = useInfiniteLoader({
+    isRowLoaded: (index: number) => index < children.length,
+    rowCount: total,
+    threshold: 30,
+    minimumBatchSize: 50,
+    loadMoreRows: loadOptions,
+  });
 
   return (
-    <InfiniteLoader isItemLoaded={(index: number) => index < children.length}
-                    itemCount={total}
-                    threshold={30}
-                    minimumBatchSize={50}
-                    loadMoreItems={loadOptions}>
-      {({ onItemsRendered, ref }) => (
-        <WindowList listRef={ref}
-                    onItemsRendered={onItemsRendered}>
-          {items}
-        </WindowList>
-      )}
-    </InfiniteLoader>
-
+    <WindowList listRef={listRef} onRowsRendered={onRowsRendered}>
+      {items}
+    </WindowList>
   );
 };
 

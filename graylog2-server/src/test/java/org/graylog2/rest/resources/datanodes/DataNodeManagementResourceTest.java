@@ -26,18 +26,21 @@ import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.datanode.DataNodeCommandService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class DataNodeManagementResourceTest {
 
     public static final String NODEID = "nodeid";
@@ -56,9 +59,9 @@ public class DataNodeManagementResourceTest {
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        classUnderTest = new DataNodeManagementResource(dataNodeCommandService, nodeService, certRenewalService, true, auditEventSender, objectMapper);
+        classUnderTest = new DataNodeManagementResource(dataNodeCommandService, nodeService, true, auditEventSender, objectMapper);
     }
 
     @Test

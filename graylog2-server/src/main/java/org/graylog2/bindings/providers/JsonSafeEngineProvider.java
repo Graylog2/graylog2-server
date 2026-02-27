@@ -22,7 +22,10 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.graylog2.jmte.NamedDateRenderer;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 
@@ -33,8 +36,13 @@ public class JsonSafeEngineProvider implements Provider<Engine> {
     @Inject
     public JsonSafeEngineProvider() {
         engine = Engine.createEngine();
+        engine.registerNamedRenderer(new NamedDateRenderer());
         engine.registerRenderer(String.class, new JsonSafeRenderer());
+        engine.registerRenderer(Map.class, new JsonSafeMapRenderer());
+        engine.registerRenderer(Iterable.class, new JsonSafeIterableRenderer());
+        engine.registerRenderer(Collection.class, new JsonSafeCollectionRenderer());
     }
+
     @Override
     public Engine get() {
         return engine;
@@ -51,5 +59,56 @@ public class JsonSafeEngineProvider implements Provider<Engine> {
             // So we use escapeJava and tack on an extra String.replace() call to escape forward slashes.
             return StringEscapeUtils.escapeJava(s).replace("/", "\\/");
         }
+    }
+
+    @SuppressWarnings("rawtypes")
+    private static class JsonSafeMapRenderer implements Renderer<Map> {
+
+        @Override
+        public String render(Map map, Locale locale, Map<String, Object> map2) {
+            final String renderedResult;
+
+            if (map.isEmpty()) {
+                renderedResult = "";
+            } else if (map.size() == 1) {
+                renderedResult = map.values().iterator().next().toString();
+            } else {
+                renderedResult = map.toString();
+            }
+            return StringEscapeUtils.escapeJava(renderedResult).replace("/", "\\/");
+        }
+    }
+
+    private static class JsonSafeIterableRenderer implements Renderer<Iterable> {
+
+        @Override
+        public String render(Iterable iterable, Locale locale, Map<String, Object> model) {
+            final String renderedResult;
+
+            final Iterator<?> iterator = iterable.iterator();
+            renderedResult = iterator.hasNext() ? iterator.next().toString() : "";
+            return StringEscapeUtils.escapeJava(renderedResult).replace("/", "\\/");
+
+        }
+
+    }
+
+    private static class JsonSafeCollectionRenderer implements Renderer<Collection> {
+
+        @Override
+        public String render(Collection collection, Locale locale, Map<String, Object> model) {
+            final String renderedResult;
+
+            if (collection.isEmpty()) {
+                renderedResult = "";
+            } else if (collection.size() == 1) {
+                renderedResult = collection.iterator().next().toString();
+            } else {
+                renderedResult = collection.toString();
+            }
+            return StringEscapeUtils.escapeJava(renderedResult).replace("/", "\\/");
+
+        }
+
     }
 }

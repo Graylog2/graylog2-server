@@ -54,8 +54,4 @@ const attributeWithFilterOptions: Attribute = {
 };
 
 // eslint-disable-next-line import/prefer-default-export
-export const attributes: Attributes = [
-  dateAttribute,
-  attributeWithFilterOptions,
-  attributeWithRelactedCollection,
-];
+export const attributes: Attributes = [dateAttribute, attributeWithFilterOptions, attributeWithRelactedCollection];

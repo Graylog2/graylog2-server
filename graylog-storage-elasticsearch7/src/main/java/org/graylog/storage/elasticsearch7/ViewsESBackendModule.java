@@ -24,8 +24,6 @@ import com.google.inject.binder.ScopedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
 import org.graylog.plugins.views.ViewsModule;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
-import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
@@ -33,6 +31,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.RangeBucket;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
@@ -59,6 +58,7 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivot;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotBucketSpecHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets.ESDateRangeHandler;
+import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets.ESRangeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets.ESTimeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets.ESValuesHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESAverageHandler;
@@ -86,8 +86,7 @@ public class ViewsESBackendModule extends ViewsModule {
     protected void configure() {
         install(new FactoryModuleBuilder().build(ESGeneratedQueryContext.Factory.class));
 
-        bindForVersion(supportedSearchVersion, new TypeLiteral<QueryBackend<? extends GeneratedQueryContext>>() {})
-                .to(ElasticsearchBackend.class);
+        registerVersionedQueryBackend(supportedSearchVersion, ElasticsearchBackend.class);
 
         registerESSearchTypeHandler(MessageList.NAME, ESMessageList.class);
         registerESSearchTypeHandler(EventList.NAME, ESEventList.class);
@@ -109,6 +108,7 @@ public class ViewsESBackendModule extends ViewsModule {
         registerPivotBucketHandler(Values.NAME, ESValuesHandler.class);
         registerPivotBucketHandler(Time.NAME, ESTimeHandler.class);
         registerPivotBucketHandler(DateRangeBucket.NAME, ESDateRangeHandler.class);
+        registerPivotBucketHandler(RangeBucket.NAME, ESRangeHandler.class);
 
         bindExportBackend().to(ElasticsearchExportBackend.class);
         bindRequestStrategy().to(org.graylog.storage.elasticsearch7.views.export.SearchAfter.class);

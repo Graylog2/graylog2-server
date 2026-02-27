@@ -1,8 +1,8 @@
 :local(.manageNotifications) {
-    float: right;
-    margin-top: 10px;
+  float: right;
+  margin-top: 10px;
 }
 
 :local(.notificationSettings) {
-    margin-top: 35px;
+  margin-top: 35px;
 }

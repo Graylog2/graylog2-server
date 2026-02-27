@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix when widget title input in widget edit mode looses cursor position on change"
+
+pulls = ["21327"]
+issues = ["21145"]

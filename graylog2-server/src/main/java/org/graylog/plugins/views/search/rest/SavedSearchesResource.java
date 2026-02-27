@@ -16,9 +16,10 @@
  */
 package org.graylog.plugins.views.search.rest;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.DefaultValue;
@@ -36,22 +37,25 @@ import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
+import org.graylog2.database.utils.SourcedMongoEntityUtils;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQueryField;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Predicate;
 
 import static java.util.Locale.ENGLISH;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "Search/Saved", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Search/Saved")
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/search/saved")
 public class SavedSearchesResource extends RestResource {
@@ -66,7 +70,7 @@ public class SavedSearchesResource extends RestResource {
             EntityAttribute.builder().id(ViewDTO.FIELD_DESCRIPTION).title("Description").build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_SUMMARY).title("Summary").build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_OWNER).title("Owner").build(),
-            EntityAttribute.builder().id(ViewDTO.FIELD_FAVORITE).title("Favorite").sortable(false).build()
+            EntityAttribute.builder().id(ViewDTO.FIELD_FAVORITE).title("Favorite").build()
     );
 
     private static final EntityDefaults settings = EntityDefaults.builder()
@@ -83,21 +87,29 @@ public class SavedSearchesResource extends RestResource {
     }
 
     @GET
-    @ApiOperation("Get a list of all searches")
-    public PageListResponse<ViewSummaryDTO> views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                  @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                  @ApiParam(name = "sort",
-                                                            value = "The field to sort the result on",
+    @Operation(summary = "Get a list of all searches")
+    public PageListResponse<ViewSummaryDTO> views(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                  @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                  @Parameter(name = "sort",
+                                                            description = "The field to sort the result on",
                                                             required = true,
-                                                            allowableValues = "id,title,created_at,description,summary,owner") @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sortField,
-                                                  @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") SortOrder order,
-                                                  @ApiParam(name = "query") @QueryParam("query") String query,
-                                                  @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
+                                                            schema = @Schema(allowableValues = {"id", "title", "created_at", "last_updated_at", "owner", "description", "summary", "favorite"}))
+                                                  @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sortField,
+                                                  @Parameter(name = "order", description = "The sort direction",
+                                                            schema = @Schema(allowableValues = {"asc", "desc"}))
+                                                  @DefaultValue("asc") @QueryParam("order") SortOrder order,
+                                                  @Parameter(name = "query") @QueryParam("query") String query,
+                                                  @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
                                                   @Context SearchUser searchUser) {
 
         if (!ViewDTO.SORT_FIELDS.contains(sortField.toLowerCase(ENGLISH))) {
             sortField = ViewDTO.FIELD_TITLE;
         }
+
+        Predicate<ViewSummaryDTO> predicate = searchUser::canReadView;
+        final SourcedMongoEntityUtils.FilterPredicate<ViewSummaryDTO> filterPredicate = SourcedMongoEntityUtils.handleEntitySourceFilter(filters, predicate);
+        filters = filterPredicate.filters();
+        predicate = filterPredicate.predicate();
 
         try {
             final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
@@ -105,7 +117,7 @@ public class SavedSearchesResource extends RestResource {
                     searchUser,
                     ViewDTO.Type.SEARCH,
                     dbQuery,
-                    searchUser::canReadView,
+                    predicate,
                     order,
                     sortField,
                     page,

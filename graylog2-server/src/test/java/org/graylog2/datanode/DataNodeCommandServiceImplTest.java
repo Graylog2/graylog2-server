@@ -23,11 +23,13 @@ import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.nodes.TestDataNodeNodeClusterService;
 import org.graylog2.events.ClusterEventBus;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -36,7 +38,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class DataNodeCommandServiceImplTest {
 
     @Mock
@@ -47,7 +50,7 @@ public class DataNodeCommandServiceImplTest {
 
     private DataNodeCommandServiceImpl classUnderTest;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.nodeService = new TestDataNodeNodeClusterService();
         this.classUnderTest = new DataNodeCommandServiceImpl(clusterEventBus, nodeService, eventBus);
@@ -69,9 +72,8 @@ public class DataNodeCommandServiceImplTest {
         final String testNodeId = "node";
         nodeService.registerServer(buildTestNode(testNodeId, DataNodeStatus.AVAILABLE));
 
-        Exception e = assertThrows(IllegalArgumentException.class, () -> {
-            classUnderTest.removeNode(testNodeId);
-        });
+        Exception e = assertThrows(IllegalArgumentException.class, () ->
+                classUnderTest.removeNode(testNodeId));
         assertEquals("Cannot remove last data node in the cluster.", e.getMessage());
         verifyNoMoreInteractions(clusterEventBus);
     }
@@ -82,9 +84,8 @@ public class DataNodeCommandServiceImplTest {
         nodeService.registerServer(buildTestNode(testNodeId, DataNodeStatus.AVAILABLE));
         nodeService.registerServer(buildTestNode("othernode", DataNodeStatus.REMOVING));
 
-        Exception e = assertThrows(IllegalArgumentException.class, () -> {
-            classUnderTest.removeNode(testNodeId);
-        });
+        Exception e = assertThrows(IllegalArgumentException.class, () ->
+                classUnderTest.removeNode(testNodeId));
         assertEquals("Cannot remove last data node in the cluster.", e.getMessage());
         verifyNoMoreInteractions(clusterEventBus);
     }
@@ -124,9 +125,8 @@ public class DataNodeCommandServiceImplTest {
     public void resetNodeFailsWhenNodeNotRemoved() throws NodeNotFoundException {
         final String testNodeId = "node";
         nodeService.registerServer(buildTestNode(testNodeId, DataNodeStatus.AVAILABLE));
-        Exception e = assertThrows(IllegalArgumentException.class, () -> {
-            classUnderTest.resetNode(testNodeId);
-        });
+        Exception e = assertThrows(IllegalArgumentException.class, () ->
+                classUnderTest.resetNode(testNodeId));
         assertEquals("Only previously removed data nodes can rejoin the cluster.", e.getMessage());
         verifyNoMoreInteractions(clusterEventBus);
     }
@@ -143,9 +143,8 @@ public class DataNodeCommandServiceImplTest {
     public void stopNodeFailsWhenNodeNotAvailable() throws NodeNotFoundException {
         final String testNodeId = "node";
         nodeService.registerServer(buildTestNode(testNodeId, DataNodeStatus.REMOVED));
-        Exception e = assertThrows(IllegalArgumentException.class, () -> {
-            classUnderTest.stopNode(testNodeId);
-        });
+        Exception e = assertThrows(IllegalArgumentException.class, () ->
+                classUnderTest.stopNode(testNodeId));
         assertEquals("Only running data nodes can be stopped.", e.getMessage());
         verifyNoMoreInteractions(clusterEventBus);
     }
@@ -162,9 +161,8 @@ public class DataNodeCommandServiceImplTest {
     public void startNodeFailsWhenNodeNotStopped() throws NodeNotFoundException {
         final String testNodeId = "node";
         nodeService.registerServer(buildTestNode(testNodeId, DataNodeStatus.AVAILABLE));
-        Exception e = assertThrows(IllegalArgumentException.class, () -> {
-            classUnderTest.startNode(testNodeId);
-        });
+        Exception e = assertThrows(IllegalArgumentException.class, () ->
+                classUnderTest.startNode(testNodeId));
         assertEquals("Only stopped data nodes can be started.", e.getMessage());
         verifyNoMoreInteractions(clusterEventBus);
     }

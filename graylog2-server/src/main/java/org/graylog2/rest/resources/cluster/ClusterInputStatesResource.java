@@ -17,28 +17,13 @@
 package org.graylog2.rest.resources.cluster;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.audit.AuditEventTypes;
-import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.cluster.NodeService;
-import org.graylog2.rest.RemoteInterfaceProvider;
-import org.graylog2.rest.models.system.inputs.responses.InputCreated;
-import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
-import org.graylog2.rest.models.system.inputs.responses.InputStateSummary;
-import org.graylog2.rest.models.system.inputs.responses.InputStatesList;
-import org.graylog2.rest.resources.system.inputs.RemoteInputStatesResource;
-import org.graylog2.shared.rest.resources.ProxiedResource;
-import org.graylog2.shared.security.RestPermissions;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
@@ -48,6 +33,20 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.cluster.NodeService;
+import org.graylog2.rest.RemoteInterfaceProvider;
+import org.graylog2.rest.models.system.inputs.responses.InputCreated;
+import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
+import org.graylog2.rest.models.system.inputs.responses.InputSetup;
+import org.graylog2.rest.models.system.inputs.responses.InputStateSummary;
+import org.graylog2.rest.models.system.inputs.responses.InputStatesList;
+import org.graylog2.rest.resources.system.inputs.RemoteInputStatesResource;
+import org.graylog2.shared.rest.resources.ProxiedResource;
+import org.graylog2.shared.security.RestPermissions;
 
 import java.util.Map;
 import java.util.Optional;
@@ -55,7 +54,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 @RequiresAuthentication
-@Api(value = "Cluster/InputState", description = "Cluster-wide input states")
+@Tag(name = "Cluster/InputState", description = "Cluster-wide input states")
 @Path("/cluster/inputstates")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterInputStatesResource extends ProxiedResource {
@@ -69,7 +68,7 @@ public class ClusterInputStatesResource extends ProxiedResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get all input states")
+    @Operation(summary = "Get all input states")
     @RequiresPermissions(RestPermissions.INPUTS_READ)
     public Map<String, Optional<Set<InputStateSummary>>> get() {
         return stripCallResult(requestOnAllNodes(RemoteInputStatesResource.class, RemoteInputStatesResource::list, InputStatesList::states));
@@ -78,24 +77,39 @@ public class ClusterInputStatesResource extends ProxiedResource {
     @PUT
     @Path("/{inputId}")
     @Timed
-    @ApiOperation(value = "Start or restart specified input in all nodes")
+    @Operation(summary = "Start or restart specified input in all nodes")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input."),
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "No such input."),
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_START)
-    public Map<String, Optional<InputCreated>> start(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
+    public Map<String, Optional<InputCreated>> start(@Parameter(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         return stripCallResult(requestOnAllNodes(RemoteInputStatesResource.class, r -> r.start(inputId)));
+    }
+
+    @PUT
+    @Path("/setup/{inputId}")
+    @Timed
+    @Operation(summary = "Switch specified input to setup mode in all nodes")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "No such input."),
+    })
+    @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_SETUP)
+    public Map<String, Optional<InputSetup>> setup(@Parameter(name = "inputId", required = true) @PathParam("inputId") String inputId) {
+        return stripCallResult(requestOnAllNodes(RemoteInputStatesResource.class, r -> r.setup(inputId)));
     }
 
     @DELETE
     @Path("/{inputId}")
     @Timed
-    @ApiOperation(value = "Stop specified input in all nodes")
+    @Operation(summary = "Stop specified input in all nodes")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input."),
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "No such input."),
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_STOP)
-    public Map<String, Optional<InputDeleted>> stop(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
+    public Map<String, Optional<InputDeleted>> stop(@Parameter(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         return stripCallResult(requestOnAllNodes(RemoteInputStatesResource.class, r -> r.stop(inputId)));
     }
 }

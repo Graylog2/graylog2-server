@@ -17,27 +17,32 @@
 package org.graylog2.rest.resources.suggestions;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.database.suggestions.EntitySuggestionResponse;
-import org.graylog2.database.suggestions.EntitySuggestionService;
-import org.graylog2.shared.rest.resources.RestResource;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.database.suggestions.EntitySuggestionResponse;
+import org.graylog2.database.suggestions.EntitySuggestionService;
+import org.graylog2.search.SearchQueryField;
+import org.graylog2.shared.rest.PublicCloudAPI;
+import org.graylog2.shared.rest.resources.RestResource;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
 
 @RequiresAuthentication
-@Api(value = "EntitySuggestions", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "EntitySuggestions")
 @Path("/entity_suggestions")
 @Produces(MediaType.APPLICATION_JSON)
 public class EntitySuggestionResource extends RestResource {
@@ -51,18 +56,32 @@ public class EntitySuggestionResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get a paginated list of suggested entities")
-    public EntitySuggestionResponse getPage(@ApiParam(name = "collection")
+    @Operation(summary = "Get a paginated list of suggested entities")
+    public EntitySuggestionResponse getPage(@Parameter(name = "collection")
                                             @QueryParam("collection") String collection,
-                                            @ApiParam(name = "column")
+                                            @Parameter(name ="identifier")
+                                            @QueryParam("identifier") @DefaultValue(ID_FIELD)
+                                            String identifier,
+                                            @Parameter(name = "column")
                                             @QueryParam("column") @DefaultValue("title") String column,
-                                            @ApiParam(name = "page")
+                                            @Parameter(name = "display_fields", description = "Comma-separated list of fields to include in composite display")
+                                            @QueryParam("display_fields") @Nullable String displayFieldsParam,
+                                            @Parameter(name = "display_template", description = "Template for formatting display values (e.g., '{node_id} ({hostname})')")
+                                            @QueryParam("display_template") @Nullable String displayTemplate,
+                                            @Parameter(name = "identifier_type", description = "BSON type of the identifier field")
+                                            @QueryParam("identifier_type") @DefaultValue("OBJECT_ID") SearchQueryField.Type identifierType,
+                                            @Parameter(name = "page")
                                             @QueryParam("page") @DefaultValue("1") int page,
-                                            @ApiParam(name = "per_page")
+                                            @Parameter(name = "per_page")
                                             @QueryParam("per_page") @DefaultValue("10") int perPage,
-                                            @ApiParam(name = "query")
+                                            @Parameter(name = "query")
                                             @QueryParam("query") @DefaultValue("") String query) {
 
-        return entitySuggestionService.suggest(collection, column, query, page, perPage, getSubject());
+        List<String> displayFields = null;
+        if (displayFieldsParam != null && !displayFieldsParam.isEmpty()) {
+            displayFields = Arrays.asList(displayFieldsParam.split(","));
+        }
+
+        return entitySuggestionService.suggest(collection, identifier, column, displayFields, displayTemplate, identifierType, query, page, perPage, getSubject());
     }
 }

@@ -18,11 +18,22 @@ package org.graylog.plugins.sidecar.rest.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableList;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.sidecar.audit.SidecarAuditEventTypes;
@@ -51,23 +62,11 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,9 +76,8 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
-@Api(value = "Sidecar/Administration", description = "Administrate sidecars", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Sidecar/Administration", description = "Administrate sidecars")
 @Path("/sidecar/administration")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -115,13 +113,13 @@ public class AdministrationResource extends RestResource implements PluginRestRe
 
     @POST
     @Timed
-    @ApiOperation(value = "Lists existing Sidecar registrations including compatible sidecars using pagination")
+    @Operation(summary = "Lists existing Sidecar registrations including compatible sidecars using pagination")
     @RequiresPermissions({SidecarRestPermissions.SIDECARS_READ, SidecarRestPermissions.COLLECTORS_READ, SidecarRestPermissions.CONFIGURATIONS_READ})
     @NoAuditEvent("this is not changing any data")
-    public SidecarListResponse administration(@ApiParam(name = "JSON body", required = true)
+    public SidecarListResponse administration(@RequestBody(required = true)
                                               @Valid @NotNull AdministrationRequest request) {
         final String sort = Sidecar.FIELD_NODE_NAME;
-        final String order = "asc";
+        final SortOrder order = SortOrder.ASCENDING;
         final String mappedQuery = sidecarStatusMapper.replaceStringStatusSearchQuery(request.query());
         SearchQuery searchQuery;
         try {
@@ -158,10 +156,13 @@ public class AdministrationResource extends RestResource implements PluginRestRe
     @Timed
     @Path("/action")
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_UPDATE)
-    @ApiOperation(value = "Set collector actions in bulk")
-    @ApiResponses(value = {@ApiResponse(code = 400, message = "The supplied action is not valid.")})
+    @Operation(summary = "Set collector actions in bulk")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "Accepted"),
+            @ApiResponse(responseCode = "400", description = "The supplied action is not valid.")
+    })
     @AuditEvent(type = SidecarAuditEventTypes.ACTION_UPDATE)
-    public Response setAction(@ApiParam(name = "JSON body", required = true)
+    public Response setAction(@RequestBody(required = true)
                               @Valid @NotNull BulkActionsRequest request) {
         for (BulkActionRequest bulkActionRequest : request.collectors()) {
             final List<CollectorAction> actions = bulkActionRequest.collectorIds().stream()

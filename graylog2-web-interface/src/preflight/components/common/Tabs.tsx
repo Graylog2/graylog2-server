@@ -18,13 +18,9 @@ import * as React from 'react';
 import type { TabsProps } from '@mantine/core';
 import { Tabs as MantineTabs } from '@mantine/core';
 
-type Props = TabsProps
+type Props = TabsProps;
 
-const Tabs = ({ children, ...props }: Props) => (
-  <MantineTabs {...props}>
-    {children}
-  </MantineTabs>
-);
+const Tabs = ({ children, ...props }: Props) => <MantineTabs {...props}>{children}</MantineTabs>;
 
 Tabs.List = MantineTabs.List;
 Tabs.Tab = MantineTabs.Tab;

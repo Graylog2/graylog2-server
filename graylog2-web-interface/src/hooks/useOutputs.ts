@@ -15,18 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
 import type { Output } from 'stores/outputs/OutputsStore';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
+import { defaultOnError } from 'util/conditional/onError';
 
 type OutputRequestResponse = {
-  outputs: Array<Output>,
-    total: number,
-}
+  outputs: Array<Output>;
+  total: number;
+};
 export const KEY_PREFIX = ['outputs', 'overview'];
 export const keyFn = () => [...KEY_PREFIX];
 
@@ -37,32 +37,28 @@ export const fetchOutputs = () => {
 };
 
 type Options = {
-  enabled: boolean,
-}
+  enabled: boolean;
+};
 
-const useOutputs = ({ enabled }: Options = { enabled: true }): {
-  data: OutputRequestResponse,
-  refetch: () => void,
-  isInitialLoading: boolean,
+const useOutputs = (
+  { enabled }: Options = { enabled: true },
+): {
+  data: OutputRequestResponse;
+  refetch: () => void;
+  isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading } = useQuery(
-    keyFn(),
-    () => fetchOutputs(),
-    {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading outputs failed with status: ${errorThrown}`,
-          'Could not load outputs');
-      },
-      keepPreviousData: true,
-      enabled,
-    },
-  );
+  const { data, refetch, isInitialLoading } = useQuery({
+    queryKey: keyFn(),
+    queryFn: () => defaultOnError(fetchOutputs(), 'Loading outputs failed with status', 'Could not load outputs'),
+    placeholderData: keepPreviousData,
+    enabled,
+  });
 
-  return ({
+  return {
     data,
     refetch,
     isInitialLoading,
-  });
+  };
 };
 
 export default useOutputs;

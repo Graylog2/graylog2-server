@@ -16,8 +16,11 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
+import com.google.common.util.concurrent.RateLimiter;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.opensearch.CsrRequester;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
@@ -32,12 +35,15 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+@SuppressWarnings("UnstableApiUsage")
 @Singleton
 public class DataNodeCertRenewalPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(DataNodeCertRenewalPeriodical.class);
-    public static final Duration PERIODICAL_DURATION = Duration.ofMinutes(30);
+    public static final Duration PERIODICAL_DURATION = Duration.ofSeconds(2);
+    public static final Duration CSR_TRIGGER_PERIOD = Duration.ofMinutes(5);
 
     private final DatanodeKeystore datanodeKeystore;
     private final Supplier<RenewalPolicy> renewalPolicySupplier;
@@ -46,22 +52,34 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
 
     private final Supplier<Boolean> isServerInPreflightMode;
 
+    private final RateLimiter rateLimiter;
+    private final String hostname;
+
     @Inject
-    public DataNodeCertRenewalPeriodical(DatanodeKeystore datanodeKeystore, ClusterConfigService clusterConfigService, CsrRequester csrRequester, PreflightConfigService preflightConfigService) {
-        this(datanodeKeystore, () -> clusterConfigService.get(RenewalPolicy.class), csrRequester, () -> isInPreflight(preflightConfigService));
+    public DataNodeCertRenewalPeriodical(
+            DatanodeKeystore datanodeKeystore,
+            ClusterConfigService clusterConfigService,
+            CsrRequester csrRequester,
+            PreflightConfigService preflightConfigService,
+            Configuration configuration
+    ) {
+        this(
+                datanodeKeystore,
+                () -> clusterConfigService.get(RenewalPolicy.class),
+                csrRequester,
+                () -> isInPreflight(preflightConfigService),
+                configuration.getHostname()
+        );
     }
 
-    private static boolean isInPreflight(PreflightConfigService preflightConfigService) {
-        return preflightConfigService.getPreflightConfigResult() != PreflightConfigResult.FINISHED;
-    }
-
-    protected DataNodeCertRenewalPeriodical(DatanodeKeystore datanodeKeystore, Supplier<RenewalPolicy> renewalPolicySupplier, CsrRequester csrRequester, Supplier<Boolean> isServerInPreflightMode) {
+    protected DataNodeCertRenewalPeriodical(DatanodeKeystore datanodeKeystore, Supplier<RenewalPolicy> renewalPolicySupplier, CsrRequester csrRequester, Supplier<Boolean> isServerInPreflightMode, String hostname) {
         this.datanodeKeystore = datanodeKeystore;
         this.renewalPolicySupplier = renewalPolicySupplier;
         this.csrRequester = csrRequester;
         this.isServerInPreflightMode = isServerInPreflightMode;
+        this.rateLimiter = RateLimiter.create(1.0 / CSR_TRIGGER_PERIOD.toSeconds());
+        this.hostname = hostname;
     }
-
 
     @Override
     public void doRun() {
@@ -71,29 +89,39 @@ public class DataNodeCertRenewalPeriodical extends Periodical {
             return;
         }
 
-        // always check if there are any certificates that we can accept
         getRenewalPolicy()
-                .filter(this::needsNewCertificate)
-                .ifPresent(renewalPolicy -> {
-                    switch (renewalPolicy.mode()) {
-                        case AUTOMATIC -> automaticRenewal();
-                        case MANUAL -> manualRenewal();
-                    }
-                });
-
+                .filter(isAutomaticRenewal())
+                .ifPresent(this::runRenewal);
     }
 
-    private void manualRenewal() {
-        LOG.debug("Manual renewal, ignoring on the datanode side for now");
+    @Nonnull
+    private static Predicate<RenewalPolicy> isAutomaticRenewal() {
+        return rp -> rp.mode() == RenewalPolicy.Mode.AUTOMATIC;
     }
 
-    private void automaticRenewal() {
-        csrRequester.triggerCertificateSigningRequest();
+    private static boolean isInPreflight(PreflightConfigService preflightConfigService) {
+        return preflightConfigService.getPreflightConfigResult() != PreflightConfigResult.FINISHED;
+    }
+
+    private void runRenewal(RenewalPolicy renewalPolicy) {
+        // only check and possibly renew once every CSR_TRIGGER_PERIOD_LIMIT period
+        // this also limits usage of the filesystem-located keystore
+        if (rateLimiter.tryAcquire() && needsNewCertificate(renewalPolicy)) {
+            csrRequester.triggerCertificateSigningRequest();
+        }
     }
 
     private boolean needsNewCertificate(RenewalPolicy renewalPolicy) {
         final Date expiration = datanodeKeystore.getCertificateExpiration();
-        return expiration == null || expiresSoon(expiration, renewalPolicy);
+        return expiration == null || expiresSoon(expiration, renewalPolicy) || hostnameChanged();
+    }
+
+    private boolean hostnameChanged() {
+        final boolean hostnameChanged = !datanodeKeystore.getSubjectAlternativeNames().contains(hostname);
+        if(hostnameChanged) {
+            LOG.info("Datanode hostname changed, certificate will be renewed now");
+        }
+        return hostnameChanged;
     }
 
     private boolean expiresSoon(Date expiration, RenewalPolicy renewalPolicy) {

@@ -29,8 +29,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchRe
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.storage.opensearch2.testing.TestMultisearchResponse;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,7 +48,7 @@ public class OpenSearchBackendSearchTypesWithStreamsOverridesTest extends OpenSe
     private final String stream1Id = "stream1Id";
     private final String stream2Id = "stream2Id";
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
         mockCancellableMSearch(response);

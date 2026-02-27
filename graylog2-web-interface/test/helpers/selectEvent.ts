@@ -16,6 +16,8 @@
  */
 
 import userEvent from '@testing-library/user-event';
+import selectEvent from 'react-select-event';
+import { screen, within } from 'wrappedTestingLibrary';
 
 /*
  * This file contains helper methods, which replace the `react-select-event` methods.
@@ -27,4 +29,49 @@ const clearAll = (container: HTMLElement, selectClassName: string) => {
   userEvent.click(clearIcons[clearIcons.length - 1]);
 };
 
-export default { clearAll };
+const customCreate = (element: HTMLElement, option: string) =>
+  selectEvent.create(element, option, { container: document.body });
+
+const customSelect = (element: HTMLElement, optionOrOptions: string | Array<string> | RegExp) =>
+  selectEvent.select(element, optionOrOptions, { container: document.body });
+
+const findSelectInput = (name: string, config?: { container: HTMLElement }) => {
+  const queryRoot = config?.container ? within(config.container) : screen;
+
+  return queryRoot.findByRole('combobox', { name: new RegExp(name, 'i') });
+};
+const assertOptionExists = async (
+  selectName: string,
+  optionName: (string | RegExp) | Array<string | RegExp>,
+  config?: { container: HTMLElement },
+) => {
+  const input = await findSelectInput(selectName, config);
+  selectEvent.openMenu(input);
+  const optionNames = Array.isArray(optionName) ? optionName : [optionName];
+
+  return Promise.all(optionNames.map((name) => screen.findByRole('option', { name: new RegExp(name, 'i') })));
+};
+
+// The select name should ideally be the HTML label. If there is no label, you can use the placeholder text.
+const chooseOption = async (
+  selectName: string,
+  optionName: (string | RegExp) | Array<string | RegExp>,
+  config?: { container: HTMLElement },
+) => {
+  const input = await findSelectInput(selectName, config);
+  const optionNames = Array.isArray(optionName) ? optionName : [optionName];
+
+  optionNames.forEach((name) => {
+    userEvent.type(input, `${name}{enter}`);
+  });
+};
+
+export default {
+  clearAll,
+  openMenu: selectEvent.openMenu,
+  create: customCreate,
+  select: customSelect,
+  chooseOption,
+  findSelectInput,
+  assertOptionExists,
+};

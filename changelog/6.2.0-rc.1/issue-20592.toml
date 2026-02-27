@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix that non visible items are selected in index sets table when changing field type"
+
+issues = ["20592"]
+pulls = ["20616"]

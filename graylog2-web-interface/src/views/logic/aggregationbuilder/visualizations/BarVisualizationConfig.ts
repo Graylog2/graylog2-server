@@ -14,8 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { XYVisualization, AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
-import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import type {
+  XYVisualization,
+  AxisType,
+  ChartAxisConfig,
+} from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import { DEFAULT_AXIS_CONFIG, DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 
 import VisualizationConfig from './VisualizationConfig';
 
@@ -24,21 +28,23 @@ export const DEFAULT_BARMODE = 'group';
 export type BarMode = 'stack' | 'group' | 'overlay' | 'relative';
 
 export type BarVisualizationConfigType = {
-  barmode: BarMode,
-  axisType: AxisType,
+  barmode: BarMode;
+  axisType: AxisType;
+  axisConfig: ChartAxisConfig;
 };
 
 export type BarVisualizationConfigJson = {
-  barmode: BarMode,
-  axis_type: AxisType,
+  barmode: BarMode;
+  axis_type: AxisType;
+  axis_config?: ChartAxisConfig;
 };
 
 export default class BarVisualizationConfig extends VisualizationConfig implements XYVisualization {
   _value: BarVisualizationConfigType;
 
-  constructor(barmode: BarMode, axisType: AxisType) {
+  constructor(barmode: BarMode, axisType: AxisType, axisConfig: ChartAxisConfig = DEFAULT_AXIS_CONFIG) {
     super();
-    this._value = { barmode, axisType };
+    this._value = { barmode, axisType, axisConfig };
   }
 
   get barmode() {
@@ -53,15 +59,19 @@ export default class BarVisualizationConfig extends VisualizationConfig implemen
     return this.barmode === 'overlay' ? 0.75 : 1.0;
   }
 
-  toBuilder() {
-    const { barmode, axisType } = this._value;
-
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder({ barmode, axisType });
+  get axisConfig() {
+    return this._value.axisConfig;
   }
 
-  static create(barmode: BarMode, axisType: AxisType = DEFAULT_AXIS_TYPE) {
-    return new BarVisualizationConfig(barmode, axisType);
+  toBuilder() {
+    const { barmode, axisType, axisConfig } = this._value;
+
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    return new Builder({ barmode, axisType, axisConfig });
+  }
+
+  static create(barmode: BarMode, axisType: AxisType = DEFAULT_AXIS_TYPE, axisConfig = DEFAULT_AXIS_CONFIG) {
+    return new BarVisualizationConfig(barmode, axisType, axisConfig);
   }
 
   static empty() {
@@ -69,24 +79,26 @@ export default class BarVisualizationConfig extends VisualizationConfig implemen
   }
 
   toJSON() {
-    const { barmode, axisType } = this._value;
+    const { barmode, axisType, axisConfig } = this._value;
 
     return {
       barmode,
       axis_type: axisType,
+      axis_config: axisConfig,
     };
   }
 
   static fromJSON(_type: string, value: BarVisualizationConfigJson) {
-    const { barmode, axis_type } = value;
+    const { barmode, axis_type, axis_config } = value;
 
-    return BarVisualizationConfig.create(barmode, axis_type);
+    return BarVisualizationConfig.create(barmode, axis_type, axis_config);
   }
 }
 
 type InternalBuilderState = {
-  barmode: BarMode,
-  axisType: AxisType,
+  barmode: BarMode;
+  axisType: AxisType;
+  axisConfig: ChartAxisConfig;
 };
 
 class Builder {
@@ -102,6 +114,10 @@ class Builder {
 
   axisType(value: AxisType) {
     return new Builder({ ...this.value, axisType: value });
+  }
+
+  axisConfig(value: ChartAxisConfig) {
+    return new Builder({ ...this.value, axisConfig: value });
   }
 
   build() {

@@ -19,26 +19,26 @@ import styled from 'styled-components';
 
 import { Select } from 'components/common';
 
-const Container = styled.div`
-  
-`;
+const Container = styled.div``;
 
 type Props = {
-  value: string | undefined,
-  onChange: (newValue: string) => void,
-  options: Array<{ label: string, value: string }>,
-  placeholder: string,
-}
+  value: string | undefined;
+  onChange: (newValue: string) => void;
+  options: Array<{ label: string; value: string }>;
+  placeholder: string;
+};
 
 const FilterValueSelect = ({ value, onChange, options, placeholder }: Props) => (
   <Container>
-    <Select placeholder={placeholder}
-            aria-label={placeholder}
-            menuIsOpen
-            clearable={false}
-            onChange={onChange}
-            value={value}
-            options={options} />
+    <Select
+      placeholder={placeholder}
+      aria-label={placeholder}
+      menuIsOpen
+      clearable={false}
+      onChange={onChange}
+      value={value}
+      options={options}
+    />
   </Container>
 );
 

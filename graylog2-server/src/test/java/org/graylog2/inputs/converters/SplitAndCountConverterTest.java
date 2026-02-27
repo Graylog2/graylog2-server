@@ -17,12 +17,13 @@
 package org.graylog2.inputs.converters;
 
 import org.graylog2.ConfigurationException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SplitAndCountConverterTest {
     @Test
@@ -35,14 +36,16 @@ public class SplitAndCountConverterTest {
         assertEquals(3, new SplitAndCountConverter(config(".")).convert("foo.bar.baz")); // Regex. Must be escaped.
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void testWithEmptyConfig() throws Exception {
-        assertEquals(null, new SplitAndCountConverter(config("")).convert("foo"));
+        assertThrows(ConfigurationException.class, () ->
+            assertEquals(null, new SplitAndCountConverter(config("")).convert("foo")));
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test
     public void testWithNullConfig() throws Exception {
-        assertEquals(null, new SplitAndCountConverter(config(null)).convert("foo"));
+        assertThrows(ConfigurationException.class, () ->
+            assertEquals(null, new SplitAndCountConverter(config(null)).convert("foo")));
     }
 
     private Map<String, Object> config(final String splitBy) {

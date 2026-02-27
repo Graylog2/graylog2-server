@@ -42,7 +42,7 @@ class ExportTabularResultResponseTest {
         final ExportTabularResultResponse response = ExportTabularResultResponse.fromPivotResult(pivotResult);
 
         final ExportTabularResultResponse expectedResponse = new ExportTabularResultResponse(
-                List.of("", "[count()]", "[max(http_response_code)]", "[DELETE, count()]", "[DELETE, max(http_response_code)]", "[GET, count()]", "[GET, max(http_response_code)]", "[POST, count()]", "[POST, max(http_response_code)]", "[PUT, count()]", "[PUT, max(http_response_code)]"),
+                List.of("http_response_code", "[count()]", "[max(http_response_code)]", "[DELETE, count()]", "[DELETE, max(http_response_code)]", "[GET, count()]", "[GET, max(http_response_code)]", "[POST, count()]", "[POST, max(http_response_code)]", "[PUT, count()]", "[PUT, max(http_response_code)]"),
                 List.of(
                         new DataRow(List.of("index", 1507337, 504, 75322, 504, 1296526, 504, 75163, 504, 60326, 504)),
                         new DataRow(List.of("show", 444038, 504, 22229, 504, 381846, 504, 22271, 504, 17692, 504)),
@@ -81,13 +81,31 @@ class ExportTabularResultResponseTest {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final byte[] bytes = Resources.toByteArray(Resources.getResource("org/graylog/plugins/views/search/rest/export/response/sample_message_list_result.json"));
         final MessageList.Result messageListResult = objectMapper.readValue(bytes, MessageList.Result.class);
-        final ExportTabularResultResponse response = ExportTabularResultResponse.fromMessageListResult(messageListResult);
+        final ExportTabularResultResponse response = ExportTabularResultResponse.fromMessageListResult(List.of(), messageListResult);
 
         final ExportTabularResultResponse expectedResponse = new ExportTabularResultResponse(
                 List.of("sequence_nr","ingest_time","gl2_receive_timestamp","took_ms","source"),
                 List.of(
                         new DataRow(List.of(277, "2024-05-06T12:35:52.284Z", "2024-05-06 12:35:52.284", 48, "example.org")),
                         new DataRow(List.of(278, "2024-05-06T12:35:52.284Z", "2024-05-06 12:35:52.284", 49, "example.org"))
+                )
+        );
+
+        assertEquals(expectedResponse, response);
+    }
+
+    @Test
+    void testCreationFromMessageListWithSelectedFields() throws Exception {
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+        final byte[] bytes = Resources.toByteArray(Resources.getResource("org/graylog/plugins/views/search/rest/export/response/sample_message_list_result.json"));
+        final MessageList.Result messageListResult = objectMapper.readValue(bytes, MessageList.Result.class);
+        final ExportTabularResultResponse response = ExportTabularResultResponse.fromMessageListResult(List.of("sequence_nr", "gl2_receive_timestamp"), messageListResult);
+
+        final ExportTabularResultResponse expectedResponse = new ExportTabularResultResponse(
+                List.of("sequence_nr","gl2_receive_timestamp"),
+                List.of(
+                        new DataRow(List.of(277, "2024-05-06 12:35:52.284")),
+                        new DataRow(List.of(278, "2024-05-06 12:35:52.284"))
                 )
         );
 

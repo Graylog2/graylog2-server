@@ -1,0 +1,5 @@
+type = "f"
+message = "Change precondition for connecting streams to pipelines to `streams:read`."
+
+pulls = ["23795"]
+issues = ["graylog-plugin-enterprise#11960"]

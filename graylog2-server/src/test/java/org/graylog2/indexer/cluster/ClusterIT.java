@@ -19,19 +19,20 @@ package org.graylog2.indexer.cluster;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
-import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
 import org.graylog2.indexer.cluster.health.WatermarkSettings;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Optional;
 import java.util.Set;
@@ -41,12 +42,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public abstract class ClusterIT extends ElasticsearchBaseTest {
     private static final String INDEX_NAME = "cluster_it_" + System.nanoTime();
     private static final String ALIAS_NAME = "cluster_it_alias_" + System.nanoTime();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private IndexSetRegistry indexSetRegistry;
@@ -59,7 +59,7 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
     protected abstract String currentNodeName();
     protected abstract String currentHostnameOrIp();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         client().createIndex(INDEX_NAME, 1, 0);
         client().addAliasMapping(INDEX_NAME, ALIAS_NAME);
@@ -99,7 +99,9 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
     @Test
     public void health_returns_green_with_no_indices() {
         final Optional<HealthStatus> health = cluster.health();
-        assertThat(health).contains(HealthStatus.Green);
+        assertThat(health)
+                .withFailMessage("Health status is not green. Logs follow:\n%s", searchServer().getLogs())
+                .contains(HealthStatus.Green);
     }
 
     @Test
@@ -170,7 +172,9 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
     @Test
     public void isHealthy_returns_true_with_no_indices() {
         when(indexSetRegistry.isUp()).thenReturn(true);
-        assertThat(cluster.isHealthy()).isTrue();
+        assertThat(cluster.isHealthy())
+                .withFailMessage("Cluster is in %s state, not healthy", cluster.health().map(Enum::toString).orElse("unknown"))
+                .isTrue();
     }
 
     @Test

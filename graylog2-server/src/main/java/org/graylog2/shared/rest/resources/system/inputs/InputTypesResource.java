@@ -17,11 +17,18 @@
 package org.graylog2.shared.rest.resources.system.inputs;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.Configuration;
 import org.graylog2.rest.models.system.inputs.responses.InputTypeInfo;
@@ -29,17 +36,9 @@ import org.graylog2.rest.models.system.inputs.responses.InputTypesSummary;
 import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +46,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RequiresAuthentication
-@Api(value = "System/Inputs/Types", description = "Message input types of this node")
+@Tag(name = "System/Inputs/Types", description = "Message input types of this node")
 @Path("/system/inputs/types")
 @Produces(MediaType.APPLICATION_JSON)
 public class InputTypesResource extends RestResource {
@@ -64,11 +63,14 @@ public class InputTypesResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get all available input types of this node")
+    @Operation(summary = "Get all available input types of this node")
     public InputTypesSummary types() {
         Map<String, String> types = new HashMap<>();
         for (Map.Entry<String, InputDescription> entry : messageInputFactory.getAvailableInputs().entrySet()) {
             if (config.isCloud() && !entry.getValue().isCloudCompatible()) {
+                continue;
+            }
+            if (!isPermitted(RestPermissions.INPUT_TYPES_CREATE, entry.getKey())) {
                 continue;
             }
             types.put(entry.getKey(), entry.getValue().getName());
@@ -79,7 +81,7 @@ public class InputTypesResource extends RestResource {
     @GET
     @Timed
     @Path("/all")
-    @ApiOperation(value = "Get information about all input types")
+    @Operation(summary = "Get information about all input types")
     public Map<String, InputTypeInfo> all() {
         final Map<String, InputDescription> availableTypes = messageInputFactory.getAvailableInputs();
         Stream<Map.Entry<String, InputDescription>> inputStream = availableTypes
@@ -88,29 +90,35 @@ public class InputTypesResource extends RestResource {
         if (config.isCloud()) {
             inputStream = inputStream.filter(e -> e.getValue().isCloudCompatible());
         }
-        return inputStream.collect(Collectors.toMap(Map.Entry::getKey, entry -> {
+        return inputStream
+                .filter(e -> isPermitted(RestPermissions.INPUT_TYPES_CREATE, e.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
             final InputDescription description = entry.getValue();
-            return InputTypeInfo.create(entry.getKey(), description.getName(), description.isExclusive(),
-                    description.getRequestedConfiguration(), description.getLinkToDocs());
+                    return InputTypeInfo.create(entry.getKey(), description.getName(), description.getDescription(),
+                            description.isExclusive(), description.getRequestedConfiguration(), description.getLinkToDocs());
         }));
     }
 
     @GET
     @Timed
     @Path("{inputType}")
-    @ApiOperation(value = "Get information about a single input type")
+    @Operation(summary = "Get information about a single input type")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input type registered.")
+            @ApiResponse(responseCode = "200", description = "Returns type info", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "No such input type registered.")
     })
-    public InputTypeInfo info(@ApiParam(name = "inputType", required = true) @PathParam("inputType") String inputType) {
+    public InputTypeInfo info(@Parameter(name = "inputType", required = true) @PathParam("inputType") String inputType) {
         final InputDescription description = messageInputFactory.getAvailableInputs().get(inputType);
         if (description == null) {
             throwInputTypeNotFound(inputType);
         } else if (config.isCloud() && !description.isCloudCompatible()) {
             throwInputTypeNotFound(inputType);
+        } else if (!isPermitted(RestPermissions.INPUT_TYPES_CREATE, inputType)) {
+            throwInputTypeNotFound(inputType);
         }
 
-        return InputTypeInfo.create(inputType, description.getName(), description.isExclusive(), description.getRequestedConfiguration(), description.getLinkToDocs());
+        return InputTypeInfo.create(inputType, description.getName(), description.getDescription(),
+                description.isExclusive(), description.getRequestedConfiguration(), description.getLinkToDocs());
     }
 
     private static void throwInputTypeNotFound(String inputType) {

@@ -22,12 +22,14 @@ import TeaserSearch from 'components/security/teaser/TeaserSearch';
 import viewJson from 'components/security/teaser/sample-dashboards/anomalies_view.json';
 import searchJson from 'components/security/teaser/sample-dashboards/anomalies_search.json';
 import resultJson from 'components/security/teaser/sample-dashboards/anomalies_results.json';
+import type { SearchJson } from 'views/logic/search/Search';
 
 const hotspots = [
   {
     positionX: '50%',
     positionY: '110px',
-    description: 'Get a summary of the anomalies that are running, how many have been detected, and how that compares to the previous time period.',
+    description:
+      'Get a summary of the anomalies that are running, how many have been detected, and how that compares to the previous time period.',
   },
   {
     positionX: '60%',
@@ -47,7 +49,12 @@ const hotspots = [
 ];
 const Anomalies = () => (
   <DocumentTitle title="Anomalies">
-    <TeaserSearch viewJson={viewJson} searchJson={searchJson} searchJobResult={resultJson} hotspots={hotspots} />
+    <TeaserSearch
+      viewJson={viewJson}
+      searchJson={searchJson as SearchJson}
+      searchJobResult={resultJson}
+      hotspots={hotspots}
+    />
   </DocumentTitle>
 );
 

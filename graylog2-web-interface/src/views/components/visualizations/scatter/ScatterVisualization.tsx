@@ -16,76 +16,81 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import type { Layout } from 'plotly.js';
 
-import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
 import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/ScatterVisualizationConfig';
 import type { Generator } from 'views/components/visualizations/ChartData';
-import useMapKeys from 'views/components/visualizations/useMapKeys';
-import { keySeparator, humanSeparator } from 'views/Constants';
 import useChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits';
 import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
+import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
 
 import XYPlot from '../XYPlot';
 
-const ScatterVisualization = makeVisualization(({
-  config,
-  data,
-  effectiveTimerange,
-  height,
-}: VisualizationComponentProps) => {
-  const visualizationConfig = (config.visualizationConfig ?? ScatterVisualizationConfig.empty()) as ScatterVisualizationConfig;
-  const getChartDataSettingsWithCustomUnits = useChartDataSettingsWithCustomUnits({ config });
-  const mapKeys = useMapKeys();
-  const rowPivotFields = useMemo(() => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [], [config?.rowPivots]);
-  const _mapKeys = useCallback((labels: string[]) => labels
-    .map((label) => label.split(keySeparator)
-      .map((l, i) => mapKeys(l, rowPivotFields[i]))
-      .join(humanSeparator),
-    ), [mapKeys, rowPivotFields]);
-  const rows = useMemo(() => retrieveChartData(data), [data]);
-  const seriesGenerator: Generator = useCallback(({ type, name, labels, values, originalName, fullPath }) => ({
-    type,
-    name,
-    x: _mapKeys(labels),
-    y: values,
-    mode: 'markers',
-    originalName,
-    ...getChartDataSettingsWithCustomUnits({ name, fullPath: fullPath, values }),
-  }), [_mapKeys, getChartDataSettingsWithCustomUnits]);
-  const _chartDataResult = useChartData(rows, {
-    widgetConfig: config,
-    chartType: 'scatter',
-    generator: seriesGenerator,
-  });
-  const { eventChartData, shapes } = useEvents(config, data.events);
-  const chartDataResult = useMemo(() => (eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult), [_chartDataResult, eventChartData]);
-  const getChartLayoutSettingsWithCustomUnits = useChartLayoutSettingsWithCustomUnits({ config, chartData: chartDataResult });
-  const layout = useMemo<Partial<Layout>>(() => {
-    const _layouts = shapes ? { shapes } : {};
+const ScatterVisualization = makeVisualization(
+  ({ config, data, effectiveTimerange, height, width }: VisualizationComponentProps) => {
+    const visualizationConfig = (config.visualizationConfig ??
+      ScatterVisualizationConfig.empty()) as ScatterVisualizationConfig;
+    const getChartDataSettingsWithCustomUnits = useChartDataSettingsWithCustomUnits({ config });
 
-    return ({ ..._layouts, ...getChartLayoutSettingsWithCustomUnits() });
-  }, [shapes, getChartLayoutSettingsWithCustomUnits]);
+    const rows = useMemo(() => retrieveChartData(data), [data]);
+    const seriesGenerator: Generator = useCallback(
+      ({ type, name, labels, values, originalName, fullPath }) => ({
+        type,
+        name,
+        x: labels,
+        y: values,
+        mode: 'markers',
+        originalName,
+        ...getChartDataSettingsWithCustomUnits({ name, fullPath: fullPath, values }),
+      }),
+      [getChartDataSettingsWithCustomUnits],
+    );
+    const _chartDataResult = useChartData(rows, {
+      widgetConfig: config,
+      chartType: 'scatter',
+      generator: seriesGenerator,
+    });
+    const { eventChartData, shapes } = useEvents(config, data.events);
+    const chartDataResult = useMemo(
+      () => (eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult),
+      [_chartDataResult, eventChartData],
+    );
+    const getChartLayoutSettingsWithCustomUnits = useChartLayoutSettingsWithCustomUnits({
+      config,
+      chartData: chartDataResult,
+    });
+    const layout = useMemo<Partial<Layout>>(() => {
+      const _layouts: Partial<Layout> = getChartLayoutSettingsWithCustomUnits();
+      if (shapes) {
+        _layouts.shapes = [...(_layouts.shapes ?? []), ...shapes];
+      }
 
-  return (
-    <XYPlot config={config}
-            axisType={visualizationConfig.axisType}
-            chartData={chartDataResult}
-            plotLayout={layout}
-            height={height}
-            effectiveTimerange={effectiveTimerange} />
-  );
-}, 'scatter');
+      return _layouts;
+    }, [shapes, getChartLayoutSettingsWithCustomUnits]);
+    const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover('scatter', config);
 
-ScatterVisualization.propTypes = {
-  config: AggregationType.isRequired,
-  data: AggregationResult.isRequired,
-  height: PropTypes.number,
-};
+    return (
+      <>
+        <XYPlot
+          config={config}
+          axisType={visualizationConfig.axisType}
+          chartData={chartDataResult}
+          plotLayout={layout}
+          height={height}
+          width={width}
+          effectiveTimerange={effectiveTimerange}
+          onClickMarker={onChartClick}
+          onInitialized={initializeGraphDivRef}
+        />
+        {popover}
+      </>
+    );
+  },
+  'scatter',
+);
 
 export default ScatterVisualization;

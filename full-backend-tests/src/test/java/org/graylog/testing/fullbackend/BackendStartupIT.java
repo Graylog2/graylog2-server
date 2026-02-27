@@ -17,27 +17,29 @@
 package org.graylog.testing.fullbackend;
 
 import org.graylog.testing.completebackend.Lifecycle;
-import org.graylog.testing.completebackend.MailServerInstance;
+import org.graylog.testing.completebackend.MailServerContainer;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.utils.SearchUtils;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, withMailServerEnabled = true)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 class BackendStartupIT {
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    public BackendStartupIT(GraylogApis api) {
-        this.api = api;
+    @BeforeAll
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void canReachApi() {
         given()
                 .config(api.withGraylogBackendFailureConfig())
@@ -48,7 +50,7 @@ class BackendStartupIT {
                 .statusCode(200);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void loadsDefaultPlugins() {
         List<Object> pluginNames =
                 given()
@@ -67,15 +69,15 @@ class BackendStartupIT {
         );
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void importsElasticsearchFixtures() {
-        this.api.backend().importElasticsearchFixture("one-message.json", getClass());
-        assertThat(SearchUtils.waitForMessage(this.api.requestSpecificationSupplier(), "hello from es fixture")).isTrue();
+        api.backend().importElasticsearchFixture("one-message.json", getClass());
+        assertThat(SearchUtils.waitForMessage(api.requestSpecificationSupplier(), "hello from es fixture")).isTrue();
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void startsMailServer() {
-        final MailServerInstance mailServer = this.api.backend().getEmailServerInstance().orElseThrow(() -> new IllegalStateException("Mail server should be accessible"));
+        final MailServerContainer mailServer = api.backend().getEmailServerInstance().orElseThrow(() -> new IllegalStateException("Mail server should be accessible"));
         given()
                 .get(mailServer.getEndpointURI() + "/api/v2/messages")
                 .then()

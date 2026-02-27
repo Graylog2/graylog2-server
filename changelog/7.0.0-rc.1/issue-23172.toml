@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixed issue preventing expired searches from being cleaned up."
+
+issues = ["23172"]
+pulls = ["23173"]

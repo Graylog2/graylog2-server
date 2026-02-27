@@ -16,6 +16,7 @@
  */
 package org.graylog2.notifications;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
 import org.graylog2.cluster.Node;
@@ -177,6 +178,7 @@ public class NotificationImpl extends PersistedImpl implements Notification {
     }
 
     @Override
+    @JsonIgnore
     public Map<String, Validator> getValidations() {
         return Collections.emptyMap();
     }

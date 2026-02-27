@@ -19,7 +19,6 @@ package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsTo
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.AggregationConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.NumberVisualizationConfig;
 
@@ -29,7 +28,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @AutoValue
-@WithBeanGetter
 public abstract class AggregationWidget implements ViewWidget {
     private static final String TYPE_AGGREGATION = "aggregation";
 
@@ -121,6 +119,7 @@ public abstract class AggregationWidget implements ViewWidget {
 
         @JsonProperty(FIELD_QUERY)
         abstract Builder query(ElasticsearchQueryString query);
+
         public Builder query(String query) {
             return query(ElasticsearchQueryString.create(query));
         }

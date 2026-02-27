@@ -48,6 +48,19 @@ class UnknownFieldsValidatorTest {
     }
 
     @Test
+    void testDoesNotIdentifyFieldsWithAsteriskWildcardAsUnknown() {
+        final List<ParsedTerm> unknownFields = toTest.identifyUnknownFields(
+                Set.of("http_response_code"),
+                List.of(
+                        ParsedTerm.create("_exists_", "http_response_\\*"),
+                        ParsedTerm.create("http_res\\*", "400"),
+                        ParsedTerm.create("_exists_", "\\*_code")
+                )
+        );
+        assertTrue(unknownFields.isEmpty());
+    }
+
+    @Test
     void testDoesNotIdentifySpecialIdFieldAsUnknown() {
         final List<ParsedTerm> unknownFields = toTest.identifyUnknownFields(
                 Set.of("some_normal_field"),
@@ -79,6 +92,16 @@ class UnknownFieldsValidatorTest {
         final List<ParsedTerm> unknownFields = toTest.identifyUnknownFields(
                 Set.of("some_normal_field"),
                 List.of(ParsedTerm.create("some_normal_field", "Haba, haba, haba!"))
+        );
+        assertTrue(unknownFields.isEmpty());
+    }
+
+    @Test
+    void testDoesNotIdentifyParameterFieldAsUnknownField() {
+        final List<ParsedTerm> unknownFields = toTest.identifyUnknownFields(
+                Set.of("some_normal_field"),
+                List.of(ParsedTerm.create("$param_representing_field$", "GET"), //param can be used for field name
+                        ParsedTerm.create("_exists_", "$param_representing_field$")) //...even in exists query
         );
         assertTrue(unknownFields.isEmpty());
     }

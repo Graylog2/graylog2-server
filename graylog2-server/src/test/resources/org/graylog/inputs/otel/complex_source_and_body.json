@@ -1,0 +1,57 @@
+{
+  "resourceLogs": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "host.name",
+            "value": {
+              "stringValue": "example.com"
+            }
+          },
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "my.service"
+            }
+          },
+          {
+            "key": "map.attribute",
+            "value": {
+              "kvlistValue": {
+                "values": [
+                  {
+                    "key": "some.map.key",
+                    "value": {
+                      "stringValue": "some value"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "scopeLogs": [
+        {
+          "logRecords": [
+            {
+              "body": {
+                "arrayValue": {
+                  "values": [
+                    {
+                      "stringValue": "many"
+                    },
+                    {
+                      "stringValue": "values"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

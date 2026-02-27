@@ -16,17 +16,29 @@
  */
 import { Map } from 'immutable';
 
-import Widget from 'views/logic/widgets/Widget';
+import Widget, { widgetAttributesForComparison } from 'views/logic/widgets/Widget';
 import type { WidgetState } from 'views/logic/widgets/Widget';
 import isDeepEqual from 'stores/isDeepEqual';
 import isEqualForSearch from 'views/stores/isEqualForSearch';
-import type { TimeRange, QueryString } from 'views/logic/queries/Query';
+import type { QueryString } from 'views/logic/queries/types';
+import type { TimeRange } from 'views/logic/queries/Query';
 import type { FiltersType } from 'views/types';
 
 import EventsWidgetConfig from './EventsWidgetConfig';
 
 export default class EventsWidget extends Widget {
-  constructor(id: string, config: EventsWidgetConfig, filter?: string, timerange?: TimeRange, query?: QueryString, streams?: Array<string>, streamCategories?: Array<string>, filters?: FiltersType) {
+  constructor(
+    id: string,
+    config: EventsWidgetConfig,
+    filter?: string,
+    timerange?: TimeRange,
+    query?: QueryString,
+    streams?: Array<string>,
+    streamCategories?: Array<string>,
+    filters?: FiltersType,
+    description?: string,
+    context?: string,
+  ) {
     super(
       id,
       EventsWidget.type,
@@ -37,6 +49,8 @@ export default class EventsWidget extends Widget {
       streams,
       streamCategories,
       filters,
+      description,
+      context,
     );
   }
 
@@ -45,14 +59,25 @@ export default class EventsWidget extends Widget {
   static defaultTitle = 'Untitled Events Overview';
 
   static fromJSON(value: WidgetState) {
-    const { id, config, filter, timerange, query, streams, stream_categories, filters } = value;
+    const { id, config, filter, timerange, query, streams, stream_categories, filters, description, context } = value;
 
-    return new EventsWidget(id, EventsWidgetConfig.fromJSON(config), filter, timerange, query, streams, stream_categories, filters);
+    return new EventsWidget(
+      id,
+      EventsWidgetConfig.fromJSON(config),
+      filter,
+      timerange,
+      query,
+      streams,
+      stream_categories,
+      filters,
+      description,
+      context,
+    );
   }
 
   equals(other: any) {
     if (other instanceof EventsWidget) {
-      return ['id', 'config', 'filter', 'timerange', 'query', 'streams', 'stream_categories', 'filters'].every((key) => isDeepEqual(this._value[key], other[key]));
+      return widgetAttributesForComparison.every((key) => isDeepEqual(this[key], other[key]));
     }
 
     return false;
@@ -60,17 +85,20 @@ export default class EventsWidget extends Widget {
 
   equalsForSearch(other: any) {
     if (other instanceof EventsWidget) {
-      return ['id', 'config', 'filter', 'timerange', 'query', 'streams', 'stream_categories', 'filters'].every((key) => isEqualForSearch(this._value[key], other[key]));
+      return widgetAttributesForComparison.every((key) => isEqualForSearch(this[key], other[key]));
     }
 
     return false;
   }
 
   toBuilder() {
-    const { id, config, filter, timerange, query, streams, stream_categories, filters } = this._value;
+    const { id, config, filter, timerange, query, streams, stream_categories, filters, description, context } =
+      this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Map({ id, config, filter, timerange, query, streams, stream_categories, filters }));
+    return new Builder(
+      Map({ id, config, filter, timerange, query, streams, stream_categories, filters, description, context }),
+    );
   }
 
   static builder() {
@@ -81,8 +109,20 @@ export default class EventsWidget extends Widget {
 
 class Builder extends Widget.Builder {
   build(): EventsWidget {
-    const { id, config, filter, timerange, query, streams, stream_categories, filters } = this.value.toObject();
+    const { id, config, filter, timerange, query, streams, stream_categories, filters, description, context } =
+      this.value.toObject();
 
-    return new EventsWidget(id, config, filter, timerange, query, streams, stream_categories, filters);
+    return new EventsWidget(
+      id,
+      config,
+      filter,
+      timerange,
+      query,
+      streams,
+      stream_categories,
+      filters,
+      description,
+      context,
+    );
   }
 }

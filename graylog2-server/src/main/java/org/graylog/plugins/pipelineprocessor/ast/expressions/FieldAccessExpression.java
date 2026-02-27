@@ -25,10 +25,10 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
 import java.lang.reflect.InvocationTargetException;
 
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 public class FieldAccessExpression extends BaseExpression {
-    private static final RateLimitedLog log = getRateLimitedLog(FieldAccessExpression.class);
+    private static final RateLimitedLog log = createDefaultRateLimitedLog(FieldAccessExpression.class);
 
     private final Expression object;
     private final Expression field;

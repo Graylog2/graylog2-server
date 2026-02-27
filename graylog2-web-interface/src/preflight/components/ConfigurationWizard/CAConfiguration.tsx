@@ -22,17 +22,20 @@ import { Title, Space, Tabs } from 'preflight/components/common';
 import CACreateForm from './CACreateForm';
 import CAUpload from './CAUpload';
 
-const StyledTabs = styled(Tabs)(({ theme }) => css`
-  button {
-    font-size: ${theme.fonts.size.body};
-  }
-`);
+const StyledTabs = styled(Tabs)(
+  ({ theme }) => css`
+    button {
+      font-size: ${theme.fonts.size.body};
+    }
+  `,
+);
 
 const CAConfiguration = () => (
   <>
     <Title order={3}>Configure Certificate Authority</Title>
     <p>
-      In this first step you can either upload or create a new certificate authority.<br />
+      In this first step you can either upload or create a new certificate authority.
+      <br />
       Using it we can provision your data nodes with certificates easily.
     </p>
     <Space h="md" />

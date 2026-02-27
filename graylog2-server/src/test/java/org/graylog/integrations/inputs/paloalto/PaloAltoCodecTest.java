@@ -16,8 +16,6 @@
  */
 package org.graylog.integrations.inputs.paloalto;
 
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
@@ -25,19 +23,11 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import java.io.FileWriter;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PaloAltoCodecTest {
 
@@ -75,16 +65,16 @@ public class PaloAltoCodecTest {
 
         PaloAltoCodec codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION, messageFactory);
 
-        Message message = codec.decode(new RawMessage(SYSLOG_THREAT_MESSAGE.getBytes(StandardCharsets.UTF_8)));
+        Message message = codec.decodeSafe(new RawMessage(SYSLOG_THREAT_MESSAGE.getBytes(StandardCharsets.UTF_8))).get();
         assertEquals("THREAT", message.getField("type"));
 
-        message = codec.decode(new RawMessage(SYSLOG_THREAT_MESSAGE_DOUBLE_SPACE_DATE.getBytes(StandardCharsets.UTF_8)));
+        message = codec.decodeSafe(new RawMessage(SYSLOG_THREAT_MESSAGE_DOUBLE_SPACE_DATE.getBytes(StandardCharsets.UTF_8))).get();
         assertEquals("THREAT", message.getField("type"));
 
-        message = codec.decode(new RawMessage(SYSLOG_THREAT_MESSAGE_NO_HOST.getBytes(StandardCharsets.UTF_8)));
+        message = codec.decodeSafe(new RawMessage(SYSLOG_THREAT_MESSAGE_NO_HOST.getBytes(StandardCharsets.UTF_8))).get();
         assertEquals("THREAT", message.getField("type"));
 
-        message = codec.decode(new RawMessage(SYSLOG_THREAT_MESSAGE_NO_HOST_DOUBLE_SPACE_DATE.getBytes(StandardCharsets.UTF_8)));
+        message = codec.decodeSafe(new RawMessage(SYSLOG_THREAT_MESSAGE_NO_HOST_DOUBLE_SPACE_DATE.getBytes(StandardCharsets.UTF_8))).get();
         assertEquals("THREAT", message.getField("type"));
     }
 
@@ -93,11 +83,11 @@ public class PaloAltoCodecTest {
 
         // Verify that a messages with a line break at the end does not break parsing.
         PaloAltoCodec codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION, messageFactory);
-        Message message = codec.decode(new RawMessage(PANORAMA_WITH_LINE_BREAK.getBytes(StandardCharsets.UTF_8)));
+        Message message = codec.decodeSafe(new RawMessage(PANORAMA_WITH_LINE_BREAK.getBytes(StandardCharsets.UTF_8))).get();
         assertEquals("SYSTEM", message.getField("type"));
 
         codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION, messageFactory);
-        message = codec.decode(new RawMessage(SYSLOG_WITH_LINE_BREAK.getBytes(StandardCharsets.UTF_8)));
+        message = codec.decodeSafe(new RawMessage(SYSLOG_WITH_LINE_BREAK.getBytes(StandardCharsets.UTF_8))).get();
         assertEquals("THREAT", message.getField("type"));
     }
 
@@ -107,7 +97,7 @@ public class PaloAltoCodecTest {
         // Test an extra list of messages.
         for (String threatString : MORE_SYSLOG_THREAT_MESSAGES) {
             PaloAltoCodec codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION, messageFactory);
-            Message message = codec.decode(new RawMessage(threatString.getBytes(StandardCharsets.UTF_8)));
+            Message message = codec.decodeSafe(new RawMessage(threatString.getBytes(StandardCharsets.UTF_8))).get();
             assertEquals("THREAT", message.getField("type"));
         }
     }
@@ -117,7 +107,7 @@ public class PaloAltoCodecTest {
 
         // Test System message results
         PaloAltoCodec codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION, messageFactory);
-        Message message = codec.decode(new RawMessage(SYSLOG_THREAT_MESSAGE_NO_HOST_DOUBLE_SPACE_DATE.getBytes(StandardCharsets.UTF_8)));
+        Message message = codec.decodeSafe(new RawMessage(SYSLOG_THREAT_MESSAGE_NO_HOST_DOUBLE_SPACE_DATE.getBytes(StandardCharsets.UTF_8))).get();
         assertEquals("THREAT", message.getField("type"));
     }
 
@@ -126,7 +116,7 @@ public class PaloAltoCodecTest {
 
         // Test System message results
         PaloAltoCodec codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION, messageFactory);
-        Message message = codec.decode(new RawMessage(PANORAMA_SYSTEM_MESSAGE.getBytes(StandardCharsets.UTF_8)));
+        Message message = codec.decodeSafe(new RawMessage(PANORAMA_SYSTEM_MESSAGE.getBytes(StandardCharsets.UTF_8))).get();
         assertEquals("SYSTEM", message.getField("type"));
         assertEquals(message.getField("module"), "general");
 
@@ -144,7 +134,7 @@ public class PaloAltoCodecTest {
         assertEquals(0, ((DateTime) message.getField("timestamp")).compareTo(new DateTime("2018-09-19T11:50:35.000-05:00", DateTimeZone.UTC)));
 
         // Test Traffic message results
-        message = codec.decode(new RawMessage(PANORAMA_TRAFFIC_MESSAGE.getBytes(StandardCharsets.UTF_8)));
+        message = codec.decodeSafe(new RawMessage(PANORAMA_TRAFFIC_MESSAGE.getBytes(StandardCharsets.UTF_8))).get();
         assertEquals(message.getField("bytes_received"), 140L);
         assertEquals(message.getField("source"), "Panorama--2");
         assertEquals(message.getField("repeat_count"), 1L);
@@ -182,64 +172,5 @@ public class PaloAltoCodecTest {
         assertEquals(message.getField("nat_dest_addr"), "10.20.30.40");
         assertEquals(message.getField("category"), "any");
         assertEquals(message.getField("nat_dest_port"), 443L);
-    }
-
-    /**
-     * Helper for parsing PAN messages from HEX export
-     */
-    public void dataParserTest() throws Exception {
-
-        List<String> hexVals = new ArrayList<>();
-        String buffer = "";
-        for (String textLine : getTextLines()) {
-            if (!textLine.equals("")) {
-                buffer += textLine;
-            } else {
-                hexVals.add(buffer);
-                buffer = "";
-            }
-        }
-
-        hexVals = hexVals.stream().map(s -> s.replace(" ", "")).map(h -> {
-            byte[] bytes = new byte[0];
-            try {
-                bytes = Hex.decodeHex(h.toCharArray());
-            } catch (DecoderException e) {
-                e.printStackTrace();
-            }
-            try {
-                return new String(bytes, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-            return "";
-        })
-                         .filter(s -> s.contains("- - - -"))
-                         .filter(s -> s.contains(">1"))
-                         .filter(s -> s.contains("<"))
-                         .map(s -> s.substring(s.indexOf(">1") - 3, s.length()))
-                         .collect(Collectors.toList());
-
-
-        FileWriter writer = new FileWriter("capture-clean.txt", StandardCharsets.UTF_8);
-        for (String str : hexVals) {
-            writer.write(str + "\n");
-        }
-        writer.close();
-    }
-
-    private List<String> getTextLines() throws Exception {
-
-        String s = new String(Files.readAllBytes(Paths.get("capture")), StandardCharsets.UTF_8);
-        return Arrays.asList(s.replace("\t", "").split("\\n")).stream()
-                .map(v -> {
-                            String withoutPrefix = v.length() > 7 ? v.substring(7, v.length()) : v;
-
-                            if (withoutPrefix.length() > 32) {
-                                withoutPrefix = withoutPrefix.substring(0, 39);
-                            }
-                            return withoutPrefix;
-                        }
-                ).collect(Collectors.toList());
     }
 }

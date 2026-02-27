@@ -15,15 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useRef } from 'react';
 import * as React from 'react';
+import { useRef } from 'react';
 
 import type { Stream } from 'stores/streams/StreamsStore';
-import StreamCountBadge from 'components/streams/StreamCountBadge';
+import { CountBadge } from 'components/common';
 
 type Props = {
-  stream: Stream
-}
+  stream: Stream;
+};
 
 const OutputsCell = ({ stream }: Props) => {
   const buttonRef = useRef();
@@ -34,11 +34,7 @@ const OutputsCell = ({ stream }: Props) => {
 
   const outputCount = stream.outputs?.length || 0;
 
-  return (
-    <StreamCountBadge $disabled={outputCount === 0} ref={buttonRef} title="Stream Outputs">
-      {outputCount}
-    </StreamCountBadge>
-  );
+  return <CountBadge count={outputCount} ref={buttonRef} title="Stream Outputs" />;
 };
 
 export default OutputsCell;

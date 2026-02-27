@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import asMock from 'helpers/mocking/AsMock';
@@ -42,7 +42,7 @@ const retry = () => Promise.resolve();
 
 describe('RequirementsProvided', () => {
   const plugin: PluginMetadata = {
-    name: 'Pandora\'s Box',
+    name: "Pandora's Box",
     url: 'https://www.graylog.org',
   };
 
@@ -83,12 +83,7 @@ describe('RequirementsProvided', () => {
     const view = View.create()
       .toBuilder()
       .createdAt(new Date('2019-05-29T11:24:51.555Z'))
-      .search(
-        Search.create()
-          .toBuilder()
-          .id('5cee6c03675ef9df8b0a7bb0')
-          .build(),
-      )
+      .search(Search.create().toBuilder().id('5cee6c03675ef9df8b0a7bb0').build())
       .requires({
         parameters: plugin,
         timetravel: plugin,
@@ -104,6 +99,14 @@ describe('RequirementsProvided', () => {
       Component = component;
     }
 
-    expect(mount(<Component />)).toExist();
+    render(<Component />);
+
+    await screen.findByText(/unfortunately executing this is not possible/i);
+    await screen.findByText(/It uses the following capabilities which are not available/i);
+
+    await screen.findByText(/timetravel/i);
+    await screen.findByText(/hyperspeed/i);
+
+    expect(await screen.findAllByText(/Pandora's Box/i)).toHaveLength(2);
   });
 });

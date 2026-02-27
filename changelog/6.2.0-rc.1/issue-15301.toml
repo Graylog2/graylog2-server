@@ -1,0 +1,5 @@
+type = "added"
+message = "Added multi_grok pipeline rule to support processing a string against many grok patterns at once."
+
+issues = ["15301"]
+pulls = ["20924"]

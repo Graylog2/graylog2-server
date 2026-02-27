@@ -19,43 +19,41 @@ package org.graylog2.system.stats.elasticsearch;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.indexer.cluster.PendingTasksStats;
 
 import java.util.List;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class ClusterHealth {
-    @JsonProperty
+    @JsonProperty("number_of_nodes")
     public abstract int numberOfNodes();
 
-    @JsonProperty
+    @JsonProperty("number_of_data_nodes")
     public abstract int numberOfDataNodes();
 
-    @JsonProperty
+    @JsonProperty("active_shards")
     public abstract int activeShards();
 
-    @JsonProperty
+    @JsonProperty("relocating_shards")
     public abstract int relocatingShards();
 
-    @JsonProperty
+    @JsonProperty("active_primary_shards")
     public abstract int activePrimaryShards();
 
-    @JsonProperty
+    @JsonProperty("initializing_shards")
     public abstract int initializingShards();
 
-    @JsonProperty
+    @JsonProperty("unassigned_shards")
     public abstract int unassignedShards();
 
-    @JsonProperty
+    @JsonProperty("timed_out")
     public abstract boolean timedOut();
 
-    @JsonProperty
+    @JsonProperty("pending_tasks")
     public abstract int pendingTasks();
 
-    @JsonProperty
+    @JsonProperty("pending_tasks_time_in_queue")
     public abstract List<Long> pendingTasksTimeInQueue();
 
     public static ClusterHealth from(ShardStats shardStats, PendingTasksStats pendingTasksStats) {

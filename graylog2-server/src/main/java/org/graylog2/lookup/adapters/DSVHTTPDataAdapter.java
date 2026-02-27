@@ -26,28 +26,27 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import okhttp3.HttpUrl;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.lookup.adapters.dsvhttp.DSVParser;
 import org.graylog2.lookup.adapters.dsvhttp.HTTPFileRetriever;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
+import org.graylog2.plugin.lookup.LookupPreview;
 import org.graylog2.plugin.lookup.LookupResult;
-import org.graylog2.system.urlwhitelist.UrlNotWhitelistedException;
-import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
-import org.graylog2.system.urlwhitelist.UrlWhitelistService;
+import org.graylog2.system.urlallowlist.UrlAllowlistNotificationService;
+import org.graylog2.system.urlallowlist.UrlAllowlistService;
+import org.graylog2.system.urlallowlist.UrlNotAllowlistedException;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
-
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -64,19 +63,19 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
     private final HTTPFileRetriever httpFileRetriever;
     private final AtomicReference<Map<String, String>> lookupRef = new AtomicReference<>(Collections.emptyMap());
     private final DSVParser dsvParser;
-    private final UrlWhitelistService whitelistService;
-    private final UrlWhitelistNotificationService urlWhitelistNotificationService;
+    private final UrlAllowlistService allowlistService;
+    private final UrlAllowlistNotificationService urlAllowlistNotificationService;
 
     @Inject
     public DSVHTTPDataAdapter(@Assisted("id") String id, @Assisted("name") String name,
                               @Assisted LookupDataAdapterConfiguration config, MetricRegistry metricRegistry,
-                              HTTPFileRetriever httpFileRetriever, UrlWhitelistService whitelistService,
-                              UrlWhitelistNotificationService urlWhitelistNotificationService) {
+                              HTTPFileRetriever httpFileRetriever, UrlAllowlistService allowlistService,
+                              UrlAllowlistNotificationService urlAllowlistNotificationService) {
         super(id, name, config, metricRegistry);
         this.config = (DSVHTTPDataAdapter.Config) config;
         this.httpFileRetriever = httpFileRetriever;
-        this.whitelistService = whitelistService;
-        this.urlWhitelistNotificationService = urlWhitelistNotificationService;
+        this.allowlistService = allowlistService;
+        this.urlAllowlistNotificationService = urlAllowlistNotificationService;
         this.dsvParser = new DSVParser(
                 this.config.ignorechar(),
                 this.config.lineSeparator(),
@@ -98,9 +97,9 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
         if (config.refreshInterval() < 1) {
             throw new IllegalStateException("Check interval setting cannot be smaller than 1");
         }
-        if (!whitelistService.isWhitelisted(config.url())) {
-            publishSystemNotificationForWhitelistFailure();
-            throw UrlNotWhitelistedException.forUrl(config.url());
+        if (!allowlistService.isAllowlisted(config.url())) {
+            publishSystemNotificationForAllowlistFailure();
+            throw UrlNotAllowlistedException.forUrl(config.url());
         }
 
         final Optional<String> response = httpFileRetriever.fetchFileIfNotModified(config.url());
@@ -115,18 +114,18 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
 
     @Override
     protected void doRefresh(LookupCachePurge cachePurge) throws Exception {
-        if (!whitelistService.isWhitelisted(config.url())) {
-            setError(UrlNotWhitelistedException.forUrl(config.url()));
-            publishSystemNotificationForWhitelistFailure();
+        if (!allowlistService.isAllowlisted(config.url())) {
+            setError(UrlNotAllowlistedException.forUrl(config.url()));
+            publishSystemNotificationForAllowlistFailure();
             return;
         }
 
-        final boolean urlWasNotWhitelisted =
-                getError().filter(UrlNotWhitelistedException.class::isInstance).isPresent();
+        final boolean urlWasNotAllowlisted =
+                getError().filter(UrlNotAllowlistedException.class::isInstance).isPresent();
 
         try {
             // reload file if the url was blacklisted so that any errors with the file will surface again
-            final Optional<String> response = urlWasNotWhitelisted ?
+            final Optional<String> response = urlWasNotAllowlisted ?
                     this.httpFileRetriever.fetchFile(config.url()) :
                     this.httpFileRetriever.fetchFileIfNotModified(config.url());
 
@@ -162,6 +161,24 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
         }
 
         return LookupResult.single(value);
+    }
+
+    @Override
+    public boolean supportsPreview() {
+        return true;
+    }
+
+    @Override
+    public LookupPreview getPreview(int size) {
+        final Map<Object, Object> result = new HashMap<>();
+        final Map<String, String> lookup = lookupRef.get();
+        for (Map.Entry<String, String> entries : lookup.entrySet()) {
+            if (result.size() == size) {
+                break;
+            }
+            result.put(entries.getKey(), entries.getValue());
+        }
+        return new LookupPreview(lookup.size(), result);
     }
 
     @Override
@@ -203,7 +220,6 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
     }
 
     @AutoValue
-    @WithBeanGetter
     @JsonAutoDetect
     @JsonDeserialize(builder = AutoValue_DSVHTTPDataAdapter_Config.Builder.class)
     @JsonTypeName(NAME)
@@ -277,8 +293,8 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
 
             if (HttpUrl.parse(url()) == null) {
                 errors.put("url", "Unable to parse url: " + url());
-            } else if (!validationContext.getUrlWhitelistService().isWhitelisted(url())) {
-                errors.put("url", "URL <" + url() + "> is not whitelisted.");
+            } else if (!validationContext.getUrlAllowlistService().isAllowlisted(url())) {
+                errors.put("url", "URL <" + url() + "> is not allowlisted.");
             }
 
             return errors.isEmpty() ? Optional.empty() : Optional.of(errors);
@@ -323,10 +339,10 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
         }
     }
 
-    private void publishSystemNotificationForWhitelistFailure() {
+    private void publishSystemNotificationForAllowlistFailure() {
         final String description =
-                "A \"DSV File from HTTP\" lookup adapter is trying to access a URL which is not whitelisted. Please " +
+                "A \"DSV File from HTTP\" lookup adapter is trying to access a URL which is not allowlisted. Please " +
                         "check your configuration. [adapter name: \"" + name() + "\", url: \"" + config.url() + "\"]";
-        urlWhitelistNotificationService.publishWhitelistFailure(description);
+        urlAllowlistNotificationService.publishAllowlistFailure(description);
     }
 }

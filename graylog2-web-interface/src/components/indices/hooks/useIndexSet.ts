@@ -21,12 +21,9 @@ import type { Dispatch, SetStateAction } from 'react';
 import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults';
 import useSelectedIndexSetTemplate from 'components/indices/IndexSetTemplates/hooks/useSelectedTemplate';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import type {
-  RotationStrategyConfig,
-  RetentionStrategyConfig,
-} from 'components/indices/Types';
+import type { RotationStrategyConfig, RetentionStrategyConfig } from 'components/indices/Types';
 
-const useIndexSet = (initialIndexSet?: IndexSet) :[IndexSet, Dispatch<SetStateAction<IndexSet>>] => {
+const useIndexSet = (initialIndexSet?: IndexSet): [IndexSet, Dispatch<SetStateAction<IndexSet>>] => {
   const { loadingIndexSetTemplateDefaults, indexSetTemplateDefaults } = useIndexSetTemplateDefaults();
   const [indexSet, setIndexSet] = useState(initialIndexSet);
   const { selectedIndexSetTemplate } = useSelectedIndexSetTemplate();
@@ -37,9 +34,8 @@ const useIndexSet = (initialIndexSet?: IndexSet) :[IndexSet, Dispatch<SetStateAc
     const defaultIndexSet: IndexSet = {
       title: '',
       description: '',
-      index_prefix: indexSetTemplateDefaults.index_prefix,
+      index_prefix: '',
       writable: true,
-      can_be_default: true,
       shards: indexSetTemplateDefaults.shards,
       data_tiering: indexSetTemplateDefaults.data_tiering,
       replicas: indexSetTemplateDefaults.replicas,
@@ -51,10 +47,14 @@ const useIndexSet = (initialIndexSet?: IndexSet) :[IndexSet, Dispatch<SetStateAc
       index_optimization_max_num_segments: indexSetTemplateDefaults.index_optimization_max_num_segments,
       index_optimization_disabled: indexSetTemplateDefaults.index_optimization_disabled,
       field_type_refresh_interval: indexSetTemplateDefaults.field_type_refresh_interval,
+      field_restrictions: indexSetTemplateDefaults.field_restrictions,
+      index_set_template_id: null,
     };
 
     if (initialIndexSet) {
-      const initialIndexWithoutNullValues = Object.fromEntries(Object.entries(initialIndexSet).filter(([_, v]) => v != null));
+      const initialIndexWithoutNullValues = Object.fromEntries(
+        Object.entries(initialIndexSet).filter(([_, v]) => v != null),
+      );
       setIndexSet({ ...defaultIndexSet, ...initialIndexWithoutNullValues });
     } else if (selectedIndexSetTemplate) {
       const indexSetTemplateConfig = selectedIndexSetTemplate.index_set_config;
@@ -65,12 +65,19 @@ const useIndexSet = (initialIndexSet?: IndexSet) :[IndexSet, Dispatch<SetStateAc
         indexSetTemplateConfig.rotation_strategy_class = indexSetTemplateDefaults.rotation_strategy_class;
         indexSetTemplateConfig.rotation_strategy = indexSetTemplateDefaults.rotation_strategy as RotationStrategyConfig;
         indexSetTemplateConfig.retention_strategy_class = indexSetTemplateDefaults.retention_strategy_class;
-        indexSetTemplateConfig.retention_strategy = indexSetTemplateDefaults.retention_strategy as RetentionStrategyConfig;
+        indexSetTemplateConfig.retention_strategy =
+          indexSetTemplateDefaults.retention_strategy as RetentionStrategyConfig;
       }
 
-      const indexSetTemplateConfigWithoutNullValues = Object.fromEntries(Object.entries(indexSetTemplateConfig).filter(([_, v]) => v != null));
+      const indexSetTemplateConfigWithoutNullValues = Object.fromEntries(
+        Object.entries(indexSetTemplateConfig).filter(([_, v]) => v != null),
+      );
 
-      setIndexSet({ ...defaultIndexSet, ...indexSetTemplateConfigWithoutNullValues });
+      setIndexSet({
+        ...defaultIndexSet,
+        ...indexSetTemplateConfigWithoutNullValues,
+        index_set_template_id: selectedIndexSetTemplate.id,
+      });
     } else {
       setIndexSet({ ...defaultIndexSet });
     }

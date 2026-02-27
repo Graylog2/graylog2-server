@@ -18,6 +18,7 @@ package org.graylog.integrations.inputs.paloalto9;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.assertj.core.api.Assertions;
 import org.graylog.integrations.inputs.paloalto.PaloAltoMessageBase;
 import org.graylog.integrations.inputs.paloalto.PaloAltoMessageType;
 import org.graylog.integrations.inputs.paloalto.PaloAltoParser;
@@ -25,15 +26,18 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.nio.charset.StandardCharsets;
 
@@ -48,13 +52,14 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class PaloAlto9xCodecTest {
     private static final String TEST_SOURCE = "Test Source";
     private static final DateTime TEST_DATE_TIME = DateTime.now(DateTimeZone.UTC);
     private static final String TEST_RAW_MESSAGE = "Foo,Bar,Baz,This,That,GLOBALPROTECT";
     private static final ImmutableList<String> TEST_FIELD_LIST = ImmutableList.of("Foo", "Bar", "Baz", "Three", "Four", "GLOBALPROTECT");
-    private static final ImmutableMap<String,Object> TEST_FIELD_MAP = ImmutableMap.of("field_one", "value_one",
+    private static final ImmutableMap<String, Object> TEST_FIELD_MAP = ImmutableMap.of("field_one", "value_one",
             "field_two", "value_two",
             "field_three", Long.valueOf(3L));
 
@@ -64,15 +69,18 @@ public class PaloAlto9xCodecTest {
     PaloAlto9xCodec cut;
 
     // Mock Objects
-    @Mock Configuration mockConfig;
-    @Mock PaloAltoParser mockRawParser;
-    @Mock PaloAlto9xParser mockPaloParser;
+    @Mock
+    Configuration mockConfig;
+    @Mock
+    PaloAltoParser mockRawParser;
+    @Mock
+    PaloAlto9xParser mockPaloParser;
 
     // Test Objects
     RawMessage in;
     Message out;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.cut = new PaloAlto9xCodec(mockConfig, mockRawParser, mockPaloParser, messageFactory);
     }
@@ -213,9 +221,7 @@ public class PaloAlto9xCodecTest {
         givenGoodInputRawMessage();
         givenRawParserReturnsNull();
 
-        whenDecodeIsCalled();
-
-        thenOutputMessageIsNull();
+        Assertions.assertThatThrownBy(this::whenDecodeIsCalled).isInstanceOf(InputProcessingException.class);
     }
 
     // GIVENs
@@ -243,7 +249,7 @@ public class PaloAlto9xCodecTest {
 
     // WHENs
     private void whenDecodeIsCalled() {
-        out = cut.decode(in);
+        out = cut.decodeSafe(in).get();
     }
 
     // THENs
@@ -270,9 +276,5 @@ public class PaloAlto9xCodecTest {
         } else {
             assertThat(out.getField(Message.FIELD_FULL_MESSAGE), nullValue());
         }
-    }
-
-    private void thenOutputMessageIsNull() {
-        assertThat(out, nullValue());
     }
 }

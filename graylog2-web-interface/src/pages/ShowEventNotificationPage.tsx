@@ -30,6 +30,7 @@ import EventNotificationActionLinks from 'components/event-notifications/event-n
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
+import PageDescription from 'components/event-notifications/PageDescription';
 
 import useHistory from '../routing/useHistory';
 
@@ -69,16 +70,14 @@ const ShowEventDefinitionPage = () => {
   return (
     <DocumentTitle title={`View "${notification.title}" Notification`}>
       <EventsPageNavigation />
-      <PageHeader title={`View "${notification.title}" Notification`}
-                  actions={notification && <EventNotificationActionLinks notificationId={notification.id} />}
-                  documentationLink={{
-                    title: 'Alerts documentation',
-                    path: DocsHelper.PAGES.ALERTS,
-                  }}>
-        <span>
-          Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
-          to you or to other systems you use for that purpose.
-        </span>
+      <PageHeader
+        title={`View "${notification.title}" Notification`}
+        actions={notification && <EventNotificationActionLinks notificationId={notification.id} />}
+        documentationLink={{
+          title: 'Alerts documentation',
+          path: DocsHelper.PAGES.ALERTS,
+        }}>
+        <PageDescription />
       </PageHeader>
 
       <EventNotificationDetails notification={notification} />

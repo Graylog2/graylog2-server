@@ -1,0 +1,5 @@
+type = "f"
+message = "Optimize cert renewal task in data node, limit keystore access"
+
+pulls = ["22054"]
+issues = ["21975"]

@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { asElement, fireEvent, render, screen } from 'wrappedTestingLibrary';
+import { asElement, render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import DrilldownContext from 'views/components/contexts/DrilldownContext';
 
@@ -24,31 +25,31 @@ import SurroundingSearchButton from './SurroundingSearchButton';
 const getOption = async (optionText: string) => {
   const button = await screen.findByRole('button', { name: /show surrounding messages/i });
 
-  fireEvent.click(button);
+  await userEvent.click(button);
 
   return screen.findByRole('menuitem', { name: new RegExp(optionText, 'i') });
 };
 
 describe('SurroundingSearchButton', () => {
   const searchConfig = {
-    surrounding_filter_fields: [
-      'somefield',
-      'someotherfield',
-    ],
+    surrounding_filter_fields: ['somefield', 'someotherfield'],
     surrounding_timerange_options: {
       PT1S: '1 second',
       PT1M: 'Only a minute',
     },
   };
   const TestComponent = (props: Partial<React.ComponentProps<typeof SurroundingSearchButton>>) => (
-    <SurroundingSearchButton searchConfig={searchConfig}
-                             timestamp="2020-02-28T09:45:31.123Z"
-                             id="foo-bar"
-                             messageFields={{}}
-                             {...props} />
+    <SurroundingSearchButton
+      searchConfig={searchConfig}
+      timestamp="2020-02-28T09:45:31.123Z"
+      id="foo-bar"
+      messageFields={{}}
+      {...props}
+    />
   );
 
-  const renderButton = (props: Partial<React.ComponentProps<typeof SurroundingSearchButton>> = {}) => render(<TestComponent {...props} />);
+  const renderButton = (props: Partial<React.ComponentProps<typeof SurroundingSearchButton>> = {}) =>
+    render(<TestComponent {...props} />);
 
   it('renders a button with a "Show surrounding messages" caption', () => {
     renderButton();
@@ -60,7 +61,7 @@ describe('SurroundingSearchButton', () => {
     renderButton();
     const button = screen.getByText('Show surrounding messages');
 
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     await screen.findByText('Only a minute');
     await screen.findByText('1 second');
@@ -119,19 +120,21 @@ describe('SurroundingSearchButton', () => {
   it('includes current set of streams in generated urls', async () => {
     const streams = ['000000000000000000000001', '5c2e07eeba33a9681ad6070a', '5d2d9649e117dc4df84cf83c'];
 
-    render((
+    render(
       <DrilldownContext.Consumer>
         {(drilldown) => (
           <DrilldownContext.Provider value={{ ...drilldown, streams }}>
             <TestComponent />
           </DrilldownContext.Provider>
         )}
-      </DrilldownContext.Consumer>
-    ));
+      </DrilldownContext.Consumer>,
+    );
 
     const option = asElement(await getOption('1 second'), HTMLAnchorElement);
 
-    expect(option.href).toContain('streams=000000000000000000000001%2C5c2e07eeba33a9681ad6070a%2C5d2d9649e117dc4df84cf83c');
+    expect(option.href).toContain(
+      'streams=000000000000000000000001%2C5c2e07eeba33a9681ad6070a%2C5d2d9649e117dc4df84cf83c',
+    );
   });
 
   it('does not include a `streams` key in generated urls if none are selected', async () => {

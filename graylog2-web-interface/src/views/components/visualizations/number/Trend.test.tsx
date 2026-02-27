@@ -23,7 +23,8 @@ const renderTrend = ({
   current = 42,
   previous = 42,
   trendPreference = 'NEUTRAL',
-}: Partial<React.ComponentProps<typeof Trend>> = {}) => render(<Trend current={current} previous={previous} trendPreference={trendPreference} />);
+}: Partial<React.ComponentProps<typeof Trend>> = {}) =>
+  render(<Trend current={current} previous={previous} trendPreference={trendPreference} />);
 
 const findTrend = async () => {
   const trend = await screen.findByTestId('trend-value');
@@ -41,19 +42,19 @@ describe('Trend', () => {
   it('shows relative delta as percentage', async () => {
     renderTrend({ previous: 23 });
 
-    expect(await findTrend()).toMatch(/\+82.61%/);
+    expect(await findTrend()).toMatch(/\+82.6%/);
   });
 
   it('shows absolute delta if values are equal', async () => {
     renderTrend();
 
-    expect(await findTrend()).toMatch(/\+0/);
+    expect(await findTrend()).toMatch(/^0 \//);
   });
 
   it('shows relative delta as percentage if values are equal', async () => {
     renderTrend();
 
-    expect(await findTrend()).toMatch(/\+0%/);
+    expect(await findTrend()).toMatch(/0\.0%/);
   });
 
   it('shows negative absolute delta', async () => {
@@ -65,7 +66,7 @@ describe('Trend', () => {
   it('shows negative relative delta as percentage', async () => {
     renderTrend({ current: 23 });
 
-    expect(await findTrend()).toMatch(/-45.24%/);
+    expect(await findTrend()).toMatch(/-45.2%/);
   });
 
   it('shows adequate results if previous value is 0', async () => {
@@ -83,7 +84,7 @@ describe('Trend', () => {
   it('shows adequate results if current value is 0', async () => {
     renderTrend({ current: 0, previous: 42 });
 
-    expect(await findTrend()).toMatch(/-42 \/ -100%/);
+    expect(await findTrend()).toMatch(/-42 \/ -100\.0%/);
   });
 
   it('shows adequate results if current value is NaN', async () => {
@@ -93,13 +94,21 @@ describe('Trend', () => {
   });
 
   describe('renders background according to values and trend preference', () => {
-    it('shows neutral background if values are equal', async () => {
-      renderTrend();
+    it.each`
+      trendPreference
+      ${'NEUTRAL'}
+      ${'HIGHER'}
+      ${'LOWER'}
+    `(
+      'shows neutral background if values are equal and trend preference is $trendPreference',
+      async ({ trendPreference }: { trendPreference: 'NEUTRAL' | 'LOWER' | 'HIGHER' }) => {
+        renderTrend({ trendPreference });
 
-      const background = await screen.findByTestId('trend-background');
+        const background = await screen.findByTestId('trend-background');
 
-      expect(background).toHaveStyleRule('background-color', '#fff!important');
-    });
+        expect(background).toHaveStyleRule('background-color', '#fff!important');
+      },
+    );
 
     it('shows good background if current value and preference are higher', async () => {
       renderTrend({ current: 43, trendPreference: 'HIGHER' });

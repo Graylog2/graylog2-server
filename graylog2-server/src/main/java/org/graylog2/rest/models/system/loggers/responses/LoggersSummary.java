@@ -20,17 +20,16 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.Map;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class LoggersSummary {
-    @JsonProperty
+    @JsonProperty("total")
     public abstract int total();
-    @JsonProperty
+
+    @JsonProperty("loggers")
     public abstract Map<String, SingleLoggerSummary> loggers();
 
     @JsonCreator

@@ -33,9 +33,7 @@ const ClusterTrafficGraph = () => {
     }
   }, [graphDays]);
 
-  return (
-    <TrafficGraphWithDaySelect traffic={traffic?.output} />
-  );
+  return <TrafficGraphWithDaySelect traffic={traffic?.output} />;
 };
 
 export default ClusterTrafficGraph;

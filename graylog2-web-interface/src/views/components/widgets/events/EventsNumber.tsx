@@ -31,7 +31,7 @@ const NumberBox = styled(ElementDimensions)`
   padding-bottom: 10px;
 `;
 
-const EventsNumber = ({ data } : WidgetComponentProps<EventsWidgetConfig, EventsListResult>) => {
+const EventsNumber = ({ data }: WidgetComponentProps<EventsWidgetConfig, EventsListResult>) => {
   const onRenderComplete = useContext(RenderCompletionCallback);
 
   useEffect(() => {
@@ -42,9 +42,7 @@ const EventsNumber = ({ data } : WidgetComponentProps<EventsWidgetConfig, Events
     <NumberBox resizeDelay={20}>
       {({ height, width }) => (
         <AutoFontSizer height={height} width={width} center>
-          <div>
-            {data.totalResults}
-          </div>
+          <div>{data.totalResults}</div>
         </AutoFontSizer>
       )}
     </NumberBox>

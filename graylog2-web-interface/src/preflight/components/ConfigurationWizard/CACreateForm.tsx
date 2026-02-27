@@ -19,29 +19,28 @@ import * as React from 'react';
 import { Formik, Form } from 'formik';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { Button, FormikInput, Space } from 'preflight/components/common';
+import { FormikInput, Space } from 'preflight/components/common';
+import Button from 'components/bootstrap/Button';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import UserNotification from 'preflight/util/UserNotification';
+import UserNotification from 'util/UserNotification';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
 
-type FormValues = {}
+type FormValues = {};
 
-const createCA = (caData: FormValues) => fetch(
-  'POST',
-  qualifyUrl('/api/ca/create'),
-  caData,
-  false,
-);
+const createCA = (caData: FormValues) => fetch('POST', qualifyUrl('/api/ca/create'), caData, false);
 
 const CACreateForm = () => {
   const queryClient = useQueryClient();
 
-  const { mutateAsync: onCreateCA } = useMutation(createCA, {
+  const { mutateAsync: onCreateCA } = useMutation({
+    mutationFn: createCA,
+
     onSuccess: () => {
       UserNotification.success('CA created successfully');
-      queryClient.invalidateQueries(DATA_NODES_CA_QUERY_KEY);
+      queryClient.invalidateQueries({ queryKey: DATA_NODES_CA_QUERY_KEY });
     },
+
     onError: (error) => {
       UserNotification.error(`CA creation failed with error: ${error}`);
     },
@@ -52,20 +51,18 @@ const CACreateForm = () => {
   return (
     <div>
       <p>
-        Here you can quickly create a new certificate authority.
-        All you need to do is to click on the &ldquo;Create CA&rdquo; button.
-        The CA should only be used to secure your Graylog data nodes.
+        Here you can quickly create a new certificate authority. All you need to do is to click on the &ldquo;Create
+        CA&rdquo; button. The CA should only be used to secure your Graylog data nodes.
       </p>
       <Space h="xs" />
-      <Formik initialValues={{ organization: 'Graylog CA' }} onSubmit={(formValues: FormValues) => onSubmit(formValues)}>
+      <Formik
+        initialValues={{ organization: 'Graylog CA' }}
+        onSubmit={(formValues: FormValues) => onSubmit(formValues)}>
         {({ isSubmitting, isValid }) => (
           <Form>
-            <FormikInput placeholder="Organization Name"
-                         name="organization"
-                         label="Organization Name"
-                         required />
+            <FormikInput placeholder="Organization Name" name="organization" label="Organization Name" required />
             <Space h="md" />
-            <Button disabled={isSubmitting || !isValid} type="submit">
+            <Button bsStyle="info" disabled={isSubmitting || !isValid} type="submit">
               {isSubmitting ? 'Creating CA...' : 'Create CA'}
             </Button>
           </Form>

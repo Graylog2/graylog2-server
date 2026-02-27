@@ -24,8 +24,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Locale;
 
+import static java.time.ZoneOffset.UTC;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.jodatime.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -51,6 +54,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  *
  */
 public class NaturalDateParserTest {
+
+    private static final Instant fixedInstant = Instant.parse("2025-05-05T09:45:23Z");
+    private static final Clock fixedClock = Clock.fixed(fixedInstant, UTC);
+
     private NaturalDateParser naturalDateParser;
     private NaturalDateParser naturalDateParserAntarctica;
     private NaturalDateParser naturalDateParserUtc;
@@ -75,9 +82,9 @@ public class NaturalDateParserTest {
 
     @BeforeEach
     public void setUp() {
-        naturalDateParser = new NaturalDateParser();
-        naturalDateParserUtc = new NaturalDateParser("Etc/UTC");
-        naturalDateParserAntarctica = new NaturalDateParser("Antarctica/Palmer");
+        naturalDateParser = new NaturalDateParser("Etc/UTC", Locale.getDefault(), fixedClock);
+        naturalDateParserUtc = new NaturalDateParser("Etc/UTC", Locale.getDefault(), fixedClock);
+        naturalDateParserAntarctica = new NaturalDateParser("Antarctica/Palmer", Locale.getDefault(), fixedClock);
     }
 
     @Test

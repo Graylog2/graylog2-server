@@ -16,12 +16,10 @@
  */
 package org.graylog2.shared.journal;
 
-import com.codahale.metrics.Gauge;
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricFilter;
-import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.*;
 import com.codahale.metrics.Timer;
 import com.github.joschi.jadconfig.util.Size;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -29,7 +27,10 @@ import com.google.common.io.Files;
 import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.Uninterruptibles;
-import org.apache.commons.lang3.StringUtils;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+import org.apache.commons.lang3.Strings;
 import org.graylog.shaded.kafka09.common.KafkaException;
 import org.graylog.shaded.kafka09.common.OffsetOutOfRangeException;
 import org.graylog.shaded.kafka09.common.TopicAndPartition;
@@ -55,6 +56,7 @@ import org.graylog.shaded.kafka09.utils.Time;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.ThrottleState;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
 import org.graylog2.shared.metrics.HdrTimer;
 import org.graylog2.shared.utilities.ByteBufferUtils;
@@ -62,10 +64,6 @@ import org.joda.time.DateTimeUtils;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Singleton;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -83,6 +81,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.Callable;
@@ -99,6 +98,7 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.graylog2.plugin.Tools.bytesToHex;
+import static org.graylog2.shared.metrics.MetricUtils.safelyRegister;
 
 @Singleton
 public class LocalKafkaJournal extends AbstractIdleService implements Journal {
@@ -166,6 +166,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
     private final LogRetentionCleaner logRetentionCleaner;
     private final long maxSegmentSize;
     private final int maxMessageSize;
+    private final long maxRetentionSize;
     private final String metricPrefix;
 
     private long nextReadOffset = 0L;
@@ -225,6 +226,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
         this.maxSegmentSize = segmentSize.toBytes();
         // Max message size should not be bigger than max segment size.
         this.maxMessageSize = Ints.saturatedCast(maxSegmentSize);
+        this.maxRetentionSize = retentionSize.toBytes();
         this.metricPrefix = metricPrefix;
         this.metricRegistry = metricRegistry;
 
@@ -375,7 +377,40 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
 
         if (LocalKafkaJournal.class.getName().equals(metricPrefix)) {
             registerLegacyMetrics();
+            //We want metrics with global names only registered for the LocalKafkaJournal, not all journals (data-lake, outputs etc):
+            registerAdditionalJournalMetrics(GlobalMetricNames.JOURNAL_GLOBAL_PREFIX);
         }
+
+        registerAdditionalJournalMetrics(this.metricPrefix);
+    }
+
+    /**
+     * Registers additional journal metrics that can be computed from journal state.
+     * These are currently the number segments, uncommitted entries, the size, size limit and the utilization ratio.
+     */
+    private void registerAdditionalJournalMetrics(final String metricPrefix) {
+        safelyRegister(metricRegistry,
+                name(metricPrefix, GlobalMetricNames.JOURNAL_SEGMENTS_SUFFIX),
+                (Gauge<Integer>) this::numberOfSegments);
+
+        registerUncommittedGauge(metricRegistry, name(metricPrefix, GlobalMetricNames.JOURNAL_UNCOMMITTED_ENTRIES_SUFFIX));
+
+        safelyRegister(metricRegistry,
+                name(metricPrefix, GlobalMetricNames.JOURNAL_SIZE_SUFFIX),
+                (Gauge<Long>) this::size);
+
+        safelyRegister(metricRegistry,
+                name(metricPrefix, GlobalMetricNames.JOURNAL_SIZE_LIMIT_SUFFIX),
+                (Gauge<Long>) () -> maxRetentionSize);
+
+        safelyRegister(metricRegistry,
+                name(metricPrefix, GlobalMetricNames.JOURNAL_UTILIZATION_RATIO_SUFFIX),
+                new RatioGauge() {
+                    @Override
+                    protected Ratio getRatio() {
+                        return Ratio.of(size(), maxRetentionSize);
+                    }
+                });
     }
 
     @Override
@@ -391,7 +426,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
                 .filter(entry -> entry.getKey().startsWith(LocalKafkaJournal.class.getName()))
                 .forEach(entry -> {
                     String legacyName = LEGACY_CLASS_NAME +
-                            StringUtils.removeStart(entry.getKey(), LocalKafkaJournal.class.getName());
+                            Strings.CS.removeStart(entry.getKey(), LocalKafkaJournal.class.getName());
                     try {
                         this.metricRegistry.register(legacyName, entry.getValue());
                     } catch (Exception e) {
@@ -452,23 +487,48 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
      * restarted independently (eg. the Forwarder).
      */
     private void teardownLogMetrics() {
-
-        this.metricRegistry.remove(name(metricPrefix, METER_WRITTEN_MESSAGES));
-        this.metricRegistry.remove(name(metricPrefix, METER_READ_MESSAGES));
-        this.metricRegistry.remove(name(metricPrefix, METER_WRITE_DISCARDED_MESSAGES));
-        this.metricRegistry.remove(name(metricPrefix, GAUGE_UNCOMMITTED_MESSAGES));
-        this.metricRegistry.remove(name(metricPrefix, TIMER_WRITE_TIME));
-        this.metricRegistry.remove(name(metricPrefix, TIMER_READ_TIME));
-        this.metricRegistry.remove(name(metricPrefix, METRIC_NAME_SIZE));
-        this.metricRegistry.remove(name(metricPrefix, METRIC_NAME_LOG_END_OFFSET));
-        this.metricRegistry.remove(name(metricPrefix, METRIC_NAME_NUMBER_OF_SEGMENTS));
-        this.metricRegistry.remove(name(metricPrefix, METRIC_NAME_UNFLUSHED_MESSAGES));
-        this.metricRegistry.remove(name(metricPrefix, METRIC_NAME_RECOVERY_POINT));
-        this.metricRegistry.remove(name(metricPrefix, METRIC_NAME_LAST_FLUSH_TIME));
+        removeAllMetrics(
+            name(metricPrefix, METER_WRITTEN_MESSAGES),
+            name(metricPrefix, METER_READ_MESSAGES),
+            name(metricPrefix, METER_WRITE_DISCARDED_MESSAGES),
+            name(metricPrefix, GAUGE_UNCOMMITTED_MESSAGES),
+            name(metricPrefix, TIMER_WRITE_TIME),
+            name(metricPrefix, TIMER_READ_TIME),
+            name(metricPrefix, METRIC_NAME_SIZE),
+            name(metricPrefix, METRIC_NAME_LOG_END_OFFSET),
+            name(metricPrefix, METRIC_NAME_NUMBER_OF_SEGMENTS),
+            name(metricPrefix, METRIC_NAME_UNFLUSHED_MESSAGES),
+            name(metricPrefix, METRIC_NAME_RECOVERY_POINT),
+            name(metricPrefix, METRIC_NAME_LAST_FLUSH_TIME)
+        );
         this.metricRegistry.remove(getOldestSegmentMetricName());
+
+        // Remove additional metrics
+        removeAllMetrics(
+            name(metricPrefix, GlobalMetricNames.JOURNAL_SEGMENTS_SUFFIX),
+            name(metricPrefix, GlobalMetricNames.JOURNAL_UNCOMMITTED_ENTRIES_SUFFIX),
+            name(metricPrefix, GlobalMetricNames.JOURNAL_SIZE_SUFFIX),
+            name(metricPrefix, GlobalMetricNames.JOURNAL_SIZE_LIMIT_SUFFIX),
+            name(metricPrefix, GlobalMetricNames.JOURNAL_UTILIZATION_RATIO_SUFFIX)
+        );
 
         if (LocalKafkaJournal.class.getName().equals(metricPrefix)) {
             this.metricRegistry.removeMatching(MetricFilter.startsWith(LEGACY_CLASS_NAME));
+
+            //Remove additional metrics from global namespace:
+            removeAllMetrics(
+                GlobalMetricNames.JOURNAL_SEGMENTS,
+                GlobalMetricNames.JOURNAL_UNCOMMITTED_ENTRIES,
+                GlobalMetricNames.JOURNAL_SIZE,
+                GlobalMetricNames.JOURNAL_SIZE_LIMIT,
+                GlobalMetricNames.JOURNAL_UTILIZATION_RATIO
+            );
+        }
+    }
+
+    private void removeAllMetrics(String... names) {
+        for (String name : names) {
+            this.metricRegistry.remove(name);
         }
     }
 
@@ -552,7 +612,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
             }
 
             // Flush the rest of the messages.
-            if (messages.size() > 0) {
+            if (!messages.isEmpty()) {
                 lastWriteOffset = flushMessages(messages, payloadSize);
             }
 
@@ -619,7 +679,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
 
         List<JournalReadEntry> messages = read(startOffset, requestedMaximumCount);
 
-        if (messages.isEmpty()) {
+        if (messages.isEmpty() && !shuttingDown) {
             // If we got an empty result BUT we know that there are more messages in the log, we bump the readOffset
             // by 1 and try to read again. We continue until we either get an non-empty result or we reached the
             // end of the log.
@@ -653,7 +713,21 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
      * @param requestedMaximumCount Maximum number of entries to return.
      * @return A list of entries
      */
+    @Override
     public List<JournalReadEntry> read(long readOffset, long requestedMaximumCount) {
+        return read(readOffset, requestedMaximumCount, false);
+    }
+
+    /**
+     * Read from the journal, starting at the given offset. If the underlying journal implementation returns an empty
+     * list of entries, it will be returned even if we know there are more entries in the journal.
+     *
+     * @param readOffset            Offset to start reading at
+     * @param requestedMaximumCount Maximum number of entries to return.
+     * @param includeMessageId      if true JournalReadEntry contains messageId
+     * @return A list of entries
+     */
+    public List<JournalReadEntry> read(long readOffset, long requestedMaximumCount, boolean includeMessageId) {
         // Always read at least one!
         final long maximumCount = Math.max(1, requestedMaximumCount);
         long maxOffset = readOffset + maximumCount;
@@ -695,12 +769,24 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
                 lastOffset = messageAndOffset.offset();
 
                 final byte[] payloadBytes = ByteBufferUtils.readBytes(messageAndOffset.message().payload());
-                if (LOG.isTraceEnabled()) {
-                    final byte[] keyBytes = ByteBufferUtils.readBytes(messageAndOffset.message().key());
-                    LOG.trace("Read message {} contains {}", bytesToHex(keyBytes), bytesToHex(payloadBytes));
+                final boolean traceEnabled = LOG.isTraceEnabled();
+                final boolean readKey = includeMessageId || traceEnabled;
+
+                final byte[] keyBytes = readKey
+                        ? ByteBufferUtils.readBytes(messageAndOffset.message().key())
+                        : null;
+                final JournalReadEntry entry = includeMessageId
+                        ? new JournalReadEntry(keyBytes, payloadBytes, messageAndOffset.offset())
+                        : new JournalReadEntry(payloadBytes, messageAndOffset.offset());
+
+                if (traceEnabled) {
+                    LOG.trace("Read message {} contains {}",
+                            bytesToHex(keyBytes), bytesToHex(payloadBytes));
                 }
+
+                messages.add(entry);
+
                 totalBytes += payloadBytes.length;
-                messages.add(new JournalReadEntry(payloadBytes, messageAndOffset.offset()));
                 // remember where to read from
                 nextReadOffset = messageAndOffset.nextOffset();
             }
@@ -782,17 +868,51 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
                     kafkaLog.flush();
                 }
             } catch (Exception e) {
-                LOG.error("Error flushing topic " + topicAndPartition.topic(), e);
+                LOG.error("Error flushing topic {}", topicAndPartition.topic(), e);
             }
         }
     }
 
+    @Override
     public long getCommittedOffset() {
         return committedOffset.get();
     }
 
+    @Override
     public long getNextReadOffset() {
         return nextReadOffset;
+    }
+
+    @Override
+    public void resetNextReadOffset() {
+        final long newValue = committedOffset.get() + 1;
+        LOG.info("Resetting next read offset to the last committed offset ({} -> {})", this.nextReadOffset, newValue);
+        this.nextReadOffset = newValue;
+    }
+
+    /**
+     * Returns the current utilization of the journal as a percentage of the maximum retention size.
+     * This method calculates how much of the maximum retention size is currently being utilized
+     * based on the size of the Kafka log.
+     *
+     * @return the journal utilization as a percentage, or 0.0 if the max retention size is zero.
+     */
+    @Override
+    public Optional<Double> getJournalUtilization() {
+        return Optional.of(calculateUtilization(maxRetentionSize, kafkaLog.size()));
+    }
+
+    /**
+     * Calculates the percentage utilization of the journal.
+     * This method computes the utilization as a percentage by dividing the Kafka log size by the
+     * maximum retention size and multiplying by 100.
+     *
+     * @param maxRetentionSize the maximum retention size of the journal
+     * @param kafkaLogSize     the current size of the Kafka log
+     * @return an {@code Optional<Double>} containing the journal utilization as a percentage.
+     */
+    private double calculateUtilization(long maxRetentionSize, long kafkaLogSize) {
+        return Tools.percentageOf(maxRetentionSize, kafkaLogSize);
     }
 
     @Override
@@ -828,7 +948,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
     @Override
     protected void shutDown() throws Exception {
         LOG.debug("Shutting down journal!");
-        shuttingDown = true;
+        triggerShutDown();
 
         offsetFlusherFuture.cancel(false);
         logRetentionFuture.cancel(false);
@@ -844,7 +964,24 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
         teardownLogMetrics();
     }
 
-    public int cleanupLogs() {
+    @VisibleForTesting
+    void triggerShutDown() {
+        shuttingDown = true;
+    }
+
+    /**
+     * Executes the retention policy on the journal by invoking the {@code logRetentionCleaner}.
+     * This method handles the following tasks:
+     * <ul>
+     *   <li>Cleans up expired log segments that have exceeded the configured retention time.</li>
+     *   <li>Ensures that segment sizes are maintained within the maximum allowable limits.</li>
+     *   <li>Removes committed log segments that are no longer needed,</li>
+     * </ul>
+     *
+     * @return an integer representing the total amount of data deleted by the {@code logRetentionCleaner}
+     */
+    @Override
+    public int runRetention() {
         try {
             return logRetentionCleaner.call();
         } catch (Exception e) {
@@ -874,20 +1011,6 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
      */
     public int numberOfSegments() {
         return kafkaLog.numberOfSegments();
-    }
-
-    /**
-     * Returns the highest journal offset that has been writting to persistent storage by Graylog.
-     * <p>
-     * Every message at an offset prior to this one can be considered as processed and does not need to be held in
-     * the journal any longer. By default Graylog will try to aggressively flush the journal to consume a smaller
-     * amount of disk space.
-     * </p>
-     *
-     * @return the offset of the last message which has been successfully processed.
-     */
-    public long getCommittedReadOffset() {
-        return committedOffset.get();
     }
 
     /**
@@ -950,10 +1073,9 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
                 // actually sync to disk
                 fos.getFD().sync();
             } catch (SyncFailedException e) {
-                LOG.error("Cannot sync " + committedReadOffsetFile.getAbsolutePath() + " to disk. Continuing anyway," +
-                        " but there is no guarantee that the file has been written.", e);
+                LOG.error("Cannot sync {} to disk. Continuing anyway, but there is no guarantee that the file has been written.", committedReadOffsetFile.getAbsolutePath(), e);
             } catch (IOException e) {
-                LOG.error("Cannot write " + committedReadOffsetFile.getAbsolutePath() + " to disk.", e);
+                LOG.error("Cannot write {} to disk.", committedReadOffsetFile.getAbsolutePath(), e);
             }
         }
     }
@@ -975,7 +1097,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
         }
 
         @Override
-        public Integer call() throws Exception {
+        public synchronized Integer call() throws Exception {
             loggerForCleaner.debug("Beginning log cleanup");
             int total = 0;
             final Timer.Context ctx = new Timer().time();
@@ -1045,7 +1167,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
         private int cleanupSegmentsToMaintainSize(Log kafkaLog) {
             final long retentionSize = kafkaLog.config().retentionSize();
             final long currentSize = kafkaLog.size();
-            final double utilizationPercentage = retentionSize > 0 ? (currentSize * 100) / retentionSize : 0.0;
+            final double utilizationPercentage = calculateUtilization(retentionSize, currentSize);
             if (utilizationPercentage > LocalKafkaJournal.NOTIFY_ON_UTILIZATION_PERCENTAGE) {
                 LOG.warn("Journal utilization ({}%) has gone over {}%.", utilizationPercentage,
                         LocalKafkaJournal.NOTIFY_ON_UTILIZATION_PERCENTAGE);

@@ -1,0 +1,5 @@
+type = "f"
+message = "Catch and report exceptions during grok pattern matching."
+
+issues=["19975"]
+pulls = ["21290"]

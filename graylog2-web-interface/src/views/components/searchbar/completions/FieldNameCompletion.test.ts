@@ -49,24 +49,26 @@ describe('FieldNameCompletion', () => {
     targetKey = 'name',
     tokens = requestDefaults.tokens,
   }: {
-    currentToken: Token,
-    currentTokenIdx?: number
-    prefix: string,
-    prevToken?: Token,
-    staticSuggestions?: Array<Suggestion>
-    targetKey?: string
-    tokens: Array<Token>
+    currentToken: Token;
+    currentTokenIdx?: number;
+    prefix: string;
+    prevToken?: Token;
+    staticSuggestions?: Array<Suggestion>;
+    targetKey?: string;
+    tokens: Array<Token>;
   }) => {
     const completer = new FieldNameCompletion(staticSuggestions);
 
-    return completer.getCompletions({
-      ...requestDefaults,
-      currentToken,
-      currentTokenIdx,
-      prefix,
-      prevToken,
-      tokens,
-    }).map((result) => result[targetKey]);
+    return completer
+      .getCompletions({
+        ...requestDefaults,
+        currentToken,
+        currentTokenIdx,
+        prefix,
+        prevToken,
+        tokens,
+      })
+      .map((result) => result[targetKey]);
   };
 
   it('returns empty list if inputs are empty', () => {
@@ -88,12 +90,14 @@ describe('FieldNameCompletion', () => {
       value: 'e',
     };
 
-    expect(completionsFor({
-      prefix: 'e',
-      currentToken: token,
-      tokens: [token],
-      staticSuggestions: [],
-    })).toEqual(['source', 'message', 'timestamp']);
+    expect(
+      completionsFor({
+        prefix: 'e',
+        currentToken: token,
+        tokens: [token],
+        staticSuggestions: [],
+      }),
+    ).toEqual(['source', 'message', 'timestamp']);
   });
 
   it('suffixes matching fields with colon', () => {
@@ -102,13 +106,15 @@ describe('FieldNameCompletion', () => {
       value: 'e',
     };
 
-    expect(completionsFor({
-      prefix: 'e',
-      currentToken: token,
-      tokens: [token],
-      targetKey: 'value',
-      staticSuggestions: [],
-    })).toEqual(['source:', 'message:', 'timestamp:']);
+    expect(
+      completionsFor({
+        prefix: 'e',
+        currentToken: token,
+        tokens: [token],
+        targetKey: 'value',
+        staticSuggestions: [],
+      }),
+    ).toEqual(['source:', 'message:', 'timestamp:']);
   });
 
   it('returns _exist_-operator if matching prefix', () => {
@@ -117,12 +123,14 @@ describe('FieldNameCompletion', () => {
       value: '_e',
     };
 
-    expect(completionsFor({
-      prefix: '_e',
-      currentToken: token,
-      tokens: [token],
-      targetKey: 'value',
-    })).toEqual(['_exists_:']);
+    expect(
+      completionsFor({
+        prefix: '_e',
+        currentToken: token,
+        tokens: [token],
+        targetKey: 'value',
+      }),
+    ).toEqual(['_exists_:']);
   });
 
   it('returns matching fields after _exists_-operator', () => {
@@ -135,13 +143,15 @@ describe('FieldNameCompletion', () => {
       value: 'e',
     };
 
-    expect(completionsFor({
-      prevToken,
-      currentToken,
-      tokens: [prevToken, currentToken],
-      currentTokenIdx: 1,
-      prefix: 'e',
-    })).toEqual(['source', 'message', 'timestamp']);
+    expect(
+      completionsFor({
+        prevToken,
+        currentToken,
+        tokens: [prevToken, currentToken],
+        currentTokenIdx: 1,
+        prefix: 'e',
+      }),
+    ).toEqual(['source', 'message', 'timestamp']);
   });
 
   it('returns exists operator together with matching fields', () => {
@@ -150,25 +160,30 @@ describe('FieldNameCompletion', () => {
       value: 'e',
     };
 
-    expect(completionsFor({
-      currentToken,
-      tokens: [currentToken],
-      prefix: 'e',
-    })).toEqual(['_exists_', 'source', 'message', 'timestamp']);
+    expect(
+      completionsFor({
+        currentToken,
+        tokens: [currentToken],
+        prefix: 'e',
+      }),
+    ).toEqual(['_exists_', 'source', 'message', 'timestamp']);
   });
 
   it('returns empty list when current token is a keyword and the the prefix is empty', () => {
     const currentToken = { type: 'keyword', value: 'http_method:', index: 0, start: 0 };
 
-    expect(completionsFor({
-      currentToken,
-      tokens: [currentToken],
-      prefix: '',
-    })).toEqual([]);
+    expect(
+      completionsFor({
+        currentToken,
+        tokens: [currentToken],
+        prefix: '',
+      }),
+    ).toEqual([]);
   });
 
   describe('considers current query', () => {
-    const completionByName = (fieldName: string, completions: CompletionResult[]) => completions.find(({ name }) => (name === fieldName));
+    const completionByName = (fieldName: string, completions: CompletionResult[]) =>
+      completions.find(({ name }) => name === fieldName);
 
     const fieldTypes = {
       all: {

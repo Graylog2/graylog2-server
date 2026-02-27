@@ -1,0 +1,5 @@
+type = "f"
+message = "Add user id permissions to users response for fronend permission checks."
+
+pulls = ["23851"]
+issues = ["23736"]

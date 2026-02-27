@@ -1,0 +1,5 @@
+type = "f"
+message = "Make index directory parser more resilient, handling state files as optional"
+
+issues = ["24358"]
+pulls = ["24397"]

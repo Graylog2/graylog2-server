@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Enterprise Traffic Graph: Ensure license data is visible on Cloud"
+
+issues = ["graylog-plugin-enterprise#6055"]
+pulls = ["20858"]

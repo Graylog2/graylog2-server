@@ -94,9 +94,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "associated_ip"
-                ],
+                "fields": ["associated_ip"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -136,9 +134,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "event_source"
-                ],
+                "fields": ["event_source"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -172,9 +168,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "event_source"
-                ],
+                "fields": ["event_source"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -208,9 +202,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "event_source_product"
-                ],
+                "fields": ["event_source_product"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -250,9 +242,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "source_ip"
-                ],
+                "fields": ["source_ip"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -286,9 +276,7 @@
             "row_groups": [
               {
                 "type": "time",
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "interval": {
                   "type": "auto",
                   "scaling": 1
@@ -330,9 +318,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "destination_ip"
-                ],
+                "fields": ["destination_ip"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -372,9 +358,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "associated_user_name"
-                ],
+                "fields": ["associated_user_name"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -408,9 +392,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "query_result"
-                ],
+                "fields": ["query_result"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -436,14 +418,10 @@
           "id": "d4b777c8-a08f-43b2-9ce6-769ca8ff5b37",
           "rows": [
             {
-              "key": [
-                "192.168.92.14"
-              ],
+              "key": ["192.168.92.14"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 18717248,
                   "rollup": true,
                   "source": "row-leaf"
@@ -452,14 +430,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.53"
-              ],
+              "key": ["192.168.92.53"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 18373525,
                   "rollup": true,
                   "source": "row-leaf"
@@ -468,14 +442,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.34"
-              ],
+              "key": ["192.168.92.34"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 17793619,
                   "rollup": true,
                   "source": "row-leaf"
@@ -484,14 +454,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.38"
-              ],
+              "key": ["192.168.92.38"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 17753320,
                   "rollup": true,
                   "source": "row-leaf"
@@ -500,14 +466,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.1"
-              ],
+              "key": ["192.168.92.1"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 17593899,
                   "rollup": true,
                   "source": "row-leaf"
@@ -516,14 +478,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.29"
-              ],
+              "key": ["192.168.92.29"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 17550107,
                   "rollup": true,
                   "source": "row-leaf"
@@ -532,14 +490,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.13"
-              ],
+              "key": ["192.168.92.13"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 17445019,
                   "rollup": true,
                   "source": "row-leaf"
@@ -548,14 +502,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.15"
-              ],
+              "key": ["192.168.92.15"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 17418120,
                   "rollup": true,
                   "source": "row-leaf"
@@ -564,14 +514,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.31"
-              ],
+              "key": ["192.168.92.31"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 17321719,
                   "rollup": true,
                   "source": "row-leaf"
@@ -580,14 +526,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.59"
-              ],
+              "key": ["192.168.92.59"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 17317532,
                   "rollup": true,
                   "source": "row-leaf"
@@ -596,14 +538,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.3"
-              ],
+              "key": ["192.168.92.3"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 17269970,
                   "rollup": true,
                   "source": "row-leaf"
@@ -612,14 +550,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.52"
-              ],
+              "key": ["192.168.92.52"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 17256420,
                   "rollup": true,
                   "source": "row-leaf"
@@ -628,14 +562,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.16"
-              ],
+              "key": ["192.168.92.16"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 17197356,
                   "rollup": true,
                   "source": "row-leaf"
@@ -644,14 +574,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.22"
-              ],
+              "key": ["192.168.92.22"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 17184039,
                   "rollup": true,
                   "source": "row-leaf"
@@ -660,14 +586,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.57"
-              ],
+              "key": ["192.168.92.57"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 17171413,
                   "rollup": true,
                   "source": "row-leaf"
@@ -679,9 +601,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 1094135122,
                   "rollup": true,
                   "source": "row-inner"
@@ -706,9 +626,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-inner"
@@ -730,14 +648,10 @@
           "id": "273e4a5c-2e84-47ca-8c8e-6aa56c2aa67a",
           "rows": [
             {
-              "key": [
-                "ppadilla"
-              ],
+              "key": ["ppadilla"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 31757736,
                   "rollup": true,
                   "source": "row-leaf"
@@ -746,14 +660,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "hkline"
-              ],
+              "key": ["hkline"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 31481804,
                   "rollup": true,
                   "source": "row-leaf"
@@ -762,14 +672,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "ewilkes"
-              ],
+              "key": ["ewilkes"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 31350170,
                   "rollup": true,
                   "source": "row-leaf"
@@ -778,14 +684,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "cmustafa"
-              ],
+              "key": ["cmustafa"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 31304436,
                   "rollup": true,
                   "source": "row-leaf"
@@ -794,14 +696,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "jgross"
-              ],
+              "key": ["jgross"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 31298524,
                   "rollup": true,
                   "source": "row-leaf"
@@ -810,14 +708,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "mgray"
-              ],
+              "key": ["mgray"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 31091733,
                   "rollup": true,
                   "source": "row-leaf"
@@ -826,14 +720,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "asheppard"
-              ],
+              "key": ["asheppard"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 31050999,
                   "rollup": true,
                   "source": "row-leaf"
@@ -842,14 +732,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "lbusby"
-              ],
+              "key": ["lbusby"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 30945125,
                   "rollup": true,
                   "source": "row-leaf"
@@ -858,14 +744,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "zsims"
-              ],
+              "key": ["zsims"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 30926354,
                   "rollup": true,
                   "source": "row-leaf"
@@ -874,14 +756,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "rferry"
-              ],
+              "key": ["rferry"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 30908423,
                   "rollup": true,
                   "source": "row-leaf"
@@ -890,14 +768,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "kpearson"
-              ],
+              "key": ["kpearson"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 30852627,
                   "rollup": true,
                   "source": "row-leaf"
@@ -906,14 +780,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "dbenitez"
-              ],
+              "key": ["dbenitez"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 30823919,
                   "rollup": true,
                   "source": "row-leaf"
@@ -922,14 +792,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "jford"
-              ],
+              "key": ["jford"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 30754712,
                   "rollup": true,
                   "source": "row-leaf"
@@ -938,14 +804,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "jduffield"
-              ],
+              "key": ["jduffield"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 30666588,
                   "rollup": true,
                   "source": "row-leaf"
@@ -954,14 +816,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "erhodes"
-              ],
+              "key": ["erhodes"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 30552705,
                   "rollup": true,
                   "source": "row-leaf"
@@ -973,9 +831,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 1058198015,
                   "rollup": true,
                   "source": "row-inner"
@@ -997,14 +853,10 @@
           "id": "7ff77c06-4f85-4586-b4e2-16dcff9a860f",
           "rows": [
             {
-              "key": [
-                "8.8.8.8"
-              ],
+              "key": ["8.8.8.8"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 214054480,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1013,14 +865,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "77.70.128.4"
-              ],
+              "key": ["77.70.128.4"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 213418502,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1029,14 +877,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "80.247.136.3"
-              ],
+              "key": ["80.247.136.3"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 211355738,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1045,14 +889,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.118.71.2"
-              ],
+              "key": ["192.118.71.2"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 211037937,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1061,14 +901,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "213.154.64.1"
-              ],
+              "key": ["213.154.64.1"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 210370252,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1077,14 +913,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "13.107.64.1"
-              ],
+              "key": ["13.107.64.1"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 2124023,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1093,14 +925,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "13.107.6.153"
-              ],
+              "key": ["13.107.6.153"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 2094113,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1109,14 +937,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "13.107.6.171"
-              ],
+              "key": ["13.107.6.171"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 2075489,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1125,14 +949,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "13.107.136.1"
-              ],
+              "key": ["13.107.136.1"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 2068990,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1141,14 +961,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.52"
-              ],
+              "key": ["192.168.92.52"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 364176,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1157,14 +973,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.12"
-              ],
+              "key": ["192.168.92.12"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 355386,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1173,14 +985,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.61"
-              ],
+              "key": ["192.168.92.61"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 354868,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1189,14 +997,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.37"
-              ],
+              "key": ["192.168.92.37"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 352835,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1205,14 +1009,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.30"
-              ],
+              "key": ["192.168.92.30"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 351334,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1221,14 +1021,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.45"
-              ],
+              "key": ["192.168.92.45"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 349931,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1240,9 +1036,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 1094189047,
                   "rollup": true,
                   "source": "row-inner"
@@ -1264,14 +1058,10 @@
           "id": "53fc12e9-990c-4463-afb0-5e9f39892a60",
           "rows": [
             {
-              "key": [
-                "8.8.8.8"
-              ],
+              "key": ["8.8.8.8"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 214054598,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1280,14 +1070,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "77.70.128.4"
-              ],
+              "key": ["77.70.128.4"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 213418502,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1296,14 +1082,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "80.247.136.3"
-              ],
+              "key": ["80.247.136.3"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 211355738,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1312,14 +1094,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.118.71.2"
-              ],
+              "key": ["192.118.71.2"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 211038158,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1328,14 +1106,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "213.154.64.1"
-              ],
+              "key": ["213.154.64.1"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 210370252,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1344,14 +1118,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.14"
-              ],
+              "key": ["192.168.92.14"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 18717248,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1360,14 +1130,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.53"
-              ],
+              "key": ["192.168.92.53"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 18373525,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1376,14 +1142,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.34"
-              ],
+              "key": ["192.168.92.34"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 17793619,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1392,14 +1154,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.38"
-              ],
+              "key": ["192.168.92.38"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 17458004,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1408,14 +1166,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.15"
-              ],
+              "key": ["192.168.92.15"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 17418120,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1424,14 +1178,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.1"
-              ],
+              "key": ["192.168.92.1"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 17376508,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1440,14 +1190,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.13"
-              ],
+              "key": ["192.168.92.13"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 17279564,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1456,14 +1202,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.3"
-              ],
+              "key": ["192.168.92.3"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 17137366,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1472,14 +1214,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.22"
-              ],
+              "key": ["192.168.92.22"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 17053883,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1488,14 +1226,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "192.168.92.16"
-              ],
+              "key": ["192.168.92.16"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 17001490,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1507,9 +1241,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 1094189386,
                   "rollup": true,
                   "source": "row-inner"
@@ -1534,9 +1266,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-inner"
@@ -1558,14 +1288,10 @@
           "id": "ed157f68-1bd1-4a06-91f6-37b37a377d62",
           "rows": [
             {
-              "key": [
-                "2023-11-29T10:30:00.000Z"
-              ],
+              "key": ["2023-11-29T10:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 19957673,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1574,14 +1300,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T11:00:00.000Z"
-              ],
+              "key": ["2023-11-29T11:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 24736991,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1590,14 +1312,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T11:30:00.000Z"
-              ],
+              "key": ["2023-11-29T11:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 24653198,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1606,14 +1324,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T12:00:00.000Z"
-              ],
+              "key": ["2023-11-29T12:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 16818079,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1622,14 +1336,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T12:30:00.000Z"
-              ],
+              "key": ["2023-11-29T12:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 15405490,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1638,14 +1348,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T13:00:00.000Z"
-              ],
+              "key": ["2023-11-29T13:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 20791673,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1654,14 +1360,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T13:30:00.000Z"
-              ],
+              "key": ["2023-11-29T13:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 19311835,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1670,14 +1372,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T14:00:00.000Z"
-              ],
+              "key": ["2023-11-29T14:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 27031450,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1686,14 +1384,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T14:30:00.000Z"
-              ],
+              "key": ["2023-11-29T14:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 27914732,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1702,14 +1396,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T15:00:00.000Z"
-              ],
+              "key": ["2023-11-29T15:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 21654820,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1718,14 +1408,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T15:30:00.000Z"
-              ],
+              "key": ["2023-11-29T15:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 22598573,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1734,14 +1420,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T16:00:00.000Z"
-              ],
+              "key": ["2023-11-29T16:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 15551798,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1750,14 +1432,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T16:30:00.000Z"
-              ],
+              "key": ["2023-11-29T16:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 16199598,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1766,14 +1444,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T17:00:00.000Z"
-              ],
+              "key": ["2023-11-29T17:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 26575522,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1782,14 +1456,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T17:30:00.000Z"
-              ],
+              "key": ["2023-11-29T17:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 26633870,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1798,14 +1468,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T18:00:00.000Z"
-              ],
+              "key": ["2023-11-29T18:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 21389396,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1814,14 +1480,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T18:30:00.000Z"
-              ],
+              "key": ["2023-11-29T18:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 22408274,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1830,14 +1492,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T19:00:00.000Z"
-              ],
+              "key": ["2023-11-29T19:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 23459001,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1846,14 +1504,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T19:30:00.000Z"
-              ],
+              "key": ["2023-11-29T19:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 22016377,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1862,14 +1516,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T20:00:00.000Z"
-              ],
+              "key": ["2023-11-29T20:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 22046143,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1878,14 +1528,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T20:30:00.000Z"
-              ],
+              "key": ["2023-11-29T20:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 21115855,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1894,14 +1540,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T21:00:00.000Z"
-              ],
+              "key": ["2023-11-29T21:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 21714786,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1910,14 +1552,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T21:30:00.000Z"
-              ],
+              "key": ["2023-11-29T21:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 22703365,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1926,14 +1564,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T22:00:00.000Z"
-              ],
+              "key": ["2023-11-29T22:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 22771726,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1942,14 +1576,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T22:30:00.000Z"
-              ],
+              "key": ["2023-11-29T22:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 23035116,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1958,14 +1588,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T23:00:00.000Z"
-              ],
+              "key": ["2023-11-29T23:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 22777791,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1974,14 +1600,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T23:30:00.000Z"
-              ],
+              "key": ["2023-11-29T23:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 22043934,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1990,14 +1612,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T00:00:00.000Z"
-              ],
+              "key": ["2023-11-30T00:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 22500986,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2006,14 +1624,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T00:30:00.000Z"
-              ],
+              "key": ["2023-11-30T00:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 22356281,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2022,14 +1636,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T01:00:00.000Z"
-              ],
+              "key": ["2023-11-30T01:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 20940618,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2038,14 +1648,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T01:30:00.000Z"
-              ],
+              "key": ["2023-11-30T01:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 22164527,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2054,14 +1660,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T02:00:00.000Z"
-              ],
+              "key": ["2023-11-30T02:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 22586562,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2070,14 +1672,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T02:30:00.000Z"
-              ],
+              "key": ["2023-11-30T02:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 22192828,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2086,14 +1684,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T03:00:00.000Z"
-              ],
+              "key": ["2023-11-30T03:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 22775374,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2102,14 +1696,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T03:30:00.000Z"
-              ],
+              "key": ["2023-11-30T03:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 21692883,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2118,14 +1708,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T04:00:00.000Z"
-              ],
+              "key": ["2023-11-30T04:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 22627755,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2134,14 +1720,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T04:30:00.000Z"
-              ],
+              "key": ["2023-11-30T04:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 21583015,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2150,14 +1732,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T05:00:00.000Z"
-              ],
+              "key": ["2023-11-30T05:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 23802530,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2166,14 +1744,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T05:30:00.000Z"
-              ],
+              "key": ["2023-11-30T05:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 22296254,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2182,14 +1756,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T06:00:00.000Z"
-              ],
+              "key": ["2023-11-30T06:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 22919600,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2198,14 +1768,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T06:30:00.000Z"
-              ],
+              "key": ["2023-11-30T06:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 22501039,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2214,14 +1780,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T07:00:00.000Z"
-              ],
+              "key": ["2023-11-30T07:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 22624916,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2230,14 +1792,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T07:30:00.000Z"
-              ],
+              "key": ["2023-11-30T07:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 22162631,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2246,14 +1804,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T08:00:00.000Z"
-              ],
+              "key": ["2023-11-30T08:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 25249725,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2262,14 +1816,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T08:30:00.000Z"
-              ],
+              "key": ["2023-11-30T08:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 25095442,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2278,14 +1828,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T09:00:00.000Z"
-              ],
+              "key": ["2023-11-30T09:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 26703874,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2294,14 +1840,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T09:30:00.000Z"
-              ],
+              "key": ["2023-11-30T09:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 29051719,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2310,14 +1852,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T10:00:00.000Z"
-              ],
+              "key": ["2023-11-30T10:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 29699771,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2326,14 +1864,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T10:30:00.000Z"
-              ],
+              "key": ["2023-11-30T10:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 7343990,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2345,9 +1879,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 1094189386,
                   "rollup": true,
                   "source": "row-inner"
@@ -2369,14 +1901,10 @@
           "id": "bd49d534-92cc-4b70-be56-1c8e2ffeb79f",
           "rows": [
             {
-              "key": [
-                "DEV01"
-              ],
+              "key": ["DEV01"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 1049835400,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2385,14 +1913,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "acme-dmzouter-fw2"
-              ],
+              "key": ["acme-dmzouter-fw2"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 2111632,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2401,14 +1925,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "acme-dmzinner-fw1"
-              ],
+              "key": ["acme-dmzinner-fw1"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 2088468,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2417,14 +1937,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "acme-dmzinner-fw2"
-              ],
+              "key": ["acme-dmzinner-fw2"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 2083420,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2433,14 +1949,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "acme-vpn-fw1"
-              ],
+              "key": ["acme-vpn-fw1"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 2071954,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2449,14 +1961,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "acme-dmzouter-fw1"
-              ],
+              "key": ["acme-dmzouter-fw1"],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 2046374,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2468,9 +1976,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "sum(network_bytes)"
-                  ],
+                  "key": ["sum(network_bytes)"],
                   "value": 1060237248,
                   "rollup": true,
                   "source": "row-inner"
@@ -2495,9 +2001,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-inner"

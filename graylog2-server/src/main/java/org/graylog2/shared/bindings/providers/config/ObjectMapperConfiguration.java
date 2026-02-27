@@ -45,6 +45,8 @@ import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.jackson.JacksonModelValidator;
 import org.graylog2.jackson.JodaDurationCompatSerializer;
 import org.graylog2.jackson.JodaTimePeriodKeyDeserializer;
+import org.graylog2.jackson.PeriodDurationDeserializer;
+import org.graylog2.jackson.PeriodDurationSerializer;
 import org.graylog2.jackson.SemverDeserializer;
 import org.graylog2.jackson.SemverRequirementDeserializer;
 import org.graylog2.jackson.SemverRequirementSerializer;
@@ -59,6 +61,7 @@ import org.graylog2.shared.jackson.SizeSerializer;
 import org.graylog2.shared.rest.RangeJsonSerializer;
 import org.joda.time.Duration;
 import org.joda.time.Period;
+import org.threeten.extra.PeriodDuration;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -102,6 +105,7 @@ public class ObjectMapperConfiguration {
                         .addSerializer(new SemverSerializer())
                         .addSerializer(new SemverRequirementSerializer())
                         .addSerializer(Duration.class, new JodaDurationCompatSerializer())
+                        .addSerializer(new PeriodDurationSerializer())
                         .addSerializer(GRN.class, new ToStringSerializer())
                         .addSerializer(EncryptedValue.class, new EncryptedValueSerializer())
                         .addDeserializer(Version.class, new VersionDeserializer())
@@ -109,6 +113,7 @@ public class ObjectMapperConfiguration {
                         .addDeserializer(Requirement.class, new SemverRequirementDeserializer())
                         .addDeserializer(GRN.class, new GRNDeserializer(grnRegistry))
                         .addDeserializer(EncryptedValue.class, new EncryptedValueDeserializer(encryptedValueService))
+                        .addDeserializer(PeriodDuration.class, new PeriodDurationDeserializer())
                         .setDeserializerModifier(inputConfigurationBeanDeserializerModifier)
                         .setSerializerModifier(JacksonModelValidator.getBeanSerializerModifier())
                 );

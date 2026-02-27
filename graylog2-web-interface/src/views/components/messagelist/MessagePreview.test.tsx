@@ -44,13 +44,15 @@ describe('MessagePreview', () => {
   const SUT = ({ message = simpleMessage, ...rest }: Partial<React.ComponentProps<typeof MessagePreview>>) => (
     <table>
       <tbody>
-        <MessagePreview message={message}
-                        onRowClick={() => {}}
-                        colSpanFixup={1}
-                        showMessageRow
-                        config={MessagesWidgetConfig.builder().build()}
-                        messageFieldType={new FieldType('string', [], [])}
-                        {...rest} />
+        <MessagePreview
+          message={message}
+          onRowClick={() => {}}
+          colSpanFixup={1}
+          showMessageRow
+          config={MessagesWidgetConfig.builder().build()}
+          messageFieldType={new FieldType('string', [], [])}
+          {...rest}
+        />
       </tbody>
     </table>
   );
@@ -68,9 +70,12 @@ describe('MessagePreview', () => {
   });
 
   it('displays pluggable message row override', () => {
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({
-      'views.components.widgets.messageTable.messageRowOverride': [() => <div>The message row override</div>],
-    }[entityKey]));
+    asMock(usePluginEntities).mockImplementation(
+      (entityKey) =>
+        ({
+          'views.components.widgets.messageTable.messageRowOverride': [() => <div>The message row override</div>],
+        })[entityKey],
+    );
 
     render(<SUT showMessageRow />);
 
@@ -78,13 +83,14 @@ describe('MessagePreview', () => {
   });
 
   it('pluggable message row override receives message row renderer as prop', () => {
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({
-      'views.components.widgets.messageTable.messageRowOverride': [({ renderMessageRow }) => (
-        <div>
-          The message row override {renderMessageRow()}
-        </div>
-      )],
-    }[entityKey]));
+    asMock(usePluginEntities).mockImplementation(
+      (entityKey) =>
+        ({
+          'views.components.widgets.messageTable.messageRowOverride': [
+            ({ renderMessageRow }) => <div>The message row override {renderMessageRow()}</div>,
+          ],
+        })[entityKey],
+    );
 
     render(<SUT showMessageRow />);
 

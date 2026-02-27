@@ -19,16 +19,17 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { MenuItem } from 'components/bootstrap';
+import suppressConsole from 'helpers/suppressConsole';
 
 import ActionDropdown from './ActionDropdown';
 
 describe('ActionDropdown', () => {
   it('opens menu when trigger element is clicked', async () => {
-    render((
+    render(
       <ActionDropdown element={<div className="my-trigger-element">Trigger!</div>}>
         <MenuItem>Foo</MenuItem>
-      </ActionDropdown>
-    ));
+      </ActionDropdown>,
+    );
 
     const triggerButton = await screen.findByText('Trigger!');
 
@@ -42,19 +43,22 @@ describe('ActionDropdown', () => {
   it('stops event when trigger element is clicked', async () => {
     const onClick = jest.fn((e) => e.persist());
 
-    render((
+    render(
       <button type="button" onClick={onClick}>
         <ActionDropdown element={<div className="my-trigger-element">Trigger!</div>}>
           <MenuItem>Foo</MenuItem>
         </ActionDropdown>
-      </button>
-    ));
+      </button>,
+    );
 
     const triggerButton = await screen.findByText('Trigger!');
 
     expect(screen.queryByText('Foo')).not.toBeInTheDocument();
 
-    await userEvent.click(triggerButton);
+    // Disabling HTML validation error for this line due to nesting buttons within each other
+    await suppressConsole(async () => {
+      await userEvent.click(triggerButton);
+    });
 
     await screen.findByRole('menuitem', { name: 'Foo' });
 
@@ -64,11 +68,11 @@ describe('ActionDropdown', () => {
   it('closes menu when MenuItem is clicked', async () => {
     const onSelect = jest.fn();
 
-    render((
+    render(
       <ActionDropdown element={<div>Trigger!</div>}>
         <MenuItem onSelect={onSelect}>Foo</MenuItem>
-      </ActionDropdown>
-    ));
+      </ActionDropdown>,
+    );
 
     const triggerButton = await screen.findByText('Trigger!');
 
@@ -89,13 +93,13 @@ describe('ActionDropdown', () => {
   it('closes menu when MenuItem with a parent element is clicked', async () => {
     const onSelect = jest.fn();
 
-    render((
+    render(
       <ActionDropdown element={<div>Trigger!</div>}>
         <div>
           <MenuItem onSelect={onSelect}>Foo</MenuItem>
         </div>
-      </ActionDropdown>
-    ));
+      </ActionDropdown>,
+    );
 
     const triggerButton = await screen.findByText('Trigger!');
 
@@ -117,13 +121,13 @@ describe('ActionDropdown', () => {
     const onClick = jest.fn();
     const onSelect = jest.fn();
 
-    render((
+    render(
       <button type="button" onClick={onClick}>
         <ActionDropdown element={<div>Trigger!</div>}>
           <MenuItem onSelect={onSelect}>Foo</MenuItem>
         </ActionDropdown>
-      </button>
-    ));
+      </button>,
+    );
 
     const triggerButton = await screen.findByText('Trigger!');
 

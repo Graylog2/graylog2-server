@@ -24,36 +24,37 @@ import useWidgetExportActionComponent from 'views/components/widgets/useWidgetEx
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 
 jest.mock('views/components/widgets/useWidgetExportActionComponent');
-const renderExportWidgetActionDelegate = () => render(
-  <OriginalExportWidgetActionDelegate widget={AggregationWidget.empty()} />,
-);
+const renderExportWidgetActionDelegate = () =>
+  render(<OriginalExportWidgetActionDelegate widget={AggregationWidget.empty()} />);
 
 describe('ExtraMenuWidgetActions', () => {
-  const plugExplanation = /export aggregation widget feature is available for the enterprise version\. graylog provides option to export your data into most popular file formats such as csv, json, yaml, xml etc\./i;
+  const plugExplanation =
+    /export aggregation widget feature is available for the enterprise version\. This feature provides options to export your data into popular file formats such as CSV, JSON, YAML, XML, etc\./i;
 
   it('Render plug when there is no WidgetExportActionComponent', async () => {
     asMock(useWidgetExportActionComponent).mockReturnValue(null);
 
     renderExportWidgetActionDelegate();
     const exportButton = await screen.findByRole('button', { name: /export widget/i });
-    userEvent.click(exportButton);
+    await userEvent.click(exportButton);
 
-    const plugText = screen.queryByText(plugExplanation);
-
-    expect(plugText).toBeNull();
+    await screen.findByText(plugExplanation);
   });
 
   it('Render original WidgetExportActionComponent without a plug', async () => {
-    asMock(useWidgetExportActionComponent).mockReturnValue(() => <button type="button" title="dummy export action">dummy export action</button>);
+    asMock(useWidgetExportActionComponent).mockReturnValue(() => (
+      <button type="button" title="dummy export action">
+        dummy export action
+      </button>
+    ));
 
     renderExportWidgetActionDelegate();
     const exportButton = await screen.findByRole('button', { name: /dummy export action/i });
-    const plugExportButton = screen.queryByRole('button', { name: /export widget/i });
-    userEvent.click(exportButton);
 
-    const plugText = screen.queryByText(plugExplanation);
+    expect(screen.queryByRole('button', { name: /export widget/i })).not.toBeInTheDocument();
 
-    expect(plugText).toBeNull();
-    expect(plugExportButton).toBeNull();
+    await userEvent.click(exportButton);
+
+    expect(screen.queryByText(plugExplanation)).not.toBeInTheDocument();
   });
 });

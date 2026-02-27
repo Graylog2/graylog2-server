@@ -18,7 +18,6 @@ package org.graylog.testing.completebackend.apis.inputs;
 
 import com.google.common.collect.ImmutableMap;
 import io.restassured.specification.RequestSpecification;
-import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.GraylogRestApi;
 import org.graylog2.inputs.gelf.http.GELFHttpInput;

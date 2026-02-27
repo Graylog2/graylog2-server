@@ -19,9 +19,9 @@ import type * as React from 'react';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 
 export type ValueRendererProps = React.PropsWithChildren & {
-  field: string,
-  value: any,
-  type?: FieldType,
+  field: string;
+  value: any;
+  type?: FieldType;
 };
 
 export type ValueRenderer = React.ComponentType<ValueRendererProps>;

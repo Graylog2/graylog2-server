@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { css, useTheme } from 'styled-components';
 
 import { Label } from 'components/bootstrap';
@@ -29,47 +28,37 @@ const ColorLabelWrap = styled.span<{ $size: Size }>(({ $size, theme }) => {
   return css`
     vertical-align: middle;
     font-size: ${$size === 'xsmall' ? tiny : fontSize};
-`;
+  `;
 });
 
 type Props = {
-  color: string,
-  size?: Size,
-  text?: string | React.ReactNode,
-}
+  color: string;
+  size?: Size;
+  text?: string | React.ReactNode;
+};
 
-const ColorLabel = ({ color, size, text }: Props) => {
+const ColorLabel = ({ color, size = 'normal', text = <span>&emsp;</span> }: Props) => {
   const theme = useTheme();
   const borderColor = theme.utils.colorLevel(color, 5);
   const textColor = theme.utils.contrastingColor(color);
 
   return (
     <ColorLabelWrap $size={size} className="color-label-wrapper">
-      <Label style={{
-        backgroundColor: color,
-        border: `1px solid ${borderColor}`,
-        color: textColor,
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        maxWidth: '128px',
-        marginRight: '4px',
-        marginBottom: '4px',
-      }}>
+      <Label
+        style={{
+          backgroundColor: color,
+          border: `1px solid ${borderColor}`,
+          color: textColor,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          maxWidth: '128px',
+          marginRight: '4px',
+          marginBottom: '4px',
+        }}>
         {text}
       </Label>
     </ColorLabelWrap>
   );
-};
-
-ColorLabel.propTypes = {
-  color: PropTypes.string.isRequired,
-  text: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  size: PropTypes.oneOf(['normal', 'small', 'xsmall']),
-};
-
-ColorLabel.defaultProps = {
-  text: <span>&emsp;</span>,
-  size: 'normal',
 };
 
 export default ColorLabel;

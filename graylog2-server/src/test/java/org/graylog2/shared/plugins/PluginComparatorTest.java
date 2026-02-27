@@ -21,22 +21,19 @@ import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Version;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(Parameterized.class)
 public class PluginComparatorTest {
-    private PluginLoader.PluginComparator comparator = new PluginLoader.PluginComparator();
+    private final PluginLoader.PluginComparator comparator = new PluginLoader.PluginComparator();
 
-    @Parameterized.Parameters
     public static Object[][] provideData() {
         return new Object[][]{
                 {new TestPlugin("u", "n", Version.from(1, 0, 0)), new TestPlugin("u", "n", Version.from(1, 0, 0)), 0},
@@ -53,19 +50,10 @@ public class PluginComparatorTest {
         };
     }
 
-    private Plugin first;
-    private Plugin second;
-    private int comparisonResult;
-
-    public PluginComparatorTest(Plugin first, Plugin second, int comparisonResult) {
-        this.first = first;
-        this.second = second;
-        this.comparisonResult = comparisonResult;
-    }
-
-    @Test
-    public void testCompare() throws Exception {
-        assertTrue(comparator.compare(first, second) == comparisonResult);
+    @MethodSource("provideData")
+    @ParameterizedTest
+    public void testCompare(Plugin first, Plugin second, int comparisonResult) throws Exception {
+        assertEquals(comparator.compare(first, second), comparisonResult);
     }
 
     public static class TestPlugin implements Plugin {

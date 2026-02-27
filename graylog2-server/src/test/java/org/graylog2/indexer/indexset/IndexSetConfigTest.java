@@ -16,23 +16,23 @@
  */
 package org.graylog2.indexer.indexset;
 
-import org.graylog2.indexer.IndexTemplateProvider;
-import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
-import org.junit.Test;
+import org.graylog2.indexer.template.IndexTemplateProvider;
+import org.graylog2.indexer.template.MessageIndexTemplateProvider;
+import org.junit.jupiter.api.Test;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 import static org.graylog2.indexer.indexset.IndexSetConfig.DEFAULT_INDEX_TEMPLATE_TYPE;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.graylog2.indexer.template.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class IndexSetConfigTest {
     @Test
@@ -134,7 +134,7 @@ public class IndexSetConfigTest {
                 "57f3d721a43c2d59cb750001",
                 "Test Regular Index",
                 "Test Regular Index",
-                true, false,
+                true, null,
                 "regular_index_test",
                 4,
                 1,
@@ -150,7 +150,6 @@ public class IndexSetConfigTest {
                 false
         );
 
-        assertThat(config.isRegular()).contains(false);
         assertThat(config.isRegularIndex()).isTrue();
     }
 
@@ -160,7 +159,7 @@ public class IndexSetConfigTest {
                 "57f3d721a43c2d59cb750001",
                 "Test Regular Index",
                 "Test Regular Index",
-                true, false,
+                true, null,
                 "regular_index_test",
                 4,
                 1,
@@ -176,7 +175,6 @@ public class IndexSetConfigTest {
                 false
         );
 
-        assertThat(config.isRegular()).contains(false);
         assertThat(config.isRegularIndex()).isTrue();
     }
 
@@ -212,7 +210,7 @@ public class IndexSetConfigTest {
                 "57f3d721a43c2d59cb750001",
                 "Test Regular Index",
                 "Test Regular Index",
-                true, false,
+                true, null,
                 "regular_index_test",
                 4,
                 1,
@@ -228,7 +226,7 @@ public class IndexSetConfigTest {
                 false
         );
 
-        assertThat(config.isRegular()).contains(false);
+        assertThat(config.isRegular()).isEmpty();
         assertThat(config.isRegularIndex()).isFalse();
     }
 
@@ -254,17 +252,16 @@ public class IndexSetConfigTest {
                 false
         );
 
-        assertThat(config.isRegular()).contains(true);
         assertThat(config.isRegularIndex()).isFalse();
     }
 
     @Test
-    public void missingIsRegularField_defaultsToFalse() {
+    public void isRegularAndWritable() {
         final IndexSetConfig config = IndexSetConfig.create(
                 "57f3d721a43c2d59cb750001",
-                "Test Regular Index",
-                "Test Regular Index",
-                true, null,
+                "Test Writable Regular Index",
+                "This is an index explicitly marked as writable and regular but given a non-default template type.",
+                true, true,
                 "regular_index_test",
                 4,
                 1,
@@ -274,13 +271,41 @@ public class IndexSetConfigTest {
                 NoopRetentionStrategyConfig.create(10),
                 ZonedDateTime.now(ZoneOffset.UTC),
                 "standard",
-                "graylog3-template",
+                "not-default-template",
                 EVENT_TEMPLATE_TYPE,
                 1,
                 false
         );
 
-        assertThat(config.isRegular()).isEmpty();
+        assertThat(config.isRegular()).isPresent();
+        assertThat(config.isRegular().get()).isTrue();
+        assertThat(config.isRegularIndex()).isTrue();
+    }
+
+    @Test
+    public void isWritableButNotRegular_isNotRegular() {
+        final IndexSetConfig config = IndexSetConfig.create(
+                "57f3d721a43c2d59cb750001",
+                "Test Writable Non-regular Index",
+                "This is an index marked as writable with the default template, but marked not regular.",
+                true, false,
+                "regular_index_test",
+                4,
+                1,
+                MessageCountRotationStrategy.class.getCanonicalName(),
+                MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
+                NoopRetentionStrategyConfig.create(10),
+                ZonedDateTime.now(ZoneOffset.UTC),
+                "standard",
+                "not-default-template",
+                null,
+                1,
+                false
+        );
+
+        assertThat(config.isRegular()).isPresent();
+        assertThat(config.isRegular().get()).isFalse();
         assertThat(config.isRegularIndex()).isFalse();
     }
 
@@ -341,6 +366,7 @@ public class IndexSetConfigTest {
                                               final String fieldTypeProfile) {
         return IndexSetConfig.create(
                 "57f3d721a43c2d59cb750001",
+                null,
                 "Test Index",
                 "Test Index",
                 true,
@@ -363,6 +389,7 @@ public class IndexSetConfigTest {
                 null,
                 customFieldMappings,
                 fieldTypeProfile,
+                null,
                 null);
 
     }

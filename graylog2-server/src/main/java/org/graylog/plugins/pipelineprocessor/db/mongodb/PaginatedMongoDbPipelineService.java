@@ -16,33 +16,32 @@
  */
 package org.graylog.plugins.pipelineprocessor.db.mongodb;
 
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.db.PaginatedPipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PaginatedDbService;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.pagination.MongoPaginationHelper;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
-import org.mongojack.DBQuery;
-import org.mongojack.DBSort;
-
-import jakarta.inject.Inject;
 
 import java.util.function.Predicate;
 
-public class PaginatedMongoDbPipelineService extends PaginatedDbService<PipelineDao> implements PaginatedPipelineService {
+public class PaginatedMongoDbPipelineService implements PaginatedPipelineService {
     private static final String COLLECTION_NAME = "pipeline_processor_pipelines";
+    private final MongoPaginationHelper<PipelineDao> paginationHelper;
 
     @Inject
-    public PaginatedMongoDbPipelineService(MongoConnection mongoConnection,
-                                           MongoJackObjectMapperProvider mapper) {
-        super(mongoConnection, mapper, PipelineDao.class, COLLECTION_NAME);
+    public PaginatedMongoDbPipelineService(MongoCollections mongoCollections) {
+        paginationHelper = mongoCollections.paginationHelper(COLLECTION_NAME, PipelineDao.class);
     }
 
     @Override
     public PaginatedList<PipelineDao> findPaginated(SearchQuery searchQuery, Predicate<PipelineDao> filter, int page, int perPage, String sortField, String order) {
-        final DBQuery.Query dbQuery = searchQuery.toDBQuery();
-        final DBSort.SortBuilder sortBuilder = getSortBuilder(order, sortField);
-        return findPaginatedWithQueryFilterAndSort(dbQuery, filter, sortBuilder, page, perPage);
+        return paginationHelper
+                .filter(searchQuery.toBson())
+                .perPage(perPage)
+                .sort(SortOrder.fromString(order).toBsonSort(sortField))
+                .page(page);
     }
 }

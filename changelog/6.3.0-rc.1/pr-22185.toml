@@ -1,0 +1,5 @@
+type = "a"
+message = "Make elastic/opensearch hosts from rest client accessible in server."
+
+issues = []
+pulls = ["22185"]

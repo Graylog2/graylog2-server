@@ -39,10 +39,12 @@ const Header = styled.div`
   align-items: center;
 `;
 
-const LoadingSpinner = styled(Spinner)(({ theme }) => css`
-  margin-left: 10px;
-  font-size: ${theme.fonts.size.h3};
-`);
+const LoadingSpinner = styled(Spinner)(
+  ({ theme }) => css`
+    margin-left: 10px;
+    font-size: ${theme.fonts.size.h3};
+  `,
+);
 
 const _headerCellFormatter = (header) => {
   switch (header.toLowerCase()) {
@@ -68,18 +70,28 @@ const _loadBackends = (pagination, setLoading, setPaginatedBackends) => {
   });
 };
 
-const _updateListOnBackendDelete = (pagination, setLoading, setPaginatedBackends, callback: () => void) => AuthenticationActions.delete.completed.listen(() => {
-  _loadBackends(pagination, setLoading, setPaginatedBackends);
-  callback();
-});
+const _updateListOnBackendDelete = (pagination, setLoading, setPaginatedBackends, callback: () => void) =>
+  AuthenticationActions.delete.completed.listen(() => {
+    _loadBackends(pagination, setLoading, setPaginatedBackends);
+    callback();
+  });
 
-const _updateListOnBackendActivation = (pagination, setLoading, setPaginatedBackends, callback: () => void) => AuthenticationActions.setActiveBackend.completed.listen(() => {
-  _loadBackends(pagination, setLoading, setPaginatedBackends);
-  callback();
-});
+const _updateListOnBackendActivation = (pagination, setLoading, setPaginatedBackends, callback: () => void) =>
+  AuthenticationActions.setActiveBackend.completed.listen(() => {
+    _loadBackends(pagination, setLoading, setPaginatedBackends);
+    callback();
+  });
 
-const _backendsOverviewItem = (authBackend: AuthenticationBackend, context: { activeBackend: AuthenticationBackendJSON }, paginatedRoles: PaginatedRoles) => (
-  <BackendsOverviewItem authenticationBackend={authBackend} isActive={authBackend.id === context?.activeBackend?.id} roles={paginatedRoles.list} />
+const _backendsOverviewItem = (
+  authBackend: AuthenticationBackend,
+  context: { activeBackend: AuthenticationBackendJSON },
+  paginatedRoles: PaginatedRoles,
+) => (
+  <BackendsOverviewItem
+    authenticationBackend={authBackend}
+    isActive={authBackend.id === context?.activeBackend?.id}
+    roles={paginatedRoles.list}
+  />
 );
 
 const BackendsOverview = () => {
@@ -92,8 +104,14 @@ const BackendsOverview = () => {
 
   useEffect(() => _loadRoles(setPaginatedRoles), []);
   useEffect(() => _loadBackends({ query, page, perPage }, setLoading, setPaginatedBackends), [query, page, perPage]);
-  useEffect(() => _updateListOnBackendDelete({ query, page, perPage }, setLoading, setPaginatedBackends, resetPage), [query, page, perPage, resetPage]);
-  useEffect(() => _updateListOnBackendActivation({ query, page, perPage }, setLoading, setPaginatedBackends, resetPage), [query, page, perPage, resetPage]);
+  useEffect(
+    () => _updateListOnBackendDelete({ query, page, perPage }, setLoading, setPaginatedBackends, resetPage),
+    [query, page, perPage, resetPage],
+  );
+  useEffect(
+    () => _updateListOnBackendActivation({ query, page, perPage }, setLoading, setPaginatedBackends, resetPage),
+    [query, page, perPage, resetPage],
+  );
 
   const onSearch = (newQuery: string, resetLoadingStateCb: () => void) => {
     resetPage();
@@ -112,24 +130,24 @@ const BackendsOverview = () => {
     <Row className="content">
       <Col xs={12}>
         <h2>Configured Authentication Services</h2>
-        <Header>
-          {loading && <LoadingSpinner text="" delay={0} />}
-        </Header>
+        <Header>{loading && <LoadingSpinner text="" delay={0} />}</Header>
         <p className="description">
           Found {paginatedBackends.pagination.total} configured authentication services on the system.
         </p>
         <PaginatedList totalItems={paginatedBackends.pagination.total}>
-          <DataTable className="table-hover"
-                     customFilter={<BackendsFilter onSearch={onSearch} />}
-                     dataRowFormatter={(authBackend) => _backendsOverviewItem(authBackend, context, paginatedRoles)}
-                     filterKeys={[]}
-                     filterLabel="Filter services"
-                     headerCellFormatter={_headerCellFormatter}
-                     headers={TABLE_HEADERS}
-                     id="auth-backends-overview"
-                     rowClassName="no-bm"
-                     rows={backends.toJS()}
-                     sortByKey="title" />
+          <DataTable
+            className="table-hover"
+            customFilter={<BackendsFilter onSearch={onSearch} />}
+            dataRowFormatter={(authBackend) => _backendsOverviewItem(authBackend, context, paginatedRoles)}
+            filterKeys={[]}
+            filterLabel="Filter services"
+            headerCellFormatter={_headerCellFormatter}
+            headers={TABLE_HEADERS}
+            id="auth-backends-overview"
+            rowClassName="no-bm"
+            rows={backends.toJS()}
+            sortByKey="title"
+          />
         </PaginatedList>
       </Col>
     </Row>

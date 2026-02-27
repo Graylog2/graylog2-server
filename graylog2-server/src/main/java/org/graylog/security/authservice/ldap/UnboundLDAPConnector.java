@@ -19,6 +19,7 @@ package org.graylog.security.authservice.ldap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Ints;
+import com.unboundid.asn1.ASN1OctetString;
 import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.BindRequest;
 import com.unboundid.ldap.sdk.BindResult;
@@ -33,12 +34,19 @@ import com.unboundid.ldap.sdk.LDAPException;
 import com.unboundid.ldap.sdk.ResultCode;
 import com.unboundid.ldap.sdk.SearchRequest;
 import com.unboundid.ldap.sdk.SearchResult;
+import com.unboundid.ldap.sdk.SearchResultEntry;
 import com.unboundid.ldap.sdk.SearchScope;
 import com.unboundid.ldap.sdk.SimpleBindRequest;
+import com.unboundid.ldap.sdk.controls.ServerSideSortRequestControl;
+import com.unboundid.ldap.sdk.controls.SimplePagedResultsControl;
+import com.unboundid.ldap.sdk.controls.SortKey;
 import com.unboundid.ldap.sdk.extensions.StartTLSExtendedRequest;
 import com.unboundid.util.Base64;
 import com.unboundid.util.LDAPTestUtils;
 import com.unboundid.util.ssl.SSLUtil;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.security.TrustAllX509TrustManager;
 import org.graylog2.security.TrustManagerProvider;
@@ -47,14 +55,13 @@ import org.graylog2.security.encryption.EncryptedValueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Singleton;
-
 import javax.net.SocketFactory;
+import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
@@ -153,12 +160,8 @@ public class UnboundLDAPConnector {
                                            Filter filter,
                                            String uniqueIdAttribute,
                                            Set<String> attributes) throws LDAPException {
-        final ImmutableSet<String> allAttributes = ImmutableSet.<String>builder()
-                .add(OBJECT_CLASS_ATTRIBUTE)
-                .addAll(attributes)
-                .build();
         // TODO: Use LDAPEntrySource for a more memory efficient search
-        final SearchRequest searchRequest = new SearchRequest(searchBase, SearchScope.SUB, filter, allAttributes.toArray(new String[0]));
+        final SearchRequest searchRequest = new SearchRequest(searchBase, SearchScope.SUB, filter, buildLdapSearchBase(searchBase, filter, attributes));
         searchRequest.setTimeLimitSeconds(requestTimeoutSeconds);
 
         if (LOG.isTraceEnabled()) {
@@ -174,6 +177,65 @@ public class UnboundLDAPConnector {
         return searchResult.getSearchEntries().stream()
                 .map(entry -> createLDAPEntry(entry, uniqueIdAttribute))
                 .collect(ImmutableList.toImmutableList());
+    }
+
+    public List<LDAPEntry> searchPaginated(LDAPConnection connection,
+                                           String searchBase,
+                                           Filter filter,
+                                           String uniqueIdAttribute,
+                                           Set<String> attributes, int pageSize) throws LDAPException {
+        // Pagination cookie to help the LDAP connection manage if more results are present.
+        boolean hasMoreResults = true;
+        List<SearchResultEntry> entries = new ArrayList<>();
+        ASN1OctetString cookie = null;
+        LOG.debug("Querying paginated LDAP records. Page size: [{}]", pageSize);
+        while (hasMoreResults) {
+            final SearchRequest searchRequest = new SearchRequest(searchBase, SearchScope.SUB, filter,
+                    buildLdapSearchBase(searchBase, filter, attributes));
+            searchRequest.setTimeLimitSeconds(requestTimeoutSeconds);
+            searchRequest.addControl(new SimplePagedResultsControl(pageSize, cookie));
+            final SearchResult searchResult = connection.search(searchRequest);
+            SortKey sortKey = new SortKey("cn");
+            searchRequest.addControl(new ServerSideSortRequestControl(sortKey));
+            SimplePagedResultsControl responseControl = SimplePagedResultsControl.get(searchResult);
+            final List<SearchResultEntry> results = searchResult.getSearchEntries();
+            LOG.debug("Received page of [{}] records.", results.size());
+            if (responseControl != null) {
+                entries.addAll(results);
+                if (responseControl.moreResultsToReturn()) {
+                    cookie = responseControl.getCookie();
+                } else {
+                    hasMoreResults = false;
+                }
+            } else {
+                LOG.warn("LDAP server does not support paged results control. Skipping pagination.");
+                entries.addAll(results);
+                hasMoreResults = false;
+            }
+            if (!hasMoreResults) {
+                LOG.debug("Finished receiving [{}] total records.", entries.size());
+            }
+        }
+
+        if (entries.isEmpty()) {
+            LOG.trace("No LDAP entry found for filter <{}>", filter.toNormalizedString());
+            return ImmutableList.of();
+        }
+
+        return entries.stream()
+                .map(entry -> createLDAPEntry(entry, uniqueIdAttribute))
+                .collect(ImmutableList.toImmutableList());
+    }
+
+    private static String[] buildLdapSearchBase(String searchBase, Filter filter, Set<String> attributes) {
+        final ImmutableSet<String> allAttributes = ImmutableSet.<String>builder()
+                .add(OBJECT_CLASS_ATTRIBUTE)
+                .addAll(attributes)
+                .build();
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Search LDAP for <{}> using search base <{}>", filter.toNormalizedString(), searchBase);
+        }
+        return allAttributes.toArray(new String[0]);
     }
 
     public Optional<LDAPUser> searchUserByPrincipal(LDAPConnection connection,

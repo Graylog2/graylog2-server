@@ -1,0 +1,5 @@
+type = "f"
+message = "Make `latest` metric preserve field type of field used in frontend."
+
+pulls = ["21833"]
+issues = ["21837"]

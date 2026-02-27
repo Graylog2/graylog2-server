@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix `org.graylog2.outputs.ElasticSearchOutput.writes` metric."
+
+pulls = ["21286"]

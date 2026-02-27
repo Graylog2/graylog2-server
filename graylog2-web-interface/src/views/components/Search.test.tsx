@@ -30,7 +30,7 @@ import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 
 import OriginalSearch from './Search';
 
-import { useSyncWithQueryParameters } from '../hooks/SyncWithQueryParameters';
+import useSyncWithQueryParameters from '../hooks/useSyncWithQueryParameters';
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 
@@ -44,16 +44,23 @@ jest.mock('hooks/useHotkey', () => jest.fn());
 const mockRefreshSearch = jest.fn();
 
 jest.mock('views/components/DashboardSearchBar', () => () => (
-  <button type="button" onClick={mockRefreshSearch}>Execute Query</button>
+  <button type="button" onClick={mockRefreshSearch}>
+    Execute Query
+  </button>
 ));
 
-jest.mock('views/hooks/SyncWithQueryParameters');
+jest.mock('views/hooks/useSyncWithQueryParameters');
 
 jest.mock('routing/withLocation', () => (Component) => (props) => (
   <Component location={{ query: {}, pathname: '', search: '' }} {...props} />
 ));
 
-jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ children }) => children);
+jest.mock(
+  'views/components/contexts/WidgetFieldTypesContextProvider',
+  () =>
+    ({ children }) =>
+      children,
+);
 
 jest.mock('hooks/useSearchConfiguration');
 

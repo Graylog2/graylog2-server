@@ -31,9 +31,9 @@ const ErrorIcon = styled(Icon)`
 `;
 
 type Props = {
-  error: React.ReactNode,
-  title: React.ReactNode,
-}
+  error: React.ReactNode;
+  title: React.ReactNode;
+};
 const Error = ({ error, title }: Props) => (
   <Center>
     <ErrorIcon name="warning" size="3x" />

@@ -19,12 +19,11 @@ import React, { useEffect, useState } from 'react';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import { Spinner, ReadOnlyFormGroup } from 'components/common';
 import type { UserTelemetrySettings } from 'stores/telemetry/TelemetrySettingsStore';
-import {
-  TelemetrySettingsActions,
-} from 'stores/telemetry/TelemetrySettingsStore';
+import { TelemetrySettingsActions } from 'stores/telemetry/TelemetrySettingsStore';
 import TelemetryInfoText from 'logic/telemetry/TelemetryInfoText';
+import AppConfig from 'util/AppConfig';
 
-const TelemetrySettingsDetails = () => {
+const TelemetrySettingsDetailsComponent = () => {
   const [settings, setSettings] = useState<UserTelemetrySettings | undefined>(undefined);
 
   useEffect(() => {
@@ -45,4 +44,11 @@ const TelemetrySettingsDetails = () => {
   );
 };
 
+const TelemetrySettingsDetails = () => {
+  const { enabled: isTelemetryEnabled } = AppConfig.telemetry() || {};
+
+  if (!isTelemetryEnabled) return null;
+
+  return <TelemetrySettingsDetailsComponent />;
+};
 export default TelemetrySettingsDetails;

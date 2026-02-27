@@ -31,7 +31,12 @@ const TestComponent = () => {
   const logout = useLogout();
 
   return (
-    <span>Logged in <button type="button" onClick={logout}>logout</button></span>
+    <span>
+      Logged in{' '}
+      <button type="button" onClick={logout}>
+        logout
+      </button>
+    </span>
   );
 };
 
@@ -75,7 +80,9 @@ describe('useLogout', () => {
 
   describe('with faulty logout hook', () => {
     const logoutHook = jest.fn();
-    const faultyLogoutHook = jest.fn(() => { throw Error('Foo!'); });
+    const faultyLogoutHook = jest.fn(() => {
+      throw Error('Foo!');
+    });
     usePluginExports({ 'hooks.logout': [faultyLogoutHook, logoutHook] });
 
     it('continues other hooks and logging out if one hook is faulty', async () => {

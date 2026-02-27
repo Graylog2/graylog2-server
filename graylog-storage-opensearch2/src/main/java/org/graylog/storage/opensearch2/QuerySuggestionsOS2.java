@@ -17,15 +17,17 @@
 package org.graylog.storage.opensearch2;
 
 import com.google.common.collect.ImmutableMap;
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionEntry;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionError;
-import org.graylog.plugins.views.search.engine.suggestions.SuggestionFieldType;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionRequest;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
+import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
@@ -40,10 +42,10 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.suggest.SuggestBuild
 import org.graylog.shaded.opensearch2.org.opensearch.search.suggest.term.TermSuggestion;
 import org.graylog.shaded.opensearch2.org.opensearch.search.suggest.term.TermSuggestionBuilder;
 import org.graylog.storage.errors.ResponseError;
+import org.graylog.storage.exceptions.ParsedOpenSearchException;
 import org.graylog2.plugin.Message;
 
-import jakarta.inject.Inject;
-
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -61,7 +63,7 @@ public class QuerySuggestionsOS2 implements QuerySuggestionsService {
     }
 
     @Override
-    public SuggestionResponse suggest(SuggestionRequest req) {
+    public SuggestionResponse suggest(SuggestionRequest req, Duration timeout) {
         final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(req.streams(), req.timerange());
         final TermSuggestionBuilder suggestionBuilder = SuggestBuilders.termSuggestion(req.field()).text(req.input()).size(req.size());
         final BoolQueryBuilder query = QueryBuilders.boolQuery()
@@ -76,7 +78,12 @@ public class QuerySuggestionsOS2 implements QuerySuggestionsService {
                 .suggest(new SuggestBuilder().addSuggestion("corrections", suggestionBuilder));
 
         try {
-            final SearchResponse result = client.singleSearch(new SearchRequest(affectedIndices.toArray(new String[]{})).source(search), "Failed to execute aggregation");
+            final var request = new SearchRequest(affectedIndices.toArray(new String[]{}))
+                    .source(search)
+                    .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
+            request.setCancelAfterTimeInterval(new TimeValue(timeout.toMillis()));
+
+            final SearchResponse result = client.search(request, "Failed to execute aggregation");
             final ParsedTerms fieldValues = result.getAggregations().get("fieldvalues");
             final List<SuggestionEntry> entries = fieldValues.getBuckets().stream().map(b -> new SuggestionEntry(b.getKeyAsString(), b.getDocCount())).collect(Collectors.toList());
 

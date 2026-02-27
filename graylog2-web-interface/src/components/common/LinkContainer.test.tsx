@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
-import { fireEvent } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom';
+import userEvent from '@testing-library/user-event';
 
 import { Button } from 'components/bootstrap';
 
@@ -31,23 +31,25 @@ describe('LinkContainer', () => {
   });
 
   it('should use component passed in children', async () => {
-    render((
+    render(
       <Routes>
-        <Route path="/"
-               element={(
-                 <LinkContainer to="/alerts">
-                   <Button bsStyle="info">All Alerts</Button>
-                 </LinkContainer>
-               )} />
+        <Route
+          path="/"
+          element={
+            <LinkContainer to="/alerts">
+              <Button bsStyle="info">All Alerts</Button>
+            </LinkContainer>
+          }
+        />
         <Route path="/alerts" element={<span>Hello world!</span>} />
-      </Routes>
-    ));
+      </Routes>,
+    );
 
     const button = await screen.findByText('All Alerts');
 
     expect(screen.queryByText('Hello world!')).not.toBeInTheDocument();
 
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     await screen.findByText('Hello world!');
   });
@@ -55,26 +57,28 @@ describe('LinkContainer', () => {
   it('should call onClick', async () => {
     const onClick = jest.fn();
 
-    render((
+    render(
       <LinkContainer to="/" onClick={onClick}>
         <Button bsStyle="info">All Alerts</Button>
-      </LinkContainer>
-    ));
+      </LinkContainer>,
+    );
 
-    fireEvent.click(await screen.findByText('All Alerts'));
+    await userEvent.click(await screen.findByText('All Alerts'));
 
     expect(onClick).toHaveBeenCalled();
   });
 
   it('should call onClick of children', async () => {
     const onClick = jest.fn();
-    const { findByText } = render((
+    const { findByText } = render(
       <LinkContainer to="/">
-        <Button bsStyle="info" onClick={onClick}>All Alerts</Button>
-      </LinkContainer>
-    ));
+        <Button bsStyle="info" onClick={onClick}>
+          All Alerts
+        </Button>
+      </LinkContainer>,
+    );
 
-    fireEvent.click(await findByText('All Alerts'));
+    await userEvent.click(await findByText('All Alerts'));
 
     expect(onClick).toHaveBeenCalled();
   });
@@ -84,11 +88,13 @@ describe('LinkContainer', () => {
 
     render(
       <LinkContainer to="/">
-        <Button bsStyle="info" onClick={onClick}>All Alerts</Button>
+        <Button bsStyle="info" onClick={onClick}>
+          All Alerts
+        </Button>
       </LinkContainer>,
     );
 
-    fireEvent.click(await screen.findByText('All Alerts'), { ctrlKey: true });
+    await userEvent.click(await screen.findByText('All Alerts'), { ctrlKey: true });
 
     expect(onClick).not.toHaveBeenCalled();
   });
@@ -96,7 +102,9 @@ describe('LinkContainer', () => {
   it('should add target URL as href to children', async () => {
     render(
       <LinkContainer to="/alerts">
-        <Button bsStyle="info" onClick={jest.fn()}>Alerts</Button>
+        <Button bsStyle="info" onClick={jest.fn()}>
+          Alerts
+        </Button>
       </LinkContainer>,
     );
 
@@ -113,12 +121,14 @@ describe('LinkContainer', () => {
       // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
       <div onClick={onClick}>
         <LinkContainer to="/">
-          <Button bsStyle="info" onClick={childOnClick}>All Alerts</Button>
+          <Button bsStyle="info" onClick={childOnClick}>
+            All Alerts
+          </Button>
         </LinkContainer>
       </div>,
     );
 
-    fireEvent.click(await screen.findByText('All Alerts'));
+    await userEvent.click(await screen.findByText('All Alerts'));
 
     await waitFor(() => expect(childOnClick).toHaveBeenCalled());
 
@@ -126,19 +136,23 @@ describe('LinkContainer', () => {
   });
 
   it('should not redirect onclick, when children is disabled', async () => {
-    render((
+    render(
       <Routes>
-        <Route path="/"
-               element={(
-                 <LinkContainer to="/">
-                   <Button bsStyle="info" disabled>All Alerts</Button>
-                 </LinkContainer>
-               )} />
+        <Route
+          path="/"
+          element={
+            <LinkContainer to="/">
+              <Button bsStyle="info" disabled>
+                All Alerts
+              </Button>
+            </LinkContainer>
+          }
+        />
         <Route path="/alerts" element={<span>Hello world!</span>} />
-      </Routes>
-    ));
+      </Routes>,
+    );
 
-    fireEvent.click(await screen.findByText('All Alerts'));
+    await userEvent.click(await screen.findByText('All Alerts'));
 
     expect(screen.queryByText(/Hello World!/i)).not.toBeInTheDocument();
   });
@@ -146,7 +160,9 @@ describe('LinkContainer', () => {
   it('should add target URL as href to children, when children is disabled', async () => {
     render(
       <LinkContainer to="/alerts">
-        <Button bsStyle="info" onClick={jest.fn()} disabled>Alerts</Button>
+        <Button bsStyle="info" onClick={jest.fn()} disabled>
+          Alerts
+        </Button>
       </LinkContainer>,
     );
 

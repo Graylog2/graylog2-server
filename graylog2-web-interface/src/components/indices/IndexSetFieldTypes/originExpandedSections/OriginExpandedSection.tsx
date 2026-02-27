@@ -18,19 +18,16 @@ import React from 'react';
 
 import type { FieldTypeOrigin, ExpandedSectionProps } from 'components/indices/IndexSetFieldTypes/types';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
-import OverriddenIndexExpandedSection
-  from 'components/indices/IndexSetFieldTypes/originExpandedSections/OverriddenIndexExpandedSection';
-import OverriddenProfileExpandedSection
-  from 'components/indices/IndexSetFieldTypes/originExpandedSections/OverriddenProfileExpandedSection';
-import ProfileExpandedSection
-  from 'components/indices/IndexSetFieldTypes/originExpandedSections/ProfileExpandedSection';
+import OverriddenIndexExpandedSection from 'components/indices/IndexSetFieldTypes/originExpandedSections/OverriddenIndexExpandedSection';
+import OverriddenProfileExpandedSection from 'components/indices/IndexSetFieldTypes/originExpandedSections/OverriddenProfileExpandedSection';
+import ProfileExpandedSection from 'components/indices/IndexSetFieldTypes/originExpandedSections/ProfileExpandedSection';
 import IndexExpandedSection from 'components/indices/IndexSetFieldTypes/originExpandedSections/IndexExpandedSection';
 
 type Props = {
-  origin: FieldTypeOrigin,
-  type: string,
-  fieldName: string,
-}
+  origin: FieldTypeOrigin;
+  type: string;
+  fieldName: string;
+};
 
 const components: Record<FieldTypeOrigin, React.FC<ExpandedSectionProps>> = {
   OVERRIDDEN_INDEX: OverriddenIndexExpandedSection,
@@ -40,7 +37,9 @@ const components: Record<FieldTypeOrigin, React.FC<ExpandedSectionProps>> = {
 };
 
 const OriginExpandedSection = ({ origin, type, fieldName }: Props) => {
-  const { data: { fieldTypes } } = useFieldTypesForMappings();
+  const {
+    data: { fieldTypes },
+  } = useFieldTypesForMappings();
   const Component = components[origin];
 
   return <Component type={fieldTypes?.[type]} fieldName={fieldName} />;

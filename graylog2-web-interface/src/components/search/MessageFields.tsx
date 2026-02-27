@@ -1,0 +1,41 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import React from 'react';
+
+import { MessageField } from 'components/search';
+import { MessageDetailsDefinitionList } from 'components/common';
+import type { Message } from 'views/components/messagelist/Types';
+
+type MessageFieldsProps = {
+  customFieldActions?: React.ReactElement;
+  message: Message;
+  renderForDisplay: (name: string) => React.ReactElement;
+};
+const MessageFields = ({ message, ...rest }: MessageFieldsProps) => {
+  const _formatFields = (fields: { [key: string]: any }) =>
+    Object.keys(fields)
+      .sort()
+      .map((key) => <MessageField key={key} message={message} {...rest} fieldName={key} />);
+
+  const { _id, ...formatted_fields } = message.fields;
+  const formattedFields = message.formatted_fields ?? formatted_fields;
+  const fields = _formatFields(formattedFields);
+
+  return <MessageDetailsDefinitionList className="message-details-fields">{fields}</MessageDetailsDefinitionList>;
+};
+
+export default MessageFields;

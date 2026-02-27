@@ -61,6 +61,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
             final String suppliedAuthHeaderValue = request.headers().get(authorizationHeader);
             if (isBlank(suppliedAuthHeaderValue) || !suppliedAuthHeaderValue.equals(authorizationHeaderValue)) {
                 writeResponse(channel, keepAlive, httpRequestVersion, HttpResponseStatus.UNAUTHORIZED, origin);
+                return;
             }
         }
 

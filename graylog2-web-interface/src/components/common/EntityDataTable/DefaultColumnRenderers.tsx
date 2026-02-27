@@ -23,17 +23,11 @@ import { Timestamp } from 'components/common';
 const DefaultColumnRenderers = {
   types: {
     DATE: {
-      renderCell: (dateTime: string) => (
-        <Timestamp dateTime={dateTime} />
-      ),
+      renderCell: (dateTime: string) => <Timestamp dateTime={dateTime} />,
       staticWidth: 160,
     },
     STRING: {
-      renderCell: (text: string) => (
-        <TextOverflowEllipsis>
-          {text}
-        </TextOverflowEllipsis>
-      ),
+      renderCell: (text: string) => <TextOverflowEllipsis>{text}</TextOverflowEllipsis>,
     },
   },
   attributes: {
@@ -43,15 +37,11 @@ const DefaultColumnRenderers = {
     summary: {
       width: 1.5,
     },
-    owner: {
-      staticWidth: 120,
-    },
     favorite: {
       renderHeader: () => '',
       staticWidth: 30,
     },
   },
-
 };
 
 export default DefaultColumnRenderers;

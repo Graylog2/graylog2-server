@@ -20,25 +20,37 @@ import type View from './View';
 
 import type { ViewHook, ViewHookArguments } from '../hooks/ViewHook';
 
-const checkReturnType = ((result) => {
+const checkReturnType = (result) => {
   if (!result || !(result instanceof Array) || result.length < 2) {
     // eslint-disable-next-line no-console
-    console.error('Return value supplied by processing hook is not array with two elements. It is: ', JSON.stringify(result, null, 2));
+    console.error(
+      'Return value supplied by processing hook is not array with two elements. It is: ',
+      JSON.stringify(result, null, 2),
+    );
   }
 
   return result;
-});
+};
 
-const _chainHooks = (hooks: Array<ViewHook>, args: ViewHookArguments) => hooks.reduce(
-  (prev, cur: ViewHook) => prev.then(checkReturnType)
-    .then(([newView, newExecutionState]) => cur({ ...args, view: newView, executionState: newExecutionState })),
-  Promise.resolve([args.view, args.executionState] as const),
-);
+const _chainHooks = (hooks: Array<ViewHook>, args: ViewHookArguments) =>
+  hooks.reduce(
+    (prev, cur: ViewHook) =>
+      prev
+        .then(checkReturnType)
+        .then(([newView, newExecutionState]) => cur({ ...args, view: newView, executionState: newExecutionState })),
+    Promise.resolve([args.view, args.executionState] as const),
+  );
 
 type Query = { [key: string]: any };
 type OnSuccess = (view: View, executionState: SearchExecutionState) => void;
 
-const _processViewHooks = (viewHooks: Array<ViewHook>, view: View, query: Query, executionState: SearchExecutionState, onSuccess: OnSuccess) => {
+const _processViewHooks = (
+  viewHooks: Array<ViewHook>,
+  view: View,
+  query: Query,
+  executionState: SearchExecutionState,
+  onSuccess: OnSuccess,
+) => {
   let promise: Promise<readonly [View, SearchExecutionState]>;
 
   if (viewHooks.length > 0) {
@@ -68,8 +80,11 @@ const processHooks = (
   executingViewHooks: Array<ViewHook> = [],
   query: Query = {},
   onSuccess: OnSuccess = () => {},
-) => promise
-  .then((view: View) => _processViewHooks(loadingViewHooks, view, query, executionState, onSuccess))
-  .then(([newView, newExecutionState]) => _processViewHooks(executingViewHooks, newView, query, newExecutionState, onSuccess));
+) =>
+  promise
+    .then((view: View) => _processViewHooks(loadingViewHooks, view, query, executionState, onSuccess))
+    .then(([newView, newExecutionState]) =>
+      _processViewHooks(executingViewHooks, newView, query, newExecutionState, onSuccess),
+    );
 
 export default processHooks;

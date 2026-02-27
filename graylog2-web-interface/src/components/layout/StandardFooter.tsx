@@ -15,33 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 
 import { getFullVersion } from 'util/Version';
-import connect from 'stores/connect';
-import type { Store } from 'stores/StoreTypes';
 import { SystemStore } from 'stores/system/SystemStore';
-
-type SystemStoreState = {
-  system: {
-    version?: string,
-    hostname?: string,
-  };
-};
+import useProductName from 'brand-customization/useProductName';
+import useSystemDetails from 'hooks/useSystemDetails';
 
 type Jvm = {
   info: string;
 };
 
-type Props = {
-  system?: {
-    version?: string,
-    hostname?: string,
-  },
-};
-
-const StandardFooter = ({ system }: Props) => {
+const StandardFooter = () => {
+  const productName = useProductName();
   const [jvm, setJvm] = useState<Jvm | undefined>();
+  const system = useSystemDetails();
 
   useEffect(() => {
     let mounted = true;
@@ -57,32 +44,15 @@ const StandardFooter = ({ system }: Props) => {
     };
   }, []);
 
-  if (!(system && jvm)) {
-    return (
-      <>Graylog {getFullVersion()}</>
-    );
-  }
-
-  return (
+  return !(system && jvm) ? (
     <>
-      Graylog {system.version} on {system.hostname} ({jvm.info})
+      {productName} {getFullVersion()}
+    </>
+  ) : (
+    <>
+      {productName} {system.version} on {system.hostname} ({jvm.info})
     </>
   );
 };
 
-StandardFooter.propTypes = {
-  system: PropTypes.shape({
-    version: PropTypes.string,
-    hostname: PropTypes.string,
-  }),
-};
-
-StandardFooter.defaultProps = {
-  system: undefined,
-};
-
-export default connect(
-  StandardFooter,
-  { system: SystemStore as Store<SystemStoreState> },
-  ({ system: { system } = { system: undefined } }) => ({ system }),
-);
+export default StandardFooter;

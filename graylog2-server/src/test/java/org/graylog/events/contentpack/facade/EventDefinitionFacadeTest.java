@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Graph;
+import jakarta.inject.Provider;
 import org.graylog.events.conditions.Expr;
 import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
@@ -51,9 +52,10 @@ import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityRegistrar;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
@@ -69,6 +71,8 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScope;
 import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.source.EntitySourceService;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.PasswordAlgorithmFactory;
@@ -79,12 +83,13 @@ import org.graylog2.shared.users.UserService;
 import org.graylog2.users.UserImpl;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -101,18 +106,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class EventDefinitionFacadeTest {
     public static final Set<EntityScope> ENTITY_SCOPES = Collections.singleton(new DefaultEntityScope());
     private static final String REMEDIATION_STEPS = "remediation";
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private ObjectMapper objectMapper;
 
     private EventDefinitionFacade facade;
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private MongoJackObjectMapperProvider mapperProvider;
 
@@ -133,13 +136,17 @@ public class EventDefinitionFacadeTest {
     @Mock
     private UserService userService;
     @Mock
-    private EntityOwnershipService entityOwnershipService;
+    private EntityRegistrar entityRegistrar;
     @Mock
     private EventProcessorConfig mockEventProcessorConfig;
+    @Mock
+    private ClusterEventBus clusterEventBus;
+    @Mock
+    private EntitySourceService entitySourceService;
 
-    @Before
+    @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
-    public void setUp() throws Exception {
+    public void setUp(MongoDBTestService dbTestService) throws Exception {
         objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(
                 AggregationEventProcessorConfig.class,
@@ -152,12 +159,27 @@ public class EventDefinitionFacadeTest {
         jobDefinitionService = mock(DBJobDefinitionService.class);
         jobTriggerService = mock(DBJobTriggerService.class);
         jobSchedulerClock = mock(JobSchedulerClock.class);
-        final MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
-        eventDefinitionService = new DBEventDefinitionService(mongoCollections, stateService, entityOwnershipService, new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters());
-        eventDefinitionHandler = new EventDefinitionHandler(
-                eventDefinitionService, jobDefinitionService, jobTriggerService, jobSchedulerClock);
+        eventDefinitionService = new DBEventDefinitionService(
+                new MongoCollections(mapperProvider, dbTestService.mongoConnection()),
+                stateService,
+                entityRegistrar,
+                new EntityScopeService(ENTITY_SCOPES),
+                new IgnoreSearchFilters());
+        eventDefinitionHandler = new EventDefinitionHandler(eventDefinitionService,
+                jobDefinitionService,
+                jobTriggerService,
+                mock(Provider.class),
+                jobSchedulerClock,
+                clusterEventBus,
+                entitySourceService);
         Set<PluginMetaData> pluginMetaData = new HashSet<>();
-        facade = new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService);
+        facade = new EventDefinitionFacade(objectMapper,
+                eventDefinitionHandler,
+                pluginMetaData,
+                jobDefinitionService,
+                eventDefinitionService,
+                userService,
+                entityRegistrar);
     }
 
     @Test
@@ -271,7 +293,7 @@ public class EventDefinitionFacadeTest {
         when(jobDefinitionService.save(any(JobDefinitionDto.class))).thenReturn(jobDefinitionDto);
         when(jobTriggerService.create(any(JobTriggerDto.class))).thenReturn(jobTriggerDto);
         final UserImpl kmerzUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),
-                mock(ClusterConfigService.class), ImmutableMap.of("username", "kmerz"));
+                mock(ClusterConfigService.class), new ObjectMapperProvider().get(), ImmutableMap.of("username", "kmerz"));
         when(userService.load("kmerz")).thenReturn(kmerzUser);
 
 
@@ -288,7 +310,7 @@ public class EventDefinitionFacadeTest {
         assertThat(eventDefinitionDto.remediationSteps()).isEqualTo(REMEDIATION_STEPS);
         assertThat(eventDefinitionDto.config().type()).isEqualTo("aggregation-v1");
         // verify that ownership was registered for this entity
-        verify(entityOwnershipService, times(1)).registerNewEventDefinition(nativeEntity.entity().id(), kmerzUser);
+        verify(entityRegistrar, times(1)).registerNewEventDefinition(nativeEntity.entity().id(), kmerzUser);
     }
 
     @Test
@@ -332,7 +354,7 @@ public class EventDefinitionFacadeTest {
     @Test
     public void listExcerptsExcludesNonContentPackExportableEventDefinitions() {
         EventDefinitionFacade testFacade = new EventDefinitionFacade(
-                objectMapper, eventDefinitionHandler, new HashSet<>(), jobDefinitionService, mockEventDefinitionService, userService);
+                objectMapper, eventDefinitionHandler, new HashSet<>(), jobDefinitionService, mockEventDefinitionService, userService, entityRegistrar);
         EventDefinitionDto dto = validEventDefinitionDto(mockEventProcessorConfig);
 
         when(mockEventProcessorConfig.isContentPackExportable()).thenReturn(false);
@@ -345,7 +367,10 @@ public class EventDefinitionFacadeTest {
     @Test
     @MongoDBFixtures("EventDefinitionFacadeTest.json")
     public void delete() {
-        long countBefore = eventDefinitionService.streamAll().count();
+        long countBefore;
+        try (var stream = eventDefinitionService.streamAll()) {
+            countBefore = stream.count();
+        }
         assertThat(countBefore).isEqualTo(1);
 
         final Optional<EventDefinitionDto> eventDefinitionDto = eventDefinitionService.get(
@@ -353,7 +378,10 @@ public class EventDefinitionFacadeTest {
         assertThat(eventDefinitionDto).isPresent();
         facade.delete(eventDefinitionDto.get());
 
-        long countAfter = eventDefinitionService.streamAll().count();
+        long countAfter;
+        try (var stream = eventDefinitionService.streamAll()) {
+            countAfter = stream.count();
+        }
         assertThat(countAfter).isEqualTo(0);
     }
 

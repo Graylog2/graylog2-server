@@ -23,10 +23,11 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
-import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
+import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -54,14 +55,14 @@ import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackReque
 import org.graylog2.rest.models.streams.alerts.requests.CreateConditionRequest;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.streams.FavoriteFieldsService;
 import org.graylog2.streams.StreamGuardException;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Collections;
 import java.util.List;
@@ -82,22 +83,22 @@ public class StreamFacade implements EntityFacade<Stream> {
     private final ObjectMapper objectMapper;
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
-    private final V20190722150700_LegacyAlertConditionMigration legacyAlertsMigration;
     private final IndexSetService indexSetService;
     private final UserService userService;
+    private final FavoriteFieldsService favoriteFieldsService;
 
     @Inject
     public StreamFacade(ObjectMapper objectMapper,
                         StreamService streamService,
                         StreamRuleService streamRuleService,
-                        V20190722150700_LegacyAlertConditionMigration legacyAlertsMigration,
-                        IndexSetService indexSetService, UserService userService) {
+                        IndexSetService indexSetService, UserService userService,
+                        FavoriteFieldsService favoriteFieldsService) {
         this.objectMapper = objectMapper;
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
-        this.legacyAlertsMigration = legacyAlertsMigration;
         this.indexSetService = indexSetService;
         this.userService = userService;
+        this.favoriteFieldsService = favoriteFieldsService;
     }
 
     @VisibleForTesting
@@ -105,13 +106,13 @@ public class StreamFacade implements EntityFacade<Stream> {
         final List<StreamRuleEntity> streamRules = stream.getStreamRules().stream()
                 .map(this::encodeStreamRule)
                 .collect(Collectors.toList());
-        final Set<ValueReference> outputIds = stream.getOutputs().stream()
-                .map(output -> entityDescriptorIds.getOrThrow(output.getId(), ModelTypes.OUTPUT_V1))
+        final Set<ValueReference> outputIds = stream.getOutputIds().stream()
+                .map(output -> entityDescriptorIds.getOrThrow(output.toHexString(), ModelTypes.OUTPUT_V1))
                 .map(ValueReference::of)
                 .collect(Collectors.toSet());
         final StreamEntity streamEntity = StreamEntity.create(
                 ValueReference.of(stream.getTitle()),
-                ValueReference.of(stream.getDescription()),
+                ValueReference.ofNullable(stream.getDescription()),
                 ValueReference.of(stream.getDisabled()),
                 ValueReference.of(stream.getMatchingType()),
                 streamRules,
@@ -119,7 +120,8 @@ public class StreamFacade implements EntityFacade<Stream> {
                 Collections.emptyList(), // Kept for backwards compatibility
                 outputIds,
                 ValueReference.of(stream.isDefaultStream()),
-                ValueReference.of(stream.getRemoveMatchesFromDefaultStream()));
+                ValueReference.of(stream.getRemoveMatchesFromDefaultStream()),
+                stream.getFavoriteFields());
 
         final JsonNode data = objectMapper.convertValue(streamEntity, JsonNode.class);
         return EntityV1.builder()
@@ -158,7 +160,7 @@ public class StreamFacade implements EntityFacade<Stream> {
         final StreamEntity streamEntity = objectMapper.convertValue(entity.data(), StreamEntity.class);
         final CreateStreamRequest createStreamRequest = CreateStreamRequest.create(
                 streamEntity.title().asString(parameters),
-                streamEntity.description().asString(parameters),
+                streamEntity.description() == null ? null : streamEntity.description().asString(parameters),
                 null, // ignored
                 null,
                 streamEntity.matchingType().asString(parameters),
@@ -185,6 +187,10 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .map(ObjectId::new)
                 .collect(Collectors.toSet());
         streamService.addOutputs(new ObjectId(savedStreamId), outputIds);
+
+        Optional.ofNullable(streamEntity.favoriteFields())
+                .filter(fields -> !fields.isEmpty())
+                .ifPresent(fields -> favoriteFieldsService.set(savedStreamId, fields));
 
         return NativeEntity.create(entity.id(), savedStreamId, TYPE_V1, stream.getTitle(), stream);
     }
@@ -240,7 +246,7 @@ public class StreamFacade implements EntityFacade<Stream> {
     private Optional<NativeEntity<Stream>> findExisting(EntityV1 entity, Map<String, ValueReference> parameters) {
         final String streamId = entity.id().id();
         // Always use the existing system stream
-        if (Stream.isSystemStreamId(streamId)) {
+        if (ObjectId.isValid(streamId) && streamService.isSystemStream(streamId)) {
             try {
                 final Stream stream = streamService.load(streamId);
                 return Optional.of(NativeEntity.create(entity.id(), streamId, ModelTypes.STREAM_V1, stream.getTitle(), stream));
@@ -313,8 +319,8 @@ public class StreamFacade implements EntityFacade<Stream> {
         final ModelId modelId = entityDescriptor.id();
         try {
             final Stream stream = streamService.load(modelId.id());
-            stream.getOutputs().stream()
-                    .map(Output::getId)
+            stream.getOutputIds().stream()
+                    .map(ObjectId::toHexString)
                     .map(ModelId::of)
                     .map(id -> EntityDescriptor.create(id, ModelTypes.OUTPUT_V1))
                     .forEach(output -> mutableGraph.putEdge(entityDescriptor, output));
@@ -353,5 +359,10 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .forEach(outputEntity -> mutableGraph.putEdge(entity, outputEntity));
 
         return ImmutableGraph.copyOf(mutableGraph);
+    }
+
+    @Override
+    public Optional<EntityPermissions> getCreatePermissions(Entity entity) {
+        return EntityPermissions.of(RestPermissions.STREAMS_CREATE);
     }
 }

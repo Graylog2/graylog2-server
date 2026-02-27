@@ -18,6 +18,7 @@ import {
   convertValueToBaseUnit,
   convertValueToUnit,
   getPrettifiedValue,
+  roundValue,
 } from 'views/components/visualizations/utils/unitConverters';
 
 describe('Unit converter functions', () => {
@@ -117,7 +118,11 @@ describe('Unit converter functions', () => {
 
   describe('convertValueToUnit converts value to needed unit', () => {
     it('for time should convert smaller unit (ms) to bigger (d)', () => {
-      const result = convertValueToUnit(86400000, { abbrev: 'ms', unitType: 'time' }, { abbrev: 'd', unitType: 'time' });
+      const result = convertValueToUnit(
+        86400000,
+        { abbrev: 'ms', unitType: 'time' },
+        { abbrev: 'd', unitType: 'time' },
+      );
 
       expect(result).toEqual({
         value: 1,
@@ -155,7 +160,11 @@ describe('Unit converter functions', () => {
     });
 
     it('for size should convert smaller unit (kb) to bigger (Gb)', () => {
-      const result = convertValueToUnit(1000000, { abbrev: 'kb', unitType: 'size' }, { abbrev: 'Gb', unitType: 'size' });
+      const result = convertValueToUnit(
+        1000000,
+        { abbrev: 'kb', unitType: 'size' },
+        { abbrev: 'Gb', unitType: 'size' },
+      );
 
       expect(result).toEqual({
         value: 1,
@@ -196,8 +205,16 @@ describe('Unit converter functions', () => {
       const result1 = convertValueToUnit(50, { abbrev: 'Gb', unitType: 'size' }, undefined);
       const result2 = convertValueToUnit(50, undefined, { abbrev: 'Gb', unitType: 'size' });
       const result3 = convertValueToUnit(null, { abbrev: 'Gb', unitType: 'size' }, { abbrev: 'kb', unitType: 'size' });
-      const result4 = convertValueToUnit(50, { abbrev: 'Gb', unitType: 'size' }, { abbrev: undefined, unitType: 'size' });
-      const result5 = convertValueToUnit(50, { abbrev: undefined, unitType: 'size' }, { abbrev: undefined, unitType: 'size' });
+      const result4 = convertValueToUnit(
+        50,
+        { abbrev: 'Gb', unitType: 'size' },
+        { abbrev: undefined, unitType: 'size' },
+      );
+      const result5 = convertValueToUnit(
+        50,
+        { abbrev: undefined, unitType: 'size' },
+        { abbrev: undefined, unitType: 'size' },
+      );
 
       expect(result1).toEqual({ value: null, unit: null });
       expect(result2).toEqual({ value: null, unit: null });
@@ -304,6 +321,18 @@ describe('Unit converter functions', () => {
 
       expect(result1).toEqual(expectedResult);
       expect(result2).toEqual(expectedResult);
+    });
+  });
+
+  describe('Round value', () => {
+    it('for value less then 10 do round ceil', () => {
+      expect(roundValue(3.3)).toEqual(4);
+      expect(roundValue(9.7)).toEqual(10);
+    });
+
+    it('for value more then 10 round ceil with 5 or 0 as last number', () => {
+      expect(roundValue(43.3)).toEqual(45);
+      expect(roundValue(899.7)).toEqual(900);
     });
   });
 });

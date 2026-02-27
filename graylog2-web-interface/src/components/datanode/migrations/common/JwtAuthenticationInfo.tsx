@@ -18,34 +18,41 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Panel } from 'components/bootstrap';
+import useProductName from 'brand-customization/useProductName';
 
-export const StyledPanel = styled(Panel)<{ bsStyle: string }>(({ bsStyle = 'default', theme }) => css`
-  &.panel {
-    background-color: ${theme.colors.global.contentBackground};
+export const StyledPanel = styled(Panel)<{ bsStyle: string }>(
+  ({ bsStyle = 'default', theme }) => css`
+    &.panel {
+      background-color: ${theme.colors.global.contentBackground};
 
-    .panel-heading {
-      color: ${theme.colors.variant.darker[bsStyle]};
+      .panel-heading {
+        color: ${theme.colors.variant.darker[bsStyle]};
+      }
     }
-  }
-  margin-top: ${theme.spacings.md} !important;
-`);
+    margin-top: ${theme.spacings.md} !important;
+  `,
+);
 
-const JwtAuthenticationInfo = () => (
-  <StyledPanel bsStyle="info">
-    <Panel.Heading>
-      <Panel.Title componentClass="h3">JWT authentication</Panel.Title>
-    </Panel.Heading>
-    <Panel.Body>
-      <p>
-        Depending on how you secured your existing cluster, some preliminary changes are needed to the security configuration.
-        We use JWT authentication to access OpenSearch from Graylog. In the next step, you have to manually enable JWT authentication
-        in your existing OpenSearch cluster to make sure the data can be accessed in the data node.
-      </p>
-      <p>
-        To do this, you should add the following snippet to your <code>opensearch-security/config.yml</code>
-      </p>
-      <pre>
-        {`jwt_auth_domain:
+const JwtAuthenticationInfo = () => {
+  const productName = useProductName();
+
+  return (
+    <StyledPanel bsStyle="info">
+      <Panel.Heading>
+        <Panel.Title componentClass="h3">JWT authentication</Panel.Title>
+      </Panel.Heading>
+      <Panel.Body>
+        <p>
+          Depending on how you secured your existing cluster, some preliminary changes are needed to the security
+          configuration. We use JWT authentication to access OpenSearch from ${productName}. In the next step, you have
+          to manually enable JWT authentication in your existing OpenSearch cluster to make sure the data can be
+          accessed in the data node.
+        </p>
+        <p>
+          To do this, you should add the following snippet to your <code>opensearch-security/config.yml</code>
+        </p>
+        <pre>
+          {`jwt_auth_domain:
           description: "Authenticate via Json Web Token"
           http_enabled: true
           transport_enabled: true
@@ -61,12 +68,14 @@ const JwtAuthenticationInfo = () => (
               subject_key: null
           authentication_backend:
             type: noop`}
-      </pre>
-      <p>
-        Please replace the signing key with your <code>GRAYLOG_PASSWORD_SECRET</code> in base64 encoding. To encode it, you can run
-      </p>
-      <pre>echo &quot;YOUR SECRET&quot; | base64</pre>
-    </Panel.Body>
-  </StyledPanel>
-);
+        </pre>
+        <p>
+          Please replace the signing key with your <code>GRAYLOG_PASSWORD_SECRET</code> in base64 encoding. To encode
+          it, you can run
+        </p>
+        <pre>echo &quot;YOUR SECRET&quot; | base64</pre>
+      </Panel.Body>
+    </StyledPanel>
+  );
+};
 export default JwtAuthenticationInfo;

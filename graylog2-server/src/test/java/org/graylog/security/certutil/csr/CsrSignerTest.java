@@ -16,6 +16,7 @@
  */
 package org.graylog.security.certutil.csr;
 
+import org.assertj.core.api.Assertions;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
@@ -25,6 +26,8 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
+import org.graylog.security.certutil.CertRequest;
+import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,7 +42,9 @@ import java.security.Security;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
@@ -47,6 +52,9 @@ import static java.time.ZoneOffset.UTC;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CsrSignerTest {
+
+    private static final CertificateGenerator CERTIFICATE_GENERATOR = new CertificateGenerator(1024);
+
     private static final X500Name subjectName = new X500Name("CN=Example Request");
     private static final Instant fixedInstant = Instant.parse("2023-09-28T12:50:00Z");
     private static final Clock fixedClock = Clock.fixed(fixedInstant, UTC);
@@ -62,8 +70,30 @@ class CsrSignerTest {
         var cert = createCert(keyPair);
         var privateKey = keyPair.getPrivate();
         var csr = createCSR(keyPair);
+        final Duration certificateLifetime = getCertificateLifetime(lifetime);
+        return new CsrSigner(fixedClock).sign(privateKey, cert, csr, certificateLifetime);
+    }
 
-        return new CsrSigner(fixedClock).sign(privateKey, cert, csr, new RenewalPolicy(RenewalPolicy.Mode.AUTOMATIC, lifetime));
+
+    @Test
+    void testMismatchIntermediateCA() throws Exception {
+        final org.graylog.security.certutil.KeyPair rootCa = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("rootCA").validity(Duration.ofDays(30)));
+        final org.graylog.security.certutil.KeyPair intermediateCa = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.signed("intermediateCa", rootCa).validity(Duration.ofDays(30)));
+
+        final KeyPair nodeKeyPair = createPrivateKey();
+        var csr = createCSR(nodeKeyPair);
+        final Duration certificateLifetime = getCertificateLifetime("P6M");
+
+        // notice the mismatch between private key and certificate!
+        final CsrSigner signer = new CsrSigner(fixedClock);
+        Assertions.assertThatThrownBy(()  -> signer.sign(intermediateCa.privateKey(), rootCa.certificate(), csr, certificateLifetime))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Provided CA private key doesn't correspond to provided CA certificate!");
+    }
+
+    private static Duration getCertificateLifetime(String lifetime) {
+        final RenewalPolicy rp = new RenewalPolicy(RenewalPolicy.Mode.AUTOMATIC, lifetime);
+        return rp.parsedCertificateLifetime();
     }
 
     @Test
@@ -78,6 +108,23 @@ class CsrSignerTest {
         var result = sign("P6M");
         assertThat(result).isNotNull();
         assertThat(result.getNotAfter()).isEqualTo(fixedInstant.plus(180, ChronoUnit.DAYS));
+    }
+
+    /**
+     * X509 certificates don't handle Y10K problem correctly, failing to parse
+     * any date after 9999-12-31. Let's make sure we limit cert validity in a way
+     * that prevents this.
+     */
+    @Test
+    void testSigningCertY10k() throws Exception {
+        var result = sign("P9999999D");
+        assertThat(result).isNotNull();
+
+        final Instant y10k = LocalDate.of(10000, 1, 1)
+                .atStartOfDay(UTC)
+                .toInstant();
+
+        assertThat(result.getNotAfter()).isBefore(y10k);
     }
 
     private PKCS10CertificationRequest createCSR(KeyPair keyPair) throws OperatorCreationException {

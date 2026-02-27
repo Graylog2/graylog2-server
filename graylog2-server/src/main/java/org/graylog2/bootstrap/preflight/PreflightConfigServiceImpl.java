@@ -19,9 +19,10 @@ package org.graylog2.bootstrap.preflight;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
-import org.graylog2.database.MongoConnection;
-
+import com.mongodb.WriteResult;
 import jakarta.inject.Inject;
+import org.graylog2.Configuration;
+import org.graylog2.database.MongoConnection;
 
 import java.util.Optional;
 
@@ -30,10 +31,12 @@ public class PreflightConfigServiceImpl implements PreflightConfigService {
     public static final String COLLECTION_NAME = "preflight";
 
     private final MongoConnection connection;
+    private final Configuration configuration;
 
     @Inject
-    public PreflightConfigServiceImpl(MongoConnection connection) {
+    public PreflightConfigServiceImpl(MongoConnection connection, Configuration configuration) {
         this.connection = connection;
+        this.configuration = configuration;
     }
 
     private DBCollection getCollection() {
@@ -41,14 +44,14 @@ public class PreflightConfigServiceImpl implements PreflightConfigService {
     }
 
     @Override
-    public PreflightConfig setConfigResult(PreflightConfigResult result) {
-        getCollection()
+    public ConfigResultState setConfigResult(PreflightConfigResult result) {
+        final WriteResult writeResult = getCollection()
                 .update(new BasicDBObject("type", "preflight_result"),
                         new BasicDBObject("$set", new BasicDBObject("value", result)),
                         true,
                         false
                 );
-        return new PreflightConfig(result);
+        return writeResult.isUpdateOfExisting() ? ConfigResultState.UPDATED : ConfigResultState.CREATED;
     }
 
     @Override
@@ -62,10 +65,14 @@ public class PreflightConfigServiceImpl implements PreflightConfigService {
 
     @Override
     public String getPreflightPassword() {
-        final DBObject doc = getCollection().findOne(new BasicDBObject("type", "preflight_password"));
-        return Optional.ofNullable(doc)
-                .map(d -> (String) d.get("value"))
-                .orElseThrow(() -> new IllegalStateException("Initial password should be automatically present in the DB, " +
-                        "this is an inconsistent state. Please report the problem to Graylog."));
+        if (configuration.getPreflightWebPassword() != null) {
+            return configuration.getPreflightWebPassword();
+        } else {
+            final DBObject doc = getCollection().findOne(new BasicDBObject("type", "preflight_password"));
+            return Optional.ofNullable(doc)
+                    .map(d -> (String) d.get("value"))
+                    .orElseThrow(() -> new IllegalStateException("Initial password should be automatically present in the DB, " +
+                            "this is an inconsistent state. Please report the problem to Graylog."));
+        }
     }
 }

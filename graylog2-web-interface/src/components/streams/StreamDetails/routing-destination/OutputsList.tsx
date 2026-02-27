@@ -28,11 +28,11 @@ import type { AvailableOutputRequestedConfiguration } from 'components/streams/u
 import OutputItem from './OutputItem';
 
 type Props = {
-  outputs: Array<Output>,
-  streamId: string,
-  getTypeDefinition: (type: string) => AvailableOutputRequestedConfiguration,
-  isLoadingOutputTypes: boolean,
-}
+  outputs: Array<Output>;
+  streamId: string;
+  getTypeDefinition: (type: string) => AvailableOutputRequestedConfiguration;
+  isLoadingOutputTypes: boolean;
+};
 
 const OutputsList = ({ outputs, streamId, getTypeDefinition, isLoadingOutputTypes }: Props) => {
   const sendTelemetry = useSendTelemetry();
@@ -45,7 +45,9 @@ const OutputsList = ({ outputs, streamId, getTypeDefinition, isLoadingOutputType
     });
 
     OutputsStore.update(output, data, (result) => {
-      queryClient.invalidateQueries(['outputs', 'overview']);
+      queryClient.invalidateQueries({
+        queryKey: ['outputs', 'overview'],
+      });
 
       return result;
     });
@@ -60,22 +62,23 @@ const OutputsList = ({ outputs, streamId, getTypeDefinition, isLoadingOutputType
       </thead>
       <tbody>
         {outputs.map((output) => (
-          <OutputItem key={output.id}
-                      output={output}
-                      streamId={streamId}
-                      onUpdate={handleUpdate}
-                      isLoadingOutputTypes={isLoadingOutputTypes}
-                      getTypeDefinition={getTypeDefinition} />
+          <OutputItem
+            key={output.id}
+            output={output}
+            streamId={streamId}
+            onUpdate={handleUpdate}
+            isLoadingOutputTypes={isLoadingOutputTypes}
+            getTypeDefinition={getTypeDefinition}
+          />
         ))}
 
-        {(outputs.length <= 0) && (
-        <tr>
-          <td colSpan={2}>No output defined.</td>
-        </tr>
+        {outputs.length <= 0 && (
+          <tr>
+            <td colSpan={2}>No output defined.</td>
+          </tr>
         )}
       </tbody>
     </Table>
-
   );
 };
 

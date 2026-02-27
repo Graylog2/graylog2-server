@@ -18,7 +18,7 @@ package org.graylog.datanode.opensearch.statemachine;
 
 import com.github.oxo42.stateless4j.StateMachine;
 import org.graylog.datanode.opensearch.OpensearchProcess;
-import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracer;
+import org.graylog.datanode.process.statemachine.tracer.StateMachineTracer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,7 +32,7 @@ class OpensearchStateMachineTest {
 
     @Mock
     OpensearchProcess opensearchProcess;
-    Set<StateMachineTracer> tracer = Set.of();
+    Set<StateMachineTracer<OpensearchState, OpensearchEvent>> tracer = Set.of();
 
     @Test
     void testOptimalScenario() {
