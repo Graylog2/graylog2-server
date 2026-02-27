@@ -103,7 +103,7 @@ public class OpensearchProcessImplTest {
 
         verify(clusterAdapter).updateClusterSetting(
                 OpensearchProcessImpl.CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING,
-                null,
+                "",
                 false
         );
 

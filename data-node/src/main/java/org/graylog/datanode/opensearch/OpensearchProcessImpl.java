@@ -295,7 +295,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         if (openSearchClient().isPresent()) {
             final String setting = clusterAdapter().getClusterSetting(CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING);
             if (nodeName.equalsIgnoreCase(setting)) {
-                clusterAdapter().updateClusterSetting(CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING, null, false);
+                clusterAdapter().updateClusterSetting(CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING, "", false);
             }
             allocationExcludeChecked = true;
         }
