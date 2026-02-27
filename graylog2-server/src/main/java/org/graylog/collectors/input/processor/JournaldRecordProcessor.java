@@ -457,11 +457,10 @@ public class JournaldRecordProcessor implements LogRecordProcessor {
             case INT_VALUE -> numericValue = value.getIntValue();
             case DOUBLE_VALUE -> {
                 final double d = value.getDoubleValue();
-                final long l = (long) d;
-                if (d != l) {
+                if (!Double.isFinite(d) || d != Math.rint(d)) {
                     return null;
                 }
-                numericValue = l;
+                numericValue = (long) d;
             }
             default -> {
                 return null;
