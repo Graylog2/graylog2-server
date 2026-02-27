@@ -23,6 +23,9 @@ import { Alert, Button } from 'components/bootstrap';
 import EventReplaySearch from 'components/events/EventReplaySearch';
 import useEventDefinition from 'hooks/useEventDefinition';
 import type { SelectedEventsData } from 'contexts/EventReplaySelectedContext';
+import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
+import sidebarSections from 'views/components/sidebar/sidebarSections';
+import SidebarBulkEventReplay from 'components/events/bulk-replay/SidebarBulkEventReplay';
 
 const Container = styled.div`
   display: flex;
@@ -46,6 +49,15 @@ const AlertWrapper = styled(Alert)(
   margin: ${theme.spacings.md};
 `,
 );
+
+const searchPageLayout: Partial<LayoutState> = {
+  sidebar: {
+    isShown: true,
+    title: SidebarBulkEventReplay,
+    sections: [...sidebarSections],
+    contentColumnWidth: 350,
+  },
+};
 
 const ReplayedSearch = ({
   onReturnClick,
@@ -72,6 +84,7 @@ const ReplayedSearch = ({
     <EventReplaySearch
       eventData={selectedEvent.event}
       eventDefinitionMappedData={eventDefinitionMappedData}
+      searchPageLayout={searchPageLayout}
     />
   );
 };

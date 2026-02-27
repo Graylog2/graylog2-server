@@ -24,15 +24,28 @@ import ReplaySearchContext from 'components/event-definitions/replay-search/Repl
 import type { Event } from 'components/events/events/types';
 import useRightSidebar from 'hooks/useRightSidebar';
 import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
+import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
+import sidebarSections from 'views/components/sidebar/sidebarSections';
+
+const defaultSearchPageLayout: Partial<LayoutState> = {
+  sidebar: {
+    isShown: true,
+    title: 'Replayed Search',
+    sections: [...sidebarSections],
+    contentColumnWidth: 350,
+  },
+};
 
 type Props = {
   eventDefinitionMappedData: EventDefinitionMappedData;
   eventData: Event;
+  searchPageLayout?: Partial<LayoutState>;
 };
 
 const EventReplaySearch = ({
   eventDefinitionMappedData,
   eventData,
+  searchPageLayout = defaultSearchPageLayout,
 }: Props) => {
   const { eventDefinition, aggregations } = eventDefinitionMappedData;
   const { openSidebar } = useRightSidebar();
@@ -63,7 +76,7 @@ const EventReplaySearch = ({
 
   return (
     <ReplaySearchContext.Provider value={replaySearchContext}>
-      <ReplaySearch view={view} />
+      <ReplaySearch view={view} searchPageLayout={searchPageLayout} />
     </ReplaySearchContext.Provider>
   );
 };
@@ -71,11 +84,13 @@ const EventReplaySearch = ({
 const WithLoadingBarrier = ({
   eventDefinitionMappedData,
   eventData,
+  searchPageLayout,
 }: Props) => (
   <LoadingBarrier eventDefinition={eventDefinitionMappedData.eventDefinition}>
     <EventReplaySearch
       eventDefinitionMappedData={eventDefinitionMappedData}
       eventData={eventData}
+      searchPageLayout={searchPageLayout}
     />
   </LoadingBarrier>
 );
