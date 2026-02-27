@@ -41,7 +41,7 @@ type Props = {
 const sourceTypeLabels: Record<SourceType, string> = {
   file: 'File',
   journald: 'Journald',
-  windows_event_log: 'WinEventLog',
+  windows_event_log: 'Windows Event Log',
   macos_unified_logging: 'macOS Unified Log',
 };
 
@@ -51,7 +51,7 @@ const defaultConfigs: Record<
 > = {
   file: { paths: [''], read_mode: 'end' },
   journald: { read_mode: 'end', priority: 'info' },
-  windows_event_log: { channels: ['Application'], read_mode: 'end', event_format: 'json' },
+  windows_event_log: { channels: [], include_default_channels: true, read_mode: 'end',  },
   macos_unified_logging: {},
 };
 
@@ -178,7 +178,7 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
           id="win-channels"
           type="text"
           label="Channels"
-          help="Comma-separated channel names (e.g., Security, Application)"
+          help="Comma-separated channel names (e.g., Application, Security, System)"
           value={winConfig.channels.join(', ')}
           onChange={(e) =>
             updateWindowsEventLogConfig({
@@ -190,6 +190,13 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
           }
           required
         />
+        <Input
+          id="win-include-default-channels"
+          type="checkbox"
+          label="Include default channels"
+          checked={winConfig.include_default_channels}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateWindowsEventLogConfig({ include_default_channels: e.target.checked})}
+        />
         <div>
           <label htmlFor="win-read-mode">Read Mode</label>
           <SegmentedControl
@@ -198,17 +205,6 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
             data={[
               { value: 'end', label: 'From end (tail)' },
               { value: 'beginning', label: 'From beginning' },
-            ]}
-          />
-        </div>
-        <div>
-          <label htmlFor="win-event-format">Event Format</label>
-          <SegmentedControl
-            value={winConfig.event_format}
-            onChange={(v) => updateWindowsEventLogConfig({ event_format: v as 'json' | 'xml' })}
-            data={[
-              { value: 'json', label: 'JSON' },
-              { value: 'xml', label: 'XML' },
             ]}
           />
         </div>

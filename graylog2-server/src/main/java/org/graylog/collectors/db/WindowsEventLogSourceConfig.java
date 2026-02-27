@@ -21,11 +21,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import jakarta.annotation.Nullable;
 import org.graylog.collectors.config.OtlpReceiverConfig;
+import org.graylog.collectors.config.WindowsEventLogReceiverConfig;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @AutoValue
 @JsonTypeName(WindowsEventLogSourceConfig.TYPE_NAME)
@@ -40,15 +43,11 @@ public abstract class WindowsEventLogSourceConfig implements SourceConfig {
     @JsonProperty("channels")
     public abstract List<String> channels();
 
+    @JsonProperty("include_default_channels")
+    public abstract boolean includeDefaultChannels();
+
     @JsonProperty("read_mode")
     public abstract String readMode();
-
-    @JsonProperty("event_format")
-    public abstract String eventFormat();
-
-    @Nullable
-    @JsonProperty("query")
-    public abstract String query();
 
     public static Builder builder() {
         return Builder.create();
@@ -56,20 +55,23 @@ public abstract class WindowsEventLogSourceConfig implements SourceConfig {
 
     @Override
     public void validate() {
-        if (channels() == null || channels().isEmpty()) {
-            throw new IllegalArgumentException("WindowsEventLogSourceConfig requires at least one channel");
-        }
-        if (readMode() == null || readMode().isBlank()) {
+        if (isBlank(readMode())) {
             throw new IllegalArgumentException("WindowsEventLogSourceConfig requires a non-blank read_mode");
         }
-        if (eventFormat() == null || eventFormat().isBlank()) {
-            throw new IllegalArgumentException("WindowsEventLogSourceConfig requires a non-blank event_format");
+        try {
+            WindowsEventLogReceiverConfig.StartAt.valueOf(readMode().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("WindowsEventLogSourceConfig: " + e.getMessage());
         }
     }
 
     @Override
     public Optional<OtlpReceiverConfig> toReceiverConfig(String id) {
-        return Optional.empty();
+        return Optional.of(WindowsEventLogReceiverConfig.builder(id)
+                .channels(channels())
+                .includeDefaultChannels(includeDefaultChannels())
+                .startAt(WindowsEventLogReceiverConfig.StartAt.valueOf(readMode().toUpperCase(Locale.ROOT)))
+                .build());
     }
 
     @AutoValue.Builder
@@ -78,8 +80,9 @@ public abstract class WindowsEventLogSourceConfig implements SourceConfig {
         public static Builder create() {
             return new AutoValue_WindowsEventLogSourceConfig.Builder()
                     .type(TYPE_NAME)
-                    .readMode("end")
-                    .eventFormat("json");
+                    .channels(List.of())
+                    .includeDefaultChannels(true)
+                    .readMode("end");
         }
 
         @JsonProperty(TYPE_FIELD)
@@ -88,14 +91,11 @@ public abstract class WindowsEventLogSourceConfig implements SourceConfig {
         @JsonProperty("channels")
         public abstract Builder channels(List<String> channels);
 
+        @JsonProperty("include_default_channels")
+        public abstract Builder includeDefaultChannels(boolean includeDefaultChannels);
+
         @JsonProperty("read_mode")
         public abstract Builder readMode(String readMode);
-
-        @JsonProperty("event_format")
-        public abstract Builder eventFormat(String eventFormat);
-
-        @JsonProperty("query")
-        public abstract Builder query(@Nullable String query);
 
         public abstract WindowsEventLogSourceConfig build();
     }

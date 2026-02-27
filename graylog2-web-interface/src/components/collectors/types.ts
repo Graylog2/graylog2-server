@@ -69,9 +69,8 @@ export type JournaldSourceConfig = {
 
 export type WindowsEventLogSourceConfig = {
   channels: string[];
+  include_default_channels: boolean;
   read_mode: 'beginning' | 'end';
-  event_format: 'json' | 'xml';
-  query?: string;
 };
 
 export type MacOSUnifiedLoggingSourceConfig = {
