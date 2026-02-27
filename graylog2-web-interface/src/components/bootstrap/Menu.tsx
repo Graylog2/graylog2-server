@@ -68,27 +68,6 @@ const Menu = ({
   </MantineMenu>
 );
 
-const StyledMenuItem = styled(MantineMenu.Item)(
-  ({ theme }) => css`
-    color: ${theme.colors.text.primary};
-    font-size: ${theme.fonts.size.body};
-    white-space: nowrap;
-
-    &:hover,
-    &:focus {
-      text-decoration: none;
-      color: inherit;
-      background-color: ${theme.utils.colorLevel(theme.colors.global.contentBackground, 10)};
-    }
-  `,
-);
-
-const StyledMenuDivider = styled(MantineMenu.Divider)(
-  ({ theme }) => css`
-    border-color: ${theme.colors.variant.lighter.default};
-  `,
-);
-
 const StyledMenuLabel = styled(MantineMenu.Label)(
   ({ theme }) => css`
     font-size: ${theme.fonts.size.small};
@@ -107,8 +86,6 @@ Menu.Dropdown = styled(MantineMenu.Dropdown)(
   `,
 );
 
-Menu.Item = StyledMenuItem;
-Menu.Divider = StyledMenuDivider;
 Menu.Label = StyledMenuLabel;
 
 export default Menu;

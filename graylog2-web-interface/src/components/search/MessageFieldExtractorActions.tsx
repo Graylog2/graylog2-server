@@ -31,8 +31,6 @@ class MessageFieldExtractorActions extends React.Component<
     [key: string]: any;
   }
 > {
-  private newExtractorRoutes: { [key: string]: string };
-
   UNSAFE_componentWillMount() {
     this._refreshExtractorRoutes(this.props);
   }
@@ -40,6 +38,8 @@ class MessageFieldExtractorActions extends React.Component<
   UNSAFE_componentWillReceiveProps(nextProps) {
     this._refreshExtractorRoutes(nextProps);
   }
+
+  private newExtractorRoutes: { [key: string]: string };
 
   _refreshExtractorRoutes = (props) => {
     this.newExtractorRoutes = ExtractorUtils.getNewExtractorRoutes(

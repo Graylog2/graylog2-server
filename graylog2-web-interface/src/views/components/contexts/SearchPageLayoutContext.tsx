@@ -19,6 +19,7 @@ import * as React from 'react';
 import type { ForwardRefExoticComponent, RefAttributes } from 'react';
 
 import { singleton } from 'logic/singleton';
+import type { SidebarSection } from 'views/components/sidebar/sidebarSections';
 
 export const SAVE_COPY = {
   save: { isShown: false },
@@ -34,8 +35,21 @@ export const BLANK = {
   actionsDropdown: { isShown: false },
 };
 
+export type LayoutSidebarTitleComponent = React.ComponentType<
+  React.PropsWithChildren<{
+    onClose: () => void;
+  }>
+>;
+
+export type LayoutSidebarTitle = string | LayoutSidebarTitleComponent;
+
 export type LayoutState = {
-  sidebar: { isShown: boolean };
+  sidebar: {
+    isShown: boolean;
+    sections?: Array<SidebarSection>;
+    title?: LayoutSidebarTitle;
+    contentColumnWidth?: number;
+  };
   viewActions: {
     save: { isShown: boolean };
     saveAs: { isShown: boolean };

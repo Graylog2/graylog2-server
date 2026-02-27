@@ -47,7 +47,8 @@ public class HttpConfiguration {
     private static final int GRAYLOG_DEFAULT_PORT = 9000;
 
     public static final String OVERRIDE_HEADER = "X-Graylog-Server-URL";
-    public static final String PATH_API = "api/";
+    public static final String API_PREFIX = "api";
+    public static final String PATH_API = API_PREFIX + "/";
 
     @Documentation("""
             ## HTTP bind address

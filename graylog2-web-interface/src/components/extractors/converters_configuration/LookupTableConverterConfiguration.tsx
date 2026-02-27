@@ -30,8 +30,6 @@ type Props = {
 };
 
 class LookupTableConverterConfiguration extends React.Component<Props, { lookupTables: any }> {
-  private converterEnabled: Input;
-
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -47,6 +45,8 @@ class LookupTableConverterConfiguration extends React.Component<Props, { lookupT
       this.setState({ lookupTables: result.lookup_tables });
     });
   }
+
+  private converterEnabled: Input;
 
   _getConverterObject = (configuration?) => ({
     type: this.props.type,

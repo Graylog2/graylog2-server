@@ -11,7 +11,7 @@ concurrency:
 jobs:
   dispatchedMainBuild:
     name: Dispatch build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
 
     steps:
       # TODO remove later

@@ -40,6 +40,7 @@ const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
   const { pathname } = useLocation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
+
   const startInput = () => {
     setIsLoading(true);
 
@@ -85,7 +86,7 @@ const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
 
   if (isInputRunning(inputStates, input.id)) {
     return (
-      <Button bsStyle="danger" bsSize="xsmall" onClick={stopInput} disabled={isLoading}>
+      <Button bsSize="xsmall" onClick={stopInput} disabled={isLoading}>
         {isLoading ? 'Stopping...' : 'Stop input'}
       </Button>
     );

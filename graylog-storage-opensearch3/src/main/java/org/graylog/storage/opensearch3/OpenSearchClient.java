@@ -20,10 +20,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Streams;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
 import org.graylog.shaded.opensearch2.org.apache.http.ContentTooLongException;
 import org.graylog.shaded.opensearch2.org.apache.http.client.config.RequestConfig;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
@@ -46,6 +46,8 @@ import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.MapperParsingException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
+import org.graylog2.indexer.ParentCircuitBreakingException;
+import org.graylog2.indexer.exceptions.ResultWindowLimitExceededException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +57,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -96,21 +97,6 @@ public class OpenSearchClient {
         final MultiSearchResponse result = this.execute((c, requestOptions) -> c.msearch(multiSearchRequest, requestOptions), errorMessage);
 
         return firstResponseFrom(result, errorMessage);
-    }
-
-    public List<MultiSearchResponse.Item> msearch(List<SearchRequest> searchRequests, String errorMessage) {
-        var multiSearchRequest = new MultiSearchRequest();
-
-        indexerMaxConcurrentSearches.ifPresent(multiSearchRequest::maxConcurrentSearchRequests);
-        indexerMaxConcurrentShardRequests.ifPresent(maxShardRequests -> searchRequests
-                .forEach(request -> request.setMaxConcurrentShardRequests(maxShardRequests)));
-
-        searchRequests.forEach(multiSearchRequest::add);
-
-        final MultiSearchResponse result = this.execute((c, requestOptions) -> c.msearch(multiSearchRequest, requestOptions), errorMessage);
-
-        return Streams.stream(result)
-                .collect(Collectors.toList());
     }
 
     private SearchResponse firstResponseFrom(MultiSearchResponse result, String errorMessage) {
@@ -185,6 +171,10 @@ public class OpenSearchClient {
 
     public static RuntimeException exceptionFrom(Exception e, String errorMessage) {
         if (e instanceof OpenSearchException openSearchException) {
+            final Integer resultWindowLimitFromError = SearchTypeErrorParser.getResultWindowLimitFromError(openSearchException);
+            if (resultWindowLimitFromError != null) {
+                throw new ResultWindowLimitExceededException(resultWindowLimitFromError);
+            }
             if (isIndexNotFoundException(openSearchException)) {
                 return IndexNotFoundException.create(errorMessage + openSearchException.getResourceId(), openSearchException.getIndex().getName());
             }
@@ -203,6 +193,9 @@ public class OpenSearchClient {
             }
             if (isMapperParsingExceptionException(openSearchException)) {
                 return new MapperParsingException(openSearchException.getMessage());
+            }
+            if (isParentCircuitBreakingException(openSearchException)) {
+                return new ParentCircuitBreakingException(openSearchException.getMessage());
             }
         } else if (e instanceof IOException && e.getCause() instanceof ContentTooLongException) {
             return new BatchSizeTooLargeException(e.getMessage());
@@ -249,6 +242,19 @@ public class OpenSearchClient {
             if (parsedException.type().equals("search_phase_execution_exception")) {
                 ParsedOpenSearchException parsedCause = ParsedOpenSearchException.from(openSearchException.getRootCause().getMessage());
                 return parsedCause.reason().contains("Batch size is too large");
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
+    }
+
+    private static boolean isParentCircuitBreakingException(OpenSearchException openSearchException) {
+        try {
+            final ParsedOpenSearchException parsedException = ParsedOpenSearchException.from(openSearchException.getMessage());
+            if (parsedException.type().equals("circuit_breaking_exception")) {
+                ParsedOpenSearchException parsedCause = ParsedOpenSearchException.from(openSearchException.getRootCause().getMessage());
+                return parsedCause.reason().contains("[parent] Data too large");
             }
         } catch (Exception e) {
             return false;

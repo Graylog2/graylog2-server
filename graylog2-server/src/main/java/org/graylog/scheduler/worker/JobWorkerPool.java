@@ -66,7 +66,7 @@ public class JobWorkerPool {
         this.executor = buildExecutor(name, poolSize, metricRegistry);
         this.slots = new Semaphore(poolSize, true);
 
-        registerMetrics(metricRegistry, poolSize);
+        registerMetrics(name, metricRegistry, poolSize);
     }
 
     /**
@@ -147,12 +147,12 @@ public class JobWorkerPool {
         return new InstrumentedExecutorService(executor, metricRegistry, name(EXECUTOR_NAME, name));
     }
 
-    private void registerMetrics(MetricRegistry metricRegistry, int poolSize) {
-        metricRegistry.register(MetricRegistry.name(this.getClass(), "waiting_for_slots"),
+    private void registerMetrics(String name, MetricRegistry metricRegistry, int poolSize) {
+        metricRegistry.register(MetricRegistry.name(this.getClass(), name, "waiting_for_slots"),
                 (Gauge<Integer>) slots::getQueueLength);
-        metricRegistry.register(MetricRegistry.name(this.getClass(), "free_slots"),
+        metricRegistry.register(MetricRegistry.name(this.getClass(), name, "free_slots"),
                 (Gauge<Integer>) this::freeSlots);
-        metricRegistry.register(MetricRegistry.name(this.getClass(), "total_slots"),
+        metricRegistry.register(MetricRegistry.name(this.getClass(), name, "total_slots"),
                 (Gauge<Integer>) () -> poolSize);
 
     }

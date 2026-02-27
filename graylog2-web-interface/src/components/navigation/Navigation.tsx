@@ -15,17 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled, { css } from 'styled-components';
 
 import useLocation from 'routing/useLocation';
-import { LinkContainer } from 'components/common/router';
+import { Link, LinkContainer } from 'components/common/router';
 import AppConfig from 'util/AppConfig';
 import { Navbar, Nav } from 'components/bootstrap';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import Routes from 'routing/Routes';
-import PerspectivesSwitcher from 'components/perspectives/PerspectivesSwitcher';
+import BrandNavLogo from 'components/navigation/NavigationBrand';
 import usePluginEntities from 'hooks/usePluginEntities';
 import MainNavbar from 'components/navigation/MainNavbar';
 import { FEATURE_FLAG } from 'components/quick-jump/Constants';
+import { NAV_ITEM_HEIGHT } from 'theme/constants';
 
 import UserMenu from './UserMenu';
 import HelpMenu from './HelpMenu';
@@ -41,6 +43,22 @@ type Props = {
   pathname: string;
 };
 
+const BrandLink = styled(Link)(
+  ({ theme }) => css`
+    display: inline-flex;
+    align-items: center;
+    min-height: ${NAV_ITEM_HEIGHT};
+    color: ${theme.colors.text.primary};
+
+    &:hover,
+    &:active,
+    &:focus {
+      text-decoration: none;
+      color: ${theme.colors.text.primary};
+    }
+  `,
+);
+
 const Navigation = React.memo(({ pathname }: Props) => {
   const pluginItems = usePluginEntities('navigationItems');
 
@@ -48,7 +66,9 @@ const Navigation = React.memo(({ pathname }: Props) => {
     <StyledNavbar fluid fixedTop collapseOnSelect>
       <Navbar.Header>
         <Navbar.Brand>
-          <PerspectivesSwitcher />
+          <BrandLink to={Routes.WELCOME} aria-label="Welcome">
+            <BrandNavLogo />
+          </BrandLink>
         </Navbar.Brand>
         <Navbar.Toggle />
         <DevelopmentHeaderBadge smallScreen />

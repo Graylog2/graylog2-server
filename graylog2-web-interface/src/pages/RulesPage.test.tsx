@@ -22,8 +22,6 @@ import { prefixUrl } from 'routing/Routes';
 
 import RulesPage from './RulesPage';
 
-jest.mock('components/perspectives/hooks/useActivePerspective');
-
 const rulesPlugin = {
   entityCreators: [
     {

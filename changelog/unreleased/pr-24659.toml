@@ -1,0 +1,5 @@
+type = "f"
+message = "Input stop/start button UX fixes"
+
+issues = ["24235", "graylog-plugin-enterprise#12659"]
+pulls = ["24659"]

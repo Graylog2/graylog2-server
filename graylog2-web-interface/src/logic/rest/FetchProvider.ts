@@ -211,7 +211,7 @@ export class Builder {
   }
 
   ignoreUnauthorized() {
-    this.errorHandler = (error: Response) => onServerError(error, () => {});
+    this.errorHandler = (error: Response) => onServerError(error, () => Promise.resolve());
 
     return this;
   }

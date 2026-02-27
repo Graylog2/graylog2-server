@@ -83,6 +83,7 @@ export { default as LocaleSelect } from './LocaleSelect';
 export { default as Markdown } from './Markdown';
 export { default as MessageDetailsDefinitionList } from './MessageDetailsDefinitionList';
 export { default as ModalSubmit } from './ModalSubmit';
+export { MoreActionsIcon, MoreActionsMenu } from './MoreActions';
 export { default as MultiSelect } from './MultiSelect';
 export { default as NavTabs } from './NavTabs';
 export { default as NestedForm } from './NestedForm';

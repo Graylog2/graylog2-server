@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useEffect, useImperativeHandle, useState } from 'react';
 import { useFormikContext } from 'formik';
 
 import { Input } from 'components/bootstrap';
@@ -29,9 +30,10 @@ type Props = {
 const CaffeineCacheFieldSet = ({ config }: Props, ref: any) => {
   const { values, setValues, errors }: { values: Partial<LookupTableCache>; setValues: any; errors: any } =
     useFormikContext();
-  const [stateConfig, setStateConfig] = React.useState<LookupTableCacheConfig>({ ...config });
+  const [stateConfig, setStateConfig] = useState<LookupTableCacheConfig>({ ...config });
 
-  React.useEffect(() => setStateConfig({ ...config }), [config]);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => setStateConfig({ ...config }), [config]);
 
   const validateConfig = () => {
     const configErrors: any = {};
@@ -42,14 +44,14 @@ const CaffeineCacheFieldSet = ({ config }: Props, ref: any) => {
     return configErrors;
   };
 
-  React.useImperativeHandle(ref, () => ({
+  useImperativeHandle(ref, () => ({
     validate: () => validateConfig(),
   }));
 
   const handleIgnoreNullChange = (event) => {
     const ignoreValue = getValueFromInput(event.target);
 
-    const valConfig = { ...values.config, ignore_null: ignoreValue };
+    const valConfig = { ...values.config, ignore_null: ignoreValue as boolean };
     setStateConfig(valConfig);
     setValues({ ...values, config: valConfig });
   };

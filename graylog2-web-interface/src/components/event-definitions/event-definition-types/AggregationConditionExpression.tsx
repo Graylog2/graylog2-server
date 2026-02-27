@@ -36,11 +36,12 @@ import GroupExpression from './AggregationConditionExpressions/GroupExpression';
 
 import styles from './AggregationConditionExpression.css';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 type AggregationConditionExpressionProps = {
   eventDefinition: EventDefinition;
   validation?: any;
-  formattedFields: any[];
+  formattedFields: FieldTypeMapping[];
   aggregationFunctions: any[];
   onChange: (...args: any[]) => void;
   expression: any;

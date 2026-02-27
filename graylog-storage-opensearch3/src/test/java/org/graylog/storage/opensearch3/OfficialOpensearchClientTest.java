@@ -18,6 +18,7 @@
 package org.graylog.storage.opensearch3;
 
 import com.github.joschi.jadconfig.util.Duration;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CompletableFuture;
@@ -29,7 +30,7 @@ class OfficialOpensearchClientTest {
 
     @Test
     void testWithTimeout() {
-        OfficialOpensearchClient client = new OfficialOpensearchClient(null, null);
+        OfficialOpensearchClient client = new OfficialOpensearchClient(null, null, new ObjectMapperProvider().get());
         assertThat((String) client.executeWithClientTimeout(c -> asyncCall(0), "Error getting data", Duration.milliseconds(50)))
                 .isEqualTo("complete");
         assertThatThrownBy(() ->

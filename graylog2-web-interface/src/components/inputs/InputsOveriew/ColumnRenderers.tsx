@@ -20,14 +20,10 @@ import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import type { InputTypesSummary } from 'hooks/useInputTypes';
 import type { InputStates } from 'hooks/useInputsStates';
-import {
-  TitleCell,
-  TypeCell,
-  NodeCell,
-  ThroughputCell,
-  ExpandedSectionToggleWrapper,
-} from 'components/inputs/InputsOveriew';
+import { TypeCell, NodeCell, ThroughputCell, ExpandedSectionToggleWrapper } from 'components/inputs/InputsOveriew';
 import { InputStateBadge } from 'components/inputs';
+import Routes from 'routing/Routes';
+import { Link } from 'components/common/router';
 
 type Props = {
   inputTypes: InputTypesSummary;
@@ -39,7 +35,9 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
     title: {
       renderCell: (_title: string, input: InputSummary) => (
         <ExpandedSectionToggleWrapper id={input.id}>
-          <TitleCell input={input} />
+          <Link to={Routes.SYSTEM.INPUT_DIAGNOSIS(input.id)} title={`show input diagnosis for ${input.title}`}>
+            {input.title}
+          </Link>
         </ExpandedSectionToggleWrapper>
       ),
       width: 0.5,
@@ -66,7 +64,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
           <NodeCell input={input} />
         </ExpandedSectionToggleWrapper>
       ),
-      staticWidth: 130,
+      staticWidth: 150,
     },
     traffic: {
       renderCell: (_traffic: string, input: InputSummary) => (
@@ -74,7 +72,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
           <ThroughputCell input={input} />
         </ExpandedSectionToggleWrapper>
       ),
-      staticWidth: 130,
+      staticWidth: 180,
     },
     address: {
       renderCell: (_address: string, input: InputSummary) => (
@@ -82,13 +80,13 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
           {input.attributes?.bind_address || 'N/A'}
         </ExpandedSectionToggleWrapper>
       ),
-      staticWidth: 100,
+      staticWidth: 125,
     },
     port: {
       renderCell: (_port: string, input: InputSummary) => (
         <ExpandedSectionToggleWrapper id={input.id}>{input.attributes?.port || 'N/A'}</ExpandedSectionToggleWrapper>
       ),
-      staticWidth: 100,
+      staticWidth: 'matchHeader',
     },
   },
 });
