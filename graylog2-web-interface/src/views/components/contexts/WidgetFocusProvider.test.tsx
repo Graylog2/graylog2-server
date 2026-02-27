@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { useLocation } from 'react-router-dom';
 import Immutable from 'immutable';
 import userEvent from '@testing-library/user-event';
 
@@ -34,6 +33,7 @@ import useView from 'views/hooks/useView';
 import View from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
 import { setNewWidget } from 'views/logic/slices/widgetsSlice';
+import useLocation from 'routing/useLocation';
 
 const mockNavigate = jest.fn();
 
