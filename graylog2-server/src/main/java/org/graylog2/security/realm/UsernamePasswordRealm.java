@@ -16,12 +16,13 @@
  */
 package org.graylog2.security.realm;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAccount;
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.authc.pam.UnsupportedTokenException;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.graylog.security.authservice.AuthServiceAuthenticator;
@@ -33,9 +34,6 @@ import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.security.AuthenticationServiceUnavailableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -62,7 +60,7 @@ public class UsernamePasswordRealm extends AuthenticatingRealm {
         setAuthenticationTokenClass(UsernamePasswordToken.class);
         setCachingEnabled(false);
         // Credentials will be matched via the authentication service itself so we don't need Shiro to do it
-        setCredentialsMatcher(new AllowAllCredentialsMatcher());
+        setCredentialsMatcher(new ServiceValidatedCredentialsMatcher());
     }
 
     @Override
@@ -112,6 +110,6 @@ public class UsernamePasswordRealm extends AuthenticatingRealm {
     }
 
     private AuthenticationInfo toAuthenticationInfo(AuthServiceResult result) {
-        return new SimpleAccount(result.userProfileId(), null, NAME + "/" + result.backendType());
+        return new SimpleAccount(result.userProfileId(), ServiceValidatedCredentialsMatcher.AUTHENTICATED, NAME + "/" + result.backendType());
     }
 }

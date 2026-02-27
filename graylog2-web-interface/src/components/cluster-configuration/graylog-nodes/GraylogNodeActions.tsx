@@ -25,7 +25,8 @@ import HideOnCloud from 'util/conditional/HideOnCloud';
 import { SystemLoadBalancerStore } from 'stores/load-balancer/SystemLoadBalancerStore';
 import { SystemProcessingStore } from 'stores/system-processing/SystemProcessingStore';
 
-import type { ClusterGraylogNode as GraylogNode } from './fetchClusterGraylogNodes';
+import { LOAD_BALANCER_STATUS } from './fetchClusterGraylogNodes';
+import type { ClusterGraylogNode as GraylogNode, LoadBalancerStatus } from './fetchClusterGraylogNodes';
 
 type Props = {
   node: GraylogNode;
@@ -33,7 +34,7 @@ type Props = {
 
 const GraylogNodeActions = ({ node }: Props) => {
   const [showMessageProcessingModal, setShowMessageProcessingModal] = useState<boolean>(false);
-  const [loadBalancerStatusToConfirm, setLoadBalancerStatusToConfirm] = useState<'ALIVE' | 'DEAD' | undefined>(
+  const [loadBalancerStatusToConfirm, setLoadBalancerStatusToConfirm] = useState<LoadBalancerStatus | undefined>(
     undefined,
   );
 
@@ -48,7 +49,7 @@ const GraylogNodeActions = ({ node }: Props) => {
     setShowMessageProcessingModal(false);
   };
 
-  const updateLoadBalancerStatus = (status: 'ALIVE' | 'DEAD') => {
+  const updateLoadBalancerStatus = (status: LoadBalancerStatus) => {
     SystemLoadBalancerStore.override(node.node_id, status);
     setLoadBalancerStatusToConfirm(undefined);
   };
@@ -62,13 +63,13 @@ const GraylogNodeActions = ({ node }: Props) => {
           </MenuItem>
         </IfPermitted>
         <IfPermitted permissions="lbstatus:change">
-          {node.lb_status === 'alive' ? (
-            <MenuItem onSelect={() => setLoadBalancerStatusToConfirm('DEAD')}>
-              Override load Balancer status to DEAD
+          {node.lb_status === LOAD_BALANCER_STATUS.ALIVE ? (
+            <MenuItem onSelect={() => setLoadBalancerStatusToConfirm(LOAD_BALANCER_STATUS.DEAD)}>
+              Override load balancer status to DEAD
             </MenuItem>
           ) : (
-            <MenuItem onSelect={() => setLoadBalancerStatusToConfirm('ALIVE')}>
-              Override load Balancer status to ALIVE
+            <MenuItem onSelect={() => setLoadBalancerStatusToConfirm(LOAD_BALANCER_STATUS.ALIVE)}>
+              Override load balancer status to ALIVE
             </MenuItem>
           )}
         </IfPermitted>

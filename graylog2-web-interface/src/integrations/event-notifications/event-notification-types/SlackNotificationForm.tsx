@@ -129,7 +129,7 @@ const SlackNotificationForm = ({ config, validation, onChange }: Props) => {
 
   const handleBacklogSizeChange = (event) => {
     const { name } = event.target;
-    const value = getValueFromInput(event.target);
+    const value = Number(getValueFromInput(event.target));
 
     setBacklogSize(value);
     propagateChange(name, value);

@@ -25,7 +25,7 @@ import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdField
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
-import org.graylog.storage.opensearch3.client.IndexerHostsAdapterOS2;
+import org.graylog.storage.opensearch3.client.IndexerHostsAdapterOS;
 import org.graylog.storage.opensearch3.client.OSCredentialsProvider;
 import org.graylog.storage.opensearch3.client.OpensearchCredentialsProvider;
 import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetrieverOS;
@@ -81,10 +81,12 @@ public class OpenSearch3Module extends VersionAwareModule {
             bindForSupportedVersion(IndexTemplateAdapter.class).to(LegacyIndexTemplateAdapter.class);
         }
         bindForSupportedVersion(IndexFieldTypePollerAdapter.class).to(IndexFieldTypePollerAdapterOS.class);
+
         bindForSupportedVersion(IndexToolsAdapter.class).to(IndexToolsAdapterOS.class);
-        bindForSupportedVersion(MessagesAdapter.class).to(MessagesAdapterOS2.class);
-        bindForSupportedVersion(MultiChunkResultRetriever.class).to(PaginationOS2.class);
-        bindForSupportedVersion(MoreSearchAdapter.class).to(MoreSearchAdapterOS2.class);
+        bindForSupportedVersion(MessagesAdapter.class).to(MessagesAdapterOS.class);
+        bindForSupportedVersion(MultiChunkResultRetriever.class).to(PaginationOS.class);
+        bindForSupportedVersion(MoreSearchAdapter.class).to(MoreSearchAdapterOS.class);
+
         bindForSupportedVersion(NodeAdapter.class).to(NodeAdapterOS.class);
         bindForSupportedVersion(SearchesAdapter.class).to(SearchesAdapterOS.class);
         bindForSupportedVersion(V20170607164210_MigrateReopenedIndicesToAliases.ClusterState.class)
@@ -96,7 +98,7 @@ public class OpenSearch3Module extends VersionAwareModule {
 
         bindForSupportedVersion(ProxyRequestAdapter.class).to(ProxyRequestAdapterOS.class);
 
-        install(new FactoryModuleBuilder().build(ScrollResultOS2.Factory.class));
+        install(new FactoryModuleBuilder().build(ScrollResultOS.Factory.class));
 
         bind(RestHighLevelClient.class).toProvider(RestClientProvider.class);
         bind(OfficialOpensearchClient.class).toProvider(OfficialOpensearchClientProvider.class).asEagerSingleton();
@@ -112,7 +114,7 @@ public class OpenSearch3Module extends VersionAwareModule {
         snifferFilters.addBinding().to(NodeAttributesFilter.class);
         snifferFilters.addBinding().to(NodeLoggingFilter.class);
 
-        bindForSupportedVersion(IndexerHostsAdapter.class).to(IndexerHostsAdapterOS2.class);
+        bindForSupportedVersion(IndexerHostsAdapter.class).to(IndexerHostsAdapterOS.class);
     }
 
     private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass) {
