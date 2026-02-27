@@ -616,6 +616,7 @@ type MarkdownAugmentation = {
 
 export type EventReplaySideBarDetailsProps = {
   alertId: string;
+  definitionId?: string;
 };
 
 export type EventReplaySideBarPlugin = {

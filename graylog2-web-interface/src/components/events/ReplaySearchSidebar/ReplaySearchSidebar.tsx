@@ -22,9 +22,10 @@ import type { EventReplaySideBarDetailsProps } from 'views/types';
 
 type Props = {
   alertId: string;
+  definitionId?: string;
 };
 
-const ReplaySearchSidebar = ({ alertId }: Props) => {
+const ReplaySearchSidebar = ({ alertId, definitionId }: Props) => {
 
   const sideBarDetailsPlugin = usePluginEntities('views.components.eventReplay.sideBarDetails');
 
@@ -38,7 +39,7 @@ const ReplaySearchSidebar = ({ alertId }: Props) => {
     return GeneralEventSideBar;
   }, [sideBarDetailsPlugin]);
 
-  return <EventSideBarDetails alertId={alertId} />;
+  return <EventSideBarDetails alertId={alertId} definitionId={definitionId} />;
 };
 
 export default ReplaySearchSidebar;

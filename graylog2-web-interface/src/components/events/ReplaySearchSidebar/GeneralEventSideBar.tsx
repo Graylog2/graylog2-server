@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 import EventDetailsTable from 'components/events/events/EventDetailsTable';
@@ -26,6 +26,8 @@ import useEventById from 'hooks/useEventById';
 import { Spinner } from 'components/common';
 import ExpandableSection from 'components/events/ReplaySearchSidebar/ExpandableSection';
 import EventDefinitionInfoTable from 'components/event-definitions/replay-search/EventDefinitionInfoTable';
+import ReplaySearchContext from 'components/event-definitions/replay-search/ReplaySearchContext';
+import type { ReplaySearchContextType } from 'components/event-definitions/replay-search/ReplaySearchContext';
 
 const attributesList = [
   {
@@ -55,9 +57,22 @@ const attributesRenderers = {
   message: { renderCell: WordBreakRenderer },
 };
 
-const GeneralEventSideBar = ({ alertId }: EventReplaySideBarDetailsProps) => {
+const GeneralEventSideBar = ({ alertId, definitionId }: EventReplaySideBarDetailsProps) => {
   const { data: eventData, isLoading: isLoadingEvent } = useEventById(alertId);
-  const { meta, eventDefinitionEventProcedureId, isLoadingEventDefinition } = useEventsAdditionalData({ eventData });
+  const resolvedDefinitionId = definitionId ?? eventData?.event_definition_id;
+  const { meta, eventDefinitionEventProcedureId, isLoadingEventDefinition } = useEventsAdditionalData({
+    eventData,
+    definitionId: resolvedDefinitionId,
+  });
+
+  const replaySearchContext = useMemo<ReplaySearchContextType>(
+    () => ({
+      alertId,
+      definitionId: resolvedDefinitionId,
+      type: eventData?.alert ? 'alert' : 'event',
+    }),
+    [alertId, resolvedDefinitionId, eventData?.alert],
+  );
 
   if (isLoadingEvent || isLoadingEventDefinition) return <Spinner />;
 
@@ -71,9 +86,11 @@ const GeneralEventSideBar = ({ alertId }: EventReplaySideBarDetailsProps) => {
           attributesRenderers={attributesRenderers}
         />
       </ExpandableSection>
-      <ExpandableSection title="Event Definition Details">
-        <EventDefinitionInfoTable />
-      </ExpandableSection>
+      <ReplaySearchContext.Provider value={replaySearchContext}>
+        <ExpandableSection title="Event Definition Details">
+          <EventDefinitionInfoTable />
+        </ExpandableSection>
+      </ReplaySearchContext.Provider>
       <ExpandableSection title="Event Procedure Summary">
         <RemediationSteps
           event={eventData}

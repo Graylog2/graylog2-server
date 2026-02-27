@@ -29,7 +29,7 @@ import useReplaySearchContext from 'components/event-definitions/replay-search/h
 
 import useAlertAndEventDefinitionData from './useAlertAndEventDefinitionData';
 
-import AggregationConditions from '../AggregationConditions';
+// import AggregationConditions from '../AggregationConditions';
 import Notifications from '../Notifications';
 
 const AlertTimestamp = styled(Timestamp)(
@@ -96,11 +96,11 @@ const useAttributeComponents = () => {
         content: <Notifications />,
       },
       { title: 'Description', content: eventDefinition.description, inRows: true },
-      {
-        title: 'Aggregation conditions',
-        content: <AggregationConditions />,
-        inRows: true,
-      },
+      // {
+      //   title: 'Aggregation conditions',
+      //   content: <AggregationConditions />,
+      //   inRows: true,
+      // },
     ];
   }, [eventData?.timestamp, eventDefinition, type]);
 };
