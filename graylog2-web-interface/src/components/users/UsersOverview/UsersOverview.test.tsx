@@ -55,11 +55,12 @@ const clickMoreActions = async (username: string) => {
 const extendedTimeout = applyTimeoutMultiplier(30000);
 
 describe('UsersOverview', () => {
-  const renderSUT = () => render(
-    <DefaultQueryParamProvider>
-      <UsersOverview />
-    </DefaultQueryParamProvider>,
-  );
+  const renderSUT = () =>
+    render(
+      <DefaultQueryParamProvider>
+        <UsersOverview />
+      </DefaultQueryParamProvider>,
+    );
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -162,9 +163,9 @@ describe('UsersOverview', () => {
     it(
       'see edit and edit tokens link for a modifiable user',
       async () => {
-      asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(
-        Promise.resolve({ ...paginatedUsers, list: modifiableUsersList }),
-      );
+        asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(
+          Promise.resolve({ ...paginatedUsers, list: modifiableUsersList }),
+        );
         renderSUT();
 
         await screen.findByTitle(`Edit user ${modifiableUser.fullName}`);

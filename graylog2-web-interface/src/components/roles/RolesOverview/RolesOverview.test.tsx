@@ -56,11 +56,12 @@ jest.mock('stores/roles/AuthzRolesStore', () => ({
 }));
 
 describe('RolesOverview', () => {
-  const renderSUT = () => render(
-    <DefaultQueryParamProvider>
-      <RolesOverview />
-    </DefaultQueryParamProvider>,
-  );
+  const renderSUT = () =>
+    render(
+      <DefaultQueryParamProvider>
+        <RolesOverview />
+      </DefaultQueryParamProvider>,
+    );
 
   afterEach(() => {
     jest.clearAllMocks();

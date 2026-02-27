@@ -35,11 +35,12 @@ const rulesPlugin = {
 };
 describe('RulesPage', () => {
   usePluginExports(rulesPlugin);
-  const renderSUT = () => render(
-    <DefaultQueryParamProvider>
-      <RulesPage />
-    </DefaultQueryParamProvider>,
-  );
+  const renderSUT = () =>
+    render(
+      <DefaultQueryParamProvider>
+        <RulesPage />
+      </DefaultQueryParamProvider>,
+    );
 
   it('should show create rule button', async () => {
     renderSUT();

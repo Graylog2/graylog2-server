@@ -70,13 +70,12 @@ const DashboardActions = ({
 describe('DashboardActions', () => {
   const simpleDashboard = simpleView();
   const menuIsHidden = () => expect(screen.queryByRole('menu')).not.toBeInTheDocument();
-  const renderSUT = (
-    props: React.ComponentProps<typeof DashboardActions> = { dashboard: simpleDashboard },
-  ) => render(
-    <DefaultQueryParamProvider>
-      <DashboardActions {...props} />
-    </DefaultQueryParamProvider>,
-  );
+  const renderSUT = (props: React.ComponentProps<typeof DashboardActions> = { dashboard: simpleDashboard }) =>
+    render(
+      <DefaultQueryParamProvider>
+        <DashboardActions {...props} />
+      </DefaultQueryParamProvider>,
+    );
 
   const clickDashboardAction = async (action: string) => {
     userEvent.click(await screen.findByRole('button', { name: /more/i }));
