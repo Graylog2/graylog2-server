@@ -98,9 +98,6 @@ describe('Slicing', () => {
     const onChangeSlicing = jest.fn();
     renderSUT({ onChangeSlicing });
 
-    const button = await screen.findByRole('button', { name: /status/i });
-    await userEvent.click(button);
-
     const noSlicingButton = await screen.findByRole('button', { name: /no slicing/i });
     await userEvent.click(noSlicingButton);
 
