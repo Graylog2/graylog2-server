@@ -14,34 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export {
-  useFleets,
-  useFleet,
-  useFleetStats,
-  fetchPaginatedFleets,
-  fleetsKeyFn,
-  FLEETS_KEY_PREFIX,
-} from './useFleetQueries';
+import {useQuery, skipToken} from '@tanstack/react-query';
+import {SystemInputs} from '@graylog/server-api';
+import {defaultOnError} from 'util/conditional/onError';
 
-export {
-  useInstances,
-  fetchPaginatedInstances,
-  instancesKeyFn,
-  INSTANCES_KEY_PREFIX,
-} from './useInstanceQueries';
+const useInput = (inputId: string | null) =>
+  useQuery({
+    queryKey: ['inputs', inputId],
+    queryFn: inputId
+      ? () => defaultOnError(
+        SystemInputs.get(inputId),
+        'Loading input failed with status',
+        'Could not load input',
+      )
+      : skipToken,
+  });
 
-export type { PaginatedCollectorsResponse } from './useInstanceQueries';
-
-export {
-  useSources,
-  fetchPaginatedSources,
-  sourcesKeyFn,
-  SOURCES_KEY_PREFIX,
-} from './useSourceQueries';
-
-export {
-  useCollectorStats,
-  useCollectorsConfig,
-} from './useCollectorConfig';
-
-export { default as useCollectorsMutations } from './useCollectorsMutations';
+export default useInput;

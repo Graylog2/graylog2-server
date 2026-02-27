@@ -19,6 +19,11 @@ package org.graylog.collectors.rest;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -123,7 +128,7 @@ public class FleetResource extends RestResource {
     @Path("/{fleetId}")
     @Timed
     @Operation(summary = "Get a single fleet")
-    public FleetResponse get(@Parameter(name = "fleetId") @PathParam("fleetId") String fleetId) {
+    public FleetResponse get(@Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId) {
         checkPermission(FleetPermissions.FLEET_READ, fleetId);
         // TODO: audit event
         return fleetService.get(fleetId)
@@ -135,7 +140,7 @@ public class FleetResource extends RestResource {
     @Path("/{fleetId}/stats")
     @Timed
     @Operation(summary = "Get statistics for a fleet")
-    public FleetStatsResponse stats(@Parameter(name = "fleetId") @PathParam("fleetId") String fleetId) {
+    public FleetStatsResponse stats(@Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId) {
         checkPermission(FleetPermissions.FLEET_READ, fleetId);
         if (fleetService.get(fleetId).isEmpty()) {
             throw new NotFoundException("Fleet " + fleetId + " not found");
@@ -152,9 +157,12 @@ public class FleetResource extends RestResource {
     @Timed
     @Operation(summary = "Create a new fleet")
     @RequiresPermissions(FleetPermissions.FLEET_CREATE)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "The newly created fleet", content = @Content(schema = @Schema(implementation =  FleetResponse.class))),
+    })
     // TODO: audit event
     @NoAuditEvent("todo")
-    public Response create(@Valid @NotNull CreateFleetRequest request) {
+    public Response create(@Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) CreateFleetRequest request) {
         final FleetDTO created = fleetService.create(request.name(), request.description(), request.targetVersion());
         final FleetResponse response = FleetResponse.fromDTO(created);
         final URI uri = getUriBuilderToSelf().path(FleetResource.class, "get")
@@ -168,7 +176,8 @@ public class FleetResource extends RestResource {
     @Operation(summary = "Update a fleet")
     // TODO: audit event
     @NoAuditEvent("todo")
-    public FleetResponse update(@Parameter(name = "fleetId") @PathParam("fleetId") String fleetId, @Valid @NotNull UpdateFleetRequest request) {
+    public FleetResponse update(@Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId,
+                                @Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) UpdateFleetRequest request) {
         checkPermission(FleetPermissions.FLEET_EDIT, fleetId);
         return fleetService.update(fleetId, request.name(), request.description(), request.targetVersion())
                 .map(FleetResponse::fromDTO)
@@ -181,7 +190,7 @@ public class FleetResource extends RestResource {
     @Operation(summary = "Delete a fleet")
     // TODO: audit event
     @NoAuditEvent("todo")
-    public void delete(@Parameter(name = "fleetId") @PathParam("fleetId") String fleetId) {
+    public void delete(@Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId) {
         checkPermission(FleetPermissions.FLEET_DELETE, fleetId);
         // TODO should this fail if there are still collectors using it? should a replacement fleed be required?
         if (!fleetService.delete(fleetId)) {

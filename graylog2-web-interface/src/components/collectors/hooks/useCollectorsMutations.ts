@@ -14,33 +14,34 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import {useMutation, useQueryClient} from '@tanstack/react-query';
+
+import { CollectorsFleets, CollectorsSources, CollectorsConfig as CollectorsConfigApi, OpAMPEnrollment } from '@graylog/server-api';
 
 import UserNotification from 'util/UserNotification';
 
-import type { CollectorsConfigRequest } from '../types';
-import {
-  createFleet,
-  updateFleet,
-  deleteFleet,
-  createSource,
-  updateSource,
-  deleteSource,
-  createEnrollmentToken,
-  updateCollectorsConfig,
-} from './collectorsApi';
+import type {CollectorsConfigRequest, Fleet, Source} from '../types';
 
-const COLLECTORS_QUERY_KEY = ['collectors'];
+type CreateSourceInput = {
+  fleetId: string;
+  source: Omit<Source, 'id' | 'fleet_id'>;
+};
+type UpdateSourceInput = {
+  fleetId: string;
+  sourceId: string;
+  updates: Omit<Source, 'id' | 'fleet_id'>;
+};
 
 const useCollectorsMutations = () => {
   const queryClient = useQueryClient();
 
   const invalidateCollectorsQueries = () =>
-    queryClient.invalidateQueries({ queryKey: COLLECTORS_QUERY_KEY });
+    queryClient.invalidateQueries({ queryKey: ['collectors'] });
 
   // Fleet mutations
   const createFleetMutation = useMutation({
-    mutationFn: createFleet,
+    mutationFn: (input: { name: string; description?: string; target_version?: string | null }) =>
+      CollectorsFleets.create({ name: input.name, description: input.description, target_version: input.target_version ?? null }),
     onError: (errorThrown) => {
       UserNotification.error(
         `Creating fleet failed: ${errorThrown}`,
@@ -55,7 +56,12 @@ const useCollectorsMutations = () => {
   });
 
   const updateFleetMutation = useMutation({
-    mutationFn: updateFleet,
+    mutationFn: ({ fleetId, updates }: { fleetId: string; updates: Partial<Fleet> }) =>
+      CollectorsFleets.update(fleetId, {
+        name: updates.name,
+        description: updates.description,
+        target_version: updates.target_version ?? null,
+      }),
     onError: (errorThrown) => {
       UserNotification.error(
         `Updating fleet failed: ${errorThrown}`,
@@ -70,7 +76,7 @@ const useCollectorsMutations = () => {
   });
 
   const deleteFleetMutation = useMutation({
-    mutationFn: deleteFleet,
+    mutationFn: (fleetId: string) => CollectorsFleets.remove(fleetId),
     onError: (errorThrown) => {
       UserNotification.error(
         `Deleting fleet failed: ${errorThrown}`,
@@ -86,7 +92,13 @@ const useCollectorsMutations = () => {
 
   // Source mutations
   const createSourceMutation = useMutation({
-    mutationFn: createSource,
+    mutationFn: ({ fleetId, source }: CreateSourceInput) =>
+      CollectorsSources.create(fleetId, {
+        name: source.name,
+        description: source.description,
+        enabled: source.enabled,
+        config: { type: source.type, ...source.config },
+      }) as Promise<Source>,
     onError: (errorThrown) => {
       UserNotification.error(
         `Creating source failed: ${errorThrown}`,
@@ -101,7 +113,13 @@ const useCollectorsMutations = () => {
   });
 
   const updateSourceMutation = useMutation({
-    mutationFn: updateSource,
+    mutationFn: ({ fleetId, sourceId, updates }: UpdateSourceInput) =>
+      CollectorsSources.update(fleetId, sourceId, {
+        name: updates.name,
+        description: updates.description,
+        enabled: updates.enabled,
+        config: { type: updates.type, ...updates.config },
+      }) as Promise<Source>,
     onError: (errorThrown) => {
       UserNotification.error(
         `Updating source failed: ${errorThrown}`,
@@ -116,7 +134,8 @@ const useCollectorsMutations = () => {
   });
 
   const deleteSourceMutation = useMutation({
-    mutationFn: deleteSource,
+    mutationFn: ({ fleetId, sourceId }: { fleetId: string; sourceId: string }) =>
+      CollectorsSources.remove(fleetId, sourceId),
     onError: (errorThrown) => {
       UserNotification.error(
         `Deleting source failed: ${errorThrown}`,
@@ -132,7 +151,11 @@ const useCollectorsMutations = () => {
 
   // Enrollment token mutation
   const createEnrollmentTokenMutation = useMutation({
-    mutationFn: createEnrollmentToken,
+    mutationFn: (input: { fleetId: string; expiresIn: string | null }) =>
+      OpAMPEnrollment.createToken({
+        fleet_id: input.fleetId,
+        expires_in: input.expiresIn,
+      }),
     onError: (errorThrown) => {
       UserNotification.error(
         `Creating enrollment token failed: ${errorThrown}`,
@@ -143,7 +166,7 @@ const useCollectorsMutations = () => {
 
   // Config mutation
   const updateConfigMutation = useMutation({
-    mutationFn: (config: CollectorsConfigRequest) => updateCollectorsConfig(config),
+    mutationFn: (config: CollectorsConfigRequest) => CollectorsConfigApi.put(config),
     onError: (errorThrown) => {
       UserNotification.error(
         `Saving collectors config failed: ${errorThrown}`,

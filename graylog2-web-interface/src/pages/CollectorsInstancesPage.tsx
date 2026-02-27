@@ -30,7 +30,7 @@ import {
   useFleets,
   useSources,
 } from 'components/collectors/hooks';
-import { useCollectorsConfig } from 'components/collectors/hooks/useCollectors';
+import { useCollectorsConfig } from 'components/collectors/hooks';
 import type { CollectorInstanceView } from 'components/collectors/types';
 import customColumnRenderers from 'components/collectors/instances/ColumnRenderers';
 import useTableElements from 'components/collectors/instances/useTableElements';

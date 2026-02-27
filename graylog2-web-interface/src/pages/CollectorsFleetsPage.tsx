@@ -25,7 +25,7 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import { FleetFormModal } from 'components/collectors/fleets';
 import { fetchPaginatedFleets, fleetsKeyFn, useCollectorsMutations } from 'components/collectors/hooks';
-import { useCollectorsConfig } from 'components/collectors/hooks/useCollectors';
+import { useCollectorsConfig } from 'components/collectors/hooks';
 import type { Fleet } from 'components/collectors/types';
 import customColumnRenderers from 'components/collectors/fleets/ColumnRenderers';
 import { DEFAULT_LAYOUT } from 'components/collectors/fleets/Constants';

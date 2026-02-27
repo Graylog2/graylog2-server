@@ -22,9 +22,11 @@ import { Spinner } from 'components/common';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import InputStateBadge from 'components/inputs/InputStateBadge';
+import useInput from 'hooks/useInput';
 import useInputsStates from 'hooks/useInputsStates';
 
-import { useCollectorsConfig, useInput } from '../hooks/useCollectors';
+import { useCollectorsConfig } from '../hooks';
+import {} from '../../inputs/hooks/useIsInitialUnknownInputState'
 import useCollectorsMutations from '../hooks/useCollectorsMutations';
 import type { CollectorsConfigRequest } from '../types';
 
@@ -42,8 +44,8 @@ const CollectorsSettings = () => {
   const { updateConfig, isUpdatingConfig } = useCollectorsMutations();
   const isConfigured = !!config?.opamp_ca_id;
   const { data: inputStates } = useInputsStates({ enabled: isConfigured });
-  const { data: httpInput } = useInput(config?.http?.input_id ?? null);
-  const { data: grpcInput } = useInput(config?.grpc?.input_id ?? null);
+  const { data: httpInput } = useInput(config?.http?.input_id);
+  const { data: grpcInput } = useInput(config?.grpc?.input_id);
 
   const [http, setHttp] = useState<EndpointFormState>(DEFAULT_HTTP);
   const [grpc, setGrpc] = useState<EndpointFormState>(DEFAULT_GRPC);

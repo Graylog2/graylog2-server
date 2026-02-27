@@ -17,6 +17,7 @@
 package org.graylog.collectors.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
@@ -28,6 +29,7 @@ import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.SecurityUtils;
@@ -83,7 +85,7 @@ public class CollectorsConfigResource extends RestResource {
 
     @GET
     @Operation(summary = "Get collectors configuration")
-    public CollectorsConfig get(@Context jakarta.ws.rs.container.ContainerRequestContext requestContext) {
+    public CollectorsConfig get(@Context ContainerRequestContext requestContext) {
         final var existing = clusterConfigService.get(CollectorsConfig.class);
         if (existing != null) {
             return existing;
@@ -100,7 +102,7 @@ public class CollectorsConfigResource extends RestResource {
     @NoAuditEvent("TODO")
     @PUT
     @Operation(summary = "Update collectors configuration")
-    public CollectorsConfig put(@Valid @NotNull CollectorsConfigRequest request) {
+    public CollectorsConfig put(@Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) CollectorsConfigRequest request) {
         // 1. Initialize CA hierarchy (creates certs if needed, caches in memory)
         opAmpCaService.ensureInitialized();
 

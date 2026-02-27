@@ -19,6 +19,7 @@ package org.graylog.collectors.rest;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -83,7 +84,7 @@ public class SourceResource extends RestResource {
     @Timed
     @Operation(summary = "Get a paginated list of sources for a fleet")
     public PageListResponse<SourceResponse> list(
-            @Parameter(name = "fleetId") @PathParam("fleetId") String fleetId,
+            @Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId,
             @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
             @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
             @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
@@ -116,8 +117,8 @@ public class SourceResource extends RestResource {
     @Timed
     @Operation(summary = "Get a single source")
     public SourceResponse get(
-            @Parameter(name = "fleetId") @PathParam("fleetId") String fleetId,
-            @Parameter(name = "sourceId") @PathParam("sourceId") String sourceId) {
+            @Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId,
+            @Parameter(name = "sourceId", required = true) @PathParam("sourceId") String sourceId) {
         checkPermission(FleetPermissions.SOURCE_READ, sourceId);
         // TODO: audit event
         return sourceService.get(fleetId, sourceId)
@@ -132,8 +133,8 @@ public class SourceResource extends RestResource {
     // TODO: audit event
     @NoAuditEvent("todo")
     public Response create(
-            @Parameter(name = "fleetId") @PathParam("fleetId") String fleetId,
-            @Valid @NotNull CreateSourceRequest request) {
+            @Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId,
+            @Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) CreateSourceRequest request) {
         final SourceDTO created;
         try {
             created = sourceService.create(fleetId, request.name(), request.description(), request.enabled(), request.config());
@@ -159,9 +160,9 @@ public class SourceResource extends RestResource {
     // TODO: audit event
     @NoAuditEvent("todo")
     public Response update(
-            @Parameter(name = "fleetId") @PathParam("fleetId") String fleetId,
-            @Parameter(name = "sourceId") @PathParam("sourceId") String sourceId,
-            @Valid @NotNull UpdateSourceRequest request) {
+            @Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId,
+            @Parameter(name = "sourceId", required = true) @PathParam("sourceId") String sourceId,
+            @Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) UpdateSourceRequest request) {
         checkPermission(FleetPermissions.SOURCE_EDIT, sourceId);
         // TODO: audit event
         try {
@@ -186,8 +187,8 @@ public class SourceResource extends RestResource {
     // TODO: audit event
     @NoAuditEvent("todo")
     public void delete(
-            @Parameter(name = "fleetId") @PathParam("fleetId") String fleetId,
-            @Parameter(name = "sourceId") @PathParam("sourceId") String sourceId) {
+            @Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId,
+            @Parameter(name = "sourceId", required = true) @PathParam("sourceId") String sourceId) {
         checkPermission(FleetPermissions.SOURCE_DELETE, sourceId);
         // TODO: audit event
         if (!sourceService.delete(fleetId, sourceId)) {

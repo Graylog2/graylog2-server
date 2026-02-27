@@ -21,7 +21,7 @@ import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { DeploymentForm } from 'components/collectors/deployment';
 import { CollectorsPageNavigation } from 'components/collectors/common';
-import { useCollectorsConfig } from 'components/collectors/hooks/useCollectors';
+import { useCollectorsConfig } from 'components/collectors/hooks';
 import Routes from 'routing/Routes';
 
 const CollectorsDeploymentPage = () => {
