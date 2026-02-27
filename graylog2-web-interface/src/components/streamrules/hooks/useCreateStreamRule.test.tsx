@@ -137,10 +137,15 @@ describe('useCreateStreamRule', () => {
     userEvent.click(screen.getByRole('button', { name: /create-rule/i }));
 
     await screen.findByText('start-dialog-open');
+    await waitFor(() => expect(mockInvalidateQueries).toHaveBeenCalledTimes(1));
 
     userEvent.click(screen.getByRole('button', { name: /start-stream/i }));
 
     await waitFor(() => expect(mockResumeStream).toHaveBeenCalledWith('stream-id', expect.any(Function)));
+    await waitFor(() => expect(mockInvalidateQueries).toHaveBeenCalledTimes(2));
+    expect(mockInvalidateQueries).toHaveBeenLastCalledWith({
+      queryKey: ['stream', 'stream-id'],
+    });
     await waitFor(() => expect(screen.queryByText('start-dialog-open')).not.toBeInTheDocument());
   });
 });

@@ -76,10 +76,13 @@ const useCreateStreamRule = ({ streamId, streamIsPaused }: Props): Result => {
       await StreamsStore.resume(streamId, () => {
         setShowStartStreamDialog(false);
       });
+      queryClient.invalidateQueries({
+        queryKey: ['stream', streamId],
+      });
     } finally {
       setIsStartingStream(false);
     }
-  }, [streamId]);
+  }, [queryClient, streamId]);
 
   return {
     onCreateStreamRule,
