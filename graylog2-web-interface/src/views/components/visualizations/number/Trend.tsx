@@ -71,6 +71,9 @@ const StyledIcon = styled(Icon)<{ $trend: TrendDirection | undefined }>(({ theme
 });
 
 const _trendDirection = (delta: number, trendPreference: TrendPreference): TrendDirection => {
+  if (delta === 0) {
+    return 'neutral';
+  }
   switch (trendPreference) {
     case 'LOWER':
       return delta > 0 ? 'bad' : 'good';
@@ -160,7 +163,7 @@ const Trend = (
     : '--';
 
   return (
-    <Background $trend={backgroundTrend} data-testid="trend-background">
+    <Background $trend={backgroundTrend} data-testid="trend-background" data-trend={backgroundTrend}>
       <TextContainer $trend={backgroundTrend} ref={ref}>
         <StyledIcon name={trendIcon} $trend={backgroundTrend} data-testid="trend-icon" />{' '}
         <span data-testid="trend-value" title={`Previous value: ${previousConverted}`}>
