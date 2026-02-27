@@ -37,7 +37,7 @@ public class SearchMetadataIT {
     @BeforeAll
     static void beforeAll(GraylogApis graylogApis) {
         api = graylogApis;
-        api.backend().importMongoDBFixture("mongodb-stored-searches-for-metadata-endpoint.json", SearchMetadataIT.class);
+        api.backend().dataBaseInstance().importFixture("mongodb-stored-searches-for-metadata-endpoint.json", SearchMetadataIT.class);
     }
 
     @FullBackendTest
