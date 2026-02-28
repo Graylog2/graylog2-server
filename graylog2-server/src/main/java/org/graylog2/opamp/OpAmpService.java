@@ -341,15 +341,15 @@ public class OpAmpService {
                             .forEach(receiverConfig -> receiverConfigs.put(receiverConfig.name(), receiverConfig));
                 }
 
-                // We don't want the noop receiver in the groups.
-                final var receiverGroups = receiverConfigs.values().stream()
-                        .collect(Collectors.groupingBy(OtlpReceiverConfig::type));
-
+                // The Collector must at least have one receiver to avoid a startup error.
                 if (receiverConfigs.isEmpty()) {
-                    // The Collector must at least have one receiver to avoid a startup error.
                     final var noop = NoopReceiverConfig.instance();
                     receiverConfigs.put(noop.name(), noop);
                 }
+
+                final var receiverGroups = receiverConfigs.values().stream()
+                        .collect(Collectors.groupingBy(OtlpReceiverConfig::type));
+
                 configBuilder.receivers(receiverConfigs);
                 configBuilder.exporters(Map.of(effectiveOtlpEndpoint.getName(), effectiveOtlpEndpoint));
 
