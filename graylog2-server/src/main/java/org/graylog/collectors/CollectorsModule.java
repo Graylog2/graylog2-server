@@ -22,6 +22,7 @@ import com.google.inject.multibindings.Multibinder;
 import org.graylog.collectors.config.FilelogReceiverConfig;
 import org.graylog.collectors.config.JournaldReceiverConfig;
 import org.graylog.collectors.config.MacOSUnifiedLoggingReceiverConfig;
+import org.graylog.collectors.config.WindowsEventLogReceiverConfig;
 import org.graylog.collectors.db.FileSourceConfig;
 import org.graylog.collectors.db.JournaldSourceConfig;
 import org.graylog.collectors.db.MacOSUnifiedLoggingSourceConfig;
@@ -36,6 +37,7 @@ import org.graylog.collectors.input.processor.FilelogRecordProcessor;
 import org.graylog.collectors.input.processor.JournaldRecordProcessor;
 import org.graylog.collectors.input.processor.LogRecordProcessor;
 import org.graylog.collectors.input.processor.MacOSUnifiedLoggingRecordProcessor;
+import org.graylog.collectors.input.processor.WindowsEventLogRecordProcessor;
 import org.graylog.collectors.input.transport.CollectorIngestGrpcTransport;
 import org.graylog.collectors.input.transport.CollectorIngestHttpTransport;
 import org.graylog.collectors.input.transport.CollectorIngestLogsService;
@@ -75,6 +77,7 @@ public class CollectorsModule extends PluginModule {
         logRecordProcessorBinder.addBinding(FilelogReceiverConfig.RECEIVER_TYPE).to(FilelogRecordProcessor.class);
         logRecordProcessorBinder.addBinding(JournaldReceiverConfig.RECEIVER_TYPE).to(JournaldRecordProcessor.class);
         logRecordProcessorBinder.addBinding(MacOSUnifiedLoggingReceiverConfig.RECEIVER_TYPE).to(MacOSUnifiedLoggingRecordProcessor.class);
+        logRecordProcessorBinder.addBinding(WindowsEventLogReceiverConfig.RECEIVER_TYPE).to(WindowsEventLogRecordProcessor.class);
 
         if (otlpDumpEnabled) {
             bind(OtlpTrafficDump.class).to(OtlpTrafficDumpService.class).asEagerSingleton();
