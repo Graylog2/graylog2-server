@@ -26,7 +26,6 @@ import useInput from 'hooks/useInput';
 import useInputsStates from 'hooks/useInputsStates';
 
 import { useCollectorsConfig } from '../hooks';
-import {} from '../../inputs/hooks/useIsInitialUnknownInputState'
 import useCollectorsMutations from '../hooks/useCollectorsMutations';
 import type { CollectorsConfigRequest } from '../types';
 
