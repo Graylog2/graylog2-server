@@ -1,0 +1,32 @@
+{
+  "nodes": [
+    {
+      "_id": {
+        "$oid": "5a82f5974b900a7a97caa1e1"
+      },
+      "node_id": "node-uuid-123",
+      "hostname": "webserver1"
+    },
+    {
+      "_id": {
+        "$oid": "5a82f5974b900a7a97caa1e2"
+      },
+      "node_id": "node-uuid-456",
+      "hostname": "webserver2"
+    },
+    {
+      "_id": {
+        "$oid": "5a82f5974b900a7a97caa1e3"
+      },
+      "node_id": "node-uuid-789",
+      "hostname": null
+    },
+    {
+      "_id": {
+        "$oid": "5a82f5974b900a7a97caa1e4"
+      },
+      "node_id": "node-uuid-abc",
+      "hostname": "very-long-hostname-with-lots-of-characters-in-it"
+    }
+  ]
+}
