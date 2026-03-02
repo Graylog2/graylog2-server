@@ -17,7 +17,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Link, LinkContainer } from 'components/common/router';
+import { Link, LinkContainer, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import { CounterRate, MetricContainer } from 'components/metrics';
 import PipelineConnectionsList from 'components/pipelines/PipelineConnectionsList';
@@ -33,7 +33,6 @@ import usePermissions from 'hooks/usePermissions';
 import PipelineProcessingErrors from './PipelineProcessingErrors';
 
 import ButtonToolbar from '../bootstrap/ButtonToolbar';
-import { Spinner } from '../common';
 
 type Props = {
   pipeline: PipelineType;
