@@ -17,9 +17,8 @@
 import React from 'react';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
-import { Link } from 'components/common/router';
+import { Link, Select } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Panel, Row } from 'components/bootstrap';
-import { Select } from 'components/common';
 import RawMessageLoader from 'components/messageloaders/RawMessageLoader';
 import Routes from 'routing/Routes';
 import { SimulatorActions } from 'stores/simulator/SimulatorStore';

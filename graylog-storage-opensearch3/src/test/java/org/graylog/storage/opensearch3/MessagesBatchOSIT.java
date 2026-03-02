@@ -22,7 +22,7 @@ import org.graylog.testing.elasticsearch.SearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.messages.MessagesBatchIT;
 
-public class MessagesBatchOS2IT extends MessagesBatchIT {
+public class MessagesBatchOSIT extends MessagesBatchIT {
     @SearchInstance
     public final OpenSearchInstance openSearchInstance = OpenSearchInstanceBuilder.builder()
             .heapSize("256m")

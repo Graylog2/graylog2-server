@@ -18,8 +18,7 @@ import React from 'react';
 
 import type View from 'views/logic/views/View';
 import type { Requirements } from 'views/logic/views/View';
-import { HoverForHelp } from 'components/common';
-import { Link } from 'components/common/router';
+import { HoverForHelp, Link } from 'components/common';
 import Routes from 'routing/Routes';
 
 const missingRequirements = (requires: Requirements, requirementsProvided: Array<string>) =>

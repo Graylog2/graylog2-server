@@ -16,11 +16,10 @@
  */
 import React, { useEffect, useState } from 'react';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, DocumentTitle, PageHeader } from 'components/common';
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
-import { DocumentTitle, PageHeader } from 'components/common';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
 import ContentPack from 'logic/content-packs/ContentPack';
 import Entity from 'logic/content-packs/Entity';
