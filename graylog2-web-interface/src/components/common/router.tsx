@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
+// eslint-disable-next-line no-restricted-imports
 import { Link, useLocation, useLinkClickHandler } from 'react-router-dom';
 
 // list of children which are being used for navigation and should receive the `active` class.

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+// eslint-disable-next-line no-restricted-imports
 import { useLocation } from 'react-router-dom';
 import Immutable from 'immutable';
 import userEvent from '@testing-library/user-event';
