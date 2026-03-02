@@ -27,7 +27,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-public class StandaloneNodeMongodbNodes implements MongodbNodesProvider {
+public class StandaloneNodeMongodbNodes implements MongodbNodesService {
 
     private final MongoClient mongoConnection;
 

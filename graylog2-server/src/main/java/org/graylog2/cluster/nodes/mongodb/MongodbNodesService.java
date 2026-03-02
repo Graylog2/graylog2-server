@@ -16,25 +16,9 @@
  */
 package org.graylog2.cluster.nodes.mongodb;
 
-import com.google.inject.Provider;
-
 import java.util.List;
-import java.util.Set;
 
-public class MongodbNodesProvider implements Provider<List<MongodbNode>> {
-
-    private final MongodbNodesService activeService;
-
-    public MongodbNodesProvider(Set<MongodbNodesService> services) {
-
-        activeService = services.stream()
-                .filter(MongodbNodesService::available)
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No MongodbNodesService available"));
-    }
-
-    @Override
-    public List<MongodbNode> get() {
-        return activeService.allNodes();
-    }
+public interface MongodbNodesService {
+    List<MongodbNode> allNodes();
+    boolean available();
 }

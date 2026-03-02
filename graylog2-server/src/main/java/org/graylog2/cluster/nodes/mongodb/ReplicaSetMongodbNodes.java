@@ -17,7 +17,6 @@
 package org.graylog2.cluster.nodes.mongodb;
 
 import com.mongodb.MongoClient;
-import com.mongodb.ReadConcern;
 import com.mongodb.client.MongoClients;
 import com.mongodb.connection.ClusterDescription;
 import com.mongodb.connection.ClusterType;
@@ -28,7 +27,7 @@ import org.graylog2.database.MongoConnection;
 import java.util.Date;
 import java.util.List;
 
-public class ReplicaSetMongodbNodes implements MongodbNodesProvider {
+public class ReplicaSetMongodbNodes implements MongodbNodesService {
 
     private final MongoClient mongoConnection;
 

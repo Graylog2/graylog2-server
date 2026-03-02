@@ -28,7 +28,9 @@ import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.nodes.ServerNodeClusterService;
 import org.graylog2.cluster.nodes.ServerNodeDto;
 import org.graylog2.cluster.nodes.ServerNodePaginatedService;
+import org.graylog2.cluster.nodes.mongodb.MongodbNode;
 import org.graylog2.cluster.nodes.mongodb.MongodbNodesProvider;
+import org.graylog2.cluster.nodes.mongodb.MongodbNodesService;
 import org.graylog2.cluster.nodes.mongodb.ReplicaSetMongodbNodes;
 import org.graylog2.cluster.nodes.mongodb.StandaloneNodeMongodbNodes;
 import org.graylog2.database.suggestions.EntitySuggestionService;
@@ -63,6 +65,8 @@ import org.graylog2.tokenusage.TokenUsageServiceImpl;
 import org.graylog2.users.UserManagementServiceImpl;
 import org.graylog2.users.UserServiceImpl;
 
+import java.util.List;
+
 public class PersistenceServicesBindings extends AbstractModule {
     @Override
     protected void configure() {
@@ -75,9 +79,10 @@ public class PersistenceServicesBindings extends AbstractModule {
         bind(new TypeLiteral<NodeService<DataNodeDto>>() {}).to(DataNodeClusterService.class);
         bind(DataNodePaginatedService.class).asEagerSingleton();
 
-        Multibinder<MongodbNodesProvider> mongodbNodesProviderBinder = Multibinder.newSetBinder(binder(), MongodbNodesProvider.class);
-        mongodbNodesProviderBinder.addBinding().to(ReplicaSetMongodbNodes.class);
-        mongodbNodesProviderBinder.addBinding().to(StandaloneNodeMongodbNodes.class);
+        Multibinder<MongodbNodesService> mongodbNodesServices = Multibinder.newSetBinder(binder(), MongodbNodesService.class);
+        mongodbNodesServices.addBinding().to(ReplicaSetMongodbNodes.class);
+        mongodbNodesServices.addBinding().to(StandaloneNodeMongodbNodes.class);
+        bind(new TypeLiteral<List<MongodbNode>>() {}).toProvider(MongodbNodesProvider.class).asEagerSingleton();
 
         bind(ServerNodePaginatedService.class).asEagerSingleton();
         bind(IndexRangeService.class).to(MongoIndexRangeService.class).asEagerSingleton();

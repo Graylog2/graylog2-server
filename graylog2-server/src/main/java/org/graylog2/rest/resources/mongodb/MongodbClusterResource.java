@@ -31,8 +31,6 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.cluster.nodes.mongodb.MongodbNode;
-import org.graylog2.utilities.lucene.InMemorySearchEngine;
-import org.graylog2.utilities.lucene.LuceneInMemorySearchEngine;
 import org.graylog2.cluster.nodes.mongodb.MongodbNodesProvider;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.SortOrder;
@@ -42,11 +40,12 @@ import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.utilities.lucene.InMemorySearchEngine;
+import org.graylog2.utilities.lucene.LuceneInMemorySearchEngine;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 @Tag(name = "System/Mongodb", description = "MongoDB Node discovery")
 @RequiresAuthentication
@@ -78,18 +77,9 @@ public class MongodbClusterResource extends RestResource {
     private final InMemorySearchEngine<MongodbNode> mongodbNodesSearchService;
 
     @Inject
-    public MongodbClusterResource(Set<MongodbNodesProvider> providers) {
-        this.mongodbNodesSearchService = new LuceneInMemorySearchEngine<>(DEFAULT_SORT_FIELD, attributes, () -> retrieveMongodbNodes(providers));
+    public MongodbClusterResource(MongodbNodesProvider provider) {
+        this.mongodbNodesSearchService = new LuceneInMemorySearchEngine<>(DEFAULT_SORT_FIELD, attributes, provider::get);
     }
-
-    private List<MongodbNode> retrieveMongodbNodes(Set<MongodbNodesProvider> providers) {
-        return providers.stream()
-                .filter(MongodbNodesProvider::available)
-                .findFirst()
-                .map(MongodbNodesProvider::allNodes)
-                .orElseThrow(() -> new IllegalStateException("No available Mongodb nodes"));
-    }
-
 
     @GET
     @Timed
