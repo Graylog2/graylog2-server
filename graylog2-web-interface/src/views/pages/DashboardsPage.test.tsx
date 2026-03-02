@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 import { usePluginExports } from 'views/test/testPlugins';
 import { prefixUrl } from 'routing/Routes';
 
@@ -49,11 +48,7 @@ const pluginExports = {
 describe('DashboardsPage', () => {
   usePluginExports(pluginExports);
   it('should render header and list', async () => {
-    render(
-      <DefaultQueryParamProvider>
-        <DashboardsPage />
-      </DefaultQueryParamProvider>,
-    );
+    render(<DashboardsPage />);
 
     await screen.findByRole('heading', { name: /dashboards/i });
     await screen.findByText('No dashboards have been found.');

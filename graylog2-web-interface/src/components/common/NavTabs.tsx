@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer } from 'components/common';
 import NavItemStateIndicator, {
   hoverIndicatorStyles,
   activeIndicatorStyles,

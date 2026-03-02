@@ -26,9 +26,9 @@ import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.graylog.datanode.configuration.DatanodeTrustManagerProvider;
-import org.graylog.storage.opensearch2.ConnectionCheckIndex;
-import org.graylog.storage.opensearch2.ConnectionCheckRequest;
-import org.graylog.storage.opensearch2.ConnectionCheckResponse;
+import org.graylog.storage.opensearch3.ConnectionCheckIndex;
+import org.graylog.storage.opensearch3.ConnectionCheckRequest;
+import org.graylog.storage.opensearch3.ConnectionCheckResponse;
 import org.graylog2.security.TrustAllX509TrustManager;
 import org.graylog2.security.untrusted.UntrustedCertificateExtractor;
 

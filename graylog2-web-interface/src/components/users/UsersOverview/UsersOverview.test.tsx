@@ -25,7 +25,6 @@ import asMock from 'helpers/mocking/AsMock';
 import mockAction from 'helpers/mocking/MockAction';
 import { UsersActions } from 'stores/users/UsersStore';
 import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import UsersOverview from './UsersOverview';
 
@@ -55,12 +54,7 @@ const clickMoreActions = async (username: string) => {
 const extendedTimeout = applyTimeoutMultiplier(30000);
 
 describe('UsersOverview', () => {
-  const renderSUT = () =>
-    render(
-      <DefaultQueryParamProvider>
-        <UsersOverview />
-      </DefaultQueryParamProvider>,
-    );
+  const renderSUT = () => render(<UsersOverview />);
 
   afterEach(() => {
     jest.clearAllMocks();
