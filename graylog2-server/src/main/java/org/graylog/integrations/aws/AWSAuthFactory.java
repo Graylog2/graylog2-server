@@ -24,8 +24,10 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.http.SdkHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sts.StsClient;
+import software.amazon.awssdk.services.sts.StsClientBuilder;
 import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider;
 import software.amazon.awssdk.services.sts.model.AssumeRoleRequest;
 import software.amazon.awssdk.services.sts.model.GetCallerIdentityRequest;
@@ -50,13 +52,27 @@ public class AWSAuthFactory {
                                          @Nullable String accessKey,
                                          @Nullable String secretKey,
                                          @Nullable String assumeRoleArn) {
+        return create(requireKeySecret, stsRegion, accessKey, secretKey, assumeRoleArn, null);
+    }
+
+    /**
+     * Resolves the appropriate AWS authorization provider, routing STS assume-role calls through the
+     * given HTTP client when {@code stsHttpClientBuilder} is non-null. Callers that need proxy support
+     * should pass an {@code ApacheHttpClient.builder()} configured with the appropriate proxy settings.
+     */
+    public AwsCredentialsProvider create(boolean requireKeySecret,
+                                         @Nullable String stsRegion,
+                                         @Nullable String accessKey,
+                                         @Nullable String secretKey,
+                                         @Nullable String assumeRoleArn,
+                                         @Nullable SdkHttpClient.Builder<?> stsHttpClientBuilder) {
         AwsCredentialsProvider awsCredentials = requireKeySecret ? getKeySecretCredentialsProvider(accessKey, secretKey) :
                 getAwsCredentialsProvider(accessKey, secretKey);
 
         // Apply the Assume Role ARN Authorization if specified. All AWSCredentialsProviders support this.
         if (!isNullOrEmpty(assumeRoleArn) && !isNullOrEmpty(stsRegion)) {
             LOG.debug("Creating cross account assume role credentials");
-            return buildStsCredentialsProvider(awsCredentials, stsRegion, assumeRoleArn, accessKey);
+            return buildStsCredentialsProvider(awsCredentials, stsRegion, assumeRoleArn, accessKey, stsHttpClientBuilder);
         }
 
         return awsCredentials;
@@ -86,9 +102,18 @@ public class AWSAuthFactory {
      * permission, which provides authorization for a role to be assumed.
      */
     private static AwsCredentialsProvider buildStsCredentialsProvider(AwsCredentialsProvider awsCredentials, String stsRegion,
-                                                                      String assumeRoleArn, @Nullable String accessKey) {
+                                                                      String assumeRoleArn, @Nullable String accessKey,
+                                                                      @Nullable SdkHttpClient.Builder<?> stsHttpClientBuilder) {
 
-        StsClient stsClient = StsClient.builder().region(Region.of(stsRegion)).credentialsProvider(awsCredentials).build();
+        final StsClientBuilder stsClientBuilder = StsClient.builder()
+                .region(Region.of(stsRegion))
+                .credentialsProvider(awsCredentials);
+
+        if (stsHttpClientBuilder != null) {
+            stsClientBuilder.httpClientBuilder(stsHttpClientBuilder);
+        }
+
+        final StsClient stsClient = stsClientBuilder.build();
 
         // The custom roleSessionName is extra metadata, which will be logged in AWS CloudTrail with each request
         // to help with auditing and debugging.

@@ -1,0 +1,4 @@
+type = "f"
+message = "Fixed STS assume-role error for the AWS S3 and Security Lake inputs when using a configured HTTP proxy."
+
+pulls = ["25072"]
