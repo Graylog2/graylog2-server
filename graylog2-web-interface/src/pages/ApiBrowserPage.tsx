@@ -288,11 +288,10 @@ const ApiBrowserPage = () => (
         url={qualifyUrl('/openapi.yaml')}
         filter
         deepLinking
-        requestInterceptor={(req) => {
-          req.headers['X-Requested-By'] = 'API Browser';
-
-          return req;
-        }}
+        requestInterceptor={(req) => ({
+          ...req,
+          headers: { ...req.headers, 'X-Requested-By': 'API Browser' },
+        })}
         plugins={[
           () => ({
             wrapComponents: {

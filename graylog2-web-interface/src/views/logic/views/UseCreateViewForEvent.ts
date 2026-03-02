@@ -94,13 +94,14 @@ const getSummaryAggregation = ({ aggregations, groupBy }) => {
   const { summaryFnSeries, summaryTitle } = aggregations.reduce(
     (res, { value, expr, fnSeries }) => {
       const concatTitle = `${fnSeries} ${expr} ${value}`;
-      res.summaryFnSeries.push(fnSeries);
-      res.summaryTitle = `${res.summaryTitle} ${concatTitle}`;
 
-      return res;
+      return {
+        summaryFnSeries: [...res.summaryFnSeries, fnSeries],
+        summaryTitle: `${res.summaryTitle} ${concatTitle}`,
+      };
     },
     {
-      summaryFnSeries: [],
+      summaryFnSeries: [] as string[],
       summaryTitle: 'Summary: ',
     },
   );
@@ -137,13 +138,14 @@ export const WidgetsGenerator = async ({ streams, streamCategories, aggregations
   const { aggregationWidgets, aggregationTitles, aggregationPositions } = aggregations.reduce(
     (res, { value, expr, fnSeries }, index) => {
       const widget = createViewWidget({ fnSeries, groupBy, expr });
-      res.aggregationWidgets.push(widget);
-      res.aggregationTitles[widget.id] = `${fnSeries} ${expr} ${value}`;
-      res.aggregationPositions[widget.id] = createViewPosition({ index, SUMMARY_ROW_DELTA });
 
-      return res;
+      return {
+        aggregationWidgets: [...res.aggregationWidgets, widget],
+        aggregationTitles: { ...res.aggregationTitles, [widget.id]: `${fnSeries} ${expr} ${value}` },
+        aggregationPositions: { ...res.aggregationPositions, [widget.id]: createViewPosition({ index, SUMMARY_ROW_DELTA }) },
+      };
     },
-    { aggregationTitles: {}, aggregationWidgets: [], aggregationPositions: {} },
+    { aggregationTitles: {} as Record<string, string>, aggregationWidgets: [] as any[], aggregationPositions: {} as Record<string, WidgetPosition> },
   );
 
   const widgets = [...aggregationWidgets, histogram, messageTable];
