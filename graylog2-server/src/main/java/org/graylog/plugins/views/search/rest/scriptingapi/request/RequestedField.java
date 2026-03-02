@@ -21,9 +21,8 @@ import com.google.common.base.Splitter;
 import javax.annotation.Nullable;
 import java.util.List;
 
-import static org.graylog.events.search.EventsSearchService.RISK_SCORE;
-
 public record RequestedField(String name, @Nullable String decorator) {
+    public static final String RISK_SCORE = "event.scores.normalized_risk";
 
     public static RequestedField parse(String value) {
         // TODO: handling of the case when we search for fields separated by "."
