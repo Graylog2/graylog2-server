@@ -21,7 +21,6 @@ import userEvent from '@testing-library/user-event';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
 import { CACHES } from 'components/lookup-tables/fixtures';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import { attributes } from './constants';
 import CacheList from './index';
@@ -74,14 +73,10 @@ jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
 }));
 
 const moreActionsName = { name: new RegExp(`More Actions for ${CACHES[0].name}`, 'i') };
-const renderSUT = () =>
-  render(
-    <DefaultQueryParamProvider>
-      <CacheList />
-    </DefaultQueryParamProvider>,
-  );
 
 describe('Cache List', () => {
+  const renderSUT = () => render(<CacheList />);
+
   it('should render a list of caches', async () => {
     renderSUT();
 

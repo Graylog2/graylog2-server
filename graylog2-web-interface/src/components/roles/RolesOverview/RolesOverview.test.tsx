@@ -22,7 +22,6 @@ import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import mockAction from 'helpers/mocking/MockAction';
 import { rolesList as mockRoles } from 'fixtures/roles';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import RolesOverview from './RolesOverview';
 
@@ -56,12 +55,7 @@ jest.mock('stores/roles/AuthzRolesStore', () => ({
 }));
 
 describe('RolesOverview', () => {
-  const renderSUT = () =>
-    render(
-      <DefaultQueryParamProvider>
-        <RolesOverview />
-      </DefaultQueryParamProvider>,
-    );
+  const renderSUT = () => render(<RolesOverview />);
 
   afterEach(() => {
     jest.clearAllMocks();
