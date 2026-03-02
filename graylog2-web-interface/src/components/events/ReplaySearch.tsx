@@ -15,47 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
-import merge from 'lodash/merge';
 
 import useCreateSearch from 'views/hooks/useCreateSearch';
-import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 import SearchPage from 'views/pages/SearchPage';
-import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import { isSystemEventDefinition } from 'components/event-definitions/event-definitions-types';
 import Center from 'components/common/Center';
 import type View from 'views/logic/views/View';
 
 type ReplaySearchProps = {
-  searchPageLayout?: Partial<LayoutState>;
   view: Promise<View>;
 };
 
-const defaultSearchPageLayout = {};
-
-const ReplaySearch = ({ searchPageLayout = defaultSearchPageLayout, view: _view }: ReplaySearchProps) => {
+const ReplaySearch = ({ view: _view }: ReplaySearchProps) => {
   const view = useCreateSearch(_view);
 
-  const _searchPageLayout = useMemo(
-    () =>
-      merge(
-        {
-          sidebar: {
-            isShown: true,
-            title: 'Replayed Search',
-          },
-        },
-        searchPageLayout,
-      ),
-    [searchPageLayout],
-  );
-
-  return (
-    <SearchPageLayoutProvider value={_searchPageLayout}>
-      <SearchPage view={view} isNew forceSideBarPinned />
-    </SearchPageLayoutProvider>
-  );
+  return <SearchPage view={view} isNew />;
 };
 
 const canReplayEvent = (eventDefinition: EventDefinition) => {

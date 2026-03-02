@@ -20,10 +20,6 @@ import styled from 'styled-components';
 import useSelectedEvents from 'components/events/bulk-replay/useSelectedEvents';
 import EventReplaySelectedProvider from 'contexts/EventReplaySelectedProvider';
 import { Alert, Button } from 'components/bootstrap';
-import type { SidebarSection } from 'views/components/sidebar/sidebarSections';
-import sidebarSections from 'views/components/sidebar/sidebarSections';
-import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
-import SidebarBulkEventReplay from 'components/events/bulk-replay/SidebarBulkEventReplay';
 import EventReplaySearch from 'components/events/EventReplaySearch';
 import useEventDefinition from 'hooks/useEventDefinition';
 import type { SelectedEventsData } from 'contexts/EventReplaySelectedContext';
@@ -51,23 +47,6 @@ const AlertWrapper = styled(Alert)(
 `,
 );
 
-const replaySection: SidebarSection = {
-  key: 'eventDescription',
-  title: null,
-  hoverTitle: 'Replayed Search',
-  icon: 'play_arrow',
-  content: ReplaySearchSidebar,
-};
-
-const searchPageLayout = {
-  sidebar: {
-    isShown: true,
-    title: SidebarBulkEventReplay,
-    sections: [replaySection, ...sidebarSections],
-    contentColumnWidth: 350,
-  },
-};
-
 const ReplayedSearch = ({
   onReturnClick,
 }: React.PropsWithChildren<{
@@ -93,7 +72,6 @@ const ReplayedSearch = ({
     <EventReplaySearch
       eventData={selectedEvent.event}
       eventDefinitionMappedData={eventDefinitionMappedData}
-      searchPageLayout={searchPageLayout}
     />
   );
 };
