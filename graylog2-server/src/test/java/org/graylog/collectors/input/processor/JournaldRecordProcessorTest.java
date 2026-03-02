@@ -24,6 +24,7 @@ import io.opentelemetry.proto.common.v1.KeyValue;
 import io.opentelemetry.proto.common.v1.KeyValueList;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import org.graylog.collectors.CollectorJournal;
+import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
@@ -98,7 +99,7 @@ class JournaldRecordProcessorTest {
         final var result = processor.process(logRecord);
 
         assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.of(
-                "vendor_event_timestamp", new DateTime(1772126101554L, DateTimeZone.UTC)
+                "vendor_event_timestamp", "2026-02-26 17:15:01.554"
         ));
     }
 
@@ -121,7 +122,7 @@ class JournaldRecordProcessorTest {
         final var result = processor.process(logRecord);
 
         assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.of(
-                "vendor_event_timestamp", new DateTime(expected.toInstant().toEpochMilli(), DateTimeZone.UTC)
+                "vendor_event_timestamp", Tools.buildElasticSearchTimeFormat(new DateTime(expected.toInstant().toEpochMilli(), DateTimeZone.UTC))
         ));
     }
 
@@ -240,7 +241,7 @@ class JournaldRecordProcessorTest {
         assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.ofEntries(
                 Map.entry("vendor_transaction_id", "544611aab98d4df8bd045f3b0ab794bf"),
                 Map.entry("host_hostname", "h2"),
-                Map.entry("vendor_event_timestamp", new DateTime(1772126101554L, DateTimeZone.UTC)),
+                Map.entry("vendor_event_timestamp", "2026-02-26 17:15:01.554"),
                 Map.entry("process_name", "cron"),
                 Map.entry("user_id", "0"),
                 //Map.entry("group_id", "0"),

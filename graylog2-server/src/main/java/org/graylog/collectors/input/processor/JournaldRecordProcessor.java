@@ -26,6 +26,7 @@ import org.graylog.schema.ServiceFields;
 import org.graylog.schema.UserFields;
 import org.graylog.schema.VendorFields;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -565,7 +566,7 @@ public class JournaldRecordProcessor implements LogRecordProcessor {
     private static void putDateTimeByPrecedence(Map<String, Object> target, String fieldName, DateTime... candidates) {
         for (final var value : candidates) {
             if (value != null) {
-                target.put(fieldName, value);
+                target.put(fieldName, Tools.buildElasticSearchTimeFormat(value));
                 return;
             }
         }

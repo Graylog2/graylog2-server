@@ -30,8 +30,6 @@ import org.graylog.schema.SourceFields;
 import org.graylog.schema.TraceFields;
 import org.graylog.schema.UserFields;
 import org.graylog.schema.VendorFields;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -68,7 +66,7 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(VendorFields.VENDOR_EVENT_ACTION, "Info")
                 .containsEntry(VendorFields.VENDOR_VERSION, "3")
                 .containsEntry(TraceFields.TRACE_ID, "{11111111-2222-3333-4444-555555555555}")
-                .containsEntry(VENDOR_EVENT_TIMESTAMP, new DateTime(1772270192772L, DateTimeZone.UTC))
+                .containsEntry(VENDOR_EVENT_TIMESTAMP, "2026-02-28 09:16:32.772")
                 .containsEntry(ProcessFields.PROCESS_ID, "5860")
                 .containsEntry(ProcessFields.PROCESS_PATH, "C:\\Windows\\System32\\OpenSSH\\sshd.exe")
                 .containsEntry(ProcessFields.PROCESS_NAME, "sshd.exe")

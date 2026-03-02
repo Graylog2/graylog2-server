@@ -29,6 +29,7 @@ import org.graylog.schema.TraceFields;
 import org.graylog.schema.UserFields;
 import org.graylog.schema.VendorFields;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -124,7 +125,7 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
         }
 
         if (fields.vendorEventTimestamp != null) {
-            result.put(VENDOR_EVENT_TIMESTAMP, fields.vendorEventTimestamp);
+            result.put(VENDOR_EVENT_TIMESTAMP, Tools.buildElasticSearchTimeFormat(fields.vendorEventTimestamp));
         }
 
         putByPrecedence(result, VendorFields.VENDOR_SUBTYPE, fields.providerName);

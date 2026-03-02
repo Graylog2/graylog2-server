@@ -29,6 +29,7 @@ import org.graylog.inputs.otel.codec.OTelTypeConverter;
 import org.graylog.schema.EventFields;
 import org.graylog.schema.VendorFields;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.configuration.Configuration;
@@ -154,10 +155,10 @@ public class CollectorIngestCodec implements Codec {
             message.addField(VendorFields.VENDOR_EVENT_SEVERITY_LEVEL, logRecord.getSeverityNumberValue());
         }
         if (logRecord.getTimeUnixNano() > 0) {
-            message.addField(EventFields.EVENT_CREATED, dateTimeFromNano(logRecord.getTimeUnixNano()));
+            message.addField(EventFields.EVENT_CREATED, Tools.buildElasticSearchTimeFormat(dateTimeFromNano(logRecord.getTimeUnixNano())));
         }
         if (logRecord.getObservedTimeUnixNano() > 0) {
-            message.addField(EventFields.EVENT_RECEIVED_TIME, dateTimeFromNano(logRecord.getObservedTimeUnixNano()));
+            message.addField(EventFields.EVENT_RECEIVED_TIME, Tools.buildElasticSearchTimeFormat(dateTimeFromNano(logRecord.getObservedTimeUnixNano())));
         }
 
         message.addFields(processor.process(logRecord));
