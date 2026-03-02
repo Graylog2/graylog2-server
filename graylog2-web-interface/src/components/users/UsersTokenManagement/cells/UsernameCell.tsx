@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import Routes from 'routing/Routes';
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import ErrorPopover from 'components/lookup-tables/ErrorPopover';
 
 import type { Token } from '../hooks/useTokens';
