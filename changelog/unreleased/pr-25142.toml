@@ -1,4 +1,4 @@
 type = "a"
 message = "Improve structure and documentation of the Events/Alerts table slicing functionality."
 
-pulls = ["25153"]
+pulls = ["25142"]
