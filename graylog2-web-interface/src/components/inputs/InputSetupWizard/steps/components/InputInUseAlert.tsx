@@ -18,7 +18,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import Routes from 'routing/Routes';
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import { Alert, Row, Col } from 'components/bootstrap';
 import useInputReferences from 'components/inputs/InputSetupWizard/hooks/useInputReferences';
 

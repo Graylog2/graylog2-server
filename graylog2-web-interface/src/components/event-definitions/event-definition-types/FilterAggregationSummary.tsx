@@ -20,7 +20,7 @@ import isEmpty from 'lodash/isEmpty';
 import upperFirst from 'lodash/upperFirst';
 
 import { describeExpression } from 'util/CronUtils';
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import { Alert } from 'components/bootstrap';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { isPermitted } from 'util/PermissionsMixin';
