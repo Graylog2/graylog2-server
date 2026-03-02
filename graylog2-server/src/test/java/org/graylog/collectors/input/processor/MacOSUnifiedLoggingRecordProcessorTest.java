@@ -55,7 +55,6 @@ class MacOSUnifiedLoggingRecordProcessorTest {
                     "userID": 501,
                     "processImagePath": "/usr/libexec/example-daemon",
                     "traceID": "AABB1122-3344-5566-7788-99AABBCCDDEE",
-                    "bootUUID": "FFEEDDCC-BBAA-9988-7766-554433221100",
                     "timestamp": "2026-02-26 14:30:45.123456+0000"
                 }
                 """;
@@ -75,7 +74,6 @@ class MacOSUnifiedLoggingRecordProcessorTest {
                 Map.entry("process_path", "/usr/libexec/example-daemon"),
                 Map.entry("process_name", "example-daemon"),
                 Map.entry("event_uid", "AABB1122-3344-5566-7788-99AABBCCDDEE"),
-                Map.entry("source_reference", "FFEEDDCC-BBAA-9988-7766-554433221100"),
                 Map.entry("vendor_event_timestamp", Instant.parse("2026-02-26T14:30:45.123456Z"))
         ));
     }
@@ -201,7 +199,6 @@ class MacOSUnifiedLoggingRecordProcessorTest {
                 Map.entry("process_path", "/usr/libexec/example-daemon"),
                 Map.entry("process_name", "example-daemon"),
                 Map.entry("event_uid", "AABBCCDD-1122-3344-5566-778899001122"),
-                Map.entry("source_reference", "FFEEDDCC-BBAA-9988-7766-554433221100"),
                 Map.entry("vendor_event_timestamp", Instant.parse("2026-02-26T14:30:45.123456Z"))
         ));
     }

@@ -161,6 +161,8 @@ public class CollectorIngestCodec implements Codec {
             message.addField(EventFields.EVENT_RECEIVED_TIME, Tools.buildElasticSearchTimeFormat(dateTimeFromNano(logRecord.getObservedTimeUnixNano())));
         }
 
+        // TODO: Surface processor errors (e.g. malformed body JSON) as message.addProcessingError()
+        //  instead of silently returning an empty map. Requires changing the LogRecordProcessor interface.
         message.addFields(processor.process(logRecord));
 
         return Optional.of(message);

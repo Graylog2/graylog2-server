@@ -18,13 +18,14 @@ package org.graylog.collectors.input.processor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import jakarta.inject.Inject;
 import org.graylog.schema.EventFields;
 import org.graylog.schema.ProcessFields;
-import org.graylog.schema.SourceFields;
 import org.graylog.schema.UserFields;
 import org.graylog.schema.VendorFields;
+import org.graylog2.jackson.TypeReferences;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,16 +65,15 @@ public class MacOSUnifiedLoggingRecordProcessor implements LogRecordProcessor {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Map<String, Object> process(LogRecord logRecord) {
         final var bodyString = logRecord.getBody().getStringValue();
-        if (bodyString == null || bodyString.isBlank()) {
+        if (bodyString.isBlank()) {
             return Map.of();
         }
 
         final Map<String, Object> body;
         try {
-            body = objectMapper.readValue(bodyString, Map.class);
+            body = objectMapper.readValue(bodyString, TypeReferences.MAP_STRING_OBJECT);
         } catch (JsonProcessingException e) {
             LOG.warn("Failed to parse macOS unified log body as JSON: {}", e.getMessage());
             return Map.of();
@@ -91,38 +91,36 @@ public class MacOSUnifiedLoggingRecordProcessor implements LogRecordProcessor {
 
             switch (entry.getKey()) {
                 // Human-readable log message.
-                case "eventMessage" -> putStringIfPresent(result, Message.FIELD_MESSAGE, value);
+                case "eventMessage" -> putAsString(result, Message.FIELD_MESSAGE, value);
                 // Log event type: logEvent, activityCreateEvent, stateEvent, userActionEvent, timesyncEvent.
-                case "eventType" -> putStringIfPresent(result, VendorFields.VENDOR_EVENT_TYPE, value);
+                case "eventType" -> putAsString(result, VendorFields.VENDOR_EVENT_TYPE, value);
                 // Apple log level: Default, Error, Fault.
-                case "messageType" -> putStringIfPresent(result, VendorFields.VENDOR_EVENT_SEVERITY, value);
+                case "messageType" -> putAsString(result, VendorFields.VENDOR_EVENT_SEVERITY, value);
                 // Reverse-DNS subsystem identifier (e.g. com.apple.xpc).
-                case "subsystem" -> putStringIfPresent(result, EventFields.EVENT_SOURCE, value);
+                case "subsystem" -> putAsString(result, EventFields.EVENT_SOURCE, value);
                 // Category within the subsystem.
-                case "category" -> putStringIfPresent(result, VendorFields.VENDOR_SUBTYPE, value);
+                case "category" -> putAsString(result, VendorFields.VENDOR_SUBTYPE, value);
                 // Apple format template string.
-                case "formatString" -> putStringIfPresent(result, VendorFields.VENDOR_EVENT_DESCRIPTION, value);
+                case "formatString" -> putAsString(result, VendorFields.VENDOR_EVENT_DESCRIPTION, value);
                 // Process ID of the logging process.
-                case "processID" -> putNumericAsString(result, ProcessFields.PROCESS_ID, value);
+                case "processID" -> putAsString(result, ProcessFields.PROCESS_ID, value);
                 // User ID of the logging process.
-                case "userID" -> putNumericAsString(result, UserFields.USER_ID, value);
+                case "userID" -> putAsString(result, UserFields.USER_ID, value);
                 // Full path to the process executable.
                 case "processImagePath" -> {
-                    final var path = stringValue(value);
+                    final var path = Strings.emptyToNull(String.valueOf(value));
                     if (path != null) {
                         processImagePath = path;
                         result.put(ProcessFields.PROCESS_PATH, path);
                     }
                 }
                 // Trace identifier for correlating related events.
-                case "traceID" -> putStringIfPresent(result, EventFields.EVENT_UID, value);
-                // Boot UUID identifying the boot session.
-                case "bootUUID" -> putStringIfPresent(result, SourceFields.SOURCE_REFERENCE, value);
+                case "traceID" -> putAsString(result, EventFields.EVENT_UID, value);
                 // Event timestamp in macOS format.
                 case "timestamp" -> {
-                    final var ts = parseTimestamp(stringValue(value));
+                    final var ts = parseTimestamp(Strings.emptyToNull(String.valueOf(value)));
                     if (ts != null) {
-                        result.put("vendor_event_timestamp", ts);
+                        result.put(VendorFields.VENDOR_EVENT_TIMESTAMP, ts);
                     }
                 }
                 // Unmapped fields (preserved as commented-out cases for future mapping):
@@ -137,6 +135,9 @@ public class MacOSUnifiedLoggingRecordProcessor implements LogRecordProcessor {
                 //}
                 //case "senderProgramCounter" -> {
                 // TODO no direct GIM mapping yet.
+                //}
+                //case "bootUUID" -> {
+                // TODO boot session identifier; no direct GIM mapping yet.
                 //}
                 //case "machTimestamp" -> {
                 // TODO redundant with timestamp.
@@ -165,28 +166,15 @@ public class MacOSUnifiedLoggingRecordProcessor implements LogRecordProcessor {
         return result;
     }
 
-    private static String stringValue(Object value) {
-        if (value instanceof String s && !s.isEmpty()) {
-            return s;
-        }
-        return null;
-    }
-
-    private static void putStringIfPresent(Map<String, Object> target, String fieldName, Object value) {
-        final var s = stringValue(value);
+    private static void putAsString(Map<String, Object> target, String fieldName, Object value) {
+        final var s = Strings.emptyToNull(String.valueOf(value));
         if (s != null) {
             target.put(fieldName, s);
         }
     }
 
-    private static void putNumericAsString(Map<String, Object> target, String fieldName, Object value) {
-        if (value instanceof Number n) {
-            target.put(fieldName, Long.toString(n.longValue()));
-        }
-    }
-
     private static Instant parseTimestamp(String value) {
-        if (value == null || value.isBlank()) {
+        if (value == null) {
             return null;
         }
 
