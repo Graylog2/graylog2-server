@@ -82,7 +82,7 @@ const webpackConfig = {
           }
 
           if (assets[chunk].css) {
-            jsfiles.push(assets[chunk].css);
+            cssfiles.push(assets[chunk].css);
           }
 
           chunks[chunk] = {
