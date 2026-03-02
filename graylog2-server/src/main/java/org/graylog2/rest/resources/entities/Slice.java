@@ -14,26 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect, useMemo } from 'react';
+package org.graylog2.rest.resources.entities;
 
-import type { InputStates } from 'hooks/useInputsStates';
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-const useIsInitialUnknownInputState = (inputStates: InputStates, inputId: string) => {
-  const seenInputIds = useMemo(() => new Set<string>(), []);
-
-  useEffect(() => {
-    if (!inputStates) {
-      return;
-    }
-
-    Object.keys(inputStates).forEach((id) => {
-      seenInputIds.add(id);
-    });
-  }, [inputStates, seenInputIds]);
-
-  const hasKnownState = !!inputStates?.[inputId];
-
-  return !hasKnownState && !seenInputIds.has(inputId);
-};
-
-export default useIsInitialUnknownInputState;
+public record Slice(@JsonProperty(FIELD_ID) String value, @JsonProperty(FIELD_TITLE) String title, @JsonProperty(FIELD_COUNT) Integer count) {
+    private static final String FIELD_ID = "value";
+    private static final String FIELD_TITLE = "title";
+    private static final String FIELD_COUNT = "count";
+}

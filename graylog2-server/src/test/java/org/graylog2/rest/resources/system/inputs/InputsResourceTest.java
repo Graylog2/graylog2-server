@@ -49,6 +49,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import org.graylog2.database.filtering.ComputedFieldRegistry;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -206,7 +209,7 @@ class InputsResourceTest {
                                   Configuration config) {
             super(inputService, mock(InputDiagnosticService.class), streamService, streamRuleService,
                     pipelineService, messageInputFactory, config, mock(MongoDbInputsMetadataService.class),
-                    mock(ClusterEventBus.class));
+                    mock(ClusterEventBus.class), new ComputedFieldRegistry(Set.of()));
             configuration = mock(HttpConfiguration.class);
 
             this.user = mock(User.class);
