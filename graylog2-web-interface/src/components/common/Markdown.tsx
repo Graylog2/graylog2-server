@@ -24,7 +24,7 @@ import type { HTMLReactParserOptions } from 'html-react-parser';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useMarkdownConfig from 'components/common/useMarkdownConfig';
 import Spinner from 'components/common/Spinner';
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 
 type Props = {

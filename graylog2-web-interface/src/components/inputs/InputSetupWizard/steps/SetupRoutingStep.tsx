@@ -19,9 +19,8 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
 import Routes from 'routing/Routes';
-import { Link } from 'components/common/router';
+import { Link, Select } from 'components/common';
 import { Alert, Button, Row, Col, Input } from 'components/bootstrap';
-import { Select } from 'components/common';
 import useInputSetupWizard from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizard';
 import useInputSetupWizardSteps from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizardSteps';
 import useInputSetupWizardStepsHelper from 'components/inputs/InputSetupWizard/hooks/useInputSetupWizardStepsHelper';

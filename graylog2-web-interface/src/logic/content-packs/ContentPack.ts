@@ -19,7 +19,7 @@ import concat from 'lodash/concat';
 import remove from 'lodash/remove';
 
 import generateId from 'logic/generateId';
-import type { ContentPackEntity, ContentPackParameter } from 'components/content-packs/Types';
+import type { ContentPackParameter } from 'components/content-packs/Types';
 
 import Entity from './Entity';
 
@@ -34,7 +34,7 @@ export default class ContentPack {
     vendor: string;
     url: string;
     parameters: ContentPackParameter[];
-    entities: ContentPackEntity[];
+    entities: any[];
   };
 
   constructor(
@@ -47,7 +47,7 @@ export default class ContentPack {
     vendor: string,
     url: string,
     parameters: ContentPackParameter[],
-    entitieValues: ContentPackEntity[],
+    entitieValues: any[],
   ) {
     const entities = entitieValues.map((e) => {
       if (e instanceof Entity) {
@@ -157,7 +157,7 @@ export default class ContentPack {
     };
   }
 
-  static fromJSON(value) {
+  static fromJSON(value: any) {
     const { v, id, rev, name, summary, description, vendor, url, parameters, entities } = value;
 
     return new ContentPack(v, id, rev, name, summary, description, vendor, url, parameters, entities);
@@ -262,7 +262,7 @@ class Builder {
     return this;
   }
 
-  entities(value: Array<ContentPackEntity>) {
+  entities(value: Array<any>) {
     this.value = this.value.set('entities', value);
 
     return this;

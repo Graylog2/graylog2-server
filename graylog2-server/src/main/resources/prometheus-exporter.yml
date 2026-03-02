@@ -1341,6 +1341,12 @@ metric_mappings:
   - metric_name: "data_lake_journal_size"
     match_pattern: "org.graylog.plugins.datalake.output.journal.size"
 
+  - metric_name: "data_lake_journal_size_limit"
+    match_pattern: "org.graylog.plugins.datalake.output.journal.size-limit"
+
+  - metric_name: "data_lake_journal_utilization_ratio"
+    match_pattern: "org.graylog.plugins.datalake.output.journal.utilization-ratio"
+
   - metric_name: "data_lake_journal_uncommitted_messages"
     match_pattern: "org.graylog.plugins.datalake.output.journal.uncommittedMessages"
 

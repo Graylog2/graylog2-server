@@ -42,8 +42,8 @@ const DataAdapter = ({ dataAdapter, noEdit = false }: Props) => {
 
   const canEdit = !noEdit && !loadingScopePermissions && scopePermissions?.is_mutable;
 
-  const _onChange = (event: React.SyntheticEvent) => {
-    setLookupKey(getValueFromInput(event.target));
+  const _onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setLookupKey(String(getValueFromInput(event.target)));
   };
 
   const _lookupKey = (event: React.SyntheticEvent) => {
