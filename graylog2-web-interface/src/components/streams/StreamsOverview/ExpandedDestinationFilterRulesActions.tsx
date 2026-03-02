@@ -18,9 +18,8 @@ import * as React from 'react';
 
 import type { Stream } from 'stores/streams/StreamsStore';
 import { Button } from 'components/bootstrap';
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, IfPermitted } from 'components/common';
 import Routes from 'routing/Routes';
-import { IfPermitted } from 'components/common';
 
 type Props = {
   stream: Stream;

@@ -27,7 +27,6 @@ import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/us
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
 import { streamRuleTypes } from 'fixtures/streamRuleTypes';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 import useStreamDestinationFilterRuleCount from 'components/streams/hooks/useStreamDestinationFilterRuleCount';
 import useStreamOutputFilters from 'components/streams/hooks/useStreamOutputFilters';
 
