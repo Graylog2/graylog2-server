@@ -21,7 +21,6 @@ import userEvent from '@testing-library/user-event';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { GenericEntityType, LookupTable } from 'logic/lookup-tables/types';
 import { LOOKUP_TABLES, CACHES_MAP, ADAPTERS_MAP, ERROR_STATE } from 'components/lookup-tables/fixtures';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import { attributes } from './constants';
 import LookupTableList from './index';
@@ -82,14 +81,10 @@ jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
 }));
 
 const moreActionsName = { name: new RegExp(`More Actions for ${LOOKUP_TABLES[0].name}`, 'i') };
-const renderSUT = () =>
-  render(
-    <DefaultQueryParamProvider>
-      <LookupTableList />
-    </DefaultQueryParamProvider>,
-  );
 
 describe('Lookup Table List', () => {
+  const renderSUT = () => render(<LookupTableList />);
+
   it('should render a list of lookup tables', async () => {
     renderSUT();
 
