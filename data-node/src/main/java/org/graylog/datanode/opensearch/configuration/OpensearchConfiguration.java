@@ -18,6 +18,7 @@ package org.graylog.datanode.opensearch.configuration;
 
 import com.google.common.collect.ImmutableList;
 import jakarta.annotation.Nonnull;
+import org.apache.http.client.utils.URIBuilder;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.OpensearchConfigurationDir;
@@ -27,8 +28,9 @@ import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPar
 import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
 import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
 import org.graylog.datanode.process.configuration.files.YamlConfigFile;
-import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.security.KeyStore;
 import java.util.Collection;
@@ -77,8 +79,16 @@ public class OpensearchConfiguration {
                 .collect(Collectors.toList());
     }
 
-    public HttpHost getRestBaseUrl() {
-        return new HttpHost(hostname, httpPort, isHttpsEnabled() ? "https" : "http");
+    public URI getRestBaseUrl() {
+        try {
+            return new URIBuilder()
+                    .setHost(hostname)
+                    .setPort(httpPort)
+                    .setScheme(isHttpsEnabled() ? "https" : "http")
+                    .build();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Error creating OpenSearch URL", e);
+        }
     }
 
     public boolean isHttpsEnabled() {
