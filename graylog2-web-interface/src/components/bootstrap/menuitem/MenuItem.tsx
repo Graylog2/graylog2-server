@@ -19,7 +19,7 @@ import { useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import { Menu as MantineMenu } from '@mantine/core';
 
-import { Link } from 'components/common/router';
+import Link from 'components/common/Link';
 import Icon from 'components/common/Icon';
 
 import Menu from '../Menu';
