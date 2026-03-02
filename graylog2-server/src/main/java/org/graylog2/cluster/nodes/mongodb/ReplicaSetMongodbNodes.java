@@ -58,12 +58,11 @@ public class ReplicaSetMongodbNodes implements MongodbNodesProvider {
                 .findFirst()
                 .orElse(null);
 
-        double storageUsedPercent = calculateStorageUsedPercent();
         Long slowQueryCount = getSlowQueryCount();
 
         return members.stream()
                 .parallel()
-                .map(member -> toMongodbNode(member, primaryMember, storageUsedPercent, slowQueryCount))
+                .map(member -> toMongodbNode(member, primaryMember, slowQueryCount))
                 .toList();
     }
 
@@ -74,22 +73,26 @@ public class ReplicaSetMongodbNodes implements MongodbNodesProvider {
         return clusterType == ClusterType.REPLICA_SET;
     }
 
-    private MongodbNode toMongodbNode(Document member, Document primaryMember,
-                                      double storageUsedPercent, Long slowQueryCount) {
+    private MongodbNode toMongodbNode(Document member, Document primaryMember, Long slowQueryCount) {
 
         String name = member.get("name", String.class);
 
         String uri = "mongodb://" + name + "/?directConnection=true";
         try (com.mongodb.client.MongoClient nodeClient = MongoClients.create(uri)) {
 
-            Document status = nodeClient
+            Document serverStatus = nodeClient
                     .getDatabase("admin")
                     .runCommand(new Document("serverStatus", 1));
 
-            Document connections = status.get("connections", Document.class);
+            final Document dbStats = nodeClient.getDatabase("admin")
+                    .runCommand(new Document("dbStats", 1));
+
+            Document connections = serverStatus.get("connections", Document.class);
             final Integer availableConnections = connections.getInteger("available");
             final Integer currentConnections = connections.getInteger("current");
             final double connectionsPercent = 100.0d / availableConnections * currentConnections;
+
+            double storageUsedPercent = 100.0d * dbStats.getDouble("fsUsedSize") / dbStats.getDouble("fsTotalSize");
 
             int id = member.get("_id", Integer.class);
             String role = member.get("stateStr", String.class);
@@ -105,13 +108,8 @@ public class ReplicaSetMongodbNodes implements MongodbNodesProvider {
                     }
                 }
             }
-            return new MongodbNode(String.valueOf(id), name, role, status.getString("version"), replicationLag, slowQueryCount, storageUsedPercent, availableConnections, currentConnections, connectionsPercent);
+            return new MongodbNode(String.valueOf(id), name, role, serverStatus.getString("version"), replicationLag, slowQueryCount, storageUsedPercent, availableConnections, currentConnections, connectionsPercent);
         }
-    }
-
-    private double calculateStorageUsedPercent() {
-        final Document dbStats = mongoConnection.getDatabase("admin").runCommand(new Document("dbStats", 1));
-        return 100.0d * dbStats.getDouble("fsUsedSize") / dbStats.getDouble("fsTotalSize");
     }
 
     private Long getSlowQueryCount() {
