@@ -16,7 +16,8 @@
  */
 package org.graylog2.cluster.nodes.mongodb;
 
-import com.google.inject.Provider;
+
+import jakarta.inject.Provider;
 
 import java.util.List;
 import java.util.Set;
