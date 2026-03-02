@@ -49,7 +49,7 @@ const CollectorRow = ({ collector, onClone, onDelete, validateCollector }: Props
         <OperatingSystemIcon operatingSystem={collector.node_operating_system} />{' '}
         {upperFirst(collector.node_operating_system)}
       </td>
-      <td>
+      <td aria-label="Actions">
         <ButtonToolbar>
           <LinkContainer to={Routes.SYSTEM.SIDECARS.EDIT_COLLECTOR(collector.id)}>
             <Button bsSize="xsmall">Edit</Button>

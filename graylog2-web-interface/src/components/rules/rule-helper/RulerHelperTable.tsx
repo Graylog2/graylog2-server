@@ -54,7 +54,7 @@ const RuleHelperTable = ({ entries, expanded = {}, onFunctionClick = undefined }
       if (expanded[d.name]) {
         details = (
           <tr>
-            <td colSpan={2}>
+            <td colSpan={2} aria-label="Function parameters">
               <Table condensed striped hover>
                 <thead>
                   <tr>

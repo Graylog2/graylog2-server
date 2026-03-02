@@ -45,7 +45,7 @@ const OutputItem = ({ output, streamId, isLoadingOutputTypes, onUpdate, getTypeD
       {output.title} <small>{`(Type: ${output.type})`}</small>{' '}
     </td>
     {}
-    <td>
+    <td aria-label="Actions">
       <ActionButtonsWrap className="align-right">
         <IfPermitted permissions="stream_outputs:create">
           <EditOutputButton
