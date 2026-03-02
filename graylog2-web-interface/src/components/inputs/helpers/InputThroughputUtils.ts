@@ -35,7 +35,7 @@ export const getValueFromMetric = (metric) => {
 
   switch (metric.type) {
     case 'meter':
-      return metric.metric.rate.mean;
+      return metric.metric.rate.one_minute;
     case 'gauge':
       return metric.metric.value;
     case 'counter':
