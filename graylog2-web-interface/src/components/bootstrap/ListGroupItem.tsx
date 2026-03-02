@@ -92,8 +92,8 @@ const StyledListGroupItem = styled(BootstrapListGroupItem)(
         color: ${theme.colors.variant.darkest.default};
       }
 
-      &:hover:not(.disabled):not(.active),
-      &:focus:not(.disabled):not(.active) {
+      &:hover:not(.disabled, .active),
+      &:focus:not(.disabled, .active) {
         color: inherit;
         background-color: ${theme.utils.colorLevel(theme.colors.global.contentBackground, 10)};
 
