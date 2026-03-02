@@ -25,7 +25,6 @@ import com.google.auto.value.AutoValue;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -50,22 +49,6 @@ public abstract class WindowsEventLogReceiverConfig implements OtlpReceiverConfi
             "Windows PowerShell"
     );
 
-    private static String createQuery(List<String> channels) {
-        final var queries = IntStream.range(0, channels.size())
-                .mapToObj(idx -> """
-                        <Query Id="%1$d" Path="%2$s">
-                          <Select Path="%2$s">*</Select>
-                        </Query>
-                        """.formatted(idx, channels.get(idx)))
-                .toList();
-
-        return """
-                <QueryList>
-                  %s
-                </QueryList>
-                """.formatted(String.join("\n", queries));
-    }
-
     public enum StartAt {
         @JsonProperty("beginning")
         BEGINNING,
@@ -79,6 +62,15 @@ public abstract class WindowsEventLogReceiverConfig implements OtlpReceiverConfi
 
     @JsonIgnore
     public abstract List<String> channels();
+
+    @JsonProperty("channel_list")
+    public List<String> channelList() {
+        final var channelSet = new HashSet<>(channels());
+        if (includeDefaultChannels()) {
+            channelSet.addAll(DEFAULT_CHANNELS);
+        }
+        return List.copyOf(channelSet);
+    }
 
     @JsonIgnore
     public abstract boolean includeDefaultChannels();
@@ -101,15 +93,6 @@ public abstract class WindowsEventLogReceiverConfig implements OtlpReceiverConfi
 
     @JsonProperty("include_log_record_original")
     public abstract boolean includeLogRecordOriginal();
-
-    @JsonProperty("query")
-    public String query() {
-        final var channelSet = new HashSet<>(channels());
-        if (includeDefaultChannels()) {
-            channelSet.addAll(DEFAULT_CHANNELS);
-        }
-        return createQuery(List.copyOf(channelSet));
-    }
 
     public static Builder builder(String id) {
         return new AutoValue_WindowsEventLogReceiverConfig.Builder()

@@ -19,36 +19,22 @@ package org.graylog.collectors.config;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class WindowsEventLogReceiverConfigTest {
-    private static final Pattern QUERY_ELEMENT_PATTERN = Pattern.compile(
-            "<Query Id=\"(\\d+)\" Path=\"([^\"]+)\">\\s*<Select Path=\"([^\"]+)\">\\*</Select>\\s*</Query>");
-
     @Test
-    void queryContainsOnlyCustomChannelsWhenDefaultsDisabled() {
+    void channelListContainsOnlyCustomChannelsWhenDefaultsDisabled() {
         final var config = receiverConfig(List.of("ForwardedEvents", "Custom/Operational"), false);
 
-        final var elements = queryElements(config.query());
-        final var paths = elements.stream().map(QueryElement::queryPath).toList();
-        final var ids = elements.stream().map(QueryElement::id).toList();
-
-        assertThat(paths).containsExactlyInAnyOrder("ForwardedEvents", "Custom/Operational");
-        assertThat(ids).containsExactlyInAnyOrder(0, 1);
-        assertThat(elements).allSatisfy(element -> assertThat(element.queryPath()).isEqualTo(element.selectPath()));
+        assertThat(config.channelList()).containsExactlyInAnyOrder("ForwardedEvents", "Custom/Operational");
     }
 
     @Test
-    void queryIncludesDefaultChannelsWhenEnabled() {
+    void channelListIncludesDefaultChannelsWhenEnabled() {
         final var config = receiverConfig(List.of("ForwardedEvents"), true);
 
-        final var elements = queryElements(config.query());
-        final var paths = elements.stream().map(QueryElement::queryPath).toList();
-
-        assertThat(paths).containsExactlyInAnyOrderElementsOf(Set.of(
+        assertThat(config.channelList()).containsExactlyInAnyOrder(
                 "Application",
                 "System",
                 "Security",
@@ -58,18 +44,14 @@ class WindowsEventLogReceiverConfigTest {
                 "Microsoft-Windows-PowerShell/Operational",
                 "Windows PowerShell",
                 "ForwardedEvents"
-        ));
-        assertThat(elements).allSatisfy(element -> assertThat(element.queryPath()).isEqualTo(element.selectPath()));
+        );
     }
 
     @Test
-    void queryDeduplicatesCustomAndDefaultChannels() {
+    void channelListDeduplicatesCustomAndDefaultChannels() {
         final var config = receiverConfig(List.of("System", "ForwardedEvents", "ForwardedEvents"), true);
 
-        final var elements = queryElements(config.query());
-        final var paths = elements.stream().map(QueryElement::queryPath).toList();
-
-        assertThat(paths).containsExactlyInAnyOrderElementsOf(Set.of(
+        assertThat(config.channelList()).containsExactlyInAnyOrder(
                 "Application",
                 "System",
                 "Security",
@@ -79,8 +61,8 @@ class WindowsEventLogReceiverConfigTest {
                 "Microsoft-Windows-PowerShell/Operational",
                 "Windows PowerShell",
                 "ForwardedEvents"
-        ));
-        assertThat(paths).doesNotHaveDuplicates();
+        );
+        assertThat(config.channelList()).doesNotHaveDuplicates();
     }
 
     private static WindowsEventLogReceiverConfig receiverConfig(List<String> channels, boolean includeDefaultChannels) {
@@ -89,19 +71,4 @@ class WindowsEventLogReceiverConfigTest {
                 .includeDefaultChannels(includeDefaultChannels)
                 .build();
     }
-
-    private static List<QueryElement> queryElements(String query) {
-        final var matcher = QUERY_ELEMENT_PATTERN.matcher(query);
-        final var elements = new java.util.ArrayList<QueryElement>();
-        while (matcher.find()) {
-            elements.add(new QueryElement(
-                    Integer.parseInt(matcher.group(1)),
-                    matcher.group(2),
-                    matcher.group(3)
-            ));
-        }
-        return elements;
-    }
-
-    private record QueryElement(int id, String queryPath, String selectPath) {}
 }
