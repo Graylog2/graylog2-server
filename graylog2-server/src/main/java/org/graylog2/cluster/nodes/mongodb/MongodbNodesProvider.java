@@ -17,6 +17,7 @@
 package org.graylog2.cluster.nodes.mongodb;
 
 
+import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class MongodbNodesProvider implements Provider<List<MongodbNode>> {
 
     private final MongodbNodesService activeService;
 
+    @Inject
     public MongodbNodesProvider(Set<MongodbNodesService> services) {
 
         activeService = services.stream()
