@@ -20,7 +20,6 @@ import userEvent from '@testing-library/user-event';
 
 import type { SearchParams } from 'stores/PaginationTypes';
 import TableFetchContext, { type ContextValue } from 'components/common/PaginatedEntityTable/TableFetchContext';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import Slicing from './index';
 
@@ -56,17 +55,15 @@ describe('Slicing', () => {
     };
 
     return render(
-      <DefaultQueryParamProvider>
-        <TableFetchContext.Provider value={contextValue}>
-          <Slicing
-            appSection="test-app-section"
-            columnSchemas={columnSchemas}
-            onChangeSlicing={() => {}}
-            fetchSlices={() => Promise.resolve({ slices: [] })}
-            {...props}
-          />
-        </TableFetchContext.Provider>
-      </DefaultQueryParamProvider>,
+      <TableFetchContext.Provider value={contextValue}>
+        <Slicing
+          appSection="test-app-section"
+          columnSchemas={columnSchemas}
+          onChangeSlicing={() => {}}
+          fetchSlices={() => Promise.resolve({ slices: [] })}
+          {...props}
+        />
+      </TableFetchContext.Provider>,
     );
   };
 

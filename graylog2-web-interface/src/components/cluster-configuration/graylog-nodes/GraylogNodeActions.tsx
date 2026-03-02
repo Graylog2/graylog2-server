@@ -16,8 +16,7 @@
  */
 import React, { useState } from 'react';
 
-import { LinkContainer } from 'components/common/router';
-import { ConfirmDialog, IfPermitted } from 'components/common';
+import { LinkContainer, ConfirmDialog, IfPermitted } from 'components/common';
 import { MoreActions } from 'components/common/EntityDataTable';
 import { MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
