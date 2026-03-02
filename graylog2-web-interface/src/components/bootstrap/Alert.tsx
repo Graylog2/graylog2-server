@@ -26,16 +26,25 @@ type Props = {
   bsStyle?: ColorVariant;
   children: React.ReactNode;
   className?: string;
+  compact?: boolean;
   onDismiss?: () => void;
   style?: CSSProperties;
   title?: React.ReactNode;
   noIcon?: boolean;
 };
 
-const StyledAlert = styled(MantineAlert)<{ $bsStyle: ColorVariant }>(
-  ({ $bsStyle, theme }) => css`
+const StyledAlert = styled(MantineAlert)<{ $bsStyle: ColorVariant; $compact: boolean }>(
+  ({ $bsStyle, $compact, theme }) => css`
   margin: ${theme.spacings.md} 0;
   border: 1px solid ${theme.colors.variant.lighter[$bsStyle]};
+  ${
+    $compact &&
+    css`
+      padding: 7px 10px;
+    `
+  }
+  background-color: ${theme.colors.alerts[$bsStyle].background};
+  border: 1px solid ${theme.colors.alerts[$bsStyle].border};
 
   .mantine-Alert-message {
     color: ${theme.colors.global.textDefault};
@@ -67,6 +76,7 @@ const iconNameForType = (bsStyle: ColorVariant) => {
 
 const Alert = ({
   children,
+  compact = false,
   bsStyle = 'default',
   title = undefined,
   style = undefined,
@@ -80,6 +90,7 @@ const Alert = ({
   return (
     <StyledAlert
       $bsStyle={bsStyle}
+      $compact={compact}
       className={className}
       color={bsStyle}
       style={style}
