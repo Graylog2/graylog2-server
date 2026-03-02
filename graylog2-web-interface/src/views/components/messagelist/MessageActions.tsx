@@ -17,9 +17,8 @@
 import * as React from 'react';
 import type * as Immutable from 'immutable';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, ClipboardButton } from 'components/common';
 import Routes from 'routing/Routes';
-import { ClipboardButton } from 'components/common';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
 import type { SearchesConfig } from 'components/search/SearchConfig';

@@ -14,13 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import URI from 'urijs';
+// eslint-disable-next-line no-restricted-imports
+import { Link as RouterLink } from 'react-router-dom';
 
-import AppConfig from 'util/AppConfig';
-
-// The webpack-dev-server serves the assets from "/"
-const assetPrefix = AppConfig.gl2DevMode() ? '/' : '/assets/';
-
-// If app prefix was not set, we need to tell webpack to load chunks from root instead of the relative URL path
-// eslint-disable-next-line no-undef
-__webpack_public_path__ = URI.joinPaths(AppConfig.gl2AppPathPrefix(), assetPrefix).path() || assetPrefix;
+export default RouterLink;
