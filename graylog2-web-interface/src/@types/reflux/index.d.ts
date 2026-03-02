@@ -19,7 +19,9 @@ declare module 'reflux' {
 
   export interface StoreDefinition {
     listenables?: RefluxActions<any>[];
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
     init?: Function;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
     getInitialState?: Function;
 
     [propertyName: string]: any;
