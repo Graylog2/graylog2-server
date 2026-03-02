@@ -19,10 +19,9 @@ import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { ARCHIVE_RETENTION_STRATEGY } from 'stores/indices/IndicesStore';
-import { Icon, Section, Spinner } from 'components/common';
+import { Icon, Section, Spinner, LinkContainer } from 'components/common';
 import { IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import { Table, Button, Alert } from 'components/bootstrap';
-import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { useStore } from 'stores/connect';
 import type { Stream } from 'stores/streams/StreamsStore';

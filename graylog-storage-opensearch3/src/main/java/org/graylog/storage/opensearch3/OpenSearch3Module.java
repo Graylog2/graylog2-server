@@ -82,7 +82,7 @@ public class OpenSearch3Module extends VersionAwareModule {
         }
         bindForSupportedVersion(IndexFieldTypePollerAdapter.class).to(IndexFieldTypePollerAdapterOS.class);
         bindForSupportedVersion(IndexToolsAdapter.class).to(IndexToolsAdapterOS2.class);
-        bindForSupportedVersion(MessagesAdapter.class).to(MessagesAdapterOS2.class);
+        bindForSupportedVersion(MessagesAdapter.class).to(MessagesAdapterOS.class);
         bindForSupportedVersion(MultiChunkResultRetriever.class).to(PaginationOS.class);
         bindForSupportedVersion(MoreSearchAdapter.class).to(MoreSearchAdapterOS.class);
         bindForSupportedVersion(NodeAdapter.class).to(NodeAdapterOS.class);
@@ -92,7 +92,7 @@ public class OpenSearch3Module extends VersionAwareModule {
         bindForSupportedVersion(V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter.class)
                 .to(V20200730000000_AddGl2MessageIdFieldAliasForEventsOS2.class);
 
-        bindForSupportedVersion(QuerySuggestionsService.class).to(QuerySuggestionsOS2.class);
+        bindForSupportedVersion(QuerySuggestionsService.class).to(QuerySuggestionsOS.class);
 
         bindForSupportedVersion(ProxyRequestAdapter.class).to(ProxyRequestAdapterOS.class);
 

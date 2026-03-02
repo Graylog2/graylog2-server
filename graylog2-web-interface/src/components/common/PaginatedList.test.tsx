@@ -16,37 +16,45 @@
  */
 import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
-import type { Location } from 'history';
 import userEvent from '@testing-library/user-event';
 
-import useLocation from 'routing/useLocation';
+import { useQueryParams } from 'routing/QueryParams';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import { asMock } from 'helpers/mocking';
 
 import PaginatedList from './PaginatedList';
 
-jest.mock('routing/useLocation', () => jest.fn(() => ({ search: '' })));
+const setQueryParams = jest.fn();
+
+jest.mock('routing/QueryParams', () => ({
+  ...jest.requireActual('routing/QueryParams'),
+  useQueryParams: jest.fn(),
+}));
 
 describe('PaginatedList', () => {
+  beforeEach(() => {
+    asMock(useQueryParams).mockImplementation(() => [{}, jest.fn()]);
+  });
+
   it('should display Pagination', () => {
-    const { getByText } = render(
+    render(
       <PaginatedList totalItems={100} onChange={() => {}}>
         <div>The list</div>
       </PaginatedList>,
     );
 
-    expect(getByText('The list')).not.toBeNull();
-    expect(getByText('1')).not.toBeNull();
+    expect(screen.getByText('The list')).not.toBeNull();
+    expect(screen.getByText('1')).not.toBeNull();
   });
 
   it('should not dived by 0 if pageSize is 0 Pagination', () => {
-    const { getByText } = render(
+    render(
       <PaginatedList totalItems={100} pageSize={0} onChange={() => {}}>
         <div>The list</div>
       </PaginatedList>,
     );
 
-    expect(getByText('The list')).not.toBeNull();
+    expect(screen.getByText('The list')).not.toBeNull();
   });
 
   it('should not display Pagination, when context is not interactive', () => {
@@ -88,10 +96,7 @@ describe('PaginatedList', () => {
   describe('with state based on URL query params', () => {
     it('should set <page> query parameter as active page', async () => {
       const currentPage = 4;
-
-      asMock(useLocation).mockReturnValue({
-        search: `?page=${currentPage}`,
-      } as Location);
+      asMock(useQueryParams).mockImplementation(() => [{ page: currentPage }, setQueryParams]);
 
       render(
         <PaginatedList totalItems={200} onChange={() => {}} activePage={3}>

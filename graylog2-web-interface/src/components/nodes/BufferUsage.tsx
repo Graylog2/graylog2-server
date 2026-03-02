@@ -25,8 +25,7 @@ import type { GaugeMetric } from 'stores/metrics/MetricsStore';
 import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 
 import { Button } from '../bootstrap';
-import { ProgressBar, Spinner } from '../common';
-import { LinkContainer } from '../common/router';
+import { LinkContainer, ProgressBar, Spinner } from '../common';
 
 const NodeBufferUsage = styled.div(
   ({ theme }) => css`

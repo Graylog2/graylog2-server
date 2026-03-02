@@ -17,7 +17,7 @@
 import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer } from 'components/common';
 import { Row, Col, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';

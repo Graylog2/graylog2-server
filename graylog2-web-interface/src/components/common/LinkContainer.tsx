@@ -16,8 +16,9 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-// eslint-disable-next-line no-restricted-imports
-import { Link, useLocation, useLinkClickHandler } from 'react-router-dom';
+import { useLinkClickHandler } from 'react-router-dom';
+
+import useLocation from 'routing/useLocation';
 
 // list of children which are being used for navigation and should receive the `active` class.
 const NAV_CHILDREN = ['Button', 'NavItem'];
@@ -106,4 +107,4 @@ const LinkContainer = ({ children, onClick = undefined, to: toProp, relativeActi
   });
 };
 
-export { Link, LinkContainer };
+export default LinkContainer;

@@ -17,9 +17,8 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Link, LinkContainer } from 'components/common/router';
+import { Link, LinkContainer, RelativeTime, Timestamp } from 'components/common';
 import { Button, ButtonToolbar } from 'components/bootstrap';
-import { RelativeTime, Timestamp } from 'components/common';
 import Routes from 'routing/Routes';
 import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon';
 import StatusIndicator from 'components/sidecars/common/StatusIndicator';

@@ -19,9 +19,8 @@ import styled, { css } from 'styled-components';
 
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
-import { Link, LinkContainer } from 'components/common/router';
+import { Link, LinkContainer, EntityList, EntityListItem, PaginatedList, SearchForm, Spinner } from 'components/common';
 import { Button, Col, DropdownButton, Label, MenuItem, Row, DeleteMenuItem } from 'components/bootstrap';
-import { EntityList, EntityListItem, PaginatedList, SearchForm, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import StringUtils from 'util/StringUtils';
 import NumberUtils from 'util/NumberUtils';
