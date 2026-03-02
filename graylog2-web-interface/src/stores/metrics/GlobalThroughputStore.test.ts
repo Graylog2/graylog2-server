@@ -23,45 +23,44 @@ const nodeThroughput = (input, output) => ({
 });
 const metricsUpdate = (metrics) => ({ metrics });
 
-const onUpdate = (fn, done) =>
-  GlobalThroughputStore.listen((newThroughput) => {
-    fn(newThroughput);
-    done();
+const onUpdate = (fn) =>
+  new Promise<void>((resolve) => {
+    const unsub = GlobalThroughputStore.listen((newThroughput) => {
+      fn(newThroughput);
+      unsub();
+      resolve();
+    });
   });
 
 describe('GlobalThroughputStore', () => {
-  let unsub;
-
-  afterEach(() => {
-    if (unsub) {
-      unsub();
-    }
-  });
-
-  it('should return zeroed response if response does not contain metrics', (done) => {
-    unsub = onUpdate((newThroughput) => {
+  it('should return zeroed response if response does not contain metrics', async () => {
+    const promise = onUpdate((newThroughput) => {
       expect(newThroughput).toEqual(expectedThroughput(0, 0));
-    }, done);
+    });
 
     GlobalThroughputStore.updateMetrics(metricsUpdate({}));
+
+    await promise;
   });
 
-  it('should extract throughput from response', (done) => {
-    unsub = onUpdate((newThroughput) => {
+  it('should extract throughput from response', async () => {
+    const promise = onUpdate((newThroughput) => {
       expect(newThroughput).toEqual(expectedThroughput(42, 17));
-    }, done);
+    });
 
     GlobalThroughputStore.updateMetrics(
       metricsUpdate({
         node1: nodeThroughput(42, 17),
       }),
     );
+
+    await promise;
   });
 
-  it('should sum individual throughputs from response', (done) => {
-    unsub = onUpdate((newThroughput) => {
+  it('should sum individual throughputs from response', async () => {
+    const promise = onUpdate((newThroughput) => {
       expect(newThroughput).toEqual(expectedThroughput(609, 5187));
-    }, done);
+    });
 
     GlobalThroughputStore.updateMetrics(
       metricsUpdate({
@@ -70,15 +69,14 @@ describe('GlobalThroughputStore', () => {
         node3: nodeThroughput(18, 190),
       }),
     );
+
+    await promise;
   });
 
-  it('should reset values between sequential updates', (done) => {
-    unsub = onUpdate(
-      (newThroughput) => {
-        expect(newThroughput).toEqual(expectedThroughput(609, 5187));
-      },
-      () => {},
-    );
+  it('should reset values between sequential updates', async () => {
+    const firstPromise = onUpdate((newThroughput) => {
+      expect(newThroughput).toEqual(expectedThroughput(609, 5187));
+    });
 
     GlobalThroughputStore.updateMetrics(
       metricsUpdate({
@@ -88,11 +86,11 @@ describe('GlobalThroughputStore', () => {
       }),
     );
 
-    unsub();
+    await firstPromise;
 
-    unsub = onUpdate((newThroughput) => {
+    const secondPromise = onUpdate((newThroughput) => {
       expect(newThroughput).toEqual(expectedThroughput(0, 0));
-    }, done);
+    });
 
     GlobalThroughputStore.updateMetrics(
       metricsUpdate({
@@ -101,5 +99,7 @@ describe('GlobalThroughputStore', () => {
         node3: nodeThroughput(0, 0),
       }),
     );
+
+    await secondPromise;
   });
 });

@@ -19,6 +19,7 @@ import isNumeric from './IsNumeric';
 describe('isNumeric', () => {
   const testIsNumericString = ({ string, result }) => expect(isNumeric(string)).toEqual(result);
 
+  // eslint-disable-next-line jest/expect-expect
   it.each`
     string                                               | result
     ${undefined}                                         | ${false}
