@@ -71,6 +71,9 @@ const StyledIcon = styled(Icon)<{ $trend: TrendDirection | undefined }>(({ theme
 });
 
 const _trendDirection = (delta: number, trendPreference: TrendPreference): TrendDirection => {
+  if (delta === 0) {
+    return 'neutral';
+  }
   switch (trendPreference) {
     case 'LOWER':
       return delta > 0 ? 'bad' : 'good';

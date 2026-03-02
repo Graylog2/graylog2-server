@@ -61,10 +61,6 @@ jest.mock('hooks/useScopePermissions', () => ({
   }),
 }));
 
-jest.mock('routing/QueryParams', () => ({
-  useQueryParam: () => [undefined, () => {}],
-}));
-
 jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
   useFetchCaches: () => ({
     fetchPaginatedCaches: mockFetchPaginatedCaches,
@@ -79,8 +75,10 @@ jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
 const moreActionsName = { name: new RegExp(`More Actions for ${CACHES[0].name}`, 'i') };
 
 describe('Cache List', () => {
+  const renderSUT = () => render(<CacheList />);
+
   it('should render a list of caches', async () => {
-    render(<CacheList />);
+    renderSUT();
 
     await screen.findByText(/0 cache title/i);
     screen.getByText(/0 cache description/i);
@@ -88,13 +86,13 @@ describe('Cache List', () => {
   });
 
   it('should show an actions menu', async () => {
-    render(<CacheList />);
+    renderSUT();
 
     await screen.findByRole('button', moreActionsName);
   });
 
   it('should be able to edit a cache', async () => {
-    render(<CacheList />);
+    renderSUT();
 
     userEvent.click(await screen.findByRole('button', moreActionsName));
 
@@ -102,7 +100,7 @@ describe('Cache List', () => {
   });
 
   it('should be able to delete a cache', async () => {
-    render(<CacheList />);
+    renderSUT();
 
     userEvent.click(await screen.findByRole('button', moreActionsName));
     userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));

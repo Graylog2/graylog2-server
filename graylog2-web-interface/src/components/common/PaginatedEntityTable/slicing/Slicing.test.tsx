@@ -60,7 +60,7 @@ describe('Slicing', () => {
           appSection="test-app-section"
           columnSchemas={columnSchemas}
           onChangeSlicing={() => {}}
-          fetchSlices={() => Promise.resolve([])}
+          fetchSlices={() => Promise.resolve({ slices: [] })}
           {...props}
         />
       </TableFetchContext.Provider>,
@@ -95,11 +95,8 @@ describe('Slicing', () => {
     const onChangeSlicing = jest.fn();
     renderSUT({ onChangeSlicing });
 
-    const button = await screen.findByRole('button', { name: /status/i });
-    await userEvent.click(button);
-
-    const menuItem = await screen.findByRole('menuitem', { name: /no slicing/i });
-    await userEvent.click(menuItem);
+    const noSlicingButton = await screen.findByRole('button', { name: /no slicing/i });
+    await userEvent.click(noSlicingButton);
 
     expect(onChangeSlicing).toHaveBeenCalledWith(undefined, undefined);
   });
@@ -107,10 +104,12 @@ describe('Slicing', () => {
   it('filters slices based on search query', async () => {
     renderSUT({
       fetchSlices: () =>
-        Promise.resolve([
-          { value: 'Alpha', count: 2 },
-          { value: 'Beta', count: 1 },
-        ]),
+        Promise.resolve({
+          slices: [
+            { value: 'Alpha', count: 2 },
+            { value: 'Beta', count: 1 },
+          ],
+        }),
     });
 
     await screen.findByText('Alpha');
@@ -124,10 +123,12 @@ describe('Slicing', () => {
   it('sorts slices by count', async () => {
     renderSUT({
       fetchSlices: () =>
-        Promise.resolve([
-          { value: 'Alpha', count: 1 },
-          { value: 'Beta', count: 3 },
-        ]),
+        Promise.resolve({
+          slices: [
+            { value: 'Alpha', count: 1 },
+            { value: 'Beta', count: 3 },
+          ],
+        }),
     });
 
     await screen.findByText('Alpha');
@@ -149,10 +150,12 @@ describe('Slicing', () => {
   it('shows empty slices when toggled', async () => {
     renderSUT({
       fetchSlices: () =>
-        Promise.resolve([
-          { value: 'Alpha', count: 1 },
-          { value: 'Gamma', count: 0 },
-        ]),
+        Promise.resolve({
+          slices: [
+            { value: 'Alpha', count: 1 },
+            { value: 'Gamma', count: 0 },
+          ],
+        }),
     });
 
     await screen.findByText('Alpha');
