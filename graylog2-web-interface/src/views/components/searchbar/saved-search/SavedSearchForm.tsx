@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 import styled from 'styled-components';
+import { useFormikContext } from 'formik';
 
 import { ButtonToolbar, Button, ControlLabel, FormControl, FormGroup } from 'components/bootstrap';
 import Popover from 'components/common/Popover';
@@ -24,6 +25,7 @@ import EntityCreateShareFormGroup from 'components/permissions/EntityCreateShare
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import type { GRN } from 'logic/permissions/types';
+import Alert from 'components/bootstrap/Alert';
 
 import styles from './SavedSearchForm.css';
 
@@ -38,7 +40,7 @@ type Props = React.PropsWithChildren<{
   selectedStreamGRN?: Array<GRN>;
 }>;
 
-const stopEvent = (e) => {
+const stopEvent = (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
   e.stopPropagation();
 };
@@ -55,6 +57,8 @@ const SavedSearchForm = ({
   viewId = null,
   selectedStreamGRN = null,
 }: Props) => {
+  const { dirty: formDirty } = useFormikContext();
+
   const [title, setTitle] = useState(value);
   const [sharePayload, setSharePayload] = useState(null);
   const onChangeTitle = useCallback(
@@ -75,6 +79,12 @@ const SavedSearchForm = ({
       <Popover.Target>{children}</Popover.Target>
       <StyledPopoverDropdown title="Name of search" id="saved-search-popover">
         <form onSubmit={stopEvent}>
+          {formDirty && (
+            <Alert compact noIcon bsStyle="warning">
+              There are unconfirmed changes to the search parameters (time range, streams, or query). Saving now will
+              discard them. Cancel and execute the search to apply your changes before saving.{' '}
+            </Alert>
+          )}
           <FormGroup>
             <ControlLabel htmlFor="title">Title</ControlLabel>
             <FormControl type="text" value={title} id="title" placeholder="Enter title" onChange={onChangeTitle} />
