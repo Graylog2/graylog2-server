@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public record RequestedField(String name, @Nullable String decorator) {
-    public static final String RISK_SCORE = "event.scores.normalized_risk";
+    public static final String RISK_SCORE = "scores.normalized_risk";
 
     public static RequestedField parse(String value) {
         // TODO: handling of the case when we search for fields separated by "."
