@@ -184,8 +184,174 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(VendorFields.VENDOR_EVENT_ACTION, "Info");
     }
 
+    @Test
+    void maps4624WithOutcomeFromNewFormat() throws IOException {
+        final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-2.ndjson", 227239L);
+
+        final var result = processor.process(logRecord);
+
+        assertThat(result)
+                .containsEntry(HostFields.HOST_HOSTNAME, "winserver01")
+                .containsEntry(EventFields.EVENT_SOURCE, "winserver01")
+                .containsEntry(EventFields.EVENT_LOG_NAME, "Security")
+                .containsEntry(EventFields.EVENT_UID, "227239")
+                .containsEntry(EventFields.EVENT_CODE, 4624L)
+                .containsEntry(EVENT_ID, "4624")
+                .containsEntry(EventFields.EVENT_OUTCOME, "success")
+                .containsEntry(VendorFields.VENDOR_SUBTYPE, "Microsoft-Windows-Security-Auditing")
+                .containsEntry(VENDOR_EVENT_CATEGORY, "Logon")
+                .containsEntry(TraceFields.TRACE_ID, "{11111111-aaaa-0001-bbbb-cccccccccccc}")
+                .containsEntry(ProcessFields.PROCESS_ID, "592")
+                .containsEntry(ProcessFields.PROCESS_PATH, "C:\\Windows\\System32\\services.exe")
+                .containsEntry(ProcessFields.PROCESS_NAME, "services.exe")
+                .containsEntry(UserFields.USER_ID, "S-1-5-18")
+                .containsEntry(UserFields.USER_NAME, "SYSTEM")
+                .containsEntry(UserFields.USER_DOMAIN, "NT AUTHORITY")
+                .containsEntry(UserFields.USER_SESSION_ID, "0x3e7")
+                .containsEntry(AssociatedFields.ASSOCIATED_USER_ID, "S-1-5-18")
+                .containsEntry(AssociatedFields.ASSOCIATED_USER_NAME, "WINSERVER01$")
+                .containsEntry(AssociatedFields.ASSOCIATED_SESSION_ID, "0x3e7");
+
+        assertThat(result).doesNotContainKeys(
+                SourceFields.SOURCE_IP,
+                SourceFields.SOURCE_HOSTNAME
+        );
+    }
+
+    @Test
+    void maps4672PrivilegesFromNewFormat() throws IOException {
+        final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-2.ndjson", 227240L);
+
+        final var result = processor.process(logRecord);
+
+        assertThat(result)
+                .containsEntry(EventFields.EVENT_CODE, 4672L)
+                .containsEntry(EVENT_ID, "4672")
+                .containsEntry(EventFields.EVENT_OUTCOME, "success")
+                .containsEntry(PRIVILEGE_ASSIGNED_NAME, List.of(
+                        "SeAssignPrimaryTokenPrivilege",
+                        "SeTcbPrivilege",
+                        "SeSecurityPrivilege",
+                        "SeTakeOwnershipPrivilege",
+                        "SeLoadDriverPrivilege",
+                        "SeBackupPrivilege",
+                        "SeRestorePrivilege",
+                        "SeDebugPrivilege",
+                        "SeAuditPrivilege",
+                        "SeSystemEnvironmentPrivilege",
+                        "SeImpersonatePrivilege",
+                        "SeDelegateSessionUserImpersonatePrivilege"
+                ))
+                .containsEntry(AssociatedFields.ASSOCIATED_USER_ID, "S-1-5-18")
+                .containsEntry(AssociatedFields.ASSOCIATED_USER_NAME, "SYSTEM")
+                .containsEntry(AssociatedFields.ASSOCIATED_SESSION_ID, "0x3e7");
+    }
+
+    @Test
+    void maps4625FailedLogonFromNewFormat() throws IOException {
+        final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-2.ndjson", 149486L);
+
+        final var result = processor.process(logRecord);
+
+        assertThat(result)
+                .containsEntry(HostFields.HOST_HOSTNAME, "winserver02")
+                .containsEntry(EventFields.EVENT_SOURCE, "winserver02")
+                .containsEntry(EventFields.EVENT_LOG_NAME, "Security")
+                .containsEntry(EventFields.EVENT_CODE, 4625L)
+                .containsEntry(EVENT_ID, "4625")
+                .containsEntry(EventFields.EVENT_OUTCOME, "failure")
+                .containsEntry(VendorFields.VENDOR_SUBTYPE, "Microsoft-Windows-Security-Auditing")
+                .containsEntry(UserFields.USER_ID, "S-1-0-0")
+                .containsEntry(UserFields.USER_NAME, "USER")
+                .containsEntry(SourceFields.SOURCE_IP, "198.51.100.42")
+                .containsEntry(SourceFields.SOURCE_PORT, 0);
+
+        assertThat(result).doesNotContainKeys(
+                SourceFields.SOURCE_HOSTNAME,
+                UserFields.USER_DOMAIN,
+                UserFields.USER_SESSION_ID
+        );
+    }
+
+    @Test
+    void mapsSystemEventFromNewFormat() throws IOException {
+        final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-2.ndjson", 187435L);
+
+        final var result = processor.process(logRecord);
+
+        assertThat(result)
+                .containsEntry(HostFields.HOST_HOSTNAME, "winserver01")
+                .containsEntry(EventFields.EVENT_LOG_NAME, "System")
+                .containsEntry(EventFields.EVENT_CODE, 7036L)
+                .containsEntry(EVENT_ID, "7036")
+                .containsEntry(VendorFields.VENDOR_SUBTYPE, "Service Control Manager");
+
+        assertThat(result).doesNotContainKeys(
+                EventFields.EVENT_OUTCOME
+        );
+    }
+
+    @Test
+    void mapsSecurityUserNameAndDomain() throws IOException {
+        final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-3.ndjson", 16521L);
+
+        final var result = processor.process(logRecord);
+
+        assertThat(result)
+                .containsEntry(HostFields.HOST_HOSTNAME, "winserver03")
+                .containsEntry(EventFields.EVENT_LOG_NAME, "System")
+                .containsEntry(EventFields.EVENT_CODE, 16977L)
+                .containsEntry(EVENT_ID, "16977")
+                .containsEntry(VendorFields.VENDOR_SUBTYPE, "Microsoft-Windows-Directory-Services-SAM")
+                .containsEntry(AssociatedFields.ASSOCIATED_USER_ID, "S-1-5-18")
+                .containsEntry(AssociatedFields.ASSOCIATED_USER_NAME, "SYSTEM");
+    }
+
+    @Test
+    void mapsUserDataSubjectFields() throws IOException {
+        final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-3.ndjson", 16518L);
+
+        final var result = processor.process(logRecord);
+
+        assertThat(result)
+                .containsEntry(HostFields.HOST_HOSTNAME, "winserver03")
+                .containsEntry(EventFields.EVENT_LOG_NAME, "System")
+                .containsEntry(EventFields.EVENT_CODE, 104L)
+                .containsEntry(EVENT_ID, "104")
+                .containsEntry(VendorFields.VENDOR_SUBTYPE, "Microsoft-Windows-Eventlog")
+                .containsEntry(AssociatedFields.ASSOCIATED_USER_ID, "S-1-5-21-1000000000-2000000000-3000000000-500")
+                .containsEntry(AssociatedFields.ASSOCIATED_USER_NAME, "Administrator");
+    }
+
+    @Test
+    void maps4688ProcessCreation() throws IOException {
+        final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-3.ndjson", 500001L);
+
+        final var result = processor.process(logRecord);
+
+        assertThat(result)
+                .containsEntry(HostFields.HOST_HOSTNAME, "testhost01")
+                .containsEntry(EventFields.EVENT_LOG_NAME, "Security")
+                .containsEntry(EventFields.EVENT_CODE, 4688L)
+                .containsEntry(EVENT_ID, "4688")
+                .containsEntry(EventFields.EVENT_OUTCOME, "success")
+                .containsEntry(VendorFields.VENDOR_SUBTYPE, "Microsoft-Windows-Security-Auditing")
+                .containsEntry(ProcessFields.PROCESS_ID, "6700")
+                .containsEntry(ProcessFields.PROCESS_PATH, "C:\\Windows\\System32\\cmd.exe")
+                .containsEntry(ProcessFields.PROCESS_NAME, "cmd.exe")
+                .containsEntry(ProcessFields.PROCESS_PARENT_PATH, "C:\\Windows\\System32\\services.exe")
+                .containsEntry(ProcessFields.PROCESS_PARENT_NAME, "services.exe")
+                .containsEntry(AssociatedFields.ASSOCIATED_USER_ID, "S-1-5-18")
+                .containsEntry(AssociatedFields.ASSOCIATED_USER_NAME, "TESTHOST01$")
+                .containsEntry(AssociatedFields.ASSOCIATED_SESSION_ID, "0x3e7");
+    }
+
     private static LogRecord fixtureRecordByRecordId(long recordId) throws IOException {
-        return parseFixture("windows-2025-eventlog-1.ndjson").stream()
+        return fixtureRecordByRecordId("windows-2025-eventlog-1.ndjson", recordId);
+    }
+
+    private static LogRecord fixtureRecordByRecordId(String fixture, long recordId) throws IOException {
+        return parseFixture(fixture).stream()
                 .filter(logRecord -> topLevelLongValue(logRecord, "record_id") == recordId)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No fixture record found for record_id=" + recordId));

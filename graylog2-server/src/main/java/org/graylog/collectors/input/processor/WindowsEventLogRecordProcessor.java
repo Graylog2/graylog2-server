@@ -45,7 +45,7 @@ import java.util.Map;
  * Field semantics are based on Windows Event Log schema and Microsoft security-auditing event documentation:
  * - System fields: SystemPropertiesType (Provider, EventID, Version, Level, Task, Opcode, Keywords,
  * TimeCreated/SystemTime, EventRecordID, Correlation/ActivityID, Execution, Channel, Computer, Security/UserID)
- * - Security event field references used here: 4624, 4634, 4648, 4672, 4717, 4718, 4776, 4798
+ * - Security event field references used here: 4624, 4634, 4648, 4672, 4688, 4717, 4718, 4740, 4776, 4798
  *
  * @see <a href="https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/windowseventlogreceiver">windowseventlog receiver</a>
  * @see <a href="https://learn.microsoft.com/en-us/windows/win32/wes/eventschema-systempropertiestype-complextype">SystemPropertiesType</a>
@@ -103,8 +103,12 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
                 case "event_data" -> extractEventData(bodyFieldValue, fields);
                 // Rendered Details section(s) produced by the receiver from message templates.
                 case "details" -> extractDetails(bodyFieldValue);
-                // System/Security/UserID: SID of the user context recorded in System section.
+                // System/Security: user context recorded in System section (SID, name, domain, type).
                 case "security" -> extractSecurity(bodyFieldValue, fields);
+                // System/Keywords outcome: rendered audit outcome (e.g. "success", "failure").
+                case "outcome" -> putIfPresent(result, EventFields.EVENT_OUTCOME, extractString(bodyFieldValue));
+                // UserData payload fields (provider-specific, alternative to EventData for some providers).
+                case "user_data" -> extractUserData(bodyFieldValue, fields);
                 // Unmapped but documented:
                 // case "level" -> rendered level text (Information/Warning/Error).
                 // case "keywords" -> System/Keywords rendered keywords bitmask/tags.
@@ -127,9 +131,13 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
         putByPrecedence(result, TraceFields.TRACE_ID, fields.activityId);
 
         putNumericByPrecedenceAsString(result, ProcessFields.PROCESS_ID,
-                fields.processId, fields.callerProcessId, fields.executionProcessId);
-        putByPrecedence(result, ProcessFields.PROCESS_PATH, fields.processPath, fields.callerProcessPath);
-        putByPrecedence(result, ProcessFields.PROCESS_NAME, fileName(fields.processPath), fileName(fields.callerProcessPath));
+                fields.newProcessId, fields.processId, fields.callerProcessId, fields.executionProcessId);
+        putByPrecedence(result, ProcessFields.PROCESS_PATH,
+                fields.newProcessPath, fields.processPath, fields.callerProcessPath);
+        putByPrecedence(result, ProcessFields.PROCESS_NAME,
+                fileName(fields.newProcessPath), fileName(fields.processPath), fileName(fields.callerProcessPath));
+        putByPrecedence(result, ProcessFields.PROCESS_PARENT_PATH, fields.parentProcessPath);
+        putByPrecedence(result, ProcessFields.PROCESS_PARENT_NAME, fileName(fields.parentProcessPath));
 
         putByPrecedence(result, UserFields.USER_ID, fields.targetUserSid);
         putByPrecedence(result, UserFields.USER_NAME, fields.targetUserName);
@@ -137,7 +145,8 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
         putByPrecedence(result, UserFields.USER_SESSION_ID, fields.targetLogonId);
 
         putByPrecedence(result, AssociatedFields.ASSOCIATED_USER_ID, fields.subjectUserSid, fields.securityUserId);
-        putByPrecedence(result, AssociatedFields.ASSOCIATED_USER_NAME, fields.subjectUserName);
+        putByPrecedence(result, AssociatedFields.ASSOCIATED_USER_NAME, fields.subjectUserName, fields.securityUserName);
+        // Unmapped: associated_user_domain (not in GIM) - sources: subjectDomainName, securityDomain
         putByPrecedence(result, AssociatedFields.ASSOCIATED_SESSION_ID, fields.subjectLogonId);
 
         putByPrecedence(result, SourceFields.SOURCE_HOSTNAME, fields.workstationName, fields.workstation);
@@ -219,6 +228,10 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
         for (final var kv : value.getKvlistValue().getValuesList()) {
             switch (kv.getKey()) {
                 case "user_id" -> fields.securityUserId = extractString(kv.getValue());
+                case "user_name" -> fields.securityUserName = extractString(kv.getValue());
+                case "domain" -> fields.securityDomain = extractString(kv.getValue());
+                // Unmapped but documented:
+                // case "user_type" -> System/Security user type descriptor.
             }
         }
     }
@@ -230,85 +243,118 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
 
         for (final var kv : value.getKvlistValue().getValuesList()) {
             switch (kv.getKey()) {
-                case "data" -> extractEventDataArray(kv.getValue(), fields);
+                // 4624/4648/4672/4798 Subject: SID of account that requested/performed the action.
+                case "SubjectUserSid" -> fields.subjectUserSid = extractString(kv.getValue());
+                // 4624/4648/4672/4798 Subject: account name.
+                case "SubjectUserName" -> fields.subjectUserName = extractString(kv.getValue());
+                // 4624/4648/4672/4688/4798 Subject: account domain/computer name.
+                case "SubjectDomainName" -> fields.subjectDomainName = extractString(kv.getValue());
+                // 4624/4648/4672/4798 Subject: logon session ID (hex string).
+                case "SubjectLogonId" -> fields.subjectLogonId = extractString(kv.getValue());
+                // 4624/4634 Target/New Logon: SID of account logged on/logged off.
+                case "TargetUserSid" -> fields.targetUserSid = extractString(kv.getValue());
+                // 4624/4634/4648/4776/4798 Target/User/Logon Account names.
+                case "TargetUserName" -> fields.targetUserName = extractString(kv.getValue());
+                // 4624/4634/4648/4798 target account domain/computer context.
+                case "TargetDomainName" -> fields.targetDomainName = extractString(kv.getValue());
+                // 4624/4634 Target logon session ID for correlation.
+                case "TargetLogonId" -> fields.targetLogonId = extractString(kv.getValue());
+                // 4624/4648 Process Information: process ID as pointer/hex or decimal.
+                case "ProcessId" -> fields.processId = extractFlexibleNumber(kv.getValue());
+                // 4624/4648/4798 Process Information: full process executable path.
+                case "ProcessName" -> fields.processPath = extractString(kv.getValue());
+                // 4798 Caller process ID that performed group-enumeration operation.
+                case "CallerProcessId" -> fields.callerProcessId = extractFlexibleNumber(kv.getValue());
+                // 4798 Caller process executable path.
+                case "CallerProcessName" -> fields.callerProcessPath = extractString(kv.getValue());
+                // 4624/4648 Network Information: source network address.
+                case "IpAddress" -> fields.ipAddress = extractString(kv.getValue());
+                // 4624/4648 Network Information: source port for the logon attempt.
+                case "IpPort" -> fields.ipPort = extractIntInRange(kv.getValue(), 0, 65535);
+                // 4624 Network Information: source workstation name.
+                case "WorkstationName" -> fields.workstationName = extractString(kv.getValue());
+                // 4776 Source Workstation: origin workstation for NTLM validation attempt.
+                case "Workstation" -> fields.workstation = extractString(kv.getValue());
+                // 4648 Target Server: server where process was run using explicit credentials.
+                case "TargetServerName" -> fields.targetServerName = extractString(kv.getValue());
+                // 4672 Privileges: sensitive privileges assigned to the new logon session.
+                case "PrivilegeList" -> fields.privilegeList = extractString(kv.getValue());
+                // 4688 Process Creation: new process executable path.
+                case "NewProcessName" -> fields.newProcessPath = extractString(kv.getValue());
+                // 4688 Process Creation: new process ID as hex or decimal.
+                case "NewProcessId" -> fields.newProcessId = extractFlexibleNumber(kv.getValue());
+                // 4688 Process Creation: parent process executable path.
+                case "ParentProcessName" -> fields.parentProcessPath = extractString(kv.getValue());
+                // 4740 Account Lockout: target account name.
+                case "TargetAccount" -> {
+                    if (fields.targetUserName == null) {
+                        fields.targetUserName = extractString(kv.getValue());
+                    }
+                }
+                // Unmapped but documented:
+                // case "process" -> OpenSSH EventData process marker.
+                // case "payload" -> OpenSSH EventData payload detail text.
+                // case "LogonType" -> 4624/4634 logon type code.
+                // case "LogonGuid" -> 4624/4648 logon GUID correlation value.
+                // case "AuthenticationPackageName" -> 4624 auth package.
+                // case "LogonProcessName" -> 4624 trusted logon process name.
+                // case "LmPackageName" -> 4624 NTLM package subtype.
+                // case "TransmittedServices" -> 4624 Kerberos transited services.
+                // case "KeyLength" -> 4624 key length.
+                // case "ImpersonationLevel" -> 4624 impersonation level.
+                // case "RestrictedAdminMode" -> 4624 v2 restricted admin flag.
+                // case "RemoteCredentialGuard" -> 4624 v2 remote credential guard flag.
+                // case "TargetOutboundUserName" -> 4624 v2 outbound username.
+                // case "TargetOutboundDomainName" -> 4624 v2 outbound domain.
+                // case "VirtualAccount" -> 4624 v2 virtual account flag.
+                // case "TargetLinkedLogonId" -> 4624 v2 linked logon ID.
+                // case "ElevatedToken" -> 4624 v2 elevated token flag.
+                // case "TargetInfo" -> 4648 target server additional info.
+                // case "TargetLogonGuid" -> 4648 target logon GUID.
+                // case "TargetSid" -> 4717/4718/4798 target SID.
+                // case "PackageName" -> 4776 authentication package.
+                // case "Status" -> 4776 validation status/error code.
+                // case "AccessGranted" -> 4717 granted logon right.
+                // case "AccessRemoved" -> 4718 removed logon right.
+                // case "MandatoryLabel" -> 4688 mandatory integrity label SID.
+                // case "TokenElevationType" -> 4688 token elevation type code.
+                // case "CommandLine" -> 4688 command line (when audit policy enabled).
+                // case "FailureReason" -> 4625 human-readable failure description.
+                // case "SubStatus" -> 4625 NTSTATUS sub-code for failure detail.
+                // case "" -> unnamed positional EventData entries (common in PowerShell events).
             }
         }
     }
 
-    private static void extractEventDataArray(AnyValue value, ExtractedFields fields) {
-        if (value.getValueCase() != AnyValue.ValueCase.ARRAY_VALUE) {
+    private static void extractUserData(AnyValue value, ExtractedFields fields) {
+        if (value.getValueCase() != AnyValue.ValueCase.KVLIST_VALUE) {
             return;
         }
 
-        for (final var dataElement : value.getArrayValue().getValuesList()) {
-            if (dataElement.getValueCase() != AnyValue.ValueCase.KVLIST_VALUE) {
-                continue;
-            }
-
-            for (final var kv : dataElement.getKvlistValue().getValuesList()) {
-                switch (kv.getKey()) {
-                    // 4624/4648/4672/4798 Subject: SID of account that requested/performed the action.
-                    case "SubjectUserSid" -> fields.subjectUserSid = extractString(kv.getValue());
-                    // 4624/4648/4672/4798 Subject: account name.
-                    case "SubjectUserName" -> fields.subjectUserName = extractString(kv.getValue());
-                    // 4624/4648/4672/4798 Subject: logon session ID (hex string).
-                    case "SubjectLogonId" -> fields.subjectLogonId = extractString(kv.getValue());
-                    // 4624/4634 Target/New Logon: SID of account logged on/logged off.
-                    case "TargetUserSid" -> fields.targetUserSid = extractString(kv.getValue());
-                    // 4624/4634/4648/4776/4798 Target/User/Logon Account names.
-                    case "TargetUserName" -> fields.targetUserName = extractString(kv.getValue());
-                    // 4624/4634/4648/4798 target account domain/computer context.
-                    case "TargetDomainName" -> fields.targetDomainName = extractString(kv.getValue());
-                    // 4624/4634 Target logon session ID for correlation.
-                    case "TargetLogonId" -> fields.targetLogonId = extractString(kv.getValue());
-                    // 4624/4648 Process Information: process ID as pointer/hex or decimal.
-                    case "ProcessId" -> fields.processId = extractFlexibleNumber(kv.getValue());
-                    // 4624/4648/4798 Process Information: full process executable path.
-                    case "ProcessName" -> fields.processPath = extractString(kv.getValue());
-                    // 4798 Caller process ID that performed group-enumeration operation.
-                    case "CallerProcessId" -> fields.callerProcessId = extractFlexibleNumber(kv.getValue());
-                    // 4798 Caller process executable path.
-                    case "CallerProcessName" -> fields.callerProcessPath = extractString(kv.getValue());
-                    // 4624/4648 Network Information: source network address.
-                    case "IpAddress" -> fields.ipAddress = extractString(kv.getValue());
-                    // 4624/4648 Network Information: source port for the logon attempt.
-                    case "IpPort" -> fields.ipPort = extractIntInRange(kv.getValue(), 0, 65535);
-                    // 4624 Network Information: source workstation name.
-                    case "WorkstationName" -> fields.workstationName = extractString(kv.getValue());
-                    // 4776 Source Workstation: origin workstation for NTLM validation attempt.
-                    case "Workstation" -> fields.workstation = extractString(kv.getValue());
-                    // 4648 Target Server: server where process was run using explicit credentials.
-                    case "TargetServerName" -> fields.targetServerName = extractString(kv.getValue());
-                    // 4672 Privileges: sensitive privileges assigned to the new logon session.
-                    case "PrivilegeList" -> fields.privilegeList = extractString(kv.getValue());
-                    // Unmapped but documented:
-                    // case "process" -> OpenSSH EventData process marker.
-                    // case "payload" -> OpenSSH EventData payload detail text.
-                    // case "LogonType" -> 4624/4634 logon type code.
-                    // case "LogonGuid" -> 4624/4648 logon GUID correlation value.
-                    // case "AuthenticationPackageName" -> 4624 auth package.
-                    // case "LogonProcessName" -> 4624 trusted logon process name.
-                    // case "LmPackageName" -> 4624 NTLM package subtype.
-                    // case "TransmittedServices" -> 4624 Kerberos transited services.
-                    // case "KeyLength" -> 4624 key length.
-                    // case "ImpersonationLevel" -> 4624 impersonation level.
-                    // case "RestrictedAdminMode" -> 4624 v2 restricted admin flag.
-                    // case "RemoteCredentialGuard" -> 4624 v2 remote credential guard flag.
-                    // case "TargetOutboundUserName" -> 4624 v2 outbound username.
-                    // case "TargetOutboundDomainName" -> 4624 v2 outbound domain.
-                    // case "VirtualAccount" -> 4624 v2 virtual account flag.
-                    // case "TargetLinkedLogonId" -> 4624 v2 linked logon ID.
-                    // case "ElevatedToken" -> 4624 v2 elevated token flag.
-                    // case "TargetInfo" -> 4648 target server additional info.
-                    // case "TargetLogonGuid" -> 4648 target logon GUID.
-                    // case "TargetSid" -> 4717/4718/4798 target SID.
-                    // case "PackageName" -> 4776 authentication package.
-                    // case "Status" -> 4776 validation status/error code.
-                    // case "SubjectDomainName" -> Subject account domain/computer name.
-                    // case "AccessGranted" -> 4717 granted logon right.
-                    // case "AccessRemoved" -> 4718 removed logon right.
-                    // case "" -> unnamed positional EventData entries (common in PowerShell events).
+        for (final var kv : value.getKvlistValue().getValuesList()) {
+            switch (kv.getKey()) {
+                // 104 EventLog-cleared: subject account name.
+                case "SubjectUserName" -> {
+                    if (fields.subjectUserName == null) {
+                        fields.subjectUserName = extractString(kv.getValue());
+                    }
                 }
+                // 104 EventLog-cleared: subject account domain.
+                case "SubjectDomainName" -> {
+                    if (fields.subjectDomainName == null) {
+                        fields.subjectDomainName = extractString(kv.getValue());
+                    }
+                }
+                // Unmapped but documented:
+                // case "Channel" -> 104 cleared channel name.
+                // case "ClientProcessId" -> 104 client process ID that cleared the log.
+                // case "ClientProcessStartKey" -> 104 client process start key.
+                // case "xml_name" -> UserData XML element name.
+                // case "param1"/"param2" -> 1000/1001 positional application error parameters.
+                // case "binaryDataSize" -> 1000/1001 binary data size.
+                // case "binaryData" -> 1000/1001 binary crash data.
+                // case "RmSessionId" -> 10000/10001 restart manager session ID.
+                // case "UTCStartTime" -> 10000/10001 restart manager UTC start time.
             }
         }
     }
@@ -499,9 +545,14 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
         private String activityId;
         private Long executionProcessId;
         private String securityUserId;
+        private String securityUserName;
+        private String securityDomain;
 
         private Long processId;
         private String processPath;
+        private Long newProcessId;
+        private String newProcessPath;
+        private String parentProcessPath;
         private Long callerProcessId;
         private String callerProcessPath;
 
@@ -512,6 +563,7 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
 
         private String subjectUserSid;
         private String subjectUserName;
+        private String subjectDomainName;
         private String subjectLogonId;
 
         private String ipAddress;
