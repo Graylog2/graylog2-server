@@ -32,6 +32,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.RangeBucket;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
@@ -60,6 +61,7 @@ import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSDateRangeHandler;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSRangeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSTimeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSValuesHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.series.OSAverageHandler;
@@ -110,6 +112,7 @@ public class ViewsOSBackendModule extends ViewsModule {
         registerPivotBucketHandler(Values.NAME, OSValuesHandler.class);
         registerPivotBucketHandler(Time.NAME, OSTimeHandler.class);
         registerPivotBucketHandler(DateRangeBucket.NAME, OSDateRangeHandler.class);
+        registerPivotBucketHandler(RangeBucket.NAME, OSRangeHandler.class);
 
         bindExportBackend().to(OpenSearchExportBackend.class);
         bindRequestStrategy().to(SearchAfter.class);

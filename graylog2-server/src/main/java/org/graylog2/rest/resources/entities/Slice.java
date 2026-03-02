@@ -14,13 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import URI from 'urijs';
+package org.graylog2.rest.resources.entities;
 
-import AppConfig from 'util/AppConfig';
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-// The webpack-dev-server serves the assets from "/"
-const assetPrefix = AppConfig.gl2DevMode() ? '/' : '/assets/';
-
-// If app prefix was not set, we need to tell webpack to load chunks from root instead of the relative URL path
-// eslint-disable-next-line no-undef
-__webpack_public_path__ = URI.joinPaths(AppConfig.gl2AppPathPrefix(), assetPrefix).path() || assetPrefix;
+public record Slice(@JsonProperty(FIELD_ID) String value, @JsonProperty(FIELD_TITLE) String title, @JsonProperty(FIELD_COUNT) Integer count) {
+    private static final String FIELD_ID = "value";
+    private static final String FIELD_TITLE = "title";
+    private static final String FIELD_COUNT = "count";
+}

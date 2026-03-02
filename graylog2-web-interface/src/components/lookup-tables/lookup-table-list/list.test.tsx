@@ -66,10 +66,6 @@ jest.mock('hooks/useScopePermissions', () => ({
   }),
 }));
 
-jest.mock('routing/QueryParams', () => ({
-  useQueryParam: () => [undefined, () => {}],
-}));
-
 jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
   useFetchLookupTables: () => ({
     fetchPaginatedLookupTables: mockFetchPaginatedLookupTables,
@@ -87,8 +83,10 @@ jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
 const moreActionsName = { name: new RegExp(`More Actions for ${LOOKUP_TABLES[0].name}`, 'i') };
 
 describe('Lookup Table List', () => {
+  const renderSUT = () => render(<LookupTableList />);
+
   it('should render a list of lookup tables', async () => {
-    render(<LookupTableList />);
+    renderSUT();
 
     await screen.findAllByRole('button', { name: /Show search syntax help/i });
 
@@ -104,7 +102,7 @@ describe('Lookup Table List', () => {
   });
 
   it('should show a warning icon on tables with errors', async () => {
-    render(<LookupTableList />);
+    renderSUT();
 
     await screen.findByTestId('lookup-table-problem', { exact: true }, { timeout: 1500 });
     screen.getByTestId('cache-problem');
@@ -112,13 +110,13 @@ describe('Lookup Table List', () => {
   });
 
   it('should show an actions menu', async () => {
-    render(<LookupTableList />);
+    renderSUT();
 
     await screen.findByRole('button', moreActionsName);
   });
 
   it('should be able to edit a table', async () => {
-    render(<LookupTableList />);
+    renderSUT();
 
     userEvent.click(await screen.findByRole('button', moreActionsName));
 
@@ -126,7 +124,7 @@ describe('Lookup Table List', () => {
   });
 
   it('should be able to delete a table', async () => {
-    render(<LookupTableList />);
+    renderSUT();
 
     userEvent.click(await screen.findByRole('button', moreActionsName));
     userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
@@ -157,7 +155,7 @@ describe('Lookup Table List', () => {
     const auxPaginatedList = { ...LOOKUP_TABLES_LIST, list: auxTableList };
     mockFetchPaginatedLookupTables.mockImplementation(async () => Promise.resolve(auxPaginatedList));
 
-    render(<LookupTableList />);
+    renderSUT();
 
     await screen.findByText(/No cache/i);
     await screen.findByText(/No data adapters/i);

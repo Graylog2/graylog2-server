@@ -78,6 +78,7 @@ describe('<EntityDataTable />', () => {
     defaultDisplayedColumns,
     defaultColumnOrder: defaultDisplayedColumns,
     layoutPreferences: { attributes: columnPreferences },
+    enableSlicing: true,
     entities: data,
     onLayoutPreferencesChange: () => Promise.resolve(),
     onSortChange: () => {},
@@ -210,7 +211,7 @@ describe('<EntityDataTable />', () => {
   });
 
   it('should slice by column using header action', async () => {
-    const onChangeSlicing = jest.fn();
+    const onChangeSlicing = jest.fn(() => {});
 
     render(<EntityDataTable {...defaultProps} columnSchemas={columnSchemas} onChangeSlicing={onChangeSlicing} />);
 
@@ -221,7 +222,7 @@ describe('<EntityDataTable />', () => {
   });
 
   it('should remove slicing using header action', async () => {
-    const onChangeSlicing = jest.fn();
+    const onChangeSlicing = jest.fn(() => {});
 
     render(
       <EntityDataTable
