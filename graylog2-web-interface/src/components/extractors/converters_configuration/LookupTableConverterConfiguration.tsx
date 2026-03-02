@@ -16,8 +16,7 @@
  */
 import React from 'react';
 
-import { Link } from 'components/common/router';
-import { Select, Spinner } from 'components/common';
+import { Link, Select, Spinner } from 'components/common';
 import { Row, Col, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { getValueFromInput } from 'util/FormsUtils';

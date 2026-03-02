@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useState, useCallback } from 'react';
 
-import { ShareButton, IfPermitted, HoverForHelp } from 'components/common';
+import { ShareButton, IfPermitted, HoverForHelp, LinkContainer } from 'components/common';
 import { Button, ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import type { Stream } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
@@ -31,7 +31,6 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import { MoreActions } from 'components/common/EntityDataTable';
-import { LinkContainer } from 'components/common/router';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import UserNotification from 'util/UserNotification';
 import StreamDeleteModal from 'components/streams/StreamsOverview/StreamDeleteModal';

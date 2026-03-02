@@ -29,7 +29,6 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import IndexSetFieldTypesPage from 'pages/IndexSetFieldTypesPage';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import { overriddenIndexField, defaultField, attributes } from 'fixtures/indexSetFieldTypes';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 const getData = (list = [defaultField]) => ({
   list,
@@ -41,12 +40,9 @@ const getData = (list = [defaultField]) => ({
 
 const renderIndexSetFieldTypesPage = () =>
   render(
-    <DefaultQueryParamProvider>
-      <TestStoreProvider>
-        <IndexSetFieldTypesPage />
-      </TestStoreProvider>
-      ,
-    </DefaultQueryParamProvider>,
+    <TestStoreProvider>
+      <IndexSetFieldTypesPage />
+    </TestStoreProvider>,
   );
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());

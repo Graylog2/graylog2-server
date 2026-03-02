@@ -19,9 +19,8 @@ import numeral from 'numeral';
 import moment from 'moment';
 import styled from 'styled-components';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, Spinner } from 'components/common';
 import { Alert, Col, Row, Button } from 'components/bootstrap';
-import { Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import { DocumentationLink } from 'components/support';

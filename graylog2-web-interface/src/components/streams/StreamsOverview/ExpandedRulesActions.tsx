@@ -21,8 +21,7 @@ import type { Stream } from 'stores/streams/StreamsStore';
 import { Button } from 'components/bootstrap';
 import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import Routes from 'routing/Routes';
-import { LinkContainer } from 'components/common/router';
-import { IfPermitted } from 'components/common';
+import { LinkContainer, IfPermitted } from 'components/common';
 import useCreateStreamRule from 'components/streamrules/hooks/useCreateStreamRule';
 import StartStreamAfterRuleCreateDialog from 'components/streamrules/StartStreamAfterRuleCreateDialog';
 

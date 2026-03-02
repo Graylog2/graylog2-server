@@ -18,7 +18,7 @@ import React from 'react';
 
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 
 const EventDefinitionLink = ({ title, id }: { title: string | undefined; id: string }) => {

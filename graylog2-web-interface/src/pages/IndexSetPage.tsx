@@ -18,9 +18,8 @@ import React from 'react';
 import numeral from 'numeral';
 
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
 import { Alert, Row, Col, Panel, Button, ButtonToolbar } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
 import useProductName from 'brand-customization/useProductName';
 import {
   IndicesConfigurationDropdown,
