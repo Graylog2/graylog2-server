@@ -57,7 +57,7 @@ public class ReplicaSetMongodbNodes implements MongodbNodesService {
                 .findFirst()
                 .orElse(null);
 
-        Long slowQueryCount = getSlowQueryCount();
+        Long slowQueryCount = MongodbNodeUtils.getSlowQueryCount(mongoConnection);
 
         return members.stream()
                 .parallel()
@@ -77,21 +77,18 @@ public class ReplicaSetMongodbNodes implements MongodbNodesService {
         String name = member.get("name", String.class);
 
         String uri = "mongodb://" + name + "/?directConnection=true";
-        try (com.mongodb.client.MongoClient nodeClient = MongoClients.create(uri)) {
+        try (MongoClient nodeClient = new MongoClient(uri)) {
 
             Document serverStatus = nodeClient
                     .getDatabase("admin")
                     .runCommand(new Document("serverStatus", 1));
-
-            final Document dbStats = nodeClient.getDatabase("admin")
-                    .runCommand(new Document("dbStats", 1));
 
             Document connections = serverStatus.get("connections", Document.class);
             final Integer availableConnections = connections.getInteger("available");
             final Integer currentConnections = connections.getInteger("current");
             final double connectionsPercent = 100.0d / availableConnections * currentConnections;
 
-            double storageUsedPercent = 100.0d * dbStats.getDouble("fsUsedSize") / dbStats.getDouble("fsTotalSize");
+            double storageUsedPercent = MongodbNodeUtils.calculateStorageUsedPercent(nodeClient);
 
             int id = member.get("_id", Integer.class);
             String role = member.get("stateStr", String.class);
@@ -109,29 +106,5 @@ public class ReplicaSetMongodbNodes implements MongodbNodesService {
             }
             return new MongodbNode(String.valueOf(id), name, role, serverStatus.getString("version"), replicationLag, slowQueryCount, storageUsedPercent, availableConnections, currentConnections, connectionsPercent);
         }
-    }
-
-    private Long getSlowQueryCount() {
-        try {
-            // Check if profiling is enabled and query system.profile
-            Document profileStatus = mongoConnection.getDatabase("admin").runCommand(new Document("profile", -1));
-            int profilingLevel = profileStatus.getInteger("was", 0);
-
-            if (profilingLevel > 0) {
-                // Count slow queries from the last 5 minutes
-                long fiveMinutesAgo = System.currentTimeMillis() - (5 * 60 * 1000);
-                Date cutoffTime = new Date(fiveMinutesAgo);
-
-                Document query = new Document("ts", new Document("$gte", cutoffTime))
-                        .append("millis", new Document("$gte", 100)); // Queries taking more than 100ms
-
-                return mongoConnection.getDatabase("admin")
-                        .getCollection("system.profile")
-                        .countDocuments(query);
-            }
-        } catch (Exception e) {
-            // Profiling may not be enabled or accessible
-        }
-        return null;
     }
 }

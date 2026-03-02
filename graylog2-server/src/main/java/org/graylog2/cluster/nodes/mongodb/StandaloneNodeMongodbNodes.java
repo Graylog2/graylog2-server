@@ -54,51 +54,13 @@ public class StandaloneNodeMongodbNodes implements MongodbNodesService {
         final double connectionsPercent = 100.0d / availableConnections * currentConnections;
 
         // Get storage information
-        double storageUsedPercent = calculateStorageUsedPercent();
+        double storageUsedPercent = MongodbNodeUtils.calculateStorageUsedPercent(mongoConnection);
 
         // Get slow query count
-        Long slowQueryCount = getSlowQueryCount();
+        Long slowQueryCount = MongodbNodeUtils.getSlowQueryCount(mongoConnection);
 
         // For standalone nodes: role is "STANDALONE", status is 1 (primary equivalent), no replication lag
         return new MongodbNode("0", host, "STANDALONE", version, 0, slowQueryCount, storageUsedPercent, availableConnections, currentConnections, connectionsPercent);
-    }
-
-    private double calculateStorageUsedPercent() {
-        try {
-            final Document dbStats = mongoConnection.getDatabase("admin").runCommand(new Document("dbStats", 1));
-            double fsUsedSize = dbStats.getDouble("fsUsedSize");
-            double fsTotalSize = dbStats.getDouble("fsTotalSize");
-            if (fsTotalSize > 0) {
-                return 100.0d * fsUsedSize / fsTotalSize;
-            }
-        } catch (Exception e) {
-            // Stats may not be available or accessible
-        }
-        return 0.0;
-    }
-
-    private Long getSlowQueryCount() {
-        try {
-            // Check if profiling is enabled and query system.profile
-            Document profileStatus = mongoConnection.getDatabase("admin").runCommand(new Document("profile", -1));
-            int profilingLevel = profileStatus.getInteger("was", 0);
-
-            if (profilingLevel > 0) {
-                // Count slow queries from the last 5 minutes
-                long fiveMinutesAgo = System.currentTimeMillis() - (5 * 60 * 1000);
-                Date cutoffTime = new Date(fiveMinutesAgo);
-
-                Document query = new Document("ts", new Document("$gte", cutoffTime))
-                        .append("millis", new Document("$gte", 100)); // Queries taking more than 100ms
-
-                return mongoConnection.getDatabase("admin")
-                        .getCollection("system.profile")
-                        .countDocuments(query);
-            }
-        } catch (Exception e) {
-            // Profiling may not be enabled or accessible
-        }
-        return null;
     }
 
     @Override
