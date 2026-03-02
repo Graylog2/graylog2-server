@@ -65,12 +65,6 @@ describe('TabKeywordTimeRange', () => {
     asMock(ToolsStore.testNaturalDate).mockClear();
   });
 
-  const findValidationState = (container) => {
-    const formGroup = container.querySelector('.form-group');
-
-    return formGroup && formGroup.className.includes('has-error') ? 'error' : null;
-  };
-
   const changeInput = async (input, value) =>
     act(async () => {
       await userEvent.clear(input);
@@ -125,9 +119,9 @@ describe('TabKeywordTimeRange', () => {
   it('shows validation errors', async () => {
     asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.reject());
 
-    const { container } = render(<TabKeywordTimeRange keyword="invalid" />);
+    render(<TabKeywordTimeRange keyword="invalid" />);
 
-    await waitFor(() => expect(findValidationState(container)).toEqual('error'));
+    await screen.findByText('validation error');
   });
 
   it('does not show keyword preview if parsing fails', async () => {
