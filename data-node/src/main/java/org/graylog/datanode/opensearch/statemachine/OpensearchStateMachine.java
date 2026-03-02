@@ -51,13 +51,15 @@ public class OpensearchStateMachine extends ProcessStateMachine<OpensearchState,
                 // jump to started only allowed to facilitate startup with insecure config
                 .permit(OpensearchEvent.PROCESS_STARTED, OpensearchState.STARTING)
                 .ignore(OpensearchEvent.PROCESS_STOPPED)
-                .ignore(OpensearchEvent.HEALTH_CHECK_FAILED);
+                .ignore(OpensearchEvent.HEALTH_CHECK_FAILED)
+                .ignore(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED);
 
         config.configure(OpensearchState.PREPARED)
                 .permitReentry(OpensearchEvent.CERTIFICATES_RELOAD, process::reloadCertificates)
                 .permit(OpensearchEvent.PROCESS_STARTED, OpensearchState.STARTING)
                 .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.TERMINATED)
+                .permit(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED, OpensearchState.WAITING_FOR_CONFIGURATION, process::removeConfiguration)
                 .ignore(OpensearchEvent.HEALTH_CHECK_FAILED);
 
         // the process has started already, now we have to wait for a running OS and available REST api
@@ -72,6 +74,7 @@ public class OpensearchStateMachine extends ProcessStateMachine<OpensearchState,
                 .permit(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.AVAILABLE)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.TERMINATED)
                 .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED)
+                .permit(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED, OpensearchState.WAITING_FOR_CONFIGURATION, process::removeConfiguration)
                 .permitReentry(OpensearchEvent.PROCESS_STARTED); // allow restarts when the process is already starting
 
         // the process is running and responding to the REST status, it's available for any usage
@@ -86,6 +89,7 @@ public class OpensearchStateMachine extends ProcessStateMachine<OpensearchState,
                 .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED)
                 .permit(OpensearchEvent.PROCESS_REMOVE, OpensearchState.REMOVING)
                 .permit(OpensearchEvent.PROCESS_PREPARED, OpensearchState.PREPARED, process::stop) //restart if reconfigured
+                .permit(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED, OpensearchState.WAITING_FOR_CONFIGURATION, process::removeConfiguration)
                 .permit(OpensearchEvent.PROCESS_STARTED, OpensearchState.STARTING); // allow restarts
 
         // if the REST api is not responding, we'll jump to this state and count how many times the failure
@@ -98,6 +102,7 @@ public class OpensearchStateMachine extends ProcessStateMachine<OpensearchState,
                 .permitReentry(OpensearchEvent.CERTIFICATES_RELOAD, process::reloadCertificates)
                 .permit(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.AVAILABLE)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.TERMINATED)
+                .permit(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED, OpensearchState.WAITING_FOR_CONFIGURATION, process::removeConfiguration)
                 .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED);
 
         // failed and we see the process as not recoverable.
@@ -109,7 +114,8 @@ public class OpensearchStateMachine extends ProcessStateMachine<OpensearchState,
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.TERMINATED)
                 .permit(OpensearchEvent.PROCESS_PREPARED, OpensearchState.PREPARED) //restart if reconfigured
                 .permit(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.TERMINATED)
-                .permit(OpensearchEvent.PROCESS_STARTED, OpensearchState.STARTING);
+                .permit(OpensearchEvent.PROCESS_STARTED, OpensearchState.STARTING)
+                .permit(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED, OpensearchState.WAITING_FOR_CONFIGURATION, process::removeConfiguration);
 
         // final state, the process is not alive anymore, terminated on the operating system level
         config.configure(OpensearchState.TERMINATED)
@@ -125,12 +131,14 @@ public class OpensearchStateMachine extends ProcessStateMachine<OpensearchState,
                 .onEntry(process::remove)
                 .ignore(OpensearchEvent.HEALTH_CHECK_OK)
                 .ignore(OpensearchEvent.CERTIFICATES_RELOAD)
+                .ignore(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED)
                 .permit(OpensearchEvent.HEALTH_CHECK_FAILED, OpensearchState.FAILED)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.REMOVED);
 
         config.configure(OpensearchState.REMOVED)
                 .onEntry(process::stop)
                 .ignore(OpensearchEvent.CERTIFICATES_RELOAD)
+                .permit(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED, OpensearchState.WAITING_FOR_CONFIGURATION, process::removeConfiguration)
                 .permit(OpensearchEvent.RESET, OpensearchState.WAITING_FOR_CONFIGURATION, process::reset)
                 .ignore(OpensearchEvent.PROCESS_STOPPED);
 
