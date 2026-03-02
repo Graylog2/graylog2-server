@@ -24,7 +24,7 @@ import { TypeCell, NodeCell, ThroughputCell, ExpandedSectionToggleWrapper } from
 import FailuresCell from 'components/inputs/InputsOveriew/cells/FailuresCell';
 import { InputStateBadge } from 'components/inputs';
 import Routes from 'routing/Routes';
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 
 type Props = {
   inputTypes: InputTypesSummary;
