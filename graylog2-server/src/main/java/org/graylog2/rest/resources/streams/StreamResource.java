@@ -135,6 +135,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @RequiresAuthentication
 @PublicCloudAPI
@@ -707,21 +708,20 @@ public class StreamResource extends RestResource {
     @NoAuditEvent("No data is changed.")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Long> getDestinationFilterRuleCountsForStreams(@Parameter(name = "streamIds", required = true) GetDestinationFilterRuleCountsRequest request) {
-        final var streamIds = request.streamIds.stream()
-                .filter(streamId -> {
-                    if (!isPermitted(RestPermissions.STREAMS_READ, streamId)) {
-                        throw new ForbiddenException("Not allowed to read configuration for stream with id: " + streamId);
-                    }
-                    return true;
-                })
-                .collect(Collectors.toSet());
+        request.streamIds().forEach(streamId -> {
+            if (!isPermitted(RestPermissions.STREAMS_READ, streamId)) {
+                throw new ForbiddenException(f("Not allowed to read configuration for stream with id: %s", streamId));
+            }
+        });
+
+        final var streamIds = Set.copyOf(request.streamIds());
         final var countsByStreamId = streamDestinationFilterService.countByStreamIds(
                 streamIds,
                 dtoId -> isPermitted(RestPermissions.STREAM_DESTINATION_FILTERS_READ, dtoId)
         );
 
         final var response = new LinkedHashMap<String, Long>();
-        request.streamIds.forEach(streamId -> response.put(streamId, countsByStreamId.getOrDefault(streamId, 0L)));
+        request.streamIds().forEach(streamId -> response.put(streamId, countsByStreamId.getOrDefault(streamId, 0L)));
 
         return response;
     }
