@@ -17,8 +17,7 @@
 import * as React from 'react';
 
 import { Label } from 'components/bootstrap';
-import { RelativeTime } from 'components/common';
-import { Link } from 'components/common/router';
+import { Link, RelativeTime } from 'components/common';
 import Routes from 'routing/Routes';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 

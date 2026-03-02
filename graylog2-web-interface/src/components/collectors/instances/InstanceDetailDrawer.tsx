@@ -18,8 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 import { Label, Table } from 'components/bootstrap';
 import Drawer from 'components/common/Drawer';
-import { RelativeTime } from 'components/common';
-import { Link } from 'components/common/router';
+import { Link, RelativeTime } from 'components/common';
 import Routes from 'routing/Routes';
 
 import type { CollectorInstanceView, Source } from '../types';

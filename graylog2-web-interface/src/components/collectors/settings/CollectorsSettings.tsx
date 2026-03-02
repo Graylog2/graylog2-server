@@ -18,8 +18,7 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 
 import { Button, Input, Alert, Row, Col } from 'components/bootstrap';
-import { Spinner } from 'components/common';
-import { Link } from 'components/common/router';
+import { Link, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import InputStateBadge from 'components/inputs/InputStateBadge';
 import useInput from 'hooks/useInput';
