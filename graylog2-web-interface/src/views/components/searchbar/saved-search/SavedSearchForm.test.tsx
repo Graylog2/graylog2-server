@@ -17,6 +17,7 @@
 import React from 'react';
 import { act, render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import { useFormikContext } from 'formik';
 
 import selectEvent from 'helpers/selectEvent';
 import { asMock } from 'helpers/mocking';
@@ -26,6 +27,10 @@ import { EntityShareStore } from 'stores/permissions/EntityShareStore';
 
 import OriginalSavedSearchForm from './SavedSearchForm';
 
+jest.mock('formik', () => ({
+  ...jest.requireActual('formik'),
+  useFormikContext: jest.fn(),
+}));
 jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('stores/permissions/EntityShareStore', () => ({
   __esModule: true,
@@ -102,6 +107,7 @@ describe('SavedSearchForm', () => {
 
   beforeEach(() => {
     asMock(useSaveViewFormControls).mockReturnValue([]);
+    asMock(useFormikContext).mockReturnValue({ dirty: false });
   });
 
   describe('render the SavedSearchForm', () => {
@@ -195,6 +201,26 @@ describe('SavedSearchForm', () => {
       userEvent.click(createNewButton);
 
       expect(onSaveAs).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('unconfirmed changes warning', () => {
+    it('should show warning when form has unconfirmed changes', async () => {
+      asMock(useFormikContext).mockReturnValue({ dirty: true });
+
+      render(<SavedSearchForm {...props} />);
+
+      await screen.findByText(/unconfirmed changes to the search parameters/i);
+    });
+
+    it('should not show warning when form has no unconfirmed changes', async () => {
+      asMock(useFormikContext).mockReturnValue({ dirty: false });
+
+      render(<SavedSearchForm {...props} />);
+
+      await findByHeadline();
+
+      expect(screen.queryByText(/unconfirmed changes to the search parameters/i)).not.toBeInTheDocument();
     });
   });
 
