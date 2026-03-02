@@ -14,26 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { useParams } from 'react-router-dom';
+// eslint-disable-next-line no-restricted-imports
+import { Link as RouterLink } from 'react-router-dom';
 
-import { Spinner } from 'components/common';
-import StreamDetails from 'components/streams/StreamDetails/StreamDetails';
-import useStream from 'components/streams/hooks/useStream';
-
-const StreamDetailsPage = () => {
-  const { streamId } = useParams<{ streamId: string }>();
-  const { data: stream, isFetching, isError } = useStream(streamId);
-
-  if (!stream && isFetching) {
-    return <Spinner />;
-  }
-
-  if (!stream || isError) {
-    return null;
-  }
-
-  return <StreamDetails stream={stream} />;
-};
-
-export default StreamDetailsPage;
+export default RouterLink;

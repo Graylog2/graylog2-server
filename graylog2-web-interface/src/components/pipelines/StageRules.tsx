@@ -18,8 +18,7 @@ import * as React from 'react';
 import { useCallback } from 'react';
 
 import { Button } from 'components/bootstrap';
-import { DataTable, Icon } from 'components/common';
-import { Link } from 'components/common/router';
+import { DataTable, Icon, Link } from 'components/common';
 import Routes from 'routing/Routes';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import type { PipelineType, StageType } from 'components/pipelines/types';

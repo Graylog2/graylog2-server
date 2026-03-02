@@ -22,9 +22,8 @@ import 'moment-duration-format';
 import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 
-import { Link } from 'components/common/router';
+import { Link, Spinner, RelativeTime } from 'components/common';
 import { Row, Col, Alert } from 'components/bootstrap';
-import { Spinner, RelativeTime } from 'components/common';
 import ProgressBar, { Bar } from 'components/common/ProgressBar';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 import NumberUtils from 'util/NumberUtils';
