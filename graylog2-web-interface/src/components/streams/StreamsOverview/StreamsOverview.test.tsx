@@ -81,12 +81,7 @@ const paginatedStreams = (exampleStream = stream) => ({
 });
 
 describe('StreamsOverview', () => {
-  const renderSut = () =>
-    render(
-      <DefaultQueryParamProvider>
-        <StreamsOverview indexSets={indexSets} />
-      </DefaultQueryParamProvider>,
-    );
+  const renderSut = () => render(<StreamsOverview indexSets={indexSets} />);
 
   beforeEach(() => {
     asMock(useUserLayoutPreferences).mockReturnValue({

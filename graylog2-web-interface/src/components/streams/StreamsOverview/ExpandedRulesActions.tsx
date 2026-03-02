@@ -23,8 +23,7 @@ import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
-import { LinkContainer } from 'components/common/router';
-import { IfPermitted } from 'components/common';
+import { LinkContainer, IfPermitted } from 'components/common';
 
 type Props = {
   stream: Stream;
