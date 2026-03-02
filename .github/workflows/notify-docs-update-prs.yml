@@ -1,0 +1,28 @@
+# This workflow sends a weekly Slack notification with merged PRs
+# that have the "requires-docs-update" label. Used by the docs team.
+
+name: "Notify docs-update PRs"
+
+on:
+  schedule:
+    - cron: "0 6 * * MON"
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: "ubuntu-slim"
+
+    permissions:
+      pull-requests: read
+
+    steps:
+      - name: "Checkout repository"
+        uses: "actions/checkout@v6"
+
+      - name: "Report docs-update PRs"
+        uses: "./.github/actions/notify-docs-update-prs"
+        with:
+          repository: "Graylog2/graylog2-server"
+          slack-bot-token: "${{ secrets.SLACK_BOT_TOKEN }}"
+          slack-channel-ids: "${{ vars.SLACK_UPGRADE_NOTIFY_CHANNELS }}"
+          github-token: "${{ secrets.GITHUB_TOKEN }}"

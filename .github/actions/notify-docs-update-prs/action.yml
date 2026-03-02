@@ -1,0 +1,79 @@
+# This composite action queries merged PRs with the "requires-docs-update"
+# label from the past week and sends a Slack notification to the docs team.
+
+name: "Notify docs-update PRs"
+description: "Weekly report of merged PRs that require documentation updates"
+
+inputs:
+  repository:
+    description: "Full repo name, e.g. Graylog2/graylog2-server"
+    required: true
+  slack-bot-token:
+    description: "Slack bot token for posting messages"
+    required: true
+  slack-channel-ids:
+    description: "Slack channel IDs to post to"
+    required: true
+  github-token:
+    description: "GitHub token for gh CLI auth"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Query merged PRs with requires-docs-update label"
+      id: "query"
+      shell: "bash"
+      env:
+        GH_TOKEN: "${{ inputs.github-token }}"
+      run: |
+        ONE_WEEK_AGO=$(date -d '7 days ago' +%Y-%m-%d)
+        echo "Querying ${{ inputs.repository }} for PRs merged since ${ONE_WEEK_AGO}..."
+
+        PRS=$(gh pr list \
+          --repo "${{ inputs.repository }}" \
+          --state merged \
+          --label "requires-docs-update" \
+          --search "merged:>=${ONE_WEEK_AGO}" \
+          --json number,title,url,mergedAt,author \
+          --jq '.[] | "- #\(.number) [\(.title)](\(.url)) (@\(.author.login))"')
+
+        PR_COUNT=$(echo "${PRS}" | grep -c '^- ' || true)
+
+        if [ -z "${PRS}" ]; then
+          echo "pr-count=0" >> "$GITHUB_OUTPUT"
+          echo "pr-list=" >> "$GITHUB_OUTPUT"
+        else
+          echo "pr-count=${PR_COUNT}" >> "$GITHUB_OUTPUT"
+          # Use a delimiter for multi-line output
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "pr-list<<${EOF}" >> "$GITHUB_OUTPUT"
+          echo "${PRS}" >> "$GITHUB_OUTPUT"
+          echo "${EOF}" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: "Write job summary"
+      shell: "bash"
+      run: |
+        echo "## Merged PRs requiring docs update — ${{ inputs.repository }}" >> "$GITHUB_STEP_SUMMARY"
+        echo "" >> "$GITHUB_STEP_SUMMARY"
+        if [ "${{ steps.query.outputs.pr-count }}" = "0" ]; then
+          echo "No PRs with the \`requires-docs-update\` label were merged in the last 7 days." >> "$GITHUB_STEP_SUMMARY"
+        else
+          echo "${{ steps.query.outputs.pr-count }} PR(s) found:" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "${{ steps.query.outputs.pr-list }}" >> "$GITHUB_STEP_SUMMARY"
+        fi
+
+    - name: "Send Slack notification"
+      #if: "steps.query.outputs.pr-count != '0'"
+      if: "${{ false }}"
+      uses: "slackapi/slack-github-action@v1"
+      env:
+        SLACK_BOT_TOKEN: "${{ inputs.slack-bot-token }}"
+      with:
+        channel-id: "${{ inputs.slack-channel-ids }}"
+        slack-message: |
+          :page_facing_up: *${{ steps.query.outputs.pr-count }} merged PR(s) in ${{ inputs.repository }} require docs updates:*
+
+          ${{ steps.query.outputs.pr-list }}
