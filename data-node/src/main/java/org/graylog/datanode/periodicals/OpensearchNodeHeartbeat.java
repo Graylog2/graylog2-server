@@ -21,17 +21,12 @@ import jakarta.inject.Singleton;
 import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
-import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchStatusException;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
-import org.graylog.shaded.opensearch2.org.opensearch.client.core.MainResponse;
 import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.util.Optional;
 
 @Singleton
 public class OpensearchNodeHeartbeat extends Periodical {
@@ -50,20 +45,18 @@ public class OpensearchNodeHeartbeat extends Periodical {
         if (!process.isInState(OpensearchState.TERMINATED) && !process.isInState(OpensearchState.WAITING_FOR_CONFIGURATION)
                 && !process.isInState(OpensearchState.REMOVED)) {
 
-            final Optional<RestHighLevelClient> restClient = process.restClient();
-            if (restClient.isPresent()) {
+            process.openSearchClient().ifPresent(client -> {
                 try {
-                    final MainResponse health = restClient.get()
-                            .info(RequestOptions.DEFAULT);
-                    onNodeResponse(process, health);
-                } catch (IOException | OpenSearchStatusException e) {
+                    client.syncWithoutErrorMapping().info();
+                    onNodeResponse(process);
+                } catch (IOException e) {
                     onRestError(process, e);
                 }
-            }
+            });
         }
     }
 
-    private void onNodeResponse(OpensearchProcess process, MainResponse nodeResponse) {
+    private void onNodeResponse(OpensearchProcess process) {
         process.onEvent(OpensearchEvent.HEALTH_CHECK_OK);
     }
 

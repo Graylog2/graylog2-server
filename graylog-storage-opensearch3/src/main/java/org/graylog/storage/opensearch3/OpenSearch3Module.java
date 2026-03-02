@@ -94,7 +94,7 @@ public class OpenSearch3Module extends VersionAwareModule {
         bindForSupportedVersion(V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter.class)
                 .to(V20200730000000_AddGl2MessageIdFieldAliasForEventsOS2.class);
 
-        bindForSupportedVersion(QuerySuggestionsService.class).to(QuerySuggestionsOS2.class);
+        bindForSupportedVersion(QuerySuggestionsService.class).to(QuerySuggestionsOS.class);
 
         bindForSupportedVersion(ProxyRequestAdapter.class).to(ProxyRequestAdapterOS.class);
 
