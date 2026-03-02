@@ -170,7 +170,7 @@ export default [
             {
               name: 'react-router-dom',
               importNames: ['Link'],
-              message: 'Please use Link from `components/common/router` instead.',
+              message: 'Please use Link from `components/common` instead.',
             },
             {
               name: 'react-router-dom',

@@ -25,14 +25,9 @@ import asMock from 'helpers/mocking/AsMock';
 import SetProfileModal from 'components/indices/IndexSetFieldTypes/SetProfileModal';
 import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
 import useRemoveProfileFromIndexMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveProfileFromIndexMutation';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 const renderModal = (currentProfile = 'profile-id-111') =>
-  render(
-    <DefaultQueryParamProvider>
-      <SetProfileModal currentProfile={currentProfile} onClose={() => {}} show />
-    </DefaultQueryParamProvider>,
-  );
+  render(<SetProfileModal currentProfile={currentProfile} onClose={() => {}} show />);
 
 jest.mock('routing/useParams', () => jest.fn());
 jest.mock('components/indices/IndexSetFieldTypes/hooks/useSetIndexSetProfileMutation', () => jest.fn());
