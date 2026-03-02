@@ -80,6 +80,11 @@ const SavedSearchForm = ({ ...props }: React.ComponentProps<typeof OriginalSaved
 );
 jest.setTimeout(10000);
 
+const mockFormDirtyState = (dirty: boolean) =>
+  asMock(useFormikContext)
+    // @ts-expect-error context return type is not complete
+    .mockReturnValue({ dirty });
+
 describe('SavedSearchForm', () => {
   beforeEach(() => {
     asMock(EntityShareStore.getInitialState).mockReturnValue({ state: createEntityShareState });
@@ -107,7 +112,7 @@ describe('SavedSearchForm', () => {
 
   beforeEach(() => {
     asMock(useSaveViewFormControls).mockReturnValue([]);
-    asMock(useFormikContext).mockReturnValue({ dirty: false });
+    mockFormDirtyState(false);
   });
 
   describe('render the SavedSearchForm', () => {
@@ -206,7 +211,7 @@ describe('SavedSearchForm', () => {
 
   describe('unconfirmed changes warning', () => {
     it('should show warning when form has unconfirmed changes', async () => {
-      asMock(useFormikContext).mockReturnValue({ dirty: true });
+      mockFormDirtyState(true);
 
       render(<SavedSearchForm {...props} />);
 
@@ -214,7 +219,7 @@ describe('SavedSearchForm', () => {
     });
 
     it('should not show warning when form has no unconfirmed changes', async () => {
-      asMock(useFormikContext).mockReturnValue({ dirty: false });
+      mockFormDirtyState(false);
 
       render(<SavedSearchForm {...props} />);
 
