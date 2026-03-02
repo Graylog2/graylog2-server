@@ -71,9 +71,30 @@ public abstract class MacOSUnifiedLoggingReceiverConfig implements OtlpReceiverC
         return "ndjson";
     }
 
+    // TODO: Expose this default via the source config REST API so the frontend can fetch it
+    //  instead of duplicating it. This should be the single source of truth.
+    // Default predicate: security-relevant subsystems, error severity and above.
+    // Subsystems: authentication, authorization, firewall, permissions, disk,
+    //             endpoint security, system policy, process lifecycle.
+    static final String DEFAULT_PREDICATE = "subsystem IN {"
+            + "'com.apple.opendirectoryd',"
+            + "'com.apple.authorization',"
+            + "'com.apple.loginwindow',"
+            + "'com.apple.securityd',"
+            + "'com.apple.TCC',"
+            + "'com.apple.alf',"
+            + "'com.apple.networkextension',"
+            + "'com.apple.DiskManagement',"
+            + "'com.apple.CoreStorage',"
+            + "'com.apple.endpointsecurity',"
+            + "'com.apple.syspolicyd',"
+            + "'com.apple.launchd'"
+            + "} AND messageType >= error";
+
     public static Builder builder(String id) {
         return new AutoValue_MacOSUnifiedLoggingReceiverConfig.Builder()
                 .name(f("macosunifiedlogging/%s", id))
+                .predicate(DEFAULT_PREDICATE)
                 .maxPollInterval(Duration.ofSeconds(30))
                 .maxLogAge(Duration.ofHours(24));
     }

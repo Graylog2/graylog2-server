@@ -52,8 +52,10 @@ public abstract class MacOSUnifiedLoggingSourceConfig implements SourceConfig {
 
     @Override
     public Optional<OtlpReceiverConfig> toReceiverConfig(String id) {
-        final var builder = MacOSUnifiedLoggingReceiverConfig.builder(id)
-                .predicate(predicate());
+        final var builder = MacOSUnifiedLoggingReceiverConfig.builder(id);
+        if (predicate() != null) {
+            builder.predicate(predicate());
+        }
         return Optional.of(builder.build());
     }
 
