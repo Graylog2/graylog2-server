@@ -14,17 +14,4 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import vendorConfig from './webpack.vendor';
-import webpackConfig from './webpack.combined.config';
-import './build-types';
-
-const TARGET = process.env.npm_lifecycle_event || 'build';
-const isProd = TARGET.startsWith('build');
-
-// eslint-disable-next-line import/no-dynamic-require,global-require
-const commonsConfigs = isProd ? [require('./webpack.commons')] : [];
-const webpackConfigs = [vendorConfig, ...commonsConfigs, ...webpackConfig];
-const pluginNames = webpackConfigs.map((config) => config.name).filter((name) => !['vendor', 'commons', 'app'].includes(name));
-global.pluginNames = pluginNames;
-
-export default webpackConfigs;
+module.exports = ['components/common'];
