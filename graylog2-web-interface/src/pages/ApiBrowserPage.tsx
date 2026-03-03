@@ -15,9 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
 import styled, { css } from 'styled-components';
+import debounce from 'lodash/debounce';
 
 import { DocumentTitle } from 'components/common';
 import { qualifyUrl } from 'util/URLUtils';
@@ -280,28 +282,58 @@ const StyledSwaggerContainer = styled.div(
   `,
 );
 
+type JsonSchemaFormProps = {
+  onChange: (newValue: string) => void;
+  value: string;
+};
+
+type RequestBodyEditorProps = {
+  onChange: (newValue: string) => void;
+};
+
+const DebounceInputsPlugin = () => ({
+  wrapComponents: {
+    JsonSchemaForm:
+      (Original: React.FC<JsonSchemaFormProps>) =>
+      ({ onChange, value, ...props }: JsonSchemaFormProps) => {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const [_value, setValue] = useState<string>(value);
+        const debouncedOnChange = debounce(onChange, 1000);
+        const _onChange = (newValue: string) => {
+          setValue(newValue);
+          debouncedOnChange(newValue);
+        };
+
+        return <Original onChange={_onChange} value={_value} {...props} />;
+      },
+
+    RequestBodyEditor:
+      (Original: React.FC<RequestBodyEditorProps>) =>
+      ({ onChange, ...props }: RequestBodyEditorProps) => {
+        const _onChange = debounce(onChange, 1000);
+
+        return <Original onChange={_onChange} {...props} />;
+      },
+  },
+});
+
 // noinspection JSUnusedGlobalSymbols
 const ApiBrowserPage = () => (
   <DocumentTitle title="API Browser">
     <StyledSwaggerContainer>
       <SwaggerUI
-        url={qualifyUrl('/openapi.yaml')}
+        url={qualifyUrl('/openapi.json')}
         filter
         deepLinking
-        requestInterceptor={(req) => {
-          req.headers['X-Requested-By'] = 'API Browser';
-
-          return req;
-        }}
-        plugins={[
-          () => ({
-            wrapComponents: {
-              // Hide authorization UI since the browser already has a valid session cookie
-              authorizeBtn: () => () => null,
-              authorizeOperationBtn: () => () => null,
-            },
-          }),
-        ]}
+        defaultModelsExpandDepth={-1}
+        requestInterceptor={(req) => ({
+          ...req,
+          headers: {
+            ...req.headers,
+            'X-Requested-By': 'API Browser',
+          },
+        })}
+        plugins={[DebounceInputsPlugin]}
       />
     </StyledSwaggerContainer>
   </DocumentTitle>
