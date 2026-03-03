@@ -27,12 +27,14 @@ import org.graylog.collectors.db.FileSourceConfig;
 import org.graylog.collectors.db.JournaldSourceConfig;
 import org.graylog.collectors.db.MacOSUnifiedLoggingSourceConfig;
 import org.graylog.collectors.db.WindowsEventLogSourceConfig;
+import org.graylog.collectors.indexer.CollectorLogsIndexTemplateProvider;
 import org.graylog.collectors.input.CollectorIngestCodec;
 import org.graylog.collectors.input.CollectorIngestGrpcInput;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
 import org.graylog.collectors.input.debug.NoOpOtlpTrafficDump;
 import org.graylog.collectors.input.debug.OtlpTrafficDump;
 import org.graylog.collectors.input.debug.OtlpTrafficDumpService;
+import org.graylog.collectors.input.processor.CollectorLogRecordProcessor;
 import org.graylog.collectors.input.processor.FilelogRecordProcessor;
 import org.graylog.collectors.input.processor.JournaldRecordProcessor;
 import org.graylog.collectors.input.processor.LogRecordProcessor;
@@ -49,6 +51,7 @@ import org.graylog.collectors.rest.FleetResource;
 import org.graylog.collectors.rest.SourceResource;
 import org.graylog2.database.SequenceTopics;
 import org.graylog2.featureflag.FeatureFlags;
+import org.graylog2.indexer.template.IndexTemplateProvider;
 import org.graylog2.plugin.PluginModule;
 
 public class CollectorsModule extends PluginModule {
@@ -79,6 +82,7 @@ public class CollectorsModule extends PluginModule {
         logRecordProcessorBinder.addBinding(JournaldReceiverConfig.RECEIVER_TYPE).to(JournaldRecordProcessor.class);
         logRecordProcessorBinder.addBinding(MacOSUnifiedLoggingReceiverConfig.RECEIVER_TYPE).to(MacOSUnifiedLoggingRecordProcessor.class);
         logRecordProcessorBinder.addBinding(WindowsEventLogReceiverConfig.RECEIVER_TYPE).to(WindowsEventLogRecordProcessor.class);
+        logRecordProcessorBinder.addBinding(CollectorLogRecordProcessor.RECEIVER_TYPE).to(CollectorLogRecordProcessor.class);
 
         if (otlpDumpEnabled) {
             bind(OtlpTrafficDump.class).to(OtlpTrafficDumpService.class).asEagerSingleton();
@@ -111,5 +115,10 @@ public class CollectorsModule extends PluginModule {
         registerJacksonSubtype(JournaldSourceConfig.class);
         registerJacksonSubtype(MacOSUnifiedLoggingSourceConfig.class);
         registerJacksonSubtype(WindowsEventLogSourceConfig.class);
+
+        final var indexTemplateProviderBinder = MapBinder.newMapBinder(binder(), String.class,
+                IndexTemplateProvider.class);
+        indexTemplateProviderBinder.addBinding(CollectorLogsIndexTemplateProvider.COLLECTOR_LOGS_TEMPLATE_TYPE)
+                .to(CollectorLogsIndexTemplateProvider.class);
     }
 }
