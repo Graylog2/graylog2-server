@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 
 import type { ClusterGraylogNode } from '../fetchClusterGraylogNodes';

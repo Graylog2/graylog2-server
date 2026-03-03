@@ -26,8 +26,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import org.graylog.datanode.configuration.DatanodeTrustManagerProvider;
-import org.graylog.storage.opensearch2.IndexState;
-import org.graylog.storage.opensearch2.IndexStateChangeRequest;
+import org.graylog.storage.opensearch3.IndexState;
+import org.graylog.storage.opensearch3.IndexStateChangeRequest;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;

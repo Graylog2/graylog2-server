@@ -19,11 +19,10 @@ import { useState, useContext, useCallback } from 'react';
 import Immutable from 'immutable';
 import styled from 'styled-components';
 
-import { Link } from 'components/common/router';
+import { Link, Icon, Spinner, Timestamp } from 'components/common';
 import { Col, Label, Row } from 'components/bootstrap';
 import { MessageFields } from 'views/components/messagelist';
 import MessageDetailsTitle from 'components/search/MessageDetailsTitle';
-import { Icon, Spinner, Timestamp } from 'components/common';
 import Routes from 'routing/Routes';
 import type { Message } from 'views/components/messagelist/Types';
 import type { Input } from 'components/messageloaders/Types';

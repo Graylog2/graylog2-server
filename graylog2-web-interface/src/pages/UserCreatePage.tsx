@@ -16,11 +16,10 @@
  */
 import * as React from 'react';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, PageHeader, DocumentTitle } from 'components/common';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { Button } from 'components/bootstrap';
-import { PageHeader, DocumentTitle } from 'components/common';
 import UserCreate from 'components/users/UserCreate';
 import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
 
