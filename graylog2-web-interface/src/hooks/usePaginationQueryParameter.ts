@@ -14,12 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import URI from 'urijs';
-import { useNavigate } from 'react-router-dom';
 import { useCallback } from 'react';
 
-import useLocation from 'routing/useLocation';
-import useQuery from 'routing/useQuery';
+import { useQueryParams, NumberParam } from 'routing/QueryParams';
 
 export const DEFAULT_PAGE = 1;
 export const DEFAULT_PAGE_SIZES = [10, 20, 50, 100];
@@ -36,10 +33,10 @@ const usePaginationQueryParameter = (
   propsPageSize: number = DEFAULT_PAGE_SIZES[0],
   syncPageSizeFromQuery: boolean = true,
 ): PaginationQueryParameterResult => {
-  const { page: pageQueryParameter, pageSize: pageSizeQueryParameter } = useQuery();
-  const navigate = useNavigate();
-  const { search, pathname } = useLocation();
-  const query = pathname + search;
+  const [{ page: pageQueryParameter, pageSize: pageSizeQueryParameter }, setQueryParams] = useQueryParams({
+    page: NumberParam,
+    pageSize: NumberParam,
+  });
   const pageQueryParameterAsNumber = Number(pageQueryParameter);
   const page =
     Number.isInteger(pageQueryParameterAsNumber) && pageQueryParameterAsNumber > 0
@@ -62,13 +59,12 @@ const usePaginationQueryParameter = (
 
   const setPagination = useCallback(
     ({ page: newPage = page, pageSize: newPageSize = pageSize }: { page?: number; pageSize?: number }) => {
-      const uri = new URI(query).setSearch({
+      setQueryParams({
         page: newPage,
-        pageSize: syncPageSizeFromQuery ? String(newPageSize) : undefined,
+        pageSize: syncPageSizeFromQuery ? newPageSize : undefined,
       });
-      navigate(uri.toString());
     },
-    [navigate, page, pageSize, query, syncPageSizeFromQuery],
+    [page, pageSize, setQueryParams, syncPageSizeFromQuery],
   );
 
   const resetPage = useCallback(() => {

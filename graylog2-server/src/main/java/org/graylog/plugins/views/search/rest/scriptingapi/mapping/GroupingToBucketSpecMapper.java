@@ -19,19 +19,23 @@ package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Grouping;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.RangeBucket;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.TimeUnitInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 
+import java.util.List;
 import java.util.function.Function;
 
 public class GroupingToBucketSpecMapper implements Function<Grouping, BucketSpec> {
     /**
-     * Only 'scaling' or 'timeunit' or none of both should be present, this is validated in Grouping.java on deserializing the JSON
+     * Only one of 'scaling', 'timeunit', or 'ranges' should be present, this is validated in Grouping.java on deserializing the JSON
      */
     @Override
     public BucketSpec apply(final Grouping grouping) {
-        if(grouping.scaling().isPresent()) {
+        if(grouping.ranges().isPresent()) {
+            return new RangeBucket(List.of(grouping.requestedField().name()), grouping.ranges().get());
+        } else if(grouping.scaling().isPresent()) {
             return Time.builder()
                     .field(grouping.requestedField().name())
                     .type(Time.NAME)

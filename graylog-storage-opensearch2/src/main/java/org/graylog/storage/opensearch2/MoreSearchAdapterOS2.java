@@ -305,23 +305,4 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
             LOG.debug("Scrolling done - took {} ms", stopwatch.stop().elapsed(TimeUnit.MILLISECONDS));
         }
     }
-
-    private ChunkCommand buildScrollCommand(String queryString, TimeRange timeRange, Set<String> affectedIndices,
-                                            List<UsedSearchFilter> filters, Set<String> streams, int batchSize) {
-        ChunkCommand.Builder commandBuilder = ChunkCommand.builder()
-                .query(queryString)
-                .range(timeRange)
-                .indices(affectedIndices)
-                .filters(filters == null ? Collections.emptyList() : filters)
-                .batchSize(batchSize)
-                // For correlation need the oldest messages to come in first
-                .sorting(new Sorting(Message.FIELD_TIMESTAMP, Sorting.Direction.ASC));
-
-        if (!streams.isEmpty()) {
-            commandBuilder = commandBuilder.streams(streams);
-        }
-
-        return commandBuilder
-                .build();
-    }
 }

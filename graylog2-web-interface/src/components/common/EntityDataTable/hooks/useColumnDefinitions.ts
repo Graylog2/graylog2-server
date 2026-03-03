@@ -32,6 +32,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   columnSchemas,
   columnWidths,
   displayBulkSelectCol,
+  enableSlicing,
   entityActions,
   entityAttributesAreCamelCase,
   hasRowActions,
@@ -48,6 +49,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   columnWidths: { [_attributeId: string]: number };
   displayBulkSelectCol: boolean;
   entityActions?: (entity: Entity) => React.ReactNode;
+  enableSlicing: boolean;
   entityAttributesAreCamelCase: boolean;
   hasRowActions: boolean;
   meta: Meta;
@@ -75,6 +77,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
     columnSchemas,
     columnWidths,
     entityAttributesAreCamelCase,
+    enableSlicing,
     meta,
     onChangeSlicing,
     onHeaderSectionResize,

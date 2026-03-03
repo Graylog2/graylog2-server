@@ -17,6 +17,7 @@
 package org.graylog.storage.opensearch3.indextemplates;
 
 import jakarta.inject.Inject;
+import org.graylog.storage.opensearch3.OSSerializationUtils;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.Template;
@@ -30,13 +31,10 @@ import org.opensearch.client.transport.endpoints.BooleanResponse;
 
 public class LegacyIndexTemplateAdapter implements IndexTemplateAdapter {
     private final OfficialOpensearchClient client;
-    private final OSSerializationUtils templateMapper;
 
     @Inject
-    public LegacyIndexTemplateAdapter(final OfficialOpensearchClient client,
-                                      final OSSerializationUtils templateMapper) {
+    public LegacyIndexTemplateAdapter(final OfficialOpensearchClient client) {
         this.client = client;
-        this.templateMapper = templateMapper;
     }
 
     @Override
@@ -47,8 +45,8 @@ public class LegacyIndexTemplateAdapter implements IndexTemplateAdapter {
             PutTemplateRequest putTemplateRequest = PutTemplateRequest.builder()
                     .name(templateName)
                     .indexPatterns(template.indexPatterns())
-                    .mappings(templateMapper.fromMap(template.mappings(), TypeMapping._DESERIALIZER))
-                    .settings(templateMapper.toJsonDataMap(template.settings()))
+                    .mappings(OSSerializationUtils.fromMap(template.mappings(), TypeMapping._DESERIALIZER))
+                    .settings(OSSerializationUtils.toJsonDataMap(template.settings()))
                     .order(template.order().intValue())
                     .build();
             final AcknowledgedResponseBase putTemplateResponse = indicesClient.putTemplate(putTemplateRequest);

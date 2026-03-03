@@ -114,6 +114,7 @@ const GroupingsConfiguration = () => {
             items={groupBy?.groupings}
             onMoveItem={(newGroupings) => setFieldValue('groupBy.groupings', newGroupings)}
             customListItemRender={GroupingsItem}
+            displayOverlayInPortal
           />
         )}
       />

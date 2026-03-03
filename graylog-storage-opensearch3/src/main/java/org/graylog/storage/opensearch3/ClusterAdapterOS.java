@@ -42,7 +42,6 @@ import org.graylog2.system.stats.elasticsearch.ShardStats;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.Time;
 import org.opensearch.client.opensearch.cat.NodesRequest;
-import org.opensearch.client.opensearch.cat.OpenSearchCatClient;
 import org.opensearch.client.opensearch.cat.aliases.AliasesRecord;
 import org.opensearch.client.opensearch.cat.allocation.AllocationRecord;
 import org.opensearch.client.opensearch.cat.indices.IndicesRecord;
@@ -51,8 +50,9 @@ import org.opensearch.client.opensearch.cluster.GetClusterSettingsRequest;
 import org.opensearch.client.opensearch.cluster.GetClusterSettingsResponse;
 import org.opensearch.client.opensearch.cluster.HealthRequest;
 import org.opensearch.client.opensearch.cluster.HealthResponse;
-import org.opensearch.client.opensearch.cluster.OpenSearchClusterClient;
 import org.opensearch.client.opensearch.cluster.PendingTasksResponse;
+import org.opensearch.client.opensearch.cluster.PutClusterSettingsRequest;
+import org.opensearch.client.opensearch.cluster.PutClusterSettingsResponse;
 import org.opensearch.client.opensearch.cluster.pending_tasks.PendingTask;
 import org.opensearch.client.opensearch.generic.Request;
 import org.opensearch.client.opensearch.generic.Requests;
@@ -413,6 +413,22 @@ public class ClusterAdapterOS implements ClusterAdapter {
                 .map(HealthStatus::fromString)
                 .min(HealthStatus::compareTo);
 
+    }
+
+    public String getClusterSetting(String setting) {
+        return getSetting(setting, getClusterSettings());
+    }
+
+    public boolean updateClusterSetting(String setting, String value, boolean persistent) {
+        PutClusterSettingsRequest.Builder request = PutClusterSettingsRequest.builder();
+        if (persistent) {
+            request.persistent(setting, JsonData.of(value));
+        } else {
+            request.transient_(setting, JsonData.of(value));
+        }
+        PutClusterSettingsResponse response = opensearchClient.sync(c -> c.cluster().putSettings(request.build()),
+                "Unable to set cluster setting " + setting);
+        return response.acknowledged();
     }
 
     private GetClusterSettingsResponse getClusterSettings() {
