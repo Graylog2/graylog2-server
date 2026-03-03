@@ -22,7 +22,8 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public record RequestedField(String name, @Nullable String decorator) {
-    public static String DECORATOR_SEPARATOR = "|";
+    // according to https://discuss.elastic.co/t/legal-character-set-for-field-names/190796, # seems to be a good separator char
+    public static String DECORATOR_SEPARATOR = "#";
 
     public static RequestedField parse(String value) {
         final List<String> parts = Splitter.on(DECORATOR_SEPARATOR)
