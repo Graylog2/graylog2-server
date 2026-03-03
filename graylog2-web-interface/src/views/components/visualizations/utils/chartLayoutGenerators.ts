@@ -132,6 +132,8 @@ export const getFormatSettingsByData = (unitTypeKey: FieldUnitType | DefaultAxis
       };
     case 'size':
       return getFormatSettingsWithCustomTickVals(values, 'size');
+    case 'binary_size':
+      return getFormatSettingsWithCustomTickVals(values, 'binary_size');
     case 'time':
       return getFormatSettingsWithCustomTickVals(values, 'time');
     default:
@@ -325,7 +327,11 @@ export const getHoverTemplateSettings = ({
   unit: FieldUnit;
   name?: string;
 }): { text: Array<string>; hovertemplate: string; meta: string } | {} => {
-  if (unit?.unitType === 'time' || unit?.unitType === 'size') {
+  if (
+    unit?.unitType === 'time' ||
+    unit?.unitType === 'size' ||
+    unit?.unitType === 'binary_size'
+  ) {
     return {
       text: getHoverTexts({ convertedValues, unit }),
       hovertemplate: `%{text}<br>${name ? '<extra>%{meta}</extra>' : '<extra></extra>'}`,
