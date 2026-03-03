@@ -82,10 +82,10 @@ const useStreamOutputFilters = (
 
     queryFn: () =>
       defaultOnError(
-        fetchStreamOutputFilters(
-          streamId,
-          { ...pagination, query: destinationType ? `destination_type:${destinationType}` : pagination.query },
-        ),
+        fetchStreamOutputFilters(streamId, {
+          ...pagination,
+          query: destinationType ? `destination_type:${destinationType}` : pagination.query,
+        }),
         'Loading stream output filters failed with status',
         'Could not load stream output filters',
       ),
