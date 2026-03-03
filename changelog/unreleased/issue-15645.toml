@@ -2,4 +2,4 @@ type = "c"
 message = "Suppress non-actionable system notifications in cloud installs."
 
 issues = ["15645"]
-pulls = [""]
+pulls = ["25130"]
