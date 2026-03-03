@@ -14,18 +14,30 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 
 import { Spinner } from 'components/common';
 import type { PlotLayout } from 'views/components/visualizations/GenericPlot';
 import GenericPlot from 'views/components/visualizations/GenericPlot';
 import AppConfig from 'util/AppConfig';
+import {
+  getHoverTemplateSettings,
+  getFormatSettingsByData,
+} from 'views/components/visualizations/utils/chartLayoutGenerators';
+import FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 
 type Props = {
   traffic: { [key: string]: number };
   width: number;
   trafficLimit?: number;
+};
+
+
+type GeneratedLayout = {
+  range: [number, number];
+  tickvals: Array<number>;
+  ticktext: Array<string>;
 };
 
 const GraphWrapper = styled.div<{
@@ -44,6 +56,12 @@ const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
   const getMaxDailyValue = (arr) => arr.reduce((a, b) => Math.max(a, b));
 
   const range = getMaxDailyValue(Object.values(traffic));
+
+  const yValues = Object.values(traffic);
+  const valuesToGetFormatSettings = useMemo(
+    () => (trafficLimit ? [...yValues, trafficLimit] : yValues),
+    [trafficLimit, yValues],
+  );
 
   if (!traffic) {
     return <Spinner />;
@@ -89,9 +107,14 @@ const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
     {
       type: 'bar',
       x: Object.keys(traffic),
-      y: Object.values(traffic),
+      y: yValues,
+      ...getHoverTemplateSettings({
+        convertedValues: yValues,
+        unit: FieldUnit.fromJSON({ abbrev: 'b', unit_type: 'binary_size' }),
+      }),
     },
   ];
+
 
   const layout: Partial<PlotLayout> = {
     showlegend: false,
@@ -101,7 +124,7 @@ const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
     xaxis: {
       type: 'date',
       title: {
-        text: 'Time',
+        text: 'Time shown in UTC',
       },
     },
     hovermode: 'x',
@@ -116,6 +139,7 @@ const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
       rangemode: 'tozero',
       hoverformat: '.4s',
       tickformat: 's',
+      ...(getFormatSettingsByData('binary_size', valuesToGetFormatSettings) as GeneratedLayout),
     },
     updatemenus: [
       {

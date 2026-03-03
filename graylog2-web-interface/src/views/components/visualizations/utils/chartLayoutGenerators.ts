@@ -107,7 +107,7 @@ const getFormatSettingsWithCustomTickVals = (values: Array<any>, fieldType: Fiel
   };
 };
 
-const getFormatSettingsByData = (unitTypeKey: FieldUnitType | DefaultAxisKey, values: Array<any>) => {
+export const getFormatSettingsByData = (unitTypeKey: FieldUnitType | DefaultAxisKey, values: Array<any>) => {
   switch (unitTypeKey) {
     case 'percent':
       return {
@@ -115,6 +115,8 @@ const getFormatSettingsByData = (unitTypeKey: FieldUnitType | DefaultAxisKey, va
       };
     case 'size':
       return getFormatSettingsWithCustomTickVals(values, 'size');
+    case 'binary_size':
+      return getFormatSettingsWithCustomTickVals(values, 'binary_size');
     case 'time':
       return getFormatSettingsWithCustomTickVals(values, 'time');
     default:
@@ -301,13 +303,17 @@ const getHoverTexts = ({ convertedValues, unit }: { convertedValues: Array<any>;
 export const getHoverTemplateSettings = ({
   convertedValues,
   unit,
-  name,
+  name = undefined,
 }: {
   convertedValues: Array<any>;
   unit: FieldUnit;
-  name: string;
+  name?: string;
 }): { text: Array<string>; hovertemplate: string; meta: string } | {} => {
-  if (unit?.unitType === 'time' || unit?.unitType === 'size') {
+  if (
+    unit?.unitType === 'time' ||
+    unit?.unitType === 'size' ||
+    unit?.unitType === 'binary_size'
+  ) {
     return {
       text: getHoverTexts({ convertedValues, unit }),
       hovertemplate: '%{text}<br><extra>%{meta}</extra>',

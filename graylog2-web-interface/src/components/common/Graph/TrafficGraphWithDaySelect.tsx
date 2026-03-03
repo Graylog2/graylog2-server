@@ -15,10 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 import reduce from 'lodash/reduce';
 import styled, { css } from 'styled-components';
-
-import NumberUtils from 'util/NumberUtils';
 import { Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import { formatTrafficData } from 'util/TrafficUtils';
@@ -30,6 +29,8 @@ import useLocation from 'routing/useLocation';
 import type { Traffic } from 'components/common/Graph/types';
 import { DAYS } from 'components/common/Graph/types';
 import useGraphDays from 'components/common/Graph/contexts/useGraphDays';
+import { getPrettifiedValue } from 'views/components/visualizations/utils/unitConverters';
+import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
 
 const StyledH3 = styled.h3(
   ({ theme }) => css`
@@ -86,12 +87,21 @@ const TrafficGraphWithDaySelect = ({ traffic, trafficLimit, title }: Props) => {
   let sumOutput = null;
   let trafficGraph = <Spinner />;
 
+
+  const bytesOut = reduce(traffic, (result, value) => result + value);
+
+  const formattedTotalTraffic = useMemo(() => {
+    const prettified = getPrettifiedValue(bytesOut, { abbrev: 'b', unitType: 'binary_size' });
+
+    return formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev);
+  }, [bytesOut]);
+
   if (traffic) {
-    const bytesOut = reduce(traffic, (result, value) => result + value);
+
 
     sumOutput = (
       <small>
-        Last {graphDays} days: {NumberUtils.formatBytes(bytesOut)}
+        Last {graphDays} days: {formattedTotalTraffic}
       </small>
     );
 
