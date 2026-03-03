@@ -158,7 +158,7 @@ public class OpenAPIContextFactory {
                 .addSecurityItem(new SecurityRequirement().addList("sessionAuth"));
 
         return new SwaggerConfiguration()
-                .openAPI31(true)
+                .openAPI31(false)
                 .openAPI(openAPI)
                 .prettyPrint(true)
                 .sortOutput(true);
