@@ -82,7 +82,7 @@ const SavedSearchForm = ({
           {formDirty && (
             <Alert compact noIcon bsStyle="warning">
               There are unconfirmed changes to the search parameters (time range, streams, or query). Saving now will
-              discard them. Cancel and execute the search to apply your changes before saving.{' '}
+              discard them. If this is not intentional, execute the search to apply your changes before saving.{' '}
             </Alert>
           )}
           <FormGroup>
