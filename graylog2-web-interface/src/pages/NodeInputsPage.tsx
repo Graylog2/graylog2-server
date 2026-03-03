@@ -18,8 +18,7 @@ import React, { useEffect } from 'react';
 
 import { Row, Col } from 'components/bootstrap';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
-import { Link } from 'components/common/router';
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import { Link, DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
 import { NodesStore } from 'stores/nodes/NodesStore';

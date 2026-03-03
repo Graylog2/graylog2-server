@@ -16,7 +16,7 @@
  */
 import React, { useContext } from 'react';
 
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 import { PipelineRulesContext } from 'components/rules/RuleContext';
 import { Input } from 'components/bootstrap';
