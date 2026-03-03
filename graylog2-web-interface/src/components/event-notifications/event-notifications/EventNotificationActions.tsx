@@ -18,8 +18,7 @@ import * as React from 'react';
 import { useState } from 'react';
 
 import UserNotification from 'util/UserNotification';
-import { ConfirmDialog, IfPermitted, ShareButton } from 'components/common';
-import { LinkContainer } from 'components/common/router';
+import { ConfirmDialog, IfPermitted, ShareButton, LinkContainer } from 'components/common';
 import Routes from 'routing/Routes';
 import { MenuItem, ButtonToolbar, DeleteMenuItem } from 'components/bootstrap';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';

@@ -19,11 +19,10 @@ import { useEffect, useMemo, useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import groupBy from 'lodash/groupBy';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, DocumentTitle, PageHeader } from 'components/common';
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
-import { DocumentTitle, PageHeader } from 'components/common';
 import ValueReferenceData from 'util/ValueReferenceData';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
 import Entity from 'logic/content-packs/Entity';
