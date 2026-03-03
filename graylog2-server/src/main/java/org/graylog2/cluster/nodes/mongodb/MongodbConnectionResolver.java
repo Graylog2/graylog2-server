@@ -16,10 +16,9 @@
  */
 package org.graylog2.cluster.nodes.mongodb;
 
-import java.util.List;
+import com.mongodb.MongoClient;
 
-public interface MongodbNodesService {
-    List<MongodbNode> allNodes();
+public interface MongodbConnectionResolver {
 
-    boolean available();
+    MongoClient resolve(String nodeName);
 }

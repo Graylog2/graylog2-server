@@ -28,6 +28,8 @@ import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.nodes.ServerNodeClusterService;
 import org.graylog2.cluster.nodes.ServerNodeDto;
 import org.graylog2.cluster.nodes.ServerNodePaginatedService;
+import org.graylog2.cluster.nodes.mongodb.DefaultMongodbConnectionResolver;
+import org.graylog2.cluster.nodes.mongodb.MongodbConnectionResolver;
 import org.graylog2.cluster.nodes.mongodb.MongodbNode;
 import org.graylog2.cluster.nodes.mongodb.MongodbNodesProvider;
 import org.graylog2.cluster.nodes.mongodb.MongodbNodesService;
@@ -79,6 +81,7 @@ public class PersistenceServicesBindings extends AbstractModule {
         bind(new TypeLiteral<NodeService<DataNodeDto>>() {}).to(DataNodeClusterService.class);
         bind(DataNodePaginatedService.class).asEagerSingleton();
 
+        bind(MongodbConnectionResolver.class).to(DefaultMongodbConnectionResolver.class);
         Multibinder<MongodbNodesService> mongodbNodesServices = Multibinder.newSetBinder(binder(), MongodbNodesService.class);
         mongodbNodesServices.addBinding().to(ReplicaSetMongodbNodes.class);
         mongodbNodesServices.addBinding().to(StandaloneNodeMongodbNodes.class);

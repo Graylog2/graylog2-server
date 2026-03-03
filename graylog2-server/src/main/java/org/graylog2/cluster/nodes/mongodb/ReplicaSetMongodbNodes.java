@@ -17,7 +17,6 @@
 package org.graylog2.cluster.nodes.mongodb;
 
 import com.mongodb.MongoClient;
-import com.mongodb.client.MongoClients;
 import com.mongodb.connection.ClusterDescription;
 import com.mongodb.connection.ClusterType;
 import jakarta.inject.Inject;
@@ -30,10 +29,12 @@ import java.util.List;
 public class ReplicaSetMongodbNodes implements MongodbNodesService {
 
     private final MongoClient mongoConnection;
+    private final MongodbConnectionResolver connectionResolver;
 
     @Inject
-    public ReplicaSetMongodbNodes(MongoConnection mongoConnection) {
+    public ReplicaSetMongodbNodes(MongoConnection mongoConnection, MongodbConnectionResolver connectionResolver) {
         this.mongoConnection = mongoConnection.connect();
+        this.connectionResolver = connectionResolver;
 
         Document command = new Document("profile", 1)
                 .append("slowms", 100);
@@ -76,8 +77,7 @@ public class ReplicaSetMongodbNodes implements MongodbNodesService {
 
         String name = member.get("name", String.class);
 
-        String uri = "mongodb://" + name + "/?directConnection=true";
-        try (MongoClient nodeClient = new MongoClient(uri)) {
+        try (MongoClient nodeClient = connectionResolver.resolve(name)) {
 
             Document serverStatus = nodeClient
                     .getDatabase("admin")
