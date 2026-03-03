@@ -1,4 +1,4 @@
 type = "a"
-message = "Addig helper method used in enterprise."
+message = "Changing delimitor char for decorators in ScriptingApi from '.' to '#' to avoid parsing problems when querying a nested field."
 
 pulls = ["25155"]
