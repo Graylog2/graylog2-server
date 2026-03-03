@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import reduce from 'lodash/reduce';
 import styled, { css } from 'styled-components';
+
 import { Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import { formatTrafficData } from 'util/TrafficUtils';
