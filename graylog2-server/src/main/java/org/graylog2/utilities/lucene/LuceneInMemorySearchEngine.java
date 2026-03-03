@@ -189,7 +189,7 @@ public class LuceneInMemorySearchEngine<U extends InMemorySearchableEntity> impl
         return switch (type) {
             case STRING -> SortField.Type.STRING;
             case DATE -> SortField.Type.INT;
-            case DOUBLE -> SortField.Type.FLOAT;
+            case DOUBLE -> SortField.Type.DOUBLE;
             case INT -> SortField.Type.INT;
             case LONG -> SortField.Type.LONG;
             case OBJECT_ID -> SortField.Type.STRING;
