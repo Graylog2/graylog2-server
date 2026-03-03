@@ -517,7 +517,7 @@ export interface WidgetCreator {
   icon: React.ComponentType<{}>;
 }
 
-export type FieldUnitType = 'size' | 'time' | 'percent';
+export type FieldUnitType = 'size' | 'time' | 'percent' | 'binary_size';
 
 export type FieldUnitsFormValues = Record<string, { abbrev: string; unitType: FieldUnitType }>;
 
