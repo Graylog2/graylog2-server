@@ -57,11 +57,12 @@ import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.CollectorInstanceReport;
 import org.graylog.collectors.db.SourceDTO;
 import org.graylog.collectors.db.TransactionMarker;
+import org.graylog.collectors.opamp.auth.AgentTokenService;
+import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
+import org.graylog.collectors.opamp.transport.OpAmpAuthContext;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
 import org.graylog.security.pki.PemUtils;
-import org.graylog.collectors.opamp.enrollment.EnrollmentTokenService;
-import org.graylog.collectors.opamp.transport.OpAmpAuthContext;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.slf4j.Logger;
@@ -93,6 +94,7 @@ public class OpAmpService {
     public static final String REMOTE_CONFIG_KEY = "collector.yaml";
 
     private final EnrollmentTokenService enrollmentTokenService;
+    private final AgentTokenService agentTokenService;
     private final OpAmpCaService opAmpCaService;
     private final CertificateService certificateService;
     private final CollectorInstanceService collectorInstanceService;
@@ -103,6 +105,7 @@ public class OpAmpService {
 
     @Inject
     public OpAmpService(EnrollmentTokenService enrollmentTokenService,
+                        AgentTokenService agentTokenService,
                         OpAmpCaService opAmpCaService,
                         CertificateService certificateService,
                         CollectorInstanceService collectorInstanceService,
@@ -110,6 +113,7 @@ public class OpAmpService {
                         FleetTransactionLogService txnLogService,
                         SourceService sourceService) {
         this.enrollmentTokenService = enrollmentTokenService;
+        this.agentTokenService = agentTokenService;
         this.opAmpCaService = opAmpCaService;
         this.certificateService = certificateService;
         this.collectorInstanceService = collectorInstanceService;
@@ -136,7 +140,7 @@ public class OpAmpService {
 
         return switch (typ) {
             case "enrollment" -> enrollmentTokenService.validateToken(token, transport).map(e -> e);
-            case "agent" -> enrollmentTokenService.validateAgentToken(token, transport).map(i -> i);
+            case "agent" -> agentTokenService.validateAgentToken(token, transport).map(i -> i);
             default -> {
                 LOG.warn("Unknown token type: {}", typ);
                 yield Optional.empty();

@@ -16,18 +16,14 @@
  */
 package org.graylog.collectors.opamp;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.SourceService;
-import org.graylog.collectors.opamp.enrollment.EnrollmentTokenService;
+import org.graylog.collectors.opamp.auth.AgentTokenService;
+import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog.collectors.opamp.transport.OpAmpAuthContext;
-import org.graylog.grn.GRNRegistry;
 import org.graylog.security.pki.CertificateService;
-import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.security.encryption.EncryptedValueService;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +32,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,6 +50,9 @@ class OpAmpServiceTest {
 
     @Mock
     private EnrollmentTokenService enrollmentTokenService;
+
+    @Mock
+    private AgentTokenService agentTokenService;
 
     @Mock
     private OpAmpCaService opAmpCaService;
@@ -80,16 +78,7 @@ class OpAmpServiceTest {
 
     @BeforeEach
     void setUp() {
-        final EncryptedValueService encryptedValueService = new EncryptedValueService("1234567890abcdef");
-        final ObjectMapper objectMapper = new ObjectMapperProvider(
-                ObjectMapperProvider.class.getClassLoader(),
-                Collections.emptySet(),
-                encryptedValueService,
-                GRNRegistry.createWithBuiltinTypes(),
-                InputConfigurationBeanDeserializerModifier.withoutConfig()
-        ).get();
-
-        opAmpService = new OpAmpService(enrollmentTokenService, opAmpCaService, certificateService,
+        opAmpService = new OpAmpService(enrollmentTokenService, agentTokenService, opAmpCaService, certificateService,
                 collectorInstanceService, clusterConfigService, fleetTransactionLogService, sourceService);
     }
 
@@ -108,7 +97,7 @@ class OpAmpServiceTest {
         assertThat(result).isPresent();
         assertThat(result.get()).isInstanceOf(OpAmpAuthContext.Enrollment.class);
         verify(enrollmentTokenService).validateToken(token, TRANSPORT);
-        verify(enrollmentTokenService, never()).validateAgentToken(any(), any());
+        verify(agentTokenService, never()).validateAgentToken(any(), any());
     }
 
     @Test
@@ -119,14 +108,14 @@ class OpAmpServiceTest {
         final String instanceUid = "instance-uid";
         final OpAmpAuthContext.Identified expectedContext = new OpAmpAuthContext.Identified(instanceUid, TRANSPORT);
 
-        when(enrollmentTokenService.validateAgentToken(eq(token), eq(TRANSPORT)))
+        when(agentTokenService.validateAgentToken(eq(token), eq(TRANSPORT)))
                 .thenReturn(Optional.of(expectedContext));
 
         final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, TRANSPORT);
 
         assertThat(result).isPresent();
         assertThat(result.get()).isInstanceOf(OpAmpAuthContext.Identified.class);
-        verify(enrollmentTokenService).validateAgentToken(token, TRANSPORT);
+        verify(agentTokenService).validateAgentToken(token, TRANSPORT);
         verify(enrollmentTokenService, never()).validateToken(any(), any());
     }
 
@@ -140,7 +129,7 @@ class OpAmpServiceTest {
 
         assertThat(result).isEmpty();
         verify(enrollmentTokenService, never()).validateToken(any(), any());
-        verify(enrollmentTokenService, never()).validateAgentToken(any(), any());
+        verify(agentTokenService, never()).validateAgentToken(any(), any());
     }
 
     @Test
@@ -153,7 +142,7 @@ class OpAmpServiceTest {
 
         assertThat(result).isEmpty();
         verify(enrollmentTokenService, never()).validateToken(any(), any());
-        verify(enrollmentTokenService, never()).validateAgentToken(any(), any());
+        verify(agentTokenService, never()).validateAgentToken(any(), any());
     }
 
     @Test
@@ -164,7 +153,7 @@ class OpAmpServiceTest {
 
         assertThat(result).isEmpty();
         verify(enrollmentTokenService, never()).validateToken(any(), any());
-        verify(enrollmentTokenService, never()).validateAgentToken(any(), any());
+        verify(agentTokenService, never()).validateAgentToken(any(), any());
     }
 
     @Test
@@ -173,7 +162,7 @@ class OpAmpServiceTest {
 
         assertThat(result).isEmpty();
         verify(enrollmentTokenService, never()).validateToken(any(), any());
-        verify(enrollmentTokenService, never()).validateAgentToken(any(), any());
+        verify(agentTokenService, never()).validateAgentToken(any(), any());
     }
 
     @Test
@@ -184,7 +173,7 @@ class OpAmpServiceTest {
 
         assertThat(result).isEmpty();
         verify(enrollmentTokenService, never()).validateToken(any(), any());
-        verify(enrollmentTokenService, never()).validateAgentToken(any(), any());
+        verify(agentTokenService, never()).validateAgentToken(any(), any());
     }
 
     @Test
@@ -195,7 +184,7 @@ class OpAmpServiceTest {
 
         assertThat(result).isEmpty();
         verify(enrollmentTokenService, never()).validateToken(any(), any());
-        verify(enrollmentTokenService, never()).validateAgentToken(any(), any());
+        verify(agentTokenService, never()).validateAgentToken(any(), any());
     }
 
     /**

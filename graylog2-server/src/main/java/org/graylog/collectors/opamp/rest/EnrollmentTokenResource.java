@@ -33,7 +33,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog.collectors.opamp.enrollment.EnrollmentTokenService;
+import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
 @Tag(name = "OpAMP Enrollment", description = "OpAMP agent enrollment management")

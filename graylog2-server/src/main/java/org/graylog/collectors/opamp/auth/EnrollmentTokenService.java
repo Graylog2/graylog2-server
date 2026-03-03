@@ -14,34 +14,30 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.opamp.enrollment;
+package org.graylog.collectors.opamp.auth;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.graylog.collectors.CollectorInstanceService;
-import org.graylog.collectors.db.CollectorInstanceDTO;
-import org.graylog.security.pki.CertificateEntry;
-import org.graylog.security.pki.CertificateService;
-import org.graylog.security.pki.PemUtils;
 import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog.collectors.opamp.rest.CreateEnrollmentTokenRequest;
 import org.graylog.collectors.opamp.rest.EnrollmentTokenResponse;
 import org.graylog.collectors.opamp.transport.OpAmpAuthContext;
+import org.graylog.security.pki.CertificateEntry;
+import org.graylog.security.pki.CertificateService;
+import org.graylog.security.pki.PemUtils;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -61,17 +57,14 @@ public class EnrollmentTokenService {
 
     private final CertificateService certificateService;
     private final ClusterConfigService clusterConfigService;
-    private final CollectorInstanceService collectorInstanceService;
     private final OpAmpCaService opAmpCaService;
 
     @Inject
     public EnrollmentTokenService(CertificateService certificateService,
                                   ClusterConfigService clusterConfigService,
-                                  CollectorInstanceService collectorInstanceService,
                                   OpAmpCaService opAmpCaService) {
         this.certificateService = certificateService;
         this.clusterConfigService = clusterConfigService;
-        this.collectorInstanceService = collectorInstanceService;
         this.opAmpCaService = opAmpCaService;
     }
 
@@ -193,68 +186,6 @@ public class EnrollmentTokenService {
             return Optional.of(new OpAmpAuthContext.Enrollment(fleetId, transport));
         } catch (Exception e) {
             LOG.warn("Enrollment token validation failed: {}", e.getMessage());
-            return Optional.empty();
-        }
-    }
-
-    /**
-     * Validates an agent token and extracts the auth context.
-     * <p>
-     * Agent tokens are JWTs signed by the agent's private key. The JWT header contains
-     * an {@code x5t#S256} claim with the certificate thumbprint (RFC 7515 format), which
-     * is used to look up the agent and retrieve its public key for signature verification.
-     * <p>
-     * Validation includes:
-     * <ul>
-     *   <li>Extracting {@code x5t#S256} thumbprint from JWT header</li>
-     *   <li>Converting from base64url to our fingerprint format for lookup</li>
-     *   <li>Looking up agent by fingerprint</li>
-     *   <li>Parsing agent's certificate and verifying validity</li>
-     *   <li>Signature verification using the certificate's public key</li>
-     *   <li>Expiration check (handled automatically by JJWT)</li>
-     * </ul>
-     *
-     * @param token     the JWT token string
-     * @param transport the transport type (HTTP or WEBSOCKET)
-     * @return the identified context if valid, empty otherwise
-     */
-    public Optional<OpAmpAuthContext.Identified> validateAgentToken(String token, OpAmpAuthContext.Transport transport) {
-        try {
-            final AtomicReference<CollectorInstanceDTO> collectorRef = new AtomicReference<>();
-
-            Jwts.parser()
-                    .keyLocator(header -> {
-                        final String x5t = (String) header.get("x5t#S256");
-                        if (x5t == null) {
-                            throw new SecurityException("Missing x5t#S256 header");
-                        }
-
-                        // Convert from base64url to our fingerprint format for lookup
-                        final String fingerprint;
-                        try {
-                            fingerprint = PemUtils.x5tToFingerprint(x5t);
-                        } catch (Exception e) {
-                            throw new SecurityException("Invalid x5t#S256 format: " + e.getMessage());
-                        }
-
-                        // TODO performance this loads the entire collector instance document, which seems excessive
-                        final CollectorInstanceDTO collector = collectorInstanceService.findByFingerprint(fingerprint)
-                                .orElseThrow(() -> new SecurityException("Unknown collector fingerprint"));
-                        collectorRef.set(collector);
-                        try {
-                            final X509Certificate cert = PemUtils.parseCertificate(collector.certificatePem());
-                            cert.checkValidity();
-                            return cert.getPublicKey();
-                        } catch (Exception e) {
-                            throw new SecurityException("Failed to parse collector certificate", e);
-                        }
-                    })
-                    .build()
-                    .parseSignedClaims(token);
-
-            return Optional.of(new OpAmpAuthContext.Identified(collectorRef.get().instanceUid(), transport));
-        } catch (Exception e) {
-            LOG.warn("Agent token validation failed.", e);
             return Optional.empty();
         }
     }

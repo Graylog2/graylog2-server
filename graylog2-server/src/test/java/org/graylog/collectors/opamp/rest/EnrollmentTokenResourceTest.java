@@ -19,7 +19,7 @@ package org.graylog.collectors.opamp.rest;
 import jakarta.ws.rs.BadRequestException;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.IngestEndpointConfig;
-import org.graylog.collectors.opamp.enrollment.EnrollmentTokenService;
+import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
