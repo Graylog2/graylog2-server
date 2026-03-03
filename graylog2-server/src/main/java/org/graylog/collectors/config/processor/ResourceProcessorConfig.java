@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ValueNode;
 import com.google.auto.value.AutoValue;
-import org.graylog.collectors.config.OtelAttributes;
+import org.graylog.collectors.config.CollectorAttributes;
 
 import java.util.List;
 
@@ -47,7 +47,7 @@ public abstract class ResourceProcessorConfig implements CollectorProcessorConfi
     }
 
     public static Attribute collectorComponentAttribute(String compoenent) {
-        return Attribute.upsert(OtelAttributes.COLLECTOR_RECEIVER_TYPE, compoenent);
+        return Attribute.upsert(CollectorAttributes.COLLECTOR_RECEIVER_TYPE, compoenent);
     }
 
     @AutoValue.Builder

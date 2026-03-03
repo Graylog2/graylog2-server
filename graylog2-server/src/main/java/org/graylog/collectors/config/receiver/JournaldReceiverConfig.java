@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.config;
+package org.graylog.collectors.config.receiver;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -32,7 +32,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  */
 @AutoValue
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public abstract class JournaldReceiverConfig implements OtlpReceiverConfig, CollectorStanzaReceiver {
+public abstract class JournaldReceiverConfig implements CollectorReceiverConfig, CollectorStanzaReceiver {
     public static final String RECEIVER_TYPE = "journald";
 
     public enum StartAt {

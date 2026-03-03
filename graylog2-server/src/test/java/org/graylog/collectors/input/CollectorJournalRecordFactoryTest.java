@@ -23,7 +23,7 @@ import io.opentelemetry.proto.logs.v1.LogRecord;
 import io.opentelemetry.proto.logs.v1.ResourceLogs;
 import io.opentelemetry.proto.logs.v1.ScopeLogs;
 import io.opentelemetry.proto.resource.v1.Resource;
-import org.graylog.collectors.config.OtelAttributes;
+import org.graylog.collectors.config.CollectorAttributes;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,7 +36,7 @@ class CollectorJournalRecordFactoryTest {
                 .addResourceLogs(ResourceLogs.newBuilder()
                         .setResource(Resource.newBuilder()
                                 .addAttributes(KeyValue.newBuilder()
-                                        .setKey(OtelAttributes.COLLECTOR_RECEIVER_TYPE)
+                                        .setKey(CollectorAttributes.COLLECTOR_RECEIVER_TYPE)
                                         .setValue(AnyValue.newBuilder().setStringValue("filelog"))))
                         .addScopeLogs(ScopeLogs.newBuilder()
                                 .addLogRecords(LogRecord.newBuilder()
@@ -73,7 +73,7 @@ class CollectorJournalRecordFactoryTest {
                 .addResourceLogs(ResourceLogs.newBuilder()
                         .setResource(Resource.newBuilder()
                                 .addAttributes(KeyValue.newBuilder()
-                                        .setKey(OtelAttributes.COLLECTOR_RECEIVER_TYPE)
+                                        .setKey(CollectorAttributes.COLLECTOR_RECEIVER_TYPE)
                                         .setValue(AnyValue.newBuilder().setStringValue("filelog"))))
                         .addScopeLogs(ScopeLogs.newBuilder()
                                 .addLogRecords(LogRecord.newBuilder()
@@ -81,7 +81,7 @@ class CollectorJournalRecordFactoryTest {
                 .addResourceLogs(ResourceLogs.newBuilder()
                         .setResource(Resource.newBuilder()
                                 .addAttributes(KeyValue.newBuilder()
-                                        .setKey(OtelAttributes.COLLECTOR_RECEIVER_TYPE)
+                                        .setKey(CollectorAttributes.COLLECTOR_RECEIVER_TYPE)
                                         .setValue(AnyValue.newBuilder().setStringValue("macosunifiedlogging"))))
                         .addScopeLogs(ScopeLogs.newBuilder()
                                 .addLogRecords(LogRecord.newBuilder()

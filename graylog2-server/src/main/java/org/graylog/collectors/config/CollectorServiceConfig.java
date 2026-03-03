@@ -16,12 +16,26 @@
  */
 package org.graylog.collectors.config;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
-public interface OtlpReceiverConfig {
-    @JsonIgnore
-    String name();
+import java.util.Map;
 
-    @JsonIgnore
-    String type();
+@AutoValue
+public abstract class CollectorServiceConfig {
+
+    @JsonProperty("pipelines")
+    public abstract Map<String, CollectorPipelineConfig> pipelines();
+
+    public static Builder builder() {
+        return new AutoValue_CollectorServiceConfig.Builder();
+    }
+
+    @AutoValue.Builder
+    public abstract static class Builder {
+
+        public abstract Builder pipelines(Map<String, CollectorPipelineConfig> pipelines);
+
+        public abstract CollectorServiceConfig build();
+    }
 }

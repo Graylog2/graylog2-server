@@ -16,20 +16,6 @@
  */
 package org.graylog.collectors.config;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.google.auto.value.AutoValue;
-
-/**
- * No-op receiver that we use to ensure the presence of at least one receiver in the Collector config.
- */
-@AutoValue
-@JsonInclude(JsonInclude.Include.NON_ABSENT)
-public abstract class NoopReceiverConfig implements OtlpReceiverConfig {
-    public String type() {
-        return "nop";
-    }
-
-    public static NoopReceiverConfig instance() {
-        return new AutoValue_NoopReceiverConfig("nop");
-    }
+public class CollectorAttributes {
+    public static final String COLLECTOR_RECEIVER_TYPE = "collector.receiver.type";
 }

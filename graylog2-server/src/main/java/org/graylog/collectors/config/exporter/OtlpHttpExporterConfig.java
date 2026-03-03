@@ -14,39 +14,34 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.config;
+package org.graylog.collectors.config.exporter;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import jakarta.annotation.Nullable;
+
+import java.time.Duration;
 
 /**
- * Multiline configuration for otel collector receivers (filelog, tcplog, udplog).
+ * OTel collector OTLP HTTP exporter configuration.
+ *
+ * @see <a href="https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter/otlphttpexporter">OTLP HTTP exporter</a>
  */
 @AutoValue
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public abstract class OtelMultilineConfig {
+public abstract class OtlpHttpExporterConfig implements OtlpExporterConfig {
 
-    @Nullable
-    @JsonProperty("line_start_pattern")
-    public abstract String lineStartPattern();
-
-    @Nullable
-    @JsonProperty("line_end_pattern")
-    public abstract String lineEndPattern();
+    public String getName() {
+        return "otlp_http";
+    }
 
     public static Builder builder() {
-        return new AutoValue_OtelMultilineConfig.Builder();
+        return new AutoValue_OtlpHttpExporterConfig.Builder()
+                .timeout(Duration.ofSeconds(5))
+                .retryOnFailure(ExporterRetryOnFailure.createDefault())
+                .sendingQueue(ExporterSendingQueue.createDefault());
     }
 
     @AutoValue.Builder
-    public abstract static class Builder {
-
-        public abstract Builder lineStartPattern(@Nullable String lineStartPattern);
-
-        public abstract Builder lineEndPattern(@Nullable String lineEndPattern);
-
-        public abstract OtelMultilineConfig build();
+    public abstract static class Builder implements OtlpExporterConfig.Builder<OtlpHttpExporterConfig, Builder> {
     }
 }

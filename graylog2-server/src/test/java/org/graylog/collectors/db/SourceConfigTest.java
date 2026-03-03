@@ -18,7 +18,7 @@ package org.graylog.collectors.db;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
-import org.graylog.collectors.config.MacOSUnifiedLoggingReceiverConfig;
+import org.graylog.collectors.config.receiver.MacOSUnifiedLoggingReceiverConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

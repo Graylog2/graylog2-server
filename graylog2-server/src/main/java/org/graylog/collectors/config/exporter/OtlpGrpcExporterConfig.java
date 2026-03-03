@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.config;
+package org.graylog.collectors.config.exporter;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.auto.value.AutoValue;
@@ -22,26 +22,26 @@ import com.google.auto.value.AutoValue;
 import java.time.Duration;
 
 /**
- * OTel collector OTLP HTTP exporter configuration.
+ * OTel collector OTLP gRPC exporter configuration.
  *
- * @see <a href="https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter/otlphttpexporter">OTLP HTTP exporter</a>
+ * @see <a href="https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter/otlpexporter">OTLP gRPC exporter</a>
  */
 @AutoValue
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public abstract class OtlpHttpExporterConfig implements OtlpExporterConfig {
+public abstract class OtlpGrpcExporterConfig implements OtlpExporterConfig {
 
     public String getName() {
-        return "otlp_http";
+        return "otlp_grpc";
     }
 
     public static Builder builder() {
-        return new AutoValue_OtlpHttpExporterConfig.Builder()
+        return new AutoValue_OtlpGrpcExporterConfig.Builder()
                 .timeout(Duration.ofSeconds(5))
                 .retryOnFailure(ExporterRetryOnFailure.createDefault())
                 .sendingQueue(ExporterSendingQueue.createDefault());
     }
 
     @AutoValue.Builder
-    public abstract static class Builder implements OtlpExporterConfig.Builder<OtlpHttpExporterConfig, Builder> {
+    public abstract static class Builder implements OtlpExporterConfig.Builder<OtlpGrpcExporterConfig, Builder> {
     }
 }

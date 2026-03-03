@@ -17,7 +17,7 @@
 package org.graylog.collectors.config.processor;
 
 import com.fasterxml.jackson.databind.node.TextNode;
-import org.graylog.collectors.config.OtelAttributes;
+import org.graylog.collectors.config.CollectorAttributes;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -40,7 +40,7 @@ class ResourceProcessorConfigTest {
     void collectorComponentAttributeUsesDefaultKeyAndUpsertAction() {
         final var attribute = ResourceProcessorConfig.collectorComponentAttribute("filelog");
 
-        assertThat(attribute.key()).isEqualTo(OtelAttributes.COLLECTOR_RECEIVER_TYPE);
+        assertThat(attribute.key()).isEqualTo(CollectorAttributes.COLLECTOR_RECEIVER_TYPE);
         assertThat(attribute.value().isTextual()).isTrue();
         assertThat(attribute.value().textValue()).isEqualTo("filelog");
         assertThat(attribute.action()).isEqualTo(ResourceProcessorConfig.Action.UPSERT);

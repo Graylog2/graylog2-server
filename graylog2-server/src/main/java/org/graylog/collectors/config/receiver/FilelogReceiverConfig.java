@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.config;
+package org.graylog.collectors.config.receiver;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -32,7 +32,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  */
 @AutoValue
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public abstract class FilelogReceiverConfig implements OtlpReceiverConfig, CollectorStanzaReceiver {
+public abstract class FilelogReceiverConfig implements CollectorReceiverConfig, CollectorStanzaReceiver {
     public static final String RECEIVER_TYPE = "filelog";
 
     public String type() {
@@ -78,7 +78,7 @@ public abstract class FilelogReceiverConfig implements OtlpReceiverConfig, Colle
 
     @Nullable
     @JsonProperty("multiline")
-    public abstract OtelMultilineConfig multiline();
+    public abstract CollectorReceiverMultilineConfig multiline();
 
     public static Builder builder(String id) {
         return new AutoValue_FilelogReceiverConfig.Builder()
@@ -120,7 +120,7 @@ public abstract class FilelogReceiverConfig implements OtlpReceiverConfig, Colle
 
         public abstract Builder startAt(@Nullable String startAt);
 
-        public abstract Builder multiline(@Nullable OtelMultilineConfig multiline);
+        public abstract Builder multiline(@Nullable CollectorReceiverMultilineConfig multiline);
 
         public abstract FilelogReceiverConfig build();
     }

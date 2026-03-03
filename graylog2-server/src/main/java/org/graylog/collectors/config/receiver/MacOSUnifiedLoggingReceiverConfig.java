@@ -14,13 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.config;
+package org.graylog.collectors.config.receiver;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.graylog.collectors.config.GoDurationSerializer;
 
 import java.time.Duration;
 
@@ -33,7 +34,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  */
 @AutoValue
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public abstract class MacOSUnifiedLoggingReceiverConfig implements OtlpReceiverConfig {
+public abstract class MacOSUnifiedLoggingReceiverConfig implements CollectorReceiverConfig {
     public static final String RECEIVER_TYPE = "macosunifiedlogging";
 
     public String type() {

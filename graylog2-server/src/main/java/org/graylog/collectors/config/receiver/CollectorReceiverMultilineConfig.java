@@ -14,28 +14,39 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.config;
+package org.graylog.collectors.config.receiver;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import jakarta.annotation.Nullable;
 
-import java.util.Map;
-
+/**
+ * Multiline configuration for otel collector receivers (filelog, tcplog, udplog).
+ */
 @AutoValue
-public abstract class OtelServiceConfig {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public abstract class CollectorReceiverMultilineConfig {
 
-    @JsonProperty("pipelines")
-    public abstract Map<String, OtelPipelineConfig> pipelines();
+    @Nullable
+    @JsonProperty("line_start_pattern")
+    public abstract String lineStartPattern();
+
+    @Nullable
+    @JsonProperty("line_end_pattern")
+    public abstract String lineEndPattern();
 
     public static Builder builder() {
-        return new AutoValue_OtelServiceConfig.Builder();
+        return new AutoValue_CollectorReceiverMultilineConfig.Builder();
     }
 
     @AutoValue.Builder
     public abstract static class Builder {
 
-        public abstract Builder pipelines(Map<String, OtelPipelineConfig> pipelines);
+        public abstract Builder lineStartPattern(@Nullable String lineStartPattern);
 
-        public abstract OtelServiceConfig build();
+        public abstract Builder lineEndPattern(@Nullable String lineEndPattern);
+
+        public abstract CollectorReceiverMultilineConfig build();
     }
 }

@@ -22,8 +22,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
-import org.graylog.collectors.config.FilelogReceiverConfig;
-import org.graylog.collectors.config.OtlpReceiverConfig;
+import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
+import org.graylog.collectors.config.receiver.FilelogReceiverConfig;
 
 import java.util.List;
 import java.util.Optional;
@@ -63,7 +63,7 @@ public abstract class FileSourceConfig implements SourceConfig {
     }
 
     @Override
-    public Optional<OtlpReceiverConfig> toReceiverConfig(String id) {
+    public Optional<CollectorReceiverConfig> toReceiverConfig(String id) {
         return Optional.of(FilelogReceiverConfig.builder(id)
                 .startAt(readMode())
                 .include(paths())

@@ -14,8 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.config;
+package org.graylog.collectors.config.receiver;
 
-public class OtelAttributes {
-    public static final String COLLECTOR_RECEIVER_TYPE = "collector.receiver.type";
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog.collectors.config.operator.CollectorOperatorConfig;
+
+import java.util.List;
+
+/**
+ * Interface for stanza-based OpenTelemetry collector receivers.
+ */
+public interface CollectorStanzaReceiver {
+    @JsonProperty("operators")
+    default List<CollectorOperatorConfig> operators() {
+        return List.of();
+    }
 }

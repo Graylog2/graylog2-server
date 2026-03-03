@@ -22,8 +22,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
-import org.graylog.collectors.config.MacOSUnifiedLoggingReceiverConfig;
-import org.graylog.collectors.config.OtlpReceiverConfig;
+import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
+import org.graylog.collectors.config.receiver.MacOSUnifiedLoggingReceiverConfig;
 
 import java.util.Optional;
 
@@ -51,7 +51,7 @@ public abstract class MacOSUnifiedLoggingSourceConfig implements SourceConfig {
     }
 
     @Override
-    public Optional<OtlpReceiverConfig> toReceiverConfig(String id) {
+    public Optional<CollectorReceiverConfig> toReceiverConfig(String id) {
         final var builder = MacOSUnifiedLoggingReceiverConfig.builder(id);
         if (predicate() != null) {
             builder.predicate(predicate());

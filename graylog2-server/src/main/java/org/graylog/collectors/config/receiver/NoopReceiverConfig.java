@@ -14,19 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.config;
+package org.graylog.collectors.config.receiver;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog.collectors.config.operator.CollectorOperatorConfig;
-
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.google.auto.value.AutoValue;
 
 /**
- * Interface for stanza-based OpenTelemetry collector receivers.
+ * No-op receiver that we use to ensure the presence of at least one receiver in the Collector config.
  */
-public interface CollectorStanzaReceiver {
-    @JsonProperty("operators")
-    default List<CollectorOperatorConfig> operators() {
-        return List.of();
+@AutoValue
+@JsonInclude(JsonInclude.Include.NON_ABSENT)
+public abstract class NoopReceiverConfig implements CollectorReceiverConfig {
+    public String type() {
+        return "nop";
+    }
+
+    public static NoopReceiverConfig instance() {
+        return new AutoValue_NoopReceiverConfig("nop");
     }
 }

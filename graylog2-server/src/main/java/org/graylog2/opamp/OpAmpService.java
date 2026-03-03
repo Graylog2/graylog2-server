@@ -40,17 +40,17 @@ import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.SourceService;
-import org.graylog.collectors.config.NoopReceiverConfig;
-import org.graylog.collectors.config.OtelCollectorConfig;
-import org.graylog.collectors.config.OtelPipelineConfig;
-import org.graylog.collectors.config.OtelServiceConfig;
-import org.graylog.collectors.config.OtlpExporterConfig;
-import org.graylog.collectors.config.OtlpGrpcExporterConfig;
-import org.graylog.collectors.config.OtlpHttpExporterConfig;
-import org.graylog.collectors.config.OtlpReceiverConfig;
+import org.graylog.collectors.config.CollectorConfig;
+import org.graylog.collectors.config.CollectorPipelineConfig;
+import org.graylog.collectors.config.CollectorServiceConfig;
 import org.graylog.collectors.config.TLSConfigurationSettings;
+import org.graylog.collectors.config.exporter.OtlpExporterConfig;
+import org.graylog.collectors.config.exporter.OtlpGrpcExporterConfig;
+import org.graylog.collectors.config.exporter.OtlpHttpExporterConfig;
 import org.graylog.collectors.config.processor.CollectorProcessorConfig;
 import org.graylog.collectors.config.processor.ResourceProcessorConfig;
+import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
+import org.graylog.collectors.config.receiver.NoopReceiverConfig;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CoalescedActions;
 import org.graylog.collectors.db.CollectorInstanceDTO;
@@ -326,7 +326,7 @@ public class OpAmpService {
             LOG.debug("[{}/{}] {} unprocessed markers for this collector (last processed tnx id {}) coalesced to {}",
                     instanceUid, sequenceNum, unprocessedMarkers.size(), lastProcessedTxnSeq, coalesced);
 
-            final var configBuilder = OtelCollectorConfig.builder();
+            final var configBuilder = CollectorConfig.builder();
             if (coalesced.recomputeConfig()) {
                 // do this first. in case there's no configured endpoint we don't have to perform the more expensive stuff
                 final OtlpExporterConfig effectiveOtlpEndpoint = getEndpointConfig();
@@ -334,7 +334,7 @@ public class OpAmpService {
                 final var effectiveFleetId = (coalesced.newFleetId() == null) ? fleetId : coalesced.newFleetId();
                 LOG.debug("[{}/{}] Computing new collector config for fleet id {}", instanceUid, sequenceNum, effectiveFleetId);
 
-                final Map<String, OtlpReceiverConfig> receiverConfigs = Maps.newHashMap();
+                final Map<String, CollectorReceiverConfig> receiverConfigs = Maps.newHashMap();
                 try (final var sources = sourceService.streamAllByFleet(effectiveFleetId)) {
                     sources.map(SourceDTO::toReceiverConfig)
                             .flatMap(Optional::stream)
@@ -348,7 +348,7 @@ public class OpAmpService {
                 }
 
                 final var receiverGroups = receiverConfigs.values().stream()
-                        .collect(Collectors.groupingBy(OtlpReceiverConfig::type));
+                        .collect(Collectors.groupingBy(CollectorReceiverConfig::type));
 
                 configBuilder.receivers(receiverConfigs);
                 configBuilder.exporters(Map.of(effectiveOtlpEndpoint.getName(), effectiveOtlpEndpoint));
@@ -362,8 +362,8 @@ public class OpAmpService {
                 configBuilder.processors(receiverProcessors);
 
                 final var pipelines = receiverGroups.entrySet().stream()
-                        .collect(Collectors.toMap(e -> f("logs/%s", e.getKey()), e -> OtelPipelineConfig.builder()
-                                .receivers(e.getValue().stream().map(OtlpReceiverConfig::name).collect(Collectors.toSet()))
+                        .collect(Collectors.toMap(e -> f("logs/%s", e.getKey()), e -> CollectorPipelineConfig.builder()
+                                .receivers(e.getValue().stream().map(CollectorReceiverConfig::name).collect(Collectors.toSet()))
                                 .exporters(Set.of(effectiveOtlpEndpoint.getName()))
                                 .processors(receiverProcessors.values().stream()
                                         .filter(config -> e.getKey().equals(config.id()))
@@ -371,7 +371,7 @@ public class OpAmpService {
                                         .collect(Collectors.toSet()))
                                 .build()));
 
-                configBuilder.service(OtelServiceConfig.builder()
+                configBuilder.service(CollectorServiceConfig.builder()
                         .pipelines(pipelines)
                         .build());
                 try {

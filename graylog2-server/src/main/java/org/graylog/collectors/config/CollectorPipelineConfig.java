@@ -17,31 +17,39 @@
 package org.graylog.collectors.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import jakarta.annotation.Nullable;
 
-import java.time.Duration;
+import java.util.Set;
 
-/**
- * OTel collector OTLP gRPC exporter configuration.
- *
- * @see <a href="https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter/otlpexporter">OTLP gRPC exporter</a>
- */
 @AutoValue
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public abstract class OtlpGrpcExporterConfig implements OtlpExporterConfig {
+public abstract class CollectorPipelineConfig {
 
-    public String getName() {
-        return "otlp_grpc";
-    }
+    @JsonProperty("receivers")
+    public abstract Set<String> receivers();
+
+    @JsonProperty("exporters")
+    public abstract Set<String> exporters();
+
+    @Nullable
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty("processors")
+    public abstract Set<String> processors();
 
     public static Builder builder() {
-        return new AutoValue_OtlpGrpcExporterConfig.Builder()
-                .timeout(Duration.ofSeconds(5))
-                .retryOnFailure(ExporterRetryOnFailure.createDefault())
-                .sendingQueue(ExporterSendingQueue.createDefault());
+        return new AutoValue_CollectorPipelineConfig.Builder();
     }
 
     @AutoValue.Builder
-    public abstract static class Builder implements OtlpExporterConfig.Builder<OtlpGrpcExporterConfig, Builder> {
+    public abstract static class Builder {
+
+        public abstract Builder receivers(Set<String> receivers);
+
+        public abstract Builder exporters(Set<String> exporters);
+
+        public abstract Builder processors(@Nullable Set<String> processors);
+
+        public abstract CollectorPipelineConfig build();
     }
 }

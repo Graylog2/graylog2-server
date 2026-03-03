@@ -22,8 +22,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
-import org.graylog.collectors.config.JournaldReceiverConfig;
-import org.graylog.collectors.config.OtlpReceiverConfig;
+import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
+import org.graylog.collectors.config.receiver.JournaldReceiverConfig;
 
 import java.util.List;
 import java.util.Locale;
@@ -63,7 +63,7 @@ public abstract class JournaldSourceConfig implements SourceConfig {
     }
 
     @Override
-    public Optional<OtlpReceiverConfig> toReceiverConfig(String id) {
+    public Optional<CollectorReceiverConfig> toReceiverConfig(String id) {
         return Optional.of(JournaldReceiverConfig.builder(id)
                 .startAt(JournaldReceiverConfig.StartAt.valueOf(readMode().toUpperCase(Locale.ROOT)))
                 .priority(JournaldReceiverConfig.Priority.valueOf(priority().toUpperCase(Locale.ROOT)))

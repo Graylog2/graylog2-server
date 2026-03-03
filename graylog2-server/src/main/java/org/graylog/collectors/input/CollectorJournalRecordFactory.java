@@ -19,7 +19,7 @@ package org.graylog.collectors.input;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.logs.v1.ResourceLogs;
 import org.graylog.collectors.CollectorJournal;
-import org.graylog.collectors.config.OtelAttributes;
+import org.graylog.collectors.config.CollectorAttributes;
 import org.graylog.inputs.otel.OTelJournal;
 
 import java.util.ArrayList;
@@ -27,7 +27,8 @@ import java.util.List;
 
 public class CollectorJournalRecordFactory {
 
-    private CollectorJournalRecordFactory() {}
+    private CollectorJournalRecordFactory() {
+    }
 
     public static List<CollectorJournal.Record> createFromRequest(ExportLogsServiceRequest request,
                                                                   String instanceUid) {
@@ -55,7 +56,7 @@ public class CollectorJournalRecordFactory {
 
     private static String extractReceiverType(ResourceLogs resourceLogs) {
         for (final var attr : resourceLogs.getResource().getAttributesList()) {
-            if (OtelAttributes.COLLECTOR_RECEIVER_TYPE.equals(attr.getKey())) {
+            if (CollectorAttributes.COLLECTOR_RECEIVER_TYPE.equals(attr.getKey())) {
                 return attr.getValue().getStringValue();
             }
         }

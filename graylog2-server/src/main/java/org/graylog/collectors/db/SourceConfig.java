@@ -18,7 +18,7 @@ package org.graylog.collectors.db;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.graylog.collectors.config.OtlpReceiverConfig;
+import org.graylog.collectors.config.receiver.CollectorReceiverConfig;
 
 import java.util.Optional;
 
@@ -34,8 +34,10 @@ public interface SourceConfig {
     @JsonProperty(TYPE_FIELD)
     String type();
 
-    /** Validate this config. Throws IllegalArgumentException on invalid config. */
+    /**
+     * Validate this config. Throws IllegalArgumentException on invalid config.
+     */
     void validate();
 
-    Optional<OtlpReceiverConfig> toReceiverConfig(String id);
+    Optional<CollectorReceiverConfig> toReceiverConfig(String id);
 }
