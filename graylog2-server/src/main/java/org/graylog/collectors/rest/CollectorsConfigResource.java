@@ -49,7 +49,6 @@ import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfigFactory;
 import org.graylog2.indexer.indexset.IndexSetService;
-import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.indexer.indexset.validation.IndexSetValidator;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
@@ -83,6 +82,7 @@ import java.util.Optional;
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.indexer.indexset.fields.IndexPrefixField.FIELD_INDEX_PREFIX;
 import static org.graylog2.indexer.indexset.fields.IndexTemplateTypeField.FIELD_INDEX_TEMPLATE_TYPE;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Tag(name = "Collectors/Config", description = "Managed collector configuration")
 @Path("/collectors/config")
@@ -101,7 +101,6 @@ public class CollectorsConfigResource extends RestResource {
     private final IndexSetService indexSetService;
     private final IndexSetConfigFactory indexSetConfigFactory;
     private final IndexSetValidator indexSetValidator;
-    private final MongoIndexSet.Factory mongoIndexSetFactory;
     private final InputService inputService;
     private final OpAmpCaService opAmpCaService;
     private final StreamService streamService;
@@ -113,7 +112,6 @@ public class CollectorsConfigResource extends RestResource {
                                     IndexSetService indexSetService,
                                     IndexSetConfigFactory indexSetConfigFactory,
                                     IndexSetValidator indexSetValidator,
-                                    MongoIndexSet.Factory mongoIndexSetFactory,
                                     InputService inputService,
                                     OpAmpCaService opAmpCaService,
                                     StreamService streamService,
@@ -123,7 +121,6 @@ public class CollectorsConfigResource extends RestResource {
         this.indexSetService = indexSetService;
         this.indexSetConfigFactory = indexSetConfigFactory;
         this.indexSetValidator = indexSetValidator;
-        this.mongoIndexSetFactory = mongoIndexSetFactory;
         this.inputService = inputService;
         this.opAmpCaService = opAmpCaService;
         this.streamService = streamService;
@@ -232,7 +229,7 @@ public class CollectorsConfigResource extends RestResource {
         final Optional<IndexSetValidator.Violation> violation = indexSetValidator.validate(indexSetConfig);
         if (violation.isPresent()) {
             throw new InternalServerErrorException(
-                    "Collector logs index set validation failed: " + violation.get().message());
+                    f("Collector logs index set validation failed: %s", violation.get().message()));
         }
 
         final IndexSetConfig saved = indexSetService.save(indexSetConfig);
