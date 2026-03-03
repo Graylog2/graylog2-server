@@ -27,7 +27,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import { getConfig } from 'components/configurations/helpers';
 import { Col, Nav, NavItem } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer } from 'components/common';
 import useLocation from 'routing/useLocation';
 import type { SelectCallback } from 'components/bootstrap/types';
 import usePermissions from 'hooks/usePermissions';

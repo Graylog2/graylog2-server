@@ -17,10 +17,9 @@
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { Link } from 'components/common/router';
+import { Link, Icon, StatusIcon } from 'components/common';
 import Routes from 'routing/Routes';
 import { Input } from 'components/bootstrap';
-import { Icon, StatusIcon } from 'components/common';
 import FormDataContext from 'integrations/contexts/FormDataContext';
 import { ApiContext } from 'integrations/aws/context/Api';
 import useFetch from 'integrations/hooks/useFetch';

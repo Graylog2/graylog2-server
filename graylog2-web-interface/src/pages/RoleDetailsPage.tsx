@@ -18,12 +18,11 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 
 import withParams from 'routing/withParams';
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, PageHeader, DocumentTitle } from 'components/common';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import RoleDetails from 'components/roles/RoleDetails';
 import RoleActionLinks from 'components/roles/navigation/RoleActionLinks';
 import DocsHelper from 'util/DocsHelper';
-import { PageHeader, DocumentTitle } from 'components/common';
 import { Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import type Role from 'logic/roles/Role';

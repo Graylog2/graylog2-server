@@ -40,7 +40,6 @@ import {
 import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfile';
 import useIndexProfileWithMappingsByField from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
 import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 const getData = (list = [defaultField]) => ({
   list,
@@ -52,12 +51,9 @@ const getData = (list = [defaultField]) => ({
 
 const renderIndexSetFieldTypesList = () =>
   render(
-    <DefaultQueryParamProvider>
-      <TestStoreProvider>
-        <IndexSetFieldTypesList />
-      </TestStoreProvider>
-      ,
-    </DefaultQueryParamProvider>,
+    <TestStoreProvider>
+      <IndexSetFieldTypesList />
+    </TestStoreProvider>,
   );
 
 jest.mock('stores/indices/IndexSetsStore', () => ({
