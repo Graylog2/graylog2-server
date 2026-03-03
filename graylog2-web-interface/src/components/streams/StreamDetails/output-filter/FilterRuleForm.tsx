@@ -70,7 +70,7 @@ const FilterRuleForm = ({ title, filterRule, onCancel, handleSubmit, destination
         {({ isSubmitting, values, isValid, errors, validateForm, setFieldValue }) => {
           const onSubmit = () => {
             validateForm().then((errorsList) => {
-              if (!formHasErrors(errorsList)) {
+              if (!formHasErrors(errorsList as Record<string, string>)) {
                 handleSubmit(values);
               }
             });

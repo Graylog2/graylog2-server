@@ -17,7 +17,6 @@
 package org.graylog.storage.opensearch3;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.ism.IsmApi;
 import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
 import org.graylog.testing.elasticsearch.SearchInstance;
@@ -41,7 +40,7 @@ public class DataStreamAdapterOSIT {
     ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     DataStreamAdapterOS dataStreamAdapter = new DataStreamAdapterOS(openSearchInstance.getOfficialOpensearchClient(),
-            new IsmApi(openSearchInstance.getOfficialOpensearchClient(), objectMapper), new OSSerializationUtils());
+            new IsmApi(openSearchInstance.getOfficialOpensearchClient(), objectMapper));
 
 
     @Test

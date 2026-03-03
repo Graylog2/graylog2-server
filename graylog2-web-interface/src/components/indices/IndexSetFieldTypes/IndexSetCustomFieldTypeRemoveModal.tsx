@@ -24,13 +24,12 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { Spinner } from 'components/common';
+import { Spinner, Link } from 'components/common';
 import { Alert, BootstrapModalForm, Input } from 'components/bootstrap';
 import type { RemovalResponse } from 'components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation';
 import useRemoveCustomFieldTypeMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation';
 import IndexSetsRemovalErrorAlert from 'components/indices/IndexSetFieldTypes/IndexSetsRemovalErrorAlert';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
-import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import useIndexProfileWithMappingsByField from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
 

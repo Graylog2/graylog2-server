@@ -25,7 +25,6 @@ import org.opensearch.client.opensearch.generic.Response;
 
 import static org.graylog.storage.opensearch3.OfficialOpensearchClient.mapException;
 
-@Deprecated
 public class PlainJsonApi {
     private final ObjectMapper objectMapper;
     private final OfficialOpensearchClient client;
@@ -40,7 +39,6 @@ public class PlainJsonApi {
         this.deprecatedClient = deprecatedClient;
     }
 
-    @Deprecated
     public JsonNode performRequest(Request request, String errorMessage) {
         try {
             Response response = client.sync().generic().execute(request);

@@ -17,9 +17,8 @@
 import * as React from 'react';
 import type * as Immutable from 'immutable';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, ClipboardButton } from 'components/common';
 import Routes from 'routing/Routes';
-import { ClipboardButton } from 'components/common';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
 import type { SearchesConfig } from 'components/search/SearchConfig';
@@ -75,7 +74,7 @@ const usePluggableMessageActions = (id: string, index: string) => {
   const pluggableMenuActions = usePluginEntities('views.components.widgets.messageTable.messageActions');
 
   return pluggableMenuActions
-    .filter((perspective) => (perspective.useCondition ? !!perspective.useCondition() : true))
+    .filter((actions) => (actions.useCondition ? !!actions.useCondition() : true))
     .map(({ component: PluggableMenuAction, key }) => <PluggableMenuAction key={key} id={id} index={index} />);
 };
 
