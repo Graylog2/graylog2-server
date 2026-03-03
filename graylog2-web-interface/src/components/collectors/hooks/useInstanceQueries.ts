@@ -84,7 +84,7 @@ const INSTANCE_ATTRIBUTES: Attribute[] = [
 export const fetchPaginatedInstances = async (
   searchParams: SearchParams,
 ): Promise<PaginatedCollectorsResponse<CollectorInstanceView>> => {
-  const url = PaginationURL('/collectors', searchParams.page, searchParams.pageSize);
+  const url = PaginationURL('/collectors', searchParams.page, searchParams.pageSize, searchParams.query);
 
   return defaultOnError(
     fetch('GET', qualifyUrl(url)).then((response) => ({

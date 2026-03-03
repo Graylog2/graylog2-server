@@ -41,6 +41,7 @@ import org.graylog.collectors.input.processor.WindowsEventLogRecordProcessor;
 import org.graylog.collectors.input.transport.CollectorIngestGrpcTransport;
 import org.graylog.collectors.input.transport.CollectorIngestHttpTransport;
 import org.graylog.collectors.input.transport.CollectorIngestLogsService;
+import org.graylog.collectors.migrations.V20260303120000_ConvertCollectorInstanceFleetIdToObjectId;
 import org.graylog.collectors.rest.CollectorInstancesResource;
 import org.graylog.collectors.rest.CollectorsConfigResource;
 import org.graylog.collectors.rest.FleetPermissions;
@@ -98,6 +99,9 @@ public class CollectorsModule extends PluginModule {
         // Fleet management REST resources
         addSystemRestResource(FleetResource.class);
         addSystemRestResource(SourceResource.class);
+
+        // Migrations
+        addMigration(V20260303120000_ConvertCollectorInstanceFleetIdToObjectId.class);
 
         // Fleet permissions
         addPermissions(FleetPermissions.class);

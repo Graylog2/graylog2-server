@@ -75,7 +75,14 @@ const FleetDetail = ({ fleetId }: Props) => {
   const sourceRenderers = useMemo(() => sourceColumnRenderers(), []);
 
   const fetchInstances = useCallback(
-    (searchParams: SearchParams) => fetchPaginatedInstances(searchParams),
+    (searchParams: SearchParams) => {
+      const fleetQuery = `fleet_id:${fleetId}`;
+      const query = searchParams.query
+        ? `${fleetQuery} ${searchParams.query}`
+        : fleetQuery;
+
+      return fetchPaginatedInstances({ ...searchParams, query });
+    },
     [fleetId],
   );
 

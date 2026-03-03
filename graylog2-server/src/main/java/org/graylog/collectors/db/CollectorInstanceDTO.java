@@ -58,6 +58,7 @@ public abstract class CollectorInstanceDTO implements BuildableMongoEntity<Colle
     @JsonProperty(FIELD_LAST_SEEN)
     public abstract Instant lastSeen();
 
+    @ObjectId
     @JsonProperty(FIELD_FLEET_ID)
     public abstract String fleetId();
 
@@ -110,6 +111,7 @@ public abstract class CollectorInstanceDTO implements BuildableMongoEntity<Colle
         @JsonProperty(FIELD_LAST_SEEN)
         public abstract Builder lastSeen(Instant lastSeen);
 
+        @ObjectId
         @JsonProperty(FIELD_FLEET_ID)
         public abstract Builder fleetId(String fleetId);
 
