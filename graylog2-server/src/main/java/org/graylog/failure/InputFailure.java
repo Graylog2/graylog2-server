@@ -25,6 +25,7 @@ import org.joda.time.DateTime;
 
 import java.util.Optional;
 
+import static org.graylog2.plugin.Message.FIELD_GL2_FORWARDER_INPUT;
 import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_INPUT;
 import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_NODE;
 import static org.graylog2.plugin.Message.FIELD_SOURCE;
@@ -37,6 +38,8 @@ public class InputFailure implements Failure {
     private final DateTime failureTimestamp;
     private final RawMessage rawMessage;
     private final String originalMessage;
+    @Nullable
+    private String forwarderInputId;
 
     public InputFailure(@Nonnull FailureCause failureCause,
                         @Nonnull String failureMessage,
@@ -108,6 +111,7 @@ public class InputFailure implements Failure {
                 .put(FIELD_GL2_SOURCE_INPUT, sourceNode.inputId)
                 .put(FIELD_GL2_SOURCE_NODE, sourceNode.nodeId)
         );
+        builder.put(FIELD_GL2_FORWARDER_INPUT, forwarderInputId);
         Optional.ofNullable(rawMessage.getRemoteAddress()).ifPresent(address ->
                 builder.put(FIELD_SOURCE, address.toString()));
 
@@ -126,5 +130,14 @@ public class InputFailure implements Failure {
 
     public RawMessage getRawMessage() {
         return rawMessage;
+    }
+
+    @Nullable
+    public String getForwarderInputId() {
+        return forwarderInputId;
+    }
+
+    public void setForwarderInputId(@Nullable String forwarderInputId) {
+        this.forwarderInputId = forwarderInputId;
     }
 }
