@@ -18,9 +18,8 @@
 import * as React from 'react';
 import { useState, useRef } from 'react';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, ModalSubmit } from 'components/common';
 import Routes from 'routing/Routes';
-import { ModalSubmit } from 'components/common';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
 import ContentPackInstall from 'components/content-packs/ContentPackInstall';
 import {
