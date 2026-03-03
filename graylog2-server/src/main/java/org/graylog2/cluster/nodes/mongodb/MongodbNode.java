@@ -25,6 +25,7 @@ public record MongodbNode(
         String name,
         String role,
         String version,
+        int profilingLevel,
         long replicationLag,
         Long slowQueryCount,
         double storageUsedPercent,
@@ -39,6 +40,7 @@ public record MongodbNode(
         builder.stringVal("id", id);
         builder.stringVal("name", name);
         builder.stringVal("role", role);
+        builder.intVal("profilingLevel", profilingLevel);
         builder.longVal("replicationLag", replicationLag);
         builder.longVal("slowQueryCount", slowQueryCount);
         builder.doubleVal("storageUsedPercent", storageUsedPercent);

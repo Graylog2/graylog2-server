@@ -61,6 +61,7 @@ public class MongodbClusterResource extends RestResource {
             EntityAttribute.builder().id("role").title("Role").type(SearchQueryField.Type.STRING).sortable(true).searchable(true).build(),
             EntityAttribute.builder().id("version").title("Version").type(SearchQueryField.Type.STRING).sortable(true).searchable(true).build(),
             EntityAttribute.builder().id("status").title("Status").type(SearchQueryField.Type.INT).sortable(true).build(),
+            EntityAttribute.builder().id("profilingLevel").title("Profiling Level").type(SearchQueryField.Type.INT).sortable(true).build(),
             EntityAttribute.builder().id("replicationLag").title("Replication Lag").type(SearchQueryField.Type.LONG).sortable(true).build(),
             EntityAttribute.builder().id("slowQueryCount").title("Slow Query Count").type(SearchQueryField.Type.LONG).sortable(true).build(),
             EntityAttribute.builder().id("storageUsedPercent").title("Storage Used").type(SearchQueryField.Type.DOUBLE).sortable(true).build(),

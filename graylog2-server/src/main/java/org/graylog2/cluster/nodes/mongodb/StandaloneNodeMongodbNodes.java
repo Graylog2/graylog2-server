@@ -24,7 +24,6 @@ import org.bson.Document;
 import org.graylog2.database.MongoConnection;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 public class StandaloneNodeMongodbNodes implements MongodbNodesService {
@@ -57,10 +56,10 @@ public class StandaloneNodeMongodbNodes implements MongodbNodesService {
         double storageUsedPercent = MongodbNodeUtils.calculateStorageUsedPercent(mongoConnection);
 
         // Get slow query count
-        Long slowQueryCount = MongodbNodeUtils.getSlowQueryCount(mongoConnection);
+        ProfilingResult profilingResults = MongodbNodeUtils.getProfilingResults(mongoConnection);
 
         // For standalone nodes: role is "STANDALONE", status is 1 (primary equivalent), no replication lag
-        return new MongodbNode("0", host, "STANDALONE", version, 0, slowQueryCount, storageUsedPercent, availableConnections, currentConnections, connectionsPercent);
+        return new MongodbNode("0", host, "STANDALONE", version, profilingResults.profilingLevel(), 0, profilingResults.slowQueryCount(), storageUsedPercent, availableConnections, currentConnections, connectionsPercent);
     }
 
     @Override

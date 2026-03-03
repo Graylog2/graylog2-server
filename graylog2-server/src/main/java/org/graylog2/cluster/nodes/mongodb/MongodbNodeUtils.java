@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
- package org.graylog2.cluster.nodes.mongodb;
+package org.graylog2.cluster.nodes.mongodb;
 
 import com.mongodb.MongoClient;
 import org.bson.Document;
@@ -24,29 +24,27 @@ import java.util.Date;
 public class MongodbNodeUtils {
 
     public static final String GRAYLOG_DATABASE_NAME = "graylog";
+    public static final int SLOW_QUERIES_TRESHOLD = 100;
 
-    public static Long getSlowQueryCount(MongoClient mongoConnection) {
-        try {
-            // Check if profiling is enabled and query system.profile
-            Document profileStatus = mongoConnection.getDatabase(GRAYLOG_DATABASE_NAME).runCommand(new Document("profile", -1));
-            int profilingLevel = profileStatus.getInteger("was", 0);
+    public static ProfilingResult getProfilingResults(MongoClient mongoConnection) {
+        // Check if profiling is enabled and query system.profile
+        Document profileStatus = mongoConnection.getDatabase(GRAYLOG_DATABASE_NAME).runCommand(new Document("profile", -1));
+        int profilingLevel = profileStatus.getInteger("was", 0);
+        if (profilingLevel > 0) {
+            // Count slow queries from the last 5 minutes
+            long fiveMinutesAgo = System.currentTimeMillis() - (5 * 60 * 1000);
+            Date cutoffTime = new Date(fiveMinutesAgo);
 
-            if (profilingLevel > 0) {
-                // Count slow queries from the last 5 minutes
-                long fiveMinutesAgo = System.currentTimeMillis() - (5 * 60 * 1000);
-                Date cutoffTime = new Date(fiveMinutesAgo);
+            Document query = new Document("ts", new Document("$gte", cutoffTime))
+                    .append("millis", new Document("$gte", SLOW_QUERIES_TRESHOLD)); // Queries taking more than 100ms
 
-                Document query = new Document("ts", new Document("$gte", cutoffTime))
-                        .append("millis", new Document("$gte", 100)); // Queries taking more than 100ms
-
-                return mongoConnection.getDatabase(GRAYLOG_DATABASE_NAME)
-                        .getCollection("system.profile")
-                        .countDocuments(query);
-            }
-        } catch (Exception e) {
-            // Profiling may not be enabled or accessible
+            final long slowQueries = mongoConnection.getDatabase(GRAYLOG_DATABASE_NAME)
+                    .getCollection("system.profile")
+                    .countDocuments(query);
+            return new ProfilingResult(profilingLevel, slowQueries);
+        } else {
+            return new ProfilingResult(profilingLevel, null);
         }
-        return null;
     }
 
     public static double calculateStorageUsedPercent(MongoClient mongoConnection) {

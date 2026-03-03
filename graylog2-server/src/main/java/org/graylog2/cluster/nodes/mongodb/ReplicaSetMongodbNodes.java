@@ -58,11 +58,9 @@ public class ReplicaSetMongodbNodes implements MongodbNodesService {
                 .findFirst()
                 .orElse(null);
 
-        Long slowQueryCount = MongodbNodeUtils.getSlowQueryCount(mongoConnection);
-
         return members.stream()
                 .parallel()
-                .map(member -> toMongodbNode(member, primaryMember, slowQueryCount))
+                .map(member -> toMongodbNode(member, primaryMember))
                 .toList();
     }
 
@@ -73,7 +71,7 @@ public class ReplicaSetMongodbNodes implements MongodbNodesService {
         return clusterType == ClusterType.REPLICA_SET;
     }
 
-    private MongodbNode toMongodbNode(Document member, Document primaryMember, Long slowQueryCount) {
+    private MongodbNode toMongodbNode(Document member, Document primaryMember) {
 
         String name = member.get("name", String.class);
 
@@ -82,6 +80,8 @@ public class ReplicaSetMongodbNodes implements MongodbNodesService {
             Document serverStatus = nodeClient
                     .getDatabase("admin")
                     .runCommand(new Document("serverStatus", 1));
+
+            ProfilingResult profilingResult = MongodbNodeUtils.getProfilingResults(nodeClient);
 
             Document connections = serverStatus.get("connections", Document.class);
             final Integer availableConnections = connections.getInteger("available");
@@ -104,7 +104,7 @@ public class ReplicaSetMongodbNodes implements MongodbNodesService {
                     }
                 }
             }
-            return new MongodbNode(String.valueOf(id), name, role, serverStatus.getString("version"), replicationLag, slowQueryCount, storageUsedPercent, availableConnections, currentConnections, connectionsPercent);
+            return new MongodbNode(String.valueOf(id), name, role, serverStatus.getString("version"), profilingResult.profilingLevel(), replicationLag, profilingResult.slowQueryCount(), storageUsedPercent, availableConnections, currentConnections, connectionsPercent);
         }
     }
 }
