@@ -39,16 +39,11 @@ const RulesSectionActions = ({ stream }: Props) => {
     setShowAddRuleModal((cur) => !cur);
   }, []);
 
-  const {
-    onCreateStreamRule,
-    showStartStreamDialog,
-    onCancelStartStreamDialog,
-    onStartStream,
-    isStartingStream,
-  } = useCreateStreamRule({
-    streamId: stream.id,
-    streamIsPaused: stream.disabled,
-  });
+  const { onCreateStreamRule, showStartStreamDialog, onCancelStartStreamDialog, onStartStream, isStartingStream } =
+    useCreateStreamRule({
+      streamId: stream.id,
+      streamIsPaused: stream.disabled,
+    });
 
   return (
     <>
