@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.opamp.transport;
+package org.graylog.collectors.opamp.transport;
 
 import com.google.protobuf.CodedInputStream;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -28,8 +28,8 @@ import org.glassfish.grizzly.websockets.SimpleWebSocket;
 import org.glassfish.grizzly.websockets.WebSocket;
 import org.glassfish.grizzly.websockets.WebSocketApplication;
 import org.glassfish.grizzly.websockets.WebSocketListener;
-import org.graylog2.opamp.OpAmpExecutor;
-import org.graylog2.opamp.OpAmpService;
+import org.graylog.collectors.opamp.OpAmpExecutor;
+import org.graylog.collectors.opamp.OpAmpService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

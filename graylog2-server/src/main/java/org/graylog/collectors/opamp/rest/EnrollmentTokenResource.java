@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.opamp.rest;
+package org.graylog.collectors.opamp.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -33,7 +33,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.opamp.enrollment.EnrollmentTokenService;
+import org.graylog.collectors.opamp.enrollment.EnrollmentTokenService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
 @Tag(name = "OpAMP Enrollment", description = "OpAMP agent enrollment management")
@@ -66,7 +66,7 @@ public class EnrollmentTokenResource {
         if (collectorsConfig == null) {
             throw new BadRequestException(
                     "Collectors must be configured before creating enrollment tokens. " +
-                    "Configure collectors at /api/collectors/config first.");
+                            "Configure collectors at /api/collectors/config first.");
         }
         return enrollmentTokenService.createToken(request);
     }

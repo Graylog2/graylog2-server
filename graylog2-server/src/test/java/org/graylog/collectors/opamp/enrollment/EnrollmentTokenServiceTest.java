@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.opamp.enrollment;
+package org.graylog.collectors.opamp.enrollment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
@@ -29,6 +29,10 @@ import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.db.CollectorInstanceDTO;
+import org.graylog.collectors.opamp.OpAmpCaService;
+import org.graylog.collectors.opamp.rest.CreateEnrollmentTokenRequest;
+import org.graylog.collectors.opamp.rest.EnrollmentTokenResponse;
+import org.graylog.collectors.opamp.transport.OpAmpAuthContext;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
@@ -38,10 +42,6 @@ import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
-import org.graylog2.opamp.OpAmpCaService;
-import org.graylog2.opamp.rest.CreateEnrollmentTokenRequest;
-import org.graylog2.opamp.rest.EnrollmentTokenResponse;
-import org.graylog2.opamp.transport.OpAmpAuthContext;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.security.encryption.EncryptedValueService;
@@ -373,8 +373,8 @@ class EnrollmentTokenServiceTest {
         // Create agent JWT with x5t#S256 header (RFC 7515 format)
         final String agentToken = Jwts.builder()
                 .header()
-                    .add("typ", "agent+jwt")
-                    .add("x5t#S256", PemUtils.fingerprintToX5t(certFingerprint))
+                .add("typ", "agent+jwt")
+                .add("x5t#S256", PemUtils.fingerprintToX5t(certFingerprint))
                 .and()
                 .subject(collectorInstanceDTO.instanceUid())
                 .issuedAt(Date.from(Instant.now()))
@@ -404,8 +404,8 @@ class EnrollmentTokenServiceTest {
         final String unknownX5t = PemUtils.fingerprintToX5t("sha256:0000000000000000000000000000000000000000000000000000000000000000");
         final String agentToken = Jwts.builder()
                 .header()
-                    .add("typ", "agent+jwt")
-                    .add("x5t#S256", unknownX5t)
+                .add("typ", "agent+jwt")
+                .add("x5t#S256", unknownX5t)
                 .and()
                 .subject("unknown-agent")
                 .issuedAt(Date.from(Instant.now()))
@@ -428,7 +428,7 @@ class EnrollmentTokenServiceTest {
         // Create agent JWT without x5t#S256 header
         final String agentToken = Jwts.builder()
                 .header()
-                    .add("typ", "agent+jwt")
+                .add("typ", "agent+jwt")
                 .and()
                 .subject("agent")
                 .issuedAt(Date.from(Instant.now()))
@@ -474,8 +474,8 @@ class EnrollmentTokenServiceTest {
         final KeyPair differentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
         final String agentToken = Jwts.builder()
                 .header()
-                    .add("typ", "agent+jwt")
-                    .add("x5t#S256", PemUtils.fingerprintToX5t(certFingerprint))
+                .add("typ", "agent+jwt")
+                .add("x5t#S256", PemUtils.fingerprintToX5t(certFingerprint))
                 .and()
                 .subject(collectorInstanceDTO.instanceUid())
                 .issuedAt(Date.from(Instant.now()))

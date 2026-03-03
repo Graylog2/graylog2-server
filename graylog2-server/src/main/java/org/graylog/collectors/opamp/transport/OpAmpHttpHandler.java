@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.opamp.transport;
+package org.graylog.collectors.opamp.transport;
 
 import com.github.joschi.jadconfig.util.Size;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -30,8 +30,8 @@ import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.util.HttpStatus;
-import org.graylog2.opamp.OpAmpExecutor;
-import org.graylog2.opamp.OpAmpService;
+import org.graylog.collectors.opamp.OpAmpExecutor;
+import org.graylog.collectors.opamp.OpAmpService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

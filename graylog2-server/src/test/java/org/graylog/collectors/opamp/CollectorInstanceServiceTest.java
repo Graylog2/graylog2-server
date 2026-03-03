@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.opamp;
+package org.graylog.collectors.opamp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.collectors.CollectorInstanceService;
@@ -74,7 +74,7 @@ class CollectorInstanceServiceTest {
 
     @Test
     void findByInstanceUidReturnsCollector() {
-         enroll(collectorInstanceService, "instance-uid-2", "sha256:fingerprint2");
+        enroll(collectorInstanceService, "instance-uid-2", "sha256:fingerprint2");
 
         final Optional<CollectorInstanceDTO> found = collectorInstanceService.findByInstanceUid("instance-uid-2");
 
@@ -114,6 +114,6 @@ class CollectorInstanceServiceTest {
                 "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----",
                 "507f1f77bcf86cd799439011", // Valid 24-char hex ObjectId
                 Instant.now()
-                );
+        );
     }
 }

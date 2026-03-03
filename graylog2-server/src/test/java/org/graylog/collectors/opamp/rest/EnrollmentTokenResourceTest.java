@@ -14,12 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.opamp.rest;
+package org.graylog.collectors.opamp.rest;
 
 import jakarta.ws.rs.BadRequestException;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.IngestEndpointConfig;
-import org.graylog2.opamp.enrollment.EnrollmentTokenService;
+import org.graylog.collectors.opamp.enrollment.EnrollmentTokenService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

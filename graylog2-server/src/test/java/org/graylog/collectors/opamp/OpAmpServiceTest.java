@@ -14,17 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.opamp;
+package org.graylog.collectors.opamp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.SourceService;
+import org.graylog.collectors.opamp.enrollment.EnrollmentTokenService;
+import org.graylog.collectors.opamp.transport.OpAmpAuthContext;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.security.pki.CertificateService;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
-import org.graylog2.opamp.enrollment.EnrollmentTokenService;
-import org.graylog2.opamp.transport.OpAmpAuthContext;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;

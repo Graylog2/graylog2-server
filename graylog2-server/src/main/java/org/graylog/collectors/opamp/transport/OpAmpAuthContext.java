@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.opamp.transport;
+package org.graylog.collectors.opamp.transport;
 
 import org.glassfish.grizzly.http.HttpRequestPacket;
 
@@ -38,7 +38,7 @@ public sealed interface OpAmpAuthContext {
         return Optional.ofNullable((OpAmpAuthContext) request.getAttribute(REQUEST_ATTRIBUTE));
     }
 
-    enum Transport { HTTP, WEBSOCKET }
+    enum Transport {HTTP, WEBSOCKET}
 
     /**
      * Context for agents authenticating with enrollment tokens.

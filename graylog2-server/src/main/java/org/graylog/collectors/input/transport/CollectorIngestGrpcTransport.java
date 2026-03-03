@@ -29,7 +29,7 @@ import io.netty.handler.ssl.SslProvider;
 import jakarta.inject.Inject;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.inputs.grpc.RemoteAddressProviderInterceptor;
-import org.graylog2.opamp.OpAmpCaService;
+import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.LocalMetricRegistry;
@@ -75,11 +75,11 @@ public class CollectorIngestGrpcTransport extends ThrottleableTransport2 {
 
     @Inject
     public CollectorIngestGrpcTransport(EventBus eventBus,
-                                  @Assisted Configuration configuration,
-                                  LocalMetricRegistry localMetricRegistry,
-                                  CollectorIngestLogsService.Factory logsServiceFactory,
-                                  OpAmpCaService opAmpCaService,
-                                  ClusterConfigService clusterConfigService) {
+                                        @Assisted Configuration configuration,
+                                        LocalMetricRegistry localMetricRegistry,
+                                        CollectorIngestLogsService.Factory logsServiceFactory,
+                                        OpAmpCaService opAmpCaService,
+                                        ClusterConfigService clusterConfigService) {
         super(eventBus, configuration);
         this.localMetricRegistry = localMetricRegistry;
         this.logsServiceFactory = logsServiceFactory;

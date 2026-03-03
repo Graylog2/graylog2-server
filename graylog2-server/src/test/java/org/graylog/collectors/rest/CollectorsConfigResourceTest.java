@@ -26,7 +26,7 @@ import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
-import org.graylog2.opamp.OpAmpCaService;
+import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.junit.jupiter.api.AfterEach;

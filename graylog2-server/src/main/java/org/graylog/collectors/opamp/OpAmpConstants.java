@@ -14,16 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.opamp;
+package org.graylog.collectors.opamp;
 
-import com.google.inject.BindingAnnotation;
+public final class OpAmpConstants {
+    public static final String PATH = "/v1/opamp";
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Target({ElementType.PARAMETER})
-@Retention(RetentionPolicy.RUNTIME)
-@BindingAnnotation
-public @interface OpAmpExecutor {}
+    private OpAmpConstants() {
+    }
+}

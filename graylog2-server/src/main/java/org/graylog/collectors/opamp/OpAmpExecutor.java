@@ -14,13 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.opamp.rest;
+package org.graylog.collectors.opamp;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.inject.BindingAnnotation;
 
-import java.time.Instant;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public record EnrollmentTokenResponse(
-        @JsonProperty("token") String token,
-        @JsonProperty("expires_at") Instant expiresAt
-) {}
+@Target({ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+@BindingAnnotation
+public @interface OpAmpExecutor {}

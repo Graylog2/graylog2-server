@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.opamp;
+package org.graylog.collectors.opamp;
 
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContextBuilder;
@@ -221,5 +221,6 @@ public class OpAmpCaService {
         return List.of();
     }
 
-    public record CaHierarchy(CertificateEntry opAmpCa, CertificateEntry tokenSigningCert, CertificateEntry otlpServerCert) {}
+    public record CaHierarchy(CertificateEntry opAmpCa, CertificateEntry tokenSigningCert,
+                              CertificateEntry otlpServerCert) {}
 }

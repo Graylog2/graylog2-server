@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.opamp.transport;
+package org.graylog.collectors.opamp.transport;
 
 import com.github.joschi.jadconfig.util.Size;
 import com.google.protobuf.ByteString;
@@ -29,8 +29,8 @@ import opamp.proto.Opamp.ServerErrorResponse;
 import opamp.proto.Opamp.ServerErrorResponseType;
 import opamp.proto.Opamp.ServerToAgent;
 import org.glassfish.grizzly.http.server.HttpServer;
-import org.graylog2.opamp.OpAmpConstants;
-import org.graylog2.opamp.OpAmpService;
+import org.graylog.collectors.opamp.OpAmpConstants;
+import org.graylog.collectors.opamp.OpAmpService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -14,17 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.opamp.rest;
+package org.graylog.collectors.opamp.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotBlank;
 
-import javax.annotation.Nullable;
-import java.time.Duration;
+import java.time.Instant;
 
-public record CreateEnrollmentTokenRequest(
-        @JsonProperty("fleet_id") @NotBlank String fleetId,
-        @JsonProperty("expires_in") @Nullable Duration expiresIn
-) {
-    public static final Duration DEFAULT_EXPIRY = Duration.ofDays(7);
-}
+public record EnrollmentTokenResponse(
+        @JsonProperty("token") String token,
+        @JsonProperty("expires_at") Instant expiresAt
+) {}

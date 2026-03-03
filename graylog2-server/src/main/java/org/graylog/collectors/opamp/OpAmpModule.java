@@ -14,14 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.opamp;
+package org.graylog.collectors.opamp;
 
 import com.google.inject.Scopes;
-import org.graylog2.opamp.enrollment.EnrollmentTokenService;
-import org.graylog2.opamp.rest.EnrollmentTokenResource;
-import org.graylog2.opamp.transport.OpAmpHttpHandler;
-import org.graylog2.opamp.transport.OpAmpWebSocketApplication;
-import org.graylog2.opamp.transport.OpAmpWebSocketAuthFilter;
+import org.graylog.collectors.opamp.enrollment.EnrollmentTokenService;
+import org.graylog.collectors.opamp.rest.EnrollmentTokenResource;
+import org.graylog.collectors.opamp.transport.OpAmpHttpHandler;
+import org.graylog.collectors.opamp.transport.OpAmpWebSocketApplication;
+import org.graylog.collectors.opamp.transport.OpAmpWebSocketAuthFilter;
 import org.graylog2.plugin.PluginModule;
 
 import java.util.concurrent.ExecutorService;

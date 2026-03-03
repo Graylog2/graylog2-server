@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.opamp.enrollment;
+package org.graylog.collectors.opamp.enrollment;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -26,10 +26,10 @@ import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
 import org.graylog.security.pki.PemUtils;
-import org.graylog2.opamp.OpAmpCaService;
-import org.graylog2.opamp.rest.CreateEnrollmentTokenRequest;
-import org.graylog2.opamp.rest.EnrollmentTokenResponse;
-import org.graylog2.opamp.transport.OpAmpAuthContext;
+import org.graylog.collectors.opamp.OpAmpCaService;
+import org.graylog.collectors.opamp.rest.CreateEnrollmentTokenRequest;
+import org.graylog.collectors.opamp.rest.EnrollmentTokenResponse;
+import org.graylog.collectors.opamp.transport.OpAmpAuthContext;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.slf4j.Logger;
@@ -156,7 +156,7 @@ public class EnrollmentTokenService {
      *   <li>Required {@code fleet_id} claim</li>
      * </ul>
      *
-     * @param token the JWT token string
+     * @param token     the JWT token string
      * @param transport the transport type (HTTP or WEBSOCKET)
      * @return the enrollment context if valid, empty otherwise
      */
@@ -214,7 +214,7 @@ public class EnrollmentTokenService {
      *   <li>Expiration check (handled automatically by JJWT)</li>
      * </ul>
      *
-     * @param token the JWT token string
+     * @param token     the JWT token string
      * @param transport the transport type (HTTP or WEBSOCKET)
      * @return the identified context if valid, empty otherwise
      */
@@ -272,7 +272,7 @@ public class EnrollmentTokenService {
             var builder = Jwts.builder()
                     .header()
                     .add("ctt", "enrollment")
-                        .add("kid", signingCert.fingerprint())
+                    .add("kid", signingCert.fingerprint())
                     .and()
                     .issuer(clusterId)
                     .audience().add(audience).and()

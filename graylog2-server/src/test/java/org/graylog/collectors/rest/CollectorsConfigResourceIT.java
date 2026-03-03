@@ -32,7 +32,7 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.InputServiceImpl;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
-import org.graylog2.opamp.OpAmpCaService;
+import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.security.RestrictedChainingClassLoader;

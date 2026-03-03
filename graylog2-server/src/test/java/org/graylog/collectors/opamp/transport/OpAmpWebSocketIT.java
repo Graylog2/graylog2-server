@@ -14,14 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.opamp.transport;
+package org.graylog.collectors.opamp.transport;
 
 import com.google.protobuf.ByteString;
 import opamp.proto.Opamp.AgentToServer;
 import opamp.proto.Opamp.ServerToAgent;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.websockets.WebSocketEngine;
-import org.graylog2.opamp.OpAmpService;
+import org.graylog.collectors.opamp.OpAmpService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

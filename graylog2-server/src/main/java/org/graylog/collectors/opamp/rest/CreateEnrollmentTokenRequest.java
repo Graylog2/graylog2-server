@@ -14,10 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.opamp;
+package org.graylog.collectors.opamp.rest;
 
-public final class OpAmpConstants {
-    public static final String PATH = "/v1/opamp";
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
 
-    private OpAmpConstants() {}
+import javax.annotation.Nullable;
+import java.time.Duration;
+
+public record CreateEnrollmentTokenRequest(
+        @JsonProperty("fleet_id") @NotBlank String fleetId,
+        @JsonProperty("expires_in") @Nullable Duration expiresIn
+) {
+    public static final Duration DEFAULT_EXPIRY = Duration.ofDays(7);
 }
