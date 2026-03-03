@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 import capitalize from 'lodash/capitalize';
 import { useNavigate } from 'react-router-dom';
 
-import { Icon, LinkToNode, RelativeTime, Section } from 'components/common';
+import { Icon, LinkToNode, RelativeTime, Section, Link } from 'components/common';
 import useParams from 'routing/useParams';
 import { Alert, Button, ListGroup, ListGroupItem } from 'components/bootstrap';
 import type {
@@ -31,7 +31,6 @@ import useInputDiagnosis from 'components/inputs/InputDiagnosis/useInputDiagnosi
 import ShowReceivedMessagesButton from 'components/inputs/InputDiagnosis/ShowReceivedMessagesButton';
 import NetworkStats from 'components/inputs/InputDiagnosis/NetworkStats';
 import Routes from 'routing/Routes';
-import { Link } from 'components/common/router';
 import type { InputState } from 'stores/inputs/InputStatesStore';
 import type { Input } from 'components/messageloaders/Types';
 import SectionGrid from 'components/common/Section/SectionGrid';

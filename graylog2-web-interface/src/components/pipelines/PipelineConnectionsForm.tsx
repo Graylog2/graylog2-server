@@ -17,8 +17,7 @@
 import React, { useMemo, useState } from 'react';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
-import { Link } from 'components/common/router';
-import { SelectableList } from 'components/common';
+import { Link, SelectableList } from 'components/common';
 import { ControlLabel, FormGroup, HelpBlock, Button, BootstrapModalForm } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import type { PipelineType } from 'components/pipelines/types';
