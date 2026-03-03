@@ -28,9 +28,7 @@ describe('<NotificationBanner>', () => {
   });
 
   it('renders the title text', () => {
-    const items: Array<NotificationItem> = [
-      { severity: 'danger', message: 'something failed' },
-    ];
+    const items: Array<NotificationItem> = [{ severity: 'danger', message: 'something failed' }];
 
     render(<NotificationBanner title="One or more inputs are currently" items={items} />);
 
