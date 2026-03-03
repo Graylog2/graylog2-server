@@ -22,15 +22,10 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public record RequestedField(String name, @Nullable String decorator) {
-    public static final String RISK_SCORE = "scores.normalized_risk";
+    public static String DECORATOR_SEPARATOR = "..";
 
     public static RequestedField parse(String value) {
-        // TODO: handling of the case when we search for fields separated by "."
-        if(RISK_SCORE.equals(value)) {
-            return new RequestedField(RISK_SCORE, null);
-        }
-
-        final List<String> parts = Splitter.on(".")
+        final List<String> parts = Splitter.on(DECORATOR_SEPARATOR)
                 .limit(2)
                 .trimResults()
                 .omitEmptyStrings()
@@ -48,7 +43,7 @@ public record RequestedField(String name, @Nullable String decorator) {
         if (decorator == null) {
             return name;
         } else {
-            return name + "." + decorator;
+            return name + DECORATOR_SEPARATOR + decorator;
         }
     }
 
