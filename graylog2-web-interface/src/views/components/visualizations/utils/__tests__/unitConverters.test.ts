@@ -71,8 +71,8 @@ describe('Unit converter functions', () => {
       });
     });
 
-    it('for ram_size should convert bigger unit to bytes', () => {
-      const result = convertValueToBaseUnit(1, { abbrev: 'KiB', unitType: 'ram_size' });
+    it('for binary_size should convert bigger unit to bytes', () => {
+      const result = convertValueToBaseUnit(1, { abbrev: 'KiB', unitType: 'binary_size' });
 
       expect(result).toEqual({
         value: 1024,
@@ -80,7 +80,7 @@ describe('Unit converter functions', () => {
           type: 'base',
           abbrev: 'b',
           name: 'byte',
-          unitType: 'ram_size',
+          unitType: 'binary_size',
           useInPrettier: true,
           conversion: undefined,
         },
@@ -217,11 +217,11 @@ describe('Unit converter functions', () => {
       });
     });
 
-    it('for ram_size should convert smaller unit (KiB) to bigger (GiB)', () => {
+    it('for binary_size should convert smaller unit (KiB) to bigger (GiB)', () => {
       const result = convertValueToUnit(
         1048576,
-        { abbrev: 'KiB', unitType: 'ram_size' },
-        { abbrev: 'GiB', unitType: 'ram_size' },
+        { abbrev: 'KiB', unitType: 'binary_size' },
+        { abbrev: 'GiB', unitType: 'binary_size' },
       );
 
       expect(result).toEqual({
@@ -230,7 +230,7 @@ describe('Unit converter functions', () => {
           type: 'derived',
           abbrev: 'GiB',
           name: 'gibibyte',
-          unitType: 'ram_size',
+          unitType: 'binary_size',
           useInPrettier: true,
           conversion: {
             value: 1073741824,
@@ -240,11 +240,11 @@ describe('Unit converter functions', () => {
       });
     });
 
-    it('for ram_size should convert bytes to GiB', () => {
+    it('for binary_size should convert bytes to GiB', () => {
       const result = convertValueToUnit(
         3221225472,
-        { abbrev: 'b', unitType: 'ram_size' },
-        { abbrev: 'GiB', unitType: 'ram_size' },
+        { abbrev: 'b', unitType: 'binary_size' },
+        { abbrev: 'GiB', unitType: 'binary_size' },
       );
 
       expect(result).toEqual({
@@ -253,7 +253,7 @@ describe('Unit converter functions', () => {
           type: 'derived',
           abbrev: 'GiB',
           name: 'gibibyte',
-          unitType: 'ram_size',
+          unitType: 'binary_size',
           useInPrettier: true,
           conversion: {
             value: 1073741824,
@@ -263,11 +263,11 @@ describe('Unit converter functions', () => {
       });
     });
 
-    it('for ram_size should convert bytes to MiB', () => {
+    it('for binary_size should convert bytes to MiB', () => {
       const result = convertValueToUnit(
         1572864,
-        { abbrev: 'b', unitType: 'ram_size' },
-        { abbrev: 'MiB', unitType: 'ram_size' },
+        { abbrev: 'b', unitType: 'binary_size' },
+        { abbrev: 'MiB', unitType: 'binary_size' },
       );
 
       expect(result).toEqual({
@@ -276,7 +276,7 @@ describe('Unit converter functions', () => {
           type: 'derived',
           abbrev: 'MiB',
           name: 'mebibyte',
-          unitType: 'ram_size',
+          unitType: 'binary_size',
           useInPrettier: true,
           conversion: {
             value: 1048576,
@@ -386,8 +386,8 @@ describe('Unit converter functions', () => {
       });
     });
 
-    it('for ram_size should convert smaller then 1 value to the value with lower unit', () => {
-      const result = getPrettifiedValue(0.5, { abbrev: 'GiB', unitType: 'ram_size' });
+    it('for binary_size should convert smaller then 1 value to the value with lower unit', () => {
+      const result = getPrettifiedValue(0.5, { abbrev: 'GiB', unitType: 'binary_size' });
 
       expect(result).toEqual({
         value: 512,
@@ -395,7 +395,7 @@ describe('Unit converter functions', () => {
           type: 'derived',
           abbrev: 'MiB',
           name: 'mebibyte',
-          unitType: 'ram_size',
+          unitType: 'binary_size',
           useInPrettier: true,
           conversion: {
             value: 1048576,
@@ -405,8 +405,8 @@ describe('Unit converter functions', () => {
       });
     });
 
-    it('for ram_size should convert bigger then 1 value to the value with higher unit', () => {
-      const result = getPrettifiedValue(2048, { abbrev: 'MiB', unitType: 'ram_size' });
+    it('for binary_size should convert bigger then 1 value to the value with higher unit', () => {
+      const result = getPrettifiedValue(2048, { abbrev: 'MiB', unitType: 'binary_size' });
 
       expect(result).toEqual({
         value: 2,
@@ -414,7 +414,7 @@ describe('Unit converter functions', () => {
           type: 'derived',
           abbrev: 'GiB',
           name: 'gibibyte',
-          unitType: 'ram_size',
+          unitType: 'binary_size',
           useInPrettier: true,
           conversion: {
             value: 1073741824,
@@ -424,8 +424,8 @@ describe('Unit converter functions', () => {
       });
     });
 
-    it('for ram_size should prettify larger bytes to GiB', () => {
-      const result = getPrettifiedValue(3221225472, { abbrev: 'b', unitType: 'ram_size' });
+    it('for binary_size should prettify larger bytes to GiB', () => {
+      const result = getPrettifiedValue(3221225472, { abbrev: 'b', unitType: 'binary_size' });
 
       expect(result).toEqual({
         value: 3,
@@ -433,7 +433,7 @@ describe('Unit converter functions', () => {
           type: 'derived',
           abbrev: 'GiB',
           name: 'gibibyte',
-          unitType: 'ram_size',
+          unitType: 'binary_size',
           useInPrettier: true,
           conversion: {
             value: 1073741824,
@@ -443,8 +443,8 @@ describe('Unit converter functions', () => {
       });
     });
 
-    it('for ram_size should prettify larger bytes to MiB', () => {
-      const result = getPrettifiedValue(1572864, { abbrev: 'b', unitType: 'ram_size' });
+    it('for binary_size should prettify larger bytes to MiB', () => {
+      const result = getPrettifiedValue(1572864, { abbrev: 'b', unitType: 'binary_size' });
 
       expect(result).toEqual({
         value: 1.5,
@@ -452,7 +452,7 @@ describe('Unit converter functions', () => {
           type: 'derived',
           abbrev: 'MiB',
           name: 'mebibyte',
-          unitType: 'ram_size',
+          unitType: 'binary_size',
           useInPrettier: true,
           conversion: {
             value: 1048576,

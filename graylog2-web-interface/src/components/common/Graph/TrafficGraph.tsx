@@ -63,7 +63,7 @@ const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
         y: yValues,
         ...getHoverTemplateSettings({
           convertedValues: yValues,
-          unit: FieldUnit.fromJSON({ abbrev: 'b', unit_type: 'ram_size' }),
+          unit: FieldUnit.fromJSON({ abbrev: 'b', unit_type: 'binary_size' }),
         }),
       },
     ],
@@ -122,14 +122,14 @@ const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
   const notZoomedLayout = useMemo<GeneratedLayout>(
     () => ({
       rangemode: 'tozero',
-      ...(getFormatSettingsByData('ram_size', valuesToGetFormatSettings) as GeneratedLayout),
+      ...(getFormatSettingsByData('binary_size', valuesToGetFormatSettings) as GeneratedLayout),
     }),
     [valuesToGetFormatSettings],
   );
   const zoomedLayout = useMemo(
     () => ({
       rangemode: 'tozero',
-      ...(getFormatSettingsByData('ram_size', yValues) as GeneratedLayout),
+      ...(getFormatSettingsByData('binary_size', yValues) as GeneratedLayout),
     }),
     [yValues],
   );

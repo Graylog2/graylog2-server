@@ -28,18 +28,18 @@ import supportedUnits from '../../../../../../graylog2-server/src/main/resources
 
 type UnitConversionAction = 'MULTIPLY' | 'DIVIDE';
 
-const ramSize = [
+const binarySize = [
   {
     'type': 'base',
     'abbrev': 'b',
     'name': 'byte',
-    'unit_type': 'ram_size',
+    'unit_type': 'binary_size',
   },
   {
     'type': 'derived',
     'abbrev': 'KiB',
     'name': 'kibibyte',
-    'unit_type': 'ram_size',
+    'unit_type': 'binary_size',
     'conversion': {
       'value': 1024,
       'action': 'MULTIPLY',
@@ -49,7 +49,7 @@ const ramSize = [
     'type': 'derived',
     'abbrev': 'MiB',
     'name': 'mebibyte',
-    'unit_type': 'ram_size',
+    'unit_type': 'binary_size',
     'conversion': {
       'value': 1048576,
       'action': 'MULTIPLY',
@@ -59,7 +59,7 @@ const ramSize = [
     'type': 'derived',
     'abbrev': 'GiB',
     'name': 'gibibyte',
-    'unit_type': 'ram_size',
+    'unit_type': 'binary_size',
     'conversion': {
       'value': 1073741824,
       'action': 'MULTIPLY',
@@ -119,7 +119,7 @@ export const mappedUnitsFromJSONForAggregation: FieldUnitTypes = <FieldUnitTypes
 
 export const mappedUnitsFromJSON: FieldUnitTypes = <FieldUnitTypes>(
   mapValues(
-    { ...sourceUnits, ram_size: ramSize },
+    { ...sourceUnits, binary_size: binarySize },
     (unitsJson: Array<UnitJson>): Array<Unit> => unitsJson.map((unitJson: UnitJson): Unit => unitFromJson(unitJson)),
   )
 );
