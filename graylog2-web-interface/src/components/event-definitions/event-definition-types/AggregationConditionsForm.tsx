@@ -16,11 +16,11 @@
  */
 import React from 'react';
 import styled from 'styled-components';
-import get from 'lodash/get';
 
 import { Alert, Row } from 'components/bootstrap';
 import { emptyComparisonExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
 import validateExpression from 'logic/alerts/AggregationExpressionValidation';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 import AggregationConditionExpression from './AggregationConditionExpression';
 import AggregationConditionsFormSummary from './AggregationConditionsFormSummary';
@@ -52,7 +52,7 @@ const StyledAlert = styled(Alert)`
 type AggregationConditionsFormProps = {
   eventDefinition: any;
   validation: any;
-  formattedFields: any[];
+  formattedFields: FieldTypeMapping[];
   aggregationFunctions: any[];
   onChange: (...args: any[]) => void;
 };
@@ -118,7 +118,7 @@ class AggregationConditionsForm extends React.Component<
         <h3 className={commonStyles.title}>Create Events for Definition</h3>
         {validation.errors.conditions && (
           <StyledAlert bsStyle="danger" title="Errors found">
-            <p>{get(validation, 'errors.conditions[0]')}</p>
+            <p>{validation?.errors?.conditions[0]}</p>
           </StyledAlert>
         )}
 
