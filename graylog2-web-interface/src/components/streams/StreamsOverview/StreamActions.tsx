@@ -129,16 +129,11 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
       });
   }, [deselectEntity, sendTelemetry, stream.id, stream.title, toggleDeleteModal]);
 
-  const {
-    onCreateStreamRule,
-    showStartStreamDialog,
-    onCancelStartStreamDialog,
-    onStartStream,
-    isStartingStream,
-  } = useCreateStreamRule({
-    streamId: stream.id,
-    streamIsPaused: stream.disabled,
-  });
+  const { onCreateStreamRule, showStartStreamDialog, onCancelStartStreamDialog, onStartStream, isStartingStream } =
+    useCreateStreamRule({
+      streamId: stream.id,
+      streamIsPaused: stream.disabled,
+    });
 
   const onUpdate = useCallback(
     (newStream: Stream) =>
