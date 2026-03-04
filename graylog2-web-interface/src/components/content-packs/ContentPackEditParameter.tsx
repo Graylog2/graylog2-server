@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { Button, Input } from 'components/bootstrap';
+import { Input } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
 import ObjectUtils from 'util/ObjectUtils';
 
@@ -281,7 +281,6 @@ class ContentPackEditParameter extends React.Component<
                   : 'Give a default value if the parameter is not optional.'
               }
             />
-            <Button type="submit" bsStyle="primary">{header}</Button>
           </fieldset>
         </form>
       </div>

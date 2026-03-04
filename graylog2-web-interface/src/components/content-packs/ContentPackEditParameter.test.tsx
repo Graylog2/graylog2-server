@@ -15,10 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, fireEvent } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import ContentPackEditParameter from 'components/content-packs/ContentPackEditParameter';
+
+// eslint-disable-next-line no-restricted-properties -- component has no submit button, jsdom doesn't support implicit form submission
+const submitForm = async () => fireEvent.submit(await screen.findByTestId('parameter-form'));
 
 describe('<ContentPackEditParameter />', () => {
   it('should render with empty parameters', async () => {
@@ -71,7 +74,7 @@ describe('<ContentPackEditParameter />', () => {
     await userEvent.selectOptions(screen.getByLabelText(/type/i), 'integer');
     await userEvent.type(screen.getByLabelText(/default value/i), '1');
 
-    await userEvent.click(screen.getByRole('button', { name: /create parameter/i }));
+    await submitForm();
 
     expect(changeFn).toHaveBeenCalledWith({
       name: 'name',
@@ -91,7 +94,7 @@ describe('<ContentPackEditParameter />', () => {
     await userEvent.type(screen.getByLabelText(/description/i), 'descr');
     await userEvent.type(screen.getByLabelText(/default value/i), 'test');
 
-    await userEvent.click(screen.getByRole('button', { name: /create parameter/i }));
+    await submitForm();
 
     expect(changeFn).not.toHaveBeenCalled();
   });
@@ -108,7 +111,7 @@ describe('<ContentPackEditParameter />', () => {
     await userEvent.clear(nameInput);
     await userEvent.type(nameInput, 'franz');
 
-    await userEvent.click(screen.getByRole('button', { name: /edit parameter/i }));
+    await submitForm();
 
     expect(screen.getByText(/must be unique/i)).toBeInTheDocument();
   });
@@ -129,19 +132,19 @@ describe('<ContentPackEditParameter />', () => {
       const nameInput = screen.getByLabelText(/name/i);
       await userEvent.clear(nameInput);
       await userEvent.type(nameInput, 'hans');
-      await userEvent.click(screen.getByRole('button', { name: /create parameter/i }));
+      await submitForm();
 
       expect(screen.getByText(/must be unique/i)).toBeInTheDocument();
 
       await userEvent.clear(nameInput);
       await userEvent.type(nameInput, 'hans-dampf');
-      await userEvent.click(screen.getByRole('button', { name: /create parameter/i }));
+      await submitForm();
 
       expect(screen.getByText(/only contain A-Z, a-z, 0-9 and _/i)).toBeInTheDocument();
 
       await userEvent.clear(nameInput);
       await userEvent.type(nameInput, 'dampf');
-      await userEvent.click(screen.getByRole('button', { name: /create parameter/i }));
+      await submitForm();
 
       expect(screen.getByText(/must not contain a space/i)).toBeInTheDocument();
     });
@@ -149,14 +152,14 @@ describe('<ContentPackEditParameter />', () => {
     it('should validate the parameter input from type double', async () => {
       await userEvent.selectOptions(screen.getByLabelText(/type/i), 'double');
       await userEvent.type(screen.getByLabelText(/default value/i), 'test');
-      await userEvent.click(screen.getByRole('button', { name: /create parameter/i }));
+      await submitForm();
 
       expect(screen.getByText(/not a double value/i)).toBeInTheDocument();
 
       const input = screen.getByLabelText(/default value/i);
       await userEvent.clear(input);
       await userEvent.type(input, '1.0');
-      await userEvent.click(screen.getByRole('button', { name: /create parameter/i }));
+      await submitForm();
 
       expect(screen.getByText(/default value if the parameter is not optional/i)).toBeInTheDocument();
     });
@@ -164,14 +167,14 @@ describe('<ContentPackEditParameter />', () => {
     it('should validate the parameter input from type integer', async () => {
       await userEvent.selectOptions(screen.getByLabelText(/type/i), 'integer');
       await userEvent.type(screen.getByLabelText(/default value/i), 'test');
-      await userEvent.click(screen.getByRole('button', { name: /create parameter/i }));
+      await submitForm();
 
       expect(screen.getByText(/not an integer value/i)).toBeInTheDocument();
 
       const input = screen.getByLabelText(/default value/i);
       await userEvent.clear(input);
       await userEvent.type(input, '1');
-      await userEvent.click(screen.getByRole('button', { name: /create parameter/i }));
+      await submitForm();
 
       expect(screen.getByText(/default value if the parameter is not optional/i)).toBeInTheDocument();
     });
@@ -179,14 +182,14 @@ describe('<ContentPackEditParameter />', () => {
     it('should validate the parameter input from type boolean', async () => {
       await userEvent.selectOptions(screen.getByLabelText(/type/i), 'boolean');
       await userEvent.type(screen.getByLabelText(/default value/i), 'test');
-      await userEvent.click(screen.getByRole('button', { name: /create parameter/i }));
+      await submitForm();
 
       expect(screen.getByText(/must be either true or false/i)).toBeInTheDocument();
 
       const input = screen.getByLabelText(/default value/i);
       await userEvent.clear(input);
       await userEvent.type(input, 'true');
-      await userEvent.click(screen.getByRole('button', { name: /create parameter/i }));
+      await submitForm();
 
       expect(screen.getByText(/default value if the parameter is not optional/i)).toBeInTheDocument();
     });
