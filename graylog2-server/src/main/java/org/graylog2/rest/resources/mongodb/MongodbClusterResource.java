@@ -38,7 +38,9 @@ import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
+import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
+import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.utilities.lucene.InMemorySearchEngine;
 import org.graylog2.utilities.lucene.LuceneInMemorySearchEngine;
@@ -76,10 +78,12 @@ public class MongodbClusterResource extends RestResource {
 
 
     private final InMemorySearchEngine<MongodbNode> mongodbNodesSearchService;
+    private final SearchQueryParser searchQueryParser;
 
     @Inject
     public MongodbClusterResource(MongodbNodesProvider provider) {
         this.mongodbNodesSearchService = new LuceneInMemorySearchEngine<>(DEFAULT_SORT_FIELD, attributes, provider::get);
+        this.searchQueryParser = new SearchQueryParser("name", attributes);
     }
 
     @GET
@@ -98,7 +102,8 @@ public class MongodbClusterResource extends RestResource {
                                                    @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order
 
     ) throws QueryNodeException, IOException {
-        final PaginatedList<MongodbNode> result = mongodbNodesSearchService.search(query, sort, order, page, perPage);
+        final SearchQuery parsedQuery = searchQueryParser.parse(query);
+        final PaginatedList<MongodbNode> result = mongodbNodesSearchService.search(parsedQuery, sort, order, page, perPage);
         return PageListResponse.create(query, result.pagination(),
                 result.grandTotal().orElse(0L), sort, order, result.stream().toList(), attributes, settings);
     }

@@ -30,7 +30,6 @@ import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
 import org.apache.lucene.queryparser.flexible.standard.config.PointsConfig;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
@@ -40,6 +39,7 @@ import org.apache.lucene.store.Directory;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.resources.entities.EntityAttribute;
+import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,28 +58,25 @@ public class LuceneInMemorySearchEngine<U extends InMemorySearchableEntity> impl
 
     private static final Logger LOG = LoggerFactory.getLogger(LuceneInMemorySearchEngine.class);
 
-    private final String defaultField;
     private final List<EntityAttribute> attributes;
     private final Supplier<List<U>> datasource;
     private final Analyzer analyzer;
-    private final StandardQueryParser queryParser;
+    private static final LuceneQueryBuilder LUCENE_QUERY_BUILDER = new LuceneQueryBuilder();
 
     public LuceneInMemorySearchEngine(String defaultField, List<EntityAttribute> attributes, Supplier<List<U>> datasource) {
-        this.defaultField = defaultField;
         this.attributes = attributes;
         this.datasource = datasource;
         this.analyzer = new StandardAnalyzer();
-        this.queryParser = createQueryParser(analyzer);
     }
 
     @Override
-    public PaginatedList<U> search(String queryString, String sortField, SortOrder order, int page, int perPage) throws IOException, QueryNodeException {
+    public PaginatedList<U> search(SearchQuery query, String sortField, SortOrder order, int page, int perPage) throws IOException, QueryNodeException {
         try (Directory directory = new ByteBuffersDirectory();) {
             IndexWriterConfig config = new IndexWriterConfig(analyzer);
             final List<U> entries = datasource.get();
             indexEntries(entries, directory, config);
 
-            Query query = safeQuery(queryString);
+            Query luceneQuery = LUCENE_QUERY_BUILDER.toLuceneQuery(query);
 
             try (IndexReader reader = DirectoryReader.open(directory)) {
                 IndexSearcher searcher = new IndexSearcher(reader);
@@ -89,22 +86,12 @@ public class LuceneInMemorySearchEngine<U extends InMemorySearchableEntity> impl
                 final int end = start + perPage;
                 final int offset = (page - 1) * perPage;
 
-                TopDocs results = searcher.search(query, end, sort); // fetch enough docs
+                TopDocs results = searcher.search(luceneQuery, end, sort); // fetch enough docs
                 final List<U> searchResults = extractSearchResults(results, searcher, offset, perPage, entries);
 
                 final int totalCount = Math.toIntExact(results.totalHits.value);
                 return new PaginatedList<>(searchResults, totalCount, page, perPage);
             }
-        }
-    }
-
-    private Query safeQuery(String queryString) throws QueryNodeException {
-        try {
-            return queryParser.parse(wrapEmptyQuery(queryString), defaultField);
-        } catch (QueryNodeException e) {
-            LOG.debug("Failed to parse query {}", queryString);
-            // fallback for unparseable and unfinished queries like "key:"
-            return new MatchAllDocsQuery();
         }
     }
 

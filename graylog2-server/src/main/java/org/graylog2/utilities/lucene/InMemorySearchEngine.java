@@ -19,9 +19,10 @@ package org.graylog2.utilities.lucene;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.SortOrder;
+import org.graylog2.search.SearchQuery;
 
 import java.io.IOException;
 
 public interface InMemorySearchEngine<T extends  InMemorySearchableEntity> {
-    PaginatedList<T> search(String queryString, String sortField, SortOrder sortOrder, int page, int perPage) throws IOException, QueryNodeException;
+    PaginatedList<T> search(SearchQuery queryString, String sortField, SortOrder sortOrder, int page, int perPage) throws IOException, QueryNodeException;
 }

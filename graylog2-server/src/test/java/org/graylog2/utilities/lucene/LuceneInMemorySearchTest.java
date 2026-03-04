@@ -21,6 +21,7 @@ import org.assertj.core.api.Assertions;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.search.SearchQueryField;
+import org.graylog2.search.SearchQueryParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,6 +31,7 @@ import java.util.List;
 class LuceneInMemorySearchTest {
 
     private LuceneInMemorySearchEngine<SearchableItem> search;
+    private SearchQueryParser searchQueryParser;
 
     @BeforeEach
     void setUp() {
@@ -44,34 +46,35 @@ class LuceneInMemorySearchTest {
                 new SearchableItem("Jane Doe", 40),
                 new SearchableItem("Alan Smithee", 45)
         ));
+        this.searchQueryParser = new SearchQueryParser("name", attributes);
     }
 
     @Test
     void testSearching() throws QueryNodeException, IOException {
-        Assertions.assertThat(search.search("name:john", "name", SortOrder.ASCENDING, 1, 10))
+        Assertions.assertThat(search.search(searchQueryParser.parse("name:john"), "name", SortOrder.ASCENDING, 1, 10))
                 .hasSize(2)
                 .extracting(SearchableItem::name)
                 .contains("John Doe", "John Smith");
 
-        Assertions.assertThat(search.search("name:max", "name", SortOrder.ASCENDING, 1, 10))
+        Assertions.assertThat(search.search(searchQueryParser.parse("name:max"), "name", SortOrder.ASCENDING, 1, 10))
                 .hasSize(1)
                 .extracting(SearchableItem::name)
                 .contains("Max Mustermann");
 
-        Assertions.assertThat(search.search("name:john AND name:doe", "name", SortOrder.ASCENDING, 1, 10))
+        Assertions.assertThat(search.search(searchQueryParser.parse("name:mustermann"), "name", SortOrder.ASCENDING, 1, 10))
                 .hasSize(1)
                 .extracting(SearchableItem::name)
-                .contains("John Doe");
+                .contains("Max Mustermann");
     }
 
     @Test
     void testSorting() throws QueryNodeException, IOException {
-        Assertions.assertThat(search.search("name:john OR name:max", "age", SortOrder.DESCENDING, 1, 10))
+        Assertions.assertThat(search.search(searchQueryParser.parse("name:john name:max"), "age", SortOrder.DESCENDING, 1, 10))
                 .hasSize(3)
                 .extracting(SearchableItem::age)
                 .containsExactly(35, 30, 25);
 
-        Assertions.assertThat(search.search("name:john OR name:max", "age", SortOrder.ASCENDING, 1, 10))
+        Assertions.assertThat(search.search(searchQueryParser.parse("name:john name:max"), "age", SortOrder.ASCENDING, 1, 10))
                 .hasSize(3)
                 .extracting(SearchableItem::age)
                 .containsExactly(25, 30, 35);
@@ -79,15 +82,15 @@ class LuceneInMemorySearchTest {
 
     @Test
     void testPaging() throws QueryNodeException, IOException {
-        Assertions.assertThat(search.search("", "age", SortOrder.ASCENDING, 1, 10))
+        Assertions.assertThat(search.search(searchQueryParser.parse(""), "age", SortOrder.ASCENDING, 1, 10))
                 .hasSize(5);
 
-        Assertions.assertThat(search.search("", "age", SortOrder.ASCENDING, 2, 2))
+        Assertions.assertThat(search.search(searchQueryParser.parse(""), "age", SortOrder.ASCENDING, 2, 2))
                 .hasSize(2)
                 .extracting(SearchableItem::age)
                 .containsExactly(35, 40);
 
-        Assertions.assertThat(search.search("", "age", SortOrder.ASCENDING, 3, 2))
+        Assertions.assertThat(search.search(searchQueryParser.parse(""), "age", SortOrder.ASCENDING, 3, 2))
                 .hasSize(1)
                 .extracting(SearchableItem::age)
                 .containsExactly(45);
