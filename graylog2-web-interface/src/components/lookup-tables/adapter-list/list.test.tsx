@@ -21,7 +21,6 @@ import userEvent from '@testing-library/user-event';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
 import { DATA_ADAPTERS, ERROR_STATE } from 'components/lookup-tables/fixtures';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import { attributes } from './constants';
 import DataAdapterList from './index';
@@ -78,14 +77,10 @@ jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
 }));
 
 const moreActionsName = { name: new RegExp(`More Actions for ${DATA_ADAPTERS[0].name}`, 'i') };
-const renderSUT = () =>
-  render(
-    <DefaultQueryParamProvider>
-      <DataAdapterList />
-    </DefaultQueryParamProvider>,
-  );
 
 describe('Data Adapter List', () => {
+  const renderSUT = () => render(<DataAdapterList />);
+
   it('should render a list of data adapters', async () => {
     renderSUT();
 
