@@ -17,6 +17,7 @@
 package org.graylog.collectors.indexer;
 
 import com.google.common.collect.ImmutableMap;
+import org.graylog.collectors.input.CollectorIngestCodec;
 import org.graylog2.indexer.ConstantsES7;
 import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
 import org.graylog2.indexer.indices.Template;
@@ -73,7 +74,7 @@ public class CollectorLogsIndexMapping extends AbstractMapping {
                 .put("source", map().put("type", "keyword").build())
                 .put("streams", map().put("type", "keyword").build())
                 // Collector identification fields
-                .put("gl2_collector_receiver_type", map().put("type", "keyword").build())
+                .put(CollectorIngestCodec.FIELD_COLLECTOR_RECEIVER_TYPE, map().put("type", "keyword").build())
                 .put("gl2_source_collector", map().put("type", "keyword").build())
                 // Severity fields
                 .put("vendor_event_severity", map().put("type", "keyword").build())

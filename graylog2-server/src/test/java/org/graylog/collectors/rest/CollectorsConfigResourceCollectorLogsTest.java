@@ -21,6 +21,7 @@ import org.apache.shiro.util.ThreadContext;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.IngestEndpointConfig;
 import org.graylog.collectors.indexer.CollectorLogsIndexTemplateProvider;
+import org.graylog.collectors.input.CollectorIngestCodec;
 import org.graylog.collectors.input.processor.CollectorLogRecordProcessor;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.database.NotFoundException;
@@ -241,7 +242,7 @@ class CollectorsConfigResourceCollectorLogsTest {
         final var ruleData = (java.util.Map<String, Object>) mapCaptor.getValue();
 
         assertThat(ruleData.get("stream_id")).hasToString(Stream.COLLECTOR_LOGS_STREAM_ID);
-        assertThat(ruleData.get("field")).isEqualTo("gl2_collector_receiver_type");
+        assertThat(ruleData.get("field")).isEqualTo(CollectorIngestCodec.FIELD_COLLECTOR_RECEIVER_TYPE);
         assertThat(ruleData.get("type")).isEqualTo(StreamRuleType.EXACT.toInteger());
         assertThat(ruleData.get("value")).isEqualTo(CollectorLogRecordProcessor.RECEIVER_TYPE);
         assertThat(ruleData.get("inverted")).isEqualTo(false);

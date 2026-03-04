@@ -39,6 +39,7 @@ import org.bson.types.ObjectId;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.IngestEndpointConfig;
 import org.graylog.collectors.indexer.CollectorLogsIndexTemplateProvider;
+import org.graylog.collectors.input.CollectorIngestCodec;
 import org.graylog.collectors.input.CollectorIngestGrpcInput;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
 import org.graylog.collectors.input.processor.CollectorLogRecordProcessor;
@@ -275,7 +276,7 @@ public class CollectorsConfigResource extends RestResource {
 
         final var rule = streamRuleService.create(Map.of(
                 StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(Stream.COLLECTOR_LOGS_STREAM_ID),
-                StreamRuleImpl.FIELD_FIELD, "gl2_collector_receiver_type",
+                StreamRuleImpl.FIELD_FIELD, CollectorIngestCodec.FIELD_COLLECTOR_RECEIVER_TYPE,
                 StreamRuleImpl.FIELD_TYPE, StreamRuleType.EXACT.toInteger(),
                 StreamRuleImpl.FIELD_VALUE, CollectorLogRecordProcessor.RECEIVER_TYPE,
                 StreamRuleImpl.FIELD_INVERTED, false,

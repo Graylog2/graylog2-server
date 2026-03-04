@@ -59,6 +59,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class CollectorIngestCodec implements Codec {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorIngestCodec.class);
     public static final String NAME = "CollectorIngest";
+    public static final String FIELD_COLLECTOR_RECEIVER_TYPE = "gl2_collector_receiver_type";
 
     private final Configuration configuration;
     private final MessageFactory messageFactory;
@@ -142,7 +143,7 @@ public class CollectorIngestCodec implements Codec {
 
         final Message message = messageFactory.createMessage(body, source, timestamp);
 
-        message.addField("gl2_collector_receiver_type", receiverType);
+        message.addField(FIELD_COLLECTOR_RECEIVER_TYPE, receiverType);
 
         if (!instanceUid.isEmpty()) {
             message.addField(Message.FIELD_GL2_SOURCE_COLLECTOR, instanceUid);
