@@ -18,7 +18,7 @@ package org.graylog.storage.opensearch3.sniffer.impl;
 
 import com.google.common.collect.Sets;
 import jakarta.inject.Inject;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
+import org.graylog.storage.opensearch3.sniffer.DiscoveredNode;
 import org.graylog.storage.opensearch3.sniffer.SnifferFilter;
 import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.slf4j.Logger;
@@ -46,8 +46,10 @@ public class NodeLoggingFilter implements SnifferFilter {
     }
 
     @Override
-    public List<Node> filterNodes(final List<Node> nodes) {
-        final Set<String> currentNodes = nodes.stream().map(n -> n.getHost().toURI()).collect(Collectors.toSet());
+    public List<DiscoveredNode> filterNodes(final List<DiscoveredNode> nodes) {
+        final Set<String> currentNodes = nodes.stream()
+                .map(n -> n.toURI().toString())
+                .collect(Collectors.toSet());
 
         final Set<String> nodesAdded = Sets.difference(currentNodes, savedNodes);
         final Set<String> nodesDropped = Sets.difference(savedNodes, currentNodes);
@@ -68,4 +70,3 @@ public class NodeLoggingFilter implements SnifferFilter {
         return nodes;
     }
 }
-
