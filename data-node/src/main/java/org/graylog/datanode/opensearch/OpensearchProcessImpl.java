@@ -152,13 +152,12 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     }
 
     public OpensearchInfo processInfo() {
-        return new OpensearchInfo(configuration.getDatanodeNodeName(), processState.getState(), getOpensearchBaseUrl().toString(), commandLineProcess != null ? commandLineProcess.processInfo() : ProcessInformation.empty());
+        return new OpensearchInfo(configuration.getDatanodeNodeName(), processState.getState(), getOpensearchBaseUrl().map(URI::toString).orElse(null), commandLineProcess != null ? commandLineProcess.processInfo() : ProcessInformation.empty());
     }
 
     @Override
-    public URI getOpensearchBaseUrl() {
-        return opensearchConfiguration.map(OpensearchConfiguration::getRestBaseUrl)
-                .orElse(URI.create("")); // Empty address will cause problems for opensearch clients. Has to be filtered out in IndexerDiscoveryProvider
+    public Optional<URI> getOpensearchBaseUrl() {
+        return opensearchConfiguration.map(OpensearchConfiguration::getRestBaseUrl);
     }
 
     @Override
