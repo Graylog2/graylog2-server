@@ -82,8 +82,8 @@ public class MongodbClusterResource extends RestResource {
 
     @Inject
     public MongodbClusterResource(MongodbNodesProvider provider) {
-        this.mongodbNodesSearchService = new LuceneInMemorySearchEngine<>(DEFAULT_SORT_FIELD, attributes, provider::get);
-        this.searchQueryParser = new SearchQueryParser("name", attributes);
+        this.mongodbNodesSearchService = new LuceneInMemorySearchEngine<>(attributes, provider::get);
+        this.searchQueryParser = new SearchQueryParser(DEFAULT_SORT_FIELD, attributes);
     }
 
     @GET

@@ -313,4 +313,61 @@ class LuceneQueryBuilderTest {
         assertThat(regexpQuery.getRegexp().field()).isEqualTo("defaultfield");
         assertThat(regexpQuery.getRegexp().text()).isEqualTo(".*john.*");
     }
+
+    @Test
+    void testCaseInsensitiveRegexpQuery() {
+        // Verify that uppercase input is lowercased for case-insensitive matching
+        SearchQuery searchQuery = parser.parse("name:John");
+        Query query = builder.toLuceneQuery(searchQuery);
+
+        assertThat(query).isInstanceOf(BooleanQuery.class);
+        BooleanQuery booleanQuery = (BooleanQuery) query;
+        assertThat(booleanQuery.clauses()).hasSize(1);
+
+        BooleanClause clause = booleanQuery.clauses().getFirst();
+        assertThat(clause.getQuery()).isInstanceOf(RegexpQuery.class);
+
+        RegexpQuery regexpQuery = (RegexpQuery) clause.getQuery();
+        assertThat(regexpQuery.getRegexp().field()).isEqualTo("name");
+        // Input "John" should be lowercased to "john" for case-insensitive matching
+        assertThat(regexpQuery.getRegexp().text()).isEqualTo(".*john.*");
+    }
+
+    @Test
+    void testCaseInsensitiveExactMatch() {
+        // Verify that uppercase input is lowercased even for exact match (EQUALS operator)
+        SearchQuery searchQuery = parser.parse("name:=JOHN");
+        Query query = builder.toLuceneQuery(searchQuery);
+
+        assertThat(query).isInstanceOf(BooleanQuery.class);
+        BooleanQuery booleanQuery = (BooleanQuery) query;
+        assertThat(booleanQuery.clauses()).hasSize(1);
+
+        BooleanClause clause = booleanQuery.clauses().getFirst();
+        assertThat(clause.getQuery()).isInstanceOf(TermQuery.class);
+
+        TermQuery termQuery = (TermQuery) clause.getQuery();
+        assertThat(termQuery.getTerm().field()).isEqualTo("name");
+        // Input "JOHN" should be lowercased to "john" for case-insensitive matching
+        assertThat(termQuery.getTerm().text()).isEqualTo("john");
+    }
+
+    @Test
+    void testCaseInsensitiveWithWildcards() {
+        // Verify that mixed case with wildcards is lowercased
+        SearchQuery searchQuery = parser.parse("name:Jo*N");
+        Query query = builder.toLuceneQuery(searchQuery);
+
+        assertThat(query).isInstanceOf(BooleanQuery.class);
+        BooleanQuery booleanQuery = (BooleanQuery) query;
+        assertThat(booleanQuery.clauses()).hasSize(1);
+
+        BooleanClause clause = booleanQuery.clauses().getFirst();
+        assertThat(clause.getQuery()).isInstanceOf(RegexpQuery.class);
+
+        RegexpQuery regexpQuery = (RegexpQuery) clause.getQuery();
+        assertThat(regexpQuery.getRegexp().field()).isEqualTo("name");
+        // Input "Jo*N" should be lowercased and wildcards converted: "jo.*n"
+        assertThat(regexpQuery.getRegexp().text()).isEqualTo("jo.*n");
+    }
 }

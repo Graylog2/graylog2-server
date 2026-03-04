@@ -39,7 +39,7 @@ class LuceneInMemorySearchTest {
                 EntityAttribute.builder().id("name").title("Name").type(SearchQueryField.Type.STRING).sortable(true).searchable(true).build(),
                 EntityAttribute.builder().id("age").title("Age").type(SearchQueryField.Type.INT).sortable(true).searchable(true).build()
         );
-        search = new LuceneInMemorySearchEngine<>("name", attributes, () -> List.of(
+        search = new LuceneInMemorySearchEngine<>(attributes, () -> List.of(
                 new SearchableItem("John Doe", 25),
                 new SearchableItem("Max Mustermann", 30),
                 new SearchableItem("John Smith", 35),

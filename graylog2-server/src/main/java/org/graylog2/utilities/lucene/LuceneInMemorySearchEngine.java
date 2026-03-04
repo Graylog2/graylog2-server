@@ -56,14 +56,12 @@ import java.util.stream.IntStream;
 
 public class LuceneInMemorySearchEngine<U extends InMemorySearchableEntity> implements InMemorySearchEngine<U> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(LuceneInMemorySearchEngine.class);
-
     private final List<EntityAttribute> attributes;
     private final Supplier<List<U>> datasource;
     private final Analyzer analyzer;
     private static final LuceneQueryBuilder LUCENE_QUERY_BUILDER = new LuceneQueryBuilder();
 
-    public LuceneInMemorySearchEngine(String defaultField, List<EntityAttribute> attributes, Supplier<List<U>> datasource) {
+    public LuceneInMemorySearchEngine(List<EntityAttribute> attributes, Supplier<List<U>> datasource) {
         this.attributes = attributes;
         this.datasource = datasource;
         this.analyzer = new StandardAnalyzer();

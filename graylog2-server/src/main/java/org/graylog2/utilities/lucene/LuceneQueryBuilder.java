@@ -30,6 +30,7 @@ import org.graylog2.search.SearchQueryOperator;
 import org.graylog2.search.SearchQueryOperators;
 import org.graylog2.search.SearchQueryParser;
 
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -73,6 +74,9 @@ public class LuceneQueryBuilder {
 
     /**
      * Builds a Lucene Query for a specific field and value with the given operator.
+     * <p>
+     * String values are lowercased to provide case-insensitive matching, consistent with
+     * StandardAnalyzer's behavior during indexing and MongoDB's REGEXP operator behavior.
      *
      * @param fieldName the field name to query
      * @param value the value to search for
@@ -84,7 +88,9 @@ public class LuceneQueryBuilder {
             return null;
         }
 
-        String stringValue = value.toString();
+        // Lowercase string values to match StandardAnalyzer's behavior (case-insensitive search)
+        // This matches MongoDB's REGEXP operator which uses Pattern.CASE_INSENSITIVE
+        String stringValue = value.toString().toLowerCase(Locale.ROOT);
 
         if (operator == SearchQueryOperators.REGEXP) {
             // Check if user provided any explicit wildcards
