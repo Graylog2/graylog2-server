@@ -17,23 +17,18 @@
 package org.graylog.storage.opensearch3.sniffer;
 
 import org.graylog.storage.opensearch3.sniffer.impl.NodeLoggingFilter;
-import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class NodeLoggingFilterTest {
 
     @Test
     void returnsNodesUnmodified() {
-        final var config = mock(ElasticsearchClientConfiguration.class);
-        when(config.isNodeActivityLogger()).thenReturn(true);
-        final var filter = new NodeLoggingFilter(config);
+        final var filter = new NodeLoggingFilter(true);
 
         final List<DiscoveredNode> nodes = List.of(
                 new DiscoveredNode("http", "host1", 9200, Collections.emptyMap()),
@@ -45,9 +40,7 @@ class NodeLoggingFilterTest {
 
     @Test
     void enabledReflectsConfiguration() {
-        final var config = mock(ElasticsearchClientConfiguration.class);
-        when(config.isNodeActivityLogger()).thenReturn(false);
-        final var filter = new NodeLoggingFilter(config);
-        assertThat(filter.enabled()).isFalse();
+        assertThat(new NodeLoggingFilter(false).enabled()).isFalse();
+        assertThat(new NodeLoggingFilter(true).enabled()).isTrue();
     }
 }

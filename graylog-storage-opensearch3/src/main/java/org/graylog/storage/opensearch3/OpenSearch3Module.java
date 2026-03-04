@@ -32,12 +32,9 @@ import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetriev
 import org.graylog.storage.opensearch3.indextemplates.ComposableIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.indextemplates.LegacyIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.migrations.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS2;
-import org.graylog.storage.opensearch3.sniffer.SnifferBuilder;
 import org.graylog.storage.opensearch3.sniffer.SnifferFilter;
-import org.graylog.storage.opensearch3.sniffer.impl.DatanodesSniffer;
 import org.graylog.storage.opensearch3.sniffer.impl.NodeAttributesFilter;
 import org.graylog.storage.opensearch3.sniffer.impl.NodeLoggingFilter;
-import org.graylog.storage.opensearch3.sniffer.impl.OpensearchClusterSniffer;
 import org.graylog.storage.opensearch3.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEventsOS2;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.client.IndexerHostsAdapter;
@@ -105,10 +102,6 @@ public class OpenSearch3Module extends VersionAwareModule {
         bind(CredentialsProvider.class).toProvider(OSCredentialsProvider.class);
         bind(org.apache.hc.client5.http.auth.CredentialsProvider.class).toProvider(OpensearchCredentialsProvider.class);
         bindForSupportedVersion(DatanodeUpgradeServiceAdapter.class).to(DatanodeUpgradeServiceAdapterOS.class);
-
-        Multibinder<SnifferBuilder> snifferBuilders = Multibinder.newSetBinder(binder(), SnifferBuilder.class);
-        snifferBuilders.addBinding().to(OpensearchClusterSniffer.class);
-        snifferBuilders.addBinding().to(DatanodesSniffer.class);
 
         Multibinder<SnifferFilter> snifferFilters = Multibinder.newSetBinder(binder(), SnifferFilter.class);
         snifferFilters.addBinding().to(NodeAttributesFilter.class);

@@ -37,7 +37,11 @@ public class NodeLoggingFilter implements SnifferFilter {
 
     @Inject
     public NodeLoggingFilter(ElasticsearchClientConfiguration configuration) {
-        this.enabled = configuration.isNodeActivityLogger();
+        this(configuration.isNodeActivityLogger());
+    }
+
+    public NodeLoggingFilter(boolean enabled) {
+        this.enabled = enabled;
     }
 
     @Override
