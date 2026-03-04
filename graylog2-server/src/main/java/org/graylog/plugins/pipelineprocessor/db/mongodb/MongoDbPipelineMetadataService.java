@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.pipelineprocessor.db.mongodb;
 
-import com.google.common.collect.ImmutableList;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
@@ -24,10 +23,15 @@ import com.mongodb.client.model.ReplaceOneModel;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.result.DeleteResult;
 import jakarta.inject.Inject;
+import org.bson.conversions.Bson;
 import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
+import org.graylog.plugins.pipelineprocessor.db.RoutingRuleDao;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.PaginatedList;
+import org.graylog2.rest.models.SortOrder;
+import org.graylog2.rest.resources.streams.responses.StreamPipelineRulesResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,23 +45,28 @@ import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao.FIELD_PIPELINE_ID;
+import static org.graylog.plugins.pipelineprocessor.db.RoutingRuleDao.FIELD_ROUTED_STREAM_IDS;
 
 /**
- * Persists information on pipeline and rules to avoid parsing these repeatedly
+ * Persists information on pipeline and rules to avoid parsing these repeatedly.
+ * Uses two collections: one for pipeline-level metadata and one for routing rule records.
  */
 public class MongoDbPipelineMetadataService {
     private static final Logger LOG = LoggerFactory.getLogger(MongoDbPipelineMetadataService.class);
     public static final String RULES_COLLECTION_NAME = "pipeline_processor_rules_meta";
+    public static final String ROUTING_RULES_COLLECTION_NAME = "pipeline_processor_routing_rules";
+
     private final MongoCollection<PipelineRulesMetadataDao> collection;
+    private final MongoCollection<RoutingRuleDao> routingRulesCollection;
 
     @Inject
     public MongoDbPipelineMetadataService(MongoCollections mongoCollections) {
         this.collection = mongoCollections.collection(RULES_COLLECTION_NAME, PipelineRulesMetadataDao.class);
         collection.createIndex(Indexes.ascending(FIELD_PIPELINE_ID), new IndexOptions().unique(true));
-    }
 
-    public ImmutableList<PipelineRulesMetadataDao> getAll() {
-        return ImmutableList.copyOf(collection.find());
+        this.routingRulesCollection = mongoCollections.collection(ROUTING_RULES_COLLECTION_NAME, RoutingRuleDao.class);
+        routingRulesCollection.createIndex(Indexes.ascending(FIELD_ROUTED_STREAM_IDS));
+        routingRulesCollection.createIndex(Indexes.ascending(RoutingRuleDao.FIELD_PIPELINE_ID));
     }
 
     public PipelineRulesMetadataDao get(final String pipelineId) throws NotFoundException {
@@ -69,15 +78,10 @@ public class MongoDbPipelineMetadataService {
     }
 
     public Map<String, PipelineRulesMetadataDao> get(Set<String> pipelineIds) {
-        return collection.find(Filters.in(PipelineRulesMetadataDao.FIELD_PIPELINE_ID, pipelineIds))
+        return collection.find(Filters.in(FIELD_PIPELINE_ID, pipelineIds))
                 .into(new ArrayList<>())
                 .stream()
                 .collect(Collectors.toMap(PipelineRulesMetadataDao::pipelineId, dao -> dao));
-    }
-
-    public Set<PipelineRulesMetadataDao> getRoutingPipelines(String streamId) {
-        return collection.find(Filters.exists(PipelineRulesMetadataDao.FIELD_ROUTED_STREAMS + "." + streamId, true))
-                .into(new HashSet<>());
     }
 
     public Set<String> getPipelinesByRule(final String ruleId) {
@@ -87,9 +91,9 @@ public class MongoDbPipelineMetadataService {
     }
 
     public Set<String> getPipelinesByRules(final Set<String> ruleIds) {
-        return ruleIds.stream()
-                .flatMap(ruleId -> getPipelinesByRule(ruleId).stream())
-                .collect(Collectors.toSet());
+        return collection.find(Filters.in(PipelineRulesMetadataDao.FIELD_RULES, ruleIds))
+                .map(PipelineRulesMetadataDao::pipelineId)
+                .into(new HashSet<>());
     }
 
     public Set<PipelineRulesMetadataDao> getReferencingPipelines() {
@@ -97,26 +101,40 @@ public class MongoDbPipelineMetadataService {
                 .into(new HashSet<>());
     }
 
-    public void save(List<PipelineRulesMetadataDao> ruleRecords, boolean upsert) {
-        if (!ruleRecords.isEmpty()) {
-            LOG.debug("Inserting/Updating {} pipeline rules metadata records.", ruleRecords.size());
+    public void save(List<PipelineRulesMetadataDao> pipelineRecords,
+                     List<RoutingRuleDao> routingRuleRecords,
+                     boolean upsert) {
+        if (!pipelineRecords.isEmpty()) {
+            LOG.debug("Inserting/Updating {} pipeline metadata records.", pipelineRecords.size());
             if (upsert) {
-                List<ReplaceOneModel<PipelineRulesMetadataDao>> ops = ruleRecords.stream()
-                        .map(ruleRecord -> new ReplaceOneModel<>(
-                                eq(FIELD_PIPELINE_ID, ruleRecord.pipelineId()),
-                                ruleRecord,
+                final List<ReplaceOneModel<PipelineRulesMetadataDao>> ops = pipelineRecords.stream()
+                        .map(record -> new ReplaceOneModel<>(
+                                eq(FIELD_PIPELINE_ID, record.pipelineId()),
+                                record,
                                 new ReplaceOptions().upsert(true)
                         ))
                         .toList();
                 collection.bulkWrite(ops);
+
+                // For routing rules, the set of (pipeline, rule) pairs may have changed,
+                // so delete existing records for affected pipelines, then insert new ones.
+                final Set<String> affectedPipelineIds = pipelineRecords.stream()
+                        .map(PipelineRulesMetadataDao::pipelineId)
+                        .collect(Collectors.toSet());
+                routingRulesCollection.deleteMany(Filters.in(RoutingRuleDao.FIELD_PIPELINE_ID, affectedPipelineIds));
             } else {
-                collection.insertMany(ruleRecords);
+                collection.insertMany(pipelineRecords);
             }
+        }
+        if (!routingRuleRecords.isEmpty()) {
+            LOG.debug("Inserting {} routing rule records.", routingRuleRecords.size());
+            routingRulesCollection.insertMany(routingRuleRecords);
         }
     }
 
     public void delete(Collection<String> pipelineIds) {
         final DeleteResult deleteResult = collection.deleteMany(Filters.in(FIELD_PIPELINE_ID, pipelineIds));
+        routingRulesCollection.deleteMany(Filters.in(RoutingRuleDao.FIELD_PIPELINE_ID, pipelineIds));
         if (deleteResult.getDeletedCount() == 0) {
             LOG.warn("No pipeline rules metadata records found for pipelines {}", pipelineIds);
         } else {
@@ -131,5 +149,36 @@ public class MongoDbPipelineMetadataService {
         } catch (NotFoundException ignored) {
             return Set.of();
         }
+    }
+
+    public PaginatedList<StreamPipelineRulesResponse> getRoutingRulesPaginated(
+            String streamId, Bson additionalFilter, String sortField, SortOrder order, int page, int perPage) {
+
+        final Bson streamFilter = eq(FIELD_ROUTED_STREAM_IDS, streamId);
+        final Bson filter = additionalFilter != null
+                ? Filters.and(streamFilter, additionalFilter)
+                : streamFilter;
+
+        final int total = (int) routingRulesCollection.countDocuments(filter);
+        final int skip = Math.max(0, page - 1) * perPage;
+
+        final List<StreamPipelineRulesResponse> results = routingRulesCollection.find(filter)
+                .sort(order.toBsonSort(sortField))
+                .skip(skip)
+                .limit(perPage)
+                .map(MongoDbPipelineMetadataService::toStreamPipelineRulesResponse)
+                .into(new ArrayList<>());
+
+        return new PaginatedList<>(results, total, page, perPage);
+    }
+
+    private static StreamPipelineRulesResponse toStreamPipelineRulesResponse(RoutingRuleDao dao) {
+        return new StreamPipelineRulesResponse(
+                dao.ruleId(),
+                dao.pipelineId(),
+                dao.pipelineTitle(),
+                dao.ruleId(),
+                dao.ruleTitle(),
+                dao.connectedStreams());
     }
 }
