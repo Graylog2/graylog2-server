@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix saved search URL query overrides to execute with URL values on initial search execution."
+
+issues = ["25028"]
+pulls = ["25051"]
