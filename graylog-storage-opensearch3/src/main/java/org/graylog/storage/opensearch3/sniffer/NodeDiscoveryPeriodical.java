@@ -45,11 +45,10 @@ public class NodeDiscoveryPeriodical extends Periodical {
     @Inject
     public NodeDiscoveryPeriodical(SnifferAggregator snifferAggregator,
                                    OfficialOpensearchClientProvider clientProvider,
-                                   DynamicTransport dynamicTransport,
                                    ElasticsearchClientConfiguration configuration) {
         this.snifferAggregator = snifferAggregator;
         this.clientProvider = clientProvider;
-        this.dynamicTransport = dynamicTransport;
+        this.dynamicTransport = clientProvider.getDynamicTransport();
         this.configuration = configuration;
     }
 

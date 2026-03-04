@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 class SnifferAggregatorTest {
@@ -29,8 +30,8 @@ class SnifferAggregatorTest {
     @Test
     void sniffOneSniffer() {
         final var aggregator = new SnifferAggregator(
-                List.of(() -> List.of(node("http", "localhost", 9200))),
-                Collections.emptyList());
+                Set.of(() -> List.of(node("http", "localhost", 9200))),
+                Collections.emptySet());
 
         Assertions.assertThat(aggregator.sniff())
                 .hasSize(1)
@@ -40,11 +41,11 @@ class SnifferAggregatorTest {
     @Test
     void sniffMoreSniffersDifferentNodes() {
         final var aggregator = new SnifferAggregator(
-                List.of(
+                Set.of(
                         () -> List.of(node("http", "localhost", 9200)),
                         () -> List.of(node("http", "second-node", 9200))
                 ),
-                Collections.emptyList());
+                Collections.emptySet());
 
         Assertions.assertThat(aggregator.sniff())
                 .hasSize(2)
@@ -55,11 +56,11 @@ class SnifferAggregatorTest {
     @Test
     void sniffMoreSniffersSameNode() {
         final var aggregator = new SnifferAggregator(
-                List.of(
+                Set.of(
                         () -> List.of(node("http", "localhost", 9200)),
                         () -> List.of(node("http", "localhost", 9200))
                 ),
-                Collections.emptyList());
+                Collections.emptySet());
 
         Assertions.assertThat(aggregator.sniff())
                 .hasSize(1)
@@ -69,11 +70,11 @@ class SnifferAggregatorTest {
     @Test
     void sniffFilters() {
         final var aggregator = new SnifferAggregator(
-                List.of(
+                Set.of(
                         () -> List.of(node("http", "localhost", 9200)),
                         () -> List.of(node("http", "second-node", 9200))
                 ),
-                List.of(createFilter()));
+                Set.of(createFilter()));
 
         Assertions.assertThat(aggregator.sniff())
                 .hasSize(1)
@@ -90,11 +91,11 @@ class SnifferAggregatorTest {
         };
 
         final var aggregator = new SnifferAggregator(
-                List.of(
+                Set.of(
                         failingSniffer,
                         () -> List.of(node("http", "localhost", 9200))
                 ),
-                Collections.emptyList());
+                Collections.emptySet());
 
         Assertions.assertThat(aggregator.sniff())
                 .hasSize(1)

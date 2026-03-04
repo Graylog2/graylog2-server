@@ -17,6 +17,8 @@
 package org.graylog.storage.opensearch3.sniffer;
 
 import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,14 +32,16 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Singleton
 public class SnifferAggregator {
 
     private static final Logger LOG = LoggerFactory.getLogger(SnifferAggregator.class);
 
-    private final List<NodesSniffer> sniffers;
-    private final List<SnifferFilter> filters;
+    private final Set<NodesSniffer> sniffers;
+    private final Set<SnifferFilter> filters;
 
-    public SnifferAggregator(List<NodesSniffer> sniffers, List<SnifferFilter> filters) {
+    @Inject
+    public SnifferAggregator(Set<NodesSniffer> sniffers, Set<SnifferFilter> filters) {
         this.sniffers = sniffers;
         this.filters = filters;
     }

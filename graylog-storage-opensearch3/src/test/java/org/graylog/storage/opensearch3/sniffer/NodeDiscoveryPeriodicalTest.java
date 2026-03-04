@@ -47,8 +47,9 @@ class NodeDiscoveryPeriodicalTest {
         snifferAggregator = mock(SnifferAggregator.class);
         clientProvider = mock(OfficialOpensearchClientProvider.class);
         dynamicTransport = mock(DynamicTransport.class);
+        when(clientProvider.getDynamicTransport()).thenReturn(dynamicTransport);
         configuration = mock(ElasticsearchClientConfiguration.class);
-        periodical = new NodeDiscoveryPeriodical(snifferAggregator, clientProvider, dynamicTransport, configuration);
+        periodical = new NodeDiscoveryPeriodical(snifferAggregator, clientProvider, configuration);
     }
 
     @Test

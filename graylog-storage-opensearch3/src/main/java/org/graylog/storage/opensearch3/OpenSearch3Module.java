@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.opensearch3;
 
-import com.google.inject.Provides;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
@@ -61,9 +60,6 @@ import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.VersionAwareModule;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.storage.SearchVersion;
-
-import java.util.ArrayList;
-import java.util.Set;
 
 public class OpenSearch3Module extends VersionAwareModule {
     private final SearchVersion supportedVersion;
@@ -122,20 +118,12 @@ public class OpenSearch3Module extends VersionAwareModule {
         snifferFilters.addBinding().to(NodeAttributesFilter.class);
         snifferFilters.addBinding().to(NodeLoggingFilter.class);
 
+        bind(SnifferAggregator.class).asEagerSingleton();
+
         Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
         periodicalBinder.addBinding().to(NodeDiscoveryPeriodical.class);
 
         bindForSupportedVersion(IndexerHostsAdapter.class).to(IndexerHostsAdapterOS.class);
-    }
-
-    @Provides
-    DynamicTransport provideDynamicTransport(OfficialOpensearchClientProvider provider) {
-        return provider.getDynamicTransport();
-    }
-
-    @Provides
-    SnifferAggregator provideSnifferAggregator(Set<NodesSniffer> sniffers, Set<SnifferFilter> filters) {
-        return new SnifferAggregator(new ArrayList<>(sniffers), new ArrayList<>(filters));
     }
 
     private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass) {

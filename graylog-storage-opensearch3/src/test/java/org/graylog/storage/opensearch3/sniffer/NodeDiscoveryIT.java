@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -77,8 +78,8 @@ class NodeDiscoveryIT {
         );
 
         final SnifferAggregator aggregator = new SnifferAggregator(
-                List.of(sniffer),
-                Collections.emptyList()
+                Set.of(sniffer),
+                Collections.emptySet()
         );
 
         final List<DiscoveredNode> nodes = aggregator.sniff();
