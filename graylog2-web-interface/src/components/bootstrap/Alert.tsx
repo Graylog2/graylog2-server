@@ -43,8 +43,6 @@ const StyledAlert = styled(MantineAlert)<{ $bsStyle: ColorVariant; $compact: boo
       padding: 7px 10px;
     `
   }
-  background-color: ${theme.colors.alerts[$bsStyle].background};
-  border: 1px solid ${theme.colors.alerts[$bsStyle].border};
 
   .mantine-Alert-message {
     color: ${theme.colors.global.textDefault};
