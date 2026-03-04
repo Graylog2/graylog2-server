@@ -26,7 +26,7 @@ type Traffic = {
 
 export const formatTrafficData = (traffic: Traffic) => {
   const ndx = crossfilter(map(traffic, (value, key) => ({ ts: key, bytes: value })));
-  const dailyTraffic = ndx.dimension((d) => moment(d.ts).format('YYYY-MM-DD'));
+  const dailyTraffic = ndx.dimension((d) => moment.utc(d.ts).format('YYYY-MM-DD'));
 
   const dailySums = dailyTraffic.group().reduceSum((d) => d.bytes);
   const t = mapKeys(dailySums.all(), (entry) => moment.utc(entry.key, 'YYYY-MM-DD').toISOString());
