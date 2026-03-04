@@ -143,6 +143,7 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
                 .map(Node::getTransportAddress)
                 .filter(address -> address != null && !address.isBlank())
                 .map(URI::create)
+                .filter(uri -> uri.getHost() != null)
                 .collect(Collectors.toList());
     }
 }

@@ -176,14 +176,13 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     }
 
     @Override
-    public URI getOpensearchBaseUrl() {
-        final String baseUrl = opensearchConfiguration.map(OpensearchConfiguration::getRestBaseUrl)
+    public Optional<URI> getOpensearchBaseUrl() {
+        return opensearchConfiguration.map(OpensearchConfiguration::getRestBaseUrl)
                 .map(httpHost -> new URIBuilder()
                         .setHost(httpHost.getHostName())
                         .setPort(httpHost.getPort())
                         .setScheme(httpHost.getSchemeName()).toString())
-                .orElse(""); // Empty address will cause problems for opensearch clients. Has to be filtered out in IndexerDiscoveryProvider
-        return URI.create(baseUrl);
+                .map(URI::create);
     }
 
     @Override
