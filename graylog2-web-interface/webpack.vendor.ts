@@ -109,7 +109,6 @@ if (TARGET === 'start') {
       historyApiFallback: {
         disableDotRule: true,
       },
-      allowedHosts: 'all',
       proxy: [
         {
           context: ['/api', '/config.js', '/sso', '/.well-known', '/v1/opamp'],
