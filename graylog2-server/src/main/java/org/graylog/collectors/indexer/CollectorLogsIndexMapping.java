@@ -41,7 +41,19 @@ public class CollectorLogsIndexMapping extends AbstractMapping {
     private ImmutableMap<String, Object> buildMappings() {
         return map()
                 .put("_source", map().put("enabled", true).build())
-                .put("dynamic", false)
+                .put("dynamic", true)
+                .put("dynamic_templates", list()
+                        .add(map()
+                                .put("strings_as_keyword", map()
+                                        .put("match_mapping_type", "string")
+                                        .put("mapping", map()
+                                                .put("type", "keyword")
+                                                .put("doc_values", true)
+                                                .put("index", true)
+                                                .build())
+                                        .build())
+                                .build())
+                        .build())
                 .put("properties", fieldProperties())
                 .build();
     }

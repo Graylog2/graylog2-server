@@ -29,10 +29,15 @@ import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.indexer.indexset.IndexSetConfigFactory;
+import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.validation.IndexSetValidator;
 import org.graylog2.inputs.InputServiceImpl;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog.collectors.opamp.OpAmpCaService;
+import org.graylog2.streams.StreamRuleService;
+import org.graylog2.streams.StreamService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.security.RestrictedChainingClassLoader;
@@ -71,6 +76,16 @@ class CollectorsConfigResourceIT {
 
     @Mock
     private OpAmpCaService opAmpCaService;
+    @Mock
+    private IndexSetService indexSetService;
+    @Mock
+    private IndexSetConfigFactory indexSetConfigFactory;
+    @Mock
+    private IndexSetValidator indexSetValidator;
+    @Mock
+    private StreamService streamService;
+    @Mock
+    private StreamRuleService streamRuleService;
     @Mock
     private ExtractorFactory extractorFactory;
     @Mock
@@ -114,7 +129,9 @@ class CollectorsConfigResourceIT {
         when(opAmpCaService.getTokenSigningCertId()).thenReturn("token-id");
         when(opAmpCaService.getOtlpServerCertId()).thenReturn("otlp-id");
 
-        resource = new CollectorsConfigResource(clusterConfigService, httpConfiguration, inputService, opAmpCaService);
+        resource = new CollectorsConfigResource(clusterConfigService, httpConfiguration, indexSetService,
+                indexSetConfigFactory, indexSetValidator, inputService, opAmpCaService, streamService,
+                streamRuleService);
 
         final var subject = mock(Subject.class);
         lenient().when(subject.getPrincipal()).thenReturn("admin");
