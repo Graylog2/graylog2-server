@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix duplicate names and descriptions of regex extraction functions in Rule Builder."
+
+issues = ["23016"]
+pulls = [""]
