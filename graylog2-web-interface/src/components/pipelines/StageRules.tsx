@@ -18,8 +18,7 @@ import * as React from 'react';
 import { useCallback } from 'react';
 
 import { Button } from 'components/bootstrap';
-import { DataTable, Icon } from 'components/common';
-import { Link } from 'components/common/router';
+import { DataTable, Icon, Link } from 'components/common';
 import Routes from 'routing/Routes';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import type { PipelineType, StageType } from 'components/pipelines/types';
@@ -89,9 +88,7 @@ const StageRules = ({
       const isInvalid = isInvalidRule(rule);
       const removableRule: RuleType | undefined = isInvalid ? undefined : rule;
       const showRemoveAction =
-        canRemoveRoutingRules &&
-        isInputSetupWizardRoutingRule(removableRule) &&
-        typeof onRemoveRule === 'function';
+        canRemoveRoutingRules && isInputSetupWizardRoutingRule(removableRule) && typeof onRemoveRule === 'function';
 
       const ruleTitle = (() => {
         if (isInvalid) {

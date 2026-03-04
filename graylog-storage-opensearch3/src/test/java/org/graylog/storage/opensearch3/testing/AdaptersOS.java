@@ -21,9 +21,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.storage.opensearch3.CountsAdapterOS;
 import org.graylog.storage.opensearch3.IndexFieldTypePollerAdapterOS;
-import org.graylog.storage.opensearch3.IndexToolsAdapterOS2;
+import org.graylog.storage.opensearch3.IndexToolsAdapterOS;
 import org.graylog.storage.opensearch3.IndicesAdapterOS;
-import org.graylog.storage.opensearch3.MessagesAdapterOS2;
+import org.graylog.storage.opensearch3.MessagesAdapterOS;
 import org.graylog.storage.opensearch3.NodeAdapterOS;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog.storage.opensearch3.OpenSearchClient;
@@ -101,7 +101,7 @@ public class AdaptersOS implements Adapters {
 
     @Override
     public IndexToolsAdapter indexToolsAdapter() {
-        return new IndexToolsAdapterOS2(client);
+        return new IndexToolsAdapterOS(officialOpensearchClient);
     }
 
     @Override
@@ -119,7 +119,7 @@ public class AdaptersOS implements Adapters {
 
     @Override
     public MessagesAdapter messagesAdapter() {
-        return new MessagesAdapterOS2(resultMessageFactory, client, new MetricRegistry(), new ChunkedBulkIndexer(), objectMapper);
+        return new MessagesAdapterOS(resultMessageFactory, officialOpensearchClient, new MetricRegistry(), new ChunkedBulkIndexer(), objectMapper);
     }
 
     @Override

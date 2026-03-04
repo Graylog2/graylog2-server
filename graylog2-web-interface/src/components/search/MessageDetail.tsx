@@ -18,8 +18,7 @@ import React from 'react';
 import Immutable from 'immutable';
 import styled from 'styled-components';
 
-import { Link } from 'components/common/router';
-import { MessageDetailsDefinitionList, ClipboardButton, Icon, Timestamp } from 'components/common';
+import { Link, MessageDetailsDefinitionList, ClipboardButton, Icon, Timestamp } from 'components/common';
 import { ButtonGroup, Col, Label, Row } from 'components/bootstrap';
 import StreamLink from 'components/streams/StreamLink';
 import MessageFields from 'components/search/MessageFields';

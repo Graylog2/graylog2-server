@@ -14,26 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect, useMemo } from 'react';
+package org.graylog.storage.opensearch3;
 
-import type { InputStates } from 'hooks/useInputsStates';
+import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
+import org.graylog.testing.elasticsearch.SearchInstance;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog2.indexer.IndexToolsAdapterIT;
 
-const useIsInitialUnknownInputState = (inputStates: InputStates, inputId: string) => {
-  const seenInputIds = useMemo(() => new Set<string>(), []);
+public class IndexToolsAdapterOSIT extends IndexToolsAdapterIT {
 
-  useEffect(() => {
-    if (!inputStates) {
-      return;
+    @SearchInstance
+    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
+
+    @Override
+    protected SearchServerInstance searchServer() {
+        return openSearchInstance;
     }
-
-    Object.keys(inputStates).forEach((id) => {
-      seenInputIds.add(id);
-    });
-  }, [inputStates, seenInputIds]);
-
-  const hasKnownState = !!inputStates?.[inputId];
-
-  return !hasKnownState && !seenInputIds.has(inputId);
-};
-
-export default useIsInitialUnknownInputState;
+}

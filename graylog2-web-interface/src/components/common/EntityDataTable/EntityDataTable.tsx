@@ -135,6 +135,8 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   defaultColumnOrder: Array<string>;
   /** The table data. */
   entities: ReadonlyArray<Entity>;
+  /** show slice by action for columns if they support it via their schema **/
+  enableSlicing?: boolean;
   /** Allows you to extend a row with additional information * */
   expandedSectionRenderers?: ExpandedSectionRenderers<Entity>;
   /** User layout preferences */
@@ -182,6 +184,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   entities,
   entityActions = undefined,
   entityAttributesAreCamelCase,
+  enableSlicing = false,
   expandedSectionRenderers = undefined,
   layoutPreferences,
   meta = undefined,
@@ -247,6 +250,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     columnSchemas: authorizedColumnSchemas,
     columnWidths,
     displayBulkSelectCol,
+    enableSlicing,
     entityActions,
     entityAttributesAreCamelCase,
     hasRowActions,

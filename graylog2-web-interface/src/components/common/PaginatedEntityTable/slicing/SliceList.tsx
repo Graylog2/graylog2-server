@@ -16,11 +16,12 @@
  */
 
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { Badge, ListGroup, ListGroupItem } from 'components/bootstrap';
+import { formatReadableNumber } from 'util/NumberFormatting';
 
-import type { Slices } from './Slicing';
+import type { SliceRenderers, Slices } from './Slicing';
 
 const StyledListGroup = styled(ListGroup)`
   margin-bottom: 0;
@@ -31,18 +32,24 @@ const SliceInner = styled.div`
   justify-content: space-between;
 `;
 
-const StyledListGroupItem = styled(ListGroupItem)<{ $active: boolean }>(
-  ({ $active }) => css`
-    font-weight: ${$active ? 'bold' : 'normal'};
-  `,
-);
+const Title = styled.div`
+  word-break: break-word;
+`;
+
+const CountBadge = styled(Badge)`
+  overflow: visible;
+
+  .mantine-Badge-label {
+    overflow: visible;
+  }
+`;
 
 type Props = {
   slices: Slices;
   activeSlice: string | undefined;
   sliceCol: string | undefined;
   onChangeSlicing: (sliceCol: string | undefined, slice?: string | undefined) => void;
-  sliceRenderers?: { [col: string]: (value: string | number) => React.ReactNode } | undefined;
+  sliceRenderers?: SliceRenderers;
   keyPrefix?: string;
   listTestId?: string;
 };
@@ -58,15 +65,16 @@ const SliceList = ({
 }: Props) => (
   <StyledListGroup data-testid={listTestId}>
     {slices.map((slice) => (
-      <StyledListGroupItem
+      <ListGroupItem
         key={`${keyPrefix}${String(slice.value)}`}
         onClick={() => onChangeSlicing(sliceCol, String(slice.value))}
-        $active={String(activeSlice) === String(slice.value)}>
+        active={String(activeSlice) === String(slice.value)}>
         <SliceInner>
-          {sliceRenderers?.[sliceCol]?.(slice.value) ?? slice.title ?? String(slice.value)}
-          <Badge>{slice.count}</Badge>
+          <Title>{sliceRenderers?.[sliceCol]?.render?.(slice.value) ?? slice.title ?? String(slice.value)}</Title>
+
+          <CountBadge title={String(slice.count)}>{formatReadableNumber(slice.count)}</CountBadge>
         </SliceInner>
-      </StyledListGroupItem>
+      </ListGroupItem>
     ))}
   </StyledListGroup>
 );
