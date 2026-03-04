@@ -36,7 +36,11 @@ import static org.mockito.Mockito.when;
 
 class DynamicTransportTest {
 
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+        final Thread t = new Thread(r, "test-drain-scheduler");
+        t.setDaemon(true);
+        return t;
+    });
 
     @Test
     void delegatesJsonpMapperToCurrentTransport() {
