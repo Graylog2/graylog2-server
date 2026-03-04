@@ -316,7 +316,7 @@ export const getHoverTemplateSettings = ({
   ) {
     return {
       text: getHoverTexts({ convertedValues, unit }),
-      hovertemplate: '%{text}<br><extra>%{meta}</extra>',
+      hovertemplate: `%{text}<br>${name ? '<extra>%{meta}</extra>' : '<extra></extra>'}`,
       meta: name,
     };
   }
