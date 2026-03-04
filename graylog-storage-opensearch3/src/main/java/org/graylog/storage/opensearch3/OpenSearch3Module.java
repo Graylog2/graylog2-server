@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.opensearch3;
 
+import com.google.inject.Provides;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
@@ -32,9 +33,14 @@ import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetriev
 import org.graylog.storage.opensearch3.indextemplates.ComposableIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.indextemplates.LegacyIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.migrations.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS2;
+import org.graylog.storage.opensearch3.sniffer.NodeDiscoveryPeriodical;
+import org.graylog.storage.opensearch3.sniffer.NodesSniffer;
+import org.graylog.storage.opensearch3.sniffer.SnifferAggregator;
 import org.graylog.storage.opensearch3.sniffer.SnifferFilter;
+import org.graylog.storage.opensearch3.sniffer.impl.DatanodesSniffer;
 import org.graylog.storage.opensearch3.sniffer.impl.NodeAttributesFilter;
 import org.graylog.storage.opensearch3.sniffer.impl.NodeLoggingFilter;
+import org.graylog.storage.opensearch3.sniffer.impl.OpensearchClusterSniffer;
 import org.graylog.storage.opensearch3.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEventsOS2;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.client.IndexerHostsAdapter;
@@ -53,7 +59,11 @@ import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.indexer.security.SecurityAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.VersionAwareModule;
+import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.storage.SearchVersion;
+
+import java.util.ArrayList;
+import java.util.Set;
 
 public class OpenSearch3Module extends VersionAwareModule {
     private final SearchVersion supportedVersion;
@@ -98,16 +108,34 @@ public class OpenSearch3Module extends VersionAwareModule {
         install(new FactoryModuleBuilder().build(ScrollResultOS.Factory.class));
 
         bind(RestHighLevelClient.class).toProvider(RestClientProvider.class);
-        bind(OfficialOpensearchClient.class).toProvider(OfficialOpensearchClientProvider.class).asEagerSingleton();
+        bind(OfficialOpensearchClientProvider.class).asEagerSingleton();
+        bind(OfficialOpensearchClient.class).toProvider(OfficialOpensearchClientProvider.class);
         bind(CredentialsProvider.class).toProvider(OSCredentialsProvider.class);
         bind(org.apache.hc.client5.http.auth.CredentialsProvider.class).toProvider(OpensearchCredentialsProvider.class);
         bindForSupportedVersion(DatanodeUpgradeServiceAdapter.class).to(DatanodeUpgradeServiceAdapterOS.class);
+
+        Multibinder<NodesSniffer> nodeSniffers = Multibinder.newSetBinder(binder(), NodesSniffer.class);
+        nodeSniffers.addBinding().to(OpensearchClusterSniffer.class);
+        nodeSniffers.addBinding().to(DatanodesSniffer.class);
 
         Multibinder<SnifferFilter> snifferFilters = Multibinder.newSetBinder(binder(), SnifferFilter.class);
         snifferFilters.addBinding().to(NodeAttributesFilter.class);
         snifferFilters.addBinding().to(NodeLoggingFilter.class);
 
+        Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
+        periodicalBinder.addBinding().to(NodeDiscoveryPeriodical.class);
+
         bindForSupportedVersion(IndexerHostsAdapter.class).to(IndexerHostsAdapterOS.class);
+    }
+
+    @Provides
+    DynamicTransport provideDynamicTransport(OfficialOpensearchClientProvider provider) {
+        return provider.getDynamicTransport();
+    }
+
+    @Provides
+    SnifferAggregator provideSnifferAggregator(Set<NodesSniffer> sniffers, Set<SnifferFilter> filters) {
+        return new SnifferAggregator(new ArrayList<>(sniffers), new ArrayList<>(filters));
     }
 
     private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass) {
