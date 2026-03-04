@@ -28,7 +28,7 @@ const migrationStep = (currentStep: MigrationState, isLoading: boolean) => {
 
   return {
     state: MIGRATION_STATE.MIGRATION_SELECTION_PAGE.key,
-    next_steps: ['SELECT_ROLLING_UPGRADE_MIGRATION', 'SELECT_REMOTE_REINDEX_MIGRATION'],
+    next_steps: ['SELECT_ROLLING_UPGRADE_MIGRATION'],
   } as MigrationState;
 };
 

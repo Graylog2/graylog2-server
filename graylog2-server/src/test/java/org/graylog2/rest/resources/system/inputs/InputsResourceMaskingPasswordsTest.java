@@ -50,6 +50,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+
+import org.graylog2.database.filtering.ComputedFieldRegistry;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -76,7 +79,8 @@ public class InputsResourceMaskingPasswordsTest {
         public InputsTestResource(InputService inputService, MessageInputFactory messageInputFactory) {
             super(inputService, mock(InputDiagnosticService.class), mock(StreamService.class), mock(StreamRuleService.class),
                     mock(PipelineService.class), messageInputFactory, new Configuration(),
-                    mock(MongoDbInputsMetadataService.class), mock(ClusterEventBus.class));
+                    mock(MongoDbInputsMetadataService.class), mock(ClusterEventBus.class),
+                    new ComputedFieldRegistry(Set.of()));
         }
 
         @Override

@@ -16,46 +16,29 @@
  */
 package org.graylog.datanode.metrics;
 
-import org.graylog.shaded.opensearch2.org.apache.http.HttpEntity;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog.storage.opensearch3.OfficialOpensearchClient;
+import org.graylog.storage.opensearch3.testing.client.mock.ServerlessOpenSearchClient;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 public class NodeMetricsCollectorTest {
 
-    private final String NODENAME = "datanode1";
+    private static final String NODENAME = "datanode1";
 
     NodeMetricsCollector collector;
-    @Mock
-    RestHighLevelClient client;
 
     @BeforeEach
     public void setUp() throws IOException {
-        Response response = mock(Response.class);
-        HttpEntity entity = mock(HttpEntity.class);
-        when(response.getEntity()).thenReturn(entity);
-        when(entity.getContent()).thenReturn(new ByteArrayInputStream(nodeStatResponse.getBytes(Charset.defaultCharset())));
-        RestClient lowLevelClient = mock(RestClient.class);
-        when(client.getLowLevelClient()).thenReturn(lowLevelClient);
-        when(lowLevelClient.performRequest(any())).thenReturn(response);
+        final OfficialOpensearchClient client = ServerlessOpenSearchClient.builder()
+                .stubResponse("GET", "_nodes/" + NODENAME + "/stats", nodeStatResponse)
+                .build();
         this.collector = new NodeMetricsCollector(client, new ObjectMapperProvider().get());
     }
 
@@ -1071,7 +1054,7 @@ public class NodeMetricsCollectorTest {
                     }
                 }
             }
-                        """;
+            """;
 
 
 }

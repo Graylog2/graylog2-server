@@ -15,33 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useMemo } from 'react';
-import styled, { css } from 'styled-components';
+import { useEffect } from 'react';
 
-import { Alert, Row, Col } from 'components/bootstrap';
+import type { Input } from 'components/messageloaders/Types';
 import useInputsStates from 'hooks/useInputsStates';
 import type { InputStates, InputState } from 'hooks/useInputsStates';
 import { useStore } from 'stores/connect';
 import { InputsStore, InputsActions } from 'stores/inputs/InputsStore';
+
+import NotificationBanner from './NotificationBanner';
+import type { NotificationItem } from './NotificationBanner';
 
 const INPUT_STATES = {
   FAILED: 'FAILED',
   FAILING: 'FAILING',
   SETUP: 'SETUP',
 } as const;
-const StyledAlert = styled(Alert)(
-  ({ theme }) => css`
-    margin-top: 10px;
 
-    i {
-      color: ${theme.colors.gray[10]};
-    }
-
-    form {
-      margin-bottom: 0;
-    }
-  `,
-);
+const INPUTS_LIST_REFETCH_INTERVAL = 5000;
 
 const hasInputInState = (inputStates: InputStates, targetStates: InputState | Array<InputState>) => {
   const statesToCheck = Array.isArray(targetStates) ? targetStates : [targetStates];
@@ -57,56 +48,44 @@ const hasInputInState = (inputStates: InputStates, targetStates: InputState | Ar
   return false;
 };
 
+const getNotificationItems = (
+  inputs: Array<Input> | undefined,
+  inputStates: InputStates | undefined,
+  isLoading: boolean,
+): Array<NotificationItem> => {
+  if (isLoading || !inputs || !inputStates) return [];
+
+  const result: Array<NotificationItem> = [];
+
+  if (hasInputInState(inputStates, [INPUT_STATES.FAILED, INPUT_STATES.FAILING])) {
+    result.push({ severity: 'danger', message: 'in failed state. Failed or failing inputs will not receive traffic until fixed.' });
+  }
+
+  if (hasInputInState(inputStates, INPUT_STATES.SETUP)) {
+    result.push({ severity: 'warning', message: 'in setup mode. Inputs will not receive traffic until started.' });
+  }
+
+  if (inputs.some((input) => !inputStates[input.id])) {
+    result.push({ severity: 'warning', message: 'stopped. Stopped Inputs will not receive traffic until started.' });
+  }
+
+  return result;
+};
+
 const InputsNotifications = () => {
   const { data: inputStates, isLoading } = useInputsStates();
   const inputs = useStore(InputsStore, (state) => state.inputs);
 
   useEffect(() => {
     InputsActions.list();
+    const interval = setInterval(InputsActions.list, INPUTS_LIST_REFETCH_INTERVAL);
+
+    return () => clearInterval(interval);
   }, []);
 
-  const notifications = useMemo(() => {
-    if (isLoading || !inputs || !inputStates) return null;
+  const items = getNotificationItems(inputs, inputStates, isLoading);
 
-    return {
-      hasStoppedInputs: inputs.some((input) => !inputStates[input.id]),
-      hasFailedInputs: hasInputInState(inputStates, [INPUT_STATES.FAILED, INPUT_STATES.FAILING]),
-      hasSetupInputs: hasInputInState(inputStates, INPUT_STATES.SETUP),
-    };
-  }, [inputs, inputStates, isLoading]);
-
-  if (!notifications) {
-    return null;
-  }
-
-  const { hasStoppedInputs, hasFailedInputs, hasSetupInputs } = notifications;
-
-  if (!hasStoppedInputs && !hasFailedInputs && !hasSetupInputs) {
-    return null;
-  }
-
-  return (
-    <Row className="content">
-      <Col md={12}>
-        {hasFailedInputs && (
-          <StyledAlert bsStyle="danger" title="Some inputs are in failed state.">
-            One or more inputs are currently in failed state. Failed or failing inputs will not receive traffic until
-            fixed.
-          </StyledAlert>
-        )}
-        {hasSetupInputs && (
-          <StyledAlert bsStyle="warning" title="Some inputs are in setup mode.">
-            One or more inputs are currently in setup mode. Inputs will not receive traffic until started.
-          </StyledAlert>
-        )}
-        {hasStoppedInputs && (
-          <StyledAlert bsStyle="warning" title="Some inputs are stopped.">
-            One or more inputs are currently stopped. Stopped Inputs will not receive traffic until started.
-          </StyledAlert>
-        )}
-      </Col>
-    </Row>
-  );
+  return <NotificationBanner title="One or more inputs are currently" items={items} />;
 };
 
 export default InputsNotifications;
