@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix parsing of field values >999 in Rule Builder conditional."
+
+issues = ["23541"]
+pulls = [""]
