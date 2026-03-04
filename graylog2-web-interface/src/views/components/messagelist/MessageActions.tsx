@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import type * as Immutable from 'immutable';
+import { JSONStringify } from 'json-with-bigint';
 
 import { LinkContainer, ClipboardButton } from 'components/common';
 import Routes from 'routing/Routes';
@@ -138,7 +139,7 @@ const MessageActions = ({
       {pluggableActions}
 
       <ClipboardButton title="Copy ID" text={id} bsSize="small" />
-      <ClipboardButton title="Copy message" bsSize="small" text={JSON.stringify(fields, null, 2)} />
+      <ClipboardButton title="Copy message" bsSize="small" text={JSONStringify(fields, null, 2)} />
       {surroundingSearchButton}
       {disableTestAgainstStream ? null : <TestAgainstStreamButton streams={streams} id={id} index={index} />}
       {isFavoriteFieldsEnabled && <MessageEditFieldConfigurationAction />}
