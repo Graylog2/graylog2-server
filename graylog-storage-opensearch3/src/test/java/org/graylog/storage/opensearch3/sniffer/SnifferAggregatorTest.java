@@ -16,96 +16,105 @@
  */
 package org.graylog.storage.opensearch3.sniffer;
 
-import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
-import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 class SnifferAggregatorTest {
 
     @Test
-    void sniffOneSniffer() throws IOException {
-        final SnifferAggregator aggregator = new SnifferAggregator(
-                List.of(
-                        () -> Collections.singletonList(node("http://localhost:9200"))
-                ),
+    void sniffOneSniffer() {
+        final var aggregator = new SnifferAggregator(
+                List.of(() -> List.of(node("http", "localhost", 9200))),
                 Collections.emptyList());
 
         Assertions.assertThat(aggregator.sniff())
                 .hasSize(1)
-                .allSatisfy(node -> Assertions.assertThat(node.getHost().toURI()).isEqualTo("http://localhost:9200"));
+                .allSatisfy(n -> Assertions.assertThat(n.toURI().toString()).isEqualTo("http://localhost:9200"));
     }
 
     @Test
-    void sniffMoreSniffersDifferentNodes() throws IOException {
-        final SnifferAggregator aggregator = new SnifferAggregator(
+    void sniffMoreSniffersDifferentNodes() {
+        final var aggregator = new SnifferAggregator(
                 List.of(
-                        () -> Collections.singletonList(node("http://localhost:9200")),
-                        () -> Collections.singletonList(node("http://second-node:9200"))
+                        () -> List.of(node("http", "localhost", 9200)),
+                        () -> List.of(node("http", "second-node", 9200))
                 ),
                 Collections.emptyList());
 
         Assertions.assertThat(aggregator.sniff())
                 .hasSize(2)
-                .anySatisfy(node -> Assertions.assertThat(node.getHost().toURI()).isEqualTo("http://localhost:9200"))
-                .anySatisfy(node -> Assertions.assertThat(node.getHost().toURI()).isEqualTo("http://second-node:9200"));
+                .anySatisfy(n -> Assertions.assertThat(n.toURI().toString()).isEqualTo("http://localhost:9200"))
+                .anySatisfy(n -> Assertions.assertThat(n.toURI().toString()).isEqualTo("http://second-node:9200"));
     }
 
     @Test
-    void sniffMoreSniffersSameNode() throws IOException {
-        final SnifferAggregator aggregator = new SnifferAggregator(
+    void sniffMoreSniffersSameNode() {
+        final var aggregator = new SnifferAggregator(
                 List.of(
-                        () -> Collections.singletonList(node("http://localhost:9200")),
-                        () -> Collections.singletonList(node("http://localhost:9200"))
+                        () -> List.of(node("http", "localhost", 9200)),
+                        () -> List.of(node("http", "localhost", 9200))
                 ),
                 Collections.emptyList());
 
         Assertions.assertThat(aggregator.sniff())
                 .hasSize(1)
-                .anySatisfy(node -> Assertions.assertThat(node.getHost().toURI()).isEqualTo("http://localhost:9200"));
+                .anySatisfy(n -> Assertions.assertThat(n.toURI().toString()).isEqualTo("http://localhost:9200"));
     }
 
     @Test
-    void sniffFilters() throws IOException {
-        final SnifferAggregator aggregator = new SnifferAggregator(
+    void sniffFilters() {
+        final var aggregator = new SnifferAggregator(
                 List.of(
-                        () -> Collections.singletonList(node("http://localhost:9200")),
-                        () -> Collections.singletonList(node("http://second-node:9200"))
+                        () -> List.of(node("http", "localhost", 9200)),
+                        () -> List.of(node("http", "second-node", 9200))
                 ),
-                List.of(
-                        createFilter(n -> n.getHost().toURI().contains("second"))
-                ));
+                List.of(createFilter()));
 
         Assertions.assertThat(aggregator.sniff())
                 .hasSize(1)
-                .anySatisfy(node -> Assertions.assertThat(node.getHost().toURI()).isEqualTo("http://second-node:9200"));
+                .anySatisfy(n -> Assertions.assertThat(n.toURI().toString()).isEqualTo("http://second-node:9200"));
     }
 
-    @Nonnull
-    private static SnifferFilter createFilter(Predicate<Node> predicate) {
+    @Test
+    void snifferFailureDoesNotBreakOthers() {
+        final NodesSniffer failingSniffer = new NodesSniffer() {
+            @Override
+            public boolean enabled() { return true; }
+            @Override
+            public List<DiscoveredNode> sniff() throws IOException { throw new IOException("connection refused"); }
+        };
+
+        final var aggregator = new SnifferAggregator(
+                List.of(
+                        failingSniffer,
+                        () -> List.of(node("http", "localhost", 9200))
+                ),
+                Collections.emptyList());
+
+        Assertions.assertThat(aggregator.sniff())
+                .hasSize(1)
+                .anySatisfy(n -> Assertions.assertThat(n.toURI().toString()).isEqualTo("http://localhost:9200"));
+    }
+
+    private static SnifferFilter createFilter() {
         return new SnifferFilter() {
-
             @Override
-            public boolean enabled() {
-                return true;
-            }
-
+            public boolean enabled() { return true; }
             @Override
-            public List<Node> filterNodes(List<Node> nodes) {
-                return nodes.stream().filter(predicate).collect(Collectors.toList());
+            public List<DiscoveredNode> filterNodes(List<DiscoveredNode> nodes) {
+                return nodes.stream()
+                        .filter(n -> n.host().contains("second"))
+                        .collect(Collectors.toList());
             }
         };
     }
 
-
-    private Node node(String url) {
-        return new Node(HttpHost.create(url));
+    private DiscoveredNode node(String scheme, String host, int port) {
+        return new DiscoveredNode(scheme, host, port, Collections.emptyMap());
     }
 }

@@ -20,6 +20,6 @@ import java.io.IOException;
 import java.util.List;
 
 public interface NodesSniffer {
-    boolean enabled();
+    default boolean enabled() { return true; }
     List<DiscoveredNode> sniff() throws IOException;
 }

@@ -17,8 +17,6 @@
 package org.graylog.storage.opensearch3.sniffer;
 
 import jakarta.annotation.Nonnull;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
-import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.NodesSniffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,16 +25,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.function.Predicate;
-import java.util.function.Function;
 
-/**
- * This aggregator has two functions. It allows more sniffers to work together, each providing its own list of available nodes,
- * even if other sniffers fail. Then it applies filters to the result. Each filter can modify the nodes list.
- */
-public class SnifferAggregator implements org.graylog.shaded.opensearch2.org.opensearch.client.sniff.NodesSniffer {
+public class SnifferAggregator {
 
     private static final Logger LOG = LoggerFactory.getLogger(SnifferAggregator.class);
 
@@ -48,25 +42,24 @@ public class SnifferAggregator implements org.graylog.shaded.opensearch2.org.ope
         this.filters = filters;
     }
 
-    @Override
-    public List<Node> sniff() throws IOException {
-        List<Node> discoveredNodes = discoverNodes().stream()
-                .filter(distinctByKey(n -> n.getHost().toURI()))
+    public List<DiscoveredNode> sniff() {
+        List<DiscoveredNode> discoveredNodes = discoverNodes().stream()
+                .filter(distinctByKey(DiscoveredNode::toURI))
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        for (SnifferFilter sniffer : filters) {
-            discoveredNodes = sniffer.filterNodes(discoveredNodes);
+        for (SnifferFilter filter : filters) {
+            discoveredNodes = filter.filterNodes(discoveredNodes);
         }
         return discoveredNodes;
     }
 
     @Nonnull
-    private List<Node> discoverNodes() {
+    private List<DiscoveredNode> discoverNodes() {
         return sniffers.stream().flatMap(SnifferAggregator::sniff).toList();
     }
 
     @Nonnull
-    private static Stream<Node> sniff(NodesSniffer sniffer) {
+    private static Stream<DiscoveredNode> sniff(NodesSniffer sniffer) {
         try {
             return sniffer.sniff().stream();
         } catch (IOException e) {
