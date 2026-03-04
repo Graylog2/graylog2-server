@@ -14,16 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.collectors.rest;
+package org.graylog.collectors;
 
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
-import org.graylog.collectors.CollectorsConfig;
-import org.graylog.collectors.IngestEndpointConfig;
 import org.graylog.collectors.indexer.CollectorLogsIndexTemplateProvider;
 import org.graylog.collectors.input.CollectorIngestCodec;
 import org.graylog.collectors.input.processor.CollectorLogRecordProcessor;
-import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -34,10 +31,6 @@ import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
-import org.graylog2.inputs.Input;
-import org.graylog2.inputs.InputService;
-import org.graylog2.opamp.OpAmpCaService;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
@@ -53,27 +46,22 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.net.URI;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class CollectorsConfigResourceCollectorLogsTest {
+class CollectorLogsDestinationServiceTest {
 
-    @Mock
-    private ClusterConfigService clusterConfigService;
-    @Mock
-    private HttpConfiguration httpConfiguration;
     @Mock
     private IndexSetService indexSetService;
     @Mock
@@ -81,33 +69,21 @@ class CollectorsConfigResourceCollectorLogsTest {
     @Mock
     private IndexSetValidator indexSetValidator;
     @Mock
-    private InputService inputService;
-    @Mock
-    private OpAmpCaService opAmpCaService;
-    @Mock
     private StreamService streamService;
     @Mock
     private StreamRuleService streamRuleService;
 
-    private CollectorsConfigResource resource;
+    private CollectorLogsDestinationService service;
 
     @BeforeEach
     void setUp() {
-        when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("https://graylog.example.com:443/"));
-        resource = new CollectorsConfigResource(
-                clusterConfigService,
-                httpConfiguration,
-                indexSetService,
-                indexSetConfigFactory,
-                indexSetValidator,
-                inputService,
-                opAmpCaService,
-                streamService,
-                streamRuleService
+        service = new CollectorLogsDestinationService(
+                indexSetService, indexSetConfigFactory, indexSetValidator,
+                streamService, streamRuleService
         );
 
         final var subject = mock(Subject.class);
-        when(subject.getPrincipal()).thenReturn("admin");
+        lenient().when(subject.getPrincipal()).thenReturn("admin");
         ThreadContext.bind(subject);
     }
 
@@ -118,18 +94,13 @@ class CollectorsConfigResourceCollectorLogsTest {
 
     @Test
     void firstCallCreatesIndexSetStreamAndStreamRule() throws Exception {
-        // Arrange: nothing exists yet
-        stubCaAndInputServices();
         stubIndexSetDoesNotExist();
         stubStreamDoesNotExist();
-        stubStreamRulesEmpty();
+        stubStreamRuleCount(0);
+        when(streamRuleService.create(anyMap())).thenReturn(mock(StreamRule.class));
 
-        final var request = enabledHttpRequest();
+        service.ensureExists();
 
-        // Act
-        resource.put(request);
-
-        // Assert: all three entities were created
         verify(indexSetService).save(any(IndexSetConfig.class));
         verify(streamService).save(any(StreamImpl.class));
         verify(streamRuleService).save(any(StreamRule.class));
@@ -137,18 +108,12 @@ class CollectorsConfigResourceCollectorLogsTest {
 
     @Test
     void secondCallIsNoOp() throws Exception {
-        // Arrange: everything already exists
-        stubCaAndInputServices();
         stubIndexSetExists();
         stubStreamExists();
-        stubStreamRulesExist();
+        stubStreamRuleCount(1);
 
-        final var request = enabledHttpRequest();
+        service.ensureExists();
 
-        // Act
-        resource.put(request);
-
-        // Assert: nothing was created
         verify(indexSetService, never()).save(any(IndexSetConfig.class));
         verify(streamService, never()).save(any(StreamImpl.class));
         verify(streamRuleService, never()).save(any(StreamRule.class));
@@ -156,18 +121,13 @@ class CollectorsConfigResourceCollectorLogsTest {
 
     @Test
     void indexSetConfigHasCorrectProperties() throws Exception {
-        // Arrange
-        stubCaAndInputServices();
         stubIndexSetDoesNotExist();
         stubStreamDoesNotExist();
-        stubStreamRulesEmpty();
+        stubStreamRuleCount(0);
+        when(streamRuleService.create(anyMap())).thenReturn(mock(StreamRule.class));
 
-        final var request = enabledHttpRequest();
+        service.ensureExists();
 
-        // Act
-        resource.put(request);
-
-        // Assert: capture the saved index set config
         final var captor = ArgumentCaptor.forClass(IndexSetConfig.class);
         verify(indexSetService).save(captor.capture());
         final var saved = captor.getValue();
@@ -180,16 +140,12 @@ class CollectorsConfigResourceCollectorLogsTest {
         assertThat(saved.isWritable()).isTrue();
         assertThat(saved.title()).isEqualTo("Collector Logs");
         assertThat(saved.description()).isEqualTo("Index set for collector self-log messages");
-
-        // Rotation strategy: TSO with 7-day lifetime
         assertThat(saved.rotationStrategyClass())
                 .isEqualTo(TimeBasedSizeOptimizingStrategy.class.getCanonicalName());
         assertThat(saved.rotationStrategyConfig()).isInstanceOf(TimeBasedSizeOptimizingStrategyConfig.class);
         final var rotationConfig = (TimeBasedSizeOptimizingStrategyConfig) saved.rotationStrategyConfig();
         assertThat(rotationConfig.indexLifetimeMin()).isEqualTo(Period.days(7));
         assertThat(rotationConfig.indexLifetimeMax()).isEqualTo(Period.days(7));
-
-        // Retention strategy: deletion
         assertThat(saved.retentionStrategyClass())
                 .isEqualTo(DeletionRetentionStrategy.class.getCanonicalName());
         assertThat(saved.retentionStrategyConfig()).isInstanceOf(DeletionRetentionStrategyConfig.class);
@@ -197,18 +153,13 @@ class CollectorsConfigResourceCollectorLogsTest {
 
     @Test
     void streamHasCorrectProperties() throws Exception {
-        // Arrange
-        stubCaAndInputServices();
         stubIndexSetDoesNotExist();
         stubStreamDoesNotExist();
-        stubStreamRulesEmpty();
+        stubStreamRuleCount(0);
+        when(streamRuleService.create(anyMap())).thenReturn(mock(StreamRule.class));
 
-        final var request = enabledHttpRequest();
+        service.ensureExists();
 
-        // Act
-        resource.put(request);
-
-        // Assert: capture the saved stream
         final var captor = ArgumentCaptor.forClass(StreamImpl.class);
         verify(streamService).save(captor.capture());
         final var saved = captor.getValue();
@@ -225,18 +176,13 @@ class CollectorsConfigResourceCollectorLogsTest {
     @SuppressWarnings("unchecked")
     @Test
     void streamRuleHasCorrectProperties() throws Exception {
-        // Arrange
-        stubCaAndInputServices();
         stubIndexSetDoesNotExist();
         stubStreamDoesNotExist();
-        stubStreamRulesEmpty();
+        stubStreamRuleCount(0);
+        when(streamRuleService.create(anyMap())).thenReturn(mock(StreamRule.class));
 
-        final var request = enabledHttpRequest();
+        service.ensureExists();
 
-        // Act
-        resource.put(request);
-
-        // Assert: capture the map passed to streamRuleService.create()
         final var mapCaptor = ArgumentCaptor.forClass(java.util.Map.class);
         verify(streamRuleService).create(mapCaptor.capture());
         final var ruleData = (java.util.Map<String, Object>) mapCaptor.getValue();
@@ -246,36 +192,13 @@ class CollectorsConfigResourceCollectorLogsTest {
         assertThat(ruleData.get("type")).isEqualTo(StreamRuleType.EXACT.toInteger());
         assertThat(ruleData.get("value")).isEqualTo(CollectorLogRecordProcessor.RECEIVER_TYPE);
         assertThat(ruleData.get("inverted")).isEqualTo(false);
-
-        // Verify the rule was saved
         verify(streamRuleService).save(any(StreamRule.class));
     }
 
-    // --- Helper methods ---
-
-    private CollectorsConfigRequest enabledHttpRequest() {
-        return new CollectorsConfigRequest(
-                new CollectorsConfigRequest.IngestEndpointRequest(true, "host", 14401),
-                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14402)
-        );
-    }
-
-    private void stubCaAndInputServices() throws Exception {
-        when(opAmpCaService.getOpAmpCaId()).thenReturn("ca-id");
-        when(opAmpCaService.getTokenSigningCertId()).thenReturn("token-id");
-        when(opAmpCaService.getOtlpServerCertId()).thenReturn("otlp-id");
-
-        // The put() method calls reconcileInput() which creates inputs when enabled
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
-        when(inputService.create(anyMap())).thenReturn(mock(Input.class));
-        when(inputService.save(any(Input.class))).thenReturn("new-input-id");
-    }
+    // --- Helpers ---
 
     private void stubIndexSetDoesNotExist() {
-        // IndexSetService.findOne() returns empty (no existing index set)
         when(indexSetService.findOne(any())).thenReturn(Optional.empty());
-
-        // IndexSetConfigFactory.createDefault() returns a real builder
         final var defaultBuilder = IndexSetConfig.builder()
                 .creationDate(ZonedDateTime.now(ZoneOffset.UTC))
                 .indexAnalyzer("standard")
@@ -292,11 +215,7 @@ class CollectorsConfigResourceCollectorLogsTest {
                 .retentionStrategyClass("placeholder")
                 .retentionStrategyConfig(DeletionRetentionStrategyConfig.createDefault());
         when(indexSetConfigFactory.createDefault()).thenReturn(defaultBuilder);
-
-        // Validator passes
         when(indexSetValidator.validate(any(IndexSetConfig.class))).thenReturn(Optional.empty());
-
-        // Save returns config with an ID
         when(indexSetService.save(any(IndexSetConfig.class))).thenAnswer(invocation -> {
             final IndexSetConfig config = invocation.getArgument(0);
             return config.toBuilder().id("saved-index-set-id").build();
@@ -336,13 +255,7 @@ class CollectorsConfigResourceCollectorLogsTest {
         when(streamService.load(Stream.COLLECTOR_LOGS_STREAM_ID)).thenReturn(mock(StreamImpl.class));
     }
 
-    private void stubStreamRulesEmpty() {
-        when(streamRuleService.loadForStreamId(Stream.COLLECTOR_LOGS_STREAM_ID)).thenReturn(Collections.emptyList());
-        when(streamRuleService.create(anyMap())).thenReturn(mock(StreamRule.class));
-    }
-
-    private void stubStreamRulesExist() {
-        when(streamRuleService.loadForStreamId(Stream.COLLECTOR_LOGS_STREAM_ID))
-                .thenReturn(Collections.singletonList(mock(StreamRule.class)));
+    private void stubStreamRuleCount(long count) {
+        when(streamRuleService.streamRuleCount(Stream.COLLECTOR_LOGS_STREAM_ID)).thenReturn(count);
     }
 }
