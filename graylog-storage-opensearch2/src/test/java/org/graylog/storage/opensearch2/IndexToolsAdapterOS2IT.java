@@ -14,17 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.opensearch.statemachine;
+package org.graylog.storage.opensearch2;
 
-public enum OpensearchEvent {
-    PROCESS_CONFIGURATION_REMOVED,
-    PROCESS_PREPARED,
-    PROCESS_STARTED,
-    HEALTH_CHECK_OK,
-    HEALTH_CHECK_FAILED,
-    PROCESS_STOPPED,
-    PROCESS_REMOVE,
-    RESET, // user-triggered action
-    CERTIFICATES_RELOAD,  // reload existing http and transport certificates
-    PROCESS_TERMINATED // failure from outside, not requested
+import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
+import org.graylog.testing.elasticsearch.SearchInstance;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog2.indexer.IndexToolsAdapterIT;
+
+public class IndexToolsAdapterOS2IT extends IndexToolsAdapterIT {
+
+    @SearchInstance
+    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
+
+    @Override
+    protected SearchServerInstance searchServer() {
+        return openSearchInstance;
+    }
 }

@@ -42,7 +42,13 @@ jest.mock('stores/streams/StreamsStore', () => ({
   },
 }));
 
-jest.mock('logic/telemetry/useSendTelemetry', () => () => (...args) => mockSendTelemetry(...args));
+jest.mock(
+  'logic/telemetry/useSendTelemetry',
+  () =>
+    () =>
+    (...args) =>
+      mockSendTelemetry(...args),
+);
 
 jest.mock('@tanstack/react-query', () => ({
   ...jest.requireActual('@tanstack/react-query'),
@@ -73,12 +79,7 @@ type TestComponentProps = {
 };
 
 const TestComponent = ({ streamIsPaused }: TestComponentProps) => {
-  const {
-    onCreateStreamRule,
-    showStartStreamDialog,
-    onCancelStartStreamDialog,
-    onStartStream,
-  } = useCreateStreamRule({
+  const { onCreateStreamRule, showStartStreamDialog, onCancelStartStreamDialog, onStartStream } = useCreateStreamRule({
     streamId: 'stream-id',
     streamIsPaused,
   });
