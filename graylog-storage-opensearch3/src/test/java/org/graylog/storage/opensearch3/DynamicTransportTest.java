@@ -112,7 +112,7 @@ class DynamicTransportTest {
         final var options = mock(TransportOptions.class);
         when(newDelegate.performRequest(any(), any(), any())).thenThrow(new IOException("connection reset"));
 
-        // Use a scheduler that never actually runs (so swapping flag stays true)
+        // Use a scheduler that never runs drain tasks (so isSwapping() stays true)
         final var neverRunScheduler = mock(ScheduledExecutorService.class);
         final var transport = new DynamicTransport(oldDelegate, neverRunScheduler);
         transport.swap(newDelegate);

@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class DynamicTransport implements OpenSearchTransport {
@@ -36,7 +37,8 @@ public class DynamicTransport implements OpenSearchTransport {
 
     private final AtomicReference<OpenSearchTransport> current;
     private final ScheduledExecutorService scheduler;
-    private volatile boolean swapping = false;
+    private final AtomicLong swapGeneration = new AtomicLong(0);
+    private volatile long drainedGeneration = 0;
 
     public DynamicTransport(OpenSearchTransport initial, ScheduledExecutorService scheduler) {
         this.current = new AtomicReference<>(initial);
@@ -45,16 +47,20 @@ public class DynamicTransport implements OpenSearchTransport {
 
     public void swap(OpenSearchTransport newTransport) {
         final OpenSearchTransport old = current.getAndSet(newTransport);
-        swapping = true;
-        LOG.info("OpenSearch transport swapped due to node list update. Draining old transport.");
+        final long generation = swapGeneration.incrementAndGet();
+        LOG.info("OpenSearch transport swapped due to node list update (generation {}). Draining old transport.", generation);
         scheduler.schedule(() -> {
-            swapping = false;
+            drainedGeneration = generation;
             try {
                 old.close();
             } catch (IOException e) {
                 LOG.warn("Failed to close old OpenSearch transport after drain period", e);
             }
         }, DRAIN_DELAY_SECONDS, TimeUnit.SECONDS);
+    }
+
+    private boolean isSwapping() {
+        return swapGeneration.get() > drainedGeneration;
     }
 
     @Override
@@ -76,7 +82,7 @@ public class DynamicTransport implements OpenSearchTransport {
             TransportOptions options) {
         return current.get().performRequestAsync(request, endpoint, options)
                 .exceptionally(t -> {
-                    if (swapping && t instanceof IOException) {
+                    if (isSwapping() && t instanceof IOException) {
                         throw new RuntimeException(wrapMessage(t.getMessage()), t);
                     }
                     if (t instanceof RuntimeException re) {
@@ -102,7 +108,7 @@ public class DynamicTransport implements OpenSearchTransport {
     }
 
     private IOException maybeWrapException(IOException original) {
-        if (swapping) {
+        if (isSwapping()) {
             return new IOException(wrapMessage(original.getMessage()), original);
         }
         return original;
