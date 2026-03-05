@@ -253,7 +253,7 @@ public abstract class MongoDBEventProcessor implements EventProcessor {
         }
         // Handle Date from MongoDB
         else if (value instanceof Date date) {
-            return new DateTime(date.getTime(), org.joda.time.DateTimeZone.UTC).toString();
+            return date.toInstant().toString();
         }
         // Handle ObjectId
         else if (value instanceof org.bson.types.ObjectId) {
