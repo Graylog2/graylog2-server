@@ -140,10 +140,9 @@ const RuleBlockDisplay = ({
   const highlightedRuleTitle = (termToHighlight: string, title: string = '') => {
     const parts = title.split(/('\$.*?')/);
 
-    const partsWithHighlight = parts.map((part, index) => {
+    const partsWithHighlight = parts.map((part) => {
       if (part === `'$${termToHighlight}'`) {
-        // eslint-disable-next-line react/no-array-index-key
-        return <Highlighted key={index}>{part}</Highlighted>;
+        return <Highlighted key={part}>{part}</Highlighted>;
       }
 
       return part;
