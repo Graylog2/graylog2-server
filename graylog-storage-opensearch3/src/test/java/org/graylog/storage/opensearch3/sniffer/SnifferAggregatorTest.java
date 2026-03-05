@@ -102,6 +102,48 @@ class SnifferAggregatorTest {
                 .anySatisfy(n -> Assertions.assertThat(n.toURI().toString()).isEqualTo("http://localhost:9200"));
     }
 
+    @Test
+    void disabledSnifferIsNotCalled() {
+        final NodesSniffer disabledSniffer = new NodesSniffer() {
+            @Override
+            public boolean enabled() { return false; }
+            @Override
+            public List<DiscoveredNode> sniff() {
+                throw new AssertionError("disabled sniffer should not be called");
+            }
+        };
+
+        final var aggregator = new SnifferAggregator(
+                Set.of(
+                        disabledSniffer,
+                        () -> List.of(node("http", "localhost", 9200))
+                ),
+                Collections.emptySet());
+
+        Assertions.assertThat(aggregator.sniff())
+                .hasSize(1)
+                .anySatisfy(n -> Assertions.assertThat(n.toURI().toString()).isEqualTo("http://localhost:9200"));
+    }
+
+    @Test
+    void disabledFilterIsNotApplied() {
+        final SnifferFilter disabledFilter = new SnifferFilter() {
+            @Override
+            public boolean enabled() { return false; }
+            @Override
+            public List<DiscoveredNode> filterNodes(List<DiscoveredNode> nodes) {
+                throw new AssertionError("disabled filter should not be called");
+            }
+        };
+
+        final var aggregator = new SnifferAggregator(
+                Set.of(() -> List.of(node("http", "localhost", 9200), node("http", "second-node", 9200))),
+                Set.of(disabledFilter));
+
+        Assertions.assertThat(aggregator.sniff())
+                .hasSize(2);
+    }
+
     private static SnifferFilter createFilter() {
         return new SnifferFilter() {
             @Override

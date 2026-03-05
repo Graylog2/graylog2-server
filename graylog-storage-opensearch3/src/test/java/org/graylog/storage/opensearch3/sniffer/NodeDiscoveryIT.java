@@ -69,7 +69,8 @@ class NodeDiscoveryIT {
                 "elasticsearch_socket_timeout", "60s",
                 "elasticsearch_max_total_connections", "1",
                 "elasticsearch_max_total_connections_per_route", "1",
-                "elasticsearch_use_expect_continue", "false"
+                "elasticsearch_use_expect_continue", "false",
+                "elasticsearch_discovery_enabled", "true"
         ));
 
         final OpensearchClusterSniffer sniffer = new OpensearchClusterSniffer(

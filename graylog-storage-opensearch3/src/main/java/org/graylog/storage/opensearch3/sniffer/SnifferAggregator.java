@@ -52,14 +52,19 @@ public class SnifferAggregator {
                 .collect(Collectors.toCollection(ArrayList::new));
 
         for (SnifferFilter filter : filters) {
-            discoveredNodes = filter.filterNodes(discoveredNodes);
+            if (filter.enabled()) {
+                discoveredNodes = filter.filterNodes(discoveredNodes);
+            }
         }
         return discoveredNodes;
     }
 
     @Nonnull
     private List<DiscoveredNode> discoverNodes() {
-        return sniffers.stream().flatMap(SnifferAggregator::sniff).toList();
+        return sniffers.stream()
+                .filter(NodesSniffer::enabled)
+                .flatMap(SnifferAggregator::sniff)
+                .toList();
     }
 
     @Nonnull
