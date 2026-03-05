@@ -49,6 +49,7 @@ const ApiBrowserPage = () => {
       <openapi-explorer
         ref={explorerRef}
         spec-url={qualifyUrl('/openapi.yaml')}
+        server-url={qualifyUrl('/')}
         hide-authentication
         hide-server-selection
       />
