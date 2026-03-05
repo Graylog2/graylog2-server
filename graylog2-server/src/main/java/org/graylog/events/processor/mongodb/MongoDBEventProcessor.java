@@ -16,13 +16,10 @@
  */
 package org.graylog.events.processor.mongodb;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.google.inject.assistedinject.Assisted;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
-import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog.events.event.Event;
@@ -65,11 +62,7 @@ import static com.mongodb.client.model.Filters.lt;
  * Events are intended to alert to specific DB conditions - the pipeline is expected to produce a single document result,
  * which is then converted into an Event.
  */
-public class MongoDBEventProcessor implements EventProcessor {
-    public interface Factory extends EventProcessor.Factory<MongoDBEventProcessor> {
-        @Override
-        MongoDBEventProcessor create(EventDefinition eventDefinition);
-    }
+public abstract class MongoDBEventProcessor implements EventProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBEventProcessor.class);
 
@@ -77,30 +70,28 @@ public class MongoDBEventProcessor implements EventProcessor {
 
     private final EventDefinition eventDefinition;
     private final MongoDBEventProcessorConfig config;
+    private final String collectionName;
     private final MongoCollection<Document> collection;
     private final DBEventProcessorStateService stateService;
     private final MessageFactory messageFactory;
+    private final ObjectMapper objectMapper;
 
-    @Inject
-    public MongoDBEventProcessor(@Assisted EventDefinition eventDefinition,
-                                 MongoCollections mongoCollections,
-                                 DBEventProcessorStateService stateService,
-                                 MessageFactory messageFactory) {
-        this(eventDefinition, (MongoDBEventProcessorConfig) eventDefinition.config(),
-                mongoCollections, stateService, messageFactory);
-    }
-
-    // Constructor that allows config override - used by specialized processors
+    // The collectionName is provided explicitly by the subclass rather than read from config,
+    // so the processor only accesses collections the subclass intends.
     protected MongoDBEventProcessor(EventDefinition eventDefinition,
                                     MongoDBEventProcessorConfig config,
+                                    String collectionName,
                                     MongoCollections mongoCollections,
                                     DBEventProcessorStateService stateService,
-                                    MessageFactory messageFactory) {
+                                    MessageFactory messageFactory,
+                                    ObjectMapper objectMapper) {
         this.eventDefinition = eventDefinition;
         this.config = config;
-        this.collection = mongoCollections.nonEntityCollection(config.collectionName(), Document.class);
+        this.collectionName = collectionName;
+        this.collection = mongoCollections.nonEntityCollection(collectionName, Document.class);
         this.stateService = stateService;
         this.messageFactory = messageFactory;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -173,9 +164,12 @@ public class MongoDBEventProcessor implements EventProcessor {
         // Parse and add user's pipeline stages
         if (config.aggregationPipeline() != null && !config.aggregationPipeline().trim().isEmpty()) {
             try {
-                JsonArray userPipeline = JsonParser.parseString(config.aggregationPipeline()).getAsJsonArray();
-                for (JsonElement stage : userPipeline) {
-                    Document stageDoc = Document.parse(stage.toString());
+                final JsonNode userPipeline = objectMapper.readTree(config.aggregationPipeline());
+                if (!userPipeline.isArray()) {
+                    throw new EventProcessorException("Aggregation pipeline must be a JSON array", true, eventDefinition, null);
+                }
+                for (final JsonNode stage : userPipeline) {
+                    final Document stageDoc = Document.parse(objectMapper.writeValueAsString(stage));
                     pipeline.add(stageDoc);
                 }
             } catch (Exception e) {
@@ -200,7 +194,7 @@ public class MongoDBEventProcessor implements EventProcessor {
         event.setTimerangeEnd(parameters.timerange().getTo());
 
         event.setOriginContext(EventOriginContext.mongodbAggregation(
-                config.collectionName(),
+                collectionName,
                 parameters.timerange().getFrom().getMillis(),
                 parameters.timerange().getTo().getMillis()
         ));
@@ -230,7 +224,7 @@ public class MongoDBEventProcessor implements EventProcessor {
         DateTime timestamp = parameters.timerange().getTo();
 
         Message message = messageFactory.createMessage(
-                "MongoDB aggregation from " + config.collectionName() + ": " + aggregationResult.toJson(),
+                "MongoDB aggregation from " + collectionName + ": " + aggregationResult.toJson(),
                 "mongodb-event-processor",
                 timestamp
         );
