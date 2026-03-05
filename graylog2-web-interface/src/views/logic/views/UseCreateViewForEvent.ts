@@ -142,10 +142,17 @@ export const WidgetsGenerator = async ({ streams, streamCategories, aggregations
       return {
         aggregationWidgets: [...res.aggregationWidgets, widget],
         aggregationTitles: { ...res.aggregationTitles, [widget.id]: `${fnSeries} ${expr} ${value}` },
-        aggregationPositions: { ...res.aggregationPositions, [widget.id]: createViewPosition({ index, SUMMARY_ROW_DELTA }) },
+        aggregationPositions: {
+          ...res.aggregationPositions,
+          [widget.id]: createViewPosition({ index, SUMMARY_ROW_DELTA }),
+        },
       };
     },
-    { aggregationTitles: {} as Record<string, string>, aggregationWidgets: [] as any[], aggregationPositions: {} as Record<string, WidgetPosition> },
+    {
+      aggregationTitles: {} as Record<string, string>,
+      aggregationWidgets: [] as any[],
+      aggregationPositions: {} as Record<string, WidgetPosition>,
+    },
   );
 
   const widgets = [...aggregationWidgets, histogram, messageTable];

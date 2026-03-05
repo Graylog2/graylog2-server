@@ -21,7 +21,10 @@ export default class ContentPackRevisions {
 
   constructor(contentPackRevision) {
     this._value = Object.fromEntries(
-      Object.keys(contentPackRevision).map((rev) => [parseInt(rev, 10), ContentPack.fromJSON(contentPackRevision[rev])]),
+      Object.keys(contentPackRevision).map((rev) => [
+        parseInt(rev, 10),
+        ContentPack.fromJSON(contentPackRevision[rev]),
+      ]),
     );
   }
 
