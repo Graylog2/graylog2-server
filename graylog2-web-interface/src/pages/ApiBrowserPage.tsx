@@ -16,9 +16,60 @@
  */
 import * as React from 'react';
 import { useCallback, useRef, useEffect, useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import { DocumentTitle } from 'components/common';
 import { qualifyUrl } from 'util/URLUtils';
+
+const StyledExplorerContainer = styled.div(
+  ({ theme }) => css`
+    margin-left: -25px;
+    margin-right: -25px;
+    margin-top: -11px;
+    height: 89vh;
+    width: 99vw;
+
+    openapi-explorer {
+      --bg: ${theme.colors.global.contentBackground};
+      --bg2: ${theme.colors.global.background};
+      --bg3: ${theme.colors.gray[90]};
+      --fg: ${theme.colors.text.primary};
+      --fg2: ${theme.colors.text.secondary};
+      --fg3: ${theme.colors.text.disabled};
+      --text-color: ${theme.colors.text.primary};
+      --primary-color: ${theme.colors.variant.primary};
+      --secondary-color: ${theme.colors.text.secondary};
+      --border-color: ${theme.colors.gray[80]};
+      --light-border-color: ${theme.colors.gray[90]};
+      --header-bg: ${theme.colors.global.contentBackground};
+      --header-fg: ${theme.colors.text.primary};
+      --header-color-darker: ${theme.colors.gray[80]};
+      --header-color-border: ${theme.colors.gray[70]};
+      --nav-bg-color: ${theme.colors.global.navigationBackground};
+      --nav-text-color: ${theme.colors.text.primary};
+      --nav-hover-bg-color: ${theme.colors.gray[90]};
+      --nav-hover-text-color: ${theme.colors.global.textAlt};
+      --input-bg: ${theme.colors.input.background};
+      --placeholder-color: ${theme.colors.input.placeholder};
+      --selection-bg: ${theme.colors.brand.primary};
+      --selection-fg: #fff;
+      --overlay-bg: rgba(0, 0, 0, 0.4);
+      --code-fg: ${theme.colors.text.primary};
+      --code-border-color: ${theme.colors.gray[80]};
+      --inline-code-fg: ${theme.colors.variant.darker?.danger ?? theme.colors.text.primary};
+      --font-regular: ${theme.fonts.family.body};
+      --font-mono: ${theme.fonts.family.monospace};
+      --font-size-regular: ${theme.fonts.size.body};
+      --font-size-small: ${theme.fonts.size.small};
+      --font-size-mono: ${theme.fonts.size.small};
+      --blue: ${theme.colors.variant.info};
+      --green: ${theme.colors.variant.success};
+      --red: ${theme.colors.variant.danger};
+      --orange: ${theme.colors.variant.warning};
+      --yellow: ${theme.colors.variant.warning};
+    }
+  `,
+);
 
 // noinspection JSUnusedGlobalSymbols
 const ApiBrowserPage = () => {
@@ -57,14 +108,16 @@ const ApiBrowserPage = () => {
 
   return (
     <DocumentTitle title="API Browser">
-      {/* @ts-ignore - openapi-explorer is a web component */}
-      <openapi-explorer
-        ref={explorerRef}
-        spec-url={qualifyUrl('/openapi.yaml')}
-        server-url="api/"
-        hide-authentication
-        hide-server-selection
-      />
+      <StyledExplorerContainer>
+        {/* @ts-ignore - openapi-explorer is a web component */}
+        <openapi-explorer
+          ref={explorerRef}
+          spec-url={qualifyUrl('/openapi.yaml')}
+          server-url="api/"
+          hide-authentication
+          hide-server-selection
+        />
+      </StyledExplorerContainer>
     </DocumentTitle>
   );
 };
