@@ -19,13 +19,11 @@ package org.graylog.events.processor.mongodb;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.graph.MutableGraph;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import org.bson.Document;
 import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorConfig;
@@ -51,15 +49,12 @@ import java.util.concurrent.TimeUnit;
 @JsonDeserialize(builder = MongoDBEventProcessorConfig.Builder.class)
 public abstract class MongoDBEventProcessorConfig implements EventProcessorConfig {
     public static final String TYPE_NAME = "mongodb-v1";
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    private static final String FIELD_COLLECTION_NAME = "collection_name";
     private static final String FIELD_AGGREGATION_PIPELINE = "aggregation_pipeline";
     private static final String FIELD_TIMESTAMP_FIELD = "timestamp_field";
     private static final String FIELD_SEARCH_WITHIN_SECONDS = "search_within_seconds";
     private static final String FIELD_EXECUTE_EVERY_SECONDS = "execute_every_seconds";
-
-    @JsonProperty(FIELD_COLLECTION_NAME)
-    public abstract String collectionName();
 
     @JsonProperty(FIELD_AGGREGATION_PIPELINE)
     public abstract String aggregationPipeline();
@@ -98,28 +93,25 @@ public abstract class MongoDBEventProcessorConfig implements EventProcessorConfi
         return createSchedulerConfig(eventDefinition, clock, searchWithinSeconds(), executeEverySeconds());
     }
 
-    /**
-     * Helper method to create scheduler config from time parameters.
-     * Can be reused by other MongoDB-based event processor configs.
-     */
     public static Optional<EventProcessorSchedulerConfig> createSchedulerConfig(EventDefinition eventDefinition,
                                                                                 JobSchedulerClock clock,
                                                                                 long searchWithinSeconds,
                                                                                 long executeEverySeconds) {
-        return createSchedulerConfig(eventDefinition, clock, searchWithinSeconds, executeEverySeconds, false);
+        return createSchedulerConfig(
+                eventDefinition, clock, searchWithinSeconds, executeEverySeconds,
+                true); // DB events are not generally expected to be linked to time-stamped objects, so no catch-up by default
     }
 
     /**
      * Helper method to create scheduler config from time parameters with optional catch-up control.
-     * Can be reused by other MongoDB-based event processor configs.
      *
-     * @param enableCatchup if true, enables catch-up behavior when processor falls behind; if false, disables catch-up
+     * @param disableCatchup if false, enables catch-up behavior when processor falls behind; if true, disables catch-up
      */
     public static Optional<EventProcessorSchedulerConfig> createSchedulerConfig(EventDefinition eventDefinition,
                                                                                 JobSchedulerClock clock,
                                                                                 long searchWithinSeconds,
                                                                                 long executeEverySeconds,
-                                                                                boolean enableCatchup) {
+                                                                                boolean disableCatchup) {
         final DateTime now = clock.nowUTC();
 
         // Convert seconds to milliseconds for scheduler
@@ -139,7 +131,7 @@ public abstract class MongoDBEventProcessorConfig implements EventProcessorConfi
                 .eventDefinitionId(eventDefinition.id())
                 .processingWindowSize(searchWithinMs)
                 .processingHopSize(executeEveryMs)
-                .enableCatchup(enableCatchup)  // Disable catch-up for MongoDB-based processors by default
+                .disableCatchup(disableCatchup)
                 .parameters(MongoDBEventProcessorParameters.builder()
                         .timerange(timerange)
                         .build())
@@ -158,9 +150,6 @@ public abstract class MongoDBEventProcessorConfig implements EventProcessorConfi
                     .searchWithinSeconds(60)      // Default: 1 minute
                     .executeEverySeconds(60);     // Default: 1 minute
         }
-
-        @JsonProperty(FIELD_COLLECTION_NAME)
-        public abstract Builder collectionName(String collectionName);
 
         @JsonProperty(FIELD_AGGREGATION_PIPELINE)
         public abstract Builder aggregationPipeline(String aggregationPipeline);
@@ -186,57 +175,48 @@ public abstract class MongoDBEventProcessorConfig implements EventProcessorConfi
         validationResult.addError("type",
                 "The mongodb-v1 event processor type cannot be created directly. Use a specific subtype instead.");
 
-        // Validate collection name
-        if (collectionName() == null || collectionName().trim().isEmpty()) {
-            validationResult.addError(FIELD_COLLECTION_NAME,
-                    "Collection name is required");
-        }
+        validateField(timestampField() != null && !timestampField().isBlank(),
+                FIELD_TIMESTAMP_FIELD, "Timestamp field must not be empty", validationResult);
+        validateField(searchWithinSeconds() > 0,
+                FIELD_SEARCH_WITHIN_SECONDS, "Search window must be greater than 0", validationResult);
+        validateField(executeEverySeconds() > 0,
+                FIELD_EXECUTE_EVERY_SECONDS, "Execution interval must be greater than 0", validationResult);
+        validateAggregationPipeline(validationResult);
 
-        // Validate aggregation pipeline JSON
-        if (aggregationPipeline() == null || aggregationPipeline().trim().isEmpty()) {
-            validationResult.addError(FIELD_AGGREGATION_PIPELINE,
-                    "Aggregation pipeline is required");
-        } else {
-            try {
-                JsonArray pipeline = JsonParser.parseString(aggregationPipeline()).getAsJsonArray();
-                if (pipeline.isEmpty()) {
-                    validationResult.addError(FIELD_AGGREGATION_PIPELINE,
-                            "Aggregation pipeline must have at least one stage");
-                }
-                // Validate each stage is valid BSON and does not contain dangerous operators
-                for (JsonElement stage : pipeline) {
-                    final Document stageDoc = Document.parse(stage.toString());
-                    if (stageDoc.containsKey("$out") || stageDoc.containsKey("$merge")) {
+        return validationResult;
+    }
+
+    private void validateField(boolean valid, String field, String errorMsg, ValidationResult validationResult) {
+        if (!valid) {
+            validationResult.addError(field, errorMsg);
+        }
+    }
+
+    private void validateAggregationPipeline(ValidationResult validationResult) {
+        if (aggregationPipeline() == null || aggregationPipeline().isBlank()) {
+            validationResult.addError(FIELD_AGGREGATION_PIPELINE, "Aggregation pipeline is required");
+            return;
+        }
+        try {
+            final JsonNode pipeline = OBJECT_MAPPER.readTree(aggregationPipeline());
+            if (!pipeline.isArray()) {
+                validationResult.addError(FIELD_AGGREGATION_PIPELINE, "Aggregation pipeline must be a JSON array");
+            } else if (pipeline.isEmpty()) {
+                validationResult.addError(FIELD_AGGREGATION_PIPELINE, "Aggregation pipeline must have at least one stage");
+            } else {
+                // $out and $merge can only appear as top-level pipeline stages, so a shallow check is sufficient.
+                for (final JsonNode stage : pipeline) {
+                    if (stage.has("$out") || stage.has("$merge")) {
                         validationResult.addError(FIELD_AGGREGATION_PIPELINE,
                                 "Aggregation pipeline must not contain $out or $merge stages");
                         break;
                     }
                 }
-            } catch (Exception e) {
-                validationResult.addError(FIELD_AGGREGATION_PIPELINE,
-                        "Invalid aggregation pipeline JSON: " + e.getMessage());
             }
+        } catch (Exception e) {
+            validationResult.addError(FIELD_AGGREGATION_PIPELINE,
+                    "Invalid aggregation pipeline JSON: " + e.getMessage());
         }
-
-        // Validate timestamp field
-        if (timestampField() == null || timestampField().trim().isEmpty()) {
-            validationResult.addError(FIELD_TIMESTAMP_FIELD,
-                    "Timestamp field must not be empty");
-        }
-
-        // Validate search window
-        if (searchWithinSeconds() <= 0) {
-            validationResult.addError(FIELD_SEARCH_WITHIN_SECONDS,
-                    "Search window must be greater than 0");
-        }
-
-        // Validate execution interval
-        if (executeEverySeconds() <= 0) {
-            validationResult.addError(FIELD_EXECUTE_EVERY_SECONDS,
-                    "Execution interval must be greater than 0");
-        }
-
-        return validationResult;
     }
 
     @Override

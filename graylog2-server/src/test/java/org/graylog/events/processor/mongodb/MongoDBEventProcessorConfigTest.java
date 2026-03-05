@@ -28,7 +28,7 @@ class MongoDBEventProcessorConfigTest {
 
     private MongoDBEventProcessorConfig validConfig() {
         return MongoDBEventProcessorConfig.builder()
-                .collectionName("test_collection")
+
                 .aggregationPipeline(VALID_PIPELINE)
                 .timestampField("bucket")
                 .searchWithinSeconds(60)
@@ -54,7 +54,7 @@ class MongoDBEventProcessorConfigTest {
     @Test
     void validate_rejectsPipelineWithOutOperator() {
         final MongoDBEventProcessorConfig config = MongoDBEventProcessorConfig.builder()
-                .collectionName("test_collection")
+
                 .aggregationPipeline("[{\"$out\": \"malicious_collection\"}]")
                 .timestampField("bucket")
                 .searchWithinSeconds(60)
@@ -72,7 +72,7 @@ class MongoDBEventProcessorConfigTest {
     @Test
     void validate_rejectsPipelineWithMergeOperator() {
         final MongoDBEventProcessorConfig config = MongoDBEventProcessorConfig.builder()
-                .collectionName("test_collection")
+
                 .aggregationPipeline("[{\"$merge\": {\"into\": \"malicious_collection\"}}]")
                 .timestampField("bucket")
                 .searchWithinSeconds(60)
@@ -98,25 +98,9 @@ class MongoDBEventProcessorConfigTest {
     }
 
     @Test
-    void validate_rejectsEmptyCollectionName() {
-        final MongoDBEventProcessorConfig config = MongoDBEventProcessorConfig.builder()
-                .collectionName("")
-                .aggregationPipeline(VALID_PIPELINE)
-                .timestampField("bucket")
-                .searchWithinSeconds(60)
-                .executeEverySeconds(60)
-                .build();
-
-        final ValidationResult result = config.validate(null);
-
-        assertThat(result.failed()).isTrue();
-        assertThat(result.getErrors()).containsKey("collection_name");
-    }
-
-    @Test
     void validate_rejectsEmptyPipeline() {
         final MongoDBEventProcessorConfig config = MongoDBEventProcessorConfig.builder()
-                .collectionName("test_collection")
+
                 .aggregationPipeline("")
                 .timestampField("bucket")
                 .searchWithinSeconds(60)

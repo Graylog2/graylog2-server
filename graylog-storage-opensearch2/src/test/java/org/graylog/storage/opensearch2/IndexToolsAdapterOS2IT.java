@@ -14,26 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { useParams } from 'react-router-dom';
+package org.graylog.storage.opensearch2;
 
-import { Spinner } from 'components/common';
-import StreamDetails from 'components/streams/StreamDetails/StreamDetails';
-import useStream from 'components/streams/hooks/useStream';
+import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
+import org.graylog.testing.elasticsearch.SearchInstance;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog2.indexer.IndexToolsAdapterIT;
 
-const StreamDetailsPage = () => {
-  const { streamId } = useParams<{ streamId: string }>();
-  const { data: stream, isFetching, isError } = useStream(streamId);
+public class IndexToolsAdapterOS2IT extends IndexToolsAdapterIT {
 
-  if (!stream && isFetching) {
-    return <Spinner />;
-  }
+    @SearchInstance
+    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
-  if (!stream || isError) {
-    return null;
-  }
-
-  return <StreamDetails stream={stream} />;
-};
-
-export default StreamDetailsPage;
+    @Override
+    protected SearchServerInstance searchServer() {
+        return openSearchInstance;
+    }
+}
