@@ -109,7 +109,7 @@ class CollectorInstanceServiceTest {
     private static CollectorInstanceDTO enroll(CollectorInstanceService service, String instanceUid, String fingerprint) {
         return service.enroll(
                 instanceUid,
-                "default-fleet",
+                "507f1f77bcf86cd799439012", // Valid 24-char hex ObjectId
                 fingerprint,
                 "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----",
                 "507f1f77bcf86cd799439011", // Valid 24-char hex ObjectId

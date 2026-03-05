@@ -117,7 +117,7 @@ class AgentTokenServiceTest {
         // Save agent with cert
         final CollectorInstanceDTO collectorInstanceDTO = collectorInstanceService.enroll(
                 "test-instance-uid",
-                "test-fleet",
+                "507f1f77bcf86cd799439012", // Valid 24-char hex ObjectId
                 certFingerprint,
                 certPem,
                 enrollmentCa.id(),
@@ -217,7 +217,7 @@ class AgentTokenServiceTest {
         // Save agent with cert
         final CollectorInstanceDTO collectorInstanceDTO = collectorInstanceService.enroll(
                 "test-instance-uid-2",
-                "test-fleet",
+                "507f1f77bcf86cd799439012", // Valid 24-char hex ObjectId
                 certFingerprint,
                 certPem,
                 enrollmentCa.id(),
