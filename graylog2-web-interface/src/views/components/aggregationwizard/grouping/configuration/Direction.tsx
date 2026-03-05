@@ -30,9 +30,10 @@ const DirectionOptions = styled.div`
 
 type Props = {
   groupingIndex: number;
+  groupingId: string;
 };
 
-const Direction = ({ groupingIndex }: Props) => (
+const Direction = ({ groupingIndex, groupingId }: Props) => (
   <Field name={`groupBy.groupings.${groupingIndex}.direction`}>
     {({ field: { name, value, onChange, onBlur }, meta: { error } }) => (
       <Input
@@ -45,20 +46,22 @@ const Direction = ({ groupingIndex }: Props) => (
           <Input
             checked={value === 'row'}
             formGroupClassName=""
-            id={name}
+            id={`${name}-row`}
+            name={`direction-${groupingId}`}
             label="Row"
             onBlur={onBlur}
-            onChange={onChange}
+            onChange={() => onChange({ target: { name, value: 'row' } })}
             type="radio"
             value="row"
           />
           <Input
             checked={value === 'column'}
             formGroupClassName=""
-            id={name}
+            id={`${name}-column`}
+            name={`direction-${groupingId}`}
             label="Column"
             onBlur={onBlur}
-            onChange={onChange}
+            onChange={() => onChange({ target: { name, value: 'column' } })}
             type="radio"
             value="column"
           />

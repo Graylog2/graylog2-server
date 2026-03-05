@@ -26,6 +26,7 @@ import org.graylog2.security.encryption.EncryptedValueService;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.awscore.client.builder.AwsClientBuilder;
 import software.amazon.awssdk.core.client.builder.SdkClientBuilder;
+import software.amazon.awssdk.http.SdkHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClient;
 import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClientBuilder;
@@ -36,6 +37,7 @@ import software.amazon.awssdk.services.kinesis.KinesisClientBuilder;
 
 import jakarta.inject.Inject;
 
+import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.Optional;
 
@@ -63,6 +65,17 @@ public class AWSClientBuilderUtil {
                 request.awsAccessKeyId(),
                 decryptSecretAccessKey(request.awsSecretAccessKey()),
                 request.assumeRoleArn());
+    }
+
+    public AwsCredentialsProvider createCredentialsProvider(AWSRequest request,
+                                                            @Nullable SdkHttpClient.Builder<?> stsHttpClientBuilder) {
+        return authFactoryProvider.get().create(
+                configuration.isCloud(),
+                request.region(),
+                request.awsAccessKeyId(),
+                decryptSecretAccessKey(request.awsSecretAccessKey()),
+                request.assumeRoleArn(),
+                stsHttpClientBuilder);
     }
 
     /**
