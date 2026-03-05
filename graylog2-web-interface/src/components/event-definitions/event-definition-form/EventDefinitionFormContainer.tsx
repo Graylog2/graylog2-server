@@ -96,22 +96,7 @@ const EventDefinitionFormContainer = ({
   onSubmit = undefined,
 }: Props) => {
   const [activeStep, setActiveStep] = useState(initialStep);
-  const [eventDefinition, setEventDefinition] = useState(() => {
-    if (!hasLocalStorageConfig) return eventDefinitionInitial;
-
-    const localStorageConditionPlugin = getConditionPlugin(configFromLocalStorage.type);
-    const defaultConfig = localStorageConditionPlugin?.defaultConfig || ({} as EventDefinition['config']);
-    const cloned = cloneDeep(eventDefinitionInitial);
-
-    return {
-      ...cloned,
-      config: {
-        ...defaultConfig,
-        ...cloned.config,
-        ...configFromLocalStorage,
-      },
-    };
-  });
+  const [eventDefinition, setEventDefinition] = useState(eventDefinitionInitial);
   const [validation, setValidation] = useState({ errors: {} });
   const [eventsClusterConfig, setEventsClusterConfig] = useState(undefined);
   const [isDirty, setIsDirty] = useState(false);
@@ -147,7 +132,25 @@ const EventDefinitionFormContainer = ({
   useEffect(() => {
     fetchClusterConfig();
     fetchNotifications();
-  }, [fetchClusterConfig]);
+
+    if (hasLocalStorageConfig) {
+      const localStorageConditionPlugin = getConditionPlugin(configFromLocalStorage.type);
+      const defaultConfig = localStorageConditionPlugin?.defaultConfig || ({} as EventDefinition['config']);
+
+      setEventDefinition((cur) => {
+        const cloned = cloneDeep(cur);
+
+        return {
+          ...cloned,
+          config: {
+            ...defaultConfig,
+            ...cloned.config,
+            ...configFromLocalStorage,
+          },
+        };
+      });
+    }
+  }, [configFromLocalStorage, fetchClusterConfig, hasLocalStorageConfig]);
 
   const handleSubmitSuccessResponse = () => {
     setIsDirty(false);
