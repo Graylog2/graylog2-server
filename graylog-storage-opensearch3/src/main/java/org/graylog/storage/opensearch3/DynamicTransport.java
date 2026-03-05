@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -49,14 +50,24 @@ public class DynamicTransport implements OpenSearchTransport {
         final OpenSearchTransport old = current.getAndSet(newTransport);
         final long generation = swapGeneration.incrementAndGet();
         LOG.info("OpenSearch transport swapped due to node list update (generation {}). Draining old transport.", generation);
-        scheduler.schedule(() -> {
+        try {
+            scheduler.schedule(() -> {
+                drainedGeneration = generation;
+                try {
+                    old.close();
+                } catch (IOException e) {
+                    LOG.warn("Failed to close old OpenSearch transport after drain period", e);
+                }
+            }, DRAIN_DELAY_SECONDS, TimeUnit.SECONDS);
+        } catch (RejectedExecutionException e) {
+            LOG.warn("Drain scheduler rejected task (likely shutting down). Closing old transport immediately.", e);
             drainedGeneration = generation;
             try {
                 old.close();
-            } catch (IOException e) {
-                LOG.warn("Failed to close old OpenSearch transport after drain period", e);
+            } catch (IOException closeEx) {
+                LOG.warn("Failed to close old OpenSearch transport during fallback", closeEx);
             }
-        }, DRAIN_DELAY_SECONDS, TimeUnit.SECONDS);
+        }
     }
 
     private boolean isSwapping() {

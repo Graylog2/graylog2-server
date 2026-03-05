@@ -24,11 +24,14 @@ import org.opensearch.client.transport.TransportOptions;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -120,5 +123,20 @@ class DynamicTransportTest {
         assertThatThrownBy(() -> transport.performRequest("req", endpoint, options))
                 .isInstanceOf(IOException.class)
                 .hasMessageContaining("node list update");
+    }
+
+    @Test
+    void closesOldTransportImmediatelyWhenSchedulerRejects() throws IOException {
+        final var oldDelegate = mock(OpenSearchTransport.class);
+        final var newDelegate = mock(OpenSearchTransport.class);
+
+        final var rejectedScheduler = mock(ScheduledExecutorService.class);
+        when(rejectedScheduler.schedule(any(Runnable.class), anyLong(), any()))
+                .thenThrow(new RejectedExecutionException("shutdown"));
+
+        final var transport = new DynamicTransport(oldDelegate, rejectedScheduler);
+
+        assertThatCode(() -> transport.swap(newDelegate)).doesNotThrowAnyException();
+        verify(oldDelegate).close();
     }
 }
