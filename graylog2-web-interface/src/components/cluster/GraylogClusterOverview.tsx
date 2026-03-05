@@ -69,10 +69,10 @@ const GraylogClusterOverview = ({ layout = 'default', children = null, showLicen
   const currentUser = useCurrentUser();
 
   const LicenseGraphComponent =
-    (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.LicenseGraphWithMetrics) ||
+    (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.TrafficGraphWithLicenseMetrics) ||
     ClusterTrafficGraph;
   const EnterpriseGraphComponent =
-    (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.EnterpriseTrafficGraph) ||
+    (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.TrafficGraph) ||
     ClusterTrafficGraph;
 
   if (layout === 'compact') {
