@@ -85,11 +85,6 @@ public class EventsSearchService extends AbstractEventsSearchService {
 
     /**
      * returns the slices for the slice-by functionality for the Alerts/Events table. Used in the core Events/Alerts table
-     *
-     * @param request
-     * @param subject
-     * @param searchUser
-     * @return
      */
     public Slices slices(final EventsSlicesRequest request, final Subject subject, final SearchUser searchUser) {
         // we cover two use cases by the include_all flag: if you only want the slices calculated from the resultset that will also be shown in the entity table, we re-use query and timerange for that. Otherwise, we query the table for "all" possible slices
@@ -147,10 +142,6 @@ public class EventsSearchService extends AbstractEventsSearchService {
     /**
      * In the Open Source part, we only map priority and type, both of which are augmented in the FE regarding the title.
      * So we only need a simple mapping function here.
-     *
-     * @param slicingColumn
-     * @param result
-     * @return Slice
      */
     Slice mapAggregationResultsToSlice(final String slicingColumn, final List<Object> result) {
         return new Slice(result.getFirst().toString(), null, Integer.valueOf(result.getLast().toString()));
@@ -211,12 +202,6 @@ public class EventsSearchService extends AbstractEventsSearchService {
 
     /**
      * Returns all assets grouped by asset id and the cardinality from the events in the Indexer.
-     *
-     * @param query
-     * @param timeRange
-     * @param subject
-     * @param searchUser
-     * @return
      */
     public Map<String, Integer> findGroupedAssets(final String query, final TimeRange timeRange, final Subject subject, SearchUser searchUser) {
         try {
