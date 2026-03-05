@@ -38,9 +38,9 @@ import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.IngestEndpointConfig;
 import org.graylog.collectors.input.CollectorIngestGrpcInput;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
+import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.configuration.HttpConfiguration;
-import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.RestTools;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -92,7 +92,7 @@ public class CollectorsConfigResource extends RestResource {
         );
     }
 
-    @NoAuditEvent("Collector config changes are not yet audited")
+    @NoAuditEvent("TODO")
     @PUT
     @Operation(summary = "Update collectors configuration")
     public CollectorsConfig put(@Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) CollectorsConfigRequest request) {

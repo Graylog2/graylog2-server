@@ -144,8 +144,8 @@ class CollectorLogsDestinationServiceTest {
                 .isEqualTo(TimeBasedSizeOptimizingStrategy.class.getCanonicalName());
         assertThat(saved.rotationStrategyConfig()).isInstanceOf(TimeBasedSizeOptimizingStrategyConfig.class);
         final var rotationConfig = (TimeBasedSizeOptimizingStrategyConfig) saved.rotationStrategyConfig();
-        assertThat(rotationConfig.indexLifetimeMin()).isEqualTo(Period.days(7));
-        assertThat(rotationConfig.indexLifetimeMax()).isEqualTo(Period.days(7));
+        assertThat(rotationConfig.indexLifetimeMin()).isEqualTo(Period.days(14));
+        assertThat(rotationConfig.indexLifetimeMax()).isEqualTo(Period.days(21));
         assertThat(saved.retentionStrategyClass())
                 .isEqualTo(DeletionRetentionStrategy.class.getCanonicalName());
         assertThat(saved.retentionStrategyConfig()).isInstanceOf(DeletionRetentionStrategyConfig.class);
@@ -238,8 +238,8 @@ class CollectorLogsDestinationServiceTest {
                 .fieldTypeRefreshInterval(IndexSetConfig.DEFAULT_FIELD_TYPE_REFRESH_INTERVAL)
                 .rotationStrategyClass(TimeBasedSizeOptimizingStrategy.class.getCanonicalName())
                 .rotationStrategyConfig(TimeBasedSizeOptimizingStrategyConfig.builder()
-                        .indexLifetimeMin(Period.days(7))
-                        .indexLifetimeMax(Period.days(7))
+                        .indexLifetimeMin(Period.days(14))
+                        .indexLifetimeMax(Period.days(21))
                         .build())
                 .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
                 .retentionStrategyConfig(DeletionRetentionStrategyConfig.createDefault())
