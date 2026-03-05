@@ -108,6 +108,54 @@ class OpensearchClusterSnifferTest {
     }
 
     @Test
+    void parsesIPv6PublishAddress() throws Exception {
+        final String json = """
+                {
+                  "nodes": {
+                    "node1": {
+                      "http": { "publish_address": "[::1]:9200" },
+                      "attributes": {}
+                    }
+                  }
+                }
+                """;
+        final JsonNode jsonNode = objectMapper.readTree(json);
+        when(client.performRequest(any(Request.class), anyString())).thenReturn(jsonNode);
+        when(configuration.discoveryEnabled()).thenReturn(true);
+
+        final var sniffer = new OpensearchClusterSniffer(client, configuration);
+        final List<DiscoveredNode> nodes = sniffer.sniff();
+
+        assertThat(nodes).hasSize(1);
+        assertThat(nodes.getFirst().host()).isEqualTo("::1");
+        assertThat(nodes.getFirst().port()).isEqualTo(9200);
+    }
+
+    @Test
+    void parsesIPv6PublishAddressWithHostnamePrefix() throws Exception {
+        final String json = """
+                {
+                  "nodes": {
+                    "node1": {
+                      "http": { "publish_address": "my-host/[2001:db8::1]:9200" },
+                      "attributes": {}
+                    }
+                  }
+                }
+                """;
+        final JsonNode jsonNode = objectMapper.readTree(json);
+        when(client.performRequest(any(Request.class), anyString())).thenReturn(jsonNode);
+        when(configuration.discoveryEnabled()).thenReturn(true);
+
+        final var sniffer = new OpensearchClusterSniffer(client, configuration);
+        final List<DiscoveredNode> nodes = sniffer.sniff();
+
+        assertThat(nodes).hasSize(1);
+        assertThat(nodes.getFirst().host()).isEqualTo("2001:db8::1");
+        assertThat(nodes.getFirst().port()).isEqualTo(9200);
+    }
+
+    @Test
     void enabledWhenDiscoveryEnabledOrNodeActivityLogger() {
         when(configuration.discoveryEnabled()).thenReturn(false);
         when(configuration.isNodeActivityLogger()).thenReturn(false);

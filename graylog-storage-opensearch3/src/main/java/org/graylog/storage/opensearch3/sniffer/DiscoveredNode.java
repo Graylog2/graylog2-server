@@ -19,6 +19,7 @@ package org.graylog.storage.opensearch3.sniffer;
 import org.apache.hc.core5.http.HttpHost;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +30,11 @@ public record DiscoveredNode(
         Map<String, List<String>> attributes
 ) {
     public URI toURI() {
-        return URI.create(scheme + "://" + host + ":" + port);
+        try {
+            return new URI(scheme, null, host, port, null, null, null);
+        } catch (URISyntaxException e) {
+            throw new IllegalStateException("Failed to construct URI from discovered node: " + host, e);
+        }
     }
 
     public HttpHost toHttpHost() {

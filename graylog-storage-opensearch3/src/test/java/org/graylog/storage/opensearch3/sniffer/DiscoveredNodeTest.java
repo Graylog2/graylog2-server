@@ -57,4 +57,20 @@ class DiscoveredNodeTest {
         final var node = new DiscoveredNode("http", "example.com", 80, Collections.emptyMap());
         assertThat(node.toURI()).isEqualTo(URI.create("http://example.com:80"));
     }
+
+    @Test
+    void toURIBracketsIPv6Address() {
+        final var node = new DiscoveredNode("https", "::1", 9200, Collections.emptyMap());
+        final URI uri = node.toURI();
+        assertThat(uri.toString()).isEqualTo("https://[::1]:9200");
+        assertThat(uri.getPort()).isEqualTo(9200);
+    }
+
+    @Test
+    void toURIHandlesFullIPv6Address() {
+        final var node = new DiscoveredNode("http", "2001:db8::1", 9200, Collections.emptyMap());
+        final URI uri = node.toURI();
+        assertThat(uri.toString()).isEqualTo("http://[2001:db8::1]:9200");
+        assertThat(uri.getPort()).isEqualTo(9200);
+    }
 }

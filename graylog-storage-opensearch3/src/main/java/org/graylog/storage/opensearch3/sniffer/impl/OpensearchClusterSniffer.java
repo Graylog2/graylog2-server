@@ -24,7 +24,12 @@ import org.graylog.storage.opensearch3.sniffer.NodesSniffer;
 import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.opensearch.client.opensearch.generic.Requests;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -33,6 +38,8 @@ import java.util.Locale;
 import java.util.Map;
 
 public class OpensearchClusterSniffer implements NodesSniffer {
+
+    private static final Logger LOG = LoggerFactory.getLogger(OpensearchClusterSniffer.class);
 
     private final OfficialOpensearchClient client;
     private final String scheme;
@@ -87,17 +94,21 @@ public class OpensearchClusterSniffer implements NodesSniffer {
         }
 
         final String publishAddress = publishAddressNode.asText();
-        final String hostPort = parseHostPort(publishAddress);
-        final String[] parts = hostPort.split(":");
-        if (parts.length != 2) {
+        final String hostPort = stripHostnamePrefix(publishAddress);
+
+        // Parse via URI to correctly handle IPv4, IPv6 (bracketed), and hostnames
+        final URI uri;
+        try {
+            uri = new URI(scheme + "://" + hostPort);
+        } catch (URISyntaxException e) {
+            LOG.warn("Failed to parse publish_address '{}': {}", publishAddress, e.getMessage());
             return null;
         }
 
-        final String host = parts[0];
-        final int port;
-        try {
-            port = Integer.parseInt(parts[1]);
-        } catch (NumberFormatException e) {
+        final String host = stripIPv6Brackets(uri.getHost());
+        final int port = uri.getPort();
+        if (host == null || port == -1) {
+            LOG.warn("Incomplete publish_address '{}': host={}, port={}", publishAddress, host, port);
             return null;
         }
 
@@ -105,8 +116,15 @@ public class OpensearchClusterSniffer implements NodesSniffer {
         return new DiscoveredNode(scheme, host, port, attributes);
     }
 
-    private static String parseHostPort(String publishAddress) {
-        // publish_address can be "host/ip:port" or just "ip:port"
+    private static String stripIPv6Brackets(String host) {
+        if (host != null && host.startsWith("[") && host.endsWith("]")) {
+            return host.substring(1, host.length() - 1);
+        }
+        return host;
+    }
+
+    private static String stripHostnamePrefix(String publishAddress) {
+        // publish_address can be "host/ip:port" or just "ip:port" or "[::1]:9200"
         final int slashIndex = publishAddress.indexOf('/');
         if (slashIndex >= 0) {
             return publishAddress.substring(slashIndex + 1);
