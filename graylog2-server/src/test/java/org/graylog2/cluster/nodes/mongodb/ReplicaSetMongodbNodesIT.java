@@ -41,7 +41,8 @@ class ReplicaSetMongodbNodesIT {
         mongoDBContainer = new MongoDBContainer("mongo:" + MongoDBVersion.DEFAULT.version())
                 .withReplicaSet();
         mongoDBContainer.start();
-        replicaSetNodes = new ReplicaSetMongodbNodes(createMongoConnection(), dockerConnectionResolver());
+        final MongoConnection mongoConnection = createMongoConnection();
+        replicaSetNodes = new ReplicaSetMongodbNodes(mongoConnection, new MongodbClusterCommand(mongoConnection, dockerConnectionResolver()));
     }
 
     /**

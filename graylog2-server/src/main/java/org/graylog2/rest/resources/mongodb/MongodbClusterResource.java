@@ -26,12 +26,19 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.bson.Document;
+import org.graylog.security.certutil.audit.CaAuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.cluster.nodes.mongodb.MongodbClusterCommand;
 import org.graylog2.cluster.nodes.mongodb.MongodbNode;
 import org.graylog2.cluster.nodes.mongodb.MongodbNodesProvider;
 import org.graylog2.database.PaginatedList;
@@ -44,12 +51,14 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.utilities.lucene.InMemorySearchEngine;
 import org.graylog2.utilities.lucene.LuceneInMemorySearchEngine;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Tag(name = "System/Mongodb", description = "MongoDB Node discovery")
@@ -81,9 +90,11 @@ public class MongodbClusterResource extends RestResource {
 
     private final InMemorySearchEngine<MongodbNode> mongodbNodesSearchService;
     private final SearchQueryParser searchQueryParser;
+    private final MongodbClusterCommand clusterCommand;
 
     @Inject
-    public MongodbClusterResource(MongodbNodesProvider provider) {
+    public MongodbClusterResource(MongodbNodesProvider provider, MongodbClusterCommand clusterCommand) {
+        this.clusterCommand = clusterCommand;
         final Supplier<List<MongodbNode>> cachingSupplier = Suppliers.memoizeWithExpiration(
                 provider::get,
                 10,
@@ -113,5 +124,28 @@ public class MongodbClusterResource extends RestResource {
         final PaginatedList<MongodbNode> result = mongodbNodesSearchService.search(parsedQuery, sort, order, page, perPage);
         return PageListResponse.create(query, result.pagination(),
                 result.grandTotal().orElse(0L), sort, order, result.stream().toList(), attributes, settings);
+    }
+
+    @PUT
+    @Path("/profiling/enable")
+    @AuditEvent(type = CaAuditEventTypes.CA_CREATE)
+    @Operation(summary = "Enables profiling for all mongodb nodes")
+    @RequiresPermissions(RestPermissions.MONGODB_ENABLE_PROFILING)
+    public Response enableProfiling() {
+        Document command = new Document("profile", 1)
+                .append("slowms", 100);
+        clusterCommand.runOnEachNode(command);
+        return Response.ok().build();
+    }
+
+    @PUT
+    @Path("/profiling/disable")
+    @AuditEvent(type = CaAuditEventTypes.CA_CREATE)
+    @Operation(summary = "Disables profiling for all mongodb nodes")
+    @RequiresPermissions(RestPermissions.MONGODB_ENABLE_PROFILING)
+    public Response disableProfiling() {
+        Document command = new Document("profile", 0);
+        clusterCommand.runOnEachNode(command);
+        return Response.ok().build();
     }
 }

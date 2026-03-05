@@ -29,28 +29,19 @@ import java.util.List;
 public class ReplicaSetMongodbNodes implements MongodbNodesService {
 
     private final MongoClient mongoConnection;
-    private final MongodbConnectionResolver connectionResolver;
+    private final MongodbClusterCommand mongodbClusterCommand;
 
     @Inject
-    public ReplicaSetMongodbNodes(MongoConnection mongoConnection, MongodbConnectionResolver connectionResolver) {
+    public ReplicaSetMongodbNodes(MongoConnection mongoConnection, MongodbClusterCommand mongodbClusterCommand) {
         this.mongoConnection = mongoConnection.connect();
-        this.connectionResolver = connectionResolver;
-
-        Document command = new Document("profile", 1)
-                .append("slowms", 100);
-
-        this.mongoConnection.getDatabase("admin").runCommand(command);
-
+        this.mongodbClusterCommand = mongodbClusterCommand;
     }
 
     @Override
     public List<MongodbNode> allNodes() {
         Document replicaStatus = mongoConnection.getDatabase("admin").runCommand(new Document("replSetGetStatus", 1));
-        //Document serverStatus = mongoConnection.getDatabase("admin").runCommand(new Document("serverStatus", 1));
 
-        // TODO: can each replica member run different mongo version?
-        //final String version = serverStatus.getString("version");
-        final List<Document> members = (List<Document>) replicaStatus.get("members");
+        final List<Document> members = replicaStatus.getList("members", Document.class);
 
         // Find primary's optime for replication lag calculation
         Document primaryMember = members.stream()
@@ -58,10 +49,15 @@ public class ReplicaSetMongodbNodes implements MongodbNodesService {
                 .findFirst()
                 .orElse(null);
 
-        return members.stream()
-                .parallel()
-                .map(member -> toMongodbNode(member, primaryMember))
+
+        return mongodbClusterCommand.runOnEachNode((host, connection) -> toMongodbNode(host, getMember(members, host), connection, primaryMember))
+                .values()
+                .stream()
                 .toList();
+    }
+
+    private Document getMember(List<Document> members, String host) {
+        return members.stream().filter(m -> m.getString("name").equals(host)).findFirst().orElseThrow(() -> new IllegalArgumentException("Could not find member " + host));
     }
 
     @Override
@@ -71,40 +67,31 @@ public class ReplicaSetMongodbNodes implements MongodbNodesService {
         return clusterType == ClusterType.REPLICA_SET;
     }
 
-    private MongodbNode toMongodbNode(Document member, Document primaryMember) {
+    private MongodbNode toMongodbNode(String hostname, Document member, MongoClient connection, Document primaryMember) {
+        final Document serverStatus = connection.getDatabase("graylog").runCommand(new Document("serverStatus", 1));
+        ProfilingResult profilingResult = MongodbNodeUtils.getProfilingResults(connection);
 
-        String name = member.get("name", String.class);
+        Document connections = serverStatus.get("connections", Document.class);
+        final Integer availableConnections = connections.getInteger("available");
+        final Integer currentConnections = connections.getInteger("current");
+        final double connectionsPercent = 100.0d / availableConnections * currentConnections;
 
-        try (MongoClient nodeClient = connectionResolver.resolve(name)) {
+        double storageUsedPercent = MongodbNodeUtils.calculateStorageUsedPercent(connection);
 
-            Document serverStatus = nodeClient
-                    .getDatabase("admin")
-                    .runCommand(new Document("serverStatus", 1));
+        int id = member.get("_id", Integer.class);
+        String role = member.get("stateStr", String.class);
 
-            ProfilingResult profilingResult = MongodbNodeUtils.getProfilingResults(nodeClient);
-
-            Document connections = serverStatus.get("connections", Document.class);
-            final Integer availableConnections = connections.getInteger("available");
-            final Integer currentConnections = connections.getInteger("current");
-            final double connectionsPercent = 100.0d / availableConnections * currentConnections;
-
-            double storageUsedPercent = MongodbNodeUtils.calculateStorageUsedPercent(nodeClient);
-
-            int id = member.get("_id", Integer.class);
-            String role = member.get("stateStr", String.class);
-
-            // Replication lag - compare optime with primary
-            long replicationLag = 0;
-            if (primaryMember != null && !member.equals(primaryMember)) {
-                if (member.containsKey("optimeDate") && primaryMember.containsKey("optimeDate")) {
-                    Date memberOptime = member.getDate("optimeDate");
-                    Date primaryOptime = primaryMember.getDate("optimeDate");
-                    if (memberOptime != null && primaryOptime != null) {
-                        replicationLag = primaryOptime.getTime() - memberOptime.getTime();
-                    }
+        // Replication lag - compare optime with primary
+        long replicationLag = 0;
+        if (primaryMember != null && !member.equals(primaryMember)) {
+            if (member.containsKey("optimeDate") && primaryMember.containsKey("optimeDate")) {
+                Date memberOptime = member.getDate("optimeDate");
+                Date primaryOptime = primaryMember.getDate("optimeDate");
+                if (memberOptime != null && primaryOptime != null) {
+                    replicationLag = primaryOptime.getTime() - memberOptime.getTime();
                 }
             }
-            return new MongodbNode(String.valueOf(id), name, role, serverStatus.getString("version"), profilingResult.profilingLevel(), replicationLag, profilingResult.slowQueryCount(), storageUsedPercent, availableConnections, currentConnections, connectionsPercent);
         }
+        return new MongodbNode(String.valueOf(id), hostname, role, serverStatus.getString("version"), profilingResult.profilingLevel(), replicationLag, profilingResult.slowQueryCount(), storageUsedPercent, availableConnections, currentConnections, connectionsPercent);
     }
 }
