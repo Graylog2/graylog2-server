@@ -165,7 +165,7 @@
         <lucene.version>9.12.3</lucene.version>
         <lz4.version>1.10.3</lz4.version>
         <metrics.version>4.2.38</metrics.version>
-        <mongodb-driver.version>5.6.3</mongodb-driver.version>
+        <mongodb-driver.version>5.6.4</mongodb-driver.version>
         <mongojack.version>5.1.0</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.2.10.Final</netty.version>
@@ -202,7 +202,7 @@
         <jjwt.version>0.13.0</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
         <poi.version>5.5.1</poi.version>
-        <mcp-bom.version>0.17.2</mcp-bom.version>
+        <mcp-bom.version>1.0.0</mcp-bom.version>
         <json-schema-generator.version>4.38.0</json-schema-generator.version>
 
         <!-- Test dependencies -->
@@ -781,7 +781,7 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.73.2</version>
+                            <version>8.74.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
