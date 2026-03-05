@@ -92,14 +92,9 @@ public class OpenApiResource {
 
     private String serializeWithServerUrl(OpenAPI openAPI, ObjectMapper mapper, URI serverUrl)
             throws JsonProcessingException {
-        final var tree = mapper.valueToTree(openAPI);
-        if (tree instanceof ObjectNode root) {
-            final var serversArray = mapper.createArrayNode();
-            final var serverNode = mapper.createObjectNode();
-            serverNode.put("url", serverUrl.toString());
-            serversArray.add(serverNode);
-            root.set("servers", serversArray);
-        }
+        final ObjectNode tree = mapper.valueToTree(openAPI);
+        final var serverNode = mapper.createObjectNode().put("url", serverUrl.toString());
+        tree.set("servers", mapper.createArrayNode().add(serverNode));
         return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(tree);
     }
 }
