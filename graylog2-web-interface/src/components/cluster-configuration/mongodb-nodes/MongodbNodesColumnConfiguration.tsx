@@ -38,11 +38,11 @@ export const DEFAULT_VISIBLE_COLUMNS = [
   'name',
   'role',
   'version',
-  'replicationLag',
-  'profilingLevel',
-  'slowQueryCount',
-  'storageUsedPercent',
-  'connectionsUsedPercent',
+  'replication_lag',
+  'profiling_level',
+  'slow_query_count',
+  'storage_used_percent',
+  'connections_used_percent',
 ];
 
 export const createColumnDefinitions = (): Array<ColumnSchema> => [];
@@ -71,7 +71,7 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
       ),
       minWidth: 120,
     },
-    replicationLag: {
+    replication_lag: {
       renderCell: (_value, entity) => (
         <ReplicationLagCell
           replicationLag={entity.replication_lag}
@@ -82,13 +82,13 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
       ),
       staticWidth: 'matchHeader',
     },
-    profilingLevel: {
+    profiling_level: {
       renderCell: (_value, entity) => (
         <ProfilingLevelCell profilingLevel={entity.profiling_level} />
       ),
       staticWidth: 'matchHeader',
     },
-    slowQueryCount: {
+    slow_query_count: {
       renderCell: (_value, entity) => {
         const count = entity.slow_query_count;
 
@@ -100,7 +100,7 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
       },
       staticWidth: 'matchHeader',
     },
-    storageUsedPercent: {
+    storage_used_percent: {
       renderCell: (_value, entity) => (
         <StorageUsedCell
           storageUsedPercent={entity.storage_used_percent}
@@ -110,7 +110,7 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
       ),
       staticWidth: 'matchHeader',
     },
-    connectionsAvailable: {
+    available_connections: {
       renderCell: (_value, entity) => {
         const count = entity.available_connections;
 
@@ -122,7 +122,7 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
       },
       staticWidth: 'matchHeader',
     },
-    connectionsCurrent: {
+    current_connections: {
       renderCell: (_value, entity) => {
         const count = entity.current_connections;
 
@@ -134,7 +134,7 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
       },
       staticWidth: 'matchHeader',
     },
-    connectionsUsedPercent: {
+    connections_used_percent: {
       renderCell: (_value, entity) => {
         const ratio = entity.connections_used_percent != null
           ? entity.connections_used_percent / 100

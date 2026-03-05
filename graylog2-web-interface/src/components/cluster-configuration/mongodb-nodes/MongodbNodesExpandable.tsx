@@ -92,7 +92,7 @@ const MongodbNodesExpandable = ({
         fetchOptions={fetchOptions}
         onDataLoaded={handleDataLoaded}
         withoutURLParams
-        entityAttributesAreCamelCase />
+        entityAttributesAreCamelCase={false} />
     </ClusterNodesSectionWrapper>
   );
 };
