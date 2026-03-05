@@ -15,8 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useRef, useEffect } from 'react';
-import 'openapi-explorer';
+import { useCallback, useRef, useEffect, useState } from 'react';
 
 import { DocumentTitle } from 'components/common';
 import { qualifyUrl } from 'util/URLUtils';
@@ -24,6 +23,11 @@ import { qualifyUrl } from 'util/URLUtils';
 // noinspection JSUnusedGlobalSymbols
 const ApiBrowserPage = () => {
   const explorerRef = useRef<HTMLElement>(null);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    import(/* webpackChunkName: "openapi-explorer" */ 'openapi-explorer').then(() => setLoaded(true));
+  }, []);
 
   const handleRequest = useCallback((event: CustomEvent) => {
     event.detail.request.headers.append('X-Requested-By', 'API Browser');
@@ -41,7 +45,15 @@ const ApiBrowserPage = () => {
         el.removeEventListener('request', handleRequest as EventListener);
       }
     };
-  }, [handleRequest]);
+  }, [handleRequest, loaded]);
+
+  if (!loaded) {
+    return (
+      <DocumentTitle title="API Browser">
+        <span>Loading...</span>
+      </DocumentTitle>
+    );
+  }
 
   return (
     <DocumentTitle title="API Browser">
