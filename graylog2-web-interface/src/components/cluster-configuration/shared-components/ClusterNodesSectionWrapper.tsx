@@ -46,7 +46,7 @@ const TableWrapper = styled.div.withConfig({
   shouldForwardProp: (prop) => prop !== 'maxHeight',
 })<{ maxHeight?: string }>(
   ({ maxHeight }) => css`
-    margin-top: -12px;
+    margin-top: -6px;
 
     ${maxHeight &&
     css`
@@ -87,6 +87,7 @@ type Props = React.PropsWithChildren<{
   onTitleCountClick?: (() => void) | null;
   collapsible?: boolean;
   maxContentHeight?: number | string | null;
+  actions?: React.ReactElement;
 }>;
 
 const ClusterNodesSectionWrapper = ({
@@ -96,6 +97,7 @@ const ClusterNodesSectionWrapper = ({
   onTitleCountClick = null,
   collapsible = true,
   maxContentHeight = 400,
+  actions = undefined,
 }: Props) => {
   const renderHeader = () => {
     const hasCount = titleCount !== null && titleCount !== undefined;
@@ -129,7 +131,7 @@ const ClusterNodesSectionWrapper = ({
   };
 
   return (
-    <PaperSection title={title} header={renderHeader()} collapsible={collapsible}>
+    <PaperSection title={title} header={renderHeader()} headerLeftSection={actions} collapsible={collapsible}>
       <TableWrapper maxHeight={getMaxHeightValue(maxContentHeight, collapsible)}>{children}</TableWrapper>
     </PaperSection>
   );

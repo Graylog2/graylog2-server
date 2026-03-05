@@ -14,9 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 
 import { PaginatedEntityTable } from 'components/common';
+import { Button } from 'components/bootstrap';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import type { FetchOptions } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
@@ -25,7 +26,7 @@ import {
   createColumnRenderers,
   DEFAULT_VISIBLE_COLUMNS,
 } from './MongodbNodesColumnConfiguration';
-import type { MongodbNode } from './fetchClusterMongodbNodes';
+import type { MongodbNode, MongodbNodesResponse } from './fetchClusterMongodbNodes';
 import { clusterMongodbNodesKeyFn, fetchMongodbNodes } from './fetchClusterMongodbNodes';
 
 import ClusterNodesSectionWrapper from '../shared-components/ClusterNodesSectionWrapper';
@@ -46,6 +47,9 @@ const MongodbNodesExpandable = ({
   refetchInterval = undefined,
 }: Props) => {
   const [totalMongodbNodes, setTotalMongodbNodes] = useState<number | undefined>(undefined);
+  const handleDataLoaded = useCallback((data: MongodbNodesResponse) => {
+    setTotalMongodbNodes(data.pagination?.total ?? data.list.length);
+  }, []);
 
   const columnSchemas = useMemo<Array<ColumnSchema>>(() => createColumnDefinitions(), []);
   const columnRenderers = useMemo(() => createColumnRenderers(), []);
@@ -63,12 +67,20 @@ const MongodbNodesExpandable = ({
   const externalSearch = useMemo(() => ({ query: searchQuery }), [searchQuery]);
   const fetchOptions = useMemo<FetchOptions>(() => ({ refetchInterval }), [refetchInterval]);
 
+  // TODO: Wire up to backend endpoint when available
+  const profilingAction = (
+    <Button bsSize="xsmall" bsStyle="primary" title="Enable profiling on all nodes">
+      Enable Profiling
+    </Button>
+  );
+
   return (
     <ClusterNodesSectionWrapper
       title="MongoDB Nodes"
       titleCount={totalMongodbNodes}
       onTitleCountClick={onSelectNodeType ?? null}
-      collapsible={collapsible}>
+      collapsible={collapsible}
+      actions={profilingAction}>
       <PaginatedEntityTable<MongodbNode>
         tableLayout={tableLayout}
         fetchEntities={fetchMongodbNodes}
@@ -78,7 +90,7 @@ const MongodbNodesExpandable = ({
         humanName="MongoDB Nodes"
         externalSearch={externalSearch}
         fetchOptions={fetchOptions}
-        onDataLoaded={(data) => setTotalMongodbNodes(data.pagination?.total ?? data.list.length)}
+        onDataLoaded={handleDataLoaded}
         withoutURLParams
         entityAttributesAreCamelCase />
     </ClusterNodesSectionWrapper>

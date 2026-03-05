@@ -20,25 +20,29 @@ import type { ColumnRenderers, ColumnSchema } from 'components/common/EntityData
 import NumberUtils from 'util/NumberUtils';
 
 import type { MongodbNode } from './fetchClusterMongodbNodes';
-import MongodbStatusCell from './cells/MongodbStatusCell';
+import ProfilingLevelCell from './cells/ProfilingLevelCell';
 import ReplicationLagCell from './cells/ReplicationLagCell';
 import StorageUsedCell from './cells/StorageUsedCell';
 
 import { RoleLabel, SecondaryText } from '../shared-components/NodeMetricsLayout';
+import RatioIndicator from '../shared-components/RatioIndicator';
 
 const REPLICATION_LAG_WARNING_THRESHOLD_MS = 1000;
 const REPLICATION_LAG_DANGER_THRESHOLD_MS = 30000;
 const STORAGE_WARNING_THRESHOLD = 0.7;
 const STORAGE_DANGER_THRESHOLD = 0.8;
+const CONNECTIONS_WARNING_THRESHOLD = 0.7;
+const CONNECTIONS_DANGER_THRESHOLD = 0.9;
 
 export const DEFAULT_VISIBLE_COLUMNS = [
   'name',
   'role',
   'version',
-  'status',
   'replicationLag',
+  'profilingLevel',
   'slowQueryCount',
   'storageUsedPercent',
+  'connectionsUsedPercent',
 ];
 
 export const createColumnDefinitions = (): Array<ColumnSchema> => [];
@@ -67,10 +71,6 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
       ),
       minWidth: 120,
     },
-    status: {
-      renderCell: (_value, entity) => <MongodbStatusCell status={entity.status} role={entity.role} />,
-      staticWidth: 120,
-    },
     replicationLag: {
       renderCell: (_value, entity) => (
         <ReplicationLagCell
@@ -79,6 +79,12 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
           warningThreshold={REPLICATION_LAG_WARNING_THRESHOLD_MS}
           dangerThreshold={REPLICATION_LAG_DANGER_THRESHOLD_MS}
         />
+      ),
+      staticWidth: 'matchHeader',
+    },
+    profilingLevel: {
+      renderCell: (_value, entity) => (
+        <ProfilingLevelCell profilingLevel={entity.profiling_level} />
       ),
       staticWidth: 'matchHeader',
     },
@@ -102,6 +108,46 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
           dangerThreshold={STORAGE_DANGER_THRESHOLD}
         />
       ),
+      staticWidth: 'matchHeader',
+    },
+    connectionsAvailable: {
+      renderCell: (_value, entity) => {
+        const count = entity.available_connections;
+
+        if (count == null) {
+          return <SecondaryText><span>N/A</span></SecondaryText>;
+        }
+
+        return <SecondaryText><span>{NumberUtils.formatNumber(count)}</span></SecondaryText>;
+      },
+      staticWidth: 'matchHeader',
+    },
+    connectionsCurrent: {
+      renderCell: (_value, entity) => {
+        const count = entity.current_connections;
+
+        if (count == null) {
+          return <SecondaryText><span>N/A</span></SecondaryText>;
+        }
+
+        return <SecondaryText><span>{NumberUtils.formatNumber(count)}</span></SecondaryText>;
+      },
+      staticWidth: 'matchHeader',
+    },
+    connectionsUsedPercent: {
+      renderCell: (_value, entity) => {
+        const ratio = entity.connections_used_percent != null
+          ? entity.connections_used_percent / 100
+          : null;
+
+        return (
+          <RatioIndicator
+            ratio={ratio}
+            warningThreshold={CONNECTIONS_WARNING_THRESHOLD}
+            dangerThreshold={CONNECTIONS_DANGER_THRESHOLD}
+          />
+        );
+      },
       staticWidth: 'matchHeader',
     },
   },

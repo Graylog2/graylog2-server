@@ -23,7 +23,7 @@ import { MongodbRole, type MongodbRoleType } from '../fetchClusterMongodbNodes';
 
 type Props = {
   replicationLag: number | undefined | null;
-  role: string | undefined | null;
+  role: MongodbRoleType | undefined | null;
   warningThreshold: number;
   dangerThreshold: number;
 };

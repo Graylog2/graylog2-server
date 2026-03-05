@@ -28,30 +28,26 @@ export const MongodbRole = {
 
 export type MongodbRoleType = typeof MongodbRole[keyof typeof MongodbRole];
 
-export const MongodbStatus = {
-  STARTUP: 0,
-  PRIMARY: 1,
-  SECONDARY: 2,
-  RECOVERING: 3,
-  STARTUP2: 5,
-  UNKNOWN: 6,
-  ARBITER: 7,
-  DOWN: 8,
-  ROLLBACK: 9,
-  REMOVED: 10,
+export const MongodbProfilingLevel = {
+  OFF: 0,
+  SLOW_OPS: 1,
+  ALL: 2,
 } as const;
 
-export type MongodbStatusType = typeof MongodbStatus[keyof typeof MongodbStatus];
+export type MongodbProfilingLevelType = typeof MongodbProfilingLevel[keyof typeof MongodbProfilingLevel];
 
 export type MongodbNode = {
   id: string;
   name: string;
-  role: string;
+  role: MongodbRoleType;
   version: string;
-  status: number;
+  profiling_level: MongodbProfilingLevelType;
   replication_lag: number;
   slow_query_count: number | null;
   storage_used_percent: number;
+  available_connections: number | null;
+  current_connections: number | null;
+  connections_used_percent: number;
 };
 
 export type MongodbNodesResponse = {
