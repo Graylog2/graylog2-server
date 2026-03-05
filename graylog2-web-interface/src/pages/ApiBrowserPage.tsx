@@ -314,6 +314,7 @@ const DebounceInputsPlugin = () => ({
 
         return <Original onChange={_onChange} {...props} />;
       },
+    FilterContainer: () => () => null,
   },
 });
 
