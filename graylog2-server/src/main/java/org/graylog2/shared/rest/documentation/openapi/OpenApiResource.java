@@ -17,7 +17,6 @@
 package org.graylog2.shared.rest.documentation.openapi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -101,6 +100,6 @@ public class OpenApiResource {
             serversArray.add(serverNode);
             root.set("servers", serversArray);
         }
-        return mapper.writer(new DefaultPrettyPrinter()).writeValueAsString(tree);
+        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(tree);
     }
 }
