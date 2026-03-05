@@ -73,7 +73,7 @@ class ContentPackApplyParameter extends React.Component<
         </Button>
       </td>
     ) : (
-      <td />
+      <td aria-label="No action available" />
     );
 
     return (

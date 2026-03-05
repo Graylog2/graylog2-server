@@ -100,7 +100,7 @@ class SidecarRow extends React.Component<
           {annotation}
         </td>
         <td>{sidecar.sidecar_version}</td>
-        <td>
+        <td aria-label="Actions">
           <ButtonToolbar>
             <LinkContainer to={`${Routes.SYSTEM.SIDECARS.ADMINISTRATION}?node_id=${sidecar.node_id}`}>
               <Button bsSize="xsmall" bsStyle="info">

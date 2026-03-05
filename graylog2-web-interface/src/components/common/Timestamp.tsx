@@ -32,6 +32,8 @@ type Props = {
   className?: string;
 };
 
+const DefaultRender = ({ value, field: _field }: RenderProps) => <>{value}</>;
+
 /**
  * Component that renders a given date time based on the user time zone in a `time` HTML element.
  * It is capable of render date times in different formats, accepting ISO 8601
@@ -46,7 +48,7 @@ const Timestamp = ({
   dateTime = undefined,
   field,
   format = 'default',
-  render: Component = ({ value }: RenderProps) => <>{value}</>,
+  render: Component = DefaultRender,
   tz = undefined,
   className = undefined,
 }: Props) => {

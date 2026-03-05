@@ -22,7 +22,7 @@ jest.mock('util/AppConfig');
 describe('DocsHelper', () => {
   it('prefixes page URLs with default base URL', () => {
     jest.isolateModules(() => {
-      // eslint-disable-next-line global-require
+      // eslint-disable-next-line global-require, @typescript-eslint/no-require-imports
       const DocsHelper = require('./DocsHelper').default;
 
       expect(DocsHelper.toString(DocsHelper.PAGES.ALERTS)).toEqual(
@@ -42,7 +42,7 @@ describe('DocsHelper', () => {
       asMock(AppConfig.branding).mockReturnValue({
         help_url: 'https://www.example.com/docs',
       });
-      // eslint-disable-next-line global-require
+      // eslint-disable-next-line global-require, @typescript-eslint/no-require-imports
       const DocsHelper = require('./DocsHelper').default;
 
       expect(DocsHelper.toString(DocsHelper.PAGES.ALERTS)).toEqual(
@@ -66,7 +66,7 @@ describe('DocsHelper', () => {
         },
       });
 
-      // eslint-disable-next-line global-require
+      // eslint-disable-next-line global-require, @typescript-eslint/no-require-imports
       const DocsHelper = require('./DocsHelper').default;
 
       expect(DocsHelper.toString(DocsHelper.PAGES.ALERTS)).toEqual('http://www.example.com/alerts');

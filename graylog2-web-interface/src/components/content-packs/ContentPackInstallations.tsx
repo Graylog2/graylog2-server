@@ -74,7 +74,7 @@ class ContentPackInstallations extends React.Component<
       <tr key={item}>
         <td>{item.comment}</td>
         <td>{item.content_pack_revision}</td>
-        <td>
+        <td aria-label="Actions">
           <div className="pull-right">
             <ButtonToolbar>
               <Button

@@ -32,6 +32,7 @@ describe('SelectedGrantee', () => {
     expect(state).toBe(expectedReturn);
   };
 
+  // eslint-disable-next-line jest/expect-expect
   it.each`
     grantee  | capability | expectedReturn
     ${alice} | ${owner}   | ${'unchanged'}

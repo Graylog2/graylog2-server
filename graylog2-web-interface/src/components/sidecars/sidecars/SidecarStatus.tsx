@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import defaultTo from 'lodash/defaultTo';
 import isNumber from 'lodash/isNumber';
 
 import { Col, Row, Button } from 'components/bootstrap';
@@ -48,13 +47,13 @@ const formatNodeDetails = (details: NodeDetails) => {
   return (
     <dl className={`${commonStyles.deflist} ${commonStyles.topMargin}`}>
       <dt>IP Address</dt>
-      <dd>{defaultTo(details.ip, 'Not available')}</dd>
+      <dd>{details.ip ?? 'Not available'}</dd>
       <dt>Operating System</dt>
-      <dd>{defaultTo(details.operating_system, 'Not available')}</dd>
+      <dd>{details.operating_system ?? 'Not available'}</dd>
       <dt>CPU Idle</dt>
       <dd>{isNumber(metrics?.cpu_idle) ? `${metrics?.cpu_idle}%` : 'Not available'}</dd>
       <dt>Load</dt>
-      <dd>{defaultTo(metrics?.load_1, 'Not available')}</dd>
+      <dd>{metrics?.load_1 ?? 'Not available'}</dd>
       <dt>Volumes &gt; 75% full</dt>
       {metrics?.disks_75 === undefined ? (
         <dd>Not available</dd>

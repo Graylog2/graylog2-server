@@ -57,14 +57,14 @@ export const ContentPacksActions = singletonActions('core.ContentPacks', () =>
 );
 
 type StoreState = {
-  contentPack: unknown;
-  contentPackMetadata: ContentPackMetadata;
-  contentPacks: Array<ContentPackInstallation>;
-  installations: Array<ContentPackInstallation>;
-  uninstallEntities: unknown;
-  contentPackRevisions: ContentPackRevisions;
-  selectedVersion: unknown;
-  constraints: unknown;
+  contentPack?: unknown;
+  contentPackMetadata?: ContentPackMetadata;
+  contentPacks?: Array<ContentPackInstallation>;
+  installations?: Array<ContentPackInstallation>;
+  uninstallEntities?: unknown;
+  contentPackRevisions?: ContentPackRevisions;
+  selectedVersion?: unknown;
+  constraints?: unknown;
 };
 export const ContentPacksStore = singletonStore('core.ContentPacks', () =>
   Reflux.createStore<StoreState>({

@@ -217,7 +217,9 @@ const createStream = async (newPipeline = false, removeFromDefault = true) => {
     name: 'Next',
   });
 
+  // eslint-disable-next-line testing-library/prefer-user-event
   fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
+  // eslint-disable-next-line testing-library/prefer-user-event
   fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
 
   if (!removeFromDefault) {
