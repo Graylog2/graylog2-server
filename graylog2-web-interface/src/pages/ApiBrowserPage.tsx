@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
 import styled, { css } from 'styled-components';
@@ -291,6 +291,49 @@ type RequestBodyEditorProps = {
   onChange: (newValue: string) => void;
 };
 
+const FilterContainer = ({ specSelectors, layoutSelectors, getComponent, layoutActions }) => {
+  const Col = useMemo(() => getComponent('Col'), [getComponent]);
+  const [filterValue, setFilterValue] = useState<string>();
+
+  const isLoading = specSelectors.loadingStatus() === 'loading';
+  const isFailed = specSelectors.loadingStatus() === 'failed';
+  const filter = layoutSelectors.currentFilter();
+
+  const debouncedUpdateFilter = useMemo(
+    () => debounce(layoutActions?.updateFilter, 1000),
+    [layoutActions?.updateFilter],
+  );
+
+  const onFilterChange = (e) => {
+    const value = e?.target?.value;
+    setFilterValue(value);
+    debouncedUpdateFilter(value);
+  };
+
+  const classNames = ['operation-filter-input'];
+  if (isFailed) classNames.push('failed');
+  if (isLoading) classNames.push('loading');
+
+  return (
+    <div>
+      {filter === false ? null : (
+        <div className="filter-container">
+          {/* eslint-disable-next-line react-hooks/static-components */}
+          <Col className="filter wrapper" mobile={12}>
+            <input
+              className={classNames.join(' ')}
+              placeholder="Filter by tag"
+              type="text"
+              onChange={onFilterChange}
+              value={filterValue}
+              disabled={isLoading}
+            />
+          </Col>
+        </div>
+      )}
+    </div>
+  );
+};
 const DebounceInputsPlugin = () => ({
   wrapComponents: {
     JsonSchemaForm:
@@ -314,7 +357,7 @@ const DebounceInputsPlugin = () => ({
 
         return <Original onChange={_onChange} {...props} />;
       },
-    FilterContainer: () => () => null,
+    FilterContainer: () => FilterContainer,
   },
 });
 
