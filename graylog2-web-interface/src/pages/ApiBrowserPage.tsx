@@ -323,7 +323,7 @@ const ApiBrowserPage = () => (
   <DocumentTitle title="API Browser">
     <StyledSwaggerContainer>
       <SwaggerUI
-        url={qualifyUrl('/openapi.json')}
+        url={qualifyUrl('/openapi.yaml')}
         filter
         deepLinking
         defaultModelsExpandDepth={-1}
