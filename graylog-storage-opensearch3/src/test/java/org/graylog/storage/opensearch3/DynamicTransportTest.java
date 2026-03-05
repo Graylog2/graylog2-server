@@ -23,6 +23,8 @@ import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.TransportOptions;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -123,6 +125,52 @@ class DynamicTransportTest {
         assertThatThrownBy(() -> transport.performRequest("req", endpoint, options))
                 .isInstanceOf(IOException.class)
                 .hasMessageContaining("node list update");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void asyncWrapsIOExceptionInsideCompletionExceptionDuringSwap() {
+        final var oldDelegate = mock(OpenSearchTransport.class);
+        final var newDelegate = mock(OpenSearchTransport.class);
+        final var endpoint = mock(Endpoint.class);
+        final var options = mock(TransportOptions.class);
+        // Simulate how CompletableFuture delivers exceptions: wrapped in CompletionException
+        when(newDelegate.performRequestAsync(any(), any(), any()))
+                .thenReturn(CompletableFuture.failedFuture(new IOException("connection reset")));
+
+        final var neverRunScheduler = mock(ScheduledExecutorService.class);
+        final var transport = new DynamicTransport(oldDelegate, neverRunScheduler);
+        transport.swap(newDelegate);
+
+        final CompletableFuture<?> future = transport.performRequestAsync("req", endpoint, options);
+        // CompletableFuture.get() unwraps CompletionException, so the chain is ExecutionException -> IOException
+        assertThatThrownBy(future::get)
+                .isInstanceOf(ExecutionException.class)
+                .cause()
+                .isInstanceOf(IOException.class)
+                .hasMessageContaining("node list update")
+                .hasMessageContaining("connection reset");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void asyncPreservesOriginalExceptionWhenNotSwapping() {
+        final var delegate = mock(OpenSearchTransport.class);
+        final var endpoint = mock(Endpoint.class);
+        final var options = mock(TransportOptions.class);
+        final var originalException = new IOException("original error");
+        when(delegate.performRequestAsync(any(), any(), any()))
+                .thenReturn(CompletableFuture.failedFuture(originalException));
+
+        // No swap has occurred, so isSwapping() is false
+        final var transport = new DynamicTransport(delegate, scheduler);
+
+        final CompletableFuture<?> future = transport.performRequestAsync("req", endpoint, options);
+        // Original IOException is preserved as-is for downstream handlers
+        assertThatThrownBy(future::get)
+                .isInstanceOf(ExecutionException.class)
+                .cause()
+                .isSameAs(originalException);
     }
 
     @Test

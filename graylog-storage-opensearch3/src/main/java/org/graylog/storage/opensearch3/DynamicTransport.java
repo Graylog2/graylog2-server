@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -93,13 +94,15 @@ public class DynamicTransport implements OpenSearchTransport {
             TransportOptions options) {
         return current.get().performRequestAsync(request, endpoint, options)
                 .exceptionally(t -> {
-                    if (isSwapping() && t instanceof IOException) {
-                        throw new RuntimeException(wrapMessage(t.getMessage()), t);
+                    final Throwable cause = unwrapCompletionException(t);
+                    if (isSwapping() && cause instanceof IOException ioe) {
+                        throw new CompletionException(new IOException(wrapMessage(ioe.getMessage()), ioe));
                     }
-                    if (t instanceof RuntimeException re) {
-                        throw re;
+                    // Preserve original exception structure for downstream handlers
+                    if (t instanceof CompletionException ce) {
+                        throw ce;
                     }
-                    throw new RuntimeException(t);
+                    throw new CompletionException(t);
                 });
     }
 
@@ -116,6 +119,14 @@ public class DynamicTransport implements OpenSearchTransport {
     @Override
     public void close() throws IOException {
         current.get().close();
+    }
+
+    private static Throwable unwrapCompletionException(Throwable t) {
+        Throwable cause = t;
+        while (cause instanceof CompletionException && cause.getCause() != null) {
+            cause = cause.getCause();
+        }
+        return cause;
     }
 
     private IOException maybeWrapException(IOException original) {
