@@ -60,6 +60,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Tag(name = "System/Mongodb", description = "MongoDB Node discovery")
 @RequiresAuthentication
@@ -147,5 +148,18 @@ public class MongodbClusterResource extends RestResource {
         Document command = new Document("profile", 0);
         clusterCommand.runOnEachNode(command);
         return Response.ok().build();
+    }
+
+    @GET
+    @Path("/profiling/status")
+    @Operation(summary = "Aggregates profiling status for all mongodb nodes")
+    @Timed
+    public Response profilingStatus() {
+        Document command = new Document("profile", -1);
+        final Map<String, Integer> result = clusterCommand.runOnEachNode(command)
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getInteger("was")));
+        return Response.ok().entity(result).build();
     }
 }
