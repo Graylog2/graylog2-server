@@ -17,6 +17,7 @@
 package org.graylog2.shared.rest.documentation.openapi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +32,6 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.MoreMediaTypes;
@@ -70,13 +70,16 @@ public class OpenApiResource {
     @Produces({MediaType.APPLICATION_JSON, MoreMediaTypes.APPLICATION_YAML})
     @Operation(hidden = true)
     public Response getOpenApi(@Context HttpHeaders headers,
-                               @Context UriInfo uriInfo,
                                @PathParam("ext") String ext) throws Exception {
         final boolean yaml = ".yaml".equals(ext);
         final var mapper = yaml ? context.getOutputYamlMapper() : context.getOutputJsonMapper();
         final var mediaType = yaml ? MoreMediaTypes.APPLICATION_YAML : MediaType.APPLICATION_JSON;
 
         final OpenAPI openAPI = context.read();
+        if (openAPI == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
         final String output = serializeWithServerUrl(openAPI, mapper, resolveServerUrl(headers));
 
         return Response.ok(output).type(mediaType).build();
@@ -98,6 +101,6 @@ public class OpenApiResource {
             serversArray.add(serverNode);
             root.set("servers", serversArray);
         }
-        return mapper.writeValueAsString(tree);
+        return mapper.writer(new DefaultPrettyPrinter()).writeValueAsString(tree);
     }
 }

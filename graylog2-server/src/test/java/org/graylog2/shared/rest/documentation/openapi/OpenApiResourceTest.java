@@ -78,7 +78,7 @@ class OpenApiResourceTest {
         headers.put(HttpConfiguration.OVERRIDE_HEADER, List.of("https://example.com/graylog/"));
         when(httpHeaders.getRequestHeaders()).thenReturn(headers);
 
-        final var response = resource.getOpenApi(httpHeaders, null, null);
+        final var response = resource.getOpenApi(httpHeaders, null);
         final var json = response.getEntity().toString();
         final var tree = new ObjectMapper().readTree(json);
 
@@ -91,7 +91,7 @@ class OpenApiResourceTest {
         when(httpHeaders.getRequestHeaders()).thenReturn(headers);
         when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("https://external.example.com/"));
 
-        final var response = resource.getOpenApi(httpHeaders, null, null);
+        final var response = resource.getOpenApi(httpHeaders, null);
         final var json = response.getEntity().toString();
         final var tree = new ObjectMapper().readTree(json);
 
@@ -104,7 +104,7 @@ class OpenApiResourceTest {
         when(httpHeaders.getRequestHeaders()).thenReturn(headers);
         when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("http://10.0.0.1:9000/"));
 
-        final var response = resource.getOpenApi(httpHeaders, null, null);
+        final var response = resource.getOpenApi(httpHeaders, null);
         final var json = response.getEntity().toString();
         final var tree = new ObjectMapper().readTree(json);
 
@@ -117,7 +117,7 @@ class OpenApiResourceTest {
         headers.put(HttpConfiguration.OVERRIDE_HEADER, List.of("https://example.com/graylog/"));
         when(httpHeaders.getRequestHeaders()).thenReturn(headers);
 
-        resource.getOpenApi(httpHeaders, null, null);
+        resource.getOpenApi(httpHeaders, null);
 
         // The cached model should still have the original /api/ server URL
         assertThat(cachedOpenAPI.getServers()).hasSize(1);
@@ -130,13 +130,15 @@ class OpenApiResourceTest {
         when(httpHeaders.getRequestHeaders()).thenReturn(headers);
         when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("http://localhost:9000/"));
 
-        final var response = resource.getOpenApi(httpHeaders, null, ".yaml");
+        final var response = resource.getOpenApi(httpHeaders, ".yaml");
         final var yaml = response.getEntity().toString();
 
         // YAML should not start with '{' (that would be JSON)
         assertThat(yaml).doesNotStartWith("{");
         // Should contain the server URL
         assertThat(yaml).contains("http://localhost:9000/api/");
+        // YAML output should be pretty-printed (contains newlines and indentation)
+        assertThat(yaml).contains("\n");
     }
 
     @Test
@@ -145,11 +147,34 @@ class OpenApiResourceTest {
         when(httpHeaders.getRequestHeaders()).thenReturn(headers);
         when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("http://localhost:9000/"));
 
-        final var response = resource.getOpenApi(httpHeaders, null, null);
+        final var response = resource.getOpenApi(httpHeaders, null);
         final var json = response.getEntity().toString();
 
         // Verify it's valid JSON by parsing it
         final var tree = new ObjectMapper().readTree(json);
         assertThat(tree.has("openapi")).isTrue();
+    }
+
+    @Test
+    void returns404WhenOpenAPIModelIsNull() throws Exception {
+        when(openApiContext.read()).thenReturn(null);
+
+        final var response = resource.getOpenApi(httpHeaders, null);
+
+        assertThat(response.getStatus()).isEqualTo(404);
+    }
+
+    @Test
+    void prettyPrintsJsonOutput() throws Exception {
+        final var headers = new MultivaluedHashMap<String, String>();
+        when(httpHeaders.getRequestHeaders()).thenReturn(headers);
+        when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("http://localhost:9000/"));
+
+        final var response = resource.getOpenApi(httpHeaders, null);
+        final var json = response.getEntity().toString();
+
+        // Pretty-printed JSON contains newlines and indentation
+        assertThat(json).contains("\n");
+        assertThat(json).contains("  ");
     }
 }
