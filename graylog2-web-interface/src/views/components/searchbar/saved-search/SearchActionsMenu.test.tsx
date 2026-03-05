@@ -19,6 +19,7 @@ import * as Immutable from 'immutable';
 import { render, screen, waitFor, waitForElementToBeRemoved } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { defaultUser } from 'defaultMockValues';
+import { useFormikContext } from 'formik';
 
 import { asMock } from 'helpers/mocking';
 import { adminUser } from 'fixtures/users';
@@ -47,6 +48,10 @@ import { EntityShareStore } from 'stores/permissions/EntityShareStore';
 
 import SearchActionsMenu from './SearchActionsMenu';
 
+jest.mock('formik', () => ({
+  ...jest.requireActual('formik'),
+  useFormikContext: jest.fn(),
+}));
 jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('routing/useHistory');
 jest.mock('hooks/useCurrentUser');
@@ -130,6 +135,8 @@ describe('SearchActionsMenu', () => {
     asMock(useIsDirty).mockReturnValue(false);
     asMock(useIsNew).mockReturnValue(false);
     asMock(EntityShareStore.getInitialState).mockReturnValue({ state: createEntityShareState });
+    // @ts-expect-error context return type is not complete
+    asMock(useFormikContext).mockReturnValue({ dirty: false });
   });
 
   useViewsPlugin();
