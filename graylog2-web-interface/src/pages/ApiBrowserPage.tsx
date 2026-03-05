@@ -116,7 +116,28 @@ const ApiBrowserPage = () => {
           server-url="api/"
           hide-authentication
           hide-server-selection
-        />
+        >
+          <div slot="overview-header" style={{ padding: '16px 16px 0', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
+            <span>Download OpenAPI specification:</span>
+            {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+            <select onChange={(e) => {
+              const path = e.target.value;
+
+              if (path) {
+                const link = document.createElement('a');
+                link.href = qualifyUrl(path);
+                link.download = `openapi${path.substring(path.lastIndexOf('.'))}`;
+                link.click();
+              }
+
+              e.target.value = '';
+            }}>
+              <option value="">Select format</option>
+              <option value="/openapi.json">JSON</option>
+              <option value="/openapi.yaml">YAML</option>
+            </select>
+          </div>
+        </openapi-explorer>
       </StyledExplorerContainer>
     </DocumentTitle>
   );
