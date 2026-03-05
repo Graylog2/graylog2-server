@@ -54,7 +54,7 @@ public class OpensearchClusterSniffer implements NodesSniffer {
     @Override
     public List<DiscoveredNode> sniff() throws IOException {
         final JsonNode response = client.performRequest(
-                Requests.builder().method("GET").endpoint("_nodes/http").build(),
+                Requests.builder().method("GET").endpoint("/_nodes/http").build(),
                 "Failed to query /_nodes/http for node discovery");
 
         final JsonNode nodesObj = response.get("nodes");
