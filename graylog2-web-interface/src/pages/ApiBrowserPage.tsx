@@ -106,6 +106,8 @@ const ApiBrowserPage = () => {
     );
   }
 
+  // @ts-ignore
+  // @ts-ignore
   return (
     <DocumentTitle title="API Browser">
       <StyledExplorerContainer>
@@ -115,28 +117,38 @@ const ApiBrowserPage = () => {
           spec-url={qualifyUrl('/openapi.yaml')}
           server-url="api/"
           hide-authentication
-          hide-server-selection
-        >
-          <div slot="overview-header" style={{ padding: '16px 16px 0', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
-            <span>Download OpenAPI specification:</span>
-            {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-            <select onChange={(e) => {
-              const path = e.target.value;
-
-              if (path) {
-                const link = document.createElement('a');
-                link.href = qualifyUrl(path);
-                link.download = `openapi${path.substring(path.lastIndexOf('.'))}`;
-                link.click();
-              }
-
-              e.target.value = '';
+          hide-server-selection>
+          <div
+            slot="overview-header"
+            style={{
+              padding: '16px 16px 0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              gap: '8px',
             }}>
+            <span>Download OpenAPI specification:</span>
+            {}
+            <select
+              onChange={(e) => {
+                const path = e.target.value;
+
+                if (path) {
+                  const link = document.createElement('a');
+                  link.href = qualifyUrl(path);
+                  link.download = `openapi${path.substring(path.lastIndexOf('.'))}`;
+                  link.click();
+                }
+
+                // eslint-disable-next-line no-param-reassign
+                e.target.value = '';
+              }}>
               <option value="">Select format</option>
               <option value="/openapi.json">JSON</option>
               <option value="/openapi.yaml">YAML</option>
             </select>
           </div>
+          {/* @ts-ignore - openapi-explorer is a web component */}
         </openapi-explorer>
       </StyledExplorerContainer>
     </DocumentTitle>
