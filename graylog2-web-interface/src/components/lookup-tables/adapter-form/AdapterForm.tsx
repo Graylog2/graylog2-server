@@ -84,6 +84,14 @@ const DataAdapterForm = ({ type, title, saved, onCancel, create = false, dataAda
   const DocComponent = React.useMemo(() => plugin?.documentationComponent, [plugin]);
   const pluginDisplayName = React.useMemo(() => plugin?.displayName || type, [plugin, type]);
 
+  const initialValues = useMemo(() => {
+    if (plugin?.prepareConfig && dataAdapter?.config) {
+      return { ...dataAdapter, config: plugin.prepareConfig(dataAdapter.config) };
+    }
+
+    return dataAdapter;
+  }, [dataAdapter, plugin]);
+
   const handleSubmit = async (values: LookupTableAdapter) => {
     const promise = create ? createAdapter(values) : updateAdapter(values);
 
@@ -109,7 +117,7 @@ const DataAdapterForm = ({ type, title, saved, onCancel, create = false, dataAda
     <RowContainer style={{ flexGrow: 1 }} $withDocs={!!DocComponent}>
       <Col style={{ flexGrow: 1, height: '100%' }}>
         <Title title={title} typeName={pluginDisplayName} create={create} />
-        <Formik initialValues={dataAdapter} onSubmit={handleSubmit} validateOnBlur={false} enableReinitialize>
+        <Formik initialValues={initialValues} onSubmit={handleSubmit} validateOnBlur={false} enableReinitialize>
           {({ isSubmitting, isValid }) => (
             <FlexForm className="form form-horizontal">
               <Row $gap="xl" style={{ flexGrow: 1 }}>
