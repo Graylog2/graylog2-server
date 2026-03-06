@@ -20,7 +20,6 @@ import fetch from 'logic/rest/FetchProvider';
 import asMock from 'helpers/mocking/AsMock';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
-
 import { EXCLUDE_INFO_FILTER } from 'logic/alerts/EventDefinitionPriorityEnum';
 
 import fetchEvents, { defaultTimeRange, parseFilters, parseTypeFilter } from './fetchEvents';
