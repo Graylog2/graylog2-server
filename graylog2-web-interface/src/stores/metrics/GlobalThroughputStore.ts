@@ -45,7 +45,11 @@ export const GlobalThroughputStore = singletonStore('core.GlobalThroughput', () 
       MetricsActions.addGlobal(this.metrics.input);
       MetricsActions.addGlobal(this.metrics.output);
       this.listenTo(MetricsStore, this.updateMetrics);
-      setInterval(MetricsActions.list, this.INTERVAL);
+      setInterval(() => {
+        if (!document.hidden) {
+          MetricsActions.list();
+        }
+      }, this.INTERVAL);
     },
 
     getInitialState() {
