@@ -15,22 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { createContext, useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
+import MetricsContext from 'contexts/MetricsContext';
 import type { ClusterMetric, Metric } from 'types/metrics';
-
-type MetricsContextType = {
-  metrics: ClusterMetric;
-  isLoading: boolean;
-  subscribe: (names: string[]) => void;
-  unsubscribe: (names: string[]) => void;
-};
-
-export const MetricsContext = createContext<MetricsContextType | undefined>(undefined);
 
 const buildMetricsFromResponse = (response: Record<string, { metrics: Metric[] } | null>): ClusterMetric => {
   const metrics: ClusterMetric = {};

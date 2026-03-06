@@ -19,7 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { ClusterNodeMetrics } from '@graylog/server-api';
 
-import { MetricsContext } from 'contexts/MetricsProvider';
+import MetricsContext from 'contexts/MetricsContext';
 import type { ClusterMetric, Metric, NodeMetric } from 'types/metrics';
 
 const useMetricsContext = () => {
