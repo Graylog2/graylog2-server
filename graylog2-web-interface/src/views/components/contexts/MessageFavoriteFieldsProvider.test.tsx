@@ -97,7 +97,7 @@ describe('MessageFavoriteFieldsProvider', () => {
   it('saveFavoriteField calls saveFavoriteField from hook', async () => {
     renderComponent();
 
-    userEvent.click(await screen.findByRole('button', { name: /save-action/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /save-action/i }));
 
     expect(mockSaveFields).toHaveBeenCalledWith(['field1', 'field2', 'new']);
   });
@@ -105,7 +105,7 @@ describe('MessageFavoriteFieldsProvider', () => {
   it('toggleField calls toggleField from hook', async () => {
     renderComponent();
 
-    userEvent.click(await screen.findByRole('button', { name: /toggle-action/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /toggle-action/i }));
 
     expect(mockToggleField).toHaveBeenCalledWith('field3');
   });

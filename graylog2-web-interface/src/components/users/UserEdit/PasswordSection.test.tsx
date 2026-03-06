@@ -16,7 +16,7 @@
  */
 import userEvent from '@testing-library/user-event';
 import * as React from 'react';
-import { render, waitFor, screen, act } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import { defaultUser } from 'defaultMockValues';
 
 import { asMock } from 'helpers/mocking';
@@ -63,12 +63,9 @@ describe('<PasswordSection />', () => {
     const newPasswordRepeatInput = screen.getByLabelText('Repeat Password');
     const submitButton = screen.getByText('Change Password');
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      await userEvent.type(newPasswordInput, 'Abcdef1!');
-      await userEvent.type(newPasswordRepeatInput, 'Abcdef1!');
-      await userEvent.click(submitButton);
-    });
+    await userEvent.type(newPasswordInput, 'Abcdef1!');
+    await userEvent.type(newPasswordRepeatInput, 'Abcdef1!');
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(UsersActions.changePassword).toHaveBeenCalledTimes(1));
 
@@ -86,13 +83,10 @@ describe('<PasswordSection />', () => {
     const newPasswordRepeatInput = screen.getByLabelText('Repeat Password');
     const submitButton = screen.getByText('Change Password');
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      await userEvent.type(passwordInput, 'oldpassword');
-      await userEvent.type(newPasswordInput, 'Abcdef1!');
-      await userEvent.type(newPasswordRepeatInput, 'Abcdef1!');
-      await userEvent.click(submitButton);
-    });
+    await userEvent.type(passwordInput, 'oldpassword');
+    await userEvent.type(newPasswordInput, 'Abcdef1!');
+    await userEvent.type(newPasswordRepeatInput, 'Abcdef1!');
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(UsersActions.changePassword).toHaveBeenCalledTimes(1));
 
@@ -108,12 +102,9 @@ describe('<PasswordSection />', () => {
     const newPasswordInput = screen.getByLabelText('New Password');
     const newPasswordRepeatInput = screen.getByLabelText('Repeat Password');
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      await userEvent.type(newPasswordInput, 'Abcdef1!');
-      await userEvent.type(newPasswordRepeatInput, 'Abcdef1?');
-      await userEvent.tab();
-    });
+    await userEvent.type(newPasswordInput, 'Abcdef1!');
+    await userEvent.type(newPasswordRepeatInput, 'Abcdef1?');
+    await userEvent.tab();
 
     await screen.findByText('Passwords do not match');
   });
@@ -125,10 +116,7 @@ describe('<PasswordSection />', () => {
 
     const newPasswordInput = screen.getByLabelText('New Password');
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      await userEvent.type(newPasswordInput, 'Abcdef1!');
-    });
+    await userEvent.type(newPasswordInput, 'Abcdef1!');
 
     await waitFor(() => {
       expect(
@@ -142,11 +130,8 @@ describe('<PasswordSection />', () => {
 
     const newPasswordInput = screen.getByLabelText('New Password');
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      await userEvent.type(newPasswordInput, 'abc');
-      await userEvent.tab();
-    });
+    await userEvent.type(newPasswordInput, 'abc');
+    await userEvent.tab();
 
     expect(screen.getByText('Password must be at least 8 characters long.', { exact: false })).toBeInTheDocument();
     expect(

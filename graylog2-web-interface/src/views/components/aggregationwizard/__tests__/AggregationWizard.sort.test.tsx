@@ -20,8 +20,6 @@ import type { Matcher } from 'wrappedTestingLibrary';
 import { render, within, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
-import { act } from 'wrappedTestingLibrary/hooks';
-
 import selectEvent from 'helpers/selectEvent';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
@@ -251,6 +249,7 @@ describe('AggregationWizard', () => {
     it(
       'should correctly update sort of sort elements',
       async () => {
+        const user = userEvent.setup();
         const sort1 = new SortConfig('pivot', 'http_method', Direction.Ascending);
         const sort2 = new SortConfig('pivot', 'took_ms', Direction.Descending);
 
@@ -266,17 +265,13 @@ describe('AggregationWizard', () => {
         });
         await firstItemDragHandle.focus();
 
-        await act(async () => {
-          await userEvent.keyboard('[Space]');
-        });
+        await user.keyboard('[Space]');
 
-        userEvent.keyboard('{ArrowDown}');
+        await user.keyboard('{ArrowDown}');
 
         await screen.findByText(/was moved over droppable area/i);
 
-        await act(async () => {
-          await userEvent.keyboard('[Space]');
-        });
+        await user.keyboard('[Space]');
 
         await submitWidgetConfigForm();
 

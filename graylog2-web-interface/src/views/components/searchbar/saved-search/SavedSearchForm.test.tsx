@@ -51,7 +51,7 @@ const shareWithCollaborator = async () => {
     name: /add collaborator/i,
   });
 
-  userEvent.click(addCollaborator);
+  await setupUser().click(addCollaborator);
 
   await screen.findByText(/everyone/i);
 };
@@ -67,6 +67,8 @@ const mockFormDirtyState = (dirty: boolean) =>
   asMock(useFormikContext)
     // @ts-expect-error context return type is not complete
     .mockReturnValue({ dirty });
+
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
 describe('SavedSearchForm', () => {
   beforeEach(() => {
@@ -127,7 +129,7 @@ describe('SavedSearchForm', () => {
       render(<SavedSearchForm {...props} toggleModal={onToggleModal} />);
 
       const cancelButton = await screen.findByRole('button', { name: /cancel/i });
-      userEvent.click(cancelButton);
+      await setupUser().click(cancelButton);
 
       expect(onToggleModal).toHaveBeenCalledTimes(1);
     });
@@ -138,7 +140,7 @@ describe('SavedSearchForm', () => {
       render(<SavedSearchForm {...props} saveSearch={onSave} />);
 
       const saveButton = await screen.findByRole('button', { name: /Save search/i });
-      userEvent.click(saveButton);
+      await setupUser().click(saveButton);
 
       expect(onSave).toHaveBeenCalledTimes(1);
     });
@@ -148,9 +150,9 @@ describe('SavedSearchForm', () => {
 
       render(<SavedSearchForm {...props} saveAsSearch={onSaveAs} />);
 
-      userEvent.type(await findTitleInput(), ' and further title');
+      await setupUser().type(await findTitleInput(), ' and further title');
       const saveAsButton = await screen.findByRole('button', { name: /Save as/i });
-      userEvent.click(saveAsButton);
+      await setupUser().click(saveAsButton);
 
       expect(onSaveAs).toHaveBeenCalledWith('new Title and further title', null);
     });
@@ -161,7 +163,7 @@ describe('SavedSearchForm', () => {
       render(<SavedSearchForm {...props} saveAsSearch={onSaveAs} />);
 
       const saveAsButton = await screen.findByRole('button', { name: /Save as/i });
-      userEvent.click(saveAsButton);
+      await setupUser().click(saveAsButton);
 
       expect(onSaveAs).not.toHaveBeenCalled();
     });
@@ -171,9 +173,9 @@ describe('SavedSearchForm', () => {
 
       render(<SavedSearchForm {...props} saveAsSearch={onSaveAs} isCreateNew />);
 
-      userEvent.type(await findTitleInput(), ' and further title');
+      await setupUser().type(await findTitleInput(), ' and further title');
       const createNewButton = await screen.findByRole('button', { name: /create new/i });
-      userEvent.click(createNewButton);
+      await setupUser().click(createNewButton);
 
       expect(onSaveAs).toHaveBeenCalledWith('new Title and further title', null);
     });
@@ -181,12 +183,12 @@ describe('SavedSearchForm', () => {
     it('should handle saveSearch with share settings', async () => {
       const onSaveAs = jest.fn();
       render(<SavedSearchForm {...props} saveAsSearch={onSaveAs} isCreateNew />);
-      userEvent.type(await findTitleInput(), ' and further title');
+      await setupUser().type(await findTitleInput(), ' and further title');
       const createNewButton = await screen.findByRole('button', { name: /create new/i });
 
       await shareWithCollaborator();
 
-      userEvent.click(createNewButton);
+      await setupUser().click(createNewButton);
 
       expect(onSaveAs).toHaveBeenCalledTimes(1);
     });
