@@ -162,6 +162,7 @@ public class EventsFilterBuilder {
             case "high", "3" -> 3;
             case "normal", "2" -> 2;
             case "low", "1" -> 1;
+            case "info", "0" -> 0;
             default -> throw new IllegalStateException("Invalid priority: " + priorityFilter);
         };
     }

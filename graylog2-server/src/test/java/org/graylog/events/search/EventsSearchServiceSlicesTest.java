@@ -86,6 +86,7 @@ class EventsSearchServiceSlicesTest {
     void testSlicesByPriority_AllLevelsPresent() throws Exception {
         // Mock ScriptingApiService to return aggregation results for priority
         mockAggregationResponse(FIELD_PRIORITY, Map.of(
+            "0", 2L,
             "1", 5L,
             "2", 8L,
             "3", 4L,
@@ -102,13 +103,14 @@ class EventsSearchServiceSlicesTest {
 
         Slices result = service.slices(request, mockSubject, mockSearchUser);
 
-        // Assert all 4 priority levels present
+        // Assert all 5 priority levels present (0=info through 4=critical)
         assertThat(result.slices())
-            .hasSize(4)
+            .hasSize(5)
             .extracting(Slice::value)
-            .containsExactlyInAnyOrder("1", "2", "3", "4");
+            .containsExactlyInAnyOrder("0", "1", "2", "3", "4");
 
         // Assert counts match fixture data
+        assertSliceCount(result.slices(), "0", 2);
         assertSliceCount(result.slices(), "1", 5);
         assertSliceCount(result.slices(), "2", 8);
         assertSliceCount(result.slices(), "3", 4);
@@ -119,6 +121,7 @@ class EventsSearchServiceSlicesTest {
     void testSlicesByPriority_WithQuery() throws Exception {
         // Mock filtered results with query
         mockAggregationResponse(FIELD_PRIORITY, Map.of(
+            "0", 1L,
             "1", 3L,
             "2", 5L,
             "3", 2L,
@@ -139,7 +142,7 @@ class EventsSearchServiceSlicesTest {
         int totalCount = result.slices().stream()
             .mapToInt(Slice::count)
             .sum();
-        assertThat(totalCount).isEqualTo(11);
+        assertThat(totalCount).isEqualTo(12);
     }
 
     @Test
@@ -287,6 +290,7 @@ class EventsSearchServiceSlicesTest {
     void testSlicesWithEmptyQuery() throws Exception {
         // Mock full dataset
         mockAggregationResponse(FIELD_PRIORITY, Map.of(
+            "0", 2L,
             "1", 5L,
             "2", 8L,
             "3", 4L,
@@ -306,7 +310,7 @@ class EventsSearchServiceSlicesTest {
         int totalCount = result.slices().stream()
             .mapToInt(Slice::count)
             .sum();
-        assertThat(totalCount).isEqualTo(20);
+        assertThat(totalCount).isEqualTo(22);
     }
 
     // Helper methods
