@@ -73,6 +73,18 @@ class FleetTransactionLogServiceTest {
     }
 
     @Test
+    void appendFleetMarkerDoesntAllowEmptyTarget() {
+        assertThatThrownBy(() -> service.appendFleetMarker("", MarkerType.CONFIG_CHANGED))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThatThrownBy(() -> service.appendFleetMarker(Set.of(""), MarkerType.CONFIG_CHANGED))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThatThrownBy(() -> service.appendFleetMarker(Set.of(), MarkerType.CONFIG_CHANGED))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
     void appendCollectorMarkerWithPayloadStoresPayload() {
         var payload = new Document("new_fleet_id", "fleet-B");
         long seq = service.appendCollectorMarker(Set.of("inst-1"), MarkerType.FLEET_REASSIGNED, payload);

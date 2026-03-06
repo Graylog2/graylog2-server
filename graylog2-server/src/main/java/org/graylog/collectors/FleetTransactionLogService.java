@@ -25,6 +25,7 @@ import com.mongodb.client.model.Updates;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog.collectors.db.CoalescedActions;
@@ -77,7 +78,12 @@ public class FleetTransactionLogService {
     }
 
     public long appendFleetMarker(String fleetId, MarkerType type) {
-        return appendMarker(TransactionMarker.TARGET_FLEET, Set.of(fleetId), type, null);
+        return appendFleetMarker(Set.of(fleetId), type);
+
+    }
+
+    public long appendFleetMarker(Set<String> fleetIds, MarkerType type) {
+        return appendMarker(TransactionMarker.TARGET_FLEET, fleetIds, type, null);
     }
 
     public long appendCollectorMarker(Set<String> instanceUids, MarkerType type, @Nullable Document payload) {
@@ -91,6 +97,10 @@ public class FleetTransactionLogService {
     }
 
     private long appendMarker(String target, Set<String> targetIds, MarkerType type, @Nullable Document payload) {
+        if (targetIds == null || targetIds.isEmpty() || targetIds.stream().noneMatch(StringUtils::isNotBlank)) {
+            throw new IllegalArgumentException("targetIds must not be empty");
+        }
+
         final long seq = sequenceService.incrementAndGet(SEQUENCE_TOPIC);
         collection.updateOne(
                 Filters.eq("_id", seq),
