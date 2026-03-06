@@ -41,7 +41,7 @@ public class StandaloneNodeMongodbNodes implements MongodbNodesService {
     }
 
     private MongodbNode getNode() {
-        Document serverStatus = mongoConnection.getDatabase("admin").runCommand(new Document("serverStatus", 1));
+        Document serverStatus = mongoConnection.getDatabase(MongodbClusterCommand.GRAYLOG_DATABASE_NAME).runCommand(new Document("serverStatus", 1));
 
         // Extract basic information
         String version = serverStatus.getString("version");

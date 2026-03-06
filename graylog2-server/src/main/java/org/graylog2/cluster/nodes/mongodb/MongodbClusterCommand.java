@@ -17,9 +17,13 @@
 package org.graylog2.cluster.nodes.mongodb;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoCommandException;
+import com.mongodb.MongoSecurityException;
 import jakarta.inject.Inject;
 import org.bson.Document;
 import org.graylog2.database.MongoConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -29,6 +33,9 @@ import java.util.stream.Collectors;
 
 public class MongodbClusterCommand {
 
+    private static final Logger LOG = LoggerFactory.getLogger(MongodbClusterCommand.class);
+
+    public static final String ADMIN_DATABASE_NAME = "admin";
     public static final String GRAYLOG_DATABASE_NAME = "graylog";
 
     private final MongoClient connection;
@@ -55,6 +62,17 @@ public class MongodbClusterCommand {
     private <T> T runCommand(String host, BiFunction<String, MongoClient, T> call) {
         try (final MongoClient client = mongodbConnectionResolver.resolve(host)) {
             return call.apply(host, client);
+        } catch (MongoCommandException e) {
+            // Error code 13 is "Unauthorized" in MongoDB
+            if (e.getErrorCode() == 13) {
+                LOG.error("Permission denied when executing command on MongoDB node '{}'. The MongoDB user may lack required privileges.", host, e);
+                throw new MongodbPermissionException("Permission denied when executing command on MongoDB node '" + host + "'. Please ensure the MongoDB user has the required privileges.", e);
+            }
+            LOG.error("MongoDB command failed on node '{}'", host, e);
+            throw e;
+        } catch (MongoSecurityException e) {
+            LOG.error("Security/authentication error when connecting to MongoDB node '{}'. Check MongoDB credentials and permissions.", host, e);
+            throw new MongodbPermissionException("Security error when connecting to MongoDB node '" + host + "'. Please check MongoDB credentials and permissions.", e);
         }
     }
 }

@@ -42,7 +42,9 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.cluster.nodes.mongodb.MongodbClusterCommand;
 import org.graylog2.cluster.nodes.mongodb.MongodbNode;
+import org.graylog2.cluster.nodes.mongodb.MongodbNodeUtils;
 import org.graylog2.cluster.nodes.mongodb.MongodbNodesProvider;
+import org.graylog2.cluster.nodes.mongodb.MongodbPermissionException;
 import org.graylog2.cluster.nodes.mongodb.ProfilingLevel;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.SortOrder;
@@ -58,6 +60,8 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.utilities.lucene.InMemorySearchEngine;
 import org.graylog2.utilities.lucene.LuceneInMemorySearchEngine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -75,6 +79,7 @@ import java.util.stream.Collectors;
 @Produces(MediaType.APPLICATION_JSON)
 public class MongodbClusterResource extends RestResource {
 
+    private static final Logger LOG = LoggerFactory.getLogger(MongodbClusterResource.class);
     private static final String DEFAULT_SORT_FIELD = "name";
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
@@ -144,10 +149,21 @@ public class MongodbClusterResource extends RestResource {
     @Operation(summary = "Enables profiling for all mongodb nodes")
     @RequiresPermissions(RestPermissions.MONGODB_ENABLE_PROFILING)
     public Response enableProfiling(@PathParam("level") ProfilingLevel level) {
-        Document command = new Document("profile", level.getNumericalValue())
-                .append("slowms", 100);
-        clusterCommand.runOnEachNode(command);
-        return profilingStatus();
+        try {
+            Document command = new Document("profile", level.getNumericalValue())
+                    .append("slowms", MongodbNodeUtils.SLOW_QUERIES_THRESHOLD);
+            clusterCommand.runOnEachNode(command);
+            return profilingStatus();
+        } catch (MongodbPermissionException e) {
+            LOG.error("Failed to enable profiling due to insufficient MongoDB permissions", e);
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity(Map.of(
+                            "error", "Permission denied",
+                            "message", e.getMessage(),
+                            "hint", "The MongoDB user needs the 'enableProfiler' privilege on the database. Grant it with: db.grantRolesToUser('<username>', [{ role: 'dbAdmin', db: 'graylog' }])"
+                    ))
+                    .build();
+        }
     }
 
     @GET
@@ -155,15 +171,26 @@ public class MongodbClusterResource extends RestResource {
     @Operation(summary = "Aggregates profiling status for all mongodb nodes")
     @Timed
     public Response profilingStatus() {
-        Document command = new Document("profile", -1);
-        final Map<ProfilingLevel, Long> result = clusterCommand.runOnEachNode(command)
-                .values().stream()
-                .map(doc -> doc.getInteger("was"))
-                .map(ProfilingLevel::fromNumericalValue)
-                .collect(Collectors.groupingBy(
-                        Function.identity(),
-                        Collectors.counting()
-                ));
-        return Response.ok().entity(result).build();
+        try {
+            Document command = new Document("profile", -1);
+            final Map<ProfilingLevel, Long> result = clusterCommand.runOnEachNode(command)
+                    .values().stream()
+                    .map(doc -> doc.getInteger("was"))
+                    .map(ProfilingLevel::fromNumericalValue)
+                    .collect(Collectors.groupingBy(
+                            Function.identity(),
+                            Collectors.counting()
+                    ));
+            return Response.ok().entity(result).build();
+        } catch (MongodbPermissionException e) {
+            LOG.error("Failed to retrieve profiling status due to insufficient MongoDB permissions", e);
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity(Map.of(
+                            "error", "Permission denied",
+                            "message", e.getMessage(),
+                            "hint", "The MongoDB user needs the 'clusterMonitor' or 'dbAdmin' role to read profiling status."
+                    ))
+                    .build();
+        }
     }
 }

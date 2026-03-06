@@ -39,7 +39,7 @@ public class ReplicaSetMongodbNodes implements MongodbNodesService {
 
     @Override
     public List<MongodbNode> allNodes() {
-        Document replicaStatus = mongoConnection.getDatabase("admin").runCommand(new Document("replSetGetStatus", 1));
+        Document replicaStatus = mongoConnection.getDatabase(MongodbClusterCommand.ADMIN_DATABASE_NAME).runCommand(new Document("replSetGetStatus", 1));
 
         final List<Document> members = replicaStatus.getList("members", Document.class);
 
@@ -68,7 +68,7 @@ public class ReplicaSetMongodbNodes implements MongodbNodesService {
     }
 
     private MongodbNode toMongodbNode(String hostname, Document member, MongoClient connection, Document primaryMember) {
-        final Document serverStatus = connection.getDatabase("graylog").runCommand(new Document("serverStatus", 1));
+        final Document serverStatus = connection.getDatabase(MongodbClusterCommand.GRAYLOG_DATABASE_NAME).runCommand(new Document("serverStatus", 1));
         ProfilingResult profilingResult = MongodbNodeUtils.getProfilingResults(connection);
 
         Document connections = serverStatus.get("connections", Document.class);

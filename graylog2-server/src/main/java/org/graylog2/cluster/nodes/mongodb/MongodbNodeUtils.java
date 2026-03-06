@@ -23,12 +23,11 @@ import java.util.Date;
 
 public class MongodbNodeUtils {
 
-    public static final String GRAYLOG_DATABASE_NAME = "graylog";
-    public static final int SLOW_QUERIES_TRESHOLD = 100;
+    public static final int SLOW_QUERIES_THRESHOLD = 100;
 
     public static ProfilingResult getProfilingResults(MongoClient mongoConnection) {
         // Check if profiling is enabled and query system.profile
-        Document profileStatus = mongoConnection.getDatabase(GRAYLOG_DATABASE_NAME).runCommand(new Document("profile", -1));
+        Document profileStatus = mongoConnection.getDatabase(MongodbClusterCommand.GRAYLOG_DATABASE_NAME).runCommand(new Document("profile", -1));
         int profilingLevel = profileStatus.getInteger("was", 0);
         if (profilingLevel > 0) {
             // Count slow queries from the last 5 minutes
@@ -36,9 +35,9 @@ public class MongodbNodeUtils {
             Date cutoffTime = new Date(fiveMinutesAgo);
 
             Document query = new Document("ts", new Document("$gte", cutoffTime))
-                    .append("millis", new Document("$gte", SLOW_QUERIES_TRESHOLD)); // Queries taking more than 100ms
+                    .append("millis", new Document("$gte", SLOW_QUERIES_THRESHOLD)); // Queries taking more than 100ms
 
-            final long slowQueries = mongoConnection.getDatabase(GRAYLOG_DATABASE_NAME)
+            final long slowQueries = mongoConnection.getDatabase(MongodbClusterCommand.GRAYLOG_DATABASE_NAME)
                     .getCollection("system.profile")
                     .countDocuments(query);
             return new ProfilingResult(ProfilingLevel.fromNumericalValue(profilingLevel), slowQueries);
@@ -49,7 +48,7 @@ public class MongodbNodeUtils {
 
     public static double calculateStorageUsedPercent(MongoClient mongoConnection) {
         try {
-            final Document dbStats = mongoConnection.getDatabase(GRAYLOG_DATABASE_NAME).runCommand(new Document("dbStats", 1));
+            final Document dbStats = mongoConnection.getDatabase(MongodbClusterCommand.GRAYLOG_DATABASE_NAME).runCommand(new Document("dbStats", 1));
             double fsUsedSize = dbStats.getDouble("fsUsedSize");
             double fsTotalSize = dbStats.getDouble("fsTotalSize");
             if (fsTotalSize > 0) {
