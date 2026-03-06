@@ -38,6 +38,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -90,10 +91,13 @@ public class RestTools {
     }
 
     public static URI buildExternalUri(@NotNull MultivaluedMap<String, String> httpHeaders, @NotNull URI defaultUri) {
+        return buildExternalUri(httpHeaders.getOrDefault(HttpConfiguration.OVERRIDE_HEADER, List.of()), defaultUri);
+    }
+
+    public static URI buildExternalUri(@NotNull List<String> overrideHeaderValues, @NotNull URI defaultUri) {
         Optional<URI> externalUri = Optional.empty();
-        final List<String> headers = httpHeaders.get(HttpConfiguration.OVERRIDE_HEADER);
-        if (headers != null && !headers.isEmpty()) {
-            externalUri = headers.stream()
+        if (!overrideHeaderValues.isEmpty()) {
+            externalUri = overrideHeaderValues.stream()
                     .filter(s -> {
                         try {
                             if (Strings.isNullOrEmpty(s)) {

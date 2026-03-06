@@ -302,6 +302,10 @@
             <artifactId>jersey-container-grizzly2-http</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.glassfish.grizzly</groupId>
+            <artifactId>grizzly-websockets</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.glassfish.hk2</groupId>
             <artifactId>guice-bridge</artifactId>
         </dependency>
@@ -1218,15 +1222,32 @@
                 <artifactId>protobuf-maven-plugin</artifactId>
                 <configuration>
                     <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
-                    <pluginId>grpc-java</pluginId>
-                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
                 </configuration>
                 <executions>
                     <execution>
+                        <id>compile</id>
                         <goals>
                             <goal>compile</goal>
                             <goal>compile-custom</goal>
                         </goals>
+                        <configuration>
+                            <pluginId>grpc-java</pluginId>
+                            <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
+                            <excludes>
+                                <exclude>opamp/proto/**</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                    <!-- We need a separate run for the OpAMP proto files because otherwise they fail to resolve imports -->
+                    <execution>
+                        <id>compile-opamp</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <clearOutputDirectory>false</clearOutputDirectory>
+                            <protoSourceRoot>${project.basedir}/src/main/proto/opamp/proto</protoSourceRoot>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
