@@ -1,0 +1,5 @@
+type = "f"
+message = "Use the 1-minute moving average for inputs throughput, instead of the total average."
+
+issues = ["graylog-plugin-enterprise#13190"]
+pulls = ["25170"]
