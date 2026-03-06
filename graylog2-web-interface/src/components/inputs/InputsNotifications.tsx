@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback, useEffect } from 'react';
 
+import { Button } from 'components/bootstrap';
 import type { Input } from 'components/messageloaders/Types';
 import useInputsStates from 'hooks/useInputsStates';
 import type { InputStates, InputState } from 'hooks/useInputsStates';
@@ -108,9 +109,9 @@ const InputsNotifications = () => {
         message: (
           <>
             {FAILED_MESSAGE}{' '}
-            <a href="#" onClick={(event) => { event.preventDefault(); applyRuntimeStatusFilter('FAILED'); }}>
+            <Button bsStyle="link" onClick={() => applyRuntimeStatusFilter('FAILED')}>
               Show failed inputs
-            </a>
+            </Button>
             .
           </>
         ),
@@ -124,9 +125,9 @@ const InputsNotifications = () => {
         message: (
           <>
             {SETUP_MESSAGE}{' '}
-            <a href="#" onClick={(event) => { event.preventDefault(); applyRuntimeStatusFilter('SETUP'); }}>
+            <Button bsStyle="link" onClick={() => applyRuntimeStatusFilter('SETUP')}>
               Show inputs in setup mode
-            </a>
+            </Button>
             .
           </>
         ),
@@ -140,9 +141,9 @@ const InputsNotifications = () => {
         message: (
           <>
             {STOPPED_MESSAGE}{' '}
-            <a href="#" onClick={(event) => { event.preventDefault(); applyRuntimeStatusFilter('NOT_RUNNING'); }}>
+            <Button bsStyle="link" onClick={() => applyRuntimeStatusFilter('NOT_RUNNING')}>
               Show stopped inputs
-            </a>
+            </Button>
             .
           </>
         ),

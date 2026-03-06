@@ -68,9 +68,9 @@ describe('<InputsNotifications />', () => {
 
     render(<InputsNotifications />);
 
-    expect(screen.getByRole('link', { name: 'Show failed inputs' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Show inputs in setup mode' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Show stopped inputs' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Show failed inputs' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Show inputs in setup mode' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Show stopped inputs' })).toBeInTheDocument();
   });
 
   it.each([
@@ -90,7 +90,7 @@ describe('<InputsNotifications />', () => {
     });
 
     render(<InputsNotifications />);
-    await userEvent.click(screen.getByRole('link', { name: linkText }));
+    await userEvent.click(screen.getByRole('button', { name: linkText }));
 
     expect(mockSetQueryParams).toHaveBeenCalledWith({
       filters: [`runtime_status=${status}`],

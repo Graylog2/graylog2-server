@@ -78,7 +78,7 @@ describe('<NotificationBanner>', () => {
         severity: 'warning',
         message: (
           <>
-            Inputs currently stopped will not receive traffic until started. <a href="#">Show stopped inputs</a>.
+            Inputs currently stopped will not receive traffic until started. <button type="button">Show stopped inputs</button>.
           </>
         ),
       },
@@ -86,6 +86,6 @@ describe('<NotificationBanner>', () => {
 
     render(<NotificationBanner title="Test" items={items} />);
 
-    expect(screen.getByRole('link', { name: 'Show stopped inputs' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Show stopped inputs' })).toBeInTheDocument();
   });
 });
