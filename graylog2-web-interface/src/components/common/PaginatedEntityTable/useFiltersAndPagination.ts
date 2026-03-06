@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { OrderedMap } from 'immutable';
 
 import { useQueryParam, StringParam } from 'routing/QueryParams';
@@ -30,15 +30,15 @@ export const useWithURLParams = (layoutConfig: LayoutConfig, defaultFilters?: Ur
   const [sliceCol, setSliceCol] = useQueryParam('sliceCol', StringParam);
   const [slice, setSlice] = useQueryParam('slice', StringParam);
   const urlPagination = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
-  const hasUserModifiedFilters = useRef(false);
+  const [hasUserModifiedFilters, setHasUserModifiedFilters] = useState(false);
 
   const effectiveFilters = useMemo(() => {
-    if (!hasUserModifiedFilters.current && urlQueryFilters.isEmpty() && defaultFilters && !defaultFilters.isEmpty()) {
+    if (!hasUserModifiedFilters && urlQueryFilters.isEmpty() && defaultFilters && !defaultFilters.isEmpty()) {
       return defaultFilters;
     }
 
     return urlQueryFilters;
-  }, [urlQueryFilters, defaultFilters]);
+  }, [hasUserModifiedFilters, urlQueryFilters, defaultFilters]);
 
   const fetchOptions: SearchParams = useMemo(
     () => ({
@@ -55,7 +55,7 @@ export const useWithURLParams = (layoutConfig: LayoutConfig, defaultFilters?: Ur
 
   const onChangeFilters = useCallback(
     (newUrlQueryFilters: UrlQueryFilters) => {
-      hasUserModifiedFilters.current = true;
+      setHasUserModifiedFilters(true);
       urlPagination.resetPage();
       setUrlQueryFilters(newUrlQueryFilters);
     },

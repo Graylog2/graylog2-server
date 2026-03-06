@@ -61,15 +61,18 @@ export const parseTypeFilter = (alert: string) => {
 const allPriorityKeys = Object.keys(EventDefinitionPriorityEnum.properties);
 
 const expandPriorityFilters = (priorities: Array<string>): Array<string> => {
-  const expanded = priorities.flatMap((p) => {
-    if (p === EXCLUDE_INFORMATIONAL_FILTER) {
-      return allPriorityKeys.filter((key) => key !== String(EventDefinitionPriorityEnum.INFORMATIONAL));
-    }
+  const hasNegated = priorities.includes(EXCLUDE_INFORMATIONAL_FILTER);
+  const specificValues = priorities.filter((p) => p !== EXCLUDE_INFORMATIONAL_FILTER);
 
-    return [p];
-  });
+  if (hasNegated && specificValues.length > 0) {
+    return specificValues;
+  }
 
-  return [...new Set(expanded)];
+  if (hasNegated) {
+    return allPriorityKeys.filter((key) => key !== String(EventDefinitionPriorityEnum.INFORMATIONAL));
+  }
+
+  return priorities;
 };
 
 const allTime = { type: 'relative', range: 0 } as const;
