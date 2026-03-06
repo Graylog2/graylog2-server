@@ -53,7 +53,7 @@ const StyledExplorerContainer = styled.div(
       --placeholder-color: ${theme.colors.input.placeholder};
       --selection-bg: ${theme.colors.brand.primary};
       --selection-fg: #fff;
-      --overlay-bg: rgba(0, 0, 0, 0.4);
+      --overlay-bg: rgb(0 0 0 / 40%);
       --code-fg: ${theme.colors.text.primary};
       --code-border-color: ${theme.colors.gray[80]};
       --inline-code-fg: ${theme.colors.variant.darker?.danger ?? theme.colors.text.primary};
