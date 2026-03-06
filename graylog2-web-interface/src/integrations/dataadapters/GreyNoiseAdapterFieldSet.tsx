@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import { Button, Input } from 'components/bootstrap';
 import type { ValidationState } from 'components/common/types';
@@ -23,35 +23,26 @@ type GreyNoiseAdapterFieldSetProps = {
   config: {
     api_token: any;
   };
-  updateConfig: (...args: any[]) => void;
+  setFieldValue: (...args: any[]) => void;
   validationState: (...args: any[]) => ValidationState;
   validationMessage: (...args: any[]) => string;
 };
 
 const GreyNoiseAdapterFieldSet = ({
   config,
-  updateConfig,
+  setFieldValue,
   validationMessage,
   validationState,
 }: GreyNoiseAdapterFieldSetProps) => {
-  const isCreate = useRef(!config.api_token?.is_set);
-  const [showResetPasswordButton, setShowResetPasswordButton] = useState(config.api_token?.is_set === true);
+  const [isCreate] = useState(() => !config.api_token?.keep_value);
+  const [showResetPasswordButton, setShowResetPasswordButton] = useState(!!config.api_token?.keep_value);
 
   const setUserPassword = useCallback(
     (nextUserPassword) => {
-      updateConfig({ ...config, api_token: nextUserPassword });
+      setFieldValue('config.api_token', nextUserPassword);
     },
-    [updateConfig, config],
+    [setFieldValue],
   );
-
-  useEffect(() => {
-    // Set a default value on `api_token` that the server can deserialize
-    if (config.api_token?.is_set !== undefined) {
-      // Keeping value is only helpful when editing, but since setting '' as value throws an error during
-      // validation, this at least avoids users seeing validation errors constantly.
-      setUserPassword({ keep_value: true });
-    }
-  }, [setUserPassword, config.api_token]);
 
   const handleUserPasswordChange = ({ target }) => {
     const typedPassword = target.value;
@@ -89,7 +80,7 @@ const GreyNoiseAdapterFieldSet = ({
           name="api_token"
           label="API Token"
           buttonAfter={
-            !isCreate.current ? (
+            !isCreate ? (
               <Button type="button" onClick={toggleUserPasswordReset}>
                 Undo Reset
               </Button>
