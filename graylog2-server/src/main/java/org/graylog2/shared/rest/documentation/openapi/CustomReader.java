@@ -30,6 +30,7 @@ import org.apache.commons.lang3.Strings;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.initializers.JerseyService;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -45,6 +46,7 @@ public class CustomReader extends Reader {
     }
 
     private final Map<Class<? extends PluginRestResource>, String> prefixes;
+    private final Set<String> usedOperationIds = new HashSet<>();
 
     @Inject
     public CustomReader(final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources,
@@ -58,9 +60,27 @@ public class CustomReader extends Reader {
         }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
+    /**
+     * Overrides the default O(n²) operation ID uniqueness check in {@link Reader} with an O(1) HashSet lookup.
+     * The parent implementation scans all existing paths and operations for every new operation ID assignment.
+     */
+    @Override
+    protected String getOperationId(String operationId) {
+        final var candidate = new StringBuilder(operationId);
+        int counter = 0;
+        while (usedOperationIds.contains(candidate.toString())) {
+            candidate.setLength(0);
+            candidate.append(operationId).append('_').append(++counter);
+        }
+        final var result = candidate.toString();
+        usedOperationIds.add(result);
+        return result;
+    }
+
     // We are synchronizing this method because the read process modifies the internal state of the Reader instance.
     @Override
     public synchronized OpenAPI read(Set<Class<?>> classes, Map<String, Object> resources) {
+        usedOperationIds.clear();
         final var openAPI = super.read(classes, resources);
 
         // Remove all markers from paths that we've added in the read method below
