@@ -23,10 +23,13 @@ import org.apache.shiro.util.ThreadContext;
 import org.graylog.collectors.CollectorInputService;
 import org.graylog.collectors.CollectorLogsDestinationService;
 import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.FleetService;
+import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.IngestEndpointConfig;
+import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
-import org.graylog2.configuration.HttpConfiguration;
 import org.graylog.collectors.opamp.OpAmpCaService;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +42,7 @@ import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -62,6 +66,10 @@ class CollectorsConfigResourceTest {
     private OpAmpCaService opAmpCaService;
     @Mock
     private ContainerRequestContext requestContext;
+    @Mock
+    private FleetService fleetService;
+    @Mock
+    private FleetTransactionLogService fleetTransactionLogService;
 
     private CollectorsConfigResource resource;
 
@@ -73,6 +81,8 @@ class CollectorsConfigResourceTest {
                 collectorInputService,
                 collectorLogsDestinationService,
                 httpConfiguration,
+                fleetService,
+                fleetTransactionLogService,
                 opAmpCaService
         );
 
@@ -158,6 +168,7 @@ class CollectorsConfigResourceTest {
         resource.put(request);
 
         verify(clusterConfigService).write(any(CollectorsConfig.class));
+        verify(fleetTransactionLogService).appendFleetMarker(anySet(), eq(MarkerType.INGEST_CONFIG_CHANGED));
     }
 
     private void stubCaService() {

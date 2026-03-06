@@ -35,7 +35,10 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.collectors.CollectorInputService;
 import org.graylog.collectors.CollectorLogsDestinationService;
 import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.FleetService;
+import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.IngestEndpointConfig;
+import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.input.CollectorIngestGrpcInput;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
 import org.graylog.collectors.opamp.OpAmpCaService;
@@ -61,6 +64,8 @@ public class CollectorsConfigResource extends RestResource {
     private final CollectorInputService collectorInputService;
     private final CollectorLogsDestinationService collectorLogsDestinationService;
     private final URI httpExternalUri;
+    private final FleetService fleetService;
+    private final FleetTransactionLogService fleetTransactionLogService;
     private final OpAmpCaService opAmpCaService;
 
     @Inject
@@ -68,11 +73,15 @@ public class CollectorsConfigResource extends RestResource {
                                     CollectorInputService collectorInputService,
                                     CollectorLogsDestinationService collectorLogsDestinationService,
                                     HttpConfiguration httpConfiguration,
+                                    FleetService fleetService,
+                                    FleetTransactionLogService fleetTransactionLogService,
                                     OpAmpCaService opAmpCaService) {
         this.clusterConfigService = clusterConfigService;
         this.collectorInputService = collectorInputService;
         this.collectorLogsDestinationService = collectorLogsDestinationService;
         this.httpExternalUri = httpConfiguration.getHttpExternalUri();
+        this.fleetService = fleetService;
+        this.fleetTransactionLogService = fleetTransactionLogService;
         this.opAmpCaService = opAmpCaService;
     }
 
@@ -127,6 +136,12 @@ public class CollectorsConfigResource extends RestResource {
         );
 
         clusterConfigService.write(config);
+
+        final var fleetIds = fleetService.getAllFleetIds();
+        if (!fleetIds.isEmpty()) {
+            fleetTransactionLogService.appendFleetMarker(fleetIds, MarkerType.INGEST_CONFIG_CHANGED);
+        }
+
         return config;
     }
 }
