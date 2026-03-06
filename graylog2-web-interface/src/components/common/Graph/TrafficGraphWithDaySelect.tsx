@@ -97,7 +97,7 @@ const TrafficGraphWithDaySelect = ({
   const unixTraffic = useMemo(() => (traffic ? formatTrafficData(traffic) : null), [traffic]);
 
   const formattedTotalTraffic = useMemo(() => {
-    const prettified = getPrettifiedValue(bytesOut, { abbrev: 'b', unitType: 'size' });
+    const prettified = getPrettifiedValue(bytesOut, { abbrev: 'b', unitType: 'binary_size' });
 
     return formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev);
   }, [bytesOut]);

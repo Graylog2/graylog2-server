@@ -58,7 +58,10 @@ const getNotificationItems = (
   const result: Array<NotificationItem> = [];
 
   if (hasInputInState(inputStates, [INPUT_STATES.FAILED, INPUT_STATES.FAILING])) {
-    result.push({ severity: 'danger', message: 'in failed state. Failed or failing inputs will not receive traffic until fixed.' });
+    result.push({
+      severity: 'danger',
+      message: 'in failed state. Failed or failing inputs will not receive traffic until fixed.',
+    });
   }
 
   if (hasInputInState(inputStates, INPUT_STATES.SETUP)) {

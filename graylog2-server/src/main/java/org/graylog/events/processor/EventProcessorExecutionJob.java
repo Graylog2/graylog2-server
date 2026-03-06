@@ -129,9 +129,9 @@ public class EventProcessorExecutionJob implements Job {
             // It's the specific event processors' duty to handle being executed with this larger timerange.
             // If an event processor was configured with a processingHopSize greater than the processingWindowSize
             // we can't use the catchup mode.
-            // Catch-up can be disabled per event processor via the enableCatchup flag.
+            // Catch-up can be disabled per event processor via the disableCatchup flag.
             final long catchUpSize = configurationProvider.get().eventCatchupWindow();
-            if (config.enableCatchup() && !config.isCron() && catchUpSize > 0 && catchUpSize > config.processingWindowSize() && to.plus(catchUpSize).isBefore(now) &&
+            if (!config.disableCatchup() && !config.isCron() && catchUpSize > 0 && catchUpSize > config.processingWindowSize() && to.plus(catchUpSize).isBefore(now) &&
                     config.processingHopSize() <= config.processingWindowSize()) {
                 final long chunkCount = catchUpSize / config.processingWindowSize();
 
@@ -153,7 +153,7 @@ public class EventProcessorExecutionJob implements Job {
 
             // The nextTime Optional can be empty if there will be no further executions of the trigger
             if (nextTime.isPresent()) {
-                if (config.enableCatchup() && nextTo.isBefore(now)) {
+                if (!config.disableCatchup() && nextTo.isBefore(now)) {
                     // If the next "to" timestamp of the timerange to process is in the past, we want to schedule the next
                     // execution of this job as soon as possible to make sure we catch up.
                     LOG.trace("Set nextTime to <{}> to catch up faster - calculated nextTime was <{}>", now, nextTime.get());
@@ -214,7 +214,7 @@ public class EventProcessorExecutionJob implements Job {
         private static final String FIELD_PROCESSING_WINDOW_SIZE = "processing_window_size";
         private static final String FIELD_PROCESSING_HOP_SIZE = "processing_hop_size";
         private static final String FIELD_IS_CRON = "is_cron";
-        private static final String FIELD_ENABLE_CATCHUP = "enable_catchup";
+        private static final String FIELD_DISABLE_CATCHUP = "disable_catchup";
 
         @JsonProperty(FIELD_EVENT_DEFINITION_ID)
         public abstract String eventDefinitionId();
@@ -231,8 +231,8 @@ public class EventProcessorExecutionJob implements Job {
         @JsonProperty(FIELD_IS_CRON)
         public abstract boolean isCron();
 
-        @JsonProperty(FIELD_ENABLE_CATCHUP)
-        public abstract boolean enableCatchup();
+        @JsonProperty(FIELD_DISABLE_CATCHUP)
+        public abstract boolean disableCatchup();
 
         public static Builder builder() {
             return Builder.create();
@@ -252,7 +252,7 @@ public class EventProcessorExecutionJob implements Job {
                 return new AutoValue_EventProcessorExecutionJob_Config.Builder()
                         .type(TYPE_NAME)
                         .isCron(false)
-                        .enableCatchup(true); // Default: catch-up enabled
+                        .disableCatchup(false); // Default: catch-up enabled
             }
 
             @JsonProperty(FIELD_EVENT_DEFINITION_ID)
@@ -270,8 +270,8 @@ public class EventProcessorExecutionJob implements Job {
             @JsonProperty(FIELD_IS_CRON)
             public abstract Builder isCron(boolean isCron);
 
-            @JsonProperty(FIELD_ENABLE_CATCHUP)
-            public abstract Builder enableCatchup(boolean enableCatchup);
+            @JsonProperty(value = FIELD_DISABLE_CATCHUP, defaultValue = "false")
+            public abstract Builder disableCatchup(boolean disableCatchup);
 
             abstract Config autoBuild();
 
