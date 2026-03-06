@@ -57,6 +57,8 @@ import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorParameters;
 import org.graylog.events.processor.aggregation.AggregationSearch;
 import org.graylog.events.processor.aggregation.PivotAggregationSearch;
+import org.graylog.events.processor.mongodb.MongoDBEventProcessorConfig;
+import org.graylog.events.processor.mongodb.MongoDBEventProcessorParameters;
 import org.graylog.events.processor.modifier.EventSummaryModifier;
 import org.graylog.events.processor.storage.EventStorageHandlerEngine;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
