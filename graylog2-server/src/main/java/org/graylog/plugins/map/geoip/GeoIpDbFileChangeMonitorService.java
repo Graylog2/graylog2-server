@@ -199,21 +199,19 @@ public final class GeoIpDbFileChangeMonitorService extends AbstractIdleService {
                 if (geoIpFileService.isCloud()) {
                     cityFile = geoIpFileService.getActiveCityFile();
                     asnFile = geoIpFileService.getActiveAsnFile();
-                    if (geoIpFileService.fileRefreshRequired(config)) {
-                        try {
-                            // This should only be true in multi-Graylog-node environments if the processor config is
-                            // changed on a different Graylog node. The files may not yet exist on-disk on this node and
-                            // will need to be downloaded first. The files have already been validated on the original node.
-                            if (geoIpFileService.fileRefreshRequired(config)) {
-                                geoIpFileService.downloadFilesToTempLocation(config);
-                                geoIpFileService.moveTempFilesToActive();
-                            }
-                        } catch (CloudDownloadException | IOException e) {
-                            String commonMessage = "Failed to pull new Geo-Location Processor database files from the cloud.";
-                            sendFailedSyncNotification(commonMessage + " Geo-Location Processor may not be functional on all nodes.");
-                            LOG.error("{} Geo-Location Processor will not be functional on this node.", commonMessage);
-                            return;
+                    try {
+                        // This should only be true in multi-Graylog-node environments if the processor config is
+                        // changed on a different Graylog node. The files may not yet exist on-disk on this node and
+                        // will need to be downloaded first. The files have already been validated on the original node.
+                        if (geoIpFileService.fileRefreshRequired(config)) {
+                            geoIpFileService.downloadFilesToTempLocation(config);
+                            geoIpFileService.moveTempFilesToActive();
                         }
+                    } catch (Exception e) {
+                        String commonMessage = "Failed to pull new Geo-Location Processor database files from the cloud.";
+                        sendFailedSyncNotification(commonMessage + " Geo-Location Processor may not be functional on all nodes.");
+                        LOG.error("{} Geo-Location Processor will not be functional on this node.", commonMessage);
+                        return;
                     }
                 }
                 geoIpResolverConfigValidator.validate(config);
