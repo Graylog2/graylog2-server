@@ -93,6 +93,7 @@ import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
+import org.graylog2.rest.resources.entities.FilterOption;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
@@ -111,6 +112,8 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static org.graylog2.database.filtering.inmemory.SingleFilterParser.FIELD_AND_VALUE_SEPARATOR;
+import static org.graylog2.database.filtering.inmemory.SingleFilterParser.WRONG_FILTER_EXPR_FORMAT_ERROR_MSG;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 @PublicCloudAPI
@@ -130,11 +133,16 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             .build();
     private static final String DEFAULT_SORT_FIELD = "title";
     private static final String DEFAULT_SORT_DIRECTION = "asc";
+    private static final String STATUS_FIELD = "status";
+    private static final String STATUS_FILTER_PREFIX = STATUS_FIELD + FIELD_AND_VALUE_SEPARATOR;
     private static final List<EntityAttribute> attributes = List.of(
             EntityAttribute.builder().id("title").title("Title").build(),
             EntityAttribute.builder().id("description").title("Description").build(),
             EntityAttribute.builder().id("priority").title("Priority").type(SearchQueryField.Type.INT).build(),
-            EntityAttribute.builder().id("status").title("Status").type(SearchQueryField.Type.BOOLEAN).sortable(false).build(),
+            EntityAttribute.builder().id(STATUS_FIELD).title("Status").type(SearchQueryField.Type.BOOLEAN).filterable(true).filterOptions(Set.of(
+                    FilterOption.create("true", "Paused"),
+                    FilterOption.create("false", "Running")
+            )).build(),
             EntityAttribute.builder().id(SourcedMongoEntityUtils.FILTERABLE_FIELD).title("Source")
                     .type(SearchQueryField.Type.STRING)
                     .sortable(false)
@@ -202,28 +210,33 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                                         @Parameter(name = "order", description = "The sort direction",
                                                                    schema = @Schema(allowableValues = {"asc", "desc"}))
                                                         @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
+        final String requestedSort = sort;
+        final SortOrder requestedOrder = order;
+        final String dbSortField = mapSortField(requestedSort);
+        final SortOrder dbSortOrder = mapSortOrder(requestedSort, requestedOrder);
+        final List<String> requestedFilters = filters == null ? List.of() : filters;
 
-        SearchQuery searchQuery;
+        final SearchQuery searchQuery;
+        Predicate<EventDefinitionDto> predicate = event -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
         try {
             searchQuery = searchQueryParser.parse(query);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
-        }
-        if ("status".equals(sort)) {
-            sort = "alert";
-        }
-        Predicate<EventDefinitionDto> predicate = event -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
+            List<String> remainingFilters = requestedFilters;
 
-        // The only filterable field currently is entity source. If new filterable fields are added, this logic needs to
-        // be adjusted so that other filters remain part of the filters, are included in the generation of searchQuery,
-        // and entity source filtering is still moved to the predicate to be applied after reading from the database.
-        final SourcedMongoEntityUtils.FilterPredicate<EventDefinitionDto> filterPredicate = SourcedMongoEntityUtils.handleScopedEntitySourceFilter(filters, predicate);
-        predicate = filterPredicate.predicate();
+            final SourcedMongoEntityUtils.FilterPredicate<EventDefinitionDto> statusFilterPredicate = handleStatusFilter(remainingFilters, predicate);
+            remainingFilters = statusFilterPredicate.filters();
+            predicate = statusFilterPredicate.predicate();
+
+            // The source filter needs to be applied via predicate because source metadata gets added after reading from DB.
+            final SourcedMongoEntityUtils.FilterPredicate<EventDefinitionDto> filterPredicate = SourcedMongoEntityUtils.handleScopedEntitySourceFilter(remainingFilters, predicate);
+            predicate = filterPredicate.predicate();
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage(), e);
+        }
 
         final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(
                 searchQuery,
                 predicate,
-                order.toBsonSort(sort),
+                dbSortOrder.toBsonSort(dbSortField),
                 page,
                 perPage);
         PaginatedList<EventDefinitionDto> definitionDtos = new PaginatedList<>(
@@ -241,7 +254,71 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                         .toList();
 
         return PageListResponse.create(query, definitionDtos.pagination(),
-                definitionDtos.pagination().total(), sort, order, eventDefinitionDtos, attributes, settings);
+                definitionDtos.pagination().total(), requestedSort, requestedOrder, eventDefinitionDtos, attributes, settings);
+    }
+
+    private static String mapSortField(String sort) {
+        if (STATUS_FIELD.equals(sort)) {
+            return EventDefinitionDto.FIELD_STATE;
+        }
+
+        return sort;
+    }
+
+    private static SortOrder mapSortOrder(String sort, SortOrder order) {
+        if (!STATUS_FIELD.equals(sort)) {
+            return order;
+        }
+
+        return order == SortOrder.ASCENDING ? SortOrder.DESCENDING : SortOrder.ASCENDING;
+    }
+
+    @VisibleForTesting
+    static SourcedMongoEntityUtils.FilterPredicate<EventDefinitionDto> handleStatusFilter(List<String> filters,
+                                                                                           Predicate<EventDefinitionDto> predicate) {
+        final List<Boolean> statusFilters = statusFilterValues(filters);
+        if (!statusFilters.isEmpty()) {
+            predicate = predicate.and(event -> statusFilters.stream().anyMatch(statusFilter -> statusMatches(event, statusFilter)));
+            filters = removeStatusFilter(filters);
+        }
+        return new SourcedMongoEntityUtils.FilterPredicate<>(filters, predicate);
+    }
+
+    private static List<Boolean> statusFilterValues(List<String> filters) {
+        return filters.stream()
+                .filter(filter -> filter.startsWith(STATUS_FILTER_PREFIX))
+                .map(EventDefinitionsResource::filterValue)
+                .map(EventDefinitionsResource::parseStatusFilterValue)
+                .toList();
+    }
+
+    private static List<String> removeStatusFilter(List<String> filters) {
+        return filters.stream()
+                .filter(filter -> !filter.startsWith(STATUS_FILTER_PREFIX))
+                .toList();
+    }
+
+    private static boolean statusMatches(EventDefinitionDto eventDefinition, boolean disabledStatus) {
+        final boolean eventDefinitionDisabled = eventDefinition.state() == EventDefinition.State.DISABLED;
+        return eventDefinitionDisabled == disabledStatus;
+    }
+
+    private static boolean parseStatusFilterValue(String value) {
+        return switch (value.toLowerCase(Locale.ROOT)) {
+            case "true" -> true;
+            case "false" -> false;
+            default -> throw new IllegalArgumentException(f("Invalid status filter value <%s>. Expected true or false.", value));
+        };
+    }
+
+    private static String filterValue(String filterExpression) {
+        final String[] split = filterExpression.split(FIELD_AND_VALUE_SEPARATOR, 2);
+        final String value = (split.length > 1) ? split[1] : null;
+        if (value == null || value.isEmpty()) {
+            throw new IllegalArgumentException(WRONG_FILTER_EXPR_FORMAT_ERROR_MSG);
+        }
+
+        return value;
     }
 
     @GET
@@ -254,7 +331,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         try {
             searchQuery = searchQueryParser.parse(query);
         } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
+            throw new BadRequestException(e.getMessage(), e);
         }
         final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(
                 searchQuery,
