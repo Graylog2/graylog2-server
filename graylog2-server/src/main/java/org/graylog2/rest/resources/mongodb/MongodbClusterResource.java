@@ -38,6 +38,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.Document;
 import org.graylog.security.certutil.audit.CaAuditEventTypes;
+import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.cluster.nodes.mongodb.MongodbClusterCommand;
 import org.graylog2.cluster.nodes.mongodb.MongodbNode;
@@ -139,7 +140,7 @@ public class MongodbClusterResource extends RestResource {
 
     @GET
     @Path("/profiling/{level}")
-    @AuditEvent(type = CaAuditEventTypes.CA_CREATE)
+    @AuditEvent(type = AuditEventTypes.MONGODB_ENABLE_PROFILING)
     @Operation(summary = "Enables profiling for all mongodb nodes")
     @RequiresPermissions(RestPermissions.MONGODB_ENABLE_PROFILING)
     public Response enableProfiling(@PathParam("level") ProfilingLevel level) {
