@@ -94,7 +94,10 @@ describe('LinkContainer', () => {
       </LinkContainer>,
     );
 
-    await userEvent.click(await screen.findByText('All Alerts'), { ctrlKey: true });
+    const user = userEvent.setup();
+    await user.keyboard('{Control>}');
+    await user.click(await screen.findByText('All Alerts'));
+    await user.keyboard('{/Control}');
 
     expect(onClick).not.toHaveBeenCalled();
   });

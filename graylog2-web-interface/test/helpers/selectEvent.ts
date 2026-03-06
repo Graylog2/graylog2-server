@@ -24,9 +24,18 @@ import { screen, within } from 'wrappedTestingLibrary';
  * They are useful when interacting with the `react-select` select component.
  */
 
-const clearAll = (container: HTMLElement, selectClassName: string) => {
+const createUser = () => {
+  // @ts-expect-error - clock property is set by @sinonjs/fake-timers when jest.useFakeTimers() is active
+  if (setTimeout.clock) {
+    return userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+  }
+
+  return userEvent.setup();
+};
+
+const clearAll = async (container: HTMLElement, selectClassName: string) => {
   const clearIcons = container.querySelectorAll(`.${selectClassName} svg[aria-hidden="true"]`);
-  userEvent.click(clearIcons[clearIcons.length - 1]);
+  await createUser().click(clearIcons[clearIcons.length - 1]);
 };
 
 const customCreate = (element: HTMLElement, option: string) =>
@@ -61,9 +70,11 @@ const chooseOption = async (
   const input = await findSelectInput(selectName, config);
   const optionNames = Array.isArray(optionName) ? optionName : [optionName];
 
-  optionNames.forEach((name) => {
-    userEvent.type(input, `${name}{enter}`);
-  });
+  const user = createUser();
+
+  for (const name of optionNames) {
+    await user.type(input, `${name}{enter}`);
+  }
 };
 
 export default {

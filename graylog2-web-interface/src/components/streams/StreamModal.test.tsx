@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import selectEvent from 'helpers/selectEvent';
 import { indexSets } from 'fixtures/indexSets';
 import { stream } from 'fixtures/streams';
-import { EntityShareStore } from 'stores/permissions/EntityShareStore';
+import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
 import asMock from 'helpers/mocking/AsMock';
 import { createEntityShareState, everyone, viewer } from 'fixtures/entityShareState';
 
@@ -107,10 +107,7 @@ describe('StreamModal', () => {
       expect(submitButton).not.toBeDisabled();
     });
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      await userEvent.click(submitButton);
-    });
+    await userEvent.click(submitButton);
 
     await waitFor(() =>
       expect(onSubmit).toHaveBeenCalledWith({
@@ -135,8 +132,8 @@ describe('StreamModal', () => {
       name: /description/i,
     });
 
-    userEvent.type(title, 'New title');
-    userEvent.type(description, 'New description');
+    await userEvent.type(title, 'New title');
+    await userEvent.type(description, 'New description');
 
     await selectEvent.chooseOption('Index Set', 'Example Index Set');
     await selectEvent.chooseOption('Search for users and teams', everyone.title);
@@ -148,7 +145,17 @@ describe('StreamModal', () => {
 
     await userEvent.click(addCollaborator);
 
-    await screen.findByText(/everyone/i);
+    await waitFor(() => {
+      const prepareCalls = asMock(EntityShareActions.prepare).mock.calls;
+      expect(prepareCalls).toHaveLength(2);
+
+      const lastCallPayload = prepareCalls[1][3];
+      expect(lastCallPayload.selected_grantee_capabilities.toJS()).toEqual(
+        createEntityShareState.selectedGranteeCapabilities.merge({
+          [everyone.id]: viewer.id,
+        }).toJS(),
+      );
+    });
 
     const submitButton = await screen.findByRole('button', {
       name: /submit/i,
@@ -158,10 +165,7 @@ describe('StreamModal', () => {
       expect(submitButton).not.toBeDisabled();
     });
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      await userEvent.click(submitButton);
-    });
+    await userEvent.click(submitButton);
 
     await waitFor(() =>
       expect(onSubmit).toHaveBeenCalledWith({

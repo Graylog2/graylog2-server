@@ -94,7 +94,7 @@ describe('Cache List', () => {
   it('should be able to edit a cache', async () => {
     renderSUT();
 
-    userEvent.click(await screen.findByRole('button', moreActionsName));
+    await userEvent.click(await screen.findByRole('button', moreActionsName));
 
     await screen.findByRole('menuitem', { name: /edit/i });
   });
@@ -102,9 +102,9 @@ describe('Cache List', () => {
   it('should be able to delete a cache', async () => {
     renderSUT();
 
-    userEvent.click(await screen.findByRole('button', moreActionsName));
-    userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
-    userEvent.click(await screen.findByRole('button', { name: /delete/i }));
+    await userEvent.click(await screen.findByRole('button', moreActionsName));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /delete/i }));
 
     expect(mockDeleteCache).toHaveBeenLastCalledWith(CACHES[0].id);
   });

@@ -14,9 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { screen, render, waitFor } from 'wrappedTestingLibrary';
+import { fireEvent, screen, render, waitFor } from 'wrappedTestingLibrary';
 
 import {
   negativeNumberField,
@@ -81,8 +80,7 @@ describe('<NumberField>', () => {
     render(<SUT onChange={changeFunction} value={numberField.default_value} />);
 
     const formField = screen.getByLabelText(numberField.human_name, { exact: false });
-    await userEvent.clear(formField);
-    await userEvent.type(formField, '123');
+    fireEvent.change(formField, { target: { value: '123' } });
 
     await waitFor(() => expect(changeFunction).toHaveBeenCalledWith('example_number_field', 123));
   });
