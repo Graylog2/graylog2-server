@@ -141,7 +141,7 @@ public class EventsSearchService extends AbstractEventsSearchService {
         }
     }
 
-    // priority can be 0 (informational) to 4 (critical), see EventDefinitionPriorityEnum.ts
+    // priority can be 0 (info) to 4 (critical), see EventDefinitionPriorityEnum.ts
     List<Slice> handlePriorityColumn(final List<Slice> slices) {
         if(slices.size() == 5) {
             return slices;

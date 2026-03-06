@@ -21,7 +21,7 @@ const EventDefinitionPriorityEnum = {
   HIGH: 3,
   CRITICAL: 4,
   properties: {
-    0: { name: 'informational' },
+    0: { name: 'info' },
     1: { name: 'low' },
     2: { name: 'medium' },
     3: { name: 'high' },
@@ -29,6 +29,6 @@ const EventDefinitionPriorityEnum = {
   },
 } as const;
 
-export const EXCLUDE_INFORMATIONAL_FILTER = '!0';
+export const EXCLUDE_INFO_FILTER = '!0';
 
 export default EventDefinitionPriorityEnum;

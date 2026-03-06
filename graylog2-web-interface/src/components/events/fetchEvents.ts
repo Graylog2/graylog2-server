@@ -26,7 +26,7 @@ import { additionalAttributes } from 'components/events/Constants';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import parseTimerangeFilter from 'components/common/PaginatedEntityTable/parseTimerangeFilter';
 import type { TimeRange, RelativeTimeRange } from 'views/logic/queries/Query';
-import EventDefinitionPriorityEnum, { EXCLUDE_INFORMATIONAL_FILTER } from 'logic/alerts/EventDefinitionPriorityEnum';
+import EventDefinitionPriorityEnum, { EXCLUDE_INFO_FILTER } from 'logic/alerts/EventDefinitionPriorityEnum';
 
 const url = URLUtils.qualifyUrl('/events/search');
 
@@ -61,8 +61,8 @@ export const parseTypeFilter = (alert: string) => {
 const allPriorityKeys = Object.keys(EventDefinitionPriorityEnum.properties);
 
 const expandPriorityFilters = (priorities: Array<string>): Array<string> => {
-  const hasNegated = priorities.includes(EXCLUDE_INFORMATIONAL_FILTER);
-  const specificValues = priorities.filter((p) => p !== EXCLUDE_INFORMATIONAL_FILTER);
+  const hasNegated = priorities.includes(EXCLUDE_INFO_FILTER);
+  const specificValues = priorities.filter((p) => p !== EXCLUDE_INFO_FILTER);
 
   if (hasNegated && specificValues.length > 0) {
     return specificValues;
