@@ -147,18 +147,18 @@ public class EventsSearchService extends AbstractEventsSearchService {
             return slices;
         }
 
-        final var INFORMATIONAL = new Slice( "0", null, 0);
+        final var INFO = new Slice( "0", null, 0);
         final var LOW = new Slice( "1", null, 0);
         final var MEDIUM = new Slice( "2", null, 0);
         final var HIGH = new Slice( "3", null, 0);
         final var CRITICAL = new Slice( "4", null, 0);
 
         if(slices.isEmpty()) {
-            return List.of(INFORMATIONAL, LOW, MEDIUM, HIGH, CRITICAL);
+            return List.of(INFO, LOW, MEDIUM, HIGH, CRITICAL);
         }
 
         List<Slice> fixedList = new ArrayList<>();
-        fixedList.add(slices.stream().filter(s -> s.value().equals(INFORMATIONAL.value())).findAny().orElse(INFORMATIONAL));
+        fixedList.add(slices.stream().filter(s -> s.value().equals(INFO.value())).findAny().orElse(INFO));
         fixedList.add(slices.stream().filter(s -> s.value().equals(LOW.value())).findAny().orElse(LOW));
         fixedList.add(slices.stream().filter(s -> s.value().equals(MEDIUM.value())).findAny().orElse(MEDIUM));
         fixedList.add(slices.stream().filter(s -> s.value().equals(HIGH.value())).findAny().orElse(HIGH));

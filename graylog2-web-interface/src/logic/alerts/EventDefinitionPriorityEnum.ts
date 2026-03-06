@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 const EventDefinitionPriorityEnum = {
-  INFORMATIONAL: 0,
+  INFO: 0,
   LOW: 1,
   MEDIUM: 2,
   HIGH: 3,

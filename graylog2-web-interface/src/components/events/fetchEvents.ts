@@ -69,7 +69,7 @@ const expandPriorityFilters = (priorities: Array<string>): Array<string> => {
   }
 
   if (hasNegated) {
-    return allPriorityKeys.filter((key) => key !== String(EventDefinitionPriorityEnum.INFORMATIONAL));
+    return allPriorityKeys.filter((key) => key !== String(EventDefinitionPriorityEnum.INFO));
   }
 
   return priorities;
