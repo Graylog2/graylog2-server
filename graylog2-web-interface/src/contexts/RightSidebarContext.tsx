@@ -18,12 +18,16 @@ import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
 
-export type RightSidebarContent<T = Record<string, unknown>> = {
+type RightSidebarContentBase<T = Record<string, unknown>> = {
   id: string;
   title: string;
-  component: React.ComponentType<T>;
   props?: T;
 };
+
+export type RightSidebarContent<T = Record<string, unknown>> = RightSidebarContentBase<T> & (
+  | { component: React.ComponentType<T>; componentKey?: never }
+  | { componentKey: string; component?: never }
+);
 
 export type RightSidebarContextType = {
   isOpen: boolean;

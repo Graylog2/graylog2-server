@@ -18,6 +18,7 @@ import React from 'react';
 import styled, { css, keyframes } from 'styled-components';
 
 import useRightSidebar from 'hooks/useRightSidebar';
+import { getSidebarComponent } from 'contexts/sidebarComponentRegistry';
 import Icon from 'components/common/Icon';
 import IconButton from 'components/common/IconButton';
 import Row from 'components/bootstrap/Row';
@@ -199,7 +200,7 @@ const RightSidebar = () => {
     );
   }
 
-  const ContentComponent = content.component;
+  const ContentComponent = content.component ?? getSidebarComponent(content.componentKey);
 
   return (
     <Container $width={width} role="complementary" aria-label={`${content.title} sidebar`}>

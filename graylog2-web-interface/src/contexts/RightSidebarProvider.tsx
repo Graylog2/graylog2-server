@@ -52,10 +52,17 @@ const initialState: HistoryState = {
   width: 400,
 };
 
-const isSameContent = (content1: RightSidebarContent, content2: RightSidebarContent): boolean =>
-  content1.id === content2.id
-  && content1.component === content2.component
-  && isEqual(content1.props, content2.props);
+const isSameContent = (content1: RightSidebarContent, content2: RightSidebarContent): boolean => {
+  if (content1.id !== content2.id || !isEqual(content1.props, content2.props)) {
+    return false;
+  }
+
+  if (content1.componentKey && content2.componentKey) {
+    return content1.componentKey === content2.componentKey;
+  }
+
+  return content1.component === content2.component;
+};
 
 const historyReducer = (state: HistoryState, action: HistoryAction): HistoryState => {
   switch (action.type) {
