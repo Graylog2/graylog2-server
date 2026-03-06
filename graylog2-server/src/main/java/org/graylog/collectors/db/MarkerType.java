@@ -25,6 +25,7 @@ package org.graylog.collectors.db;
  */
 public enum MarkerType {
     CONFIG_CHANGED,
+    INGEST_CONFIG_CHANGED,
     RESTART,
     DISCOVERY_RUN,
     FLEET_REASSIGNED,

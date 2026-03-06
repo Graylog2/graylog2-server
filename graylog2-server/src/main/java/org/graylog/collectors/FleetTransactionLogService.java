@@ -177,6 +177,7 @@ public class FleetTransactionLogService {
         }
 
         boolean recomputeConfig = false;
+        boolean recomputeIngestConfig = false;
         boolean restart = false;
         boolean runDiscovery = false;
         String newFleetId = null;
@@ -217,15 +218,18 @@ public class FleetTransactionLogService {
             for (var marker : markers) {
                 switch (marker.type()) {
                     case CONFIG_CHANGED -> recomputeConfig = true;
+                    case INGEST_CONFIG_CHANGED -> recomputeIngestConfig = true;
                     case RESTART -> restart = true;
                     case DISCOVERY_RUN -> runDiscovery = true;
-                    case UNKNOWN -> { }
-                    default -> { }
+                    case UNKNOWN -> {
+                    }
+                    default -> {
+                    }
                 }
             }
         }
 
-        return new CoalescedActions(recomputeConfig, newFleetId, restart, runDiscovery, maxSeq);
+        return new CoalescedActions(recomputeConfig, recomputeIngestConfig, newFleetId, restart, runDiscovery, maxSeq);
     }
 
     // Package-private for test access

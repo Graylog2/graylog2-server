@@ -28,13 +28,16 @@ import jakarta.annotation.Nullable;
  * @param maxSeq          highest sequence number seen (new value for last_processed_txn_seq)
  */
 public record CoalescedActions(boolean recomputeConfig,
+                               boolean recomputeIngestConfig,
                                @Nullable String newFleetId,
                                boolean restart,
                                boolean runDiscovery,
                                long maxSeq) {
 
-    /** No actions needed. */
+    /**
+     * No actions needed.
+     */
     public static CoalescedActions empty(long currentSeq) {
-        return new CoalescedActions(false, null, false, false, currentSeq);
+        return new CoalescedActions(false, false, null, false, false, currentSeq);
     }
 }
