@@ -26,7 +26,7 @@ public record MongodbNode(
         @JsonProperty(FIELD_NAME) String name,
         @JsonProperty(FIELD_ROLE) String role,
         @JsonProperty(FIELD_VERSION) String version,
-        @JsonProperty(FIELD_PROFILING_LEVEL) int profilingLevel,
+        @JsonProperty(FIELD_PROFILING_LEVEL) ProfilingLevel profilingLevel,
         @JsonProperty(FIELD_REPLICATION_LAG) long replicationLag,
         @JsonProperty(FIELD_SLOW_QUERY_COUNT) Long slowQueryCount,
         @JsonProperty(FIELD_STORAGE_USED_PERCENT) double storageUsedPercent,
@@ -53,7 +53,7 @@ public record MongodbNode(
         builder.stringVal(FIELD_ID, id);
         builder.stringVal(FIELD_NAME, name);
         builder.stringVal(FIELD_ROLE, role);
-        builder.intVal(FIELD_PROFILING_LEVEL, profilingLevel);
+        builder.stringVal(FIELD_PROFILING_LEVEL, profilingLevel.name());
         builder.stringVal(FIELD_VERSION, version);
         builder.longVal(FIELD_REPLICATION_LAG, replicationLag);
         builder.longVal(FIELD_SLOW_QUERY_COUNT, slowQueryCount);

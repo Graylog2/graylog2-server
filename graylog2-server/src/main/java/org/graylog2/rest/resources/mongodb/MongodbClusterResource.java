@@ -28,6 +28,7 @@ import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
@@ -41,6 +42,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.cluster.nodes.mongodb.MongodbClusterCommand;
 import org.graylog2.cluster.nodes.mongodb.MongodbNode;
 import org.graylog2.cluster.nodes.mongodb.MongodbNodesProvider;
+import org.graylog2.cluster.nodes.mongodb.ProfilingLevel;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
@@ -60,6 +62,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Tag(name = "System/Mongodb", description = "MongoDB Node discovery")
@@ -127,27 +130,16 @@ public class MongodbClusterResource extends RestResource {
                 result.grandTotal().orElse(0L), sort, order, result.stream().toList(), attributes, settings);
     }
 
-    @PUT
-    @Path("/profiling/enable")
+    @GET
+    @Path("/profiling/{level}")
     @AuditEvent(type = CaAuditEventTypes.CA_CREATE)
     @Operation(summary = "Enables profiling for all mongodb nodes")
     @RequiresPermissions(RestPermissions.MONGODB_ENABLE_PROFILING)
-    public Response enableProfiling() {
-        Document command = new Document("profile", 1)
+    public Response enableProfiling(@PathParam("level") ProfilingLevel level) {
+        Document command = new Document("profile", level.getNumericalValue())
                 .append("slowms", 100);
         clusterCommand.runOnEachNode(command);
-        return Response.ok().build();
-    }
-
-    @PUT
-    @Path("/profiling/disable")
-    @AuditEvent(type = CaAuditEventTypes.CA_CREATE)
-    @Operation(summary = "Disables profiling for all mongodb nodes")
-    @RequiresPermissions(RestPermissions.MONGODB_ENABLE_PROFILING)
-    public Response disableProfiling() {
-        Document command = new Document("profile", 0);
-        clusterCommand.runOnEachNode(command);
-        return Response.ok().build();
+        return profilingStatus();
     }
 
     @GET
@@ -156,10 +148,14 @@ public class MongodbClusterResource extends RestResource {
     @Timed
     public Response profilingStatus() {
         Document command = new Document("profile", -1);
-        final Map<String, Integer> result = clusterCommand.runOnEachNode(command)
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getInteger("was")));
+        final Map<ProfilingLevel, Long> result = clusterCommand.runOnEachNode(command)
+                .values().stream()
+                .map(doc -> doc.getInteger("was"))
+                .map(ProfilingLevel::fromNumericalValue)
+                .collect(Collectors.groupingBy(
+                        Function.identity(),
+                        Collectors.counting()
+                ));
         return Response.ok().entity(result).build();
     }
 }

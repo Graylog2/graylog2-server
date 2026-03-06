@@ -41,9 +41,9 @@ public class MongodbNodeUtils {
             final long slowQueries = mongoConnection.getDatabase(GRAYLOG_DATABASE_NAME)
                     .getCollection("system.profile")
                     .countDocuments(query);
-            return new ProfilingResult(profilingLevel, slowQueries);
+            return new ProfilingResult(ProfilingLevel.fromNumericalValue(profilingLevel), slowQueries);
         } else {
-            return new ProfilingResult(profilingLevel, null);
+            return new ProfilingResult(ProfilingLevel.OFF, null);
         }
     }
 

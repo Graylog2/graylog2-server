@@ -16,5 +16,24 @@
  */
 package org.graylog2.cluster.nodes.mongodb;
 
-public record ProfilingResult(ProfilingLevel profilingLevel, Long slowQueryCount) {
+import java.util.Arrays;
+
+public enum ProfilingLevel {
+    OFF(0),
+    SLOW_OPS(1),
+    ALL(2);
+
+    private final int level;
+
+    ProfilingLevel(int level) {
+        this.level = level;
+    }
+
+    public int getNumericalValue() {
+        return level;
+    }
+
+    public static ProfilingLevel fromNumericalValue(int level) {
+        return Arrays.stream(values()).filter(e -> e.level == level).findFirst().orElse(OFF);
+    }
 }
