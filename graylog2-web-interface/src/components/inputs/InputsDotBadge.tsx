@@ -17,38 +17,26 @@
 import * as React from 'react';
 
 import useInputsStates from 'hooks/useInputsStates';
-import usePluginEntities from 'hooks/usePluginEntities';
 import MenuItemDotBadge from 'components/navigation/MenuItemDotBadge';
 
 const InputsDotBadge = ({ text }: { text: string }) => {
   const { data, isLoading } = useInputsStates();
-  const additionalProviders = usePluginEntities('inputsBadgeProviders');
-  const additionalResults = additionalProviders.map((provider) => provider.useCondition());
 
   if (isLoading) {
-    return null;
+    return <>{text}</>;
   }
 
   const hasFailedOrSetupInputs = Object.values(data).some((inputStateByNode) =>
     Object.values(inputStateByNode).some((node) => ['FAILED', 'FAILING', 'SETUP'].includes(node.state)),
   );
 
-  const titles: Array<string> = [];
-  let showDot = false;
-
-  if (hasFailedOrSetupInputs) {
-    showDot = true;
-    titles.push('Some inputs are in failed state or in setup mode.');
-  }
-
-  additionalResults.forEach((result) => {
-    if (result.hasIssues) {
-      showDot = true;
-      titles.push(result.title);
-    }
-  });
-
-  return <MenuItemDotBadge text={text} title={titles.join(' ')} showDot={showDot} />;
+  return (
+    <MenuItemDotBadge
+      text={text}
+      title="Some inputs are in failed state or in setup mode."
+      showDot={hasFailedOrSetupInputs}
+    />
+  );
 };
 
 export default InputsDotBadge;
