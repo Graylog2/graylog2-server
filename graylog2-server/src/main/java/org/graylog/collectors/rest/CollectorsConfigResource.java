@@ -137,6 +137,7 @@ public class CollectorsConfigResource extends RestResource {
 
         clusterConfigService.write(config);
 
+        // TODO: We should probably compare the existing and new config to avoid the marker for unrelated changes.
         final var fleetIds = fleetService.getAllFleetIds();
         if (!fleetIds.isEmpty()) {
             fleetTransactionLogService.appendFleetMarker(fleetIds, MarkerType.INGEST_CONFIG_CHANGED);
