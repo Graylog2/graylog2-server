@@ -69,18 +69,24 @@ describe('PipelineProcessingErrors', () => {
       data: {
         node1: {
           'org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-1.0.failed': {
+            full_name: 'org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-1.0.failed',
+            name: 'failed',
             type: 'meter',
-            metric: { rate: { total: 2 } },
+            metric: { rate: { total: 2, mean: 0, one_minute: 0, five_minute: 0, fifteen_minute: 0 }, rate_unit: 'events/second' },
           },
           'org.graylog.plugins.pipelineprocessor.ast.Rule.rule-2.pipeline-1.2.failed': {
+            full_name: 'org.graylog.plugins.pipelineprocessor.ast.Rule.rule-2.pipeline-1.2.failed',
+            name: 'failed',
             type: 'meter',
-            metric: { rate: { total: 3 } },
+            metric: { rate: { total: 3, mean: 0, one_minute: 0, five_minute: 0, fifteen_minute: 0 }, rate_unit: 'events/second' },
           },
         },
         node2: {
           'org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-1.0.failed': {
+            full_name: 'org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-1.0.failed',
+            name: 'failed',
             type: 'meter',
-            metric: { rate: { total: 5 } },
+            metric: { rate: { total: 5, mean: 0, one_minute: 0, five_minute: 0, fifteen_minute: 0 }, rate_unit: 'events/second' },
           },
         },
       },
