@@ -15,10 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
 
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
-import { useMetrics } from 'hooks/useMetrics';
+import { useMetric } from 'hooks/useMetrics';
 
 type Props = {
   name: string;
@@ -27,8 +26,7 @@ type Props = {
 };
 
 const MetricContainer = ({ name, zeroOnMissing = true, children }: Props) => {
-  const metricNames = useMemo(() => [name], [name]);
-  const { data: metrics, isLoading } = useMetrics(metricNames);
+  const { data: metrics, isLoading } = useMetric(name);
 
   if (isLoading || Object.keys(metrics).length === 0) {
     return <span>Loading...</span>;

@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo } from 'react';
+import React from 'react';
 import capitalize from 'lodash/capitalize';
 import numeral from 'numeral';
 
 import { Col } from 'components/bootstrap';
 import { Spinner } from 'components/common';
-import { useNodeMetrics } from 'hooks/useMetrics';
+import { useNodeMetric } from 'hooks/useMetrics';
 
 type Props = {
   nodeId: string;
@@ -29,8 +29,7 @@ type Props = {
 
 const LogLevelMetrics = ({ nodeId, loglevel }: Props) => {
   const metricName = `org.apache.logging.log4j.core.Appender.${loglevel}`;
-  const metricNames = useMemo(() => [metricName], [metricName]);
-  const { data: nodeMetrics } = useNodeMetrics(nodeId, metricNames);
+  const { data: nodeMetrics } = useNodeMetric(nodeId, metricName);
 
   let metricsDetails;
 

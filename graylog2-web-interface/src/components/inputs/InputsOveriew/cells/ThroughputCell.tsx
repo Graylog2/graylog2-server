@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef, useCallback, useMemo } from 'react';
+import { useRef, useCallback } from 'react';
 import styled from 'styled-components';
 
 import type { InputSummary } from 'hooks/usePaginatedInputs';
-import { useMetrics } from 'hooks/useMetrics';
+import { useMetric } from 'hooks/useMetrics';
 import { Spinner } from 'components/common';
 import { formatCount, getValueFromMetric, prefixMetric } from 'components/inputs/helpers/InputThroughputUtils';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
@@ -36,8 +36,7 @@ const METRIC_NAME = 'incomingMessages';
 
 const ThroughputCell = ({ input }: Props) => {
   const metricName = prefixMetric(input, METRIC_NAME);
-  const metricNames = useMemo(() => [metricName], [metricName]);
-  const { data: metrics, isLoading } = useMetrics(metricNames);
+  const { data: metrics, isLoading } = useMetric(metricName);
   const spanRef = useRef();
   const { toggleSection, expandedSections } = useExpandedSections();
 

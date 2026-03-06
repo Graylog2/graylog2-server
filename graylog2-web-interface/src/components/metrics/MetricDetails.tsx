@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
 import capitalize from 'lodash/capitalize';
 import styled from 'styled-components';
 
@@ -25,7 +24,7 @@ import HistogramDetails from 'components/metrics/HistogramDetails';
 import MeterDetails from 'components/metrics/MeterDetails';
 import TimerDetails from 'components/metrics/TimerDetails';
 import type { Metric } from 'types/metrics';
-import { useNodeMetrics } from 'hooks/useMetrics';
+import { useNodeMetric } from 'hooks/useMetrics';
 
 const DetailsForType = ({ metric }: { metric: Metric }) => {
   switch (metric.type) {
@@ -78,8 +77,7 @@ type Props = {
 };
 
 const MetricDetails = ({ nodeId, metric, metric: { full_name: metricName } }: Props) => {
-  const metricNames = useMemo(() => [metricName], [metricName]);
-  const { data: nodeMetrics } = useNodeMetrics(nodeId, metricNames);
+  const { data: nodeMetrics } = useNodeMetric(nodeId, metricName);
 
   const currentMetric = nodeMetrics?.[metricName] ?? metric;
   const type = capitalize(currentMetric.type);

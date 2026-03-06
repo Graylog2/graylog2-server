@@ -63,6 +63,21 @@ export const useNodeMetrics = (
   return { data: metrics[nodeId], isLoading };
 };
 
+export const useMetric = (metricName: string): { data: ClusterMetric; isLoading: boolean } => {
+  const names = useMemo(() => [metricName], [metricName]);
+
+  return useMetrics(names);
+};
+
+export const useNodeMetric = (
+  nodeId: string,
+  metricName: string,
+): { data: NodeMetric | undefined; isLoading: boolean } => {
+  const names = useMemo(() => [metricName], [metricName]);
+
+  return useNodeMetrics(nodeId, names);
+};
+
 export const useMetricsNames = (
   nodeId: string | undefined,
   namespace: string = 'org',
