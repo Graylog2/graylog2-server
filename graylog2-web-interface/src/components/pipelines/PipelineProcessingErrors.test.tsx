@@ -20,6 +20,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 import type { PipelineType } from 'components/pipelines/types';
 import usePipelineRulesMetadata from 'components/rules/hooks/usePipelineRulesMetadata';
 import { useMetrics } from 'hooks/useMetrics';
+import { asMock } from 'helpers/mocking';
 
 import PipelineProcessingErrors, { getPipelineRuleFailureMetricNames } from './PipelineProcessingErrors';
 
@@ -58,13 +59,13 @@ describe('PipelineProcessingErrors', () => {
   };
 
   beforeEach(() => {
-    (usePipelineRulesMetadata as jest.Mock).mockReturnValue({
+    asMock(usePipelineRulesMetadata).mockReturnValue({
       data: mockPipelineRulesMetadata,
       isLoading: false,
       refetch: jest.fn(),
     });
 
-    (useMetrics as jest.Mock).mockReturnValue({
+    asMock(useMetrics).mockReturnValue({
       data: {
         node1: {
           'org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-1.0.failed': {
