@@ -48,6 +48,7 @@ import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
+import org.graylog2.rest.resources.entities.FilterOption;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
@@ -58,9 +59,11 @@ import org.graylog2.utilities.lucene.InMemorySearchEngine;
 import org.graylog2.utilities.lucene.LuceneInMemorySearchEngine;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -78,7 +81,7 @@ public class MongodbClusterResource extends RestResource {
             EntityAttribute.builder().id(MongodbNode.FIELD_NAME).title("Node Name").type(SearchQueryField.Type.STRING).sortable(true).searchable(true).build(),
             EntityAttribute.builder().id(MongodbNode.FIELD_ROLE).title("Role").type(SearchQueryField.Type.STRING).sortable(true).searchable(true).build(),
             EntityAttribute.builder().id(MongodbNode.FIELD_VERSION).title("Version").type(SearchQueryField.Type.STRING).sortable(true).searchable(true).build(),
-            EntityAttribute.builder().id(MongodbNode.FIELD_PROFILING_LEVEL).title("Profiling Level").type(SearchQueryField.Type.INT).sortable(true).build(),
+            EntityAttribute.builder().id(MongodbNode.FIELD_PROFILING_LEVEL).title("Profiling Level").type(SearchQueryField.Type.STRING).sortable(true).filterable(true).filterOptions(profilingLevelOptions()).build(),
             EntityAttribute.builder().id(MongodbNode.FIELD_REPLICATION_LAG).title("Replication Lag").type(SearchQueryField.Type.LONG).sortable(true).build(),
             EntityAttribute.builder().id(MongodbNode.FIELD_SLOW_QUERY_COUNT).title("Slow Query Count").type(SearchQueryField.Type.LONG).sortable(true).build(),
             EntityAttribute.builder().id(MongodbNode.FIELD_STORAGE_USED_PERCENT).title("Storage Used").type(SearchQueryField.Type.DOUBLE).sortable(true).build(),
@@ -86,6 +89,10 @@ public class MongodbClusterResource extends RestResource {
             EntityAttribute.builder().id(MongodbNode.FIELD_CURRENT_CONNECTIONS).title("Connections current").type(SearchQueryField.Type.INT).sortable(true).build(),
             EntityAttribute.builder().id(MongodbNode.FIELD_CONNECTIONS_USED_PERCENT).title("Connections used").type(SearchQueryField.Type.DOUBLE).sortable(true).build()
     );
+
+    private static Set<FilterOption> profilingLevelOptions() {
+        return Arrays.stream(ProfilingLevel.values()).map(level -> new FilterOption(level.name(), level.name())).collect(Collectors.toSet());
+    }
 
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
