@@ -33,7 +33,7 @@ describe('<InputsDotBadge />', () => {
     jest.clearAllMocks();
   });
 
-  it('returns null while loading', () => {
+  it('renders text while loading', () => {
     asMock(useInputsStates).mockReturnValue({
       refetch: jest.fn(),
       isLoading: true,
@@ -42,7 +42,7 @@ describe('<InputsDotBadge />', () => {
 
     render(<InputsDotBadge text={TEXT} />);
 
-    expect(screen.queryByText(TEXT)).not.toBeInTheDocument();
+    expect(screen.getByText(TEXT)).toBeInTheDocument();
   });
 
   it('renders plain text when there are no failed/failing/setup inputs', () => {
@@ -54,9 +54,6 @@ describe('<InputsDotBadge />', () => {
           nodeA: { state: 'RUNNING', id: '1', detailed_message: null, message_input: {} as InputSummary },
           nodeB: { state: 'STARTING', id: '2', detailed_message: 'Error', message_input: {} as InputSummary },
         },
-        input2: {
-          nodeC: { state: 'RUNNING', id: '3', detailed_message: null, message_input: {} as InputSummary },
-        },
       },
     });
 
@@ -64,7 +61,7 @@ describe('<InputsDotBadge />', () => {
 
     const textEl = screen.getByText(TEXT);
     expect(textEl).toBeInTheDocument();
-    expect(textEl).not.toHaveAttribute('title', 'Some inputs are in failed state or in setup mode.');
+    expect(textEl).not.toHaveAttribute('title');
   });
 
   describe.each(['FAILED', 'FAILING', 'SETUP'])(

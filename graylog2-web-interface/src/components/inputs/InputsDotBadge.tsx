@@ -23,7 +23,7 @@ const InputsDotBadge = ({ text }: { text: string }) => {
   const { data, isLoading } = useInputsStates();
 
   if (isLoading) {
-    return null;
+    return <>{text}</>;
   }
 
   const hasFailedOrSetupInputs = Object.values(data).some((inputStateByNode) =>
