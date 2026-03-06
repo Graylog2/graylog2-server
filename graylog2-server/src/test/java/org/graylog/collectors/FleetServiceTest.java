@@ -16,6 +16,7 @@
  */
 package org.graylog.collectors;
 
+import org.bson.types.ObjectId;
 import org.graylog.collectors.db.FileSourceConfig;
 import org.graylog.collectors.db.FleetConfig;
 import org.graylog.collectors.db.FleetDTO;
@@ -204,5 +205,22 @@ class FleetServiceTest {
 
         assertThat(fleetService.get(fleet.id())).isEmpty();
         assertThat(sourceService.streamAllByFleet(fleet.id())).isEmpty();
+    }
+
+    @Test
+    void getAllFleetIds() {
+        assertThat(fleetService.getAllFleetIds()).isEmpty();
+
+        fleetService.create("fleet-a", "First", null);
+
+        assertThat(fleetService.getAllFleetIds()).hasSize(1);
+
+        fleetService.create("fleet-b", "Second", null);
+        fleetService.create("fleet-c", "Third", null);
+
+        assertThat(fleetService.getAllFleetIds()).hasSize(3);
+
+        assertThat(fleetService.getAllFleetIds().stream().map(ObjectId::isValid))
+                .containsExactly(true, true, true);
     }
 }

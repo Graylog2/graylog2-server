@@ -19,6 +19,7 @@ package org.graylog.collectors;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.bson.Document;
 import org.graylog.collectors.db.FleetConfig;
 import org.graylog.collectors.db.FleetDTO;
 import org.graylog.collectors.db.MarkerType;
@@ -32,9 +33,12 @@ import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
@@ -53,11 +57,13 @@ public class FleetService {
     private final SearchQueryParser searchQueryParser;
     private final FleetTransactionLogService txnLogService;
     private final SourceService sourceService;
+    private final com.mongodb.client.MongoCollection<Document> nonEntityCollection;
 
     @Inject
     public FleetService(MongoCollections mongoCollections, FleetTransactionLogService txnLogService,
                         SourceService sourceService) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, FleetDTO.class);
+        this.nonEntityCollection = mongoCollections.nonEntityCollection(COLLECTION_NAME, Document.class);
         this.paginationHelper = mongoCollections.paginationHelper(collection);
         this.searchQueryParser = new SearchQueryParser(FleetDTO.FIELD_NAME, SEARCH_FIELD_MAPPING);
         this.txnLogService = txnLogService;
@@ -69,8 +75,8 @@ public class FleetService {
     }
 
     public PaginatedList<FleetDTO> findPaginated(SearchQuery searchQuery, int page, int perPage,
-                                                  String sortField, SortOrder order,
-                                                  Predicate<FleetDTO> permissionFilter) {
+                                                 String sortField, SortOrder order,
+                                                 Predicate<FleetDTO> permissionFilter) {
         return paginationHelper
                 .filter(searchQuery.toBson())
                 .sort(order.toBsonSort(sortField))
@@ -133,5 +139,19 @@ public class FleetService {
                 return new FleetConfig(fleet, sources.toList());
             }
         });
+    }
+
+    /**
+     * Returns all fleet IDs in the database.
+     *
+     * @return a set of fleet IDs
+     */
+    public Set<String> getAllFleetIds() {
+        return nonEntityCollection.find()
+                .projection(new Document("_id", 1))
+                .into(new ArrayList<>())
+                .stream()
+                .map(doc -> doc.getObjectId("_id").toHexString())
+                .collect(Collectors.toSet());
     }
 }
