@@ -19,6 +19,7 @@ package org.graylog.collectors;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+import org.graylog.collectors.db.FleetDTO;
 import org.graylog.collectors.config.receiver.FilelogReceiverConfig;
 import org.graylog.collectors.config.receiver.JournaldReceiverConfig;
 import org.graylog.collectors.config.receiver.MacOSUnifiedLoggingReceiverConfig;
@@ -109,6 +110,9 @@ public class CollectorsModule extends PluginModule {
 
         // Fleet permissions
         addPermissions(FleetPermissions.class);
+
+        // Register entities with the title service
+        addDbEntities(FleetDTO.class);
 
         // SourceConfig Jackson subtypes
         registerJacksonSubtype(FileSourceConfig.class);

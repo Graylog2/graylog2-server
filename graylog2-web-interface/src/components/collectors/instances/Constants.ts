@@ -21,7 +21,7 @@ export const ENTITY_TABLE_ID = 'collectors-instances';
 export const DEFAULT_LAYOUT = {
   entityTableId: ENTITY_TABLE_ID,
   defaultPageSize: 20,
-  defaultSort: { attributeId: 'hostname', direction: 'asc' } as Sort,
+  defaultSort: { attributeId: 'last_seen', direction: 'desc' } as Sort,
   defaultDisplayedAttributes: ['status', 'hostname', 'os', 'fleet_id', 'last_seen', 'version'],
   defaultColumnOrder: ['status', 'hostname', 'os', 'fleet_id', 'last_seen', 'version'],
 };

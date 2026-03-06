@@ -21,12 +21,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.graylog.collectors.FleetService;
+import org.graylog.collectors.rest.FleetPermissions;
 import org.graylog2.database.BuildableMongoEntity;
+import org.graylog2.database.DbEntity;
 
 import java.time.Instant;
 
 @AutoValue
 @JsonDeserialize(builder = FleetDTO.Builder.class)
+@DbEntity(collection = FleetService.COLLECTION_NAME, titleField = FleetDTO.FIELD_NAME, readPermission = FleetPermissions.FLEET_READ)
 public abstract class FleetDTO implements BuildableMongoEntity<FleetDTO, FleetDTO.Builder> {
     public static final String FIELD_NAME = "name";
     public static final String FIELD_DESCRIPTION = "description";

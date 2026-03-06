@@ -22,6 +22,7 @@ import java.time.Instant;
 import java.util.Map;
 
 public record CollectorInstanceResponse(
+        @JsonProperty("status") String status,
         @JsonProperty("instance_uid") String instanceUid,
         @JsonProperty("fleet_id") String fleetId,
         @JsonProperty("capabilities") long capabilities,

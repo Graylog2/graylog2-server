@@ -16,6 +16,7 @@
  */
 package org.graylog2.database.filtering.inmemory;
 
+import org.graylog2.database.filtering.BsonFilterCreatorFilter;
 import org.graylog2.database.filtering.Filter;
 import org.graylog2.database.filtering.RangeFilter;
 import org.graylog2.database.filtering.SingleValueFilter;
@@ -71,6 +72,9 @@ public class SingleFilterParser {
                         extractValue(fieldType, ranges[1])
                 );
             }
+        } else if (attributeMetaData.bsonFilterCreator() != null) {
+            final String dbField = attributeMetaData.dbField() != null ? attributeMetaData.dbField() : attributeMetaData.id();
+            return new BsonFilterCreatorFilter(dbField, attributeMetaData.bsonFilterCreator(), fieldType, extractValue(fieldType, valuePart));
         } else {
             return new SingleValueFilter(attributeMetaData.id(), extractValue(fieldType, valuePart));
         }

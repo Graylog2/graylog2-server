@@ -46,6 +46,7 @@ public class FleetService {
             "name", SearchQueryField.create(FleetDTO.FIELD_NAME),
             "description", SearchQueryField.create(FleetDTO.FIELD_DESCRIPTION)
     );
+    public static final String COLLECTION_NAME = "fleets";
 
     private final MongoCollection<FleetDTO> collection;
     private final MongoPaginationHelper<FleetDTO> paginationHelper;
@@ -56,7 +57,7 @@ public class FleetService {
     @Inject
     public FleetService(MongoCollections mongoCollections, FleetTransactionLogService txnLogService,
                         SourceService sourceService) {
-        this.collection = mongoCollections.collection("fleets", FleetDTO.class);
+        this.collection = mongoCollections.collection(COLLECTION_NAME, FleetDTO.class);
         this.paginationHelper = mongoCollections.paginationHelper(collection);
         this.searchQueryParser = new SearchQueryParser(FleetDTO.FIELD_NAME, SEARCH_FIELD_MAPPING);
         this.txnLogService = txnLogService;

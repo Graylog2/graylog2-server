@@ -17,6 +17,7 @@
 package org.graylog.collectors.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.mongodb.client.model.Filters;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,21 +31,25 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.bson.conversions.Bson;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.SourceService;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
+import org.graylog.collectors.db.FleetDTO;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.filtering.BsonFilterCreatorFilter;
+import org.graylog2.database.filtering.ComputedFieldRegistry;
+import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
-import org.graylog2.rest.resources.entities.EntityDefaults;
-import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.entities.EntityAttribute;
+import org.graylog2.rest.resources.entities.EntityDefaults;
+import org.graylog2.rest.resources.entities.FilterOption;
+import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.AttributeFieldFilters;
-import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
-import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.slf4j.Logger;
@@ -55,8 +60,10 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static java.util.stream.Collectors.toMap;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_LAST_SEEN;
 
 @PublicCloudAPI
 @Tag(name = "Collectors", description = "Collector management")
@@ -72,42 +79,66 @@ public class CollectorInstancesResource extends RestResource {
     private static final String DEFAULT_SORT_DIRECTION = "desc";
 
     private static final List<EntityAttribute> ATTRIBUTES = List.of(
-            EntityAttribute.builder().id("fleet_id").title("Fleet").sortable(false).searchable(true).build(),
+            EntityAttribute.builder().id("status")
+                    .title("Status")
+                    .filterable(true)
+                    .sortable(true)
+                    .filterOptions(Set.of(
+                            FilterOption.create("online", "Online"),
+                            FilterOption.create("offline", "Offline")))
+                    .bsonFilterCreator((name, value) -> {
+                        final Instant threshold = Instant.now().minus(ONLINE_THRESHOLD);
+                        if (value.getValue().equals("online")) {
+                            return Filters.gte(FIELD_LAST_SEEN, threshold);
+                        }
+                        return Filters.lt(FIELD_LAST_SEEN, threshold);
+                    })
+                    .build(),
+            EntityAttribute.builder().id("fleet_id")
+                    .title("Fleet")
+                    .relatedCollection(FleetService.COLLECTION_NAME)
+                    .relatedIdentifier("_id")
+                    .relatedDisplayFields(List.of(FleetDTO.FIELD_NAME))
+                    .relatedDisplayTemplate("{name}")
+                    .type(SearchQueryField.Type.OBJECT_ID)
+                    .sortable(false)
+                    .searchable(true)
+                    .filterable(true)
+                    .build(),
             EntityAttribute.builder().id("instance_uid").title("Instance UID").sortable(true).searchable(true).build(),
             EntityAttribute.builder().id("last_seen").title("Last Seen").type(SearchQueryField.Type.DATE).sortable(true).build(),
-            EntityAttribute.builder().id("hostname").title("Hostname").sortable(false).searchable(true).build(),
-            EntityAttribute.builder().id("os").title("OS").sortable(false).searchable(true).build(),
-            EntityAttribute.builder().id("version").title("Version").sortable(false).searchable(true).build()
+            EntityAttribute.builder().id("hostname").title("Hostname")
+                    .dbField(CollectorInstanceDTO.FIELD_NON_IDENTIFYING_ATTRIBUTES)
+                    .bsonFilterCreator(AttributeFieldFilters.attributeArray("host.name"))
+                    .sortable(true).searchable(true).build(),
+            EntityAttribute.builder().id("os").title("OS")
+                    .dbField(CollectorInstanceDTO.FIELD_NON_IDENTIFYING_ATTRIBUTES)
+                    .bsonFilterCreator(AttributeFieldFilters.attributeArray("os.type"))
+                    .sortable(true).searchable(true).filterable(true).build(),
+            EntityAttribute.builder().id("version").title("Version")
+                    .dbField(CollectorInstanceDTO.FIELD_NON_IDENTIFYING_ATTRIBUTES)
+                    .bsonFilterCreator(AttributeFieldFilters.attributeArray("service.version"))
+                    .sortable(true).searchable(true).filterable(true).build()
     );
 
     private static final EntityDefaults DEFAULTS = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.DESC))
             .build();
 
-    private static final Map<String, SearchQueryField> SEARCH_FIELD_MAPPING = Map.of(
-            "fleet_id", SearchQueryField.create(CollectorInstanceDTO.FIELD_FLEET_ID, SearchQueryField.Type.OBJECT_ID),
-            "instance_uid", SearchQueryField.create(CollectorInstanceDTO.FIELD_INSTANCE_UID),
-            "last_seen", SearchQueryField.create(CollectorInstanceDTO.FIELD_LAST_SEEN, SearchQueryField.Type.DATE),
-            "hostname", SearchQueryField.create(CollectorInstanceDTO.FIELD_NON_IDENTIFYING_ATTRIBUTES, SearchQueryField.Type.STRING,
-                    AttributeFieldFilters.attributeArray("host.name")),
-            "os", SearchQueryField.create(CollectorInstanceDTO.FIELD_NON_IDENTIFYING_ATTRIBUTES, SearchQueryField.Type.STRING,
-                    AttributeFieldFilters.attributeArray("os.type")),
-            "version", SearchQueryField.create(CollectorInstanceDTO.FIELD_NON_IDENTIFYING_ATTRIBUTES, SearchQueryField.Type.STRING,
-                    AttributeFieldFilters.attributeArray("service.version"))
-    );
-
     private final CollectorInstanceService collectorInstanceService;
     private final FleetService fleetService;
     private final SourceService sourceService;
-    private final SearchQueryParser searchQueryParser;
+    private final DbQueryCreator dbQueryCreator;
 
     @Inject
     public CollectorInstancesResource(CollectorInstanceService collectorInstanceService,
-                                      FleetService fleetService, SourceService sourceService) {
+                                      FleetService fleetService,
+                                      SourceService sourceService,
+                                      ComputedFieldRegistry computedFieldRegistry) {
         this.collectorInstanceService = collectorInstanceService;
         this.fleetService = fleetService;
         this.sourceService = sourceService;
-        this.searchQueryParser = new SearchQueryParser(CollectorInstanceDTO.FIELD_INSTANCE_UID, SEARCH_FIELD_MAPPING);
+        this.dbQueryCreator = new DbQueryCreator(CollectorInstanceDTO.FIELD_INSTANCE_UID, ATTRIBUTES, computedFieldRegistry);
     }
 
     @GET
@@ -129,23 +160,24 @@ public class CollectorInstancesResource extends RestResource {
     @GET
     @Timed
     @Operation(summary = "Get a paginated list of collector instances")
-    public PageListResponse<CollectorInstanceResponse> findInstances(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                                     @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                   @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
-//  TODO do we need this? seems to be for scopes  @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
-                                                   @Parameter(name = "sort",
-                                                              description = "The field to sort the result on",
-                                                              schema = @Schema(allowableValues = {"instance_uid", "last_seen"}))
-                                                       @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
-                                                   @Parameter(name = "order", description = "The sort direction",
-                                                              schema = @Schema(allowableValues = {"asc", "desc"}))
-                                                       @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order
+    public PageListResponse<CollectorInstanceResponse> findInstances(
+            @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+            @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+            @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+            @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
+            @Parameter(name = "sort",
+                       description = "The field to sort the result on",
+                       schema = @Schema(allowableValues = {"instance_uid", "last_seen"}))
+            @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
+            @Parameter(name = "order", description = "The sort direction",
+                       schema = @Schema(allowableValues = {"asc", "desc"}))
+            @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order
     ) {
 
-        final SearchQuery searchQuery = searchQueryParser.parse(query);
-
+        final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
+        LOG.info("Query {} Filters {}\nDB Query: {}", query, filters, dbQuery);
         final PaginatedList<CollectorInstanceDTO> list = collectorInstanceService.findPaginated(
-                searchQuery,
+                dbQuery,
                 order.toBsonSort(sort),
                 page,
                 perPage);
@@ -157,6 +189,7 @@ public class CollectorInstancesResource extends RestResource {
                 sort,
                 order,
                 list.stream().map(dto -> new CollectorInstanceResponse(
+                        dto.lastSeen().isBefore(Instant.now().minus(ONLINE_THRESHOLD)) ? "offline" : "online",
                         dto.instanceUid(),
                         dto.fleetId(),
                         dto.capabilities(),

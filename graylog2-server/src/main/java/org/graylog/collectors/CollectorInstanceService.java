@@ -108,7 +108,6 @@ public class CollectorInstanceService {
                 combine(updateOps),
                 new FindOneAndUpdateOptions()
                         .returnDocument(ReturnDocument.BEFORE)
-                        // TODO we should define a separate minimal "DTO" for using projections, otherwise we have too many optionals
                         .projection(Projections.include(FIELD_MESSAGE_SEQ_NUM, FIELD_LAST_PROCESSED_TXN_SEQ, FIELD_FLEET_ID))
                         .upsert(true));
 
@@ -149,8 +148,8 @@ public class CollectorInstanceService {
         );
     }
 
-    public PaginatedList<CollectorInstanceDTO> findPaginated(SearchQuery searchQuery, Bson sort, int page, int perPage) {
-        return paginationHelper.filter(searchQuery.toBson()).sort(sort).perPage(perPage).page(page);
+    public PaginatedList<CollectorInstanceDTO> findPaginated(Bson query, Bson sort, int page, int perPage) {
+        return paginationHelper.filter(query).sort(sort).perPage(perPage).page(page);
     }
 
     public long count() {
