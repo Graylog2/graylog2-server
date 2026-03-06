@@ -29,6 +29,11 @@ jest.mock('components/common/PaginatedEntityTable', () => ({
   useTableFetchContext: jest.fn(),
 }));
 
+jest.mock('./MongodbProfilingAction', () => ({
+  __esModule: true,
+  default: jest.fn(() => <div>MongoDB Profiling Action</div>),
+}));
+
 describe('<MongodbNodesExpandable />', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -36,11 +41,15 @@ describe('<MongodbNodesExpandable />', () => {
 
   it('renders paginated entity table with proper props', () => {
     const { default: PaginatedEntityTable } = jest.requireMock('components/common/PaginatedEntityTable');
+    const { default: MongodbProfilingAction } = jest.requireMock('./MongodbProfilingAction');
     const mockPaginatedEntityTable = asMock(PaginatedEntityTable);
+    const mockMongodbProfilingAction = asMock(MongodbProfilingAction);
 
     render(<MongodbNodesExpandable searchQuery="role:secondary" refetchInterval={10000} />);
 
     expect(screen.getByText('Paginated MongoDB Nodes')).toBeInTheDocument();
+    expect(screen.getByText('MongoDB Profiling Action')).toBeInTheDocument();
+    expect(mockMongodbProfilingAction.mock.calls[0][0]).toEqual({});
     expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(1);
     const callProps = mockPaginatedEntityTable.mock.calls[0][0] as PaginatedEntityTableProps<any, any>;
     expect(callProps.humanName).toBe('MongoDB Nodes');

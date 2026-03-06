@@ -34,13 +34,14 @@ const ProfilingLevelCell = ({ profilingLevel }: Props) => {
     return null;
   }
 
-  const levelInfo = LEVEL_LABELS[profilingLevel] ?? { label: `Unknown (${profilingLevel})`, style: 'default' };
+  const levelInfo = LEVEL_LABELS[profilingLevel];
+  const resolvedLevelInfo = levelInfo ?? { label: `Unknown (${profilingLevel})`, style: 'default' };
 
   return (
     <MetricsColumn>
       <MetricsRow>
-        <StyledLabel bsStyle={levelInfo.style} bsSize="xs">
-          {levelInfo.label}
+        <StyledLabel bsStyle={resolvedLevelInfo.style} bsSize="xs">
+          {resolvedLevelInfo.label}
         </StyledLabel>
       </MetricsRow>
     </MetricsColumn>

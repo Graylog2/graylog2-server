@@ -17,7 +17,6 @@
 import React, { useMemo, useState, useCallback } from 'react';
 
 import { PaginatedEntityTable } from 'components/common';
-import { Button } from 'components/bootstrap';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import type { FetchOptions } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
@@ -28,6 +27,7 @@ import {
 } from './MongodbNodesColumnConfiguration';
 import type { MongodbNode, MongodbNodesResponse } from './fetchClusterMongodbNodes';
 import { clusterMongodbNodesKeyFn, fetchMongodbNodes } from './fetchClusterMongodbNodes';
+import MongodbProfilingAction from './MongodbProfilingAction';
 
 import ClusterNodesSectionWrapper from '../shared-components/ClusterNodesSectionWrapper';
 
@@ -67,20 +67,13 @@ const MongodbNodesExpandable = ({
   const externalSearch = useMemo(() => ({ query: searchQuery }), [searchQuery]);
   const fetchOptions = useMemo<FetchOptions>(() => ({ refetchInterval }), [refetchInterval]);
 
-  // TODO: Wire up to backend endpoint when available
-  const profilingAction = (
-    <Button bsSize="xsmall" bsStyle="primary" title="Enable profiling on all nodes">
-      Enable Profiling
-    </Button>
-  );
-
   return (
     <ClusterNodesSectionWrapper
       title="MongoDB Nodes"
       titleCount={totalMongodbNodes}
       onTitleCountClick={onSelectNodeType ?? null}
-      collapsible={collapsible}
-      actions={profilingAction}>
+      collapsible={collapsible}>
+      <MongodbProfilingAction />
       <PaginatedEntityTable<MongodbNode>
         tableLayout={tableLayout}
         fetchEntities={fetchMongodbNodes}

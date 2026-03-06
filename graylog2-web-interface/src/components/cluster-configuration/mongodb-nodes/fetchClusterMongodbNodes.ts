@@ -29,9 +29,9 @@ export const MongodbRole = {
 export type MongodbRoleType = typeof MongodbRole[keyof typeof MongodbRole];
 
 export const MongodbProfilingLevel = {
-  OFF: 0,
-  SLOW_OPS: 1,
-  ALL: 2,
+  OFF: 'OFF',
+  SLOW_OPS: 'SLOW_OPS',
+  ALL: 'ALL',
 } as const;
 
 export type MongodbProfilingLevelType = typeof MongodbProfilingLevel[keyof typeof MongodbProfilingLevel];

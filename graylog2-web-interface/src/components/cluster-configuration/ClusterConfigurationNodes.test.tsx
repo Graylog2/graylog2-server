@@ -29,6 +29,17 @@ jest.mock('components/common/PaginatedEntityTable', () => ({
   useTableFetchContext: jest.fn(),
 }));
 
+jest.mock('./mongodb-nodes/useMongodbProfilingToggle', () => ({
+  __esModule: true,
+  default: jest.fn(() => ({
+    action: 'enable',
+    state: 'off',
+    isLoadingStatus: false,
+    isTogglingProfiling: false,
+    runToggleAction: jest.fn(),
+  })),
+}));
+
 describe('<ClusterConfigurationNodes />', () => {
   beforeEach(() => {
     jest.useFakeTimers();
