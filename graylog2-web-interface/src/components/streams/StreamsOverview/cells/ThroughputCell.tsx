@@ -15,30 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useMemo } from 'react';
 
-import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 import type { Stream } from 'stores/streams/StreamsStore';
 import { Spinner } from 'components/common';
-import { useStore } from 'stores/connect';
+import { useMetrics } from 'hooks/useMetrics';
 
 type Props = {
   stream: Stream;
 };
 
 const ThroughputCell = ({ stream }: Props) => {
-  const { metrics } = useStore(MetricsStore);
   const metricName = `org.graylog2.plugin.streams.Stream.${stream.id}.incomingMessages.1-sec-rate`;
+  const metricNames = useMemo(() => [metricName], [metricName]);
+  const { data: metrics, isLoading } = useMetrics(metricNames);
 
-  useEffect(() => {
-    MetricsActions.addGlobal(metricName);
-
-    return () => {
-      MetricsActions.removeGlobal(metricName);
-    };
-  });
-
-  if (!metrics) {
+  if (isLoading || Object.keys(metrics).length === 0) {
     return <Spinner size="xs" />;
   }
 

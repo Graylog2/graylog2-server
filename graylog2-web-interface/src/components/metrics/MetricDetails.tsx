@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useMemo } from 'react';
 import capitalize from 'lodash/capitalize';
 import styled from 'styled-components';
 
@@ -24,9 +24,8 @@ import GaugeDetails from 'components/metrics/GaugeDetails';
 import HistogramDetails from 'components/metrics/HistogramDetails';
 import MeterDetails from 'components/metrics/MeterDetails';
 import TimerDetails from 'components/metrics/TimerDetails';
-import { useStore } from 'stores/connect';
-import type { Metric } from 'stores/metrics/MetricsStore';
-import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
+import type { Metric } from 'types/metrics';
+import { useNodeMetrics } from 'hooks/useMetrics';
 
 const DetailsForType = ({ metric }: { metric: Metric }) => {
   switch (metric.type) {
@@ -79,17 +78,10 @@ type Props = {
 };
 
 const MetricDetails = ({ nodeId, metric, metric: { full_name: metricName } }: Props) => {
-  const metrics = useStore(MetricsStore, (metricsStoreState) => metricsStoreState.metrics);
+  const metricNames = useMemo(() => [metricName], [metricName]);
+  const { data: nodeMetrics } = useNodeMetrics(nodeId, metricNames);
 
-  useEffect(() => {
-    MetricsActions.add(nodeId, metricName);
-
-    return () => {
-      MetricsActions.remove(nodeId, metricName);
-    };
-  }, [metricName, nodeId]);
-
-  const currentMetric = metrics?.[nodeId]?.[metricName] ?? metric;
+  const currentMetric = nodeMetrics?.[metricName] ?? metric;
   const type = capitalize(currentMetric.type);
 
   return (
