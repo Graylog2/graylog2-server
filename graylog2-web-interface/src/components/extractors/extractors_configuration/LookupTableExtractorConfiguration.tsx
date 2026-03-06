@@ -16,8 +16,7 @@
  */
 import React from 'react';
 
-import { Link } from 'components/common/router';
-import { Select, Spinner, Icon } from 'components/common';
+import { Link, Select, Spinner, Icon } from 'components/common';
 import { Row, Col, Button, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';

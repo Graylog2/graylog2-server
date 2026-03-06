@@ -18,11 +18,13 @@ package org.graylog.plugins.views.search.rest.scriptingapi.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.ValidationException;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.NumberRange;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -30,34 +32,38 @@ import java.util.concurrent.atomic.AtomicInteger;
 public record Grouping(@JsonProperty("field") @Valid @NotBlank String fieldName,
                        @JsonProperty("limit") Optional<Integer> limit,
                        @JsonProperty("timeunit") Optional<String> timeunit,
-                       @JsonProperty("scaling") Optional<Double> scaling) {
+                       @JsonProperty("scaling") Optional<Double> scaling,
+                       @JsonProperty("ranges") Optional<List<NumberRange>> ranges) {
 
     public Grouping(String fieldName) {
-        this(fieldName, Optional.of(Values.DEFAULT_LIMIT), Optional.empty(), Optional.empty());
+        this(fieldName, Optional.of(Values.DEFAULT_LIMIT), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
     public Grouping(@JsonProperty("field") @Valid @NotBlank String fieldName,
                     @JsonProperty("limit") Optional<Integer> limit,
                     @JsonProperty("timeunit") Optional<String> timeunit,
-                    @JsonProperty("scaling") Optional<Double> scaling) {
+                    @JsonProperty("scaling") Optional<Double> scaling,
+                    @JsonProperty("ranges") Optional<List<NumberRange>> ranges) {
         this.fieldName = fieldName;
         this.limit = limit.map(lim -> lim <= 0 ? Values.DEFAULT_LIMIT : lim);
         this.timeunit = timeunit;
         this.scaling = scaling;
+        this.ranges = ranges;
 
-        // only one of the three following parameters are allowed to be present
+        // only one of the following parameters are allowed to be present
         final AtomicInteger attrCounter = new AtomicInteger();
         limit.ifPresent(l -> attrCounter.getAndIncrement());
         timeunit.ifPresent(t -> attrCounter.getAndIncrement());
         scaling.ifPresent(s -> attrCounter.getAndIncrement());
+        ranges.ifPresent(r -> attrCounter.getAndIncrement());
         if(attrCounter.get() > 1) {
-            throw new ValidationException("Only one attribute out of 'limit', 'timeunit' or 'scaling' can be specified");
+            throw new ValidationException("Only one attribute out of 'limit', 'timeunit', 'scaling' or 'ranges' can be specified");
         }
     }
 
     public Grouping(@JsonProperty("field") @Valid @NotBlank String fieldName,
                     @JsonProperty("limit") int limit) {
-        this(fieldName, Optional.of(limit), Optional.empty(), Optional.empty());
+        this(fieldName, Optional.of(limit), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
     @Deprecated

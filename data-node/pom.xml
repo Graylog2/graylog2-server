@@ -65,7 +65,7 @@
         </dependency>
         <dependency>
             <groupId>org.graylog</groupId>
-            <artifactId>graylog-storage-opensearch2</artifactId>
+            <artifactId>graylog-storage-opensearch3</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -461,6 +461,14 @@
         <dependency>
             <groupId>org.graylog2</groupId>
             <artifactId>graylog2-server</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.graylog</groupId>
+            <artifactId>graylog-storage-opensearch3</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>

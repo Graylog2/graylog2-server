@@ -74,7 +74,7 @@ const usePluggableSearchAction = (loaded: boolean, view: View) => {
   const pluggableSearchActions = usePluginEntities('views.components.searchActions');
 
   const actions = pluggableSearchActions
-    .filter((perspective) => (perspective.useCondition ? !!perspective.useCondition() : true))
+    .filter((action) => (action.useCondition ? !!action.useCondition() : true))
     .map(({ component: PluggableSearchAction, key, modals }) => {
       if (modals) {
         const refs = Object.fromEntries(

@@ -27,12 +27,17 @@ import { type SortMode } from './SliceFilters';
 import SlicesOverview from './SlicesOverview';
 import type { FetchSlices } from './useFetchSlices';
 
-type Slice = { value: string | number; count: number; title?: string };
+export type Slice = { value: string | number; count: number; title?: string };
+export type SliceRenderer = {
+  extendSlices?: (slices: Array<Slice>) => Array<Slice>;
+  render?: (value: string | number) => React.ReactNode;
+};
+export type SliceRenderers = { [col: string]: SliceRenderer };
 export type Slices = Array<Slice>;
 
 const Container = styled.div(
   ({ theme }) => css`
-    min-width: 300px;
+    width: 400px;
     border-right: 1px solid ${theme.colors.gray[90]};
     padding-right: ${theme.spacings.sm};
   `,
@@ -42,7 +47,7 @@ type Props = {
   appSection: string;
   columnSchemas: Array<ColumnSchema>;
   onChangeSlicing: (sliceCol: string | undefined, slice?: string | undefined) => void;
-  sliceRenderers?: { [col: string]: (value: string | number) => React.ReactNode } | undefined;
+  sliceRenderers?: SliceRenderers;
   fetchSlices: FetchSlices;
 };
 
