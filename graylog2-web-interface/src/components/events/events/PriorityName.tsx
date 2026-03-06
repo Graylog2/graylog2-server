@@ -16,14 +16,18 @@
  */
 import * as React from 'react';
 
-import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
+import EventDefinitionPriorityEnum, { EXCLUDE_INFORMATIONAL_FILTER } from 'logic/alerts/EventDefinitionPriorityEnum';
 import StringUtils from 'util/StringUtils';
 
 type Props = {
   priority: number | string;
 };
-const PriorityName = ({ priority }: Props) => (
-  <>{StringUtils.capitalizeFirstLetter(EventDefinitionPriorityEnum.properties[priority].name)}</>
-);
+const PriorityName = ({ priority }: Props) => {
+  if (String(priority) === EXCLUDE_INFORMATIONAL_FILTER) {
+    return <>Not Informational</>;
+  }
+
+  return <>{StringUtils.capitalizeFirstLetter(EventDefinitionPriorityEnum.properties[priority].name)}</>;
+};
 
 export default PriorityName;

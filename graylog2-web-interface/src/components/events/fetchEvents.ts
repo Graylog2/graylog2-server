@@ -26,6 +26,7 @@ import { additionalAttributes } from 'components/events/Constants';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import parseTimerangeFilter from 'components/common/PaginatedEntityTable/parseTimerangeFilter';
 import type { TimeRange, RelativeTimeRange } from 'views/logic/queries/Query';
+import EventDefinitionPriorityEnum, { EXCLUDE_INFORMATIONAL_FILTER } from 'logic/alerts/EventDefinitionPriorityEnum';
 
 const url = URLUtils.qualifyUrl('/events/search');
 
@@ -55,6 +56,20 @@ export const parseTypeFilter = (alert: string) => {
     default:
       return 'include';
   }
+};
+
+const allPriorityKeys = Object.keys(EventDefinitionPriorityEnum.properties);
+
+const expandPriorityFilters = (priorities: Array<string>): Array<string> => {
+  const expanded = priorities.flatMap((p) => {
+    if (p === EXCLUDE_INFORMATIONAL_FILTER) {
+      return allPriorityKeys.filter((key) => key !== String(EventDefinitionPriorityEnum.INFORMATIONAL));
+    }
+
+    return [p];
+  });
+
+  return [...new Set(expanded)];
 };
 
 const allTime = { type: 'relative', range: 0 } as const;
@@ -89,7 +104,7 @@ export const parseFilters = (filters: UrlQueryFilters, defaultTimerange: TimeRan
   }
 
   if (filters.get('priority')?.length > 0) {
-    result.filter.priority = filters.get('priority');
+    result.filter.priority = expandPriorityFilters(filters.get('priority'));
   }
 
   if (filters.get('id')?.length > 0) {

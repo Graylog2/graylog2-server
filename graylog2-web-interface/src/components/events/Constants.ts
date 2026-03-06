@@ -15,14 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { Sort, Attribute } from 'stores/PaginationTypes';
-import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
+import EventDefinitionPriorityEnum, { EXCLUDE_INFORMATIONAL_FILTER } from 'logic/alerts/EventDefinitionPriorityEnum';
 import type { MiddleSectionProps } from 'components/common/PaginatedEntityTable/PaginatedEntityTable';
 
 export const EVENTS_ENTITY_TABLE_ID = 'events';
 
 export const commonEventAttributes: Array<Attribute> = [
   {
-    filter_options: Object.keys(EventDefinitionPriorityEnum.properties).map((num) => ({ value: num, title: num })),
+    filter_options: [
+      { value: EXCLUDE_INFORMATIONAL_FILTER, title: 'Not Informational' },
+      ...Object.keys(EventDefinitionPriorityEnum.properties).map((num) => ({ value: num, title: num })),
+    ],
     filterable: true,
     id: 'priority',
     searchable: false,
