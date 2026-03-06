@@ -29,6 +29,17 @@ jest.mock('components/common/PaginatedEntityTable', () => ({
   useTableFetchContext: jest.fn(),
 }));
 
+jest.mock('./mongodb-nodes/useMongodbProfilingToggle', () => ({
+  __esModule: true,
+  default: jest.fn(() => ({
+    action: 'enable',
+    state: 'off',
+    isLoadingStatus: false,
+    isTogglingProfiling: false,
+    runToggleAction: jest.fn(),
+  })),
+}));
+
 describe('<ClusterConfigurationNodes />', () => {
   beforeEach(() => {
     jest.useFakeTimers();
@@ -39,14 +50,14 @@ describe('<ClusterConfigurationNodes />', () => {
     jest.clearAllMocks();
   });
 
-  it('renders both node types with default paging and refresh settings in "all" view', () => {
+  it('renders all node types with default paging and refresh settings in "all" view', () => {
     const { default: MockPaginatedEntityTable } = jest.requireMock('components/common/PaginatedEntityTable');
     const mockPaginatedEntityTable = asMock(MockPaginatedEntityTable);
 
     render(<ClusterConfigurationNodes />);
 
-    expect(screen.getAllByRole('table')).toHaveLength(2);
-    expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(2);
+    expect(screen.getAllByRole('table')).toHaveLength(3);
+    expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(3);
   });
 
   it('switches to a specific node type when segmented control is used', async () => {
@@ -58,6 +69,19 @@ describe('<ClusterConfigurationNodes />', () => {
     mockPaginatedEntityTable.mockClear();
 
     await userEvent.click(screen.getByRole('radio', { name: 'Data Nodes' }));
+
+    await waitFor(() => expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(1));
+  });
+
+  it('switches to mongodb node type when segmented control is used', async () => {
+    const { default: MockPaginatedEntityTable } = jest.requireMock('components/common/PaginatedEntityTable');
+    const mockPaginatedEntityTable = asMock(MockPaginatedEntityTable);
+
+    render(<ClusterConfigurationNodes />);
+
+    mockPaginatedEntityTable.mockClear();
+
+    await userEvent.click(screen.getByRole('radio', { name: 'MongoDB Nodes' }));
 
     await waitFor(() => expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(1));
   });
