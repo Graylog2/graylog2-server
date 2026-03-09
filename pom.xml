@@ -182,7 +182,7 @@
         <retrofit.version>3.0.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>2.1.0</shiro.version>
-        <snakeyaml.version>2.5</snakeyaml.version>
+        <snakeyaml.version>2.6</snakeyaml.version>
         <snappy-java.version>1.1.10.8</snappy-java.version>
         <oshi.version>6.10.0</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
@@ -781,7 +781,7 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.74.1</version>
+                            <version>8.74.3</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
