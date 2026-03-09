@@ -21,9 +21,6 @@ import org.apache.shiro.subject.Subject;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiService;
-import org.graylog.plugins.views.search.rest.scriptingapi.response.Metadata;
-import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
-import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.rest.resources.entities.Slice;
 import org.graylog2.rest.resources.entities.Slices;
@@ -320,20 +317,20 @@ class EventsSearchServiceSlicesTest {
             datarows.add(List.of(value, count));
         });
 
-        ResponseSchemaEntry fieldSchema =
-            ResponseSchemaEntry.groupBy(field);
-        ResponseSchemaEntry countSchema =
-            ResponseSchemaEntry.metric("count", null);
-
+        org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry fieldSchema =
+            org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry.groupBy(field);
+        org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry countSchema =
+            org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry.metric("count", null);
+        
         org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange timeRange =
             org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange.create(
                 "2024-01-01T00:00:00.000Z", "2024-01-02T00:00:00.000Z");
 
-        Metadata metadata =
-            new Metadata(timeRange);
-
-        TabularResponse response =
-            new TabularResponse(
+        org.graylog.plugins.views.search.rest.scriptingapi.response.Metadata metadata =
+            new org.graylog.plugins.views.search.rest.scriptingapi.response.Metadata(timeRange);
+        
+        org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse response =
+            new org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse(
                 List.of(fieldSchema, countSchema),
                 datarows,
                 metadata
