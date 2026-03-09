@@ -84,6 +84,7 @@ export { default as LoadingIndicator } from './LoadingIndicator';
 export { default as LocaleSelect } from './LocaleSelect';
 export { default as Markdown } from './Markdown';
 export { default as MessageDetailsDefinitionList } from './MessageDetailsDefinitionList';
+export { default as MessageDetail } from './message/details/MessageDetail';
 export { default as MessageTable } from './message/messagetable/MessageTable';
 export { default as ModalSubmit } from './ModalSubmit';
 export { MoreActionsIcon, MoreActionsMenu } from './MoreActions';

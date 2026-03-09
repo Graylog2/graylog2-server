@@ -19,9 +19,12 @@ import { useState, useContext, useCallback } from 'react';
 import Immutable from 'immutable';
 import styled from 'styled-components';
 
-import { Link, Icon, Spinner, Timestamp } from 'components/common';
+import Link from 'components/common/Link';
+import Icon from 'components/common/Icon';
+import Spinner from 'components/common/Spinner';
+import Timestamp from 'components/common/Timestamp';
 import { Col, Label, Row } from 'components/bootstrap';
-import { MessageFields } from 'views/components/messagelist';
+import MessageFields from 'views/components/messagelist/MessageFields/MessageFields';
 import MessageDetailsTitle from 'components/search/MessageDetailsTitle';
 import Routes from 'routing/Routes';
 import type { Message } from 'views/components/messagelist/Types';
@@ -37,11 +40,10 @@ import MessageFavoriteFieldsProvider from 'views/components/contexts/MessageFavo
 import MessageDetailAdditionalContextProvider from 'views/components/contexts/MessageDetailAdditionalContextProvider';
 import useFeature from 'hooks/useFeature';
 import DefaultMessageFields from 'views/components/messagelist/MessageFields/DefaultMessageFields';
-
-import MessageDetailProviders from './MessageDetailProviders';
-import MessageActions from './MessageActions';
-import MessageAugmentations from './MessageAugmentations';
-import MessageMetadata from './MessageMetadata';
+import MessageDetailProviders from 'views/components/messagelist/MessageDetailProviders';
+import MessageActions from 'views/components/messagelist/MessageActions';
+import MessageAugmentations from 'views/components/messagelist/MessageAugmentations';
+import MessageMetadata from 'views/components/messagelist/MessageMetadata';
 
 const _formatMessageTitle = (index, id) => {
   if (index) {

@@ -14,6 +14,4 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { MessageDetail } from 'components/common';
-export { default as MessageField } from './MessageField';
-export { default as MessageFields } from './MessageFields/MessageFields';
+export { default as MessageDetail } from './MessageDetail';

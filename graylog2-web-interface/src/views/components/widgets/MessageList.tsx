@@ -22,7 +22,7 @@ import type { WidgetComponentProps, MessageResult } from 'views/types';
 import { Messages } from 'views/Constants';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
-import { PaginatedList } from 'components/common';
+import { PaginatedList, MessageTable } from 'components/common';
 import ErrorWidget from 'views/components/widgets/ErrorWidget';
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type { BackendMessage } from 'views/components/messagelist/Types';
@@ -37,7 +37,6 @@ import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useSearchResult from 'views/hooks/useSearchResult';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
-import MessageTable from 'components/common/message/messagetable/MessageTable';
 
 const Wrapper = styled.div`
   display: flex;

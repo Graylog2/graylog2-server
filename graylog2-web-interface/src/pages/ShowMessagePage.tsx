@@ -19,11 +19,11 @@ import * as Immutable from 'immutable';
 import styled from 'styled-components';
 
 import useMessage from 'views/hooks/useMessage';
+import { MessageDetail } from 'components/common';
 import DocumentTitle from 'components/common/DocumentTitle';
 import Spinner from 'components/common/Spinner';
 import { Col, Row } from 'components/bootstrap';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
-import MessageDetail from 'views/components/messagelist/MessageDetail';
 import withParams from 'routing/withParams';
 import type { Input } from 'components/messageloaders/Types';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';

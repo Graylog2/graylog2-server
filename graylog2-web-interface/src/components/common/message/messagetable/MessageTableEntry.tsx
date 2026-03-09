@@ -32,7 +32,7 @@ import { InputsStore } from 'stores/inputs/InputsStore';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { TableDataCell } from 'views/components/datatable';
-import MessageDetail from 'views/components/messagelist/MessageDetail';
+import { MessageDetail } from 'components/common';
 import DecoratedValue from 'views/components/messagelist/decoration/DecoratedValue';
 import type { Message } from 'views/components/messagelist/Types';
 import CustomHighlighting from 'views/components/highlighting/CustomHighlighting';
