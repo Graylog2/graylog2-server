@@ -100,7 +100,7 @@
         <opensearch.shaded.version>2.19.3-1</opensearch.shaded.version>
         <opensearch.client.version>3.2.0</opensearch.client.version>
         <airline.version>3.2.0</airline.version>
-        <amqp-client.version>5.28.0</amqp-client.version>
+        <amqp-client.version>5.29.0</amqp-client.version>
         <antlr.version>4.13.2</antlr.version>
         <apache-directory-version>2.1.7</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
@@ -127,7 +127,7 @@
         <commons-validator.version>1.10.1</commons-validator.version>
         <commons-io.version>2.21.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
-        <error-prone.version>2.47.0</error-prone.version>
+        <error-prone.version>2.48.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
         <gcs.version>2.64.0</gcs.version>
         <azure-blob-storage.version>12.33.2</azure-blob-storage.version>
@@ -213,7 +213,7 @@
         <equalsverifier.version>4.4.1</equalsverifier.version>
         <guice-extension.version>1.2.1</guice-extension.version>
         <junit-jupiter.version>6.0.3</junit-jupiter.version>
-        <mockito.version>5.21.0</mockito.version>
+        <mockito.version>5.22.0</mockito.version>
         <restassured.version>6.0.0</restassured.version>
         <testcontainers.version>2.0.3</testcontainers.version>
         <testcontainers.opensearch.version>4.1.0</testcontainers.opensearch.version>
