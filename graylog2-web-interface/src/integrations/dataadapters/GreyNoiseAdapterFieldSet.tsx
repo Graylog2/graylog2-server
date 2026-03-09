@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 
 import { Button, Input } from 'components/bootstrap';
 import type { ValidationState } from 'components/common/types';
@@ -37,12 +37,9 @@ const GreyNoiseAdapterFieldSet = ({
   const [isCreate] = useState(() => !config.api_token?.keep_value);
   const [showResetPasswordButton, setShowResetPasswordButton] = useState(!!config.api_token?.keep_value);
 
-  const setUserPassword = useCallback(
-    (nextUserPassword) => {
-      setFieldValue('config.api_token', nextUserPassword);
-    },
-    [setFieldValue],
-  );
+  const setUserPassword = (nextUserPassword) => {
+    setFieldValue('config.api_token', nextUserPassword);
+  };
 
   const handleUserPasswordChange = ({ target }) => {
     const typedPassword = target.value;
