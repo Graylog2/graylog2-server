@@ -17,6 +17,7 @@
 import numeral from 'numeral';
 
 import type { InputSummary } from 'hooks/usePaginatedInputs';
+import type { Metric } from 'stores/metrics/MetricsStore';
 
 export type InputConnectionMetrics = {
   openConnections: number | undefined;
@@ -28,23 +29,23 @@ export type InputConnectionMetrics = {
   readBytesTotal: number | undefined;
 };
 
-export const getValueFromMetric = (metric) => {
-  if (metric === null || metric === undefined) {
-    return undefined;
+export const getValueFromMetric = (metric?: Metric): number => {
+  if (!metric) {
+    return 0;
   }
 
   switch (metric.type) {
     case 'meter':
-      return metric.metric.rate.mean;
+      return metric.metric.rate.one_minute;
     case 'gauge':
       return metric.metric.value;
     case 'counter':
       return metric.metric.count;
     default:
-      return undefined;
+      return 0;
   }
 };
-export const formatCount = (count: number) => numeral(count).format('0,0');
+export const formatCount = (count: number) => numeral(Math.round(count)).format('0,0');
 const inputsMeticNames = [
   'incomingMessages',
   'emptyMessages',
