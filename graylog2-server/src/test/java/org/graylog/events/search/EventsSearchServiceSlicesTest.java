@@ -90,8 +90,8 @@ class EventsSearchServiceSlicesTest {
     void testSlicesByPriority_AllLevelsPresent() throws Exception {
         // Mock ScriptingApiService to return aggregation results for priority
         mockAggregationResponse(FIELD_PRIORITY, Map.of(
-		"0", 2L,                
-		"1", 5L,
+                "0", 2L,
+		        "1", 5L,
                 "2", 8L,
                 "3", 4L,
                 "4", 3L
@@ -126,7 +126,7 @@ class EventsSearchServiceSlicesTest {
         // Mock filtered results with query
         mockAggregationResponse(FIELD_PRIORITY, Map.of(
                 "0", 1L,
-		"1", 3L,
+		        "1", 3L,
                 "2", 5L,
                 "3", 2L,
                 "4", 1L
@@ -295,7 +295,7 @@ class EventsSearchServiceSlicesTest {
         // Mock full dataset
         mockAggregationResponse(FIELD_PRIORITY, Map.of(
                 "0", 2L,
-		"1", 5L,
+		        "1", 5L,
                 "2", 8L,
                 "3", 4L,
                 "4", 3L

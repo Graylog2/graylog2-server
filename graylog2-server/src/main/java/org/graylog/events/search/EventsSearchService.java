@@ -193,6 +193,7 @@ public class EventsSearchService extends AbstractEventsSearchService {
         return fixedList;
     }
 
+    // when slicing, add missing keys that don't exist in the data but you still want to show with cardinality 0
     private List<Slice> addMissingOptions(final List<Slice> slices, final String slicingColumn) {
         return switch (slicingColumn) {
             case FIELD_ALERT -> handleAlertColumn(slices);
