@@ -1,0 +1,5 @@
+type = "f"
+message = "Use element center instead of nearest edge for ScrollToHint visibility check on dashboards."
+
+issues = ["25237"]
+pulls = ["25256"]
