@@ -24,7 +24,7 @@ import MockAction from 'helpers/mocking/MockAction';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import { MessageTable } from 'components/common';
+import MessageTable from 'components/common/message/messagetable/MessageTable';
 
 import InteractiveContext from '../contexts/InteractiveContext';
 import HighlightMessageContext from '../contexts/HighlightMessageContext';

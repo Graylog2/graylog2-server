@@ -33,19 +33,9 @@ import { usePlugin } from 'views/test/testPlugins';
 import ShowMessagePage from './ShowMessagePage';
 import { message, event, input } from './ShowMessagePage.fixtures';
 
-jest.mock('components/common', () => {
-  const actual = jest.requireActual('components/common');
-
-  return new Proxy(actual, {
-    get: (target, prop) => {
-      if (prop === 'MessageDetail') {
-        return (props) => <span>{JSON.stringify(props, null, 2)}</span>;
-      }
-
-      return target[prop];
-    },
-  });
-});
+jest.mock('components/common/message/details/MessageDetail', () => (props) => (
+  <span>{JSON.stringify(props, null, 2)}</span>
+));
 
 const mockGetInput = jest.fn();
 const mockListNodes = jest.fn();

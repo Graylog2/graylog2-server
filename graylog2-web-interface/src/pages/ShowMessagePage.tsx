@@ -19,7 +19,7 @@ import * as Immutable from 'immutable';
 import styled from 'styled-components';
 
 import useMessage from 'views/hooks/useMessage';
-import { MessageDetail } from 'components/common';
+import MessageDetail from 'components/common/message/details/MessageDetail';
 import DocumentTitle from 'components/common/DocumentTitle';
 import Spinner from 'components/common/Spinner';
 import { Col, Row } from 'components/bootstrap';
