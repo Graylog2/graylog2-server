@@ -65,6 +65,7 @@ describe('TabKeywordTimeRange', () => {
   });
 
   const findValidationState = (container) => {
+    // eslint-disable-next-line testing-library/no-node-access
     const formGroup = container.querySelector('.form-group');
 
     return formGroup && formGroup.className.includes('has-error') ? 'error' : null;

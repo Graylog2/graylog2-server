@@ -20,6 +20,7 @@ import type { Matcher } from 'wrappedTestingLibrary';
 import { render, within, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
+
 import selectEvent from 'helpers/selectEvent';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';

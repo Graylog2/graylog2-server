@@ -76,6 +76,7 @@ describe('QueryInput', () => {
     render(<SimpleQueryInput onChange={onChange} />);
 
     const queryInput = await findQueryInput();
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.input(queryInput, { target: { value: 'the query' } });
 
     expect(onChange).toHaveBeenCalledTimes(1);
@@ -88,6 +89,7 @@ describe('QueryInput', () => {
 
     const queryInput = await findQueryInput();
     queryInput.focus();
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.input(queryInput, { target: { value: 'the query' } });
     await userEvent.tab();
 

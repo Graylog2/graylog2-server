@@ -103,6 +103,7 @@ describe('<TimeUnitInput />', () => {
 
     const timeInput = await findTimeInput();
 
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.change(timeInput, { target: { value: '42' } });
 
     await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(42, 'SECONDS', true));

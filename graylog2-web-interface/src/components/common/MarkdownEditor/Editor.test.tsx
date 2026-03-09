@@ -53,6 +53,7 @@ describe('MarkdownEditor', () => {
 
     const editor = await screen.findByRole('textbox');
 
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.input(editor, { target: { value: '# this would be a title' } });
 
     expect(onChange).toHaveBeenLastCalledWith('# this would be a title');

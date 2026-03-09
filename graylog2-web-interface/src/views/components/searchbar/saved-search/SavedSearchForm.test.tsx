@@ -43,6 +43,9 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
     getInitialState: jest.fn(),
   },
 }));
+
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+
 const shareWithCollaborator = async () => {
   await selectEvent.chooseOption('Search for users and teams', everyone.title);
   await selectEvent.chooseOption('Select a capability', viewer.title);
@@ -67,8 +70,6 @@ const mockFormDirtyState = (dirty: boolean) =>
   asMock(useFormikContext)
     // @ts-expect-error context return type is not complete
     .mockReturnValue({ dirty });
-
-const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
 describe('SavedSearchForm', () => {
   beforeEach(() => {

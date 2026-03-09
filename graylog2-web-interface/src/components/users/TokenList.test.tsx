@@ -101,6 +101,7 @@ describe('<TokenList />', () => {
     await setupUser().type(nameInput, 'hans');
 
     const ttlInput = await screen.findByLabelText('Token TTL');
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.change(ttlInput, { target: { value: 'PT72H' } });
 
     const createToken = await screen.findByRole('button', { name: 'Create Token' });

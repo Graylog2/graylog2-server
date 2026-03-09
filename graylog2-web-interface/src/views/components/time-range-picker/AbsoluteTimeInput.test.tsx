@@ -57,6 +57,7 @@ describe('AbsoluteTimeInput', () => {
 
     const inputHour = screen.getByRole<HTMLInputElement>('spinbutton', { name: /from hour/i });
 
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.change(inputHour, { target: { value: '!' } });
 
     expect(defaultProps.onChange).toHaveBeenCalled();
@@ -68,6 +69,7 @@ describe('AbsoluteTimeInput', () => {
 
     const inputHour = screen.getByRole('spinbutton', { name: /from hour/i });
 
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.change(inputHour, { target: { value: '10' } });
 
     expect(defaultProps.onChange).toHaveBeenCalled();
@@ -81,14 +83,17 @@ describe('AbsoluteTimeInput', () => {
     const inputMinute = screen.getByRole<HTMLInputElement>('spinbutton', { name: /from minutes/i });
     const inputSeconds = screen.getByRole<HTMLInputElement>('spinbutton', { name: /from seconds/i });
 
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.change(inputHour, { target: { value: '99' } });
 
     expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 23:15:00');
 
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.change(inputMinute, { target: { value: '999' } });
 
     expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 06:59:00');
 
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.change(inputSeconds, { target: { value: '999' } });
 
     expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 06:15:59');
