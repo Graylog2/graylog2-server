@@ -37,7 +37,7 @@ import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useSearchResult from 'views/hooks/useSearchResult';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
-import MessageTable from 'components/common/messagetable/MessageTable';
+import MessageTable from 'components/common/message/messagetable/MessageTable';
 
 const Wrapper = styled.div`
   display: flex;
