@@ -35,7 +35,7 @@ import java.time.Instant;
 public class ClusterEventCleanupPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterEventCleanupPeriodical.class);
     private static final String COLLECTION_NAME = ClusterEventPeriodical.COLLECTION_NAME;
-    private static final long MIN_PERIOD_SECONDS = 600;
+    private static final long MIN_PERIOD_SECONDS = 60;
 
     private final MongoCollection<ClusterEvent> collection;
     private final Duration maxEventAge;

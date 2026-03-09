@@ -77,15 +77,15 @@ public class ClusterEventCleanupPeriodicalTest {
     }
 
     @Test
-    void getPeriodSeconds_defaultAge_returns86400(MongoCollections mongoCollections) {
-        final var periodical = new ClusterEventCleanupPeriodical(mongoCollections, Duration.ofDays(1));
-        assertThat(periodical.getPeriodSeconds()).isEqualTo(86400);
+    void getPeriodSeconds_defaultAge_returns3600(MongoCollections mongoCollections) {
+        final var periodical = new ClusterEventCleanupPeriodical(mongoCollections, Duration.ofHours(1));
+        assertThat(periodical.getPeriodSeconds()).isEqualTo(3600);
     }
 
     @Test
     void getPeriodSeconds_shortAge_clampsToMinimum(MongoCollections mongoCollections) {
-        final var periodical = new ClusterEventCleanupPeriodical(mongoCollections, Duration.ofMinutes(1));
-        assertThat(periodical.getPeriodSeconds()).isEqualTo(600);
+        final var periodical = new ClusterEventCleanupPeriodical(mongoCollections, Duration.ofSeconds(10));
+        assertThat(periodical.getPeriodSeconds()).isEqualTo(60);
     }
 
     @Test

@@ -516,7 +516,7 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
 
     @Documentation("tbd")
     @Parameter(value = "max_event_age", converter = JavaDurationConverter.class, validators = PositiveJavaDurationValidator.class)
-    private java.time.Duration maxEventAge = java.time.Duration.ofDays(1L);
+    private java.time.Duration maxEventAge = java.time.Duration.ofHours(1L);
 
     public boolean maintainsStreamAwareFieldTypes() {
         return streamAwareFieldTypes;
