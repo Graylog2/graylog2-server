@@ -200,21 +200,6 @@ public class EventsSearchService extends AbstractEventsSearchService {
         };
     }
 
-    /**
-     * Returns all assets grouped by asset id and the cardinality from the events in the Indexer.
-     */
-    public Map<String, Integer> findGroupedAssets(final String query, final TimeRange timeRange, final Subject subject, SearchUser searchUser) {
-        try {
-            return scriptingApiService.executeAggregation(
-                            new AggregationRequestSpec(query, allowedEventStreams(subject), Set.of(), timeRange, List.of(new Grouping("associated_assets", Integer.MAX_VALUE)), List.of(new Metric("count", null))),
-                            searchUser
-                )
-                .datarows().stream().collect(Collectors.toMap( r -> r.getFirst().toString(), r -> Integer.valueOf(r.getLast().toString())));
-        } catch (QueryFailedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public EventsSearchResult search(EventsSearchParameters parameters, Subject subject) {
         final var eventStreams = allowedEventStreams(subject);
         if (eventStreams.isEmpty()) {
