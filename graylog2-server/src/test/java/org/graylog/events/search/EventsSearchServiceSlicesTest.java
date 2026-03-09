@@ -321,14 +321,14 @@ class EventsSearchServiceSlicesTest {
             org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry.groupBy(field);
         org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry countSchema =
             org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry.metric("count", null);
-        
+
         org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange timeRange =
             org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange.create(
                 "2024-01-01T00:00:00.000Z", "2024-01-02T00:00:00.000Z");
 
         org.graylog.plugins.views.search.rest.scriptingapi.response.Metadata metadata =
             new org.graylog.plugins.views.search.rest.scriptingapi.response.Metadata(timeRange);
-        
+
         org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse response =
             new org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse(
                 List.of(fieldSchema, countSchema),
