@@ -40,11 +40,12 @@ const ScrollHint = styled.button(
   `,
 );
 
-const isElementVisibleInContainer = (target: HTMLElement, scrollContainer: HTMLElement) => {
+export const isElementCenterVisibleInContainer = (target: HTMLElement, scrollContainer: HTMLElement): boolean => {
   const containerRect = scrollContainer.getBoundingClientRect();
   const targetRect = target.getBoundingClientRect();
+  const targetCenterY = targetRect.top + targetRect.height / 2;
 
-  return targetRect.top >= containerRect.top && targetRect.bottom <= containerRect.bottom;
+  return targetCenterY >= containerRect.top && targetCenterY <= containerRect.bottom;
 };
 
 type Props = {
@@ -66,7 +67,7 @@ const ScrollToHint = ({
   const scrollTargetRef = useRef<HTMLDivElement | null>(null);
   const [showHint, setShowHint] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const timeoutRef = useRef(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const scrollToTarget = useCallback(() => {
     setShowHint(false);
@@ -82,7 +83,7 @@ const ScrollToHint = ({
       ifTrue &&
       scrollTargetRef.current &&
       scrollContainer.current &&
-      !isElementVisibleInContainer(scrollTargetRef.current, scrollContainer.current)
+      !isElementCenterVisibleInContainer(scrollTargetRef.current, scrollContainer.current)
     ) {
       if (autoScroll) {
         scrollToTarget();
@@ -105,6 +106,7 @@ const ScrollToHint = ({
 
   const iconName = useMemo(() => {
     const currentScroll = scrollContainer.current?.scrollTop;
+    // eslint-disable-next-line react-hooks/refs
     const elementTop = scrollTargetRef?.current?.getBoundingClientRect().top;
 
     return elementTop !== undefined && currentScroll !== undefined && elementTop > currentScroll
