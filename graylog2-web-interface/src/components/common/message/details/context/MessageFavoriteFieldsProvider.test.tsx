@@ -38,14 +38,7 @@ const mockToggleField = jest.fn();
 
 jest.mock('views/stores/StreamsStore');
 
-jest.mock('../fields/hooks/useMessageFavoriteFieldsForEditing', () => ({
-  DEFAULT_FIELDS: ['source', 'destination_ip', 'usernames'],
-}));
-
-jest.mock('../fields/hooks/useMessageFavoriteFieldsMutation', () => ({
-  __esModule: true,
-  default: jest.fn(),
-}));
+jest.mock('../fields/hooks/useMessageFavoriteFieldsMutation');
 
 jest.mock('views/stores/StreamsStore', () => ({
   StreamsActions: { refresh: jest.fn() },
