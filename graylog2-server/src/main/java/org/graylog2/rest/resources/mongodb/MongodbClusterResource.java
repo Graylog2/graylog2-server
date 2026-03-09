@@ -148,7 +148,7 @@ public class MongodbClusterResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.MONGODB_ENABLE_PROFILING)
     @Operation(summary = "Enables profiling for all mongodb nodes")
     @RequiresPermissions(RestPermissions.MONGODB_ENABLE_PROFILING)
-    public Response enableProfiling(@PathParam("level") ProfilingLevel level) {
+    public Response enableProfiling(@Parameter(name = "level", required = true, description = "Profiling level") @PathParam("level") ProfilingLevel level) {
         try {
             Document command = new Document("profile", level.getNumericalValue())
                     .append("slowms", MongodbNodeUtils.SLOW_QUERIES_THRESHOLD);
