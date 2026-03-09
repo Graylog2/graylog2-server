@@ -14,12 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+const fs = require('fs');
 const path = require('path');
 
 const webpack = require('webpack');
 const AssetsPlugin = require('assets-webpack-plugin');
 const { merge } = require('webpack-merge');
-const { EsbuildPlugin } = require('esbuild-loader');
+const TerserPlugin = require('terser-webpack-plugin');
 const { CycloneDxWebpackPlugin } = require('@cyclonedx/webpack-plugin');
 
 const ROOT_PATH = path.resolve(__dirname);
@@ -27,16 +28,53 @@ const BUILD_PATH = path.resolve(ROOT_PATH, 'target/web/build');
 const MANIFESTS_PATH = path.resolve(ROOT_PATH, 'manifests');
 
 const vendorModules = require('./vendor.modules');
-const supportedBrowsers = require('./supportedBrowsers');
 
 const TARGET = process.env.npm_lifecycle_event || 'build';
 process.env.BABEL_ENV = TARGET;
 
 export const DEFAULT_API_URL = 'http://localhost:9000';
-const apiUrl = process.env.GRAYLOG_API_URL ?? DEFAULT_API_URL;
 
 // eslint-disable-next-line no-console
 console.error('Building vendor bundle.');
+
+// Plugin to strip HMR-related entries from the DLL manifest.
+// In multi-compiler dev mode, webpack-dev-server injects its client and hot entries
+// into all compilers. If these end up in the DLL manifest, the app compiler resolves
+// them from the DLL, causing the HMR emitter chain to break (different instances).
+class CleanDllManifestPlugin {
+  private manifestPath: string;
+
+  constructor(manifestPath: string) {
+    this.manifestPath = manifestPath;
+  }
+
+  apply(compiler) {
+    compiler.hooks.afterEmit.tap('CleanDllManifestPlugin', () => {
+      try {
+        const manifest = JSON.parse(fs.readFileSync(this.manifestPath, 'utf-8'));
+        const cleaned = {};
+        let removed = 0;
+
+        for (const [key, value] of Object.entries(manifest.content)) {
+          if (key.includes('webpack-dev-server') || key.includes('webpack/hot')) {
+            removed++;
+          } else {
+            cleaned[key] = value;
+          }
+        }
+
+        if (removed > 0) {
+          manifest.content = cleaned;
+          fs.writeFileSync(this.manifestPath, JSON.stringify(manifest));
+        }
+      } catch (e) {
+        // Manifest may not exist on first build
+      }
+    });
+  }
+}
+
+const vendorManifestPath = path.resolve(MANIFESTS_PATH, 'vendor-manifest.json');
 
 const webpackConfig = {
   mode: 'development',
@@ -58,6 +96,7 @@ const webpackConfig = {
       path: path.resolve(MANIFESTS_PATH, '[name]-manifest.json'),
       name: '__[name]',
     }),
+    new CleanDllManifestPlugin(vendorManifestPath),
     new AssetsPlugin({
       filename: 'vendor-module.json',
       useCompilerPath: true,
@@ -98,34 +137,6 @@ const webpackConfig = {
 // eslint-disable-next-line import/no-mutable-exports
 let defaultExport = webpackConfig;
 
-if (TARGET === 'start') {
-  defaultExport = merge(webpackConfig, {
-    devServer: {
-      hot: false,
-      liveReload: true,
-      compress: true,
-      historyApiFallback: {
-        disableDotRule: true,
-      },
-      proxy: [
-        {
-          context: ['/api', '/config.js', '/sso'],
-          target: apiUrl,
-          // Skip proxying for /api-browser - it's a frontend route, not an API endpoint
-          bypass: (req) => (req.path.startsWith('/api-browser') ? req.path : null),
-          onProxyReq: (proxyReq, req) => {
-            const existingHeader = proxyReq.getHeader('X-Graylog-Server-URL');
-            if (!existingHeader?.trim()) {
-              const serverUrl = `${req.protocol}://${req.get('host')}`;
-              proxyReq.setHeader('X-Graylog-Server-URL', serverUrl);
-            }
-          },
-        },
-      ],
-    },
-  });
-}
-
 if (TARGET.startsWith('build')) {
   defaultExport = merge(webpackConfig, {
     mode: 'production',
@@ -133,9 +144,11 @@ if (TARGET.startsWith('build')) {
       concatenateModules: false,
       sideEffects: false,
       minimizer: [
-        new EsbuildPlugin({
-          format: 'cjs',
-          target: supportedBrowsers,
+        new TerserPlugin({
+          terserOptions: {
+            compress: true,
+            mangle: true,
+          },
         }),
       ],
     },

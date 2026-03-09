@@ -17,6 +17,16 @@
 // We need to set the app prefix before doing anything else, so it applies to styles too.
 import 'webpack-entry';
 
+// In the multi-compiler setup, plugin compilers' ReactRefreshEntry may run before the app's,
+// setting the __reactRefreshInjected guard flag. This causes the app's ReactRefreshEntry to skip
+// injectIntoGlobalHook, leaving the app's react-refresh/runtime with empty mountedRoots.
+// Explicitly inject here to ensure the app's runtime instance tracks fiber roots for HMR updates.
+if (process.env.NODE_ENV !== 'production') {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires,global-require
+  const RefreshRuntime = require('react-refresh/runtime');
+  RefreshRuntime.injectIntoGlobalHook(window);
+}
+
 import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import Reflux from 'reflux';
@@ -85,3 +95,4 @@ root.render(
     </LoginQueryClientProvider>
   </TelemetryInit>,
 );
+
