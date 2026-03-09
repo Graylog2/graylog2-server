@@ -19,8 +19,8 @@ import * as React from 'react';
 import MessageField from 'views/components/messagelist/MessageField';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import type { MessageFieldsComponentProps } from 'views/components/messagelist/MessageFields/types';
-import { MessageDetailsDL } from 'views/components/messagelist/MessageFields/MessageFieldsViewModeList';
+import type { MessageFieldsComponentProps } from 'components/common/message/details/fields/types';
+import { MessageDetailsDL } from 'components/common/message/details/fields/MessageFieldsViewModeList';
 
 export const DefaultMessageFields = ({ message, fields }: MessageFieldsComponentProps) => {
   const formattedFields = message.formatted_fields;

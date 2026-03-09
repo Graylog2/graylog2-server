@@ -18,8 +18,8 @@
 import React, { useState, useCallback } from 'react';
 
 import { Button } from 'components/bootstrap';
-import MessageFieldsEditModal from 'views/components/messagelist/MessageFields/MessageFieldsEditModal';
-import useSendFavoriteFieldTelemetry from 'views/components/messagelist/MessageFields/hooks/useSendFavoriteFieldTelemetry';
+import MessageFieldsEditModal from 'components/common/message/details/fields/MessageFieldsEditModal';
+import useSendFavoriteFieldTelemetry from 'components/common/message/details/fields/hooks/useSendFavoriteFieldTelemetry';
 
 const MessageEditFieldConfigurationAction = () => {
   const [showModal, setShowModal] = useState(false);

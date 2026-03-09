@@ -18,7 +18,7 @@
 import React, { useContext } from 'react';
 import styled, { css } from 'styled-components';
 
-import type { MessageFieldsListProps } from 'views/components/messagelist/MessageFields/types';
+import type { MessageFieldsListProps } from 'components/common/message/details/fields/types';
 import MessageField from 'views/components/messagelist/MessageField';
 import { MessageDetailsDefinitionList } from 'components/common';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';

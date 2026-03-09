@@ -26,10 +26,10 @@ import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavor
 import StringUtils from 'util/StringUtils';
 import useMessageFavoriteFieldsForEditing, {
   DEFAULT_FIELDS,
-} from 'views/components/messagelist/MessageFields/hooks/useMessageFavoriteFieldsForEditing';
+} from 'components/common/message/details/fields/hooks/useMessageFavoriteFieldsForEditing';
 import { ModalSubmit } from 'components/common';
-import MessageFieldsEditModeLists from 'views/components/messagelist/MessageFields/MessageFieldsEditModeLists';
-import useSendFavoriteFieldTelemetry from 'views/components/messagelist/MessageFields/hooks/useSendFavoriteFieldTelemetry';
+import MessageFieldsEditModeLists from 'components/common/message/details/fields/MessageFieldsEditModeLists';
+import useSendFavoriteFieldTelemetry from 'components/common/message/details/fields/hooks/useSendFavoriteFieldTelemetry';
 
 const FieldsContainer = styled.div(
   ({ theme }) => css`

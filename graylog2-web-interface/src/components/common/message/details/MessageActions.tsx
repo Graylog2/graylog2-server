@@ -26,7 +26,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import MessagePermalinkButton from 'views/components/common/MessagePermalinkButton';
-import MessageEditFieldConfigurationAction from 'views/components/messagelist/MessageFields/MessageEditFieldConfigurationAction';
+import MessageEditFieldConfigurationAction from 'components/common/message/details/fields/MessageEditFieldConfigurationAction';
 import useFeature from 'hooks/useFeature';
 
 const TestAgainstStreamButton = ({
