@@ -31,8 +31,6 @@ import type { Message } from 'views/components/messagelist/Types';
 import type { Input } from 'components/messageloaders/Types';
 import type { Stream } from 'views/stores/StreamsStore';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
-import FormatReceivedBy from 'views/components/messagelist/FormatReceivedBy';
-import FormatAssetList from 'views/components/messagelist/FormatAssetList';
 import useIsLocalNode from 'views/hooks/useIsLocalNode';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
@@ -40,10 +38,12 @@ import MessageFavoriteFieldsProvider from 'views/components/contexts/MessageFavo
 import MessageDetailAdditionalContextProvider from 'views/components/contexts/MessageDetailAdditionalContextProvider';
 import useFeature from 'hooks/useFeature';
 import DefaultMessageFields from 'views/components/messagelist/MessageFields/DefaultMessageFields';
-import MessageDetailProviders from 'views/components/messagelist/MessageDetailProviders';
-import MessageActions from 'views/components/messagelist/MessageActions';
-import MessageAugmentations from 'views/components/messagelist/MessageAugmentations';
-import MessageMetadata from 'views/components/messagelist/MessageMetadata';
+import FormatReceivedBy from './FormatReceivedBy';
+import FormatAssetList from './FormatAssetList';
+import MessageDetailProviders from './MessageDetailProviders';
+import MessageActions from './MessageActions';
+import MessageAugmentations from './MessageAugmentations';
+import MessageMetadata from './MessageMetadata';
 
 const _formatMessageTitle = (index, id) => {
   if (index) {
