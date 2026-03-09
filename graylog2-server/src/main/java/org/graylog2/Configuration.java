@@ -41,6 +41,7 @@ import org.graylog2.cluster.lock.MongoLockService;
 import com.github.joschi.jadconfig.documentation.Documentation;
 import org.graylog2.configuration.DocumentationConstants;
 import org.graylog2.configuration.converters.JavaDurationConverter;
+import org.graylog2.configuration.validators.PositiveJavaDurationValidator;
 import org.graylog2.notifications.Notification;
 import org.graylog2.outputs.BatchSizeConfig;
 import org.graylog2.plugin.Tools;
@@ -514,7 +515,7 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     private boolean globalInputsOnly = false;
 
     @Documentation("tbd")
-    @Parameter(value = "max_event_age", converter = JavaDurationConverter.class)
+    @Parameter(value = "max_event_age", converter = JavaDurationConverter.class, validators = PositiveJavaDurationValidator.class)
     private java.time.Duration maxEventAge = java.time.Duration.ofDays(1L);
 
     public boolean maintainsStreamAwareFieldTypes() {
