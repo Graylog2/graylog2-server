@@ -16,6 +16,8 @@
  */
 export { default as MessageDetail } from './MessageDetail';
 export { default as MessageFields } from './fields/MessageFields';
+export { default as MessageFavoriteFieldsProvider } from './context/MessageFavoriteFieldsProvider';
+export { default as MessageDetailAdditionalContextProvider } from './context/MessageDetailAdditionalContextProvider';
 export { default as MessageEditFieldConfigurationAction } from './fields/MessageEditFieldConfigurationAction';
 export { default as MessageFieldsEditModal } from './fields/MessageFieldsEditModal';
 export { MessageDetailsDL } from './fields/MessageFieldsViewModeList';
