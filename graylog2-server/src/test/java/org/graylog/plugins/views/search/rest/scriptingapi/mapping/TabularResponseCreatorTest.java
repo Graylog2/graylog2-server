@@ -40,7 +40,7 @@ class TabularResponseCreatorTest {
                         (field) -> Objects.equals(field.decorator(), "uppercase"),
                         (field, o, searchUser) -> String.valueOf(o).toUpperCase(Locale.ROOT))
         );
-        final Object decorated = creator.decorate(decorators, RequestedField.parse("myfield.uppercase"), "my-value", TestSearchUser.builder().build());
+        final Object decorated = creator.decorate(decorators, RequestedField.parse("myfield#uppercase"), "my-value", TestSearchUser.builder().build());
         Assertions.assertThat(decorated).isEqualTo("MY-VALUE");
     }
 
@@ -53,7 +53,7 @@ class TabularResponseCreatorTest {
                         (field, o, searchUser) -> String.valueOf(o).toUpperCase(Locale.ROOT))
         );
 
-        Assertions.assertThatThrownBy(() -> creator.decorate(decorators, RequestedField.parse("myfield.lowercase"), "my-value", TestSearchUser.builder().build()))
+        Assertions.assertThatThrownBy(() -> creator.decorate(decorators, RequestedField.parse("myfield#lowercase"), "my-value", TestSearchUser.builder().build()))
                 .isInstanceOf(UnsupportedOperationException.class)
                 .hasMessageContaining("Unsupported property 'lowercase' on field 'myfield'");
     }
@@ -71,7 +71,7 @@ class TabularResponseCreatorTest {
                         (field, o, searchUser) -> String.valueOf(o).toLowerCase(Locale.ROOT))
         );
 
-        Assertions.assertThatThrownBy(() -> creator.decorate(decorators, RequestedField.parse("myfield.lowercase"), "my-value", TestSearchUser.builder().build()))
+        Assertions.assertThatThrownBy(() -> creator.decorate(decorators, RequestedField.parse("myfield#lowercase"), "my-value", TestSearchUser.builder().build()))
                 .isInstanceOf(UnsupportedOperationException.class)
                 .hasMessageContaining("Found more decorators supporting 'lowercase' on field 'myfield', this is not supported operation.");
     }
