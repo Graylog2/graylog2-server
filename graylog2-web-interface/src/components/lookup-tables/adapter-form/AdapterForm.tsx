@@ -79,10 +79,10 @@ const DataAdapterForm = ({ type, title, saved, onCancel, create = false, dataAda
   const { updateAdapter, updatingAdapter } = useUpdateAdapter();
 
   const adapterPlugins = usePluginEntities('lookupTableAdapters');
-  const plugin = React.useMemo(() => adapterPlugins.find((p) => p.type === type), [adapterPlugins, type]);
+  const plugin = adapterPlugins.find((p) => p.type === type);
 
-  const DocComponent = React.useMemo(() => plugin?.documentationComponent, [plugin]);
-  const pluginDisplayName = React.useMemo(() => plugin?.displayName || type, [plugin, type]);
+  const DocComponent = plugin?.documentationComponent;
+  const pluginDisplayName = plugin?.displayName || type;
 
   const initialValues = useMemo(() => {
     if (plugin?.prepareConfig && dataAdapter?.config) {
@@ -108,10 +108,7 @@ const DataAdapterForm = ({ type, title, saved, onCancel, create = false, dataAda
     });
   };
 
-  const canModify = React.useMemo(
-    () => create || (!loadingScopePermissions && scopePermissions?.is_mutable),
-    [create, loadingScopePermissions, scopePermissions?.is_mutable],
-  );
+  const canModify = create || (!loadingScopePermissions && scopePermissions?.is_mutable);
 
   return (
     <RowContainer style={{ flexGrow: 1 }} $withDocs={!!DocComponent}>
