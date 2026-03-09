@@ -18,7 +18,6 @@ package org.graylog2.search;
 
 public class SearchQueryOperators {
     public static final SearchQueryOperator EQUALS = new SearchQueryOperator.Equals();
-    public static final SearchQueryOperator NOT_EQUALS = new SearchQueryOperator.NotEquals();
     public static final SearchQueryOperator GREATER = new SearchQueryOperator.Greater();
     public static final SearchQueryOperator GREATER_EQUALS = new SearchQueryOperator.GreaterEquals();
     public static final SearchQueryOperator LESS = new SearchQueryOperator.Less();

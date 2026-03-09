@@ -38,13 +38,6 @@ public abstract class SearchQueryOperator {
         }
     }
 
-    public static class NotEquals extends SearchQueryOperator {
-        @Override
-        public Bson buildBson(String key, Object value) {
-            return Filters.ne(key, value);
-        }
-    }
-
     public static class Regexp extends SearchQueryOperator {
         @Override
         public Bson buildBson(String key, Object value) {
