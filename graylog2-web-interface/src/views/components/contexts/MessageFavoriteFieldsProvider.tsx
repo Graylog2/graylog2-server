@@ -23,11 +23,10 @@ import flattenDeep from 'lodash/flattenDeep';
 import type { Message } from 'views/components/messagelist/Types';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
-import useMessageFavoriteFieldsMutation from 'components/common/message/details/fields/hooks/useMessageFavoriteFieldsMutation';
+import { useMessageFavoriteFieldsMutation, DEFAULT_FIELDS } from 'components/common/message/details';
 import { useStore } from 'stores/connect';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import type { Stream } from 'logic/streams/types';
-import { DEFAULT_FIELDS } from 'components/common/message/details/fields/hooks/useMessageFavoriteFieldsForEditing';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 

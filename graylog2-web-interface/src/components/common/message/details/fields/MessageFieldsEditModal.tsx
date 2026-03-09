@@ -24,12 +24,10 @@ import { useStore } from 'stores/connect';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 import StringUtils from 'util/StringUtils';
-import useMessageFavoriteFieldsForEditing, {
-  DEFAULT_FIELDS,
-} from 'components/common/message/details/fields/hooks/useMessageFavoriteFieldsForEditing';
+import useMessageFavoriteFieldsForEditing, { DEFAULT_FIELDS } from './hooks/useMessageFavoriteFieldsForEditing';
 import { ModalSubmit } from 'components/common';
-import MessageFieldsEditModeLists from 'components/common/message/details/fields/MessageFieldsEditModeLists';
-import useSendFavoriteFieldTelemetry from 'components/common/message/details/fields/hooks/useSendFavoriteFieldTelemetry';
+import MessageFieldsEditModeLists from './MessageFieldsEditModeLists';
+import useSendFavoriteFieldTelemetry from './hooks/useSendFavoriteFieldTelemetry';
 
 const FieldsContainer = styled.div(
   ({ theme }) => css`

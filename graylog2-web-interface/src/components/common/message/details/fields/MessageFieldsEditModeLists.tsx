@@ -18,10 +18,10 @@
 import React, { useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
-import MessageFieldEditModeListItem from 'components/common/message/details/fields/MessageFieldEditModeListItem';
-import type { MessageFieldsListProps, FormattedField } from 'components/common/message/details/fields/types';
+import MessageFieldEditModeListItem from './MessageFieldEditModeListItem';
+import type { MessageFieldsListProps, FormattedField } from './types';
 import { SortableList } from 'components/common';
-import useFormattedFields from 'components/common/message/details/fields/hooks/useFormattedFields';
+import useFormattedFields from './hooks/useFormattedFields';
 
 const Container = styled.div(
   ({ theme }) => css`

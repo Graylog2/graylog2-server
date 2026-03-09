@@ -18,14 +18,14 @@ import React from 'react';
 import { renderHook, act } from 'wrappedTestingLibrary';
 import Immutable from 'immutable';
 
-import useMessageFavoriteFieldsForEditing from 'components/common/message/details/fields/hooks/useMessageFavoriteFieldsForEditing';
+import useMessageFavoriteFieldsForEditing from './useMessageFavoriteFieldsForEditing';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
-import type { FormattedField } from 'components/common/message/details/fields/types';
+import type { FormattedField } from '../types';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
 const DEFAULT_FIELDS = ['source', 'destination_ip', 'usernames'];
 
-jest.mock('components/common/message/details/fields/hooks/useSendFavoriteFieldTelemetry', () => jest.fn);
+jest.mock('./useSendFavoriteFieldTelemetry', () => jest.fn);
 
 type ProviderProps = {
   initialFavorites?: Array<string>;

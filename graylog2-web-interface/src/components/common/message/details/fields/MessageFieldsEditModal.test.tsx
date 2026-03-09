@@ -28,8 +28,8 @@ import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import suppressConsole from 'helpers/suppressConsole';
-import useFormattedFields from 'components/common/message/details/fields/hooks/useFormattedFields';
-import useMessageFavoriteFieldsForEditing from 'components/common/message/details/fields/hooks/useMessageFavoriteFieldsForEditing';
+import useFormattedFields from './hooks/useFormattedFields';
+import useMessageFavoriteFieldsForEditing from './hooks/useMessageFavoriteFieldsForEditing';
 
 import MessageFieldsEditModal from './MessageFieldsEditModal';
 
@@ -44,9 +44,9 @@ jest.mock('views/stores/StreamsStore', () => ({
   StreamsStore: MockStore(['getInitialState', () => ({ streams: [{ id: 'streamId', title: 'Stream' }] })]),
 }));
 
-jest.mock('components/common/message/details/fields/hooks/useFormattedFields');
-jest.mock('components/common/message/details/fields/hooks/useMessageFavoriteFieldsForEditing');
-jest.mock('components/common/message/details/fields/hooks/useSendFavoriteFieldTelemetry', () => jest.fn);
+jest.mock('./hooks/useFormattedFields');
+jest.mock('./hooks/useMessageFavoriteFieldsForEditing');
+jest.mock('./hooks/useSendFavoriteFieldTelemetry', () => jest.fn);
 
 const formattedFavorites = [
   {

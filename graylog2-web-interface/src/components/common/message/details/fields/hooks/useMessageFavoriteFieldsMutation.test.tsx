@@ -48,7 +48,7 @@ jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
 }));
 
-jest.mock('components/common/message/details/fields/hooks/useSendFavoriteFieldTelemetry', () => jest.fn);
+jest.mock('./useSendFavoriteFieldTelemetry', () => jest.fn);
 
 jest.mock('hooks/useCurrentUser');
 

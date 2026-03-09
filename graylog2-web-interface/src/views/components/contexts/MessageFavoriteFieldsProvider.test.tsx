@@ -23,7 +23,7 @@ import Immutable from 'immutable';
 import { asMock, StoreMock as MockStore } from 'helpers/mocking';
 import MessageFavoriteFieldsProvider from 'views/components/contexts/MessageFavoriteFieldsProvider';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
-import useMessageFavoriteFieldsMutation from 'components/common/message/details/fields/hooks/useMessageFavoriteFieldsMutation';
+import { useMessageFavoriteFieldsMutation } from 'components/common/message/details';
 import { Button } from 'components/bootstrap';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
@@ -36,9 +36,9 @@ const mockToggleField = jest.fn();
 
 jest.mock('views/stores/StreamsStore');
 
-jest.mock('components/common/message/details/fields/hooks/useMessageFavoriteFieldsMutation', () => ({
-  __esModule: true,
-  default: jest.fn(),
+jest.mock('components/common/message/details', () => ({
+  DEFAULT_FIELDS: ['source', 'destination_ip', 'usernames'],
+  useMessageFavoriteFieldsMutation: jest.fn(),
 }));
 
 jest.mock('views/stores/StreamsStore', () => ({

@@ -24,7 +24,7 @@ import Icon from 'components/common/Icon';
 import Spinner from 'components/common/Spinner';
 import Timestamp from 'components/common/Timestamp';
 import { Col, Label, Row } from 'components/bootstrap';
-import MessageFields from 'components/common/message/details/fields/MessageFields';
+import MessageFields from './fields/MessageFields';
 import MessageDetailsTitle from 'components/search/MessageDetailsTitle';
 import Routes from 'routing/Routes';
 import type { Message } from 'views/components/messagelist/Types';
