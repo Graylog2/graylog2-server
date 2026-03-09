@@ -18,8 +18,7 @@ import * as React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import usePluginEntities from 'hooks/usePluginEntities';
-
-import type { Message } from './Types';
+import type { Message } from 'views/components/messagelist/Types';
 
 type Props = {
   children: React.ReactElement;
