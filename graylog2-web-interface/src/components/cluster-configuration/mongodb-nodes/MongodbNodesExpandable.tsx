@@ -16,7 +16,7 @@
  */
 import React, { useMemo, useState, useCallback } from 'react';
 
-import { PaginatedEntityTable } from 'components/common';
+import { IfPermitted, PaginatedEntityTable } from 'components/common';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import type { FetchOptions } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
@@ -30,6 +30,8 @@ import { clusterMongodbNodesKeyFn, fetchMongodbNodes } from './fetchClusterMongo
 import MongodbProfilingAction from './MongodbProfilingAction';
 
 import ClusterNodesSectionWrapper from '../shared-components/ClusterNodesSectionWrapper';
+
+const MONGODB_ENABLE_PROFILING_PERMISSION = 'mongodb:enableprofiling';
 
 type Props = {
   collapsible?: boolean;
@@ -73,7 +75,9 @@ const MongodbNodesExpandable = ({
       titleCount={totalMongodbNodes}
       onTitleCountClick={onSelectNodeType ?? null}
       collapsible={collapsible}>
-      <MongodbProfilingAction />
+      <IfPermitted permissions={MONGODB_ENABLE_PROFILING_PERMISSION}>
+        <MongodbProfilingAction />
+      </IfPermitted>
       <PaginatedEntityTable<MongodbNode>
         tableLayout={tableLayout}
         fetchEntities={fetchMongodbNodes}

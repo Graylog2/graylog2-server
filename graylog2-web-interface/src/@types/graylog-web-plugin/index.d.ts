@@ -254,6 +254,7 @@ declare module 'graylog-web-plugin/plugin' {
     lookuptables: 'read';
     mappingprofiles: 'read';
     metrics: 'read';
+    mongodb: 'enableprofiling';
     messagecount: 'read';
     messages: 'analyze' | 'read';
     node: 'shutdown';

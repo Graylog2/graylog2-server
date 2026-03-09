@@ -82,7 +82,7 @@ export const fetchMongodbNodes = async (
       elements: Array<MongodbNode>;
     }) => ({
       attributes,
-      list: elements.map((node) => ({ ...node, id: node.name })),
+      list: elements,
       pagination,
     }),
   );
