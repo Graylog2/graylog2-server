@@ -28,9 +28,9 @@ import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import suppressConsole from 'helpers/suppressConsole';
+
 import useFormattedFields from './hooks/useFormattedFields';
 import useMessageFavoriteFieldsForEditing from './hooks/useMessageFavoriteFieldsForEditing';
-
 import MessageFieldsEditModal from './MessageFieldsEditModal';
 
 const reorderFavoriteFields = jest.fn();

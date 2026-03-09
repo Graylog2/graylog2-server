@@ -19,6 +19,7 @@ import * as React from 'react';
 import MessageField from 'views/components/messagelist/MessageField';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+
 import type { MessageFieldsComponentProps } from './fields/types';
 import { MessageDetailsDL } from './fields/MessageFieldsViewModeList';
 

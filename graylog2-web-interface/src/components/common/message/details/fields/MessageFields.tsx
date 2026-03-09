@@ -18,12 +18,13 @@
 import React, { useContext, useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
-import MessageFieldsViewModeList from './MessageFieldsViewModeList';
-import useFormattedFields from './hooks/useFormattedFields';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 import { Icon } from 'components/common';
 import Store from 'logic/local-storage/Store';
 import StringUtils from 'util/StringUtils';
+
+import useFormattedFields from './hooks/useFormattedFields';
+import MessageFieldsViewModeList from './MessageFieldsViewModeList';
 import useSendFavoriteFieldTelemetry from './hooks/useSendFavoriteFieldTelemetry';
 
 const Line = styled.div(

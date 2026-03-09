@@ -23,13 +23,14 @@ import flattenDeep from 'lodash/flattenDeep';
 import type { Message } from 'views/components/messagelist/Types';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
-import useMessageFavoriteFieldsMutation from '../fields/hooks/useMessageFavoriteFieldsMutation';
-import { DEFAULT_FIELDS } from '../fields/hooks/useMessageFavoriteFieldsForEditing';
 import { useStore } from 'stores/connect';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import type { Stream } from 'logic/streams/types';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
+
+import { DEFAULT_FIELDS } from '../fields/hooks/useMessageFavoriteFieldsForEditing';
+import useMessageFavoriteFieldsMutation from '../fields/hooks/useMessageFavoriteFieldsMutation';
 
 type OriginalProps = React.PropsWithChildren<{
   message: Message;

@@ -18,6 +18,7 @@
 import React, { useState, useCallback } from 'react';
 
 import { Button } from 'components/bootstrap';
+
 import MessageFieldsEditModal from './MessageFieldsEditModal';
 import useSendFavoriteFieldTelemetry from './hooks/useSendFavoriteFieldTelemetry';
 
