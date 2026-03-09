@@ -1,0 +1,5 @@
+type = "a"
+message = "Added an 'Info' Events priority level."
+
+issues = ["24889"]
+pulls = ["25240", "graylog-plugin-enterprise#13456"]

@@ -167,22 +167,24 @@ public class EventsSearchService extends AbstractEventsSearchService {
         }
     }
 
-    // priority can be 1 (low) to 4 (critical), see EventDefinitionPriority.ts
+    // priority can be 0 (info) to 4 (critical), see EventDefinitionPriorityEnum.ts
     List<Slice> handlePriorityColumn(final List<Slice> slices) {
-        if (slices.size() == 4) {
+        if (slices.size() == 5) {
             return slices;
         }
 
+	final var INFO = new Slice("0", null, 0);
         final var LOW = new Slice("1", null, 0);
         final var MEDIUM = new Slice("2", null, 0);
         final var HIGH = new Slice("3", null, 0);
         final var CRITICAL = new Slice("4", null, 0);
 
         if (slices.isEmpty()) {
-            return List.of(LOW, MEDIUM, HIGH, CRITICAL);
+            return List.of(INFO, LOW, MEDIUM, HIGH, CRITICAL);
         }
 
         List<Slice> fixedList = new ArrayList<>();
+        fixedList.add(slices.stream().filter(s -> s.value().equals(INFO.value())).findAny().orElse(INFO));
         fixedList.add(slices.stream().filter(s -> s.value().equals(LOW.value())).findAny().orElse(LOW));
         fixedList.add(slices.stream().filter(s -> s.value().equals(MEDIUM.value())).findAny().orElse(MEDIUM));
         fixedList.add(slices.stream().filter(s -> s.value().equals(HIGH.value())).findAny().orElse(HIGH));
