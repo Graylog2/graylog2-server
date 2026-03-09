@@ -34,7 +34,6 @@ import org.graylog.events.processor.EventProcessorParameters;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
-import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -49,7 +48,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -71,11 +69,16 @@ class MongoDBEventProcessorTest {
     private static final String VALID_PIPELINE = """
             [{"$group": {"_id": null, "count": {"$sum": 1}}}]""";
 
-    @Mock private MongoCollections mongoCollections;
-    @Mock private DBEventProcessorStateService stateService;
-    @Mock private MessageFactory messageFactory;
-    @Mock private EventDefinition eventDefinition;
-    @Mock private EventFactory eventFactory;
+    @Mock
+    private MongoCollections mongoCollections;
+    @Mock
+    private DBEventProcessorStateService stateService;
+    @Mock
+    private MessageFactory messageFactory;
+    @Mock
+    private EventDefinition eventDefinition;
+    @Mock
+    private EventFactory eventFactory;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -362,8 +365,6 @@ class MongoDBEventProcessorTest {
     void createEvents_convertsMongoValueTypes() throws Exception {
         final Date javaDate = new Date(1709596800000L); // 2024-03-05T00:00:00Z
         final ObjectId objectId = new ObjectId("507f1f77bcf86cd799439011");
-        final DateTime jodaDateTime = new DateTime(2026, 6, 15, 10, 30, DateTimeZone.UTC);
-
         final Document result = new Document()
                 .append("date_field", javaDate)
                 .append("objectid_field", objectId)

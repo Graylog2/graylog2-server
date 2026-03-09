@@ -96,8 +96,8 @@ public abstract class MongoDBEventProcessor implements EventProcessor {
 
     @Override
     public void createEvents(EventFactory eventFactory,
-                            EventProcessorParameters processorParameters,
-                            EventConsumer<List<EventWithContext>> eventsConsumer)
+                             EventProcessorParameters processorParameters,
+                             EventConsumer<List<EventWithContext>> eventsConsumer)
             throws EventProcessorException {
         if (!(processorParameters instanceof final MongoDBEventProcessorParameters parameters)) {
             final String message = String.format(Locale.ROOT,
@@ -169,8 +169,7 @@ public abstract class MongoDBEventProcessor implements EventProcessor {
                     throw new EventProcessorException("Aggregation pipeline must be a JSON array", true, eventDefinition, null);
                 }
                 for (final JsonNode stage : userPipeline) {
-                    final Document stageDoc = Document.parse(objectMapper.writeValueAsString(stage));
-                    pipeline.add(stageDoc);
+                    pipeline.add(Document.parse(objectMapper.writeValueAsString(stage)));
                 }
             } catch (Exception e) {
                 LOG.error("Failed to parse aggregation pipeline: {}", config.aggregationPipeline(), e);
@@ -185,8 +184,8 @@ public abstract class MongoDBEventProcessor implements EventProcessor {
     }
 
     private Event createEventFromAggregation(EventFactory eventFactory,
-                                            Document aggregationResult,
-                                            MongoDBEventProcessorParameters parameters) {
+                                             Document aggregationResult,
+                                             MongoDBEventProcessorParameters parameters) {
         // Use end of time range as event timestamp
         DateTime timestamp = parameters.timerange().getTo();
         Event event = eventFactory.createEvent(eventDefinition, timestamp, eventDefinition.title());
@@ -247,24 +246,13 @@ public abstract class MongoDBEventProcessor implements EventProcessor {
     }
 
     private Object convertMongoValue(Object value) {
-        // Handle DateTime (Joda) from TrafficDto
-        if (value instanceof DateTime dateTime) {
-            return dateTime.toString();
-        }
-        // Handle Date from MongoDB
-        else if (value instanceof Date date) {
+        if (value instanceof Date date) {
             return date.toInstant().toString();
-        }
-        // Handle ObjectId
-        else if (value instanceof org.bson.types.ObjectId) {
+        } else if (value instanceof org.bson.types.ObjectId) {
             return value.toString();
-        }
-        // Handle numeric types - ensure they're compatible with event fields
-        else if (value instanceof Number) {
+        } else if (value instanceof Number) {
             return value;
-        }
-        // Handle other types
-        else if (value != null) {
+        } else if (value != null) {
             return value.toString();
         }
         return null;
@@ -272,8 +260,8 @@ public abstract class MongoDBEventProcessor implements EventProcessor {
 
     @Override
     public void sourceMessagesForEvent(Event event,
-                                      Consumer<List<MessageSummary>> messageConsumer,
-                                      long limit)
+                                       Consumer<List<MessageSummary>> messageConsumer,
+                                       long limit)
             throws EventProcessorException {
         LOG.debug("sourceMessagesForEvent not applicable for DB aggregation event processor");
     }
