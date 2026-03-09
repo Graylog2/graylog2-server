@@ -20,11 +20,9 @@ import styled from 'styled-components';
 import type { Message } from 'views/components/messagelist/Types';
 import { MESSAGE_FIELD } from 'views/Constants';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
-
-import DecoratedValue from './decoration/DecoratedValue';
-
-import CustomHighlighting from '../highlighting/CustomHighlighting';
-import TypeSpecificValue from '../TypeSpecificValue';
+import DecoratedValue from 'views/components/messagelist/decoration/DecoratedValue';
+import CustomHighlighting from 'views/components/highlighting/CustomHighlighting';
+import TypeSpecificValue from 'views/components/TypeSpecificValue';
 
 export const MessageWrapper = styled.div`
   white-space: pre-line;
