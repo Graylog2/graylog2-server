@@ -2,4 +2,4 @@ type = "f"
 message = "Honor the max_event_age configuration for cluster event cleanup."
 
 issues = ["25259"]
-pulls = [""]
+pulls = ["25265"]
