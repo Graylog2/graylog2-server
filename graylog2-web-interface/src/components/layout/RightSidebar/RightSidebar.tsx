@@ -18,7 +18,7 @@ import React from 'react';
 import styled, { css, keyframes } from 'styled-components';
 
 import useRightSidebar from 'hooks/useRightSidebar';
-import { getSidebarComponent } from 'contexts/sidebarComponentRegistry';
+import usePluginEntities from 'hooks/usePluginEntities';
 import Icon from 'components/common/Icon';
 import IconButton from 'components/common/IconButton';
 import Row from 'components/bootstrap/Row';
@@ -182,6 +182,7 @@ const StyledRow = styled(Row)`
 
 const RightSidebar = () => {
   const { content, width, isCollapsed, closeSidebar, collapseSidebar, expandSidebar, goBack, goForward, canGoBack, canGoForward } = useRightSidebar();
+  const sidebarComponents = usePluginEntities('sidebar.components');
 
   if (!content) {
     return null;
@@ -200,7 +201,12 @@ const RightSidebar = () => {
     );
   }
 
-  const ContentComponent = content.component ?? getSidebarComponent(content.componentKey);
+  const ContentComponent = content.component
+    ?? sidebarComponents.find((c) => c.key === content.componentKey)?.component;
+
+  if (!ContentComponent) {
+    return null;
+  }
 
   return (
     <Container $width={width} role="complementary" aria-label={`${content.title} sidebar`}>
