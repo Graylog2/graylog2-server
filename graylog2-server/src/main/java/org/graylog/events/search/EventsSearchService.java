@@ -72,7 +72,7 @@ public class EventsSearchService extends AbstractEventsSearchService {
         return new EventsFilterBuilder(parameters).build();
     }
 
-    private Set<String> allowedEventStreams(Subject subject) {
+    public Set<String> allowedEventStreams(Subject subject) {
         final var eventStreams = defaultEventStreams();
         if (subject.isPermitted(RestPermissions.STREAMS_READ)) {
             return eventStreams;
@@ -143,24 +143,24 @@ public class EventsSearchService extends AbstractEventsSearchService {
      * In the Open Source part, we only map priority and type, both of which are augmented in the FE regarding the title.
      * So we only need a simple mapping function here.
      */
-    Slice mapAggregationResultsToSlice(final String slicingColumn, final List<Object> result) {
+    public Slice mapAggregationResultsToSlice(final String slicingColumn, final List<Object> result) {
         return new Slice(result.getFirst().toString(), null, Integer.valueOf(result.getLast().toString()));
     }
 
     // the alert can either be true or false
     List<Slice> handleAlertColumn(final List<Slice> slices) {
-        if(slices.size() == 2) {
+        if (slices.size() == 2) {
             return slices;
         }
 
-        final var TRUE = new Slice( "true", null, 0);
-        final var FALSE = new Slice( "false", null, 0);
+        final var TRUE = new Slice("true", null, 0);
+        final var FALSE = new Slice("false", null, 0);
 
-        if(slices.isEmpty()) {
+        if (slices.isEmpty()) {
             return List.of(TRUE, FALSE);
         }
 
-        if(slices.getFirst().value().equals("true")) {
+        if (slices.getFirst().value().equals("true")) {
             return List.of(slices.getFirst(), FALSE);
         } else {
             return List.of(TRUE, slices.getFirst());
@@ -169,16 +169,16 @@ public class EventsSearchService extends AbstractEventsSearchService {
 
     // priority can be 1 (low) to 4 (critical), see EventDefinitionPriority.ts
     List<Slice> handlePriorityColumn(final List<Slice> slices) {
-        if(slices.size() == 4) {
+        if (slices.size() == 4) {
             return slices;
         }
 
-        final var LOW = new Slice( "1", null, 0);
-        final var MEDIUM = new Slice( "2", null, 0);
-        final var HIGH = new Slice( "3", null, 0);
-        final var CRITICAL = new Slice( "4", null, 0);
+        final var LOW = new Slice("1", null, 0);
+        final var MEDIUM = new Slice("2", null, 0);
+        final var HIGH = new Slice("3", null, 0);
+        final var CRITICAL = new Slice("4", null, 0);
 
-        if(slices.isEmpty()) {
+        if (slices.isEmpty()) {
             return List.of(LOW, MEDIUM, HIGH, CRITICAL);
         }
 

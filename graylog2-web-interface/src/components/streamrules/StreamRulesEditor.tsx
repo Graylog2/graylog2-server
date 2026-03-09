@@ -63,16 +63,11 @@ const StreamRulesEditor = ({ streamId, messageId = '', index = '' }: Props) => {
   const [message, setMessage] = useState<{ [fieldName: string]: unknown } | undefined>();
   const [matchData, setMatchData] = useState<MatchData | undefined>();
   const { data: stream, refetch } = useStream(streamId);
-  const {
-    onCreateStreamRule,
-    showStartStreamDialog,
-    onCancelStartStreamDialog,
-    onStartStream,
-    isStartingStream,
-  } = useCreateStreamRule({
-    streamId,
-    streamIsPaused: stream?.disabled ?? false,
-  });
+  const { onCreateStreamRule, showStartStreamDialog, onCancelStartStreamDialog, onStartStream, isStartingStream } =
+    useCreateStreamRule({
+      streamId,
+      streamIsPaused: stream?.disabled ?? false,
+    });
 
   useEffect(() => {
     const refetchStrems = () => refetch();
