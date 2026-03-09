@@ -20,7 +20,7 @@ import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig'
 import { defaultSortDirection } from 'views/logic/widgets/MessagesWidgetConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
-import { SortIcon } from 'components/common';
+import SortIcon from 'components/common/SortIcon';
 
 type Props = {
   config: MessagesWidgetConfig;
