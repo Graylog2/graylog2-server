@@ -25,7 +25,7 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 
-import MessageTable from './MessageTable';
+import MessageTable from 'components/common/messagetable/MessageTable';
 
 import InteractiveContext from '../contexts/InteractiveContext';
 import HighlightMessageContext from '../contexts/HighlightMessageContext';

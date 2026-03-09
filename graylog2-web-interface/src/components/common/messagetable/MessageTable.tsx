@@ -26,12 +26,13 @@ import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig'
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import { MessageTableEntry } from 'views/components/messagelist';
 import type { BackendMessage, Message } from 'views/components/messagelist/Types';
-import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
 import Field from 'views/components/Field';
 import MessageTableProviders from 'views/components/messagelist/MessageTableProviders';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import { TableHeaderCell, TableHead } from 'views/components/datatable';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
+
+import FieldSortIcon from './FieldSortIcon';
 
 const Table = styled.table(
   ({ theme }) => css`
