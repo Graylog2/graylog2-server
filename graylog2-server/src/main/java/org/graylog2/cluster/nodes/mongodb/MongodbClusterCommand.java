@@ -25,8 +25,10 @@ import org.graylog2.database.MongoConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+  import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -52,11 +54,25 @@ public class MongodbClusterCommand {
     }
 
     public <T> Map<String, T> runOnEachNode(BiFunction<String, MongoClient, T> call) {
+
+        return knownHosts().map(hosts -> hosts.stream()
+                        .parallel()
+                        .collect(Collectors.toMap(host -> host, host -> runCommand(host, call))))
+                .orElseGet(() -> {
+                    final String host = connection.getClusterDescription().getServerDescriptions().getFirst().getAddress().toString();
+                    return Collections.singletonMap(host, call.apply(host, connection));
+                });
+    }
+
+    private Optional<List<String>> knownHosts() {
         final Document hello = connection.getDatabase(GRAYLOG_DATABASE_NAME).runCommand(new Document("hello", 1));
-        final List<String> knownHosts = hello.getList("hosts", String.class);
-        return knownHosts.stream()
-                .parallel()
-                .collect(Collectors.toMap(host -> host, host -> runCommand(host, call)));
+        if (hello.containsKey("hosts")) {
+            // valid for replica set
+            return Optional.of(hello.getList("hosts", String.class));
+        } else {
+            // this is the case for standalone instance
+            return Optional.empty();
+        }
     }
 
     private <T> T runCommand(String host, BiFunction<String, MongoClient, T> call) {
