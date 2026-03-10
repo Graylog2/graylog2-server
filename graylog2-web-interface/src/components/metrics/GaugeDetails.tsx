@@ -17,7 +17,7 @@
 import React from 'react';
 import numeral from 'numeral';
 
-import type { GaugeMetric } from 'stores/metrics/MetricsStore';
+import type { GaugeMetric } from 'types/metrics';
 
 type Props = {
   metric: GaugeMetric;

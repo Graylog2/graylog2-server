@@ -19,22 +19,14 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import type { PipelineType } from 'components/pipelines/types';
 import usePipelineRulesMetadata from 'components/rules/hooks/usePipelineRulesMetadata';
-import { useStore } from 'stores/connect';
-import { MetricsActions } from 'stores/metrics/MetricsStore';
+import { useMetrics } from 'hooks/useMetrics';
+import { asMock } from 'helpers/mocking';
 
 import PipelineProcessingErrors, { getPipelineRuleFailureMetricNames } from './PipelineProcessingErrors';
 
 jest.mock('components/rules/hooks/usePipelineRulesMetadata');
-jest.mock('stores/connect', () => ({
-  __esModule: true,
-  useStore: jest.fn(),
-}));
-jest.mock('stores/metrics/MetricsStore', () => ({
-  MetricsStore: {},
-  MetricsActions: {
-    addGlobal: jest.fn(),
-    removeGlobal: jest.fn(),
-  },
+jest.mock('hooks/useMetrics', () => ({
+  useMetrics: jest.fn(),
 }));
 jest.mock('components/metrics', () => ({
   CounterRate: ({ metric }: { metric: { count: number } }) => (
@@ -67,31 +59,38 @@ describe('PipelineProcessingErrors', () => {
   };
 
   beforeEach(() => {
-    (usePipelineRulesMetadata as jest.Mock).mockReturnValue({
+    asMock(usePipelineRulesMetadata).mockReturnValue({
       data: mockPipelineRulesMetadata,
       isLoading: false,
       refetch: jest.fn(),
     });
 
-    (useStore as jest.Mock).mockReturnValue({
-      metrics: {
+    asMock(useMetrics).mockReturnValue({
+      data: {
         node1: {
           'org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-1.0.failed': {
+            full_name: 'org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-1.0.failed',
+            name: 'failed',
             type: 'meter',
-            metric: { rate: { total: 2 } },
+            metric: { rate: { total: 2, mean: 0, one_minute: 0, five_minute: 0, fifteen_minute: 0 }, rate_unit: 'events/second' },
           },
           'org.graylog.plugins.pipelineprocessor.ast.Rule.rule-2.pipeline-1.2.failed': {
+            full_name: 'org.graylog.plugins.pipelineprocessor.ast.Rule.rule-2.pipeline-1.2.failed',
+            name: 'failed',
             type: 'meter',
-            metric: { rate: { total: 3 } },
+            metric: { rate: { total: 3, mean: 0, one_minute: 0, five_minute: 0, fifteen_minute: 0 }, rate_unit: 'events/second' },
           },
         },
         node2: {
           'org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-1.0.failed': {
+            full_name: 'org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-1.0.failed',
+            name: 'failed',
             type: 'meter',
-            metric: { rate: { total: 5 } },
+            metric: { rate: { total: 5, mean: 0, one_minute: 0, five_minute: 0, fifteen_minute: 0 }, rate_unit: 'events/second' },
           },
         },
       },
+      isLoading: false,
     });
 
     jest.clearAllMocks();
@@ -116,29 +115,10 @@ describe('PipelineProcessingErrors', () => {
     ]);
   });
 
-  it('registers metrics and renders total failures across nodes', () => {
-    const { unmount } = render(<PipelineProcessingErrors pipeline={pipeline} />);
-
-    const expectedMetricNames = [
-      'org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-1.0.failed',
-      'org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-1.2.failed',
-      'org.graylog.plugins.pipelineprocessor.ast.Rule.rule-2.pipeline-1.0.failed',
-      'org.graylog.plugins.pipelineprocessor.ast.Rule.rule-2.pipeline-1.2.failed',
-    ];
-
-    expect(MetricsActions.addGlobal).toHaveBeenCalledTimes(expectedMetricNames.length);
-    expectedMetricNames.forEach((name) => {
-      expect(MetricsActions.addGlobal).toHaveBeenCalledWith(name);
-    });
+  it('renders total failures across nodes', () => {
+    render(<PipelineProcessingErrors pipeline={pipeline} />);
 
     expect(screen.getByTestId('pipeline-processing-errors-rate')).toHaveTextContent('10 errors/s');
     expect(screen.getByText('(10 total)')).toBeInTheDocument();
-
-    unmount();
-
-    expect(MetricsActions.removeGlobal).toHaveBeenCalledTimes(expectedMetricNames.length);
-    expectedMetricNames.forEach((name) => {
-      expect(MetricsActions.removeGlobal).toHaveBeenCalledWith(name);
-    });
   });
 });
