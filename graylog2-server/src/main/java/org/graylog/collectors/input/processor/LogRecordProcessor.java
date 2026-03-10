@@ -16,7 +16,7 @@
  */
 package org.graylog.collectors.input.processor;
 
-import io.opentelemetry.proto.logs.v1.LogRecord;
+import org.graylog.inputs.otel.OTelJournal;
 
 import java.util.Map;
 
@@ -24,5 +24,5 @@ import java.util.Map;
  * Processor for OpenTelemetry log records. Maps OTel attributes to GIM fields.
  */
 public interface LogRecordProcessor {
-    Map<String, Object> process(LogRecord logRecord);
+    Map<String, Object> process(OTelJournal.Log log);
 }

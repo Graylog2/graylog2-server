@@ -21,6 +21,7 @@ import com.google.protobuf.util.JsonFormat;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
+import org.graylog.inputs.otel.OTelJournal;
 import org.graylog.schema.AssociatedFields;
 import org.graylog.schema.DestinationFields;
 import org.graylog.schema.EventFields;
@@ -51,7 +52,7 @@ class WindowsEventLogRecordProcessorTest {
     void maps4624FromFixture() throws IOException {
         final var logRecord = fixtureRecordByRecordId(140716L);
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result)
                 .containsEntry("message", "An account was successfully logged on.")
@@ -90,7 +91,7 @@ class WindowsEventLogRecordProcessorTest {
     void maps4648FromFixture() throws IOException {
         final var logRecord = fixtureRecordByRecordId(140715L);
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result)
                 .containsEntry("message", "A logon was attempted using explicit credentials.")
@@ -118,7 +119,7 @@ class WindowsEventLogRecordProcessorTest {
     void maps4672PrivilegesFromFixture() throws IOException {
         final var logRecord = fixtureRecordByRecordId(140717L);
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result)
                 .containsEntry("message", "Special privileges assigned to new logon.")
@@ -144,7 +145,7 @@ class WindowsEventLogRecordProcessorTest {
     void mapsOpenSshFromFixture() throws IOException {
         final var logRecord = fixtureRecordByRecordId(2743L);
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result)
                 .containsEntry("message", "sshd: Received disconnect from 203.0.113.10 port 62064:11: disconnected by user")
@@ -168,7 +169,7 @@ class WindowsEventLogRecordProcessorTest {
     void handlesUnnamedPowershellEventDataFromFixture() throws IOException {
         final var logRecord = fixtureRecordByRecordId(8526L);
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result)
                 .containsEntry("message", "Provider \"Registry\" is Started. \r\n\r\nDetails: \r\n\tProviderName=Registry\r\n\tNewProviderState=Started\r\n\r\n\tSequenceNumber=1\r\n\r\n\tHostName=ConsoleHost\r\n\tHostVersion=5.1.26100.32370\r\n\tHostId=aaaaaaa2-bbbb-4ccc-8ddd-eeeeeeeeeee2\r\n\tHostApplication=c:\\windows\\system32\\windowspowershell\\v1.0\\powershell.exe\r\n\tEngineVersion=\r\n\tRunspaceId=\r\n\tPipelineId=\r\n\tCommandName=\r\n\tCommandType=\r\n\tScriptName=\r\n\tCommandPath=\r\n\tCommandLine=")
@@ -186,7 +187,7 @@ class WindowsEventLogRecordProcessorTest {
     void maps4624WithOutcomeFromNewFormat() throws IOException {
         final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-2.ndjson", 227239L);
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result)
                 .containsEntry(HostFields.HOST_HOSTNAME, "winserver01")
@@ -220,7 +221,7 @@ class WindowsEventLogRecordProcessorTest {
     void maps4672PrivilegesFromNewFormat() throws IOException {
         final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-2.ndjson", 227240L);
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result)
                 .containsEntry(EventFields.EVENT_CODE, 4672L)
@@ -249,7 +250,7 @@ class WindowsEventLogRecordProcessorTest {
     void maps4625FailedLogonFromNewFormat() throws IOException {
         final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-2.ndjson", 149486L);
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result)
                 .containsEntry(HostFields.HOST_HOSTNAME, "winserver02")
@@ -275,7 +276,7 @@ class WindowsEventLogRecordProcessorTest {
     void mapsSystemEventFromNewFormat() throws IOException {
         final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-2.ndjson", 187435L);
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result)
                 .containsEntry(HostFields.HOST_HOSTNAME, "winserver01")
@@ -293,7 +294,7 @@ class WindowsEventLogRecordProcessorTest {
     void mapsSecurityUserNameAndDomain() throws IOException {
         final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-3.ndjson", 16521L);
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result)
                 .containsEntry(HostFields.HOST_HOSTNAME, "winserver03")
@@ -309,7 +310,7 @@ class WindowsEventLogRecordProcessorTest {
     void mapsUserDataSubjectFields() throws IOException {
         final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-3.ndjson", 16518L);
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result)
                 .containsEntry(HostFields.HOST_HOSTNAME, "winserver03")
@@ -325,7 +326,7 @@ class WindowsEventLogRecordProcessorTest {
     void maps4688ProcessCreation() throws IOException {
         final var logRecord = fixtureRecordByRecordId("windows-2025-eventlog-3.ndjson", 500001L);
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result)
                 .containsEntry(HostFields.HOST_HOSTNAME, "testhost01")
@@ -342,6 +343,10 @@ class WindowsEventLogRecordProcessorTest {
                 .containsEntry(AssociatedFields.ASSOCIATED_USER_ID, "S-1-5-18")
                 .containsEntry(AssociatedFields.ASSOCIATED_USER_NAME, "TESTHOST01$")
                 .containsEntry(AssociatedFields.ASSOCIATED_SESSION_ID, "0x3e7");
+    }
+
+    private static OTelJournal.Log wrapLogRecord(LogRecord logRecord) {
+        return OTelJournal.Log.newBuilder().setLogRecord(logRecord).build();
     }
 
     private static LogRecord fixtureRecordByRecordId(long recordId) throws IOException {

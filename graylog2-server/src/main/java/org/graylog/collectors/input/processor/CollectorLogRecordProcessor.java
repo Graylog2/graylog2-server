@@ -16,7 +16,7 @@
  */
 package org.graylog.collectors.input.processor;
 
-import io.opentelemetry.proto.logs.v1.LogRecord;
+import org.graylog.inputs.otel.OTelJournal;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,10 +32,10 @@ public class CollectorLogRecordProcessor implements LogRecordProcessor {
     public static final String RECEIVER_TYPE = "collector_log";
 
     @Override
-    public Map<String, Object> process(LogRecord logRecord) {
+    public Map<String, Object> process(OTelJournal.Log log) {
         final Map<String, Object> result = new HashMap<>();
 
-        for (final var attr : logRecord.getAttributesList()) {
+        for (final var attr : log.getResource().getAttributesList()) {
             switch (attr.getKey()) {
                 case "service.name" -> result.put("collector_service_name",
                         attr.getValue().getStringValue());

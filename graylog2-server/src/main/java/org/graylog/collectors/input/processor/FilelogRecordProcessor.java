@@ -16,7 +16,7 @@
  */
 package org.graylog.collectors.input.processor;
 
-import io.opentelemetry.proto.logs.v1.LogRecord;
+import org.graylog.inputs.otel.OTelJournal;
 import org.graylog.schema.EventFields;
 
 import java.util.HashMap;
@@ -24,10 +24,10 @@ import java.util.Map;
 
 public class FilelogRecordProcessor implements LogRecordProcessor {
     @Override
-    public Map<String, Object> process(LogRecord logRecord) {
+    public Map<String, Object> process(OTelJournal.Log log) {
         final Map<String, Object> result = new HashMap<>();
 
-        for (final var attr : logRecord.getAttributesList()) {
+        for (final var attr : log.getLogRecord().getAttributesList()) {
             switch (attr.getKey()) {
                 case "log.file.name" -> {
                     final var name = attr.getValue().getStringValue();

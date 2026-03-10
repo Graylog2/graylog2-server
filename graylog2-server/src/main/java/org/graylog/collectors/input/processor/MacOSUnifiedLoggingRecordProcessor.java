@@ -19,8 +19,8 @@ package org.graylog.collectors.input.processor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
-import io.opentelemetry.proto.logs.v1.LogRecord;
 import jakarta.inject.Inject;
+import org.graylog.inputs.otel.OTelJournal;
 import org.graylog.schema.EventFields;
 import org.graylog.schema.ProcessFields;
 import org.graylog.schema.UserFields;
@@ -65,8 +65,8 @@ public class MacOSUnifiedLoggingRecordProcessor implements LogRecordProcessor {
     }
 
     @Override
-    public Map<String, Object> process(LogRecord logRecord) {
-        final var bodyString = logRecord.getBody().getStringValue();
+    public Map<String, Object> process(OTelJournal.Log log) {
+        final var bodyString = log.getLogRecord().getBody().getStringValue();
         if (bodyString.isBlank()) {
             return Map.of();
         }

@@ -19,6 +19,7 @@ package org.graylog.collectors.input.processor;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.common.v1.KeyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
+import org.graylog.inputs.otel.OTelJournal;
 import org.graylog.schema.EventFields;
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +39,7 @@ class FilelogRecordProcessorTest {
                 .addAttributes(stringAttribute("log.file.owner.name", "graylog"))
                 .build();
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.of(
                 EventFields.EVENT_LOG_NAME, "graylog.log",
@@ -52,9 +53,13 @@ class FilelogRecordProcessorTest {
                 .addAttributes(stringAttribute("log.file.owner.name", "graylog"))
                 .build();
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).isEmpty();
+    }
+
+    private static OTelJournal.Log wrapLogRecord(LogRecord logRecord) {
+        return OTelJournal.Log.newBuilder().setLogRecord(logRecord).build();
     }
 
     private static KeyValue stringAttribute(String key, String value) {

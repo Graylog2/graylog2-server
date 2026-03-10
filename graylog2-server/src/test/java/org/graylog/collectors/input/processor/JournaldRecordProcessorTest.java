@@ -24,6 +24,7 @@ import io.opentelemetry.proto.common.v1.KeyValue;
 import io.opentelemetry.proto.common.v1.KeyValueList;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import org.graylog.collectors.CollectorJournal;
+import org.graylog.inputs.otel.OTelJournal;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -56,7 +57,7 @@ class JournaldRecordProcessorTest {
                         .build())
                 .build();
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.of(
                 "message", "pam_unix(cron:session): session opened for user root(uid=0) by root(uid=0)",
@@ -77,7 +78,7 @@ class JournaldRecordProcessorTest {
                         .build())
                 .build();
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.of(
                 "message", "example"
@@ -96,7 +97,7 @@ class JournaldRecordProcessorTest {
                         .build())
                 .build();
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.of(
                 "vendor_event_timestamp", "2026-02-26 17:15:01.554"
@@ -119,7 +120,7 @@ class JournaldRecordProcessorTest {
             expected = expected.minusYears(1);
         }
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.of(
                 "vendor_event_timestamp", Tools.buildElasticSearchTimeFormat(new DateTime(expected.toInstant().toEpochMilli(), DateTimeZone.UTC))
@@ -136,7 +137,7 @@ class JournaldRecordProcessorTest {
                         .build())
                 .build();
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).isEmpty();
     }
@@ -151,7 +152,7 @@ class JournaldRecordProcessorTest {
                         .build())
                 .build();
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.of(
                 "user_session_id", "42"
@@ -168,7 +169,7 @@ class JournaldRecordProcessorTest {
                         .build())
                 .build();
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).isEmpty();
     }
@@ -188,7 +189,7 @@ class JournaldRecordProcessorTest {
                         .build())
                 .build();
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.of(
                 "message", "WARN 2026-02-26 test"
@@ -205,7 +206,7 @@ class JournaldRecordProcessorTest {
                         .build())
                 .build();
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).isEmpty();
     }
@@ -225,7 +226,7 @@ class JournaldRecordProcessorTest {
                         .build())
                 .build();
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.of(
                 "message", "WARN int-array"
@@ -234,9 +235,9 @@ class JournaldRecordProcessorTest {
 
     @Test
     void mapsFieldsFromSyslogFixture() throws IOException {
-        final var logRecord = parseFixture("journald-syslog-cron-record.json");
+        final var log = wrapLogRecord(parseFixture("journald-syslog-cron-record.json"));
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(log);
 
         assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.ofEntries(
                 Map.entry("vendor_transaction_id", "544611aab98d4df8bd045f3b0ab794bf"),
@@ -266,9 +267,9 @@ class JournaldRecordProcessorTest {
 
     @Test
     void mapsFieldsFromKernelFixture() throws IOException {
-        final var logRecord = parseFixture("journald-kernel-record.json");
+        final var log = wrapLogRecord(parseFixture("journald-kernel-record.json"));
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(log);
 
         assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.ofEntries(
                 Map.entry("vendor_event_severity_level", 6L),
@@ -286,6 +287,10 @@ class JournaldRecordProcessorTest {
                 //Map.entry("source_type", "system"),
                 Map.entry("event_source_input", "kernel")
         ));
+    }
+
+    private static OTelJournal.Log wrapLogRecord(LogRecord logRecord) {
+        return OTelJournal.Log.newBuilder().setLogRecord(logRecord).build();
     }
 
     private static LogRecord parseFixture(String filename) throws IOException {

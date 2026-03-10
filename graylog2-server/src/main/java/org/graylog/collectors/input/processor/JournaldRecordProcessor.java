@@ -17,7 +17,7 @@
 package org.graylog.collectors.input.processor;
 
 import io.opentelemetry.proto.common.v1.AnyValue;
-import io.opentelemetry.proto.logs.v1.LogRecord;
+import org.graylog.inputs.otel.OTelJournal;
 import org.graylog.schema.AssociatedFields;
 import org.graylog.schema.EventFields;
 import org.graylog.schema.HostFields;
@@ -62,7 +62,7 @@ public class JournaldRecordProcessor implements LogRecordProcessor {
             .toFormatter(Locale.ENGLISH);
 
     @Override
-    public Map<String, Object> process(LogRecord logRecord) {
+    public Map<String, Object> process(OTelJournal.Log log) {
         final Map<String, Object> result = new HashMap<>();
 
         String systemdUnit = null;
@@ -88,7 +88,7 @@ public class JournaldRecordProcessor implements LogRecordProcessor {
         Long realtimeTimestampMicros = null;
         DateTime syslogTimestamp = null;
 
-        for (final var field : logRecord.getBody().getKvlistValue().getValuesList()) {
+        for (final var field : log.getLogRecord().getBody().getKvlistValue().getValuesList()) {
             final var fieldValue = field.getValue();
 
             switch (field.getKey()) {

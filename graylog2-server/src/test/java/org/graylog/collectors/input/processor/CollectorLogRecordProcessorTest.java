@@ -19,6 +19,8 @@ package org.graylog.collectors.input.processor;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.common.v1.KeyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
+import io.opentelemetry.proto.resource.v1.Resource;
+import org.graylog.inputs.otel.OTelJournal;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,21 +31,26 @@ class CollectorLogRecordProcessorTest {
 
     @Test
     void processesEmptyLogRecord() {
-        final var logRecord = LogRecord.newBuilder().build();
-        final var result = processor.process(logRecord);
+        final var log = OTelJournal.Log.newBuilder()
+                .setLogRecord(LogRecord.newBuilder().build())
+                .build();
+        final var result = processor.process(log);
         assertThat(result).isEmpty();
     }
 
     @Test
     void extractsServiceName() {
         // TODO: Update once we finalize the schema with real collector self-log payloads.
-        final var logRecord = LogRecord.newBuilder()
-                .addAttributes(KeyValue.newBuilder()
-                        .setKey("service.name")
-                        .setValue(AnyValue.newBuilder().setStringValue("otel-collector").build())
+        final var log = OTelJournal.Log.newBuilder()
+                .setLogRecord(LogRecord.newBuilder().build())
+                .setResource(Resource.newBuilder()
+                        .addAttributes(KeyValue.newBuilder()
+                                .setKey("service.name")
+                                .setValue(AnyValue.newBuilder().setStringValue("otel-collector").build())
+                                .build())
                         .build())
                 .build();
-        final var result = processor.process(logRecord);
+        final var result = processor.process(log);
         assertThat(result).containsEntry("collector_service_name", "otel-collector");
     }
 }

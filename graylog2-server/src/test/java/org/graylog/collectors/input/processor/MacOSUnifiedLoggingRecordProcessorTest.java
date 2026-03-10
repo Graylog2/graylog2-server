@@ -21,6 +21,7 @@ import com.google.protobuf.util.JsonFormat;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import org.graylog.collectors.CollectorJournal;
+import org.graylog.inputs.otel.OTelJournal;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,7 +61,7 @@ class MacOSUnifiedLoggingRecordProcessorTest {
                 """;
         final var logRecord = logRecordWithBody(body);
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.ofEntries(
                 Map.entry("message", "Service started successfully"),
@@ -82,7 +83,7 @@ class MacOSUnifiedLoggingRecordProcessorTest {
     void returnsEmptyMapWhenBodyIsBlank() {
         final var logRecord = logRecordWithBody("");
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).isEmpty();
     }
@@ -91,7 +92,7 @@ class MacOSUnifiedLoggingRecordProcessorTest {
     void returnsEmptyMapWhenBodyIsNotJson() {
         final var logRecord = logRecordWithBody("this is not json");
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).isEmpty();
     }
@@ -102,7 +103,7 @@ class MacOSUnifiedLoggingRecordProcessorTest {
                 {"unknownField": "value", "anotherUnknown": 123}
                 """);
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).isEmpty();
     }
@@ -113,7 +114,7 @@ class MacOSUnifiedLoggingRecordProcessorTest {
                 {"eventMessage": "hello"}
                 """);
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.of(
                 "message", "hello"
@@ -126,7 +127,7 @@ class MacOSUnifiedLoggingRecordProcessorTest {
                 {"processImagePath": "/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mdworker_shared"}
                 """);
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).containsEntry("process_name", "mdworker_shared");
         assertThat(result).containsEntry("process_path", "/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mdworker_shared");
@@ -138,7 +139,7 @@ class MacOSUnifiedLoggingRecordProcessorTest {
                 {"processImagePath": "standalone-binary"}
                 """);
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).containsEntry("process_name", "standalone-binary");
         assertThat(result).containsEntry("process_path", "standalone-binary");
@@ -150,7 +151,7 @@ class MacOSUnifiedLoggingRecordProcessorTest {
                 {"eventMessage": "", "subsystem": "", "eventType": "logEvent"}
                 """);
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.of(
                 "vendor_event_type", "logEvent"
@@ -163,7 +164,7 @@ class MacOSUnifiedLoggingRecordProcessorTest {
                 {"processID": 99999, "userID": 0}
                 """);
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).containsEntry("process_id", "99999");
         assertThat(result).containsEntry("user_id", "0");
@@ -175,7 +176,7 @@ class MacOSUnifiedLoggingRecordProcessorTest {
                 {"timestamp": "not-a-timestamp", "eventMessage": "hello"}
                 """);
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).containsEntry("message", "hello");
         assertThat(result).doesNotContainKey("vendor_event_timestamp");
@@ -185,7 +186,7 @@ class MacOSUnifiedLoggingRecordProcessorTest {
     void mapsFieldsFromFixture() throws IOException {
         final var logRecord = parseFixture("macos-unified-log-record.json");
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).containsExactlyInAnyOrderEntriesOf(Map.ofEntries(
                 Map.entry("message", "Connection established to endpoint 10.0.1.50:443"),
@@ -209,7 +210,7 @@ class MacOSUnifiedLoggingRecordProcessorTest {
                 {"eventMessage": "Activity created", "eventType": "activityCreateEvent", "processID": 100}
                 """);
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).containsEntry("vendor_event_type", "activityCreateEvent");
         assertThat(result).containsEntry("message", "Activity created");
@@ -222,11 +223,15 @@ class MacOSUnifiedLoggingRecordProcessorTest {
                 {"eventMessage": "test", "processImagePath": null}
                 """);
 
-        final var result = processor.process(logRecord);
+        final var result = processor.process(wrapLogRecord(logRecord));
 
         assertThat(result).containsEntry("message", "test");
         assertThat(result).doesNotContainKey("process_path");
         assertThat(result).doesNotContainKey("process_name");
+    }
+
+    private static OTelJournal.Log wrapLogRecord(LogRecord logRecord) {
+        return OTelJournal.Log.newBuilder().setLogRecord(logRecord).build();
     }
 
     private static LogRecord logRecordWithBody(String body) {

@@ -29,9 +29,9 @@ import org.graylog.inputs.otel.codec.OTelTypeConverter;
 import org.graylog.schema.EventFields;
 import org.graylog.schema.VendorFields;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
@@ -122,7 +122,8 @@ public class CollectorIngestCodec implements Codec {
     }
 
     private Optional<Message> decodeLog(CollectorJournal.Record collectorRecord, RawMessage rawMessage) {
-        final var logRecord = collectorRecord.getOtelRecord().getLog().getLogRecord();
+        final var log = collectorRecord.getOtelRecord().getLog();
+        final var logRecord = log.getLogRecord();
         final var receiverType = collectorRecord.getCollectorReceiverType();
         final var instanceUid = collectorRecord.getCollectorInstanceUid();
 
@@ -164,7 +165,7 @@ public class CollectorIngestCodec implements Codec {
 
         // TODO: Surface processor errors (e.g. malformed body JSON) as message.addProcessingError()
         //  instead of silently returning an empty map. Requires changing the LogRecordProcessor interface.
-        message.addFields(processor.process(logRecord));
+        message.addFields(processor.process(log));
 
         return Optional.of(message);
     }

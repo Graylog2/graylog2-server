@@ -26,10 +26,10 @@ import org.graylog.schema.EventFields;
 import org.graylog.schema.VendorFields;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
@@ -64,7 +64,7 @@ class CollectorIngestCodecTest {
     void setUp() {
         typeConverter = new OTelTypeConverter(new ObjectMapperProvider().get());
         codec = new CollectorIngestCodec(Configuration.EMPTY_CONFIGURATION, messageFactory,
-                dumpWriter, typeConverter, Map.of(TEST_RECEIVER_TYPE, logRecord -> Map.of()));
+                dumpWriter, typeConverter, Map.of(TEST_RECEIVER_TYPE, log -> Map.of()));
     }
 
     @Test
@@ -369,7 +369,7 @@ class CollectorIngestCodecTest {
     void setsReceiverTypeField() {
         final var codecWithProcessor = new CollectorIngestCodec(
                 Configuration.EMPTY_CONFIGURATION, messageFactory, dumpWriter, typeConverter,
-                Map.of("filelog", logRecord -> Map.of(EventFields.EVENT_LOG_NAME, "test.log")));
+                Map.of("filelog", log -> Map.of(EventFields.EVENT_LOG_NAME, "test.log")));
 
         final var logRecord = LogRecord.newBuilder()
                 .setBody(AnyValue.newBuilder().setStringValue("test"))

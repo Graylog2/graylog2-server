@@ -18,7 +18,7 @@ package org.graylog.collectors.input.processor;
 
 import com.google.common.net.InetAddresses;
 import io.opentelemetry.proto.common.v1.AnyValue;
-import io.opentelemetry.proto.logs.v1.LogRecord;
+import org.graylog.inputs.otel.OTelJournal;
 import org.graylog.schema.AssociatedFields;
 import org.graylog.schema.DestinationFields;
 import org.graylog.schema.EventFields;
@@ -58,8 +58,9 @@ public class WindowsEventLogRecordProcessor implements LogRecordProcessor {
     private static final String PRIVILEGE_ASSIGNED_NAME = "privilege_assigned_name";
 
     @Override
-    public Map<String, Object> process(LogRecord logRecord) {
+    public Map<String, Object> process(OTelJournal.Log log) {
         final Map<String, Object> result = new HashMap<>();
+        final var logRecord = log.getLogRecord();
 
         if (logRecord.getBody().getValueCase() != AnyValue.ValueCase.KVLIST_VALUE) {
             return result;
