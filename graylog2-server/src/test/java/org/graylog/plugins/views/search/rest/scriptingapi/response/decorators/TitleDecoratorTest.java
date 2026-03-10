@@ -33,19 +33,19 @@ class TitleDecoratorTest {
     void testPermitted() {
         final FieldDecorator decorator = new TitleDecorator((request, permissions) -> EntitiesTitleResponse.EMPTY_RESPONSE);
         Assertions.assertThat(decorator.accept(RequestedField.parse("streams"))).isTrue();
-        Assertions.assertThat(decorator.accept(RequestedField.parse("streams.title"))).isTrue();
+        Assertions.assertThat(decorator.accept(RequestedField.parse("streams#title"))).isTrue();
 
         Assertions.assertThat(decorator.accept(RequestedField.parse("gl2_source_input"))).isTrue();
-        Assertions.assertThat(decorator.accept(RequestedField.parse("gl2_source_input.title"))).isTrue();
+        Assertions.assertThat(decorator.accept(RequestedField.parse("gl2_source_input#title"))).isTrue();
 
         // For IDs we have a different decorator
         Assertions.assertThat(decorator.accept(RequestedField.parse("streams.id"))).isFalse();
-        Assertions.assertThat(decorator.accept(RequestedField.parse("gl2_source_input.id"))).isFalse();
+        Assertions.assertThat(decorator.accept(RequestedField.parse("gl2_source_input#id"))).isFalse();
         // unknown decorator
-        Assertions.assertThat(decorator.accept(RequestedField.parse("gl2_source_input.uppercase"))).isFalse();
+        Assertions.assertThat(decorator.accept(RequestedField.parse("gl2_source_input#uppercase"))).isFalse();
         // other fields and entities are not supported
         Assertions.assertThat(decorator.accept(RequestedField.parse("http_response_code"))).isFalse();
-        Assertions.assertThat(decorator.accept(RequestedField.parse("http_response_code.title"))).isFalse();
+        Assertions.assertThat(decorator.accept(RequestedField.parse("http_response_code#title"))).isFalse();
     }
 
     @Test

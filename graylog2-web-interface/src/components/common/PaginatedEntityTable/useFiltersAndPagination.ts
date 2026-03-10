@@ -24,12 +24,21 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import type { LayoutConfig } from 'components/common/EntityDataTable/hooks/useTableLayout';
 
-export const useWithURLParams = (layoutConfig: LayoutConfig) => {
+export const useWithURLParams = (layoutConfig: LayoutConfig, defaultFilters?: UrlQueryFilters) => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setUrlQuery] = useQueryParam('query', StringParam);
   const [sliceCol, setSliceCol] = useQueryParam('sliceCol', StringParam);
   const [slice, setSlice] = useQueryParam('slice', StringParam);
   const urlPagination = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
+  const [hasUserModifiedFilters, setHasUserModifiedFilters] = useState(false);
+
+  const effectiveFilters = useMemo(() => {
+    if (!hasUserModifiedFilters && urlQueryFilters.isEmpty() && defaultFilters && !defaultFilters.isEmpty()) {
+      return defaultFilters;
+    }
+
+    return urlQueryFilters;
+  }, [hasUserModifiedFilters, urlQueryFilters, defaultFilters]);
 
   const fetchOptions: SearchParams = useMemo(
     () => ({
@@ -39,13 +48,14 @@ export const useWithURLParams = (layoutConfig: LayoutConfig) => {
       page: urlPagination.page,
       pageSize: layoutConfig.pageSize,
       sort: layoutConfig.sort,
-      filters: urlQueryFilters,
+      filters: effectiveFilters,
     }),
-    [query, slice, sliceCol, urlPagination.page, layoutConfig.pageSize, layoutConfig.sort, urlQueryFilters],
+    [query, slice, sliceCol, urlPagination.page, layoutConfig.pageSize, layoutConfig.sort, effectiveFilters],
   );
 
   const onChangeFilters = useCallback(
     (newUrlQueryFilters: UrlQueryFilters) => {
+      setHasUserModifiedFilters(true);
       urlPagination.resetPage();
       setUrlQueryFilters(newUrlQueryFilters);
     },
@@ -67,11 +77,11 @@ export const useWithURLParams = (layoutConfig: LayoutConfig) => {
   };
 };
 
-export const useWithLocalState = (layoutConfig: LayoutConfig) => {
+export const useWithLocalState = (layoutConfig: LayoutConfig, defaultFilters?: UrlQueryFilters) => {
   const [transientFetchOptions, setTransientFetchOptions] = useState<any>({
     query: '',
     page: DEFAULT_PAGE,
-    filters: OrderedMap<string, Array<string>>(),
+    filters: defaultFilters ?? OrderedMap<string, Array<string>>(),
     slice: undefined,
     sliceCol: undefined,
   });
