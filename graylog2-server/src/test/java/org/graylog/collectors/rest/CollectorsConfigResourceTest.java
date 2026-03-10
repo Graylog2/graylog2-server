@@ -39,10 +39,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.net.URI;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -165,10 +165,13 @@ class CollectorsConfigResourceTest {
                 new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14402)
         );
 
+        final var fleetIds = Set.of("fleet-1", "fleet-2");
+        when(fleetService.getAllFleetIds()).thenReturn(fleetIds);
+
         resource.put(request);
 
         verify(clusterConfigService).write(any(CollectorsConfig.class));
-        verify(fleetTransactionLogService).appendFleetMarker(anySet(), eq(MarkerType.INGEST_CONFIG_CHANGED));
+        verify(fleetTransactionLogService).appendFleetMarker(eq(fleetIds), eq(MarkerType.INGEST_CONFIG_CHANGED));
     }
 
     private void stubCaService() {
