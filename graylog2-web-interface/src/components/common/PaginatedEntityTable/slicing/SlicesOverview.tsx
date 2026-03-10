@@ -16,7 +16,7 @@
  */
 
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
@@ -73,6 +73,46 @@ type Props = {
   onSortModeChange: (mode: SortMode) => void;
 };
 
+type UseAutoExpandEmptySlicesArgs = {
+  activeSlice: string | undefined;
+  showEmptySlices: boolean;
+  visibleEmptySlices: Slices;
+  setShowEmptySlices: React.Dispatch<React.SetStateAction<boolean>>;
+  setEmptyPage: React.Dispatch<React.SetStateAction<number>>;
+};
+
+const useAutoExpandEmptySlices = ({
+  activeSlice,
+  showEmptySlices,
+  visibleEmptySlices,
+  setShowEmptySlices,
+  setEmptyPage,
+}: UseAutoExpandEmptySlicesArgs) => {
+  const lastAutoExpandedSliceRef = useRef<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (!activeSlice || showEmptySlices) {
+      return;
+    }
+
+    const activeSliceValue = String(activeSlice);
+    const activeSliceMovedToEmpty = visibleEmptySlices.some((slice) => String(slice.value) === activeSliceValue);
+
+    if (!activeSliceMovedToEmpty) {
+      lastAutoExpandedSliceRef.current = undefined;
+      return;
+    }
+
+    if (lastAutoExpandedSliceRef.current === activeSliceValue) {
+      return;
+    }
+
+    lastAutoExpandedSliceRef.current = activeSliceValue;
+    setShowEmptySlices(true);
+    setEmptyPage(1);
+  }, [activeSlice, showEmptySlices, visibleEmptySlices, setShowEmptySlices, setEmptyPage]);
+};
+
 const SlicesOverview = ({
   appSection,
   sliceCol,
@@ -95,6 +135,8 @@ const SlicesOverview = ({
     sortMode,
     sliceRenderers,
   });
+
+  useAutoExpandEmptySlices({ activeSlice, showEmptySlices, visibleEmptySlices, setShowEmptySlices, setEmptyPage });
 
   const currentNonEmptySlices = paginatedSlices(visibleNonEmptySlices, nonEmptyPage, SLICES_PAGE_SIZE);
   const currentEmptySlices = paginatedSlices(visibleEmptySlices, emptyPage, SLICES_PAGE_SIZE);

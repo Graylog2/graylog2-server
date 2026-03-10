@@ -218,4 +218,29 @@ describe('Slicing', () => {
 
     expect(await screen.findByText('Gamma')).toBeInTheDocument();
   });
+
+  it('auto-expands empty slices when active slice becomes empty', async () => {
+    renderSUT(
+      {
+        fetchSlices: () =>
+          Promise.resolve({
+            slices: [
+              { value: 'Alpha', count: 1 },
+              { value: 'Gamma', count: 0 },
+            ],
+          }),
+      },
+      { searchParams: { slice: 'Gamma' } },
+    );
+
+    await screen.findByText('Alpha');
+
+    expect(screen.getByRole('button', { name: /hide empty slices/i })).toBeInTheDocument();
+    expect(within(screen.getByTestId('empty-slices-list')).getByText('Gamma')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /hide empty slices/i }));
+
+    expect(screen.getByRole('button', { name: /show empty slices/i })).toBeInTheDocument();
+    expect(screen.queryByTestId('empty-slices-list')).not.toBeInTheDocument();
+  });
 });
