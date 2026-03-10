@@ -95,7 +95,7 @@ describe('<DropdownField>', () => {
 
     const select = screen.getByLabelText(dropdownField.human_name, { exact: false });
 
-    userEvent.selectOptions(select, 'two');
+    await userEvent.selectOptions(select, 'two');
     await waitFor(() => expect(updateFunction).toHaveBeenCalledWith('example_dropdown_field', 'dos'));
   });
 });
