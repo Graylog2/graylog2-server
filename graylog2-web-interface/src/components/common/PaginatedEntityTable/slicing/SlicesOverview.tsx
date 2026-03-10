@@ -130,13 +130,14 @@ const SlicesOverview = ({
   const [nonEmptyPage, setNonEmptyPage] = useState(1);
   const [emptyPage, setEmptyPage] = useState(1);
   const sendTelemetry = useSendTelemetry();
-  const { isLoading, hasEmptySlices, emptySliceCount, visibleNonEmptySlices, visibleEmptySlices } = useSlices({
-    fetchSlices,
-    activeSlice,
-    searchQuery,
-    sortMode,
-    sliceRenderers,
-  });
+  const { isLoading, refetchSlices, hasEmptySlices, emptySliceCount, visibleNonEmptySlices, visibleEmptySlices } =
+    useSlices({
+      fetchSlices,
+      activeSlice,
+      searchQuery,
+      sortMode,
+      sliceRenderers,
+    });
 
   useAutoExpandEmptySlices({ activeSlice, showEmptySlices, visibleEmptySlices, setShowEmptySlices, setEmptyPage });
 
@@ -174,6 +175,14 @@ const SlicesOverview = ({
     });
   };
 
+  const onSliceSelection = (newSliceCol: string | undefined, newSlice?: string | undefined) => {
+    onChangeSlicing(newSliceCol, newSlice);
+
+    if (newSlice !== undefined) {
+      void refetchSlices();
+    }
+  };
+
   if (isLoading) {
     return <Spinner />;
   }
@@ -206,7 +215,7 @@ const SlicesOverview = ({
             slices={currentNonEmptySlices}
             activeSlice={activeSlice}
             sliceCol={sliceCol}
-            onChangeSlicing={onChangeSlicing}
+            onChangeSlicing={onSliceSelection}
             sliceRenderers={sliceRenderers}
             listTestId="slices-list"
           />
@@ -240,7 +249,7 @@ const SlicesOverview = ({
               slices={currentEmptySlices}
               activeSlice={activeSlice}
               sliceCol={sliceCol}
-              onChangeSlicing={onChangeSlicing}
+              onChangeSlicing={onSliceSelection}
               sliceRenderers={sliceRenderers}
               keyPrefix="empty-"
               listTestId="empty-slices-list"

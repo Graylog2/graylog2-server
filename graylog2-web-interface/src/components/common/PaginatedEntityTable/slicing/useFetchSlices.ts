@@ -48,7 +48,7 @@ const useFetchSlices = (fetchSlices: FetchSlices, sliceRenderers?: SliceRenderer
   });
   useOnRefresh(refetch);
 
-  return { slices: data ?? [], isLoading };
+  return { slices: data ?? [], isLoading, refetchSlices: refetch };
 };
 
 export default useFetchSlices;

@@ -280,4 +280,23 @@ describe('Slicing', () => {
     await waitFor(() => expect(screen.queryByText('Missing-Slice')).not.toBeInTheDocument());
     expect(screen.getByText('Empty slices (0)')).toBeInTheDocument();
   });
+
+  it('refetches slices when selecting a slice', async () => {
+    const fetchSlices = jest.fn(() =>
+      Promise.resolve({
+        slices: [
+          { value: 'Alpha', count: 2 },
+          { value: 'Beta', count: 1 },
+        ],
+      }),
+    );
+    renderSUT({ fetchSlices });
+
+    await screen.findByText('Alpha');
+    expect(fetchSlices).toHaveBeenCalledTimes(1);
+
+    await userEvent.click(within(screen.getByTestId('slices-list')).getByRole('button', { name: /beta/i }));
+
+    await waitFor(() => expect(fetchSlices.mock.calls.length).toBeGreaterThanOrEqual(2));
+  });
 });

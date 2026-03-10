@@ -74,7 +74,7 @@ const addMissingSelectedSlice = (slices: Slices, activeSlice: string | undefined
 };
 
 const useSlices = ({ fetchSlices, activeSlice, searchQuery, sortMode, sliceRenderers = undefined }: Props) => {
-  const { slices, isLoading } = useFetchSlices(fetchSlices, sliceRenderers);
+  const { slices, isLoading, refetchSlices } = useFetchSlices(fetchSlices, sliceRenderers);
   const slicesWithSelected = addMissingSelectedSlice(slices, activeSlice);
   const filteredSlices = slicesWithSelected.filter((slice) => matchesQuery(slice, searchQuery));
   const nonEmptySlices = filteredSlices.filter((slice) => slice.count > 0);
@@ -82,6 +82,7 @@ const useSlices = ({ fetchSlices, activeSlice, searchQuery, sortMode, sliceRende
 
   return {
     isLoading,
+    refetchSlices,
     hasEmptySlices: emptySlices.length > 0,
     emptySliceCount: emptySlices.length,
     visibleNonEmptySlices: sortSlices(nonEmptySlices, sortMode, getSliceLabel),
