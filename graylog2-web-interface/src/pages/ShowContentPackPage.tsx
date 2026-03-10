@@ -17,12 +17,11 @@
 import * as React from 'react';
 import { useState } from 'react';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, DocumentTitle, PageHeader } from 'components/common';
 import { Row, Col, Button, ButtonToolbar, BootstrapModalConfirm } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
-import { DocumentTitle, PageHeader } from 'components/common';
 import ContentPackDetails from 'components/content-packs/ContentPackDetails';
 import ContentPackVersions from 'components/content-packs/ContentPackVersions';
 import ContentPackInstallations from 'components/content-packs/ContentPackInstallations';

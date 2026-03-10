@@ -31,10 +31,6 @@ type State = {
 };
 
 class ErrorBoundary extends React.Component<Props, State> {
-  static contextType = TelemetryContext;
-
-  context: React.ContextType<typeof TelemetryContext>;
-
   constructor(props: Props) {
     super(props);
     this.state = {};
@@ -44,6 +40,10 @@ class ErrorBoundary extends React.Component<Props, State> {
     this.setState({ error, info });
     this.context.sendErrorReport(error);
   }
+
+  static contextType = TelemetryContext;
+
+  context: React.ContextType<typeof TelemetryContext>;
 
   render() {
     const { error, info } = this.state;

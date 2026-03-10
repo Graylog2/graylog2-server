@@ -17,9 +17,8 @@
 import React from 'react';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
-import { Link } from 'components/common/router';
+import { Link, Select } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Panel, Row } from 'components/bootstrap';
-import { Select } from 'components/common';
 import RawMessageLoader from 'components/messageloaders/RawMessageLoader';
 import Routes from 'routing/Routes';
 import { SimulatorActions } from 'stores/simulator/SimulatorStore';
@@ -48,8 +47,6 @@ class ProcessorSimulator extends React.Component<
     [key: string]: any;
   }
 > {
-  private defaultStream: any;
-
   constructor(props) {
     super(props);
     // The default stream could not be present in a system. In that case we fallback to the first available stream.
@@ -63,6 +60,8 @@ class ProcessorSimulator extends React.Component<
       error: undefined,
     };
   }
+
+  private defaultStream: any;
 
   _onMessageLoad = (message, options) => {
     this.setState({ message: message, simulation: undefined, loading: true, error: undefined });

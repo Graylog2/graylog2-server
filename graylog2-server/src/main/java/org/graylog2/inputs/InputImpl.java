@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -86,15 +87,25 @@ public abstract class InputImpl implements Input, MongoEntity {
     public abstract List<Map<String, String>> getEmbeddedStaticFields();
 
     public Map<String, String> getStaticFields() {
-        if (getEmbeddedStaticFields() == null) {
+        final List<Map<String, String>> embeddedStaticFields = getEmbeddedStaticFields();
+        if (embeddedStaticFields == null || embeddedStaticFields.isEmpty()) {
             return Map.of();
         }
-        return getEmbeddedStaticFields().stream()
-                .filter(map -> map.containsKey(FIELD_STATIC_FIELD_KEY) && map.containsKey(FIELD_STATIC_FIELD_VALUE))
-                .collect(java.util.stream.Collectors.toMap(
-                        map -> map.get(FIELD_STATIC_FIELD_KEY),
-                        map -> map.get(FIELD_STATIC_FIELD_VALUE)
-                ));
+
+        final Map<String, String> result = new LinkedHashMap<>(embeddedStaticFields.size());
+
+        for (Map<String, String> map : embeddedStaticFields) {
+            final String key = map.get(FIELD_STATIC_FIELD_KEY);
+            final String value = map.get(FIELD_STATIC_FIELD_VALUE);
+
+            if (key != null && value != null) {
+                if (result.put(key, value) != null) {
+                    LOG.warn("Duplicate static field key '{}' found in input [{}], keeping last value", key, getId());
+                }
+            }
+        }
+
+        return result;
     }
 
     @NotNull

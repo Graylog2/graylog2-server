@@ -16,7 +16,6 @@
  */
 package org.graylog.events.processor.aggregation;
 
-import com.floreysoft.jmte.Engine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -89,7 +88,6 @@ public class AggregationSearchUtilsTest {
     private PermittedStreams permittedStreams;
     private EventStreamService eventStreamService;
     private final MessageFactory messageFactory = new TestMessageFactory();
-    private final Engine templateEngine = new Engine();
 
     @BeforeEach
     public void setup() {
@@ -132,8 +130,7 @@ public class AggregationSearchUtilsTest {
                 searchFactory,
                 eventStreamService,
                 messageFactory,
-                permittedStreams,
-                templateEngine
+                permittedStreams
         );
 
         final AggregationResult result = AggregationResult.builder()
@@ -205,64 +202,6 @@ public class AggregationSearchUtilsTest {
     }
 
     @Test
-    public void testEventsFromAggregationResultUsesCustomEventSummaryTemplate() throws EventProcessorException {
-        final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.minusHours(1).plusMillis(SEARCH_WINDOW_MS));
-
-        final TestEvent event1 = new TestEvent(timerange.to());
-        when(eventFactory.createEvent(any(EventDefinition.class), any(DateTime.class), anyString()))
-                .thenReturn(event1);
-
-        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of("stream-2"), ImmutableList.of(), null, emptyList())
-                .toBuilder()
-                .eventSummaryTemplate("Aggregation on ${group_field_one} and ${group_field_two} has source count of ${aggregation_conditions.count_source}")
-                .build();
-        final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
-                .timerange(timerange)
-                .build();
-
-        final AggregationSearchUtils searchUtils = new AggregationSearchUtils(
-                eventDefinitionDto,
-                (AggregationEventProcessorConfig) eventDefinitionDto.config(),
-                Set.of(),
-                searchFactory,
-                eventStreamService,
-                messageFactory,
-                permittedStreams,
-                templateEngine
-        );
-
-        final AggregationResult result = AggregationResult.builder()
-                .effectiveTimerange(timerange)
-                .totalAggregatedMessages(1)
-                .sourceStreams(ImmutableSet.of("stream-1", "stream-2"))
-                .keyResults(ImmutableList.of(
-                        AggregationKeyResult.builder()
-                                .key(ImmutableList.of("one", "two"))
-                                .timestamp(timerange.to())
-                                .seriesValues(ImmutableList.of(
-                                        AggregationSeriesValue.builder()
-                                                .key(ImmutableList.of("a"))
-                                                .value(42.0d)
-                                                .series(Count.builder()
-                                                        .id("abc123")
-                                                        .field("source")
-                                                        .build())
-                                                .build()
-                                ))
-                                .build()
-                ))
-                .build();
-
-        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> {});
-
-        assertThat(eventsWithContext).hasSize(1);
-        final EventWithContext eventWithContext = eventsWithContext.getFirst();
-        assertThat(eventWithContext.event().getMessage()).isEqualTo("Aggregation on one and two has source count of 42.0");
-        assertThat(eventWithContext.messageContext().orElseThrow().getMessage()).isEqualTo("Aggregation on one and two has source count of 42.0");
-    }
-
-    @Test
     public void testEventsFromAggregationResultWithEventModifierState() throws EventProcessorException {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.minusHours(1).plusMillis(SEARCH_WINDOW_MS));
@@ -302,8 +241,7 @@ public class AggregationSearchUtilsTest {
                 searchFactory,
                 eventStreamService,
                 messageFactory,
-                permittedStreams,
-                templateEngine
+                permittedStreams
         );
 
         final AggregationResult result = AggregationResult.builder()
@@ -389,8 +327,7 @@ public class AggregationSearchUtilsTest {
                 searchFactory,
                 eventStreamService,
                 messageFactory,
-                permittedStreams,
-                templateEngine
+                permittedStreams
         );
 
         final AggregationResult result = AggregationResult.builder()
@@ -506,8 +443,7 @@ public class AggregationSearchUtilsTest {
                 searchFactory,
                 eventStreamService,
                 messageFactory,
-                permittedStreams,
-                templateEngine
+                permittedStreams
         );
 
         final AggregationResult result = AggregationResult.builder()
@@ -599,8 +535,7 @@ public class AggregationSearchUtilsTest {
                 searchFactory,
                 eventStreamService,
                 messageFactory,
-                permittedStreams,
-                templateEngine
+                permittedStreams
         );
         final AggregationResult result = buildAggregationResult(timerange, timerange.to(), ImmutableList.of("one", "two"));
         final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> {});
@@ -663,8 +598,7 @@ public class AggregationSearchUtilsTest {
                 searchFactory,
                 eventStreamService,
                 messageFactory,
-                permittedStreams,
-                templateEngine
+                permittedStreams
         );
         final AggregationResult result = buildAggregationResult(timerange, timerange.to(), ImmutableList.of("one", "two"));
         final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> {});
@@ -718,8 +652,7 @@ public class AggregationSearchUtilsTest {
                 searchFactory,
                 eventStreamService,
                 messageFactory,
-                permittedStreams,
-                templateEngine
+                permittedStreams
         );
 
         final AggregationResult result = AggregationResult.builder()

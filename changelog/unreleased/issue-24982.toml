@@ -1,0 +1,5 @@
+type = "f"
+message = "Use GiB units for defining traffic limits in the chart. Add a label indicating that limits are calculated in UTC."
+
+issues = ["24982"]
+pulls = ["24983"]

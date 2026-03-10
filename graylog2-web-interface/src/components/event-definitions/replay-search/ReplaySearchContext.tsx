@@ -17,8 +17,9 @@
 import * as React from 'react';
 
 import type { AlertType } from 'components/event-definitions/types';
+import { singleton } from 'logic/singleton';
 
-type ReplaySearchContextType = {
+export type ReplaySearchContextType = {
   alertId: string;
   definitionId: string;
   type: AlertType;
@@ -28,4 +29,5 @@ const ReplaySearchContext = React.createContext<ReplaySearchContextType>({
   definitionId: undefined,
   type: undefined,
 });
-export default ReplaySearchContext;
+
+export default singleton('contexts.ReplaySearchContext', () => ReplaySearchContext);

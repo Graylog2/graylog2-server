@@ -104,7 +104,7 @@ public class MongoIndexRangeService implements IndexRangeService {
 
     @Override
     public SortedSet<IndexRange> find(DateTime begin, DateTime end) {
-        if(end.isBefore(begin)) {
+        if (end.isBefore(begin)) {
             throw new RuntimeException("Calculation of IndexRanges error: end time (" + end + ") is earlier than begin time (" + begin + ")");
         }
         final var query = or(
@@ -145,6 +145,19 @@ public class MongoIndexRangeService implements IndexRangeService {
 
         LOG.info("Calculated range of [{}] in [{}ms].", index, duration);
         return MongoIndexRange.create(index, stats.min(), stats.max(), now, duration, stats.streamIds());
+    }
+
+    @Override
+    public boolean calculateRangeAndSave(String index) {
+        LOG.info("Calculating ranges for index {}.", index);
+        try {
+            save(calculateRange(index));
+            LOG.info("Created ranges for index {}.", index);
+            return true;
+        } catch (Exception e) {
+            LOG.error("Exception during index range calculation for index {}", index, e);
+            return false;
+        }
     }
 
     @Override

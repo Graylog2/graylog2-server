@@ -16,8 +16,7 @@
  */
 import React from 'react';
 
-import { Link } from 'components/common/router';
-import { Select, Spinner } from 'components/common';
+import { Link, Select, Spinner } from 'components/common';
 import { Row, Col, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { getValueFromInput } from 'util/FormsUtils';
@@ -30,8 +29,6 @@ type Props = {
 };
 
 class LookupTableConverterConfiguration extends React.Component<Props, { lookupTables: any }> {
-  private converterEnabled: Input;
-
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -47,6 +44,8 @@ class LookupTableConverterConfiguration extends React.Component<Props, { lookupT
       this.setState({ lookupTables: result.lookup_tables });
     });
   }
+
+  private converterEnabled: Input;
 
   _getConverterObject = (configuration?) => ({
     type: this.props.type,

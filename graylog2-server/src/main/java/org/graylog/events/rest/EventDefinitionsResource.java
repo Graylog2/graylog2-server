@@ -77,6 +77,7 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.NonDeletableSystemScope;
 import org.graylog2.database.entities.source.DBEntitySourceService;
 import org.graylog2.database.utils.SourcedMongoEntityUtils;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -357,8 +358,14 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         if (result.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
         }
-
-        dto = dto.toBuilder().state(schedule ? EventDefinition.State.ENABLED : EventDefinition.State.DISABLED).build();
+        if (NonDeletableSystemScope.NAME.equals(dto.scope())) {
+            //never change the state of system definitions, as the state cannot be later on changed in the UI
+            dto = dto.toBuilder().build();
+        } else {
+            dto = dto.toBuilder()
+                    .state(schedule ? EventDefinition.State.ENABLED : EventDefinition.State.DISABLED)
+                    .build();
+        }
         recentActivityService.update(definitionId, GRNTypes.EVENT_DEFINITION, userContext.getUser());
         return Response.ok().entity(eventDefinitionHandler.update(dto, schedule)).build();
     }
@@ -524,7 +531,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                      @Context UserContext userContext) {
         EventProcessorConfig oldConfig = dbService.get(toValidate.id()).map(EventDefinition::config).orElse(null);
         ValidationResult validationResult = toValidate.config().validate(userContext);
-        validationResult.addAll(toValidate.config().validate(oldConfig, eventDefinitionConfiguration));
+        validationResult.addAll(toValidate.config().validate(userContext, oldConfig, eventDefinitionConfiguration));
         return validationResult;
     }
 

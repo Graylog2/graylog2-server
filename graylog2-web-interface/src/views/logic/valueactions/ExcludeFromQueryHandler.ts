@@ -18,6 +18,7 @@ import uniq from 'lodash/uniq';
 import type { Datum } from 'plotly.js';
 
 import { escape, addToQuery, predicate, not } from 'views/logic/queries/QueryHelper';
+import recordQueryStringUsage from 'views/logic/queries/recordQueryStringUsage';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { RootState } from 'views/types';
 import { updateQueryString } from 'views/logic/slices/viewSlice';
@@ -39,7 +40,7 @@ type Args = {
 
 const ExcludeFromQueryHandler =
   ({ queryId, field, value, contexts }: Args) =>
-  (dispatch: ViewsDispatch, getState: () => RootState) => {
+  async (dispatch: ViewsDispatch, getState: () => RootState) => {
     const oldQuery = selectQueryString(queryId)(getState());
 
     const valuesToAdd = uniq(
@@ -50,6 +51,8 @@ const ExcludeFromQueryHandler =
       (prev, valueToAdd) => formatNewQuery(prev, valueToAdd.field, valueToAdd.value as string | number),
       oldQuery,
     );
+
+    await recordQueryStringUsage(newQuery, oldQuery);
 
     return dispatch(updateQueryString(queryId, newQuery));
   };
