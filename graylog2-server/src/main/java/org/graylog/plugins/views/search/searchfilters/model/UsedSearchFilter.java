@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.searchfilters.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.graylog2.contentpacks.ContentPackable;
@@ -24,6 +25,8 @@ import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.NativeEntityConverter;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.ScopedEntity;
 
 import java.util.Map;
 
@@ -48,6 +51,11 @@ public interface UsedSearchFilter extends NativeEntityConverter<UsedSearchFilter
 
     String INLINE_QUERY_STRING_SEARCH_FILTER = "inlineQueryString";
     String REFERENCED_SEARCH_FILTER = "referenced";
+
+    @JsonProperty(ScopedEntity.FIELD_SCOPE)
+    default String scope() {
+        return DefaultEntityScope.NAME;
+    }
 
     boolean negation();
 
