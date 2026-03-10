@@ -187,6 +187,20 @@ public abstract class EntityAttribute {
     @Nullable
     public abstract SearchQueryField.BsonFilterCreator bsonFilterCreator();
 
+    /**
+     * Describes how to sort on this attribute when it doesn't map to a simple MongoDB field.
+     * When {@code null}, sorting uses {@link #dbField()} (or {@link #id()} if dbField is also null)
+     * as the MongoDB sort field directly.
+     * <p>
+     * Not serialized to JSON — this is backend-only metadata.
+     *
+     * @see AttributeSortSpec
+     * @see AttributeFieldSorts
+     */
+    @JsonIgnore
+    @Nullable
+    public abstract AttributeSortSpec sortSpec();
+
     public static Builder builder() {
         return Builder.builder();
     }
@@ -270,6 +284,9 @@ public abstract class EntityAttribute {
          * @see EntityAttribute#bsonFilterCreator()
          */
         public abstract Builder bsonFilterCreator(SearchQueryField.BsonFilterCreator bsonFilterCreator);
+
+        /** @see EntityAttribute#sortSpec() */
+        public abstract Builder sortSpec(AttributeSortSpec sortSpec);
 
         public abstract EntityAttribute build();
 
