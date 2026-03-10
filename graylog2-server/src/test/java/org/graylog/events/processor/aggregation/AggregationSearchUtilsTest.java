@@ -631,6 +631,71 @@ public class AggregationSearchUtilsTest {
         });
     }
 
+    @Test
+    public void testAggregationConditionsFieldsAreSetCorrectly() throws EventProcessorException {
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.minusHours(1).plusMillis(SEARCH_WINDOW_MS));
+
+        final TestEvent event1 = new TestEvent(timerange.to());
+        when(eventFactory.createEvent(any(EventDefinition.class), any(DateTime.class), anyString()))
+                .thenReturn(event1);
+
+        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of("stream-2"), ImmutableList.of(), null, emptyList());
+        final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
+                .timerange(timerange)
+                .build();
+
+        final AggregationSearchUtils searchUtils = new AggregationSearchUtils(
+                eventDefinitionDto,
+                (AggregationEventProcessorConfig) eventDefinitionDto.config(),
+                Set.of(),
+                searchFactory,
+                eventStreamService,
+                messageFactory,
+                permittedStreams
+        );
+
+        final AggregationResult result = AggregationResult.builder()
+                .effectiveTimerange(timerange)
+                .totalAggregatedMessages(1)
+                .sourceStreams(ImmutableSet.of("stream-1", "stream-2"))
+                .keyResults(ImmutableList.of(
+                        AggregationKeyResult.builder()
+                                .key(ImmutableList.of("one", "two"))
+                                .timestamp(timerange.to())
+                                .seriesValues(ImmutableList.of(
+                                        AggregationSeriesValue.builder()
+                                                .key(ImmutableList.of("a"))
+                                                .value(42.0d)
+                                                .series(Count.builder()
+                                                        .id("abc123")
+                                                        .field("source")
+                                                        .build())
+                                                .build(),
+                                        AggregationSeriesValue.builder()
+                                                .key(ImmutableList.of("a"))
+                                                .value(23.0d)
+                                                .series(Cardinality.builder()
+                                                        .id("xyz789")
+                                                        .field("user")
+                                                        .build())
+                                                .build()
+                                ))
+                                .build()
+                ))
+                .build();
+
+        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> {});
+
+        assertThat(eventsWithContext).hasSize(1);
+        final Event event = eventsWithContext.get(0).event();
+        Map<String, Double> aggregationConditions = event.getAggregationConditions();
+
+        assertThat(aggregationConditions)
+                .containsEntry("count_source", 42.0d)
+                .containsEntry("card_user", 23.0d);
+    }
+
     // Helper method to build test AggregationResult, since we only care about a few of the values
     private AggregationResult buildAggregationResult(AbsoluteRange timeRange, DateTime dateTime, List<String> testKey) {
         return AggregationResult.builder()

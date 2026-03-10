@@ -40,10 +40,15 @@ const Header = styled.div`
 const GET_INDEXER_CLUSTER_HEALTH = 'indexerCluster.health';
 const GET_INDEXER_CLUSTER_NAME = 'indexerCluster.name';
 
-const getIndexerClusterHealth = () => {
+type ClusterHealth = {
+  status: string;
+  shards: { active: number; initializing: number; relocating: number; unassigned: number };
+};
+
+const getIndexerClusterHealth = (): Promise<ClusterHealth> => {
   const url = URLUtils.qualifyUrl(ApiRoutes.IndexerClusterApiController.health().url);
 
-  return fetchPeriodically('GET', url);
+  return fetchPeriodically<ClusterHealth>('GET', url);
 };
 
 const getIndexerClusterName = (): Promise<{ name: string; distribution: string }> => {

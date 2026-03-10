@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { isPermitted } from 'util/PermissionsMixin';
@@ -31,7 +31,7 @@ const useShowDatanodeMigration = (): {
   showDatanodeMigration: boolean;
 } => {
   const { permissions } = useCurrentUser();
-  const canStartDataNode = React.useMemo(() => isPermitted(permissions, 'datanode:start'), [permissions]);
+  const canStartDataNode = useMemo(() => isPermitted(permissions, 'datanode:start'), [permissions]);
 
   const { data: isDatanodeConfiguredAndUsed } = useQuery({
     queryKey: ['show_datanode_migration'],

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import type { PreferencesMap } from 'stores/users/PreferencesStore';
 
@@ -34,7 +35,7 @@ export type UserJSON = {
   last_name: string;
   id: string;
   last_activity: string | null | undefined;
-  permissions: string[];
+  permissions: Permission[];
   grn_permissions?: string[];
   preferences: PreferencesMap;
   read_only: boolean;
@@ -57,7 +58,7 @@ type InternalState = {
   lastName: string;
   email: string;
   grnPermissions: Immutable.List<string>;
-  permissions: Immutable.List<string>;
+  permissions: Immutable.List<Permission>;
   timezone: string | null | undefined;
   preferences: PreferencesMap;
   roles: Immutable.Set<string>;
@@ -514,8 +515,8 @@ class Builder {
     return new Builder(this.value.set('grnPermissions', value));
   }
 
-  permissions(value: InternalState['permissions']) {
-    return new Builder(this.value.set('permissions', value));
+  permissions(value: InternalState['permissions'] | Array<Permission>) {
+    return new Builder(this.value.set('permissions', Immutable.List(value)));
   }
 
   timezone(value: InternalState['timezone']) {

@@ -30,7 +30,7 @@ import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 
 import OriginalSearch from './Search';
 
-import { useSyncWithQueryParameters } from '../hooks/SyncWithQueryParameters';
+import useSyncWithQueryParameters from '../hooks/useSyncWithQueryParameters';
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 
@@ -49,7 +49,7 @@ jest.mock('views/components/DashboardSearchBar', () => () => (
   </button>
 ));
 
-jest.mock('views/hooks/SyncWithQueryParameters');
+jest.mock('views/hooks/useSyncWithQueryParameters');
 
 jest.mock('routing/withLocation', () => (Component) => (props) => (
   <Component location={{ query: {}, pathname: '', search: '' }} {...props} />

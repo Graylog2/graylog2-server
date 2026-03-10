@@ -15,12 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useRef, useCallback } from 'react';
+import { useRef, useCallback } from 'react';
 import styled from 'styled-components';
 
 import type { InputSummary } from 'hooks/usePaginatedInputs';
-import { useStore } from 'stores/connect';
-import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
+import { useMetric } from 'hooks/useMetrics';
 import { Spinner } from 'components/common';
 import { formatCount, getValueFromMetric, prefixMetric } from 'components/inputs/helpers/InputThroughputUtils';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
@@ -36,23 +35,15 @@ const StyledSpan = styled.span`
 const METRIC_NAME = 'incomingMessages';
 
 const ThroughputCell = ({ input }: Props) => {
-  const metrics = useStore(MetricsStore, (store) => store.metrics);
   const metricName = prefixMetric(input, METRIC_NAME);
+  const { data: metrics, isLoading } = useMetric(metricName);
   const spanRef = useRef();
   const { toggleSection, expandedSections } = useExpandedSections();
 
   const toggleTrafficSection = useCallback(() => toggleSection(input.id, 'traffic'), [input.id, toggleSection]);
 
-  useEffect(() => {
-    MetricsActions.addGlobal(metricName);
-
-    return () => {
-      MetricsActions.removeGlobal(metricName);
-    };
-  }, [metricName]);
-
-  if (!metrics) {
-    return <Spinner />;
+  if (isLoading || Object.keys(metrics).length === 0) {
+    return <Spinner size="xs" />;
   }
 
   const incomingMessages =
@@ -77,7 +68,7 @@ const ThroughputCell = ({ input }: Props) => {
       ref={spanRef}
       title={`${throughputSectionIsOpen ? 'Hide' : 'Show'} metrics`}
       onClick={toggleTrafficSection}>
-      {!isNaN(incomingMessages) ? formatCount(incomingMessages) : 0} msg/s Last Minute
+      {!isNaN(incomingMessages) ? formatCount(incomingMessages) : 0} msg/s
     </StyledSpan>
   );
 };

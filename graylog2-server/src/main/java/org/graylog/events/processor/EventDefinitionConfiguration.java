@@ -17,10 +17,17 @@
 package org.graylog.events.processor;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.documentation.Documentation;
+import com.github.joschi.jadconfig.documentation.DocumentationSection;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 
+@DocumentationSection(heading = "Event Definition", description = "")
 public class EventDefinitionConfiguration {
 
+    @Documentation("""
+            Maximum value that can be set for an event limit.
+            Default: 1000
+            """)
     @Parameter(value = "event_definition_max_event_limit", validators = PositiveIntegerValidator.class)
     private int maxEventLimit = 1000;
 

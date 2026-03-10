@@ -24,20 +24,17 @@ const getVisibleAttributeColumns = (
   defaultDisplayedColumns: Array<string>,
   userColumnPreferences: ColumnPreferences | undefined = {},
 ) => {
-  const visible = new Set(
+  const userSelection = new Set(
     Object.entries(userColumnPreferences)
       .filter(([, { status }]) => status === ATTRIBUTE_STATUS.show)
       .map(([attr]) => attr),
   );
 
-  // Add default columns, which are not explicitly hidden
-  defaultDisplayedColumns.forEach((attr) => {
-    if (!(userColumnPreferences[attr]?.status === 'hide')) {
-      visible.add(attr);
-    }
-  });
+  if (userSelection.size > 0) {
+    return userSelection;
+  }
 
-  return visible;
+  return new Set(defaultDisplayedColumns);
 };
 const useVisibleColumnOrder = (
   columnPreferences: ColumnPreferences | undefined,
@@ -52,6 +49,8 @@ const useVisibleColumnOrder = (
     // Additional: visible attributes not in attributeColumnOrder
     const additionalVisible = [...visibleAttributeColumns].filter((id) => !attributeColumnOrder.includes(id));
 
+    // Keep actions as the trailing column even when there are no row actions.
+    // It doubles as the "tail" column to consume leftover width for fully-static layouts.
     return [...(displayBulkSelectCol ? [BULK_SELECT_COL_ID] : []), ...coreOrder, ...additionalVisible, ACTIONS_COL_ID];
   }, [columnPreferences, defaultDisplayedColumns, attributeColumnOrder, displayBulkSelectCol]);
 

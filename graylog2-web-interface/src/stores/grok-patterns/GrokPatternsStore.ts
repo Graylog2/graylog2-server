@@ -44,7 +44,6 @@ type GrokPatternTest = {
   sampleData: string;
 };
 
-// eslint-disable-next-line import/prefer-default-export
 export const GrokPatternsStore = singletonStore('core.GrokPatterns', () =>
   Reflux.createStore({
     URL: qualifyUrl('/system/grok'),

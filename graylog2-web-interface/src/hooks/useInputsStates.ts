@@ -32,6 +32,7 @@ export type InputStateByNode = {
     state: InputState;
     id: string;
     detailed_message: string | null;
+    last_failed_at?: string | null;
     message_input: InputSummary;
   };
 };

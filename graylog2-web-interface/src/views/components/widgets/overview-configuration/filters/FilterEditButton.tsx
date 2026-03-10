@@ -44,7 +44,7 @@ const FilterEditButton = ({
   onDelete,
 }: Props) => {
   const [open, setOpen] = useState(false);
-  const [editValue, setEditValue] = React.useState<string>(value);
+  const [editValue, setEditValue] = useState<string>(value);
 
   const submitChanges = (newValue: string) => {
     if (newValue) {

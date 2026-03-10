@@ -22,11 +22,11 @@ import org.junit.jupiter.api.Test;
 class RequestedFieldTest {
     @Test
     void testParsing() {
-        final RequestedField streamId = RequestedField.parse("streams.id");
+        final RequestedField streamId = RequestedField.parse("streams#id");
         Assertions.assertThat(streamId.name()).isEqualTo("streams");
         Assertions.assertThat(streamId.decorator()).isEqualTo("id");
 
-        final RequestedField streamName = RequestedField.parse("streams.name");
+        final RequestedField streamName = RequestedField.parse("streams#name");
         Assertions.assertThat(streamName.name()).isEqualTo("streams");
         Assertions.assertThat(streamName.decorator()).isEqualTo("name");
 

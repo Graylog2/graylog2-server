@@ -43,8 +43,7 @@ jest.mock('util/AppConfig', () => ({
   isFeatureEnabled: () => true,
 }));
 
-// eslint-disable-next-line react/require-default-props
-const AreaVisualization = (props: React.ComponentProps<typeof OriginalAreaVisualization>) => (
+const AreaVisualization = ({ ...props }: React.ComponentProps<typeof OriginalAreaVisualization>) => (
   <TestStoreProvider>
     <TestFieldTypesContextProvider>
       <OriginalAreaVisualization {...props} />

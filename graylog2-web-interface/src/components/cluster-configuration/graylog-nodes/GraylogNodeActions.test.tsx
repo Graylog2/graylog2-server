@@ -18,7 +18,8 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import type { GraylogNode } from '../graylog-nodes/useClusterGraylogNodes';
+import { LOAD_BALANCER_STATUS } from '../graylog-nodes/fetchClusterGraylogNodes';
+import type { ClusterGraylogNode as GraylogNode } from '../graylog-nodes/fetchClusterGraylogNodes';
 import GraylogNodeActions from '../graylog-nodes/GraylogNodeActions';
 
 const nodeMock: GraylogNode = {
@@ -30,7 +31,7 @@ const nodeMock: GraylogNode = {
   is_leader: true,
   is_processing: true,
   last_seen: '2025-03-06T09:36:14.000Z',
-  lb_status: 'alive',
+  lb_status: LOAD_BALANCER_STATUS.ALIVE,
   lifecycle: 'running',
   node_id: 'a853111d-85ce-42c0-bc6d-22f7f0fecbb4',
   operating_system: 'Mac OS X 15.3.1',
@@ -51,7 +52,6 @@ describe('GraylogNodeActions', () => {
     await userEvent.click(button);
 
     await screen.findByRole('menuitem', { name: /Metrics/i });
-    await screen.findByRole('menuitem', { name: /API Browser/i });
   });
 
   it('shows pause message processing menu item when is_processing true', async () => {
@@ -72,21 +72,21 @@ describe('GraylogNodeActions', () => {
     await screen.findByRole('menuitem', { name: /Resume message processing/i });
   });
 
-  it('shows set load balancer to DEAD menu item when lb_status is alive', async () => {
-    render(<GraylogNodeActions node={{ ...nodeMock, lb_status: 'alive' }} />);
+  it('shows set load balancer to DEAD menu item when lb_status is ALIVE', async () => {
+    render(<GraylogNodeActions node={{ ...nodeMock, lb_status: LOAD_BALANCER_STATUS.ALIVE }} />);
 
     const button = await screen.findByRole('button', { name: /More/i });
     await userEvent.click(button);
 
-    await screen.findByRole('menuitem', { name: /Override load Balancer status to DEAD/i });
+    await screen.findByRole('menuitem', { name: /Override load balancer status to DEAD/i });
   });
 
-  it('shows set load balancer to ALIVE menu item when lb_status is not alive', async () => {
-    render(<GraylogNodeActions node={{ ...nodeMock, lb_status: 'dead' }} />);
+  it('shows set load balancer to ALIVE menu item when lb_status is DEAD', async () => {
+    render(<GraylogNodeActions node={{ ...nodeMock, lb_status: LOAD_BALANCER_STATUS.DEAD }} />);
 
     const button = await screen.findByRole('button', { name: /More/i });
     await userEvent.click(button);
 
-    await screen.findByRole('menuitem', { name: /Override load Balancer status to ALIVE/i });
+    await screen.findByRole('menuitem', { name: /Override load balancer status to ALIVE/i });
   });
 });

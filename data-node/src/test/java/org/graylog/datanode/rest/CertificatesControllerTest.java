@@ -47,6 +47,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(MockitoExtension.class)
 public class CertificatesControllerTest {
 
+    private static final CertificateGenerator CERTIFICATE_GENERATOR = new CertificateGenerator(1024);
 
     private CertificatesController certificatesController;
 
@@ -83,15 +84,15 @@ public class CertificatesControllerTest {
         datanodeKeystore.create(DatanodeTestUtils.generateKeyPair(Duration.ofDays(31)));
 
 
-        final KeyPair rootCa = CertificateGenerator.generate(CertRequest.selfSigned("root")
+        final KeyPair rootCa = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("root")
                 .isCA(true)
                 .validity(Duration.ofDays(365)));
 
-        final KeyPair intermediate = CertificateGenerator.generate(CertRequest.signed("intermediate", rootCa)
+        final KeyPair intermediate = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.signed("intermediate", rootCa)
                 .isCA(true)
                 .validity(Duration.ofDays(365)));
 
-        final KeyPair server = CertificateGenerator.generate(CertRequest.signed("server", intermediate)
+        final KeyPair server = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.signed("server", intermediate)
                 .isCA(false)
                 .validity(Duration.ofDays(365)));
 

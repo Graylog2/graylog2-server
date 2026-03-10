@@ -65,7 +65,7 @@ public class ExecuteNotification extends Action {
         @Override
         public URIBuilder getLink(EventDto event) {
             final TemplateURI.Builder uriBuilder = new TemplateURI.Builder();
-            uriBuilder.setPath("security/security-events/alerts");
+            uriBuilder.setPath("alerts");
             uriBuilder.addParameter("query", "id:" + event.id());
             return uriBuilder.build().getLinkPath();
         }

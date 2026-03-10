@@ -23,10 +23,12 @@ import java.util.Map;
 
 public class VersionAwareProvider<T> implements Provider<T> {
     private final SearchVersion elasticsearchMajorVersion;
+    private final SearchVersion actualVersion;
     private final Map<SearchVersion, Provider<T>> pluginBindings;
 
     @Inject
     public VersionAwareProvider(@DetectedSearchVersion SearchVersion indexerVersion, Map<SearchVersion, Provider<T>> pluginBindings) {
+        this.actualVersion = indexerVersion;
         this.elasticsearchMajorVersion = majorVersionFrom(indexerVersion);
         this.pluginBindings = pluginBindings;
     }
@@ -35,7 +37,7 @@ public class VersionAwareProvider<T> implements Provider<T> {
     public T get() {
         final Provider<T> provider = this.pluginBindings.get(elasticsearchMajorVersion);
         if (provider == null) {
-            throw new UnsupportedSearchException(elasticsearchMajorVersion, this.getClass().getName());
+            throw new UnsupportedSearchException(actualVersion, this.getClass().getName());
         }
         return provider.get();
     }

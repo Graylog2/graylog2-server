@@ -17,23 +17,30 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ExtendedStats;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ExtendedStatsAggregationBuilder;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.ExtendedStatsAggregateBase;
 
-public class OSVarianceHandler extends OSBasicSeriesSpecHandler<Variance, ExtendedStats> {
+import java.util.Optional;
+
+public class OSVarianceHandler extends OSBasicSeriesSpecHandler<Variance> {
 
     @Override
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Variance varianceSpec) {
-        final ExtendedStatsAggregationBuilder variance = AggregationBuilders.extendedStats(name).field(varianceSpec.field());
-        return SeriesAggregationBuilder.metric(variance);
+        return SeriesAggregationBuilder.metric(new MutableNamedAggregationBuilder(name,
+                Aggregation.builder().extendedStats(e -> e.field(varianceSpec.field()))));
     }
 
     @Override
-    protected Object getValueFromAggregationResult(final ExtendedStats extendedStats,
+    protected Object getValueFromAggregationResult(final Aggregate agg,
                                                    final Variance varianceSpec) {
-        return extendedStats.getVariance();
+        return Optional.ofNullable(agg)
+                .filter(Aggregate::isExtendedStats)
+                .map(Aggregate::extendedStats)
+                .map(ExtendedStatsAggregateBase::variance)
+                .orElse(null);
     }
 }
 

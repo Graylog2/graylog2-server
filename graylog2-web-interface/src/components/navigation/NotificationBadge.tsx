@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer } from 'components/common';
 import { Badge, Nav } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { NAV_ITEM_HEIGHT } from 'theme/constants';

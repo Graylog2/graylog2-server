@@ -19,6 +19,8 @@ package org.graylog.plugins.pipelineprocessor.rulebuilder.rest;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.graylog2.plugin.Message;
@@ -67,6 +69,7 @@ public class RuleBuilderSimulatorResponse {
         Iterables.removeIf(simulatorActionVariables, Predicates.isNull());
     }
 
+    @ArraySchema(schema = @Schema(implementation = Map.class))
     public List<Pair<String, Object>> getSimulatorActionVariables() {
         return simulatorActionVariables;
     }

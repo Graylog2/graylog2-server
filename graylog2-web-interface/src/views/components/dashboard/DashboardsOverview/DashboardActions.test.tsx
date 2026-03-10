@@ -20,6 +20,7 @@ import * as React from 'react';
 import userEvent from '@testing-library/user-event';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import Immutable from 'immutable';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import { asMock } from 'helpers/mocking';
 import OriginalDashboardActions from 'views/components/dashboard/DashboardsOverview/DashboardActions';
@@ -68,6 +69,8 @@ const DashboardActions = ({
 describe('DashboardActions', () => {
   const simpleDashboard = simpleView();
   const menuIsHidden = () => expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+  const renderSUT = (props: React.ComponentProps<typeof DashboardActions> = { dashboard: simpleDashboard }) =>
+    render(<DashboardActions {...props} />);
 
   const clickDashboardAction = async (action: string) => {
     userEvent.click(await screen.findByRole('button', { name: /more/i }));
@@ -86,13 +89,15 @@ describe('DashboardActions', () => {
       selectEntity: () => {},
       deselectEntity: () => {},
       toggleEntitySelect: () => {},
+      isSomeRowsSelected: false,
+      isAllRowsSelected: false,
     });
   });
 
   it('does not delete dashboard when user clicks cancel', async () => {
     asMock(window.confirm).mockReturnValue(false);
 
-    render(<DashboardActions dashboard={simpleDashboard} />);
+    renderSUT();
 
     await clickDashboardAction('Delete');
 
@@ -104,7 +109,7 @@ describe('DashboardActions', () => {
   it('deletes dashboard when user confirms deletion', async () => {
     asMock(window.confirm).mockReturnValue(true);
 
-    render(<DashboardActions dashboard={simpleDashboard} />);
+    renderSUT();
 
     await clickDashboardAction('Delete');
 
@@ -116,11 +121,11 @@ describe('DashboardActions', () => {
   it('does not display more actions dropdown when user has no permissions for deletion and there are no pluggable actions', async () => {
     const currentUser = adminUser
       .toBuilder()
-      .permissions(Immutable.List([`view:read:${simpleDashboard.id}`]))
+      .permissions(Immutable.List<Permission>([`view:read:${simpleDashboard.id}`]))
       .build();
     asMock(useCurrentUser).mockReturnValue(currentUser);
 
-    render(<DashboardActions dashboard={simpleDashboard} />);
+    renderSUT();
 
     await screen.findByRole('button', { name: /share/i });
 
@@ -147,7 +152,7 @@ describe('DashboardActions', () => {
     });
 
     it('triggers hook when deleting dashboard', async () => {
-      render(<DashboardActions dashboard={simpleDashboard} />);
+      renderSUT();
 
       await clickDashboardAction('Delete');
 
@@ -161,7 +166,7 @@ describe('DashboardActions', () => {
         ...mockContextValue,
         refetch: jest.fn(),
       };
-      render(<DashboardActions dashboard={simpleDashboard} contextValue={contextValue} />);
+      renderSUT({ dashboard: simpleDashboard, contextValue });
 
       await clickDashboardAction('Delete');
 
@@ -173,7 +178,7 @@ describe('DashboardActions', () => {
     it('does not delete dashboard when hook returns false', async () => {
       asMock(deletingDashboard).mockResolvedValue(false);
 
-      render(<DashboardActions dashboard={simpleDashboard} />);
+      renderSUT();
 
       await clickDashboardAction('Delete');
 
@@ -186,7 +191,7 @@ describe('DashboardActions', () => {
       asMock(deletingDashboard).mockReturnValue(null);
       asMock(window.confirm).mockReturnValue(true);
 
-      render(<DashboardActions dashboard={simpleDashboard} />);
+      renderSUT();
 
       await clickDashboardAction('Delete');
 
@@ -204,7 +209,7 @@ describe('DashboardActions', () => {
       });
       asMock(window.confirm).mockReturnValue(true);
 
-      render(<DashboardActions dashboard={simpleDashboard} />);
+      renderSUT();
 
       /* eslint-disable no-console */
       const oldConsoleTrace = console.trace;

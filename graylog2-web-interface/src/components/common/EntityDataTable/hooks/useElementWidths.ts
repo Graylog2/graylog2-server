@@ -15,48 +15,61 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useRef, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import type { EntityBase, ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import useElementDimensions from 'hooks/useElementDimensions';
-import { BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
+import { BULK_SELECT_COLUMN_WIDTH, ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
 import useColumnWidths from 'components/common/EntityDataTable/hooks/useColumnWidths';
+import useActionsColumnWidth from 'components/common/EntityDataTable/hooks/useActionsColumnWidth';
 
 type Props<Entity extends EntityBase, Meta> = {
-  columnSchemas: Array<ColumnSchema>;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
+  columnSchemas: Array<ColumnSchema>;
+  columnWidthPreferences: { [colId: string]: number };
   displayBulkSelectCol: boolean;
-  fixedActionsCellWidth: number | undefined;
+  hasRowActions: boolean;
+  headerMinWidths: { [colId: string]: number };
   visibleColumns: Array<string>;
-  columnWidthPreferences: { [key: string]: number };
+  entities: ReadonlyArray<Entity>;
+  scrollContainerRef: React.RefObject<HTMLDivElement>;
 };
 
 const useElementWidths = <Entity extends EntityBase, Meta>({
-  columnSchemas,
   columnRenderersByAttribute,
-  displayBulkSelectCol,
-  fixedActionsCellWidth,
-  visibleColumns,
+  columnSchemas,
   columnWidthPreferences,
+  displayBulkSelectCol,
+  entities,
+  hasRowActions,
+  headerMinWidths,
+  scrollContainerRef,
+  visibleColumns,
 }: Props<Entity, Meta>) => {
-  const tableRef = useRef<HTMLTableElement>(null);
-  const actionsRef = useRef<HTMLDivElement>();
-  const { width: tableWidth } = useElementDimensions(tableRef);
+  const { colMinWidth: actionsColMinWidth, handleWidthChange: handleActionsWidthChange } =
+    useActionsColumnWidth<Entity>(entities, hasRowActions);
+  const { width: scrollContainerWidth } = useElementDimensions(scrollContainerRef);
   const columnIds = useMemo(
     () => columnSchemas.filter(({ id }) => visibleColumns.includes(id)).map(({ id }) => id),
     [columnSchemas, visibleColumns],
   );
   const columnWidths = useColumnWidths<Entity>({
-    actionsColWidth: fixedActionsCellWidth,
+    actionsColMinWidth,
     bulkSelectColWidth: displayBulkSelectCol ? BULK_SELECT_COLUMN_WIDTH : 0,
-    columnRenderersByAttribute,
     columnIds,
-    tableWidth,
+    columnRenderersByAttribute,
     columnWidthPreferences,
+    headerMinWidths,
+    scrollContainerWidth,
   });
 
-  return { tableRef, actionsRef, columnWidths };
+  return {
+    handleActionsWidthChange,
+    columnWidths,
+    tableIsCompressed: actionsColMinWidth === columnWidths[ACTIONS_COL_ID],
+    actionsColMinWidth,
+  };
 };
 
 export default useElementWidths;

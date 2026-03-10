@@ -51,6 +51,8 @@ describe('StreamsOverview BulkActionsRow', () => {
     selectEntity: () => {},
     deselectEntity: () => {},
     toggleEntitySelect: () => {},
+    isSomeRowsSelected: false,
+    isAllRowsSelected: false,
   };
 
   const openActionsDropdown = async () =>

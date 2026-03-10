@@ -16,11 +16,10 @@
  */
 import React, { useEffect, useState } from 'react';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, DocumentTitle, PageHeader } from 'components/common';
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
-import { DocumentTitle, PageHeader } from 'components/common';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
 import ContentPack from 'logic/content-packs/ContentPack';
 import Entity from 'logic/content-packs/Entity';
@@ -86,13 +85,13 @@ const CreateContentPackPage = () => {
   const _getEntities = (selectedEntities) => {
     const { contentPack } = contentPackState;
 
-    CatalogActions.getSelectedEntities(selectedEntities).then((result) => {
+    CatalogActions.getSelectedEntities(selectedEntities).then((result: any) => {
       const newContentPack = contentPack
         .toBuilder()
         /* Mark entities from server */
-        .entities(result.entities.map((e) => Entity.fromJSON(e, true, contentPack.parameters)))
+        .entities(result.entities.map((e: any) => Entity.fromJSON(e, true, contentPack.parameters)))
         .build();
-      const fetchedEntities = result.entities.map((e) => Entity.fromJSON(e, false, contentPack.parameters));
+      const fetchedEntities = result.entities.map((e: any) => Entity.fromJSON(e, false, contentPack.parameters));
 
       setContentPackState((cur) => ({ ...cur, contentPack: newContentPack, fetchedEntities }));
     });

@@ -18,8 +18,7 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import startCase from 'lodash/startCase';
 
-import { QueryHelper, RelativeTime, PaginatedEntityTable } from 'components/common';
-import { Link } from 'components/common/router';
+import { QueryHelper, RelativeTime, PaginatedEntityTable, Link } from 'components/common';
 import Routes from 'routing/Routes';
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
 import { keyFn, fetchEventDefinitions } from 'components/event-definitions/hooks/useEventDefinitions';
@@ -54,10 +53,10 @@ const getCustomColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByAt
       renderCell: (_status: string, eventDefinition: EventDefinition) => (
         <StatusCell eventDefinition={eventDefinition} />
       ),
-      staticWidth: 100,
+      staticWidth: 110,
     },
     priority: {
-      staticWidth: 100,
+      staticWidth: 'matchHeader' as const,
     },
     '_entity_source.source': {
       renderCell: (_title: string, eventDefinition: EventDefinition) => (

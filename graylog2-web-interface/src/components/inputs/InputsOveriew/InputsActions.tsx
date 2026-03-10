@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useState } from 'react';
 
 import { Button, ButtonToolbar, DeleteMenuItem, MenuItem } from 'components/bootstrap';
-import { ConfirmDialog, IfPermitted } from 'components/common';
+import { ConfirmDialog, IfPermitted, LinkContainer } from 'components/common';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { isInputInSetupMode, isInputRunning } from 'components/inputs/helpers/inputState';
@@ -30,7 +30,6 @@ import useLocation from 'routing/useLocation';
 import useFeature from 'hooks/useFeature';
 import type { ConfiguredInput, Input } from 'components/messageloaders/Types';
 import InputStatesStore from 'stores/inputs/InputStatesStore';
-import { LinkContainer } from 'components/common/router';
 import { MoreActions } from 'components/common/EntityDataTable';
 import type { InputTypesSummary } from 'hooks/useInputTypes';
 import type { InputTypeDescriptionsResponse } from 'hooks/useInputTypesDescriptions';
@@ -155,7 +154,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
         </LinkContainer>
       </IfPermitted>
 
-      <IfPermitted permissions={[`inputs:edit:${input.id}`, `input_types:create:${input.type}`]}>
+      <IfPermitted permissions={`inputs:changestate:${input.id}`}>
         {!isLoadingInputStates && (
           <InputStateControl
             key={`input-state-control-${input.id}`}

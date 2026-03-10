@@ -21,7 +21,6 @@ import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import { LookupTablesOverview } from 'components/lookup-tables';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
-import LUTModals from 'components/lookup-tables/LUTModals';
 
 function LUTTablesPage() {
   const navigate = useNavigate();
@@ -37,7 +36,6 @@ function LUTTablesPage() {
         </Button>
       }>
       <LookupTablesOverview />
-      <LUTModals />
     </LUTPageLayout>
   );
 }

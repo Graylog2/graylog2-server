@@ -39,6 +39,8 @@ import java.util.List;
 
 class DatanodeKeystoreTest {
 
+    private static final CertificateGenerator CERTIFICATE_GENERATOR = new CertificateGenerator(1024);
+
     private EventBus eventBus;
     private final List<Object> receivedEvents = new LinkedList<>();
 
@@ -65,6 +67,12 @@ class DatanodeKeystoreTest {
         receivedEvents.add(event);
     }
 
+    @Subscribe
+    public void subscribe(DatanodeCertificateRevokedEvent event) {
+        // remember received events so we can verify them later
+        receivedEvents.add(event);
+    }
+
     @Test
     void testCreateRead(@TempDir Path tempDir) throws Exception {
         final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(DatanodeTestUtils.tempDirectories(tempDir), "foobar", this.eventBus);
@@ -80,7 +88,7 @@ class DatanodeKeystoreTest {
         Assertions.assertThat(csr.getSubject().toString()).isEqualTo("CN=my-hostname");
 
         final CsrSigner signer = new CsrSigner();
-        final KeyPair ca = CertificateGenerator.generate(CertRequest.selfSigned("Graylog CA").isCA(true).validity(Duration.ofDays(365)));
+        final KeyPair ca = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("Graylog CA").isCA(true).validity(Duration.ofDays(365)));
         final X509Certificate datanodeCert = signer.sign(ca.privateKey(), ca.certificate(), csr, 30);
         final CertificateChain certChain = new CertificateChain(datanodeCert, List.of(ca.certificate()));
 
@@ -97,17 +105,17 @@ class DatanodeKeystoreTest {
     @Test
     void testIntermediateCA(@TempDir Path tempDir) throws Exception {
         final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(DatanodeTestUtils.tempDirectories(tempDir), "foobar", this.eventBus);
-        datanodeKeystore.create( DatanodeTestUtils.generateKeyPair(Duration.ofDays(30)));
+        datanodeKeystore.create(DatanodeTestUtils.generateKeyPair(Duration.ofDays(30)));
 
-        final KeyPair rootCa = CertificateGenerator.generate(CertRequest.selfSigned("root")
+        final KeyPair rootCa = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("root")
                 .isCA(true)
                 .validity(Duration.ofDays(365)));
 
-        final KeyPair intermediate = CertificateGenerator.generate(CertRequest.signed("intermediate", rootCa)
+        final KeyPair intermediate = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.signed("intermediate", rootCa)
                 .isCA(true)
                 .validity(Duration.ofDays(365)));
 
-        final KeyPair server = CertificateGenerator.generate(CertRequest.signed("server", intermediate)
+        final KeyPair server = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.signed("server", intermediate)
                 .isCA(true)
                 .validity(Duration.ofDays(365)));
 
@@ -120,5 +128,75 @@ class DatanodeKeystoreTest {
         datanodeKeystore.replaceCertificatesInKeystore(certChain);
 
         Assertions.assertThat(datanodeKeystore.hasSignedCertificate()).isTrue();
+    }
+
+    @Test
+    void testInitWithSelfSignedCertificate(@TempDir Path tempDir) throws Exception {
+        final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(DatanodeTestUtils.tempDirectories(tempDir), "foobar", this.eventBus);
+
+        // Initially keystore doesn't exist
+        Assertions.assertThat(datanodeKeystore.exists()).isFalse();
+
+        // Create a self-signed certificate
+        final java.security.KeyStore keystore = datanodeKeystore.initWithSelfSignedCertificate();
+
+        // Verify keystore was created and persisted
+        Assertions.assertThat(datanodeKeystore.exists()).isTrue();
+        Assertions.assertThat(keystore).isNotNull();
+
+        // Verify the certificate is self-signed (not CA-signed)
+        Assertions.assertThat(datanodeKeystore.hasSignedCertificate()).isFalse();
+
+        // Verify the certificate exists with the correct alias
+        final X509Certificate cert = (X509Certificate) keystore.getCertificate(DatanodeKeystore.DATANODE_KEY_ALIAS);
+        Assertions.assertThat(cert).isNotNull();
+
+        // Verify it's self-signed (issuer == subject)
+        Assertions.assertThat(cert.getIssuerX500Principal()).isEqualTo(cert.getSubjectX500Principal());
+
+        // Verify subject contains the datanode alias
+        Assertions.assertThat(cert.getSubjectX500Principal().getName()).contains(DatanodeKeystore.DATANODE_KEY_ALIAS);
+
+        // Verify certificate validity is approximately 99 years (with some tolerance)
+        long validityDays = (cert.getNotAfter().getTime() - cert.getNotBefore().getTime()) / (1000L * 60 * 60 * 24);
+        Assertions.assertThat(validityDays).isBetween(99L * 365 - 10, 99L * 365 + 10);
+
+        // One event should be posted for self-signed certificate creation
+        Assertions.assertThat(this.receivedEvents).isEmpty();
+    }
+
+    @Test
+    void testRevokeSignedCertificateReplacesExistingSignedCert(@TempDir Path tempDir) throws Exception {
+        final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(DatanodeTestUtils.tempDirectories(tempDir), "foobar", this.eventBus);
+
+        // Create initial keystore with a CA-signed certificate
+        datanodeKeystore.create(DatanodeTestUtils.generateKeyPair(Duration.ofDays(30)));
+        final PKCS10CertificationRequest csr = datanodeKeystore.createCertificateSigningRequest("my-hostname", List.of());
+
+        final CsrSigner signer = new CsrSigner();
+        final KeyPair ca = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("Graylog CA").isCA(true).validity(Duration.ofDays(365)));
+        final X509Certificate datanodeCert = signer.sign(ca.privateKey(), ca.certificate(), csr, 30);
+        final CertificateChain certChain = new CertificateChain(datanodeCert, List.of(ca.certificate()));
+
+        datanodeKeystore.replaceCertificatesInKeystore(certChain);
+
+        // Verify we have a signed certificate
+        Assertions.assertThat(datanodeKeystore.hasSignedCertificate()).isTrue();
+        Assertions.assertThat(this.receivedEvents).hasSize(1);
+
+        // Reset to self-signed certificate
+        receivedEvents.clear();
+        final java.security.KeyStore keystore = datanodeKeystore.revokeSignedCertificate();
+
+        // Verify the certificate is now self-signed
+        Assertions.assertThat(datanodeKeystore.hasSignedCertificate()).isFalse();
+
+        final X509Certificate cert = (X509Certificate) keystore.getCertificate(DatanodeKeystore.DATANODE_KEY_ALIAS);
+        Assertions.assertThat(cert.getIssuerX500Principal()).isEqualTo(cert.getSubjectX500Principal());
+
+        // One event should be posted when resetting to self-signed
+        Assertions.assertThat(this.receivedEvents)
+                .hasSize(1)
+                .allSatisfy(e -> Assertions.assertThat(e).isInstanceOf(DatanodeCertificateRevokedEvent.class));
     }
 }

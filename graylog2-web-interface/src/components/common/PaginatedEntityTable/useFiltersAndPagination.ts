@@ -24,85 +24,108 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import type { LayoutConfig } from 'components/common/EntityDataTable/hooks/useTableLayout';
 
-export const useWithURLParams = (layoutConfig: LayoutConfig) => {
+export const useWithURLParams = (layoutConfig: LayoutConfig, defaultFilters?: UrlQueryFilters) => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setUrlQuery] = useQueryParam('query', StringParam);
+  const [sliceCol, setSliceCol] = useQueryParam('sliceCol', StringParam);
+  const [slice, setSlice] = useQueryParam('slice', StringParam);
   const urlPagination = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
+  const [hasUserModifiedFilters, setHasUserModifiedFilters] = useState(false);
+
+  const effectiveFilters = useMemo(() => {
+    if (!hasUserModifiedFilters && urlQueryFilters.isEmpty() && defaultFilters && !defaultFilters.isEmpty()) {
+      return defaultFilters;
+    }
+
+    return urlQueryFilters;
+  }, [hasUserModifiedFilters, urlQueryFilters, defaultFilters]);
 
   const fetchOptions: SearchParams = useMemo(
     () => ({
       query,
+      slice,
+      sliceCol,
       page: urlPagination.page,
       pageSize: layoutConfig.pageSize,
       sort: layoutConfig.sort,
-      filters: urlQueryFilters,
+      filters: effectiveFilters,
     }),
-    [layoutConfig.pageSize, layoutConfig.sort, urlPagination.page, query, urlQueryFilters],
+    [query, slice, sliceCol, urlPagination.page, layoutConfig.pageSize, layoutConfig.sort, effectiveFilters],
   );
 
   const onChangeFilters = useCallback(
     (newUrlQueryFilters: UrlQueryFilters) => {
+      setHasUserModifiedFilters(true);
       urlPagination.resetPage();
       setUrlQueryFilters(newUrlQueryFilters);
     },
     [urlPagination, setUrlQueryFilters],
   );
 
+  const onChangeSlicing = (newSliceCol: string | undefined, newSlice?: string) => {
+    urlPagination.resetPage();
+    setSliceCol(newSliceCol);
+    setSlice(newSlice);
+  };
+
   return {
     fetchOptions,
     setQuery: setUrlQuery,
     onChangeFilters,
+    onChangeSlicing,
     paginationState: urlPagination,
   };
 };
 
-export const useWithLocalState = (layoutConfig: LayoutConfig) => {
+export const useWithLocalState = (layoutConfig: LayoutConfig, defaultFilters?: UrlQueryFilters) => {
   const [transientFetchOptions, setTransientFetchOptions] = useState<any>({
     query: '',
     page: DEFAULT_PAGE,
-    filters: OrderedMap<string, Array<string>>(),
+    filters: defaultFilters ?? OrderedMap<string, Array<string>>(),
+    slice: undefined,
+    sliceCol: undefined,
   });
 
-  const setPagination = useCallback(
-    ({ page, pageSize }: { page?: number; pageSize?: number }) => {
-      setTransientFetchOptions({
-        ...transientFetchOptions,
-        page,
-        pageSize,
-      });
-    },
-    [transientFetchOptions],
-  );
+  const setPagination = useCallback(({ page, pageSize }: { page?: number; pageSize?: number }) => {
+    setTransientFetchOptions((cur) => ({
+      ...cur,
+      page,
+      pageSize,
+    }));
+  }, []);
 
   const resetPage = useCallback(() => {
-    setTransientFetchOptions({
-      ...transientFetchOptions,
+    setTransientFetchOptions((cur) => ({
+      ...cur,
       page: DEFAULT_PAGE,
       sort: layoutConfig.sort,
-    });
-  }, [transientFetchOptions, layoutConfig.sort]);
+    }));
+  }, [layoutConfig.sort]);
 
-  const onChangeFilters = useCallback(
-    (newFilters: UrlQueryFilters) => {
-      setTransientFetchOptions({
-        ...transientFetchOptions,
-        page: DEFAULT_PAGE,
-        filters: newFilters,
-      });
-    },
-    [transientFetchOptions],
-  );
+  const onChangeFilters = useCallback((newFilters: UrlQueryFilters) => {
+    setTransientFetchOptions((cur) => ({
+      ...cur,
+      page: DEFAULT_PAGE,
+      filters: newFilters,
+    }));
+  }, []);
 
-  const setQuery = useCallback(
-    (newQuery: string) => {
-      setTransientFetchOptions({
-        ...transientFetchOptions,
-        query: newQuery,
-        page: DEFAULT_PAGE,
-      });
-    },
-    [transientFetchOptions],
-  );
+  const onChangeSlicing = useCallback((sliceCol: string | undefined, slice?: string | undefined) => {
+    setTransientFetchOptions((cur) => ({
+      ...cur,
+      page: DEFAULT_PAGE,
+      sliceCol,
+      slice,
+    }));
+  }, []);
+
+  const setQuery = useCallback((newQuery: string) => {
+    setTransientFetchOptions((cur) => ({
+      ...cur,
+      query: newQuery,
+      page: DEFAULT_PAGE,
+    }));
+  }, []);
 
   const fetchOptions: SearchParams = useMemo(
     () => ({
@@ -118,6 +141,7 @@ export const useWithLocalState = (layoutConfig: LayoutConfig) => {
       fetchOptions,
       setQuery,
       onChangeFilters,
+      onChangeSlicing,
       paginationState: {
         page: fetchOptions.page,
         pageSize: fetchOptions.pageSize,
@@ -125,6 +149,6 @@ export const useWithLocalState = (layoutConfig: LayoutConfig) => {
         setPagination,
       },
     }),
-    [fetchOptions, onChangeFilters, resetPage, setPagination, setQuery],
+    [fetchOptions, onChangeFilters, onChangeSlicing, resetPage, setPagination, setQuery],
   );
 };

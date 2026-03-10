@@ -24,7 +24,10 @@ const Container = styled.div(
   ({ theme }) => css`
     cursor: col-resize;
     color: ${theme.colors.gray[70]};
+    margin-left: ${theme.spacings.xxs};
     user-select: none;
+  }
+    
   `,
 );
 
@@ -34,15 +37,28 @@ type Props = {
   colTitle: string;
 };
 
-const ResizeHandle = ({ onMouseDown = undefined, onTouchStart = undefined, colTitle }: Props) => (
-  <Container
-    onMouseDown={onMouseDown}
-    onTouchStart={onTouchStart}
-    role="separator"
-    aria-label={`Resize ${colTitle} column`}
-    title={`Resize ${colTitle} column`}>
-    <Icon name="arrows_outward" />
-  </Container>
-);
+const ResizeHandle = ({ onMouseDown = undefined, onTouchStart = undefined, colTitle }: Props) => {
+  const _onMouseDown = (e) => {
+    // Required to prevent text selection while resizing in Safari
+    e?.preventDefault();
+    onMouseDown?.(e);
+  };
+
+  const _onTouchStart = (e) => {
+    e?.preventDefault();
+    onTouchStart?.(e);
+  };
+
+  return (
+    <Container
+      onMouseDown={_onMouseDown}
+      onTouchStart={_onTouchStart}
+      role="separator"
+      aria-label={`Resize ${colTitle} column`}
+      title={`Resize ${colTitle} column`}>
+      <Icon name="arrows_outward" />
+    </Container>
+  );
+};
 
 export default ResizeHandle;

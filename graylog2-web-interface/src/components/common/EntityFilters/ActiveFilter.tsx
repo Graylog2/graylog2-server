@@ -33,12 +33,17 @@ const CenteredButton = styled(Button)`
   align-items: center;
 `;
 
+const FilterValueButton = styled(CenteredButton)<{ $isConflicting: boolean }>`
+  text-decoration: ${({ $isConflicting }) => ($isConflicting ? 'line-through' : 'none')};
+`;
+
 type FilterValueDropdownProps = {
   attribute: Attribute;
   allActiveFilters: Filters | undefined;
   filter: Filter;
   filterValueRenderer: (value: Filter['value'], title: string) => React.ReactNode | undefined;
   onChangeFilter: (attributeId: string, prevValue: string, newFilter: Filter) => void;
+  isConflicting: boolean;
 };
 
 const FilterValueDropdown = ({
@@ -47,12 +52,17 @@ const FilterValueDropdown = ({
   onChangeFilter,
   filterValueRenderer,
   filter,
+  isConflicting,
 }: FilterValueDropdownProps) => {
   const [show, setShowDropdown] = useState(false);
   const { value, title } = filter;
 
   const _onToggle = () => {
     setShowDropdown((cur) => !cur);
+  };
+
+  const _onClose = () => {
+    setShowDropdown(false);
   };
 
   const onSubmit = (newFilter: { title: string; value: string }) => {
@@ -65,12 +75,13 @@ const FilterValueDropdown = ({
       show={show}
       closeOnSelect={false}
       toggleChild={
-        <CenteredButton bsSize="xsmall" title="Change filter value">
+        <FilterValueButton bsSize="xsmall" title="Change filter value" $isConflicting={isConflicting}>
           {filterValueRenderer ? filterValueRenderer(value, title) : title}
-        </CenteredButton>
+        </FilterValueButton>
       }
       placement="bottom"
       onToggle={_onToggle}
+      onClose={_onClose}
       dropdownZIndex={1050}>
       <FilterConfiguration
         attribute={attribute}
@@ -90,6 +101,7 @@ type Props = {
   filterValueRenderer: (value: string, title: string) => React.ReactNode | undefined;
   onChangeFilter: (attributeId: string, prevValue: string, newFilter: Filter) => void;
   onDeleteFilter: (attributeId: string, filterId: string) => void;
+  isConflicting: boolean;
 };
 
 const ActiveFilter = ({
@@ -99,6 +111,7 @@ const ActiveFilter = ({
   filterValueRenderer,
   onDeleteFilter,
   onChangeFilter,
+  isConflicting,
 }: Props) => {
   const { value, title } = filter;
 
@@ -112,9 +125,13 @@ const ActiveFilter = ({
   return (
     <Container className="btn-group" data-testid={`${attribute.id}-filter-${value}`}>
       {attribute.type === 'BOOLEAN' && (
-        <CenteredButton bsSize="xsmall" onClick={onChangeBooleanValue} title="Change filter value">
+        <FilterValueButton
+          bsSize="xsmall"
+          onClick={onChangeBooleanValue}
+          title="Change filter value"
+          $isConflicting={isConflicting}>
           {filterValueRenderer ? filterValueRenderer(value, title) : title}
-        </CenteredButton>
+        </FilterValueButton>
       )}
       {attribute.type !== 'BOOLEAN' && (
         <FilterValueDropdown
@@ -123,6 +140,7 @@ const ActiveFilter = ({
           filter={filter}
           allActiveFilters={allActiveFilters}
           filterValueRenderer={filterValueRenderer}
+          isConflicting={isConflicting}
         />
       )}
       <CenteredButton bsSize="xsmall" onClick={() => onDeleteFilter(attribute.id, value)} title="Delete filter">

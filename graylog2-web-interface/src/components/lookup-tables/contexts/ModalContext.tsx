@@ -15,15 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useContext, useMemo, useState } from 'react';
 
 const ModalContext = React.createContext(null);
 
 export function ModalProvider<ModalTypes, EntityType = unknown>({ children }: { children: React.ReactNode }) {
-  const [modal, setModal] = React.useState<ModalTypes>(null);
-  const [entity, setEntity] = React.useState<EntityType>();
-  const [title, setTitle] = React.useState<string>(null);
-  const [double, setDouble] = React.useState<boolean>(false);
-  const value = React.useMemo(
+  const [modal, setModal] = useState<ModalTypes>(null);
+  const [entity, setEntity] = useState<EntityType>();
+  const [title, setTitle] = useState<string>(null);
+  const [double, setDouble] = useState<boolean>(false);
+  const value = useMemo(
     () => ({ modal, setModal, entity, setEntity, title, setTitle, double, setDouble }),
     [modal, entity, title, double],
   );
@@ -38,7 +39,7 @@ export const withLUTModalProvider = (Component: React.ElementType, props = {}) =
 );
 
 export function useModalContext() {
-  const context = React.useContext(ModalContext);
+  const context = useContext(ModalContext);
 
   if (!context) {
     throw new Error('useModalContext must be used within a ModalProvider');

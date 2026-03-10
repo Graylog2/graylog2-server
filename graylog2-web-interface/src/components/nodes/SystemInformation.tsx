@@ -51,8 +51,6 @@ class SystemInformation extends React.Component<
     jvmInformation: undefined,
   };
 
-  private interval: NodeJS.Timeout;
-
   constructor(props) {
     super(props);
     this.state = _getInitialState();
@@ -65,6 +63,8 @@ class SystemInformation extends React.Component<
   componentWillUnmount() {
     clearTimeout(this.interval);
   }
+
+  private interval: NodeJS.Timeout;
 
   render() {
     const {

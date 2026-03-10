@@ -16,12 +16,15 @@
  */
 package org.graylog.plugins.pipelineprocessor.db;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog2.database.BuildableMongoEntity;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @JsonDeserialize(builder = AutoValue_PipelineRulesMetadataDao.Builder.class)
@@ -32,6 +35,8 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
     private static final String FIELD_STREAMS = "streams";
     private static final String FIELD_FUNCTIONS = "functions";
     private static final String FIELD_DEPRECATED_FUNCTIONS = "deprecated_functions";
+    public static final String FIELD_ROUTING_RULES = "routing_rules";
+    public static final String FIELD_ROUTED_STREAMS = "routed_streams";
     public static final String FIELD_HAS_INPUT_REFERENCES = "has_input_references";
 
     @JsonProperty(FIELD_PIPELINE_ID)
@@ -49,8 +54,21 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
     @JsonProperty(FIELD_DEPRECATED_FUNCTIONS)
     public abstract Set<String> deprecatedFunctions();
 
+    @JsonProperty(FIELD_ROUTING_RULES)
+    // Maps rule ID to IDs of routed stream
+    public abstract Map<String, Set<String>> streamsByRuleId();
+
+    @JsonProperty(FIELD_ROUTED_STREAMS)
+    // Maps stream ID to stream title
+    public abstract Map<String, String> routedStreamTitleById();
+
     @JsonProperty(FIELD_HAS_INPUT_REFERENCES)
     public abstract Boolean hasInputReferences();
+
+    @JsonIgnore
+    public boolean hasDeprecatedFunctions() {
+        return deprecatedFunctions() != null && !deprecatedFunctions().isEmpty();
+    }
 
     public static Builder builder() {
         return new AutoValue_PipelineRulesMetadataDao.Builder()
@@ -59,7 +77,9 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
                 .streams(new HashSet<>())
                 .functions(new HashSet<>())
                 .deprecatedFunctions(new HashSet<>())
-                .hasInputReferences(false);
+                .hasInputReferences(false)
+                .streamsByRuleId(new HashMap<>())
+                .routedStreamTitleById(new HashMap<>());
     }
 
     @AutoValue.Builder
@@ -79,6 +99,12 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
 
         @JsonProperty(FIELD_DEPRECATED_FUNCTIONS)
         public abstract Builder deprecatedFunctions(Set<String> deprecatedFunctions);
+
+        @JsonProperty(FIELD_ROUTING_RULES)
+        public abstract Builder streamsByRuleId(Map<String, Set<String>> routingRules);
+
+        @JsonProperty(FIELD_ROUTED_STREAMS)
+        public abstract Builder routedStreamTitleById(Map<String, String> routedStreamsMap);
 
         @JsonProperty(FIELD_HAS_INPUT_REFERENCES)
         public abstract Builder hasInputReferences(Boolean hasInputReferences);

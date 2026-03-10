@@ -19,8 +19,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Routes from 'routing/Routes';
-import { LinkContainer } from 'components/common/router';
-import { IfPermitted, ShareButton, ConfirmDialog } from 'components/common';
+import { LinkContainer, IfPermitted, ShareButton, ConfirmDialog } from 'components/common';
 import { ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';

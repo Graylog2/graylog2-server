@@ -36,9 +36,10 @@ const AuthWrapper = styled.div(
 
 type AWSAuthenticationTypesProps = {
   onChange: (...args: any[]) => void;
+  requireCredentials?: boolean;
 };
 
-const AWSAuthenticationTypes = ({ onChange }: AWSAuthenticationTypesProps) => {
+const AWSAuthenticationTypes = ({ onChange, requireCredentials = true }: AWSAuthenticationTypesProps) => {
   const { clearField, formData } = useContext(FormDataContext);
 
   const { awsAuthenticationType, awsAccessKey, awsSecretKey, awsAssumeRoleARN } = formData;
@@ -75,7 +76,7 @@ const AWSAuthenticationTypes = ({ onChange }: AWSAuthenticationTypesProps) => {
   return (
     <>
       {isCloud ? (
-        <KeySecret awsKey={awsAccessKey} awsSecret={awsSecretKey} onChange={onChange} />
+        <KeySecret awsKey={awsAccessKey} awsSecret={awsSecretKey} onChange={onChange} required={requireCredentials} />
       ) : (
         <>
           <Input
@@ -96,7 +97,12 @@ const AWSAuthenticationTypes = ({ onChange }: AWSAuthenticationTypesProps) => {
             {isType(AWS_AUTH_TYPES.automatic) && <Automatic />}
 
             {isType(AWS_AUTH_TYPES.keysecret) && (
-              <KeySecret awsKey={awsAccessKey} awsSecret={awsSecretKey} onChange={onChange} />
+              <KeySecret
+                awsKey={awsAccessKey}
+                awsSecret={awsSecretKey}
+                onChange={onChange}
+                required={requireCredentials}
+              />
             )}
           </AuthWrapper>
         </>

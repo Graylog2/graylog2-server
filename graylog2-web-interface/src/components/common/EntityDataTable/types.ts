@@ -27,7 +27,7 @@ export type ColumnSchema = {
   anyPermissions?: boolean;
   // Indicates that a column does not exist as an attribute in table data
   isDerived?: boolean;
-} & Pick<Attribute, 'id' | 'title' | 'type' | 'sortable' | 'hidden' | 'permissions'>;
+} & Pick<Attribute, 'id' | 'title' | 'type' | 'sortable' | 'hidden' | 'permissions' | 'sliceable'>;
 
 // A column render should have either a `width` and optionally a `minWidth` or only a `staticWidth`.
 export type ColumnRenderer<Entity extends EntityBase, Meta = unknown> = {
@@ -36,7 +36,8 @@ export type ColumnRenderer<Entity extends EntityBase, Meta = unknown> = {
   textAlign?: string;
   minWidth?: number; // px
   width?: number; // fraction of unassigned table width, similar to CSS unit fr.
-  staticWidth?: number; // px
+  // Uses the rendered title width as the fixed width; or provide a px value, if the title width is too small.
+  staticWidth?: number | 'matchHeader';
 };
 
 export type ColumnRenderersByAttribute<Entity extends EntityBase, Meta = unknown> = {
@@ -95,8 +96,10 @@ export type DefaultLayout = {
 
 export type ColumnMetaContext<Entity extends EntityBase> =
   | {
-      label?: string;
       columnRenderer?: ColumnRenderer<Entity>;
       enableColumnOrdering?: boolean;
+      enableSlicing?: boolean;
+      hideCellPadding?: boolean;
+      label?: string;
     }
   | undefined;
