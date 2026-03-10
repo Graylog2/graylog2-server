@@ -14,21 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import numeral from 'numeral';
+import * as React from 'react';
 
-import type { CounterMetric } from 'types/metrics';
+import { singleton } from 'logic/singleton';
+import type { ClusterMetric } from 'types/metrics';
 
-type Props = {
-  metric: CounterMetric;
+export type MetricsContextType = {
+  metrics: ClusterMetric;
+  isLoading: boolean;
+  subscribe: (names: string[]) => void;
+  unsubscribe: (names: string[]) => void;
 };
-const CounterDetails = ({ metric: { metric } }: Props) => (
-  <dl className="metric-def metric-counter">
-    <dt>Value:</dt>
-    <dd>
-      <span className="number-format">{numeral(metric.count).format('0,0')}</span>
-    </dd>
-  </dl>
-);
 
-export default CounterDetails;
+const MetricsContext = React.createContext<MetricsContextType | undefined>(undefined);
+
+export default singleton('contexts.MetricsContext', () => MetricsContext);
