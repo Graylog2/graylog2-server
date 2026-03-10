@@ -147,6 +147,58 @@ describe('Slicing', () => {
     });
   });
 
+  it('paginates non-empty slices', async () => {
+    renderSUT({
+      fetchSlices: () =>
+        Promise.resolve({
+          slices: Array.from({ length: 11 }, (_, index) => ({
+            value: `Slice-${String(index + 1).padStart(2, '0')}`,
+            count: 1,
+          })),
+        }),
+    });
+
+    await screen.findByText('Slice-01');
+
+    expect(within(screen.getByTestId('slices-list')).getByText('Slice-01')).toBeInTheDocument();
+    expect(within(screen.getByTestId('slices-list')).queryByText('Slice-11')).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /open page 2/i }));
+
+    await waitFor(() =>
+      expect(within(screen.getByTestId('slices-list')).getByText('Slice-11')).toBeInTheDocument(),
+    );
+    expect(within(screen.getByTestId('slices-list')).queryByText('Slice-01')).not.toBeInTheDocument();
+  });
+
+  it('paginates empty slices', async () => {
+    renderSUT({
+      fetchSlices: () =>
+        Promise.resolve({
+          slices: [
+            { value: 'Alpha', count: 1 },
+            ...Array.from({ length: 11 }, (_, index) => ({
+              value: `Empty-${String(index + 1).padStart(2, '0')}`,
+              count: 0,
+            })),
+          ],
+        }),
+    });
+
+    await screen.findByText('Alpha');
+    await userEvent.click(screen.getByRole('button', { name: /show empty slices/i }));
+
+    expect(within(screen.getByTestId('empty-slices-list')).getByText('Empty-01')).toBeInTheDocument();
+    expect(within(screen.getByTestId('empty-slices-list')).queryByText('Empty-11')).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /open page 2/i }));
+
+    await waitFor(() =>
+      expect(within(screen.getByTestId('empty-slices-list')).getByText('Empty-11')).toBeInTheDocument(),
+    );
+    expect(within(screen.getByTestId('empty-slices-list')).queryByText('Empty-01')).not.toBeInTheDocument();
+  });
+
   it('shows empty slices when toggled', async () => {
     renderSUT({
       fetchSlices: () =>
