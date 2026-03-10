@@ -60,7 +60,7 @@ public class MongodbClusterCommand {
                         .collect(Collectors.toMap(host -> host, host -> runCommand(host, call))))
                 .orElseGet(() -> {
                     final String host = connection.getClusterDescription().getServerDescriptions().getFirst().getAddress().toString();
-                    return Collections.singletonMap(host, call.apply(host, connection));
+                    return Collections.singletonMap(host, runCommand(host, (h, c) -> call.apply(h, connection)));
                 });
     }
 
