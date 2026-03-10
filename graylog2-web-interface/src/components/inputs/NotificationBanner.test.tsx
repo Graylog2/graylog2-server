@@ -78,7 +78,8 @@ describe('<NotificationBanner>', () => {
         severity: 'warning',
         message: (
           <>
-            Inputs currently stopped will not receive traffic until started. <button type="button">Show stopped inputs</button>.
+            Inputs currently stopped will not receive traffic until started.{' '}
+            <button type="button">Show stopped inputs</button>.
           </>
         ),
       },
