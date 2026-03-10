@@ -87,4 +87,39 @@ describe('<InputsDotBadge />', () => {
       });
     },
   );
+
+  it('shows badge when hasExternalIssues is true and no failed inputs', () => {
+    asMock(useInputsStates).mockReturnValue({
+      refetch: jest.fn(),
+      isLoading: false,
+      data: {
+        input1: {
+          nodeA: { state: 'RUNNING', id: '1', detailed_message: null, message_input: {} as InputSummary },
+        },
+      },
+    });
+
+    render(<InputsDotBadge text={TEXT} hasExternalIssues externalIssuesTitle="Forwarder inputs have issues." />);
+
+    const badge = screen.getByTitle(/Forwarder inputs have issues\./i);
+    expect(badge).toBeInTheDocument();
+    expect(badge).toHaveTextContent(TEXT);
+  });
+
+  it('shows failed inputs title when both failed inputs and external issues exist', () => {
+    asMock(useInputsStates).mockReturnValue({
+      refetch: jest.fn(),
+      isLoading: false,
+      data: {
+        input1: {
+          nodeA: { state: 'FAILED', id: '1', detailed_message: 'Error', message_input: {} as InputSummary },
+        },
+      },
+    });
+
+    render(<InputsDotBadge text={TEXT} hasExternalIssues externalIssuesTitle="Forwarder inputs have issues." />);
+
+    const badge = screen.getByTitle(/Some inputs are in failed state or in setup mode\./i);
+    expect(badge).toBeInTheDocument();
+  });
 });

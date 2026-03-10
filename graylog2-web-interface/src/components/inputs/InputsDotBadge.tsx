@@ -19,7 +19,13 @@ import * as React from 'react';
 import useInputsStates from 'hooks/useInputsStates';
 import MenuItemDotBadge from 'components/navigation/MenuItemDotBadge';
 
-const InputsDotBadge = ({ text }: { text: string }) => {
+type Props = {
+  text: string;
+  hasExternalIssues?: boolean;
+  externalIssuesTitle?: string;
+};
+
+const InputsDotBadge = ({ text, hasExternalIssues = false, externalIssuesTitle = '' }: Props) => {
   const { data, isLoading } = useInputsStates();
 
   if (isLoading) {
@@ -30,11 +36,16 @@ const InputsDotBadge = ({ text }: { text: string }) => {
     Object.values(inputStateByNode).some((node) => ['FAILED', 'FAILING', 'SETUP'].includes(node.state)),
   );
 
+  const showDot = hasFailedOrSetupInputs || hasExternalIssues;
+  const title = hasFailedOrSetupInputs
+    ? 'Some inputs are in failed state or in setup mode.'
+    : externalIssuesTitle;
+
   return (
     <MenuItemDotBadge
       text={text}
-      title="Some inputs are in failed state or in setup mode."
-      showDot={hasFailedOrSetupInputs}
+      title={title}
+      showDot={showDot}
     />
   );
 };
