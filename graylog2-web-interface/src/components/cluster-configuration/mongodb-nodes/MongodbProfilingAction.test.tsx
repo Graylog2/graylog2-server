@@ -29,7 +29,7 @@ jest.mock('./useMongodbProfilingToggle', () => ({
     action: 'enable',
     state: 'off',
     profilingStatusByLevel: { OFF: 3 },
-    isLoadingStatus: false,
+    isStatusReady: true,
     isTogglingProfiling: false,
     runToggleAction: jest.fn(),
   })),
@@ -53,13 +53,13 @@ describe('<MongodbProfilingAction />', () => {
   });
 
   it('asks for confirmation when profiling is in enable mode', async () => {
-    const runToggleAction = jest.fn().mockResolvedValue(undefined);
+    const runToggleAction = jest.fn().mockResolvedValue(true);
     const mockUseMongodbProfilingToggle = asMock(useMongodbProfilingToggle);
     mockUseMongodbProfilingToggle.mockReturnValue({
       action: 'enable',
       state: 'off',
       profilingStatusByLevel: { OFF: 3 },
-      isLoadingStatus: false,
+      isStatusReady: true,
       isTogglingProfiling: false,
       runToggleAction,
     });
@@ -73,13 +73,13 @@ describe('<MongodbProfilingAction />', () => {
   });
 
   it('runs toggle action directly when profiling is in disable mode', async () => {
-    const runToggleAction = jest.fn().mockResolvedValue(undefined);
+    const runToggleAction = jest.fn().mockResolvedValue(true);
     const mockUseMongodbProfilingToggle = asMock(useMongodbProfilingToggle);
     mockUseMongodbProfilingToggle.mockReturnValue({
       action: 'disable',
       state: 'enabled',
       profilingStatusByLevel: { SLOW_OPS: 2, ALL: 1 },
-      isLoadingStatus: false,
+      isStatusReady: true,
       isTogglingProfiling: false,
       runToggleAction,
     });
@@ -100,7 +100,7 @@ describe('<MongodbProfilingAction />', () => {
       action: 'enable',
       state: 'mixed',
       profilingStatusByLevel: { OFF: 2, SLOW_OPS: 1, ALL: 0 },
-      isLoadingStatus: false,
+      isStatusReady: true,
       isTogglingProfiling: false,
       runToggleAction: jest.fn(),
     });
@@ -109,5 +109,30 @@ describe('<MongodbProfilingAction />', () => {
 
     expect(screen.getByText(/profiling differs across mongodb nodes/i)).toBeInTheDocument();
     expect(screen.getByText(/off 2, slow_ops 1, all 0/i)).toBeInTheDocument();
+  });
+
+  it('shows loading state and prevents actions until profiling status is ready', async () => {
+    const runToggleAction = jest.fn().mockResolvedValue(true);
+    const mockUseMongodbProfilingToggle = asMock(useMongodbProfilingToggle);
+    mockUseMongodbProfilingToggle.mockReturnValue({
+      action: null,
+      state: 'unknown',
+      profilingStatusByLevel: undefined,
+      isStatusReady: false,
+      isTogglingProfiling: false,
+      runToggleAction,
+    });
+
+    render(<MongodbProfilingAction />);
+
+    const loadingStatusButton = screen.getByRole('button', { name: 'Loading MongoDB profiling status' });
+
+    expect(loadingStatusButton).toBeDisabled();
+    expect(screen.getByText(/loading current profiling status across mongodb nodes/i)).toBeInTheDocument();
+
+    await userEvent.click(loadingStatusButton);
+
+    expect(runToggleAction).not.toHaveBeenCalled();
+    expect(screen.queryByText(/level 1, 100ms threshold/i)).not.toBeInTheDocument();
   });
 });

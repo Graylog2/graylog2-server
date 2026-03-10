@@ -26,6 +26,27 @@ export const MONGODB_PROFILING_STATUS_QUERY_KEY = [...MONGODB_NODES_QUERY_KEY_PR
 export type MongodbProfilingStatusByLevel = Partial<Record<'OFF' | 'SLOW_OPS' | 'ALL', number>>;
 export type MongodbProfilingState = 'off' | 'enabled' | 'mixed' | 'unknown';
 export type MongodbProfilingToggleAction = 'enable' | 'disable';
+type RunToggleAction = () => Promise<boolean>;
+
+type MongodbProfilingToggleCommonResult = {
+  profilingStatusByLevel: MongodbProfilingStatusByLevel | undefined;
+  isTogglingProfiling: boolean;
+  runToggleAction: RunToggleAction;
+};
+
+export type MongodbProfilingToggleNotReadyResult = MongodbProfilingToggleCommonResult & {
+  isStatusReady: false;
+  state: 'unknown';
+  action: null;
+};
+
+export type MongodbProfilingToggleReadyResult = MongodbProfilingToggleCommonResult & {
+  isStatusReady: true;
+  state: MongodbProfilingState;
+  action: MongodbProfilingToggleAction;
+};
+
+export type MongodbProfilingToggleResult = MongodbProfilingToggleNotReadyResult | MongodbProfilingToggleReadyResult;
 
 const fetchMongodbProfilingStatus = () =>
   fetch('GET', qualifyUrl('/system/cluster/mongodb/profiling/status')) as Promise<MongodbProfilingStatusByLevel>;
@@ -71,16 +92,17 @@ const successMessage = {
 
 const DEFAULT_MONGODB_PROFILING_REFETCH_INTERVAL_MS = 10000;
 
-const useMongodbProfilingToggle = (refetchInterval = DEFAULT_MONGODB_PROFILING_REFETCH_INTERVAL_MS) => {
+const useMongodbProfilingToggle = (
+  refetchInterval = DEFAULT_MONGODB_PROFILING_REFETCH_INTERVAL_MS,
+): MongodbProfilingToggleResult => {
   const queryClient = useQueryClient();
-  const { data: statusByNode, isLoading: isLoadingStatus } = useQuery({
+  const { data: statusByNode } = useQuery({
     queryKey: MONGODB_PROFILING_STATUS_QUERY_KEY,
     queryFn: fetchMongodbProfilingStatus,
     refetchInterval,
   });
 
-  const state = getClusterProfilingState(statusByNode);
-  const action = getProfilingActionForState(state);
+  const isStatusReady = statusByNode !== undefined;
 
   const { mutateAsync: toggleProfiling, isPending: isTogglingProfiling } = useMutation({
     mutationFn: (toggleAction: MongodbProfilingToggleAction) =>
@@ -97,7 +119,7 @@ const useMongodbProfilingToggle = (refetchInterval = DEFAULT_MONGODB_PROFILING_R
     },
   });
 
-  const runToggleAction = async (): Promise<boolean> => {
+  const performToggleAction = async (action: MongodbProfilingToggleAction): Promise<boolean> => {
     try {
       await toggleProfiling(action);
 
@@ -107,13 +129,27 @@ const useMongodbProfilingToggle = (refetchInterval = DEFAULT_MONGODB_PROFILING_R
     }
   };
 
+  if (!isStatusReady) {
+    return {
+      action: null,
+      state: 'unknown',
+      profilingStatusByLevel: statusByNode,
+      isStatusReady: false,
+      isTogglingProfiling,
+      runToggleAction: () => Promise.resolve(false),
+    };
+  }
+
+  const state = getClusterProfilingState(statusByNode);
+  const action = getProfilingActionForState(state);
+
   return {
     action,
     state,
     profilingStatusByLevel: statusByNode,
-    isLoadingStatus,
+    isStatusReady: true,
     isTogglingProfiling,
-    runToggleAction,
+    runToggleAction: () => performToggleAction(action),
   };
 };
 

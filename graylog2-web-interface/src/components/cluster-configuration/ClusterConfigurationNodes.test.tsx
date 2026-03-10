@@ -34,7 +34,8 @@ jest.mock('./mongodb-nodes/useMongodbProfilingToggle', () => ({
   default: jest.fn(() => ({
     action: 'enable',
     state: 'off',
-    isLoadingStatus: false,
+    profilingStatusByLevel: { OFF: 3 },
+    isStatusReady: true,
     isTogglingProfiling: false,
     runToggleAction: jest.fn(),
   })),

@@ -21,6 +21,7 @@ import { ConfirmDialog } from 'components/common';
 import { Alert, Button } from 'components/bootstrap';
 
 import useMongodbProfilingToggle from './useMongodbProfilingToggle';
+import buildMongodbProfilingActionView from './buildMongodbProfilingActionView';
 
 const AlertContent = styled.div`
   display: flex;
@@ -50,33 +51,28 @@ const ActionBlock = styled.div`
 
 const MongodbProfilingAction = () => {
   const [showProfilingDialog, setShowProfilingDialog] = useState(false);
-  const { action, state, profilingStatusByLevel, isTogglingProfiling, runToggleAction } = useMongodbProfilingToggle();
+  const {
+    action,
+    state,
+    profilingStatusByLevel,
+    isStatusReady,
+    isTogglingProfiling,
+    runToggleAction,
+  } = useMongodbProfilingToggle();
 
-  const enablingProfiling = action === 'enable';
-  const profilingActionLabel = enablingProfiling ? 'Enable Profiling' : 'Disable Profiling';
-  const profilingActionLoadingLabel = enablingProfiling ? 'Enabling...' : 'Disabling...';
-  const profilingActionButtonLabel = isTogglingProfiling ? profilingActionLoadingLabel : profilingActionLabel;
-  const profilingActionTitle = enablingProfiling
-    ? 'Set profiling to Slow Ops on all MongoDB nodes'
-    : 'Disable profiling on all MongoDB nodes';
-  const offCount = profilingStatusByLevel?.OFF ?? 0;
-  const slowOpsCount = profilingStatusByLevel?.SLOW_OPS ?? 0;
-  const allCount = profilingStatusByLevel?.ALL ?? 0;
-  const enabledCount = slowOpsCount + allCount;
-  const totalNodeCount = offCount + slowOpsCount + allCount;
-  const profiledNodesSummary = `${enabledCount}/${totalNodeCount} nodes profiled`;
-  const distributionSummary = `OFF ${offCount}, SLOW_OPS ${slowOpsCount}, ALL ${allCount}`;
-  const profilingStatusSummaryByState = {
-    off: `Profiling is off for all MongoDB nodes (${profiledNodesSummary}). Enable it to collect slow-query diagnostics.`,
-    mixed:
-      `Profiling differs across MongoDB nodes (${distributionSummary}). Enable profiling to make diagnostics consistent.`,
-    enabled:
-      `Profiling is on for all MongoDB nodes (${profiledNodesSummary}). Disable it after troubleshooting to reduce MongoDB overhead.`,
-    unknown: totalNodeCount > 0
-      ? `Profiling state is unavailable (${distributionSummary}). You can still update it if needed.`
-      : 'Profiling state is unavailable. You can still update it if needed.',
-  } as const;
-  const profilingStatusSummary = profilingStatusSummaryByState[state];
+  const {
+    actionLabel,
+    actionTitle,
+    buttonLabel,
+    enablingProfiling,
+    statusSummary,
+  } = buildMongodbProfilingActionView({
+    action,
+    state,
+    profilingStatusByLevel,
+    isStatusReady,
+    isTogglingProfiling,
+  });
 
   const onConfirmProfilingAction = async () => {
     const actionWasSuccessful = await runToggleAction();
@@ -87,6 +83,10 @@ const MongodbProfilingAction = () => {
   };
 
   const onProfilingActionClick = async () => {
+    if (!isStatusReady) {
+      return;
+    }
+
     if (enablingProfiling) {
       setShowProfilingDialog(true);
 
@@ -102,26 +102,26 @@ const MongodbProfilingAction = () => {
         <AlertContent>
           <MessageBlock>
             <p>MongoDB profiling helps identify slow queries and troubleshoot performance issues across cluster nodes.</p>
-            <p>{profilingStatusSummary}</p>
+            <p>{statusSummary}</p>
           </MessageBlock>
           <ActionBlock>
             <Button
               bsSize="xsmall"
               bsStyle="primary"
-              title={profilingActionTitle}
-              aria-label={profilingActionTitle}
+              title={actionTitle}
+              aria-label={actionTitle}
               onClick={onProfilingActionClick}
-              disabled={isTogglingProfiling}>
-              {profilingActionButtonLabel}
+              disabled={isTogglingProfiling || !isStatusReady}>
+              {buttonLabel}
             </Button>
           </ActionBlock>
         </AlertContent>
       </Alert>
-      {showProfilingDialog && enablingProfiling && (
+      {showProfilingDialog && isStatusReady && enablingProfiling && (
         <ConfirmDialog
           show
-          title={profilingActionLabel}
-          btnConfirmText={profilingActionLabel}
+          title={actionLabel}
+          btnConfirmText={actionLabel}
           submitLoadingText="Enabling profiling..."
           isAsyncSubmit
           isSubmitting={isTogglingProfiling}
