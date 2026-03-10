@@ -65,6 +65,7 @@ const InputDiagnosisRulesTab = ({ inputId }: Props) => (
             entityAttributesAreCamelCase={false}
             searchPlaceholder="Search for pipeline rule"
             columnRenderers={pipelineRulesColumnRenderers}
+            withoutURLParams
           />
         </ListCol>
       </Row>
@@ -81,6 +82,7 @@ const InputDiagnosisRulesTab = ({ inputId }: Props) => (
             entityAttributesAreCamelCase={false}
             searchPlaceholder="Search for stream rule"
             columnRenderers={streamRulesColumnRenderers}
+            withoutURLParams
           />
         </ListCol>
       </Row>

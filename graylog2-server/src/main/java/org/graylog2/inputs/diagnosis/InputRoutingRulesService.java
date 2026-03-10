@@ -50,6 +50,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 public class InputRoutingRulesService {
+    private static final String PIPELINE_RULE_ID_SEPARATOR = ":";
 
     // Pipeline rules endpoint attributes
     private static final String ATTRIBUTE_PIPELINE_RULE = "rule";
@@ -170,7 +171,7 @@ public class InputRoutingRulesService {
                     .toList();
 
             allResults.add(new StreamPipelineRulesResponse(
-                    entry.ruleId(),
+                    entry.pipelineId() + PIPELINE_RULE_ID_SEPARATOR + entry.ruleId(),
                     entry.pipelineId(),
                     pipelineDao.title(),
                     entry.ruleId(),

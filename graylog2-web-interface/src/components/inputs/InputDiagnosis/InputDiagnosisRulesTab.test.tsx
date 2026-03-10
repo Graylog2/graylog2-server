@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen, within } from 'wrappedTestingLibrary';
+import { fireEvent, render, screen, within } from 'wrappedTestingLibrary';
 
 import { SystemInputs } from '@graylog/server-api';
 
@@ -68,7 +68,7 @@ const pipelineRulesResponse = {
   order: 'asc' as const,
   elements: [
     {
-      id: 'rule-id-1',
+      id: 'pipeline-id-1:rule-id-1',
       pipeline_id: 'pipeline-id-1',
       pipeline: 'Test Pipeline',
       rule_id: 'rule-id-1',
@@ -125,7 +125,7 @@ describe('<InputDiagnosisRulesTab />', () => {
   it('should render pipeline rules', async () => {
     render(<InputDiagnosisRulesTab inputId="test-input-id" />);
 
-    const row = await screen.findByTestId('table-row-rule-id-1');
+    const row = await screen.findByTestId('table-row-pipeline-id-1:rule-id-1');
 
     expect(within(row).getByText(/Test Rule/i)).toBeInTheDocument();
     expect(within(row).getByText(/Test Pipeline/i)).toBeInTheDocument();
@@ -139,5 +139,22 @@ describe('<InputDiagnosisRulesTab />', () => {
 
     expect(within(row).getByText(/Test Stream/i)).toBeInTheDocument();
     expect(within(row).getByText(/gl2_source_input test-input-id/i)).toBeInTheDocument();
+  });
+
+  it('keeps both table search inputs independent', async () => {
+    render(<InputDiagnosisRulesTab inputId="test-input-id" />);
+
+    const pipelineSearch = await screen.findByPlaceholderText('Search for pipeline rule');
+    const streamSearch = await screen.findByPlaceholderText('Search for stream rule');
+
+    fireEvent.change(pipelineSearch, { target: { value: 'pipeline filter' } });
+
+    expect(pipelineSearch).toHaveValue('pipeline filter');
+    expect(streamSearch).toHaveValue('');
+
+    fireEvent.change(streamSearch, { target: { value: 'stream filter' } });
+
+    expect(pipelineSearch).toHaveValue('pipeline filter');
+    expect(streamSearch).toHaveValue('stream filter');
   });
 });
