@@ -32,15 +32,14 @@ import { InputsStore } from 'stores/inputs/InputsStore';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { TableDataCell } from 'views/components/datatable';
+import MessageDetail from 'components/common/message/details/MessageDetail';
+import DecoratedValue from 'views/components/messagelist/decoration/DecoratedValue';
+import type { Message } from 'views/components/messagelist/Types';
+import CustomHighlighting from 'views/components/highlighting/CustomHighlighting';
+import TypeSpecificValue from 'views/components/TypeSpecificValue';
+import HighlightMessageContext from 'views/components/contexts/HighlightMessageContext';
 
-import MessageDetail from './MessageDetail';
-import DecoratedValue from './decoration/DecoratedValue';
 import MessagePreview from './MessagePreview';
-import type { Message } from './Types';
-
-import CustomHighlighting from '../highlighting/CustomHighlighting';
-import TypeSpecificValue from '../TypeSpecificValue';
-import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
 export const TableBody = styled.tbody<{ $expanded?: boolean; $highlighted?: boolean }>(
   ({ $expanded, $highlighted, theme }) => `
