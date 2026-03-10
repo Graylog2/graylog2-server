@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { fireEvent, render, screen, within } from 'wrappedTestingLibrary';
+import { render, screen, within } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { SystemInputs } from '@graylog/server-api';
 
@@ -147,12 +148,12 @@ describe('<InputDiagnosisRulesTab />', () => {
     const pipelineSearch = await screen.findByPlaceholderText('Search for pipeline rule');
     const streamSearch = await screen.findByPlaceholderText('Search for stream rule');
 
-    fireEvent.change(pipelineSearch, { target: { value: 'pipeline filter' } });
+    await userEvent.type(pipelineSearch, 'pipeline filter');
 
     expect(pipelineSearch).toHaveValue('pipeline filter');
     expect(streamSearch).toHaveValue('');
 
-    fireEvent.change(streamSearch, { target: { value: 'stream filter' } });
+    await userEvent.type(streamSearch, 'stream filter');
 
     expect(pipelineSearch).toHaveValue('pipeline filter');
     expect(streamSearch).toHaveValue('stream filter');
