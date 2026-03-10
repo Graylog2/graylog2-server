@@ -18,7 +18,7 @@ import React, { useCallback, useState } from 'react';
 
 import { MetricDetails } from 'components/metrics';
 import { Icon } from 'components/common';
-import type { Metric as MetricType } from 'stores/metrics/MetricsStore';
+import type { Metric as MetricType } from 'types/metrics';
 
 const iconMapping = {
   timer: 'schedule',
