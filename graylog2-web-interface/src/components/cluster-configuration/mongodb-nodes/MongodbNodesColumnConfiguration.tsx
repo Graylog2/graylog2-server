@@ -16,16 +16,15 @@
  */
 import React from 'react';
 
-import type { ColumnRenderers, ColumnSchema } from 'components/common/EntityDataTable';
+import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import NumberUtils from 'util/NumberUtils';
 
 import type { MongodbNode } from './fetchClusterMongodbNodes';
+import PercentRatioCell from './cells/PercentRatioCell';
 import ProfilingLevelCell from './cells/ProfilingLevelCell';
 import ReplicationLagCell from './cells/ReplicationLagCell';
-import StorageUsedCell from './cells/StorageUsedCell';
 
 import { RoleLabel, SecondaryText } from '../shared-components/NodeMetricsLayout';
-import RatioIndicator from '../shared-components/RatioIndicator';
 
 const REPLICATION_LAG_WARNING_THRESHOLD_MS = 1000;
 const REPLICATION_LAG_DANGER_THRESHOLD_MS = 30000;
@@ -44,8 +43,6 @@ export const DEFAULT_VISIBLE_COLUMNS = [
   'storage_used_percent',
   'connections_used_percent',
 ];
-
-export const createColumnDefinitions = (): Array<ColumnSchema> => [];
 
 export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
   attributes: {
@@ -102,8 +99,8 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
     },
     storage_used_percent: {
       renderCell: (_value, entity) => (
-        <StorageUsedCell
-          storageUsedPercent={entity.storage_used_percent}
+        <PercentRatioCell
+          percent={entity.storage_used_percent}
           warningThreshold={STORAGE_WARNING_THRESHOLD}
           dangerThreshold={STORAGE_DANGER_THRESHOLD}
         />
@@ -135,19 +132,13 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
       staticWidth: 'matchHeader',
     },
     connections_used_percent: {
-      renderCell: (_value, entity) => {
-        const ratio = entity.connections_used_percent != null
-          ? entity.connections_used_percent / 100
-          : null;
-
-        return (
-          <RatioIndicator
-            ratio={ratio}
-            warningThreshold={CONNECTIONS_WARNING_THRESHOLD}
-            dangerThreshold={CONNECTIONS_DANGER_THRESHOLD}
-          />
-        );
-      },
+      renderCell: (_value, entity) => (
+        <PercentRatioCell
+          percent={entity.connections_used_percent}
+          warningThreshold={CONNECTIONS_WARNING_THRESHOLD}
+          dangerThreshold={CONNECTIONS_DANGER_THRESHOLD}
+        />
+      ),
       staticWidth: 'matchHeader',
     },
   },

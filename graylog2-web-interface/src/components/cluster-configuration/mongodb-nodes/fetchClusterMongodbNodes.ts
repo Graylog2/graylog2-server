@@ -42,12 +42,12 @@ export type MongodbNode = {
   role: MongodbRoleType;
   version: string;
   profiling_level: MongodbProfilingLevelType;
-  replication_lag: number;
+  replication_lag: number | null;
   slow_query_count: number | null;
-  storage_used_percent: number;
+  storage_used_percent: number | null;
   available_connections: number | null;
   current_connections: number | null;
-  connections_used_percent: number;
+  connections_used_percent: number | null;
 };
 
 export type MongodbNodesResponse = {

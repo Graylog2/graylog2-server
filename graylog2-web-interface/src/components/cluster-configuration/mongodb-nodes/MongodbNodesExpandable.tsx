@@ -14,14 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useState } from 'react';
 
 import { IfPermitted, PaginatedEntityTable } from 'components/common';
-import type { ColumnSchema } from 'components/common/EntityDataTable';
 import type { FetchOptions } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
 import {
-  createColumnDefinitions,
   createColumnRenderers,
   DEFAULT_VISIBLE_COLUMNS,
 } from './MongodbNodesColumnConfiguration';
@@ -49,25 +47,21 @@ const MongodbNodesExpandable = ({
   refetchInterval = undefined,
 }: Props) => {
   const [totalMongodbNodes, setTotalMongodbNodes] = useState<number | undefined>(undefined);
-  const handleDataLoaded = useCallback((data: MongodbNodesResponse) => {
+  const handleDataLoaded = (data: MongodbNodesResponse) => {
     setTotalMongodbNodes(data.pagination?.total ?? data.list.length);
-  }, []);
+  };
 
-  const columnSchemas = useMemo<Array<ColumnSchema>>(() => createColumnDefinitions(), []);
-  const columnRenderers = useMemo(() => createColumnRenderers(), []);
+  const columnRenderers = createColumnRenderers();
 
-  const tableLayout = useMemo(
-    () => ({
-      entityTableId: 'cluster-mongodb-nodes',
-      defaultSort: { attributeId: 'name', direction: 'asc' as const },
-      defaultDisplayedAttributes: [...DEFAULT_VISIBLE_COLUMNS],
-      defaultPageSize: pageSizeLimit ?? 0,
-      defaultColumnOrder: [...DEFAULT_VISIBLE_COLUMNS],
-    }),
-    [pageSizeLimit],
-  );
-  const externalSearch = useMemo(() => ({ query: searchQuery }), [searchQuery]);
-  const fetchOptions = useMemo<FetchOptions>(() => ({ refetchInterval }), [refetchInterval]);
+  const tableLayout = {
+    entityTableId: 'cluster-mongodb-nodes',
+    defaultSort: { attributeId: 'name', direction: 'asc' as const },
+    defaultDisplayedAttributes: [...DEFAULT_VISIBLE_COLUMNS],
+    defaultPageSize: pageSizeLimit ?? 0,
+    defaultColumnOrder: [...DEFAULT_VISIBLE_COLUMNS],
+  };
+  const externalSearch = { query: searchQuery };
+  const fetchOptions: FetchOptions = { refetchInterval };
 
   return (
     <ClusterNodesSectionWrapper
@@ -82,7 +76,6 @@ const MongodbNodesExpandable = ({
         tableLayout={tableLayout}
         fetchEntities={fetchMongodbNodes}
         keyFn={clusterMongodbNodesKeyFn}
-        additionalAttributes={columnSchemas}
         columnRenderers={columnRenderers}
         humanName="MongoDB Nodes"
         externalSearch={externalSearch}

@@ -20,23 +20,21 @@ import RatioIndicator from '../../shared-components/RatioIndicator';
 import { MetricPlaceholder, MetricsColumn, MetricsRow } from '../../shared-components/NodeMetricsLayout';
 
 type Props = {
-  storageUsedPercent: number | undefined | null;
+  percent: number | undefined | null;
   warningThreshold: number;
   dangerThreshold: number;
 };
 
-const StorageUsedCell = ({ storageUsedPercent, warningThreshold, dangerThreshold }: Props) => {
-  if (storageUsedPercent == null) {
+const PercentRatioCell = ({ percent, warningThreshold, dangerThreshold }: Props) => {
+  if (percent == null) {
     return <MetricPlaceholder />;
   }
-
-  const ratio = storageUsedPercent / 100;
 
   return (
     <MetricsColumn>
       <MetricsRow>
         <RatioIndicator
-          ratio={ratio}
+          ratio={percent / 100}
           warningThreshold={warningThreshold}
           dangerThreshold={dangerThreshold}
         />
@@ -45,4 +43,4 @@ const StorageUsedCell = ({ storageUsedPercent, warningThreshold, dangerThreshold
   );
 };
 
-export default StorageUsedCell;
+export default PercentRatioCell;
