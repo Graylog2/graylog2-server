@@ -18,10 +18,11 @@
 import React, { useContext } from 'react';
 import styled, { css } from 'styled-components';
 
-import type { MessageFieldsListProps } from 'views/components/messagelist/MessageFields/types';
 import MessageField from 'views/components/messagelist/MessageField';
 import { MessageDetailsDefinitionList } from 'components/common';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
+
+import type { MessageFieldsListProps } from './types';
 
 export const MessageDetailsDL = styled(MessageDetailsDefinitionList)(
   ({ theme }) => css`

@@ -40,7 +40,7 @@ const ScrollHint = styled.button(
   `,
 );
 
-const isElementVisibleInContainer = (target: HTMLElement, scrollContainer: HTMLElement) => {
+export const isElementVisibleInContainer = (target: HTMLElement, scrollContainer: HTMLElement) => {
   const containerRect = scrollContainer.getBoundingClientRect();
   const targetRect = target.getBoundingClientRect();
 
@@ -82,7 +82,10 @@ const ScrollToHint = ({
       ifTrue &&
       scrollTargetRef.current &&
       scrollContainer.current &&
-      !isElementVisibleInContainer(scrollTargetRef.current, scrollContainer.current)
+      !isElementVisibleInContainer(
+        scrollTargetRef.current.parentElement ?? scrollTargetRef.current,
+        scrollContainer.current,
+      )
     ) {
       if (autoScroll) {
         scrollToTarget();
@@ -105,6 +108,7 @@ const ScrollToHint = ({
 
   const iconName = useMemo(() => {
     const currentScroll = scrollContainer.current?.scrollTop;
+    // eslint-disable-next-line react-hooks/refs
     const elementTop = scrollTargetRef?.current?.getBoundingClientRect().top;
 
     return elementTop !== undefined && currentScroll !== undefined && elementTop > currentScroll
