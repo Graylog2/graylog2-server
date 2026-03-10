@@ -27,9 +27,10 @@ jest.mock('components/streams/hooks/useStreamRuleTypes', () => () => ({ data: []
 
 describe('ExpandedRulesActions', () => {
   it('should open add rule modal', async () => {
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     render(<ExpandedRulesActions stream={stream} />);
 
-    userEvent.click(await screen.findByRole('button', { name: /quick add rule/i }));
+    await user.click(await screen.findByRole('button', { name: /quick add rule/i }));
 
     await screen.findByRole('heading', {
       name: /new stream rule/i,
