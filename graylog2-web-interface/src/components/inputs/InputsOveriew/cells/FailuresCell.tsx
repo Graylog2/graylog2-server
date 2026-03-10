@@ -15,12 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { InputSummary } from 'hooks/usePaginatedInputs';
-import { useStore } from 'stores/connect';
-import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
+import { useMetrics } from 'hooks/useMetrics';
 import { Link, Spinner } from 'components/common';
 import { formatCount, getValueFromMetric } from 'components/inputs/helpers/InputThroughputUtils';
 import Routes from 'routing/Routes';
@@ -41,43 +39,20 @@ const StyledLink = styled(Link)<{ $hasFailures: boolean }>(
 );
 
 const FailuresCell = ({ input }: Props) => {
-  const metrics = useStore(MetricsStore, (store) => store.metrics);
+  const metricNames = FAILURE_SUFFIXES.map((suffix) => buildMetricName(input.id, suffix));
+  const { data: metrics, isLoading } = useMetrics(metricNames);
 
-  const metricNames = useMemo(
-    () => FAILURE_SUFFIXES.map((suffix) => buildMetricName(input.id, suffix)),
-    [input.id],
-  );
-
-  useEffect(() => {
-    metricNames.forEach((name) => MetricsActions.addGlobal(name));
-
-    return () => {
-      metricNames.forEach((name) => MetricsActions.removeGlobal(name));
-    };
-  }, [metricNames]);
-
-  if (!metrics) {
+  if (isLoading) {
     return <Spinner size="xs" />;
   }
 
   const totalFailures = metricNames.reduce((sum, metricName) => {
-    const aggregated = Object.keys(metrics).reduce((prev, nodeId) => {
-      if (!metrics?.[nodeId]?.[metricName]) {
-        return prev;
-      }
+    const aggregated = Object.keys(metrics).reduce(
+      (prev, nodeId) => prev + getValueFromMetric(metrics[nodeId]?.[metricName]),
+      0,
+    );
 
-      const value = getValueFromMetric(metrics[nodeId][metricName]);
-
-      if (value !== undefined) {
-        return isNaN(prev) ? value : prev + value;
-      }
-
-      return prev;
-    }, NaN);
-
-    const safeAggregated = isNaN(aggregated) ? 0 : aggregated;
-
-    return sum + safeAggregated;
+    return sum + aggregated;
   }, 0);
 
   return (
