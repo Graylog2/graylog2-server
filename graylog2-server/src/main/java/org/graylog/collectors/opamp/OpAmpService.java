@@ -22,12 +22,19 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.google.auto.value.AutoValue;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.primitives.Longs;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.GeneratedMessageV3;
+import com.google.protobuf.util.JsonFormat;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import okhttp3.HttpUrl;
 import opamp.proto.Anyvalue;
 import opamp.proto.Opamp;
 import opamp.proto.Opamp.AgentToServer;
@@ -85,13 +92,17 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toCollection;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Singleton
 public class OpAmpService {
     private static final Logger LOG = LoggerFactory.getLogger(OpAmpService.class);
     public static final String REMOTE_CONFIG_KEY = "collector.yaml";
+
+    private static final JsonFormat.Printer PROTO_PRINTER = JsonFormat.printer().omittingInsignificantWhitespace();
 
     private final EnrollmentTokenService enrollmentTokenService;
     private final AgentTokenService agentTokenService;
@@ -124,6 +135,20 @@ public class OpAmpService {
                 .enable(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE))
                 .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
                 .registerModule(new Jdk8Module());
+    }
+
+    /**
+     * Converts the given protobuf message to a JSON string.
+     *
+     * @param message the message to convert
+     * @return the JSON string or the #toString() result if the JSON converter fails
+     */
+    private static String toProtoString(GeneratedMessageV3 message) {
+        try {
+            return PROTO_PRINTER.print(message);
+        } catch (Exception e) {
+            return message.toString();
+        }
     }
 
     public Optional<OpAmpAuthContext> authenticate(String authHeader, OpAmpAuthContext.Transport transport) {
@@ -174,6 +199,7 @@ public class OpAmpService {
         }
     }
 
+    @WithSpan
     public ServerToAgent handleMessage(AgentToServer message, OpAmpAuthContext authContext) {
         return switch (authContext) {
             case OpAmpAuthContext.Enrollment e -> handleEnrollment(message, e);
@@ -181,6 +207,7 @@ public class OpAmpService {
         };
     }
 
+    @WithSpan
     private ServerToAgent handleEnrollment(AgentToServer message, OpAmpAuthContext.Enrollment auth) {
         final String instanceUid = bytesToUuidString(message.getInstanceUid().toByteArray());
 
@@ -218,7 +245,7 @@ public class OpAmpService {
             // Add OTLP connection settings from CollectorsConfig
             final var collectorsConfig = clusterConfigService.get(CollectorsConfig.class);
             if (collectorsConfig != null) {
-                buildOtlpConnectionSettings(connectionSettingsBuilder, collectorsConfig, opAmpCaService, clusterConfigService);
+                buildOtherConnectionSettings(connectionSettingsBuilder, collectorsConfig, opAmpCaService, clusterConfigService);
             }
 
             return ServerToAgent.newBuilder().setInstanceUid(message.getInstanceUid()).setConnectionSettings(connectionSettingsBuilder).build();
@@ -228,7 +255,8 @@ public class OpAmpService {
         }
     }
 
-    static void buildOtlpConnectionSettings(ConnectionSettingsOffers.Builder builder, CollectorsConfig config, OpAmpCaService opAmpCaService, ClusterConfigService clusterConfigService) {
+    // TODO: Do we still need the "other_settings" now that we have the "own_logs" settings in place?
+    static void buildOtherConnectionSettings(ConnectionSettingsOffers.Builder builder, CollectorsConfig config, OpAmpCaService opAmpCaService, ClusterConfigService clusterConfigService) {
         try {
             final CertificateEntry opAmpCa = opAmpCaService.getOpAmpCa();
             final String caPem = opAmpCa.certificate();
@@ -257,6 +285,37 @@ public class OpAmpService {
         }
     }
 
+    static void buildConnectionSettings(ServerToAgent.Builder builder, @Nullable OtlpExporterConfig exporterConfig) {
+        if (exporterConfig == null) {
+            builder.setConnectionSettings(Opamp.ConnectionSettingsOffers.newBuilder()
+                    .setOwnLogs(Opamp.TelemetryConnectionSettings.newBuilder()
+                            .setDestinationEndpoint(""))); // Empty signals: don't send logs
+            return;
+        }
+
+        final var caCert = exporterConfig.tls().caPem().orElseThrow();
+        final var minVersion = exporterConfig.tls().minVersion();
+        final var maxVersion = exporterConfig.tls().maxVersion().orElse("");
+        final var serverName = exporterConfig.tls().serverNameOverride();
+
+        final var endpoint = requireNonNull(HttpUrl.parse(exporterConfig.endpoint()), "endpoint is null")
+                .newBuilder()
+                // We pass settings that we can't represent in OpAMP protobuf messages as endpoint URL params.
+                .addQueryParameter("tls_server_name", serverName)
+                .addQueryParameter("log_level", "info") // TODO: Make log level configurable
+                .build()
+                .toString();
+
+        builder.setConnectionSettings(Opamp.ConnectionSettingsOffers.newBuilder()
+                .setOwnLogs(Opamp.TelemetryConnectionSettings.newBuilder()
+                        .setDestinationEndpoint(endpoint)
+                        .setTls(Opamp.TLSConnectionSettings.newBuilder()
+                                .setMinVersion(minVersion)
+                                .setMaxVersion(maxVersion)
+                                .setCaPemContents(caCert))));
+    }
+
+    @WithSpan
     private ServerToAgent handleIdentifiedMessage(AgentToServer message, OpAmpAuthContext.Identified auth) {
         final String instanceUid = bytesToUuidString(message.getInstanceUid().toByteArray());
 
@@ -288,7 +347,10 @@ public class OpAmpService {
                 }
                 case AgentCapabilities_ReportsHealth -> {
                     if (message.hasHealth()) {
-                        LOG.debug("[{}/{}] {}", instanceUid, sequenceNum, message.getHealth());
+                        LOG.atDebug().setMessage("[{}/{}] Health update: {}")
+                                .addArgument(instanceUid).addArgument(sequenceNum)
+                                .addArgument(() -> toProtoString(message.getHealth()))
+                                .log();
                     }
                 }
                 case AgentCapabilities_ReportsHeartbeat -> {
@@ -298,6 +360,8 @@ public class OpAmpService {
                 case AgentCapabilities_AcceptsRemoteConfig -> {
                     // TODO determine whether applicable config has changed for this agent and include updated config in our response
                 }
+                case AgentCapabilities_ReportsRemoteConfig ->
+                        handleRemoteConfig(instanceUid, sequenceNum, message, updateBuilder);
                 default -> LOG.debug("[{}/{}] Ignoring capability of {}", instanceUid, sequenceNum, cap);
             }
         }
@@ -310,7 +374,9 @@ public class OpAmpService {
                 .isPresent();
 
         // determine our response
-        final ServerToAgent.Builder responseBuilder = ServerToAgent.newBuilder().setCapabilities(Opamp.ServerCapabilities.ServerCapabilities_AcceptsStatus_VALUE).setInstanceUid(message.getInstanceUid());
+        final ServerToAgent.Builder responseBuilder = ServerToAgent.newBuilder()
+                .setCapabilities(Opamp.ServerCapabilities.ServerCapabilities_AcceptsStatus_VALUE)
+                .setInstanceUid(message.getInstanceUid());
 
         LOG.debug("[{}/{}] previously seen state {} - consecutive: {}", instanceUid, sequenceNum, previousState, seqConsecutive);
         if (!seqConsecutive) {
@@ -328,11 +394,20 @@ public class OpAmpService {
             LOG.debug("[{}/{}] {} unprocessed markers for this collector (last processed tnx id {}) coalesced to {}",
                     instanceUid, sequenceNum, unprocessedMarkers.size(), lastProcessedTxnSeq, coalesced);
 
-            final var configBuilder = CollectorConfig.builder();
-            if (coalesced.recomputeConfig()) {
-                // do this first. in case there's no configured endpoint we don't have to perform the more expensive stuff
-                final OtlpExporterConfig effectiveOtlpEndpoint = getEndpointConfig();
+            // do this first. in case there's no configured endpoint we don't have to perform the more expensive stuff
+            final ExporterConfigs exporterConfigs = getExporterConfigs();
 
+            if (coalesced.recomputeIngestConfig()) {
+                // The connection settings should only be sent when they change. Not having a config is a change, too.
+                if (agentCapabilities.contains(Opamp.AgentCapabilities.AgentCapabilities_ReportsOwnLogs)) {
+                    // The "own_logs" are always transmitted via HTTP according to OpAMP.
+                    buildConnectionSettings(responseBuilder, exporterConfigs.httpConfig().orElse(null));
+                }
+            }
+
+            final var configBuilder = CollectorConfig.builder();
+            if (coalesced.recomputeConfig() || coalesced.recomputeIngestConfig()) {
+                final var effectiveEndpoint = exporterConfigs.getDefault().orElseThrow();
                 final var effectiveFleetId = (coalesced.newFleetId() == null) ? fleetId : coalesced.newFleetId();
                 LOG.debug("[{}/{}] Computing new collector config for fleet id {}", instanceUid, sequenceNum, effectiveFleetId);
 
@@ -353,7 +428,7 @@ public class OpAmpService {
                         .collect(Collectors.groupingBy(CollectorReceiverConfig::type));
 
                 configBuilder.receivers(receiverConfigs);
-                configBuilder.exporters(Map.of(effectiveOtlpEndpoint.getName(), effectiveOtlpEndpoint));
+                configBuilder.exporters(Map.of(effectiveEndpoint.getName(), effectiveEndpoint));
 
                 final Map<String, CollectorProcessorConfig> receiverProcessors = receiverGroups.keySet().stream()
                         .map(component -> ResourceProcessorConfig.builder(component)
@@ -366,7 +441,7 @@ public class OpAmpService {
                 final var pipelines = receiverGroups.entrySet().stream()
                         .collect(Collectors.toMap(e -> f("logs/%s", e.getKey()), e -> CollectorPipelineConfig.builder()
                                 .receivers(e.getValue().stream().map(CollectorReceiverConfig::name).collect(Collectors.toSet()))
-                                .exporters(Set.of(effectiveOtlpEndpoint.getName()))
+                                .exporters(Set.of(effectiveEndpoint.getName()))
                                 .processors(receiverProcessors.values().stream()
                                         .filter(config -> e.getKey().equals(config.id()))
                                         .map(CollectorProcessorConfig::name)
@@ -405,8 +480,82 @@ public class OpAmpService {
         return responseBuilder.build();
     }
 
+    @WithSpan
+    private void handleRemoteConfig(String instanceUid,
+                                    long sequenceNum,
+                                    AgentToServer message,
+                                    CollectorInstanceReport.Builder updateBuilder) {
+        if (!message.hasRemoteConfigStatus()) {
+            return;
+        }
+
+        final var logEvent = LOG.atDebug()
+                .setMessage("[{}/{}] Remote config status {}: {}")
+                .addArgument(instanceUid)
+                .addArgument(sequenceNum);
+
+        final var status = message.getRemoteConfigStatus();
+        switch (status.getStatus()) {
+            case RemoteConfigStatuses_APPLIED -> {
+                try {
+                    final var hashString = status.getLastRemoteConfigHash().toStringUtf8();
+                    if (isNotBlank(hashString)) {
+                        logEvent.addArgument("APPLIED").addArgument(() -> toProtoString(status)).log();
+                        final var txnSeq = Longs.tryParse(hashString);
+                        if (txnSeq != null) {
+                            updateBuilder.lastProcessedTxnSeq(txnSeq);
+                        }
+                    }
+                } catch (Exception e) {
+                    LOG.warn("Failed to get last remote config hash from status", e);
+                }
+            }
+            case RemoteConfigStatuses_APPLYING -> {
+                logEvent.addArgument("APPLYING").addArgument(() -> toProtoString(status)).log();
+            }
+            case RemoteConfigStatuses_FAILED -> {
+                logEvent.addArgument("FAILED").addArgument(() -> toProtoString(status)).log();
+                // TODO: Store error message in instance document
+            }
+            case RemoteConfigStatuses_UNSET -> {
+                logEvent.addArgument("UNSET").addArgument(() -> toProtoString(status)).log();
+            }
+        }
+    }
+
+    @AutoValue
+    abstract static class ExporterConfigs {
+        abstract Optional<OtlpExporterConfig> grpcConfig();
+
+        abstract Optional<OtlpExporterConfig> httpConfig();
+
+        /**
+         * Returns the default exporter config. Prefers gRPC to HTTP.
+         */
+        Optional<OtlpExporterConfig> getDefault() {
+            return grpcConfig().or(this::httpConfig);
+        }
+
+        boolean isEmpty() {
+            return grpcConfig().isEmpty() && httpConfig().isEmpty();
+        }
+
+        static Builder builder() {
+            return new AutoValue_OpAmpService_ExporterConfigs.Builder();
+        }
+
+        @AutoValue.Builder
+        abstract static class Builder {
+            abstract Builder grpcConfig(OtlpExporterConfig grpcConfig);
+
+            abstract Builder httpConfig(OtlpExporterConfig httpConfig);
+
+            abstract ExporterConfigs build();
+        }
+    }
+
     @Nonnull
-    private OtlpExporterConfig getEndpointConfig() {
+    private ExporterConfigs getExporterConfigs() {
         final CollectorsConfig collectorsConfig = clusterConfigService.get(CollectorsConfig.class);
         if (collectorsConfig == null) {
             throw new IllegalStateException("Unable to determine collector input config, cannot send remote config.");
@@ -420,21 +569,22 @@ public class OpAmpService {
         final var clusterId = clusterConfigService.get(ClusterId.class);
         final var caCert = opAmpCaService.getOpAmpCa().certificate();
         final var tlsSettings = TLSConfigurationSettings.withCACert(clusterId.clusterId(), caCert);
+        final var builder = ExporterConfigs.builder();
 
-        // prefer grpc endpoint if available
         if (grpcEndpoint != null && grpcEndpoint.enabled()) {
-            return OtlpGrpcExporterConfig.builder()
+            builder.grpcConfig(OtlpGrpcExporterConfig.builder()
                     .endpoint(f("%s:%s", grpcEndpoint.hostname(), grpcEndpoint.port()))
                     .tls(tlsSettings)
-                    .build();
+                    .build());
         }
         if (httpEndpoint != null && httpEndpoint.enabled()) {
-            return OtlpHttpExporterConfig.builder()
+            builder.httpConfig(OtlpHttpExporterConfig.builder()
                     .endpoint(f("https://%s:%s", httpEndpoint.hostname(), httpEndpoint.port()))
                     .tls(tlsSettings)
-                    .build();
+                    .build());
         }
-        throw new IllegalStateException("No collector input enabled, cannot send remote config.");
+
+        return builder.build();
     }
 
     @Nonnull

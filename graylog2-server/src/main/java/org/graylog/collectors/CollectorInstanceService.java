@@ -94,6 +94,9 @@ public class CollectorInstanceService {
         updateOps.add(set(FIELD_LAST_SEEN, update.lastSeen()));
         updateOps.add(set(FIELD_MESSAGE_SEQ_NUM, update.messageSeqNum()));
         updateOps.add(set(FIELD_CAPABILITIES, update.capabilities()));
+        if (update.lastProcessedTxnSeq().isPresent()) {
+            updateOps.add(set(FIELD_LAST_PROCESSED_TXN_SEQ, update.lastProcessedTxnSeq().getAsLong()));
+        }
         if (update.identifyingAttributes().isPresent()) {
             updateOps.add(set(FIELD_IDENTIFYING_ATTRIBUTES, update.identifyingAttributes().get()));
         }

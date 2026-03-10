@@ -67,7 +67,7 @@ class OpAmpServiceOtlpSettingsTest {
         );
 
         final ConnectionSettingsOffers.Builder builder = ConnectionSettingsOffers.newBuilder();
-        OpAmpService.buildOtlpConnectionSettings(builder, config, opAmpCaService, clusterConfigService);
+        OpAmpService.buildOtherConnectionSettings(builder, config, opAmpCaService, clusterConfigService);
 
         final Opamp.OtherConnectionSettings httpSettings = builder.getOtherConnectionsOrThrow("otlp-http");
 
@@ -86,7 +86,7 @@ class OpAmpServiceOtlpSettingsTest {
         );
 
         final ConnectionSettingsOffers.Builder builder = ConnectionSettingsOffers.newBuilder();
-        OpAmpService.buildOtlpConnectionSettings(builder, config, opAmpCaService, clusterConfigService);
+        OpAmpService.buildOtherConnectionSettings(builder, config, opAmpCaService, clusterConfigService);
 
         final Opamp.OtherConnectionSettings httpSettings = builder.getOtherConnectionsOrThrow("otlp-http");
         assertThat(httpSettings.getOtherSettingsOrThrow("server_name")).isEqualTo(CLUSTER_ID);
@@ -101,7 +101,7 @@ class OpAmpServiceOtlpSettingsTest {
         );
 
         final ConnectionSettingsOffers.Builder builder = ConnectionSettingsOffers.newBuilder();
-        OpAmpService.buildOtlpConnectionSettings(builder, config, opAmpCaService, clusterConfigService);
+        OpAmpService.buildOtherConnectionSettings(builder, config, opAmpCaService, clusterConfigService);
 
         assertThat(builder.getOtherConnectionsOrThrow("otlp-http").getDestinationEndpoint())
                 .isEqualTo("https://otlp.example.com:14401");
@@ -118,7 +118,7 @@ class OpAmpServiceOtlpSettingsTest {
         );
 
         final ConnectionSettingsOffers.Builder builder = ConnectionSettingsOffers.newBuilder();
-        OpAmpService.buildOtlpConnectionSettings(builder, config, opAmpCaService, clusterConfigService);
+        OpAmpService.buildOtherConnectionSettings(builder, config, opAmpCaService, clusterConfigService);
 
         assertThat(builder.getOtherConnectionsMap()).isEmpty();
     }
@@ -134,7 +134,7 @@ class OpAmpServiceOtlpSettingsTest {
         );
 
         final ConnectionSettingsOffers.Builder builder = ConnectionSettingsOffers.newBuilder();
-        OpAmpService.buildOtlpConnectionSettings(builder, config, opAmpCaService, clusterConfigService);
+        OpAmpService.buildOtherConnectionSettings(builder, config, opAmpCaService, clusterConfigService);
 
         final Opamp.OtherConnectionSettings httpSettings = builder.getOtherConnectionsOrThrow("otlp-http");
         assertThat(httpSettings.getOtherSettingsMap()).doesNotContainKey("server_name");

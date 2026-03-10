@@ -17,18 +17,18 @@
 package org.graylog.collectors.db;
 
 import com.google.auto.value.AutoBuilder;
-import org.apache.commons.collections.KeyValue;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalLong;
 
 
 public record CollectorInstanceReport(
         String instanceUid,
         long messageSeqNum,
         long capabilities,
+        OptionalLong lastProcessedTxnSeq,
         Instant lastSeen,
         Optional<List<Attribute>> identifyingAttributes,
         Optional<List<Attribute>> nonIdentifyingAttributes
@@ -36,11 +36,19 @@ public record CollectorInstanceReport(
     @AutoBuilder
     public interface Builder {
         Builder instanceUid(String instanceUid);
+
         Builder messageSeqNum(long messageSeqNum);
+
         Builder capabilities(long capabilities);
+
+        Builder lastProcessedTxnSeq(long lastProcessedTxnSeq);
+
         Builder lastSeen(Instant lastSeen);
+
         Builder identifyingAttributes(List<Attribute> identifyingAttributes);
+
         Builder nonIdentifyingAttributes(List<Attribute> nonIdentifyingAttributes);
+
         CollectorInstanceReport build();
 
     }
