@@ -37,6 +37,7 @@ import {
   columnTransformVar,
   columnWidthVar,
   displayScrollRightIndicatorVar,
+  scrollContainerWidthVar,
 } from 'components/common/EntityDataTable/CSSVariables';
 import useHeaderMinWidths from 'components/common/EntityDataTable/hooks/useHeaderMinWidths';
 import useColumnDefinitions from 'components/common/EntityDataTable/hooks/useColumnDefinitions';
@@ -60,8 +61,16 @@ const ScrollContainer = styled.div<{
   $columnTransform: { [_attributeId: string]: string };
   $actionsHeaderWidth: number;
   $canScrollRight: boolean;
+  $scrollContainerWidth: number;
 }>(
-  ({ $columnWidths, $activeColId, $columnTransform, $actionsHeaderWidth, $canScrollRight }) => css`
+  ({
+    $columnWidths,
+    $activeColId,
+    $columnTransform,
+    $actionsHeaderWidth,
+    $canScrollRight,
+    $scrollContainerWidth,
+  }) => css`
     width: 100%;
     overflow-x: auto;
 
@@ -69,6 +78,7 @@ const ScrollContainer = styled.div<{
     ${Object.entries($columnTransform).map(([id, transform]) => cssVariable(columnTransformVar(id), transform))}
     ${$actionsHeaderWidth && cssVariable(actionsHeaderWidthVar, `${$actionsHeaderWidth}px`)}
     ${$canScrollRight && cssVariable(displayScrollRightIndicatorVar, 'block')}
+    ${$scrollContainerWidth && cssVariable(scrollContainerWidthVar, `${$scrollContainerWidth}px`)}
     ${$activeColId &&
     css`
       ${cssVariable(columnOpacityVar($activeColId), 0.4)}
@@ -229,20 +239,18 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     displayBulkSelectCol,
   );
 
-  const { columnWidths, handleActionsWidthChange, tableIsCompressed, actionsColMinWidth } = useElementWidths<
-    Entity,
-    Meta
-  >({
-    columnRenderersByAttribute,
-    columnSchemas: authorizedColumnSchemas,
-    columnWidthPreferences: internalColumnWidthPreferences,
-    displayBulkSelectCol,
-    entities,
-    hasRowActions,
-    headerMinWidths,
-    scrollContainerRef,
-    visibleColumns: columnOrder,
-  });
+  const { columnWidths, handleActionsWidthChange, tableIsCompressed, actionsColMinWidth, scrollContainerWidth } =
+    useElementWidths<Entity, Meta>({
+      columnRenderersByAttribute,
+      columnSchemas: authorizedColumnSchemas,
+      columnWidthPreferences: internalColumnWidthPreferences,
+      displayBulkSelectCol,
+      entities,
+      hasRowActions,
+      headerMinWidths,
+      scrollContainerRef,
+      visibleColumns: columnOrder,
+    });
 
   const columnDefinitions = useColumnDefinitions<Entity, Meta>({
     actionsColMinWidth,
@@ -324,7 +332,8 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                     $activeColId={activeColId}
                     $columnTransform={columnTransform}
                     $columnWidths={columnWidths}
-                    $canScrollRight={scrolledToRight && tableIsCompressed}>
+                    $canScrollRight={scrolledToRight && tableIsCompressed}
+                    $scrollContainerWidth={scrollContainerWidth}>
                     <InnerContainer>
                       <Table<Entity>
                         expandedSectionRenderers={expandedSectionRenderers}
