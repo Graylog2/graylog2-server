@@ -38,7 +38,6 @@ import org.graylog.collectors.SourceService;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.FleetDTO;
-import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.database.filtering.DbSortResolver;
@@ -186,14 +185,7 @@ public class CollectorInstancesResource extends RestResource {
         final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
         LOG.info("Query {} Filters {}\nDB Query: {}", query, filters, dbQuery);
         final var resolvedSort = DbSortResolver.resolve(ATTRIBUTES, sort, order);
-
-        final PaginatedList<CollectorInstanceDTO> list;
-        if (resolvedSort.needsPipeline()) {
-            list = collectorInstanceService.findPaginated(
-                    dbQuery, resolvedSort.sort(), resolvedSort.preSortStages(), page, perPage);
-        } else {
-            list = collectorInstanceService.findPaginated(dbQuery, resolvedSort.sort(), page, perPage);
-        }
+        final var list = collectorInstanceService.findPaginated(dbQuery, resolvedSort, page, perPage);
 
         return PageListResponse.create(
                 query,

@@ -28,6 +28,7 @@ import com.mongodb.client.result.InsertOneResult;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bson.conversions.Bson;
+import org.graylog2.database.filtering.DbSortResolver;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.CollectorInstanceReport;
 import org.graylog2.database.MongoCollection;
@@ -148,17 +149,13 @@ public class CollectorInstanceService {
         );
     }
 
-    public PaginatedList<CollectorInstanceDTO> findPaginated(Bson query, Bson sort, int page, int perPage) {
-        return paginationHelper.filter(query).sort(sort).perPage(perPage).page(page);
-    }
-
-    public PaginatedList<CollectorInstanceDTO> findPaginated(Bson query, Bson sort,
-                                                              List<Bson> pipeline,
+    public PaginatedList<CollectorInstanceDTO> findPaginated(Bson query, DbSortResolver.ResolvedSort resolvedSort,
                                                               int page, int perPage) {
         return paginationHelper
                 .filter(query)
-                .sort(sort)
-                .pipeline(pipeline)
+                .sort(resolvedSort.sort())
+                .pipeline(resolvedSort.preSortStages())
+                .postSortPipeline(resolvedSort.postSortStages())
                 .perPage(perPage)
                 .page(page);
     }
