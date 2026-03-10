@@ -38,6 +38,7 @@ import org.testcontainers.mongodb.MongoDBContainer;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -73,7 +74,7 @@ class MongodbClusterResourceIntegrationIT {
         String host = mongoContainer.getHost();
         int port = mongoContainer.getFirstMappedPort();
 
-        String adminUri = String.format(
+        String adminUri = String.format(Locale.ROOT,
                 "mongodb://%s:%s@%s:%d/admin",
                 ADMIN_USER,
                 ADMIN_PASSWORD,
@@ -93,7 +94,7 @@ class MongodbClusterResourceIntegrationIT {
         );
 
         // Create restricted client
-        String restrictedUri = String.format(
+        String restrictedUri = String.format(Locale.ROOT,
                 "mongodb://%s:%s@%s:%d/%s",
                 RESTRICTED_USER,
                 RESTRICTED_PASSWORD,
@@ -228,7 +229,7 @@ class MongodbClusterResourceIntegrationIT {
         int port = mongoContainer.getFirstMappedPort();
 
         MongoDbConfiguration config = new MongoDbConfiguration();
-        config.setUri(String.format(
+        config.setUri(String.format(Locale.ROOT,
                 "mongodb://%s:%s@%s:%d/%s?authSource=%s",
                 username,
                 password,

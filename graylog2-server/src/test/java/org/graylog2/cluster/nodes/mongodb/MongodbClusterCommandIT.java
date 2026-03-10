@@ -32,6 +32,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.mongodb.MongoDBContainer;
 
 import java.util.Collections;
+import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -62,7 +63,7 @@ class MongodbClusterCommandIT {
         String host = mongoContainer.getHost();
         int port = mongoContainer.getFirstMappedPort();
 
-        String adminUri = String.format("mongodb://%s:%s@%s:%d/admin", ADMIN_USER, ADMIN_PASSWORD, host, port);
+        String adminUri = String.format(Locale.ROOT, "mongodb://%s:%s@%s:%d/admin", ADMIN_USER, ADMIN_PASSWORD, host, port);
         adminClient = new MongoClient(adminUri);
 
         // Create a restricted user with read/write but NO profiling permissions
@@ -74,7 +75,7 @@ class MongodbClusterCommandIT {
                 ))
         );
 
-        String restrictedUri = String.format("mongodb://%s:%s@%s:%d/%s",
+        String restrictedUri = String.format(Locale.ROOT, "mongodb://%s:%s@%s:%d/%s",
                 RESTRICTED_USER, RESTRICTED_PASSWORD, host, port, TEST_DATABASE);
         restrictedClient = new MongoClient(restrictedUri);
     }
@@ -124,7 +125,7 @@ class MongodbClusterCommandIT {
     private MongoConnection createMongoConnection(String username, String password, String authDatabase) {
         String host = mongoContainer.getHost();
         int port = mongoContainer.getFirstMappedPort();
-        String uri = String.format("mongodb://%s:%s@%s:%d/%s?authSource=%s",
+        String uri = String.format(Locale.ROOT, "mongodb://%s:%s@%s:%d/%s?authSource=%s",
                 username, password, host, port, TEST_DATABASE, authDatabase);
 
         return new MongoConnection() {
