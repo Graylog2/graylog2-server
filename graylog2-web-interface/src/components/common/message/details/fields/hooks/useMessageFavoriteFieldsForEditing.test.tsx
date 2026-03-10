@@ -25,7 +25,6 @@ import useMessageFavoriteFieldsForEditing from './useMessageFavoriteFieldsForEdi
 
 import type { FormattedField } from '../types';
 
-
 const DEFAULT_FIELDS = ['source', 'destination_ip', 'usernames'];
 
 jest.mock('./useSendFavoriteFieldTelemetry', () => jest.fn);
