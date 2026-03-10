@@ -131,6 +131,7 @@ public class RuleBuilderRegistry {
         Map<String, RuleFragment> fragments = conditionsWithInternal();
         fragments.putAll(actionsWithInternal());
         final Configuration config = secureFreemarkerConfigProvider.get();
+        config.setNumberFormat("computer");
         StringTemplateLoader stringTemplateLoader = new StringTemplateLoader();
         fragments.entrySet().stream().filter(c -> c.getValue().isFragment()).forEach(c -> stringTemplateLoader.putTemplate(c.getKey(), c.getValue().fragment()));
         config.setTemplateLoader(stringTemplateLoader);
