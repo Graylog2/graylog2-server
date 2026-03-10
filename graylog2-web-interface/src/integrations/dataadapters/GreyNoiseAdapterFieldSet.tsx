@@ -18,6 +18,7 @@ import React, { useState } from 'react';
 
 import { Button, Input } from 'components/bootstrap';
 import type { ValidationState } from 'components/common/types';
+import type { EncryptedFieldValue } from 'components/configurationforms/types';
 
 type GreyNoiseAdapterFieldSetProps = {
   config: {
@@ -37,7 +38,7 @@ const GreyNoiseAdapterFieldSet = ({
   const [isCreate] = useState(() => !config.api_token?.keep_value);
   const [showResetPasswordButton, setShowResetPasswordButton] = useState(!!config.api_token?.keep_value);
 
-  const setUserPassword = (nextUserPassword) => {
+  const setUserPassword = (nextUserPassword: EncryptedFieldValue<string>) => {
     setFieldValue('config.api_token', nextUserPassword);
   };
 
