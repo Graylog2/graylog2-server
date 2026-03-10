@@ -22,7 +22,8 @@ import { FavoriteFields } from '@graylog/server-api';
 import { StreamsActions } from 'views/stores/StreamsStore';
 import UserNotification from 'util/UserNotification';
 import type { Stream } from 'logic/streams/types';
-import useSendFavoriteFieldTelemetry from 'views/components/messagelist/MessageFields/hooks/useSendFavoriteFieldTelemetry';
+
+import useSendFavoriteFieldTelemetry from './useSendFavoriteFieldTelemetry';
 
 interface FavoriteFieldRequest {
   readonly field: string;

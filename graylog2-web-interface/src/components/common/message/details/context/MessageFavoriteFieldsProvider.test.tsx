@@ -21,9 +21,7 @@ import userEvent from '@testing-library/user-event';
 import Immutable from 'immutable';
 
 import { asMock, StoreMock as MockStore } from 'helpers/mocking';
-import MessageFavoriteFieldsProvider from 'views/components/contexts/MessageFavoriteFieldsProvider';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
-import useMessageFavoriteFieldsMutation from 'views/components/messagelist/MessageFields/hooks/useMessageFavoriteFieldsMutation';
 import { Button } from 'components/bootstrap';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
@@ -31,15 +29,16 @@ import { StreamsActions } from 'views/stores/StreamsStore';
 import mockAction from 'helpers/mocking/MockAction';
 import type { Stream } from 'logic/streams/types';
 
+import MessageFavoriteFieldsProvider from './MessageFavoriteFieldsProvider';
+
+import useMessageFavoriteFieldsMutation from '../fields/hooks/useMessageFavoriteFieldsMutation';
+
 const mockSaveFields = jest.fn();
 const mockToggleField = jest.fn();
 
 jest.mock('views/stores/StreamsStore');
 
-jest.mock('views/components/messagelist/MessageFields/hooks/useMessageFavoriteFieldsMutation', () => ({
-  __esModule: true,
-  default: jest.fn(),
-}));
+jest.mock('../fields/hooks/useMessageFavoriteFieldsMutation');
 
 jest.mock('views/stores/StreamsStore', () => ({
   StreamsActions: { refresh: jest.fn() },
