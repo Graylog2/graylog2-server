@@ -16,9 +16,8 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
+import { SystemInputStates } from '@graylog/server-api';
+
 import { defaultOnError } from 'util/conditional/onError';
 
 type StateSummary = { [inputId: string]: Array<string> };
@@ -26,7 +25,7 @@ type StateSummary = { [inputId: string]: Array<string> };
 const PROBLEMATIC_STATES = new Set(['FAILED', 'FAILING', 'SETUP']);
 
 const fetchStateSummary = (): Promise<StateSummary> =>
-  fetch('GET', qualifyUrl(ApiRoutes.InputStatesController.summary().url));
+  SystemInputStates.summary();
 
 const useInputStateSummary = (): { hasProblematicInputs: boolean; isLoading: boolean } => {
   const { data, isLoading } = useQuery<StateSummary>({
