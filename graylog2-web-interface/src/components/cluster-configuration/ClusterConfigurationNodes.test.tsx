@@ -75,7 +75,7 @@ describe('<ClusterConfigurationNodes />', () => {
 
     mockPaginatedEntityTable.mockClear();
 
-    await setupUser().click(screen.getByRole('radio', { name: 'Data Nodes' }));
+    await userEvent.click(screen.getByRole('radio', { name: 'Data Nodes' }));
 
     await waitFor(() => expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(1));
   });
@@ -128,7 +128,7 @@ describe('<ClusterConfigurationNodes />', () => {
 
     const searchInput = screen.getByPlaceholderText('Search nodes…');
 
-    await setupUser().type(searchInput, '  nodes  ');
+    await userEvent.type(searchInput, '  nodes  ');
     act(() => {
       jest.advanceTimersByTime(SEARCH_DEBOUNCE_THRESHOLD + 10);
     });
