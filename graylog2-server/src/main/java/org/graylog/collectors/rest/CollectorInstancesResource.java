@@ -39,16 +39,18 @@ import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.FleetDTO;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.database.filtering.BsonFilterCreatorFilter;
 import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.database.filtering.DbQueryCreator;
+import org.graylog2.database.filtering.DbSortResolver;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
+import org.graylog2.rest.resources.entities.AttributeSortSpec;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.FilterOption;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.AttributeFieldFilters;
+import org.graylog2.search.AttributeFieldSorts;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -93,6 +95,7 @@ public class CollectorInstancesResource extends RestResource {
                         }
                         return Filters.lt(FIELD_LAST_SEEN, threshold);
                     })
+                    .sortSpec(AttributeSortSpec.field(FIELD_LAST_SEEN))
                     .build(),
             EntityAttribute.builder().id("fleet_id")
                     .title("Fleet")
@@ -110,14 +113,20 @@ public class CollectorInstancesResource extends RestResource {
             EntityAttribute.builder().id("hostname").title("Hostname")
                     .dbField(CollectorInstanceDTO.FIELD_NON_IDENTIFYING_ATTRIBUTES)
                     .bsonFilterCreator(AttributeFieldFilters.attributeArray("host.name"))
+                    .sortSpec(AttributeFieldSorts.attributeArray(
+                            CollectorInstanceDTO.FIELD_NON_IDENTIFYING_ATTRIBUTES, "host.name"))
                     .sortable(true).searchable(true).build(),
             EntityAttribute.builder().id("os").title("OS")
                     .dbField(CollectorInstanceDTO.FIELD_NON_IDENTIFYING_ATTRIBUTES)
                     .bsonFilterCreator(AttributeFieldFilters.attributeArray("os.type"))
+                    .sortSpec(AttributeFieldSorts.attributeArray(
+                            CollectorInstanceDTO.FIELD_NON_IDENTIFYING_ATTRIBUTES, "os.type"))
                     .sortable(true).searchable(true).filterable(true).build(),
             EntityAttribute.builder().id("version").title("Version")
                     .dbField(CollectorInstanceDTO.FIELD_NON_IDENTIFYING_ATTRIBUTES)
                     .bsonFilterCreator(AttributeFieldFilters.attributeArray("service.version"))
+                    .sortSpec(AttributeFieldSorts.attributeArray(
+                            CollectorInstanceDTO.FIELD_NON_IDENTIFYING_ATTRIBUTES, "service.version"))
                     .sortable(true).searchable(true).filterable(true).build()
     );
 
@@ -167,7 +176,7 @@ public class CollectorInstancesResource extends RestResource {
             @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
             @Parameter(name = "sort",
                        description = "The field to sort the result on",
-                       schema = @Schema(allowableValues = {"instance_uid", "last_seen"}))
+                       schema = @Schema(allowableValues = {"instance_uid", "last_seen", "status", "hostname", "os", "version"}))
             @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
             @Parameter(name = "order", description = "The sort direction",
                        schema = @Schema(allowableValues = {"asc", "desc"}))
@@ -176,11 +185,15 @@ public class CollectorInstancesResource extends RestResource {
 
         final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
         LOG.info("Query {} Filters {}\nDB Query: {}", query, filters, dbQuery);
-        final PaginatedList<CollectorInstanceDTO> list = collectorInstanceService.findPaginated(
-                dbQuery,
-                order.toBsonSort(sort),
-                page,
-                perPage);
+        final var resolvedSort = DbSortResolver.resolve(ATTRIBUTES, sort, order);
+
+        final PaginatedList<CollectorInstanceDTO> list;
+        if (resolvedSort.needsPipeline()) {
+            list = collectorInstanceService.findPaginated(
+                    dbQuery, resolvedSort.sort(), resolvedSort.preSortStages(), page, perPage);
+        } else {
+            list = collectorInstanceService.findPaginated(dbQuery, resolvedSort.sort(), page, perPage);
+        }
 
         return PageListResponse.create(
                 query,

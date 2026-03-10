@@ -152,6 +152,17 @@ public class CollectorInstanceService {
         return paginationHelper.filter(query).sort(sort).perPage(perPage).page(page);
     }
 
+    public PaginatedList<CollectorInstanceDTO> findPaginated(Bson query, Bson sort,
+                                                              List<Bson> pipeline,
+                                                              int page, int perPage) {
+        return paginationHelper
+                .filter(query)
+                .sort(sort)
+                .pipeline(pipeline)
+                .perPage(perPage)
+                .page(page);
+    }
+
     public long count() {
         return collection.countDocuments();
     }
