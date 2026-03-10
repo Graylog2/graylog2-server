@@ -53,8 +53,8 @@ describe('HighlightingRule', () => {
     render(<SUT onUpdate={onUpdate} />);
 
     const staticColorPicker = await screen.findByTestId('static-color-preview');
-    userEvent.click(staticColorPicker);
-    userEvent.click(await screen.findByTitle(/#fbfdd8/i));
+    await userEvent.click(staticColorPicker);
+    await userEvent.click(await screen.findByTitle(/#fbfdd8/i));
 
     await waitFor(() => {
       expect(onUpdate).toHaveBeenCalledWith(
@@ -71,9 +71,9 @@ describe('HighlightingRule', () => {
     render(<SUT />);
 
     const staticColorPicker = await screen.findByTestId('static-color-preview');
-    userEvent.click(staticColorPicker);
+    await userEvent.click(staticColorPicker);
 
-    userEvent.click(await screen.findByTitle(/#fbfdd8/i));
+    await userEvent.click(await screen.findByTitle(/#fbfdd8/i));
 
     await waitFor(() => {
       expect(screen.queryByTitle(/#ff51b9/i)).not.toBeInTheDocument();
@@ -87,7 +87,7 @@ describe('HighlightingRule', () => {
 
       expect(screen.queryByText('Edit Highlighting Rule')).not.toBeInTheDocument();
 
-      userEvent.click(editIcon);
+      await userEvent.click(editIcon);
 
       await screen.findByText('Edit Highlighting Rule');
     });
@@ -100,14 +100,14 @@ describe('HighlightingRule', () => {
 
     it('asks for confirmation before rule is removed', async () => {
       render(<SUT />);
-      userEvent.click(await findDeleteIcon());
+      await userEvent.click(await findDeleteIcon());
 
       expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove this highlighting?');
     });
 
     it('does not remove rule if confirmation was cancelled', async () => {
       render(<SUT />);
-      userEvent.click(await findDeleteIcon());
+      await userEvent.click(await findDeleteIcon());
 
       await screen.findByText('response_time');
     });
@@ -116,7 +116,7 @@ describe('HighlightingRule', () => {
       const onDelete = jest.fn(() => Promise.resolve());
       render(<SUT onDelete={onDelete} />);
       window.confirm = jest.fn(() => true);
-      userEvent.click(await findDeleteIcon());
+      await userEvent.click(await findDeleteIcon());
 
       await waitFor(() => expect(onDelete).toHaveBeenCalledWith(rule));
     });
