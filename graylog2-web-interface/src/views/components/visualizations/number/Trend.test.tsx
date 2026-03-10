@@ -94,13 +94,21 @@ describe('Trend', () => {
   });
 
   describe('renders background according to values and trend preference', () => {
-    it('shows neutral background if values are equal', async () => {
-      renderTrend();
+    it.each`
+      trendPreference
+      ${'NEUTRAL'}
+      ${'HIGHER'}
+      ${'LOWER'}
+    `(
+      'shows neutral background if values are equal and trend preference is $trendPreference',
+      async ({ trendPreference }: { trendPreference: 'NEUTRAL' | 'LOWER' | 'HIGHER' }) => {
+        renderTrend({ trendPreference });
 
-      const background = await screen.findByTestId('trend-background');
+        const background = await screen.findByTestId('trend-background');
 
-      expect(background).toHaveStyleRule('background-color', '#fff!important');
-    });
+        expect(background).toHaveStyleRule('background-color', '#fff!important');
+      },
+    );
 
     it('shows good background if current value and preference are higher', async () => {
       renderTrend({ current: 43, trendPreference: 'HIGHER' });

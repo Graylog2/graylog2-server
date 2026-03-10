@@ -22,8 +22,7 @@ import upperFirst from 'lodash/upperFirst';
 import { TIME_UNITS } from 'components/event-definitions/event-definition-types/FilterForm';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
-import { Timestamp, HoverForHelp } from 'components/common';
-import { Link } from 'components/common/router';
+import { Timestamp, HoverForHelp, Link } from 'components/common';
 import Routes from 'routing/Routes';
 import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
 

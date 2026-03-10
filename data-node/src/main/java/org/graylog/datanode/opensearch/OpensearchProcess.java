@@ -20,8 +20,7 @@ import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.datanode.process.ManagableProcess;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
-import org.graylog.storage.opensearch2.OpenSearchClient;
+import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 
 import java.net.URI;
 import java.util.List;
@@ -31,9 +30,7 @@ public interface OpensearchProcess extends ManagableProcess<OpensearchConfigurat
 
     OpensearchInfo processInfo();
 
-    Optional<RestHighLevelClient> restClient();
-
-    Optional<OpenSearchClient> openSearchClient();
+    Optional<OfficialOpensearchClient> openSearchClient();
     List<String> stdOutLogs();
     List<String> stdErrLogs();
 
@@ -53,4 +50,6 @@ public interface OpensearchProcess extends ManagableProcess<OpensearchConfigurat
     boolean isManagerNode();
 
     List<String> configurationWarnings();
+
+    void removeConfiguration();
 }

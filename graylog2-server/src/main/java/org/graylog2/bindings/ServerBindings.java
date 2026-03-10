@@ -46,6 +46,8 @@ import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.leader.FakeLeaderElectionModule;
 import org.graylog2.cluster.leader.LeaderElectionModule;
 import org.graylog2.cluster.lock.LockServiceModule;
+import org.graylog2.database.filtering.ComputedFieldProvider;
+import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.grok.GrokModule;
 import org.graylog2.grok.GrokPatternRegistry;
 import org.graylog2.indexer.fieldtypes.FieldTypesModule;
@@ -53,6 +55,7 @@ import org.graylog2.indexer.healing.FixDeflectorByDeleteJob;
 import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.inputs.InputEventListener;
+import org.graylog2.inputs.InputRuntimeStatusProvider;
 import org.graylog2.inputs.InputStateListener;
 import org.graylog2.inputs.PersistedInputsImpl;
 import org.graylog2.lookup.LookupModule;
@@ -218,6 +221,10 @@ public class ServerBindings extends Graylog2Module {
         OptionalBinder.newOptionalBinder(binder(), TrafficUpdater.class).setDefault().to(TrafficCounterService.class).asEagerSingleton();
 
         Multibinder.newSetBinder(binder(), PluggableEntityHandler.class);
+
+        bind(ComputedFieldRegistry.class).in(Scopes.SINGLETON);
+        final Multibinder<ComputedFieldProvider> computedFieldProviders = Multibinder.newSetBinder(binder(), ComputedFieldProvider.class);
+        computedFieldProviders.addBinding().to(InputRuntimeStatusProvider.class);
     }
 
     private void bindDynamicFeatures() {

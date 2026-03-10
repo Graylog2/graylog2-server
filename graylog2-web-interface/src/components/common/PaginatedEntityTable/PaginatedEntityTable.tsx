@@ -32,7 +32,7 @@ import type { PaginatedResponse, FetchOptions } from 'components/common/Paginate
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
 import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
-import Slicing from 'components/common/PaginatedEntityTable/slicing';
+import Slicing, { type SliceRenderers } from 'components/common/PaginatedEntityTable/slicing';
 import type { FetchSlices } from 'components/common/PaginatedEntityTable/slicing/useFetchSlices';
 
 import { useWithLocalState, useWithURLParams } from './useFiltersAndPagination';
@@ -220,6 +220,8 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
                     setUrlQueryFilters={onChangeFilters}
                     filterValueRenderers={filterValueRenderers}
                     appSection={appSection}
+                    activeSliceCol={fetchOptions.sliceCol}
+                    activeSlice={fetchOptions.slice}
                   />
                 </div>
               </SearchForm>
@@ -249,6 +251,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
                 onLayoutPreferencesChange={onLayoutPreferencesChange}
                 onChangeSlicing={onChangeSlicing}
                 expandedSectionRenderers={expandedSectionRenderers}
+                enableSlicing={typeof fetchSlices === 'function'}
                 bulkSelection={bulkSelection}
                 onSortChange={onSortChange}
                 onPageSizeChange={onPageSizeChange}
@@ -280,6 +283,7 @@ type WrapperProps<T, M> = PaginatedEntityTableProps<T, M> & {
 const TableWithLocalState = <T extends EntityBase, M = unknown>({ ...props }: WrapperProps<T, M>) => {
   const { fetchOptions, setQuery, onChangeFilters, onChangeSlicing, paginationState } = useWithLocalState(
     props.layoutConfig,
+    props.defaultFilters,
   );
   const effectiveFetchOptions = props.externalSearch
     ? { ...fetchOptions, query: props.externalSearch.query }
@@ -301,6 +305,7 @@ const TableWithLocalState = <T extends EntityBase, M = unknown>({ ...props }: Wr
 const TableWithURLParams = <T extends EntityBase, M = unknown>({ ...props }: WrapperProps<T, M>) => {
   const { fetchOptions, setQuery, onChangeFilters, paginationState, onChangeSlicing } = useWithURLParams(
     props.layoutConfig,
+    props.defaultFilters,
   );
   const effectiveFetchOptions = props.externalSearch
     ? { ...fetchOptions, query: props.externalSearch.query }
@@ -323,6 +328,7 @@ export type PaginatedEntityTableProps<T, M> = {
   additionalAttributes?: Array<Attribute>;
   bulkSelection?: EntityDataTableProps['bulkSelection'];
   columnRenderers: EntityDataTableProps['columnRenderers'];
+  defaultFilters?: UrlQueryFilters;
   entityActions?: EntityDataTableProps['entityActions'];
   entityAttributesAreCamelCase: boolean;
   expandedSectionRenderers?: ExpandedSectionRenderers<T>;
@@ -338,7 +344,7 @@ export type PaginatedEntityTableProps<T, M> = {
   onDataLoaded?: (data: PaginatedResponse<T, M>) => void;
   queryHelpComponent?: React.ReactNode;
   searchPlaceholder?: string;
-  sliceRenderers?: { [col: string]: (value: string | number) => React.ReactNode } | undefined;
+  sliceRenderers?: SliceRenderers;
   tableLayout: DefaultLayout;
   topRightCol?: React.ReactNode;
   withoutURLParams?: boolean;

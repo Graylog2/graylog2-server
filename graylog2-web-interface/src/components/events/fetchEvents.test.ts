@@ -20,6 +20,7 @@ import fetch from 'logic/rest/FetchProvider';
 import asMock from 'helpers/mocking/AsMock';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
+import { EXCLUDE_INFO_FILTER } from 'logic/alerts/EventDefinitionPriorityEnum';
 
 import fetchEvents, { defaultTimeRange, parseFilters, parseTypeFilter } from './fetchEvents';
 
@@ -128,6 +129,20 @@ describe('fetchEvents', () => {
       expect(result.filter.priority).toEqual(['1', '2']);
     });
 
+    it('expands exclude info filter to all non-info priorities', () => {
+      const filters: UrlQueryFilters = OrderedMap({ priority: [EXCLUDE_INFO_FILTER] });
+      const result = parseFilters(filters);
+
+      expect(result.filter.priority).toEqual(['1', '2', '3', '4']);
+    });
+
+    it('drops exclude info filter when specific priorities are also selected', () => {
+      const filters: UrlQueryFilters = OrderedMap({ priority: [EXCLUDE_INFO_FILTER, '3'] });
+      const result = parseFilters(filters);
+
+      expect(result.filter.priority).toEqual(['3']);
+    });
+
     it('includes id filter when present', () => {
       const filters: UrlQueryFilters = OrderedMap({ id: ['evt-1'] });
       const result = parseFilters(filters);
@@ -163,7 +178,7 @@ describe('fetchEvents', () => {
       });
     });
 
-    it('sends defaultTimeRange when no timestamp filter is provided', async () => {
+    it('sends 30 days timerange when no timestamp filter is provided', async () => {
       await fetchEvents(baseSearchParams, undefined);
 
       expect(fetch).toHaveBeenCalledWith(

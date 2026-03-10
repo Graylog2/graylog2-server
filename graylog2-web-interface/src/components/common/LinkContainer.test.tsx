@@ -21,7 +21,7 @@ import userEvent from '@testing-library/user-event';
 
 import { Button } from 'components/bootstrap';
 
-import { LinkContainer } from './router';
+import LinkContainer from './LinkContainer';
 
 describe('LinkContainer', () => {
   const hasHref = (element: HTMLElement | HTMLAnchorElement): element is HTMLAnchorElement => 'href' in element;
@@ -94,7 +94,10 @@ describe('LinkContainer', () => {
       </LinkContainer>,
     );
 
-    await userEvent.click(await screen.findByText('All Alerts'), { ctrlKey: true });
+    const user = userEvent.setup();
+    await user.keyboard('{Control>}');
+    await user.click(await screen.findByText('All Alerts'));
+    await user.keyboard('{/Control}');
 
     expect(onClick).not.toHaveBeenCalled();
   });

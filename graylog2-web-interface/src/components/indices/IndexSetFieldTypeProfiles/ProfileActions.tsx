@@ -18,7 +18,7 @@ import React from 'react';
 
 import { Button, ButtonToolbar, DeleteMenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer } from 'components/common';
 import { MoreActions } from 'components/common/EntityDataTable';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import useProfileMutations from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations';

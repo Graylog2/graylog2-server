@@ -164,7 +164,7 @@ describe('TimeRangePicker', () => {
       name: /update time range/i,
     });
 
-    userEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(setCurrentTimeRange).toHaveBeenCalledTimes(1));
 

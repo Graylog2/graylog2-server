@@ -21,6 +21,7 @@ import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
+import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiService;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
@@ -66,12 +67,14 @@ class EventsSearchServiceTest {
     private ObjectMapper objectMapper;
     @Mock
     private Subject subject;
+    @Mock
+    private ScriptingApiService scriptingApiService;
 
     private EventsSearchService service;
 
     @BeforeEach
     void setUp() {
-        service = new EventsSearchService(moreSearch, streamService, eventDefinitionService, objectMapper);
+        service = new EventsSearchService(moreSearch, streamService, eventDefinitionService, scriptingApiService, objectMapper);
 
         when(objectMapper.convertValue(any(Map.class), eq(EventDto.class))).thenAnswer(invocation -> {
             final Map<String, Object> fields = invocation.getArgument(0);
