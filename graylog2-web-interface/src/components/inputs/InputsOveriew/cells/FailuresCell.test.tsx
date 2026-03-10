@@ -17,24 +17,14 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
-import { StoreMock as MockStore } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
+import { useMetrics } from 'hooks/useMetrics';
+import type { ClusterMetric } from 'types/metrics';
 
 import FailuresCell from './FailuresCell';
 
-const mockAddGlobal = jest.fn();
-const mockRemoveGlobal = jest.fn();
-
-let mockMetricsData: Record<string, Record<string, { type: string; metric: { value: number } }>> = {
-  'node-1': {
-    'org.graylog2.inputs.input-1.failures.input': { type: 'gauge', metric: { value: 5 } },
-    'org.graylog2.inputs.input-1.failures.processing': { type: 'gauge', metric: { value: 3 } },
-    'org.graylog2.inputs.input-1.failures.indexing': { type: 'gauge', metric: { value: 2 } },
-  },
-};
-
-jest.mock('stores/metrics/MetricsStore', () => ({
-  MetricsActions: { addGlobal: (...args: unknown[]) => mockAddGlobal(...args), removeGlobal: (...args: unknown[]) => mockRemoveGlobal(...args) },
-  MetricsStore: MockStore(['getInitialState', () => ({ metrics: mockMetricsData })]),
+jest.mock('hooks/useMetrics', () => ({
+  useMetrics: jest.fn(),
 }));
 
 const input = {
@@ -51,15 +41,24 @@ const input = {
   content_pack: '',
 };
 
+const gauge = (fullName: string, value: number) => ({
+  full_name: fullName,
+  name: fullName.split('.').pop()!,
+  type: 'gauge' as const,
+  metric: { value },
+});
+
+const defaultMetricsData: ClusterMetric = {
+  'node-1': {
+    'org.graylog2.inputs.input-1.failures.input': gauge('org.graylog2.inputs.input-1.failures.input', 5),
+    'org.graylog2.inputs.input-1.failures.processing': gauge('org.graylog2.inputs.input-1.failures.processing', 3),
+    'org.graylog2.inputs.input-1.failures.indexing': gauge('org.graylog2.inputs.input-1.failures.indexing', 2),
+  },
+};
+
 describe('FailuresCell', () => {
-  afterEach(() => {
-    mockMetricsData = {
-      'node-1': {
-        'org.graylog2.inputs.input-1.failures.input': { type: 'gauge', metric: { value: 5 } },
-        'org.graylog2.inputs.input-1.failures.processing': { type: 'gauge', metric: { value: 3 } },
-        'org.graylog2.inputs.input-1.failures.indexing': { type: 'gauge', metric: { value: 2 } },
-      },
-    };
+  beforeEach(() => {
+    asMock(useMetrics).mockReturnValue({ data: defaultMetricsData, isLoading: false });
   });
 
   it('renders the sum of all failure metrics across nodes', () => {
@@ -76,27 +75,31 @@ describe('FailuresCell', () => {
     expect(link).toHaveAttribute('href', '/system/input/diagnosis/input-1');
   });
 
-  it('registers all three failure metrics on mount', () => {
+  it('calls useMetrics with the correct metric names', () => {
     render(<FailuresCell input={input} />);
 
-    expect(mockAddGlobal).toHaveBeenCalledWith('org.graylog2.inputs.input-1.failures.input');
-    expect(mockAddGlobal).toHaveBeenCalledWith('org.graylog2.inputs.input-1.failures.processing');
-    expect(mockAddGlobal).toHaveBeenCalledWith('org.graylog2.inputs.input-1.failures.indexing');
+    expect(useMetrics).toHaveBeenCalledWith([
+      'org.graylog2.inputs.input-1.failures.input',
+      'org.graylog2.inputs.input-1.failures.processing',
+      'org.graylog2.inputs.input-1.failures.indexing',
+    ]);
   });
 
   it('aggregates failure metrics from multiple nodes', () => {
-    mockMetricsData = {
+    const multiNodeData: ClusterMetric = {
       'node-1': {
-        'org.graylog2.inputs.input-1.failures.input': { type: 'gauge', metric: { value: 5 } },
-        'org.graylog2.inputs.input-1.failures.processing': { type: 'gauge', metric: { value: 3 } },
-        'org.graylog2.inputs.input-1.failures.indexing': { type: 'gauge', metric: { value: 2 } },
+        'org.graylog2.inputs.input-1.failures.input': gauge('org.graylog2.inputs.input-1.failures.input', 5),
+        'org.graylog2.inputs.input-1.failures.processing': gauge('org.graylog2.inputs.input-1.failures.processing', 3),
+        'org.graylog2.inputs.input-1.failures.indexing': gauge('org.graylog2.inputs.input-1.failures.indexing', 2),
       },
       'node-2': {
-        'org.graylog2.inputs.input-1.failures.input': { type: 'gauge', metric: { value: 10 } },
-        'org.graylog2.inputs.input-1.failures.processing': { type: 'gauge', metric: { value: 7 } },
-        'org.graylog2.inputs.input-1.failures.indexing': { type: 'gauge', metric: { value: 3 } },
+        'org.graylog2.inputs.input-1.failures.input': gauge('org.graylog2.inputs.input-1.failures.input', 10),
+        'org.graylog2.inputs.input-1.failures.processing': gauge('org.graylog2.inputs.input-1.failures.processing', 7),
+        'org.graylog2.inputs.input-1.failures.indexing': gauge('org.graylog2.inputs.input-1.failures.indexing', 3),
       },
     };
+
+    asMock(useMetrics).mockReturnValue({ data: multiNodeData, isLoading: false });
 
     render(<FailuresCell input={input} />);
 
@@ -104,10 +107,18 @@ describe('FailuresCell', () => {
   });
 
   it('shows 0 when no failure metrics exist for the input', () => {
-    mockMetricsData = { 'node-1': {} };
+    asMock(useMetrics).mockReturnValue({ data: { 'node-1': {} }, isLoading: false });
 
     render(<FailuresCell input={input} />);
 
     expect(screen.getByText('0')).toBeInTheDocument();
+  });
+
+  it('shows a spinner while loading', async () => {
+    asMock(useMetrics).mockReturnValue({ data: {}, isLoading: true });
+
+    render(<FailuresCell input={input} />);
+
+    expect(await screen.findByText(/loading/i)).toBeInTheDocument();
   });
 });
