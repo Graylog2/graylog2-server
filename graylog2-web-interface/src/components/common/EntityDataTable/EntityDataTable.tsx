@@ -76,14 +76,15 @@ const ScrollContainer = styled.div<{
 
     ${Object.entries($columnWidths).map(([id, width]) => cssVariable(columnWidthVar(id), `${width}px`))}
     ${Object.entries($columnTransform).map(([id, transform]) => cssVariable(columnTransformVar(id), transform))}
-    ${$actionsHeaderWidth && cssVariable(actionsHeaderWidthVar, `${$actionsHeaderWidth}px`)}
-    ${$canScrollRight && cssVariable(displayScrollRightIndicatorVar, 'block')}
-    ${$scrollContainerWidth && cssVariable(scrollContainerWidthVar, `${$scrollContainerWidth}px`)}
-    ${$activeColId &&
-    css`
-      ${cssVariable(columnOpacityVar($activeColId), 0.4)}
-      ${cssVariable(columnTransition(), 'transform 0.2s ease-in-out')}
-    `}
+    ${$actionsHeaderWidth ? cssVariable(actionsHeaderWidthVar, `${$actionsHeaderWidth}px`) : ''}
+    ${$canScrollRight ? cssVariable(displayScrollRightIndicatorVar, 'block') : ''}
+    ${$scrollContainerWidth ? cssVariable(scrollContainerWidthVar, `${$scrollContainerWidth}px`) : ''}
+    ${$activeColId
+      ? css`
+          ${cssVariable(columnOpacityVar($activeColId), 0.4)}
+          ${cssVariable(columnTransition(), 'transform 0.2s ease-in-out')}
+        `
+      : ''}
   `,
 );
 
