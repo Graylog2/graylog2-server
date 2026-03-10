@@ -45,17 +45,17 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.model.Resource;
+import org.graylog.collectors.opamp.OpAmpConstants;
+import org.graylog.collectors.opamp.transport.OpAmpAddOn;
+import org.graylog.collectors.opamp.transport.OpAmpHttpHandler;
+import org.graylog.collectors.opamp.transport.OpAmpWebSocketApplication;
+import org.graylog.collectors.opamp.transport.OpAmpWebSocketAuthFilter;
 import org.graylog.security.UserContextBinder;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.jersey.AuditEventModelProcessor;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.jersey.PrefixAddingModelProcessor;
-import org.graylog.collectors.opamp.OpAmpConstants;
-import org.graylog.collectors.opamp.transport.OpAmpAddOn;
-import org.graylog.collectors.opamp.transport.OpAmpWebSocketAuthFilter;
-import org.graylog.collectors.opamp.transport.OpAmpHttpHandler;
-import org.graylog.collectors.opamp.transport.OpAmpWebSocketApplication;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
@@ -372,6 +372,10 @@ public class JerseyService extends AbstractIdleService {
 
         final NetworkListener listener = httpServer.getListener("grizzly");
         listener.setMaxHttpHeaderSize(maxHeaderSize);
+        // Graylog Collector has a default poll interval of 30 seconds. The default Grizzly idle timeout is
+        // also 30 seconds. We the default timeout to avoid race conditions where the Collector tries to
+        // execute a poll request at the same time Grizzly will close the connection.
+        listener.getKeepAlive().setIdleTimeoutInSeconds(90);
 
         final ExecutorService workerThreadPoolExecutor = instrumentedExecutor(
                 "http-worker-executor",
