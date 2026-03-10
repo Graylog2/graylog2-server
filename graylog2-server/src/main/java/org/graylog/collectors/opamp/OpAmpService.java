@@ -305,17 +305,15 @@ public class OpAmpService {
         // let's save the report and load the previously known values for the important properties
         // previousState is not the entire document, but the minimal version to avoid high deserialization cost
         final Optional<CollectorInstanceService.MinimalCollectorInstanceDTO> previousState = collectorInstanceService.createOrUpdateFromReport(updateBuilder.build());
-        long previousSeqNum = 0L;
-        if (previousState.isPresent()) {
-            previousSeqNum = previousState.get().messageSeqNum();
-
-        }
+        final boolean seqConsecutive = previousState
+                .filter(prevState -> (prevState.messageSeqNum() + 1) == sequenceNum)
+                .isPresent();
 
         // determine our response
         final ServerToAgent.Builder responseBuilder = ServerToAgent.newBuilder().setCapabilities(Opamp.ServerCapabilities.ServerCapabilities_AcceptsStatus_VALUE).setInstanceUid(message.getInstanceUid());
 
-        LOG.debug("[{}/{}] previously seen sequence number {}", instanceUid, sequenceNum, previousSeqNum);
-        if ((previousSeqNum == 0L) || ((previousSeqNum + 1) != sequenceNum)) {
+        LOG.debug("[{}/{}] previously seen state {} - consecutive: {}", instanceUid, sequenceNum, previousState, seqConsecutive);
+        if (!seqConsecutive) {
             // either we haven't seen messages from this agent before (which means we've just started)
             // or the sequence numbers aren't consecutive, which means we have missed one or more messages.
             // in either case we need to request a full state report
