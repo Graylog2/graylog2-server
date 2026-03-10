@@ -23,6 +23,12 @@ import asMock from 'helpers/mocking/AsMock';
 
 import ClusterConfigurationNodes from './ClusterConfigurationNodes';
 
+type MockPaginatedEntityTableProps = {
+  humanName?: string;
+  onDataLoaded?: (data: { list: Array<unknown>; pagination?: { total?: number } }) => void;
+  externalSearch?: { query?: string };
+};
+
 jest.mock('components/common/PaginatedEntityTable', () => ({
   __esModule: true,
   default: jest.fn(() => <div role="table">paginated-table</div>),
@@ -93,9 +99,22 @@ describe('<ClusterConfigurationNodes />', () => {
 
     render(<ClusterConfigurationNodes />);
 
+    const calls = mockPaginatedEntityTable.mock.calls as Array<[MockPaginatedEntityTableProps]>;
+    const dataNodesTableProps = calls
+      .map(([props]) => props)
+      .find((props) => props?.humanName === 'Data Nodes');
+
+    expect(dataNodesTableProps?.onDataLoaded).toBeDefined();
+
+    if (dataNodesTableProps?.onDataLoaded) {
+      act(() => {
+        dataNodesTableProps.onDataLoaded?.({ list: [], pagination: { total: 3 } });
+      });
+    }
+
     mockPaginatedEntityTable.mockClear();
 
-    await userEvent.click(screen.getByRole('radio', { name: 'Data Nodes' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Show Data Nodes' }));
 
     await waitFor(() => expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(1));
   });
@@ -105,6 +124,7 @@ describe('<ClusterConfigurationNodes />', () => {
     const mockPaginatedEntityTable = asMock(MockPaginatedEntityTable);
 
     render(<ClusterConfigurationNodes />);
+    mockPaginatedEntityTable.mockClear();
 
     const searchInput = screen.getByPlaceholderText('Search nodes…');
 
@@ -113,6 +133,12 @@ describe('<ClusterConfigurationNodes />', () => {
       jest.advanceTimersByTime(SEARCH_DEBOUNCE_THRESHOLD + 10);
     });
 
-    await waitFor(() => expect(mockPaginatedEntityTable).toHaveBeenCalled());
+    await waitFor(() => {
+      expect(mockPaginatedEntityTable).toHaveBeenCalled();
+      const calls = mockPaginatedEntityTable.mock.calls as Array<[MockPaginatedEntityTableProps]>;
+      const queries = calls.map(([props]) => props.externalSearch?.query);
+
+      expect(queries.every((query) => query === 'nodes')).toBe(true);
+    });
   });
 });
