@@ -18,7 +18,6 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 
-import { SEARCH_DEBOUNCE_THRESHOLD } from 'components/common/SearchForm';
 import asMock from 'helpers/mocking/AsMock';
 
 import ClusterConfigurationNodes from './ClusterConfigurationNodes';
@@ -48,12 +47,7 @@ jest.mock('./mongodb-nodes/useMongodbProfilingToggle', () => ({
 }));
 
 describe('<ClusterConfigurationNodes />', () => {
-  beforeEach(() => {
-    jest.useFakeTimers();
-  });
-
   afterEach(() => {
-    jest.useRealTimers();
     jest.clearAllMocks();
   });
 
@@ -129,9 +123,6 @@ describe('<ClusterConfigurationNodes />', () => {
     const searchInput = screen.getByPlaceholderText('Search nodes…');
 
     await userEvent.type(searchInput, '  nodes  ');
-    act(() => {
-      jest.advanceTimersByTime(SEARCH_DEBOUNCE_THRESHOLD + 10);
-    });
 
     await waitFor(() => {
       expect(mockPaginatedEntityTable).toHaveBeenCalled();
