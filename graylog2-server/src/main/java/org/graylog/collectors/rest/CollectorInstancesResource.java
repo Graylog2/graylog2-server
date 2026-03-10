@@ -181,9 +181,7 @@ public class CollectorInstancesResource extends RestResource {
                        schema = @Schema(allowableValues = {"asc", "desc"}))
             @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order
     ) {
-
         final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
-        LOG.info("Query {} Filters {}\nDB Query: {}", query, filters, dbQuery);
         final var resolvedSort = DbSortResolver.resolve(ATTRIBUTES, sort, order);
         final var list = collectorInstanceService.findPaginated(dbQuery, resolvedSort, page, perPage);
 
