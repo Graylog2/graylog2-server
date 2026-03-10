@@ -100,6 +100,7 @@ const useAutoExpandEmptySlices = ({
 
     if (!activeSliceMovedToEmpty) {
       lastAutoExpandedSliceRef.current = undefined;
+
       return;
     }
 
@@ -131,6 +132,7 @@ const SlicesOverview = ({
   const sendTelemetry = useSendTelemetry();
   const { isLoading, hasEmptySlices, emptySliceCount, visibleNonEmptySlices, visibleEmptySlices } = useSlices({
     fetchSlices,
+    activeSlice,
     searchQuery,
     sortMode,
     sliceRenderers,
