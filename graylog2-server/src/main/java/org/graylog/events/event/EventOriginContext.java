@@ -27,7 +27,7 @@ public class EventOriginContext {
     private static final String URN = "urn:graylog";
     private static final String ES_MESSAGE = String.join(":", URN, "message:es");
     private static final String ES_EVENT = String.join(":", URN, "event:es");
-    private static final String MONGODB_AGGREGATION = String.join(":", URN, "aggregation:mongodb");
+    private static final String DB_AGGREGATION = String.join(":", URN, "aggregation:mongodb");
 
     public static String elasticsearchMessage(String indexName, String messageId) {
         checkArgument("indexName", indexName);
@@ -46,7 +46,7 @@ public class EventOriginContext {
     public static String mongodbAggregation(String collection, long fromTimeMillis, long toTimeMillis) {
         checkArgument("collection", collection);
 
-        return String.join(":", MONGODB_AGGREGATION, collection,
+        return String.join(":", DB_AGGREGATION, collection,
                 String.valueOf(fromTimeMillis), String.valueOf(toTimeMillis));
     }
 
