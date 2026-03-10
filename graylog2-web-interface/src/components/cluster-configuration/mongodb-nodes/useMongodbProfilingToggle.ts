@@ -69,11 +69,14 @@ const successMessage = {
   disable: 'MongoDB profiling disabled successfully.',
 } as const;
 
-const useMongodbProfilingToggle = () => {
+const DEFAULT_MONGODB_PROFILING_REFETCH_INTERVAL_MS = 10000;
+
+const useMongodbProfilingToggle = (refetchInterval = DEFAULT_MONGODB_PROFILING_REFETCH_INTERVAL_MS) => {
   const queryClient = useQueryClient();
   const { data: statusByNode, isLoading: isLoadingStatus } = useQuery({
     queryKey: MONGODB_PROFILING_STATUS_QUERY_KEY,
     queryFn: fetchMongodbProfilingStatus,
+    refetchInterval,
   });
 
   const state = getClusterProfilingState(statusByNode);
