@@ -1,5 +1,12 @@
 type = "f"
-message = "Honor the max_event_age configuration for cluster event cleanup."
+message = "Honor the max_event_age configuration for cluster event cleanup. Default reduced from 24h to 12h."
+
+details.user = """
+A clean-up job runs at a period of max_event_age to remove old events from the cluster. Note that
+events created just after the last clean-up job will be removed after max_event_age, so the effective
+age of events in the cluster is between max_event_age and 2*max_event_age.
+The default value of max_event_age is reduced from 24h to 12h to ensure that events are cleaned up in a more timely manner.
+"""
 
 issues = ["25259"]
 pulls = ["25265"]
