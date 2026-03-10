@@ -22,6 +22,7 @@ import { defaultOnError } from 'util/conditional/onError';
 import TableFetchContext from 'components/common/PaginatedEntityTable/TableFetchContext';
 import type { Slice, SliceRenderers } from 'components/common/PaginatedEntityTable/slicing/Slicing';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
+import { slicesQueryKey } from 'components/common/PaginatedEntityTable/slicing/queryKeys';
 
 export type FetchSlices = (
   column: string,
@@ -35,7 +36,7 @@ const useFetchSlices = (fetchSlices: FetchSlices, sliceRenderers?: SliceRenderer
   } = useContext(TableFetchContext);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['slicing', sliceCol, query, filters],
+    queryKey: slicesQueryKey(sliceCol, query, filters),
     queryFn: () =>
       defaultOnError(
         fetchSlices(sliceCol, query, filters).then(
