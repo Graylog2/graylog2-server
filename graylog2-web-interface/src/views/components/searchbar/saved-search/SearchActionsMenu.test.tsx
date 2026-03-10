@@ -158,9 +158,9 @@ describe('SearchActionsMenu', () => {
       );
 
       render(<SimpleSearchActionsMenu />);
-      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
       const exportAsDashboardMenuItem = await screen.findByText('Export to dashboard');
-      userEvent.click(exportAsDashboardMenuItem);
+      await userEvent.click(exportAsDashboardMenuItem);
       await waitFor(() => expect(history.pushWithState).toHaveBeenCalledTimes(1));
 
       expect(history.pushWithState).toHaveBeenCalledWith('/dashboards/new', { view: defaultView });
@@ -170,7 +170,7 @@ describe('SearchActionsMenu', () => {
       asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().permissions(Immutable.List([])).build());
 
       render(<SimpleSearchActionsMenu />);
-      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
 
       await screen.findByText('Export');
 
@@ -179,10 +179,10 @@ describe('SearchActionsMenu', () => {
 
     it('should open file export modal', async () => {
       render(<SimpleSearchActionsMenu />);
-      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
 
       const exportMenuItem = await screen.findByText('Export');
-      userEvent.click(exportMenuItem);
+      await userEvent.click(exportMenuItem);
 
       await screen.findByText('Export all search results');
     });
@@ -197,9 +197,9 @@ describe('SearchActionsMenu', () => {
 
       asMock(useView).mockReturnValue(_createView('some-id'));
       render(<SimpleSearchActionsMenu />);
-      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
       const exportMenuItem = await screen.findByText('Edit metadata');
-      userEvent.click(exportMenuItem);
+      await userEvent.click(exportMenuItem);
 
       await screen.findByText('Editing saved search');
     });
@@ -209,11 +209,11 @@ describe('SearchActionsMenu', () => {
       const loadNewView = jest.fn(() => Promise.resolve());
 
       render(<SimpleSearchActionsMenu loadNewView={loadNewView} />);
-      userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
 
       const resetSearch = await screen.findByText('Reset search');
 
-      userEvent.click(resetSearch);
+      await userEvent.click(resetSearch);
 
       await waitFor(() => {
         expect(loadNewView).toHaveBeenCalledTimes(1);
@@ -226,9 +226,9 @@ describe('SearchActionsMenu', () => {
 
       render(<SimpleSearchActionsMenu onLoadView={onLoadView} />);
 
-      userEvent.click(await screen.findByTitle('Save search'));
-      userEvent.type(await findTitleInput(), 'Test');
-      userEvent.click(await findCreateNewButton());
+      await userEvent.click(await screen.findByTitle('Save search'));
+      await userEvent.type(await findTitleInput(), 'Test');
+      await userEvent.click(await findCreateNewButton());
 
       await waitFor(() => expect(onLoadView).toHaveBeenCalledTimes(1));
     });
@@ -240,9 +240,9 @@ describe('SearchActionsMenu', () => {
 
       render(<SimpleSearchActionsMenu />);
 
-      userEvent.click(await screen.findByTitle('Saved search'));
-      userEvent.type(await findTitleInput(), ' and further title');
-      userEvent.click(await findCreateNewButton());
+      await userEvent.click(await screen.findByTitle('Saved search'));
+      await userEvent.type(await findTitleInput(), ' and further title');
+      await userEvent.click(await findCreateNewButton());
 
       const updatedView = defaultView.toBuilder().title('title and further title').id('new-search-id').build();
 
@@ -265,9 +265,9 @@ describe('SearchActionsMenu', () => {
 
       render(<SimpleSearchActionsMenu />);
 
-      userEvent.click(await screen.findByTitle('Saved search'));
-      userEvent.type(await findTitleInput(), ' and further title');
-      userEvent.click(await findCreateNewButton());
+      await userEvent.click(await screen.findByTitle('Saved search'));
+      await userEvent.type(await findTitleInput(), ' and further title');
+      await userEvent.click(await findCreateNewButton());
 
       const updatedView = defaultView
         .toBuilder()
@@ -284,7 +284,7 @@ describe('SearchActionsMenu', () => {
     it('should save search when pressing related keyboard shortcut', async () => {
       asMock(useView).mockReturnValue(_createView('some-id'));
       render(<SimpleSearchActionsMenu />);
-      userEvent.keyboard('{Meta>}s{/Meta}');
+      await userEvent.keyboard('{Meta>}s{/Meta}');
 
       await waitFor(() => expect(OnSaveViewAction).toHaveBeenCalledTimes(1));
     });

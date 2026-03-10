@@ -15,15 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import numeral from 'numeral';
 
 import { CounterRate } from 'components/metrics';
 import usePipelineRulesMetadata from 'components/rules/hooks/usePipelineRulesMetadata';
 import type { PipelineType } from 'components/pipelines/types';
-import { useStore } from 'stores/connect';
-import type { ClusterMetric, Metric, NodeMetric } from 'stores/metrics/MetricsStore';
-import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
+import type { Metric, NodeMetric } from 'types/metrics';
+import { useMetrics } from 'hooks/useMetrics';
 
 type Props = {
   pipeline: PipelineType;
@@ -72,22 +71,13 @@ const PipelineProcessingErrors = ({ pipeline }: Props) => {
   const { data: pipelineRulesMetadata } = usePipelineRulesMetadata(pipeline.id, {
     enabled: !!pipeline.id,
   });
-  const { metrics }: { metrics: ClusterMetric } = useStore(MetricsStore, (state) => ({
-    metrics: state.metrics ?? {},
-  }));
 
   const metricNames = useMemo(
     () => getPipelineRuleFailureMetricNames(pipeline, pipelineRulesMetadata?.rules ?? []),
     [pipeline, pipelineRulesMetadata?.rules],
   );
 
-  useEffect(() => {
-    metricNames.forEach((name) => MetricsActions.addGlobal(name));
-
-    return () => {
-      metricNames.forEach((name) => MetricsActions.removeGlobal(name));
-    };
-  }, [metricNames]);
+  const { data: metrics } = useMetrics(metricNames);
 
   const totalErrors = useMemo(
     () =>
