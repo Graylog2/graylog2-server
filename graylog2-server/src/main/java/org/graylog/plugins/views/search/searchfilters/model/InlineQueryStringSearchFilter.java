@@ -22,8 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog2.database.entities.DefaultEntityScope;
-import org.graylog2.database.entities.ScopedEntity;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -47,10 +45,6 @@ public abstract class InlineQueryStringSearchFilter implements UsedSearchFilter,
 
     @JsonProperty(QUERY_STRING_FIELD)
     public abstract String queryString();
-
-    @Override
-    @JsonProperty(ScopedEntity.FIELD_SCOPE)
-    public abstract String scope();
 
     @Override
     @JsonProperty(value = NEGATION_FIELD, defaultValue = "false")
@@ -86,9 +80,6 @@ public abstract class InlineQueryStringSearchFilter implements UsedSearchFilter,
         @JsonProperty(QUERY_STRING_FIELD)
         public abstract Builder queryString(String queryString);
 
-        @JsonProperty(ScopedEntity.FIELD_SCOPE)
-        public abstract Builder scope(String scope);
-
         @JsonProperty(value = NEGATION_FIELD, defaultValue = "false")
         public abstract Builder negation(boolean negation);
 
@@ -99,8 +90,7 @@ public abstract class InlineQueryStringSearchFilter implements UsedSearchFilter,
         public static Builder create() {
             return new AutoValue_InlineQueryStringSearchFilter.Builder()
                     .disabled(false)
-                    .negation(false)
-                    .scope(DefaultEntityScope.NAME);
+                    .negation(false);
         }
 
         public abstract InlineQueryStringSearchFilter build();
