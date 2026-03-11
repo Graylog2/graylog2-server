@@ -74,30 +74,36 @@ const GeneralEventSideBar = ({ alertId, definitionId }: EventReplaySideBarDetail
     [alertId, resolvedDefinitionId, eventData?.alert],
   );
 
-  if (isLoadingEvent || isLoadingEventDefinition) return <Spinner />;
+  if ((alertId && isLoadingEvent) || isLoadingEventDefinition) return <Spinner />;
 
   return (
     <div>
-      <ExpandableSection title="Event Details">
-        <EventDetailsTable
-          event={eventData}
-          meta={meta}
-          attributesList={attributesList}
-          attributesRenderers={attributesRenderers}
-        />
-      </ExpandableSection>
-      <ReplaySearchContext.Provider value={replaySearchContext}>
-        <ExpandableSection title="Event Definition Details">
-          <EventDefinitionInfoTable />
+      {alertId && (
+        <ExpandableSection title="Event Details">
+          <EventDetailsTable
+            event={eventData}
+            meta={meta}
+            attributesList={attributesList}
+            attributesRenderers={attributesRenderers}
+          />
         </ExpandableSection>
-      </ReplaySearchContext.Provider>
-      <ExpandableSection title="Event Procedure Summary">
-        <RemediationSteps
-          event={eventData}
-          meta={meta}
-          eventDefinitionEventProcedureId={eventDefinitionEventProcedureId}
-        />
-      </ExpandableSection>
+      )}
+      {resolvedDefinitionId && (
+        <ReplaySearchContext.Provider value={replaySearchContext}>
+          <ExpandableSection title="Event Definition Details">
+            <EventDefinitionInfoTable />
+          </ExpandableSection>
+        </ReplaySearchContext.Provider>
+      )}
+      {alertId && (
+        <ExpandableSection title="Event Procedure Summary">
+          <RemediationSteps
+            event={eventData}
+            meta={meta}
+            eventDefinitionEventProcedureId={eventDefinitionEventProcedureId}
+          />
+        </ExpandableSection>
+      )}
     </div>
   );
 };
