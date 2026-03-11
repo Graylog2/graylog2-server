@@ -67,8 +67,9 @@ export const useFleetStats = (fleetId: string) =>
 
 export const FLEETS_BULK_STATS_KEY = ['collectors', 'fleets', 'stats'];
 
+// TODO: replace with generated CollectorsFleets.bulkStats() after API client regeneration
 const fetchBulkFleetStats = (): Promise<BulkFleetStatsResponse> =>
-  request('GET', '/collectors/fleets/stats');
+  request('GET', '/collectors/fleets/stats', null, {}, { Accept: 'application/json' });
 
 export const useFleetsBulkStats = () =>
   useQuery<BulkFleetStatsResponse>({

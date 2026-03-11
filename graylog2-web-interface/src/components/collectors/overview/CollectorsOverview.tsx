@@ -15,11 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
+import { Alert, Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
+import useHistory from 'routing/useHistory';
+import Routes from 'routing/Routes';
 
-import { useCollectorStats } from '../hooks';
+import FleetCardsGrid from './FleetCardsGrid';
+
+import { useCollectorStats, useFleetsBulkStats } from '../hooks';
 import StatCard from '../common/StatCard';
 
 const StatsRow = styled.div(
@@ -31,22 +37,80 @@ const StatsRow = styled.div(
   `,
 );
 
-const CollectorsOverview = () => {
-  const { data: stats, isLoading: statsLoading } = useCollectorStats();
+const SectionHeader = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: ${theme.spacings.sm};
+  `,
+);
 
-  if (statsLoading) {
-    return <Spinner />;
-  }
+const SectionTitle = styled.h3(
+  ({ theme }) => css`
+    margin: 0;
+    font-size: ${theme.fonts.size.h3};
+  `,
+);
+
+const CollectorsOverview = () => {
+  const { data: stats, isLoading: statsLoading, isError: statsError } = useCollectorStats();
+  const { data: bulkStats, isLoading: bulkLoading, isError: bulkError } = useFleetsBulkStats();
+  const [filter, setFilter] = useState('');
+  const history = useHistory();
 
   return (
     <div>
-      <StatsRow>
-        <StatCard value={stats?.total_instances || 0} label="Instances" />
-        <StatCard value={stats?.online_instances || 0} label="Online" variant="success" />
-        <StatCard value={stats?.offline_instances || 0} label="Offline" variant="warning" />
-        <StatCard value={stats?.total_fleets || 0} label="Fleets" />
-        <StatCard value={stats?.total_sources || 0} label="Sources" />
-      </StatsRow>
+      {statsLoading ? (
+        <Spinner />
+      ) : statsError ? (
+        <Alert bsStyle="danger">Could not load collector stats.</Alert>
+      ) : (
+        <StatsRow>
+          <StatCard
+            value={stats?.total_instances || 0}
+            label="Instances"
+            onClick={() => history.push(Routes.SYSTEM.COLLECTORS.INSTANCES)}
+          />
+          <StatCard
+            value={stats?.online_instances || 0}
+            label="Online"
+            variant="success"
+            onClick={() => history.push(`${Routes.SYSTEM.COLLECTORS.INSTANCES}?filters=status%3Donline`)}
+          />
+          <StatCard
+            value={stats?.offline_instances || 0}
+            label="Offline"
+            variant="warning"
+            onClick={() => history.push(`${Routes.SYSTEM.COLLECTORS.INSTANCES}?filters=status%3Doffline`)}
+          />
+          <StatCard
+            value={stats?.total_fleets || 0}
+            label="Fleets"
+            onClick={() => history.push(Routes.SYSTEM.COLLECTORS.FLEETS)}
+          />
+          <StatCard value={stats?.total_sources || 0} label="Sources" />
+        </StatsRow>
+      )}
+
+      <SectionHeader>
+        <SectionTitle>Fleets</SectionTitle>
+        <Input
+          type="text"
+          placeholder="Filter fleets..."
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          style={{ width: 200, marginBottom: 0 }}
+        />
+      </SectionHeader>
+
+      {bulkLoading ? (
+        <Spinner />
+      ) : bulkError ? (
+        <Alert bsStyle="danger">Could not load fleet stats.</Alert>
+      ) : (
+        <FleetCardsGrid fleets={bulkStats?.fleets || []} filter={filter} />
+      )}
     </div>
   );
 };
