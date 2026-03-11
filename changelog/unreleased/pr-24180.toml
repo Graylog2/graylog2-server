@@ -1,0 +1,5 @@
+type = "a"
+message = "Create metrics supplier for sidecars version."
+
+pulls = ["24180"]
+issues = ["Graylog2/graylog-plugin-enterprise#12213"]

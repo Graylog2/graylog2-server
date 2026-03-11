@@ -44,6 +44,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String CONTENT_PACK_DELETE_REV = PREFIX + "content_pack:delete_rev";
     public static final String CONTENT_PACK_INSTALL = PREFIX + "content_pack:install";
     public static final String CONTENT_PACK_UNINSTALL = PREFIX + "content_pack:uninstall";
+    public static final String CONTENT_PACK_ENTITY_CREATE = PREFIX + "content_pack_entity:create";
+    public static final String CONTENT_PACK_ENTITY_DELETE = PREFIX + "content_pack_entity:delete";
     public static final String DASHBOARD_CREATE = PREFIX + "dashboard:create";
     public static final String DASHBOARD_DELETE = PREFIX + "dashboard:delete";
     public static final String DASHBOARD_UPDATE = PREFIX + "dashboard:update";
@@ -133,6 +135,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String NODE_SHUTDOWN_INITIATE = PREFIX + "node_shutdown:initiate";
     public static final String NODE_STARTUP_COMPLETE = PREFIX + "node_startup:complete";
     public static final String NODE_STARTUP_INITIATE = PREFIX + "node_startup:initiate";
+    public static final String ROLE_AUTHZ_DELETE = PREFIX + "role_authz_membership:delete";
+    public static final String ROLE_AUTHZ_UPDATE = PREFIX + "role_authz_membership:update";
     public static final String ROLE_CREATE = PREFIX + "role:create";
     public static final String ROLE_DELETE = PREFIX + "role:delete";
     public static final String ROLE_MEMBERSHIP_DELETE = PREFIX + "role_membership:delete";
@@ -177,6 +181,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String USER_PERMISSIONS_DELETE = PREFIX + "user_permissions:delete";
     public static final String USER_PREFERENCES_UPDATE = PREFIX + "user_preferences:update";
     public static final String USER_UPDATE = PREFIX + "user:update";
+    public static final String USER_ROLES_UPDATE = PREFIX + "user_roles:update";
     public static final String TELEMETRY_USER_SETTINGS_UPDATE = PREFIX + "telemetry_user_settings:update";
     public static final String CONTENT_STREAM_USER_SETTINGS_UPDATE = PREFIX + "content_stream_user_settings:update";
 
@@ -211,6 +216,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(CONTENT_PACK_DELETE_REV)
             .add(CONTENT_PACK_INSTALL)
             .add(CONTENT_PACK_UNINSTALL)
+            .add(CONTENT_PACK_ENTITY_CREATE)
+            .add(CONTENT_PACK_ENTITY_DELETE)
             .add(DASHBOARD_CREATE)
             .add(DASHBOARD_DELETE)
             .add(DASHBOARD_UPDATE)
@@ -300,6 +307,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(NODE_SHUTDOWN_INITIATE)
             .add(NODE_STARTUP_COMPLETE)
             .add(NODE_STARTUP_INITIATE)
+            .add(ROLE_AUTHZ_DELETE)
+            .add(ROLE_AUTHZ_UPDATE)
             .add(ROLE_CREATE)
             .add(ROLE_DELETE)
             .add(ROLE_MEMBERSHIP_DELETE)
@@ -343,6 +352,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(USER_PERMISSIONS_DELETE)
             .add(USER_PREFERENCES_UPDATE)
             .add(USER_UPDATE)
+            .add(USER_ROLES_UPDATE)
             .add(TELEMETRY_USER_SETTINGS_UPDATE)
             .add(CONTENT_STREAM_USER_SETTINGS_UPDATE)
             .add(CERTIFICATE_RENEWAL_MANUALLY_INITIATED)

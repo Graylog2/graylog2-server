@@ -109,7 +109,9 @@ const EventDefinitionFormContainer = ({
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
   const isNew = action === 'create';
-  const currentStepKeys = getStepKeys(isNew);
+  const conditionPlugin = getConditionPlugin(eventDefinition.config.type);
+  const hideFieldsStep = conditionPlugin?.hideFieldsStep ?? false;
+  const currentStepKeys = getStepKeys(isNew, hideFieldsStep);
 
   const isLoading = !entityTypes || !notifications.all || !eventsClusterConfig;
   const defaults = { default_backlog_size: eventsClusterConfig?.events_notification_default_backlog };
@@ -132,8 +134,8 @@ const EventDefinitionFormContainer = ({
     fetchNotifications();
 
     if (hasLocalStorageConfig) {
-      const conditionPlugin = getConditionPlugin(configFromLocalStorage.type);
-      const defaultConfig = conditionPlugin?.defaultConfig || ({} as EventDefinition['config']);
+      const localStorageConditionPlugin = getConditionPlugin(configFromLocalStorage.type);
+      const defaultConfig = localStorageConditionPlugin?.defaultConfig || ({} as EventDefinition['config']);
 
       setEventDefinition((cur) => {
         const cloned = cloneDeep(cur);
@@ -258,6 +260,7 @@ const EventDefinitionFormContainer = ({
         onChangeStep={changeStep}
         onSubmit={handleSubmit}
         validation={validation}
+        hideFieldsStep={hideFieldsStep}
       />
     </>
   );

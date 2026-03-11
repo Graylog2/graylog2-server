@@ -14,14 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import styled, { css } from 'styled-components';
 import type { PropsWithChildren } from 'react';
+import * as React from 'react';
 import { useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import { Alert, Button } from 'components/bootstrap';
 import { Icon, ConfirmDialog } from 'components/common';
-import { ContentArea, Container } from 'components/security/page-layout';
 
 const StyledAlert = styled(Alert)`
   padding: ${({ theme }) => theme.spacings.lg};
@@ -103,22 +102,19 @@ const TeaserPageLayout = ({ children }: PropsWithChildren) => {
 
   return (
     <>
-      <Container>
-        <ContentArea>
-          <StyledAlert bsStyle="info" noIcon>
-            <Banner>
-              <LeftItems>
-                <BoldText>Security Demo</BoldText>
-                <span>For more information and booking a full demo of the product visit Graylog website.</span>
-              </LeftItems>
-              <Button bsStyle="primary" role="link" target="_blank" href="https://graylog.org/explore-security/">
-                Graylog Security <Icon name="open_in_new" />
-              </Button>
-            </Banner>
-          </StyledAlert>
-          {children}
-        </ContentArea>
-      </Container>
+      <StyledAlert bsStyle="info" noIcon>
+        <Banner>
+          <LeftItems>
+            <BoldText>Security Demo</BoldText>
+            <span>For more information and booking a full demo of the product visit Graylog website.</span>
+          </LeftItems>
+          <Button bsStyle="primary" role="link" target="_blank" href="https://graylog.org/explore-security/">
+            Graylog Security <Icon name="open_in_new" />
+          </Button>
+        </Banner>
+      </StyledAlert>
+      {children}
+
       {showModal && (
         <ConfirmDialog
           show

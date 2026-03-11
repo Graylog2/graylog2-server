@@ -27,12 +27,13 @@ import org.graylog.integrations.aws.service.CloudWatchService;
 import org.graylog.integrations.aws.service.KinesisService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.encryption.EncryptedValue;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClient;
 import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClientBuilder;
@@ -56,7 +57,7 @@ import software.amazon.awssdk.services.kinesis.model.StreamStatus;
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
@@ -65,6 +66,8 @@ import static org.mockito.Mockito.when;
 /**
  * Integration test for all automatic setup requests/responses.
  */
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class KinesisSetupResourceTest {
 
     private static final String REGION = "us-east-1";
@@ -72,9 +75,6 @@ public class KinesisSetupResourceTest {
     private static final String STREAM_NAME = "stream-name";
     private static final String STREAM_ARN = "stream-arn";
     private static final String ROLE_ARN = "role-arn";
-
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private KinesisSetupResource setupResource;
     @Mock
@@ -104,7 +104,7 @@ public class KinesisSetupResourceTest {
         }
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
 
         // Set up services.

@@ -53,12 +53,13 @@ import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.List;
@@ -78,14 +79,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class PivotAggregationSearchTest {
     private static final List<UsedSearchFilter> SEARCH_FILTERS = List.of(InlineQueryStringSearchFilter.builder().title("title").description("desc").queryString("host:localhost").build());
     private static final String QUERY = "source:foo";
     private static final String TEST_USER = "test";
     private static final long WINDOW_LENGTH = 30000;
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private SearchJobService searchJobService;
@@ -514,9 +514,7 @@ public class PivotAggregationSearchTest {
                         .build()),
                 new PermittedStreams(() -> Stream.of("00001"), (categories) -> Stream.of(), () -> NON_EDITABLE_STREAM_IDS)
         );
-        when(searchNormalization.postValidation(isA(Query.class), isA(ParameterProvider.class))).thenAnswer(invocation -> {
-            return invocation.getArgument(0); // Return same query received.
-        });
+        when(searchNormalization.postValidation(isA(Query.class), isA(ParameterProvider.class))).thenAnswer(invocation -> invocation.getArgument(0));
         final SearchJob job = new SearchJob("job", mock(Search.class), TEST_USER, "test-node-id");
         final QueryResult queryResult = QueryResult.builder()
                 .searchTypes(Collections.singletonMap("searchType", mock(SearchType.Result.class)))

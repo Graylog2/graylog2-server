@@ -22,25 +22,26 @@ import org.graylog.events.TestJobTriggerData;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class JobTriggerUpdatesTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private JobSchedulerTestClock clock;
     private JobScheduleStrategies strategies;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
         this.strategies = new JobScheduleStrategies(clock);

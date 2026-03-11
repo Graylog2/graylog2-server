@@ -93,23 +93,23 @@ const DataNodeActions = ({ dataNode, refetch = undefined, displayAs = 'dropdown'
     await refetchDatanodes();
   };
 
-  const updateState = ({ show, type }) => {
-    setShowConfirmDialog(show);
+  const openConfirmDialog = (type) => {
+    setShowConfirmDialog(true);
     setDialogType(type);
   };
 
   const handleAction = (action) => {
     switch (action) {
       case DIALOG_TYPES.REJOIN:
-        updateState({ show: true, type: DIALOG_TYPES.REJOIN });
+        openConfirmDialog(DIALOG_TYPES.REJOIN);
 
         break;
       case DIALOG_TYPES.REMOVE:
-        updateState({ show: true, type: DIALOG_TYPES.REMOVE });
+        openConfirmDialog(DIALOG_TYPES.REMOVE);
 
         break;
       case DIALOG_TYPES.STOP:
-        updateState({ show: true, type: DIALOG_TYPES.STOP });
+        openConfirmDialog(DIALOG_TYPES.STOP);
 
         break;
       default:
@@ -118,7 +118,8 @@ const DataNodeActions = ({ dataNode, refetch = undefined, displayAs = 'dropdown'
   };
 
   const handleClearState = async () => {
-    updateState({ show: false, type: null });
+    setShowConfirmDialog(false);
+    setDialogType(null);
     await refetchDatanodes();
   };
 
@@ -147,9 +148,9 @@ const DataNodeActions = ({ dataNode, refetch = undefined, displayAs = 'dropdown'
     }
   };
 
-  const isDatanodeRunning = dataNode.data_node_status === 'AVAILABLE';
-  const isDatanodeRemoved = dataNode.data_node_status === 'REMOVED';
-  const isRemovingDatanode = dataNode.data_node_status === 'REMOVING';
+  const isDatanodeRunning = dataNode.datanode_status === 'AVAILABLE';
+  const isDatanodeRemoved = dataNode.datanode_status === 'REMOVED';
+  const isRemovingDatanode = dataNode.datanode_status === 'REMOVING';
 
   return (
     <IfPermitted permissions="datanode:start">
@@ -162,7 +163,12 @@ const DataNodeActions = ({ dataNode, refetch = undefined, displayAs = 'dropdown'
           {(!isDatanodeRemoved || isRemovingDatanode) && (
             <MenuItem onSelect={() => handleAction(DIALOG_TYPES.REMOVE)}>Remove</MenuItem>
           )}
-          <MenuItem onSelect={() => setShowLogsDialog(true)}>Show logs</MenuItem>
+          <MenuItem
+            onSelect={() => {
+              setShowLogsDialog(true);
+            }}>
+            Show logs
+          </MenuItem>
         </MoreActions>
       )}
       {displayAs === 'buttons' && (
@@ -187,7 +193,11 @@ const DataNodeActions = ({ dataNode, refetch = undefined, displayAs = 'dropdown'
               Remove
             </ActionButton>
           )}
-          <ActionButton onClick={() => setShowLogsDialog(true)} bsSize="small">
+          <ActionButton
+            onClick={() => {
+              setShowLogsDialog(true);
+            }}
+            bsSize="small">
             Show logs
           </ActionButton>
         </>
@@ -205,7 +215,9 @@ const DataNodeActions = ({ dataNode, refetch = undefined, displayAs = 'dropdown'
         <DataNodeLogsDialog
           show={showLogsDialog}
           hostname={dataNode?.hostname}
-          onHide={() => setShowLogsDialog(false)}
+          onHide={() => {
+            setShowLogsDialog(false);
+          }}
         />
       )}
     </IfPermitted>

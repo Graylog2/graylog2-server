@@ -15,20 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { Sort, Attribute } from 'stores/PaginationTypes';
-import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
+import EventDefinitionPriorityEnum, { EXCLUDE_INFO_FILTER } from 'logic/alerts/EventDefinitionPriorityEnum';
 import type { MiddleSectionProps } from 'components/common/PaginatedEntityTable/PaginatedEntityTable';
 
 export const EVENTS_ENTITY_TABLE_ID = 'events';
 
 export const commonEventAttributes: Array<Attribute> = [
   {
+    filter_options: [
+      { value: EXCLUDE_INFO_FILTER, title: 'Exclude Info' },
+      ...Object.keys(EventDefinitionPriorityEnum.properties).map((num) => ({ value: num, title: num })),
+    ],
+    filterable: true,
     id: 'priority',
+    searchable: false,
+    sliceable: true,
+    sortable: true,
     title: 'Priority',
     type: 'STRING',
-    sortable: true,
-    searchable: false,
-    filterable: true,
-    filter_options: Object.keys(EventDefinitionPriorityEnum.properties).map((num) => ({ value: num, title: num })),
   },
   {
     id: 'timestamp',
@@ -108,6 +112,7 @@ export const eventsTableSpecificAttributes: Array<Attribute> = [
     title: 'Type',
     type: 'BOOLEAN',
     sortable: true,
+    sliceable: true,
     filterable: true,
     filter_options: [
       { value: 'false', title: 'Event' },
@@ -131,22 +136,24 @@ export const eventsTableElements = {
       'event_definition_type',
       'timestamp',
     ],
+    defaultColumnOrder: [
+      'message',
+      'id',
+      'priority',
+      'key',
+      'alert',
+      'event_definition_id',
+      'event_definition_type',
+      'timestamp',
+      'fields',
+      'group_by_fields',
+      'remediation_steps',
+      'timerange_start',
+    ],
   },
-  columnOrder: [
-    'message',
-    'id',
-    'priority',
-    'key',
-    'alert',
-    'event_definition_id',
-    'event_definition_type',
-    'timestamp',
-    'fields',
-    'group_by_fields',
-    'remediation_steps',
-    'timerange_start',
-  ],
 };
+
+export const REPLAY_SESSION_ID_PARAM = 'replaySessionId';
 
 type EventsMetricsAction = {
   id: string;

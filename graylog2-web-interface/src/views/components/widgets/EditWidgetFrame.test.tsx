@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen, within } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import selectEvent from 'helpers/selectEvent';
 import MockStore from 'helpers/mocking/StoreMock';
@@ -88,7 +89,7 @@ describe('EditWidgetFrame', () => {
       const searchButton = await screen.findByRole('button', { name: /perform search/i });
 
       await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
-      fireEvent.click(searchButton);
+      await userEvent.click(searchButton);
 
       await waitFor(() => expect(executeActiveQuery).toHaveBeenCalledTimes(1));
     });
@@ -96,20 +97,16 @@ describe('EditWidgetFrame', () => {
     it("changes the widget's streams when using stream filter", async () => {
       renderSUT();
       const streamFilter = await screen.findByTestId('streams-filter');
-      const reactSelect = streamFilter.querySelector('div');
+      const reactSelect = within(streamFilter).getByRole('combobox');
 
-      expect(reactSelect).not.toBeNull();
-
-      if (reactSelect) {
-        await selectEvent.select(reactSelect, 'PFLog');
-      }
+      await selectEvent.select(reactSelect, 'PFLog');
 
       const searchButton = screen.getByRole('button', {
         name: /perform search \(changes were made after last search execution\)/i,
       });
       await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
 
-      fireEvent.click(searchButton);
+      await userEvent.click(searchButton);
 
       await waitFor(() =>
         expect(updateWidget).toHaveBeenCalledWith(
@@ -125,7 +122,7 @@ describe('EditWidgetFrame', () => {
       const onSubmit = jest.fn(() => Promise.resolve());
       renderSUT({ onSubmit });
 
-      fireEvent.click(await screen.findByRole('button', { name: /update widget/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /update widget/i }));
 
       await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
     });
@@ -134,7 +131,7 @@ describe('EditWidgetFrame', () => {
       const onCancel = jest.fn();
       renderSUT({ onCancel });
 
-      fireEvent.click(await screen.findByRole('button', { name: /cancel/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /cancel/i }));
 
       await waitFor(() => expect(onCancel).toHaveBeenCalledTimes(1));
     });

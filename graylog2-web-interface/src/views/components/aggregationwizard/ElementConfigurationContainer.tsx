@@ -18,8 +18,7 @@ import * as React from 'react';
 import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Icon, IconButton } from 'components/common';
-import type { DraggableProps, DragHandleProps } from 'components/common/SortableList';
+import { IconButton } from 'components/common';
 
 const Container = styled.div(
   ({ theme }) => css`
@@ -31,6 +30,16 @@ const Container = styled.div(
     background-color: ${theme.colors.variant.lightest.default};
     flex-direction: column;
     position: relative;
+
+    input {
+      font-size: ${theme.fonts.size.body};
+    }
+
+    .control-label {
+      padding-left: 0;
+      padding-right: 5px;
+      font-weight: normal;
+    }
   `,
 );
 
@@ -55,41 +64,21 @@ const ElementConfiguration = styled.div`
   min-width: 0;
 `;
 
-const DragHandle = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
 type Props = {
   children: React.ReactNode;
   onRemove?: () => void;
   elementTitle: string;
-  draggableProps?: DraggableProps;
-  dragHandleProps?: DragHandleProps;
+  dragHandle?: React.ReactNode;
   className?: string;
-  testIdPrefix?: string;
 };
 
 const ElementConfigurationContainer = (
-  {
-    children,
-    onRemove = undefined,
-    testIdPrefix = 'configuration',
-    dragHandleProps = undefined,
-    className = undefined,
-    draggableProps = undefined,
-    elementTitle,
-  }: Props,
+  { children, onRemove = undefined, dragHandle = undefined, className = undefined, elementTitle }: Props,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) => (
-  <Container className={className} ref={ref} {...(draggableProps ?? {})}>
+  <Container className={className} ref={ref}>
     <ElementActions>
-      {dragHandleProps && (
-        <DragHandle {...dragHandleProps} data-testid={`${testIdPrefix}-drag-handle`}>
-          <Icon size="sm" name="drag_indicator" />
-        </DragHandle>
-      )}
+      {dragHandle}
       {onRemove && <StyledIconButton size="sm" onClick={onRemove} name="delete" title={`Remove ${elementTitle}`} />}
     </ElementActions>
     <ElementConfiguration>{children}</ElementConfiguration>

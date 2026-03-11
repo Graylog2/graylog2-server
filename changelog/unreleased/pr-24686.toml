@@ -1,0 +1,5 @@
+type = "f"
+message = "By default the future timestamp normalization should always be disabled."
+
+issues = ["23025"]
+pulls = ["24686"]

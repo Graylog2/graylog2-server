@@ -30,6 +30,7 @@ export type Decorator = {
   type: string;
   config?: any;
   stream: string | undefined | null;
+  category?: string | null;
   order: number;
 };
 

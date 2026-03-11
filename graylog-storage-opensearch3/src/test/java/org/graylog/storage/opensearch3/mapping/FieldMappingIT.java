@@ -18,7 +18,7 @@ package org.graylog.storage.opensearch3.mapping;
 
 import org.assertj.core.api.Assertions;
 import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
-import org.junit.Rule;
+import org.graylog.testing.elasticsearch.SearchInstance;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.client.opensearch.indices.PutMappingRequest;
@@ -30,7 +30,7 @@ import java.util.function.Function;
 public class FieldMappingIT {
 
     public static final String INDEX_NAME = "graylog_42";
-    @Rule
+    @SearchInstance
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
 

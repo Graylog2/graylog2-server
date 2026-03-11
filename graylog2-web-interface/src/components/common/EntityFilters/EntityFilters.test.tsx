@@ -32,6 +32,7 @@ import OriginalEntityFilters from './EntityFilters';
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
 jest.useFakeTimers().setSystemTime(mockedUnixTime);
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
 jest.mock('logic/generateId', () => jest.fn(() => 'filter-id'));
 jest.mock('components/common/EntityFilters/hooks/useFilterValueSuggestions');
@@ -154,19 +155,19 @@ describe('<EntityFilters />', () => {
     it('should create filter', async () => {
       render(<EntityFilters urlQueryFilters={undefined} />);
 
-      userEvent.click(
+      await setupUser().click(
         await screen.findByRole('button', {
           name: /create filter/i,
         }),
       );
 
-      userEvent.click(
+      await setupUser().click(
         await screen.findByRole('menuitem', {
           name: /status/i,
         }),
       );
 
-      userEvent.click(
+      await setupUser().click(
         await screen.findByRole('menuitem', {
           name: /running/i,
         }),
@@ -205,7 +206,7 @@ describe('<EntityFilters />', () => {
         name: /change filter value/i,
       });
 
-      userEvent.click(toggleFilterButton);
+      await setupUser().click(toggleFilterButton);
 
       await waitFor(() =>
         expect(onChangeFiltersWithTitle).toHaveBeenCalledWith(
@@ -228,7 +229,7 @@ describe('<EntityFilters />', () => {
 
       await screen.findByTestId('disabled-filter-false');
 
-      userEvent.click(
+      await setupUser().click(
         await screen.findByRole('button', {
           name: /create filter/i,
         }),
@@ -259,19 +260,19 @@ describe('<EntityFilters />', () => {
     it('should create filter', async () => {
       render(<EntityFilters urlQueryFilters={undefined} />);
 
-      userEvent.click(
+      await setupUser().click(
         await screen.findByRole('button', {
           name: /create filter/i,
         }),
       );
 
-      userEvent.click(
+      await setupUser().click(
         await screen.findByRole('menuitem', {
           name: /index set/i,
         }),
       );
 
-      userEvent.click(
+      await setupUser().click(
         await screen.findByRole('button', {
           name: /default index set/i,
         }),
@@ -307,9 +308,9 @@ describe('<EntityFilters />', () => {
         name: /change filter value/i,
       });
 
-      userEvent.click(openSuggestionsButton);
+      await setupUser().click(openSuggestionsButton);
 
-      userEvent.click(
+      await setupUser().click(
         await screen.findByRole('button', {
           name: /example index set/i,
         }),
@@ -333,13 +334,13 @@ describe('<EntityFilters />', () => {
     it('should create filter', async () => {
       render(<EntityFilters urlQueryFilters={undefined} />);
 
-      userEvent.click(
+      await setupUser().click(
         await screen.findByRole('button', {
           name: /create filter/i,
         }),
       );
 
-      userEvent.click(
+      await setupUser().click(
         await screen.findByRole('menuitem', {
           name: /created at/i,
         }),
@@ -348,15 +349,18 @@ describe('<EntityFilters />', () => {
       const timeRangeForm = await screen.findByTestId('time-range-form');
 
       const fromPicker = await screen.findByTestId('date-picker-from');
-      userEvent.click(await within(fromPicker).findByRole('gridcell', { name: /Jan 13 2020/i }));
-      userEvent.type(await screen.findByRole('spinbutton', { name: /from hour/i }), '{selectall}13');
-      userEvent.type(await screen.findByRole('spinbutton', { name: /from minutes/i }), '{selectall}42');
-      userEvent.type(await screen.findByRole('spinbutton', { name: /from seconds/i }), '{selectall}23');
+      await setupUser().click(await within(fromPicker).findByRole('button', { name: /Monday, January 13th, 2020/i }));
+      await setupUser().clear(await screen.findByRole('spinbutton', { name: /from hour/i }));
+      await setupUser().type(await screen.findByRole('spinbutton', { name: /from hour/i }), '13');
+      await setupUser().clear(await screen.findByRole('spinbutton', { name: /from minutes/i }));
+      await setupUser().type(await screen.findByRole('spinbutton', { name: /from minutes/i }), '42');
+      await setupUser().clear(await screen.findByRole('spinbutton', { name: /from seconds/i }));
+      await setupUser().type(await screen.findByRole('spinbutton', { name: /from seconds/i }), '23');
 
       const submitButton = within(timeRangeForm).getByRole('button', {
         name: /create filter/i,
       });
-      userEvent.click(submitButton);
+      await setupUser().click(submitButton);
 
       await waitFor(() =>
         expect(onChangeFiltersWithTitle).toHaveBeenCalledWith(
@@ -401,19 +405,22 @@ describe('<EntityFilters />', () => {
       const toggleFilterButton = within(activeFilter).getByRole('button', {
         name: /change filter value/i,
       });
-      userEvent.click(toggleFilterButton);
+      await setupUser().click(toggleFilterButton);
 
       const fromPicker = await screen.findByTestId('date-picker-from');
-      userEvent.click(await within(fromPicker).findByRole('gridcell', { name: /Jan 13 2020/i }));
-      userEvent.type(await screen.findByRole('spinbutton', { name: /from hour/i }), '{selectall}13');
-      userEvent.type(await screen.findByRole('spinbutton', { name: /from minutes/i }), '{selectall}42');
-      userEvent.type(await screen.findByRole('spinbutton', { name: /from seconds/i }), '{selectall}23');
+      await setupUser().click(await within(fromPicker).findByRole('button', { name: /Monday, January 13th, 2020/i }));
+      await setupUser().clear(await screen.findByRole('spinbutton', { name: /from hour/i }));
+      await setupUser().type(await screen.findByRole('spinbutton', { name: /from hour/i }), '13');
+      await setupUser().clear(await screen.findByRole('spinbutton', { name: /from minutes/i }));
+      await setupUser().type(await screen.findByRole('spinbutton', { name: /from minutes/i }), '42');
+      await setupUser().clear(await screen.findByRole('spinbutton', { name: /from seconds/i }));
+      await setupUser().type(await screen.findByRole('spinbutton', { name: /from seconds/i }), '23');
 
       const timeRangeForm = await screen.findByTestId('time-range-form');
       const submitButton = within(timeRangeForm).getByRole('button', {
         name: /update filter/i,
       });
-      userEvent.click(submitButton);
+      await setupUser().click(submitButton);
 
       await waitFor(() =>
         expect(onChangeFiltersWithTitle).toHaveBeenCalledWith(
@@ -450,13 +457,13 @@ describe('<EntityFilters />', () => {
 
       await screen.findByTestId('type-filter-string');
 
-      userEvent.click(
+      await setupUser().click(
         await screen.findByRole('button', {
           name: /create filter/i,
         }),
       );
 
-      userEvent.click(
+      await setupUser().click(
         await screen.findByRole('menuitem', {
           name: /type/i,
         }),
@@ -470,15 +477,15 @@ describe('<EntityFilters />', () => {
     it('provides text input to create filter', async () => {
       render(<EntityFilters urlQueryFilters={OrderedMap()} />);
 
-      userEvent.click(await screen.findByRole('button', { name: /create filter/i }));
+      await setupUser().click(await screen.findByRole('button', { name: /create filter/i }));
 
-      userEvent.click(await screen.findByRole('menuitem', { name: /generic/i }));
+      await setupUser().click(await screen.findByRole('menuitem', { name: /generic/i }));
 
       const filterInput = await screen.findByPlaceholderText('Enter value to filter for');
-      userEvent.type(filterInput, 'foo');
+      await setupUser().type(filterInput, 'foo');
 
       const form = await screen.findByTestId('generic-filter-form');
-      userEvent.click(await within(form).findByRole('button', { name: /create filter/i }));
+      await setupUser().click(await within(form).findByRole('button', { name: /create filter/i }));
 
       await waitFor(() => {
         expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ generic: ['foo'] }));
@@ -494,13 +501,14 @@ describe('<EntityFilters />', () => {
 
       render(<EntityFilters urlQueryFilters={OrderedMap()} />);
 
-      userEvent.click(await screen.findByText('foo'));
+      await setupUser().click(await screen.findByText('foo'));
 
       const filterInput = await screen.findByPlaceholderText('Enter value to filter for');
-      userEvent.type(filterInput, '{selectall}bar');
+      await setupUser().clear(filterInput);
+      await setupUser().type(filterInput, 'bar');
 
       const form = await screen.findByTestId('generic-filter-form');
-      userEvent.click(await within(form).findByRole('button', { name: /update filter/i }));
+      await setupUser().click(await within(form).findByRole('button', { name: /update filter/i }));
 
       await waitFor(() => {
         expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ generic: ['bar'] }));
@@ -512,15 +520,15 @@ describe('<EntityFilters />', () => {
     it('provides text input to create filter', async () => {
       render(<EntityFilters urlQueryFilters={OrderedMap()} />);
 
-      userEvent.click(await screen.findByRole('button', { name: /create filter/i }));
+      await setupUser().click(await screen.findByRole('button', { name: /create filter/i }));
 
-      userEvent.click(await screen.findByRole('menuitem', { name: /custom component/i }));
+      await setupUser().click(await screen.findByRole('menuitem', { name: /custom component/i }));
 
       const filterInput = await screen.findByPlaceholderText('My custom input');
-      userEvent.type(filterInput, 'foo');
+      await setupUser().type(filterInput, 'foo');
 
       const form = await screen.findByTestId('custom-component-form');
-      userEvent.click(await within(form).findByRole('button', { name: /create filter/i }));
+      await setupUser().click(await within(form).findByRole('button', { name: /create filter/i }));
 
       await waitFor(() => {
         expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ customComponent: ['foo'] }));
@@ -536,13 +544,14 @@ describe('<EntityFilters />', () => {
 
       render(<EntityFilters urlQueryFilters={OrderedMap()} />);
 
-      userEvent.click(await screen.findByText('foo'));
+      await setupUser().click(await screen.findByText('foo'));
 
       const filterInput = await screen.findByPlaceholderText('My custom input');
-      userEvent.type(filterInput, '{selectall}bar');
+      await setupUser().clear(filterInput);
+      await setupUser().type(filterInput, 'bar');
 
       const form = await screen.findByTestId('custom-component-form');
-      userEvent.click(await within(form).findByRole('button', { name: /update filter/i }));
+      await setupUser().click(await within(form).findByRole('button', { name: /update filter/i }));
 
       await waitFor(() => {
         expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ customComponent: ['bar'] }));
@@ -580,7 +589,7 @@ describe('<EntityFilters />', () => {
       name: /delete filter/i,
     });
 
-    userEvent.click(deleteButton);
+    await setupUser().click(deleteButton);
 
     await waitFor(() => expect(onChangeFiltersWithTitle).toHaveBeenCalledWith(OrderedMap(), OrderedMap()));
     await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap()));

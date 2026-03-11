@@ -54,11 +54,10 @@ const GraphContainer = styled.div`
 `;
 
 type ResultPromise = ReturnType<typeof fetchEventsHistogram>;
-type PromiseType<T> = T extends Promise<infer R> ? R : never;
 
 const generateChart = (
   type: 'Alerts' | 'Events',
-  buckets: PromiseType<ResultPromise>['results']['buckets']['alerts' | 'events'],
+  buckets: Awaited<ResultPromise>['results']['buckets']['alerts' | 'events'],
 ) => {
   const x = buckets.map((b) => b.start_date);
   const y = buckets.map((b) => b.count);
@@ -124,7 +123,7 @@ const EventsGraph = ({
   alerts,
   onZoom,
 }: {
-  data: PromiseType<ResultPromise>;
+  data: Awaited<ResultPromise>;
   alerts: 'include' | 'exclude' | 'only';
   onZoom: (from: string, to: string) => void;
 }) => {

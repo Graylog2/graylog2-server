@@ -18,7 +18,7 @@
 import type { TableLayoutPreferences, TableLayoutPreferencesJSON } from 'components/common/EntityDataTable/types';
 
 export const layoutPreferences: TableLayoutPreferences = {
-  displayedAttributes: ['title', 'description'],
+  attributes: { title: { status: 'show' }, description: { status: 'show' } },
   perPage: 50,
   sort: { attributeId: 'title', direction: 'asc' } as const,
 };

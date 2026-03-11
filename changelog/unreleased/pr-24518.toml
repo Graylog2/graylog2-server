@@ -1,0 +1,5 @@
+type = "a"
+message = "Throw custom exception with help text on parent circuit breaking exception."
+
+issues = ["graylog-plugin-enterprise#7917"]
+pulls = ["24518"]

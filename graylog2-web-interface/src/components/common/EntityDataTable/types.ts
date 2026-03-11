@@ -17,6 +17,7 @@
 import type * as React from 'react';
 
 import type { Attribute, Sort } from 'stores/PaginationTypes';
+import type { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
 
 export type EntityBase = {
   id: string;
@@ -26,7 +27,7 @@ export type ColumnSchema = {
   anyPermissions?: boolean;
   // Indicates that a column does not exist as an attribute in table data
   isDerived?: boolean;
-} & Pick<Attribute, 'id' | 'title' | 'type' | 'sortable' | 'hidden' | 'permissions'>;
+} & Pick<Attribute, 'id' | 'title' | 'type' | 'sortable' | 'hidden' | 'permissions' | 'sliceable'>;
 
 // A column render should have either a `width` and optionally a `minWidth` or only a `staticWidth`.
 export type ColumnRenderer<Entity extends EntityBase, Meta = unknown> = {
@@ -35,7 +36,8 @@ export type ColumnRenderer<Entity extends EntityBase, Meta = unknown> = {
   textAlign?: string;
   minWidth?: number; // px
   width?: number; // fraction of unassigned table width, similar to CSS unit fr.
-  staticWidth?: number; // px
+  // Uses the rendered title width as the fixed width; or provide a px value, if the title width is too small.
+  staticWidth?: number | 'matchHeader';
 };
 
 export type ColumnRenderersByAttribute<Entity extends EntityBase, Meta = unknown> = {
@@ -47,25 +49,30 @@ export type ColumnRenderers<Entity extends EntityBase, Meta = unknown> = {
   types?: { [type: string]: ColumnRenderer<Entity, Meta> };
 };
 
+export type ColumnPreferences = {
+  [attributeId: string]: {
+    status: (typeof ATTRIBUTE_STATUS)[keyof typeof ATTRIBUTE_STATUS];
+    width?: number; // px
+  };
+};
+
 export type TableLayoutPreferences<T = { [key: string]: unknown }> = {
-  displayedAttributes?: Array<string>;
+  attributes?: ColumnPreferences;
   sort?: Sort;
   perPage?: number;
+  order?: Array<string>;
   customPreferences?: T;
 };
 
 export type TableLayoutPreferencesJSON<T = { [key: string]: unknown }> = {
-  attributes?: {
-    [attributeId: string]: {
-      status: 'show' | 'hide';
-    };
-  };
+  attributes?: ColumnPreferences;
   sort?: {
     field: string;
     order: 'asc' | 'desc';
   };
   per_page?: number;
   custom_preferences?: T;
+  order?: Array<string>;
 };
 
 export type ExpandedSectionRenderer<Entity> = {
@@ -75,14 +82,24 @@ export type ExpandedSectionRenderer<Entity> = {
   disableHeader?: boolean;
 };
 
+export type ExpandedSectionRenderers<Entity> = {
+  [sectionName: string]: ExpandedSectionRenderer<Entity>;
+};
+
 export type DefaultLayout = {
   entityTableId: string;
   defaultSort: Sort;
   defaultDisplayedAttributes: Array<string>;
   defaultPageSize: number;
+  defaultColumnOrder: Array<string>;
 };
 
-export type ColumnMetaContext<Entity extends EntityBase> = {
-  label?: string;
-  columnRenderer?: ColumnRenderer<Entity>;
-};
+export type ColumnMetaContext<Entity extends EntityBase> =
+  | {
+      columnRenderer?: ColumnRenderer<Entity>;
+      enableColumnOrdering?: boolean;
+      enableSlicing?: boolean;
+      hideCellPadding?: boolean;
+      label?: string;
+    }
+  | undefined;

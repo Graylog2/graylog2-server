@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix an issue where clicking on the checkbox title doesn't change the checkbox state in aggregation widget edit form."
+
+pulls = ["24386"]
+issues = ["24385"]

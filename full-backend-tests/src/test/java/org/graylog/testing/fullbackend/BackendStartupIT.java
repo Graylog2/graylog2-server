@@ -17,7 +17,7 @@
 package org.graylog.testing.fullbackend;
 
 import org.graylog.testing.completebackend.Lifecycle;
-import org.graylog.testing.completebackend.MailServerInstance;
+import org.graylog.testing.completebackend.MailServerContainer;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.FullBackendTest;
 import org.graylog.testing.completebackend.GraylogBackendConfiguration;
@@ -77,7 +77,7 @@ class BackendStartupIT {
 
     @FullBackendTest
     void startsMailServer() {
-        final MailServerInstance mailServer = api.backend().getEmailServerInstance().orElseThrow(() -> new IllegalStateException("Mail server should be accessible"));
+        final MailServerContainer mailServer = api.backend().getEmailServerInstance().orElseThrow(() -> new IllegalStateException("Mail server should be accessible"));
         given()
                 .get(mailServer.getEndpointURI() + "/api/v2/messages")
                 .then()

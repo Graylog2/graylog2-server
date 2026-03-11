@@ -33,7 +33,7 @@ import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.graylog2.indexer.indexset.fields.BaseIndexSetFields.FIELD_DATA_TIERING;
+import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_DATA_TIERING;
 
 /**
  * In-database configuration (via ClusterConfigService) for index set

@@ -24,6 +24,7 @@ export default ({
   title,
   description,
   defaultRoles = Immutable.List(),
+  defaultUserTimezone,
   config: {
     servers = [],
     systemUserDn,
@@ -40,6 +41,7 @@ export default ({
   title,
   description,
   defaultRoles: defaultRoles.join(),
+  defaultUserTimezone: defaultUserTimezone,
   serverHost: servers[0].host,
   serverPort: servers[0].port,
   systemUserDn,

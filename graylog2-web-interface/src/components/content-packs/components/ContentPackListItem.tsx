@@ -19,9 +19,8 @@ import * as React from 'react';
 import { useState, useRef } from 'react';
 
 import { Button, Col, DropdownButton, MenuItem, Row, ButtonToolbar, DeleteMenuItem, Modal } from 'components/bootstrap';
-import { ModalSubmit } from 'components/common';
+import { ModalSubmit, LinkContainer, Link } from 'components/common';
 import ControlledTableListItem from 'components/common/ControlledTableListItem';
-import { LinkContainer, Link } from 'components/common/router';
 import ContentPackStatus from 'components/content-packs/ContentPackStatus';
 import ContentPackInstall from 'components/content-packs/ContentPackInstall';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';

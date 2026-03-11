@@ -31,15 +31,13 @@ const getEventNotificationTableElements = (pluggableAttributes?: {
       'created_at',
       ...(pluggableAttributes?.attributeNames || []),
     ],
+    defaultColumnOrder: ['title', 'description', 'type', 'created_at', ...(pluggableAttributes?.attributeNames || [])],
   };
-
-  const COLUMNS_ORDER = ['title', 'description', 'type', 'created_at', ...(pluggableAttributes?.attributeNames || [])];
 
   const additionalAttributes = [...(pluggableAttributes?.attributes || [])];
 
   return {
     defaultLayout: DEFAULT_LAYOUT,
-    columnOrder: COLUMNS_ORDER,
     additionalAttributes,
   };
 };

@@ -37,6 +37,7 @@ const typePrefixCornerCasesMap = {
   event_definition: 'eventdefinitions:',
   notification: 'eventnotifications:',
   search: 'view:',
+  dashboard: 'view:',
 };
 
 const standardEntityPermissionsMapper: EntityPermissionsMapper = {

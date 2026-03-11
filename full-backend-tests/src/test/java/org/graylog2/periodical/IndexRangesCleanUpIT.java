@@ -61,12 +61,8 @@ public class IndexRangesCleanUpIT {
 
         assertIndexRanges(ranges -> ranges.isNotEmpty().doesNotContain(INDEX_ONE));
 
-        //Deleting index set without deleting underlying indices
+        //Deleting index set without deleting underlying indices should now remove ranges immediately
         api.indices().deleteIndexSet(indexSetId, false);
-        assertIndexRanges(ranges -> ranges.isNotEmpty().contains(INDEX_TWO));
-
-        //Trigger clean up periodical over api
-        api.indices().rebuildIndexRanges();
         assertIndexRanges(ranges -> ranges.isNotEmpty().doesNotContain(INDEX_TWO));
     }
 

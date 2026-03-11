@@ -23,22 +23,38 @@ export type EventReplayInfo = {
   stream_categories?: string[];
 };
 
-export type Event = {
-  id: string;
-  event_definition_id: string;
-  event_definition_type: string;
+export interface Event {
+  timerange_end: string;
+  timestamp_processing: string;
+  origin_context?: string;
+  scores?: {
+    [_key: string]: number;
+  };
+  replay_info: EventReplayInfo;
+  streams?: string[];
+  source_streams: string[];
+  source?: string;
   priority: number;
+  message: string;
+  associated_assets?: string[];
+  group_by_fields: {
+    [_key: string]: string;
+  };
+  key_tuple?: string[];
+  alert: boolean;
+  event_definition_type: string;
+  event_definition_id: string;
+  id: string;
+  fields: {
+    [_key: string]: string;
+  };
+  key: string;
+  aggregation_conditions?: {
+    [_key: string]: number;
+  };
   timestamp: string;
   timerange_start: string;
-  timerange_end: string;
-  key: string;
-  fields: Record<string, string>;
-  group_by_fields: { [key: string]: string };
-  source_streams: string[];
-  replay_info: EventReplayInfo | undefined;
-  alert: boolean | undefined;
-  message: string;
-};
+}
 
 export type EventDefinitionContext = {
   id: string;

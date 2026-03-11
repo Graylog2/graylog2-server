@@ -18,6 +18,7 @@ package org.graylog2.plugin;
 
 import com.codahale.metrics.Meter;
 import com.eaio.uuid.UUID;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
@@ -38,7 +39,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.failure.FailureCause;
 import org.graylog.failure.ProcessingFailureCause;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.utilities.date.DateTimeConverter;
@@ -768,6 +769,17 @@ public class Message implements Messages, Indexable, Acknowledgeable {
      */
     public Set<Stream> getStreams() {
         return ImmutableSet.copyOf(this.streams);
+    }
+
+    /**
+     * Returns a lightweight, unmodifiable view of the streams this message is currently routed to.
+     * Unlike {@link #getStreams()}, this does not create a copy — changes to the message's streams
+     * will be reflected in the returned set. Only use this when the set is consumed immediately
+     * (e.g. iteration, streaming) and not held across operations that may mutate the message.
+     */
+    @JsonIgnore
+    public Set<Stream> getStreamsUnmodifiable() {
+        return Collections.unmodifiableSet(this.streams);
     }
 
     /**

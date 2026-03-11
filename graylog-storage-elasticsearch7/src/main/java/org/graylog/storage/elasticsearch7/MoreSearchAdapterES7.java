@@ -53,6 +53,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.search.QueryStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -205,7 +206,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
 
     private QueryBuilder createQuery(String queryString, TimeRange timerange, Set<String> eventStreams, String filterString,
                                      Set<String> forbiddenSourceStreams, Map<String, Set<String>> extraFilters) {
-        final QueryBuilder query = (queryString.isEmpty() || queryString.equals("*"))
+        final QueryBuilder query = QueryStringUtils.isEmptyOrMatchAllQueryString(queryString)
                 ? matchAllQuery()
                 : queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcard);
 
@@ -305,23 +306,5 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
             }
             LOG.debug("Scrolling done - took {} ms", stopwatch.stop().elapsed(TimeUnit.MILLISECONDS));
         }
-    }
-
-    private ChunkCommand buildScrollCommand(String queryString, TimeRange timeRange, Set<String> affectedIndices, List<UsedSearchFilter> filters, Set<String> streams, int batchSize) {
-        ChunkCommand.Builder commandBuilder = ChunkCommand.builder()
-                .query(queryString)
-                .range(timeRange)
-                .indices(affectedIndices)
-                .filters(filters == null ? Collections.emptyList() : filters)
-                .batchSize(batchSize)
-                // For correlation need the oldest messages to come in first
-                .sorting(new Sorting(Message.FIELD_TIMESTAMP, Sorting.Direction.ASC));
-
-        if (!streams.isEmpty()) {
-            commandBuilder = commandBuilder.streams(streams);
-        }
-
-        return commandBuilder
-                .build();
     }
 }

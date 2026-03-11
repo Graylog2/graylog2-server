@@ -23,9 +23,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
 
 import java.util.Map;
+import java.util.Optional;
 
 @AutoValue
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -35,22 +37,31 @@ public abstract class ServerNodeDto extends NodeDto {
 
     public static final String FIELD_IS_PROCESSING = "is_processing";
     public static final String FIELD_LOAD_BALANCER_STATUS = "lb_status";
+    public static final String FIELD_LIFECYCLE = "lifecycle";
 
-    @JsonProperty("is_processing")
+    @JsonProperty(FIELD_IS_PROCESSING)
     public abstract boolean isProcessing();
 
     @Nullable
-    @JsonProperty("lb_status")
-    public abstract LoadBalancerStatus getLoadBalancerStatus();
+    @JsonProperty(FIELD_LOAD_BALANCER_STATUS)
+    public LoadBalancerStatus getLoadBalancerStatus() {
+        return Optional.ofNullable(getLifecycle())
+                .map(Lifecycle::getLoadbalancerStatus)
+                .orElse(null);
+    }
+
+    @Nullable
+    @JsonProperty(FIELD_LIFECYCLE)
+    public abstract Lifecycle getLifecycle();
 
     public abstract Builder toBuilder();
 
     @Override
     public Map<String, Object> toEntityParameters() {
         final Map<String, Object> entityParameters = super.toEntityParameters();
-        entityParameters.put("is_processing", isProcessing());
-        if(getLoadBalancerStatus() != null) {
-            entityParameters.put("lb_status", getLoadBalancerStatus());
+        entityParameters.put(FIELD_IS_PROCESSING, isProcessing());
+        if(getLifecycle() != null) {
+            entityParameters.put(FIELD_LIFECYCLE, getLifecycle().name());
         }
         return entityParameters;
     }
@@ -62,8 +73,8 @@ public abstract class ServerNodeDto extends NodeDto {
         @JsonProperty(FIELD_IS_PROCESSING)
         public abstract ServerNodeDto.Builder setProcessing(boolean isProcessing);
 
-        @JsonProperty(FIELD_LOAD_BALANCER_STATUS)
-        public abstract Builder setLoadBalancerStatus(@Nullable LoadBalancerStatus loadBalancerStatus);
+        @JsonProperty(FIELD_LIFECYCLE)
+        public abstract Builder setLifecycle(@Nullable Lifecycle lifecycle);
 
         @JsonCreator
         public static Builder builder() {

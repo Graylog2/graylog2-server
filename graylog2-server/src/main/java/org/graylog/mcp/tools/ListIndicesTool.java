@@ -21,13 +21,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.mcp.server.Tool;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
-import org.graylog2.indexer.MongoIndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.NodeInfoCache;
+import org.graylog2.indexer.indexset.index.IndexPattern;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.indices.util.NumberBasedIndexNameComparator;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.system.indexer.responses.AllIndices;
 import org.graylog2.rest.models.system.indexer.responses.ClosedIndices;
 import org.graylog2.rest.models.system.indexer.responses.IndexInfo;
@@ -56,14 +57,14 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
     private final IndexSetRegistry indexSetRegistry;
 
     @Inject
-    public ListIndicesTool(ObjectMapper objectMapper,
-                           SchemaGeneratorProvider schemaGeneratorProvider,
-                           Indices indices,
+    public ListIndicesTool(Indices indices,
                            NodeInfoCache nodeInfoCache,
                            IndexSetRegistry indexSetRegistry,
-                           CustomizationConfig customizationConfig) {
-        super(objectMapper,
-                schemaGeneratorProvider,
+                           final CustomizationConfig customizationConfig,
+                           final ObjectMapper objectMapper,
+                           final ClusterConfigService clusterConfigService,
+                           final SchemaGeneratorProvider schemaGeneratorProvider) {
+        super(
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
@@ -72,7 +73,13 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
                         List all %s indices from the cluster. Returns comprehensive index information including status (open/closed),
                         document counts, storage size, and health metrics. Use this to understand data distribution, identify problematic indices,
                         or before performing queries to understand available data sources. No parameters required.
-                        """, customizationConfig.productName()));
+                        """,
+                        customizationConfig.productName()
+                ),
+                objectMapper,
+                clusterConfigService,
+                schemaGeneratorProvider
+        );
         this.indices = indices;
         this.nodeInfoCache = nodeInfoCache;
         this.indexSetRegistry = indexSetRegistry;
@@ -111,7 +118,7 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
     // TODO: find a better way to do this. These are all verbatim from org.graylog2.rest.resources.system.indexer.IndicesResource
 
     public OpenIndicesInfo open(PermissionHelper permissionHelper) {
-        final Set<IndexSet> indexSets = indexSetRegistry.getAll();
+        final Set<IndexSet> indexSets = indexSetRegistry.getAllIndexSets();
         final Set<String> indexWildcards = indexSets.stream()
                 .map(IndexSet::getIndexWildcard)
                 .collect(Collectors.toSet());
@@ -123,7 +130,7 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
     }
 
     public ClosedIndices closed(PermissionHelper permissionHelper) {
-        final Set<IndexSet> indexSets = indexSetRegistry.getAll();
+        final Set<IndexSet> indexSets = indexSetRegistry.getAllIndexSets();
         final Set<String> indexWildcards = indexSets.stream()
                 .map(IndexSet::getIndexWildcard)
                 .collect(Collectors.toSet());
@@ -135,7 +142,7 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
     }
 
     public ClosedIndices reopened(PermissionHelper permissionHelper) {
-        final Set<IndexSet> indexSets = indexSetRegistry.getAll();
+        final Set<IndexSet> indexSets = indexSetRegistry.getAllIndexSets();
         final Set<String> indexWildcards = indexSets.stream()
                 .map(IndexSet::getIndexWildcard)
                 .collect(Collectors.toSet());
@@ -154,7 +161,7 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
         final Map<String, Boolean> areReopened = this.indices.areReopened(indices);
 
         final List<IndexStatistics> sortedIndexStatistics = indicesStatistics.stream()
-                .sorted(Comparator.comparing(IndexStatistics::index, new NumberBasedIndexNameComparator(MongoIndexSet.SEPARATOR)))
+                .sorted(Comparator.comparing(IndexStatistics::index, new NumberBasedIndexNameComparator(IndexPattern.SEPARATOR)))
                 .toList();
 
         for (IndexStatistics indexStatistics : sortedIndexStatistics) {

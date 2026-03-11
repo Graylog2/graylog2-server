@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactDom from 'react-dom';
 import styled from 'styled-components';
 
@@ -91,17 +92,17 @@ function EditorModal({
   onDone = () => {},
   helpBlock = undefined,
 }: Props) {
-  const [height, setHeight] = React.useState<number>(0);
-  const [localValue, setLocalValue] = React.useState<string>(value);
+  const [height, setHeight] = useState<number>(0);
+  const [localValue, setLocalValue] = useState<string>(value);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const contentHeight = document.getElementById('editor-body')?.scrollHeight;
     setHeight(contentHeight);
   }, []);
 
-  React.useEffect(() => setLocalValue(value), [value]);
+  useEffect(() => setLocalValue(value), [value]);
 
-  const handleOnChange = React.useCallback(
+  const handleOnChange = useCallback(
     (newValue: string) => {
       setLocalValue(newValue);
       onChange(newValue);
@@ -109,12 +110,12 @@ function EditorModal({
     [onChange],
   );
 
-  const handleOnDone = React.useCallback(() => {
+  const handleOnDone = useCallback(() => {
     if (onDone) onDone(localValue);
     onClose();
   }, [localValue, onClose, onDone]);
 
-  const Component = React.useMemo(
+  const Component = useMemo(
     () =>
       show ? (
         <Backdrop onClick={() => onClose()}>

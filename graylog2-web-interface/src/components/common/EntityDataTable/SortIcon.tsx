@@ -16,17 +16,20 @@
  */
 
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+import type { Column } from '@tanstack/react-table';
 
 import CommonSortIcon from 'components/common/SortIcon';
 import type { ColumnMetaContext, EntityBase } from 'components/common/EntityDataTable/types';
 
-const StyledCommonSortIcon = styled(CommonSortIcon)`
-  display: inline-block;
-  margin-left: 6px;
-  padding: 0;
-  cursor: pointer;
-`;
+const StyledCommonSortIcon = styled(CommonSortIcon)(
+  ({ theme }) => css`
+    display: inline-block;
+    margin-left: ${theme.spacings.xs};
+    padding: 0;
+    cursor: pointer;
+  `,
+);
 
 const SORT_DIRECTIONS = {
   ASC: 'asc',
@@ -38,14 +41,14 @@ const SORT_ORDER_NAMES = {
   desc: 'descending',
 };
 
-const SortIcon = <Entity extends EntityBase>({ header }: { header: any }) => {
-  const nextSortDirection = header.column.getNextSortingOrder();
-  const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
+const SortIcon = <Entity extends EntityBase>({ column }: { column: Column<Entity> }) => {
+  const nextSortDirection = column.getNextSortingOrder() || SORT_DIRECTIONS.ASC;
+  const columnMeta = column.columnDef.meta as ColumnMetaContext<Entity>;
 
   return (
     <StyledCommonSortIcon
-      activeDirection={header.column.getIsSorted()}
-      onChange={() => header.column.toggleSorting()}
+      activeDirection={column.getIsSorted() || null}
+      onChange={() => column.toggleSorting()}
       title={`Sort ${columnMeta.label.toLowerCase()} ${SORT_ORDER_NAMES[nextSortDirection]}`}
       ascId={SORT_DIRECTIONS.ASC}
       descId={SORT_DIRECTIONS.DESC}

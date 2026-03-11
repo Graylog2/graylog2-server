@@ -17,27 +17,41 @@
 
 import { useMemo } from 'react';
 
-import { BULK_SELECT_COL_ID, ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
+import { BULK_SELECT_COL_ID, ACTIONS_COL_ID, ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
+import type { ColumnPreferences } from 'components/common/EntityDataTable/types';
 
+const getVisibleAttributeColumns = (
+  defaultDisplayedColumns: Array<string>,
+  userColumnPreferences: ColumnPreferences | undefined = {},
+) => {
+  const userSelection = new Set(
+    Object.entries(userColumnPreferences)
+      .filter(([, { status }]) => status === ATTRIBUTE_STATUS.show)
+      .map(([attr]) => attr),
+  );
+
+  if (userSelection.size > 0) {
+    return userSelection;
+  }
+
+  return new Set(defaultDisplayedColumns);
+};
 const useVisibleColumnOrder = (
-  visibleAttributeColumns: Array<string>,
-  attributeColumnsOder: Array<string>,
-  displayActionsCol: boolean,
+  columnPreferences: ColumnPreferences | undefined,
+  attributeColumnOrder: Array<string>,
+  defaultDisplayedColumns: Array<string>,
   displayBulkSelectCol: boolean,
 ) =>
   useMemo(() => {
-    const visibleSet = new Set(visibleAttributeColumns);
-    // Core order: visible attributes in the order defined by attributeColumnsOder
-    const coreOrder = attributeColumnsOder.filter((id) => visibleSet.has(id));
-    // Additional: visible attributes not in attributeColumnsOder
-    const additionalVisible = visibleAttributeColumns.filter((id) => !attributeColumnsOder.includes(id));
+    const visibleAttributeColumns = getVisibleAttributeColumns(defaultDisplayedColumns, columnPreferences);
+    // Core order: visible attributes in the order defined by attributeColumnOrder
+    const coreOrder = attributeColumnOrder.filter((id) => visibleAttributeColumns.has(id));
+    // Additional: visible attributes not in attributeColumnOrder
+    const additionalVisible = [...visibleAttributeColumns].filter((id) => !attributeColumnOrder.includes(id));
 
-    return [
-      ...(displayBulkSelectCol ? [BULK_SELECT_COL_ID] : []),
-      ...coreOrder,
-      ...additionalVisible,
-      ...(displayActionsCol ? [ACTIONS_COL_ID] : []),
-    ];
-  }, [visibleAttributeColumns, displayActionsCol, displayBulkSelectCol, attributeColumnsOder]);
+    // Keep actions as the trailing column even when there are no row actions.
+    // It doubles as the "tail" column to consume leftover width for fully-static layouts.
+    return [...(displayBulkSelectCol ? [BULK_SELECT_COL_ID] : []), ...coreOrder, ...additionalVisible, ACTIONS_COL_ID];
+  }, [columnPreferences, defaultDisplayedColumns, attributeColumnOrder, displayBulkSelectCol]);
 
 export default useVisibleColumnOrder;

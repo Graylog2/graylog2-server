@@ -121,7 +121,7 @@ class IndexSetDeletionForm extends React.Component<
             id="remove-data-checkbox"
             type="checkbox"
             label="Remove all data for this index set?"
-            help={<span>All indices related to this index set will be deleted from Elasticsearch.</span>}
+            help={<span>All indices related to this index set will be deleted.</span>}
             checked={this.state.deleteIndices}
             onChange={this._onRemoveClick}
           />

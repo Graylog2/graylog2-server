@@ -15,18 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
 import Routes from 'routing/Routes';
 import NumberUtils from 'util/NumberUtils';
-import { useStore } from 'stores/connect';
-import type { GaugeMetric } from 'stores/metrics/MetricsStore';
-import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
+import type { GaugeMetric } from 'types/metrics';
+import { useNodeMetrics } from 'hooks/useMetrics';
 
 import { Button } from '../bootstrap';
-import { ProgressBar, Spinner } from '../common';
-import { LinkContainer } from '../common/router';
+import { LinkContainer, ProgressBar, Spinner } from '../common';
 
 const NodeBufferUsage = styled.div(
   ({ theme }) => css`
@@ -52,27 +50,17 @@ type Props = {
 };
 
 const BufferUsage = ({ nodeId, bufferType, title }: Props) => {
-  useEffect(() => {
-    const prefix = _metricPrefix(bufferType);
-    const metricNames = [`${prefix}.usage`, `${prefix}.size`];
+  const prefix = _metricPrefix(bufferType);
+  const metricNames = useMemo(() => [`${prefix}.usage`, `${prefix}.size`], [prefix]);
+  const { data: nodeMetrics } = useNodeMetrics(nodeId, metricNames);
 
-    metricNames.forEach((metricName) => MetricsActions.add(nodeId, metricName));
-
-    return () => metricNames.forEach((metricName) => MetricsActions.remove(nodeId, metricName));
-  }, [nodeId, bufferType]);
-
-  const { metrics } = useStore(MetricsStore);
-
-  // metrics for this node could be undefined
-  if (!metrics?.[nodeId]) {
+  if (!nodeMetrics) {
     return <Spinner />;
   }
 
-  const prefix = _metricPrefix(bufferType);
-
-  const usageMetric = metrics[nodeId][`${prefix}.usage`] as GaugeMetric;
+  const usageMetric = nodeMetrics[`${prefix}.usage`] as GaugeMetric;
   const usage = usageMetric ? usageMetric.metric.value : NaN;
-  const sizeMetric = metrics[nodeId][`${prefix}.size`] as GaugeMetric;
+  const sizeMetric = nodeMetrics[`${prefix}.size`] as GaugeMetric;
   const size = sizeMetric ? sizeMetric.metric.value : NaN;
 
   const usagePercentage = !isNaN(usage) && !isNaN(size) ? usage / size : 0;

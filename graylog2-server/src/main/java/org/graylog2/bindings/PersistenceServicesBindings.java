@@ -31,8 +31,6 @@ import org.graylog2.database.suggestions.EntitySuggestionService;
 import org.graylog2.database.suggestions.MongoEntitySuggestionService;
 import org.graylog2.indexer.IndexFailureService;
 import org.graylog2.indexer.IndexFailureServiceImpl;
-import org.graylog2.indexer.datanode.RemoteReindexMigrationService;
-import org.graylog2.indexer.datanode.RemoteReindexMigrationServiceImpl;
 import org.graylog2.indexer.datastream.DataStreamService;
 import org.graylog2.indexer.datastream.DataStreamServiceImpl;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -50,8 +48,8 @@ import org.graylog2.rest.resources.system.contentpacks.titles.EntityTitleService
 import org.graylog2.rest.resources.system.contentpacks.titles.EntityTitleServiceImpl;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.AccessTokenServiceImpl;
-import org.graylog2.security.MongoDBSessionService;
-import org.graylog2.security.MongoDBSessionServiceImpl;
+import org.graylog2.security.sessions.MongoDbSessionService;
+import org.graylog2.security.sessions.SessionService;
 import org.graylog2.shared.tokenusage.TokenUsageService;
 import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.shared.users.UserService;
@@ -80,12 +78,11 @@ public class PersistenceServicesBindings extends AbstractModule {
                 .setDefault().to(UserManagementServiceImpl.class);
         bind(AccessTokenService.class).to(AccessTokenServiceImpl.class).asEagerSingleton();
         bind(TokenUsageService.class).to(TokenUsageServiceImpl.class).asEagerSingleton();
-        bind(MongoDBSessionService.class).to(MongoDBSessionServiceImpl.class).asEagerSingleton();
+        bind(SessionService.class).to(MongoDbSessionService.class).asEagerSingleton();
         bind(InputStatusService.class).to(MongoInputStatusService.class).asEagerSingleton();
         bind(EntityListPreferencesService.class).to(EntityListPreferencesServiceImpl.class);
         bind(EntitySuggestionService.class).to(MongoEntitySuggestionService.class);
         bind(EntityTitleService.class).to(EntityTitleServiceImpl.class);
         bind(DataStreamService.class).to(DataStreamServiceImpl.class);
-        bind(RemoteReindexMigrationService.class).to(RemoteReindexMigrationServiceImpl.class);
     }
 }

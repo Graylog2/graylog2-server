@@ -37,8 +37,9 @@ import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.security.shares.EntitySharesService;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
@@ -54,14 +55,14 @@ import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Optional;
 import java.util.Set;
@@ -79,15 +80,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class EventDefinitionHandlerTest {
     public final Set<EntityScope> ENTITY_SCOPES = Set.of(new DefaultEntityScope(), new TestEntityScope());
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private DBEventProcessorStateService stateService;
@@ -109,8 +106,8 @@ public class EventDefinitionHandlerTest {
     private DBJobDefinitionService jobDefinitionService;
     private DBJobTriggerService jobTriggerService;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp(MongoDBTestService dbTestService) throws Exception {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(new NamedType(TestEventProcessorConfig.class, TestEventProcessorConfig.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(TestEventProcessorParameters.class, TestEventProcessorParameters.TYPE_NAME));
@@ -122,11 +119,10 @@ public class EventDefinitionHandlerTest {
         objectMapper.registerSubtypes(new NamedType(PersistToStreamsStorageHandler.Config.class, PersistToStreamsStorageHandler.Config.TYPE_NAME));
 
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-
+        final var mongoCollections = new MongoCollections(mapperProvider, dbTestService.mongoConnection());
         this.clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
-        final MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
         this.eventDefinitionService = spy(new DBEventDefinitionService(mongoCollections, stateService, mock(EntityRegistrar.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters()));
-        this.jobDefinitionService = spy(new DBJobDefinitionService(new MongoCollections(mapperProvider, mongodb.mongoConnection()), mapperProvider));
+        this.jobDefinitionService = spy(new DBJobDefinitionService(mongoCollections, mapperProvider));
         this.jobTriggerService = spy(new DBJobTriggerService(mongoCollections, nodeId, clock, schedulerCapabilitiesService, Duration.minutes(5)));
 
         this.handler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, entitySharesServiceProvider, clock, clusterEventBus, entitySourceService);
@@ -250,6 +246,32 @@ public class EventDefinitionHandlerTest {
 
         // And the handler should also NOT create a job trigger for the created job definition
         assertThat(jobTriggerService.nextRunnableTrigger()).isNotPresent();
+    }
+
+    @Test
+    public void testEventSummaryTemplateHandling() {
+        EventDefinitionDto dtoToSave = EventDefinitionDto.builder()
+                .title("Test")
+                .eventSummaryTemplate(" ")
+                .description("A test event definition")
+                .config(TestEventProcessorConfig.builder()
+                        .message("This is a test event processor")
+                        .searchWithinMs(300000)
+                        .executeEveryMs(60001)
+                        .build())
+                .priority(3)
+                .alert(false)
+                .notificationSettings(EventNotificationSettings.withGracePeriod(60000))
+                .keySpec(ImmutableList.of("a", "b"))
+                .notifications(ImmutableList.of())
+                .build();
+
+        EventDefinitionDto savedDto = handler.create(dtoToSave, Optional.empty());
+        assertThat(savedDto.eventSummaryTemplate()).isNull();
+
+        dtoToSave = dtoToSave.toBuilder().eventSummaryTemplate("\tTitle with whitespace   ").build();
+        savedDto = handler.create(dtoToSave, Optional.empty());
+        assertThat(savedDto.eventSummaryTemplate()).isEqualTo("Title with whitespace");
     }
 
     @Test
@@ -566,6 +588,7 @@ public class EventDefinitionHandlerTest {
         assertThat(jobTriggerService.get("61fbcca5b2507945cc120002")).isPresent();
     }
 
+    @ExtendWith(MongoDBExtension.class)
     static class TestEntityScope extends EntityScope {
         public static final String NAME = "TESTSCOPE";
 

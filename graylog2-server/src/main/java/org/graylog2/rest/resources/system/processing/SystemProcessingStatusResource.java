@@ -17,8 +17,8 @@
 package org.graylog2.rest.resources.system.processing;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.rest.models.system.processing.ProcessingStatusSummary;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -33,7 +33,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
-@Api(value = "System/Processing/Status")
+@Tag(name = "System/Processing/Status")
 @Path("/system/processing/status")
 @RequiresAuthentication
 @Produces(MediaType.APPLICATION_JSON)
@@ -50,7 +50,7 @@ public class SystemProcessingStatusResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get processing status summary from node")
+    @Operation(summary = "Get processing status summary from node")
     public ProcessingStatusSummary getStatus() {
         return ProcessingStatusSummary.of(processingStatusRecorder);
     }
@@ -58,7 +58,7 @@ public class SystemProcessingStatusResource extends RestResource {
     @GET
     @Path("/persisted")
     @Timed
-    @ApiOperation(value = "Get persisted processing status summary from node")
+    @Operation(summary = "Get persisted processing status summary from node")
     public ProcessingStatusSummary getPersistedStatus() {
         return dbService.get().map(ProcessingStatusSummary::of)
                 .orElseThrow(() -> new NotFoundException("No processing status persisted yet"));

@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
+import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import MockQuery from 'views/logic/queries/Query';
@@ -101,7 +102,7 @@ describe('SearchBar', () => {
 
     asMock(dispatch).mockClear();
 
-    fireEvent.click(searchButton);
+    await userEvent.click(searchButton);
 
     await waitFor(() => expect(dispatch).toHaveBeenCalled());
   });

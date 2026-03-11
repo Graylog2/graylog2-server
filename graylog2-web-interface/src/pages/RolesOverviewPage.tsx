@@ -16,12 +16,11 @@
  */
 import * as React from 'react';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, PageHeader, DocumentTitle, Icon } from 'components/common';
 import RolesOverview from 'components/roles/RolesOverview';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { Button, Row, Col, Alert } from 'components/bootstrap';
-import { PageHeader, DocumentTitle, Icon } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import useProductName from 'brand-customization/useProductName';
 

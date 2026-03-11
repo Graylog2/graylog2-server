@@ -32,8 +32,6 @@ class GrokPatternFilter extends React.Component<
     [key: string]: any;
   }
 > {
-  shownListItems = [];
-
   constructor(props) {
     super(props);
 
@@ -57,6 +55,8 @@ class GrokPatternFilter extends React.Component<
 
     return true;
   }
+
+  shownListItems = [];
 
   _onPatternFilterChange = (e) => {
     this.setState({ patternFilter: e.target.value, activeListItem: -1 });

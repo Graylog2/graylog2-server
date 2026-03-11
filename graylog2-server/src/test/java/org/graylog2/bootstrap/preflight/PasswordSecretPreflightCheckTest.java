@@ -25,7 +25,6 @@ import org.graylog2.Configuration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 class PasswordSecretPreflightCheckTest {
 

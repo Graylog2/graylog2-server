@@ -37,7 +37,7 @@ jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
 
 describe('SavedSearches BulkActions', () => {
   const openActionsDropdown = async () => {
-    userEvent.click(
+    await userEvent.click(
       await screen.findByRole('button', {
         name: /bulk actions/i,
       }),
@@ -45,7 +45,7 @@ describe('SavedSearches BulkActions', () => {
   };
 
   const deleteSavedSearch = async () => {
-    userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
   };
 
   useWindowConfirmMock();
@@ -57,6 +57,8 @@ describe('SavedSearches BulkActions', () => {
       selectEntity: () => {},
       deselectEntity: () => {},
       toggleEntitySelect: () => {},
+      isSomeRowsSelected: false,
+      isAllRowsSelected: false,
     });
   });
 
@@ -70,6 +72,8 @@ describe('SavedSearches BulkActions', () => {
       selectEntity: () => {},
       deselectEntity: () => {},
       toggleEntitySelect: () => {},
+      isSomeRowsSelected: true,
+      isAllRowsSelected: false,
     });
 
     render(<BulkActions />);
@@ -104,6 +108,8 @@ describe('SavedSearches BulkActions', () => {
       selectEntity: () => {},
       deselectEntity: () => {},
       toggleEntitySelect: () => {},
+      isSomeRowsSelected: true,
+      isAllRowsSelected: false,
     });
 
     render(<BulkActions />);

@@ -18,7 +18,7 @@ package org.graylog2.shared.events;
 
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.spy;

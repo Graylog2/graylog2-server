@@ -71,7 +71,7 @@ export type EventProcessorConfig = {
   filters?: SearchFilter[];
   streams?: string[];
   stream_categories?: string[];
-  group_by: string[];
+  group_by?: string[];
   _is_scheduled?: boolean;
   series?: Array<{ field: string; id: string; type: string }>;
   conditions?: {
@@ -110,6 +110,7 @@ export type EventDefinition = {
   updated_at: string | null;
   matched_at: string;
   scheduler: Scheduler;
+  event_summary_template: string;
 };
 
 export type EventDefinitionFormControlsProps = {

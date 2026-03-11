@@ -49,6 +49,8 @@ import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +61,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -82,7 +85,7 @@ class JobSchedulerServiceIT {
     private JobSchedulerClock clock;
 
     // intentionally mutable so that individual tests can add their factories
-    private final Map<String, Job.Factory> jobFactories = new HashMap<>();
+    private final Map<String, Job.Factory<? extends Job>> jobFactories = new HashMap<>();
 
     @BeforeEach
     void setUp(MongoDBTestService mongoDBTestService) throws Exception {
@@ -101,22 +104,18 @@ class JobSchedulerServiceIT {
         final Duration lockExpirationDuration = Duration.seconds(10);
 
         final var mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        jobDefinitionService = new DBJobDefinitionService(
-                new MongoCollections(mapperProvider,
-                        mongoDBTestService.mongoConnection()), mapperProvider);
+        final var mongoCollections = new MongoCollections(mapperProvider, mongoDBTestService.mongoConnection());
+        jobDefinitionService = new DBJobDefinitionService(mongoCollections, mapperProvider);
 
         jobTriggerService = new DBJobTriggerService(
-                new MongoCollections(mapperProvider, mongoDBTestService.mongoConnection()),
+                mongoCollections,
                 nodeId,
                 clock,
                 schedulerCapabilitiesService,
                 lockExpirationDuration
         );
 
-        final DBJobDefinitionService jobDefinitionService = new DBJobDefinitionService(
-                new MongoCollections(mapperProvider,
-                        mongoDBTestService.mongoConnection()),
-                mapperProvider);
+        final DBJobDefinitionService jobDefinitionService = new DBJobDefinitionService(mongoCollections, mapperProvider);
         final JobScheduleStrategies scheduleStrategies = new JobScheduleStrategies(clock);
 
         final JobTriggerUpdates.Factory jobTriggerUpdatesFactory = trigger -> new JobTriggerUpdates(
@@ -134,15 +133,22 @@ class JobSchedulerServiceIT {
                         .build()
         );
 
-        final JobExecutionEngine.Factory engineFactory = workerPool -> new JobExecutionEngine(
-                jobTriggerService,
-                jobDefinitionService,
+        final JobExecutionEngine.Factory engineFactory = (
+                name,
+                jobFactories,
+                workerPool,
+                definitionLookup,
+                triggerService
+        ) -> new JobExecutionEngine(
+                triggerService,
+                definitionLookup,
                 eventBus,
                 scheduleStrategies,
                 jobTriggerUpdatesFactory,
                 () -> new RefreshingLockService(lockService, scheduler, leaderElectionLockTTL),
                 jobFactories,
                 workerPool,
+                "test",
                 schedulerConfig,
                 metricRegistry,
                 200);
@@ -150,9 +156,30 @@ class JobSchedulerServiceIT {
         final JobWorkerPool.Factory workerPoolFactory = (name, poolSize) ->
                 new JobWorkerPool(name, poolSize, metricRegistry);
 
-        final Duration loopSleepDuration = Duration.milliseconds(200);
+        jobSchedulerService = new TestJobSchedulerService(
+                workerPool -> engineFactory.create(
+                        "test",
+                        jobFactories,
+                        workerPool,
+                        jobDefinitionService::get,
+                        jobTriggerService
+                ),
+                workerPoolFactory.create("test", schedulerConfig.numberOfWorkerThreads()), schedulerConfig, clock,
+                eventBus, serverStatus);
+    }
 
-        jobSchedulerService = new JobSchedulerService(engineFactory, workerPoolFactory, schedulerConfig, clock, eventBus, serverStatus, new GracefulShutdownService(), 30_000, loopSleepDuration);
+    static class TestJobSchedulerService extends JobSchedulerService {
+        private static final Logger LOG = LoggerFactory.getLogger(TestJobSchedulerService.class);
+
+        public TestJobSchedulerService(Function<JobWorkerPool, JobExecutionEngine> engineFactory,
+                                       JobWorkerPool workerPool,
+                                       JobSchedulerConfig schedulerConfig,
+                                       JobSchedulerClock clock,
+                                       JobSchedulerEventBus schedulerEventBus,
+                                       ServerStatus serverStatus) {
+            super(LOG, engineFactory, workerPool, schedulerConfig::canExecute, clock, schedulerEventBus,
+                    serverStatus, new GracefulShutdownService(), 30_000, Duration.milliseconds(200));
+        }
     }
 
     @Test

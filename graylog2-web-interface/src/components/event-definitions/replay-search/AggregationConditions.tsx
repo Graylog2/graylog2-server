@@ -35,6 +35,7 @@ import useAlertAndEventDefinitionData from './hooks/useAlertAndEventDefinitionDa
 const List = styled.div`
   display: flex;
   gap: 5px;
+  flex-wrap: wrap;
 `;
 
 const Condition = styled.div`
@@ -122,7 +123,7 @@ const AggregationConditions = () => {
               color={hexColor}
               colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
               triggerNode={
-                <ColorComponent style={{ backgroundColor: hexColor }}>
+                <ColorComponent style={{ backgroundColor: hexColor }} data-testid={`color-${condition}`}>
                   {!hexColor && <Icon name="colors" size="xs" />}
                 </ColorComponent>
               }
@@ -137,7 +138,7 @@ const AggregationConditions = () => {
       })}
     </List>
   ) : (
-    <NoAttributeProvided name="Aggregation conditions" />
+    <NoAttributeProvided />
   );
 };
 

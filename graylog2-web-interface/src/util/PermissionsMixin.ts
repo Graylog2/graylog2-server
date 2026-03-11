@@ -14,15 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type * as Immutable from 'immutable';
+import type { List } from 'immutable';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
-type Permission = string;
-type Permissions = Array<Permission>;
-type UserPermissions = Immutable.List<Permission>;
+type Permissions = Array<Permission> | List<Permission>;
 
-const _isWildCard = (permissionSet: UserPermissions | Permissions) => permissionSet.indexOf('*') > -1;
+const _isWildCard = (permissionSet: Permissions) => permissionSet.indexOf('*') > -1;
 
-const _permissionPredicate = (permissionSet: UserPermissions | Permissions, p: Permission) => {
+const _permissionPredicate = (permissionSet: Permissions, p: Permission) => {
   if (permissionSet.indexOf(p) > -1 || permissionSet.indexOf('*') > -1) {
     return true;
   }
@@ -30,25 +29,22 @@ const _permissionPredicate = (permissionSet: UserPermissions | Permissions, p: P
   const permissionParts = p.split(':');
 
   if (permissionParts.length >= 2) {
-    const first = permissionParts[0];
-    const second = `${permissionParts[0]}:${permissionParts[1]}`;
+    const first = permissionParts[0] as Permission;
+    const second = `${permissionParts[0]}:${permissionParts[1]}` as Permission;
 
     return (
       permissionSet.indexOf(first) > -1 ||
-      permissionSet.indexOf(`${first}:*`) > -1 ||
+      permissionSet.indexOf(`${first}:*` as Permission) > -1 ||
       permissionSet.indexOf(second) > -1 ||
-      permissionSet.indexOf(`${second}:*`) > -1
+      permissionSet.indexOf(`${second}:*` as Permission) > -1
     );
   }
 
-  return permissionSet.indexOf(`${p}:*`) > -1;
+  return permissionSet.indexOf(`${p}:*` as Permission) > -1;
 };
 
-export const isPermitted = (
-  possessedPermissions: UserPermissions | Permissions,
-  requiredPermissions: Permissions | Permission,
-) => {
-  if (!requiredPermissions || requiredPermissions.length === 0) {
+export const isPermitted = (possessedPermissions: Permissions, requiredPermissions: Permissions | Permission) => {
+  if (!requiredPermissions || (Array.isArray(requiredPermissions) && requiredPermissions.length === 0)) {
     return true;
   }
 
@@ -67,11 +63,8 @@ export const isPermitted = (
   return _permissionPredicate(possessedPermissions, requiredPermissions);
 };
 
-export const isAnyPermitted = (
-  possessedPermissions: UserPermissions | Permissions,
-  requiredPermissions: Permissions,
-) => {
-  if (!requiredPermissions || requiredPermissions.length === 0) {
+export const isAnyPermitted = (possessedPermissions: Permissions, requiredPermissions: Permissions) => {
+  if (!requiredPermissions || (Array.isArray(requiredPermissions) && requiredPermissions.length === 0)) {
     return true;
   }
 
@@ -87,8 +80,7 @@ export const isAnyPermitted = (
 };
 
 const ADMIN_PERMISSION = '*';
-export const hasAdminPermission = (permissions: UserPermissions | Permissions) =>
-  permissions.includes(ADMIN_PERMISSION);
+export const hasAdminPermission = (permissions: Permissions) => permissions.includes(ADMIN_PERMISSION);
 
 const PermissionsMixin = { isPermitted, isAnyPermitted };
 

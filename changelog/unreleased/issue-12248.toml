@@ -1,0 +1,5 @@
+type = "a"
+message = "Improved Inputs Overview Page: The page has been revamped with pagination and various UI enhancements to improve navigation."
+
+pulls = ["24245", "Graylog2/graylog-plugin-enterprise#12538"]
+issues = ["12248", "graylog-plugin-enterprise#24421"]

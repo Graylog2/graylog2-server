@@ -37,9 +37,3 @@ type IndexRetentionConfig = {
   configComponent: React.ComponentType<IndexRetentionConfigComponentProps>;
   summaryComponent: React.ComponentType<IndexRetentionSummaryComponentProps>;
 };
-
-declare module 'graylog-web-plugin/plugin' {
-  interface PluginExports {
-    indexRetentionConfig?: Array<IndexRetentionConfig>;
-  }
-}

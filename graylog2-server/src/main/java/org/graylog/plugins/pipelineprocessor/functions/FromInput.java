@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions;
 
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
@@ -25,8 +26,6 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGrou
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.inputs.InputRegistry;
-
-import jakarta.inject.Inject;
 
 import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;

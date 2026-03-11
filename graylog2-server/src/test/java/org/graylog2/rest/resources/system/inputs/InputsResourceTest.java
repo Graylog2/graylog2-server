@@ -23,6 +23,7 @@ import org.assertj.core.api.Assertions;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbInputsMetadataService;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.events.ClusterEventBus;
@@ -48,6 +49,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import org.graylog2.database.filtering.ComputedFieldRegistry;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -91,7 +95,7 @@ class InputsResourceTest {
     @BeforeEach
     public void setUp() {
         inputsResource = new InputsTestResource(inputService, streamService, streamRuleService,
-                pipelineService, pipelineStreamConnectionsService, messageInputFactory, configuration);
+                pipelineService, messageInputFactory, configuration);
     }
 
     @Test
@@ -201,11 +205,11 @@ class InputsResourceTest {
                                   StreamService streamService,
                                   StreamRuleService streamRuleService,
                                   PipelineService pipelineService,
-                                  PipelineStreamConnectionsService pipelineStreamConnectionsService,
                                   MessageInputFactory messageInputFactory,
                                   Configuration config) {
             super(inputService, mock(InputDiagnosticService.class), streamService, streamRuleService,
-                    pipelineService, messageInputFactory, config, mock(ClusterEventBus.class));
+                    pipelineService, messageInputFactory, config, mock(MongoDbInputsMetadataService.class),
+                    mock(ClusterEventBus.class), new ComputedFieldRegistry(Set.of()));
             configuration = mock(HttpConfiguration.class);
 
             this.user = mock(User.class);

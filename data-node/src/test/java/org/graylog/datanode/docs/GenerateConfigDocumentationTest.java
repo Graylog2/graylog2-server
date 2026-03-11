@@ -17,6 +17,11 @@
 package org.graylog.datanode.docs;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.documentation.ConfigurationDocsGenerator;
+import com.github.joschi.jadconfig.documentation.Documentation;
+import com.github.joschi.jadconfig.documentation.DocumentationFormat;
+import com.github.joschi.jadconfig.documentation.DocumentationSection;
+import com.github.joschi.jadconfig.documentation.printers.CsvDocsPrinter;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
@@ -25,9 +30,6 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.docs.printers.CsvDocsPrinter;
-import org.graylog2.configuration.Documentation;
-import org.graylog2.configuration.DocumentationSection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;

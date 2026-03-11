@@ -23,8 +23,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.jayway.jsonpath.ReadContext;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -32,8 +32,8 @@ import jakarta.ws.rs.core.MediaType;
 import org.graylog2.rest.resources.HelloWorldResource;
 import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.rest.documentation.generator.Generator;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
@@ -41,9 +41,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GeneratorTest {
 
@@ -55,19 +55,19 @@ public class GeneratorTest {
                                  @JsonProperty("entity") SampleEntity entity,
                                  @JsonProperty("another_entity") SampleEntity anotherEntity) {}
 
-    @Api(value = "Sample", description = "An example REST resource")
+    @Tag(name = "Sample", description = "An example REST resource")
     @Path("/sample")
     public class SampleResource {
         @GET
         @Timed
-        @ApiOperation(value = "A few details about the Graylog node.")
+        @Operation(summary = "A few details about the Graylog node.")
         @Produces(MediaType.APPLICATION_JSON)
         public SampleResponse sample() {
             return null;
         }
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void init() {
         objectMapper = new ObjectMapper();
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);

@@ -22,48 +22,58 @@ import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
-import org.graylog.events.processor.EventDefinitionDto;
-import org.graylog2.indexer.IndexMapping;
+import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
+import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiService;
+import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedException;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.Grouping;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.plugin.streams.Stream;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.rest.resources.entities.Slice;
+import org.graylog2.rest.resources.entities.Slices;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.graylog.events.event.EventDto.FIELD_ALERT;
+import static org.graylog.events.event.EventDto.FIELD_PRIORITY;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
-import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID;
 
-public class EventsSearchService {
+public class EventsSearchService extends AbstractEventsSearchService {
     private final MoreSearch moreSearch;
     private final StreamService streamService;
-    private final DBEventDefinitionService eventDefinitionService;
-    private final ObjectMapper objectMapper;
+    private final ScriptingApiService scriptingApiService;
 
     @Inject
     public EventsSearchService(MoreSearch moreSearch,
                                StreamService streamService,
                                DBEventDefinitionService eventDefinitionService,
+                               final ScriptingApiService scriptingApiService,
                                ObjectMapper objectMapper) {
+        super(eventDefinitionService, streamService, objectMapper);
         this.moreSearch = moreSearch;
         this.streamService = streamService;
-        this.eventDefinitionService = eventDefinitionService;
-        this.objectMapper = objectMapper;
+        this.scriptingApiService = scriptingApiService;
     }
 
     private String buildFilter(EventsSearchParameters parameters) {
         return new EventsFilterBuilder(parameters).build();
     }
 
-    private Set<String> allowedEventStreams(Subject subject) {
-        final var eventStreams = Set.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
+    public Set<String> allowedEventStreams(Subject subject) {
+        final var eventStreams = defaultEventStreams();
         if (subject.isPermitted(RestPermissions.STREAMS_READ)) {
             return eventStreams;
         }
@@ -71,6 +81,125 @@ public class EventsSearchService {
         return eventStreams.stream()
                 .filter(streamId -> subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)) || streamId.equals(DEFAULT_EVENTS_STREAM_ID))
                 .collect(Collectors.toSet());
+    }
+
+    /**
+     * returns the slices for the slice-by functionality for the Alerts/Events table. Used in the core Events/Alerts table
+     */
+    public Slices slices(final EventsSlicesRequest request, final Subject subject, final SearchUser searchUser) {
+        // we cover two use cases by the include_all flag: if you only want the slices calculated from the resultset that will also be shown in the entity table, we re-use query and timerange for that. Otherwise, we query the table for "all" possible slices
+        final var query = request.includeAll() ? "" : request.query();
+        final var timeRange = request.includeAll() ? RelativeRange.allTime() : request.timerange();
+        final var filter = buildFilter(EventsSearchParameters.builder().query(query).timerange(timeRange).filter(request.filter()).build());
+
+        final var queryString = filter.isEmpty() ? query : query.isEmpty() ? filter : query + " AND " + filter;
+
+        return this.slices(queryString, timeRange, subject, searchUser, request.sliceColumn(), request.includeAll());
+    }
+
+    /**
+     * Used inside this service for the core Events/Alerts table but also is a provided method, re-used from the enterprise/security part of Graylog
+     */
+    public Slices slices(String query, TimeRange timeRange, Subject subject, SearchUser searchUser, final String slicingColumn, final boolean includeAll) {
+        try {
+            final var slices = scriptingApiService.executeAggregation(
+                            new AggregationRequestSpec(query, allowedEventStreams(subject), Set.of(), timeRange, List.of(new Grouping(slicingColumn, Integer.MAX_VALUE)), List.of(new Metric("count", slicingColumn))),
+                            searchUser
+                    )
+                    .datarows()
+                    .stream()
+                    .map(r -> mapAggregationResultsToSlice(slicingColumn, r))
+                    .toList();
+
+            final var filtered = includeAll
+                    ? addMissingOptions(slices, slicingColumn)
+                    : slices.stream().filter(s -> !MissingBucketConstants.MISSING_BUCKET_NAME.equals(s.value())).toList();
+
+            return new Slices(filtered);
+        } catch (QueryFailedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * finding the overall count for one column for MongoDB based queries so we can calculate the "empty" case
+     */
+    public Optional<Slice> count(String query, TimeRange timeRange, Subject subject, SearchUser searchUser, final String slicingColumn) {
+        try {
+            return scriptingApiService.executeAggregation(
+                            new AggregationRequestSpec(query, allowedEventStreams(subject), Set.of(), timeRange, List.of(), List.of(new Metric("count", null))),
+                            searchUser
+                    )
+                    .datarows()
+                    .stream()
+                    .map(r -> new Slice(r.getFirst().toString(), r.getFirst().toString(), Integer.valueOf(r.getLast().toString())))
+                    .findFirst();
+        } catch (QueryFailedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * In the Open Source part, we only map priority and type, both of which are augmented in the FE regarding the title.
+     * So we only need a simple mapping function here.
+     */
+    public Slice mapAggregationResultsToSlice(final String slicingColumn, final List<Object> result) {
+        return new Slice(result.getFirst().toString(), null, Integer.valueOf(result.getLast().toString()));
+    }
+
+    // the alert can either be true or false
+    List<Slice> handleAlertColumn(final List<Slice> slices) {
+        if (slices.size() == 2) {
+            return slices;
+        }
+
+        final var TRUE = new Slice("true", null, 0);
+        final var FALSE = new Slice("false", null, 0);
+
+        if (slices.isEmpty()) {
+            return List.of(TRUE, FALSE);
+        }
+
+        if (slices.getFirst().value().equals("true")) {
+            return List.of(slices.getFirst(), FALSE);
+        } else {
+            return List.of(TRUE, slices.getFirst());
+        }
+    }
+
+    // priority can be 0 (info) to 4 (critical), see EventDefinitionPriorityEnum.ts
+    List<Slice> handlePriorityColumn(final List<Slice> slices) {
+        if (slices.size() == 5) {
+            return slices;
+        }
+
+	final var INFO = new Slice("0", null, 0);
+        final var LOW = new Slice("1", null, 0);
+        final var MEDIUM = new Slice("2", null, 0);
+        final var HIGH = new Slice("3", null, 0);
+        final var CRITICAL = new Slice("4", null, 0);
+
+        if (slices.isEmpty()) {
+            return List.of(INFO, LOW, MEDIUM, HIGH, CRITICAL);
+        }
+
+        List<Slice> fixedList = new ArrayList<>();
+        fixedList.add(slices.stream().filter(s -> s.value().equals(INFO.value())).findAny().orElse(INFO));
+        fixedList.add(slices.stream().filter(s -> s.value().equals(LOW.value())).findAny().orElse(LOW));
+        fixedList.add(slices.stream().filter(s -> s.value().equals(MEDIUM.value())).findAny().orElse(MEDIUM));
+        fixedList.add(slices.stream().filter(s -> s.value().equals(HIGH.value())).findAny().orElse(HIGH));
+        fixedList.add(slices.stream().filter(s -> s.value().equals(CRITICAL.value())).findAny().orElse(CRITICAL));
+
+        return fixedList;
+    }
+
+    // when slicing, add missing keys that don't exist in the data but you still want to show with cardinality 0
+    public List<Slice> addMissingOptions(final List<Slice> slices, final String slicingColumn) {
+        return switch (slicingColumn) {
+            case FIELD_ALERT -> handleAlertColumn(slices);
+            case FIELD_PRIORITY -> handlePriorityColumn(slices);
+            default -> slices;
+        };
     }
 
     public EventsSearchResult search(EventsSearchParameters parameters, Subject subject) {
@@ -83,32 +212,7 @@ public class EventsSearchService {
 
         final MoreSearch.Result result = moreSearch.eventSearch(parameters, filter, eventStreams, forbiddenSourceStreams(subject));
 
-        final ImmutableSet.Builder<String> eventDefinitionIdsBuilder = ImmutableSet.builder();
-        final ImmutableSet.Builder<String> streamIdsBuilder = ImmutableSet.builder();
-
-        final List<EventsSearchResult.Event> events = result.results().stream()
-                .map(resultMsg -> {
-                    final EventDto eventDto = objectMapper.convertValue(resultMsg.getMessage().getFields(), EventDto.class);
-
-                    eventDefinitionIdsBuilder.add((String) resultMsg.getMessage().getField(EventDto.FIELD_EVENT_DEFINITION_ID));
-                    streamIdsBuilder.addAll(resultMsg.getMessage().getStreamIds());
-
-                    return EventsSearchResult.Event.create(eventDto, resultMsg.getIndex(), IndexMapping.TYPE_MESSAGE);
-                }).collect(Collectors.toList());
-
-        final EventsSearchResult.Context context = EventsSearchResult.Context.create(
-                lookupEventDefinitions(eventDefinitionIdsBuilder.build(), subject),
-                lookupStreams(streamIdsBuilder.build(), subject)
-        );
-
-        return EventsSearchResult.builder()
-                .parameters(parameters)
-                .totalEvents(result.resultsCount())
-                .duration(result.duration())
-                .events(events)
-                .usedIndices(result.usedIndexNames())
-                .context(context)
-                .build();
+        return buildResultForSubject(parameters, result, subject);
     }
 
     public EventsHistogramResult histogram(EventsSearchParameters parameters, Subject subject, ZoneId timeZone) {
@@ -158,20 +262,16 @@ public class EventsSearchService {
         }
     }
 
-    private Map<String, EventsSearchResult.ContextEntity> lookupStreams(Set<String> streams, final Subject subject) {
-        final var allowedStreams = streams.stream().filter(streamId -> subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId))).collect(Collectors.toSet());
+    private EventsSearchResult buildResultForSubject(EventsSearchParameters parameters,
+                                                     MoreSearch.Result result,
+                                                     Subject subject) {
+        final ImmutableSet.Builder<String> eventDefinitionIdsBuilder = ImmutableSet.builder();
+        final ImmutableSet.Builder<String> streamIdsBuilder = ImmutableSet.builder();
+        final List<EventsSearchResult.Event> events = toEvents(result, eventDefinitionIdsBuilder, streamIdsBuilder);
+        final EventsSearchResult.Context context = EventsSearchResult.Context.create(
+                lookupEventDefinitions(eventDefinitionIdsBuilder.build(), subject),
+                lookupStreams(streamIdsBuilder.build(), subject));
 
-        return streamService.loadByIds(allowedStreams)
-                .stream()
-                .collect(Collectors.toMap(Stream::getId, s -> EventsSearchResult.ContextEntity.create(s.getId(), s.getTitle(), s.getDescription())));
-    }
-
-    private Map<String, EventsSearchResult.ContextEntity> lookupEventDefinitions(Set<String> eventDefinitions, final Subject subject) {
-        final var allowedEventDefinitions = eventDefinitions.stream().filter(eventDefinitionId -> subject.isPermitted(String.join(":", RestPermissions.EVENT_DEFINITIONS_READ, eventDefinitionId))).collect(Collectors.toSet());
-
-        return eventDefinitionService.getByIds(allowedEventDefinitions)
-                .stream()
-                .collect(Collectors.toMap(EventDefinitionDto::id,
-                        d -> EventsSearchResult.ContextEntity.create(d.id(), d.title(), d.description(), d.remediationSteps())));
+        return assembleResult(parameters, result, events, context);
     }
 }

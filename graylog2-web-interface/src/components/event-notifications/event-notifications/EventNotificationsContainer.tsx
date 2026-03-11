@@ -65,7 +65,7 @@ const EventNotificationsContainer = () => {
   const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
     usePluggableEntityTableElements<EventNotification>(null, 'notification');
 
-  const { defaultLayout, columnOrder, additionalAttributes } = getEventNotificationTableElements(pluggableAttributes);
+  const { defaultLayout, additionalAttributes } = getEventNotificationTableElements(pluggableAttributes);
   const columnRenderers = useMemo(
     () => customColumnRenderers(testResults, pluggableColumnRenderers),
     [testResults, pluggableColumnRenderers],
@@ -108,13 +108,12 @@ const EventNotificationsContainer = () => {
   return (
     <PaginatedEntityTable<EventNotification>
       humanName="event notifications"
-      columnsOrder={columnOrder}
       queryHelpComponent={<QueryHelper entityName="notification" />}
       entityActions={renderEvenNotificationActions}
       tableLayout={defaultLayout}
       fetchEntities={fetchEntities}
       additionalAttributes={additionalAttributes}
-      expandedSectionsRenderer={expandedSections}
+      expandedSectionRenderers={expandedSections}
       keyFn={keyFn}
       bulkSelection={{ actions: <BulkActions /> }}
       entityAttributesAreCamelCase

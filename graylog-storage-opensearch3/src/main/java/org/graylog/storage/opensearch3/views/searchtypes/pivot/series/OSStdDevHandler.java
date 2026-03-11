@@ -16,36 +16,29 @@
  */
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
-import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ExtendedStats;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ExtendedStatsAggregationBuilder;
-import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
-import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.ExtendedStatsAggregateBase;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.stream.Stream;
+import java.util.Optional;
 
-public class OSStdDevHandler extends OSPivotSeriesSpecHandler<StdDev, ExtendedStats> {
-    @Nonnull
+public class OSStdDevHandler extends OSBasicSeriesSpecHandler<StdDev> {
+
     @Override
-    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, StdDev stddevSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
-        final ExtendedStatsAggregationBuilder stddev = AggregationBuilders.extendedStats(name).field(stddevSpec.field());
-        record(queryContext, pivot, stddevSpec, name, ExtendedStats.class);
-        return List.of(SeriesAggregationBuilder.metric(stddev));
+    protected SeriesAggregationBuilder createAggregationBuilder(final String name, final StdDev stddevSpec) {
+        return SeriesAggregationBuilder.metric(new MutableNamedAggregationBuilder(name,
+                Aggregation.builder().extendedStats(e -> e.field(stddevSpec.field()))));
     }
 
     @Override
-    public Stream<Value> doHandleResult(Pivot pivot, StdDev pivotSpec,
-                                        SearchResponse searchResult,
-                                        ExtendedStats stddevAggregation,
-                                        OSSearchTypeHandler<Pivot> searchTypeHandler,
-                                        OSGeneratedQueryContext OSGeneratedQueryContext) {
-        return Stream.of(OSPivotSeriesSpecHandler.Value.create(pivotSpec.id(), StdDev.NAME, stddevAggregation.getStdDeviation()));
+    protected Object getValueFromAggregationResult(final Aggregate agg, final StdDev seriesSpec) {
+        return Optional.ofNullable(agg)
+                .filter(Aggregate::isExtendedStats)
+                .map(Aggregate::extendedStats)
+                .map(ExtendedStatsAggregateBase::stdDeviation)
+                .orElse(null);
     }
 }

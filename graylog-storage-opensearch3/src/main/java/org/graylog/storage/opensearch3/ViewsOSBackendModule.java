@@ -32,6 +32,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.RangeBucket;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
@@ -46,12 +47,9 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch3.views.OpenSearchBackend;
 import org.graylog.storage.opensearch3.views.export.OpenSearchExportBackend;
-import org.graylog.storage.opensearch3.views.export.RequestStrategy;
-import org.graylog.storage.opensearch3.views.export.SearchAfter;
 import org.graylog.storage.opensearch3.views.searchtypes.EventListStrategy;
 import org.graylog.storage.opensearch3.views.searchtypes.OSEventListDelegate;
 import org.graylog.storage.opensearch3.views.searchtypes.OSMessageList;
@@ -60,6 +58,7 @@ import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivot;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotBucketSpecHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.buckets.OSDateRangeHandler;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.buckets.OSRangeHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.buckets.OSTimeHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.buckets.OSValuesHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.series.OSAverageHandler;
@@ -110,13 +109,9 @@ public class ViewsOSBackendModule extends ViewsModule {
         registerPivotBucketHandler(Values.NAME, OSValuesHandler.class);
         registerPivotBucketHandler(Time.NAME, OSTimeHandler.class);
         registerPivotBucketHandler(DateRangeBucket.NAME, OSDateRangeHandler.class);
+        registerPivotBucketHandler(RangeBucket.NAME, OSRangeHandler.class);
 
         bindExportBackend().to(OpenSearchExportBackend.class);
-        bindRequestStrategy().to(SearchAfter.class);
-    }
-
-    private LinkedBindingBuilder<RequestStrategy> bindRequestStrategy() {
-        return bind(RequestStrategy.class);
     }
 
     private LinkedBindingBuilder<ExportBackend> bindExportBackend() {
@@ -137,7 +132,7 @@ public class ViewsOSBackendModule extends ViewsModule {
         pivotBucketHandlerBinder().addBinding(name).to(implementation);
     }
 
-    protected MapBinder<String, OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> pivotSeriesHandlerBinder() {
+    protected MapBinder<String, OSPivotSeriesSpecHandler<? extends SeriesSpec>> pivotSeriesHandlerBinder() {
         return MapBinder.newMapBinder(binder(),
                 TypeLiteral.get(String.class),
                 new TypeLiteral<>() {});
@@ -146,7 +141,7 @@ public class ViewsOSBackendModule extends ViewsModule {
 
     private void registerPivotSeriesHandler(
             String name,
-            Class<? extends OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> implementation
+            Class<? extends OSPivotSeriesSpecHandler<? extends SeriesSpec>> implementation
     ) {
         pivotSeriesHandlerBinder().addBinding(name).to(implementation);
     }

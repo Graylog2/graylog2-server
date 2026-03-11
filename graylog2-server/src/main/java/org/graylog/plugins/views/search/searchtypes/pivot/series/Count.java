@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Strings;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 
 import javax.annotation.Nullable;
@@ -70,8 +71,12 @@ public abstract class Count implements SeriesSpec, HasOptionalField {
         @JsonProperty
         public abstract Builder id(String id);
 
-        @JsonProperty
         public abstract Builder field(@Nullable String field);
+
+        @JsonProperty("field")
+        public Builder nonEmptyField(@Nullable String field) {
+            return field(Strings.emptyToNull(field));
+        }
 
         abstract Optional<String> id();
 

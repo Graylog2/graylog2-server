@@ -32,6 +32,8 @@ public interface GraylogBackend {
 
     void importMongoDBFixture(String resourcePath, Class<?> testClass);
 
+    long countDocumentsInMongoDBCollection(String collection);
+
     void dropCollection(String collectionName);
 
     void importElasticsearchFixture(String resourcePath, Class<?> testClass);
@@ -40,8 +42,8 @@ public interface GraylogBackend {
 
     String getLogs();
 
-    Optional<MailServerInstance> getEmailServerInstance();
-    Optional<WebhookServerInstance> getWebhookServerInstance();
+    Optional<MailServerContainer> getEmailServerInstance();
+    Optional<WebhookServerContainer> getWebhookServerInstance();
 
     String getSearchLogs();
 }

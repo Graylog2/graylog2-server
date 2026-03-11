@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import authBindings from 'components/authentication/bindings';
 import Routes from 'routing/Routes';
@@ -45,7 +46,7 @@ describe('ServiceSelect', () => {
     await selectEvent.chooseOption('Select a service', 'LDAP');
 
     const submitButton = await screen.findByRole('button', { name: 'Get started' });
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(history.push).toHaveBeenCalledTimes(1));
     await waitFor(() =>
@@ -59,7 +60,7 @@ describe('ServiceSelect', () => {
     await selectEvent.chooseOption('Select a service', 'Active Directory');
 
     const submitButton = await screen.findByRole('button', { name: 'Get started' });
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(history.push).toHaveBeenCalledTimes(1));
     await waitFor(() =>
