@@ -111,7 +111,7 @@ const ShareDetails = ({ shareState = null }: Props) => {
               const currentGranteeState = grantee.currentState(activeShares);
 
               return (
-                <GranteeListItemContainer $currentState={currentGranteeState}>
+                <GranteeListItemContainer key={grantee.id} $currentState={currentGranteeState}>
                   <GranteeInfo title={grantee.title}>
                     <StyledGranteeIcon type={grantee.type} />
                     <GranteeListItemTitle>{grantee.title}</GranteeListItemTitle>
