@@ -143,7 +143,7 @@ public class MongodbClusterResource extends RestResource {
                 result.grandTotal().orElse(0L), sort, order, result.stream().toList(), attributes, settings);
     }
 
-    @GET
+    @PUT
     @Path("/profiling/{level}")
     @AuditEvent(type = AuditEventTypes.MONGODB_ENABLE_PROFILING)
     @Operation(summary = "Enables profiling for all mongodb nodes")
