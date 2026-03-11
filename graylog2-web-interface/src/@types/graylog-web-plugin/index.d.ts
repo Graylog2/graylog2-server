@@ -347,6 +347,7 @@ declare module 'graylog-web-plugin/plugin' {
       requiredFeatureFlag?: string;
       path: QualifiedUrl<string>;
       exactPathMatch?: boolean;
+      BadgeComponent?: React.ComponentType<{ text: string }>;
     }>;
   }
 
@@ -413,6 +414,9 @@ declare module 'graylog-web-plugin/plugin' {
     entityTypeRoute?: Array<EntityTypeRouteGenerator>;
     entityCreators?: Array<EntityCreator>;
     indexRetentionConfig?: Array<IndexRetentionConfig>;
+    inputsBadgeProviders?: Array<{
+      useCondition: () => { hasIssues: boolean; title: string };
+    }>;
   }
   interface PluginMetadata {
     name?: string;
