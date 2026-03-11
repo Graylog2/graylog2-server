@@ -64,13 +64,6 @@ describe('TabKeywordTimeRange', () => {
     asMock(ToolsStore.testNaturalDate).mockClear();
   });
 
-  const findValidationState = (container) => {
-    // eslint-disable-next-line testing-library/no-node-access
-    const formGroup = container.querySelector('.form-group');
-
-    return formGroup && formGroup.className.includes('has-error') ? 'error' : null;
-  };
-
   const changeInput = async (input, value) => {
     await userEvent.clear(input);
     await userEvent.type(input, value);
