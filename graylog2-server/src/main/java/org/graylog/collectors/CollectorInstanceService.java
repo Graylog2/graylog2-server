@@ -17,6 +17,8 @@
 package org.graylog.collectors;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.IndexModel;
@@ -27,6 +29,7 @@ import com.mongodb.client.model.ReturnDocument;
 import com.mongodb.client.result.InsertOneResult;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog2.database.filtering.DbSortResolver;
 import org.graylog.collectors.db.CollectorInstanceDTO;
@@ -40,7 +43,9 @@ import org.mongojack.Id;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Updates.combine;
@@ -180,6 +185,32 @@ public class CollectorInstanceService {
                 Filters.eq(CollectorInstanceDTO.FIELD_FLEET_ID, fleetId),
                 Filters.gte(FIELD_LAST_SEEN, onlineThreshold)
         ));
+    }
+
+    public Map<String, long[]> countByFleetGrouped(Instant onlineThreshold) {
+        final var pipeline = List.of(
+                Aggregates.group("$" + FIELD_FLEET_ID,
+                        Accumulators.sum("total", 1L),
+                        Accumulators.sum("online",
+                                new Document("$cond", List.of(
+                                        new Document("$gte", List.of("$" + FIELD_LAST_SEEN, onlineThreshold)),
+                                        1L,
+                                        0L
+                                ))
+                        )
+                )
+        );
+        final Map<String, long[]> result = new HashMap<>();
+        collection.aggregate(pipeline, Document.class).forEach(doc -> {
+            final String fleetId = doc.getString("_id");
+            if (fleetId != null) {
+                result.put(fleetId, new long[]{
+                        ((Number) doc.get("total")).longValue(),
+                        ((Number) doc.get("online")).longValue()
+                });
+            }
+        });
+        return result;
     }
 
     public record MinimalCollectorInstanceDTO(@Id @JsonProperty(FIELD_ID) String id,

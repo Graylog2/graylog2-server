@@ -34,6 +34,7 @@ import org.graylog2.search.SearchQueryParser;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -153,5 +154,9 @@ public class FleetService {
                 .stream()
                 .map(doc -> doc.getObjectId("_id").toHexString())
                 .collect(Collectors.toSet());
+    }
+
+    public List<FleetDTO> getAllFleets() {
+        return collection.find().into(new ArrayList<>());
     }
 }

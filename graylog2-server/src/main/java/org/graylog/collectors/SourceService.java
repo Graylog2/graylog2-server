@@ -17,6 +17,8 @@
 package org.graylog.collectors;
 
 import com.mongodb.MongoException;
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexModel;
 import com.mongodb.client.model.IndexOptions;
@@ -24,6 +26,7 @@ import com.mongodb.client.model.Indexes;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.bson.Document;
 import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.db.SourceConfig;
 import org.graylog.collectors.db.SourceDTO;
@@ -37,6 +40,7 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -174,6 +178,20 @@ public class SourceService {
 
     public long countByFleet(String fleetId) {
         return collection.countDocuments(Filters.eq(SourceDTO.FIELD_FLEET_ID, fleetId));
+    }
+
+    public Map<String, Long> countByFleetGrouped() {
+        final var pipeline = List.of(
+                Aggregates.group("$" + SourceDTO.FIELD_FLEET_ID, Accumulators.sum("count", 1L))
+        );
+        final Map<String, Long> result = new HashMap<>();
+        collection.aggregate(pipeline, Document.class).forEach(doc -> {
+            final String fleetId = doc.getString("_id");
+            if (fleetId != null) {
+                result.put(fleetId, ((Number) doc.get("count")).longValue());
+            }
+        });
+        return result;
     }
 
     public long deleteAllByFleet(String fleetId, boolean appendMarker) {

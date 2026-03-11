@@ -61,6 +61,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 
 @Tag(name = "Collectors/Fleets")
@@ -134,6 +135,33 @@ public class FleetResource extends RestResource {
         return fleetService.get(fleetId)
                 .map(FleetResponse::fromDTO)
                 .orElseThrow(() -> new NotFoundException("Fleet " + fleetId + " not found"));
+    }
+
+    @GET
+    @Path("/stats")
+    @Timed
+    @Operation(summary = "Get statistics for all fleets")
+    public BulkFleetStatsResponse bulkStats() {
+        final var fleets = fleetService.getAllFleets();
+        final var instanceCounts = instanceService.countByFleetGrouped(
+                Instant.now().minus(ONLINE_THRESHOLD));
+        final var sourceCountByFleet = sourceService.countByFleetGrouped();
+
+        final List<BulkFleetStatsResponse.FleetStatsSummary> summaries = fleets.stream()
+                .sorted(Comparator.comparing(FleetDTO::name))
+                .map(fleet -> {
+                    final long[] counts = instanceCounts.getOrDefault(fleet.id(), new long[]{0, 0});
+                    return new BulkFleetStatsResponse.FleetStatsSummary(
+                            fleet.id(),
+                            fleet.name(),
+                            counts[0],
+                            counts[1],
+                            counts[0] - counts[1],
+                            sourceCountByFleet.getOrDefault(fleet.id(), 0L));
+                })
+                .toList();
+
+        return new BulkFleetStatsResponse(summaries);
     }
 
     @GET
