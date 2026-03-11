@@ -64,13 +64,6 @@ describe('TabKeywordTimeRange', () => {
     asMock(ToolsStore.testNaturalDate).mockClear();
   });
 
-  const findValidationState = (container) => {
-    // eslint-disable-next-line testing-library/no-node-access
-    const formGroup = container.querySelector('.form-group');
-
-    return formGroup && formGroup.className.includes('has-error') ? 'error' : null;
-  };
-
   const changeInput = async (input, value) => {
     await userEvent.clear(input);
     await userEvent.type(input, value);
@@ -112,9 +105,9 @@ describe('TabKeywordTimeRange', () => {
   it('shows validation errors', async () => {
     asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.reject());
 
-    const { container } = render(<TabKeywordTimeRange keyword="invalid" />);
+    render(<TabKeywordTimeRange keyword="invalid" />);
 
-    await waitFor(() => expect(findValidationState(container)).toEqual('error'));
+    await screen.findByText('validation error');
   });
 
   it('does not show keyword preview if parsing fails', async () => {
