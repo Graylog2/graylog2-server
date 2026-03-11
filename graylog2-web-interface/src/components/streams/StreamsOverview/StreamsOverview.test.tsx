@@ -183,7 +183,7 @@ describe('StreamsOverview', () => {
 
     const tableRow = await screen.findByTestId(`table-row-${streamWithRules.id}`);
 
-    userEvent.click(within(tableRow).getByTitle('Show stream rules'));
+    await userEvent.click(within(tableRow).getByTitle('Show stream rules'));
 
     await screen.findByText(/must match all of the 2 configured stream \./i);
     const deleteStreamRuleButtons = await screen.findAllByRole('button', { name: /delete stream rule/i });
@@ -235,13 +235,13 @@ describe('StreamsOverview', () => {
     renderSut();
 
     const filterRulesBadge = await screen.findByTitle('Show filter rules');
-    userEvent.click(filterRulesBadge);
+    await userEvent.click(filterRulesBadge);
 
     expect(screen.getByText('Only prod logs')).toBeInTheDocument();
     expect(screen.getByText(/Showing 1 configured filter/)).toBeInTheDocument();
 
     const hideFilterRulesBadge = await screen.findByTitle('Hide filter rules');
-    userEvent.click(hideFilterRulesBadge);
+    await userEvent.click(hideFilterRulesBadge);
 
     expect(screen.queryByText('Only prod logs')).not.toBeInTheDocument();
   });

@@ -15,16 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 const EventDefinitionPriorityEnum = {
+  INFO: 0,
   LOW: 1,
   MEDIUM: 2,
   HIGH: 3,
   CRITICAL: 4,
   properties: {
+    0: { name: 'info' },
     1: { name: 'low' },
     2: { name: 'medium' },
     3: { name: 'high' },
     4: { name: 'critical' },
   },
 } as const;
+
+export const EXCLUDE_INFO_FILTER = '!0';
 
 export default EventDefinitionPriorityEnum;
