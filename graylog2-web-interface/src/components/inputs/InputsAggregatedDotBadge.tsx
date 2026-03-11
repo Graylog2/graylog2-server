@@ -31,13 +31,7 @@ const InputsAggregatedDotBadge = ({ text }: { text: string }) => {
   const providerResults = useInputsBadgeProviderResults();
   const providerIssue = providerResults.find((r) => r.hasIssues);
 
-  return (
-    <InputsDotBadge
-      text={text}
-      hasExternalIssues={!!providerIssue}
-      externalIssuesTitle={providerIssue?.title}
-    />
-  );
+  return <InputsDotBadge text={text} hasExternalIssues={!!providerIssue} externalIssuesTitle={providerIssue?.title} />;
 };
 
 export default InputsAggregatedDotBadge;
