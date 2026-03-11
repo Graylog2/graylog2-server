@@ -1,4 +1,4 @@
 type = "a"
-message = "Add support for submitting input failures received from the forwarder."
+message = "Add support for handling input failures received from the forwarder."
 
 pulls = ["25025"]
