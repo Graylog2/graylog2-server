@@ -14,28 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-
-import './types';
+import * as React from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
-import SecurityPage from 'components/security/teaser/SecurityPage';
 
-const SecurityPageEntry = () => {
-  const securityPagePlugins = usePluginEntities('securityPage');
+import InputsDotBadge from './InputsDotBadge';
 
-  if (securityPagePlugins?.length) {
-    return (
-      <>
-        {securityPagePlugins.map((Page, index) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <Page key={index} />
-        ))}
-      </>
-    );
-  }
+const useInputsBadgeProviderResults = () => {
+  const providers = usePluginEntities('inputsBadgeProviders');
 
-  return <SecurityPage />;
+  // Safe: providers array is static (registered once at plugin load)
+  return providers.map((provider) => provider.useCondition());
 };
 
-export default SecurityPageEntry;
+const InputsAggregatedDotBadge = ({ text }: { text: string }) => {
+  const providerResults = useInputsBadgeProviderResults();
+  const providerIssue = providerResults.find((r) => r.hasIssues);
+
+  return <InputsDotBadge text={text} hasExternalIssues={!!providerIssue} externalIssuesTitle={providerIssue?.title} />;
+};
+
+export default InputsAggregatedDotBadge;

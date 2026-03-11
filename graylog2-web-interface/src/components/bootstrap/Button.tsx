@@ -19,8 +19,8 @@ import type { ColorVariant } from '@graylog/sawmill';
 import { Button as MantineButton } from '@mantine/core';
 import type { DefaultTheme } from 'styled-components';
 import styled, { useTheme, css } from 'styled-components';
-import { Link } from 'react-router-dom';
 
+import Link from 'components/common/Link';
 import type { BsSize } from 'components/bootstrap/types';
 
 const sizeForMantine = (size: BsSize) => {
