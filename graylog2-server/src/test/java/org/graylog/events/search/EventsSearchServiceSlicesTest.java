@@ -62,22 +62,18 @@ class EventsSearchServiceSlicesTest {
     @Mock
     private ScriptingApiService scriptingApiService;
 
-    @Mock
-    private MoreSearch moreSearch;
-
-    private EventsSearchService service;
+    private EventsSliceService service;
     private Subject mockSubject;
     private SearchUser mockSearchUser;
-    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
         // Setup object mapper
-        objectMapper = new ObjectMapperProvider().get();
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
         // Setup service
-        service = new EventsSearchService(moreSearch, streamService,
-                eventDefinitionService, scriptingApiService, objectMapper);
+        service = new EventsSliceService(scriptingApiService, streamService,
+                eventDefinitionService, objectMapper);
 
         // Setup mock user permissions - allow all streams
         mockSubject = mock(Subject.class);
