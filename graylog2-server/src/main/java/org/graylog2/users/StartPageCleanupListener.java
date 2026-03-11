@@ -16,9 +16,9 @@
  */
 package org.graylog2.users;
 
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import jakarta.inject.Inject;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.models.users.requests.DashboardStartPage;
@@ -35,10 +35,11 @@ public class StartPageCleanupListener {
     private final UserService userService;
 
     @Inject
-    public StartPageCleanupListener(EventBus serverEventBus,
+    public StartPageCleanupListener(ClusterEventBus clusterEventBus,
                                     UserService userService) {
         this.userService = userService;
-        serverEventBus.register(this);
+        // Subscribe on ClusterEventBus to only receive events originating on this node (local-only delivery).
+        clusterEventBus.registerClusterEventSubscriber(this);
     }
 
     @Subscribe
