@@ -27,7 +27,9 @@ import ProgressBar, { Bar } from 'components/common/ProgressBar';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 import NumberUtils from 'util/NumberUtils';
 import Routes from 'routing/Routes';
-import { JournalStore } from 'stores/journal/JournalStore';
+import fetch from 'logic/rest/FetchProvider';
+import * as URLUtils from 'util/URLUtils';
+import UserNotification from 'util/UserNotification';
 import { useNodeMetrics } from 'hooks/useMetrics';
 
 const JournalUsageProgressBar = styled(ProgressBar)`
@@ -56,7 +58,18 @@ const metricValues = Object.values(metricNames);
 const JournalDetails = ({ nodeId }: Props) => {
   const { data: journalInformation } = useQuery({
     queryKey: ['journal', 'info', nodeId],
-    queryFn: () => JournalStore.get(nodeId),
+    queryFn: () => {
+      const url = URLUtils.qualifyUrl(`/cluster/${nodeId}/journal`);
+
+      return fetch('GET', url).catch((error: unknown) => {
+        UserNotification.error(
+          `Getting journal information on node ${nodeId} failed: ${error}`,
+          'Could not get journal information',
+        );
+
+        throw error;
+      });
+    },
   });
 
   const { data: nodeMetrics, isLoading: metricsLoading } = useNodeMetrics(nodeId, metricValues);

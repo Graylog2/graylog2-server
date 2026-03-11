@@ -14,14 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Link, Select } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Panel, Row } from 'components/bootstrap';
 import RawMessageLoader from 'components/messageloaders/RawMessageLoader';
 import Routes from 'routing/Routes';
-import { SimulatorActions } from 'stores/simulator/SimulatorStore';
+import fetch from 'logic/rest/FetchProvider';
+import * as URLUtils from 'util/URLUtils';
+import ApiRoutes from 'routing/ApiRoutes';
+import MessageFormatter from 'logic/message/MessageFormatter';
 
 import SimulationResults from './SimulationResults';
 
@@ -41,110 +44,122 @@ const getFormattedStreams = (streams) => {
     .sort((s1, s2) => naturalSort(s1.label, s2.label));
 };
 
-class ProcessorSimulator extends React.Component<
-  ProcessorSimulatorProps,
-  {
-    [key: string]: any;
-  }
-> {
-  constructor(props) {
-    super(props);
-    // The default stream could not be present in a system. In that case we fallback to the first available stream.
-    this.defaultStream = props.streams.find((s) => s.id === DEFAULT_STREAM_ID) || props.streams[0];
-
-    this.state = {
-      message: undefined,
-      stream: this.defaultStream,
-      simulation: undefined,
-      loading: false,
-      error: undefined,
-    };
-  }
-
-  private defaultStream: any;
-
-  _onMessageLoad = (message, options) => {
-    this.setState({ message: message, simulation: undefined, loading: true, error: undefined });
-
-    SimulatorActions.simulate.triggerPromise(this.state.stream, message.fields, options.inputId).then(
-      (response) => {
-        this.setState({ simulation: response, loading: false });
-      },
-      (error) => {
-        this.setState({ loading: false, error: error });
-      },
-    );
+const simulateMessage = (stream: { id: string }, messageFields: unknown, inputId: string) => {
+  const url = URLUtils.qualifyUrl(ApiRoutes.SimulatorController.simulate().url);
+  const simulation = {
+    stream_id: stream.id,
+    message: messageFields,
+    input_id: inputId,
   };
 
-  _onStreamSelect = (selectedStream) => {
-    const stream = this.props.streams.find((s) => s.id.toLowerCase() === selectedStream.toLowerCase());
+  type SimulateResponse = { messages: Array<unknown>; [key: string]: unknown };
 
-    this.setState({ stream: stream });
-  };
+  return fetch<SimulateResponse>('POST', url, simulation).then((response) => ({
+    ...response,
+    messages: response.messages.map((msg) => MessageFormatter.formatMessageSummary(msg)),
+  }));
+};
 
-  render() {
-    if (this.props.streams.length === 0) {
-      return (
-        <div>
-          <Row className="row-sm">
-            <Col md={8} mdOffset={2}>
-              <Panel bsStyle="danger" header="No streams found">
-                Pipelines operate on streams, but your system currently has no streams. Please{' '}
-                <Link to={Routes.STREAMS}>create a stream</Link> and come back here later to test pipelines processing
-                messages in your new stream.
-              </Panel>
-            </Col>
-          </Row>
-        </div>
+const ProcessorSimulator = ({ streams }: ProcessorSimulatorProps) => {
+  const defaultStream = useMemo(() => streams.find((s) => s.id === DEFAULT_STREAM_ID) ?? streams[0], [streams]);
+
+  const [stream, setStream] = useState(defaultStream);
+  const [message, setMessage] = useState(undefined);
+  const [simulation, setSimulation] = useState(undefined);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(undefined);
+
+  const onMessageLoad = useCallback(
+    (loadedMessage, options) => {
+      setMessage(loadedMessage);
+      setSimulation(undefined);
+      setLoading(true);
+      setError(undefined);
+
+      simulateMessage(stream, loadedMessage.fields, options.inputId).then(
+        (response) => {
+          setSimulation(response);
+          setLoading(false);
+        },
+        (err) => {
+          setLoading(false);
+          setError(err);
+        },
       );
-    }
+    },
+    [stream],
+  );
 
-    const streamHelp = (
-      <span>
-        Select a stream to use during simulation, the <em>{this.defaultStream.title}</em> stream is used by default.
-      </span>
-    );
+  const onStreamSelect = useCallback(
+    (selectedStream) => {
+      const found = streams.find((s) => s.id.toLowerCase() === selectedStream.toLowerCase());
 
+      setStream(found);
+    },
+    [streams],
+  );
+
+  if (streams.length === 0) {
     return (
       <div>
-        <Row>
-          <Col md={12}>
-            <h1>Load a message</h1>
-            <p>
-              Build an example message that will be used in the simulation.{' '}
-              <strong>
-                No real messages will be altered. All actions are purely simulated on the temporary input you provide
-                below.
-              </strong>
-            </p>
-            <Row className="row-sm">
-              <Col md={7}>
-                <FormGroup id="streamSelectorSimulation">
-                  <ControlLabel>Stream</ControlLabel>
-                  <Select
-                    options={getFormattedStreams(this.props.streams)}
-                    onChange={this._onStreamSelect}
-                    value={this.state.stream.id}
-                    required
-                    clearable={false}
-                  />
-                  <HelpBlock>{streamHelp}</HelpBlock>
-                </FormGroup>
-              </Col>
-            </Row>
-            <RawMessageLoader onMessageLoaded={this._onMessageLoad} inputIdSelector />
+        <Row className="row-sm">
+          <Col md={8} mdOffset={2}>
+            <Panel bsStyle="danger" header="No streams found">
+              Pipelines operate on streams, but your system currently has no streams. Please{' '}
+              <Link to={Routes.STREAMS}>create a stream</Link> and come back here later to test pipelines processing
+              messages in your new stream.
+            </Panel>
           </Col>
         </Row>
-        <SimulationResults
-          stream={this.state.stream}
-          originalMessage={this.state.message}
-          simulationResults={this.state.simulation}
-          isLoading={this.state.loading}
-          error={this.state.error}
-        />
       </div>
     );
   }
-}
+
+  const streamHelp = (
+    <span>
+      Select a stream to use during simulation, the <em>{defaultStream.title}</em> stream is used by default.
+    </span>
+  );
+
+  return (
+    <div>
+      <Row>
+        <Col md={12}>
+          <h1>Load a message</h1>
+          <p>
+            Build an example message that will be used in the simulation.{' '}
+            <strong>
+              No real messages will be altered. All actions are purely simulated on the temporary input you provide
+              below.
+            </strong>
+          </p>
+          <Row className="row-sm">
+            <Col md={7}>
+              <FormGroup id="streamSelectorSimulation">
+                <ControlLabel>Stream</ControlLabel>
+                <Select
+                  options={getFormattedStreams(streams)}
+                  onChange={onStreamSelect}
+                  value={stream.id}
+                  required
+                  clearable={false}
+                />
+                <HelpBlock>{streamHelp}</HelpBlock>
+              </FormGroup>
+            </Col>
+          </Row>
+          <RawMessageLoader onMessageLoaded={onMessageLoad} inputIdSelector />
+        </Col>
+      </Row>
+      <SimulationResults
+        stream={stream}
+        originalMessage={message}
+        simulationResults={simulation}
+        isLoading={loading}
+        error={error}
+      />
+    </div>
+  );
+};
 
 export default ProcessorSimulator;
