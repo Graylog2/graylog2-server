@@ -102,7 +102,6 @@ public class CollectorInstancesResource extends RestResource {
                     .relatedIdentifier("_id")
                     .relatedDisplayFields(List.of(FleetDTO.FIELD_NAME))
                     .relatedDisplayTemplate("{name}")
-                    .type(SearchQueryField.Type.OBJECT_ID)
                     .sortable(false)
                     .searchable(true)
                     .filterable(true)
