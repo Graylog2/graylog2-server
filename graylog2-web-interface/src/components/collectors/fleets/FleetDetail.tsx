@@ -17,10 +17,13 @@
 import * as React from 'react';
 import { useState, useMemo, useCallback } from 'react';
 import styled, { css } from 'styled-components';
+import URI from 'urijs';
 
-import {Button, Tab, Tabs, Label} from 'components/bootstrap';
+import {Button, Label, SegmentedControl} from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
+import useHistory from 'routing/useHistory';
+import useQuery from 'routing/useQuery';
 import type { SearchParams } from 'stores/PaginationTypes';
 
 import FleetSettings from './FleetSettings';
@@ -56,6 +59,16 @@ const StatsRow = styled.div(
   `,
 );
 
+type FleetTab = 'sources' | 'instances' | 'settings';
+const DEFAULT_TAB: FleetTab = 'sources';
+const VALID_TABS: ReadonlyArray<FleetTab> = ['sources', 'instances', 'settings'];
+
+const SEGMENTS = [
+  { value: 'sources' as const, label: 'Sources' },
+  { value: 'instances' as const, label: 'Instances' },
+  { value: 'settings' as const, label: 'Settings' },
+];
+
 const FleetDetail = ({ fleetId }: Props) => {
   const { data: fleet, isLoading: fleetLoading } = useFleet(fleetId);
   const { data: stats, isLoading: statsLoading } = useFleetStats(fleetId);
@@ -64,6 +77,25 @@ const FleetDetail = ({ fleetId }: Props) => {
   const [showSourceModal, setShowSourceModal] = useState(false);
   const [editingSource, setEditingSource] = useState<Source | null>(null);
   const [selectedInstance, setSelectedInstance] = useState<CollectorInstanceView | null>(null);
+
+  const { tab: tabParam } = useQuery();
+  const history = useHistory();
+  const initialTab: FleetTab = VALID_TABS.includes(tabParam as FleetTab) ? (tabParam as FleetTab) : DEFAULT_TAB;
+  const [activeTab, setActiveTab] = useState<FleetTab>(initialTab);
+
+  const onTabChange = useCallback((nextTab: FleetTab) => {
+    setActiveTab(nextTab);
+
+    const newUrl = new URI(window.location.href)
+      .removeSearch('tab')
+      .removeSearch('page')
+      .removeSearch('pageSize')
+      .removeSearch('query')
+      .removeSearch('filters')
+      .addSearch('tab', nextTab);
+
+    history.replace(newUrl.resource());
+  }, [history]);
 
   const fleetNames = useMemo(() => (fleet ? { [fleet.id]: fleet.name } : {}), [fleet]);
 
@@ -159,8 +191,14 @@ const FleetDetail = ({ fleetId }: Props) => {
         <StatCard value={stats?.total_sources || 0} label="Sources" />
       </StatsRow>
 
-      <Tabs defaultActiveKey="sources" id="fleet-detail-tabs">
-        <Tab eventKey="sources" title="Sources">
+      <SegmentedControl<FleetTab>
+        data={SEGMENTS}
+        value={activeTab}
+        onChange={onTabChange}
+      />
+
+      {activeTab === 'sources' && (
+        <>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
             <Button bsStyle="success" onClick={() => setShowSourceModal(true)}>Add Source</Button>
           </div>
@@ -173,34 +211,33 @@ const FleetDetail = ({ fleetId }: Props) => {
             columnRenderers={sourceRenderers}
             entityActions={sourceActions}
           />
-        </Tab>
+        </>
+      )}
 
-        <Tab eventKey="instances" title="Instances">
-          <PaginatedEntityTable<CollectorInstanceView>
-            humanName="instances"
-            entityActions={instanceActions}
-            tableLayout={INSTANCES_LAYOUT}
-            fetchEntities={fetchInstances}
-            keyFn={(params) => [...instancesKeyFn(params), fleetId]}
-            entityAttributesAreCamelCase={false}
-            columnRenderers={instanceRenderers}
-          />
-        </Tab>
+      {activeTab === 'instances' && (
+        <PaginatedEntityTable<CollectorInstanceView>
+          humanName="instances"
+          entityActions={instanceActions}
+          tableLayout={INSTANCES_LAYOUT}
+          fetchEntities={fetchInstances}
+          keyFn={(params) => [...instancesKeyFn(params), fleetId]}
+          entityAttributesAreCamelCase={false}
+          columnRenderers={instanceRenderers}
+        />
+      )}
 
-        <Tab eventKey="settings" title="Settings">
-          <FleetSettings
-            fleet={fleet}
-            onSave={async (updates) => {
-              await updateFleet({ fleetId: fleet.id, updates });
-            }}
-            onDelete={async () => {
-              await deleteFleet(fleet.id);
-              // Navigation back to fleets list will be handled by parent or router
-            }}
-            isLoading={isUpdatingFleet || isDeletingFleet}
-          />
-        </Tab>
-      </Tabs>
+      {activeTab === 'settings' && (
+        <FleetSettings
+          fleet={fleet}
+          onSave={async (updates) => {
+            await updateFleet({ fleetId: fleet.id, updates });
+          }}
+          onDelete={async () => {
+            await deleteFleet(fleet.id);
+          }}
+          isLoading={isUpdatingFleet || isDeletingFleet}
+        />
+      )}
 
       {showSourceModal && (
         <SourceFormModal
