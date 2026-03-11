@@ -83,10 +83,10 @@ const FleetDetail = ({ fleetId }: Props) => {
   const initialTab: FleetTab = VALID_TABS.includes(tabParam as FleetTab) ? (tabParam as FleetTab) : DEFAULT_TAB;
   const [activeTab, setActiveTab] = useState<FleetTab>(initialTab);
 
-  const onTabChange = useCallback((nextTab: FleetTab) => {
+  const navigateToTab = useCallback((nextTab: FleetTab, filters?: Array<string>) => {
     setActiveTab(nextTab);
 
-    const newUrl = new URI(window.location.href)
+    let newUrl = new URI(window.location.href)
       .removeSearch('tab')
       .removeSearch('page')
       .removeSearch('pageSize')
@@ -94,8 +94,16 @@ const FleetDetail = ({ fleetId }: Props) => {
       .removeSearch('filters')
       .addSearch('tab', nextTab);
 
+    if (filters?.length) {
+      filters.forEach((f) => { newUrl = newUrl.addSearch('filters', f); });
+    }
+
     history.replace(newUrl.resource());
   }, [history]);
+
+  const onTabChange = useCallback((nextTab: FleetTab) => {
+    navigateToTab(nextTab);
+  }, [navigateToTab]);
 
   const fleetNames = useMemo(() => (fleet ? { [fleet.id]: fleet.name } : {}), [fleet]);
 
@@ -185,10 +193,14 @@ const FleetDetail = ({ fleetId }: Props) => {
       </Header>
 
       <StatsRow>
-        <StatCard value={stats?.total_instances || 0} label="Instances" />
-        <StatCard value={stats?.online_instances || 0} label="Online" variant="success" />
-        <StatCard value={stats?.offline_instances || 0} label="Offline" variant="warning" />
-        <StatCard value={stats?.total_sources || 0} label="Sources" />
+        <StatCard value={stats?.total_instances || 0} label="Instances"
+                  onClick={() => navigateToTab('instances')} />
+        <StatCard value={stats?.online_instances || 0} label="Online" variant="success"
+                  onClick={() => navigateToTab('instances', ['status=online'])} />
+        <StatCard value={stats?.offline_instances || 0} label="Offline" variant="warning"
+                  onClick={() => navigateToTab('instances', ['status=offline'])} />
+        <StatCard value={stats?.total_sources || 0} label="Sources"
+                  onClick={() => navigateToTab('sources')} />
       </StatsRow>
 
       <SegmentedControl<FleetTab>

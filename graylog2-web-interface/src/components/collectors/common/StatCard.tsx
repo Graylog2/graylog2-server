@@ -27,16 +27,26 @@ type Props = {
   value: number;
   label: string;
   variant?: Variant;
+  onClick?: () => void;
 };
 
-const StyledCard = styled.div<{ $variant: Variant }>(
-  ({ theme, $variant }) => css`
+const StyledCard = styled.div<{ $variant: Variant; $clickable: boolean }>(
+  ({ theme, $variant, $clickable }) => css`
     text-align: center;
     min-width: 100px;
     padding: ${theme.spacings.md};
     background-color: ${theme.colors.cards.background};
     border: 1px solid ${theme.colors.cards.border};
     border-radius: 8px;
+
+    ${$clickable &&
+    css`
+      cursor: pointer;
+
+      &:hover {
+        outline: 1px solid ${theme.colors.variant.info};
+      }
+    `}
 
     ${$variant === 'success' &&
     css`
@@ -70,8 +80,8 @@ const Label = styled.div(
   `,
 );
 
-const StatCard = ({ value, label, variant = 'default' }: Props) => (
-  <StyledCard $variant={variant} data-testid="stat-card">
+const StatCard = ({ value, label, variant = 'default', onClick = undefined }: Props) => (
+  <StyledCard $variant={variant} $clickable={!!onClick} onClick={onClick} data-testid="stat-card">
     <Value>{value}</Value>
     <Label>{label}</Label>
   </StyledCard>
