@@ -70,7 +70,7 @@ describe('Section', () => {
     await screen.findByRole('heading', { name: /the title/i });
     await screen.findByText(/the children/i);
 
-    userEvent.click(screen.getByTestId('collapseButton'));
+    await userEvent.click(screen.getByTestId('collapseButton'));
 
     const children = await screen.findByText(/the children/i);
 
@@ -89,7 +89,7 @@ describe('Section', () => {
     await screen.findByRole('heading', { name: /the title/i });
     await screen.findByText(/the children/i);
 
-    userEvent.click(screen.getByTestId('collapseButton'));
+    await userEvent.click(screen.getByTestId('collapseButton'));
 
     const children = await screen.findByText(/the children/i);
 
