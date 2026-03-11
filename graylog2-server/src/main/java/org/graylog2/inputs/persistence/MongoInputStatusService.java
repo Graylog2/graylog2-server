@@ -74,7 +74,7 @@ public class MongoInputStatusService implements InputStatusService {
     /**
      * Clean up MongoDB records when Inputs are deleted.
      *
-     * @param event ID of the input being deleted
+     * @param event InputDeleted event containing the ID of the input being deleted
      */
     @Subscribe
     public void handleInputDeleted(InputDeleted event) {

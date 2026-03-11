@@ -149,17 +149,18 @@ public class InputEventListener {
     @Subscribe
     public void inputStopped(InputStopped inputStoppedEvent) {
         LOG.debug("Input stopped: {}", inputStoppedEvent.id());
-        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputStoppedEvent.id());
-        if (inputState != null) {
-            inputRegistry.remove(inputState);
-        }
+        removeFromRegistry(inputStoppedEvent.id());
     }
 
     @Subscribe
     public void inputDeleted(InputDeleted inputDeletedEvent) {
         LOG.debug("Input deleted: {}", inputDeletedEvent.id());
         metricRegistry.remove(name(Input.class, FAILED_STARTS_METRIC, inputDeletedEvent.id()));
-        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputDeletedEvent.id());
+        removeFromRegistry(inputDeletedEvent.id());
+    }
+
+    private void removeFromRegistry(String inputId) {
+        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
         if (inputState != null) {
             inputRegistry.remove(inputState);
         }
