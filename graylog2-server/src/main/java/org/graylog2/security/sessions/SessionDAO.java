@@ -107,18 +107,15 @@ public class SessionDAO extends CachingSessionDAO {
 
     private void doUpdate(SimpleSession session) {
         LOG.debug("Updating session");
-
-        final var sessionDTO = sessionService.getBySessionId(session.getId().toString())
-                .map(SessionDTO::id)
-                .map(id -> SessionDTO.fromSimpleSession(session).toBuilder().id(id).build())
-                .orElseThrow(() -> new RuntimeException("Couldn't load session"));
+        final var sessionId = session.getId().toString();
+        final var sessionDTO = SessionDTO.fromSimpleSession(session);
 
         // Due to https://jira.mongodb.org/browse/SERVER-14322 upserts can fail under concurrency.
         // We need to retry the update, and stagger them a bit, so not all the retries attempt it at the same time again.
         // Usually this should succeed the first time, though
         try {
             UPSERT_RETRYER.call(() -> {
-                sessionService.update(sessionDTO);
+                sessionService.updateBySessionId(sessionId, sessionDTO);
                 return null;
             });
         } catch (ExecutionException e) {

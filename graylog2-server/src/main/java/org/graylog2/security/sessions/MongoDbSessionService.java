@@ -98,6 +98,11 @@ public class MongoDbSessionService implements SessionService {
     }
 
     @Override
+    public void updateBySessionId(String sessionId, SessionDTO session) {
+        collection.replaceOne(eq(FIELD_SESSION_ID, sessionId), session);
+    }
+
+    @Override
     @MustBeClosed
     public Stream<SessionDTO> streamAll() {
         return MongoUtils.stream(collection.find());

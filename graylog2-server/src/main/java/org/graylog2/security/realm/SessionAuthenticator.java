@@ -35,12 +35,16 @@ import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
 import java.util.Optional;
 
 public class SessionAuthenticator extends AuthenticatingRealm {
     private static final Logger LOG = LoggerFactory.getLogger(SessionAuthenticator.class);
     public static final String NAME = "mongodb-session";
     public static final String X_GRAYLOG_NO_SESSION_EXTENSION = "X-Graylog-No-Session-Extension";
+    private static final Duration TOUCH_INTERVAL = Duration.ofMinutes(1);
 
     private final UserService userService;
     private final ClusterConfigService clusterConfigService;
@@ -93,12 +97,20 @@ public class SessionAuthenticator extends AuthenticatingRealm {
         final Optional<String> noSessionExtension = ShiroRequestHeadersBinder.getHeaderFromThreadContext(X_GRAYLOG_NO_SESSION_EXTENSION);
         if (noSessionExtension.isPresent() && "true".equalsIgnoreCase(noSessionExtension.get())) {
             LOG.debug("Not extending session because the request indicated not to.");
-        } else {
+        } else if (shouldTouch(session)) {
             session.touch();
         }
         ThreadContext.bind(subject);
 
         return new SimpleAccount(user.getId(), ServiceValidatedCredentialsMatcher.AUTHENTICATED, "session authenticator");
+    }
+
+    private boolean shouldTouch(Session session) {
+        final Date lastAccessTime = session.getLastAccessTime();
+        if (lastAccessTime == null) {
+            return true;
+        }
+        return Duration.between(lastAccessTime.toInstant(), Instant.now()).compareTo(TOUCH_INTERVAL) >= 0;
     }
 
     private HTTPHeaderAuthConfig loadHTTPHeaderConfig() {

@@ -28,5 +28,7 @@ public interface SessionService {
 
     void update(SessionDTO session);
 
+    void updateBySessionId(String sessionId, SessionDTO session);
+
     Stream<SessionDTO> streamAll();
 }
