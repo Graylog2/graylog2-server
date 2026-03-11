@@ -139,7 +139,7 @@ public class V20230720161500_AddExtractorFragments extends Migration {
                                 string("newField").description("New field to copy value to").build()
                         ))
                         .returnType(String.class)
-                        .description("Copy extracted regular expression of field value to a new field")
+                        .description("Copy and replace extracted regular expression of field value to a new field")
                         .ruleBuilderEnabled()
                         .ruleBuilderName("Extract regular expression to new field with replacement")
                         .ruleBuilderTitle("Extract regular expression '${pattern}' for field '${field}', replace with '${replacement}' and set to new field '${newField}'")
