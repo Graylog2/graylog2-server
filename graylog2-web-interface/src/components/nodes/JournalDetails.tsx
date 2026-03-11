@@ -27,8 +27,7 @@ import ProgressBar, { Bar } from 'components/common/ProgressBar';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 import NumberUtils from 'util/NumberUtils';
 import Routes from 'routing/Routes';
-import fetch from 'logic/rest/FetchProvider';
-import * as URLUtils from 'util/URLUtils';
+import { ClusterJournal } from '@graylog/server-api';
 import UserNotification from 'util/UserNotification';
 import { useNodeMetrics } from 'hooks/useMetrics';
 
@@ -40,19 +39,6 @@ const JournalUsageProgressBar = styled(ProgressBar)`
     min-width: 3em;
   }
 `;
-
-type JournalConfig = {
-  directory: string;
-  max_size: number;
-  max_age: string;
-  flush_interval: number;
-  flush_age: string;
-};
-
-type JournalInformation = {
-  enabled: boolean;
-  journal_config: JournalConfig;
-};
 
 type Props = {
   nodeId: string;
@@ -68,10 +54,8 @@ const metricNames = {
 
 const metricValues = Object.values(metricNames);
 
-const fetchJournalInfo = (nodeId: string): Promise<JournalInformation> => {
-  const url = URLUtils.qualifyUrl(`/cluster/${nodeId}/journal`);
-
-  return fetch<JournalInformation>('GET', url).catch((error: unknown) => {
+const fetchJournalInfo = (nodeId: string) =>
+  ClusterJournal.get(nodeId).catch((error: unknown) => {
     UserNotification.error(
       `Getting journal information on node ${nodeId} failed: ${error}`,
       'Could not get journal information',
@@ -79,7 +63,6 @@ const fetchJournalInfo = (nodeId: string): Promise<JournalInformation> => {
 
     throw error;
   });
-};
 
 const JournalDetails = ({ nodeId }: Props) => {
   const { data: journalInformation } = useQuery({
