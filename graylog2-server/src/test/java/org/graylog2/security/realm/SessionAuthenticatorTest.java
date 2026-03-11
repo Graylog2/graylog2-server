@@ -37,7 +37,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Clock;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
@@ -56,12 +58,17 @@ class SessionAuthenticatorTest {
     @Mock
     private ClusterConfigService clusterConfigService;
 
+    // Captured once so the fixed Clock and all test setups share the same instant. Using the real wall clock
+    // avoids Shiro's DefaultSessionManager expiring sessions (it validates timeouts against wall-clock time).
+    private static final Instant NOW = Instant.now();
+
     private SessionAuthenticator authenticator;
     private DefaultSecurityManager securityManager;
 
     @BeforeEach
     void setUp() {
-        authenticator = new SessionAuthenticator(userService, clusterConfigService);
+        final var clock = Clock.fixed(NOW, ZoneOffset.UTC);
+        authenticator = new SessionAuthenticator(userService, clusterConfigService, clock);
 
         final var realm = new SimpleAccountRealm();
         realm.addAccount(TEST_USER_ID, "password");
@@ -90,8 +97,7 @@ class SessionAuthenticatorTest {
     @Test
     void touchesSessionWhenLastAccessTimeIsStale() {
         final var sessionId = createSession();
-        final var staleTime = Instant.now().minus(2, ChronoUnit.MINUTES);
-        setLastAccessTime(sessionId, staleTime);
+        setLastAccessTime(sessionId, NOW.minus(2, ChronoUnit.MINUTES));
 
         final var lastAccessBefore = getSessionLastAccessTime(sessionId);
 
@@ -104,6 +110,7 @@ class SessionAuthenticatorTest {
     @Test
     void skipsTouchWhenLastAccessTimeIsRecent() {
         final var sessionId = createSession();
+        setLastAccessTime(sessionId, NOW.minus(30, ChronoUnit.SECONDS));
 
         final var lastAccessBefore = getSessionLastAccessTime(sessionId);
 
@@ -114,10 +121,22 @@ class SessionAuthenticatorTest {
     }
 
     @Test
+    void touchesSessionWhenLastAccessTimeIsInTheFuture() {
+        final var sessionId = createSession();
+        setLastAccessTime(sessionId, NOW.plus(5, ChronoUnit.MINUTES));
+
+        final var lastAccessBefore = getSessionLastAccessTime(sessionId);
+
+        authenticator.getAuthenticationInfo(new SessionIdToken(sessionId, "host", "addr"));
+
+        final var lastAccessAfter = getSessionLastAccessTime(sessionId);
+        assertThat(lastAccessAfter).isBefore(lastAccessBefore);
+    }
+
+    @Test
     void touchesSessionWhenLastAccessTimeIsExactlyAtThreshold() {
         final var sessionId = createSession();
-        final var thresholdTime = Instant.now().minus(1, ChronoUnit.MINUTES);
-        setLastAccessTime(sessionId, thresholdTime);
+        setLastAccessTime(sessionId, NOW.minus(1, ChronoUnit.MINUTES));
 
         final var lastAccessBefore = getSessionLastAccessTime(sessionId);
 

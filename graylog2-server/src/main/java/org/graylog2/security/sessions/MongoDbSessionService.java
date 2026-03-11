@@ -19,6 +19,7 @@ package org.graylog2.security.sessions;
 import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.ReplaceOptions;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.database.MongoCollection;
@@ -99,7 +100,11 @@ public class MongoDbSessionService implements SessionService {
 
     @Override
     public void updateBySessionId(String sessionId, SessionDTO session) {
-        collection.replaceOne(eq(FIELD_SESSION_ID, sessionId), session);
+        final var result = collection.replaceOne(eq(FIELD_SESSION_ID, sessionId), session, new ReplaceOptions().upsert(true));
+        if (result.getMatchedCount() == 0) {
+            LOG.warn("Session <{}> was missing from MongoDB and had to be re-created via upsert. " +
+                    "This may indicate a cache/database desync.", sessionId);
+        }
     }
 
     @Override

@@ -110,9 +110,10 @@ public class SessionDAO extends CachingSessionDAO {
         final var sessionId = session.getId().toString();
         final var sessionDTO = SessionDTO.fromSimpleSession(session);
 
-        // Due to https://jira.mongodb.org/browse/SERVER-14322 upserts can fail under concurrency.
-        // We need to retry the update, and stagger them a bit, so not all the retries attempt it at the same time again.
-        // Usually this should succeed the first time, though
+        // The update uses replaceOne with upsert(true) so sessions can self-heal if the MongoDB document was
+        // deleted while still cached. Due to https://jira.mongodb.org/browse/SERVER-14322, concurrent upserts for the
+        // same session can both attempt an insert and hit a duplicate key error on the unique session_id index.
+        // We retry with random backoff so the losing request can fall back to a replace on the next attempt.
         try {
             UPSERT_RETRYER.call(() -> {
                 sessionService.updateBySessionId(sessionId, sessionDTO);

@@ -35,6 +35,7 @@ import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
@@ -48,11 +49,13 @@ public class SessionAuthenticator extends AuthenticatingRealm {
 
     private final UserService userService;
     private final ClusterConfigService clusterConfigService;
+    private final Clock clock;
 
     @Inject
-    SessionAuthenticator(UserService userService, ClusterConfigService clusterConfigService) {
+    SessionAuthenticator(UserService userService, ClusterConfigService clusterConfigService, Clock clock) {
         this.userService = userService;
         this.clusterConfigService = clusterConfigService;
+        this.clock = clock;
         // this realm either rejects a session, or allows the associated user implicitly
         setCredentialsMatcher(new ServiceValidatedCredentialsMatcher());
         setAuthenticationTokenClass(SessionIdToken.class);
@@ -110,7 +113,13 @@ public class SessionAuthenticator extends AuthenticatingRealm {
         if (lastAccessTime == null) {
             return true;
         }
-        return Duration.between(lastAccessTime.toInstant(), Instant.now()).compareTo(TOUCH_INTERVAL) >= 0;
+        final var elapsed = Duration.between(lastAccessTime.toInstant(), Instant.now(clock));
+        // A negative elapsed time means lastAccessTime is in the future (e.g., set by a node with clock skew).
+        // Treat that as stale so we touch the session and correct the timestamp to local time.
+        if (elapsed.isNegative()) {
+            return true;
+        }
+        return elapsed.compareTo(TOUCH_INTERVAL) >= 0;
     }
 
     private HTTPHeaderAuthConfig loadHTTPHeaderConfig() {
