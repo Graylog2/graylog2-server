@@ -78,7 +78,9 @@ class SidecarList extends React.Component<
                 />
               </th>
             ))}
-            <th className={style.actions}>&nbsp;</th>
+            <th className={style.actions}>
+              &nbsp;
+            </th>
           </tr>
         </thead>
         <tbody>{sidecars}</tbody>

@@ -27,6 +27,7 @@ import { matchesDecoratorStream, matchesDecoratorStreamCategories } from 'views/
 import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
 import ViewState from 'views/logic/views/ViewState';
 import { allMessagesTable, resultHistogram } from 'views/logic/Widgets';
+import type Widget from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { DecoratorsActions } from 'stores/decorators/DecoratorsStore';
 import generateId from 'logic/generateId';
@@ -90,14 +91,15 @@ const createViewWidget = ({ groupBy, fnSeries, expr }: { groupBy: Array<string>;
   return getAggregationWidget({ rowPivots, fnSeries: [fnSeriesForFunc], sort });
 };
 
-const getSummaryAggregation = ({ aggregations, groupBy }) => {
-  const { summaryFnSeries, summaryTitle } = aggregations.reduce(
+const getSummaryAggregation = ({ aggregations, groupBy }: { aggregations: Array<EventDefinitionAggregation>; groupBy: Array<string> }) => {
+  const { summaryFnSeries, summaryTitle } = aggregations.reduce<{ summaryFnSeries: string[]; summaryTitle: string }>(
     (res, { value, expr, fnSeries }) => {
       const concatTitle = `${fnSeries} ${expr} ${value}`;
-      res.summaryFnSeries.push(fnSeries);
-      res.summaryTitle = `${res.summaryTitle} ${concatTitle}`;
 
-      return res;
+      return {
+        summaryFnSeries: [...res.summaryFnSeries, fnSeries],
+        summaryTitle: `${res.summaryTitle} ${concatTitle}`,
+      };
     },
     {
       summaryFnSeries: [],
@@ -117,7 +119,12 @@ const getSummaryAggregation = ({ aggregations, groupBy }) => {
   };
 };
 
-export const WidgetsGenerator = async ({ streams, streamCategories, aggregations, groupBy }) => {
+export const WidgetsGenerator = async ({ streams, streamCategories, aggregations, groupBy }: {
+  streams: string | string[] | undefined;
+  streamCategories: string | string[] | undefined;
+  aggregations: Array<EventDefinitionAggregation>;
+  groupBy: Array<string>;
+}) => {
   const decorators = await DecoratorsActions.list();
   const byStreamId = matchesDecoratorStream(streams);
   const byStreamCategory = matchesDecoratorStreamCategories(streamCategories);
@@ -134,16 +141,28 @@ export const WidgetsGenerator = async ({ streams, streamCategories, aggregations
   const messageTable = allMessagesTable(undefined, allDecorators);
   const needsSummaryAggregations = aggregations.length > 1;
   const SUMMARY_ROW_DELTA = needsSummaryAggregations ? AGGREGATION_WIDGET_HEIGHT : 0;
-  const { aggregationWidgets, aggregationTitles, aggregationPositions } = aggregations.reduce(
+  const { aggregationWidgets, aggregationTitles, aggregationPositions } = aggregations.reduce<{
+    aggregationTitles: Record<string, string>;
+    aggregationWidgets: Widget[];
+    aggregationPositions: Record<string, WidgetPosition>;
+  }>(
     (res, { value, expr, fnSeries }, index) => {
       const widget = createViewWidget({ fnSeries, groupBy, expr });
-      res.aggregationWidgets.push(widget);
-      res.aggregationTitles[widget.id] = `${fnSeries} ${expr} ${value}`;
-      res.aggregationPositions[widget.id] = createViewPosition({ index, SUMMARY_ROW_DELTA });
 
-      return res;
+      return {
+        aggregationWidgets: [...res.aggregationWidgets, widget],
+        aggregationTitles: { ...res.aggregationTitles, [widget.id]: `${fnSeries} ${expr} ${value}` },
+        aggregationPositions: {
+          ...res.aggregationPositions,
+          [widget.id]: createViewPosition({ index, SUMMARY_ROW_DELTA }),
+        },
+      };
     },
-    { aggregationTitles: {}, aggregationWidgets: [], aggregationPositions: {} },
+    {
+      aggregationTitles: {},
+      aggregationWidgets: [],
+      aggregationPositions: {},
+    },
   );
 
   const widgets = [...aggregationWidgets, histogram, messageTable];
