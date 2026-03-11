@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
 import org.graylog2.database.BuildableMongoEntity;
-import org.mongojack.ObjectId;
 
 import java.time.Instant;
 import java.util.List;
@@ -58,7 +57,6 @@ public abstract class CollectorInstanceDTO implements BuildableMongoEntity<Colle
     @JsonProperty(FIELD_LAST_SEEN)
     public abstract Instant lastSeen();
 
-    @ObjectId
     @JsonProperty(FIELD_FLEET_ID)
     public abstract String fleetId();
 
@@ -68,7 +66,6 @@ public abstract class CollectorInstanceDTO implements BuildableMongoEntity<Colle
     @JsonProperty(FIELD_CERTIFICATE_PEM)
     public abstract String certificatePem();
 
-    @ObjectId
     @JsonProperty(FIELD_ISSUING_CA_ID)
     public abstract String issuingCaId();
 
@@ -111,7 +108,6 @@ public abstract class CollectorInstanceDTO implements BuildableMongoEntity<Colle
         @JsonProperty(FIELD_LAST_SEEN)
         public abstract Builder lastSeen(Instant lastSeen);
 
-        @ObjectId
         @JsonProperty(FIELD_FLEET_ID)
         public abstract Builder fleetId(String fleetId);
 
@@ -121,7 +117,6 @@ public abstract class CollectorInstanceDTO implements BuildableMongoEntity<Colle
         @JsonProperty(FIELD_CERTIFICATE_PEM)
         public abstract Builder certificatePem(String certificatePem);
 
-        @ObjectId
         @JsonProperty(FIELD_ISSUING_CA_ID)
         public abstract Builder issuingCaId(String issuingCaId);
 

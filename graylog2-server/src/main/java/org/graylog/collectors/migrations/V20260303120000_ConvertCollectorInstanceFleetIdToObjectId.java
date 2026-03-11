@@ -30,13 +30,15 @@ import org.slf4j.LoggerFactory;
 import java.time.ZonedDateTime;
 
 /**
- * Converts {@code fleet_id} fields in the {@code collector_instances} collection from String to ObjectId.
- * This can be removed once all test/dev deployments have been migrated.
+ * Converts {@code fleet_id} and {@code issuing_ca_id} fields in the {@code collector_instances} collection
+ * from ObjectId back to String for consistency with the rest of the codebase.
+ * This can be removed once all deployments have been migrated.
  */
 public class V20260303120000_ConvertCollectorInstanceFleetIdToObjectId extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20260303120000_ConvertCollectorInstanceFleetIdToObjectId.class);
     private static final String COLLECTION_NAME = "collector_instances";
     private static final String FIELD_FLEET_ID = "fleet_id";
+    private static final String FIELD_ISSUING_CA_ID = "issuing_ca_id";
 
     private final MongoConnection mongoConnection;
 
@@ -55,26 +57,28 @@ public class V20260303120000_ConvertCollectorInstanceFleetIdToObjectId extends M
         final MongoCollection<Document> collection =
                 mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
 
-        // Find documents where fleet_id is a string (not already an ObjectId)
-        final var cursor = collection.find(Filters.type(FIELD_FLEET_ID, "string"));
-
         long converted = 0;
-        for (Document doc : cursor) {
-            final String fleetIdStr = doc.getString(FIELD_FLEET_ID);
-            try {
-                collection.updateOne(
-                        Filters.eq("_id", doc.getObjectId("_id")),
-                        Updates.set(FIELD_FLEET_ID, new ObjectId(fleetIdStr))
-                );
-                converted++;
-            } catch (IllegalArgumentException e) {
-                LOG.warn("Skipping collector instance {} — fleet_id '{}' is not a valid ObjectId",
-                        doc.getObjectId("_id"), fleetIdStr);
-            }
-        }
+        converted += convertObjectIdFieldToString(collection, FIELD_FLEET_ID);
+        converted += convertObjectIdFieldToString(collection, FIELD_ISSUING_CA_ID);
 
         if (converted > 0) {
-            LOG.info("Converted fleet_id from String to ObjectId in {} collector instance document(s)", converted);
+            LOG.info("Converted ObjectId fields to String in {} collector instance document(s)", converted);
         }
+    }
+
+    private long convertObjectIdFieldToString(MongoCollection<Document> collection, String fieldName) {
+        final var cursor = collection.find(Filters.type(fieldName, "objectId"));
+
+        long converted = 0;
+        for (final Document doc : cursor) {
+            final ObjectId objectId = doc.getObjectId(fieldName);
+            collection.updateOne(
+                    Filters.eq("_id", doc.getObjectId("_id")),
+                    Updates.set(fieldName, objectId.toHexString())
+            );
+            converted++;
+        }
+
+        return converted;
     }
 }
