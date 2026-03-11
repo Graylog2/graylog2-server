@@ -51,8 +51,8 @@ export type MongodbProfilingToggleResult = MongodbProfilingToggleNotReadyResult 
 const fetchMongodbProfilingStatus = () =>
   fetch('GET', qualifyUrl('/system/cluster/mongodb/profiling/status')) as Promise<MongodbProfilingStatusByLevel>;
 
-const enableMongodbProfiling = () => fetch('GET', qualifyUrl('/system/cluster/mongodb/profiling/SLOW_OPS'));
-const disableMongodbProfiling = () => fetch('GET', qualifyUrl('/system/cluster/mongodb/profiling/OFF'));
+const enableMongodbProfiling = () => fetch('PUT', qualifyUrl('/system/cluster/mongodb/profiling/SLOW_OPS'));
+const disableMongodbProfiling = () => fetch('PUT', qualifyUrl('/system/cluster/mongodb/profiling/OFF'));
 
 export const getClusterProfilingState = (statusByLevel?: MongodbProfilingStatusByLevel): MongodbProfilingState => {
   if (!statusByLevel) {
