@@ -14,36 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+
+import { ClusterJobs } from '@graylog/server-api';
 
 import { SystemJobsList } from 'components/systemjobs';
 import { Col, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
-import connect from 'stores/connect';
-import { SystemJobsActions, SystemJobsStore } from 'stores/systemjobs/SystemJobsStore';
 import useProductName from 'brand-customization/useProductName';
+import { defaultOnError } from 'util/conditional/onError';
 
-type SystemJobsComponentProps = {
-  jobs?: Record<
-    string,
-    {
-      jobs?: any[];
-    }
-  >;
-};
+export const SYSTEM_JOBS_QUERY_KEY = ['system', 'jobs'];
 
-const SystemJobsComponent = ({ jobs = undefined }: SystemJobsComponentProps) => {
+const SystemJobsComponent = () => {
   const productName = useProductName();
-  useEffect(() => {
-    SystemJobsActions.list();
-    const interval = setInterval(SystemJobsActions.list, 2000);
+  const { data: jobs, isLoading } = useQuery({
+    queryKey: SYSTEM_JOBS_QUERY_KEY,
+    queryFn: () =>
+      defaultOnError(ClusterJobs.list(), 'Loading system jobs failed with status', 'Could not load system jobs'),
+    refetchInterval: 2000,
+  });
 
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
-
-  if (!jobs) {
+  if (isLoading || !jobs) {
     return <Spinner />;
   }
 
@@ -66,6 +59,4 @@ const SystemJobsComponent = ({ jobs = undefined }: SystemJobsComponentProps) => 
   );
 };
 
-export default connect(SystemJobsComponent, { systemJobsStore: SystemJobsStore }, ({ systemJobsStore }) => ({
-  jobs: (systemJobsStore as any).jobs,
-}));
+export default SystemJobsComponent;

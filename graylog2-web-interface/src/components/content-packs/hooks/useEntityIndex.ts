@@ -15,23 +15,30 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useQuery } from '@tanstack/react-query';
+import groupBy from 'lodash/groupBy';
 
-import { ClusterPlugins } from '@graylog/server-api';
+import { SystemCatalog } from '@graylog/server-api';
 
+import EntityIndex from 'logic/content-packs/EntityIndex';
 import { defaultOnError } from 'util/conditional/onError';
 
-const usePluginList = (nodeId: string) => {
-  const { data, isInitialLoading } = useQuery({
-    queryKey: ['plugins', 'list', nodeId],
+const useEntityIndex = () => {
+  const { data: entityIndex, isLoading } = useQuery({
+    queryKey: ['catalog', 'entity-index'],
     queryFn: () =>
       defaultOnError(
-        ClusterPlugins.list(nodeId),
-        `Getting plugins on node "${nodeId}" failed`,
-        'Could not get plugins',
+        SystemCatalog.showEntityIndex(),
+        'Loading entity index failed with status',
+        'Could not load entity index',
+      ),
+    select: (result) =>
+      groupBy(
+        result.entities.map((e) => EntityIndex.fromJSON(e)),
+        'type.name',
       ),
   });
 
-  return { pluginList: data, isLoading: isInitialLoading };
+  return { entityIndex, isLoading };
 };
 
-export default usePluginList;
+export default useEntityIndex;

@@ -16,22 +16,33 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { ClusterPlugins } from '@graylog/server-api';
+import { IndexerFailures } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
 
-const usePluginList = (nodeId: string) => {
-  const { data, isInitialLoading } = useQuery({
-    queryKey: ['plugins', 'list', nodeId],
+const INDEXER_FAILURES_LIST_QUERY_KEY = 'indexer_failures_list';
+
+const useIndexerFailuresList = (
+  limit: number,
+  offset: number,
+): {
+  data: unknown;
+  isLoading: boolean;
+} => {
+  const { data, isLoading } = useQuery({
+    queryKey: [INDEXER_FAILURES_LIST_QUERY_KEY, limit, offset],
     queryFn: () =>
       defaultOnError(
-        ClusterPlugins.list(nodeId),
-        `Getting plugins on node "${nodeId}" failed`,
-        'Could not get plugins',
+        IndexerFailures.single(limit, offset),
+        'Loading indexer failures list failed with status',
+        'Could not load indexer failures list',
       ),
   });
 
-  return { pluginList: data, isLoading: isInitialLoading };
+  return {
+    data,
+    isLoading,
+  };
 };
 
-export default usePluginList;
+export default useIndexerFailuresList;

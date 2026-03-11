@@ -16,22 +16,24 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { ClusterPlugins } from '@graylog/server-api';
+import { SystemClusterTraffic } from '@graylog/server-api';
 
+import type { Traffic } from 'components/cluster/types';
 import { defaultOnError } from 'util/conditional/onError';
 
-const usePluginList = (nodeId: string) => {
-  const { data, isInitialLoading } = useQuery({
-    queryKey: ['plugins', 'list', nodeId],
+const useClusterTraffic = (days: number) => {
+  const { data: traffic, isLoading } = useQuery<Traffic>({
+    queryKey: ['cluster', 'traffic', days],
     queryFn: () =>
       defaultOnError(
-        ClusterPlugins.list(nodeId),
-        `Getting plugins on node "${nodeId}" failed`,
-        'Could not get plugins',
+        SystemClusterTraffic.get(days, false),
+        'Loading cluster traffic failed with status',
+        'Could not load cluster traffic',
       ),
+    enabled: !!days,
   });
 
-  return { pluginList: data, isLoading: isInitialLoading };
+  return { traffic, isLoading };
 };
 
-export default usePluginList;
+export default useClusterTraffic;

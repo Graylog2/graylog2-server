@@ -14,24 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import { useQuery } from '@tanstack/react-query';
 
-import { ClusterPlugins } from '@graylog/server-api';
-
+import ApiRoutes from 'routing/ApiRoutes';
+import fetch from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
 import { defaultOnError } from 'util/conditional/onError';
 
-const usePluginList = (nodeId: string) => {
-  const { data, isInitialLoading } = useQuery({
-    queryKey: ['plugins', 'list', nodeId],
+import type { CodecTypes } from './Types';
+
+const useCodecTypes = () => {
+  const { data, isInitialLoading } = useQuery<CodecTypes>({
+    queryKey: ['system', 'codecs', 'types'],
     queryFn: () =>
       defaultOnError(
-        ClusterPlugins.list(nodeId),
-        `Getting plugins on node "${nodeId}" failed`,
-        'Could not get plugins',
+        fetch('GET', qualifyUrl(ApiRoutes.CodecTypesController.list().url)),
+        'Fetching codec types failed with status',
+        'Could not retrieve codec types',
       ),
   });
 
-  return { pluginList: data, isLoading: isInitialLoading };
+  return { data, isInitialLoading };
 };
 
-export default usePluginList;
+export default useCodecTypes;
