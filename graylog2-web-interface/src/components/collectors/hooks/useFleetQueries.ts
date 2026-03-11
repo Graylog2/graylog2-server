@@ -18,12 +18,13 @@ import { useQuery } from '@tanstack/react-query';
 
 import { CollectorsFleets } from '@graylog/server-api';
 
+import request from 'routing/request';
 import type { SearchParams } from 'stores/PaginationTypes';
 import { defaultOnError } from 'util/conditional/onError';
 
 import type { PaginatedCollectorsResponse } from './useInstanceQueries';
 
-import type { Fleet } from '../types';
+import type { BulkFleetStatsResponse, Fleet } from '../types';
 
 export const FLEETS_KEY_PREFIX = ['collectors', 'fleets'];
 export const FLEETS_PAGINATED_KEY_PREFIX = ['collectors', 'fleets', 'paginated'];
@@ -62,6 +63,22 @@ export const useFleetStats = (fleetId: string) =>
         'Could not load Fleet Stats',
       ),
     enabled: !!fleetId,
+  });
+
+export const FLEETS_BULK_STATS_KEY = ['collectors', 'fleets', 'stats'];
+
+const fetchBulkFleetStats = (): Promise<BulkFleetStatsResponse> =>
+  request('GET', '/collectors/fleets/stats');
+
+export const useFleetsBulkStats = () =>
+  useQuery<BulkFleetStatsResponse>({
+    queryKey: FLEETS_BULK_STATS_KEY,
+    queryFn: () =>
+      defaultOnError(
+        fetchBulkFleetStats(),
+        'Loading fleet stats failed with status',
+        'Could not load Fleet Stats',
+      ),
   });
 
 export const fetchPaginatedFleets = async (

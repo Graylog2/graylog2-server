@@ -18,6 +18,7 @@ export {
   useFleets,
   useFleet,
   useFleetStats,
+  useFleetsBulkStats,
   fetchPaginatedFleets,
   fleetsKeyFn,
   FLEETS_KEY_PREFIX,

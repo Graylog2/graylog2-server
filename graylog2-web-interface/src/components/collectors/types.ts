@@ -129,3 +129,16 @@ export type CollectorsConfigRequest = {
     port: number;
   };
 };
+
+export type FleetStatsSummary = {
+  fleet_id: string;
+  fleet_name: string;
+  total_instances: number;
+  online_instances: number;
+  offline_instances: number;
+  total_sources: number;
+};
+
+export type BulkFleetStatsResponse = {
+  fleets: FleetStatsSummary[];
+};
