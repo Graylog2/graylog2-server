@@ -24,11 +24,11 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.handler.ssl.SslContext;
 import jakarta.inject.Named;
 import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog.inputs.otel.transport.OTelHttpTransport;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
-import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.configuration.Configuration;
@@ -88,7 +88,7 @@ public class CollectorIngestHttpTransport extends OTelHttpTransport {
                 OTelHttpTransport.CK_MAX_CHUNK_SIZE, 4 * 1024 * 1024,
                 OTelHttpTransport.CK_RECV_BUFFER_SIZE, 1048576,
                 OTelHttpTransport.CK_NUMBER_WORKER_THREADS, 4,
-                OTelHttpTransport.CK_TCP_KEEPALIVE, false,
+                OTelHttpTransport.CK_TCP_KEEPALIVE, true,
                 OTelHttpTransport.CK_IDLE_WRITER_TIMEOUT, 60
         ));
     }
