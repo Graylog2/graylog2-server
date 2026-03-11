@@ -98,32 +98,30 @@ describe('PaginatedList', () => {
       const currentPage = 4;
       asMock(useQueryParams).mockImplementation(() => [{ page: currentPage }, setQueryParams]);
 
-      const { findByTestId } = render(
+      render(
         <PaginatedList totalItems={200} onChange={() => {}} activePage={3}>
           <div>The list</div>
         </PaginatedList>,
       );
 
-      const graylogPagination = await findByTestId('graylog-pagination');
-      const activePageElement = graylogPagination.getElementsByClassName('active');
+      const activePageElement = await screen.findByTitle('Active page');
 
       expect(activePageElement).not.toBeNull();
-      expect(activePageElement[0].textContent).toContain(`${currentPage}`);
+      expect(activePageElement).toHaveTextContent(`${currentPage}`);
     });
   });
 
   describe('with internal state', () => {
     it('should update active page, when prop changes', async () => {
-      const { findByTestId, rerender } = render(
+      const { rerender } = render(
         <PaginatedList totalItems={200} onChange={() => {}} activePage={3} useQueryParameter={false}>
           <div>The list</div>
         </PaginatedList>,
       );
 
-      const graylogPagination = await findByTestId('graylog-pagination');
-      const activePageElement = graylogPagination.getElementsByClassName('active');
+      const activePageElement = await screen.findByTitle('Active page');
 
-      expect(activePageElement[0].textContent).toContain('3');
+      expect(activePageElement).toHaveTextContent('3');
 
       rerender(
         <PaginatedList totalItems={200} onChange={() => {}} activePage={1} useQueryParameter={false}>
@@ -131,10 +129,9 @@ describe('PaginatedList', () => {
         </PaginatedList>,
       );
 
-      await findByTestId('graylog-pagination');
-      const newActivePageElement = graylogPagination.getElementsByClassName('active');
+      const newActivePageElement = await screen.findByTitle('Active page');
 
-      expect(newActivePageElement[0].textContent).toContain('1');
+      expect(newActivePageElement).toHaveTextContent('1');
     });
   });
 });
