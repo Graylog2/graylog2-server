@@ -373,7 +373,7 @@ public class JerseyService extends AbstractIdleService {
         final NetworkListener listener = httpServer.getListener("grizzly");
         listener.setMaxHttpHeaderSize(maxHeaderSize);
         // Graylog Collector has a default poll interval of 30 seconds. The default Grizzly idle timeout is
-        // also 30 seconds. We the default timeout to avoid race conditions where the Collector tries to
+        // also 30 seconds. We increase the default timeout to avoid race conditions where the Collector tries to
         // execute a poll request at the same time Grizzly will close the connection.
         listener.getKeepAlive().setIdleTimeoutInSeconds(90);
 
