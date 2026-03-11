@@ -34,9 +34,9 @@ describe('Slicing', () => {
 
   const renderSUT = (
     props: Partial<React.ComponentProps<typeof Slicing>> = {},
-    contextOverrides: Partial<ContextValue> & { searchParams?: Partial<SearchParams> } = {},
+    contextOverrides: { searchParams?: Partial<SearchParams> } = {},
   ) => {
-    const searchParams = {
+    const searchParams: SearchParams = {
       page: 1,
       pageSize: 10,
       query: '',
@@ -51,7 +51,6 @@ describe('Slicing', () => {
       refetch: jest.fn(),
       attributes: [],
       entityTableId: 'test-entity-table',
-      ...contextOverrides,
     };
 
     return render(
@@ -165,9 +164,7 @@ describe('Slicing', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /open page 2/i }));
 
-    await waitFor(() =>
-      expect(within(screen.getByTestId('slices-list')).getByText('Slice-11')).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(within(screen.getByTestId('slices-list')).getByText('Slice-11')).toBeInTheDocument());
     expect(within(screen.getByTestId('slices-list')).queryByText('Slice-01')).not.toBeInTheDocument();
   });
 
