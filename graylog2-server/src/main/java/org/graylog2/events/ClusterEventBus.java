@@ -45,8 +45,18 @@ public class ClusterEventBus extends AsyncEventBus {
     }
 
     /**
-     * Only use this if you maintain the cluster event bus! Use regular EventBus to receive cluster event updates.
-     * @param object
+     * Registers a subscriber that only receives events posted on the local node.
+     *
+     * <p>Events posted to {@link ClusterEventBus} are dispatched to subscribers registered here
+     * <strong>before</strong> they are persisted and replicated to other nodes. On remote nodes,
+     * {@link org.graylog2.events.ClusterEventPeriodical} polls MongoDB and posts the replicated
+     * events to the server {@link com.google.common.eventbus.EventBus} instead, so subscribers
+     * registered here will <strong>not</strong> see those replicated events.</p>
+     *
+     * <p>Use this when a handler must run exactly once on the originating node (e.g. reacting to
+     * a license install). For cluster-wide delivery, subscribe on the server EventBus.</p>
+     *
+     * @param object the subscriber to register
      */
     public void registerClusterEventSubscriber(Object object) {
         super.register(object);
