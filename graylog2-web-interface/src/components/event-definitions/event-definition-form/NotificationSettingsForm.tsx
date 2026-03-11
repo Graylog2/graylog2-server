@@ -126,6 +126,7 @@ class NotificationSettingsForm extends React.Component<
               <input
                 id="toggle_backlog_size"
                 type="checkbox"
+                aria-label="Toggle message backlog"
                 checked={isBacklogSizeEnabled}
                 onChange={this.toggleBacklogSize}
               />
