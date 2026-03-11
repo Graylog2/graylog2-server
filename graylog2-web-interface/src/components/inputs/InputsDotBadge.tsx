@@ -37,17 +37,9 @@ const InputsDotBadge = ({ text, hasExternalIssues = false, externalIssuesTitle =
   );
 
   const showDot = hasFailedOrSetupInputs || hasExternalIssues;
-  const title = hasFailedOrSetupInputs
-    ? 'Some inputs are in failed state or in setup mode.'
-    : externalIssuesTitle;
+  const title = hasFailedOrSetupInputs ? 'Some inputs are in failed state or in setup mode.' : externalIssuesTitle;
 
-  return (
-    <MenuItemDotBadge
-      text={text}
-      title={title}
-      showDot={showDot}
-    />
-  );
+  return <MenuItemDotBadge text={text} title={title} showDot={showDot} />;
 };
 
 export default InputsDotBadge;
