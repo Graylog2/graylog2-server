@@ -92,14 +92,17 @@ const InputsNotifications = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const applyRuntimeStatusFilter = useCallback((status: 'FAILED' | 'SETUP' | 'NOT_RUNNING') => {
-    setQueryParams({
-      filters: [`${RUNTIME_STATUS_FILTER}=${status}`],
-      page: 1,
-      slice: undefined,
-      sliceCol: undefined,
-    });
-  }, [setQueryParams]);
+  const applyRuntimeStatusFilter = useCallback(
+    (status: 'FAILED' | 'SETUP' | 'NOT_RUNNING') => {
+      setQueryParams({
+        filters: [`${RUNTIME_STATUS_FILTER}=${status}`],
+        page: 1,
+        slice: undefined,
+        sliceCol: undefined,
+      });
+    },
+    [setQueryParams],
+  );
 
   const items = getNotificationItems(inputs, inputStates, isLoading).map((item) => {
     if (item.message === FAILED_MESSAGE) {

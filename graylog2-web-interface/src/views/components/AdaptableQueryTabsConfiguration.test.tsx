@@ -86,7 +86,9 @@ describe('AdaptableQueryTabsConfiguration', () => {
 
     await userEvent.click(deleteButton);
 
-    await waitFor(() => expect(screen.queryByRole('button', { name: /remove page query title 2/i })).not.toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: /remove page query title 2/i })).not.toBeInTheDocument(),
+    );
 
     const submitButton = await screen.findByTitle('Update configuration');
 
