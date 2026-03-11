@@ -151,9 +151,11 @@ describe('StreamModal', () => {
 
       const lastCallPayload = prepareCalls[1][3];
       expect(lastCallPayload.selected_grantee_capabilities.toJS()).toEqual(
-        createEntityShareState.selectedGranteeCapabilities.merge({
-          [everyone.id]: viewer.id,
-        }).toJS(),
+        createEntityShareState.selectedGranteeCapabilities
+          .merge({
+            [everyone.id]: viewer.id,
+          })
+          .toJS(),
       );
     });
 
