@@ -186,14 +186,6 @@ public class PreflightResource {
         }
     }
 
-    @DELETE
-    @Path("/startOver/{nodeID}")
-    @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
-    @NoAuditEvent("No Auditing during preflight")
-    public void startOver(@PathParam("nodeID") String nodeID) {
-        //TODO:  reset a specific datanode
-    }
-
     @POST
     @Path("/generate")
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)

@@ -53,6 +53,9 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,6 +88,7 @@ import static org.hamcrest.Matchers.not;
                                      @GraylogBackendConfiguration.Env(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),
                              })
 @EnabledIfSearchServer(distribution = SearchVersion.Distribution.DATANODE)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DatanodeProvisioningIT {
 
     private final Logger log = LoggerFactory.getLogger(DatanodeProvisioningIT.class);
@@ -123,6 +127,7 @@ public class DatanodeProvisioningIT {
     }
 
     @FullBackendTest
+    @Order(1)
     void provisionDatanodeGenerateCA() throws ExecutionException, RetryException, KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
         final String caSubjectName = createSelfSignedCA();
 
@@ -278,6 +283,7 @@ public class DatanodeProvisioningIT {
     }
 
     @FullBackendTest
+    @Order(2)
     void provisionDatanodeUploadCA() throws ExecutionException, RetryException, CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
         final Path caKeystore = createCA();
 
