@@ -31,6 +31,7 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.rest.models.system.inputs.responses.InputSetup;
+import org.graylog2.rest.models.system.inputs.responses.InputStopped;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
 import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
@@ -146,6 +147,15 @@ public class InputEventListener {
     }
 
     @Subscribe
+    public void inputStopped(InputStopped inputStoppedEvent) {
+        LOG.debug("Input stopped: {}", inputStoppedEvent.id());
+        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputStoppedEvent.id());
+        if (inputState != null) {
+            inputRegistry.remove(inputState);
+        }
+    }
+
+    @Subscribe
     public void inputDeleted(InputDeleted inputDeletedEvent) {
         LOG.debug("Input deleted: {}", inputDeletedEvent.id());
         metricRegistry.remove(name(Input.class, FAILED_STARTS_METRIC, inputDeletedEvent.id()));
@@ -199,7 +209,7 @@ public class InputEventListener {
                     .filter(input -> input.isGlobal() && input.onlyOnePerCluster())
                     .forEach(input -> {
                         LOG.info("Lost leader role. Stopping input {}", input.toIdentifier());
-                        inputDeleted(InputDeleted.create(input.getId()));
+                        inputStopped(InputStopped.create(input.getId()));
                     });
         }
     }

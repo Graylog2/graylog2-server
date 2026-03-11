@@ -42,8 +42,8 @@ import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
-import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.rest.models.system.inputs.responses.InputSetup;
+import org.graylog2.rest.models.system.inputs.responses.InputStopped;
 import org.graylog2.rest.models.system.inputs.responses.InputStateSummary;
 import org.graylog2.rest.models.system.inputs.responses.InputStatesList;
 import org.graylog2.rest.models.system.inputs.responses.InputSummary;
@@ -173,7 +173,7 @@ public class InputStatesResource extends AbstractInputsResource {
             @ApiResponse(responseCode = "404", description = "No such input on this node."),
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_STOP)
-    public InputDeleted stop(@Parameter(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
+    public InputStopped stop(@Parameter(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_CHANGESTATE, inputId);
         final Input input = inputService.find(inputId);
         checkPermission(RestPermissions.INPUT_TYPES_CREATE, input.getType()); // remove after sharing inputs implemented
@@ -183,7 +183,7 @@ public class InputStatesResource extends AbstractInputsResource {
             throw new BadRequestException(e);
         }
 
-        final InputDeleted result = InputDeleted.create(inputId);
+        final InputStopped result = InputStopped.create(inputId);
         this.serverEventBus.post(result);
 
         return result;
