@@ -44,8 +44,12 @@ jest.mock('routing/QueryParams', () => ({
   useQueryParams: jest.fn(),
 }));
 
-const buildInputState = (state: 'RUNNING' | 'FAILED' | 'FAILING' | 'SETUP') =>
-  ({ state, id: 'state-id', detailed_message: null, message_input: {} as InputSummary });
+const buildInputState = (state: 'RUNNING' | 'FAILED' | 'FAILING' | 'SETUP') => ({
+  state,
+  id: 'state-id',
+  detailed_message: null,
+  message_input: {} as InputSummary,
+});
 
 describe('<InputsNotifications />', () => {
   beforeEach(() => {
