@@ -41,6 +41,19 @@ const JournalUsageProgressBar = styled(ProgressBar)`
   }
 `;
 
+type JournalConfig = {
+  directory: string;
+  max_size: number;
+  max_age: string;
+  flush_interval: number;
+  flush_age: string;
+};
+
+type JournalInformation = {
+  enabled: boolean;
+  journal_config: JournalConfig;
+};
+
 type Props = {
   nodeId: string;
 };
@@ -55,21 +68,23 @@ const metricNames = {
 
 const metricValues = Object.values(metricNames);
 
+const fetchJournalInfo = (nodeId: string): Promise<JournalInformation> => {
+  const url = URLUtils.qualifyUrl(`/cluster/${nodeId}/journal`);
+
+  return fetch<JournalInformation>('GET', url).catch((error: unknown) => {
+    UserNotification.error(
+      `Getting journal information on node ${nodeId} failed: ${error}`,
+      'Could not get journal information',
+    );
+
+    throw error;
+  });
+};
+
 const JournalDetails = ({ nodeId }: Props) => {
   const { data: journalInformation } = useQuery({
     queryKey: ['journal', 'info', nodeId],
-    queryFn: () => {
-      const url = URLUtils.qualifyUrl(`/cluster/${nodeId}/journal`);
-
-      return fetch('GET', url).catch((error: unknown) => {
-        UserNotification.error(
-          `Getting journal information on node ${nodeId} failed: ${error}`,
-          'Could not get journal information',
-        );
-
-        throw error;
-      });
-    },
+    queryFn: () => fetchJournalInfo(nodeId),
   });
 
   const { data: nodeMetrics, isLoading: metricsLoading } = useNodeMetrics(nodeId, metricValues);

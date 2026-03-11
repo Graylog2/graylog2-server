@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { Col, Row } from 'components/bootstrap';
@@ -47,17 +47,17 @@ const SystemMessagesComponent = () => {
     refetchInterval: 1000,
   });
 
-  const onSelected = useCallback((selectedPage: number) => {
-    setCurrentPage(selectedPage);
-  }, []);
-
   const content =
     data?.total != null && data?.messages ? (
       <div>
         <SystemMessagesList messages={data.messages} />
 
         <nav style={{ textAlign: 'center' }}>
-          <Pagination totalPages={Math.ceil(data.total / PER_PAGE)} currentPage={currentPage} onChange={onSelected} />
+          <Pagination
+            totalPages={Math.ceil(data.total / PER_PAGE)}
+            currentPage={currentPage}
+            onChange={setCurrentPage}
+          />
         </nav>
       </div>
     ) : (

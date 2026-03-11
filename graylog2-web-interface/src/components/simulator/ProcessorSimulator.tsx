@@ -25,16 +25,24 @@ import fetch from 'logic/rest/FetchProvider';
 import * as URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import MessageFormatter from 'logic/message/MessageFormatter';
+import type { FormattedMessage } from 'logic/message/MessageFormatter';
+import type { Stream } from 'logic/streams/types';
+import type { Message } from 'views/components/messagelist/Types';
 
 import SimulationResults from './SimulationResults';
 
 const DEFAULT_STREAM_ID = '000000000000000000000001';
 
-type ProcessorSimulatorProps = {
-  streams: any[];
+type SimulateResponse = {
+  messages: Array<FormattedMessage>;
+  [key: string]: unknown;
 };
 
-const getFormattedStreams = (streams) => {
+type ProcessorSimulatorProps = {
+  streams: Stream[];
+};
+
+const getFormattedStreams = (streams: Stream[]) => {
   if (!streams) {
     return [];
   }
@@ -44,7 +52,16 @@ const getFormattedStreams = (streams) => {
     .sort((s1, s2) => naturalSort(s1.label, s2.label));
 };
 
-const simulateMessage = (stream: { id: string }, messageFields: unknown, inputId: string) => {
+type RawSimulateResponse = {
+  messages: Array<unknown>;
+  [key: string]: unknown;
+};
+
+const simulateMessage = (
+  stream: Pick<Stream, 'id'>,
+  messageFields: Record<string, unknown>,
+  inputId: string,
+): Promise<SimulateResponse> => {
   const url = URLUtils.qualifyUrl(ApiRoutes.SimulatorController.simulate().url);
   const simulation = {
     stream_id: stream.id,
@@ -52,9 +69,7 @@ const simulateMessage = (stream: { id: string }, messageFields: unknown, inputId
     input_id: inputId,
   };
 
-  type SimulateResponse = { messages: Array<unknown>; [key: string]: unknown };
-
-  return fetch<SimulateResponse>('POST', url, simulation).then((response) => ({
+  return fetch<RawSimulateResponse>('POST', url, simulation).then((response) => ({
     ...response,
     messages: response.messages.map((msg) => MessageFormatter.formatMessageSummary(msg)),
   }));
@@ -63,25 +78,25 @@ const simulateMessage = (stream: { id: string }, messageFields: unknown, inputId
 const ProcessorSimulator = ({ streams }: ProcessorSimulatorProps) => {
   const defaultStream = useMemo(() => streams.find((s) => s.id === DEFAULT_STREAM_ID) ?? streams[0], [streams]);
 
-  const [stream, setStream] = useState(defaultStream);
-  const [message, setMessage] = useState(undefined);
-  const [simulation, setSimulation] = useState(undefined);
+  const [stream, setStream] = useState<Stream>(defaultStream);
+  const [message, setMessage] = useState<Message | undefined>(undefined);
+  const [simulation, setSimulation] = useState<SimulateResponse | undefined>(undefined);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(undefined);
+  const [error, setError] = useState<unknown>(undefined);
 
   const onMessageLoad = useCallback(
-    (loadedMessage, options) => {
+    (loadedMessage: Message | undefined, options: { inputId?: string }) => {
       setMessage(loadedMessage);
       setSimulation(undefined);
       setLoading(true);
       setError(undefined);
 
-      simulateMessage(stream, loadedMessage.fields, options.inputId).then(
+      simulateMessage(stream, loadedMessage?.fields ?? {}, options.inputId ?? '').then(
         (response) => {
           setSimulation(response);
           setLoading(false);
         },
-        (err) => {
+        (err: unknown) => {
           setLoading(false);
           setError(err);
         },
@@ -91,7 +106,7 @@ const ProcessorSimulator = ({ streams }: ProcessorSimulatorProps) => {
   );
 
   const onStreamSelect = useCallback(
-    (selectedStream) => {
+    (selectedStream: string) => {
       const found = streams.find((s) => s.id.toLowerCase() === selectedStream.toLowerCase());
 
       setStream(found);
