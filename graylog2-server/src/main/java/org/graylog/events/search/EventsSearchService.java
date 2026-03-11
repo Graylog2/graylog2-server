@@ -18,6 +18,7 @@ package org.graylog.events.search;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Streams;
 import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
@@ -87,22 +88,32 @@ public class EventsSearchService extends AbstractEventsSearchService {
      * returns the slices for the slice-by functionality for the Alerts/Events table. Used in the core Events/Alerts table
      */
     public Slices slices(final EventsSlicesRequest request, final Subject subject, final SearchUser searchUser) {
-        // we cover two use cases by the include_all flag: if you only want the slices calculated from the resultset that will also be shown in the entity table, we re-use query and timerange for that. Otherwise, we query the table for "all" possible slices
-        final var query = request.includeAll() ? "" : request.query();
-        final var timeRange = request.includeAll() ? RelativeRange.allTime() : request.timerange();
-        final var filter = buildFilter(EventsSearchParameters.builder().query(query).timerange(timeRange).filter(request.filter()).build());
+       // we cover two use cases by the include_all flag: if you only want the slices calculated from the resultset that will also be shown in the entity table, we re-use query and timerange for that. Otherwise, we query the table for "all" possible slices
+       final var query = request.query();
+       final var timeRange = request.timerange();
+       final var filter = buildFilter(EventsSearchParameters.builder().query(query).timerange(timeRange).filter(request.filter()).build());
 
-        final var queryString = filter.isEmpty() ? query : query.isEmpty() ? filter : query + " AND " + filter;
+       final var queryString = filter.isEmpty() ? query : query.isEmpty() ? filter : query + " AND " + filter;
 
-        return this.slices(queryString, timeRange, subject, searchUser, request.sliceColumn(), request.includeAll());
+       final var allSlicesInTimeRange = this.slices("", timeRange, subject, searchUser, request.sliceColumn());
+       final var filteredSlices = this.slices(queryString, timeRange, subject, searchUser, request.sliceColumn());
+       final var slices = filteredSlicesWithMergedInEmptySlicesFrom(filteredSlices, allSlicesInTimeRange);
+
+       return new Slices(addMissingOptions(slices, request.sliceColumn()));
+    }
+
+    public static List<Slice> filteredSlicesWithMergedInEmptySlicesFrom(final List<Slice> filteredSlices, final List<Slice> allSlicesInTimeRange) {
+        final var existingSlices = filteredSlices.stream().map(Slice::value).collect(Collectors.toSet());
+        final var emptySlices = allSlicesInTimeRange.stream().filter(slice -> !existingSlices.contains(slice.value())).map(s -> new Slice(s.value(), s.title(), 0));
+        return Streams.concat(filteredSlices.stream(), emptySlices).toList();
     }
 
     /**
      * Used inside this service for the core Events/Alerts table but also is a provided method, re-used from the enterprise/security part of Graylog
      */
-    public Slices slices(String query, TimeRange timeRange, Subject subject, SearchUser searchUser, final String slicingColumn, final boolean includeAll) {
+    public List<Slice> slices(String query, TimeRange timeRange, Subject subject, SearchUser searchUser, final String slicingColumn) {
         try {
-            final var slices = scriptingApiService.executeAggregation(
+            return scriptingApiService.executeAggregation(
                             new AggregationRequestSpec(query, allowedEventStreams(subject), Set.of(), timeRange, List.of(new Grouping(slicingColumn, Integer.MAX_VALUE)), List.of(new Metric("count", slicingColumn))),
                             searchUser
                     )
@@ -110,12 +121,6 @@ public class EventsSearchService extends AbstractEventsSearchService {
                     .stream()
                     .map(r -> mapAggregationResultsToSlice(slicingColumn, r))
                     .toList();
-
-            final var filtered = includeAll
-                    ? addMissingOptions(slices, slicingColumn)
-                    : slices.stream().filter(s -> !MissingBucketConstants.MISSING_BUCKET_NAME.equals(s.value())).toList();
-
-            return new Slices(filtered);
         } catch (QueryFailedException e) {
             throw new RuntimeException(e);
         }
