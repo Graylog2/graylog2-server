@@ -178,7 +178,7 @@ const SlicesOverview = ({
   const onSliceSelection = (newSliceCol: string | undefined, newSlice?: string | undefined) => {
     onChangeSlicing(newSliceCol, newSlice);
 
-    if (newSlice !== undefined) {
+    if (newSlice !== undefined && newSlice !== activeSlice) {
       void refetchSlices();
     }
   };
