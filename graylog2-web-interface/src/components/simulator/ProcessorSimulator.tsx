@@ -16,27 +16,20 @@
  */
 import React, { useMemo, useState, useCallback } from 'react';
 
+import { PipelinesSimulator } from '@graylog/server-api';
+
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Link, Select } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Panel, Row } from 'components/bootstrap';
 import RawMessageLoader from 'components/messageloaders/RawMessageLoader';
 import Routes from 'routing/Routes';
-import fetch from 'logic/rest/FetchProvider';
-import * as URLUtils from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
 import MessageFormatter from 'logic/message/MessageFormatter';
-import type { FormattedMessage } from 'logic/message/MessageFormatter';
 import type { Stream } from 'logic/streams/types';
 import type { Message } from 'views/components/messagelist/Types';
 
 import SimulationResults from './SimulationResults';
 
 const DEFAULT_STREAM_ID = '000000000000000000000001';
-
-type SimulateResponse = {
-  messages: Array<FormattedMessage>;
-  [key: string]: unknown;
-};
 
 type ProcessorSimulatorProps = {
   streams: Stream[];
@@ -52,35 +45,22 @@ const getFormattedStreams = (streams: Stream[]) => {
     .sort((s1, s2) => naturalSort(s1.label, s2.label));
 };
 
-type RawSimulateResponse = {
-  messages: Array<unknown>;
-  [key: string]: unknown;
-};
-
-const simulateMessage = (
-  stream: Pick<Stream, 'id'>,
-  messageFields: Record<string, unknown>,
-  inputId: string,
-): Promise<SimulateResponse> => {
-  const url = URLUtils.qualifyUrl(ApiRoutes.SimulatorController.simulate().url);
-  const simulation = {
-    stream_id: stream.id,
+const simulateMessage = (streamId: string, messageFields: Record<string, unknown>, inputId: string) =>
+  PipelinesSimulator.simulate({
+    stream_id: streamId,
     message: messageFields,
     input_id: inputId,
-  };
-
-  return fetch<RawSimulateResponse>('POST', url, simulation).then((response) => ({
+  }).then((response) => ({
     ...response,
     messages: response.messages.map((msg) => MessageFormatter.formatMessageSummary(msg)),
   }));
-};
 
 const ProcessorSimulator = ({ streams }: ProcessorSimulatorProps) => {
   const defaultStream = useMemo(() => streams.find((s) => s.id === DEFAULT_STREAM_ID) ?? streams[0], [streams]);
 
   const [stream, setStream] = useState<Stream>(defaultStream);
   const [message, setMessage] = useState<Message | undefined>(undefined);
-  const [simulation, setSimulation] = useState<SimulateResponse | undefined>(undefined);
+  const [simulation, setSimulation] = useState(undefined);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<unknown>(undefined);
 
@@ -91,7 +71,7 @@ const ProcessorSimulator = ({ streams }: ProcessorSimulatorProps) => {
       setLoading(true);
       setError(undefined);
 
-      simulateMessage(stream, loadedMessage?.fields ?? {}, options.inputId ?? '').then(
+      simulateMessage(stream.id, loadedMessage?.fields ?? {}, options.inputId ?? '').then(
         (response) => {
           setSimulation(response);
           setLoading(false);
