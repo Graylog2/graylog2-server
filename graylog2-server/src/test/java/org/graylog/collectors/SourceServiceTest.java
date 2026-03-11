@@ -36,6 +36,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -221,6 +222,26 @@ class SourceServiceTest {
 
         assertThat(sourceA.id()).isNotEqualTo(sourceB.id());
         assertThat(sourceA.name()).isEqualTo(sourceB.name());
+    }
+
+    @Test
+    void countByFleetGroupedReturnsPerFleetSourceCounts() {
+        FleetDTO fleetA = fleetService.create("fleet-a", "Fleet A", null);
+        FleetDTO fleetB = fleetService.create("fleet-b", "Fleet B", null);
+
+        // fleet-a: 3 sources
+        sourceService.create(fleetA.id(), "source-a1", "Source A1", true, validFileConfig());
+        sourceService.create(fleetA.id(), "source-a2", "Source A2", true, validFileConfig());
+        sourceService.create(fleetA.id(), "source-a3", "Source A3", true, validFileConfig());
+
+        // fleet-b: 1 source
+        sourceService.create(fleetB.id(), "source-b1", "Source B1", true, validFileConfig());
+
+        Map<String, Long> grouped = sourceService.countByFleetGrouped();
+
+        assertThat(grouped).containsEntry(fleetA.id(), 3L);
+        assertThat(grouped).containsEntry(fleetB.id(), 1L);
+        assertThat(grouped).hasSize(2);
     }
 
     @Test

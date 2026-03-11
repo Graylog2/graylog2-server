@@ -33,6 +33,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.time.Instant;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -106,6 +107,38 @@ class CollectorInstanceServiceTest {
         assertThat(exists).isFalse();
     }
 
+    @Test
+    void countByFleetGroupedReturnsPerFleetCounts() {
+        final Instant now = Instant.now();
+        final Instant recentlySeen = now.minusSeconds(30);
+        final Instant longAgo = now.minusSeconds(600);
+        final Instant onlineThreshold = now.minusSeconds(60);
+
+        final String fleetA = "507f1f77bcf86cd799439012";
+        final String fleetB = "507f1f77bcf86cd799439013";
+
+        // fleet-a: 3 instances (2 online, 1 offline based on threshold)
+        enrollWithFleetAndLastSeen(collectorInstanceService, "uid-a1", "sha256:fp-a1", fleetA, recentlySeen);
+        enrollWithFleetAndLastSeen(collectorInstanceService, "uid-a2", "sha256:fp-a2", fleetA, recentlySeen);
+        enrollWithFleetAndLastSeen(collectorInstanceService, "uid-a3", "sha256:fp-a3", fleetA, longAgo);
+
+        // fleet-b: 1 instance (1 online)
+        enrollWithFleetAndLastSeen(collectorInstanceService, "uid-b1", "sha256:fp-b1", fleetB, recentlySeen);
+
+        final Map<String, long[]> grouped = collectorInstanceService.countByFleetGrouped(onlineThreshold);
+
+        assertThat(grouped).containsKey(fleetA);
+        assertThat(grouped.get(fleetA)[0]).isEqualTo(3L); // total
+        assertThat(grouped.get(fleetA)[1]).isEqualTo(2L); // online
+
+        assertThat(grouped).containsKey(fleetB);
+        assertThat(grouped.get(fleetB)[0]).isEqualTo(1L); // total
+        assertThat(grouped.get(fleetB)[1]).isEqualTo(1L); // online
+
+        // absent fleet should not be in the map
+        assertThat(grouped).doesNotContainKey("507f1f77bcf86cd799439099");
+    }
+
     private static CollectorInstanceDTO enroll(CollectorInstanceService service, String instanceUid, String fingerprint) {
         return service.enroll(
                 instanceUid,
@@ -114,6 +147,19 @@ class CollectorInstanceServiceTest {
                 "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----",
                 "507f1f77bcf86cd799439011", // Valid 24-char hex ObjectId
                 Instant.now()
+        );
+    }
+
+    private static CollectorInstanceDTO enrollWithFleetAndLastSeen(CollectorInstanceService service,
+                                                                    String instanceUid, String fingerprint,
+                                                                    String fleetId, Instant lastSeen) {
+        return service.enroll(
+                instanceUid,
+                fleetId,
+                fingerprint,
+                "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----",
+                "507f1f77bcf86cd799439011",
+                lastSeen
         );
     }
 }
