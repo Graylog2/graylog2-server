@@ -30,9 +30,8 @@ import {
 import isDeepEqual from '../isDeepEqual';
 
 describe('isDeepEqual', () => {
-  const verifyIsDeepEqual = ({ initial, next, result }) => expect(isDeepEqual(initial, next)).toBe(result);
+  const expectIsDeepEqual = ({ initial, next, result }) => expect(isDeepEqual(initial, next)).toBe(result);
 
-  // eslint-disable-next-line jest/expect-expect
   it.each`
     initial                  | next                     | result   | description
     ${undefined}             | ${undefined}             | ${true}  | ${'equal undefined values'}
@@ -64,5 +63,5 @@ describe('isDeepEqual', () => {
     ${objectWithMap()}       | ${objectWithMap()}       | ${true}  | ${'objects containing immutable maps'}
     ${arrayOfMaps()}         | ${arrayOfMaps()}         | ${true}  | ${'arrays containing immutable maps'}
     ${mixedMapsAndObjects()} | ${mixedMapsAndObjects()} | ${true}  | ${'nested immutable maps and objects'}
-  `('compares $description and returns $result', verifyIsDeepEqual);
+  `('compares $description and returns $result', ({ initial, next, result }) => expectIsDeepEqual({ initial, next, result }));
 });

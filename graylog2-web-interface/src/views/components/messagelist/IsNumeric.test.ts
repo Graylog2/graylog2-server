@@ -17,9 +17,8 @@
 import isNumeric from './IsNumeric';
 
 describe('isNumeric', () => {
-  const testIsNumericString = ({ string, result }) => expect(isNumeric(string)).toEqual(result);
+  const expectIsNumericString = ({ string, result }) => expect(isNumeric(string)).toEqual(result);
 
-  // eslint-disable-next-line jest/expect-expect
   it.each`
     string                                               | result
     ${undefined}                                         | ${false}
@@ -32,5 +31,5 @@ describe('isNumeric', () => {
     ${23}                                                | ${true}
     ${23.42}                                             | ${true}
     ${'2020-11-02T09:37:55.256Z PUT /posts [200] 104ms'} | ${false}
-  `('returns $result for value $string', testIsNumericString);
+  `('returns $result for value $string', ({ string, result }) => expectIsNumericString({ string, result }));
 });

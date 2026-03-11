@@ -78,7 +78,7 @@ class SidecarList extends React.Component<
                 />
               </th>
             ))}
-            <th className={style.actions} aria-label="Actions">
+            <th className={style.actions}>
               &nbsp;
             </th>
           </tr>

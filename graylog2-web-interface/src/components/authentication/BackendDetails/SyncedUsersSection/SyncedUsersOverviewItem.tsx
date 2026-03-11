@@ -47,7 +47,7 @@ const SyncedUsersOverviewItem = ({ user: { fullName, id, roles: userRolesIds, us
       </td>
       <td className="limited">{fullName}</td>
       <RolesCell roles={userRolesNames} />
-      <td className="limited" aria-label="Actions">
+      <td className="limited">
         <ActionsWrapper>
           <LinkContainer to={Routes.SYSTEM.USERS.edit(id)}>
             <Button type="button" bsStyle="info" bsSize="xs">

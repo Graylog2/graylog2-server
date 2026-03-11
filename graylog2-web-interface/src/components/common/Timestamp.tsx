@@ -46,7 +46,7 @@ const DefaultRender = ({ value, field: _field }: RenderProps) => <>{value}</>;
  */
 const Timestamp = ({
   dateTime = undefined,
-  field,
+  field = undefined,
   format = 'default',
   render: Component = DefaultRender,
   tz = undefined,

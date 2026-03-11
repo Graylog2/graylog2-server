@@ -17,7 +17,7 @@
 import userEvent from '@testing-library/user-event';
 import * as React from 'react';
 import { Formik } from 'formik';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import Autocomplete from './Autocomplete';
 
@@ -60,8 +60,6 @@ describe('Autocomplete component', () => {
 
     await userEvent.type(input, 'ver');
 
-    await waitFor(() => {
-      expect(screen.getByRole('listbox')).toBeVisible();
-    });
+    expect(await screen.findByRole('listbox')).toBeVisible();
   });
 });

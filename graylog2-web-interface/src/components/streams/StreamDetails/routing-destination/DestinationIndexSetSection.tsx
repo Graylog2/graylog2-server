@@ -131,7 +131,7 @@ const DestinationIndexSetSection = ({ stream }: Props) => {
               <td>
                 <IndexSetArchivingCell isArchivingEnabled={archivingEnabled} streamId={stream.id} />
               </td>
-              <td aria-label="Actions">
+              <td>
                 <ActionButtonsWrap>
                   <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet?.id)}>
                     <Button bsStyle="default" bsSize="xsmall" onClick={() => {}} title="View index set">

@@ -180,7 +180,7 @@ class GrokPatterns extends React.Component<
       <tr key={pattern.id}>
         <td>{pattern.name}</td>
         <td>{pattern.pattern}</td>
-        <td aria-label="Actions">
+        <td>
           <ButtonToolbar>
             <IfPermitted permissions="inputs:edit">
               <EditPatternModal

@@ -74,7 +74,7 @@ const StreamDataRoutingProcessing = ({ stream }: Props) => {
                 <tr key={pipeline.id}>
                   <td>{pipeline.title}</td>
                   {}
-                  <td aria-label="Actions">
+                  <td>
                     <ActionButtonsWrap className="align-right">
                       <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>
                         <Button bsStyle="default" bsSize="xsmall" title="View">

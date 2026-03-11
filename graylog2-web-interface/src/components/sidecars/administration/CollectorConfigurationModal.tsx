@@ -273,7 +273,7 @@ const CollectorConfigurationModal = ({
                 rows
               )}
               <StickyTableRowFooter>
-                <td colSpan={6} aria-label="Add configuration">
+                <td colSpan={6}>
                   <AddNewConfiguration>
                     <Link to={Routes.SYSTEM.SIDECARS.NEW_CONFIGURATION}>
                       <Icon name="add" />
