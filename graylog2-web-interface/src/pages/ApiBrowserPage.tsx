@@ -15,296 +15,144 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import SwaggerUI from 'swagger-ui-react';
-import 'swagger-ui-react/swagger-ui.css';
+import { useCallback, useRef, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { DocumentTitle } from 'components/common';
 import { qualifyUrl } from 'util/URLUtils';
 
-const StyledSwaggerContainer = styled.div(
+const StyledExplorerContainer = styled.div(
   ({ theme }) => css`
-    /* General text colors */
-    .swagger-ui {
-      color: ${theme.colors.text.primary};
-      font-family: ${theme.fonts.family.body};
-    }
+    margin-left: -25px;
+    margin-right: -25px;
+    margin-top: -11px;
+    height: 89vh;
+    width: 99vw;
 
-    /* Info section - title, description, version */
-    .swagger-ui .info .title,
-    .swagger-ui .info h1,
-    .swagger-ui .info h2,
-    .swagger-ui .info h3,
-    .swagger-ui .info h4 {
-      color: ${theme.colors.text.primary};
-    }
-
-    /* Version number badge (gray rounded pill) */
-    .swagger-ui .info hgroup.main small:not(.version-stamp) {
-      background-color: #7d8492;
-      border-radius: 57px;
-      padding: 2px 4px;
-    }
-
-    /* OAS version badge (green rounded pill) */
-    .swagger-ui .info hgroup.main small.version-stamp {
-      background-color: #89bf04;
-      border-radius: 57px;
-      padding: 2px 4px;
-    }
-
-    /* Version text inside badges */
-    .swagger-ui .info hgroup.main pre.version {
-      background-color: transparent;
-      color: #fff;
-      border: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .swagger-ui .info p,
-    .swagger-ui .info li {
-      color: ${theme.colors.text.primary};
-    }
-
-    /* Operation blocks - tag headers */
-    .swagger-ui .opblock-tag {
-      color: ${theme.colors.text.primary};
-      border-bottom-color: ${theme.colors.gray[80]};
-    }
-
-    .swagger-ui .opblock-tag:hover {
-      background-color: ${theme.colors.gray[90]};
-    }
-
-    /* Tag description text - needs better contrast in dark mode */
-    .swagger-ui .opblock-tag small {
-      color: ${theme.colors.text.secondary};
-    }
-
-    /* Expand/collapse arrows - make them visible */
-    .swagger-ui .opblock-tag svg,
-    .swagger-ui .opblock-tag .arrow,
-    .swagger-ui .expand-operation svg {
-      fill: ${theme.colors.text.primary};
-    }
-
-    .swagger-ui .opblock .opblock-summary-description {
-      color: ${theme.colors.text.secondary};
-    }
-
-    .swagger-ui .opblock .opblock-summary-path {
-      color: ${theme.colors.text.primary};
-    }
-
-    /* Operation expand/collapse button */
-    .swagger-ui .opblock .opblock-summary-control svg {
-      fill: ${theme.colors.text.primary};
-    }
-
-    /* Parameter and schema sections */
-    .swagger-ui .opblock-description-wrapper p,
-    .swagger-ui .opblock-external-docs-wrapper p,
-    .swagger-ui table thead tr th,
-    .swagger-ui table thead tr td,
-    .swagger-ui .parameter__name,
-    .swagger-ui .parameter__type,
-    .swagger-ui .parameter__in {
-      color: ${theme.colors.text.primary};
-    }
-
-    .swagger-ui .opblock-section-header {
-      background-color: ${theme.colors.gray[90]};
-    }
-
-    .swagger-ui .opblock-section-header h4 {
-      color: ${theme.colors.text.primary};
-    }
-
-    /* Try it out and cancel buttons need dark colors for contrast against light section header */
-    .swagger-ui .opblock-section-header .try-out__btn,
-    .swagger-ui .opblock-section-header .btn-group .cancel {
-      color: #333;
-      border-color: #333;
-    }
-
-    /* Tab headers (Parameters, etc.) */
-    .swagger-ui .tab li {
-      color: ${theme.colors.text.primary};
-    }
-
-    .swagger-ui .tab li button.tablinks {
-      color: ${theme.colors.text.primary};
-    }
-
-    /* Schema/Model section */
-    .swagger-ui .model-title {
-      color: ${theme.colors.text.primary};
-    }
-
-    .swagger-ui .model {
-      color: ${theme.colors.text.primary};
-    }
-
-    .swagger-ui .model .property,
-    .swagger-ui .model .property.primitive {
-      color: ${theme.colors.variant.info};
-    }
-
-    /* Response section */
-    .swagger-ui .responses-inner h4,
-    .swagger-ui .responses-inner h5 {
-      color: ${theme.colors.text.primary};
-    }
-
-    .swagger-ui .response-col_status {
-      color: ${theme.colors.text.primary};
-    }
-
-    .swagger-ui .response-col_description__inner p {
-      color: ${theme.colors.text.primary};
-    }
-
-    /* Table styling */
-    .swagger-ui table tbody tr td {
-      color: ${theme.colors.text.primary};
-    }
-
-    /* Links */
-    .swagger-ui a {
-      color: ${theme.colors.global.link};
-    }
-
-    .swagger-ui a:hover {
-      color: ${theme.colors.global.linkHover};
-    }
-
-    /* Code blocks */
-    .swagger-ui .highlight-code {
-      background-color: ${theme.colors.variant.lightest.default};
-    }
-
-    /* Markdown content */
-    .swagger-ui .markdown p,
-    .swagger-ui .markdown li {
-      color: ${theme.colors.text.primary};
-    }
-
-    .swagger-ui .markdown code {
-      color: ${theme.colors.variant.darker.danger};
-      background-color: ${theme.colors.variant.lightest.danger};
-    }
-
-    /* Filter input */
-    .swagger-ui .filter-container input {
-      color: ${theme.colors.input.color};
-      background-color: ${theme.colors.input.background};
-      border-color: ${theme.colors.input.border};
-    }
-
-    .swagger-ui .filter-container input::placeholder {
-      color: ${theme.colors.input.placeholder};
-    }
-
-    /* Buttons - ensure visibility */
-    .swagger-ui .btn {
-      color: ${theme.colors.text.primary};
-      border-color: ${theme.colors.text.primary};
-    }
-
-    .swagger-ui .btn:hover {
-      color: ${theme.colors.text.primary};
-    }
-
-    /* Try it out button */
-    .swagger-ui .try-out__btn {
-      color: ${theme.colors.text.primary};
-      border-color: ${theme.colors.text.primary};
-      background-color: transparent;
-    }
-
-    /* Cancel button */
-    .swagger-ui .btn-group .cancel {
-      color: ${theme.colors.text.primary};
-      border-color: ${theme.colors.text.primary};
-    }
-
-    .swagger-ui .btn-group .btn {
-      color: ${theme.colors.text.primary};
-    }
-
-    /* Execute button */
-    .swagger-ui .execute-wrapper .btn,
-    .swagger-ui .btn.execute {
-      color: #fff;
-    }
-
-    /* Hide schemes section (server selection and authorize button) */
-    .swagger-ui .scheme-container {
-      display: none;
-    }
-
-    .swagger-ui .servers-title,
-    .swagger-ui .servers label {
-      color: ${theme.colors.text.primary};
-    }
-
-    .swagger-ui select {
-      color: ${theme.colors.input.color};
-      background-color: ${theme.colors.input.background};
-      border-color: ${theme.colors.input.border};
-    }
-
-    /* Copy to clipboard and download buttons */
-    .swagger-ui .copy-to-clipboard,
-    .swagger-ui .download-contents {
-      background-color: ${theme.colors.gray[80]};
-    }
-
-    .swagger-ui .copy-to-clipboard button,
-    .swagger-ui .download-contents button {
-      color: ${theme.colors.text.primary};
-    }
-
-    /* JSON/Schema toggle */
-    .swagger-ui .model-box-control,
-    .swagger-ui .models-control {
-      color: ${theme.colors.text.primary};
-    }
-
-    /* All SVG icons should use text color */
-    .swagger-ui svg.arrow,
-    .swagger-ui button svg {
-      fill: ${theme.colors.text.primary};
+    openapi-explorer {
+      --bg: ${theme.colors.global.contentBackground};
+      --bg2: ${theme.colors.global.background};
+      --bg3: ${theme.colors.gray[90]};
+      --fg: ${theme.colors.text.primary};
+      --fg2: ${theme.colors.text.secondary};
+      --fg3: ${theme.colors.text.disabled};
+      --text-color: ${theme.colors.text.primary};
+      --primary-color: ${theme.colors.variant.primary};
+      --secondary-color: ${theme.colors.text.secondary};
+      --border-color: ${theme.colors.gray[80]};
+      --light-border-color: ${theme.colors.gray[90]};
+      --header-bg: ${theme.colors.global.contentBackground};
+      --header-fg: ${theme.colors.text.primary};
+      --header-color-darker: ${theme.colors.gray[80]};
+      --header-color-border: ${theme.colors.gray[70]};
+      --nav-bg-color: ${theme.colors.global.navigationBackground};
+      --nav-text-color: ${theme.colors.text.primary};
+      --nav-hover-bg-color: ${theme.colors.gray[90]};
+      --nav-hover-text-color: ${theme.colors.global.textAlt};
+      --input-bg: ${theme.colors.input.background};
+      --placeholder-color: ${theme.colors.input.placeholder};
+      --selection-bg: ${theme.colors.brand.primary};
+      --selection-fg: #fff;
+      --overlay-bg: rgb(0 0 0 / 40%);
+      --code-fg: ${theme.colors.text.primary};
+      --code-border-color: ${theme.colors.gray[80]};
+      --inline-code-fg: ${theme.colors.variant.darker?.danger ?? theme.colors.text.primary};
+      --font-regular: ${theme.fonts.family.body};
+      --font-mono: ${theme.fonts.family.monospace};
+      --font-size-regular: ${theme.fonts.size.body};
+      --font-size-small: ${theme.fonts.size.small};
+      --font-size-mono: ${theme.fonts.size.small};
+      --blue: ${theme.colors.variant.info};
+      --green: ${theme.colors.variant.success};
+      --red: ${theme.colors.variant.danger};
+      --orange: ${theme.colors.variant.warning};
+      --yellow: ${theme.colors.variant.warning};
     }
   `,
 );
 
 // noinspection JSUnusedGlobalSymbols
-const ApiBrowserPage = () => (
-  <DocumentTitle title="API Browser">
-    <StyledSwaggerContainer>
-      <SwaggerUI
-        url={qualifyUrl('/openapi.yaml')}
-        filter
-        deepLinking
-        requestInterceptor={(req) => {
-          req.headers['X-Requested-By'] = 'API Browser';
+const ApiBrowserPage = () => {
+  const explorerRef = useRef<HTMLElement>(null);
+  const [loaded, setLoaded] = useState(false);
 
-          return req;
-        }}
-        plugins={[
-          () => ({
-            wrapComponents: {
-              // Hide authorization UI since the browser already has a valid session cookie
-              authorizeBtn: () => () => null,
-              authorizeOperationBtn: () => () => null,
-            },
-          }),
-        ]}
-      />
-    </StyledSwaggerContainer>
-  </DocumentTitle>
-);
+  useEffect(() => {
+    import(/* webpackChunkName: "openapi-explorer" */ 'openapi-explorer').then(() => setLoaded(true));
+  }, []);
+
+  const handleRequest = useCallback((event: CustomEvent) => {
+    event.detail.request.headers.append('X-Requested-By', 'API Browser');
+  }, []);
+
+  useEffect(() => {
+    const el = explorerRef.current;
+
+    if (el) {
+      el.addEventListener('request', handleRequest as EventListener);
+    }
+
+    return () => {
+      if (el) {
+        el.removeEventListener('request', handleRequest as EventListener);
+      }
+    };
+  }, [handleRequest, loaded]);
+
+  if (!loaded) {
+    return (
+      <DocumentTitle title="API Browser">
+        <span>Loading...</span>
+      </DocumentTitle>
+    );
+  }
+
+  // @ts-ignore
+  // @ts-ignore
+  return (
+    <DocumentTitle title="API Browser">
+      <StyledExplorerContainer>
+        {/* @ts-ignore - openapi-explorer is a web component */}
+        <openapi-explorer
+          ref={explorerRef}
+          spec-url={qualifyUrl('/openapi.yaml')}
+          server-url="api/"
+          hide-authentication
+          hide-server-selection>
+          <div
+            slot="overview-header"
+            style={{
+              padding: '16px 16px 0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              gap: '8px',
+            }}>
+            <span>Download OpenAPI specification:</span>
+            {}
+            <select
+              onChange={(e) => {
+                const path = e.target.value;
+
+                if (path) {
+                  const link = document.createElement('a');
+                  link.href = qualifyUrl(path);
+                  link.download = `openapi${path.substring(path.lastIndexOf('.'))}`;
+                  link.click();
+                }
+
+                // eslint-disable-next-line no-param-reassign
+                e.target.value = '';
+              }}>
+              <option value="">Select format</option>
+              <option value="/openapi.json">JSON</option>
+              <option value="/openapi.yaml">YAML</option>
+            </select>
+          </div>
+          {/* @ts-ignore - openapi-explorer is a web component */}
+        </openapi-explorer>
+      </StyledExplorerContainer>
+    </DocumentTitle>
+  );
+};
 
 export default ApiBrowserPage;

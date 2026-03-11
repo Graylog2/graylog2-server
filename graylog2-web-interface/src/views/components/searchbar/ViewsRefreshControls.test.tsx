@@ -31,6 +31,7 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import ViewsRefreshControls from './ViewsRefreshControls';
 
 jest.useFakeTimers();
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
 jest.mock('hooks/useSearchConfiguration');
 jest.mock('views/hooks/useAutoRefresh');
@@ -135,7 +136,7 @@ describe('RefreshControls', () => {
 
     render(<SUT />);
 
-    userEvent.click(await screen.findByTitle(/start refresh/i));
+    await setupUser().click(await screen.findByTitle(/start refresh/i));
 
     await waitFor(() => expect(startAutoRefresh).toHaveBeenCalledWith(1000));
   });
@@ -151,7 +152,7 @@ describe('RefreshControls', () => {
 
     render(<SUT />);
 
-    userEvent.click(await screen.findByTitle(/pause refresh/i));
+    await setupUser().click(await screen.findByTitle(/pause refresh/i));
 
     expect(stopAutoRefresh).toHaveBeenCalled();
   });
@@ -165,8 +166,8 @@ describe('RefreshControls', () => {
       </SUT>,
     );
 
-    userEvent.click(await screen.findByRole('button', { name: /change form field value/i }));
-    userEvent.click(await screen.findByTitle(/start refresh/i));
+    await setupUser().click(await screen.findByRole('button', { name: /change form field value/i }));
+    await setupUser().click(await screen.findByTitle(/start refresh/i));
 
     await waitFor(() => expect(onSubmitMock).toHaveBeenCalled());
   });
@@ -186,7 +187,7 @@ describe('RefreshControls', () => {
       </SUT>,
     );
 
-    await userEvent.click(await screen.findByRole('button', { name: /change form field value/i }));
+    await setupUser().click(await screen.findByRole('button', { name: /change form field value/i }));
 
     await screen.findByText(/example-value/i);
 

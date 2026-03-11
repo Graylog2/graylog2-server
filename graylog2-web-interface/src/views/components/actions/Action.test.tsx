@@ -78,7 +78,7 @@ describe('Action', () => {
 
   const openDropdown = async (headerTitle = 'The dropdown header') => {
     const dropdownToggle = screen.getByText('Open Actions Menu');
-    userEvent.click(dropdownToggle);
+    await userEvent.click(dropdownToggle);
     await screen.findByText(headerTitle);
   };
 
@@ -108,7 +108,7 @@ describe('Action', () => {
     await openDropdown();
 
     const actionMenuItem = screen.getByText('Show top values');
-    userEvent.click(actionMenuItem);
+    await userEvent.click(actionMenuItem);
 
     expect(mockActionHandler).toHaveBeenCalledTimes(1);
   });

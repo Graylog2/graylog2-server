@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { OrderedMap } from 'immutable';
 
 import { Events } from '@graylog/server-api';
 
@@ -33,10 +34,13 @@ import QueryHelper from 'components/common/QueryHelper';
 import EventsWidgets from 'components/events/EventsWidgets';
 import EventsRefreshProvider from 'components/events/EventsRefreshProvider';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
+import { EXCLUDE_INFO_FILTER } from 'logic/alerts/EventDefinitionPriorityEnum';
 
 const additionalSearchFields = {
   key: 'The key of the event',
 };
+
+const defaultFilters = OrderedMap({ priority: [EXCLUDE_INFO_FILTER] });
 
 const EventsEntityTable = () => {
   const { stream_id: streamId } = useQuery();
@@ -64,6 +68,7 @@ const EventsEntityTable = () => {
         queryHelpComponent={<QueryHelper entityName="event" fieldMap={additionalSearchFields} />}
         entityActions={entityActions}
         tableLayout={eventsTableElements.defaultLayout}
+        defaultFilters={defaultFilters}
         fetchEntities={_fetchEvents}
         fetchSlices={_fetchSlices}
         sliceRenderers={eventsSliceRenderers}
