@@ -19,6 +19,7 @@ import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import Badge from 'components/bootstrap/Badge';
+import Icon from 'components/common/Icon';
 
 const StyledBadge = styled(Badge)<{ onClick: () => void }>(
   ({ onClick }) => css`
@@ -26,19 +27,33 @@ const StyledBadge = styled(Badge)<{ onClick: () => void }>(
   `,
 );
 
+const BadgeInner = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+`;
+
 type Props = {
   onClick?: () => void;
   className?: string;
   title?: string;
   count: number;
+  iconName?: React.ComponentProps<typeof Icon>['name'];
 };
 
 const CountBadge = (
-  { onClick = undefined, className = '', title = undefined, count }: Props,
+  { onClick = undefined, className = '', title = undefined, count, iconName = undefined }: Props,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) => (
   <StyledBadge bsStyle={!count ? 'gray' : 'info'} className={className} onClick={onClick} ref={ref} title={title}>
-    {count}
+    {iconName ? (
+      <BadgeInner>
+        {count}
+        <Icon name={iconName} size="sm" />
+      </BadgeInner>
+    ) : (
+      count
+    )}
   </StyledBadge>
 );
 

@@ -36,15 +36,22 @@ const DestinationFilterRulesCell = ({ stream }: Props) => {
     return null;
   }
 
+  const filterRuleCount = destinationFilterRuleCount ?? 0;
+  if (filterRuleCount === 0) {
+    return null;
+  }
+
   const destinationFilterRulesSectionIsOpen = expandedSections?.[stream.id]?.includes('destination_filters');
+  const destinationFilterRulesSectionTitle = `${destinationFilterRulesSectionIsOpen ? 'Hide' : 'Show'} filter rules`;
+  const toggleDestinationFilterRulesSection = () => toggleSection(stream.id, 'destination_filters');
 
   return (
     <CountBadge
-      count={destinationFilterRuleCount}
-      onClick={() => toggleSection(stream.id, 'destination_filters')}
+      count={filterRuleCount}
+      iconName={destinationFilterRulesSectionIsOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
+      onClick={toggleDestinationFilterRulesSection}
       ref={buttonRef}
-      title={`${destinationFilterRulesSectionIsOpen ? 'Hide' : 'Show'} filter rules`}
-    />
+      title={destinationFilterRulesSectionTitle} />
   );
 };
 
