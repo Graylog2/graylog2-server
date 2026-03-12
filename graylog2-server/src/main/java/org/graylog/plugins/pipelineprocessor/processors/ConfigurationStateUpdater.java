@@ -109,6 +109,7 @@ public class ConfigurationStateUpdater {
         final RuleMetricsConfigDto ruleMetricsConfig = ruleMetricsConfigService.get();
         final PipelineInterpreter.State newState = stateFactory.newState(currentPipelines, streamPipelineConnections, ruleMetricsConfig);
         latestState.set(newState);
+        log.debug("Pipeline interpreter state got updated");
         return newState;
     }
 
@@ -180,7 +181,7 @@ public class ConfigurationStateUpdater {
             pipelineMetricRegistry.removeRuleMetrics(ref.id());
         });
         event.updatedRules().forEach(ref -> log.debug("Refreshing rule {}", ref.id()));
-        scheduler.schedule(() -> serverEventBus.post(reloadAndSave(event)), 0, TimeUnit.SECONDS);
+        scheduler.schedule(() -> reloadAndSave(event), 0, TimeUnit.SECONDS);
     }
 
     @Subscribe
@@ -190,29 +191,24 @@ public class ConfigurationStateUpdater {
             pipelineMetricRegistry.removePipelineMetrics(id);
         });
         event.updatedPipelineIds().forEach(id -> log.debug("Refreshing pipeline {}", id));
-        scheduler.schedule(() -> serverEventBus.post(reloadAndSave(event)), 0, TimeUnit.SECONDS);
+        scheduler.schedule(() -> reloadAndSave(event), 0, TimeUnit.SECONDS);
     }
 
     @Subscribe
     public void handlePipelineConnectionChanges(PipelineConnectionsChangedEvent event) {
         log.debug("Pipeline stream connection changed: {}", event);
-        scheduler.schedule(() -> serverEventBus.post(reloadAndSave(event)), 0, TimeUnit.SECONDS);
-    }
-
-    @Subscribe
-    public void handlePipelineStateChange(PipelineInterpreter.State event) {
-        log.debug("Pipeline interpreter state got updated");
+        scheduler.schedule(() -> reloadAndSave(event), 0, TimeUnit.SECONDS);
     }
 
     @Subscribe
     public void handleRuleMetricsConfigChange(RuleMetricsConfigChangedEvent event) {
         log.debug("Rule metrics config changed: {}", event);
-        scheduler.schedule(() -> serverEventBus.post(reloadAndSave()), 0, TimeUnit.SECONDS);
+        scheduler.schedule(() -> reloadAndSave(), 0, TimeUnit.SECONDS);
     }
 
     @Subscribe
     public void handleInputDeleted(InputDeletedEvent event) {
         log.debug("Input deleted: {}", event);
-        scheduler.schedule(() -> serverEventBus.post(reloadAndSave(event)), 0, TimeUnit.SECONDS);
+        scheduler.schedule(() -> reloadAndSave(event), 0, TimeUnit.SECONDS);
     }
 }
