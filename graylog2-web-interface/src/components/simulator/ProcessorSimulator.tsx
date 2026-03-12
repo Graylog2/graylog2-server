@@ -64,13 +64,13 @@ const ProcessorSimulator = ({ streams }: ProcessorSimulatorProps) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<unknown>(undefined);
 
-  const onMessageLoad = useCallback(
-    (loadedMessage: Message | undefined, options: { inputId?: string }) => {
-      setMessage(loadedMessage);
-      setSimulation(undefined);
-      setLoading(true);
-      setError(undefined);
+  const onMessageLoad = (loadedMessage: Message | undefined, options: { inputId?: string }) => {
+    setMessage(loadedMessage);
+    setSimulation(undefined);
+    setLoading(true);
+    setError(undefined);
 
+    if (message) {
       simulateMessage(stream.id, loadedMessage?.fields ?? {}, options.inputId ?? '').then(
         (response) => {
           setSimulation(response);
@@ -81,9 +81,8 @@ const ProcessorSimulator = ({ streams }: ProcessorSimulatorProps) => {
           setError(err);
         },
       );
-    },
-    [stream],
-  );
+    }
+  };
 
   const onStreamSelect = useCallback(
     (selectedStream: string) => {
