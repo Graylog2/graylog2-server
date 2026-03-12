@@ -18,7 +18,6 @@ import React from 'react';
 
 import type { Attribute } from 'stores/PaginationTypes';
 import { MenuItem } from 'components/bootstrap';
-import { defaultCompare } from 'logic/DefaultCompare';
 import type { Filters } from 'components/common/EntityFilters/types';
 
 type Props = {
@@ -31,7 +30,6 @@ type Props = {
 const StaticOptionsList = ({ allActiveFilters, attribute, filterValueRenderer, onSubmit }: Props) => (
   <>
     {attribute.filter_options
-      .sort(({ title: title1 }, { title: title2 }) => defaultCompare(title1.toLowerCase(), title2.toLowerCase()))
       .map(({ title, value }) => {
         const disabled = !!allActiveFilters?.get(attribute.id)?.find(({ value: filterValue }) => value === filterValue);
 
