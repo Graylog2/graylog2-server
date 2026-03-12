@@ -72,7 +72,7 @@ public class SessionDAO extends CachingSessionDAO {
 
         assignSessionId(session, sessionId);
 
-        final var primaryKey = sessionService.create(SessionDTO.fromSimpleSession(session));
+        final var primaryKey = sessionService.create(SessionDTO.builderFromSimpleSession(session).build());
         LOG.debug("Created session {}", primaryKey);
 
         return sessionId;
@@ -93,7 +93,7 @@ public class SessionDAO extends CachingSessionDAO {
 
     private void doUpdate(SimpleSession session) {
         LOG.debug("Updating session");
-        final var sessionDTO = SessionDTO.fromSimpleSession(session);
+        final var sessionDTO = SessionDTO.builderFromSimpleSession(session).build();
         sessionService.updateBySessionId(sessionDTO);
     }
 

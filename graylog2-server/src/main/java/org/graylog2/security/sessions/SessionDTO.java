@@ -33,6 +33,7 @@ import java.util.Optional;
 public abstract class SessionDTO implements BuildableMongoEntity<SessionDTO, SessionDTO.Builder> {
 
     @Override
+    @Nullable
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public abstract String id();
 
@@ -130,8 +131,8 @@ public abstract class SessionDTO implements BuildableMongoEntity<SessionDTO, Ses
         }
     }
 
-    public static SessionDTO fromSimpleSession(SimpleSession simpleSession) {
-        return SessionConverter.simpleSessionToSessionDTO(simpleSession);
+    public static Builder builderFromSimpleSession(SimpleSession simpleSession) {
+        return SessionConverter.simpleSessionToSessionDTOBuilder(simpleSession);
     }
 
     public SimpleSession toSimpleSession() {
