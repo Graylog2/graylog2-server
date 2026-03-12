@@ -14,13 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.resources.entities;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
-public record Slice(@JsonProperty(FIELD_ID) String value, @JsonProperty(FIELD_TITLE) String title, @JsonProperty(FIELD_TYPE) String type, @JsonProperty(FIELD_COUNT) Integer count) {
-    private static final String FIELD_ID = "value";
-    private static final String FIELD_TITLE = "title";
-    private static final String FIELD_TYPE = "type";
-    private static final String FIELD_COUNT = "count";
-}
+export const SLICING_QUERY_KEY = 'slicing';
+
+export const slicesQueryKeyForColumn = (sliceCol: string | undefined) => [SLICING_QUERY_KEY, sliceCol] as const;
+
+export const slicesQueryKey = (sliceCol: string | undefined, query: string | undefined, filters: UrlQueryFilters) =>
+  [...slicesQueryKeyForColumn(sliceCol), query, filters] as const;
