@@ -505,7 +505,7 @@ public class PipelineInterpreterTest {
         final RuleMetricsConfigService ruleMetricsConfigService = mock(RuleMetricsConfigService.class);
         when(ruleMetricsConfigService.get()).thenReturn(RuleMetricsConfigDto.createDefault());
 
-        final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(
+        final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
                 ruleService,
                 pipelineService,
                 connectionsService,
@@ -560,7 +560,7 @@ public class PipelineInterpreterTest {
         final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry);
 
         final MetricRegistry metricRegistry = new MetricRegistry();
-        final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(
+        final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
                 ruleService,
                 pipelineService,
                 pipelineStreamConnectionsService,
@@ -618,7 +618,7 @@ public class PipelineInterpreterTest {
         final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry);
 
         final MetricRegistry metricRegistry = new MetricRegistry();
-        final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(
+        final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
                 ruleService,
                 pipelineService,
                 pipelineStreamConnectionsService,

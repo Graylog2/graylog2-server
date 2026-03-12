@@ -46,8 +46,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 @Singleton
-public class ConfigurationStateUpdater {
-    private static final RateLimitedLog log = createDefaultRateLimitedLog(ConfigurationStateUpdater.class);
+public class PipelineInterpreterStateUpdater {
+    private static final RateLimitedLog log = createDefaultRateLimitedLog(PipelineInterpreterStateUpdater.class);
 
     private final RuleMetricsConfigService ruleMetricsConfigService;
     private final ScheduledExecutorService scheduler;
@@ -60,7 +60,7 @@ public class ConfigurationStateUpdater {
     private final PipelineMetricRegistry pipelineMetricRegistry;
 
     @Inject
-    public ConfigurationStateUpdater(RuleService ruleService,
+    public PipelineInterpreterStateUpdater(RuleService ruleService,
                                      PipelineService pipelineService,
                                      PipelineStreamConnectionsService pipelineStreamConnectionsService,
                                      PipelineRuleParser pipelineRuleParser,

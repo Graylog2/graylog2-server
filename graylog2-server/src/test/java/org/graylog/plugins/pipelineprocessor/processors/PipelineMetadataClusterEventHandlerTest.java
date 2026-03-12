@@ -44,7 +44,7 @@ import static org.mockito.Mockito.when;
 
 class PipelineMetadataClusterEventHandlerTest {
 
-    private final ConfigurationStateUpdater stateUpdater = mock(ConfigurationStateUpdater.class);
+    private final PipelineInterpreterStateUpdater stateUpdater = mock(PipelineInterpreterStateUpdater.class);
     private final PipelineMetadataUpdater metadataUpdater = mock(PipelineMetadataUpdater.class);
     private final MongoDbPipelineMetadataService pipelineMetadataService = mock(MongoDbPipelineMetadataService.class);
     private final PipelineInterpreter.State state = mock(PipelineInterpreter.State.class);
@@ -54,7 +54,7 @@ class PipelineMetadataClusterEventHandlerTest {
 
     @BeforeEach
     void setUp() {
-        Provider<ConfigurationStateUpdater> stateUpdaterProvider = () -> stateUpdater;
+        Provider<PipelineInterpreterStateUpdater> stateUpdaterProvider = () -> stateUpdater;
         handler = new PipelineMetadataClusterEventHandler(
                 clusterEventBus, stateUpdaterProvider, metadataUpdater, pipelineMetadataService);
         when(stateUpdater.getLatestState()).thenReturn(state);

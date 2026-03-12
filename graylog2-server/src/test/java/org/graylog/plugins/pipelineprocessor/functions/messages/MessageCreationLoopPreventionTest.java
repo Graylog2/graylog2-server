@@ -36,7 +36,7 @@ import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineStreamCon
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
-import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdater;
+import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreterStateUpdater;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineResolver;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
@@ -132,7 +132,7 @@ class MessageCreationLoopPreventionTest extends BaseParserTest {
         final FunctionRegistry functionRegistry = new FunctionRegistry(functions);
         final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry);
         final MetricRegistry metricRegistry = new MetricRegistry();
-        final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(
+        final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
                 ruleService,
                 pipelineService,
                 pipelineStreamConnectionsService,

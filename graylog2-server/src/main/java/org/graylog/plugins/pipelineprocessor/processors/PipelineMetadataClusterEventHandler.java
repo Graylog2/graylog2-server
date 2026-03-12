@@ -38,20 +38,20 @@ import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory
 /**
  * Listens on {@link ClusterEventBus} for pipeline-related events and delegates metadata updates
  * to {@link PipelineMetadataUpdater}. Since ClusterEventBus only delivers events on the originating
- * node, this replaces the previous leader-only guard in ConfigurationStateUpdater.
+ * node, this replaces the previous leader-only guard in PipelineInterpreterStateUpdater.
  */
 @Singleton
 public class PipelineMetadataClusterEventHandler {
 
     private static final RateLimitedLog log = createDefaultRateLimitedLog(PipelineMetadataClusterEventHandler.class);
 
-    private final Provider<ConfigurationStateUpdater> stateUpdaterProvider;
+    private final Provider<PipelineInterpreterStateUpdater> stateUpdaterProvider;
     private final PipelineMetadataUpdater metadataUpdater;
     private final MongoDbPipelineMetadataService pipelineMetadataService;
 
     @Inject
     public PipelineMetadataClusterEventHandler(ClusterEventBus clusterEventBus,
-                                               Provider<ConfigurationStateUpdater> stateUpdaterProvider,
+                                               Provider<PipelineInterpreterStateUpdater> stateUpdaterProvider,
                                                PipelineMetadataUpdater metadataUpdater,
                                                MongoDbPipelineMetadataService pipelineMetadataService) {
         this.stateUpdaterProvider = stateUpdaterProvider;
