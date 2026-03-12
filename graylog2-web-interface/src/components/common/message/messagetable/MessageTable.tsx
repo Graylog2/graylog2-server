@@ -88,7 +88,6 @@ const TableWrapper = styled.div(
 );
 
 type Props = {
-  activeQueryId: string;
   config: MessagesWidgetConfig;
   fields: Immutable.List<FieldTypeMapping>;
   messages: Array<BackendMessage>;
@@ -130,7 +129,6 @@ const _toggleMessageDetail = (
 
 const MessageTable = ({
   fields,
-  activeQueryId,
   messages,
   config,
   onSortChange,
@@ -164,7 +162,7 @@ const MessageTable = ({
 
                   return (
                     <TableHeaderCell key={selectedFieldName} $isNumeric={type.isNumeric()}>
-                      <Field type={type} name={selectedFieldName} queryId={activeQueryId}>
+                      <Field type={type} name={selectedFieldName}>
                         {selectedFieldName}
                       </Field>
                       {interactive && !isCompound && (

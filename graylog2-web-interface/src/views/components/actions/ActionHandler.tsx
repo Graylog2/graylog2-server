@@ -25,7 +25,7 @@ import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 
 export type ActionComponentProps = {
   onClose: () => void;
-  queryId: QueryId;
+  queryId: QueryId | undefined;
   field: FieldName;
   type: FieldType;
   value: FieldValue | undefined | null;
@@ -38,7 +38,7 @@ export type ActionComponents = { [key: string]: React.ReactElement<ActionCompone
 export type SetActionComponents = (fn: (component: ActionComponents) => ActionComponents) => void;
 
 export type ActionHandlerArguments<Contexts = ActionContexts> = {
-  queryId: QueryId;
+  queryId: QueryId | undefined;
   field: FieldName;
   value?: FieldValue;
   type: FieldType;
@@ -64,6 +64,8 @@ type ActionDefinitionBase<Contexts> = {
 export type ThunkActionHandler<T> = (
   args: ActionHandlerArguments<T>,
 ) => (dispatch: ViewsDispatch, getState: GetState) => unknown | Promise<unknown>;
+
+export type ExecuteThunkAction = <T>(thunk: ThunkActionHandler<T>, args: ActionHandlerArguments<T>) => Promise<unknown>;
 
 type FunctionHandlerAction<Contexts> = {
   handler: ActionHandler<Contexts>;
@@ -94,7 +96,7 @@ export function isExternalLinkAction<T>(action: ActionDefinition<T>): action is 
 }
 
 export function createHandlerFor<T>(
-  dispatch: ViewsDispatch,
+  executeThunkAction: ExecuteThunkAction,
   action: ActionDefinitionBase<T> & HandlerAction<T>,
   setActionComponents: SetActionComponents,
 ): ActionHandler<T> {
@@ -103,7 +105,7 @@ export function createHandlerFor<T>(
   }
 
   if ('thunk' in action) {
-    return async (args: ActionHandlerArguments<T>) => dispatch(action.thunk(args));
+    return async (args: ActionHandlerArguments<T>) => executeThunkAction(action.thunk, args);
   }
 
   if (action.component) {

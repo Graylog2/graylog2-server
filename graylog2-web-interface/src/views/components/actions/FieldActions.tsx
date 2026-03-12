@@ -20,8 +20,8 @@ import styled, { css } from 'styled-components';
 
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { ActionContext } from 'views/logic/ActionContext';
-import type { QueryId } from 'views/logic/queries/Query';
 import Action from 'views/components/actions/Action';
+import FieldActionsContext from 'views/components/actions/FieldActionsContext';
 
 type Props = {
   children: React.ReactNode;
@@ -29,7 +29,6 @@ type Props = {
   element: React.ReactNode;
   menuContainer: HTMLElement | undefined | null;
   name: string;
-  queryId: QueryId;
   type: FieldType;
 };
 
@@ -47,8 +46,9 @@ const FieldElement = styled.span.attrs({
   `,
 );
 
-const FieldActions = ({ children, disabled, element, menuContainer, name, type, queryId }: Props) => {
+const FieldActions = ({ children, disabled, element, menuContainer, name, type }: Props) => {
   const actionContext = useContext(ActionContext);
+  const { queryId } = useContext(FieldActionsContext);
   const wrappedElement = ({ active }: { active: boolean }) => (
     <FieldElement $active={active} $disabled={disabled}>
       {element}

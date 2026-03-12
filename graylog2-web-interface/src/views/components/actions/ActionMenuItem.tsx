@@ -33,9 +33,9 @@ import type {
 } from 'views/components/actions/ActionHandler';
 import { createHandlerFor, isExternalLinkAction } from 'views/components/actions/ActionHandler';
 import HoverForHelp from 'components/common/HoverForHelp';
-import useViewsDispatch from 'views/stores/useViewsDispatch';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import FieldActionsContext from 'views/components/actions/FieldActionsContext';
 
 const StyledMenuItem: typeof MenuItem = styled(MenuItem)`
   && > a {
@@ -137,7 +137,7 @@ const ActionHandlerItem = ({
   onMenuToggle,
 }: ActionHandlerItemProps) => {
   const { unsetWidgetFocusing } = useContext(WidgetFocusContext);
-  const dispatch = useViewsDispatch();
+  const { executeThunkAction } = useContext(FieldActionsContext);
   const sendTelemetry = useSendTelemetry();
 
   const setActionComponents: SetActionComponents = useCallback(
@@ -148,8 +148,8 @@ const ActionHandlerItem = ({
   );
 
   const handler = useMemo(
-    () => createHandlerFor(dispatch, action, setActionComponents),
-    [action, dispatch, setActionComponents],
+    () => createHandlerFor(executeThunkAction, action, setActionComponents),
+    [action, executeThunkAction, setActionComponents],
   );
 
   const onSelect = useCallback(() => {
@@ -187,8 +187,9 @@ const ActionMenuItem = ({
   onMenuToggle,
 }: Props) => {
   const { isEnabled = () => true } = action;
-  const dispatch = useViewsDispatch();
-  const actionDisabled = dispatch((_dispatch, getState) => !isEnabled(handlerArgs, getState));
+  const { evaluateCondition } = useContext(FieldActionsContext);
+  const actionEnabled = evaluateCondition(isEnabled, handlerArgs, true);
+  const actionDisabled = !actionEnabled;
   const { field } = handlerArgs;
 
   if (isExternalLinkAction(action)) {

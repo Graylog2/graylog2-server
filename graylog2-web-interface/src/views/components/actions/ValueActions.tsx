@@ -27,7 +27,7 @@ type Props = {
   element: React.ReactNode;
   field: string;
   menuContainer?: HTMLElement | undefined | null;
-  queryId: QueryId;
+  queryId?: QueryId;
   type?: FieldType;
   value: React.ReactNode;
 };
@@ -37,7 +37,7 @@ const ValueActions = ({
   element,
   field,
   menuContainer = document.body,
-  queryId,
+  queryId = undefined,
   type = FieldType.Unknown,
   value,
 }: Props) => {

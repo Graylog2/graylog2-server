@@ -23,6 +23,8 @@ import { createHandlerFor } from './ActionHandler';
 import type { ActionComponentProps, ActionComponents, ActionDefinition } from './ActionHandler';
 
 describe('ActionHandler', () => {
+  const executeThunkAction = jest.fn(() => Promise.resolve(undefined));
+
   it('returns the handler for a function-based definition', () => {
     const actionDefinition: ActionDefinition = {
       type: 'dummy-action',
@@ -31,7 +33,7 @@ describe('ActionHandler', () => {
       resetFocus: false,
     };
 
-    const result = createHandlerFor(jest.fn(), actionDefinition, jest.fn());
+    const result = createHandlerFor(executeThunkAction, actionDefinition, jest.fn());
 
     expect(result).toEqual(actionDefinition.handler);
   });
@@ -45,7 +47,7 @@ describe('ActionHandler', () => {
       component: () => <div>Hello world!</div>,
       resetFocus: false,
     };
-    const handler = createHandlerFor(jest.fn(), actionDefinition, setActionComponents);
+    const handler = createHandlerFor(executeThunkAction, actionDefinition, setActionComponents);
 
     expect(handler).toBeDefined();
 
@@ -66,6 +68,23 @@ describe('ActionHandler', () => {
     );
   });
 
+  it('generates a handler from a thunk-based definition', async () => {
+    const thunk = jest.fn(() => () => Promise.resolve('done'));
+    const actionDefinition: ActionDefinition<{}> = {
+      type: 'dummy-action',
+      title: 'A Dummy Action',
+      thunk,
+      resetFocus: false,
+    };
+    const localExecuteThunkAction = jest.fn(() => Promise.resolve('done'));
+    const handler = createHandlerFor(localExecuteThunkAction, actionDefinition, jest.fn());
+    const args = { queryId: 'foo', field: 'bar', value: 42, type: FieldType.Unknown, contexts: {} };
+
+    await handler(args);
+
+    expect(localExecuteThunkAction).toHaveBeenCalledWith(thunk, args);
+  });
+
   it('supplied onClose removes component from state', () => {
     const setState = jest.fn();
     const setActionComponents = jest.fn((fn) => setState(fn({})));
@@ -75,7 +94,7 @@ describe('ActionHandler', () => {
       component: () => <div>Hello world!</div>,
       resetFocus: false,
     };
-    const handler = createHandlerFor(jest.fn(), actionDefinition, setActionComponents);
+    const handler = createHandlerFor(executeThunkAction, actionDefinition, setActionComponents);
 
     return handler({ queryId: 'foo', field: 'bar', value: 42, type: FieldType.Unknown, contexts: {} }).then(() => {
       const state: ActionComponents = setState.mock.calls[0][0];

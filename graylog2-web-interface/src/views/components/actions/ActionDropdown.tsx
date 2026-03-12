@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useContext } from 'react';
 import styled from 'styled-components';
 
-import usePluginEntities from 'hooks/usePluginEntities';
 import { MenuItem } from 'components/bootstrap';
 import ActionMenuItem from 'views/components/actions/ActionMenuItem';
 import type {
@@ -25,10 +25,10 @@ import type {
   ActionHandlerArguments,
   ActionComponents,
 } from 'views/components/actions/ActionHandler';
-import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
-import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { Spinner } from 'components/common';
 import useExternalValueActions from 'views/hooks/useExternalValueActions';
+import FieldActionsContext from 'views/components/actions/FieldActionsContext';
+import type { EvaluateActionCondition } from 'views/components/actions/FieldActionsContext';
 
 const DropdownHeader = styled.span`
   padding-left: 10px;
@@ -44,27 +44,27 @@ const StyledListItem = styled.li`
 `;
 
 const filterVisibleActions = (
-  dispatch: ViewsDispatch,
+  evaluateCondition: EvaluateActionCondition,
   handlerArgs: Props['handlerArgs'],
   actions: Array<ActionDefinition> | undefined = [],
 ) =>
   actions.filter((action: ActionDefinition) => {
     const { isHidden = () => false } = action;
+    const hidden = evaluateCondition(isHidden, handlerArgs, false);
 
-    return dispatch((_dispatch, getState) => !isHidden(handlerArgs, getState));
+    return !hidden;
   });
 
 const useInternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
-  const valueActions = usePluginEntities('valueActions');
-  const fieldActions = usePluginEntities('fieldActions');
-  const dispatch = useViewsDispatch();
+  const { evaluateCondition, valueActions, fieldActions } = useContext(FieldActionsContext);
+  const actions = type === 'value' ? valueActions : fieldActions;
 
   if (type === 'value') {
-    return filterVisibleActions(dispatch, handlerArgs, valueActions);
+    return filterVisibleActions(evaluateCondition, handlerArgs, actions);
   }
 
   if (type === 'field') {
-    return filterVisibleActions(dispatch, handlerArgs, fieldActions);
+    return filterVisibleActions(evaluateCondition, handlerArgs, actions);
   }
 
   return [];
@@ -72,13 +72,13 @@ const useInternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs
 
 const useExternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
   const { isLoading, isError, externalValueActions } = useExternalValueActions();
-  const dispatch = useViewsDispatch();
+  const { evaluateCondition } = useContext(FieldActionsContext);
 
   if (type !== 'value') {
-    return { isLoading, isError, externalValueActions: [] };
+    return { isLoading, isError, externalActions: [] };
   }
 
-  const externalActions = filterVisibleActions(dispatch, handlerArgs, externalValueActions);
+  const externalActions = filterVisibleActions(evaluateCondition, handlerArgs, externalValueActions);
 
   return { isLoading, isError, externalActions };
 };

@@ -17,21 +17,22 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import noop from 'lodash/noop';
 
 import { createSimpleExternalValueAction } from 'fixtures/externalValueActions';
 import type { ActionContexts, RootState } from 'views/types';
 import asMock from 'helpers/mocking/AsMock';
-import usePluginEntities from 'hooks/usePluginEntities';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import mockDispatch from 'views/test/mockDispatch';
 import { createSearch } from 'fixtures/searches';
 import useExternalValueActions from 'views/hooks/useExternalValueActions';
+import FieldActionsContext, {
+  DEFAULT_FIELD_ACTIONS_CONTEXT,
+  type FieldActionsContextValue,
+} from 'views/components/actions/FieldActionsContext';
 
 import Action from './Action';
 
-jest.mock('hooks/usePluginEntities', () => jest.fn(() => []));
 jest.mock('views/stores/useViewsDispatch');
 
 jest.mock('views/hooks/useExternalValueActions');
@@ -61,7 +62,9 @@ describe('Action', () => {
     contexts: {} as ActionContexts,
   };
 
-  type Props = Partial<React.ComponentProps<typeof Action>>;
+  type Props = Partial<React.ComponentProps<typeof Action>> & {
+    actionConfig?: FieldActionsContextValue;
+  };
 
   const OpenActionsMenu = () => <div>Open Actions Menu</div>;
 
@@ -70,10 +73,13 @@ describe('Action', () => {
     handlerArgs = exampleHandlerArgs,
     menuContainer = undefined,
     type = 'field',
+    actionConfig = DEFAULT_FIELD_ACTIONS_CONTEXT,
   }: Props) => (
-    <Action element={OpenActionsMenu} handlerArgs={handlerArgs} menuContainer={menuContainer} type={type}>
-      {children}
-    </Action>
+    <FieldActionsContext.Provider value={actionConfig}>
+      <Action element={OpenActionsMenu} handlerArgs={handlerArgs} menuContainer={menuContainer} type={type}>
+        {children}
+      </Action>
+    </FieldActionsContext.Provider>
   );
 
   const openDropdown = async (headerTitle = 'The dropdown header') => {
@@ -101,9 +107,7 @@ describe('Action', () => {
       },
     ];
 
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({ fieldActions })[entityKey]);
-
-    render(<SimpleAction type="field" />);
+    render(<SimpleAction type="field" actionConfig={{ ...DEFAULT_FIELD_ACTIONS_CONTEXT, fieldActions }} />);
 
     await openDropdown();
 
@@ -113,9 +117,7 @@ describe('Action', () => {
     expect(mockActionHandler).toHaveBeenCalledTimes(1);
   });
 
-  it('does not fail when plugin is not present for external actions', async () => {
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({ wrongKey: noop })[entityKey]);
-
+  it('does not fail when no internal actions are configured', async () => {
     render(<SimpleAction>The dropdown header</SimpleAction>);
     await openDropdown('The dropdown header');
 
