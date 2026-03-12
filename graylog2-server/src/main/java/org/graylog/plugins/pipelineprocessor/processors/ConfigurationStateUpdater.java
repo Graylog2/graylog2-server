@@ -51,7 +51,6 @@ public class ConfigurationStateUpdater {
 
     private final RuleMetricsConfigService ruleMetricsConfigService;
     private final ScheduledExecutorService scheduler;
-    private final EventBus serverEventBus;
     private final PipelineInterpreter.State.Factory stateFactory;
     /**
      * non-null if the update has successfully loaded a state
@@ -73,7 +72,6 @@ public class ConfigurationStateUpdater {
                                      PipelineInterpreter.State.Factory stateFactory) {
         this.ruleMetricsConfigService = ruleMetricsConfigService;
         this.scheduler = scheduler;
-        this.serverEventBus = serverEventBus;
         this.stateFactory = stateFactory;
         this.pipelineResolver = pipelineResolverFactory.create(
                 PipelineResolverConfig.of(
