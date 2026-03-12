@@ -45,7 +45,7 @@ public class RefreshingLockServiceTest {
     private ScheduledExecutorService scheduler;
 
     private RefreshingLockService refreshingLockService;
-    
+
     private final Lock firstLock = Lock.builder()
             .resource("first-resource")
             .lockedBy("node-123")
@@ -83,8 +83,6 @@ public class RefreshingLockServiceTest {
         // Mock the lock service to return locks
         when(lockService.lock(eq("first-resource"), anyString()))
                 .thenReturn(Optional.of(firstLock));
-        when(lockService.lock(eq("second-resource"), anyString()))
-                .thenReturn(Optional.of(secondLock));
 
         // Acquire first lock successfully
         refreshingLockService.acquireAndKeepLock("first-resource", "context-1");
@@ -100,8 +98,6 @@ public class RefreshingLockServiceTest {
         // Mock the lock service to return locks
         when(lockService.lock(eq("first-resource"), eq(1)))
                 .thenReturn(Optional.of(firstLock));
-        when(lockService.lock(eq("second-resource"), eq(1)))
-                .thenReturn(Optional.of(secondLock));
 
         // Acquire first lock successfully
         refreshingLockService.acquireAndKeepLock("first-resource", 1);

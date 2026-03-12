@@ -26,6 +26,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -61,11 +62,10 @@ public class RefreshingLockService implements AutoCloseable {
      * @throws AlreadyLockedException when the resource couldn't be locked
      */
     public void acquireAndKeepLock(String resource, int maxConcurrency) throws AlreadyLockedException {
-        Optional<Lock> optionalLock = lockService.lock(resource, maxConcurrency);
-        if (optionalLock.isEmpty()) {
-            throw new AlreadyLockedException(f("Could not acquire lock for resource <%s> with max concurrency <%d>", resource, maxConcurrency));
-        }
-        scheduleLock(optionalLock.get());
+        assertNoLockYet();
+        final var newLock = lockService.lock(resource, maxConcurrency)
+                .orElseThrow(() -> new AlreadyLockedException(f("Could not acquire lock for resource <%s> with max concurrency <%d>", resource, maxConcurrency)));
+        scheduleLock(newLock);
     }
 
     /**
@@ -76,18 +76,18 @@ public class RefreshingLockService implements AutoCloseable {
      * @throws AlreadyLockedException when the resource couldn't be locked
      */
     public void acquireAndKeepLock(String resource, String lockContext) throws AlreadyLockedException {
+        assertNoLockYet();
         checkArgument(!isNullOrEmpty(lockContext), "lockContext cannot be blank");
-        Optional<Lock> optionalLock = lockService.lock(resource, lockContext);
-        if (optionalLock.isEmpty()) {
-            throw new AlreadyLockedException(f("Could not acquire lock for resource <%s> and lock context <%s>", resource, lockContext));
-        }
-        scheduleLock(optionalLock.get());
+        final var newLock = lockService.lock(resource, lockContext)
+                .orElseThrow(() -> new AlreadyLockedException(f("Could not acquire lock for resource <%s> and lock context <%s>", resource, lockContext)));
+        scheduleLock(newLock);
+    }
+
+    private void assertNoLockYet() {
+        checkState(lock == null, "Unable to acquire new lock, already holding lock that would get lost: " + lock);
     }
 
     private void scheduleLock(Lock newLock) {
-        if (lock != null) {
-            throw new IllegalStateException("Unable to acquire new lock, already holding lock that would get lost: " + lock);
-        }
         lock = newLock;
         Duration duration = lockTTL.minusSeconds(30);
         if (duration.isNegative() || duration.isZero()) {
