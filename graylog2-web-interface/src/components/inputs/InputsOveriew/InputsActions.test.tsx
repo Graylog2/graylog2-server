@@ -32,6 +32,7 @@ import usePermissions from 'hooks/usePermissions';
 import InputsActions from './InputsActions';
 
 jest.useFakeTimers();
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
 jest.mock('hooks/useInputsStates', () => ({
   __esModule: true,
@@ -125,7 +126,7 @@ const renderSUT = (input = baseInput, extraProps = {}) =>
     />,
   );
 
-const openMoreActions = async () => userEvent.click(await screen.findByRole('button', { name: /more/i }));
+const openMoreActions = async () => setupUser().click(await screen.findByRole('button', { name: /more/i }));
 
 describe('InputsActions', () => {
   const updateInputMock = jest.fn(() => Promise.resolve());
@@ -177,7 +178,7 @@ describe('InputsActions', () => {
 
     const setupButton = await screen.findByRole('button', { name: /set up input/i });
 
-    userEvent.click(setupButton);
+    await setupUser().click(setupButton);
 
     expect(await screen.findByText(/InputSetupWizard/i)).toBeInTheDocument();
   });
@@ -223,12 +224,12 @@ describe('InputsActions', () => {
     };
     renderSUT(input);
     await openMoreActions();
-    userEvent.click(screen.getByText('Add static field'));
+    await setupUser().click(screen.getByText('Add static field'));
 
     expect(await screen.findByText('StaticFieldForm')).toBeInTheDocument();
   });
 
-  it('uses forwarder query field for ForwarderServiceInput', () => {
+  it('uses forwarder query field for ForwarderServiceInput', async () => {
     const input = {
       ...baseInput,
       id: 'forwarder-id',
@@ -238,7 +239,7 @@ describe('InputsActions', () => {
     renderSUT(input);
     const btn = screen.getByText('Received messages');
     expect(btn).toBeInTheDocument();
-    userEvent.click(btn);
+    await setupUser().click(btn);
     expect(telemetryMock).toHaveBeenCalledWith(
       'Inputs Show Received Messages Clicked',
       expect.objectContaining({
@@ -259,7 +260,7 @@ describe('InputsActions', () => {
 
     renderSUT(setupInput);
     const setupButton = await screen.findByRole('button', { name: /set up input/i });
-    userEvent.click(setupButton);
+    await setupUser().click(setupButton);
     expect(await screen.findByText(/InputSetupWizard/i)).toBeInTheDocument();
   });
 
@@ -276,7 +277,7 @@ describe('InputsActions', () => {
     renderSUT(setupInput);
     await openMoreActions();
 
-    userEvent.click(screen.getByText('Edit input'));
+    await setupUser().click(screen.getByText('Edit input'));
 
     act(() => {
       jest.advanceTimersByTime(200);
@@ -284,7 +285,7 @@ describe('InputsActions', () => {
 
     expect(screen.getByText(/Editing Input Input 3/)).toBeInTheDocument();
 
-    await userEvent.click(screen.getByText('Update input'));
+    await setupUser().click(screen.getByText('Update input'));
     expect(updateInputMock).toHaveBeenCalledWith({
       input: expect.objectContaining({ title: 'Input 3' }),
       inputId: 'input3',
@@ -348,11 +349,11 @@ describe('InputsActions', () => {
     renderSUT(setupInput);
     await openMoreActions();
 
-    userEvent.click(screen.getByText('Delete input'));
+    await setupUser().click(screen.getByText('Delete input'));
 
     expect(screen.getByText('Do you really want to delete input Input 3?')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+    await setupUser().click(screen.getByRole('button', { name: 'Confirm' }));
 
     expect(deleteInputMock).toHaveBeenCalledWith({ inputId: 'input3' });
   });
@@ -378,7 +379,7 @@ describe('InputsActions', () => {
       const enterItem = screen.getByText('Enter Setup mode');
       expect(enterItem).toBeInTheDocument();
 
-      userEvent.click(enterItem);
+      await setupUser().click(enterItem);
 
       const InputStatesStore = jest.requireMock('stores/inputs/InputStatesStore').default;
       expect(InputStatesStore.setup).toHaveBeenCalledWith(input);
@@ -402,7 +403,7 @@ describe('InputsActions', () => {
       const exitItem = screen.getByText('Exit Setup mode');
       expect(exitItem).toBeInTheDocument();
 
-      userEvent.click(exitItem);
+      await setupUser().click(exitItem);
 
       const InputStatesStore = jest.requireMock('stores/inputs/InputStatesStore').default;
       expect(InputStatesStore.stop).toHaveBeenCalledWith(input);
