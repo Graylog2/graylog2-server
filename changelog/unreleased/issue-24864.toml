@@ -2,4 +2,4 @@ type = "f"
 message = "Error handling for trailing comma in map and array literals."
 
 issues = ["24864"]
-pulls = [""]
+pulls = ["25304"]
