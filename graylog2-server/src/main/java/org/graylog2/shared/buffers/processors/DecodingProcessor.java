@@ -175,11 +175,12 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             event.setMessage(postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, message.get(), decodeTime, raw.getPayload().length));
         } else if (messages != null && !messages.isEmpty()) {
             final List<Message> processedMessages = Lists.newArrayListWithCapacity(messages.size());
+            final long payloadLength = raw.getPayload().length;
             boolean first = true;
 
             for (final Message msg : messages) {
                 // Avoid overcounting input traffic by only setting the input size for the first message.
-                final long inputSize = first ? raw.getPayload().length : 0L;
+                final long inputSize = first ? payloadLength : 0L;
                 first = false;
                 final Message processedMessage = postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, msg, decodeTime, inputSize);
 
