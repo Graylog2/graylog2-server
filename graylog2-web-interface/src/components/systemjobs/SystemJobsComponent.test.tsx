@@ -51,6 +51,6 @@ describe('SystemJobsComponent', () => {
     asMock(useSystemJobs).mockReturnValue(undefined);
 
     render(<SystemJobsComponent />);
-    await screen.findByText('Optimized data for Data Lake archives');
+    await screen.findByText('Loading...');
   });
 });
