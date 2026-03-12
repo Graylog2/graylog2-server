@@ -19,6 +19,7 @@ package org.graylog.collectors.db;
 import jakarta.annotation.Nullable;
 import org.bson.Document;
 
+import java.time.Instant;
 import java.util.Set;
 
 /**
@@ -32,13 +33,17 @@ import java.util.Set;
  * @param type      parsed marker type
  * @param rawType   original string from MongoDB (for logging unknown types)
  * @param payload   optional type-specific data (e.g., new_fleet_id for FLEET_REASSIGNED)
+ * @param createdAt      timestamp when the marker was created
+ * @param createdByUser  username of the actor, or null for system-initiated actions
  */
 public record TransactionMarker(long seq,
                                 String target,
                                 Set<String> targetIds,
                                 MarkerType type,
                                 String rawType,
-                                @Nullable Document payload) {
+                                @Nullable Document payload,
+                                @Nullable Instant createdAt,
+                                @Nullable String createdByUser) {
 
     public static final String TARGET_FLEET = "fleet";
     public static final String TARGET_COLLECTOR = "collector";

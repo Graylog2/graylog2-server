@@ -50,6 +50,7 @@ public class FleetTransactionLogService {
     static final String FIELD_PAYLOAD = "payload";
     static final String FIELD_CREATED_AT = "created_at";
     static final String FIELD_CREATED_BY = "created_by";
+    static final String FIELD_CREATED_BY_USER = "created_by_user";
     /**
      * The maximum number of bulk action targets we allow for a transaction log entry.
      */
@@ -110,7 +111,8 @@ public class FleetTransactionLogService {
                         Updates.set(FIELD_TYPE, type.name()),
                         Updates.set(FIELD_PAYLOAD, payload),
                         Updates.set(FIELD_CREATED_BY, nodeId.getNodeId()),
-                        Updates.currentDate(FIELD_CREATED_AT)
+                        Updates.currentDate(FIELD_CREATED_AT),
+                        Updates.set(FIELD_CREATED_BY_USER, resolveCurrentUsername())
                 ),
                 new UpdateOptions().upsert(true)
         );
@@ -156,14 +158,46 @@ public class FleetTransactionLogService {
 
     private TransactionMarker documentToMarker(Document doc) {
         final String rawType = doc.getString(FIELD_TYPE);
+        final var createdAt = doc.getDate(FIELD_CREATED_AT);
         return new TransactionMarker(
                 doc.getLong("_id"),
                 doc.getString(FIELD_TARGET),
                 Set.copyOf(doc.getList(FIELD_TARGET_ID, String.class)),
                 MarkerType.fromString(rawType),
                 rawType,
-                doc.get(FIELD_PAYLOAD, Document.class)
+                doc.get(FIELD_PAYLOAD, Document.class),
+                createdAt != null ? createdAt.toInstant() : null,
+                doc.getString(FIELD_CREATED_BY_USER)
         );
+    }
+
+    @Nullable
+    private static String resolveCurrentUsername() {
+        try {
+            final var subject = org.apache.shiro.SecurityUtils.getSubject();
+            if (subject != null && subject.getPrincipal() != null) {
+                return subject.getPrincipal().toString();
+            }
+        } catch (Exception e) {
+            // No Shiro subject available (non-HTTP context) — this is expected
+        }
+        return null;
+    }
+
+    public List<TransactionMarker> getRecentMarkers(int limit) {
+        // Exclude UNKNOWN by filtering for known types only
+        final Bson filter = Filters.in(FIELD_TYPE,
+                MarkerType.CONFIG_CHANGED.name(),
+                MarkerType.INGEST_CONFIG_CHANGED.name(),
+                MarkerType.RESTART.name(),
+                MarkerType.DISCOVERY_RUN.name(),
+                MarkerType.FLEET_REASSIGNED.name());
+
+        return collection.find(filter)
+                .sort(new Document("_id", -1))
+                .limit(limit)
+                .map(this::documentToMarker)
+                .into(new ArrayList<>());
     }
 
     public CoalescedActions coalesce(List<TransactionMarker> markers) {

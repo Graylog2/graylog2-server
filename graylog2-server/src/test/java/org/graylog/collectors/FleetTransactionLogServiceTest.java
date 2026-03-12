@@ -70,6 +70,7 @@ class FleetTransactionLogServiceTest {
         assertThat(doc.get(FleetTransactionLogService.FIELD_PAYLOAD)).isNull();
         assertThat(doc.get(FleetTransactionLogService.FIELD_CREATED_AT)).isNotNull();
         assertThat(doc.getString(FleetTransactionLogService.FIELD_CREATED_BY)).isEqualTo("test-node-1");
+        assertThat(doc.getString("created_by_user")).isNull();
     }
 
     @Test
@@ -188,5 +189,37 @@ class FleetTransactionLogServiceTest {
         assertThat(markers).hasSize(1);
         assertThat(markers.getFirst().type()).isEqualTo(MarkerType.UNKNOWN);
         assertThat(markers.getFirst().rawType()).isEqualTo("FUTURE_MARKER_TYPE");
+    }
+
+    // --- Recent markers tests ---
+
+    @Test
+    void getRecentMarkersReturnsLastNDescending() {
+        service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED);       // seq 1
+        service.appendCollectorMarker(Set.of("inst-1"), MarkerType.RESTART, null); // seq 2
+        service.appendFleetMarker("fleet-2", MarkerType.DISCOVERY_RUN);        // seq 3
+
+        List<TransactionMarker> markers = service.getRecentMarkers(2);
+
+        assertThat(markers).hasSize(2);
+        assertThat(markers.get(0).seq()).isEqualTo(3L); // most recent first
+        assertThat(markers.get(1).seq()).isEqualTo(2L);
+    }
+
+    @Test
+    void getRecentMarkersExcludesUnknownType() {
+        service.appendFleetMarker("fleet-1", MarkerType.CONFIG_CHANGED); // seq 1
+
+        // Insert an UNKNOWN marker directly
+        service.getCollection().insertOne(new Document("_id", 999L)
+                .append(FleetTransactionLogService.FIELD_TARGET, "fleet")
+                .append(FleetTransactionLogService.FIELD_TARGET_ID, List.of("fleet-1"))
+                .append(FleetTransactionLogService.FIELD_TYPE, "FUTURE_MARKER_TYPE")
+                .append(FleetTransactionLogService.FIELD_CREATED_BY, "test"));
+
+        List<TransactionMarker> markers = service.getRecentMarkers(10);
+
+        assertThat(markers).hasSize(1);
+        assertThat(markers.getFirst().type()).isEqualTo(MarkerType.CONFIG_CHANGED);
     }
 }
