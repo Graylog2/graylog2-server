@@ -62,6 +62,7 @@ const LegacyNotificationDetails = ({ notification }: LegacyNotificationDetailsPr
           if (key === 'body' || key === 'script_args') {
             return (
               <ReadOnlyFormGroup
+                key={key}
                 label={value.human_name}
                 value={
                   <Well bsSize="small" className={emailStyles.bodyPreview}>
@@ -72,7 +73,7 @@ const LegacyNotificationDetails = ({ notification }: LegacyNotificationDetailsPr
             );
           }
 
-          return <ReadOnlyFormGroup label={value.human_name} value={configurationValues[key]} />;
+          return <ReadOnlyFormGroup key={key} label={value.human_name} value={configurationValues[key]} />;
         })}
     </>
   );
