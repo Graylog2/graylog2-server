@@ -24,7 +24,6 @@ export type Props<ItemType extends ListItemType> = {
   customContentRender?: CustomContentRender<ItemType>;
   customListItemRender?: CustomListItemRender<ItemType>;
   disableDragging?: boolean;
-  displayOverlayInPortal?: boolean;
   items: Array<ItemType> | undefined;
 };
 
@@ -33,20 +32,18 @@ const List = <ItemType extends ListItemType>({
   customContentRender = undefined,
   customListItemRender = undefined,
   disableDragging = false,
-  displayOverlayInPortal = false,
   items,
 }: Props<ItemType>) => (
   <>
     {items?.map((item, index) => (
       <SortableListItem
         alignItemContent={alignItemContent}
-        item={item}
-        index={index}
-        key={item.id}
         customContentRender={customContentRender}
         customListItemRender={customListItemRender}
         disableDragging={disableDragging}
-        displayOverlayInPortal={displayOverlayInPortal}
+        index={index}
+        item={item}
+        key={item.id}
       />
     ))}
   </>

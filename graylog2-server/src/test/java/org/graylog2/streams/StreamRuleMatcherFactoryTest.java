@@ -24,7 +24,7 @@ import org.graylog2.streams.matchers.FieldPresenceMatcher;
 import org.graylog2.streams.matchers.GreaterMatcher;
 import org.graylog2.streams.matchers.RegexMatcher;
 import org.graylog2.streams.matchers.SmallerMatcher;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

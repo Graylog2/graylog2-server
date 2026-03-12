@@ -17,13 +17,14 @@
 
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import type Immutable from 'immutable';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import type { Attribute, Sort } from 'stores/PaginationTypes';
 
 const getStreamDataLakeTableElements = PluginStore.exports('dataLake')?.[0]?.getStreamDataLakeTableElements;
 
 const getStreamTableElements = (
-  permissions: Immutable.List<string>,
+  permissions: Immutable.List<Permission>,
   isPipelineColumnPermitted: boolean,
   pluggableAttributes?: {
     attributeNames?: Array<string>;
@@ -39,35 +40,39 @@ const getStreamTableElements = (
     defaultDisplayedAttributes: [
       'title',
       'index_set_title',
-      'archiving',
-      ...(streamDataLakeTableElements?.attributeName ? [streamDataLakeTableElements.attributeName] : []),
       'rules',
       ...(isPipelineColumnPermitted ? ['pipelines'] : []),
-      ...(pluggableAttributes?.attributeNames || []),
       'outputs',
-      'throughput',
+      'archiving',
+      ...(streamDataLakeTableElements?.attributeName ? [streamDataLakeTableElements.attributeName] : []),
+      'destination_filters',
+      ...(pluggableAttributes?.attributeNames || []),
       'disabled',
+      'throughput',
+    ],
+    defaultColumnOrder: [
+      'title',
+      'index_set_title',
+      'rules',
+      ...(isPipelineColumnPermitted ? ['pipelines'] : []),
+      'outputs',
+      'archiving',
+      ...(streamDataLakeTableElements?.attributeName ? [streamDataLakeTableElements.attributeName] : []),
+      'destination_filters',
+      ...(pluggableAttributes?.attributeNames || []),
+      'disabled',
+      'throughput',
+      'created_at',
     ],
   };
-  const columnOrder = [
-    'title',
-    'index_set_title',
-    'archiving',
-    ...(streamDataLakeTableElements?.attributeName ? [streamDataLakeTableElements.attributeName] : []),
-    'rules',
-    ...(isPipelineColumnPermitted ? ['pipelines'] : []),
-    ...(pluggableAttributes?.attributeNames || []),
-    'outputs',
-    'throughput',
-    'disabled',
-    'created_at',
-  ];
-  const additionalAttributes = [
+
+  const additionalAttributes: Array<Attribute> = [
     { id: 'index_set_title', title: 'Index Set', sortable: true, permissions: ['indexsets:read'] },
     { id: 'throughput', title: 'Throughput' },
-    { id: 'rules', title: 'Rules' },
+    { id: 'rules', title: 'Stream Rules' },
     ...(isPipelineColumnPermitted ? [{ id: 'pipelines', title: 'Pipelines' }] : []),
     { id: 'outputs', title: 'Outputs' },
+    { id: 'destination_filters', title: 'Filter Rules' },
     { id: 'archiving', title: 'Archiving' },
     ...(streamDataLakeTableElements?.attributes || []),
     ...(pluggableAttributes?.attributes || []),
@@ -75,7 +80,6 @@ const getStreamTableElements = (
 
   return {
     defaultLayout,
-    columnOrder,
     additionalAttributes,
   };
 };

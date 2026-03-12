@@ -21,7 +21,7 @@ import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.impl.Log4jLogEvent;
 import org.apache.logging.log4j.message.SimpleMessage;
 import org.graylog2.log4j.MemoryAppender;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;

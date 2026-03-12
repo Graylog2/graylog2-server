@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { asElement, fireEvent, render, screen } from 'wrappedTestingLibrary';
+import { asElement, render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import DrilldownContext from 'views/components/contexts/DrilldownContext';
 
@@ -24,7 +25,7 @@ import SurroundingSearchButton from './SurroundingSearchButton';
 const getOption = async (optionText: string) => {
   const button = await screen.findByRole('button', { name: /show surrounding messages/i });
 
-  fireEvent.click(button);
+  await userEvent.click(button);
 
   return screen.findByRole('menuitem', { name: new RegExp(optionText, 'i') });
 };
@@ -60,7 +61,7 @@ describe('SurroundingSearchButton', () => {
     renderButton();
     const button = screen.getByText('Show surrounding messages');
 
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     await screen.findByText('Only a minute');
     await screen.findByText('1 second');

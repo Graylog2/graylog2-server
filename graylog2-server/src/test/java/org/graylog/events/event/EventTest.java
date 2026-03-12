@@ -21,13 +21,13 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.events.fields.FieldValueType;
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class EventTest {
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
     }
 

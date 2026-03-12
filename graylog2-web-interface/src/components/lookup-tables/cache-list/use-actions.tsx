@@ -15,34 +15,35 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import { MenuItem, DeleteMenuItem, DropdownButton, BootstrapModalConfirm } from 'components/bootstrap';
-import { Icon, Spinner } from 'components/common';
+import Routes from 'routing/Routes';
+import { MenuItem, DeleteMenuItem, BootstrapModalConfirm } from 'components/bootstrap';
+import { Spinner } from 'components/common';
 import useScopePermissions from 'hooks/useScopePermissions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
 import { useDeleteCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import type { CacheEntity } from 'components/lookup-tables/types';
+import { MoreActionsMenu } from 'components/common/MoreActions';
 
 type ActionsProps = {
   cache: CacheEntity;
 };
 
 function Actions({ cache }: ActionsProps) {
-  const [showDeleteModal, setShowDeleteModal] = React.useState<boolean>(false);
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const sendTelemetry = useSendTelemetry();
   const { deleteCache, deletingCache } = useDeleteCache();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
-  const { setModal, setTitle, setEntity } = useModalContext();
+  const navigate = useNavigate();
 
-  const handleEdit = React.useCallback(() => {
-    setModal('CACHE-EDIT');
-    setTitle(cache.name);
-    setEntity(cache);
-  }, [cache, setModal, setTitle, setEntity]);
+  const handleEdit = useCallback(() => {
+    navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cache.name));
+  }, [navigate, cache.name]);
 
-  const handleDelete = React.useCallback(() => {
+  const handleDelete = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.CACHE_DELETED, {
       app_pathname: 'lut',
       app_section: 'lut_cache',
@@ -57,17 +58,11 @@ function Actions({ cache }: ActionsProps) {
 
   return (
     <>
-      <DropdownButton
-        bsStyle="transparent"
-        title={<Icon name="more_horiz" size="lg" />}
-        id={cache.id}
-        buttonTitle={cache.id}
-        noCaret
-        pullRight>
+      <MoreActionsMenu id={cache.id} size="lg" pullRight title={`More Actions for ${cache.name}`}>
         <MenuItem onSelect={handleEdit}>Edit</MenuItem>
         <MenuItem divider />
         <DeleteMenuItem onSelect={() => setShowDeleteModal(true)}>Delete</DeleteMenuItem>
-      </DropdownButton>
+      </MoreActionsMenu>
       {showDeleteModal && (
         <BootstrapModalConfirm
           showModal
@@ -84,9 +79,11 @@ function Actions({ cache }: ActionsProps) {
   );
 }
 
+const renderActions = (cache: CacheEntity) => <Actions cache={cache} />;
+
 function useActions() {
   return {
-    renderActions: (cache: CacheEntity) => <Actions cache={cache} />,
+    renderActions,
   };
 }
 

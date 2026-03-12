@@ -15,8 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useRef } from 'react';
 import styled, { css } from 'styled-components';
-import { useState, useEffect } from 'react';
+
+import useIntersectionObserver from 'hooks/useIntersectionObserver';
+import ScrollShadow from 'theme/box-shadows/ScrollShadow';
 
 const Container = styled.div`
   height: 100%;
@@ -45,15 +48,9 @@ const Actions = styled.div<{ $scrolledToBottom: boolean; $alignAtBottom: boolean
     justify-content: ${$alignAtBottom ? 'flex-end' : 'space-between'};
     padding-top: 5px;
 
+    ${ScrollShadow('top')}
     &::before {
-      box-shadow: 1px -2px 3px rgb(0 0 0 / 25%);
-      content: ' ';
       display: ${$scrolledToBottom ? 'block' : 'none'};
-      height: 3px;
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 0;
     }
   `,
 );
@@ -66,35 +63,6 @@ const ScrolledToBottomIndicator = styled.div`
   z-index: 0;
 `;
 
-const useScrolledToBottom = (): {
-  setScrolledToBottomIndicatorRef: (ref: HTMLDivElement) => void;
-  scrolledToBottom: boolean;
-} => {
-  const [scrolledToBottomIndicatorRef, setScrolledToBottomIndicatorRef] = useState(null);
-  const [scrolledToBottom, setScrolledToBottom] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setScrolledToBottom(!entry.isIntersecting);
-      },
-      { threshold: 0.9 },
-    );
-
-    if (scrolledToBottomIndicatorRef) {
-      observer.observe(scrolledToBottomIndicatorRef);
-    }
-
-    return () => {
-      if (scrolledToBottomIndicatorRef) {
-        observer.unobserve(scrolledToBottomIndicatorRef);
-      }
-    };
-  }, [scrolledToBottomIndicatorRef]);
-
-  return { setScrolledToBottomIndicatorRef, scrolledToBottom };
-};
-
 type Props = {
   actions: React.ReactNode;
   children: React.ReactNode;
@@ -104,14 +72,16 @@ type Props = {
 };
 
 const StickyBottomActions = ({ actions, children, className = undefined, alignActionsAtBottom = false }: Props) => {
-  const { setScrolledToBottomIndicatorRef, scrolledToBottom } = useScrolledToBottom();
+  const scrollContainerRef = useRef<HTMLDivElement>();
+  const scrolledToBottomIndicatorRef = useRef<HTMLDivElement>();
+  const scrolledToBottom = useIntersectionObserver(scrollContainerRef, scrolledToBottomIndicatorRef);
 
   return (
     <Container className={className}>
-      <ScrollContainer>
+      <ScrollContainer ref={scrollContainerRef}>
         <Content>
           {children}
-          <ScrolledToBottomIndicator ref={setScrolledToBottomIndicatorRef} />
+          <ScrolledToBottomIndicator ref={scrolledToBottomIndicatorRef} />
         </Content>
       </ScrollContainer>
       <Actions $scrolledToBottom={scrolledToBottom} $alignAtBottom={alignActionsAtBottom}>

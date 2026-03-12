@@ -19,8 +19,8 @@ package org.graylog2.streams;
 import com.google.common.base.MoreObjects;
 import org.bson.types.ObjectId;
 import org.graylog2.database.entities.DefaultEntityScope;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.TestIndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.TestIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
@@ -41,7 +41,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.graylog2.indexer.MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
+import static org.graylog2.indexer.template.MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 
 public class StreamMock implements Stream {
     private String id;
@@ -244,5 +244,10 @@ public class StreamMock implements Stream {
     @Override
     public IndexSet getIndexSet() {
         return indexSet;
+    }
+
+    @Override
+    public List<String> getFavoriteFields() {
+        return List.of();
     }
 }

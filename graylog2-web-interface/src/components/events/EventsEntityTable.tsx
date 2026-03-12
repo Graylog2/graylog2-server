@@ -15,53 +15,68 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { OrderedMap } from 'immutable';
+
+import { Events } from '@graylog/server-api';
 
 import useTableElements from 'components/events/events/hooks/useTableComponents';
 import { eventsTableElements } from 'components/events/Constants';
+import eventsSliceRenderers from 'components/events/SliceRenderers';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import FilterValueRenderers from 'components/events/FilterValueRenderers';
-import fetchEvents, { keyFn } from 'components/events/fetchEvents';
+import fetchEvents, { keyFn, parseFilters, getConcatenatedQuery } from 'components/events/fetchEvents';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import useQuery from 'routing/useQuery';
-import useColumnRenderers from 'components/events/events/ColumnRenderers';
+import CustomColumnRenderers from 'components/events/events/ColumnRenderers';
 import EventsRefreshControls from 'components/events/events/EventsRefreshControls';
 import QueryHelper from 'components/common/QueryHelper';
 import EventsWidgets from 'components/events/EventsWidgets';
 import EventsRefreshProvider from 'components/events/EventsRefreshProvider';
+import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
+import { EXCLUDE_INFO_FILTER } from 'logic/alerts/EventDefinitionPriorityEnum';
 
 const additionalSearchFields = {
   key: 'The key of the event',
 };
 
+const defaultFilters = OrderedMap({ priority: [EXCLUDE_INFO_FILTER] });
+
 const EventsEntityTable = () => {
   const { stream_id: streamId } = useQuery();
-
-  const columnRenderers = useColumnRenderers();
-  const _fetchEvents = useCallback(
-    (searchParams: SearchParams) => fetchEvents(searchParams, streamId as string),
-    [streamId],
-  );
+  const _fetchEvents = (searchParams: SearchParams) => fetchEvents(searchParams, streamId as string);
   const { entityActions, expandedSections, bulkSelection } = useTableElements({
     defaultLayout: eventsTableElements.defaultLayout,
   });
+
+  const _fetchSlices = (column: string, query: string, filters: UrlQueryFilters) => {
+    const { filter, timerange } = parseFilters(filters);
+
+    return Events.slices({
+      include_all: true,
+      slice_column: column,
+      query: getConcatenatedQuery(query, streamId as string),
+      filter,
+      timerange,
+    });
+  };
 
   return (
     <EventsRefreshProvider>
       <PaginatedEntityTable<Event, EventsAdditionalData>
         humanName="events"
-        columnsOrder={eventsTableElements.columnOrder}
         queryHelpComponent={<QueryHelper entityName="event" fieldMap={additionalSearchFields} />}
         entityActions={entityActions}
         tableLayout={eventsTableElements.defaultLayout}
+        defaultFilters={defaultFilters}
         fetchEntities={_fetchEvents}
+        fetchSlices={_fetchSlices}
+        sliceRenderers={eventsSliceRenderers}
         keyFn={keyFn}
-        actionsCellWidth={110}
-        expandedSectionsRenderer={expandedSections}
+        expandedSectionRenderers={expandedSections}
         entityAttributesAreCamelCase={false}
         filterValueRenderers={FilterValueRenderers}
-        columnRenderers={columnRenderers}
+        columnRenderers={CustomColumnRenderers}
         bulkSelection={bulkSelection}
         topRightCol={<EventsRefreshControls />}
         middleSection={EventsWidgets}

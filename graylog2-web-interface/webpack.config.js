@@ -30,7 +30,6 @@ const BUILD_PATH = path.resolve(ROOT_PATH, 'target/web/build');
 const TARGET = process.env.npm_lifecycle_event || 'build';
 process.env.BABEL_ENV = TARGET;
 
-// eslint-disable-next-line import/no-dynamic-require
 const BOOTSTRAPVARS = require(path.resolve(ROOT_PATH, 'public', 'stylesheets', 'bootstrap-config.json')).vars;
 const coreConfig = core.config(TARGET, APP_PATH, ROOT_PATH, ROOT_PATH, supportedBrowsers);
 
@@ -39,7 +38,8 @@ const webpackConfig = merge(coreConfig, {
   dependencies: ['vendor'],
   entry: {
     app: APP_PATH,
-    polyfill: [path.resolve(APP_PATH, 'polyfill.js')],
+    preload: [path.resolve(APP_PATH, 'preload.ts')],
+    polyfill: [path.resolve(APP_PATH, 'polyfill.ts')],
   },
   module: {
     rules: [

@@ -15,19 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 
+import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import { CachesOverview } from 'components/lookup-tables';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
-import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
-import LUTModals from 'components/lookup-tables/LUTModals';
 
 function LUTCachesPage() {
-  const { setModal } = useModalContext();
-
-  const showCreateModal = () => {
-    setModal('CACHE-CREATE');
-  };
+  const navigate = useNavigate();
 
   return (
     <LUTPageLayout
@@ -35,12 +31,11 @@ function LUTCachesPage() {
       pageTitle="Caches for Lookup Tables"
       pageDescription="Caches provide the actual values for lookup tables."
       actions={
-        <Button bsStyle="primary" onClick={showCreateModal}>
+        <Button bsStyle="primary" onClick={() => navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE)}>
           Create cache
         </Button>
       }>
       <CachesOverview />
-      <LUTModals />
     </LUTPageLayout>
   );
 }

@@ -81,6 +81,10 @@ public abstract class StreamResponse {
     @Nullable
     public abstract List<String> categories();
 
+    @JsonProperty("favorite_fields")
+    @Nullable
+    public abstract List<String> favoriteFields();
+
     @JsonCreator
     public static StreamResponse create(@JsonProperty("id") String id,
                                         @JsonProperty("creator_user_id") String creatorUserId,
@@ -96,7 +100,8 @@ public abstract class StreamResponse {
                                         @JsonProperty("remove_matches_from_default_stream") @Nullable Boolean removeMatchesFromDefaultStream,
                                         @JsonProperty("index_set_id") String indexSetId,
                                         @JsonProperty("categories") @Nullable List<String> categories,
-                                        @JsonProperty("is_editable") boolean isEditable) {
+                                        @JsonProperty("is_editable") boolean isEditable,
+                                        @JsonProperty("favorite_fields") List<String> favoriteFields) {
         return new AutoValue_StreamResponse(
                 id,
                 creatorUserId,
@@ -112,6 +117,7 @@ public abstract class StreamResponse {
                 firstNonNull(removeMatchesFromDefaultStream, false),
                 indexSetId,
                 isEditable,
-                categories);
+                categories,
+                favoriteFields);
     }
 }

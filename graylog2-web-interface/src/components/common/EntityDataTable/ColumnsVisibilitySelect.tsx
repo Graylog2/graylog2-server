@@ -16,12 +16,13 @@
  */
 import styled from 'styled-components';
 import * as React from 'react';
-import { useMemo } from 'react';
+import type { Column, Table } from '@tanstack/react-table';
 
-import { Checkbox, DropdownButton, MenuItem } from 'components/bootstrap';
-import type { Column } from 'components/common/EntityDataTable/types';
+import { defaultCompare } from 'logic/DefaultCompare';
+import { Checkbox, DropdownButton, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
-import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
+import type { EntityBase, ColumnMetaContext } from 'components/common/EntityDataTable/types';
+import { Icon } from 'components/common';
 
 const StyledDropdownButton = styled(DropdownButton)`
   ~ .dropdown-menu {
@@ -55,75 +56,50 @@ const ColumnTitle = styled(TextOverflowEllipsis)`
   display: inline;
 `;
 
-const ColumnListItem = ({
-  allColumns,
-  column,
-  onClick,
-  selectedColumns,
-}: {
-  allColumns: Array<Column>;
-  column: Column;
-  onClick: (selectedColumns: Array<string>) => void;
-  selectedColumns: Array<string>;
-}) => {
-  const isSelected = selectedColumns.includes(column.id);
+const colLabel = <Entity extends EntityBase>(column: Column<Entity>) =>
+  (column.columnDef.meta as ColumnMetaContext<Entity>)?.label ?? column.id;
 
-  const toggleVisibility = () => {
-    const newAttributes = allColumns.reduce((collection, attr) => {
-      const isCurAttr = column.id === attr.id;
-
-      if ((isCurAttr && !isSelected) || (!isCurAttr && selectedColumns.includes(attr.id))) {
-        return [...collection, attr.id];
-      }
-
-      return collection;
-    }, []);
-
-    onClick(newAttributes);
-  };
+const ColumnListItem = <Entity extends EntityBase>({ column }: { column: Column<Entity> }) => {
+  const isSelected = column.getIsVisible();
+  const toggleVisibility = () => column.toggleVisibility();
+  const label = colLabel<Entity>(column);
 
   return (
-    <MenuItem onSelect={toggleVisibility} title={`${isSelected ? 'Hide' : 'Show'} ${column.title}`}>
+    <MenuItem onSelect={toggleVisibility} title={`${isSelected ? 'Hide' : 'Show'} ${label}`}>
       <ListItemInner>
         <ColumnCheckbox checked={isSelected} onChange={toggleVisibility} />
-        <ColumnTitle>{column.title}</ColumnTitle>
+        <ColumnTitle>{label}</ColumnTitle>
       </ListItemInner>
     </MenuItem>
   );
 };
 
-type Props = {
-  allColumns: Array<Column>;
-  onChange: (attributes: Array<string>) => void;
-  selectedColumns: Array<string>;
+type Props<Entity> = {
+  onResetLayoutPreferences: () => void;
+  table: Table<Entity>;
 };
 
-const ColumnsVisibilitySelect = ({ onChange, selectedColumns, allColumns }: Props) => {
-  const sortedColumns = useMemo(
-    () => allColumns.sort((col1, col2) => naturalSort(col1.title, col2.title)),
-    [allColumns],
-  );
-
-  return (
-    <StyledDropdownButton
-      title="Columns"
-      bsSize="small"
-      pullRight
-      aria-label="Configure visible columns"
-      id="columns-visibility-select"
-      bsStyle="default"
-      closeOnItemClick={false}>
-      {sortedColumns.map((column) => (
-        <ColumnListItem
-          column={column}
-          onClick={onChange}
-          key={column.id}
-          allColumns={allColumns}
-          selectedColumns={selectedColumns}
-        />
+const ColumnsVisibilitySelect = <Entity extends EntityBase>({ table, onResetLayoutPreferences }: Props<Entity>) => (
+  <StyledDropdownButton
+    title="Columns"
+    bsSize="small"
+    pullRight
+    aria-label="Configure visible columns"
+    id="columns-visibility-select"
+    bsStyle="default"
+    closeOnItemClick={false}>
+    {table
+      .getAllLeafColumns()
+      .filter((column) => column.getCanHide())
+      .sort((col1, col2) => defaultCompare(colLabel<Entity>(col1), colLabel<Entity>(col2)))
+      .map((column) => (
+        <ColumnListItem<Entity> column={column} key={column.id} />
       ))}
-    </StyledDropdownButton>
-  );
-};
+    <MenuItem divider />
+    <DeleteMenuItem onSelect={onResetLayoutPreferences}>
+      <Icon name="reopen_window" /> Reset all columns
+    </DeleteMenuItem>
+  </StyledDropdownButton>
+);
 
 export default ColumnsVisibilitySelect;

@@ -107,7 +107,7 @@ const QueryHelper = ({
     overlay={queryHelpPopover(commonFields, fieldMap, example, entityName)}
     title="Search Syntax Help"
     width={500}>
-    <QueryHelpButton bsStyle="link">
+    <QueryHelpButton bsStyle="link" title="Show search syntax help">
       <Icon name="help" />
     </QueryHelpButton>
   </OverlayTrigger>

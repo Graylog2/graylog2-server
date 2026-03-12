@@ -16,33 +16,32 @@
  */
 package org.graylog.storage.opensearch3.stats;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
-import org.graylog.storage.opensearch3.PlainJsonApi;
+import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
+import org.opensearch.client.opensearch.cluster.ClusterStatsRequest;
+import org.opensearch.client.opensearch.cluster.ClusterStatsResponse;
+import org.opensearch.client.opensearch.cluster.stats.IndexMetric;
+import org.opensearch.client.opensearch.cluster.stats.Metric;
+
+import java.util.List;
 
 public class ClusterStatsApi {
-    private final ObjectMapper objectMapper;
-    private final PlainJsonApi jsonApi;
+    private final OfficialOpensearchClient officialOpensearchClient;
 
     @Inject
-    public ClusterStatsApi(ObjectMapper objectMapper,
-                           PlainJsonApi jsonApi) {
-        this.objectMapper = objectMapper;
-        this.jsonApi = jsonApi;
+    public ClusterStatsApi(OfficialOpensearchClient officialOpensearchClient) {
+        this.officialOpensearchClient = officialOpensearchClient;
     }
 
     public IndexSetStats clusterStats() {
-        final Request request = new Request("GET", "/_cluster/stats");
-        request.addParameter("filter_path", "indices.count,indices.docs.count,indices.store.size_in_bytes");
-        final JsonNode stats = jsonApi.perform(request, "Couldn't read Elasticsearch cluster stats");
+        final ClusterStatsRequest request = ClusterStatsRequest.builder()
+                .nodeId("_all")
+                .metric(List.of(Metric.Indices))
+                .indexMetric(List.of(IndexMetric.Store, IndexMetric.Docs))
+                .build();
 
-        final long indicesCount = stats.path("indices").path("count").asLong();
-        final long docsCount = stats.path("indices").path("docs").path("count").asLong();
-        final long sizeBytes = stats.path("indices").path("store").path("size_in_bytes").asLong();
-
-        return IndexSetStats.create(indicesCount, docsCount, sizeBytes);
+        final ClusterStatsResponse stats = officialOpensearchClient.sync(c -> c.cluster().stats(request), "Couldn't read OpensSearch cluster stats");
+        return IndexSetStats.create(stats.indices().count(), stats.indices().docs().count(), stats.indices().store().sizeInBytes());
     }
 }

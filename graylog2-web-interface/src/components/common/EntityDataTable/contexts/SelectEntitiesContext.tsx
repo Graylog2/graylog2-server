@@ -28,6 +28,8 @@ type ContextValue =
       selectEntity: (entityId: EntityBase['id']) => void;
       deselectEntity: (entityId: EntityBase['id']) => void;
       toggleEntitySelect: (entityId: EntityBase['id']) => void;
+      isAllRowsSelected: boolean;
+      isSomeRowsSelected: boolean;
     }
   | undefined;
 

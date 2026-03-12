@@ -17,7 +17,7 @@
 package org.graylog.plugins.views.search;
 
 import org.graylog.plugins.views.search.errors.SearchError;
-import org.graylog2.indexer.MongoIndexSet;
+import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.indexer.ranges.IndexRange;
 
 import java.util.Collection;

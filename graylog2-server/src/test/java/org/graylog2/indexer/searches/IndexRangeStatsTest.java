@@ -18,7 +18,7 @@ package org.graylog2.indexer.searches;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.jodatime.api.Assertions.assertThat;
 

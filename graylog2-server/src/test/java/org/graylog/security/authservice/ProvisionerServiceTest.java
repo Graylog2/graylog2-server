@@ -20,25 +20,29 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.HashMap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class ProvisionerServiceTest {
 
     public static final String BACKEND_ID = "backend-id";
@@ -50,9 +54,6 @@ public class ProvisionerServiceTest {
     public static final String USER_ID = "user-id";
     public static final String USERNAME = "username";
 
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
     private ProvisionerService provisionerService;
 
     @Mock
@@ -62,9 +63,9 @@ public class ProvisionerServiceTest {
     private AuthServiceBackend authServiceBackend;
 
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        provisionerService = new ProvisionerService(userService, DateTimeZone.UTC, new HashMap<>());
+        provisionerService = new ProvisionerService(userService, new HashMap<>());
     }
 
     @Test
@@ -90,6 +91,7 @@ public class ProvisionerServiceTest {
         provisionerService.provision(userDetails);
         verify(userService, times(1)).save(isA(User.class));
         verify(user, times(1)).setFirstLastFullNames(eq(FIRST_NAME), eq(LAST_NAME));
+        verify(user, times(1)).setTimeZone((DateTimeZone) isNull());
     }
 
     @Test
@@ -114,5 +116,6 @@ public class ProvisionerServiceTest {
         provisionerService.provision(userDetails);
         verify(userService, times(1)).save(isA(User.class));
         verify(user, times(1)).setFullName(FULL_NAME);
+        verify(user, times(1)).setTimeZone((DateTimeZone) isNull());
     }
 }

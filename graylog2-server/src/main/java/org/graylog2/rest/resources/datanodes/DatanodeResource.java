@@ -18,9 +18,10 @@ package org.graylog2.rest.resources.datanodes;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -31,21 +32,26 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodePaginatedService;
+import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
+import org.graylog2.rest.resources.entities.FilterOption;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-@Api(value = "System/Datanodes", description = "Data Node discovery")
+@Tag(name = "System/Datanodes", description = "Data Node discovery")
 @RequiresAuthentication
 @Path("/system/cluster/datanodes")
 @Produces(MediaType.APPLICATION_JSON)
@@ -55,20 +61,26 @@ public class DatanodeResource extends RestResource {
     private final SearchQueryParser searchQueryParser;
 
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
-            .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
-            .put("hostname", SearchQueryField.create("hostname"))
-            .put("datanode_status", SearchQueryField.create("datanode_status"))
+            .put(DataNodeDto.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
+            .put(DataNodeDto.FIELD_HOSTNAME, SearchQueryField.create(DataNodeDto.FIELD_HOSTNAME))
+            .put(DataNodeDto.FIELD_DATANODE_STATUS, SearchQueryField.create(DataNodeDto.FIELD_DATANODE_STATUS))
             .build();
 
-    private static final String DEFAULT_SORT_FIELD = "title";
+    private static final String DEFAULT_SORT_FIELD = DataNodeDto.FIELD_HOSTNAME;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
-            EntityAttribute.builder().id("hostname").title("Name").build(),
-            EntityAttribute.builder().id("data_node_status").title("Status").build(),
-            EntityAttribute.builder().id("transport_address").title("Transport address").build(),
-            EntityAttribute.builder().id("cert_valid_until").title("Certificate valid until").build(),
-            EntityAttribute.builder().id("datanode_version").title("Datanode version").build()
+            EntityAttribute.builder().id(DataNodeDto.FIELD_HOSTNAME).title("Node").type(SearchQueryField.Type.STRING).sortable(true).searchable(true).build(),
+            EntityAttribute.builder().id(DataNodeDto.FIELD_DATANODE_STATUS).sortable(true).filterable(true).filterOptions(danodeStatusOptions()).title("Status").build(),
+            EntityAttribute.builder().id(DataNodeDto.FIELD_CLUSTER_ADDRESS).title("Transport address").type(SearchQueryField.Type.STRING).searchable(true).sortable(true).build(),
+            EntityAttribute.builder().id(DataNodeDto.FIELD_CERT_VALID_UNTIL).title("Certificate valid until").type(SearchQueryField.Type.DATE).sortable(true).build(),
+            EntityAttribute.builder().id(DataNodeDto.FIELD_DATANODE_VERSION).title("Version").type(SearchQueryField.Type.STRING).sortable(true).build(),
+            EntityAttribute.builder().id(DataNodeDto.FIELD_OPENSEARCH_ROLES).title("Roles").type(SearchQueryField.Type.STRING).sortable(true).build()
     );
+
+    private static Set<FilterOption> danodeStatusOptions() {
+        return Arrays.stream(DataNodeStatus.values()).map(s -> new FilterOption(s.name(), s.name())).collect(Collectors.toSet());
+    }
+
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
             .build();
@@ -81,16 +93,17 @@ public class DatanodeResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get a paginated list of all datanodes in this cluster")
-    public PageListResponse<DataNodeDto> dataNodes(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                   @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                   @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                                   @ApiParam(name = "sort",
-                                                             value = "The field to sort the result on",
+    @Operation(summary = "Get a paginated list of all datanodes in this cluster")
+    public PageListResponse<DataNodeDto> dataNodes(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                   @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                   @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                   @Parameter(name = "sort",
+                                                             description = "The field to sort the result on",
                                                              required = true,
-                                                             allowableValues = "title,description,type")
+                                                             schema = @Schema(allowableValues = {"hostname", "data_node_status", "transport_address", "cert_valid_until", "datanode_version"}))
                                                    @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
-                                                   @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                   @Parameter(name = "order", description = "The sort direction",
+                                                             schema = @Schema(allowableValues = {"asc", "desc"}))
                                                    @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order
 
     ) {

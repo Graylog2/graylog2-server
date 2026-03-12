@@ -44,7 +44,7 @@ const useCustomColumnRenderers = () => {
         is_reserved: {
           renderCell: (isReserved: boolean) =>
             isReserved ? <Icon title="Field has reserved field type" name="check" /> : null,
-          staticWidth: 120,
+          staticWidth: 'matchHeader' as const,
         },
       },
     }),

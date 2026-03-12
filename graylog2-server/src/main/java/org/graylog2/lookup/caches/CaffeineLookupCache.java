@@ -83,14 +83,14 @@ public class CaffeineLookupCache extends LookupCache {
                                String name,
                                LookupCacheConfiguration c,
                                MetricRegistry metricRegistry,
-                               Ticker fakeTicker) {
+                               Ticker ticker) {
         super(id, name, c, metricRegistry);
         config = (Config) c;
         cache = Caffeine.newBuilder()
                 .recordStats(() -> new MetricStatsCounter(this))
                 .maximumSize(config.maxSize())
                 .expireAfter(buildExpiry(config))
-                .ticker(fakeTicker)
+                .ticker(ticker)
                 .build();
     }
 

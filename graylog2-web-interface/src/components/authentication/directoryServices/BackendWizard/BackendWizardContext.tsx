@@ -23,6 +23,7 @@ export type WizardFormValues = {
   title?: string;
   description?: string;
   defaultRoles?: string;
+  defaultUserTimezone?: string;
   groupSearchBase?: string;
   groupSearchPattern?: string;
   serverHost?: string;

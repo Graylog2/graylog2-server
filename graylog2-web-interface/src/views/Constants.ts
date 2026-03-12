@@ -152,8 +152,8 @@ export const showSearchPath = `${searchPath}/:viewId`;
 
 export const dashboardsPath = '/dashboards';
 export const newDashboardsPath = `${dashboardsPath}/new`;
-export const dashboardsTvPath = `${dashboardsPath}/tv/:viewId`;
-export const showDashboardsPath = `${dashboardsPath}/:viewId`;
+export const dashboardsTvPath = (viewId: string = ':viewId') => `${dashboardsPath}/tv/${viewId}`;
+export const showDashboardsPath = (viewId: string = ':viewId') => `${dashboardsPath}/${viewId}`;
 
 export const extendedSearchPath = '/extendedsearch';
 

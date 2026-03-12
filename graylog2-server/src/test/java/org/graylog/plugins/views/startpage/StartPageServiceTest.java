@@ -31,13 +31,16 @@ import org.graylog.plugins.views.startpage.lastOpened.LastOpenedForUserDTO;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.plugins.views.startpage.title.StartPageItemTitleRetriever;
+import org.graylog.security.CapabilityRegistry;
+import org.graylog.security.DBGrantService;
 import org.graylog.security.PermissionAndRoleResolver;
+import org.graylog.security.shares.GranteeService;
+import org.graylog.security.shares.PluggableEntityService;
 import org.graylog.testing.GRNExtension;
 import org.graylog.testing.TestUserServiceExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.lookup.Catalog;
 import org.joda.time.DateTime;
@@ -73,14 +76,12 @@ public class StartPageServiceTest {
 
     @BeforeEach
     public void init(MongoDBTestService mongodb,
-                     MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
+                     MongoCollections mongoCollections,
                      GRNRegistry grnRegistry) {
 
-        var admin = TestUser.builder().withId("637748db06e1d74da0a54331").withUsername("local:admin").isLocalAdmin(true).build();
         var user = TestUser.builder().withId("637748db06e1d74da0a54330").withUsername("test").isLocalAdmin(false).build();
         this.searchUser = TestSearchUser.builder().withUser(user).build();
         this.grnRegistry = grnRegistry;
-        var searchAdmin = TestSearchUser.builder().withUser(admin).build();
 
         var permissionAndRoleResolver = new PermissionAndRoleResolver() {
             @Override
@@ -101,12 +102,12 @@ public class StartPageServiceTest {
 
         var eventbus = new EventBus();
         final var connection = mongodb.mongoConnection();
-        final var collections = new MongoCollections(mongoJackObjectMapperProvider, connection);
-        var lastOpenedService = new LastOpenedService(collections, eventbus);
-        var recentActivityService = new RecentActivityService(collections, connection, eventbus, grnRegistry, permissionAndRoleResolver);
+        var lastOpenedService = new LastOpenedService(mongoCollections, eventbus);
+        var recentActivityService = new RecentActivityService(mongoCollections, connection, eventbus, grnRegistry, permissionAndRoleResolver,
+                new DBGrantService(mongoCollections), mock(GranteeService.class), new PluggableEntityService(Set.of()), mock(CapabilityRegistry.class));
         catalog = mock(Catalog.class);
         doReturn(Optional.of(new Catalog.Entry("", ""))).when(catalog).getEntry(any());
-        startPageService = new StartPageService(grnRegistry, lastOpenedService, recentActivityService, eventbus, new StartPageItemTitleRetriever(catalog, Map.of()));
+        startPageService = new StartPageService(grnRegistry, lastOpenedService, recentActivityService, new StartPageItemTitleRetriever(catalog, Map.of()));
     }
 
     @Test

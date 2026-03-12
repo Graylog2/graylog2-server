@@ -38,15 +38,17 @@ const IndexSetReadOnlyConfiguration = ({
   hiddenFields,
   immutableFields,
   ignoreFieldRestrictions,
+  onPrefixChange,
 }: {
   hiddenFields: string[];
   immutableFields: string[];
   ignoreFieldRestrictions: boolean;
+  onPrefixChange: () => void;
 }) => {
   const indexPrefixHelp = (
     <span>
-      A <strong>unique</strong> prefix used in Elasticsearch indices belonging to this index set. The prefix must start
-      with a letter or number, and can only contain letters, numbers, &apos;_&apos;, &apos;-&apos; and &apos;+&apos;.
+      A <strong>unique</strong> prefix used for indices belonging to this index set. The prefix must start with a letter
+      or number, and can only contain letters, numbers, &apos;_&apos;, &apos;-&apos; and &apos;+&apos;.
     </span>
   );
 
@@ -59,6 +61,7 @@ const IndexSetReadOnlyConfiguration = ({
         name="index_prefix"
         help={indexPrefixHelp}
         validate={_validateIndexPrefix}
+        onChange={onPrefixChange}
         required
       />
       {(!hiddenFields.includes('index_analyzer') || ignoreFieldRestrictions) && (
@@ -67,7 +70,7 @@ const IndexSetReadOnlyConfiguration = ({
           id="index-analyzer"
           label="Analyzer"
           name="index_analyzer"
-          help="Elasticsearch analyzer for this index set."
+          help="Analyzer for this index set."
           required
           disabled={immutableFields.includes('index_analyzer') && !ignoreFieldRestrictions}
         />

@@ -29,7 +29,7 @@
       "type": "org.graylog2.inputs.raw.tcp.RawTCPInput",
       "title": "Raw TCP",
       "content_pack": null,
-      "node_id": "cd03ee44-b2a7-cafe-babe-0000deadbeef"
+      "node_id": "cd03ee44-b2a7-cafe-babe-0000deadbeef",
     },
     {
       "_id": {
@@ -55,7 +55,25 @@
       "type": "org.graylog2.inputs.syslog.udp.SyslogUDPInput",
       "title": "Syslog UDP",
       "content_pack": "54e3cafebabecafebabe0001",
-      "node_id": "cd03ee44-b2a7-cafe-babe-0000deadbeef"
+      "node_id": "cd03ee44-b2a7-cafe-babe-0000deadbeef",
+      "extractors": [
+        {
+          "id": "4ec88750-c522-11f0-bdff-9eee7e74cea5",
+          "title": "a copy of the action",
+          "order": new NumberLong("0"),
+          "type": "copy_input",
+          "cursor_strategy": "copy",
+          "target_field": "copyaction",
+          "source_field": "action",
+          "creator_user_id": "admin",
+          "extractor_config": {
+          },
+          "condition_type": "none",
+          "condition_value": "",
+          "converters": [
+          ]
+        }
+      ]
     },
     {
       "_id": {
@@ -83,6 +101,12 @@
       "created_at": {
         "$date": "2018-03-28T13:03:00.000Z"
       },
+      "static_fields": [
+        {
+          "key": "static_field",
+          "value": "foo"
+        }
+      ],
       "global": true,
       "type": "org.graylog2.inputs.gelf.tcp.GELFTCPInput",
       "title": "GELF TCP"

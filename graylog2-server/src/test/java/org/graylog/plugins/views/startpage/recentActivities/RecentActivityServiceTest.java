@@ -23,14 +23,17 @@ import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog.plugins.views.search.rest.TestUser;
+import org.graylog.security.CapabilityRegistry;
+import org.graylog.security.DBGrantService;
 import org.graylog.security.PermissionAndRoleResolver;
+import org.graylog.security.shares.GranteeService;
+import org.graylog.security.shares.PluggableEntityService;
 import org.graylog.testing.GRNExtension;
 import org.graylog.testing.TestUserService;
 import org.graylog.testing.TestUserServiceExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.database.users.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +44,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
@@ -63,7 +67,7 @@ public class RecentActivityServiceTest {
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb,
-               MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
+               MongoCollections mongoCollections,
                GRNRegistry grnRegistry,
                TestUserService testUserService) {
         admin = TestUser.builder().withId("637748db06e1d74da0a54331").withUsername("local:admin").isLocalAdmin(true).build();
@@ -90,12 +94,18 @@ public class RecentActivityServiceTest {
 
         this.testUserService = testUserService;
         this.grnRegistry = grnRegistry;
-        this.recentActivityService = new RecentActivityService(new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()),
+        this.recentActivityService = new RecentActivityService(
+                mongoCollections,
                 mongodb.mongoConnection(),
                null,
                 grnRegistry,
                 permissionAndRoleResolver,
-                MAXIMUM);
+                MAXIMUM,
+                new DBGrantService(mongoCollections),
+                mock(GranteeService.class),
+                new PluggableEntityService(Set.of()),
+                mock(CapabilityRegistry.class)
+        );
      }
 
     @Test

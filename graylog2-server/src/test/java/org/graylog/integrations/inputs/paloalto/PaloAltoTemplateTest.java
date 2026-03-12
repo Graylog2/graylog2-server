@@ -16,10 +16,10 @@
  */
 package org.graylog.integrations.inputs.paloalto;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test parsing of raw PAN message templates.
@@ -49,9 +49,8 @@ public class PaloAltoTemplateTest {
                                                                     DEFAULT_HEADER,
                                                                     DEFAULT_HEADER);
         assertEquals(3, templates.getAllErrors().size());
-        templates.getAllErrors().forEach(error -> {
-            assertTrue(error.contains("The header row is invalid"));
-        });
+        templates.getAllErrors().forEach(error ->
+            assertTrue(error.contains("The header row is invalid")));
 
         // Verify that invalid value messages returned for invalid values.
         templates = PaloAltoTemplates.newInstance("field,position,type\n" +
@@ -59,8 +58,7 @@ public class PaloAltoTemplateTest {
                                                   DEFAULT_HEADER,
                                                   DEFAULT_HEADER);
 
-        templates.getAllErrors().forEach(error -> {
-            assertTrue(error.contains("[] is not a valid"));
-        });
+        templates.getAllErrors().forEach(error ->
+            assertTrue(error.contains("[] is not a valid")));
     }
 }

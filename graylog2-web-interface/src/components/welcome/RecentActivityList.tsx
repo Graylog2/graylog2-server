@@ -19,8 +19,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 
 import { Table } from 'components/bootstrap';
 import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
-import { NoSearchResult, PaginatedList, RelativeTime, Spinner } from 'components/common';
-import { Link } from 'components/common/router';
+import { NoSearchResult, PaginatedList, RelativeTime, Spinner, Link } from 'components/common';
 import { StyledLabel } from 'components/welcome/EntityListItem';
 import type { RecentActivityType } from 'components/welcome/types';
 import useRecentActivity from 'components/welcome/hooks/useRecentActivity';
@@ -45,13 +44,7 @@ const ActionItem = ({ itemGrn, activityType, itemTitle, userName = null }: Props
   return (
     <div>
       {`The ${entityTypeTitle} `}
-      {!showLink ? (
-        <i>{entityTitle}</i>
-      ) : (
-        <Link target="_blank" to={entityLink}>
-          {entityTitle}
-        </Link>
-      )}
+      {!showLink ? <i>{entityTitle}</i> : <Link to={entityLink}>{entityTitle}</Link>}
       {' was '}
       {`${activityType}d`}
       {userName ? ` by ${userName}` : ''}

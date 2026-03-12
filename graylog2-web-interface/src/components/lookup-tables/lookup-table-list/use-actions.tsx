@@ -15,34 +15,35 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import { MenuItem, DeleteMenuItem, DropdownButton, BootstrapModalConfirm } from 'components/bootstrap';
-import { Icon, Spinner } from 'components/common';
+import Routes from 'routing/Routes';
+import { MenuItem, DeleteMenuItem, BootstrapModalConfirm } from 'components/bootstrap';
+import { Spinner } from 'components/common';
 import useScopePermissions from 'hooks/useScopePermissions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { useDeleteLookupTable } from 'components/lookup-tables/hooks/useLookupTablesAPI';
-import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
 import type { LookupTableEntity } from 'components/lookup-tables/types';
+import { MoreActionsMenu } from 'components/common/MoreActions';
 
 type ActionsProps = {
   lut: LookupTableEntity;
 };
 
 function Actions({ lut }: ActionsProps) {
-  const [showDeleteModal, setShowDeleteModal] = React.useState<boolean>(false);
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const sendTelemetry = useSendTelemetry();
   const { deleteLookupTable, deletingLookupTable } = useDeleteLookupTable();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(lut);
-  const { setModal, setTitle, setEntity } = useModalContext();
+  const navigate = useNavigate();
 
-  const handleEdit = React.useCallback(() => {
-    setModal('LUT-EDIT');
-    setTitle(lut.name);
-    setEntity(lut);
-  }, [lut, setModal, setTitle, setEntity]);
+  const handleEdit = useCallback(() => {
+    navigate(Routes.SYSTEM.LOOKUPTABLES.edit(lut.name));
+  }, [lut, navigate]);
 
-  const handleDelete = React.useCallback(() => {
+  const handleDelete = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.DELETED, {
       app_pathname: 'lut',
       app_section: 'lut',
@@ -57,17 +58,11 @@ function Actions({ lut }: ActionsProps) {
 
   return (
     <>
-      <DropdownButton
-        bsStyle="transparent"
-        title={<Icon name="more_horiz" size="lg" />}
-        id={lut.id}
-        buttonTitle={lut.id}
-        noCaret
-        pullRight>
+      <MoreActionsMenu id={lut.id} size="lg" pullRight title={`More Actions for ${lut.name}`}>
         <MenuItem onSelect={handleEdit}>Edit</MenuItem>
         <MenuItem divider />
         <DeleteMenuItem onSelect={() => setShowDeleteModal(true)}>Delete</DeleteMenuItem>
-      </DropdownButton>
+      </MoreActionsMenu>
       {showDeleteModal && (
         <BootstrapModalConfirm
           showModal
@@ -84,9 +79,11 @@ function Actions({ lut }: ActionsProps) {
   );
 }
 
+const renderActions = (lut: LookupTableEntity) => <Actions lut={lut} />;
+
 function useActions() {
   return {
-    renderActions: (lut: LookupTableEntity) => <Actions lut={lut} />,
+    renderActions,
   };
 }
 

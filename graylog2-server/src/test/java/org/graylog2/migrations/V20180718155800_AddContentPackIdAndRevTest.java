@@ -19,13 +19,14 @@ package org.graylog2.migrations;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.model.ContentPack;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.graylog2.database.MongoCollections;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.time.ZonedDateTime;
 
@@ -33,15 +34,16 @@ import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.exists;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(MongoDBExtension.class)
 public class V20180718155800_AddContentPackIdAndRevTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private V20180718155800_AddContentPackIdAndRev migration;
+    private MongoCollections mongoCollections;
 
-    @Before
-    public void setUp() {
-        this.migration = new V20180718155800_AddContentPackIdAndRev(mongodb.mongoConnection());
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) {
+        this.migration = new V20180718155800_AddContentPackIdAndRev(mongoCollections.mongoConnection());
+        this.mongoCollections = mongoCollections;
     }
 
     @Test
@@ -52,7 +54,7 @@ public class V20180718155800_AddContentPackIdAndRevTest {
     @Test
     @MongoDBFixtures("V20180718155800_AddContentPackIdAndRevTest.json")
     public void upgrade() {
-        final MongoCollection<Document> collection = mongodb.mongoConnection()
+        final MongoCollection<Document> collection = mongoCollections.mongoConnection()
                 .getMongoDatabase()
                 .getCollection(ContentPackPersistenceService.COLLECTION_NAME);
         final Bson filter = and(exists(ContentPack.FIELD_META_ID), exists(ContentPack.FIELD_META_REVISION));

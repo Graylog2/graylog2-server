@@ -19,11 +19,10 @@ import { useEffect, useMemo, useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import groupBy from 'lodash/groupBy';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, DocumentTitle, PageHeader } from 'components/common';
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
-import { DocumentTitle, PageHeader } from 'components/common';
 import ValueReferenceData from 'util/ValueReferenceData';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
 import Entity from 'logic/content-packs/Entity';
@@ -95,6 +94,7 @@ const EditContentPackPage = () => {
       return result;
     }, {});
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedEntities(newSelectedEntities);
   }, [contentPack, entityCatalog, entityIndex]);
 
@@ -119,6 +119,7 @@ const EditContentPackPage = () => {
       return newResult;
     }, {});
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setAppliedParameter(newAppliedParameter);
   }, [contentPack]);
 
@@ -151,7 +152,7 @@ const EditContentPackPage = () => {
   };
 
   const _getEntities = (newSelectedEntities) => {
-    CatalogActions.getSelectedEntities(newSelectedEntities).then((result) => {
+    CatalogActions.getSelectedEntities(newSelectedEntities).then((result: any) => {
       const selectedContentPackEntities = Object.keys(newSelectedEntities)
         .reduce((acc, entityType) => acc.concat(newSelectedEntities[entityType]), [])
         .filter((e) => e instanceof Entity);

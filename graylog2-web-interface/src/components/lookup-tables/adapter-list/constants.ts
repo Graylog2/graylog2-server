@@ -48,6 +48,6 @@ export const adapterListElements = {
     defaultPageSize: 20,
     defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
     defaultDisplayedAttributes: ['title', 'description', 'name', 'throughput'],
+    defaultColumnOrder: ['title', 'description', 'name', 'throughput'],
   },
-  columnOrder: ['title', 'description', 'name', 'throughput'],
 };

@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nullable;
 import java.io.IOException;

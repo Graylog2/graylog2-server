@@ -17,6 +17,7 @@
 package org.graylog2.cluster;
 
 
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 
 import java.net.URI;
@@ -30,10 +31,10 @@ import java.util.Map;
 @Deprecated(since = "6.0")
 public interface NodeService {
 
-    boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String clusterUri, String hostname);
+    boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String clusterUri, String hostname, boolean isProcessing, Lifecycle lifecycle);
 
-    default boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String hostname) {
-        return registerServer(nodeId, isLeader, httpPublishUri, null, hostname);
+    default boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String hostname, boolean isProcessing, Lifecycle lifecycle) {
+        return registerServer(nodeId, isLeader, httpPublishUri, null, hostname, isProcessing, lifecycle);
     }
 
     Node byNodeId(String nodeId) throws NodeNotFoundException;

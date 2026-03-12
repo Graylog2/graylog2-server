@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, fireEvent, screen } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 
@@ -43,7 +44,7 @@ describe('RuntimeErrorPage', () => {
 
     const showMoreButton = getByText('Show more');
 
-    fireEvent.click(showMoreButton);
+    await userEvent.click(showMoreButton);
 
     await findByText(/The component stack/);
   });

@@ -14,69 +14,124 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { Button } from 'components/bootstrap';
-import { Icon } from 'components/common';
+import { Button, Table, ButtonToolbar } from 'components/bootstrap';
+import { ConfirmDialog, Icon, IfPermitted } from 'components/common';
 import { InputStaticFieldsStore } from 'stores/inputs/InputStaticFieldsStore';
+import { StaticFieldForm } from 'components/inputs';
+import SectionGrid from 'components/common/Section/SectionGrid';
+import { KEY_PREFIX } from 'hooks/usePaginatedInputs';
+
+const StyledWrapper = styled.div`
+  margin-top: ${(props) => props.theme.spacings.md};
+`;
+
+const StyledTable = styled(Table)`
+  margin-top: ${(props) => props.theme.spacings.md};
+`;
+
+const StyledTd = styled.td`
+  width: ${(props) => props.theme.spacings.md};
+`;
+
+const StyledSpan = styled.span`
+  display: flex;
+  justify-content: flex-end;
+`;
 
 type InputStaticFieldsProps = {
   input: any;
 };
 
-class InputStaticFields extends React.Component<
-  InputStaticFieldsProps,
-  {
-    [key: string]: any;
-  }
-> {
-  _deleteStaticField = (fieldName) => () => {
-    if (
-      window.confirm(`Are you sure you want to remove static field '${fieldName}' from '${this.props.input.title}'?`)
-    ) {
-      InputStaticFieldsStore.destroy(this.props.input, fieldName);
-    }
+const InputStaticFields = ({ input }: InputStaticFieldsProps) => {
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [showStaticFieldForm, setShowStaticFieldForm] = useState(false);
+  const [fieldToDelete, setFieldToDelete] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+
+  const handleDeleteStaticField = () => {
+    InputStaticFieldsStore.destroy(input, fieldToDelete).finally(() => {
+      setFieldToDelete(null);
+      setShowConfirmDelete(false);
+      queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
+    });
+  };
+  const onDeleteStaticField = (fieldName: string) => {
+    setFieldToDelete(fieldName);
+    setShowConfirmDelete(true);
   };
 
-  _deleteButton = (fieldName) => (
+  const deleteButton = (fieldName: string) => (
     <Button
-      bsStyle="link"
+      bsStyle="transparent"
       bsSize="xsmall"
       style={{ verticalAlign: 'baseline' }}
-      onClick={this._deleteStaticField(fieldName)}>
-      <Icon name="remove" />
+      onClick={() => onDeleteStaticField(fieldName)}>
+      <Icon name="close" />
     </Button>
   );
 
-  _formatStaticFields = (staticFields) => {
+  const formatStaticFields = (staticFields) => {
     const formattedFields = [];
     const staticFieldNames = Object.keys(staticFields);
 
     staticFieldNames.forEach((fieldName) => {
       formattedFields.push(
-        <li key={`${fieldName}-field`}>
-          <strong>{fieldName}:</strong> {staticFields[fieldName]} {this._deleteButton(fieldName)}
-        </li>,
+        <tr key={`${fieldName}-field`}>
+          <td>{fieldName}</td>
+          <td>{staticFields[fieldName]}</td>
+          <StyledTd>
+            <ButtonToolbar>{deleteButton(fieldName)}</ButtonToolbar>
+          </StyledTd>
+        </tr>,
       );
     });
 
     return formattedFields;
   };
 
-  render() {
-    const staticFieldNames = Object.keys(this.props.input.static_fields);
+  const staticFieldNames = Object.keys(input.static_fields);
 
-    if (staticFieldNames.length === 0) {
-      return <div />;
-    }
-
-    return (
-      <div className="static-fields">
-        <h3 style={{ marginBottom: 5 }}>Static fields</h3>
-        <ul>{this._formatStaticFields(this.props.input.static_fields)}</ul>
-      </div>
-    );
+  if (staticFieldNames.length === 0) {
+    return <div />;
   }
-}
+
+  return (
+    <StyledWrapper>
+      <SectionGrid>
+        <h4>Static fields</h4>
+        <StyledSpan>
+          <IfPermitted permissions={[`inputs:edit:${input.id}`, `input_types:create:${input.type}`]}>
+            <Button
+              bsStyle="primary"
+              bsSize="xs"
+              key={`add-static-field-${input.id}`}
+              onClick={() => {
+                setShowStaticFieldForm(true);
+              }}>
+              Add static field
+            </Button>
+          </IfPermitted>
+        </StyledSpan>
+      </SectionGrid>
+      <StyledTable condensed striped hover>
+        <tbody>{formatStaticFields(input.static_fields)}</tbody>
+      </StyledTable>
+      {showConfirmDelete && (
+        <ConfirmDialog
+          title="Delete static field"
+          show
+          onConfirm={() => handleDeleteStaticField()}
+          onCancel={() => setShowConfirmDelete(false)}>
+          {`Are you sure you want to remove static field '${fieldToDelete}' from '${input.title}'?`}
+        </ConfirmDialog>
+      )}
+      {showStaticFieldForm && <StaticFieldForm input={input} setShowModal={setShowStaticFieldForm} />}
+    </StyledWrapper>
+  );
+};
 
 export default InputStaticFields;

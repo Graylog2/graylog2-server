@@ -16,44 +16,36 @@
  */
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
-import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Avg;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.AvgAggregationBuilder;
-import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
-import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
+import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.AvgAggregate;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.stream.Stream;
+import java.util.Optional;
 
-public class OSAverageHandler extends OSPivotSeriesSpecHandler<Average, Avg> {
-    @Nonnull
-    @Override
-    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Average avgSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
-        final AvgAggregationBuilder avg = AggregationBuilders.avg(name).field(avgSpec.field());
-        record(queryContext, pivot, avgSpec, name, Avg.class);
-        return List.of(SeriesAggregationBuilder.metric(avg));
+public class OSAverageHandler extends OSBasicSeriesSpecHandler<Average> {
+
+    protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Average avgSpec) {
+        return SeriesAggregationBuilder.metric(new MutableNamedAggregationBuilder(name,
+                Aggregation.builder().avg(a -> a.field(avgSpec.field()))));
     }
 
     @Override
-    public Stream<OSPivotSeriesSpecHandler.Value> doHandleResult(Pivot pivot, Average pivotSpec,
-                                                                 SearchResponse searchResult,
-                                                                 Avg avgAggregation,
-                                                                 OSSearchTypeHandler<Pivot> searchTypeHandler,
-                                                                 OSGeneratedQueryContext OSGeneratedQueryContext) {
-        double value = avgAggregation.getValue();
-        if (pivotSpec.wholeNumber()) {
+    protected Object getValueFromAggregationResult(final Aggregate agg, final Average avgSpec) {
+        double value = Optional.ofNullable(agg)
+                .filter(Aggregate::isAvg)
+                .map(Aggregate::avg)
+                .map(AvgAggregate::value)
+                .orElse(0.0);
+        if (avgSpec.wholeNumber()) {
             if (Double.isNaN(value) || Double.isInfinite(value)) {
                 value = 0;
             } else {
                 value = Math.round(value);
             }
         }
-        return Stream.of(OSPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Average.NAME, value));
+        return value;
     }
 }

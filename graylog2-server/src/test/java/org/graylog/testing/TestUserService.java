@@ -45,6 +45,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -163,6 +164,11 @@ public class TestUserService extends PersistedServiceImpl implements UserService
 
     @Override
     public long count() {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public Map<String, Long> countByPrivilege() {
         throw new UnsupportedOperationException("Not implemented");
     }
 

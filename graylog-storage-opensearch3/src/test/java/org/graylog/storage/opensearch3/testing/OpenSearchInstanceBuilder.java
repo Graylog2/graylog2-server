@@ -21,6 +21,9 @@ import org.graylog.testing.storage.SearchServer;
 import org.graylog2.storage.SearchVersion;
 
 public class OpenSearchInstanceBuilder extends SearchServerBuilder<OpenSearchInstance> {
+
+    private OpensearchSecurity security = OpensearchSecurity.DISABLED;
+
     public OpenSearchInstanceBuilder(SearchVersion version) {
         super(version);
     }
@@ -29,8 +32,13 @@ public class OpenSearchInstanceBuilder extends SearchServerBuilder<OpenSearchIns
         return new OpenSearchInstanceBuilder(SearchServer.DEFAULT_VERSION);
     }
 
+    public OpenSearchInstanceBuilder withEnabledSecurity() {
+        this.security = OpensearchSecurity.ENABLED;
+        return this;
+    }
+
     @Override
     protected OpenSearchInstance instantiate() {
-        return new OpenSearchInstance(getCachedInstance(), getVersion(), getHostname(), getNetwork(), getHeapSize(), getFeatureFlags(), getEnv()).init();
+        return new OpenSearchInstance(getCachedInstance(), getVersion(), getHostname(), getNetwork(), getHeapSize(), getFeatureFlags(), getEnv(), security).init();
     }
 }

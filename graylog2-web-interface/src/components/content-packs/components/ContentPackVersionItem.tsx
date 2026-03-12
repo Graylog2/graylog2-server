@@ -18,9 +18,8 @@
 import * as React from 'react';
 import { useState, useRef } from 'react';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, ModalSubmit } from 'components/common';
 import Routes from 'routing/Routes';
-import { ModalSubmit } from 'components/common';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
 import ContentPackInstall from 'components/content-packs/ContentPackInstall';
 import {
@@ -86,7 +85,7 @@ const ContentPackVersionItem = ({
       <td>{pack.rev}</td>
       <td className="text-right">
         <ButtonToolbar className="pull-right">
-          {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+          {}
           <Button bsStyle="primary" bsSize="small" onClick={() => handleDownload()}>
             Download
           </Button>

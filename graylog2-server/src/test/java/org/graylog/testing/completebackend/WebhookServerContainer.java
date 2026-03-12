@@ -22,7 +22,6 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import io.restassured.RestAssured;
-import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
@@ -39,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class WebhookServerContainer extends ExternalResource implements AutoCloseable, WebhookServerInstance {
+public class WebhookServerContainer implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(WebhookServerContainer.class);
     public static final int REQUEST_ACCEPT_PORT = 8000;
@@ -69,12 +68,10 @@ public class WebhookServerContainer extends ExternalResource implements AutoClos
     }
 
 
-    @Override
     public URI getContainerizedCollectorURI() {
         return URI.create("http://" + CONTAINER_ALIAS + ":" + REQUEST_ACCEPT_PORT);
     }
 
-    @Override
     public URI getMappedCollectorURI() {
         return URI.create("http://" + container.getHost() + ":" + container.getMappedPort(REQUEST_ACCEPT_PORT));
     }
@@ -83,7 +80,6 @@ public class WebhookServerContainer extends ExternalResource implements AutoClos
         return URI.create("http://" + container.getHost() + ":" + container.getMappedPort(API_PORT));
     }
 
-    @Override
     public List<WebhookRequest> allRequests() {
         final WebhookRequest[] webhookRequests = RestAssured.given()
                 .get(getMappedApiURI())
@@ -93,7 +89,6 @@ public class WebhookServerContainer extends ExternalResource implements AutoClos
         return List.of(webhookRequests);
     }
 
-    @Override
     public List<WebhookRequest> waitForRequests(Predicate<WebhookRequest> predicate) throws ExecutionException, RetryException {
         final Retryer<List<WebhookRequest>> retryer = RetryerBuilder.<List<WebhookRequest>>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(500, TimeUnit.MILLISECONDS))

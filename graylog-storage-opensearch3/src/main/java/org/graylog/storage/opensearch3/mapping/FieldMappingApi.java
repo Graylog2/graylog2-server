@@ -16,57 +16,52 @@
  */
 package org.graylog.storage.opensearch3.mapping;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.Streams;
 import jakarta.inject.Inject;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
-import org.graylog.storage.opensearch3.OpenSearchClient;
+import org.graylog.storage.opensearch3.OfficialOpensearchClient;
+import org.opensearch.client.opensearch._types.mapping.Property;
+import org.opensearch.client.opensearch._types.mapping.TextProperty;
+import org.opensearch.client.opensearch.indices.GetMappingResponse;
 
-import javax.annotation.Nullable;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class FieldMappingApi {
-    private final OpenSearchClient client;
+    private final OfficialOpensearchClient client;
 
     @Inject
-    public FieldMappingApi(OpenSearchClient client) {
+    public FieldMappingApi(OfficialOpensearchClient client) {
         this.client = client;
     }
 
-    @AutoValue
-    public static abstract class FieldMapping {
-        public abstract String type();
+    public Map<String, FieldMapping> fieldTypes(final String index) {
+        final GetMappingResponse response = client.sync(c -> c.indices().getMapping(fn -> fn.index(index)), "Unable to retrieve field types of index " + index);
+        final Map<String, Property> properties = response.get(index).mappings().properties();
+        return properties.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> toFieldMapping(e.getValue(), properties)));
+    }
 
-        public abstract Optional<Boolean> fielddata();
-
-        static FieldMapping create(String type, @Nullable Boolean fielddata) {
-            return new AutoValue_FieldMappingApi_FieldMapping(type, Optional.ofNullable(fielddata));
+    private FieldMapping toFieldMapping(Property mapping, Map<String, Property> properties) {
+        final Property.Kind kind = mapping._kind();
+        if (kind == Property.Kind.Alias) {
+            return resolveAlias(mapping, properties);
+        } else {
+            return new FieldMapping(kind.name().toLowerCase(Locale.ROOT), hasFieldData(mapping));
         }
     }
 
-    public Map<String, FieldMapping> fieldTypes(final String index) {
-        final JsonNode result = client.executeRequest(request(index), "Unable to retrieve field types of index " + index);
-        final JsonNode fields = result.path(index).path("mappings").path("properties");
-        //noinspection UnstableApiUsage
-        return Streams.stream(fields.fields())
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
-                    final JsonNode entryValue = entry.getValue();
-                    String type = entryValue.path("type").asText();
-                    if ("alias".equals(type)) {
-                        String aliasPath = entryValue.path("path").asText();
-                        type = fields.path(aliasPath).path("type").asText();
-                    }
-                    return FieldMapping.create(
-                            type,
-                            entryValue.path("fielddata").asBoolean()
-                    );
-                }));
+    private FieldMapping resolveAlias(Property mapping, Map<String, Property> properties) {
+        final String path = mapping.alias().path();
+        return toFieldMapping(properties.get(path), properties);
     }
 
-    private Request request(String index) {
-        return new Request("GET", "/" + index + "/_mapping");
+    private boolean hasFieldData(Property value) {
+        if (value._get() instanceof TextProperty textProperty) {
+            return Optional.ofNullable(textProperty.fielddata()).orElse(false);
+        }
+        return false;
+    }
+
+    public record FieldMapping(String type, boolean fieldData) {
     }
 }

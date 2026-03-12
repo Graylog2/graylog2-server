@@ -31,12 +31,13 @@ import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.iam.IamClientBuilder;
@@ -67,13 +68,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class KinesisServiceTest {
 
     private static final String TEST_STREAM_1 = "test-stream-1";
@@ -82,9 +85,6 @@ public class KinesisServiceTest {
     private static final String TEST_REGION = Region.EU_WEST_1.id();
     private static final int SHARD_COUNT = 1;
     private static final String STREAM_ARN = "test-stream-arn";
-
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private KinesisClient kinesisClient;
@@ -95,7 +95,7 @@ public class KinesisServiceTest {
 
     private KinesisService kinesisService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         kinesisService = new KinesisService(
                 mock(IamClientBuilder.class),

@@ -17,9 +17,9 @@
 package org.graylog.storage.opensearch3;
 
 import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
+import org.graylog.testing.elasticsearch.SearchInstance;
 import org.graylog.testing.storage.SearchServer;
 import org.graylog2.storage.SearchVersion;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class NodeAdapterOSIT {
 
-    @Rule
+    @SearchInstance
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
     private NodeAdapterOS adapter;

@@ -16,5 +16,4 @@
  */
 import QuickJumpModalContainer from './QuickJumpModalContainer';
 
-// eslint-disable-next-line import/prefer-default-export
 export { QuickJumpModalContainer };

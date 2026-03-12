@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
@@ -62,6 +63,8 @@ describe('IndexSetFieldTypesList', () => {
       selectEntity: () => {},
       deselectEntity: () => {},
       toggleEntitySelect: () => {},
+      isSomeRowsSelected: true,
+      isAllRowsSelected: false,
     });
 
     asMock(useRemoveCustomFieldTypeMutation).mockReturnValue({
@@ -84,7 +87,7 @@ describe('IndexSetFieldTypesList', () => {
       const submit = await screen.findByRole('button', {
         name: /remove field type overrides/i,
       });
-      fireEvent.click(submit);
+      await userEvent.click(submit);
 
       expect(mockedRemoveCustomFieldTypeMutation).toHaveBeenCalledWith({
         fields: ['field'],
@@ -100,8 +103,8 @@ describe('IndexSetFieldTypesList', () => {
       const submit = await screen.findByRole('button', {
         name: /remove field type overrides/i,
       });
-      fireEvent.click(checkbox);
-      fireEvent.click(submit);
+      await userEvent.click(checkbox);
+      await userEvent.click(submit);
 
       expect(mockedRemoveCustomFieldTypeMutation).toHaveBeenCalledWith({
         fields: ['field'],

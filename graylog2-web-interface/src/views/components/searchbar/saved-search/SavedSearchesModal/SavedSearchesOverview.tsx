@@ -17,19 +17,17 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 
-import { PaginatedList, SearchForm, Spinner, NoEntitiesExist, NoSearchResult } from 'components/common';
+import { PaginatedEntityTable } from 'components/common';
 import type View from 'views/logic/views/View';
 import QueryHelper from 'components/common/QueryHelper';
-import EntityDataTable from 'components/common/EntityDataTable';
-import useSavedSearches from 'views/hooks/useSavedSearches';
+import { fetchSavedSearches, queryKey } from 'views/hooks/useSavedSearches';
 import useColumnRenderers from 'views/components/searchbar/saved-search/useColumnRenderes';
-import useSavedSearchPaginationAndTableLayout from 'views/components/searchbar/saved-search/useSavedSearchPaginationAndTableLayout';
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
+import { DEFAULT_LAYOUT } from 'views/components/searchbar/saved-search/Constants';
 
 import SearchActions from './SearchActions';
 
 import BulkActions from '../BulkActions';
-import { DEFAULT_LAYOUT } from '../Constants';
 
 type Props = {
   activeSavedSearchId: string;
@@ -38,25 +36,6 @@ type Props = {
 };
 
 const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadSavedSearch }: Props) => {
-  const {
-    isLoadingLayoutPreferences,
-    onPageChange,
-    layoutConfig,
-    activePage,
-    onSearch,
-    onResetSearch,
-    searchParams,
-    onColumnsChange,
-    onSortChange,
-    onPageSizeChange,
-  } = useSavedSearchPaginationAndTableLayout();
-
-  const {
-    data: paginatedSavedSearches,
-    isInitialLoading: isLoadingSavedSearches,
-    refetch,
-  } = useSavedSearches(searchParams, { enabled: !isLoadingLayoutPreferences });
-
   const { pluggableAttributes, pluggableExpandedSections } = usePluggableEntityTableElements<View>(null, 'search');
 
   const renderSavedSearchActions = useCallback(
@@ -64,67 +43,30 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
       <SearchActions
         search={search}
         onDeleteSavedSearch={deleteSavedSearch}
-        refetch={refetch}
         activeSavedSearchId={activeSavedSearchId}
       />
     ),
-    [activeSavedSearchId, deleteSavedSearch, refetch],
+    [activeSavedSearchId, deleteSavedSearch],
   );
 
-  const customColumnRenderers = useColumnRenderers(onLoadSavedSearch, searchParams);
-
-  if (isLoadingSavedSearches || isLoadingLayoutPreferences) {
-    return <Spinner />;
-  }
-
-  const { list: savedSearches, pagination, attributes } = paginatedSavedSearches;
-  const columnDefinitions = [...attributes, ...pluggableAttributes.attributes];
-  const visibleColumns = [...layoutConfig.displayedAttributes, ...pluggableAttributes.attributeNames];
-  const columnsOrder = [...DEFAULT_LAYOUT.columnsOrder, ...pluggableAttributes.attributeNames];
+  const customColumnRenderers = useColumnRenderers(onLoadSavedSearch);
 
   return (
-    <PaginatedList
-      onChange={onPageChange}
-      totalItems={pagination?.total}
-      pageSize={layoutConfig.pageSize}
-      activePage={activePage}
-      showPageSizeSelect={false}
-      useQueryParameter={false}>
-      <div style={{ marginBottom: '5px' }}>
-        <SearchForm
-          focusAfterMount
-          onSearch={onSearch}
-          queryHelpComponent={<QueryHelper entityName="search" commonFields={['id', 'title']} />}
-          topMargin={0}
-          onReset={onResetSearch}
-        />
-      </div>
-      {pagination?.total === 0 && !searchParams.query && (
-        <NoEntitiesExist>No saved searches have been created yet.</NoEntitiesExist>
-      )}
-      {pagination?.total === 0 && searchParams.query && (
-        <NoSearchResult>No saved searches have been found.</NoSearchResult>
-      )}
-      {!!savedSearches?.length && (
-        <EntityDataTable<View>
-          entities={savedSearches}
-          visibleColumns={visibleColumns}
-          columnsOrder={columnsOrder}
-          onColumnsChange={onColumnsChange}
-          bulkSelection={{ actions: <BulkActions /> }}
-          onSortChange={onSortChange}
-          activeSort={layoutConfig.sort}
-          entityAttributesAreCamelCase
-          pageSize={searchParams.pageSize}
-          onPageSizeChange={onPageSizeChange}
-          actionsCellWidth={120}
-          expandedSectionsRenderer={pluggableExpandedSections}
-          entityActions={renderSavedSearchActions}
-          columnRenderers={customColumnRenderers}
-          columnDefinitions={columnDefinitions}
-        />
-      )}
-    </PaginatedList>
+    <PaginatedEntityTable<View>
+      additionalAttributes={pluggableAttributes.attributes}
+      bulkSelection={{ actions: <BulkActions /> }}
+      columnRenderers={customColumnRenderers}
+      entityActions={renderSavedSearchActions}
+      entityAttributesAreCamelCase
+      expandedSectionRenderers={pluggableExpandedSections}
+      fetchEntities={fetchSavedSearches}
+      focusSearchAfterMount
+      humanName="Saved Searches"
+      keyFn={queryKey}
+      queryHelpComponent={<QueryHelper entityName="search" commonFields={['id', 'title']} />}
+      tableLayout={DEFAULT_LAYOUT}
+      withoutURLParams
+    />
   );
 };
 

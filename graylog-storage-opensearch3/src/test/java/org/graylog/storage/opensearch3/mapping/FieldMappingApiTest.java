@@ -16,36 +16,18 @@
  */
 package org.graylog.storage.opensearch3.mapping;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
-import org.graylog.storage.opensearch3.OpenSearchClient;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.jupiter.api.BeforeEach;
+import org.graylog.storage.opensearch3.OfficialOpensearchClient;
+import org.graylog.storage.opensearch3.testing.client.mock.ServerlessOpenSearchClient;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 class FieldMappingApiTest {
 
-    FieldMappingApi toTest;
-    OpenSearchClient client;
-    ObjectMapper objectMapper;
-
-    @BeforeEach
-    void setUp() {
-        client = mock(OpenSearchClient.class);
-        toTest = new FieldMappingApi(client);
-        objectMapper = new ObjectMapperProvider().get();
-    }
-
     @Test
-    void testReturnsEmptyMapOnNoMappings() throws Exception {
+    void testReturnsEmptyMapOnNoMappings() {
         String mappingResponse = """
                 {
                   "graylog_13": {
@@ -56,16 +38,19 @@ class FieldMappingApiTest {
                   }
                 }
                 """;
-        doReturn(objectMapper.readTree(mappingResponse))
-                .when(client)
-                .executeRequest(eq(new Request("GET", "/graylog_13/_mapping")), anyString());
 
-        final Map<String, FieldMappingApi.FieldMapping> result = toTest.fieldTypes("graylog_13");
+        final OfficialOpensearchClient opensearchClient = ServerlessOpenSearchClient.builder()
+                .stubResponse("GET", "/graylog_13/_mapping", mappingResponse)
+                .build();
+
+        final FieldMappingApi api = new FieldMappingApi(opensearchClient);
+
+        final Map<String, FieldMappingApi.FieldMapping> result = api.fieldTypes("graylog_13");
         assertEquals(Map.of(), result);
     }
 
     @Test
-    void testParsesMappingsCorrectly() throws Exception {
+    void testParsesMappingsCorrectly() {
         String mappingResponse = """
                 {
                   "graylog_42": {
@@ -91,22 +76,20 @@ class FieldMappingApiTest {
                   }
                 }
                 """;
-        doReturn(objectMapper.readTree(mappingResponse))
-                .when(client)
-                .executeRequest(eq(new Request("GET", "/graylog_42/_mapping")), anyString());
 
-        final Map<String, FieldMappingApi.FieldMapping> expectedResult = Map.of(
-                "text", FieldMappingApi.FieldMapping.create("text", true),
-                "action", FieldMappingApi.FieldMapping.create("keyword", false),
-                "date", FieldMappingApi.FieldMapping.create("date", false),
-                "number", FieldMappingApi.FieldMapping.create("long", false)
-        );
-        final Map<String, FieldMappingApi.FieldMapping> result = toTest.fieldTypes("graylog_42");
+        final OfficialOpensearchClient opensearchClient = ServerlessOpenSearchClient.builder()
+                .stubResponse("GET", "/graylog_42/_mapping", mappingResponse)
+                .build();
+
+        final FieldMappingApi api = new FieldMappingApi(opensearchClient);
+
+        final Map<String, FieldMappingApi.FieldMapping> expectedResult = Map.of("text", new FieldMappingApi.FieldMapping("text", true), "action", new FieldMappingApi.FieldMapping("keyword", false), "date", new FieldMappingApi.FieldMapping("date", false), "number", new FieldMappingApi.FieldMapping("long", false));
+        final Map<String, FieldMappingApi.FieldMapping> result = api.fieldTypes("graylog_42");
         assertEquals(expectedResult, result);
     }
 
     @Test
-    void testAliasTypeIsProperlyResolved() throws Exception {
+    void testAliasTypeIsProperlyResolved() {
         String mappingResponse = """
                 {
                   "graylog_42": {
@@ -124,15 +107,14 @@ class FieldMappingApiTest {
                   }
                 }
                 """;
-        doReturn(objectMapper.readTree(mappingResponse))
-                .when(client)
-                .executeRequest(eq(new Request("GET", "/graylog_42/_mapping")), anyString());
+        final OfficialOpensearchClient opensearchClient = ServerlessOpenSearchClient.builder()
+                .stubResponse("GET", "/graylog_42/_mapping", mappingResponse)
+                .build();
 
-        final Map<String, FieldMappingApi.FieldMapping> expectedResult = Map.of(
-                "action_alias", FieldMappingApi.FieldMapping.create("keyword", false),
-                "action", FieldMappingApi.FieldMapping.create("keyword", false)
-        );
-        final Map<String, FieldMappingApi.FieldMapping> result = toTest.fieldTypes("graylog_42");
+        final FieldMappingApi api = new FieldMappingApi(opensearchClient);
+
+        final Map<String, FieldMappingApi.FieldMapping> expectedResult = Map.of("action_alias", new FieldMappingApi.FieldMapping("keyword", false), "action", new FieldMappingApi.FieldMapping("keyword", false));
+        final Map<String, FieldMappingApi.FieldMapping> result = api.fieldTypes("graylog_42");
         assertEquals(expectedResult, result);
     }
 

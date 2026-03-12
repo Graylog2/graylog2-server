@@ -15,16 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import OriginalButtonGroup from './ButtonGroup';
 
-const StyledButtonToolbar = styled(OriginalButtonGroup)`
-  gap: 0.25em;
-`;
+const StyledButtonToolbar = styled(OriginalButtonGroup)(
+  ({ theme }) => css`
+    gap: ${theme.spacings.xs};
+  `,
+);
 
-const ButtonToolbar = ({ ...props }: React.ComponentProps<typeof StyledButtonToolbar>) => (
-  <StyledButtonToolbar {...props} />
+const ButtonToolbar = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<typeof StyledButtonToolbar>>(
+  ({ ...props }, ref) => <StyledButtonToolbar ref={ref} {...props} />,
 );
 
 /** @component */

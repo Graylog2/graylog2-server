@@ -29,11 +29,13 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.core.rest.RestStatus;
 import org.graylog2.indexer.BatchSizeTooLargeException;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,7 +44,8 @@ import java.io.OutputStream;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class OpenSearchExceptionTest {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     Response response;
@@ -145,8 +148,9 @@ public class OpenSearchExceptionTest {
                 "status msg", restStatus, responseException);
         final OpenSearchClient openSearchClient = new OpenSearchClient(restHighLevelClient, new ObjectMapper());
 
-        Exception exception = assertThrows(BatchSizeTooLargeException.class, () -> {
-            openSearchClient.execute((a, b) -> {throw statusException;});
-        });
+        Exception exception = assertThrows(BatchSizeTooLargeException.class, () ->
+                openSearchClient.execute((a, b) -> {
+                    throw statusException;
+                }));
     }
 }

@@ -85,7 +85,7 @@ class EditConfigurationVariableModal extends React.Component<
   _getId = (prefixIdName) => {
     const { id } = this.state;
 
-    return `${prefixIdName} ${id}` || 'new';
+    return `${prefixIdName} ${id || 'new'}`;
   };
 
   _saved = () => {
@@ -93,13 +93,13 @@ class EditConfigurationVariableModal extends React.Component<
   };
 
   _validateFormData = (nextFormData) => {
-    ConfigurationVariableActions.validate(nextFormData).then((validation) => {
+    ConfigurationVariableActions.validate(nextFormData).then((validation: any) => {
       this.setState({ validation_errors: validation.errors, error: validation.failed });
     });
   };
 
   // Needs to be after _validateFormData is defined
-  // eslint-disable-next-line react/sort-comp
+
   _debouncedValidateFormData = debounce(this._validateFormData, 200);
 
   _formDataUpdate = (key) => {

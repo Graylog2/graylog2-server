@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import jakarta.annotation.Nonnull;
 import org.graylog.testing.messages.MessagesExtension;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.ImmutableMessage;
 import org.graylog2.outputs.filter.AllOutputsFilter;

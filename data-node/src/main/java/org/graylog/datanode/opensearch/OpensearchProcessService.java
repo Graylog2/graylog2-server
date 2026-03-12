@@ -24,6 +24,10 @@ import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bootstrap.preflight.DatanodeDirectoriesLockfileCheck;
+import org.graylog.datanode.configuration.DatanodeCertificateRenewedEvent;
+import org.graylog.datanode.configuration.DatanodeCertificateRevokedEvent;
+import org.graylog.datanode.configuration.DatanodeKeystore;
+import org.graylog.datanode.configuration.DatanodeKeystoreException;
 import org.graylog.datanode.configuration.OpensearchConfigurationService;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
@@ -32,7 +36,6 @@ import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
-import org.graylog2.datanode.RemoteReindexAllowlistEvent;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +51,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private final DatanodeDirectoriesLockfileCheck lockfileCheck;
     private final PreflightConfigService preflightConfigService;
     private final Configuration configuration;
+    private final DatanodeKeystore datanodeKeystore;
 
     private final OpensearchStateMachine stateMachine;
     private final CsrRequester csrRequester;
@@ -62,25 +66,17 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
             final NodeId nodeId,
             final DatanodeDirectoriesLockfileCheck lockfileCheck,
             final PreflightConfigService preflightConfigService,
-            final OpensearchProcess process, CsrRequester csrRequester, OpensearchStateMachine stateMachine) {
+            final OpensearchProcess process, DatanodeKeystore datanodeKeystore, CsrRequester csrRequester, OpensearchStateMachine stateMachine) {
         this.configurationProvider = configurationProvider;
         this.configuration = configuration;
         this.nodeId = nodeId;
         this.lockfileCheck = lockfileCheck;
         this.preflightConfigService = preflightConfigService;
         this.process = process;
+        this.datanodeKeystore = datanodeKeystore;
         this.csrRequester = csrRequester;
         this.stateMachine = stateMachine;
         eventBus.register(this);
-    }
-
-    @Subscribe
-    @SuppressWarnings("unused")
-    public void handleRemoteReindexAllowlistEvent(RemoteReindexAllowlistEvent event) {
-        switch (event.action()) {
-            case ADD -> this.configurationProvider.setAllowlist(event.allowlist(), event.trustedCertificates());
-            case REMOVE -> this.configurationProvider.removeAllowlist();
-        }
     }
 
     @Subscribe
@@ -100,8 +96,26 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                     this.processAutostart = true;
                     csrRequester.triggerCertificateSigningRequest();
                 }
+                case REVOKE_CERTIFICATE -> {
+                    LOG.info("Removing datanode configuration and stopping process");
+                    try {
+                        datanodeKeystore.revokeSignedCertificate();
+                    } catch (DatanodeKeystoreException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
             }
         }
+    }
+
+    @Subscribe
+    public void handleCertificateChangeEvent(DatanodeCertificateRenewedEvent event) {
+        stateMachine.fire(OpensearchEvent.CERTIFICATES_RELOAD);
+    }
+
+    @Subscribe
+    public void handleCertificateChangeEvent(DatanodeCertificateRevokedEvent event) {
+        stateMachine.fire(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED);
     }
 
     private void checkWritePreflightFinishedOnInsecureStartup() {

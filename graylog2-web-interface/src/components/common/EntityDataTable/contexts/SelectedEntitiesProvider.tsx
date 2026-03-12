@@ -15,80 +15,55 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { SetStateAction } from 'react';
-import { useMemo, useState, useCallback } from 'react';
-import isFunction from 'lodash/isFunction';
+import { useMemo, useCallback } from 'react';
+import type { Table } from '@tanstack/react-table';
 
 import SelectEntitiesContext from './SelectEntitiesContext';
 
 import type { EntityBase } from '../types';
 
-const removeSelectedEntityId = <Entity extends EntityBase>(
-  selectedEntities: Array<Entity['id']>,
-  targetEntityId: Entity['id'],
-) => selectedEntities.filter((entityId) => entityId !== targetEntityId);
-
 type Props<Entity extends EntityBase> = React.PropsWithChildren<{
-  initialSelection?: Array<string>;
-  onChangeSelection: (selectedEntities: Array<Entity['id']>, data: Readonly<Array<Entity>>) => void;
-  entities: Readonly<Array<Entity>>;
+  isAllRowsSelected: boolean;
+  isSomeRowsSelected: boolean;
+  selectedEntities: Array<Entity['id']>;
+  table: Table<Entity>;
 }>;
 
 const SelectedEntitiesProvider = <Entity extends EntityBase>({
   children = undefined,
-  initialSelection = [],
-  onChangeSelection,
-  entities,
+  isAllRowsSelected,
+  isSomeRowsSelected,
+  selectedEntities,
+  table,
 }: Props<Entity>) => {
-  const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection);
-
-  const _setSelectedEntities = useCallback(
-    (setSelectedEntitiesArgument: SetStateAction<Array<Entity['id']>>) => {
-      const newState = isFunction(setSelectedEntitiesArgument)
-        ? setSelectedEntitiesArgument(selectedEntities)
-        : setSelectedEntitiesArgument;
-
-      setSelectedEntities(newState);
-
-      if (onChangeSelection) {
-        onChangeSelection(newState, entities);
-      }
-    },
-    [entities, onChangeSelection, selectedEntities],
-  );
-
   const deselectEntity = useCallback(
-    (targetEntityId: EntityBase['id']) => _setSelectedEntities((cur) => removeSelectedEntityId(cur, targetEntityId)),
-    [_setSelectedEntities],
+    (targetEntityId: EntityBase['id']) => table.setRowSelection((cur) => ({ ...cur, [targetEntityId]: false })),
+    [table],
   );
 
   const selectEntity = useCallback(
-    (targetEntityId: EntityBase['id']) => _setSelectedEntities((cur) => [...cur, targetEntityId]),
-    [_setSelectedEntities],
+    (targetEntityId: EntityBase['id']) => table.setRowSelection((cur) => ({ ...cur, [targetEntityId]: true })),
+    [table],
   );
 
   const toggleEntitySelect = useCallback(
-    (targetEntityId: EntityBase['id']) => {
-      _setSelectedEntities((cur) => {
-        if (cur.includes(targetEntityId)) {
-          return removeSelectedEntityId(cur, targetEntityId);
-        }
-
-        return [...cur, targetEntityId];
-      });
-    },
-    [_setSelectedEntities],
+    (targetEntityId: EntityBase['id']) =>
+      table.setRowSelection((cur) => ({ ...cur, [targetEntityId]: !cur[targetEntityId] })),
+    [table],
   );
 
   const contextValue = useMemo(
     () => ({
-      setSelectedEntities: _setSelectedEntities,
+      setSelectedEntities: (rows: Array<string>) =>
+        table.setRowSelection(Object.fromEntries(rows.map((id) => [id, true]))),
       selectedEntities,
       deselectEntity,
       selectEntity,
       toggleEntitySelect,
+      isAllRowsSelected,
+      isSomeRowsSelected,
     }),
-    [_setSelectedEntities, selectedEntities, deselectEntity, selectEntity, toggleEntitySelect],
+    [selectedEntities, deselectEntity, selectEntity, toggleEntitySelect, table, isAllRowsSelected, isSomeRowsSelected],
   );
 
   return <SelectEntitiesContext.Provider value={contextValue}>{children}</SelectEntitiesContext.Provider>;

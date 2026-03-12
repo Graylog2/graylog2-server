@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Allow users to edit index field types without needing access to Failure Processing."
+
+pulls = ["24890"]
+issues = ["Graylog2/graylog-plugin-enterprise#12765"]

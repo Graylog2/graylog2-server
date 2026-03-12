@@ -19,8 +19,8 @@ package org.graylog2.filters;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import org.graylog2.database.NotFoundException;
-import org.graylog2.inputs.Input;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.filters.MessageFilter;
@@ -30,9 +30,6 @@ import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import java.util.Collections;
 import java.util.List;
@@ -121,12 +118,7 @@ public class StaticFieldFilter implements MessageFilter {
 
     private void loadStaticFields(final String inputId) {
         LOG.debug("Re-loading static fields for input <{}> into cache.", inputId);
-        try {
-            final Input input = inputService.find(inputId);
-            staticFields.put(inputId, ImmutableList.copyOf(inputService.getStaticFields(input)));
-        } catch (NotFoundException e) {
-            LOG.warn("Unable to load input: {}", e.getMessage());
-        }
+        staticFields.put(inputId, ImmutableList.copyOf(inputService.getStaticFields(inputId)));
     }
 
     @Override

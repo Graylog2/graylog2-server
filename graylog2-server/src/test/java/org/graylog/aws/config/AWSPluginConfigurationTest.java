@@ -17,7 +17,7 @@
 package org.graylog.aws.config;
 
 import com.amazonaws.regions.Regions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.aws.config.AWSPluginConfiguration.createDefault;

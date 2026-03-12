@@ -23,7 +23,5 @@ import java.nio.file.Path;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-public record OpensearchConfigurationParams(List<X509Certificate> trustedCertificates,
-                                            java.util.Map<String, String> transientConfiguration,
-                                            Path targetConfigDir) implements ConfigurationBuildParams {
+public record OpensearchConfigurationParams(Path targetConfigDir) implements ConfigurationBuildParams {
 }

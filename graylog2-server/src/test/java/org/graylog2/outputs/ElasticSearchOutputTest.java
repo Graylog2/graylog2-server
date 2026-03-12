@@ -19,7 +19,7 @@ package org.graylog2.outputs;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableList;
 import org.graylog.testing.messages.MessagesExtension;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.messages.IndexingResults;
 import org.graylog2.indexer.messages.MessageWithIndex;
 import org.graylog2.indexer.messages.Messages;
@@ -102,13 +102,13 @@ public class ElasticSearchOutputTest {
         }
 
         verify(messages, times(1)).bulkIndex(eq(List.of(
-                new MessageWithIndex(wrap(messageList.get(0)), defaultIndexSet)
+                new MessageWithIndex(wrap(messageList.get(0)), null)
         )));
         verify(messages, times(1)).bulkIndex(eq(List.of(
-                new MessageWithIndex(wrap(messageList.get(1)), defaultIndexSet)
+                new MessageWithIndex(wrap(messageList.get(1)), null)
         )));
         verify(messages, times(1)).bulkIndex(eq(List.of(
-                new MessageWithIndex(wrap(messageList.get(2)), defaultIndexSet)
+                new MessageWithIndex(wrap(messageList.get(2)), null)
         )));
 
         verifyNoMoreInteractions(messages);
@@ -121,9 +121,9 @@ public class ElasticSearchOutputTest {
         output.write(messageList);
 
         verify(messages, times(1)).bulkIndex(eq(List.of(
-                new MessageWithIndex(wrap(messageList.get(0)), defaultIndexSet),
-                new MessageWithIndex(wrap(messageList.get(1)), defaultIndexSet),
-                new MessageWithIndex(wrap(messageList.get(2)), defaultIndexSet)
+                new MessageWithIndex(wrap(messageList.get(0)), null),
+                new MessageWithIndex(wrap(messageList.get(1)), null),
+                new MessageWithIndex(wrap(messageList.get(2)), null)
         )));
 
         verifyNoMoreInteractions(messages);
@@ -143,14 +143,14 @@ public class ElasticSearchOutputTest {
         verify(messages, times(1)).bulkIndex(argThat(argument -> {
             assertThat(argument).size().isEqualTo(7);
             assertThat(argument).containsExactlyInAnyOrderElementsOf(List.of(
-                    new MessageWithIndex(wrap(messageList.get(0)), defaultIndexSet),
-                    new MessageWithIndex(wrap(messageList.get(0)), testIndexSet),
-                    new MessageWithIndex(wrap(messageList.get(1)), defaultIndexSet),
-                    new MessageWithIndex(wrap(messageList.get(1)), testIndexSet),
-                    new MessageWithIndex(wrap(messageList.get(2)), defaultIndexSet),
-                    new MessageWithIndex(wrap(messageList.get(2)), testIndexSet),
+                    new MessageWithIndex(wrap(messageList.get(0)), null),
+                    new MessageWithIndex(wrap(messageList.get(0)), null),
+                    new MessageWithIndex(wrap(messageList.get(1)), null),
+                    new MessageWithIndex(wrap(messageList.get(1)), null),
+                    new MessageWithIndex(wrap(messageList.get(2)), null),
+                    new MessageWithIndex(wrap(messageList.get(2)), null),
                     // Only one message for the 4th message because it only contains the test stream.
-                    new MessageWithIndex(wrap(messageList.get(3)), testIndexSet)
+                    new MessageWithIndex(wrap(messageList.get(3)), null)
             ));
             return true;
         }));
@@ -169,7 +169,7 @@ public class ElasticSearchOutputTest {
         ));
 
         verify(messages, times(1)).bulkIndex(eq(List.of(
-                new MessageWithIndex(wrap(messageList.get(1)), defaultIndexSet)
+                new MessageWithIndex(wrap(messageList.get(1)), null)
         )));
 
         verifyNoMoreInteractions(messages);
@@ -190,8 +190,8 @@ public class ElasticSearchOutputTest {
         verify(messages, times(1)).bulkIndex(argThat(argument -> {
             assertThat(argument).size().isEqualTo(2);
             assertThat(argument).containsExactlyInAnyOrderElementsOf(List.of(
-                    new MessageWithIndex(wrap(messageList.get(1)), defaultIndexSet),
-                    new MessageWithIndex(wrap(messageList.get(1)), testIndexSet)
+                    new MessageWithIndex(wrap(messageList.get(1)), null),
+                    new MessageWithIndex(wrap(messageList.get(1)), null)
             ));
             return true;
         }));

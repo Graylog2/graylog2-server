@@ -16,7 +16,7 @@
  */
 package org.graylog2.indexer.indexset.profile;
 
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
@@ -33,34 +33,31 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.streams.StreamService;
 import org.joda.time.Duration;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
+@ExtendWith(MongoDBExtension.class)
 public class IndexFieldTypeProfileUsagesServiceTest {
 
     private static final String PROFILE1_ID = "aa0000000000000000000001";
     private static final String PROFILE2_ID = "aa0000000000000000000002";
     private static final String UNUSED_PROFILE_ID = "dada00000000000000000000";
     private static final String WRONG_PROFILE_ID = "that's not proper ObjetID!";
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private IndexFieldTypeProfileUsagesService toTest;
 
-    @Before
-    public void setUp() {
-        final MongoConnection mongoConnection = mongodb.mongoConnection();
-        final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
-        MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongodb.mongoConnection());
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) {
+        final MongoConnection mongoConnection = mongoCollections.mongoConnection();
         final EntityScopeService entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope()));
 
         final MongoIndexSetService mongoIndexSetService = new MongoIndexSetService(mongoCollections,

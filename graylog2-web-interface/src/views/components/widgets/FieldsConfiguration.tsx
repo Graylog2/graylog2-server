@@ -44,7 +44,6 @@ type Props = {
   isFieldQualified?: (field: FieldTypeMapping) => boolean;
   selectSize?: 'normal' | 'small';
   selectedFields: Array<string>;
-  testPrefix?: string;
   showSelectAllRest?: boolean;
   showDeSelectAll?: boolean;
   showListCollapseButton?: boolean;
@@ -59,7 +58,6 @@ const FieldsConfiguration = ({
   isFieldQualified = undefined,
   selectSize = undefined,
   selectedFields,
-  testPrefix = '',
   showSelectAllRest = false,
   showDeSelectAll = false,
   showListCollapseButton = false,
@@ -105,7 +103,6 @@ const FieldsConfiguration = ({
       )}
       {showSelectedList && (
         <SelectedFieldsList
-          testPrefix={testPrefix}
           selectedFields={selectedFields}
           selectSize={selectSize}
           displayOverlayInPortal={displaySortableListOverlayInPortal}

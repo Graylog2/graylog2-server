@@ -19,23 +19,23 @@ package org.graylog.storage.opensearch3.testing;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
-import org.graylog.storage.opensearch3.ComposableIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.CountsAdapterOS;
-import org.graylog.storage.opensearch3.IndexFieldTypePollerAdapterOS2;
-import org.graylog.storage.opensearch3.IndexToolsAdapterOS2;
+import org.graylog.storage.opensearch3.IndexFieldTypePollerAdapterOS;
+import org.graylog.storage.opensearch3.IndexToolsAdapterOS;
 import org.graylog.storage.opensearch3.IndicesAdapterOS;
-import org.graylog.storage.opensearch3.LegacyIndexTemplateAdapter;
-import org.graylog.storage.opensearch3.MessagesAdapterOS2;
+import org.graylog.storage.opensearch3.MessagesAdapterOS;
 import org.graylog.storage.opensearch3.NodeAdapterOS;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog.storage.opensearch3.OpenSearchClient;
 import org.graylog.storage.opensearch3.PlainJsonApi;
 import org.graylog.storage.opensearch3.Scroll;
-import org.graylog.storage.opensearch3.ScrollResultOS2;
+import org.graylog.storage.opensearch3.ScrollResultOS;
 import org.graylog.storage.opensearch3.SearchRequestFactory;
+import org.graylog.storage.opensearch3.SearchRequestFactoryOS;
 import org.graylog.storage.opensearch3.SearchesAdapterOS;
-import org.graylog.storage.opensearch3.SortOrderMapper;
-import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetrieverOS2;
+import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetrieverOS;
+import org.graylog.storage.opensearch3.indextemplates.ComposableIndexTemplateAdapter;
+import org.graylog.storage.opensearch3.indextemplates.LegacyIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.mapping.FieldMappingApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
 import org.graylog.testing.elasticsearch.Adapters;
@@ -44,6 +44,7 @@ import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.MessagesAdapter;
@@ -64,29 +65,32 @@ public class AdaptersOS implements Adapters {
     private final List<String> featureFlags;
     private final ObjectMapper objectMapper;
     private final ResultMessageFactory resultMessageFactory = new TestResultMessageFactory();
+    private final SearchRequestFactory searchRequestFactory;
 
     public AdaptersOS(@Deprecated OpenSearchClient client, OfficialOpensearchClient officialOpensearchClient, List<String> featureFlags) {
         this.client = client;
         this.officialOpensearchClient = officialOpensearchClient;
         this.featureFlags = featureFlags;
         this.objectMapper = new ObjectMapperProvider().get();
+        this.searchRequestFactory = new SearchRequestFactory(true, true, new IgnoreSearchFilters());
     }
+
 
     @Override
     public CountsAdapter countsAdapter() {
-        return new CountsAdapterOS(officialOpensearchClient);
+        return new CountsAdapterOS(officialOpensearchClient, new SearchRequestFactoryOS(true, new IgnoreSearchFilters()));
     }
 
     @Override
     public IndicesAdapter indicesAdapter() {
-        return new IndicesAdapterOS(client,
+        return new IndicesAdapterOS(officialOpensearchClient,
                 new org.graylog.storage.opensearch3.stats.StatsApi(officialOpensearchClient),
-                new org.graylog.storage.opensearch3.stats.ClusterStatsApi(objectMapper, new PlainJsonApi(objectMapper, client)),
-                new org.graylog.storage.opensearch3.cat.CatApi(objectMapper, client),
-                new org.graylog.storage.opensearch3.cluster.ClusterStateApi(objectMapper, client),
-                featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? new ComposableIndexTemplateAdapter(client, objectMapper) : new LegacyIndexTemplateAdapter(client),
+                new org.graylog.storage.opensearch3.stats.ClusterStatsApi(officialOpensearchClient),
+                new org.graylog.storage.opensearch3.cluster.ClusterStateApi(officialOpensearchClient),
+                indexTemplateAdapter(),
                 new IndexStatisticsBuilder(),
-                objectMapper
+                objectMapper,
+                new PlainJsonApi(objectMapper, client, officialOpensearchClient)
         );
     }
 
@@ -97,29 +101,25 @@ public class AdaptersOS implements Adapters {
 
     @Override
     public IndexToolsAdapter indexToolsAdapter() {
-        return new IndexToolsAdapterOS2(client);
+        return new IndexToolsAdapterOS(officialOpensearchClient);
     }
 
     @Override
     public SearchesAdapter searchesAdapter() {
-        final ScrollResultOS2.Factory scrollResultFactory = (initialResult, query, scroll, fields, limit) -> new ScrollResultOS2(
-                resultMessageFactory, client, initialResult, query, scroll, fields, limit
+        final SearchRequestFactoryOS searchRequestFactoryOS = new SearchRequestFactoryOS(true, new IgnoreSearchFilters());
+        final ScrollResultOS.Factory scrollResultFactory = (initialResult, query, scroll, fields, limit) -> new ScrollResultOS(
+                resultMessageFactory, officialOpensearchClient, initialResult, query, scroll, fields, limit
         );
-        final SortOrderMapper sortOrderMapper = new SortOrderMapper();
-        final boolean allowHighlighting = true;
-        final boolean allowLeadingWildcardSearches = true;
-
-        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(sortOrderMapper, allowHighlighting, allowLeadingWildcardSearches, new IgnoreSearchFilters());
         return new SearchesAdapterOS(client,
-                new Scroll(client,
+                new Scroll(officialOpensearchClient,
                         scrollResultFactory,
-                        searchRequestFactory),
+                        searchRequestFactoryOS),
                 searchRequestFactory, resultMessageFactory);
     }
 
     @Override
     public MessagesAdapter messagesAdapter() {
-        return new MessagesAdapterOS2(resultMessageFactory, client, new MetricRegistry(), new ChunkedBulkIndexer(), objectMapper);
+        return new MessagesAdapterOS(resultMessageFactory, officialOpensearchClient, new MetricRegistry(), new ChunkedBulkIndexer(), objectMapper);
     }
 
     @Override
@@ -129,7 +129,15 @@ public class AdaptersOS implements Adapters {
 
     @Override
     public IndexFieldTypePollerAdapter indexFieldTypePollerAdapter(final Configuration configuration) {
-        return new IndexFieldTypePollerAdapterOS2(new FieldMappingApi(client), configuration, new StreamsForFieldRetrieverOS2(client));
+        return new IndexFieldTypePollerAdapterOS(new FieldMappingApi(officialOpensearchClient), configuration, new StreamsForFieldRetrieverOS(officialOpensearchClient));
     }
 
+    @Override
+    public IndexTemplateAdapter indexTemplateAdapter() {
+        if(featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE)) {
+            return new ComposableIndexTemplateAdapter(officialOpensearchClient);
+        } else {
+            return new LegacyIndexTemplateAdapter(officialOpensearchClient);
+        }
+    }
 }

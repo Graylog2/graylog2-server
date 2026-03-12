@@ -25,14 +25,14 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Iterator;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -41,7 +41,7 @@ public class OrderedMessageProcessorsTest {
     private OrderedMessageProcessors orderedMessageProcessors;
     private ClusterConfigService clusterConfigService;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         Set<MessageProcessor> processors = Sets.newHashSet();
         processors.add(new A());
@@ -59,9 +59,9 @@ public class OrderedMessageProcessorsTest {
     @Test
     public void testIterator() throws Exception {
         final Iterator<MessageProcessor> iterator = orderedMessageProcessors.iterator();
-        assertEquals("A is first", A.class, iterator.next().getClass());
-        assertEquals("B is last", B.class, iterator.next().getClass());
-        assertFalse("Iterator exhausted", iterator.hasNext());
+        assertEquals(A.class, iterator.next().getClass(), "A is first");
+        assertEquals(B.class, iterator.next().getClass(), "B is last");
+        assertFalse(iterator.hasNext(), "Iterator exhausted");
 
         when(clusterConfigService.get(MessageProcessorsConfig.class)).thenReturn(
                 MessageProcessorsConfig.create(Lists.newArrayList(B.class.getCanonicalName(),
@@ -70,9 +70,9 @@ public class OrderedMessageProcessorsTest {
         orderedMessageProcessors.handleOrderingUpdate(getClusterConfigChangedEvent());
 
         final Iterator<MessageProcessor> it2 = orderedMessageProcessors.iterator();
-        assertEquals("B is first", B.class, it2.next().getClass());
-        assertEquals("A is last", A.class, it2.next().getClass());
-        assertFalse("Iterator exhausted", it2.hasNext());
+        assertEquals(B.class, it2.next().getClass(), "B is first");
+        assertEquals(A.class, it2.next().getClass(), "A is last");
+        assertFalse(it2.hasNext(), "Iterator exhausted");
 
 
         when(clusterConfigService.get(MessageProcessorsConfig.class)).thenReturn(
@@ -83,8 +83,8 @@ public class OrderedMessageProcessorsTest {
         orderedMessageProcessors.handleOrderingUpdate(getClusterConfigChangedEvent());
 
         final Iterator<MessageProcessor> it3 = orderedMessageProcessors.iterator();
-        assertEquals("A is only element", A.class, it3.next().getClass());
-        assertFalse("Iterator exhausted", it3.hasNext());
+        assertEquals(A.class, it3.next().getClass(), "A is only element");
+        assertFalse(it3.hasNext(), "Iterator exhausted");
     }
 
     private static class A implements MessageProcessor {

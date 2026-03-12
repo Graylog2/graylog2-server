@@ -18,8 +18,8 @@ package org.graylog2.indexer.fieldtypes;
 
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
@@ -35,24 +35,9 @@ public abstract class StreamsForFieldRetrieverIT extends ElasticsearchBaseTest {
 
     protected abstract StreamsForFieldRetriever getRetriever();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         importFixture("org/graylog2/indexer/fieldtypes/streams/StreamsForFieldRetrieverIT.json");
-    }
-
-    @Test
-    public void retrievesProperStreamsForSingleField() {
-        Set<String> streams = getRetriever().getStreams("stream1_only", INDEX_NAME);
-        assertThat(streams).isNotNull().hasSize(1).contains(STREAM_1);
-
-        streams = getRetriever().getStreams("stream2_only", INDEX_NAME);
-        assertThat(streams).isNotNull().hasSize(1).contains(STREAM_2);
-
-        streams = getRetriever().getStreams("message", INDEX_NAME);
-        assertThat(streams).isNotNull().hasSize(2).contains(STREAM_1, STREAM_2);
-
-        streams = getRetriever().getStreams("additional_field", INDEX_NAME);
-        assertThat(streams).isNotNull().hasSize(2).contains(STREAM_1, STREAM_2);
     }
 
     @Test
@@ -65,7 +50,5 @@ public abstract class StreamsForFieldRetrieverIT extends ElasticsearchBaseTest {
                 .hasEntrySatisfying("stream2_only", set -> assertThat(set).containsOnly(STREAM_2))
                 .hasEntrySatisfying("message", set -> assertThat(set).containsOnly(STREAM_1, STREAM_2))
                 .hasEntrySatisfying("additional_field", set -> assertThat(set).containsOnly(STREAM_1, STREAM_2));
-
-
     }
 }

@@ -360,6 +360,21 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     }
 
     @Override
+    public Map<String, Long> countByPrivilege() {
+        ObjectId adminRoleId = new ObjectId(roleService.getAdminRoleObjectId());
+
+        final long adminCount = collection(UserImpl.class)
+                .count(new BasicDBObject(UserImpl.ROLES, adminRoleId)) + (configuration.isRootUserDisabled() ? 0 : 1);
+
+        final long totalUsers = collection(UserImpl.class).count();
+
+        return Map.of(
+                "admin_users", adminCount,
+                "non_admin_users", totalUsers - adminCount
+        );
+    }
+
+    @Override
     public List<User> loadAllForAuthServiceBackend(String authServiceBackendId) {
         final DBObject query = BasicDBObjectBuilder.start(UserImpl.AUTH_SERVICE_ID, authServiceBackendId).get();
         return buildUserList(query);

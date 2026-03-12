@@ -19,6 +19,7 @@ package org.graylog2.cluster.nodes;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import org.bson.types.ObjectId;
 import org.graylog2.database.DbEntity;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 
 import java.util.Map;
 
@@ -34,6 +35,22 @@ public class ServerNodeEntity extends AbstractNode<ServerNodeDto> {
         super(id, fields);
     }
 
+    public Lifecycle getLifecycle() {
+        if (!fields.containsKey(ServerNodeDto.FIELD_LIFECYCLE)) {
+            return null;
+        }
+        return Lifecycle.valueOf(fields.get(ServerNodeDto.FIELD_LIFECYCLE).toString());
+    }
+
+    public boolean isProcessing() {
+        final Object value = fields.get(ServerNodeDto.FIELD_IS_PROCESSING);
+        if(value != null) {
+            return Boolean.parseBoolean(value.toString());
+        } else {
+            return false;
+        }
+    }
+
     @Override
     public ServerNodeDto toDto() {
         return ServerNodeDto.Builder.builder()
@@ -43,6 +60,8 @@ public class ServerNodeEntity extends AbstractNode<ServerNodeDto> {
                 .setLastSeen(this.getLastSeen())
                 .setHostname(this.getHostname())
                 .setLeader(this.isLeader())
+                .setProcessing(this.isProcessing())
+                .setLifecycle(this.getLifecycle())
                 .build();
     }
 

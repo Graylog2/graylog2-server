@@ -17,7 +17,6 @@
 package org.graylog2.rest.resources;
 
 import org.graylog.plugins.views.search.engine.monitoring.data.histogram.rest.HistogramResponseWriter;
-import org.graylog.plugins.views.storage.migration.RemoteReindexResource;
 import org.graylog.security.rest.CAResource;
 import org.graylog.security.rest.CertificateRenewalResource;
 import org.graylog.security.rest.CertificatesResource;
@@ -50,9 +49,11 @@ import org.graylog2.rest.resources.search.AbsoluteSearchResource;
 import org.graylog2.rest.resources.search.DecoratorResource;
 import org.graylog2.rest.resources.search.KeywordSearchResource;
 import org.graylog2.rest.resources.search.RelativeSearchResource;
+import org.graylog2.rest.resources.streams.StreamPipelineRulesResource;
 import org.graylog2.rest.resources.streams.StreamResource;
 import org.graylog2.rest.resources.streams.destinations.filters.StreamDestinationFilterBuilderResource;
 import org.graylog2.rest.resources.streams.destinations.filters.StreamDestinationFiltersResource;
+import org.graylog2.rest.resources.streams.favoritefields.FavoriteFieldsResource;
 import org.graylog2.rest.resources.streams.outputs.StreamOutputResource;
 import org.graylog2.rest.resources.streams.rules.StreamRuleInputsResource;
 import org.graylog2.rest.resources.streams.rules.StreamRuleResource;
@@ -170,7 +171,6 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(DataNodeRestApiProxyResource.class);
         addSystemRestResource(DataNodeManagementResource.class);
         addSystemRestResource(DatanodeUpgradeResource.class);
-        addSystemRestResource(RemoteReindexResource.class);
         addSystemRestResource(CAResource.class);
         addSystemRestResource(ClientCertResource.class);
         addSystemRestResource(CertificatesResource.class);
@@ -271,6 +271,8 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(StreamRuleInputsResource.class);
         addSystemRestResource(StreamDestinationFiltersResource.class);
         addSystemRestResource(StreamDestinationFilterBuilderResource.class);
+        addSystemRestResource(FavoriteFieldsResource.class);
+        addSystemRestResource(StreamPipelineRulesResource.class);
     }
 
     private void addMonitoringResources() {

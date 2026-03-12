@@ -18,7 +18,7 @@ package org.graylog.plugins.beats;
 
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.transports.NettyTransport;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

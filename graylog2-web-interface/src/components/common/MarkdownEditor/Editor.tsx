@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { IconButton } from 'components/common';
@@ -71,18 +72,18 @@ type Props = {
 };
 
 function Editor({ id = undefined, value, height, readOnly = false, onChange, onFullMode = () => {} }: Props) {
-  const [localValue, setLocalValue] = React.useState<string>(value);
-  const [showPreview, setShowPreview] = React.useState<boolean>(false);
-  const [fullView, setFullView] = React.useState<boolean>(false);
+  const [localValue, setLocalValue] = useState<string>(value);
+  const [showPreview, setShowPreview] = useState<boolean>(false);
+  const [fullView, setFullView] = useState<boolean>(false);
 
-  React.useEffect(() => setLocalValue(value), [value]);
+  useEffect(() => setLocalValue(value), [value]);
 
   const handleOnFullMode = (fullMode: boolean) => {
     setFullView(fullMode);
     if (onFullMode) onFullMode(fullMode);
   };
 
-  const handleOnChange = React.useCallback(
+  const handleOnChange = useCallback(
     (newValue: string) => {
       setLocalValue(newValue);
       onChange(newValue);

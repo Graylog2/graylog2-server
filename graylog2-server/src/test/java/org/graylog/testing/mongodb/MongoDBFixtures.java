@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation can be used with the {@link MongoDBInstance} role to load the given MongoDB data fixtures into the
+ * This annotation can be used with the {@link MongoDBExtension} extension to load the given MongoDB data fixtures into the
  * database by using {@link MongoDBFixtureImporter}.
  */
 @Retention(RetentionPolicy.RUNTIME)

@@ -18,8 +18,8 @@ package org.graylog2.rest.resources.system.logs;
 
 import org.apache.logging.log4j.Level;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
@@ -32,7 +32,7 @@ public class LoggersResourceTest {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         resource = new LoggersResource();
     }

@@ -80,7 +80,7 @@ public class AggregationSpecToPivotMapper implements BiFunction<AggregationReque
     }
 
     private Grouping addAutoInterval(Grouping grouping) {
-        return new Grouping(grouping.requestedField().name(), Optional.empty(), Optional.empty(), Optional.of(DEFAULT_SCALINGFACTOR));
+        return new Grouping(grouping.requestedField().name(), Optional.empty(), Optional.empty(), Optional.of(DEFAULT_SCALINGFACTOR), Optional.empty());
     }
 
     private boolean isDateType(final String fieldName, final Map<String, FieldTypes.Type> fields) {
@@ -88,7 +88,7 @@ public class AggregationSpecToPivotMapper implements BiFunction<AggregationReque
     }
 
     private boolean noBucketingParameterSetOn(Grouping grouping) {
-        return grouping.timeunit().isEmpty() && grouping.scaling().isEmpty();
+        return grouping.timeunit().isEmpty() && grouping.scaling().isEmpty() && grouping.ranges().isEmpty();
     }
 
     @Override

@@ -28,9 +28,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.views.MongoIgnore;
 import org.graylog.testing.mongodb.MongoDBExtension;
-import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.joda.time.DateTime;
@@ -78,8 +76,8 @@ class MongoCollectionsTest {
                          @JsonProperty("timestamp") DateTime timestamp) implements MongoEntity {}
 
     @BeforeEach
-    void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider mongoJackObjectMapperProvider) {
-        collections = new MongoCollections(mongoJackObjectMapperProvider, mongoDBTestService.mongoConnection());
+    void setUp(MongoCollections mongoCollections) {
+        collections = mongoCollections;
         encryptedValueService = new EncryptedValueService(UUID.randomUUID().toString());
     }
 

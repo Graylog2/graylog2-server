@@ -17,7 +17,7 @@
 package org.graylog2.indexer.rotation.tso;
 
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.indexer.IndexSetValidator;
+import org.graylog2.indexer.indexset.validation.IndexSetValidator;
 import org.joda.time.DurationFieldType;
 import org.joda.time.Period;
 

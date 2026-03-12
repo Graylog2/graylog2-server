@@ -32,19 +32,10 @@ type Props = {
   title?: string;
 };
 
-const ShareMenuItem = ({
-  entityId,
-  entityType,
-  onClick,
-  disabledInfo = undefined,
-  title = undefined,
-}: Props) => (
+const ShareMenuItem = ({ entityId, entityType, onClick, disabledInfo = undefined, title = undefined }: Props) => (
   <HasOwnership id={entityId} type={entityType}>
     {({ disabled: hasMissingPermissions }) => (
-      <MenuItem
-        onSelect={onClick}
-        disabled={!!disabledInfo || hasMissingPermissions}
-        title="Share">
+      <MenuItem onSelect={onClick} disabled={!!disabledInfo || hasMissingPermissions} title="Share">
         {title ?? 'Share'}{' '}
         {(!!disabledInfo || hasMissingPermissions) && (
           <SharingDisabledPopover type={entityType} description={disabledInfo} />
