@@ -26,9 +26,7 @@ public interface SessionService {
 
     String create(SessionDTO session);
 
-    void update(SessionDTO session);
-
-    void updateBySessionId(String sessionId, SessionDTO session);
+    void updateBySessionId(SessionDTO session);
 
     Stream<SessionDTO> streamAll();
 }
