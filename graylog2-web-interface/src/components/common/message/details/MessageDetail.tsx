@@ -32,7 +32,6 @@ import type { Stream } from 'views/stores/StreamsStore';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import useIsLocalNode from 'views/hooks/useIsLocalNode';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useFeature from 'hooks/useFeature';
 
 import MessageFavoriteFieldsProvider from './context/MessageFavoriteFieldsProvider';
@@ -91,7 +90,6 @@ const MessageDetail = ({
   allStreams = Immutable.List(),
 }: Props) => {
   const isFavoriteFieldsEnabled = useFeature('message_table_favorite_fields');
-  const { config: searchesClusterConfig } = useSearchConfiguration();
   const [showOriginal, setShowOriginal] = useState(false);
   const { fields, index, id, decoration_stats: decorationStats } = message;
   const { gl2_source_node, gl2_source_input, associated_assets } = fields;
@@ -162,7 +160,6 @@ const MessageDetail = ({
                     disableTestAgainstStream={disableTestAgainstStream}
                     showOriginal={showOriginal}
                     toggleShowOriginal={_toggleShowOriginal}
-                    searchConfig={searchesClusterConfig}
                     streams={allStreams}
                   />
                 </Header>
