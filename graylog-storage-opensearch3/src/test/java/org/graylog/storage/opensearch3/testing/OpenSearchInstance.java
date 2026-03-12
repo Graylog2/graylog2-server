@@ -146,7 +146,9 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 IndexerJwtAuthToken.disabled(),
                 createCredentialsProvider(),
                 getElasticsearchClientConfiguration(),
+                new ObjectMapperProvider().get(),
                 getTrustManagerAndSocketFactoryProvider()
+
         ).get();
     }
 

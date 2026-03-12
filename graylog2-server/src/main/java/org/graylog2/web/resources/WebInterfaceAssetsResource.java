@@ -163,7 +163,9 @@ public class WebInterfaceAssetsResource {
     public Response getIndex(@Context ContainerRequest request,
                              @Context HttpHeaders headers) {
         // If we end up here, the request should go to the API, but no resource class matched it, so we return a 404.
-        if (request.getAbsolutePath().getPath().startsWith("/" + HttpConfiguration.API_PREFIX)) {
+        final var path = request.getAbsolutePath().getPath();
+        final var apiPrefix = "/" + HttpConfiguration.API_PREFIX;
+        if (path.equals(apiPrefix) || path.startsWith(apiPrefix + "/")) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         final URI originalLocation = request.getRequestUri();

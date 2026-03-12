@@ -20,6 +20,8 @@ import { act, render, screen } from 'wrappedTestingLibrary';
 
 import TypeAheadDataFilter from './TypeAheadDataFilter';
 
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+
 describe('<TypeAheadDataFilter />', () => {
   const data = [{ name: 'Alpha' }, { name: 'Beta' }, { name: 'Gamma' }];
 
@@ -53,7 +55,7 @@ describe('<TypeAheadDataFilter />', () => {
     const { onDataFiltered } = renderSut();
     const input = screen.getByRole('textbox', { name: /filter/i });
 
-    await userEvent.type(input, 'be');
+    await setupUser().type(input, 'be');
 
     act(() => {
       jest.advanceTimersByTime(200);
@@ -70,15 +72,15 @@ describe('<TypeAheadDataFilter />', () => {
 
     expect(resetButton).toBeDisabled();
 
-    await userEvent.type(input, 'ga');
+    await setupUser().type(input, 'ga');
     expect(resetButton).toBeEnabled();
 
-    await userEvent.keyboard('{Enter}');
+    await setupUser().keyboard('{Enter}');
 
     expect(onDataFiltered).toHaveBeenCalledTimes(1);
     expect(onDataFiltered).toHaveBeenCalledWith([{ name: 'Gamma' }], 'ga');
 
-    await userEvent.click(resetButton);
+    await setupUser().click(resetButton);
 
     expect(onDataFiltered).toHaveBeenCalledTimes(2);
     expect(onDataFiltered).toHaveBeenLastCalledWith(data, '');

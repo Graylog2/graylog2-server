@@ -108,7 +108,7 @@ public class ScriptingApiResourceIT {
                          {
                            "group_by": [
                              {
-                               "field": "streams.id"
+                               "field": "streams#id"
                              }
                            ],
                            "metrics": [
@@ -186,7 +186,7 @@ public class ScriptingApiResourceIT {
                          {
                            "group_by": [
                              {
-                               "field": "streams.title"
+                               "field": "streams#title"
                              }
                            ],
                            "metrics": [
@@ -1115,6 +1115,111 @@ public class ScriptingApiResourceIT {
         assertThat(expectedResult.containsAll(response))
                 .withFailMessage("Comparison failed:\n\n%s\n\nbut expected:\n\n%s", String.join("\n", response), String.join("\n", expectedResult))
                 .isTrue();
+    }
+
+    @FullBackendTest
+    void testRangeAggregation() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(api.requestSpecification())
+                .when()
+                .body("""
+                        {
+                          "group_by": [
+                            {
+                              "field": "level",
+                              "ranges": [
+                                {"to": 2.0},
+                                {"from": 2.0, "to": 3.0},
+                                {"from": 3.0}
+                              ]
+                            }
+                          ],
+                          "metrics": [
+                            {
+                              "function": "count"
+                            }
+                          ]
+                        }
+                        """)
+                .post("/search/aggregate")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200);
+
+        validatableResponse.assertThat().body("datarows", Matchers.hasSize(3));
+        validateRow(validatableResponse, "*-2.0", 1);
+        validateRow(validatableResponse, "2.0-3.0", 1);
+        validateRow(validatableResponse, "3.0-*", 1);
+    }
+
+    @FullBackendTest
+    void testRangeAggregationWithMultipleMetrics() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(api.requestSpecification())
+                .when()
+                .body("""
+                        {
+                          "group_by": [
+                            {
+                              "field": "level",
+                              "ranges": [
+                                {"to": 2.5},
+                                {"from": 2.5}
+                              ]
+                            }
+                          ],
+                          "metrics": [
+                            {
+                              "function": "count"
+                            },
+                            {
+                              "function": "max",
+                              "field": "level"
+                            }
+                          ]
+                        }
+                        """)
+                .post("/search/aggregate")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200);
+
+        validatableResponse.assertThat().body("datarows", Matchers.hasSize(2));
+        validateRow(validatableResponse, "*-2.5", 2, 2.0f);
+        validateRow(validatableResponse, "2.5-*", 1, 3.0f);
+    }
+
+    @FullBackendTest
+    void testRangeAggregationSchema() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(api.requestSpecification())
+                .when()
+                .body("""
+                        {
+                          "group_by": [
+                            {
+                              "field": "level",
+                              "ranges": [
+                                {"to": 2.0},
+                                {"from": 2.0}
+                              ]
+                            }
+                          ],
+                          "metrics": [
+                            {
+                              "function": "count",
+                              "field": "level"
+                            }
+                          ]
+                        }
+                        """)
+                .post("/search/aggregate")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200);
+
+        validateSchema(validatableResponse, "grouping: level", "string", "level");
+        validateSchema(validatableResponse, "metric: count(level)", "numeric", "level");
     }
 
     private void validateSchema(ValidatableResponse response, String name, String type, String field) {

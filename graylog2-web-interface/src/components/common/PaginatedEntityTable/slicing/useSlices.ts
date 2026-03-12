@@ -16,8 +16,8 @@
  */
 
 import { defaultCompare } from 'logic/DefaultCompare';
+import type { Slices, SliceRenderers } from 'components/common/PaginatedEntityTable/slicing/Slicing';
 
-import type { Slices } from './Slicing';
 import type { SortMode } from './SliceFilters';
 import useFetchSlices, { type FetchSlices } from './useFetchSlices';
 
@@ -50,18 +50,39 @@ const matchesQuery = (slice: Slice, query: string) => {
 
 type Props = {
   fetchSlices: FetchSlices;
+  activeSlice: string | undefined;
   searchQuery: string;
   sortMode: SortMode;
+  sliceRenderers?: SliceRenderers;
 };
 
-const useSlices = ({ fetchSlices, searchQuery, sortMode }: Props) => {
-  const { slices, isLoading } = useFetchSlices(fetchSlices);
-  const filteredSlices = slices.filter((slice) => matchesQuery(slice, searchQuery));
+const isSelectedSlice = (slice: Slice, activeSlice: string | undefined) =>
+  activeSlice !== undefined && String(slice.value) === String(activeSlice);
+
+const addMissingSelectedSlice = (slices: Slices, activeSlice: string | undefined): Slices => {
+  if (activeSlice === undefined) {
+    return slices;
+  }
+
+  const selectedSliceExists = slices.some((slice) => isSelectedSlice(slice, activeSlice));
+
+  if (selectedSliceExists) {
+    return slices;
+  }
+
+  return [...slices, { value: activeSlice, count: 0 }];
+};
+
+const useSlices = ({ fetchSlices, activeSlice, searchQuery, sortMode, sliceRenderers = undefined }: Props) => {
+  const { slices, isLoading, refetchSlices } = useFetchSlices(fetchSlices, sliceRenderers);
+  const slicesWithSelected = addMissingSelectedSlice(slices, activeSlice);
+  const filteredSlices = slicesWithSelected.filter((slice) => matchesQuery(slice, searchQuery));
   const nonEmptySlices = filteredSlices.filter((slice) => slice.count > 0);
   const emptySlices = filteredSlices.filter((slice) => slice.count === 0);
 
   return {
     isLoading,
+    refetchSlices,
     hasEmptySlices: emptySlices.length > 0,
     emptySliceCount: emptySlices.length,
     visibleNonEmptySlices: sortSlices(nonEmptySlices, sortMode, getSliceLabel),

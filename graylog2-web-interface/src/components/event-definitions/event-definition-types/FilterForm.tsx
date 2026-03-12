@@ -390,7 +390,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
       const value = FormsUtils.getValueFromInput(event.target);
       const newConfig = getUpdatedConfig(name as EventDefinitionConfigKeys, value);
       handleConfigChange(name, newConfig);
-      debouncedParseQuery(value, newConfig);
+      debouncedParseQuery(value as string, newConfig);
     },
     [debouncedParseQuery, getUpdatedConfig, handleConfigChange],
   );

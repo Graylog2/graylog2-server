@@ -37,6 +37,7 @@ import {
   columnTransformVar,
   columnWidthVar,
   displayScrollRightIndicatorVar,
+  scrollContainerWidthVar,
 } from 'components/common/EntityDataTable/CSSVariables';
 import useHeaderMinWidths from 'components/common/EntityDataTable/hooks/useHeaderMinWidths';
 import useColumnDefinitions from 'components/common/EntityDataTable/hooks/useColumnDefinitions';
@@ -60,20 +61,30 @@ const ScrollContainer = styled.div<{
   $columnTransform: { [_attributeId: string]: string };
   $actionsHeaderWidth: number;
   $canScrollRight: boolean;
+  $scrollContainerWidth: number;
 }>(
-  ({ $columnWidths, $activeColId, $columnTransform, $actionsHeaderWidth, $canScrollRight }) => css`
+  ({
+    $columnWidths,
+    $activeColId,
+    $columnTransform,
+    $actionsHeaderWidth,
+    $canScrollRight,
+    $scrollContainerWidth,
+  }) => css`
     width: 100%;
     overflow-x: auto;
 
     ${Object.entries($columnWidths).map(([id, width]) => cssVariable(columnWidthVar(id), `${width}px`))}
     ${Object.entries($columnTransform).map(([id, transform]) => cssVariable(columnTransformVar(id), transform))}
-    ${$actionsHeaderWidth && cssVariable(actionsHeaderWidthVar, `${$actionsHeaderWidth}px`)}
-    ${$canScrollRight && cssVariable(displayScrollRightIndicatorVar, 'block')}
-    ${$activeColId &&
-    css`
-      ${cssVariable(columnOpacityVar($activeColId), 0.4)}
-      ${cssVariable(columnTransition(), 'transform 0.2s ease-in-out')}
-    `}
+    ${$actionsHeaderWidth ? cssVariable(actionsHeaderWidthVar, `${$actionsHeaderWidth}px`) : ''}
+    ${$canScrollRight ? cssVariable(displayScrollRightIndicatorVar, 'block') : ''}
+    ${$scrollContainerWidth ? cssVariable(scrollContainerWidthVar, `${$scrollContainerWidth}px`) : ''}
+    ${$activeColId
+      ? css`
+          ${cssVariable(columnOpacityVar($activeColId), 0.4)}
+          ${cssVariable(columnTransition(), 'transform 0.2s ease-in-out')}
+        `
+      : ''}
   `,
 );
 
@@ -135,6 +146,8 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   defaultColumnOrder: Array<string>;
   /** The table data. */
   entities: ReadonlyArray<Entity>;
+  /** show slice by action for columns if they support it via their schema **/
+  enableSlicing?: boolean;
   /** Allows you to extend a row with additional information * */
   expandedSectionRenderers?: ExpandedSectionRenderers<Entity>;
   /** User layout preferences */
@@ -182,6 +195,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   entities,
   entityActions = undefined,
   entityAttributesAreCamelCase,
+  enableSlicing = false,
   expandedSectionRenderers = undefined,
   layoutPreferences,
   meta = undefined,
@@ -226,20 +240,18 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     displayBulkSelectCol,
   );
 
-  const { columnWidths, handleActionsWidthChange, tableIsCompressed, actionsColMinWidth } = useElementWidths<
-    Entity,
-    Meta
-  >({
-    columnRenderersByAttribute,
-    columnSchemas: authorizedColumnSchemas,
-    columnWidthPreferences: internalColumnWidthPreferences,
-    displayBulkSelectCol,
-    entities,
-    hasRowActions,
-    headerMinWidths,
-    scrollContainerRef,
-    visibleColumns: columnOrder,
-  });
+  const { columnWidths, handleActionsWidthChange, tableIsCompressed, actionsColMinWidth, scrollContainerWidth } =
+    useElementWidths<Entity, Meta>({
+      columnRenderersByAttribute,
+      columnSchemas: authorizedColumnSchemas,
+      columnWidthPreferences: internalColumnWidthPreferences,
+      displayBulkSelectCol,
+      entities,
+      hasRowActions,
+      headerMinWidths,
+      scrollContainerRef,
+      visibleColumns: columnOrder,
+    });
 
   const columnDefinitions = useColumnDefinitions<Entity, Meta>({
     actionsColMinWidth,
@@ -247,6 +259,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     columnSchemas: authorizedColumnSchemas,
     columnWidths,
     displayBulkSelectCol,
+    enableSlicing,
     entityActions,
     entityAttributesAreCamelCase,
     hasRowActions,
@@ -320,7 +333,8 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                     $activeColId={activeColId}
                     $columnTransform={columnTransform}
                     $columnWidths={columnWidths}
-                    $canScrollRight={scrolledToRight && tableIsCompressed}>
+                    $canScrollRight={scrolledToRight && tableIsCompressed}
+                    $scrollContainerWidth={scrollContainerWidth}>
                     <InnerContainer>
                       <Table<Entity>
                         expandedSectionRenderers={expandedSectionRenderers}

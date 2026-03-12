@@ -16,17 +16,16 @@
  */
 package org.graylog.testing.mongodb;
 
-import com.google.auto.value.AutoValue;
-
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
-@AutoValue
-public abstract class MongoDBVersion {
+public record MongoDBVersion(String version) {
     public static final MongoDBVersion DEFAULT = of("7.0");
 
-    public abstract String version();
+    public MongoDBVersion {
+        requireNonBlank(version, "version can't be blank");
+    }
 
-    public static MongoDBVersion of(String version) {
-        return new AutoValue_MongoDBVersion(requireNonBlank(version, "version can't be blank"));
+    public static MongoDBVersion of(final String version) {
+        return new MongoDBVersion(version);
     }
 }

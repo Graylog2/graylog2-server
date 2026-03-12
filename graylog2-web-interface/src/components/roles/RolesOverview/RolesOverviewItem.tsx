@@ -18,10 +18,9 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
 
-import { Link } from 'components/common/router';
+import { Link, TextOverflowEllipsis } from 'components/common';
 import Routes from 'routing/Routes';
 import type Role from 'logic/roles/Role';
-import { TextOverflowEllipsis } from 'components/common';
 import type { UserContext } from 'actions/roles/AuthzRolesActions';
 
 import ActionsCell from './ActionsCell';

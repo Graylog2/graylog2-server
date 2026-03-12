@@ -126,10 +126,10 @@ const StepReview = ({ onSubmit, externalInputSubmit = false }: Props) => {
             <strong>S3 Region </strong>
             <span>{formData.awsCloudTrailS3Region.value}</span>
           </li>
-          {formData.assumeRoleArn?.value && (
+          {formData.awsAssumeRoleARN?.value && (
             <li>
               <strong>AWS Assume Role (ARN) </strong>
-              <span>{formData.assumeRoleArn?.value}</span>
+              <span>{formData.awsAssumeRoleARN?.value}</span>
             </li>
           )}
           <li>

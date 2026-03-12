@@ -317,13 +317,6 @@
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
         </dependency>
-        <!-- We need the servlet API dependency for the Swagger resources to be able to initialize properly. We don't
-             run a servlet container though, therefore the Grizzly HTTP server won't provide it at runtime. That's why
-             we need to include it as a compile dependency. -->
-        <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-        </dependency>
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
@@ -784,19 +777,10 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
-        <!-- used for sanity -->
-        <dependency>
-            <groupId>net.jcip</groupId>
-            <artifactId>jcip-annotations</artifactId>
-        </dependency>
         <dependency>
             <groupId>com.google.auto.value</groupId>
             <artifactId>auto-value-annotations</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>info.leadinglight</groupId>
-            <artifactId>jdot</artifactId>
         </dependency>
         <dependency>
             <groupId>one.util</groupId>
