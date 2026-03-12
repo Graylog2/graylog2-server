@@ -49,6 +49,7 @@ import org.graylog.collectors.rest.CollectorInstancesResource;
 import org.graylog.collectors.rest.CollectorsConfigResource;
 import org.graylog.collectors.rest.FleetPermissions;
 import org.graylog.collectors.rest.FleetResource;
+import org.graylog.collectors.rest.CollectorsActivityResource;
 import org.graylog.collectors.rest.SourceResource;
 import org.graylog2.database.SequenceTopics;
 import org.graylog2.featureflag.FeatureFlags;
@@ -104,6 +105,7 @@ public class CollectorsModule extends PluginModule {
         // Fleet management REST resources
         addSystemRestResource(FleetResource.class);
         addSystemRestResource(SourceResource.class);
+        addSystemRestResource(CollectorsActivityResource.class);
 
         // Migrations
         addMigration(V20260303120000_ConvertCollectorInstanceFleetIdToObjectId.class);

@@ -35,6 +35,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -137,6 +138,26 @@ class CollectorInstanceServiceTest {
 
         // absent fleet should not be in the map
         assertThat(grouped).doesNotContainKey("507f1f77bcf86cd799439099");
+    }
+
+    @Test
+    void findByInstanceUidsReturnsMappedResults() {
+        enroll(collectorInstanceService, "uid-1", "sha256:fp-1");
+        enroll(collectorInstanceService, "uid-2", "sha256:fp-2");
+        enroll(collectorInstanceService, "uid-3", "sha256:fp-3");
+
+        Map<String, CollectorInstanceDTO> result = collectorInstanceService.findByInstanceUids(Set.of("uid-1", "uid-3"));
+
+        assertThat(result).hasSize(2);
+        assertThat(result).containsKeys("uid-1", "uid-3");
+        assertThat(result.get("uid-1").instanceUid()).isEqualTo("uid-1");
+    }
+
+    @Test
+    void findByInstanceUidsReturnsEmptyForNoMatches() {
+        Map<String, CollectorInstanceDTO> result = collectorInstanceService.findByInstanceUids(Set.of("nonexistent"));
+
+        assertThat(result).isEmpty();
     }
 
     private static CollectorInstanceDTO enroll(CollectorInstanceService service, String instanceUid, String fingerprint) {

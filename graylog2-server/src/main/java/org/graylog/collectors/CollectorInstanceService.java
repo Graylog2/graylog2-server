@@ -47,6 +47,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
@@ -210,6 +211,16 @@ public class CollectorInstanceService {
                 });
             }
         });
+        return result;
+    }
+
+    public Map<String, CollectorInstanceDTO> findByInstanceUids(Set<String> instanceUids) {
+        if (instanceUids == null || instanceUids.isEmpty()) {
+            return Map.of();
+        }
+        final Map<String, CollectorInstanceDTO> result = new HashMap<>();
+        collection.find(Filters.in(FIELD_INSTANCE_UID, instanceUids))
+                .forEach(dto -> result.put(dto.instanceUid(), dto));
         return result;
     }
 
