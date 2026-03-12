@@ -70,7 +70,7 @@ const SliceList = ({
         onClick={() => onChangeSlicing(sliceCol, String(slice.value))}
         active={String(activeSlice) === String(slice.value)}>
         <SliceInner>
-          <Title>{sliceRenderers?.[sliceCol]?.render?.(slice.value) ?? slice.title ?? String(slice.value)}</Title>
+          <Title>{sliceRenderers?.[sliceCol]?.render?.(slice) ?? slice.title ?? String(slice.value)}</Title>
 
           <CountBadge title={String(slice.count)}>{formatReadableNumber(slice.count)}</CountBadge>
         </SliceInner>

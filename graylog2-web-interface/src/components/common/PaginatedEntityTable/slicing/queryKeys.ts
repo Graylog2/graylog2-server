@@ -14,8 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { useLocation as useRouterLocation, type Location } from 'react-router-dom';
 
-const useLocation = <T>(): Location<T> => useRouterLocation();
-export default useLocation;
+import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
+
+export const SLICING_QUERY_KEY = 'slicing';
+
+export const slicesQueryKeyForColumn = (sliceCol: string | undefined) => [SLICING_QUERY_KEY, sliceCol] as const;
+
+export const slicesQueryKey = (sliceCol: string | undefined, query: string | undefined, filters: UrlQueryFilters) =>
+  [...slicesQueryKeyForColumn(sliceCol), query, filters] as const;
