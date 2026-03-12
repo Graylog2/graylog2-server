@@ -23,6 +23,8 @@ import Routes from 'routing/Routes';
 
 import type { CollectorInstanceView, Source } from '../types';
 
+const COLLECTOR_LOGS_STREAM_ID = '000000000000000000000005';
+
 type Props = {
   instance: CollectorInstanceView;
   sources: Source[];
@@ -96,6 +98,18 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
         <DetailRow>
           <Title>Version:</Title>
           <span>{instance.version || 'Unknown'}</span>
+        </DetailRow>
+
+        <DetailRow>
+          <Title>Logs:</Title>
+          <Link to={Routes.search_with_query(
+            `gl_collector_instance_id:"${instance.instance_uid}"`,
+            'relative',
+            { relative: 3600 },
+            [COLLECTOR_LOGS_STREAM_ID],
+          )}>
+            View Logs
+          </Link>
         </DetailRow>
       </Section>
 

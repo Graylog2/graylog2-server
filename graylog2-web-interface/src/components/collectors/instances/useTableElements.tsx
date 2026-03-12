@@ -17,9 +17,13 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 
-import { Button } from 'components/bootstrap';
+import { Button, ButtonToolbar } from 'components/bootstrap';
+import { LinkContainer } from 'components/common';
+import Routes from 'routing/Routes';
 
 import type { CollectorInstanceView } from '../types';
+
+const COLLECTOR_LOGS_STREAM_ID = '000000000000000000000005';
 
 type Props = {
   onInstanceClick: (instance: CollectorInstanceView) => void;
@@ -28,9 +32,21 @@ type Props = {
 const useTableElements = ({ onInstanceClick }: Props) => {
   const entityActions = useCallback(
     (instance: CollectorInstanceView) => (
-      <Button bsStyle="link" bsSize="xs" onClick={() => onInstanceClick(instance)}>
-        Details
-      </Button>
+      <ButtonToolbar>
+        <Button bsStyle="link" bsSize="xs" onClick={() => onInstanceClick(instance)}>
+          Details
+        </Button>
+        <LinkContainer to={Routes.search_with_query(
+          `gl_collector_instance_id:"${instance.instance_uid}"`,
+          'relative',
+          { relative: 3600 },
+          [COLLECTOR_LOGS_STREAM_ID],
+        )}>
+          <Button bsStyle="link" bsSize="xs">
+            View Logs
+          </Button>
+        </LinkContainer>
+      </ButtonToolbar>
     ),
     [onInstanceClick],
   );
