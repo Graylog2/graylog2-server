@@ -16,13 +16,10 @@
  */
 package org.graylog.plugins.views.search.searchfilters.model;
 
-import javax.annotation.Nullable;
-
 /**
  * Signature for Search Filter objects that are stored in MongoDB (Enterprise Feature).
  * Exposes ID field to for use outside of Enterprise Plugin.
  */
 public interface DBSearchFilter {
-    @Nullable
     String id();
 }
