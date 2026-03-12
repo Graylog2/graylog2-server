@@ -14,18 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.resources.streams.responses;
+package org.graylog2.rest.resources.system.inputs.responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
-
-public record StreamPipelineRulesResponse(
+public record InputStreamRulesResponse(
         @JsonProperty("id") String id,
-        @JsonProperty("pipeline_id") String pipelineId,
-        @JsonProperty("pipeline") String pipeline,
-        @JsonProperty("rule_id") String ruleId,
-        @JsonProperty("rule") String rule,
-        @JsonProperty("stage") int stage,
-        @JsonProperty("connected_streams") List<StreamReference> connectedStreams
+        @JsonProperty("stream_id") String streamId,
+        @JsonProperty("stream") String stream,
+        @JsonProperty("rule_field") String ruleField,
+        @JsonProperty("rule_type") int ruleType,
+        @JsonProperty("rule_value") String ruleValue,
+        @JsonProperty("inverted") boolean inverted,
+        @JsonProperty("description") String description
 ) {}
