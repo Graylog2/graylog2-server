@@ -20,6 +20,7 @@ import fetch from 'logic/rest/FetchProvider';
 import asMock from 'helpers/mocking/AsMock';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
+
 import fetchEvents, { defaultTimeRange, parseFilters, parseTypeFilter } from './fetchEvents';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn());
