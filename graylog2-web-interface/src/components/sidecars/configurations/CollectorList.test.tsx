@@ -103,7 +103,7 @@ describe('CollectorList', () => {
     render(<SUT onQueryChange={onQueryChange} />);
 
     const queryInput = await screen.findByPlaceholderText('Find collectors');
-    userEvent.type(queryInput, 'newquery{enter}');
+    await userEvent.type(queryInput, 'newquery{enter}');
 
     await waitFor(() => {
       expect(onQueryChange).toHaveBeenCalledWith('newquery', expect.any(Function));
@@ -115,9 +115,9 @@ describe('CollectorList', () => {
     render(<SUT onPageChange={onPageChange} />);
 
     const pageDropdown = await screen.findByRole('button', { name: /configure page size/i });
-    userEvent.click(pageDropdown);
+    await userEvent.click(pageDropdown);
 
-    userEvent.click(await screen.findByRole('menuitem', { name: '25' }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: '25' }));
 
     await waitFor(() => {
       expect(onPageChange).toHaveBeenCalledWith(1, 25);
