@@ -549,7 +549,7 @@ public class PipelineRuleParser {
 
         @Override
         public void exitArrayLiteralExpr(RuleLangParser.ArrayLiteralExprContext ctx) {
-            final List<Expression> elements = ctx.expression().stream().map(exprs::get).collect(toList());
+            final List<Expression> elements = ctx.expression().stream().map(exprs::get).filter(Objects::nonNull).collect(toList());
             exprs.put(ctx, new ArrayLiteralExpression(ctx.getStart(), elements));
         }
 
@@ -557,6 +557,9 @@ public class PipelineRuleParser {
         public void exitMapLiteralExpr(RuleLangParser.MapLiteralExprContext ctx) {
             final HashMap<String, Expression> map = Maps.newHashMap();
             for (RuleLangParser.PropAssignmentContext propAssignmentContext : ctx.propAssignment()) {
+                if (propAssignmentContext.Identifier() == null) {
+                    continue;
+                }
                 final String key = unquote(propAssignmentContext.Identifier().getText(), '`');
                 final Expression value = exprs.get(propAssignmentContext.expression());
                 map.put(key, value);
