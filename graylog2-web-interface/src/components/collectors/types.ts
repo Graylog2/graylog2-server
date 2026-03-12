@@ -142,3 +142,27 @@ export type FleetStatsSummary = {
 export type BulkFleetStatsResponse = {
   fleets: FleetStatsSummary[];
 };
+
+export type ActorInfo = {
+  username: string;
+  full_name: string;
+};
+
+export type TargetInfo = {
+  id: string;
+  name: string;
+  type: 'fleet' | 'collector';
+};
+
+export type ActivityEntry = {
+  seq: number;
+  timestamp: string | null;
+  type: 'CONFIG_CHANGED' | 'INGEST_CONFIG_CHANGED' | 'RESTART' | 'DISCOVERY_RUN' | 'FLEET_REASSIGNED';
+  actor: ActorInfo | null;
+  targets: TargetInfo[];
+  details: Record<string, string>;
+};
+
+export type RecentActivityResponse = {
+  activities: ActivityEntry[];
+};

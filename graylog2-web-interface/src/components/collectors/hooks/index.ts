@@ -46,3 +46,8 @@ export {
 } from './useCollectorConfig';
 
 export { default as useCollectorsMutations } from './useCollectorsMutations';
+
+export {
+  useRecentActivity,
+  ACTIVITY_KEY,
+} from './useActivityQueries';

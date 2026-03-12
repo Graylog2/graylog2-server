@@ -24,6 +24,7 @@ import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 
 import FleetCardsGrid from './FleetCardsGrid';
+import RecentActivity from './RecentActivity';
 
 import { useCollectorStats, useFleetsBulkStats } from '../hooks';
 import StatCard from '../common/StatCard';
@@ -111,6 +112,8 @@ const CollectorsOverview = () => {
       ) : (
         <FleetCardsGrid fleets={bulkStats?.fleets || []} filter={filter} />
       )}
+
+      <RecentActivity />
     </div>
   );
 };
