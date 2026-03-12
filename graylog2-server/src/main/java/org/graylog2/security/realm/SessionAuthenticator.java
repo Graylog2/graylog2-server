@@ -114,9 +114,10 @@ public class SessionAuthenticator extends AuthenticatingRealm {
             return true;
         }
         final var elapsed = Duration.between(lastAccessTime.toInstant(), Instant.now(clock));
-        // A negative elapsed time means lastAccessTime is in the future (e.g., set by a node with clock skew).
+        // A negative elapsed time indicates clock skew between cluster nodes.
         // Treat that as stale so we touch the session and correct the timestamp to local time.
         if (elapsed.isNegative()) {
+            LOG.warn("Session last access time is in the future (by {}). This may indicate clock skew between cluster nodes.", elapsed.abs());
             return true;
         }
         return elapsed.compareTo(TOUCH_INTERVAL) >= 0;
