@@ -29,7 +29,9 @@ type Props = {
 
 const StaticOptionsList = ({ allActiveFilters, attribute, filterValueRenderer, onSubmit }: Props) => (
   <>
-    {attribute.filter_options
+    {(attribute.id === 'priority'
+      ? attribute.filter_options
+      : [...attribute.filter_options].sort((a, b) => a.title.localeCompare(b.title)))
       .map(({ title, value }) => {
         const disabled = !!allActiveFilters?.get(attribute.id)?.find(({ value: filterValue }) => value === filterValue);
 
