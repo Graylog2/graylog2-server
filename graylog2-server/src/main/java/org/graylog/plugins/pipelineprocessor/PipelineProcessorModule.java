@@ -23,6 +23,7 @@ import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
 import org.graylog.plugins.pipelineprocessor.functions.ProcessorFunctionsModule;
 import org.graylog.plugins.pipelineprocessor.periodical.LegacyDefaultStreamMigration;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
+import org.graylog.plugins.pipelineprocessor.processors.PipelineMetadataClusterEventHandler;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineResolver;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnectionsResource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
@@ -55,6 +56,8 @@ public class PipelineProcessorModule extends PluginModule {
 
         install(new FactoryModuleBuilder().build(PipelineInterpreter.State.Factory.class));
         install(new FactoryModuleBuilder().build(PipelineResolver.Factory.class));
+
+        bind(PipelineMetadataClusterEventHandler.class).asEagerSingleton();
 
         addAuditEventTypes(PipelineProcessorAuditEventTypes.class);
 

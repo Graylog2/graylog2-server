@@ -50,7 +50,6 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.StreamCacheServi
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
-import org.graylog2.Configuration;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageCollection;
@@ -507,7 +506,6 @@ public class PipelineInterpreterTest {
         when(ruleMetricsConfigService.get()).thenReturn(RuleMetricsConfigDto.createDefault());
 
         final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(
-                mock(Configuration.class),
                 ruleService,
                 pipelineService,
                 connectionsService,
@@ -515,7 +513,6 @@ public class PipelineInterpreterTest {
                 (config, ruleParser) -> new PipelineResolver(ruleParser, config),
                 ruleMetricsConfigService,
                 metricRegistry,
-                mock(PipelineMetadataUpdater.class),
                 Executors.newScheduledThreadPool(1),
                 eventBus,
                 (currentPipelines, streamPipelineConnections, ruleMetricsConfig) ->
@@ -564,7 +561,6 @@ public class PipelineInterpreterTest {
 
         final MetricRegistry metricRegistry = new MetricRegistry();
         final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(
-                mock(Configuration.class),
                 ruleService,
                 pipelineService,
                 pipelineStreamConnectionsService,
@@ -572,7 +568,6 @@ public class PipelineInterpreterTest {
                 (config, ruleParser) -> new PipelineResolver(ruleParser, config),
                 ruleMetricsConfigService,
                 metricRegistry,
-                mock(PipelineMetadataUpdater.class),
                 Executors.newScheduledThreadPool(1),
                 mock(EventBus.class),
                 (currentPipelines, streamPipelineConnections, ruleMetricsConfig) ->
@@ -624,7 +619,6 @@ public class PipelineInterpreterTest {
 
         final MetricRegistry metricRegistry = new MetricRegistry();
         final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(
-                mock(Configuration.class),
                 ruleService,
                 pipelineService,
                 pipelineStreamConnectionsService,
@@ -632,7 +626,6 @@ public class PipelineInterpreterTest {
                 (config, ruleParser) -> new PipelineResolver(ruleParser, config),
                 ruleMetricsConfigService,
                 metricRegistry,
-                mock(PipelineMetadataUpdater.class),
                 Executors.newScheduledThreadPool(1),
                 mock(EventBus.class),
                 (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true)
