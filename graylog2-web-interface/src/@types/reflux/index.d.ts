@@ -17,10 +17,10 @@
 declare module 'reflux' {
   import type { RefluxActions, Store } from 'stores/StoreTypes';
 
-  export interface StoreDefinition {
+  export interface StoreDefinition<T = any> {
     listenables?: RefluxActions<any>[];
-    init?: Function;
-    getInitialState?: Function;
+    init?: () => void;
+    getInitialState?: () => T;
 
     [propertyName: string]: any;
   }
@@ -31,7 +31,7 @@ declare module 'reflux' {
 
   type ElementType<T extends ReadonlyArray<unknown>> = T extends ReadonlyArray<infer E> ? E : never;
 
-  export function createStore<T>(definition: StoreDefinition): Store<T> & typeof definition;
+  export function createStore<T>(definition: StoreDefinition<T>): Store<T> & typeof definition;
   export function createActions<R>(definitions: ActionsDefinition): RefluxActions<R>;
   export function createActions<R>(
     definitions: R,

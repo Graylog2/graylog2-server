@@ -15,10 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-export const columnTransformVar = (colId: string) => `--col-${colId}-transform`;
-export const columnWidthVar = (colId: string) => `--col-${colId.replace(/\./g, '_')}-width`;
-export const columnOpacityVar = (colId: string) => `--col-${colId}-opacity`;
-export const columnTransition = () => `--col-transition`;
-export const actionsHeaderWidthVar = `--actions-header-width`;
-export const displayScrollRightIndicatorVar = `--display-scroll-right-indicator`;
-export const scrollContainerWidthVar = `--scroll-container-width`;
+import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
+
+export const SLICING_QUERY_KEY = 'slicing';
+
+export const slicesQueryKeyForColumn = (sliceCol: string | undefined) => [SLICING_QUERY_KEY, sliceCol] as const;
+
+export const slicesQueryKey = (sliceCol: string | undefined, query: string | undefined, filters: UrlQueryFilters) =>
+  [...slicesQueryKeyForColumn(sliceCol), query, filters] as const;
