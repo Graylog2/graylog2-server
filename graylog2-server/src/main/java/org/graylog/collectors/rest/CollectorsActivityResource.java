@@ -29,7 +29,6 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.FleetTransactionLogService;
-import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.FleetDTO;
 import org.graylog.collectors.db.MarkerType;
@@ -43,6 +42,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -62,9 +63,9 @@ public class CollectorsActivityResource extends RestResource {
 
     @Inject
     public CollectorsActivityResource(FleetTransactionLogService transactionLogService,
-                                       FleetService fleetService,
-                                       CollectorInstanceService instanceService,
-                                       UserService userService) {
+                                      FleetService fleetService,
+                                      CollectorInstanceService instanceService,
+                                      UserService userService) {
         this.transactionLogService = transactionLogService;
         this.fleetService = fleetService;
         this.instanceService = instanceService;
@@ -103,7 +104,7 @@ public class CollectorsActivityResource extends RestResource {
         // Batch-resolve actor display names
         final Set<String> usernames = markers.stream()
                 .map(TransactionMarker::createdByUser)
-                .filter(u -> u != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
         final Map<String, String> userDisplayNames = resolveUserDisplayNames(usernames);
 
@@ -181,12 +182,11 @@ public class CollectorsActivityResource extends RestResource {
     private Map<String, String> resolveUserDisplayNames(Set<String> usernames) {
         final Map<String, String> result = new HashMap<>();
         for (final var username : usernames) {
-            final User user = userService.load(username);
-            if (user != null) {
-                result.put(username, user.getFullName());
-            } else {
-                result.put(username, username);
-            }
+            final var fullName = Optional.ofNullable(userService.load(username))
+                    .or(() -> Optional.ofNullable(userService.loadById(username)))
+                    .map(User::getFullName)
+                    .orElse(username);
+            result.put(username, fullName);
         }
         return result;
     }
