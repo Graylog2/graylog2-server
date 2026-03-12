@@ -163,7 +163,7 @@ public class CollectorLogsDestinationService {
 
         final var rule = streamRuleService.create(Map.of(
                 StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(Stream.COLLECTOR_LOGS_STREAM_ID),
-                StreamRuleImpl.FIELD_FIELD, CollectorIngestCodec.FIELD_COLLECTOR_RECEIVER_TYPE,
+                StreamRuleImpl.FIELD_FIELD, CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_TYPE,
                 StreamRuleImpl.FIELD_TYPE, StreamRuleType.EXACT.toInteger(),
                 StreamRuleImpl.FIELD_VALUE, CollectorLogRecordProcessor.RECEIVER_TYPE,
                 StreamRuleImpl.FIELD_INVERTED, false,

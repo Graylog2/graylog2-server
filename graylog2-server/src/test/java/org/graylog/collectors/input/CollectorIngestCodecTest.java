@@ -216,7 +216,7 @@ class CollectorIngestCodecTest {
     }
 
     @Test
-    void doesNotMapCollectorInstanceUidToMessageField() {
+    void doesMapCollectorInstanceUidToMessageField() {
         final var logRecord = LogRecord.newBuilder()
                 .setBody(AnyValue.newBuilder().setStringValue("agent log"))
                 .setTimeUnixNano(1700000000000000000L)
@@ -240,8 +240,7 @@ class CollectorIngestCodecTest {
         final var decoded = codec.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
-        assertThat(decoded.get().getField("collector_instance_uid")).isNull();
-        assertThat(decoded.get().getField("agent_instance_uid")).isNull();
+        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_COLLECTOR_INSTANCE_UID)).isEqualTo(TEST_INSTANCE_UID);
     }
 
     @Test
@@ -262,15 +261,13 @@ class CollectorIngestCodecTest {
         final var collectorRecord = CollectorJournal.Record.newBuilder()
                 .setOtelRecord(otelRecord)
                 .setCollectorReceiverType(TEST_RECEIVER_TYPE)
-                .setCollectorInstanceUid(TEST_INSTANCE_UID)
                 .build();
 
         final var rawMessage = new RawMessage(collectorRecord.toByteArray());
         final var decoded = codec.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
-        assertThat(decoded.get().getField("collector_instance_uid")).isNull();
-        assertThat(decoded.get().getField("agent_instance_uid")).isNull();
+        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_COLLECTOR_INSTANCE_UID)).isNull();
     }
 
     @Test
@@ -392,7 +389,7 @@ class CollectorIngestCodecTest {
         final var decoded = codecWithProcessor.decodeSafe(rawMessage);
 
         assertThat(decoded).isPresent();
-        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_COLLECTOR_RECEIVER_TYPE)).isEqualTo("filelog");
+        assertThat(decoded.get().getField(CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_TYPE)).isEqualTo("filelog");
         assertThat(decoded.get().getField(EventFields.EVENT_LOG_NAME)).isEqualTo("test.log");
     }
 

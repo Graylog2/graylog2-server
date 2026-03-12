@@ -22,8 +22,11 @@ import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.graylog.collectors.input.CollectorIngestCodec;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
+import org.graylog2.plugin.streams.Stream;
+import org.graylog2.streams.StreamRuleImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +66,15 @@ public class V20260303120000_ConvertCollectorInstanceFleetIdToObjectId extends M
 
         if (converted > 0) {
             LOG.info("Converted ObjectId fields to String in {} collector instance document(s)", converted);
+        }
+
+        final var updateResult = mongoConnection.getMongoDatabase().getCollection("streamrules")
+                .updateOne(
+                        Filters.eq(StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(Stream.COLLECTOR_LOGS_STREAM_ID)),
+                        Updates.set(StreamRuleImpl.FIELD_FIELD, CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_TYPE)
+                );
+        if (updateResult.getModifiedCount() > 0) {
+            LOG.info("Updated streamrule <{}> to match on field <{}>", updateResult.getUpsertedId(), CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_TYPE);
         }
     }
 

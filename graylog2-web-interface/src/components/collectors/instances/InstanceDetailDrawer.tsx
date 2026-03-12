@@ -103,7 +103,7 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
         <DetailRow>
           <Title>Logs:</Title>
           <Link to={Routes.search_with_query(
-            `gl_collector_instance_id:"${instance.instance_uid}"`,
+            `collector_instance_uid:"${instance.instance_uid}"`,
             'relative',
             { relative: 3600 },
             [COLLECTOR_LOGS_STREAM_ID],
