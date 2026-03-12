@@ -59,8 +59,9 @@ automatically disabled during the upgrade to Graylog 7.1. A software migration w
 OpenSearch anomaly detectors and delete their associated event definitions.
 
 To set up new anomaly detectors, create a new Event Definition using the `Anomaly Events` type, or install
-an anomaly detection content pack from the Illuminate page. Previously active OpenSearch detectors will be disabled and remain visible in the Anomaly Detection
-Configuration page for reference, but can no longer be edited or re-enabled.
+an anomaly detection content pack from the Illuminate page. Previously active OpenSearch detectors will be 
+disabled and remain visible in the Anomaly Detection Configuration page for reference, but can no longer be 
+edited or re-enabled.
 
 ## Configuration File Changes
 
