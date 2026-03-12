@@ -21,9 +21,10 @@ import styled, { css } from 'styled-components';
 import { Input, ListGroupItem } from 'components/bootstrap';
 import type { Attribute } from 'stores/PaginationTypes';
 import type { Filters } from 'components/common/EntityFilters/types';
-import { PaginatedList, NoSearchResult } from 'components/common';
+import { NoSearchResult } from 'components/common';
 import useIsKeyHeld from 'hooks/useIsKeyHeld';
 import Spinner from 'components/common/Spinner';
+import PaginatedList from 'components/common/PaginatedList';
 
 const Container = styled.div(
   ({ theme }) => css`
@@ -32,11 +33,12 @@ const Container = styled.div(
   `,
 );
 
-const PaddingContainer = styled.div(
-  ({ theme }) => css`
-    padding: 0 ${theme.spacings.sm};
-  `,
-);
+const sidePaddings = ({ theme }) => css`
+  padding: 0 ${theme.spacings.sm};
+`;
+
+const PaddingContainer = styled.div(sidePaddings);
+
 const SearchInput = styled(Input)`
   margin-bottom: 6px;
 `;
@@ -55,6 +57,8 @@ const Hint = styled.div(
     font-size: ${theme.fonts.size.small};
   `,
 );
+
+const StyledPaginatedList = styled(PaginatedList)(sidePaddings);
 
 type SearchParams = {
   query: string;
@@ -125,7 +129,7 @@ const SuggestionsList = ({
         {isLoading && <Spinner />}
       </PaddingContainer>
       {!!suggestions?.length && (
-        <PaginatedList
+        <StyledPaginatedList
           showPageSizeSelect={false}
           totalItems={total}
           hidePreviousAndNextPageLinks
@@ -164,7 +168,7 @@ const SuggestionsList = ({
               </StyledListGroup>
             </PaddingContainer>
           </ScrollableArea>
-        </PaginatedList>
+        </StyledPaginatedList>
       )}
       <PaddingContainer>
         {!suggestions?.length && <NoSearchResult>No entities found</NoSearchResult>}
