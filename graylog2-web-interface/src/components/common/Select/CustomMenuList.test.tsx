@@ -19,7 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import CustomMenuList from './CustomMenuList';
 
-const getChildrenList: Function = (n: number): React.ReactElement[] => {
+const getChildrenList = (n: number): React.ReactElement[] => {
   const list = Array(n).fill(null);
 
   return list.map(() => <div key={Math.random()}>{Math.random()}</div>);
