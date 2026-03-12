@@ -22,6 +22,7 @@ import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.db.TransactionMarker;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -146,7 +147,7 @@ class FleetTransactionLogCoalesceTest {
     @Test
     void unknownMarkerTypesAreSkipped() {
         var markers = List.of(
-                new TransactionMarker(10, TARGET_FLEET, Set.of("fleet-1"), MarkerType.UNKNOWN, "FUTURE_TYPE", null),
+                new TransactionMarker(10, TARGET_FLEET, Set.of("fleet-1"), MarkerType.UNKNOWN, "FUTURE_TYPE", null, Instant.now(), "system"),
                 marker(15, TARGET_FLEET, "fleet-1", MarkerType.CONFIG_CHANGED)
         );
         CoalescedActions actions = FleetTransactionLogService.doCoalesce(markers);
@@ -158,7 +159,7 @@ class FleetTransactionLogCoalesceTest {
     @Test
     void maxSeqIncludesUnknownMarkers() {
         var markers = List.of(
-                new TransactionMarker(20, TARGET_FLEET, Set.of("fleet-1"), MarkerType.UNKNOWN, "FUTURE_TYPE", null)
+                new TransactionMarker(20, TARGET_FLEET, Set.of("fleet-1"), MarkerType.UNKNOWN, "FUTURE_TYPE", null, Instant.now(), "system")
         );
         CoalescedActions actions = FleetTransactionLogService.doCoalesce(markers);
         assertThat(actions.recomputeConfig()).isFalse();
@@ -183,12 +184,12 @@ class FleetTransactionLogCoalesceTest {
     // --- helpers ---
 
     private static TransactionMarker marker(long seq, String target, String targetId, MarkerType type) {
-        return new TransactionMarker(seq, target, Set.of(targetId), type, type.name(), null);
+        return new TransactionMarker(seq, target, Set.of(targetId), type, type.name(), null, Instant.now(), "system");
     }
 
     private static TransactionMarker reassignmentMarker(long seq, String instanceUid, String newFleetId) {
         return new TransactionMarker(seq, TransactionMarker.TARGET_COLLECTOR, Set.of(instanceUid),
                 MarkerType.FLEET_REASSIGNED, MarkerType.FLEET_REASSIGNED.name(),
-                new Document("new_fleet_id", newFleetId));
+                new Document("new_fleet_id", newFleetId), Instant.now(), "system");
     }
 }
