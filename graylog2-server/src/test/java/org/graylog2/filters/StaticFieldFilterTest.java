@@ -25,7 +25,11 @@ import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.lifecycles.Lifecycle;
+import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
+import org.graylog2.rest.models.system.inputs.responses.InputStopped;
 import org.graylog2.shared.SuppressForbidden;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -35,13 +39,16 @@ import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
+@SuppressForbidden("Executors#newSingleThreadScheduledExecutor() is okay for tests")
 public class StaticFieldFilterTest {
     private final MessageFactory messageFactory = new TestMessageFactory();
 
@@ -50,8 +57,19 @@ public class StaticFieldFilterTest {
     @Mock
     private Input input;
 
+    private ScheduledExecutorService scheduler;
+
+    @BeforeEach
+    void setUp() {
+        scheduler = Executors.newSingleThreadScheduledExecutor();
+    }
+
+    @AfterEach
+    void tearDown() {
+        scheduler.shutdownNow();
+    }
+
     @Test
-    @SuppressForbidden("Executors#newSingleThreadExecutor() is okay for tests")
     public void testFilter() throws Exception {
         Message msg = messageFactory.createMessage("hello", "junit", Tools.nowUTC());
         msg.setSourceInputId("someid");
@@ -62,7 +80,7 @@ public class StaticFieldFilterTest {
         when(inputService.getStaticFields(eq(input.getId())))
                 .thenReturn(Collections.singletonList(Maps.immutableEntry("foo", "bar")));
 
-        final StaticFieldFilter filter = new StaticFieldFilter(inputService, new EventBus(), Executors.newSingleThreadScheduledExecutor());
+        final StaticFieldFilter filter = new StaticFieldFilter(inputService, new EventBus(), scheduler);
         filter.lifecycleChanged(Lifecycle.STARTING);
         filter.filter(msg);
 
@@ -72,17 +90,63 @@ public class StaticFieldFilterTest {
     }
 
     @Test
-    @SuppressForbidden("Executors#newSingleThreadExecutor() is okay for tests")
     public void testFilterIsNotOverwritingExistingKeys() {
         Message msg = messageFactory.createMessage("hello", "junit", Tools.nowUTC());
         msg.addField("foo", "IWILLSURVIVE");
 
-        final StaticFieldFilter filter = new StaticFieldFilter(inputService, new EventBus(), Executors.newSingleThreadScheduledExecutor());
+        final StaticFieldFilter filter = new StaticFieldFilter(inputService, new EventBus(), scheduler);
         filter.lifecycleChanged(Lifecycle.STARTING);
         filter.filter(msg);
 
         assertEquals("hello", msg.getMessage());
         assertEquals("junit", msg.getSource());
         assertEquals("IWILLSURVIVE", msg.getField("foo"));
+    }
+
+    @Test
+    public void stoppedInputRetainsStaticFieldsForJournalMessages() {
+        final String inputId = "someid";
+
+        when(input.getId()).thenReturn(inputId);
+        when(inputService.all()).thenReturn(Collections.singletonList(input));
+        when(inputService.getStaticFields(eq(inputId)))
+                .thenReturn(Collections.singletonList(Maps.immutableEntry("foo", "bar")));
+
+        final EventBus eventBus = new EventBus();
+        final StaticFieldFilter filter = new StaticFieldFilter(inputService, eventBus, scheduler);
+        filter.lifecycleChanged(Lifecycle.STARTING);
+
+        // Stop the input — static fields should remain cached
+        eventBus.post(InputStopped.create(inputId));
+
+        // Simulate a message from the journal arriving after the input was stopped
+        final Message msg = messageFactory.createMessage("hello", "junit", Tools.nowUTC());
+        msg.setSourceInputId(inputId);
+        filter.filter(msg);
+
+        assertEquals("bar", msg.getField("foo"));
+    }
+
+    @Test
+    public void deletedInputClearsStaticFieldsCache() {
+        final String inputId = "someid";
+
+        when(input.getId()).thenReturn(inputId);
+        when(inputService.all()).thenReturn(Collections.singletonList(input));
+        when(inputService.getStaticFields(eq(inputId)))
+                .thenReturn(Collections.singletonList(Maps.immutableEntry("foo", "bar")));
+
+        final EventBus eventBus = new EventBus();
+        final StaticFieldFilter filter = new StaticFieldFilter(inputService, eventBus, scheduler);
+        filter.lifecycleChanged(Lifecycle.STARTING);
+
+        // Delete the input — static fields should be removed from cache
+        eventBus.post(InputDeleted.create(inputId));
+
+        final Message msg = messageFactory.createMessage("hello", "junit", Tools.nowUTC());
+        msg.setSourceInputId(inputId);
+        filter.filter(msg);
+
+        assertNull(msg.getField("foo"));
     }
 }
