@@ -22,12 +22,15 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bson.conversions.Bson;
 import org.graylog.scheduler.DBSystemJobTriggerService;
+import org.graylog.scheduler.JobSchedule;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.JobTriggerStatus;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.system.SystemJobSummary;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -68,6 +71,20 @@ public class SystemJobManager {
                 .build();
 
         triggerService.create(trigger);
+    }
+
+    public void submitWithSchedule(SystemJobConfig config, JobSchedule schedule, Instant firstTime) {
+        final var nextTime = new DateTime(firstTime.toEpochMilli(), DateTimeZone.UTC);
+        final var trigger = JobTriggerDto.builderWithClock(clock)
+                .jobDefinitionType(SystemJobDefinitionConfig.TYPE_NAME)
+                .jobDefinitionId(config.type())
+                .data(config)
+                .startTime(nextTime)
+                .nextTime(nextTime)
+                .schedule(schedule)
+                .build();
+
+        // TODO: Upsert? What happens if there are multiple trigger already? (once type)
     }
 
     public List<SystemJobConfig> getRunningJobConfigs(String type) {
