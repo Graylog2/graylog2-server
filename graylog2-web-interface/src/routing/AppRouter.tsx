@@ -385,6 +385,7 @@ const AppRouter = () => {
 
             { path: RoutePaths.SYSTEM.COLLECTORS.OVERVIEW, element: <CollectorsOverviewPage /> },
             { path: RoutePaths.SYSTEM.COLLECTORS.FLEETS, element: <CollectorsFleetsPage /> },
+            { path: `${RoutePaths.SYSTEM.COLLECTORS.FLEETS}/new`, element: <CollectorsFleetsPage /> },
             { path: `${RoutePaths.SYSTEM.COLLECTORS.FLEETS}/:fleetId`, element: <CollectorsFleetDetailPage /> },
             { path: RoutePaths.SYSTEM.COLLECTORS.INSTANCES, element: <CollectorsInstancesPage /> },
             { path: RoutePaths.SYSTEM.COLLECTORS.DEPLOYMENT, element: <CollectorsDeploymentPage /> },

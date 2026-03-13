@@ -17,6 +17,7 @@
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
+import {TELEMETRY_EVENT_TYPE} from 'logic/telemetry/Constants';
 
 export const PAGE_NAV_TITLE = 'Collectors';
 
@@ -31,6 +32,19 @@ const bindings: PluginExports = {
         { description: 'Deployment', path: Routes.SYSTEM.COLLECTORS.DEPLOYMENT },
         { description: 'Settings', path: Routes.SYSTEM.COLLECTORS.SETTINGS },
       ],
+    },
+  ],
+  entityCreators: [
+    {
+      id: 'Fleet',
+      title: 'Create fleet',
+      path: Routes.SYSTEM.COLLECTORS.FLEETS_NEW,
+      telemetryEvent: {
+        type: TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET_NEW_OPENED,
+        section: 'collectors',
+        actionValue: 'create-fleet-button',
+      },
+// TODO we don't have permissions yet      permissions: 'fleets:create',
     },
   ],
 };

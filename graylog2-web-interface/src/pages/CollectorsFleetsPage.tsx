@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useMemo, useCallback } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useEffect, useState, useMemo, useCallback } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 
-import { Button, Row, Col } from 'components/bootstrap';
+import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import type { SearchParams } from 'stores/PaginationTypes';
@@ -30,11 +30,19 @@ import type { Fleet } from 'components/collectors/types';
 import customColumnRenderers from 'components/collectors/fleets/ColumnRenderers';
 import { DEFAULT_LAYOUT } from 'components/collectors/fleets/Constants';
 import Routes from 'routing/Routes';
+import useHistory from 'routing/useHistory';
+import CreateButton from 'components/common/CreateButton';
 
 const CollectorsFleetsPage = () => {
   const { data: config, isLoading } = useCollectorsConfig();
   const [showFleetModal, setShowFleetModal] = useState(false);
   const { createFleet, isCreatingFleet } = useCollectorsMutations();
+  const { pathname } = useLocation();
+  const history = useHistory();
+
+  useEffect(() => {
+    setShowFleetModal(pathname === Routes.SYSTEM.COLLECTORS.FLEETS_NEW);
+  }, [pathname]);
 
   const columnRenderers = useMemo(() => customColumnRenderers(), []);
 
@@ -43,9 +51,13 @@ const CollectorsFleetsPage = () => {
     [],
   );
 
+  const closeCreateModal = useCallback(() => {
+    history.push(Routes.SYSTEM.COLLECTORS.FLEETS);
+  }, [history]);
+
   const handleSaveFleet = async (fleet: Omit<Fleet, 'id' | 'created_at' | 'updated_at'>) => {
     await createFleet(fleet);
-    setShowFleetModal(false);
+    closeCreateModal();
   };
 
   if (isLoading) {
@@ -61,7 +73,7 @@ const CollectorsFleetsPage = () => {
       <CollectorsPageNavigation />
       <PageHeader
         title="Fleets"
-        actions={<Button bsStyle="success" onClick={() => setShowFleetModal(true)}>Add Fleet</Button>}
+        actions={<CreateButton entityKey={"Fleet"} />}
       >
         <span>Manage collector fleets and their configurations.</span>
       </PageHeader>
@@ -82,7 +94,7 @@ const CollectorsFleetsPage = () => {
 
       {showFleetModal && (
         <FleetFormModal
-          onClose={() => setShowFleetModal(false)}
+          onClose={closeCreateModal}
           onSave={handleSaveFleet}
           isLoading={isCreatingFleet}
         />

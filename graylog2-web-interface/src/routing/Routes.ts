@@ -229,6 +229,7 @@ const Routes = {
     COLLECTORS: {
       OVERVIEW: '/system/collectors',
       FLEETS: '/system/collectors/fleets',
+      FLEETS_NEW: '/system/collectors/fleets/new',
       FLEET: (fleetId: string) => `/system/collectors/fleets/${fleetId}`,
       INSTANCES: '/system/collectors/instances',
       INSTANCE: (instanceId: string) => `/system/collectors/instances/${instanceId}`,
