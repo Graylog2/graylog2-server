@@ -21,6 +21,7 @@ import org.graylog.inputs.otel.OTelGrpcInput;
 import org.graylog.inputs.otel.codec.OTelCodec;
 import org.graylog.inputs.otel.transport.OTelGrpcTransport;
 import org.graylog.inputs.otel.transport.OTelLogsService;
+import org.graylog.inputs.otel.transport.OTelTraceService;
 import org.graylog2.plugin.PluginModule;
 
 public class OTelModule extends PluginModule {
@@ -31,5 +32,6 @@ public class OTelModule extends PluginModule {
         addCodec(OTelCodec.NAME, OTelCodec.class);
 
         install(new FactoryModuleBuilder().build(OTelLogsService.Factory.class));
+        install(new FactoryModuleBuilder().build(OTelTraceService.Factory.class));
     }
 }

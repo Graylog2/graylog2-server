@@ -40,11 +40,13 @@ public class OTelCodec implements Codec {
 
     private final Configuration configuration;
     private final OTelLogsCodec logsCodec;
+    private final OTelTraceCodec traceCodec;
 
     @Inject
-    public OTelCodec(@Assisted Configuration configuration, OTelLogsCodec logsCodec) {
+    public OTelCodec(@Assisted Configuration configuration, OTelLogsCodec logsCodec, OTelTraceCodec traceCodec) {
         this.configuration = configuration;
         this.logsCodec = logsCodec;
+        this.traceCodec = traceCodec;
     }
 
     @FactoryClass
@@ -85,6 +87,8 @@ public class OTelCodec implements Codec {
         return switch (journalRecord.getPayloadCase()) {
             case LOG ->
                     logsCodec.decode(journalRecord.getLog(), rawMessage.getTimestamp(), rawMessage.getRemoteAddress());
+            case TRACE ->
+                    traceCodec.decode(journalRecord.getTrace(), rawMessage.getTimestamp(), rawMessage.getRemoteAddress());
             case PAYLOAD_NOT_SET -> throw InputProcessingException.create(
                     "Error handling OpenTelemetry message. No payload set.", rawMessage);
         };
