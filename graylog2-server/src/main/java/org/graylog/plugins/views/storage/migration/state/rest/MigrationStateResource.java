@@ -24,6 +24,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -62,12 +63,13 @@ public class MigrationStateResource {
     @Path("/trigger")
     @NoAuditEvent("No Audit Event needed") // TODO: do we need audit log here?
     @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
-    @Operation(summary = "trigger migration step", response = CurrentStateInformation.class)
-    public Response trigger(@Parameter(name = "request") @NotNull MigrationStepRequest request) {
+    @Operation(summary = "trigger migration step")
+    public CurrentStateInformation trigger(@Parameter(name = "request") @NotNull MigrationStepRequest request) {
         final CurrentStateInformation newState = stateMachine.trigger(request.step(), request.args());
-        Response.ResponseBuilder response = newState.hasErrors() ? Response.serverError() : Response.ok();
-        return response.entity(newState)
-                .build();
+        if (newState.hasErrors()) {
+            throw new InternalServerErrorException();
+        }
+        return newState;
     }
 
     @GET
