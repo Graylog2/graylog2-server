@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 import useCreateViewForEvent from 'views/logic/views/UseCreateViewForEvent';
 import type { EventDefinitionMappedData } from 'hooks/useEventDefinition';
@@ -22,14 +22,16 @@ import ReplaySearch, { LoadingBarrier } from 'components/events/ReplaySearch';
 import type { ReplaySearchContextType } from 'components/event-definitions/replay-search/ReplaySearchContext';
 import ReplaySearchContext from 'components/event-definitions/replay-search/ReplaySearchContext';
 import type { Event } from 'components/events/events/types';
-import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
+import useRightSidebar from 'hooks/useRightSidebar';
 import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
+import useFeature from 'hooks/useFeature';
+import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
 import sidebarSections, { type SidebarSection } from 'views/components/sidebar/sidebarSections';
+import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
 
-type Props = {
-  eventDefinitionMappedData: EventDefinitionMappedData;
-  eventData: Event;
-  searchPageLayout?: Partial<LayoutState>;
+const ReplaySearchSidebarSection = () => {
+  const { alertId, definitionId } = useReplaySearchContext();
+  return <ReplaySearchSidebar alertId={alertId} definitionId={definitionId} />;
 };
 
 const replaySection: SidebarSection = {
@@ -37,10 +39,19 @@ const replaySection: SidebarSection = {
   hoverTitle: 'Replay Details',
   title: null,
   icon: 'play_arrow',
-  content: ReplaySearchSidebar,
+  content: ReplaySearchSidebarSection,
 };
 
 const defaultSearchPageLayout: Partial<LayoutState> = {
+  sidebar: {
+    isShown: true,
+    title: 'Replayed Search',
+    sections: [...sidebarSections],
+    contentColumnWidth: 350,
+  },
+};
+
+const legacySearchPageLayout: Partial<LayoutState> = {
   sidebar: {
     isShown: true,
     title: 'Replayed Search',
@@ -49,12 +60,21 @@ const defaultSearchPageLayout: Partial<LayoutState> = {
   },
 };
 
+type Props = {
+  eventDefinitionMappedData: EventDefinitionMappedData;
+  eventData: Event;
+  searchPageLayout?: Partial<LayoutState>;
+};
+
 const EventReplaySearch = ({
   eventDefinitionMappedData,
-  searchPageLayout = defaultSearchPageLayout,
   eventData,
+  searchPageLayout,
 }: Props) => {
   const { eventDefinition, aggregations } = eventDefinitionMappedData;
+  const { openSidebar } = useRightSidebar();
+  const isRightSidebarEnabled = useFeature('replay_search_right_sidebar');
+  const effectiveLayout = searchPageLayout ?? (isRightSidebarEnabled ? defaultSearchPageLayout : legacySearchPageLayout);
 
   const view = useCreateViewForEvent({
     eventData,
@@ -71,23 +91,34 @@ const EventReplaySearch = ({
     [eventData?.alert, eventData?.id, eventDefinition?.id],
   );
 
+  useEffect(() => {
+    if (isRightSidebarEnabled) {
+      openSidebar({
+        id: 'replay-search-sidebar',
+        title: 'Replay Details',
+        component: ReplaySearchSidebar,
+        props: { alertId: eventData?.id, definitionId: eventDefinition?.id },
+      });
+    }
+  }, [isRightSidebarEnabled, openSidebar, eventData?.id, eventDefinition?.id]);
+
   return (
     <ReplaySearchContext.Provider value={replaySearchContext}>
-      <ReplaySearch view={view} searchPageLayout={searchPageLayout} />
+      <ReplaySearch view={view} searchPageLayout={effectiveLayout} />
     </ReplaySearchContext.Provider>
   );
 };
 
 const WithLoadingBarrier = ({
   eventDefinitionMappedData,
-  searchPageLayout = defaultSearchPageLayout,
   eventData,
+  searchPageLayout,
 }: Props) => (
   <LoadingBarrier eventDefinition={eventDefinitionMappedData.eventDefinition}>
     <EventReplaySearch
       eventDefinitionMappedData={eventDefinitionMappedData}
-      searchPageLayout={searchPageLayout}
       eventData={eventData}
+      searchPageLayout={searchPageLayout}
     />
   </LoadingBarrier>
 );
