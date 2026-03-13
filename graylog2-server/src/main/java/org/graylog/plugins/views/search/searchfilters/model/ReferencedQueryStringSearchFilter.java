@@ -38,6 +38,8 @@ import java.util.Optional;
 @JsonDeserialize(builder = ReferencedQueryStringSearchFilter.Builder.class)
 public abstract class ReferencedQueryStringSearchFilter implements ReferencedSearchFilter, QueryStringSearchFilter {
 
+    public static final String SCOPE_FIELD = "_scope";
+
     @JsonProperty(ID_FIELD)
     @Override
     public abstract String id();
@@ -53,6 +55,10 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
     @JsonProperty(QUERY_STRING_FIELD)
     @Nullable
     public abstract String queryString();
+
+    @JsonProperty(SCOPE_FIELD)
+    @Nullable
+    public abstract String scope();
 
     @Override
     @JsonProperty(value = NEGATION_FIELD, defaultValue = "false")
@@ -91,6 +97,9 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
 
         @JsonProperty(QUERY_STRING_FIELD)
         public abstract Builder queryString(String queryString);
+
+        @JsonProperty(SCOPE_FIELD)
+        public abstract Builder scope(String scope);
 
         @JsonProperty(value = NEGATION_FIELD, defaultValue = "false")
         public abstract Builder negation(boolean negation);

@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.searchfilters.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -66,6 +67,7 @@ public abstract class InlineQueryStringSearchFilter implements UsedSearchFilter,
     }
 
     @AutoValue.Builder
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public abstract static class Builder {
 
         @JsonProperty(TITLE_FIELD)
