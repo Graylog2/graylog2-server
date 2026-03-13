@@ -1,0 +1,5 @@
+type = "a"
+message = "Added a default timestamp filter for Alerts and Events table to show entities from the last month."
+
+pulls = ["25292"]
+issues = ["24361"]

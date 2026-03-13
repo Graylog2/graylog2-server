@@ -35,12 +35,18 @@ import EventsWidgets from 'components/events/EventsWidgets';
 import EventsRefreshProvider from 'components/events/EventsRefreshProvider';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import { EXCLUDE_INFO_FILTER } from 'logic/alerts/EventDefinitionPriorityEnum';
+import { adjustFormat, toDateObject } from 'util/DateTime';
+import { DATE_SEPARATOR } from 'components/common/EntityFilters/helpers/timeRange';
 
 const additionalSearchFields = {
   key: 'The key of the event',
 };
 
-const defaultFilters = OrderedMap({ priority: [EXCLUDE_INFO_FILTER] });
+const defaultFrom = adjustFormat(toDateObject(new Date(), undefined, 'UTC').subtract(1, 'month'), 'internal');
+const defaultFilters = OrderedMap({
+  priority: [EXCLUDE_INFO_FILTER],
+  timestamp: [`${defaultFrom}${DATE_SEPARATOR}`],
+});
 
 const EventsEntityTable = () => {
   const { stream_id: streamId } = useQuery();
