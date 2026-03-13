@@ -409,6 +409,9 @@ public class PipelineRuleParser {
         public void exitNamedArgs(RuleLangParser.NamedArgsContext ctx) {
             final Map<String, Expression> argMap = Maps.newHashMap();
             for (RuleLangParser.PropAssignmentContext propAssignmentContext : ctx.propAssignment()) {
+                if (propAssignmentContext.Identifier() == null) {
+                    continue;
+                }
                 final String argName = unquote(propAssignmentContext.Identifier().getText(), '`');
                 final Expression argValue = exprs.get(propAssignmentContext.expression());
                 argMap.put(argName, argValue);
@@ -419,7 +422,7 @@ public class PipelineRuleParser {
         @Override
         public void exitPositionalArgs(RuleLangParser.PositionalArgsContext ctx) {
             List<Expression> expressions = Lists.newArrayListWithCapacity(ctx.expression().size());
-            expressions.addAll(ctx.expression().stream().map(exprs::get).collect(toList()));
+            expressions.addAll(ctx.expression().stream().map(exprs::get).filter(Objects::nonNull).collect(toList()));
             argsList.put(ctx, expressions);
         }
 

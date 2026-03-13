@@ -287,6 +287,26 @@ class PipelineRuleParserTest extends BaseParserTest {
     }
 
     @Test
+    void namedArgsTrailingComma() {
+        try {
+            parseRuleWithOptionalCodegen();
+            fail("Should have thrown parse exception");
+        } catch (ParseException e) {
+            assertTrue(e.getErrors().stream().anyMatch(error -> error instanceof SyntaxError));
+        }
+    }
+
+    @Test
+    void positionalArgsTrailingComma() {
+        try {
+            parseRuleWithOptionalCodegen();
+            fail("Should have thrown parse exception");
+        } catch (ParseException e) {
+            assertTrue(e.getErrors().stream().anyMatch(error -> error instanceof SyntaxError));
+        }
+    }
+
+    @Test
     void charLiteral() {
         final Rule rule = parseRuleWithOptionalCodegen();
         Message message = messageFactory.createMessage("hello test", "source", DateTime.now(DateTimeZone.UTC));
