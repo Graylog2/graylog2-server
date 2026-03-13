@@ -63,5 +63,7 @@ describe('isDeepEqual', () => {
     ${objectWithMap()}       | ${objectWithMap()}       | ${true}  | ${'objects containing immutable maps'}
     ${arrayOfMaps()}         | ${arrayOfMaps()}         | ${true}  | ${'arrays containing immutable maps'}
     ${mixedMapsAndObjects()} | ${mixedMapsAndObjects()} | ${true}  | ${'nested immutable maps and objects'}
-  `('compares $description and returns $result', ({ initial, next, result }) => expectIsDeepEqual({ initial, next, result }));
+  `('compares $description and returns $result', ({ initial, next, result }) =>
+    expectIsDeepEqual({ initial, next, result }),
+  );
 });

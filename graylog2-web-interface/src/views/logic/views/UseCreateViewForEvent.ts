@@ -91,7 +91,13 @@ const createViewWidget = ({ groupBy, fnSeries, expr }: { groupBy: Array<string>;
   return getAggregationWidget({ rowPivots, fnSeries: [fnSeriesForFunc], sort });
 };
 
-const getSummaryAggregation = ({ aggregations, groupBy }: { aggregations: Array<EventDefinitionAggregation>; groupBy: Array<string> }) => {
+const getSummaryAggregation = ({
+  aggregations,
+  groupBy,
+}: {
+  aggregations: Array<EventDefinitionAggregation>;
+  groupBy: Array<string>;
+}) => {
   const { summaryFnSeries, summaryTitle } = aggregations.reduce<{ summaryFnSeries: string[]; summaryTitle: string }>(
     (res, { value, expr, fnSeries }) => {
       const concatTitle = `${fnSeries} ${expr} ${value}`;
@@ -119,7 +125,12 @@ const getSummaryAggregation = ({ aggregations, groupBy }: { aggregations: Array<
   };
 };
 
-export const WidgetsGenerator = async ({ streams, streamCategories, aggregations, groupBy }: {
+export const WidgetsGenerator = async ({
+  streams,
+  streamCategories,
+  aggregations,
+  groupBy,
+}: {
   streams: string | string[] | undefined;
   streamCategories: string | string[] | undefined;
   aggregations: Array<EventDefinitionAggregation>;
