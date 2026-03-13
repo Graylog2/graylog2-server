@@ -74,26 +74,6 @@ public class V20260313163300_MigrateTeamsNotificationV2Test {
         verify(clusterConfigService, never()).write(any());
     }
 
-    @Test
-    @MongoDBFixtures("V20260313163300_MigrateTeamsNotificationV2Test.json")
-    public void testSetsTimeZoneToUTC() {
-        when(clusterConfigService.get(V20260313163300_MigrateTeamsNotificationV2.MigrationCompletion.class))
-                .thenReturn(null);
-
-        // Before migration: time_zone is "Europe/Berlin"
-        var notificationBefore = eventNotifications.find(
-                Filters.eq("_id", new ObjectId("69b409a722ad2cd99b88a69a"))).first();
-        assertThat(notificationBefore.get("config", Document.class).getString("time_zone"))
-                .isEqualTo("Europe/Berlin");
-
-        migration.upgrade();
-
-        // After migration: time_zone is "UTC"
-        var notificationAfter = eventNotifications.find(
-                Filters.eq("_id", new ObjectId("69b409a722ad2cd99b88a69a"))).first();
-        assertThat(notificationAfter.get("config", Document.class).getString("time_zone"))
-                .isEqualTo("UTC");
-    }
 
     @Test
     @MongoDBFixtures("V20260313163300_MigrateTeamsNotificationV2Test.json")

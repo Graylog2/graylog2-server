@@ -39,7 +39,6 @@ public class V20260313163300_MigrateTeamsNotificationV2 extends Migration {
     private static final String COLLECTION_NAME = "event_notifications";
     private static final String TEAMS_V2 = "teams-notification-v2";
     private static final String TYPE_FIELD = "config.type";
-    private static final String TIME_ZONE_FIELD = "config.time_zone";
     private static final String ADAPTIVE_CARD_FIELD = "config.adaptive_card";
     private static final String OLD_TIMESTAMP = "\"value\": \"${event.timestamp_processing}\"";
     private static final String NEW_TIMESTAMP = "\"value\": \"{{DATE(${event.timestamp_processing},SHORT)}} at {{TIME(${event.timestamp_processing})}}\"";
@@ -59,10 +58,8 @@ public class V20260313163300_MigrateTeamsNotificationV2 extends Migration {
     }
 
     /**
-     * This migration updates existing teams-notification-v2 configurations:
-     * 1. Sets time_zone to "UTC" (timestamps are always sent in UTC and displayed
-     * in the viewer's local Teams timezone via the Adaptive Cards DATE() function).
-     * 2. Updates the adaptive card timestamp format to use DATE()/TIME() functions
+     * This migration updates existing teams-notification-v2 configurations
+     * Updates the adaptive card timestamp format to use DATE()/TIME() functions
      * for proper local time rendering in Teams.
      */
     @Override
@@ -77,12 +74,8 @@ public class V20260313163300_MigrateTeamsNotificationV2 extends Migration {
         LOG.info("Updating '{}' collection.", COLLECTION_NAME);
 
         Bson v2Filter = Filters.eq(TYPE_FIELD, TEAMS_V2);
-        // Step 1: Update time_zone field to UTC
-        LOG.info("Updating '{}' field to UTC for {} configurations", TIME_ZONE_FIELD, TEAMS_V2);
-        UpdateResult tzResult = collection.updateMany(v2Filter, Updates.set(TIME_ZONE_FIELD, "UTC"));
-        LOG.info("time_zone update result: {}", tzResult);
 
-        // Step 2: Update adaptive_card timestamp format for each matching doc
+        // Update adaptive_card timestamp format for each matching doc
         collection.find(v2Filter).forEach(doc -> {
             Document config = doc.get("config", Document.class);
             if (config == null) return;

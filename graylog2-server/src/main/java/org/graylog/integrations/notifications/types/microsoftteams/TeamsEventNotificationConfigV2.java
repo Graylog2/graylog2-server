@@ -77,7 +77,7 @@ public abstract class TeamsEventNotificationConfigV2 implements EventNotificatio
     /**
      * @deprecated The timezone is no longer user-configurable. Timestamps are sent in UTC
      * and displayed in the viewer's local Teams timezone via the Adaptive
-     * Cards DATE() function.This field is retained only for backward-compatible
+     * Cards DATE() function. This field is retained only for backward-compatible
      * deserialization of existing installations.
      */
     @Deprecated
@@ -115,7 +115,9 @@ public abstract class TeamsEventNotificationConfigV2 implements EventNotificatio
                 .build();
     }
 
-    public static Builder builder() { return Builder.create(); }
+    public static Builder builder() {
+        return Builder.create();
+    }
 
     @Override
     @JsonIgnore

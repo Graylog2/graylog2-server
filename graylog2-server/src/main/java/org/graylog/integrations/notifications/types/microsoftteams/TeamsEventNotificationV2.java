@@ -138,8 +138,8 @@ public class TeamsEventNotificationV2 implements EventNotification {
     Map<String, Object> getCustomMessageModel(EventNotificationContext ctx, String type, List<MessageSummary> backlog) {
         Map<String, Object> model = new HashMap<>(
                 templateModelProvider.of(ctx, backlog, DateTimeZone.UTC, Map.of("type", type)));
-        // Override timestamp fields with DATE()-wrapped RFC 3339 strings so that Teams Adaptive Cards
-        // automatically display them in the viewer's local Teams timezone.
+        // Override timestamp fields with RFC 3339 strings. The Adaptive Card template wraps these
+        // values with DATE()/TIME() so that Teams automatically displays them in the viewer's local timezone.
         EventDto event = ctx.event();
         model.put("event", overrideEventTimestamps(model, event));
 
@@ -147,8 +147,8 @@ public class TeamsEventNotificationV2 implements EventNotification {
     }
 
     /**
-     * Returns a copy of the serialised event map with timestamp fields replaced by
-     * Adaptive Cards DATE()-wrapped RFC 3339 strings.
+     * Returns a copy of the serialised event map with timestamp fields replaced by RFC 3339 strings
+     * that are intended to be wrapped with DATE()/TIME() functions in the Adaptive Card template.
      */
     @SuppressWarnings("unchecked")
     private Map<String, Object> overrideEventTimestamps(Map<String, Object> model, EventDto event) {

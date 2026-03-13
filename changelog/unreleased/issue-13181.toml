@@ -2,3 +2,4 @@ type = "fixed"
 message = "Fixed Teams Notification V2 to display timestamps in the user's local timezone."
 
 issues = ["13181"]
+pulls = ["25324"]
