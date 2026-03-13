@@ -24,7 +24,7 @@ import { ProgressBar, LinkToNode, RelativeTime, Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 import Badge from 'components/bootstrap/Badge';
-import { SYSTEM_JOBS_QUERY_KEY } from 'components/systemjobs/SystemJobsComponent';
+import { SYSTEM_JOBS_QUERY_KEY } from 'components/systemjobs/useSystemJobs';
 
 enum JobStatus {
   Cancelled = 'cancelled',

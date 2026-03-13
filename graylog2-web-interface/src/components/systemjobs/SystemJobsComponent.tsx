@@ -14,35 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-
-import { ClusterJobs } from '@graylog/server-api';
+import React, { useMemo } from 'react';
 
 import { SystemJobsList } from 'components/systemjobs';
 import { Col, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import useProductName from 'brand-customization/useProductName';
-import { defaultOnError } from 'util/conditional/onError';
-
-export const SYSTEM_JOBS_QUERY_KEY = ['system', 'jobs'];
+import useSystemJobs from 'components/systemjobs/useSystemJobs';
 
 const SystemJobsComponent = () => {
   const productName = useProductName();
-  const { data: jobs, isLoading } = useQuery({
-    queryKey: SYSTEM_JOBS_QUERY_KEY,
-    queryFn: () =>
-      defaultOnError(ClusterJobs.list(), 'Loading system jobs failed with status', 'Could not load system jobs'),
-    refetchInterval: 2000,
-  });
+  const jobs = useSystemJobs();
+  const jobList = useMemo(
+    () => (jobs ? Object.values(jobs).flatMap((jobsPerNode) => jobsPerNode?.jobs ?? []) : undefined),
+    [jobs],
+  );
 
-  if (isLoading || !jobs) {
+  if (!jobList) {
     return <Spinner />;
   }
-
-  const jobList = Object.keys(jobs)
-    .map((nodeId) => (jobs[nodeId] ? jobs[nodeId].jobs : []))
-    .reduce((a, b) => a.concat(b), []);
 
   return (
     <Row className="content">

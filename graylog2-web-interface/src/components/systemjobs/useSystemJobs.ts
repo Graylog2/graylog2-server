@@ -14,21 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Reflux from 'reflux';
+import { useQuery } from '@tanstack/react-query';
 
-import * as URLUtils from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
-import { fetchPeriodically } from 'logic/rest/FetchProvider';
-import { singletonStore } from 'logic/singleton';
+import { ClusterJobs } from '@graylog/server-api';
 
-export const SystemMessagesStore = singletonStore('core.SystemMessages', () =>
-  Reflux.createStore({
-    listenables: [],
+import { defaultOnError } from 'util/conditional/onError';
 
-    all(page: number): Promise<unknown> {
-      const url = URLUtils.qualifyUrl(ApiRoutes.SystemMessagesApiController.all(page).url);
+export const SYSTEM_JOBS_QUERY_KEY = ['system', 'jobs'];
 
-      return fetchPeriodically('GET', url);
-    },
-  }),
-);
+const useSystemJobs = () => {
+  const { data: jobs } = useQuery({
+    queryKey: SYSTEM_JOBS_QUERY_KEY,
+    queryFn: () =>
+      defaultOnError(ClusterJobs.list(), 'Loading system jobs failed with status', 'Could not load system jobs'),
+    refetchInterval: 2000,
+  });
+
+  return jobs;
+};
+
+export default useSystemJobs;
