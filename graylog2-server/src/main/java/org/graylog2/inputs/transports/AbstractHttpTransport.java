@@ -64,8 +64,8 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
 
     static final String CK_ENABLE_BULK_RECEIVING = "enable_bulk_receiving";
     static final String CK_ENABLE_CORS = "enable_cors";
-    static final String CK_MAX_CHUNK_SIZE = "max_chunk_size";
-    static final String CK_IDLE_WRITER_TIMEOUT = "idle_writer_timeout";
+    public static final String CK_MAX_CHUNK_SIZE = "max_chunk_size";
+    public static final String CK_IDLE_WRITER_TIMEOUT = "idle_writer_timeout";
     static final String CK_AUTHORIZATION_HEADER_NAME = "authorization_header_name";
     static final String CK_AUTHORIZATION_HEADER_VALUE = "authorization_header_value";
     private static final String AUTHORIZATION_HEADER_NAME_LABEL = "Authorization Header Name";

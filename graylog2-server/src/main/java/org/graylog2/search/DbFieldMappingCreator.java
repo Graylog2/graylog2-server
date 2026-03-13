@@ -32,10 +32,10 @@ public class DbFieldMappingCreator {
                 .filter(attr -> Objects.nonNull(attr.searchable()))
                 .filter(EntityAttribute::searchable)
                 .forEach(attr -> {
-                    final SearchQueryField searchQueryField = SearchQueryField.create(
-                            attr.id(),
-                            attr.type()
-                    );
+                    final String fieldName = attr.dbField() != null ? attr.dbField() : attr.id();
+                    final SearchQueryField searchQueryField = attr.bsonFilterCreator() != null
+                            ? SearchQueryField.create(fieldName, attr.type(), attr.bsonFilterCreator())
+                            : SearchQueryField.create(fieldName, attr.type());
                     dbFieldMapping.put(attr.id(), searchQueryField);
                     if (!attr.title().contains(" ")) {
                         dbFieldMapping.put(attr.title().toLowerCase(Locale.ROOT), searchQueryField);
