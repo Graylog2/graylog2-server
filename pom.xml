@@ -131,6 +131,7 @@
         <freemarker.version>2.3.34</freemarker.version>
         <gcs.version>2.64.0</gcs.version>
         <azure-blob-storage.version>12.33.2</azure-blob-storage.version>
+        <azure-identity.version>1.18.2</azure-identity.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>5.0.2</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
@@ -320,6 +321,11 @@
                 <groupId>com.azure</groupId>
                 <artifactId>azure-storage-blob</artifactId>
                 <version>${azure-blob-storage.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-identity</artifactId>
+                <version>${azure-identity.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
