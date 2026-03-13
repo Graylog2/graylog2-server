@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -46,8 +47,8 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
-
 import jakarta.validation.constraints.NotEmpty;
 
 import java.io.IOException;
@@ -236,8 +237,25 @@ public class GreyNoiseQuickIPDataAdapter extends LookupDataAdapter {
         @NotEmpty
         public abstract EncryptedValue apiToken();
 
+        public abstract Builder toBuilder();
+
         public static Builder builder() {
             return new AutoValue_GreyNoiseQuickIPDataAdapter_Config.Builder();
+        }
+
+        @Override
+        @JsonIgnore
+        public LookupDataAdapterConfiguration prepareConfigUpdate(@Nonnull LookupDataAdapterConfiguration newConfig) {
+            final Config newGreyNoiseConfig = (Config) newConfig;
+            EncryptedValue newApiToken = newGreyNoiseConfig.apiToken();
+
+            if (newApiToken.isKeepValue()) {
+                newApiToken = apiToken();
+            } else if (newApiToken.isDeleteValue()) {
+                newApiToken = EncryptedValue.createUnset();
+            }
+
+            return newGreyNoiseConfig.toBuilder().apiToken(newApiToken).build();
         }
 
         @AutoValue.Builder
