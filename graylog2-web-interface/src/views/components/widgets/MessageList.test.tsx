@@ -37,8 +37,9 @@ import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes'
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
-import type { MessageListResult } from './MessageList';
+import type { MessageListResult, MessageTableBulkSelection } from './MessageList';
 import MessageList from './MessageList';
 import type { TRenderCompletionCallback } from './RenderCompletionCallback';
 import RenderCompletionCallback from './RenderCompletionCallback';
@@ -141,7 +142,7 @@ describe('MessageList', () => {
     config: _config = config,
     fields = Immutable.List([]),
     ...props
-  }: Partial<React.ComponentProps<typeof MessageList>>) => (
+  }: Partial<React.ComponentProps<typeof MessageList>> & { bulkSelection?: MessageTableBulkSelection }) => (
     <TestStoreProvider>
       <MessageList
         title="Message List"
@@ -276,5 +277,133 @@ describe('MessageList', () => {
     );
 
     await waitFor(() => expect(onRenderComplete).toHaveBeenCalled());
+  });
+
+  it('does not render bulk selection checkboxes when bulk actions are not defined', async () => {
+    render(<SimpleMessageList />);
+
+    await findTable();
+
+    expect(screen.queryByRole('checkbox', { name: /select message/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('checkbox', { name: /select all visible messages/i })).not.toBeInTheDocument();
+  });
+
+  it('bulk actions and row checkboxes update selected message state', async () => {
+    const selectedItemInfo = '1 item selected';
+    const BulkActions = () => {
+      const { setSelectedEntities } = useSelectedEntities();
+
+      return (
+        <button onClick={() => setSelectedEntities([])} type="button">
+          Reset selection
+        </button>
+      );
+    };
+
+    render(<SimpleMessageList bulkSelection={{ actions: <BulkActions /> }} />);
+
+    const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select message/i });
+    await userEvent.click(rowCheckboxes[0]);
+
+    await screen.findByText(selectedItemInfo);
+    const customBulkAction = await screen.findByRole('button', { name: /reset selection/i });
+
+    await userEvent.click(customBulkAction);
+
+    expect(screen.queryByText(selectedItemInfo)).not.toBeInTheDocument();
+    expect(rowCheckboxes[0]).not.toBeChecked();
+  });
+
+  it('selects and deselects all visible messages', async () => {
+    const secondMessageId = 'feedface';
+
+    render(
+      <SimpleMessageList
+        data={{
+          ...data,
+          messages: [
+            ...data.messages,
+            {
+              highlight_ranges: {},
+              index: 'graylog_43',
+              message: {
+                _id: secondMessageId,
+                file_name: 'pam.txt',
+                timestamp: '2018-09-26T12:43:49.234Z',
+              },
+            },
+          ],
+          total: 2,
+        }}
+        bulkSelection={{ actions: <div /> }}
+      />,
+    );
+
+    const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select message/i });
+
+    expect(rowCheckboxes[0]).not.toBeChecked();
+    expect(rowCheckboxes[1]).not.toBeChecked();
+
+    const selectAllCheckbox = await screen.findByRole('checkbox', { name: /select all visible messages/i });
+    await userEvent.click(selectAllCheckbox);
+
+    expect(rowCheckboxes[0]).toBeChecked();
+    expect(rowCheckboxes[1]).toBeChecked();
+    await screen.findByText(/2 items selected/i);
+
+    await userEvent.click(selectAllCheckbox);
+
+    expect(rowCheckboxes[0]).not.toBeChecked();
+    expect(rowCheckboxes[1]).not.toBeChecked();
+  });
+
+  it('supports a complete bulk selection setup as example usage', async () => {
+    const onChangeSelection = jest.fn();
+    const BulkActions = () => {
+      const { selectedEntities, setSelectedEntities } = useSelectedEntities();
+
+      return (
+        <button onClick={() => setSelectedEntities([])} type="button">
+          Clear {selectedEntities.length}
+        </button>
+      );
+    };
+
+    render(
+      <SimpleMessageList
+        bulkSelection={{
+          actions: <BulkActions />,
+          initialSelection: ['deadbeef'],
+          isEntitySelectable: (message) => message.message.file_name === 'frank.txt',
+          onChangeSelection,
+        }}
+      />,
+    );
+
+    const rowCheckbox = await screen.findByRole('checkbox', { name: /deselect message/i });
+
+    expect(rowCheckbox).toBeChecked();
+    expect(screen.getByRole('button', { name: /clear 1/i })).toBeInTheDocument();
+    expect(onChangeSelection).not.toHaveBeenCalled();
+
+    await userEvent.click(rowCheckbox);
+
+    expect(onChangeSelection).toHaveBeenLastCalledWith([], [
+      {
+        id: 'deadbeef',
+        index: 'graylog_42',
+        timestamp: '2018-09-26T12:42:49.234Z',
+      },
+    ]);
+
+    await userEvent.click(rowCheckbox);
+
+    expect(onChangeSelection).toHaveBeenLastCalledWith(['deadbeef'], [
+      {
+        id: 'deadbeef',
+        index: 'graylog_42',
+        timestamp: '2018-09-26T12:42:49.234Z',
+      },
+    ]);
   });
 });

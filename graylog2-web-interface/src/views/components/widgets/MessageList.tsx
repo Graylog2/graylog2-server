@@ -23,6 +23,7 @@ import { Messages } from 'views/Constants';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
 import { PaginatedList } from 'components/common';
+import BulkActionsRow from 'components/common/EntityDataTable/BulkActionsRow';
 import MessageTable from 'components/common/message/messagetable/MessageTable';
 import ErrorWidget from 'views/components/widgets/ErrorWidget';
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
@@ -36,8 +37,12 @@ import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes'
 import useOnSearchExecution from 'views/hooks/useOnSearchExecution';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useSearchResult from 'views/hooks/useSearchResult';
+import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
+import useMessageListPluggableBulkActions from 'views/components/widgets/useMessageListPluggableBulkActions';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
+import MessageTableSelectedEntitiesProvider from './MessageTableSelectedEntitiesProvider';
+import SelectableMessageTableMessagesProvider from './SelectableMessageTableMessagesProvider';
 
 const Wrapper = styled.div`
   display: flex;
@@ -50,6 +55,23 @@ const Wrapper = styled.div`
   }
 `;
 
+const StyledBulkActionsRow = styled(BulkActionsRow)`
+  padding-bottom: 10px;
+`;
+
+const BulkActions = () => {
+  const { actions, actionModals } = useMessageListPluggableBulkActions();
+
+  if (!actions?.length) return null;
+
+  return (
+    <>
+      <BulkActionsDropdown>{actions}</BulkActionsDropdown>
+      {actionModals}
+    </>
+  );
+};
+
 export type MessageListResult = {
   messages: Array<BackendMessage>;
   total: number;
@@ -57,8 +79,25 @@ export type MessageListResult = {
   type: 'messages';
 };
 
+export type SelectableMessageTableMessage = {
+  id: string;
+  index: BackendMessage['index'];
+  timestamp: BackendMessage['message']['timestamp'];
+};
+
+export type MessageTableBulkSelection = {
+  actions?: React.ReactNode;
+  onChangeSelection?: (
+    selectedEntities: Array<BackendMessage['message']['_id']>,
+    data: Readonly<Array<SelectableMessageTableMessage>>,
+  ) => void;
+  initialSelection?: Array<BackendMessage['message']['_id']>;
+  isEntitySelectable?: (entity: BackendMessage) => boolean;
+};
+
 type Props = WidgetComponentProps<MessagesWidgetConfig, MessageListResult> & {
   pageSize?: number;
+  bulkSelection?: MessageTableBulkSelection;
 };
 
 const useResetPaginationOnSearchExecution = (setCurrentPage: (pageNr: number) => void, currentPage) => {
@@ -104,6 +143,8 @@ const MessageList = ({
   onConfigChange = () => Promise.resolve(),
   pageSize = Messages.DEFAULT_LIMIT,
   setLoadingState,
+  editing,
+  bulkSelection = { actions: <BulkActions /> },
 }: Props) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { stopAutoRefresh } = useAutoRefresh();
@@ -115,6 +156,23 @@ const MessageList = ({
   const dispatch = useViewsDispatch();
   useResetPaginationOnSearchExecution(setCurrentPage, currentPage);
   useRenderCompletionCallback();
+  const displayBulkAction = !!bulkSelection?.actions && !editing;
+  const displayBulkSelectCol =
+    (typeof bulkSelection?.onChangeSelection === 'function' || displayBulkAction) && !editing;
+  const isEntitySelectable = useCallback(
+    (entity: BackendMessage) => {
+      if (!displayBulkSelectCol || !entity.message?._id) {
+        return false;
+      }
+
+      if (typeof bulkSelection?.isEntitySelectable === 'function') {
+        return bulkSelection.isEntitySelectable(entity);
+      }
+
+      return true;
+    },
+    [bulkSelection, displayBulkSelectCol],
+  );
 
   const handlePageChange = useCallback(
     (newCurrentPage: number) => {
@@ -150,32 +208,46 @@ const MessageList = ({
     [config, onConfigChange],
   );
 
+  const content = (
+    <Wrapper>
+      {displayBulkAction && <StyledBulkActionsRow bulkActions={bulkSelection.actions} />}
+      <PaginatedList
+        onChange={handlePageChange}
+        activePage={Number(currentPage)}
+        showPageSizeSelect={false}
+        totalItems={totalMessages}
+        pageSize={pageSize}
+        enforcePageBounds={false}
+        useQueryParameter={false}>
+        {pageErrors.length > 0 ? (
+          <ErrorWidget errors={pageErrors} />
+        ) : (
+          <MessageTable
+            activeQueryId={activeQueryId}
+            config={config}
+            scrollContainerRef={scrollContainerRef}
+            fields={fields}
+            onSortChange={onSortChange}
+            setLoadingState={setLoadingState}
+            messages={messages}
+            displayBulkSelectCol={displayBulkSelectCol}
+            isEntitySelectable={isEntitySelectable}
+          />
+        )}
+      </PaginatedList>
+    </Wrapper>
+  );
+
   return (
     <WindowDimensionsContextProvider>
-      <Wrapper>
-        <PaginatedList
-          onChange={handlePageChange}
-          activePage={Number(currentPage)}
-          showPageSizeSelect={false}
-          totalItems={totalMessages}
-          pageSize={pageSize}
-          enforcePageBounds={false}
-          useQueryParameter={false}>
-          {pageErrors.length > 0 ? (
-            <ErrorWidget errors={pageErrors} />
-          ) : (
-            <MessageTable
-              activeQueryId={activeQueryId}
-              config={config}
-              scrollContainerRef={scrollContainerRef}
-              fields={fields}
-              onSortChange={onSortChange}
-              setLoadingState={setLoadingState}
-              messages={messages}
-            />
-          )}
-        </PaginatedList>
-      </Wrapper>
+      <SelectableMessageTableMessagesProvider
+        messages={messages}
+        isEntitySelectable={isEntitySelectable}
+        displayBulkSelectCol={displayBulkSelectCol}>
+        <MessageTableSelectedEntitiesProvider bulkSelection={bulkSelection}>
+          {content}
+        </MessageTableSelectedEntitiesProvider>
+      </SelectableMessageTableMessagesProvider>
     </WindowDimensionsContextProvider>
   );
 };
