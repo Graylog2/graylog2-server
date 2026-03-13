@@ -68,13 +68,14 @@ public class V20260303120000_ConvertCollectorInstanceFleetIdToObjectId extends M
             LOG.info("Converted ObjectId fields to String in {} collector instance document(s)", converted);
         }
 
+        // We renamed the field that contains the source type
         final var updateResult = mongoConnection.getMongoDatabase().getCollection("streamrules")
                 .updateOne(
                         Filters.eq(StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(Stream.COLLECTOR_LOGS_STREAM_ID)),
                         Updates.set(StreamRuleImpl.FIELD_FIELD, CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_TYPE)
                 );
         if (updateResult.getModifiedCount() > 0) {
-            LOG.info("Updated streamrule <{}> to match on field <{}>", updateResult.getUpsertedId(), CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_TYPE);
+            LOG.info("Updated Collector stream rule to match on field <{}>", CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_TYPE);
         }
     }
 
