@@ -14,21 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Reflux from 'reflux';
+package org.graylog2.configuration.validators;
 
-import * as URLUtils from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
-import { fetchPeriodically } from 'logic/rest/FetchProvider';
-import { singletonStore } from 'logic/singleton';
+import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.Validator;
 
-export const SystemMessagesStore = singletonStore('core.SystemMessages', () =>
-  Reflux.createStore({
-    listenables: [],
+import java.time.Duration;
 
-    all(page: number): Promise<unknown> {
-      const url = URLUtils.qualifyUrl(ApiRoutes.SystemMessagesApiController.all(page).url);
-
-      return fetchPeriodically('GET', url);
-    },
-  }),
-);
+public class PositiveJavaDurationValidator implements Validator<Duration> {
+    @Override
+    public void validate(String name, Duration value) throws ValidationException {
+        if (value == null || value.isZero() || value.isNegative()) {
+            throw new ValidationException("Parameter " + name + " must be a positive duration (found " + value + ")");
+        }
+    }
+}
