@@ -17,12 +17,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import cloneDeep from 'lodash/cloneDeep';
+import { useQuery } from '@tanstack/react-query';
 
 import { useStore } from 'stores/connect';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import { ConfirmLeaveDialog, Spinner } from 'components/common';
-import { AvailableEventDefinitionTypesStore } from 'stores/event-definitions/AvailableEventDefinitionTypesStore';
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
+import fetch from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
+import { defaultOnError } from 'util/conditional/onError';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
@@ -103,7 +106,15 @@ const EventDefinitionFormContainer = ({
   const { configFromLocalStorage, hasLocalStorageConfig } = useEventDefinitionConfigFromLocalStorage();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(eventDefinition);
   const { createEventDefinition } = useEventDefinitionMutations();
-  const entityTypes = useStore(AvailableEventDefinitionTypesStore);
+  const { data: entityTypes } = useQuery({
+    queryKey: ['event-definitions', 'entity-types'],
+    queryFn: () =>
+      defaultOnError(
+        fetch('GET', qualifyUrl('/events/entity_types')),
+        'Loading event definition entity types failed with status',
+        'Could not load event definition entity types',
+      ),
+  });
   const notifications = useStore(EventNotificationsStore);
   const currentUser = useCurrentUser();
   const { pathname } = useLocation();

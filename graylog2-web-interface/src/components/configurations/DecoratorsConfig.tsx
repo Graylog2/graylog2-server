@@ -18,10 +18,11 @@ import React, { useCallback, useMemo, useState } from 'react';
 import groupBy from 'lodash/groupBy';
 import { useQuery } from '@tanstack/react-query';
 
+import { SearchDecorators } from '@graylog/server-api';
+
 import { Button } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
 import Spinner from 'components/common/Spinner';
-import { DecoratorsActions } from 'stores/decorators/DecoratorsStore';
 import type { Stream } from 'stores/streams/StreamsStore';
 import { StreamsActions } from 'stores/streams/StreamsStore';
 import UserNotification from 'util/UserNotification';
@@ -41,15 +42,15 @@ const DecoratorsConfig = () => {
   });
   const { data: types, isLoading: typesLoading } = useQuery<{ [key: string]: DecoratorType }>({
     queryKey: ['decorators', 'types'],
-    queryFn: DecoratorsActions.available,
+    queryFn: SearchDecorators.getAvailable,
   });
   const {
     data: decorators,
     isLoading: decoratorsLoading,
     refetch: refetchDecorators,
   } = useQuery<Array<Decorator>>({
-    queryKey: ['decorators', 'available'],
-    queryFn: DecoratorsActions.list,
+    queryKey: ['decorators', 'list'],
+    queryFn: SearchDecorators.get,
   });
   const [showConfigModal, setShowConfigModal] = useState(false);
   const streamsMap = useMemo(() => Object.fromEntries(streams?.map((s) => [s.id, s] as const) ?? []), [streams]);
