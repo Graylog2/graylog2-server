@@ -20,8 +20,8 @@ import { useQuery } from '@tanstack/react-query';
 import { NodeMaintenanceDropdown, NodeOverview } from 'components/nodes';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
-import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { InputTypesStore } from 'stores/inputs/InputTypesStore';
+import { fetchInputStates } from 'hooks/useInputsStates';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import useParams from 'routing/useParams';
 import { useStore } from 'stores/connect';
@@ -41,15 +41,12 @@ const ShowNodePage = () => {
   });
   const { data: inputStates } = useQuery({
     queryKey: ['inputs', 'states', nodeId],
-
     queryFn: () =>
-      InputStatesStore.list().then((newInputStates) => {
-        // We only want the input states for the current node
-        const inputIds = Object.keys(newInputStates);
+      fetchInputStates().then((allInputStates) => {
         const filteredInputStates = [];
 
-        inputIds.forEach((inputId) => {
-          const inputObject = newInputStates[inputId][nodeId];
+        Object.keys(allInputStates).forEach((inputId) => {
+          const inputObject = allInputStates[inputId][nodeId];
 
           if (inputObject) {
             filteredInputStates.push(inputObject);
