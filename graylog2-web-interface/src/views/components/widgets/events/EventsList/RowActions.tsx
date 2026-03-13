@@ -23,6 +23,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import Routes from 'routing/Routes';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useEventPanel from 'hooks/useEventPanel';
 
 import EventDetails from './EventDetails';
 
@@ -60,6 +61,11 @@ const RowActions = ({ eventId, hasReplayInfo, eventDefinitionId }: Props) => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const toggleDetailsModal = () => setShowDetailsModal((cur) => !cur);
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableDashboardActions(eventId);
+  const { isRightSidebarEnabled, openEventDetails } = useEventPanel();
+
+  const onViewDetails = isRightSidebarEnabled
+    ? () => openEventDetails(eventId)
+    : toggleDetailsModal;
 
   const moreActions = [
     hasReplayInfo && isPermitted(user.permissions, `eventdefinitions:read:${eventDefinitionId}`) ? (
@@ -75,7 +81,7 @@ const RowActions = ({ eventId, hasReplayInfo, eventDefinitionId }: Props) => {
   return (
     <>
       <ButtonToolbar>
-        <IconButton name="open_in_full" title="View event details" onClick={toggleDetailsModal} />
+        <IconButton name="open_in_full" title="View event details" onClick={onViewDetails} />
         {!!moreActions.length && (
           <Menu position="bottom-end">
             <Menu.Target>
@@ -85,7 +91,7 @@ const RowActions = ({ eventId, hasReplayInfo, eventDefinitionId }: Props) => {
           </Menu>
         )}
       </ButtonToolbar>
-      {showDetailsModal && (
+      {!isRightSidebarEnabled && showDetailsModal && (
         <Modal show={showDetailsModal} bsSize="large" onHide={toggleDetailsModal}>
           <Modal.Header>
             <Modal.Title>Event details</Modal.Title>

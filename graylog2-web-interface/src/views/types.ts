@@ -630,6 +630,12 @@ export type SidebarComponentPlugin = {
   component: React.ComponentType<any>;
 };
 
+export type EventDetailsSidebarPlugin = {
+  component: React.ComponentType<{ eventId: string }>;
+  key: string;
+  useCondition?: () => boolean;
+};
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     'sidebar.components'?: Array<SidebarComponentPlugin>;
@@ -672,6 +678,7 @@ declare module 'graylog-web-plugin/plugin' {
       useCondition: () => boolean;
       key: string;
     }>;
+    'views.components.widgets.events.sidebarComponent'?: Array<EventDetailsSidebarPlugin>;
     'views.components.widgets.events.actions'?: Array<EventWidgetAction<unknown>>;
     'views.components.searchActions'?: Array<SearchAction>;
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
