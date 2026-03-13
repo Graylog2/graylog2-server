@@ -18,8 +18,8 @@ import React, { useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 
 import { getValueFromInput } from 'util/FormsUtils';
-import { Input, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/bootstrap';
-import { TimezoneSelect, URLAllowListInput, SourceCodeEditor } from 'components/common';
+import { ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/bootstrap';
+import { URLAllowListInput, SourceCodeEditor } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
 
@@ -72,7 +72,7 @@ export const defaultConfig: ConfigV2Type = {
     '              },\n' +
     '              {\n' +
     '                "title": "Timestamp",\n' +
-    '                "value": "${event.timestamp_processing}"\n' +
+    '                "value": "{{DATE(${event.timestamp_processing},SHORT)}} at {{TIME(${event.timestamp_processing})}}"\n' +
     '              },\n' +
     '              {\n' +
     '                "title": "Message",\n' +
@@ -142,7 +142,6 @@ export const defaultConfig: ConfigV2Type = {
     '}',
   /* eslint-enable no-template-curly-in-string */
   backlog_size: 0,
-  time_zone: 'UTC',
 };
 
 const TeamsNotificationV2Form = ({ config, validation, onChange }: TeamsNotificationFormV2Type) => {
@@ -171,10 +170,6 @@ const TeamsNotificationV2Form = ({ config, validation, onChange }: TeamsNotifica
 
       return nextIsBacklogSizeEnabled;
     });
-  };
-
-  const handleTimeZoneChange = (nextValue) => {
-    propagateChange('time_zone', nextValue);
   };
 
   const handleWebhookUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -215,18 +210,6 @@ const TeamsNotificationV2Form = ({ config, validation, onChange }: TeamsNotifica
         <HelpBlock>{validation?.errors?.adaptive_card?.[0] ?? element}</HelpBlock>
       </FormGroup>
       <FormGroup>
-        <Input
-          id="notification-time-zone"
-          help="Time zone used for timestamps in the notification body."
-          label="Time zone for date/time values">
-          <TimezoneSelect
-            className="timezone-select"
-            name="time_zone"
-            value={config.time_zone}
-            onChange={handleTimeZoneChange}
-            clearable={false}
-          />
-        </Input>
         <ControlLabel>Message Backlog Limit (optional)</ControlLabel>
         <InputGroup>
           <InputGroup.Addon>

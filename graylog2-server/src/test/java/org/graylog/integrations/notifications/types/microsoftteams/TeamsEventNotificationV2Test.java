@@ -223,7 +223,7 @@ public class TeamsEventNotificationV2Test {
     @Test
     public void getCustomMessageModel() {
         List<MessageSummary> messageSummaries = generateMessageSummaries(50);
-        Map<String, Object> customMessageModel = teamsEventNotification.getCustomMessageModel(eventNotificationContext, notificationConfig.type(), messageSummaries, DateTimeZone.UTC);
+        Map<String, Object> customMessageModel = teamsEventNotification.getCustomMessageModel(eventNotificationContext, notificationConfig.type(), messageSummaries);
 
         assertThat(customMessageModel).isNotNull();
         assertThat(customMessageModel.get("event_definition_description")).isEqualTo("Event Definition Test Description");
