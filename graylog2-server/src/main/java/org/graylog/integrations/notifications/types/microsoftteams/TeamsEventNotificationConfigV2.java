@@ -74,6 +74,13 @@ public abstract class TeamsEventNotificationConfigV2 implements EventNotificatio
     static final String FIELD_WEBHOOK_URL = "webhook_url";
     static final String FIELD_ADAPTIVE_CARD = "adaptive_card";
     static final String FIELD_BACKLOG_SIZE = "backlog_size";
+    /**
+     * @deprecated The timezone is no longer user-configurable. Timestamps are sent in UTC
+     * and displayed in the viewer's local Teams timezone via the Adaptive
+     * Cards DATE() function. This field is retained only for backward-compatible
+     * deserialization of existing installations.
+     */
+    @Deprecated
     static final String FIELD_TIME_ZONE = "time_zone";
 
     @JsonProperty(FIELD_BACKLOG_SIZE)
@@ -86,6 +93,11 @@ public abstract class TeamsEventNotificationConfigV2 implements EventNotificatio
     @JsonProperty(FIELD_ADAPTIVE_CARD)
     public abstract String adaptiveCard();
 
+    /**
+     * @deprecated No longer used. Timestamps are always sent in UTC and displayed in the
+     * viewer's local Teams timezone via the Adaptive Cards DATE() function.
+     */
+    @Deprecated
     @JsonProperty(FIELD_TIME_ZONE)
     public abstract DateTimeZone timeZone();
 
@@ -100,11 +112,12 @@ public abstract class TeamsEventNotificationConfigV2 implements EventNotificatio
         return TeamsEventNotificationConfigV2Entity.builder()
                 .webhookUrl(ValueReference.of(webhookUrl()))
                 .adaptiveCard(ValueReference.of(adaptiveCard()))
-                .timeZone(ValueReference.of(timeZone().getID()))
                 .build();
     }
 
-    public static Builder builder() { return Builder.create(); }
+    public static Builder builder() {
+        return Builder.create();
+    }
 
     @Override
     @JsonIgnore
@@ -145,6 +158,11 @@ public abstract class TeamsEventNotificationConfigV2 implements EventNotificatio
         @JsonProperty(FIELD_ADAPTIVE_CARD)
         public abstract Builder adaptiveCard(String adaptiveCard);
 
+        /**
+         * @see TeamsEventNotificationConfigV2#FIELD_TIME_ZONE
+         * @deprecated Retained for backward-compatible deserialization only.
+         */
+        @Deprecated
         @JsonProperty(FIELD_TIME_ZONE)
         public abstract Builder timeZone(DateTimeZone timeZone);
 
