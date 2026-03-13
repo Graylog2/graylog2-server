@@ -18,10 +18,11 @@ const path = require('path');
 
 const webpack = require('webpack');
 const { merge } = require('webpack-merge');
-const { EsbuildPlugin } = require('esbuild-loader');
+const TerserPlugin = require('terser-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const { CycloneDxWebpackPlugin } = require('@cyclonedx/webpack-plugin');
 const { defineReactCompilerLoaderOption, reactCompilerLoader } = require('react-compiler-webpack');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 const UniqueChunkIdPlugin = require('./UniqueChunkIdPlugin');
 
@@ -66,10 +67,26 @@ const sortChunks = (c1, c2) => {
   return 0;
 };
 
-const esbuildLoader = (supportedBrowsers) => ({
-  loader: 'esbuild-loader',
+const swcLoader = (target, browserslistQuery) => ({
+  loader: 'swc-loader',
   options: {
-    target: supportedBrowsers,
+    env: {
+      targets: browserslistQuery,
+    },
+    jsc: {
+      parser: {
+        syntax: 'typescript',
+        tsx: true,
+        dynamicImport: true,
+      },
+      transform: {
+        react: {
+          runtime: 'classic',
+          development: target === 'start',
+          refresh: target === 'start',
+        },
+      },
+    },
   },
 });
 
@@ -83,7 +100,12 @@ const reactCompiler = {
 const rules = (target, supportedBrowsers) => [
   {
     test: /\.[jt]s(x)?$/,
-    use: [reactCompiler, esbuildLoader(supportedBrowsers)],
+    use: [
+      // React Compiler interferes with React Refresh signature matching in dev mode,
+      // so only enable it for production builds.
+      ...(target === 'start' ? [] : [reactCompiler]),
+      swcLoader(target, supportedBrowsers),
+    ],
     exclude: /node_modules\/(?!(@react-hook|uuid|@?react-leaflet|graylog-web-plugin))|\.node_cache/,
   },
   {
@@ -172,6 +194,10 @@ const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) 
         new webpack.DefinePlugin({
           DEVELOPMENT: true,
         }),
+        new ReactRefreshWebpackPlugin({
+          overlay: false,
+          forceEnable: true,
+        }),
         ...(disableTsc
           ? []
           : [
@@ -213,8 +239,11 @@ const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) 
         },
         moduleIds: 'deterministic',
         minimizer: [
-          new EsbuildPlugin({
-            target: supportedBrowsers,
+          new TerserPlugin({
+            terserOptions: {
+              compress: true,
+              mangle: true,
+            },
           }),
         ],
       },

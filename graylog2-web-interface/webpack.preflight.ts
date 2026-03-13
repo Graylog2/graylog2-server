@@ -19,7 +19,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { merge } = require('webpack-merge');
-const { EsbuildPlugin } = require('esbuild-loader');
+const TerserPlugin = require('terser-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 const { DEFAULT_API_URL } = require('./webpack.vendor');
@@ -73,8 +73,8 @@ let webpackConfig;
 if (mode === 'development') {
   webpackConfig = merge(baseConfig, {
     devServer: {
-      hot: false,
-      liveReload: true,
+      hot: true,
+      liveReload: false,
       compress: true,
       proxy: [
         {
@@ -102,8 +102,11 @@ if (mode === 'production') {
     optimization: {
       moduleIds: 'deterministic',
       minimizer: [
-        new EsbuildPlugin({
-          target: supportedBrowsers,
+        new TerserPlugin({
+          terserOptions: {
+            compress: true,
+            mangle: true,
+          },
         }),
       ],
     },
