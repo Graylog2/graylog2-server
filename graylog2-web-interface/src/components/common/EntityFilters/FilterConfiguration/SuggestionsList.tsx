@@ -21,21 +21,32 @@ import styled, { css } from 'styled-components';
 import { Input, ListGroupItem } from 'components/bootstrap';
 import type { Attribute } from 'stores/PaginationTypes';
 import type { Filters } from 'components/common/EntityFilters/types';
-import { PaginatedList, NoSearchResult } from 'components/common';
+import { NoSearchResult } from 'components/common';
 import useIsKeyHeld from 'hooks/useIsKeyHeld';
 import Spinner from 'components/common/Spinner';
+import PaginatedList from 'components/common/PaginatedList';
 
 const Container = styled.div(
   ({ theme }) => css`
     color: ${theme.colors.text.primary};
-    padding: 3px 10px;
+    padding: ${theme.spacings.xs} 0;
   `,
 );
+
+const sidePaddings = ({ theme }) => css`
+  padding: 0 ${theme.spacings.sm};
+`;
+
+const PaddingContainer = styled.div(sidePaddings);
 
 const SearchInput = styled(Input)`
   margin-bottom: 6px;
 `;
 
+const ScrollableArea = styled.div`
+  max-height: 50vh;
+  overflow: auto;
+`;
 const StyledListGroup = styled.div`
   margin-bottom: 0;
 `;
@@ -46,6 +57,8 @@ const Hint = styled.div(
     font-size: ${theme.fonts.size.small};
   `,
 );
+
+const StyledPaginatedList = styled(PaginatedList)(sidePaddings);
 
 type SearchParams = {
   query: string;
@@ -105,17 +118,18 @@ const SuggestionsList = ({
 
   return (
     <Container>
-      <SearchInput
-        type="text"
-        id="search-filters-input"
-        formGroupClassName=""
-        placeholder={`Search for ${attribute.title.toLowerCase()}`}
-        onChange={({ target: { value } }) => debounceOnSearch(value)}
-      />
-      {isLoading && <Spinner />}
-
+      <PaddingContainer>
+        <SearchInput
+          type="text"
+          id="search-filters-input"
+          formGroupClassName=""
+          placeholder={`Search for ${attribute.title.toLowerCase()}`}
+          onChange={({ target: { value } }) => debounceOnSearch(value)}
+        />
+        {isLoading && <Spinner />}
+      </PaddingContainer>
       {!!suggestions?.length && (
-        <PaginatedList
+        <StyledPaginatedList
           showPageSizeSelect={false}
           totalItems={total}
           hidePreviousAndNextPageLinks
@@ -124,42 +138,47 @@ const SuggestionsList = ({
           pageSize={pageSize}
           onChange={handlePaginationChange}
           useQueryParameter={false}>
-          <StyledListGroup>
-            {suggestions.map((suggestion) => {
-              const filterValue = suggestion.target_id || suggestion.id;
-              const disabled = !!allActiveFilters?.get(attribute.id)?.find(({ value }) => value === filterValue);
+          <ScrollableArea>
+            <PaddingContainer>
+              <StyledListGroup>
+                {suggestions.map((suggestion) => {
+                  const filterValue = suggestion.target_id || suggestion.id;
+                  const disabled = !!allActiveFilters?.get(attribute.id)?.find(({ value }) => value === filterValue);
 
-              const onClick = () => {
-                if (disabled) {
-                  return;
-                }
+                  const onClick = () => {
+                    if (disabled) {
+                      return;
+                    }
 
-                onSubmit(
-                  {
-                    value: filterValue,
-                    title: suggestion.value,
-                  },
-                  !multiSelect ? true : !isShiftHeld,
-                );
-              };
+                    onSubmit(
+                      {
+                        value: filterValue,
+                        title: suggestion.value,
+                      },
+                      !multiSelect ? true : !isShiftHeld,
+                    );
+                  };
 
-              return (
-                <ListGroupItem onClick={onClick} key={`filter-value-${suggestion.id}`} disabled={disabled}>
-                  {filterValueRenderer ? filterValueRenderer(suggestion.id, suggestion.value) : suggestion.value}
-                </ListGroupItem>
-              );
-            })}
-          </StyledListGroup>
-        </PaginatedList>
+                  return (
+                    <ListGroupItem onClick={onClick} key={`filter-value-${suggestion.id}`} disabled={disabled}>
+                      {filterValueRenderer ? filterValueRenderer(suggestion.id, suggestion.value) : suggestion.value}
+                    </ListGroupItem>
+                  );
+                })}
+              </StyledListGroup>
+            </PaddingContainer>
+          </ScrollableArea>
+        </StyledPaginatedList>
       )}
+      <PaddingContainer>
+        {!suggestions?.length && <NoSearchResult>No entities found</NoSearchResult>}
 
-      {!suggestions?.length && <NoSearchResult>No entities found</NoSearchResult>}
-
-      {multiSelect && (
-        <Hint>
-          <i>Hold Shift to select multiple</i>
-        </Hint>
-      )}
+        {multiSelect && (
+          <Hint>
+            <i>Hold Shift to select multiple</i>
+          </Hint>
+        )}
+      </PaddingContainer>
     </Container>
   );
 };
