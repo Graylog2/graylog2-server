@@ -19,7 +19,6 @@ import { waitFor } from 'wrappedTestingLibrary';
 
 import { SystemIndicesRotation, SystemIndicesRetention } from '@graylog/server-api';
 
-import asMock from 'helpers/mocking/AsMock';
 import suppressConsole from 'helpers/suppressConsole';
 import UserNotification from 'util/UserNotification';
 
@@ -38,6 +37,9 @@ jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
   success: jest.fn(),
 }));
+
+const listRotation = SystemIndicesRotation.list as jest.Mock;
+const listRetention = SystemIndicesRetention.list as jest.Mock;
 
 const mockRotationData = {
   total: 2,
@@ -62,8 +64,8 @@ describe('useIndicesConfiguration', () => {
   });
 
   it('should fetch both rotation and retention strategies', async () => {
-    asMock(SystemIndicesRotation.list).mockResolvedValue(mockRotationData);
-    asMock(SystemIndicesRetention.list).mockResolvedValue(mockRetentionData);
+    listRotation.mockResolvedValue(mockRotationData);
+    listRetention.mockResolvedValue(mockRetentionData);
 
     const { result } = renderHook(() => useIndicesConfiguration());
 
@@ -85,8 +87,8 @@ describe('useIndicesConfiguration', () => {
   });
 
   it('should report loading when one query is still pending', async () => {
-    asMock(SystemIndicesRotation.list).mockResolvedValue(mockRotationData);
-    asMock(SystemIndicesRetention.list).mockReturnValue(new Promise(() => {}));
+    listRotation.mockResolvedValue(mockRotationData);
+    listRetention.mockReturnValue(new Promise(() => {}));
 
     const { result } = renderHook(() => useIndicesConfiguration());
 
@@ -96,8 +98,8 @@ describe('useIndicesConfiguration', () => {
   });
 
   it('should show notification on rotation fetch error', async () => {
-    asMock(SystemIndicesRotation.list).mockRejectedValue(new Error('Rotation error'));
-    asMock(SystemIndicesRetention.list).mockResolvedValue(mockRetentionData);
+    listRotation.mockRejectedValue(new Error('Rotation error'));
+    listRetention.mockResolvedValue(mockRetentionData);
 
     await suppressConsole(async () => {
       renderHook(() => useIndicesConfiguration());
@@ -112,8 +114,8 @@ describe('useIndicesConfiguration', () => {
   });
 
   it('should show notification on retention fetch error', async () => {
-    asMock(SystemIndicesRotation.list).mockResolvedValue(mockRotationData);
-    asMock(SystemIndicesRetention.list).mockRejectedValue(new Error('Retention error'));
+    listRotation.mockResolvedValue(mockRotationData);
+    listRetention.mockRejectedValue(new Error('Retention error'));
 
     await suppressConsole(async () => {
       renderHook(() => useIndicesConfiguration());
