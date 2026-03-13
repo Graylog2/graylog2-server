@@ -111,7 +111,7 @@ describe('GraylogClusterOverview', () => {
 
     await waitFor(() => expect(SystemClusterTraffic.get).toHaveBeenCalledWith(30, false));
 
-    expect(screen.getByText(/Last 30 days/)).toBeInTheDocument();
+    await screen.findByText(/Last 30 days/);
   });
 
   it('renders GraylogClusterOverview and change the days for the traffic graph', async () => {
@@ -122,6 +122,6 @@ describe('GraylogClusterOverview', () => {
 
     await waitFor(() => expect(SystemClusterTraffic.get).toHaveBeenCalledWith(365, false));
 
-    expect(screen.getByText(/Last 365 days/)).toBeInTheDocument();
+    await screen.findByText(/Last 365 days/);
   });
 });

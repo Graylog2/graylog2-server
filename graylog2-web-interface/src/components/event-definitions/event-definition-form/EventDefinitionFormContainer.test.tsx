@@ -94,7 +94,12 @@ jest.mock('stores/connect', () => ({
   ),
 }));
 
-jest.mock('logic/rest/FetchProvider', () => jest.fn());
+jest.mock('logic/rest/FetchProvider', () => {
+  const mockFetch = jest.fn(() => Promise.resolve({}));
+  const MockBuilder = () => ({ json: () => ({ build: () => Promise.resolve({}) }) });
+
+  return { __esModule: true, default: mockFetch, Builder: MockBuilder };
+});
 
 const mockEntityTypes = {
   aggregation_functions: [
