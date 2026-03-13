@@ -45,7 +45,7 @@ const CountBadge = (
   { onClick = undefined, className = '', title = undefined, count, iconName = undefined }: Props,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) => (
-  <StyledBadge bsStyle={!count ? 'gray' : 'info'} className={className} onClick={onClick} ref={ref} title={title}>
+  <StyledBadge bsStyle="default" className={className} onClick={onClick} ref={ref} title={title}>
     {iconName ? (
       <BadgeInner>
         {count}
