@@ -181,9 +181,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 config,
                 credentialsProvider,
                 trustFactory,
-                IndexerJwtAuthToken.disabled(),
-                Collections.emptySet(),
-                Collections.emptySet())
+                IndexerJwtAuthToken.disabled())
                 .get();
     }
 
