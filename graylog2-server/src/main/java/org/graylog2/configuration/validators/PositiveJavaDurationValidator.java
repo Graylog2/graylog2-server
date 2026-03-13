@@ -14,11 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.configuration.validators;
 
-export const columnTransformVar = (colId: string) => `--col-${colId}-transform`;
-export const columnWidthVar = (colId: string) => `--col-${colId.replace(/\./g, '_')}-width`;
-export const columnOpacityVar = (colId: string) => `--col-${colId}-opacity`;
-export const columnTransition = () => `--col-transition`;
-export const actionsHeaderWidthVar = `--actions-header-width`;
-export const displayScrollRightIndicatorVar = `--display-scroll-right-indicator`;
-export const scrollContainerWidthVar = `--scroll-container-width`;
+import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.Validator;
+
+import java.time.Duration;
+
+public class PositiveJavaDurationValidator implements Validator<Duration> {
+    @Override
+    public void validate(String name, Duration value) throws ValidationException {
+        if (value == null || value.isZero() || value.isNegative()) {
+            throw new ValidationException("Parameter " + name + " must be a positive duration (found " + value + ")");
+        }
+    }
+}
