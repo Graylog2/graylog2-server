@@ -30,6 +30,7 @@ import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import { TableHeaderCell, TableHead } from 'views/components/datatable';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import type { SelectableMessageTableMessage } from 'views/components/widgets/MessageList';
+import useSelectableMessageTableMessages from 'views/components/widgets/useSelectableMessageTableMessages';
 import BulkSelectCell from 'components/common/message/messagetable/BulkSelectCell';
 
 import FieldSortIcon from './FieldSortIcon';
@@ -100,7 +101,6 @@ type Props = {
   setLoadingState: (loading: boolean) => void;
   displayBulkSelectCol?: boolean;
   isEntitySelectable?: (entity: BackendMessage) => boolean;
-  selectableMessages?: Readonly<Array<SelectableMessageTableMessage>>;
 };
 
 const _fieldTypeFor = (fieldName: string, fields: Immutable.List<FieldTypeMapping>) =>
@@ -144,9 +144,9 @@ const MessageTable = ({
   scrollContainerRef,
   displayBulkSelectCol = false,
   isEntitySelectable = () => false,
-  selectableMessages = [],
 }: Props) => {
   const { stopAutoRefresh } = useAutoRefresh();
+  const { selectableMessageTableMessages } = useSelectableMessageTableMessages();
   const [expandedMessages, setExpandedMessages] = useState(Immutable.Set<string>());
   const formattedMessages = useMemo(() => _getFormattedMessages(messages), [messages]);
   const selectedFields = useMemo(() => Immutable.OrderedSet<string>(config?.fields ?? []), [config?.fields]);
@@ -167,7 +167,7 @@ const MessageTable = ({
             <tr>
               {displayBulkSelectCol && (
                 <BulkSelectCell>
-                  <BulkSelectHead<SelectableMessageTableMessage> data={selectableMessages} />
+                  <BulkSelectHead<SelectableMessageTableMessage> data={selectableMessageTableMessages} />
                 </BulkSelectCell>
               )}
               {selectedFields

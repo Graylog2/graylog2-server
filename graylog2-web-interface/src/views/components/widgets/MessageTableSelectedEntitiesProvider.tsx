@@ -4,32 +4,24 @@ import SelectedMessageEntitiesProvider from 'views/components/contexts/SelectedM
 import type { BackendMessage, Message } from 'views/components/messagelist/Types';
 
 import type { MessageTableBulkSelection, SelectableMessageTableMessage } from './MessageList';
+import useSelectableMessageTableMessages from './useSelectableMessageTableMessages';
 
 type Props = React.PropsWithChildren<{
   bulkSelection?: MessageTableBulkSelection;
-  entities: Readonly<Array<SelectableMessageTableMessage>>;
 }>;
 
-const MessageTableSelectedEntitiesProvider = ({ children = null, bulkSelection = undefined, entities }: Props) => (
-  <SelectedMessageEntitiesProvider<SelectableMessageTableMessage>
-    initialSelection={bulkSelection?.initialSelection}
-    onChangeSelection={bulkSelection?.onChangeSelection}
-    entities={entities}>
-    {children}
-  </SelectedMessageEntitiesProvider>
-);
+const MessageTableSelectedEntitiesProvider = ({ children = null, bulkSelection = undefined }: Props) => {
+  const { selectableMessageTableMessages } = useSelectableMessageTableMessages();
 
-export const toSelectableMessageTableMessages = (
-  messages: Readonly<Array<BackendMessage>>,
-  isEntitySelectable: (entity: BackendMessage) => boolean,
-): Array<SelectableMessageTableMessage> =>
-  messages
-    .filter((message) => !!message.message?._id && isEntitySelectable(message))
-    .map(({ index, message }) => ({
-      id: message._id,
-      index,
-      timestamp: message.timestamp,
-    }));
+  return (
+    <SelectedMessageEntitiesProvider<SelectableMessageTableMessage>
+      initialSelection={bulkSelection?.initialSelection}
+      onChangeSelection={bulkSelection?.onChangeSelection}
+      entities={selectableMessageTableMessages}>
+      {children}
+    </SelectedMessageEntitiesProvider>
+  );
+};
 
 export const toSelectableMessageTableEntry = (message: Message): BackendMessage => ({
   index: message.index,

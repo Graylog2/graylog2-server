@@ -14,14 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import React from 'react';
 import styled from 'styled-components';
 
 import { BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
-const BulkSelectCell = styled.td.attrs<{ 'data-bulk-select-cell': boolean }>({
-  'data-bulk-select-cell': true,
-})`
+const StyledCell = styled.td`
   width: ${BULK_SELECT_COLUMN_WIDTH}px;
 `;
+// 'data-bulk-select-cell'
+const BulkSelectCell = ({ children = null }: React.PropsWithChildren) => (
+  <StyledCell onClick={(event) => event.stopPropagation()}>{children}</StyledCell>
+);
 
 export default BulkSelectCell;

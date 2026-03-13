@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useContext, useState, useEffect, useCallback, useRef } from 'react';
 
 import type { WidgetComponentProps, MessageResult } from 'views/types';
 import { Messages } from 'views/Constants';
@@ -24,7 +24,6 @@ import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig'
 import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
 import { PaginatedList } from 'components/common';
 import BulkActionsRow from 'components/common/EntityDataTable/BulkActionsRow';
-import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import MessageTable from 'components/common/message/messagetable/MessageTable';
 import ErrorWidget from 'views/components/widgets/ErrorWidget';
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
@@ -41,10 +40,9 @@ import useSearchResult from 'views/hooks/useSearchResult';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useMessageListPluggableBulkActions from 'views/components/widgets/useMessageListPluggableBulkActions';
 
-import MessageTableSelectedEntitiesProvider, {
-  toSelectableMessageTableMessages,
-} from './MessageTableSelectedEntitiesProvider';
 import RenderCompletionCallback from './RenderCompletionCallback';
+import MessageTableSelectedEntitiesProvider from './MessageTableSelectedEntitiesProvider';
+import SelectableMessageTableMessagesProvider from './SelectableMessageTableMessagesProvider';
 
 const Wrapper = styled.div`
   display: flex;
@@ -61,10 +59,8 @@ const StyledBulkActionsRow = styled(BulkActionsRow)`
   padding-bottom: 10px;
 `;
 
-const BulkActions = ({ selectedEntitiesData }: unknown) => {
-  const { setSelectedEntities } = useSelectedEntities();
+const BulkActions = () => {
   const { actions, actionModals } = useMessageListPluggableBulkActions();
-  console.log({ selectedEntitiesData, setSelectedEntities });
 
   if (!actions?.length) return null;
 
@@ -177,10 +173,6 @@ const MessageList = ({
     },
     [bulkSelection, displayBulkSelectCol],
   );
-  const selectableMessages = useMemo(
-    () => toSelectableMessageTableMessages(messages, isEntitySelectable),
-    [isEntitySelectable, messages],
-  );
 
   const handlePageChange = useCallback(
     (newCurrentPage: number) => {
@@ -240,7 +232,6 @@ const MessageList = ({
             messages={messages}
             displayBulkSelectCol={displayBulkSelectCol}
             isEntitySelectable={isEntitySelectable}
-            selectableMessages={selectableMessages}
           />
         )}
       </PaginatedList>
@@ -249,9 +240,14 @@ const MessageList = ({
 
   return (
     <WindowDimensionsContextProvider>
-      <MessageTableSelectedEntitiesProvider bulkSelection={bulkSelection} entities={selectableMessages}>
-        {content}
-      </MessageTableSelectedEntitiesProvider>
+      <SelectableMessageTableMessagesProvider
+        messages={messages}
+        isEntitySelectable={isEntitySelectable}
+        displayBulkSelectCol={displayBulkSelectCol}>
+        <MessageTableSelectedEntitiesProvider bulkSelection={bulkSelection}>
+          {content}
+        </MessageTableSelectedEntitiesProvider>
+      </SelectableMessageTableMessagesProvider>
     </WindowDimensionsContextProvider>
   );
 };

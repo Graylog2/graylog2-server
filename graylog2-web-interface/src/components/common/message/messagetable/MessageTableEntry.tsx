@@ -205,7 +205,7 @@ const MessageTableEntry = ({
       <TableBody $expanded={expanded} $highlighted={message.id === highlightMessageId}>
         <FieldsRow onClick={_toggleDetail} className="table-data-row">
           {displayBulkSelectCol && (
-            <BulkSelectCell onClick={(event) => event.stopPropagation()}>
+            <BulkSelectCell>
               <RowCheckbox
                 onChange={() => toggleEntitySelect(message.id)}
                 title={!isSelectDisabled ? checkboxTitle : undefined}

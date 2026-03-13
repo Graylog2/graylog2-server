@@ -434,11 +434,11 @@ type MessageActionComponentProps = {
   id: string;
 };
 
-type MessageBulkActionsComponentProps<T = unknown> = {
+export type MessageBulkActionsComponentProps<T = unknown> = {
   modalRef: () => T;
 };
 
-type MessageBulkActionsModalProps<T = unknown> = {
+export type MessageBulkActionsModalProps<T = unknown> = {
   ref: React.LegacyRef<T>;
 };
 
@@ -667,8 +667,8 @@ declare module 'graylog-web-plugin/plugin' {
       useCondition: () => boolean;
     }>;
     'views.components.widgets.messageTable.messageBulkActions'?: Array<{
-      component: React.ComponentType<MessageBulkActionsComponentProps>;
-      modal?: React.ComponentType<MessageBulkActionsModalProps>;
+      component: React.ComponentType<MessageBulkActionsComponentProps<unknown>>;
+      modal?: React.ComponentType<MessageBulkActionsModalProps<unknown>>;
       key: string;
       useCondition: () => boolean;
     }>;
