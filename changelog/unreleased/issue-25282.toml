@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix absolute time range picker highlighting current day based on UTC instead of user timezone."
+
+issues = ["25282"]
+pulls = ["25305"]
