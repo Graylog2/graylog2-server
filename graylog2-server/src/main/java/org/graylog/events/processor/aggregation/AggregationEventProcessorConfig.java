@@ -28,6 +28,7 @@ import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
 import org.graylog.events.contentpack.entities.SeriesSpecEntity;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventDefinitionConfiguration;
+import org.graylog.events.processor.EventDefinitionReplayInfo;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.events.processor.EventProcessorSchedulerConfig;
@@ -321,6 +322,17 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         if (eventLimit() <= 0) {
             validationResult.addError(FIELD_EVENT_LIMIT, "Event limit must be greater than 0.");
         }
+    }
+
+    @Override
+    public Optional<EventDefinitionReplayInfo> replayInfo() {
+        return Optional.of(EventDefinitionReplayInfo.builder()
+                .query(query())
+                .streams(streams())
+                .streamCategories(streamCategories())
+                .filters(filters())
+                .searchWithinMs(searchWithinMs())
+                .build());
     }
 
     @Override

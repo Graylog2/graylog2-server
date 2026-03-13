@@ -84,6 +84,15 @@ export type EventProcessorConfig = {
   cron_timezone?: string;
   event_limit?: number;
 };
+
+export type EventDefinitionReplayInfo = {
+  query?: string;
+  streams?: string[];
+  stream_categories?: string[];
+  filters?: SearchFilter[];
+  search_within_ms?: number;
+};
+
 export type EventDefinition = {
   _scope: string;
   _entity_source: any;
@@ -111,6 +120,7 @@ export type EventDefinition = {
   matched_at: string;
   scheduler: Scheduler;
   event_summary_template: string;
+  replay_info?: EventDefinitionReplayInfo;
 };
 
 export type EventDefinitionFormControlsProps = {

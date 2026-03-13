@@ -299,7 +299,7 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
               />
             </IfPermitted>
           )}
-          {isAggregationEventDefinition(eventDefinition) && (
+          {(isAggregationEventDefinition(eventDefinition) || isSigmaEventDefinition(eventDefinition)) && (
             <>
               <IfPermitted
                 permissions={[
