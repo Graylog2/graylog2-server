@@ -23,8 +23,9 @@ import Icon from 'components/common/Icon';
 type NotificationSeverity = 'danger' | 'warning';
 
 type NotificationItem = {
+  id?: string;
   severity: NotificationSeverity;
-  message: string;
+  message: React.ReactNode;
 };
 
 type Props = {
@@ -85,11 +86,12 @@ const NotificationBanner = ({ title, items }: Props) => {
       <Col md={12}>
         <StyledAlert bsStyle="info" noIcon title={title}>
           <NotificationList>
-            {items.map((item) => {
+            {items.map((item, index) => {
               const SeverityIcon = ICON_BY_SEVERITY[item.severity];
+              const key = item.id ?? (typeof item.message === 'string' ? item.message : `${item.severity}-${index}`);
 
               return (
-                <li key={item.message}>
+                <li key={key}>
                   <SeverityIcon name="error" />
                   <span>{item.message}</span>
                 </li>

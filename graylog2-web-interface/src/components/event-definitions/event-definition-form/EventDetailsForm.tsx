@@ -101,7 +101,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'event-definition-details',
       app_action_value: 'priority-select',
-      priority: priorityOptions[toNumber(nextPriority) - 1]?.label,
+      priority: priorityOptions.find((opt) => opt.value === nextPriority)?.label,
     });
 
     onChange('priority', toNumber(nextPriority));
