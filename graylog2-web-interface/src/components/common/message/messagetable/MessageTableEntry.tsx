@@ -34,10 +34,14 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { TableDataCell } from 'views/components/datatable';
 import MessageDetail from 'components/common/message/details/MessageDetail';
 import DecoratedValue from 'views/components/messagelist/decoration/DecoratedValue';
-import type { Message } from 'views/components/messagelist/Types';
+import type { BackendMessage, Message } from 'views/components/messagelist/Types';
 import CustomHighlighting from 'views/components/highlighting/CustomHighlighting';
 import TypeSpecificValue from 'views/components/TypeSpecificValue';
 import HighlightMessageContext from 'views/components/contexts/HighlightMessageContext';
+import { toSelectableMessageTableEntry } from 'views/components/widgets/MessageTableSelectedEntitiesProvider';
+import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import BulkSelectCell from 'components/common/message/messagetable/BulkSelectCell';
 
 import MessagePreview from './MessagePreview';
 
@@ -68,7 +72,7 @@ export const TableBody = styled.tbody<{ $expanded?: boolean; $highlighted?: bool
 const FieldsRow = styled.tr`
   cursor: pointer;
 
-  && td {
+  && td:not([data-bulk-select-cell]) {
     min-width: 50px;
     word-break: break-word;
     padding: 4px 5px 2px;
@@ -104,6 +108,8 @@ type Props = {
   selectedFields?: Immutable.OrderedSet<string>;
   showMessageRow?: boolean;
   toggleDetail: (messageId: string) => void;
+  displayBulkSelectCol?: boolean;
+  isEntitySelectable?: (entity: BackendMessage) => boolean;
 };
 
 const isDecoratedField = (field: string | number, decorationStats: Message['decoration_stats']) =>
@@ -128,10 +134,13 @@ const MessageTableEntry = ({
   showMessageRow = false,
   selectedFields = Immutable.OrderedSet<string>(),
   toggleDetail,
+  displayBulkSelectCol = false,
+  isEntitySelectable = () => false,
 }: Props) => {
   const { inputs: inputsList = [] } = useStore(InputsStore);
   const { streams: streamsList = [] } = useStore(StreamsStore);
   const highlightMessageId = useContext(HighlightMessageContext);
+  const { toggleEntitySelect, selectedEntities } = useSelectedEntities();
   const sendTelemetry = useSendTelemetry();
   const additionalContextValue = useMemo(() => ({ message }), [message]);
   const allStreams = useMemo(() => Immutable.List<Stream>(streamsList), [streamsList]);
@@ -157,7 +166,10 @@ const MessageTableEntry = ({
     }
   }, [message.id, message.index, sendTelemetry, toggleDetail]);
 
-  const colSpanFixup = selectedFields.size + 1;
+  const isSelected = selectedEntities.includes(message.id);
+  const checkboxTitle = `${isSelected ? 'Deselect' : 'Select'} message`;
+  const isSelectDisabled = !displayBulkSelectCol || !isEntitySelectable(toSelectableMessageTableEntry(message));
+  const colSpanFixup = selectedFields.size + 1 + Number(displayBulkSelectCol);
 
   const selectedFieldsList = useMemo(
     () =>
@@ -192,6 +204,17 @@ const MessageTableEntry = ({
     <AdditionalContext.Provider value={additionalContextValue}>
       <TableBody $expanded={expanded} $highlighted={message.id === highlightMessageId}>
         <FieldsRow onClick={_toggleDetail} className="table-data-row">
+          {displayBulkSelectCol && (
+            <BulkSelectCell onClick={(event) => event.stopPropagation()}>
+              <RowCheckbox
+                onChange={() => toggleEntitySelect(message.id)}
+                title={!isSelectDisabled ? checkboxTitle : undefined}
+                checked={isSelected}
+                disabled={isSelectDisabled}
+                aria-label={checkboxTitle}
+              />
+            </BulkSelectCell>
+          )}
           {selectedFieldsList}
         </FieldsRow>
 
@@ -202,6 +225,7 @@ const MessageTableEntry = ({
           messageFieldType={messageFieldType}
           onRowClick={_toggleDetail}
           message={message}
+          displayBulkSelectCol={displayBulkSelectCol}
         />
 
         {expanded && (

@@ -29,10 +29,13 @@ import Field from 'views/components/Field';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import { TableHeaderCell, TableHead } from 'views/components/datatable';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import type { SelectableMessageTableMessage } from 'views/components/widgets/MessageList';
+import BulkSelectCell from 'components/common/message/messagetable/BulkSelectCell';
 
 import FieldSortIcon from './FieldSortIcon';
 import MessageTableEntry from './MessageTableEntry';
 import MessageTableProviders from './MessageTableProviders';
+import BulkSelectHead from './BulkSelectHead';
 
 const Table = styled.table(
   ({ theme }) => css`
@@ -95,6 +98,9 @@ type Props = {
   onSortChange: (newSortConfig: SortConfig[]) => Promise<void>;
   scrollContainerRef: React.MutableRefObject<HTMLDivElement>;
   setLoadingState: (loading: boolean) => void;
+  displayBulkSelectCol?: boolean;
+  isEntitySelectable?: (entity: BackendMessage) => boolean;
+  selectableMessages?: Readonly<Array<SelectableMessageTableMessage>>;
 };
 
 const _fieldTypeFor = (fieldName: string, fields: Immutable.List<FieldTypeMapping>) =>
@@ -136,6 +142,9 @@ const MessageTable = ({
   onSortChange,
   setLoadingState,
   scrollContainerRef,
+  displayBulkSelectCol = false,
+  isEntitySelectable = () => false,
+  selectableMessages = [],
 }: Props) => {
   const { stopAutoRefresh } = useAutoRefresh();
   const [expandedMessages, setExpandedMessages] = useState(Immutable.Set<string>());
@@ -156,6 +165,11 @@ const MessageTable = ({
         <Table className="table table-condensed">
           <TableHead>
             <tr>
+              {displayBulkSelectCol && (
+                <BulkSelectCell>
+                  <BulkSelectHead<SelectableMessageTableMessage> data={selectableMessages} />
+                </BulkSelectCell>
+              )}
               {selectedFields
                 .toSeq()
                 .map((selectedFieldName) => {
@@ -195,6 +209,8 @@ const MessageTable = ({
                 expanded={expandedMessages.contains(messageKey)}
                 toggleDetail={toggleDetail}
                 expandAllRenderAsync={false}
+                displayBulkSelectCol={displayBulkSelectCol}
+                isEntitySelectable={isEntitySelectable}
               />
             );
           })}
