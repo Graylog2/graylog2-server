@@ -50,9 +50,7 @@ const mockRotationData = {
 
 const mockRetentionData = {
   total: 1,
-  strategies: [
-    { type: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy', default_config: {} },
-  ],
+  strategies: [{ type: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy', default_config: {} }],
   context: { max_index_retention_period: 'P90D' },
 };
 
