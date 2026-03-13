@@ -25,10 +25,11 @@ import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { Timestamp, HoverForHelp, Link } from 'components/common';
 import Routes from 'routing/Routes';
 import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
+import useFeature from 'hooks/useFeature';
 
 import useAlertAndEventDefinitionData from './useAlertAndEventDefinitionData';
 
-// import AggregationConditions from '../AggregationConditions';
+import AggregationConditions from '../AggregationConditions';
 import Notifications from '../Notifications';
 
 const AlertTimestamp = styled(Timestamp)(
@@ -40,6 +41,7 @@ const AlertTimestamp = styled(Timestamp)(
 const useAttributeComponents = () => {
   const { alertId, definitionId, type } = useReplaySearchContext();
   const { eventData, eventDefinition } = useAlertAndEventDefinitionData(alertId, definitionId);
+  const isRightSidebarEnabled = useFeature('replay_search_right_sidebar');
 
   return useMemo(() => {
     const isEventDefinition = type === 'event_definition';
@@ -53,7 +55,12 @@ const useAttributeComponents = () => {
     const isEDUpdatedAfterEvent =
       !isEventDefinition && moment(eventDefinition.updated_at).diff(eventData?.timestamp) > 0;
 
-    return [
+    const components: Array<{
+      title: string;
+      content: React.ReactNode;
+      show?: boolean;
+      inRows?: boolean;
+    }> = [
       {
         title: 'Event definition updated at',
         content: (
@@ -95,13 +102,16 @@ const useAttributeComponents = () => {
         content: <Notifications />,
       },
       { title: 'Description', content: eventDefinition.description, inRows: true },
-      // {
-      //   title: 'Aggregation conditions',
-      //   content: <AggregationConditions />,
-      //   inRows: true,
-      // },
     ];
-  }, [eventData?.timestamp, eventDefinition, type]);
+    if (!isRightSidebarEnabled) {
+      components.push({
+        title: 'Aggregation conditions',
+        content: <AggregationConditions />,
+        inRows: true,
+      });
+    }
+    return components;
+  }, [eventData?.timestamp, eventDefinition, isRightSidebarEnabled, type]);
 };
 
 export default useAttributeComponents;

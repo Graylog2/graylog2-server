@@ -24,14 +24,38 @@ import ReplaySearchContext from 'components/event-definitions/replay-search/Repl
 import type { Event } from 'components/events/events/types';
 import useRightSidebar from 'hooks/useRightSidebar';
 import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
+import useFeature from 'hooks/useFeature';
 import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
-import sidebarSections from 'views/components/sidebar/sidebarSections';
+import sidebarSections, { type SidebarSection } from 'views/components/sidebar/sidebarSections';
+import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
+
+const ReplaySearchSidebarSection = () => {
+  const { alertId, definitionId } = useReplaySearchContext();
+  return <ReplaySearchSidebar alertId={alertId} definitionId={definitionId} />;
+};
+
+const replaySection: SidebarSection = {
+  key: 'eventDescription',
+  hoverTitle: 'Replay Details',
+  title: null,
+  icon: 'play_arrow',
+  content: ReplaySearchSidebarSection,
+};
 
 const defaultSearchPageLayout: Partial<LayoutState> = {
   sidebar: {
     isShown: true,
     title: 'Replayed Search',
     sections: [...sidebarSections],
+    contentColumnWidth: 350,
+  },
+};
+
+const legacySearchPageLayout: Partial<LayoutState> = {
+  sidebar: {
+    isShown: true,
+    title: 'Replayed Search',
+    sections: [replaySection, ...sidebarSections],
     contentColumnWidth: 350,
   },
 };
@@ -45,10 +69,12 @@ type Props = {
 const EventReplaySearch = ({
   eventDefinitionMappedData,
   eventData,
-  searchPageLayout = defaultSearchPageLayout,
+  searchPageLayout,
 }: Props) => {
   const { eventDefinition, aggregations } = eventDefinitionMappedData;
   const { openSidebar } = useRightSidebar();
+  const isRightSidebarEnabled = useFeature('replay_search_right_sidebar');
+  const effectiveLayout = searchPageLayout ?? (isRightSidebarEnabled ? defaultSearchPageLayout : legacySearchPageLayout);
 
   const view = useCreateViewForEvent({
     eventData,
@@ -66,17 +92,19 @@ const EventReplaySearch = ({
   );
 
   useEffect(() => {
-    openSidebar({
-      id: 'replay-search-sidebar',
-      title: 'Replay Details',
-      component: ReplaySearchSidebar,
-      props: { alertId: eventData?.id, definitionId: eventDefinition?.id },
-    });
-  }, [openSidebar, eventData?.id, eventDefinition?.id]);
+    if (isRightSidebarEnabled) {
+      openSidebar({
+        id: 'replay-search-sidebar',
+        title: 'Replay Details',
+        component: ReplaySearchSidebar,
+        props: { alertId: eventData?.id, definitionId: eventDefinition?.id },
+      });
+    }
+  }, [isRightSidebarEnabled, openSidebar, eventData?.id, eventDefinition?.id]);
 
   return (
     <ReplaySearchContext.Provider value={replaySearchContext}>
-      <ReplaySearch view={view} searchPageLayout={searchPageLayout} />
+      <ReplaySearch view={view} searchPageLayout={effectiveLayout} />
     </ReplaySearchContext.Provider>
   );
 };
