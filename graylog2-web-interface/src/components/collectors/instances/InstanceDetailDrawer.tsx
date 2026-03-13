@@ -21,9 +21,8 @@ import Drawer from 'components/common/Drawer';
 import { Link, RelativeTime } from 'components/common';
 import Routes from 'routing/Routes';
 
+import collectorLogsUrl from '../common/collectorLogsUrl';
 import type { CollectorInstanceView, Source } from '../types';
-
-const COLLECTOR_LOGS_STREAM_ID = '000000000000000000000005';
 
 type Props = {
   instance: CollectorInstanceView;
@@ -102,14 +101,7 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
 
         <DetailRow>
           <Title>Logs:</Title>
-          <Link to={Routes.search_with_query(
-            `collector_instance_uid:"${instance.instance_uid}"`,
-            'relative',
-            { relative: 3600 },
-            [COLLECTOR_LOGS_STREAM_ID],
-          )}>
-            View Logs
-          </Link>
+          <Link to={collectorLogsUrl(instance.instance_uid)}>View Logs</Link>
         </DetailRow>
       </Section>
 

@@ -19,8 +19,8 @@ import { useState, useMemo, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import URI from 'urijs';
 
-import {Button, Label, SegmentedControl} from 'components/bootstrap';
-import { Spinner } from 'components/common';
+import {Button, ButtonToolbar, Label, SegmentedControl} from 'components/bootstrap';
+import { LinkContainer, Spinner } from 'components/common';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import useHistory from 'routing/useHistory';
 import useQuery from 'routing/useQuery';
@@ -28,6 +28,7 @@ import type { SearchParams } from 'stores/PaginationTypes';
 
 import FleetSettings from './FleetSettings';
 
+import collectorLogsUrl from '../common/collectorLogsUrl';
 import { useFleet, useFleetStats, useSources, fetchPaginatedSources, sourcesKeyFn, fetchPaginatedInstances, instancesKeyFn, useCollectorsMutations } from '../hooks';
 import StatCard from '../common/StatCard';
 import { InstanceDetailDrawer } from '../instances';
@@ -133,9 +134,16 @@ const FleetDetail = ({ fleetId }: Props) => {
 
   const instanceActions = useCallback(
     (instance: CollectorInstanceView) => (
-      <Button bsStyle="link" bsSize="xs" onClick={() => setSelectedInstance(instance)}>
-        Details
-      </Button>
+      <ButtonToolbar>
+        <Button bsStyle="link" bsSize="xs" onClick={() => setSelectedInstance(instance)}>
+          Details
+        </Button>
+        <LinkContainer to={collectorLogsUrl(instance.instance_uid)}>
+          <Button bsStyle="link" bsSize="xs">
+            View Logs
+          </Button>
+        </LinkContainer>
+      </ButtonToolbar>
     ),
     [],
   );

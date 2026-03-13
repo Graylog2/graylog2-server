@@ -19,11 +19,9 @@ import { useCallback } from 'react';
 
 import { Button, ButtonToolbar } from 'components/bootstrap';
 import { LinkContainer } from 'components/common';
-import Routes from 'routing/Routes';
 
+import collectorLogsUrl from '../common/collectorLogsUrl';
 import type { CollectorInstanceView } from '../types';
-
-const COLLECTOR_LOGS_STREAM_ID = '000000000000000000000005';
 
 type Props = {
   onInstanceClick: (instance: CollectorInstanceView) => void;
@@ -36,12 +34,7 @@ const useTableElements = ({ onInstanceClick }: Props) => {
         <Button bsStyle="link" bsSize="xs" onClick={() => onInstanceClick(instance)}>
           Details
         </Button>
-        <LinkContainer to={Routes.search_with_query(
-          `collector_instance_uid:"${instance.instance_uid}"`,
-          'relative',
-          { relative: 3600 },
-          [COLLECTOR_LOGS_STREAM_ID],
-        )}>
+        <LinkContainer to={collectorLogsUrl(instance.instance_uid)}>
           <Button bsStyle="link" bsSize="xs">
             View Logs
           </Button>
