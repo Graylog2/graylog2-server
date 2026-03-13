@@ -23,10 +23,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.buffers.processors.fakestreams.FakeStream;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
-import org.graylog2.indexer.TestIndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.TestIndexSet;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeComparator;
@@ -69,8 +69,8 @@ import java.util.SortedSet;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 import static org.graylog2.indexer.searches.ChunkCommand.NO_BATCHSIZE;
+import static org.graylog2.indexer.template.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 import static org.joda.time.DateTimeZone.UTC;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
@@ -169,7 +169,8 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
                 streamService,
                 indices,
                 indexSetRegistry,
-                createSearchesAdapter()
+                createSearchesAdapter(),
+                searchServer().adapters().countsAdapter()
         );
     }
 
@@ -183,7 +184,8 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
 
         CountResult result = searches.count("*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
-                new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)));
+                        new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)),
+                null);
 
         assertThat(result.count()).isEqualTo(10L);
     }
@@ -241,7 +243,8 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
 
         CountResult result = searches.count("*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
-                new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)));
+                        new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)),
+                null);
 
         assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);
         assertThat(metricRegistry.getHistograms()).containsKey(RANGES_HISTOGRAM_NAME);

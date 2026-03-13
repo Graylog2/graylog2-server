@@ -20,7 +20,6 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActionsFactory;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActionsImpl;
-import org.graylog.plugins.views.storage.migration.state.machine.MigrationShutdownService;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachine;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineProvider;
 import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationConfigurationImpl;
@@ -36,6 +35,5 @@ public class DatanodeMigrationBindings extends Graylog2Module {
         install(new FactoryModuleBuilder().implement(MigrationActions.class, MigrationActionsImpl.class).build(
                 MigrationActionsFactory.class));
         bind(MigrationStateMachine.class).toProvider(MigrationStateMachineProvider.class);
-        serviceBinder().addBinding().to(MigrationShutdownService.class).asEagerSingleton();
     }
 }

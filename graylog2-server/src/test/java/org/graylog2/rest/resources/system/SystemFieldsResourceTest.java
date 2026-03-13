@@ -17,7 +17,7 @@
 package org.graylog2.rest.resources.system;
 
 import org.assertj.core.api.Assertions;
-import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.Message;
 import org.junit.jupiter.api.BeforeEach;

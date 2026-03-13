@@ -16,22 +16,28 @@
  */
 package org.graylog.storage.opensearch2;
 
-import org.graylog2.indexer.counts.CountsAdapter;
+import jakarta.inject.Inject;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
-
-import jakarta.inject.Inject;
+import org.graylog2.indexer.counts.CountsAdapter;
+import org.graylog2.indexer.results.CountResult;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public class CountsAdapterOS2 implements CountsAdapter {
     private final OpenSearchClient client;
+    private final SearchRequestFactory searchRequestFactory;
 
     @Inject
-    public CountsAdapterOS2(OpenSearchClient client) {
+    public CountsAdapterOS2(final OpenSearchClient client,
+                            final SearchRequestFactory searchRequestFactory) {
         this.client = client;
+        this.searchRequestFactory = searchRequestFactory;
     }
 
     @Override
@@ -46,5 +52,21 @@ public class CountsAdapterOS2 implements CountsAdapter {
         final SearchResponse result = client.search(searchRequest, "Fetching message count failed for indices ");
 
         return result.getHits().getTotalHits().value;
+    }
+
+    @Override
+    public CountResult count(final Set<String> affectedIndices,
+                             final String query,
+                             final TimeRange range,
+                             final String filter) {
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
+                .query(searchRequestFactory.createQueryBuilder(query, Optional.ofNullable(range), Optional.ofNullable(filter)))
+                .size(0)
+                .trackTotalHits(true);
+        final SearchRequest searchRequest = new SearchRequest(affectedIndices.toArray(new String[0]))
+                .source(searchSourceBuilder);
+        final SearchResponse result = client.search(searchRequest, "Fetching message count failed for indices ");
+
+        return CountResult.create(result.getHits().getTotalHits().value, result.getTook().getMillis());
     }
 }

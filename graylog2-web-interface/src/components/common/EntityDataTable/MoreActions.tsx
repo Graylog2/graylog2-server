@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import DropdownButton from 'components/bootstrap/DropdownButton';
+import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 
 import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from './Constants';
 
@@ -24,14 +24,13 @@ type Props = React.PropsWithChildren<{
   disabled?: boolean;
 }>;
 const MoreActions = ({ children = undefined, disabled = false }: Props) => (
-  <DropdownButton
+  <OverlayDropdownButton
     title={MORE_ACTIONS_TITLE}
     bsSize="xsmall"
-    pullRight
     buttonTitle={MORE_ACTIONS_HOVER_TITLE}
     disabled={disabled}>
     {children}
-  </DropdownButton>
+  </OverlayDropdownButton>
 );
 
 export default MoreActions;

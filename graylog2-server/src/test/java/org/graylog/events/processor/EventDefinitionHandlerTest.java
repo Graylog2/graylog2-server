@@ -249,6 +249,32 @@ public class EventDefinitionHandlerTest {
     }
 
     @Test
+    public void testEventSummaryTemplateHandling() {
+        EventDefinitionDto dtoToSave = EventDefinitionDto.builder()
+                .title("Test")
+                .eventSummaryTemplate(" ")
+                .description("A test event definition")
+                .config(TestEventProcessorConfig.builder()
+                        .message("This is a test event processor")
+                        .searchWithinMs(300000)
+                        .executeEveryMs(60001)
+                        .build())
+                .priority(3)
+                .alert(false)
+                .notificationSettings(EventNotificationSettings.withGracePeriod(60000))
+                .keySpec(ImmutableList.of("a", "b"))
+                .notifications(ImmutableList.of())
+                .build();
+
+        EventDefinitionDto savedDto = handler.create(dtoToSave, Optional.empty());
+        assertThat(savedDto.eventSummaryTemplate()).isNull();
+
+        dtoToSave = dtoToSave.toBuilder().eventSummaryTemplate("\tTitle with whitespace   ").build();
+        savedDto = handler.create(dtoToSave, Optional.empty());
+        assertThat(savedDto.eventSummaryTemplate()).isEqualTo("Title with whitespace");
+    }
+
+    @Test
     @MongoDBFixtures("event-processors.json")
     public void update() {
         final String newTitle = "A NEW TITLE " + DateTime.now(DateTimeZone.UTC);

@@ -23,5 +23,6 @@ export const DEFAULT_LAYOUT = {
   entityTableId: 'field-type',
   defaultPageSize: 20,
   defaultSort: { attributeId: 'index_set_title', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: COLUMN_ORDER,
+  defaultDisplayedAttributes: ['index_set_title', 'stream_titles', 'types'],
+  defaultColumnOrder: ['index_set_title', 'stream_titles', 'types'],
 };

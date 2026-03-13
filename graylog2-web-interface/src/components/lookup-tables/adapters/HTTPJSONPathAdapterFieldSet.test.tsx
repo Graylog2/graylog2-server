@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { fireEvent, render } from 'wrappedTestingLibrary';
+import { render } from 'wrappedTestingLibrary';
 
 import HTTPJSONPathAdapterFieldSet from './HTTPJSONPathAdapterFieldSet';
 
@@ -42,7 +43,7 @@ describe('HTTPJSONPathAdapterFieldSet', () => {
     expect(container).not.toBeNull();
   });
 
-  it('should add a header', () => {
+  it('should add a header', async () => {
     const updateConfig = jest.fn();
     const { getByTestId, getByText } = render(
       <HTTPJSONPathAdapterFieldSet
@@ -57,9 +58,9 @@ describe('HTTPJSONPathAdapterFieldSet', () => {
     const newValueInput = getByTestId('newValue');
     const addBtn = getByText('Add');
 
-    fireEvent.change(newKeyInput, { target: { value: 'new Key' } });
-    fireEvent.change(newValueInput, { target: { value: 'new Value' } });
-    fireEvent.click(addBtn);
+    await userEvent.type(newKeyInput, 'new Key');
+    await userEvent.type(newValueInput, 'new Value');
+    await userEvent.click(addBtn);
 
     const newConfig = {
       ...config,

@@ -16,9 +16,10 @@
  */
 package org.graylog.plugins.views.search.rest.export;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.HeaderParam;
@@ -34,17 +35,18 @@ import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.RestTools;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "Search/Pivot/Export", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Search/Pivot/Export")
 @Path("/views/search/pivot/export")
 @RequiresAuthentication
 @Consumes(MediaType.APPLICATION_JSON)
 public class AggregationWidgetExportResource extends RestResource {
 
-    @ApiOperation(value = "Export widget data")
+    @Operation(summary = "Export widget data")
     @POST
     @NoAuditEvent("Exporting widget data does not need audit event")
     @Produces({MoreMediaTypes.TEXT_CSV,
@@ -53,9 +55,9 @@ public class AggregationWidgetExportResource extends RestResource {
             MediaType.APPLICATION_XML,
             MoreMediaTypes.APPLICATION_XLS})
     @Path("/{filename}")
-    public Response exportData(@ApiParam @Valid PivotResult pivotResult,
+    public Response exportData(@RequestBody(required = true) @Valid PivotResult pivotResult,
                                @HeaderParam("Accept") String mediaType,
-                               @ApiParam("filename") @PathParam("filename") String filename) {
+                               @Parameter(name = "filename") @PathParam("filename") String filename) {
         return RestTools.respondWithFile(
                         filename,
                         ExportTabularResultResponse.fromPivotResult(pivotResult),

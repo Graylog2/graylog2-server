@@ -29,12 +29,12 @@ export interface RotationStrategyContext {
 }
 
 export type IndicesConfigurationStoreState = {
-  activeRotationConfig: any;
-  rotationStrategies: any;
-  activeRetentionConfig: any;
-  retentionStrategies: any;
-  retentionStrategiesContext: RetentionStrategyContext;
-  rotationStrategiesContext: RotationStrategyContext;
+  activeRotationConfig?: any;
+  rotationStrategies?: any;
+  activeRetentionConfig?: any;
+  retentionStrategies?: any;
+  retentionStrategiesContext?: RetentionStrategyContext;
+  rotationStrategiesContext?: RotationStrategyContext;
 };
 export type SizeBasedRotationStrategyConfig = {
   type: string;

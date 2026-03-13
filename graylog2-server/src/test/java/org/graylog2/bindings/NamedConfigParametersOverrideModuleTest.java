@@ -17,6 +17,7 @@
 package org.graylog2.bindings;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.documentation.Documentation;
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -31,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class NamedConfigParametersOverrideModuleTest {
     static class BaseConfig {
+        @Documentation(visible = false)
         @Parameter(value = "test_param", required = true)
         private String testParam;
 
@@ -46,6 +48,7 @@ public class NamedConfigParametersOverrideModuleTest {
     }
 
     static class SubConfigB extends SubConfigA {
+        @Documentation(visible = false)
         @Parameter(value = "test_param_2", required = true)
         private String testParam2;
 
@@ -56,6 +59,7 @@ public class NamedConfigParametersOverrideModuleTest {
     }
 
     static class OtherConfig {
+        @Documentation(visible = false)
         @Parameter(value = "test_param", required = true)
         private String testParam;
 

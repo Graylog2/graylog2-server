@@ -16,7 +16,7 @@
  */
 package org.graylog.testing.elasticsearch;
 
-import org.graylog2.indexer.MessageIndexTemplateProvider;
+import org.graylog2.indexer.template.MessageIndexTemplateProvider;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,7 +66,7 @@ public abstract class ElasticsearchBaseTest {
         for (var template : templates.entrySet()) {
             final String templateName = template.getKey();
 
-            searchServer().client().putTemplate(templateName, template.getValue());
+            searchServer().adapters().indexTemplateAdapter().ensureIndexTemplate(templateName, template.getValue());
         }
     }
 

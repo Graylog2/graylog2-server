@@ -26,9 +26,9 @@ import type { ChartDefinition } from 'views/components/visualizations/ChartData'
 import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
 import useFeature from 'hooks/useFeature';
 import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
-import generateDomain from 'views/components/visualizations/utils/generateDomain';
 import useXAxisTicksAndType from 'views/components/visualizations/hooks/useXAxisTicksAndType';
 import getThresholdShapes from 'views/components/visualizations/utils/getThresholdShapes';
+import getPlotXTitleSettings from 'views/components/visualizations/utils/getPlotXTitleSettings';
 
 const useChartLayoutSettingsWithCustomUnits = ({
   config,
@@ -79,7 +79,7 @@ const useChartLayoutSettingsWithCustomUnits = ({
       annotations: thresholdsAnnotations,
       hovermode: 'x',
       xaxis: {
-        domain: generateDomain(Object.keys(unitTypeMapper)?.length),
+        title: getPlotXTitleSettings(theme, config),
         ...ticksAndTypeConfig,
       },
     };

@@ -24,8 +24,6 @@ import { updateView } from 'views/api/views';
 
 import View from './View';
 
-jest.mock('routing/Routes', () => ({ VIEWS: { VIEWID: (viewId: string) => `/views/${viewId}` } }));
-
 jest.mock('views/api/views', () => ({
   updateView: jest.fn((view: View) => Promise.resolve(view)),
 }));

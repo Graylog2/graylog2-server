@@ -115,6 +115,7 @@ const _prepareSubmitPayload =
     const formValues = overrideFormValues ?? getUpdatedFormsValues();
     const {
       defaultRoles = '',
+      defaultUserTimezone,
       description,
       serverHost,
       serverPort,
@@ -136,6 +137,7 @@ const _prepareSubmitPayload =
       title,
       description,
       default_roles: defaultRoles.split(','),
+      default_user_timezone: defaultUserTimezone,
       config: {
         servers: [{ host: serverHost, port: serverPort }],
         system_user_dn: systemUserDn,

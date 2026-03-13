@@ -46,16 +46,14 @@ import static org.mockito.Mockito.when;
 
 class PipelineMetadataUpdaterTest {
 
-    private MongoDbPipelineMetadataService pipelineMetadataService = mock(MongoDbPipelineMetadataService.class);
-    private MongoDbInputsMetadataService inputsMetadataService = mock(MongoDbInputsMetadataService.class);
-    private PipelineService pipelineService = mock(PipelineService.class);
+    private final MongoDbPipelineMetadataService pipelineMetadataService = mock(MongoDbPipelineMetadataService.class);
+    private final MongoDbInputsMetadataService inputsMetadataService = mock(MongoDbInputsMetadataService.class);
+    private final PipelineService pipelineService = mock(PipelineService.class);
     private PipelineMetadataUpdater updater;
 
-    private PipelineInterpreter.State state = mock(PipelineInterpreter.State.class);
-    private PipelineResolver resolver = mock(PipelineResolver.class);
-    private PipelineMetricRegistry metricRegistry = mock(PipelineMetricRegistry.class);
-    private PipelineAnalyzer pipelineAnalyzer = mock(PipelineAnalyzer.class);
-    private EventBus eventBus = mock(EventBus.class);
+    private final PipelineInterpreter.State state = mock(PipelineInterpreter.State.class);
+    private final PipelineAnalyzer pipelineAnalyzer = mock(PipelineAnalyzer.class);
+    private final EventBus eventBus = mock(EventBus.class);
 
     @BeforeEach
     void setUp() throws NotFoundException {
@@ -82,13 +80,13 @@ class PipelineMetadataUpdaterTest {
     void testHandlePipelineChanges() {
         PipelinesChangedEvent event = PipelinesChangedEvent.create(Set.of("id1"), Set.of("id2"));
 
-        updater.handlePipelineChanges(event, state, resolver, metricRegistry);
+        updater.handlePipelineChanges(event, state);
 
         verify(pipelineMetadataService).delete(Set.of("id1"));
         verify(inputsMetadataService).deleteInputMentionsByPipelineId("id1");
 
         ArgumentCaptor<Set<PipelineDao>> pipelineCaptor = ArgumentCaptor.forClass(Set.class);
-        verify(updater).handleUpdates(pipelineCaptor.capture(), any(), any(), any());
+        verify(updater).handleUpdates(pipelineCaptor.capture(), any());
         assertTrue(pipelineCaptor.getValue().stream().anyMatch(p -> p.id().equals("id2")));
     }
 
@@ -96,10 +94,10 @@ class PipelineMetadataUpdaterTest {
     void testHandleConnectionChanges() {
         PipelineConnectionsChangedEvent event = PipelineConnectionsChangedEvent.create("stream_id", Set.of("id1"));
 
-        updater.handleConnectionChanges(event, state, resolver, metricRegistry);
+        updater.handleConnectionChanges(event, state);
 
         ArgumentCaptor<Set<PipelineDao>> pipelineCaptor = ArgumentCaptor.forClass(Set.class);
-        verify(updater).handleUpdates(pipelineCaptor.capture(), any(), any(), any());
+        verify(updater).handleUpdates(pipelineCaptor.capture(), any());
         assertTrue(pipelineCaptor.getValue().stream().anyMatch(p -> p.id().equals("id1")));
     }
 
@@ -113,12 +111,12 @@ class PipelineMetadataUpdaterTest {
                 "title1", "description1", "source1", null, null)))
                 .when(updater).affectedPipelines(event);
 
-        updater.handleRuleChanges(event, state, resolver, metricRegistry);
+        updater.handleRuleChanges(event, state);
 
         verify(inputsMetadataService).deleteInputMentionsByRuleId("rule1");
 
         ArgumentCaptor<Set<PipelineDao>> pipelineCaptor = ArgumentCaptor.forClass(Set.class);
-        verify(updater).handleUpdates(pipelineCaptor.capture(), any(), any(), any());
+        verify(updater).handleUpdates(pipelineCaptor.capture(), any());
         assertTrue(pipelineCaptor.getValue().stream().anyMatch(p -> p.id().equals("pipeline1")));
     }
 
@@ -135,7 +133,7 @@ class PipelineMetadataUpdaterTest {
                         ))
                         .build()
         );
-        updater.handleInputDeleted(event, state, resolver, metricRegistry);
+        updater.handleInputDeleted(event, state);
 
         verify(inputsMetadataService).deleteInput("input1");
     }

@@ -22,8 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.views.formatting.highlighting.HighlightingRule;
 
-import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 
 @AutoValue
 @JsonDeserialize(builder = FormattingSettings.Builder.class)
@@ -31,7 +30,7 @@ public abstract class FormattingSettings {
     static final String FIELD_HIGHLIGHTING = "highlighting";
 
     @JsonProperty(FIELD_HIGHLIGHTING)
-    public abstract Set<HighlightingRule> highlighting();
+    public abstract List<HighlightingRule> highlighting();
 
     public static Builder builder() {
         return Builder.create();
@@ -40,13 +39,13 @@ public abstract class FormattingSettings {
     @AutoValue.Builder
     public static abstract class Builder {
         @JsonProperty(FIELD_HIGHLIGHTING)
-        public abstract Builder highlighting(Set<HighlightingRule> highlightingRules);
+        public abstract Builder highlighting(List<HighlightingRule> highlightingRules);
 
         public abstract FormattingSettings build();
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_FormattingSettings.Builder().highlighting(Collections.emptySet());
+            return new AutoValue_FormattingSettings.Builder().highlighting(List.of());
         }
     }
 }

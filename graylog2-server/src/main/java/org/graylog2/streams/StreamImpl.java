@@ -25,7 +25,7 @@ import com.google.auto.value.AutoValue;
 import org.bson.types.ObjectId;
 import org.graylog2.database.DbEntity;
 import org.graylog2.database.entities.DefaultEntityScope;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;

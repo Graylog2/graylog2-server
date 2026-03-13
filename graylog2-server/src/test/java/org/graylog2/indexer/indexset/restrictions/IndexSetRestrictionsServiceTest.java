@@ -68,8 +68,8 @@ public class IndexSetRestrictionsServiceTest {
         underTest = new IndexSetRestrictionsService(
                 templateService,
                 indexSetDefaultTemplateService,
-                new ObjectMapperProvider().get(),
-                new DefaultIndexSetConfigTransformer());
+                new DefaultIndexSetConfigTransformer(),
+                new FieldRestrictionService(new ObjectMapperProvider().get()));
     }
 
     @Test

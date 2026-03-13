@@ -156,7 +156,7 @@ public class ExtractorFilter implements MessageFilter {
 
         try {
             final Input input = inputService.find(inputId);
-            final List<Extractor> sortedExtractors = inputService.getExtractors(input).stream()
+            final List<Extractor> sortedExtractors = inputService.getExtractors(input.getId()).stream()
                     .sorted(Comparator.comparingLong(Extractor::getOrder))
                     .collect(Collectors.toList());
 

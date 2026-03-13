@@ -29,6 +29,7 @@ import useBarChartDataSettingsWithCustomUnits from 'views/components/visualizati
 import getFieldNameFromTrace from 'views/components/visualizations/utils/getFieldNameFromTrace';
 import * as chartLayoutGenerators from 'views/components/visualizations/utils/chartLayoutGenerators';
 import type { MappersForYAxis } from 'views/components/visualizations/utils/chartLayoutGenerators';
+import { DEFAULT_AXIS_KEY } from 'views/components/visualizations/Constants';
 
 jest.mock('views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits');
 jest.mock('hooks/useFeature');
@@ -94,7 +95,7 @@ describe('useBarChartDataSettingsWithCustomUnits', () => {
           axisCount: 3,
           axisKeyName: 'yaxis3',
         },
-        withoutUnit: {
+        [DEFAULT_AXIS_KEY]: {
           axisCount: 4,
           axisKeyName: 'yaxis4',
         },

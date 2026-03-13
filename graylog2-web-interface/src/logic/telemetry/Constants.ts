@@ -18,7 +18,6 @@
 // Please note, each project has its own collection of telemetry event types.
 // Only maintain event types related to core features in this file.
 
-// eslint-disable-next-line import/prefer-default-export
 export const TELEMETRY_EVENT_TYPE = {
   SEARCH_TIMERANGE_PRESET_SELECTED: 'Search TimeRange Preset Selected',
   SEARCH_TIMERANGE_PICKER_TOGGLED: 'Search TimeRange Picker Toggled',
@@ -124,6 +123,7 @@ export const TELEMETRY_EVENT_TYPE = {
   EVENTDEFINITION_DUPLICATED: 'EventDefinition Duplicated',
   EVENTDEFINITION_NEXT_CLICKED: 'EventDefinition Next Clicked',
   EVENTDEFINITION_PREVIOUS_CLICKED: 'EventDefinition Previous Clicked',
+  EVENTDEFINITION_REPLAY_SEARCH_CLICKED: 'EventDefinition Replay Search Clicked',
   EVENTDEFINITION_DETAILS: {
     STEP_CLICKED: 'EventDefinition Details Step Clicked',
     PRIORITY_CHANGED: 'EventDefinition Details Priority Changed',
@@ -259,6 +259,7 @@ export const TELEMETRY_EVENT_TYPE = {
     DECORATORS_UPDATED: 'Configurations Decorators Updated',
     GEOLOCATION_CONFIGURATION_UPDATED: 'Configurations Geolocation Configuration Updated',
     MARKDOWN_UPDATED: 'Configurations Markdown Updated',
+    PASSWORD_COMPLEXITY_UPDATED: 'Configurations Password Complexity Updated',
   },
   INPUTS: {
     INPUT_SELECTED: 'Inputs Input Selected',
@@ -408,30 +409,25 @@ export const TELEMETRY_EVENT_TYPE = {
       'Datanode Migration Inplace Journal Size Downtime Warning Next Clicked',
     INPLACE_STOP_MESSAGE_PROCESSING_NEXT_CLICKED: 'Datanode Migration Inplace Stop Message Processing Next Clicked',
     INPLACE_RESTART_GRAYLOG_NEXT_CLICKED: 'Datanode Migration Inplace Restart Graylog Next Clicked',
-    REMOTEREINDEX_WELCOME_NEXT_CLICKED: 'Datanode Migration RemoteReindex Welcome Next Clicked',
-    REMOTEREINDEX_MIGRATE_EXISTING_DATA_QUESTION_NEXT_CLICKED:
-      'Datanode Migration RemoteReindex Migrate Existing Data Question Next Clicked',
-    REMOTEREINDEX_MIGRATE_EXISTING_DATA_QUESTION_SKIP_CLICKED:
-      'Datanode Migration RemoteReindex Migrate Existing Data Question Skip Clicked',
-    REMOTEREINDEX_MIGRATE_EXISTING_DATA_CHECK_CONNECTION_CLICKED:
-      'Datanode Migration RemoteReindex Migrate Existing Data Check Connection Clicked',
-    REMOTEREINDEX_MIGRATE_EXISTING_DATA_START_CLICKED:
-      'Datanode Migration RemoteReindex Migrate Existing Data Start Clicked',
-    REMOTEREINDEX_RUNNING_LOGVIEW_CLICKED: 'Datanode Migration RemoteReindex Running Logview Clicked',
-    REMOTEREINDEX_RUNNING_RETRY_CLICKED: 'Datanode Migration RemoteReindex Running Retry Clicked',
-    REMOTEREINDEX_RUNNING_RETRY_CONFIRM_CLICKED: 'Datanode Migration RemoteReindex Running Retry Confirm Clicked',
-    REMOTEREINDEX_SHUTDOWN_OLD_CLUSTER_NEXT_CLICKED:
-      'Datanode Migration RemoteReindex Shutdown Old Cluster Next Clicked',
   },
   ALERTS_AND_EVENTS: {
     ACTION_RAN: 'Alerts And Events Action Ran',
   },
   ENTITY_DATA_TABLE: {
+    COLUMNS_RESET: 'Entity Data Table Columns Reset',
     COLUMNS_CHANGED: 'Entity Data Table Columns Changed',
+    COLUMN_ORDER_CHANGED: 'Entity Data Table Column Order Changed',
     SORT_CHANGED: 'Entity Data Table Sort Changed',
     PAGE_SIZE_CHANGED: 'Entity Data Table Page Size Changed',
     FILTER_CREATED: 'Entity Data Table Filter Created',
     FILTER_DELETED: 'Entity Data Table Filter Deleted',
     FILTER_CHANGED: 'Entity Data Table Filter Changed',
+    SLICE_COLUMN_SELECTED_HEADER: 'Entity Data Table Slice Column Selected (Header)',
+    SLICE_COLUMN_SELECTED_SECTION: 'Entity Data Table Slice Column Selected (Section)',
+    SLICE_REMOVED: 'Entity Data Table Slice Removed',
+    SLICE_VALUE_SELECTED: 'Entity Data Table Slice Value Selected',
+    SLICE_SEARCH_CHANGED: 'Entity Data Table Slice Search Changed',
+    SLICE_SORT_CHANGED: 'Entity Data Table Slice Sort Changed',
+    SLICE_EMPTY_VALUES_TOGGLED: 'Entity Data Table Slice Empty Values Toggled',
   },
 } as const;

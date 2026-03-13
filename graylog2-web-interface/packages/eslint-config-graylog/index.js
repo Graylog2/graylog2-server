@@ -109,8 +109,8 @@ export default [
       'no-await-in-loop': 'error',
       'no-loop-func': 'error',
 
-      'import/prefer-default-export': 'error',
-      'jsx-a11y/control-has-associated-label': 'error',
+      'import/prefer-default-export': 'off',
+      'jsx-a11y/control-has-associated-label': ['error', { depth: 3, ignoreElements: ['td', 'th'] }],
       'react/no-array-index-key': 'error',
       'react/no-danger': 'error',
       'react/no-unstable-nested-components': 'error',
@@ -153,6 +153,7 @@ export default [
       ],
       'sort-imports': 'off', // disabled in favor of 'import/order'
       'jsx-a11y/label-has-associated-control': ['error', { assert: 'either' }],
+      'jsx-a11y/no-autofocus': 'off',
       'max-classes-per-file': 'off',
       'max-len': 'off',
       'new-cap': 'off',
@@ -165,6 +166,16 @@ export default [
             {
               name: 'react-bootstrap',
               message: 'Please use `components/bootstrap` instead.',
+            },
+            {
+              name: 'react-router-dom',
+              importNames: ['Link'],
+              message: 'Please use Link from `components/common` instead.',
+            },
+            {
+              name: 'react-router-dom',
+              importNames: ['useLocation'],
+              message: 'Please use `routing/useLocation` instead.',
             },
             {
               name: 'create-react-class',
@@ -265,6 +276,16 @@ export default [
       'testing-library/await-async-events': 'off',
       'testing-library/no-debugging-utils': 'warn',
       'testing-library/prefer-screen-queries': 'off',
+      'testing-library/prefer-user-event': 'error',
+      'no-restricted-properties': [
+        'error',
+        {
+          object: 'fireEvent',
+          property: 'submit',
+          message:
+            'Submit the form through user interactions (e.g. userEvent.click on the submit button) instead of fireEvent.submit.',
+        },
+      ],
       'testing-library/render-result-naming-convention': 'off',
     },
   },

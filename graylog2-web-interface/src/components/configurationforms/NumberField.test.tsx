@@ -80,6 +80,7 @@ describe('<NumberField>', () => {
     render(<SUT onChange={changeFunction} value={numberField.default_value} />);
 
     const formField = screen.getByLabelText(numberField.human_name, { exact: false });
+    // eslint-disable-next-line testing-library/prefer-user-event
     fireEvent.change(formField, { target: { value: '123' } });
 
     await waitFor(() => expect(changeFunction).toHaveBeenCalledWith('example_number_field', 123));

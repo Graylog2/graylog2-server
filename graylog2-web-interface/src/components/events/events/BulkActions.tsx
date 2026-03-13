@@ -15,19 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
 
 import MenuItem from 'components/bootstrap/menuitem/MenuItem';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import type { Event } from 'components/events/events/types';
 import useEventBulkActions from 'components/events/events/hooks/useEventBulkActions';
-import useHistory from 'routing/useHistory';
-import Routes from 'routing/Routes';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
-import type { BulkEventReplayState } from 'views/pages/BulkEventReplayPage';
-import useLocation from 'routing/useLocation';
-import useSendEventActionTelemetry from 'components/events/events/hooks/useSendEventActionTelemetry';
+import useReplayBulkAction from 'components/events/events/hooks/useReplayBulkAction';
 
 type Props = {
   selectedEntitiesData: { [eventId: string]: Event };
@@ -35,21 +30,13 @@ type Props = {
 
 const BulkActions = ({ selectedEntitiesData }: Props) => {
   const events = Object.values(selectedEntitiesData);
-  const sendEventActionTelemetry = useSendEventActionTelemetry();
   const { actions, pluggableActionModals } = useEventBulkActions(events);
   const currentUser = useCurrentUser();
-  const location = useLocation();
-  const returnUrl = `${location.pathname}${location.search}`;
 
-  const history = useHistory();
   const replayableEvents = events.filter(
     (event) => !!event.replay_info && isPermitted(currentUser?.permissions, `eventdefinitions:read:${event.id}`),
   );
-  const onReplaySearchClick = useCallback(() => {
-    const eventIds = replayableEvents.map((event) => event.id);
-    sendEventActionTelemetry('REPLAY_SEARCH', true, { events_length: eventIds.length });
-    history.pushWithState<BulkEventReplayState>(Routes.ALERTS.BULK_REPLAY_SEARCH, { eventIds, returnUrl });
-  }, [replayableEvents, history, returnUrl, sendEventActionTelemetry]);
+  const onReplaySearchClick = useReplayBulkAction(replayableEvents);
 
   return (
     <>

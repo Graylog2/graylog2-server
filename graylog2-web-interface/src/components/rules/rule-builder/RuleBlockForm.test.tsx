@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
-import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import selectEvent from 'helpers/selectEvent';
 
@@ -83,9 +84,9 @@ describe('RuleBlockForm', () => {
     const submitButton = await screen.findByRole('button', { name: /add/i });
 
     const fieldInput = screen.getByLabelText('field');
-    fireEvent.change(fieldInput, { target: { value: 'bar' } });
+    await userEvent.type(fieldInput, 'bar');
 
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(mockAdd).toHaveBeenCalledWith({ field: 'bar', message: undefined }));
   });
@@ -99,7 +100,7 @@ describe('RuleBlockForm', () => {
 
     const requiredField = screen.getByLabelText('field');
 
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     expect(mockAdd).not.toHaveBeenCalled();
 
@@ -124,7 +125,7 @@ describe('RuleBlockForm', () => {
 
     const helpIcon = screen.getByTestId('funcSyntaxHelpIcon');
 
-    fireEvent.click(helpIcon);
+    await userEvent.click(helpIcon);
 
     await screen.findByText('Function Syntax Help');
   });
@@ -135,9 +136,9 @@ describe('RuleBlockForm', () => {
     const cancelButton = await screen.findByRole('button', { name: /cancel/i });
 
     const fieldInput = screen.getByLabelText('field');
-    fireEvent.change(fieldInput, { target: { value: 'bar' } });
+    await userEvent.type(fieldInput, 'bar');
 
-    fireEvent.click(cancelButton);
+    await userEvent.click(cancelButton);
 
     await waitFor(() => expect(mockCancel).toHaveBeenCalled());
 
@@ -152,9 +153,10 @@ describe('RuleBlockForm', () => {
     const updateButton = await screen.findByRole('button', { name: /update/i });
 
     const fieldInput = screen.getByLabelText('value');
-    fireEvent.change(fieldInput, { target: { value: 'Lumos' } });
+    await userEvent.clear(fieldInput);
+    await userEvent.type(fieldInput, 'Lumos');
 
-    fireEvent.click(updateButton);
+    await userEvent.click(updateButton);
 
     await waitFor(() =>
       expect(mockUpdate).toHaveBeenCalledWith({ indexEnd: 2, start: 1, value: 'Lumos' }, 'substring'),

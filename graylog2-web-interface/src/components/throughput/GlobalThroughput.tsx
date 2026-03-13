@@ -17,11 +17,10 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { useStore } from 'stores/connect';
 import NumberUtils from 'util/NumberUtils';
 import { NavItem } from 'components/bootstrap';
 import { Spinner } from 'components/common';
-import { GlobalThroughputStore } from 'stores/metrics/GlobalThroughputStore';
+import { useGlobalThroughput } from 'hooks/useMetrics';
 
 const ThroughputNavItem = styled(NavItem)`
   > a {
@@ -91,12 +90,12 @@ const ThroughputData = styled.span<{ $dataIn?: boolean }>(
 );
 
 const GlobalThroughput = (props) => {
-  const { throughput } = useStore(GlobalThroughputStore);
+  const { input, output: outputVal, isLoading } = useGlobalThroughput();
   let output = <Spinner text="" />;
 
-  if (!throughput.loading) {
-    const inputNumeral = NumberUtils.formatNumber(throughput.input);
-    const outputNumeral = NumberUtils.formatNumber(throughput.output);
+  if (!isLoading) {
+    const inputNumeral = NumberUtils.formatNumber(input);
+    const outputNumeral = NumberUtils.formatNumber(outputVal);
 
     output = (
       <ContentWrap aria-label={`Throughput: In ${inputNumeral} / Out ${outputNumeral} msg/s`}>

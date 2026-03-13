@@ -29,6 +29,9 @@ const StringUtils = {
 
     return this.tempDocument.textContent;
   },
+  escapeRegExp(str: string) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  },
   pluralize(number: string | number, singular: string, plural: string) {
     return number === 1 || number === '1' ? singular : plural;
   },

@@ -24,6 +24,8 @@ import java.time.Duration;
 
 class CertificateGeneratorTest {
 
+    private static final CertificateGenerator CERTIFICATE_GENERATOR = new CertificateGenerator(1024);
+
     @Test
     void testDomainName() throws Exception {
         final KeyPair pair = selfSigned("www.graylog.org");
@@ -42,6 +44,6 @@ class CertificateGeneratorTest {
 
     private static KeyPair selfSigned(String cname) throws Exception {
         final CertRequest req = CertRequest.selfSigned(cname).validity(Duration.ofDays(1));
-        return CertificateGenerator.generate(req);
+        return CERTIFICATE_GENERATOR.generateKeyPair(req);
     }
 }

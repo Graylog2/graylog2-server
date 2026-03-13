@@ -21,6 +21,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.conversions.Bson;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFiltersReFetcher;
@@ -79,7 +80,9 @@ public class DBEventDefinitionService {
     @Inject
     public DBEventDefinitionService(MongoCollections mongoCollections,
                                     DBEventProcessorStateService stateService,
-                                    EntityRegistrar entityRegistrar, EntityScopeService entityScopeService, SearchFiltersReFetcher searchFiltersRefetcher) {
+                                    EntityRegistrar entityRegistrar,
+                                    EntityScopeService entityScopeService,
+                                    SearchFiltersReFetcher searchFiltersRefetcher) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, EventDefinitionDto.class);
         this.mongoUtils = mongoCollections.utils(collection);
         this.scopedEntityMongoUtils = mongoCollections.scopedEntityUtils(collection, entityScopeService);
@@ -115,6 +118,7 @@ public class DBEventDefinitionService {
         EventDefinitionDto enrichedWithUpdateDate = entity
                 .toBuilder()
                 .updatedAt(DateTime.now(DateTimeZone.UTC))
+                .eventSummaryTemplate(StringUtils.trimToNull(entity.eventSummaryTemplate()))
                 .build();
         if (enrichedWithUpdateDate.id() == null) {
             final String id = scopedEntityMongoUtils.create(enrichedWithUpdateDate);

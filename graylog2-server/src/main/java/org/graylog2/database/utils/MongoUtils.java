@@ -26,6 +26,7 @@ import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
+import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.InsertOneResult;
 import jakarta.annotation.Nonnull;
 import org.bson.BsonValue;
@@ -265,5 +266,9 @@ public class MongoUtils<T extends MongoEntity> {
             }
         });
         return counts;
+    }
+
+    public static Bson removeEmbedded(String fieldName, String key, String value) {
+        return Updates.pull(fieldName, new Document(key, value));
     }
 }

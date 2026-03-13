@@ -17,6 +17,7 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.buckets;
 
 import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.engine.PivotAggsContext;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
@@ -24,10 +25,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Interval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.AutoDateHistogramAggregationBuilder;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch3.views.searchtypes.pivot.AggTypes;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.MutableNamedAggregationBuilder;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -35,6 +34,7 @@ import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -67,8 +67,8 @@ class OSTimeHandlerTest {
         this.osTimeHandler = new OSTimeHandler();
         when(time.interval()).thenReturn(interval);
         when(time.fields()).thenReturn(Collections.singletonList("foobar"));
-        final AggTypes aggTypes = mock(AggTypes.class);
-        when(queryContext.contextMap().get(any())).thenReturn(aggTypes);
+        final PivotAggsContext pivotAggsContext = mock(PivotAggsContext.class);
+        when(queryContext.contextMap().get(any())).thenReturn(pivotAggsContext);
         when(queryContext.timezone()).thenReturn(DateTimeZone.UTC);
         when(query.effectiveTimeRange(any())).thenCallRealMethod();
     }
@@ -105,12 +105,13 @@ class OSTimeHandlerTest {
         doReturn(allMessagesRange).when(query).timerange();
         when(time.interval()).thenReturn(interval);
 
-        final BucketSpecHandler.CreatedAggregations<AggregationBuilder> createdAggregations = this.osTimeHandler.doCreateAggregation(BucketSpecHandler.Direction.Row, "foobar", pivot, time, queryContext, query);
-        assertEquals(createdAggregations.root(), createdAggregations.leaf());
-        assertTrue(createdAggregations.root() instanceof AutoDateHistogramAggregationBuilder);
+        final BucketSpecHandler.CreatedAggregations<MutableNamedAggregationBuilder> createdAggregations = this.osTimeHandler.doCreateAggregation(BucketSpecHandler.Direction.Row, "foobar", pivot, time, queryContext, query);
+        assertEquals(createdAggregations.root().getName(), createdAggregations.leaf().getName());
+        Aggregation builtAggregation = createdAggregations.root().build();
+        assertTrue(builtAggregation.isAutoDateHistogram());
         assertEquals("foobar", createdAggregations.root().getName());
-        assertEquals("foobar", ((AutoDateHistogramAggregationBuilder) createdAggregations.root()).field());
-        assertEquals(DATE_TIME_FORMAT, ((AutoDateHistogramAggregationBuilder) createdAggregations.root()).format());
+        assertEquals("foobar", builtAggregation.autoDateHistogram().field());
+        assertEquals(DATE_TIME_FORMAT, builtAggregation.autoDateHistogram().format());
 
     }
 

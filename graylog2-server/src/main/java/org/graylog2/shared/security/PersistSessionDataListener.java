@@ -30,6 +30,10 @@ import org.graylog2.security.sessions.SessionAuthContext;
  * A listener that is invoked by shiro after an authentication attempt
  * (e.g. within {@link org.apache.shiro.subject.Subject#login(AuthenticationToken)}). The listener checks if the
  * authentication info contains a {@link SessionAuthContext} and if so, persists it to the current session.
+ * <p>
+ * If a session auth context is provided, but no session exists at this point, we will create a session. We can treat
+ * the presence of a {@link SessionAuthContext} as a sufficient indicator that the creation of a session is expected or
+ * required during this authentication flow.
  */
 public class PersistSessionDataListener implements AuthenticationListener {
     @Override
@@ -37,10 +41,8 @@ public class PersistSessionDataListener implements AuthenticationListener {
         if (info instanceof AuthenticationInfoWithSessionAuthContext(
                 AuthenticationInfo ignored, SessionAuthContext sessionAuthContext
         )) {
-            final var session = SecurityUtils.getSubject().getSession(false);
-            if (session != null) {
-                session.setAttribute(SessionUtils.AUTH_CONTEXT_SESSION_KEY, sessionAuthContext);
-            }
+            SecurityUtils.getSubject().getSession()
+                    .setAttribute(SessionUtils.AUTH_CONTEXT_SESSION_KEY, sessionAuthContext);
         }
     }
 

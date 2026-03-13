@@ -18,7 +18,6 @@
 import { useCallback } from 'react';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
@@ -26,7 +25,6 @@ import useLocation from 'routing/useLocation';
 const useSendEventActionTelemetry = () => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
-  const { activePerspective } = useActivePerspective();
 
   return useCallback(
     (actionName: string, fromBulk: boolean, eventDetails: { [key: string]: unknown } = {}) =>
@@ -36,11 +34,10 @@ const useSendEventActionTelemetry = () => {
         event_details: {
           actionName,
           fromBulk: !!fromBulk,
-          perspectiveId: activePerspective.id,
           ...eventDetails,
         },
       }),
-    [activePerspective.id, pathname, sendTelemetry],
+    [pathname, sendTelemetry],
   );
 };
 

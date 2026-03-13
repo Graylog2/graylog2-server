@@ -22,9 +22,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
 import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.indexer.indexset.fields.BaseIndexSetFields;
 import org.graylog2.indexer.indexset.fields.FieldRestrictionsField;
 import org.graylog2.indexer.indexset.fields.FieldTypeProfileField;
+import org.graylog2.indexer.indexset.fields.RotationAndRetentionFields;
+import org.graylog2.indexer.indexset.fields.ShardsAndReplicasField;
 import org.graylog2.indexer.indexset.fields.UseLegacyRotationField;
 import org.graylog2.indexer.indexset.fields.WritableField;
 import org.graylog2.shared.fields.IdField;
@@ -36,7 +37,8 @@ import org.graylog2.shared.fields.TitleAndDescriptionFields;
 public abstract class IndexSetUpdateRequest implements
         IdField,
         TitleAndDescriptionFields,
-        BaseIndexSetFields,
+        ShardsAndReplicasField,
+        RotationAndRetentionFields,
         UseLegacyRotationField,
         WritableField,
         FieldTypeProfileField,
@@ -67,7 +69,7 @@ public abstract class IndexSetUpdateRequest implements
     public abstract Builder toBuilder();
 
     public static Builder builder() {
-        return AutoValue_IndexSetUpdateRequest.Builder.builder();
+        return Builder.builder();
     }
 
     @AutoValue.Builder
@@ -76,7 +78,8 @@ public abstract class IndexSetUpdateRequest implements
     public abstract static class Builder implements
             IdFieldBuilder<Builder>,
             TitleAndDescriptionFieldsBuilder<Builder>,
-            BaseIndexSetFieldsBuilder<Builder>,
+            ShardsAndReplicasFieldBuilder<Builder>,
+            RotationAndRetentionFieldsBuilder<Builder>,
             UseLegacyRotationFieldBuilder<Builder>,
             WritableFieldBuilder<Builder>,
             FieldTypeProfileFieldBuilder<Builder>,

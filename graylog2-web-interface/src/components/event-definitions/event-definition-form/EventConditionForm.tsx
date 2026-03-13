@@ -74,6 +74,7 @@ const EventConditionForm = ({
   const sendTelemetry = useSendTelemetry();
 
   const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
+  const filteredDefinitionTypes = eventDefinitionTypes.filter((type) => type.useCondition());
 
   const getConditionPlugin = useCallback(
     (type: string) => {
@@ -81,14 +82,14 @@ const EventConditionForm = ({
         return undefined;
       }
 
-      return eventDefinitionTypes.find((eventDefinitionType) => eventDefinitionType.type === type);
+      return filteredDefinitionTypes.find((eventDefinitionType) => eventDefinitionType.type === type);
     },
-    [eventDefinitionTypes],
+    [filteredDefinitionTypes],
   );
 
   const sortedEventDefinitionTypes = useMemo(
     () =>
-      eventDefinitionTypes.sort((eventDefinitionType1, eventDefinitionType2) => {
+      filteredDefinitionTypes.sort((eventDefinitionType1, eventDefinitionType2) => {
         // Try to sort by given sort order and displayName if possible, otherwise do it by displayName
         const eventDefinitionType1Order = eventDefinitionType1.sortOrder;
         const eventDefinitionType2Order = eventDefinitionType2.sortOrder;
@@ -105,14 +106,11 @@ const EventConditionForm = ({
 
         return defaultCompare(eventDefinitionType1.displayName, eventDefinitionType2.displayName);
       }),
-    [eventDefinitionTypes],
+    [filteredDefinitionTypes],
   );
 
   const formattedEventDefinitionTypes = useMemo(
-    () =>
-      sortedEventDefinitionTypes
-        .filter((type) => type.useCondition())
-        .map((type) => ({ label: type.displayName, value: type.type })),
+    () => sortedEventDefinitionTypes.map((type) => ({ label: type.displayName, value: type.type })),
     [sortedEventDefinitionTypes],
   );
 

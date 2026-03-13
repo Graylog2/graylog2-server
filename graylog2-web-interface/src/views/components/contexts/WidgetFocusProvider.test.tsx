@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
-import { useLocation } from 'react-router-dom';
+import { render, screen } from 'wrappedTestingLibrary';
 import Immutable from 'immutable';
+import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
@@ -33,16 +33,15 @@ import useView from 'views/hooks/useView';
 import View from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
 import { setNewWidget } from 'views/logic/slices/widgetsSlice';
+import useLocation from 'routing/useLocation';
+
+jest.mock('routing/useLocation');
 
 const mockNavigate = jest.fn();
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => mockNavigate,
-  useLocation: jest.fn(() => ({
-    pathname: '',
-    search: '',
-  })),
 }));
 
 jest.mock('views/stores/useViewsDispatch');
@@ -111,13 +110,13 @@ describe('WidgetFocusProvider', () => {
 
     const button = await screen.findByRole('button', { name: 'Focus!' });
 
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(mockNavigate).toHaveBeenCalledWith('?focusedId=widget-id&focusing=true', { replace: true });
   });
 
   it('should update url on widget focus close', async () => {
-    asMock(useLocation).mockReturnValueOnce({
+    asMock(useLocation).mockReturnValue({
       ...emptyLocation,
       search: '?focusedId=widget-id&focusing=true',
     });
@@ -129,7 +128,7 @@ describe('WidgetFocusProvider', () => {
     renderSUT(consume);
 
     const button = await screen.findByRole('button', { name: 'Unfocus!' });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(mockNavigate).toHaveBeenLastCalledWith('', { replace: true });
   });
@@ -153,7 +152,7 @@ describe('WidgetFocusProvider', () => {
     renderSUT(consume);
 
     const button = await screen.findByRole('button', { name: 'Edit!' });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(mockNavigate).toHaveBeenCalledWith('?focusedId=widget-id&editing=true', { replace: true });
   });
@@ -171,7 +170,7 @@ describe('WidgetFocusProvider', () => {
     renderSUT(consume);
 
     const button = await screen.findByRole('button', { name: 'Cancel Edit!' });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(mockNavigate).toHaveBeenCalledWith('', { replace: true });
   });
@@ -202,11 +201,11 @@ describe('WidgetFocusProvider', () => {
 
     renderSUT(consume);
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Edit' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Edit' }));
 
     expect(mockNavigate).toHaveBeenCalledWith('?focusedId=widget-id&focusing=true&editing=true', { replace: true });
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Cancel' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Cancel' }));
 
     expect(mockNavigate).toHaveBeenCalledWith('?focusedId=widget-id&focusing=true', { replace: true });
   });
@@ -248,7 +247,7 @@ describe('WidgetFocusProvider', () => {
     renderSUT(consume);
 
     const button = await screen.findByRole('button', { name: 'Unfocus!' });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     // setNewWidget should be dispatched with the focused widget id
     expect(setNewWidget).toHaveBeenCalledWith('widget-id');
@@ -269,7 +268,7 @@ describe('WidgetFocusProvider', () => {
     renderSUT(consume);
 
     const button = await screen.findByRole('button', { name: 'Cancel Edit!' });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     // setNewWidget should be dispatched with the focused widget id
     expect(setNewWidget).toHaveBeenCalledWith('widget-id');

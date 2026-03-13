@@ -18,6 +18,7 @@
 import * as React from 'react';
 import type { PluginNavigation } from 'graylog-web-plugin';
 import type * as Immutable from 'immutable';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import useCurrentUser from 'hooks/useCurrentUser';
 import isActiveRoute from 'components/navigation/util/isActiveRoute';
@@ -28,8 +29,8 @@ import AppConfig from 'util/AppConfig';
 
 const shouldRender = (
   requiredFeatureFlag: string | undefined,
-  requiredPermissions: string | Array<string> | undefined,
-  userPermissions: Immutable.List<string>,
+  requiredPermissions: Permission | Array<Permission> | undefined,
+  userPermissions: Immutable.List<Permission>,
 ) => {
   if (requiredFeatureFlag) {
     return AppConfig.isFeatureEnabled(requiredFeatureFlag);

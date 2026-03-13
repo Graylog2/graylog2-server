@@ -23,6 +23,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
@@ -45,8 +46,6 @@ import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Path;
-import java.security.GeneralSecurityException;
-import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -63,18 +62,19 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.security.certutil.CertConstants.KEY_GENERATION_ALGORITHM;
 import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TruststoreCreatorTest {
 
+    private static final CertificateGenerator CERTIFICATE_GENERATOR = new CertificateGenerator(1024);
+
     @Test
     void testTrustStoreCreation(@TempDir Path tempDir) throws Exception {
 
-        final KeystoreInformation root = createKeystore(tempDir.resolve("root.p12"), "root", "CN=ROOT", BigInteger.ONE);
-        final KeystoreInformation boot = createKeystore(tempDir.resolve("boot.p12"), "boot", "CN=BOOT", BigInteger.TWO);
+        final KeystoreInformation root = createKeystore("root", "CN=ROOT", BigInteger.ONE);
+        final KeystoreInformation boot = createKeystore("boot", "CN=BOOT", BigInteger.TWO);
 
         final FilesystemKeystoreInformation truststore = TruststoreCreator.newEmpty()
                 .addCertificates(root)
@@ -109,8 +109,8 @@ public class TruststoreCreatorTest {
     }
 
     @Test
-    void testAdditionalCertificates(@TempDir Path tempDir) throws GeneralSecurityException, IOException, OperatorCreationException {
-        final KeystoreInformation root = createKeystore(tempDir.resolve("root.p12"), "something-unknown", "CN=ROOT", BigInteger.ONE);
+    void testAdditionalCertificates(@TempDir Path tempDir) throws Exception {
+        final KeystoreInformation root = createKeystore("something-unknown", "CN=ROOT", BigInteger.ONE);
         final X509Certificate cert = (X509Certificate) root.loadKeystore().getCertificate("something-unknown");
 
         final FilesystemKeystoreInformation truststore = TruststoreCreator.newEmpty()
@@ -127,9 +127,9 @@ public class TruststoreCreatorTest {
 
     @Test
     void testIntermediateCa() throws Exception {
-        final KeyPair ca = CertificateGenerator.generate(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(100)));
-        final KeyPair intermediateCa = CertificateGenerator.generate(CertRequest.signed("intermediate", ca).isCA(true).validity(Duration.ofDays(100)));
-        final KeyPair nodeKeys = CertificateGenerator.generate(CertRequest.signed("my-node", intermediateCa).isCA(false).validity(Duration.ofDays(100)));
+        final KeyPair ca = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(100)));
+        final KeyPair intermediateCa = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.signed("intermediate", ca).isCA(true).validity(Duration.ofDays(100)));
+        final KeyPair nodeKeys = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.signed("my-node", intermediateCa).isCA(false).validity(Duration.ofDays(100)));
 
 
         final InMemoryKeystoreInformation keystoreInformation = createInMemoryKeystore(nodeKeys, intermediateCa);
@@ -142,16 +142,16 @@ public class TruststoreCreatorTest {
 
         Assertions.assertThatNoException().isThrownBy(() -> defaultTrustManager.checkServerTrusted(new X509Certificate[]{nodeKeys.certificate()}, "RSA"));
 
-        final KeyPair fakeNodeKeys = CertificateGenerator.generate(CertRequest.selfSigned("my-fake-node").isCA(false).validity(Duration.ofDays(100)));
+        final KeyPair fakeNodeKeys = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("my-fake-node").isCA(false).validity(Duration.ofDays(100)));
         Assertions.assertThatThrownBy(() -> defaultTrustManager.checkServerTrusted(new X509Certificate[]{fakeNodeKeys.certificate()}, "RSA"))
                 .isInstanceOf(CertificateException.class);
     }
 
     @Test
     void testDuplicateCname() throws Exception {
-        final KeyPair ca1 = CertificateGenerator.generate(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(90)));
-        final KeyPair ca2 = CertificateGenerator.generate(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(90)));
-        final KeyPair ca3 = CertificateGenerator.generate(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(90)));
+        final KeyPair ca1 = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(90)));
+        final KeyPair ca2 = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(90)));
+        final KeyPair ca3 = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(90)));
 
         final KeyStore truststore = TruststoreCreator.newEmpty()
                 .addCertificates(List.of(ca1.certificate()))
@@ -172,6 +172,82 @@ public class TruststoreCreatorTest {
         final TrustManager[] trustManagers = tmf.getTrustManagers();
         return (X509TrustManager) trustManagers[0];
     }
+
+    @Test
+    void testExpiredCertificates() throws Exception {
+
+        final KeyStore keystore = KeyStore.getInstance(CertConstants.PKCS12);
+        keystore.load(null, null);
+
+        keystore.setCertificateEntry("valid1", certWithValidity("valid1",
+                Date.from(Instant.now().minus(10, ChronoUnit.DAYS)),
+                Date.from(Instant.now().plus(10, ChronoUnit.DAYS))
+        ));
+        keystore.setCertificateEntry("valid2", certWithValidity("valid2",
+                Date.from(Instant.now().minus(10, ChronoUnit.DAYS)),
+                Date.from(Instant.now().plus(10, ChronoUnit.DAYS))
+        ));
+        keystore.setCertificateEntry("expired", certWithValidity("expired",
+                Date.from(Instant.now().minus(10, ChronoUnit.DAYS)),
+                Date.from(Instant.now().minus(5, ChronoUnit.DAYS))
+        ));
+        keystore.setCertificateEntry("notyetvalid", certWithValidity("notyetvalid",
+                Date.from(Instant.now().plus(5, ChronoUnit.DAYS)),
+                Date.from(Instant.now().plus(10, ChronoUnit.DAYS))
+        ));
+
+        final TruststoreCreator truststoreCreator = new TruststoreCreator(keystore);
+        Assertions.assertThat(Collections.list(truststoreCreator.getTruststore().aliases()))
+                .hasSize(2)
+                .contains("valid1", "valid2");
+    }
+
+    @Test
+    void testAddingExpiredCertificates() throws Exception {
+
+        final TruststoreCreator truststoreCreator = TruststoreCreator.newEmpty();
+
+        truststoreCreator.addCertificates(List.of(certWithValidity("valid1",
+                Date.from(Instant.now().minus(10, ChronoUnit.DAYS)),
+                Date.from(Instant.now().plus(10, ChronoUnit.DAYS))
+        )));
+
+        truststoreCreator.addCertificates(List.of(certWithValidity("valid2",
+                Date.from(Instant.now().minus(10, ChronoUnit.DAYS)),
+                Date.from(Instant.now().plus(10, ChronoUnit.DAYS))
+        )));
+
+        truststoreCreator.addCertificates(List.of(certWithValidity("expired",
+                Date.from(Instant.now().minus(10, ChronoUnit.DAYS)),
+                Date.from(Instant.now().minus(5, ChronoUnit.DAYS))
+        )));
+
+        truststoreCreator.addCertificates(List.of(certWithValidity("notyetvalid",
+                Date.from(Instant.now().plus(5, ChronoUnit.DAYS)),
+                Date.from(Instant.now().plus(10, ChronoUnit.DAYS))
+        )));
+
+        Assertions.assertThat(Collections.list(truststoreCreator.getTruststore().aliases()))
+                .hasSize(2)
+                .contains("cn=valid1", "cn=valid2");
+    }
+
+    private X509Certificate certWithValidity(String alias, Date notBefore, Date notAfter) throws Exception {
+        final KeyPair keyPair = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned(alias).isCA(true).validity(Duration.ofDays(365)));
+
+        X500Name rootSubject = new X500Name("CN=" + alias);
+        ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSA").build(keyPair.privateKey());
+        X509v3CertificateBuilder rootCertBuilder = new JcaX509v3CertificateBuilder(
+                rootSubject,
+                BigInteger.valueOf(1),
+                notBefore,
+                notAfter,
+                rootSubject,
+                keyPair.publicKey()
+        );
+        return new JcaX509CertificateConverter().getCertificate(rootCertBuilder.build(signer));
+    }
+
 
     @SuppressWarnings("deprecation")
     @Nonnull
@@ -194,9 +270,9 @@ public class TruststoreCreatorTest {
     }
 
     @SuppressWarnings("deprecation")
-    private KeystoreInformation createKeystore(Path path, String alias, final String cnName, final BigInteger serialNumber) throws GeneralSecurityException, OperatorCreationException, IOException {
-        KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
-        java.security.KeyPair certKeyPair = keyGen.generateKeyPair();
+    private KeystoreInformation createKeystore(String alias, final String cnName, final BigInteger serialNumber) throws IOException, CertificateException, OperatorCreationException, KeyStoreException, NoSuchAlgorithmException {
+        final KeyPair keyPair = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned(alias).isCA(true).validity(Duration.ofDays(90)));
+
         X500Name name = new X500Name(cnName);
 
         JcaX509v3CertificateBuilder builder = new JcaX509v3CertificateBuilder(
@@ -205,9 +281,9 @@ public class TruststoreCreatorTest {
                 Date.from(Instant.now()),
                 Date.from(Instant.now().plus(13, ChronoUnit.DAYS)),
                 name,
-                certKeyPair.getPublic());
+                keyPair.publicKey());
 
-        ContentSigner signer = new JcaContentSignerBuilder(SIGNING_ALGORITHM).build(certKeyPair.getPrivate());
+        ContentSigner signer = new JcaContentSignerBuilder(SIGNING_ALGORITHM).build(keyPair.privateKey());
         X509CertificateHolder certHolder = builder.build(signer);
 
         final X509Certificate signedCert = new JcaX509CertificateConverter().getCertificate(certHolder);
@@ -217,7 +293,7 @@ public class TruststoreCreatorTest {
 
         final char[] password = RandomStringUtils.randomAlphabetic(256).toCharArray();
 
-        keyStore.setKeyEntry(alias, certKeyPair.getPrivate(), password, new Certificate[]{signedCert});
+        keyStore.setKeyEntry(alias, keyPair.privateKey(), password, new Certificate[]{signedCert});
 
         return new InMemoryKeystoreInformation(keyStore, password);
     }

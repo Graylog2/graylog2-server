@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback, useState } from 'react';
 
 import { Row, Col } from 'components/bootstrap';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
@@ -22,8 +23,6 @@ import QueryHelper from 'components/common/QueryHelper';
 import { ErrorsProvider } from 'components/lookup-tables/contexts/ErrorsContext';
 import ErrorsConsumer from 'components/lookup-tables/lookup-table-list/errors-consumer';
 import { useFetchDataAdapters } from 'components/lookup-tables/hooks/useLookupTablesAPI';
-import { ModalProvider } from 'components/lookup-tables/contexts/ModalContext';
-import LUTModals from 'components/lookup-tables/LUTModals';
 import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 import type { DataAdapterEntity } from 'components/lookup-tables/types';
 
@@ -49,13 +48,13 @@ const queryHelpComponent = (
 );
 
 function DataAdapterList() {
-  const [{ adapterNames }, setNames] = React.useState<{
+  const [{ adapterNames }, setNames] = useState<{
     adapterNames?: Array<string>;
   }>({ adapterNames: undefined });
   const { fetchPaginatedDataAdapters, dataAdaptersKeyFn } = useFetchDataAdapters();
   const { renderActions } = useActions();
 
-  const handleFetchAdapters = React.useCallback(
+  const handleFetchAdapters = useCallback(
     async (searchParams: SearchParams) => {
       const resp = await fetchPaginatedDataAdapters(searchParams);
 
@@ -99,28 +98,23 @@ function DataAdapterList() {
   );
 
   return (
-    <ModalProvider>
-      <ErrorsProvider>
-        <ErrorsConsumer adapterNames={adapterNames} />
-        <Row className="content">
-          <Col md={12}>
-            <PaginatedEntityTable<DataAdapterEntity>
-              humanName="data adapter"
-              entityActions={renderActions}
-              columnsOrder={adapterListElements.columnOrder}
-              queryHelpComponent={queryHelpComponent}
-              tableLayout={adapterListElements.defaultLayout}
-              fetchEntities={handleFetchAdapters}
-              keyFn={dataAdaptersKeyFn}
-              actionsCellWidth={100}
-              entityAttributesAreCamelCase={false}
-              columnRenderers={columnRenderers}
-            />
-          </Col>
-        </Row>
-        <LUTModals />
-      </ErrorsProvider>
-    </ModalProvider>
+    <ErrorsProvider>
+      <ErrorsConsumer adapterNames={adapterNames} />
+      <Row className="content">
+        <Col md={12}>
+          <PaginatedEntityTable<DataAdapterEntity>
+            humanName="data adapter"
+            entityActions={renderActions}
+            queryHelpComponent={queryHelpComponent}
+            tableLayout={adapterListElements.defaultLayout}
+            fetchEntities={handleFetchAdapters}
+            keyFn={dataAdaptersKeyFn}
+            entityAttributesAreCamelCase={false}
+            columnRenderers={columnRenderers}
+          />
+        </Col>
+      </Row>
+    </ErrorsProvider>
   );
 }
 

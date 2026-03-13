@@ -19,8 +19,11 @@ package org.graylog.scheduler;
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.Validator;
+import com.github.joschi.jadconfig.documentation.Documentation;
+import com.github.joschi.jadconfig.documentation.DocumentationSection;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
+import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import org.graylog2.configuration.converters.MapConverter;
 import org.graylog2.plugin.PluginConfigBean;
 
@@ -30,17 +33,38 @@ import java.util.Map;
  * Job scheduler specific configuration fields for the server configuration file.
  */
 @SuppressWarnings({"FieldCanBeLocal", "unused", "WeakerAccess", "FieldMayBeFinal"})
+@DocumentationSection(heading = "Job Scheduler", description = "")
 public class JobSchedulerConfiguration implements PluginConfigBean {
+    public static final String SYSTEM_WORKER_THREADS = "job_scheduler_system_worker_threads";
     public static final String LOOP_SLEEP_DURATION = "job_scheduler_loop_sleep_duration";
     public static final String LOCK_EXPIRATION_DURATION = "job_scheduler_lock_expiration_duration";
     public static final String CONCURRENCY_LIMITS = "job_scheduler_concurrency_limits";
 
+    @Documentation("""
+            The number of worker threads for the system job scheduler. (e.g., index maintenance jobs)
+            Default: 5
+            """)
+    @Parameter(value = SYSTEM_WORKER_THREADS, validators = PositiveIntegerValidator.class)
+    private int jobSchedulerSystemWorkerThreads = 5;
+
+    @Documentation("tbd")
     @Parameter(value = LOOP_SLEEP_DURATION, validators = PositiveDurationValidator.class)
     private Duration loopSleepDuration = Duration.seconds(1);
 
+    @Documentation("tbd")
     @Parameter(value = LOCK_EXPIRATION_DURATION, validators = Minimum1MinuteValidator.class)
     private Duration lockExpirationDuration = Duration.minutes(5);
 
+    @Documentation("""
+            Optional limits on scheduling concurrency by job type. No more than the specified number of worker
+            threads will be executing jobs of the specified type across the entire cluster.
+            Default: no limitation
+            Note: Monitor job queue metrics to avoid excessive backlog of unprocessed jobs when using this setting!
+            Available job types in Graylog Open:
+              check-for-cert-renewal-execution-v1
+              event-processor-execution-v1
+              notification-execution-v1
+            """)
     @Parameter(value = CONCURRENCY_LIMITS, converter = MapConverter.StringInteger.class)
     private Map<String, Integer> concurrencyLimits = Map.of();
 

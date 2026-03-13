@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix Sidecars Not allowed to view user graylog-sidecar."
+
+issues = ["24132", "24407"]
+pulls = ["24848"]

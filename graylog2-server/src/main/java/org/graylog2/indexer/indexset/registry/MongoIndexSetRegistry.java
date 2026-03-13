@@ -1,0 +1,221 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog2.indexer.indexset.registry;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Streams;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.MongoIndexSet;
+import org.graylog2.indexer.indexset.basic.BasicIndexSet;
+import org.graylog2.indexer.indexset.basic.ExtendedBasicIndexSets;
+import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
+import org.graylog2.indexer.indexset.events.IndexSetDeletedEvent;
+import org.graylog2.indexer.indices.TooManyAliasesException;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.Objects.requireNonNull;
+
+@Singleton
+public class MongoIndexSetRegistry implements IndexSetRegistry {
+    private final IndexSetService indexSetService;
+    private final MongoIndexSet.Factory mongoIndexSetFactory;
+
+    static class IndexSetsCache {
+        private final IndexSetService indexSetService;
+        private final AtomicReference<Supplier<List<IndexSetConfig>>> indexSetConfigs;
+
+        @Inject
+        IndexSetsCache(IndexSetService indexSetService,
+                       EventBus serverEventBus) {
+            this.indexSetService = requireNonNull(indexSetService);
+            this.indexSetConfigs = new AtomicReference<>(Suppliers.memoize(this.indexSetService::findAll));
+            serverEventBus.register(this);
+        }
+
+        List<IndexSetConfig> get() {
+            return Collections.unmodifiableList(indexSetConfigs.get().get());
+        }
+
+        @VisibleForTesting
+        void invalidate() {
+            this.indexSetConfigs.set(Suppliers.memoize(this.indexSetService::findAll));
+        }
+
+        @Subscribe
+        void handleIndexSetCreation(IndexSetCreatedEvent indexSetCreatedEvent) {
+            this.invalidate();
+        }
+
+        @Subscribe
+        void handleIndexSetDeletion(IndexSetDeletedEvent indexSetDeletedEvent) {
+            this.invalidate();
+        }
+    }
+
+    private final IndexSetsCache indexSetsCache;
+    private final Set<ExtendedBasicIndexSets> extendedBasicIndexSets;
+
+    @Inject
+    public MongoIndexSetRegistry(IndexSetService indexSetService,
+                                 MongoIndexSet.Factory mongoIndexSetFactory,
+                                 IndexSetsCache indexSetsCache,
+                                 Set<ExtendedBasicIndexSets> extendedBasicIndexSets) {
+        this.indexSetService = indexSetService;
+        this.mongoIndexSetFactory = requireNonNull(mongoIndexSetFactory);
+        this.indexSetsCache = indexSetsCache;
+        this.extendedBasicIndexSets = extendedBasicIndexSets;
+    }
+
+    private Set<IndexSet> findAllIndexSets() {
+        return getIndexSetsStream().collect(ImmutableSet.toImmutableSet());
+    }
+
+    private Stream<IndexSet> getIndexSetsStream() {
+        return indexSetsCache.get().stream().map(mongoIndexSetFactory::create);
+    }
+
+    @Override
+    public Set<IndexSet> getAllIndexSets() {
+        return findAllIndexSets();
+    }
+
+    @Override
+    public Set<BasicIndexSet> getAllBasicIndexSets() {
+        return Streams.concat(getIndexSetsStream(),
+                        extendedBasicIndexSets.stream().flatMap(sets -> sets.indexSets().stream()))
+                .collect(Collectors.toUnmodifiableSet());
+    }
+
+    @Override
+    public Optional<IndexSet> get(final String indexSetId) {
+        return this.indexSetsCache.get()
+                .stream()
+                .filter(indexSet -> Objects.equals(indexSet.id(), indexSetId))
+                .map(mongoIndexSetFactory::create)
+                .findFirst();
+    }
+
+    @Override
+    public Optional<IndexSet> getForIndex(String indexName) {
+        return findAllIndexSets()
+                .stream()
+                .filter(indexSet -> indexSet.isManagedIndex(indexName))
+                .findFirst();
+    }
+
+    @Override
+    public Set<IndexSet> getForIndices(Collection<String> indices) {
+        final Set<? extends IndexSet> indexSets = findAllIndexSets();
+        final ImmutableSet.Builder<IndexSet> resultBuilder = ImmutableSet.builder();
+        for (IndexSet indexSet : indexSets) {
+            for (String index : indices) {
+                if (indexSet.isManagedIndex(index)) {
+                    resultBuilder.add(indexSet);
+                }
+            }
+        }
+
+        return resultBuilder.build();
+    }
+
+    @Override
+    public Set<IndexSet> getFromIndexConfig(Collection<IndexSetConfig> indexSetConfigs) {
+        return indexSetConfigs.stream()
+                .map(mongoIndexSetFactory::create)
+                .collect(Collectors.toUnmodifiableSet());
+    }
+
+    @Override
+    public IndexSet getDefault() {
+        return mongoIndexSetFactory.create(indexSetService.getDefault());
+    }
+
+    @Override
+    public String[] getManagedIndices() {
+        return getAllBasicIndexSets().stream()
+                .flatMap(indexSet -> Stream.of(indexSet.getManagedIndices()))
+                .toArray(String[]::new);
+    }
+
+    @Override
+    public boolean isManagedIndex(String indexName) {
+        return isManagedIndex(getAllBasicIndexSets(), indexName);
+    }
+
+    @Override
+    public Map<String, Boolean> isManagedIndex(Collection<String> indices) {
+        final Set<BasicIndexSet> indexSets = getAllBasicIndexSets();
+        return indices.stream()
+                .collect(Collectors.toMap(Function.identity(), index -> isManagedIndex(indexSets, index)));
+    }
+
+    private boolean isManagedIndex(Collection<? extends BasicIndexSet> indexSets, String index) {
+        return indexSets.stream()
+                .anyMatch(indexSet -> indexSet.isManagedIndex(index));
+    }
+
+    private String[] doWithWritableIndices(Function<IndexSet, String> fn) {
+        return findAllIndexSets().stream()
+                .filter(indexSet -> indexSet.getConfig().isWritable())
+                .map(fn)
+                .toArray(String[]::new);
+    }
+
+    @Override
+    public String[] getIndexWildcards() {
+        return doWithWritableIndices(IndexSet::getIndexWildcard);
+    }
+
+    @Override
+    public String[] getWriteIndexAliases() {
+        return doWithWritableIndices(IndexSet::getWriteIndexAlias);
+    }
+
+    @Override
+    public boolean isUp() {
+        return findAllIndexSets().stream()
+                .filter(indexSet -> indexSet.getConfig().isWritable())
+                .allMatch(IndexSet::isUp);
+    }
+
+    @Override
+    public boolean isCurrentWriteIndex(String indexName) throws TooManyAliasesException {
+        return getForIndex(indexName)
+                .map(indexSet -> Objects.equals(indexSet.getActiveWriteIndex(), indexName))
+                .orElse(false);
+    }
+}

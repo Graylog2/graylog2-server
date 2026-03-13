@@ -17,6 +17,8 @@
 package org.graylog2.inputs.transports;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.documentation.Documentation;
+import com.github.joschi.jadconfig.documentation.DocumentationSection;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.google.common.annotations.VisibleForTesting;
@@ -30,16 +32,20 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
 
+@DocumentationSection(heading = "Netty transport configuration", description = "")
 public class NettyTransportConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(NettyTransportConfiguration.class);
     private static final String PREFIX = "transport_netty_";
 
+    @Documentation(value = "tbd")
     @Parameter(value = PREFIX + "type", required = true, validators = StringNotBlankValidator.class)
     private String type = "auto";
 
+    @Documentation(value = "tbd")
     @Parameter(value = PREFIX + "tls_provider", required = true, validators = StringNotBlankValidator.class)
     private String tlsProvider = "auto";
 
+    @Documentation(value = "tbd")
     @Parameter(value = PREFIX + "num_threads", required = true, validators = PositiveIntegerValidator.class)
     private int numThreads = Runtime.getRuntime().availableProcessors() * 2;
 

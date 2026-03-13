@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
+import userEvent from '@testing-library/user-event';
 
 import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
@@ -83,7 +84,7 @@ describe('ExportModal', () => {
       name: /start download/i,
     });
 
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
   };
 
   const payload = {

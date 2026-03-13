@@ -31,11 +31,18 @@ import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.NonDeletableSystemScope;
 import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.datatiering.DataTieringConfig;
-import org.graylog2.indexer.IndexTemplateProvider;
-import org.graylog2.indexer.MessageIndexTemplateProvider;
+import org.graylog2.indexer.indexset.fields.CustomFieldMappingsField;
 import org.graylog2.indexer.indexset.fields.ExtendedIndexSetFields;
 import org.graylog2.indexer.indexset.fields.FieldRestrictionsField;
+import org.graylog2.indexer.indexset.fields.FieldTypeProfileField;
+import org.graylog2.indexer.indexset.fields.IndexAnalyzerField;
+import org.graylog2.indexer.indexset.fields.IndexPrefixField;
+import org.graylog2.indexer.indexset.fields.IndexTemplateNameField;
+import org.graylog2.indexer.indexset.fields.IndexTemplateTypeField;
+import org.graylog2.indexer.indexset.fields.ShardsAndReplicasField;
 import org.graylog2.indexer.indexset.restrictions.IndexSetFieldRestriction;
+import org.graylog2.indexer.template.IndexTemplateProvider;
+import org.graylog2.indexer.template.MessageIndexTemplateProvider;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.validation.ValidObjectId;
@@ -50,7 +57,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
+import static org.graylog2.indexer.template.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 
 @AutoValue
@@ -60,14 +67,19 @@ public abstract class IndexSetConfig implements
         Comparable<IndexSetConfig>,
         ExtendedIndexSetFields,
         FieldRestrictionsField,
+        IndexTemplateNameField,
+        ShardsAndReplicasField,
+        IndexAnalyzerField,
+        FieldTypeProfileField,
+        IndexTemplateTypeField,
+        IndexPrefixField,
+        CustomFieldMappingsField,
         ScopedEntity<IndexSetConfig.Builder> {
     public static final String DEFAULT_INDEX_TEMPLATE_TYPE = MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 
     public static final String FIELD_REGULAR = "regular";
     public static final String FIELD_INDEX_MATCH_PATTERN = "index_match_pattern";
     public static final String FIELD_INDEX_WILDCARD = "index_wildcard";
-    public static final String FIELD_INDEX_TEMPLATE_NAME = "index_template_name";
-    public static final String FIELD_CUSTOM_FIELD_MAPPINGS = "custom_field_mappings";
     public static final Duration DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(5L);
 
     private static final Set<String> TEMPLATE_TYPES_FOR_INDEX_SETS_WITH_IMMUTABLE_FIELD_TYPES = Set.of(
@@ -234,13 +246,6 @@ public abstract class IndexSetConfig implements
     @Nullable
     public abstract String indexWildcard();
 
-    @JsonProperty(FIELD_INDEX_TEMPLATE_NAME)
-    @NotBlank
-    public abstract String indexTemplateName();
-
-    @JsonProperty(FIELD_CUSTOM_FIELD_MAPPINGS)
-    public abstract CustomFieldMappings customFieldMappings();
-
     @JsonIgnore
     public boolean isRegularIndex() {
         // Non-writable means the index has been restored and cannot be used as default, no matter if it was explicitly
@@ -280,17 +285,23 @@ public abstract class IndexSetConfig implements
     public abstract static class Builder implements
             ExtendedIndexSetFieldsBuilder<Builder>,
             FieldRestrictionsFieldBuilder<Builder>,
+            IndexTemplateNameFieldBuilder<Builder>,
+            ShardsAndReplicasFieldBuilder<Builder>,
+            IndexAnalyzerFieldBuilder<Builder>,
+            FieldTypeProfileFieldBuilder<Builder>,
+            IndexTemplateTypeFieldBuilder<Builder>,
+            IndexPrefixFieldBuilder<Builder>,
+            CustomFieldMappingsFieldBuilder<Builder>,
             ScopedEntity.Builder<Builder> {
 
+        @JsonProperty(FIELD_REGULAR)
         public abstract Builder isRegular(@Nullable Boolean isRegular);
 
+        @JsonProperty(FIELD_INDEX_MATCH_PATTERN)
         public abstract Builder indexMatchPattern(String indexMatchPattern);
 
+        @JsonProperty(FIELD_INDEX_WILDCARD)
         public abstract Builder indexWildcard(String indexWildcard);
-
-        public abstract Builder indexTemplateName(String templateName);
-
-        public abstract Builder customFieldMappings(CustomFieldMappings customFieldMappings);
 
         public abstract IndexSetConfig build();
     }

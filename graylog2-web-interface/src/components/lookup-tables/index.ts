@@ -18,29 +18,16 @@ import './adapters';
 import './caches';
 
 export { default as LookupTablesOverview } from './lookup-table-list';
-export { default as LUTTableEntry } from './LUTTableEntry';
-export { default as LookupTableView } from './LookupTableView';
-export { default as LookupTableForm } from './LookupTableForm';
 export { default as LookupTableFields } from './LookupTableFields';
-
-export { default as LookupTableCreate } from './LookupTableCreate';
+export { default as LookupTableWizard } from './lookup-table-form';
+export { default as LookupTableView } from './lookup-table-view';
 
 export { default as CachesOverview } from './cache-list';
-export { default as CacheTableEntry } from './CacheTableEntry';
-export { default as Cache } from './Cache';
-export { default as CacheForm } from './CacheForm';
-export { default as CacheCreate } from './CacheCreate';
-export { default as CachePicker } from './CachePicker';
-export { default as CachesContainer } from './CachesContainer';
+export { CacheFormView } from './cache-form';
+export { default as CacheView } from './cache-view';
 
 export { default as DataAdaptersOverview } from './adapter-list';
-
-export { default as DataAdapterTableEntry } from './DataAdapterTableEntry';
-export { default as DataAdapter } from './DataAdapter';
-export { default as DataAdapterForm } from './DataAdapterForm';
-
-export { default as DataAdapterCreate } from './DataAdapterCreate';
-export { default as DataAdapterPicker } from './DataAdapterPicker';
-export { default as DataAdaptersContainer } from './DataAdaptersContainer';
+export { DataAdapterFormView } from './adapter-form';
+export { default as DataAdapterView } from './adapter-view';
 
 export { default as ErrorPopover } from './ErrorPopover';

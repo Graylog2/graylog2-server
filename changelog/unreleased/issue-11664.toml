@@ -1,0 +1,5 @@
+type = "a"
+message = "Cloud Trail input improvements: Added setup wizard, improved processing, and support for automatic authentication."
+
+pulls = ["23711", "24355"]
+issues = ["graylog-plugin-enterprise#11664", "graylog-plugin-enterprise#12591"]

@@ -16,8 +16,9 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import { act } from 'react';
+import userEvent from '@testing-library/user-event';
 
 import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
@@ -52,6 +53,8 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
 }));
 
 jest.setTimeout(10000);
+
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
 describe('EntityShareModal', () => {
   beforeEach(() => {
@@ -90,7 +93,7 @@ describe('EntityShareModal', () => {
   it('updates entity share state on submit', async () => {
     render(<SimpleEntityShareModal />);
 
-    fireEvent.click(await screen.findByRole('button', { name: /update sharing/i }));
+    await setupUser().click(await screen.findByRole('button', { name: /update sharing/i }));
 
     await waitFor(() => expect(EntityShareActions.update).toHaveBeenCalledTimes(1));
 
@@ -107,7 +110,7 @@ describe('EntityShareModal', () => {
       name: /cancel/i,
     });
 
-    fireEvent.click(cancelButton);
+    await setupUser().click(cancelButton);
 
     await waitFor(() => {
       expect(onClose).toHaveBeenCalledTimes(1);
@@ -169,7 +172,7 @@ describe('EntityShareModal', () => {
           name: /add collaborator/i,
         });
 
-        fireEvent.click(submitButton);
+        await setupUser().click(submitButton);
 
         await waitFor(() => {
           expect(EntityShareActions.prepare).toHaveBeenCalledWith(
@@ -199,7 +202,7 @@ describe('EntityShareModal', () => {
 
       await selectEvent.chooseOption('Search for users and teams', john.title);
 
-      fireEvent.click(await screen.findByRole('button', { name: /update sharing/i }));
+      await setupUser().click(await screen.findByRole('button', { name: /update sharing/i }));
 
       await waitFor(() => {
         expect(window.confirm).toHaveBeenCalledWith(
@@ -270,7 +273,7 @@ describe('EntityShareModal', () => {
 
         const deleteButton = await screen.findByTitle(`Remove sharing for ${grantee.title}`);
 
-        fireEvent.click(deleteButton);
+        await setupUser().click(deleteButton);
 
         await waitFor(() => {
           expect(EntityShareActions.prepare).toHaveBeenCalledWith(

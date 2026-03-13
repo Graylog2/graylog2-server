@@ -20,6 +20,7 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.documentation.Documentation;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -97,6 +98,7 @@ class DirectoriesWritableValidatorTest {
     }
 
     static class MyConfiguration {
+        @Documentation(visible = false)
         @Parameter(value = "path_repo", converter = PathListConverter.class, validators = DirectoriesWritableValidator.class)
         private List<Path> pathRepo;
     }

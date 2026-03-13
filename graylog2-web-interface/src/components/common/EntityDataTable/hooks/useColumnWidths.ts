@@ -14,106 +14,175 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useState, useLayoutEffect } from 'react';
+import { useState, useLayoutEffect, useMemo } from 'react';
 
-import { DEFAULT_COL_MIN_WIDTH, DEFAULT_COL_WIDTH } from 'components/common/EntityDataTable/Constants';
+import {
+  DEFAULT_COL_MIN_WIDTH,
+  DEFAULT_COL_WIDTH,
+  ACTIONS_COL_ID,
+  BULK_SELECT_COL_ID,
+} from 'components/common/EntityDataTable/Constants';
 
 import type { EntityBase, ColumnRenderersByAttribute } from '../types';
 
-const assignableTableWidth = ({
-  tableWidth,
-  actionsColWidth,
+const calculateAssignableWidth = ({
+  scrollContainerWidth,
+  actionsColMinWidth,
   bulkSelectColWidth,
   columnIds,
-  columnRenderersByAttribute,
+  staticColumnWidths,
 }: {
-  actionsColWidth: number;
+  actionsColMinWidth: number;
   bulkSelectColWidth: number;
-  columnRenderersByAttribute: { [columnId: string]: { staticWidth?: number } };
   columnIds: Array<string>;
-  tableWidth: number;
+  scrollContainerWidth: number;
+  staticColumnWidths: { [colId: string]: number };
 }) => {
-  const staticColWidths = columnIds.reduce(
-    (total, id) => total + (columnRenderersByAttribute[id]?.staticWidth ?? 0),
-    0,
-  );
+  const staticColWidths = columnIds.reduce((total, id) => total + (staticColumnWidths[id] ?? 0), 0);
 
-  return tableWidth - bulkSelectColWidth - actionsColWidth - staticColWidths;
+  return scrollContainerWidth - bulkSelectColWidth - actionsColMinWidth - staticColWidths;
 };
 
 const calculateColumnWidths = ({
+  actionsColMinWidth,
   assignableWidth,
-  columnIds,
-  columnRenderersByAttribute,
+  attributeColumnIds,
+  attributeColumnRenderers,
+  bulkSelectColWidth,
+  staticColumnWidths,
+  headerMinWidths,
 }: {
+  actionsColMinWidth: number;
   assignableWidth: number;
-  columnRenderersByAttribute: { [columnId: string]: { staticWidth?: number; width?: number; minWidth?: number } };
-  columnIds: Array<string>;
+  attributeColumnRenderers: ColumnRenderersByAttribute<EntityBase>;
+  attributeColumnIds: Array<string>;
+  bulkSelectColWidth?: number;
+  staticColumnWidths: { [colId: string]: number };
+  headerMinWidths: { [colId: string]: number };
 }) => {
-  const totalFlexColumns = columnIds.reduce((total, id) => {
-    const { staticWidth, width = DEFAULT_COL_WIDTH } = columnRenderersByAttribute[id] ?? {};
+  const totalFlexColumns = attributeColumnIds.reduce((total, id) => {
+    const { width = DEFAULT_COL_WIDTH } = attributeColumnRenderers[id] ?? {};
 
-    if (staticWidth) {
+    if (staticColumnWidths[id]) {
       return total;
     }
 
     return total + width;
   }, 0);
 
-  const flexColWidth = assignableWidth / totalFlexColumns;
+  const hasFlexColumns = totalFlexColumns > 0;
+  const flexColWidth = hasFlexColumns ? assignableWidth / totalFlexColumns : 0;
+  const actionsColWidth =
+    !hasFlexColumns && assignableWidth > 0 ? assignableWidth + actionsColMinWidth : actionsColMinWidth;
 
-  return Object.fromEntries(
-    columnIds.map((id) => {
-      const {
-        staticWidth,
-        width = DEFAULT_COL_WIDTH,
-        minWidth = DEFAULT_COL_MIN_WIDTH,
-      } = columnRenderersByAttribute[id] ?? {};
-      const targetWidth = staticWidth ?? flexColWidth * width;
+  return {
+    ...Object.fromEntries(
+      attributeColumnIds.map((id) => {
+        const { width = DEFAULT_COL_WIDTH, minWidth } = attributeColumnRenderers[id] ?? {};
+        const targetWidth = staticColumnWidths[id] ?? Math.floor(flexColWidth * width);
+        const baseMinWidth = minWidth ?? DEFAULT_COL_MIN_WIDTH;
+        const resolvedMinWidth = Math.max(baseMinWidth, headerMinWidths[id] ?? 0);
 
-      return [id, !staticWidth && targetWidth < minWidth ? minWidth : targetWidth];
-    }),
-  );
+        return [id, !staticColumnWidths[id] && targetWidth < resolvedMinWidth ? resolvedMinWidth : targetWidth];
+      }),
+    ),
+    // When all data columns have static widths, the actions column acts as the elastic tail.
+    // It fills any remaining space so the table spans the container even without row actions.
+    [ACTIONS_COL_ID]: actionsColWidth,
+    ...(bulkSelectColWidth ? { [BULK_SELECT_COL_ID]: bulkSelectColWidth } : {}),
+  };
 };
 
+const calculateStaticColumnWidths = ({
+  attributeColumnIds,
+  attributeColumnRenderers,
+  columnWidthPreferences,
+  headerMinWidths,
+}: {
+  attributeColumnIds: Array<string>;
+  attributeColumnRenderers: ColumnRenderersByAttribute<EntityBase>;
+  headerMinWidths: { [colId: string]: number };
+  columnWidthPreferences: { [colId: string]: number } | undefined;
+}) =>
+  attributeColumnIds.reduce((staticWidths, id) => {
+    const staticWidth = columnWidthPreferences?.[id] ?? attributeColumnRenderers[id]?.staticWidth;
+
+    if (!staticWidth) {
+      return staticWidths;
+    }
+
+    const resolvedStaticWidth =
+      staticWidth === 'matchHeader' || staticWidth < headerMinWidths[id] ? headerMinWidths[id] : staticWidth;
+
+    return resolvedStaticWidth ? { ...staticWidths, [id]: resolvedStaticWidth } : staticWidths;
+  }, {});
+
 const useColumnWidths = <Entity extends EntityBase>({
-  actionsColWidth,
+  actionsColMinWidth,
   bulkSelectColWidth,
   columnRenderersByAttribute,
   columnIds,
-  tableWidth,
+  scrollContainerWidth,
+  columnWidthPreferences,
+  headerMinWidths,
 }: {
-  actionsColWidth: number;
+  actionsColMinWidth: number;
   bulkSelectColWidth: number;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>;
   columnIds: Array<string>;
-  tableWidth: number;
+  scrollContainerWidth: number;
+  columnWidthPreferences: { [key: string]: number } | undefined;
+  headerMinWidths: { [colId: string]: number };
 }) => {
   const [columnWidths, setColumnWidths] = useState({});
+  const staticColumnWidths = useMemo(
+    () =>
+      calculateStaticColumnWidths({
+        attributeColumnIds: columnIds,
+        attributeColumnRenderers: columnRenderersByAttribute,
+        columnWidthPreferences,
+        headerMinWidths,
+      }),
+    [columnIds, columnRenderersByAttribute, columnWidthPreferences, headerMinWidths],
+  );
 
   useLayoutEffect(() => {
-    if (!tableWidth) {
+    if (!scrollContainerWidth) {
       return;
     }
 
     // Calculate available width for columns which do not have a static width
-    const assignableWidth = assignableTableWidth({
-      actionsColWidth,
-      columnRenderersByAttribute,
+    // Width that can be assigned to flex columns (or to the actions tail when there are none).
+    const assignableWidth = calculateAssignableWidth({
+      actionsColMinWidth,
       columnIds,
       bulkSelectColWidth,
-      tableWidth,
+      scrollContainerWidth,
+      staticColumnWidths,
     });
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setColumnWidths(
       calculateColumnWidths({
+        actionsColMinWidth,
         assignableWidth,
-        columnIds,
-        columnRenderersByAttribute,
+        attributeColumnIds: columnIds,
+        attributeColumnRenderers: columnRenderersByAttribute,
+        bulkSelectColWidth,
+        staticColumnWidths,
+        headerMinWidths,
       }),
     );
-  }, [actionsColWidth, bulkSelectColWidth, columnRenderersByAttribute, columnIds, tableWidth]);
+  }, [
+    actionsColMinWidth,
+    bulkSelectColWidth,
+    columnRenderersByAttribute,
+    columnIds,
+    scrollContainerWidth,
+    columnWidthPreferences,
+    staticColumnWidths,
+    headerMinWidths,
+  ]);
 
   return columnWidths;
 };

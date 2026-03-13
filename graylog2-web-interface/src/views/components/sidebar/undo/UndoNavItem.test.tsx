@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
@@ -57,14 +57,14 @@ describe('<UndoNavItem />', () => {
   it('Call Undo action on call', async () => {
     render(<RedoNavItemComponent />);
     const undoButton = await screen.findByLabelText('Undo');
-    fireEvent.click(undoButton);
+    await userEvent.click(undoButton);
 
     await waitFor(() => expect(undo).toHaveBeenCalled());
   });
 
   it('Call redo action when pressing related keyboard shortcut', async () => {
     render(<RedoNavItemComponent />);
-    userEvent.keyboard('{Meta>}{Shift>}z{/Shift}{/Meta}');
+    await userEvent.keyboard('{Meta>}{Shift>}z{/Shift}{/Meta}');
     await waitFor(() => expect(undo).toHaveBeenCalledTimes(1));
   });
 });
