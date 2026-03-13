@@ -20,8 +20,8 @@ import { useQuery } from '@tanstack/react-query';
 import { NodeMaintenanceDropdown, NodeOverview } from 'components/nodes';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
-import { InputTypesStore } from 'stores/inputs/InputTypesStore';
 import { fetchInputStates } from 'hooks/useInputsStates';
+import useInputTypesDescriptions from 'hooks/useInputTypesDescriptions';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import useParams from 'routing/useParams';
 import { useStore } from 'stores/connect';
@@ -31,7 +31,7 @@ import useProductName from 'brand-customization/useProductName';
 const ShowNodePage = () => {
   const productName = useProductName();
   const { nodeId } = useParams<{ nodeId: string }>();
-  const { inputDescriptions } = useStore(InputTypesStore);
+  const { data: inputDescriptions } = useInputTypesDescriptions();
   const { nodes } = useStore(NodesStore);
   const { clusterOverview } = useStore(ClusterOverviewStore);
   const { pluginList, isLoading: isLoadingPlugins } = usePluginList(nodeId);
@@ -93,7 +93,7 @@ const ShowNodePage = () => {
           jvmInformation={jvmInformation}
           plugins={pluginList.plugins}
           inputStates={inputStates}
-          inputDescriptions={inputDescriptions}
+          inputDescriptions={inputDescriptions as any}
         />
       </div>
     </DocumentTitle>
