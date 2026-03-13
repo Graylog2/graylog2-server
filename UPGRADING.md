@@ -48,6 +48,12 @@ underscores instead, e.g. `${aggregation_conditions.count}`, `${aggregation_cond
 existing notifications using the escaping of parentheses in explicit `aggregation_conditions` key names will need to
 be modified to instead use the underscore format.
 
+### Dqtq Node in-place migration only available for Opensearch versions above 2.0.0
+
+Due to bundling OpenSearch 3.5.0 with Data Node, in-place migrations are now only supported for OpenSearch versions
+higher than 2.0.0. If you are running a lower version, please upgrade your OpenSearch to the highest available 2.x or
+3.x version first.
+
 ## Configuration File Changes
 
 | Option | Action    | Description |

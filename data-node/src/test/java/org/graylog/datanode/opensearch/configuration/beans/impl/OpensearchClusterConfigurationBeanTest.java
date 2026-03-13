@@ -32,7 +32,6 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -60,10 +59,10 @@ class OpensearchClusterConfigurationBeanTest {
 
         testNodeService.registerServer(DataNodeDto.builder()
                 .setId(Tools.generateServerId())
-                .setTransportAddress("https://my_search_node:9200")
-                .setHostname("my_search_node")
+                .setTransportAddress("https://my_warm_node:9200")
+                .setHostname("my_warm_node")
                 .setDataNodeStatus(DataNodeStatus.AVAILABLE)
-                .setOpensearchRoles(List.of(OpensearchNodeRole.SEARCH))
+                .setOpensearchRoles(List.of(OpensearchNodeRole.WARM))
                 .build());
     }
 
@@ -86,7 +85,7 @@ class OpensearchClusterConfigurationBeanTest {
     @Test
     void testManagerNodesWithSelfNoManager(@TempDir Path tempDir) throws ValidationException, RepositoryException {
         final OpensearchClusterConfigurationBean configurationBean = new OpensearchClusterConfigurationBean(DatanodeTestUtils.datanodeConfiguration(
-                Map.of("hostname", "this_node_cannot_be_manager", "node_roles", OpensearchNodeRole.SEARCH), tempDir), testNodeService);
+                Map.of("hostname", "this_node_cannot_be_manager", "node_roles", OpensearchNodeRole.WARM), tempDir), testNodeService);
 
         final DatanodeConfigurationPart configurationPart = configurationBean.buildConfigurationPart(new OpensearchConfigurationParams(tempDir));
 
