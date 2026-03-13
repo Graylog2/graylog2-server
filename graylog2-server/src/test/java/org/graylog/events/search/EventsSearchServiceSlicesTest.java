@@ -62,22 +62,18 @@ class EventsSearchServiceSlicesTest {
     @Mock
     private ScriptingApiService scriptingApiService;
 
-    @Mock
-    private MoreSearch moreSearch;
-
-    private EventsSearchService service;
+    private EventsSliceService service;
     private Subject mockSubject;
     private SearchUser mockSearchUser;
-    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
         // Setup object mapper
-        objectMapper = new ObjectMapperProvider().get();
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
         // Setup service
-        service = new EventsSearchService(moreSearch, streamService,
-                eventDefinitionService, scriptingApiService, objectMapper);
+        service = new EventsSliceService(scriptingApiService, streamService,
+                eventDefinitionService, objectMapper);
 
         // Setup mock user permissions - allow all streams
         mockSubject = mock(Subject.class);
@@ -100,7 +96,6 @@ class EventsSearchServiceSlicesTest {
         EventsSlicesRequest request = EventsSlicesRequest.builder()
                 .query("")
                 .sliceColumn(FIELD_PRIORITY)
-                .includeAll(false)
                 .timerange(RelativeRange.create(86400))
                 .filter(EventsSearchFilter.empty())
                 .build();
@@ -135,7 +130,6 @@ class EventsSearchServiceSlicesTest {
         EventsSlicesRequest request = EventsSlicesRequest.builder()
                 .query("source:test")
                 .sliceColumn(FIELD_PRIORITY)
-                .includeAll(false)
                 .timerange(RelativeRange.create(86400))
                 .filter(EventsSearchFilter.empty())
                 .build();
@@ -160,7 +154,6 @@ class EventsSearchServiceSlicesTest {
         EventsSlicesRequest request = EventsSlicesRequest.builder()
                 .query("")
                 .sliceColumn(FIELD_ALERT)
-                .includeAll(false)
                 .timerange(RelativeRange.create(86400))
                 .filter(EventsSearchFilter.empty())
                 .build();
@@ -189,7 +182,6 @@ class EventsSearchServiceSlicesTest {
         EventsSlicesRequest request = EventsSlicesRequest.builder()
                 .query("")
                 .sliceColumn(FIELD_EVENT_DEFINITION_ID)
-                .includeAll(false)
                 .timerange(RelativeRange.create(86400))
                 .filter(EventsSearchFilter.empty())
                 .build();
@@ -218,7 +210,6 @@ class EventsSearchServiceSlicesTest {
         EventsSlicesRequest request = EventsSlicesRequest.builder()
                 .query("")
                 .sliceColumn(FIELD_EVENT_DEFINITION_TYPE)
-                .includeAll(false)
                 .timerange(RelativeRange.create(86400))
                 .filter(EventsSearchFilter.empty())
                 .build();
@@ -247,7 +238,6 @@ class EventsSearchServiceSlicesTest {
         EventsSlicesRequest request = EventsSlicesRequest.builder()
                 .query("")
                 .sliceColumn(FIELD_KEY)
-                .includeAll(true)
                 .timerange(RelativeRange.allTime())  // includeAll uses all time
                 .filter(EventsSearchFilter.empty())
                 .build();
@@ -277,7 +267,6 @@ class EventsSearchServiceSlicesTest {
         EventsSlicesRequest request = EventsSlicesRequest.builder()
                 .query("")
                 .sliceColumn(FIELD_KEY)
-                .includeAll(false)
                 .timerange(RelativeRange.create(86400))
                 .filter(EventsSearchFilter.empty())
                 .build();
@@ -304,7 +293,6 @@ class EventsSearchServiceSlicesTest {
         EventsSlicesRequest request = EventsSlicesRequest.builder()
                 .query("")
                 .sliceColumn(FIELD_PRIORITY)
-                .includeAll(false)
                 .timerange(RelativeRange.create(86400))
                 .filter(EventsSearchFilter.empty())
                 .build();
