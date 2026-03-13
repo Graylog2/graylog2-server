@@ -17,92 +17,59 @@
 package org.graylog.plugins.pipelineprocessor.processors;
 
 import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.ArrayListMultimap;
-
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Iterators;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
 public class StageIterator extends AbstractIterator<List<Stage>> {
-
-    private final Configuration config;
-
-    // the currentStage is always one before the next one to be returned
-    private int currentStage;
-
+    private final Iterator<List<Stage>> stageSlices;
 
     public StageIterator(Configuration config) {
-        this.config = config;
-        currentStage = config.initialStage();
+        this.stageSlices = config.stageSlicesIterator();
     }
 
     public StageIterator(Set<Pipeline> pipelines) {
-        this.config = new Configuration(pipelines);
-        currentStage = config.initialStage();
+        this(new Configuration(pipelines));
     }
 
     @Override
     protected List<Stage> computeNext() {
-        if (currentStage == config.lastStage()) {
+        if (!stageSlices.hasNext()) {
             return endOfData();
         }
-        do {
-            currentStage++;
-            if (currentStage > config.lastStage()) {
-                return endOfData();
-            }
-        } while (!config.hasStages(currentStage));
-        return config.getStages(currentStage);
+        return stageSlices.next();
     }
 
     public static class Configuration {
-        // first and last stage for the given pipelines
-        private final int[] extent = new int[]{Integer.MAX_VALUE, Integer.MIN_VALUE};
-
-        private final ArrayListMultimap<Integer, Stage> stageMultimap = ArrayListMultimap.create();
-
-        private final int initialStage;
+        private final ImmutableSortedSet<Integer> stageOrder;
+        private final ImmutableListMultimap<Integer, Stage> stagesByNumber;
 
         public Configuration(Set<Pipeline> pipelines) {
-            if (pipelines.isEmpty()) {
-                initialStage = extent[0] = extent[1] = 0;
-                return;
-            }
-            pipelines.forEach(pipeline -> {
-                // skip pipelines without any stages, they don't contribute any rules to run
-                final SortedSet<Stage> stages = pipeline.stages();
-                if (stages.isEmpty()) {
-                    return;
-                }
-                extent[0] = Math.min(extent[0], stages.first().stage());
-                extent[1] = Math.max(extent[1], stages.last().stage());
-                stages.forEach(stage -> stageMultimap.put(stage.stage(), stage));
-            });
+            final ImmutableSortedSet.Builder<Integer> stageOrderBuilder = ImmutableSortedSet.naturalOrder();
+            final ImmutableListMultimap.Builder<Integer, Stage> stagesByNumberBuilder = ImmutableListMultimap.builder();
 
-            if (extent[0] == Integer.MIN_VALUE) {
-                throw new IllegalArgumentException("First stage cannot be at " + Integer.MIN_VALUE);
-            }
-            // the stage before the first stage.
-            initialStage = extent[0] - 1;
+            pipelines.stream()
+                    .map(Pipeline::stages)
+                    .filter(stages -> !stages.isEmpty())
+                    .flatMap(SortedSet::stream)
+                    .forEach(stage -> {
+                        stageOrderBuilder.add(stage.stage());
+                        stagesByNumberBuilder.put(stage.stage(), stage);
+                    });
+
+            this.stageOrder = stageOrderBuilder.build();
+            this.stagesByNumber = stagesByNumberBuilder.build();
         }
 
-        public int initialStage() {
-            return initialStage;
-        }
-
-        public int lastStage() {
-            return extent[1];
-        }
-
-        public boolean hasStages(int stage) {
-            return stageMultimap.containsKey(stage);
-        }
-
-        public List<Stage> getStages(int stage) {
-            return stageMultimap.get(stage);
+        Iterator<List<Stage>> stageSlicesIterator() {
+            return Iterators.transform(stageOrder.iterator(), stagesByNumber::get);
         }
     }
 }
