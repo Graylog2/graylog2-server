@@ -16,10 +16,10 @@
  */
 
 import * as React from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 
 import { Table } from 'components/bootstrap';
-import { OutputsStore, type Output } from 'stores/outputs/OutputsStore';
+import type { Output } from 'hooks/useOutputs';
+import useOutputMutations from 'hooks/useOutputMutations';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import type { ConfigurationFormData } from 'components/configurationforms';
@@ -36,7 +36,7 @@ type Props = {
 
 const OutputsList = ({ outputs, streamId, getTypeDefinition, isLoadingOutputTypes }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const queryClient = useQueryClient();
+  const { updateOutput } = useOutputMutations();
 
   const handleUpdate = (output: Output, data: ConfigurationFormData<Output['configuration']>) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.OUTPUTS.OUTPUT_UPDATED, {
@@ -44,13 +44,7 @@ const OutputsList = ({ outputs, streamId, getTypeDefinition, isLoadingOutputType
       app_action_value: 'create-output',
     });
 
-    OutputsStore.update(output, data, (result) => {
-      queryClient.invalidateQueries({
-        queryKey: ['outputs', 'overview'],
-      });
-
-      return result;
-    });
+    updateOutput({ outputId: output.id, title: output.title, deltas: data });
   };
 
   return (
