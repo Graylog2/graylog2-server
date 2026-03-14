@@ -25,7 +25,6 @@ import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
-import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
 import useParams from 'routing/useParams';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
@@ -33,6 +32,7 @@ import useQuery from 'routing/useQuery';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import SelectIndexSetTemplateProvider from 'components/indices/IndexSetTemplates/contexts/SelectedIndexSetTemplateProvider';
+import useIndicesConfiguration from 'hooks/useIndicesConfiguration';
 
 const _saveConfiguration = (history: HistoryFunction, indexSet: IndexSet) =>
   IndexSetsActions.update(indexSet).then(() => {
@@ -42,15 +42,13 @@ const _saveConfiguration = (history: HistoryFunction, indexSet: IndexSet) =>
 const IndexSetConfigurationPage = () => {
   const { indexSetId } = useParams();
   const { indexSet } = useStore(IndexSetsStore);
-  const { retentionStrategies, rotationStrategies, retentionStrategiesContext } = useStore(IndicesConfigurationStore);
+  const { retentionStrategies, rotationStrategies, retentionStrategiesContext } = useIndicesConfiguration();
   const history = useHistory();
   const { from } = useQuery();
   const sendTelemetry = useSendTelemetry();
 
   useEffect(() => {
     IndexSetsActions.get(indexSetId);
-    IndicesConfigurationActions.loadRotationStrategies();
-    IndicesConfigurationActions.loadRetentionStrategies();
   }, [indexSetId]);
 
   const formCancelLink = () => {

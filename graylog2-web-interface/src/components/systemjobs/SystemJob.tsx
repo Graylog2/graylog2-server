@@ -16,12 +16,15 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { useQueryClient } from '@tanstack/react-query';
+
+import { ClusterJobs, SystemJobs } from '@graylog/server-api';
 
 import { ProgressBar, LinkToNode, RelativeTime, Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
-import { SystemJobsActions } from 'stores/systemjobs/SystemJobsStore';
 import UserNotification from 'util/UserNotification';
 import Badge from 'components/bootstrap/Badge';
+import { SYSTEM_JOBS_QUERY_KEY } from 'components/systemjobs/useSystemJobs';
 
 enum JobStatus {
   Cancelled = 'cancelled',
@@ -87,6 +90,7 @@ type SystemJobProps = {
 };
 
 const SystemJob = ({ job }: SystemJobProps) => {
+  const queryClient = useQueryClient();
   const jobIsOver =
     job.job_status === JobStatus.Complete ||
     job.percent_complete === 100 ||
@@ -97,9 +101,13 @@ const SystemJob = ({ job }: SystemJobProps) => {
   const _onAcknowledge = () => (e) => {
     e.preventDefault();
 
-    SystemJobsActions.acknowledgeJob(job.id).catch((error) => {
-      UserNotification.error(error.responseMessage, 'Unable to acknowledge the job');
-    });
+    SystemJobs.acknowledgeJob(job.id)
+      .then(() => {
+        queryClient.invalidateQueries({ queryKey: SYSTEM_JOBS_QUERY_KEY });
+      })
+      .catch((error) => {
+        UserNotification.error(error.responseMessage, 'Unable to acknowledge the job');
+      });
   };
 
   const _onCancel = () => (e) => {
@@ -107,9 +115,13 @@ const SystemJob = ({ job }: SystemJobProps) => {
 
     // eslint-disable-next-line no-alert
     if (window.confirm(`Are you sure you want to cancel system job "${job.info}"?`)) {
-      SystemJobsActions.cancelJob(job.id).catch((error) => {
-        UserNotification.error(error.responseMessage, 'Unable to cancel the job');
-      });
+      ClusterJobs.cancelJob(job.id)
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey: SYSTEM_JOBS_QUERY_KEY });
+        })
+        .catch((error) => {
+          UserNotification.error(error.responseMessage, 'Unable to cancel the job');
+        });
     }
   };
 

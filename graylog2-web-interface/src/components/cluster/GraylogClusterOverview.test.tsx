@@ -20,11 +20,11 @@ import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import type { Permission } from 'graylog-web-plugin/plugin';
 
+import { SystemClusterTraffic } from '@graylog/server-api';
+
 import { adminUser } from 'fixtures/users';
-import MockStore from 'helpers/mocking/StoreMock';
 import asMock from 'helpers/mocking/AsMock';
 import useCurrentUser from 'hooks/useCurrentUser';
-import { ClusterTrafficActions, ClusterTrafficStore } from 'stores/cluster/ClusterTrafficStore';
 
 import GraylogClusterOverview from './GraylogClusterOverview';
 
@@ -83,15 +83,9 @@ const trafficResponse = {
 
 jest.mock('hooks/useCurrentUser');
 
-jest.mock('stores/cluster/ClusterTrafficStore', () => ({
-  ClusterTrafficStore: MockStore([
-    'getInitialState',
-    jest.fn(() => ({
-      traffic: undefined,
-    })),
-  ]),
-  ClusterTrafficActions: {
-    getTraffic: jest.fn((_days: number) => ({ traffic: undefined })),
+jest.mock('@graylog/server-api', () => ({
+  SystemClusterTraffic: {
+    get: jest.fn(() => Promise.resolve(trafficResponse)),
   },
 }));
 
@@ -103,10 +97,6 @@ describe('GraylogClusterOverview', () => {
       .build();
 
     asMock(useCurrentUser).mockReturnValue(currentUserWithPermissions);
-
-    asMock(ClusterTrafficStore.getInitialState).mockReturnValue({
-      traffic: trafficResponse,
-    });
   });
 
   afterEach(() => {
@@ -119,9 +109,9 @@ describe('GraylogClusterOverview', () => {
 
     expect(screen.getByText(/Outgoing traffic/)).toBeInTheDocument();
 
-    await waitFor(() => expect(ClusterTrafficActions.getTraffic).toHaveBeenCalledWith(30));
+    await waitFor(() => expect(SystemClusterTraffic.get).toHaveBeenCalledWith(30, false));
 
-    expect(screen.getByText(/Last 30 days/)).toBeInTheDocument();
+    await screen.findByText(/Last 30 days/);
   });
 
   it('renders GraylogClusterOverview and change the days for the traffic graph', async () => {
@@ -130,8 +120,8 @@ describe('GraylogClusterOverview', () => {
 
     await userEvent.selectOptions(graphDaysSelect, '365');
 
-    await waitFor(() => expect(ClusterTrafficActions.getTraffic).toHaveBeenCalledWith(365));
+    await waitFor(() => expect(SystemClusterTraffic.get).toHaveBeenCalledWith(365, false));
 
-    expect(screen.getByText(/Last 365 days/)).toBeInTheDocument();
+    await screen.findByText(/Last 365 days/);
   });
 });

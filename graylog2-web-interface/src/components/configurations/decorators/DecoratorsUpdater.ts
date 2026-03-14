@@ -17,7 +17,8 @@
 import difference from 'lodash/difference';
 import isEqual from 'lodash/isEqual';
 
-import { DecoratorsActions } from 'stores/decorators/DecoratorsStore';
+import { SearchDecorators } from '@graylog/server-api';
+
 import type { Decorator } from 'views/components/messagelist/decorators/Types';
 
 const DecoratorsUpdater = (newDecorators: Array<Decorator>, oldDecorators: Array<Decorator>) => {
@@ -41,17 +42,13 @@ const DecoratorsUpdater = (newDecorators: Array<Decorator>, oldDecorators: Array
     );
   const deletedDecoratorIds = difference(oldDecoratorIds, newDecoratorIds);
 
-  return [
-    ...createdDecorators.map(
-      ({ id: _id, ...newDecorator }) =>
-        () =>
-          DecoratorsActions.create(newDecorator),
+  return Promise.all([
+    ...createdDecorators.map(({ id: _id, ...newDecorator }) => SearchDecorators.create(newDecorator as any)),
+    ...updatedDecorators.map((updatedDecorator) =>
+      SearchDecorators.update(updatedDecorator.id, updatedDecorator as any),
     ),
-    ...updatedDecorators.map(
-      (updatedDecorator) => () => DecoratorsActions.update(updatedDecorator.id, updatedDecorator),
-    ),
-    ...deletedDecoratorIds.map((deletedID) => () => DecoratorsActions.remove(deletedID)),
-  ].reduce((prev, cur) => prev.then(() => cur()), Promise.resolve());
+    ...deletedDecoratorIds.map((deletedID) => SearchDecorators.remove(deletedID)),
+  ]).then(() => {});
 };
 
 export default DecoratorsUpdater;
