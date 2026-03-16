@@ -29,6 +29,8 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.Persisted;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 
@@ -40,6 +42,7 @@ import java.util.List;
 
 @Singleton
 public class MongoDBSessionServiceImpl extends PersistedServiceImpl implements MongoDBSessionService {
+    private static final Logger LOG = LoggerFactory.getLogger(MongoDBSessionServiceImpl.class);
     private final ClusterEventBus eventBus;
 
     @Inject
@@ -89,6 +92,18 @@ public class MongoDBSessionServiceImpl extends PersistedServiceImpl implements M
         session.setExpired(sessionDAO.isExpired());
         session.setAttributes(sessionDAO.getAttributes());
         return session;
+    }
+
+    @Override
+    public void updateBySessionId(String sessionId, MongoDbSession session) {
+        final BasicDBObject doc = new BasicDBObject(session.getFields());
+        fieldTransformations(doc);
+        final BasicDBObject query = new BasicDBObject(MongoDbSession.FIELD_SESSION_ID, sessionId);
+        final var result = collection(session).update(query, doc, false, false);
+        if (result.getN() == 0) {
+            LOG.warn("Session <{}> was not found in MongoDB. " +
+                    "This may indicate a cache/database desync.", sessionId);
+        }
     }
 
     @Override
