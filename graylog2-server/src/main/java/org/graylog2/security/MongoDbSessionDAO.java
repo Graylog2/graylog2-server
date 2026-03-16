@@ -58,17 +58,16 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
         final Serializable id = generateSessionId(session);
         assignSessionId(session, id);
 
-        Map<String, Object> fields = Maps.newHashMap();
-        fields.put("session_id", id);
-        fields.put("host", session.getHost());
-        fields.put("start_timestamp", session.getStartTimestamp());
-        fields.put("last_access_time", session.getLastAccessTime());
-        fields.put("timeout", session.getTimeout());
+        final MongoDbSession dbSession = new MongoDbSession(Maps.newHashMap());
+        dbSession.setSessionId(id.toString());
+        dbSession.setHost(session.getHost());
+        dbSession.setStartTimestamp(session.getStartTimestamp());
+        dbSession.setLastAccessTime(session.getLastAccessTime());
+        dbSession.setTimeout(session.getTimeout());
         Map<Object, Object> attributes = Maps.newHashMap();
         for (Object key : session.getAttributeKeys()) {
             attributes.put(key.toString(), session.getAttribute(key));
         }
-        final MongoDbSession dbSession = new MongoDbSession(fields);
         dbSession.setAttributes(attributes);
         final String objectId = mongoDBSessionService.saveWithoutValidation(dbSession);
         LOG.debug("Created session {}", objectId);
@@ -95,15 +94,13 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
         LOG.debug("Updating session");
 
         final String sessionId = session.getId().toString();
-        final Map<String, Object> fields = Maps.newHashMap();
-        fields.put("session_id", sessionId);
-        fields.put("host", session.getHost());
-        fields.put("start_timestamp", session.getStartTimestamp());
-        fields.put("last_access_time", session.getLastAccessTime());
-        fields.put("timeout", session.getTimeout());
-        fields.put("expired", simpleSession.isExpired());
-
-        final MongoDbSession dbSession = new MongoDbSession(fields);
+        final MongoDbSession dbSession = new MongoDbSession(Maps.newHashMap());
+        dbSession.setSessionId(sessionId);
+        dbSession.setHost(session.getHost());
+        dbSession.setStartTimestamp(session.getStartTimestamp());
+        dbSession.setLastAccessTime(session.getLastAccessTime());
+        dbSession.setTimeout(session.getTimeout());
+        dbSession.setExpired(simpleSession.isExpired());
         dbSession.setAttributes(simpleSession.getAttributes());
 
         mongoDBSessionService.updateBySessionId(sessionId, dbSession);
