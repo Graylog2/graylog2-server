@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix excessive DB queries for session management."
+
+issues = ["Graylog2/graylog-plugin-enterprise#13300"]
+pulls = ["25330"]
