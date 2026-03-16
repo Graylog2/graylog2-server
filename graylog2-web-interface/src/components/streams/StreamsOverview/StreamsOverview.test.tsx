@@ -17,6 +17,7 @@
 import React from 'react';
 import { render, screen, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import * as Immutable from 'immutable';
 
 import { indexSets } from 'fixtures/indexSets';
 import { asMock, MockStore } from 'helpers/mocking';
@@ -26,12 +27,16 @@ import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/us
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
 import { streamRuleTypes } from 'fixtures/streamRuleTypes';
+import useStreamDestinationFilterRuleCount from 'components/streams/hooks/useStreamDestinationFilterRuleCount';
+import useStreamOutputFilters from 'components/streams/hooks/useStreamOutputFilters';
 
 import StreamsOverview from './StreamsOverview';
 
 jest.mock('components/common/PaginatedEntityTable/useFetchEntities');
 jest.mock('components/streams/hooks/useStreamRuleTypes');
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
+jest.mock('components/streams/hooks/useStreamDestinationFilterRuleCount');
+jest.mock('components/streams/hooks/useStreamOutputFilters');
 
 jest.mock('stores/inputs/StreamRulesInputsStore', () => ({
   StreamRulesInputsActions: {
@@ -85,6 +90,7 @@ describe('StreamsOverview', () => {
           title: { status: 'show' },
           description: { status: 'show' },
           rules: { status: 'show' },
+          destination_filters: { status: 'show' },
         },
       },
       isInitialLoading: false,
@@ -92,6 +98,28 @@ describe('StreamsOverview', () => {
     });
 
     asMock(useStreamRuleTypes).mockReturnValue({ data: streamRuleTypes });
+    asMock(useStreamDestinationFilterRuleCount).mockReturnValue({
+      data: 0,
+      refetch: () => {},
+      isInitialLoading: false,
+      error: undefined,
+      isError: false,
+    });
+    asMock(useStreamOutputFilters).mockReturnValue({
+      data: {
+        list: Immutable.List([]),
+        pagination: {
+          total: 0,
+          page: 1,
+          perPage: 10,
+          query: '',
+          count: 0,
+        },
+      },
+      refetch: () => {},
+      isLoading: false,
+      isSuccess: true,
+    });
   });
 
   it('should render empty', async () => {
@@ -155,7 +183,7 @@ describe('StreamsOverview', () => {
 
     const tableRow = await screen.findByTestId(`table-row-${streamWithRules.id}`);
 
-    userEvent.click(within(tableRow).getByTitle('Show stream rules'));
+    await userEvent.click(within(tableRow).getByTitle('Show stream rules'));
 
     await screen.findByText(/must match all of the 2 configured stream \./i);
     const deleteStreamRuleButtons = await screen.findAllByRole('button', { name: /delete stream rule/i });
@@ -163,5 +191,58 @@ describe('StreamsOverview', () => {
 
     expect(deleteStreamRuleButtons.length).toBe(2);
     expect(editStreamRuleButtons.length).toBe(2);
+  });
+
+  it('should open and close filter rules overview for a stream', async () => {
+    asMock(useFetchEntities).mockReturnValue(paginatedStreams());
+    asMock(useStreamDestinationFilterRuleCount).mockReturnValue({
+      data: 1,
+      refetch: () => {},
+      isInitialLoading: false,
+      error: undefined,
+      isError: false,
+    });
+    asMock(useStreamOutputFilters).mockReturnValue({
+      data: {
+        list: Immutable.List([
+          {
+            id: 'filter-id-1',
+            stream_id: stream.id,
+            destination_type: 'indexer',
+            title: 'Only prod logs',
+            description: 'Drops noisy data',
+            status: 'enabled',
+            rule: {
+              operator: 'AND',
+              conditions: [],
+              actions: [],
+            },
+          },
+        ]),
+        pagination: {
+          total: 1,
+          page: 1,
+          perPage: 10,
+          query: '',
+          count: 1,
+        },
+      },
+      refetch: () => {},
+      isLoading: false,
+      isSuccess: true,
+    });
+
+    renderSut();
+
+    const filterRulesBadge = await screen.findByTitle('Show filter rules');
+    await userEvent.click(filterRulesBadge);
+
+    expect(screen.getByText('Only prod logs')).toBeInTheDocument();
+    expect(screen.getByText(/Showing 1 configured filter/)).toBeInTheDocument();
+
+    const hideFilterRulesBadge = await screen.findByTitle('Hide filter rules');
+    await userEvent.click(hideFilterRulesBadge);
+
+    expect(screen.queryByText('Only prod logs')).not.toBeInTheDocument();
   });
 });

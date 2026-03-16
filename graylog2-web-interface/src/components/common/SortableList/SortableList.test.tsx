@@ -52,7 +52,7 @@ describe('SortableList', () => {
       await userEvent.keyboard('[Space]');
     });
 
-    userEvent.keyboard('{ArrowDown}');
+    await userEvent.keyboard('{ArrowDown}');
 
     await screen.findByText('Draggable item item-1 was moved over droppable area item-2.');
 
