@@ -35,11 +35,11 @@ const FlexibleButtonGroup = styled(ButtonGroup)`
   }
 `;
 
-const ButtonLabel = () => {
+const ButtonLabel = ({ children }: React.PropsWithChildren) => {
   const { refreshConfig } = useAutoRefresh();
 
   if (!refreshConfig?.enabled) {
-    return <>Not updating</>;
+    return <>Not updating{children}</>;
   }
 
   return (
@@ -49,7 +49,7 @@ const ButtonLabel = () => {
   );
 };
 
-type Props = {
+type Props = React.PropsWithChildren<{
   disable: boolean;
   intervalOptions: Array<[string, string]>;
   isLoadingMinimumInterval: boolean;
@@ -60,9 +60,10 @@ type Props = {
   onEnable?: () => void;
   onDisable?: () => void;
   humanName: string;
-};
+}>;
 
 const RefreshControls = ({
+  children = null,
   humanName,
   disable,
   onToggle = null,
@@ -137,7 +138,7 @@ const RefreshControls = ({
         <Icon name={refreshConfig?.enabled ? 'pause' : 'update'} />
       </Button>
 
-      <DropdownButton title={<ButtonLabel />} disabled={disable} id="refresh-options-dropdown">
+      <DropdownButton title={<ButtonLabel>{children}</ButtonLabel>} disabled={disable} id="refresh-options-dropdown">
         {isLoadingMinimumInterval && <Spinner />}
         {!isLoadingMinimumInterval &&
           intervalOptions.map(([interval, label]) => {
