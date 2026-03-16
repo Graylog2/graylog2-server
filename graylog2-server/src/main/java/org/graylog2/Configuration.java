@@ -524,10 +524,6 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = "max_events_collection_size")
     private Size maxEventsCollectionSize = Size.megabytes(100);
 
-    @Documentation("Maximum age of cluster events before cleanup. The cleanup runs at this interval, so effective event age is between max_event_age and 2*max_event_age. Minimum effective interval is 1 hour. Default: 12h")
-    @Parameter(value = "max_event_age", converter = JavaDurationConverter.class, validators = PositiveJavaDurationValidator.class)
-    private java.time.Duration maxEventAge = java.time.Duration.ofHours(12L);
-
     public boolean maintainsStreamAwareFieldTypes() {
         return streamAwareFieldTypes;
     }
