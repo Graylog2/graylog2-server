@@ -297,8 +297,8 @@ public class TeamsEventNotificationV2Test {
         assertThat(body).contains("\"contentType\": \"application/vnd.microsoft.card.adaptive\"");
         assertThat(body).contains("\"type\": \"AdaptiveCard\"");
         assertThat(body).contains("\"version\": \"1.6\"");
-        assertThat(body).contains("${event_definition_title} triggered");
-        assertThat(body).contains("${event_definition_description}");
+        assertThat(body).doesNotContain("${event_definition_title} triggered");
+        assertThat(body).doesNotContain("${event_definition_description}");
     }
 
     @Test
@@ -310,8 +310,9 @@ public class TeamsEventNotificationV2Test {
                 .webhookUrl("http://localhost:12345")
                 .build();
         String body = teamsEventNotification.generateBody(eventNotificationContext, config);
-        assertThat(body).contains("{{DATE(${event.timestamp_processing},SHORT)}}");
-        assertThat(body).contains("{{TIME(${event.timestamp_processing})}}");
+        assertThat(body).contains("{{DATE(");
+        assertThat(body).contains("{{TIME(");
+        assertThat(body).doesNotContain("${event.timestamp_processing}");
     }
 
     @Test

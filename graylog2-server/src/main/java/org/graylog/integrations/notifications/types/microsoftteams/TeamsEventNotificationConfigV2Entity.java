@@ -54,7 +54,6 @@ public abstract class TeamsEventNotificationConfigV2Entity implements EventNotif
      * via the Adaptive Cards DATE() function.
      */
     @Deprecated
-    @JsonProperty("time_zone")
     public abstract ValueReference timeZone();
 
     public static Builder builder() {
@@ -81,7 +80,6 @@ public abstract class TeamsEventNotificationConfigV2Entity implements EventNotif
         public abstract Builder adaptiveCard(ValueReference customMessage);
 
         @Deprecated
-        @JsonProperty("time_zone")
         public abstract Builder timeZone(ValueReference timeZone);
 
         public abstract TeamsEventNotificationConfigV2Entity build();
