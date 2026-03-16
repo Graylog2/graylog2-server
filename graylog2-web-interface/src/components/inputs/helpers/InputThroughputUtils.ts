@@ -17,7 +17,7 @@
 import numeral from 'numeral';
 
 import type { InputSummary } from 'hooks/usePaginatedInputs';
-import type { Metric } from 'stores/metrics/MetricsStore';
+import type { Metric } from 'types/metrics';
 
 export type InputConnectionMetrics = {
   openConnections: number | undefined;

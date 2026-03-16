@@ -52,64 +52,65 @@ export const SystemJobsActions = singletonActions('core.SystemJobs', () =>
   }),
 );
 
-export const SystemJobsStore: Store<{ jobs: unknown; jobsById: Record<string, unknown> }> = singletonStore(
-  'core.SystemJobs',
-  () =>
-    Reflux.createStore({
-      listenables: [SystemJobsActions],
+export const SystemJobsStore: Store<{
+  jobs: Record<string, { jobs?: unknown[]; systemJobs?: unknown[] }>;
+  jobsById: Record<string, unknown>;
+}> = singletonStore('core.SystemJobs', () =>
+  Reflux.createStore({
+    listenables: [SystemJobsActions],
 
-      jobsById: {} as Record<string, unknown>,
+    jobsById: {} as Record<string, unknown>,
 
-      getInitialState() {
-        return { jobs: this.jobs, jobsById: this.jobsById };
-      },
-      list() {
-        const url = URLUtils.qualifyUrl(ApiRoutes.SystemJobsApiController.list().url);
-        const promise = fetchPeriodically<SystemJobsListResponse>('GET', url).then((response) => {
-          this.jobs = response;
-          this.trigger({ jobs: response });
+    getInitialState() {
+      return { jobs: this.jobs, jobsById: this.jobsById };
+    },
+    list() {
+      const url = URLUtils.qualifyUrl(ApiRoutes.SystemJobsApiController.list().url);
+      const promise = fetchPeriodically<SystemJobsListResponse>('GET', url).then((response) => {
+        this.jobs = response;
+        this.trigger({ jobs: response });
+
+        return response;
+      });
+
+      SystemJobsActions.list.promise(promise);
+    },
+    getJob(jobId: string) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.SystemJobsApiController.getJob(jobId).url);
+      const promise = fetch<{ id: string }>('GET', url).then(
+        (response) => {
+          this.jobsById = { ...this.jobsById, [response.id]: response };
+          this.trigger({ jobsById: this.jobsById });
 
           return response;
-        });
+        },
+        () => {
+          // If we get an error (probably 404 because the job is gone), remove the job from the cache and trigger an update.
 
-        SystemJobsActions.list.promise(promise);
-      },
-      getJob(jobId: string) {
-        const url = URLUtils.qualifyUrl(ApiRoutes.SystemJobsApiController.getJob(jobId).url);
-        const promise = fetch<{ id: string }>('GET', url).then(
-          (response) => {
-            this.jobsById = { ...this.jobsById, [response.id]: response };
-            this.trigger({ jobsById: this.jobsById });
+          const { [jobId]: _, ...rest } = this.jobsById;
 
-            return response;
-          },
-          () => {
-            // If we get an error (probably 404 because the job is gone), remove the job from the cache and trigger an update.
+          this.jobsById = rest;
+          this.trigger({ jobsById: this.jobsById });
+        },
+      );
 
-            const { [jobId]: _, ...rest } = this.jobsById;
+      SystemJobsActions.getJob.promise(promise);
+    },
+    acknowledgeJob(jobId: string) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.SystemJobsApiController.acknowledgeJob(jobId).url);
+      const promise = fetch('DELETE', url).then(() => {
+        delete this.jobsById[jobId];
+      });
 
-            this.jobsById = rest;
-            this.trigger({ jobsById: this.jobsById });
-          },
-        );
+      SystemJobsActions.acknowledgeJob.promise(promise);
+    },
+    cancelJob(jobId: string) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.SystemJobsApiController.cancelJob(jobId).url);
+      const promise = fetch<{ id: string }>('DELETE', url).then((response) => {
+        delete this.jobsById[response.id];
+      });
 
-        SystemJobsActions.getJob.promise(promise);
-      },
-      acknowledgeJob(jobId: string) {
-        const url = URLUtils.qualifyUrl(ApiRoutes.SystemJobsApiController.acknowledgeJob(jobId).url);
-        const promise = fetch('DELETE', url).then(() => {
-          delete this.jobsById[jobId];
-        });
-
-        SystemJobsActions.acknowledgeJob.promise(promise);
-      },
-      cancelJob(jobId: string) {
-        const url = URLUtils.qualifyUrl(ApiRoutes.SystemJobsApiController.cancelJob(jobId).url);
-        const promise = fetch<{ id: string }>('DELETE', url).then((response) => {
-          delete this.jobsById[response.id];
-        });
-
-        SystemJobsActions.cancelJob.promise(promise);
-      },
-    }),
+      SystemJobsActions.cancelJob.promise(promise);
+    },
+  }),
 );

@@ -56,6 +56,8 @@ const SUT = ({ ...props }) => (
   />
 );
 
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+
 describe('EntityCreateShareFormGroup', () => {
   beforeEach(() => {
     asMock(EntityShareStore.getInitialState).mockReturnValue({ state: createEntityShareState });
@@ -93,7 +95,7 @@ describe('EntityCreateShareFormGroup', () => {
       name: /add collaborator/i,
     });
 
-    await userEvent.click(addCollaborator);
+    await setupUser().click(addCollaborator);
 
     await waitFor(() => {
       expect(EntityShareActions.prepare).toHaveBeenCalledWith('stream', '', null, {
