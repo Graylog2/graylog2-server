@@ -320,6 +320,28 @@ class DecodingProcessorTest {
                 .isEqualTo(300L);
     }
 
+    @Test
+    void inputMessageSizeFromRawMessageTakesPrecedence() throws Exception {
+        setUpCodecFactory();
+        setUpRecordingStrategy();
+
+        final byte[] payload = new byte[900];
+        final RawMessage raw = createRawMessage(payload);
+        raw.setInputMessageSize(300);
+
+        final Message msg = messageFactory.createMessage("test", "source", Tools.nowUTC());
+        when(codec.decodeSafe(any(RawMessage.class))).thenReturn(Optional.of(msg));
+
+        final MessageEvent event = new MessageEvent();
+        event.setRaw(raw);
+
+        processor.onEvent(event, 0, true);
+
+        assertThat(event.getMessage()).isNotNull();
+        assertThat((Long) event.getMessage().getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE))
+                .isEqualTo(300L);
+    }
+
     // --- Helpers ---
 
     /**

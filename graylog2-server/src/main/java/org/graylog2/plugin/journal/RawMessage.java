@@ -73,6 +73,11 @@ public class RawMessage implements Serializable {
     private int sequenceNr;
     private Configuration codecConfig;
 
+    // Transient: not serialized to the journal. When set (> 0), represents the
+    // proportional share of the original network request size for this message.
+    // Used by transports that split a single request into multiple RawMessages.
+    private int inputMessageSize;
+
     public RawMessage(@Nonnull byte[] payload) {
         this(payload, (ResolvableInetSocketAddress) null);
     }
@@ -202,6 +207,14 @@ public class RawMessage implements Serializable {
      */
     public int getPayloadSize() {
         return msgBuilder.getPayload().size();
+    }
+
+    public int getInputMessageSize() {
+        return inputMessageSize;
+    }
+
+    public void setInputMessageSize(int inputMessageSize) {
+        this.inputMessageSize = inputMessageSize;
     }
 
     public UUID getId() {
