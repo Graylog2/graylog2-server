@@ -115,6 +115,9 @@ export type CollectorsConfig = {
   otlp_server_cert_id: string | null;
   http: IngestEndpointConfig;
   grpc: IngestEndpointConfig;
+  collector_offline_threshold: string;
+  collector_default_visibility_threshold: string;
+  collector_expiration_threshold: string;
 };
 
 export type CollectorsConfigRequest = {
@@ -128,6 +131,9 @@ export type CollectorsConfigRequest = {
     hostname: string;
     port: number;
   };
+  collector_offline_threshold: string;
+  collector_default_visibility_threshold: string;
+  collector_expiration_threshold: string;
 };
 
 export type FleetStatsSummary = {

@@ -167,7 +167,14 @@ const useCollectorsMutations = () => {
   // Config mutation
   const updateConfigMutation = useMutation({
     mutationFn: (config: CollectorsConfigRequest) => CollectorsConfigApi.put(config),
-    onError: (errorThrown) => {
+    onError: (errorThrown: { additional?: { body?: { validation_errors?: Record<string, Array<{ error: string }>> } } }) => {
+      const validationErrors = errorThrown?.additional?.body?.validation_errors;
+
+      if (validationErrors) {
+        // Don't show toast for validation errors — form will display them inline
+        return;
+      }
+
       UserNotification.error(
         `Saving collectors config failed: ${errorThrown}`,
         'Could not save config',
