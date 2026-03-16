@@ -45,6 +45,7 @@ const ButtonLabel = ({ children }: React.PropsWithChildren) => {
   return (
     <>
       Every <ReadableDuration duration={refreshConfig.interval} />
+      {children}
     </>
   );
 };
