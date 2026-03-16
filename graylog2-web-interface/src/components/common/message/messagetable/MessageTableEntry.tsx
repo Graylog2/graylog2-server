@@ -40,8 +40,8 @@ import TypeSpecificValue from 'views/components/TypeSpecificValue';
 import HighlightMessageContext from 'views/components/contexts/HighlightMessageContext';
 import { toSelectableMessageTableEntry } from 'views/components/widgets/MessageTableSelectedEntitiesProvider';
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
-import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import BulkSelectCell from 'components/common/message/messagetable/BulkSelectCell';
+import useSelectedMessageEntities from 'views/hooks/useSelectedMessageEntities';
 
 import MessagePreview from './MessagePreview';
 
@@ -140,7 +140,7 @@ const MessageTableEntry = ({
   const { inputs: inputsList = [] } = useStore(InputsStore);
   const { streams: streamsList = [] } = useStore(StreamsStore);
   const highlightMessageId = useContext(HighlightMessageContext);
-  const { toggleEntitySelect, selectedEntities } = useSelectedEntities();
+  const { toggleEntitySelect, isEntitySelected } = useSelectedMessageEntities();
   const sendTelemetry = useSendTelemetry();
   const additionalContextValue = useMemo(() => ({ message }), [message]);
   const allStreams = useMemo(() => Immutable.List<Stream>(streamsList), [streamsList]);
@@ -166,7 +166,7 @@ const MessageTableEntry = ({
     }
   }, [message.id, message.index, sendTelemetry, toggleDetail]);
 
-  const isSelected = selectedEntities.includes(message.id);
+  const isSelected = isEntitySelected(message.index, message.id);
   const checkboxTitle = `${isSelected ? 'Deselect' : 'Select'} message`;
   const isSelectDisabled = !displayBulkSelectCol || !isEntitySelectable(toSelectableMessageTableEntry(message));
   const colSpanFixup = selectedFields.size + 1 + Number(displayBulkSelectCol);
@@ -207,7 +207,7 @@ const MessageTableEntry = ({
           {displayBulkSelectCol && (
             <BulkSelectCell>
               <RowCheckbox
-                onChange={() => toggleEntitySelect(message.id)}
+                onChange={() => toggleEntitySelect(message.index, message.id)}
                 title={!isSelectDisabled ? checkboxTitle : undefined}
                 checked={isSelected}
                 disabled={isSelectDisabled}

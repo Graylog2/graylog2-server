@@ -1,29 +1,14 @@
 import * as React from 'react';
-import uniq from 'lodash/uniq';
 
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
-import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
-import type { EntityBase } from 'components/common/EntityDataTable/types';
+import type { SelectableMessageTableMessage } from 'views/components/widgets/MessageList';
+import useSelectedMessageEntities from 'views/hooks/useSelectedMessageEntities';
 
-type Props<Entity extends EntityBase> = {
-  data: Readonly<Array<Entity>>;
-};
-
-const BulkSelectHead = <Entity extends EntityBase>({ data }: Props<Entity>) => {
-  const { setSelectedEntities, isAllRowsSelected, isSomeRowsSelected } = useSelectedEntities();
+const BulkSelectHead = ({ data }: { data: Array<SelectableMessageTableMessage> }) => {
+  const { toggleAllEntitySelect, isAllRowsSelected, isSomeRowsSelected } = useSelectedMessageEntities();
   const title = `${isAllRowsSelected ? 'Deselect' : 'Select'} all visible messages`;
 
-  const onBulkSelect = () => {
-    setSelectedEntities((cur) => {
-      const entityIds = data.map(({ id }) => id);
-
-      if (isAllRowsSelected) {
-        return cur.filter((itemId) => !entityIds.includes(itemId));
-      }
-
-      return uniq([...cur, ...entityIds]);
-    });
-  };
+  const onBulkSelect = () => toggleAllEntitySelect(data);
 
   return (
     <RowCheckbox

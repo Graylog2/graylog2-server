@@ -66,7 +66,7 @@ const BulkActions = () => {
 
   return (
     <>
-      <BulkActionsDropdown>{actions}</BulkActionsDropdown>
+      <BulkActionsDropdown bsSize="xs">{actions}</BulkActionsDropdown>
       {actionModals}
     </>
   );

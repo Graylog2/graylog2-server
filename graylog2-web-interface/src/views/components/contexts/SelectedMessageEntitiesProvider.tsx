@@ -4,6 +4,8 @@ import { useMemo, useState, useCallback } from 'react';
 
 import SelectEntitiesContext from 'components/common/EntityDataTable/contexts/SelectEntitiesContext';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
+import { createSelectedEntityId } from 'views/hooks/useSelectedMessageEntities';
+import type { SelectableMessageTableMessage } from 'views/components/widgets/MessageList';
 
 const removeSelectedEntityId = <Entity extends EntityBase>(
   selectedEntities: Array<Entity['id']>,
@@ -21,13 +23,13 @@ const isUpdateFunction = <Entity extends EntityBase>(
 ): setSelectedEntitiesArgument is (prev: Array<Entity['id']>) => Array<Entity['id']> =>
   typeof setSelectedEntitiesArgument === 'function';
 
-const SelectedMessageEntitiesProvider = <Entity extends EntityBase>({
+const SelectedMessageEntitiesProvider = <Entity extends SelectableMessageTableMessage>({
   children = undefined,
   initialSelection = [],
   onChangeSelection = undefined,
   entities,
 }: Props<Entity>) => {
-  const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection);
+  const [selectedEntities, setSelectedEntities] = useState<Array<EntityBase['id']>>(initialSelection);
 
   const _setSelectedEntities = useCallback(
     (setSelectedEntitiesArgument: SetStateAction<Array<Entity['id']>>) => {
@@ -69,7 +71,10 @@ const SelectedMessageEntitiesProvider = <Entity extends EntityBase>({
     [_setSelectedEntities],
   );
 
-  const visibleEntityIds = useMemo(() => entities.map(({ id }) => id), [entities]);
+  const visibleEntityIds = useMemo(
+    () => entities.map(({ id, index }) => createSelectedEntityId(index, id)),
+    [entities],
+  );
   const selectedVisibleEntitiesCount = useMemo(
     () => visibleEntityIds.filter((entityId) => selectedEntities.includes(entityId)).length,
     [selectedEntities, visibleEntityIds],
