@@ -16,8 +16,6 @@
  */
 package org.graylog2.security;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import jakarta.inject.Inject;
@@ -28,7 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,13 +58,13 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
         final Serializable id = generateSessionId(session);
         assignSessionId(session, id);
 
-        final MongoDbSession dbSession = new MongoDbSession(Maps.newHashMap());
+        final MongoDbSession dbSession = new MongoDbSession(new HashMap<>());
         dbSession.setSessionId(id.toString());
         dbSession.setHost(session.getHost());
         dbSession.setStartTimestamp(session.getStartTimestamp());
         dbSession.setLastAccessTime(session.getLastAccessTime());
         dbSession.setTimeout(session.getTimeout());
-        Map<Object, Object> attributes = Maps.newHashMap();
+        Map<Object, Object> attributes = new HashMap<>();
         for (Object key : session.getAttributeKeys()) {
             attributes.put(key.toString(), session.getAttribute(key));
         }
@@ -94,7 +94,7 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
         LOG.debug("Updating session");
 
         final String sessionId = session.getId().toString();
-        final MongoDbSession dbSession = new MongoDbSession(Maps.newHashMap());
+        final MongoDbSession dbSession = new MongoDbSession(new HashMap<>());
         dbSession.setSessionId(sessionId);
         dbSession.setHost(session.getHost());
         dbSession.setStartTimestamp(session.getStartTimestamp());
@@ -124,7 +124,7 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
         LOG.debug("Retrieving all active sessions.");
 
         Collection<MongoDbSession> dbSessions = mongoDBSessionService.loadAll();
-        List<Session> sessions = Lists.newArrayList();
+        List<Session> sessions = new ArrayList<>();
         for (MongoDbSession dbSession : dbSessions) {
             sessions.add(mongoDBSessionService.daoToSimpleSession(dbSession));
         }
