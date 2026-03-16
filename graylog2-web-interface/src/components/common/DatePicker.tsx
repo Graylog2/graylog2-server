@@ -62,7 +62,13 @@ type Props = {
   timeZone?: string;
 };
 
-const DatePicker = ({ date = undefined, fromDate = undefined, onChange, showOutsideDays = false, timeZone = 'UTC' }: Props) => {
+const DatePicker = ({
+  date = undefined,
+  fromDate = undefined,
+  onChange,
+  showOutsideDays = false,
+  timeZone = 'UTC',
+}: Props) => {
   const selectedDate = useSelectedDate(date);
 
   const modifiers = useMemo(
