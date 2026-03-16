@@ -14,19 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.security.sessions;
+export function prepareGreyNoiseConfig(config: Record<string, unknown>): Record<string, unknown> {
+  const apiToken = config.api_token as { is_set?: boolean } | undefined;
 
-import java.util.Optional;
-import java.util.stream.Stream;
+  if (apiToken && 'is_set' in apiToken) {
+    return {
+      ...config,
+      api_token: apiToken.is_set ? { keep_value: true } : { set_value: '' },
+    };
+  }
 
-public interface SessionService {
-    Optional<SessionDTO> getBySessionId(String sessionId);
-
-    boolean deleteBySessionId(String sessionId);
-
-    String create(SessionDTO session);
-
-    void updateBySessionId(SessionDTO session);
-
-    Stream<SessionDTO> streamAll();
+  return config;
 }

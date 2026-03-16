@@ -14,19 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.security.sessions;
+package org.graylog2.configuration.validators;
 
-import java.util.Optional;
-import java.util.stream.Stream;
+import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.Validator;
 
-public interface SessionService {
-    Optional<SessionDTO> getBySessionId(String sessionId);
+import java.time.Duration;
 
-    boolean deleteBySessionId(String sessionId);
-
-    String create(SessionDTO session);
-
-    void updateBySessionId(SessionDTO session);
-
-    Stream<SessionDTO> streamAll();
+public class PositiveJavaDurationValidator implements Validator<Duration> {
+    @Override
+    public void validate(String name, Duration value) throws ValidationException {
+        if (value == null || value.isZero() || value.isNegative()) {
+            throw new ValidationException("Parameter " + name + " must be a positive duration (found " + value + ")");
+        }
+    }
 }
