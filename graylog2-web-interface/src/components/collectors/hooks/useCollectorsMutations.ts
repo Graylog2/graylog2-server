@@ -18,6 +18,7 @@ import {useMutation, useQueryClient} from '@tanstack/react-query';
 
 import { CollectorsFleets, CollectorsSources, CollectorsConfig as CollectorsConfigApi, OpAMPEnrollment } from '@graylog/server-api';
 
+import request from 'routing/request';
 import UserNotification from 'util/UserNotification';
 
 import type {CollectorsConfigRequest, Fleet, Source} from '../types';
@@ -164,6 +165,27 @@ const useCollectorsMutations = () => {
     },
   });
 
+  // Instance reassignment mutation
+  // TODO: Replace with generated API client after regeneration (Collectors.reassignInstances)
+  const reassignInstancesMutation = useMutation({
+    mutationFn: (input: { instanceUids: string[]; fleetId: string }) =>
+      request('POST', '/collectors/instances/reassign', {
+        instance_uids: input.instanceUids,
+        fleet_id: input.fleetId,
+      }, {}, { Accept: 'application/json' }),
+    onError: (errorThrown) => {
+      UserNotification.error(
+        `Reassigning instances failed: ${errorThrown}`,
+        'Could not reassign instances',
+      );
+    },
+    onSuccess: () => {
+      UserNotification.success('Instances have been reassigned.', 'Success!');
+
+      return invalidateCollectorsQueries();
+    },
+  });
+
   // Config mutation
   const updateConfigMutation = useMutation({
     mutationFn: (config: CollectorsConfigRequest) => CollectorsConfigApi.put(config),
@@ -207,6 +229,10 @@ const useCollectorsMutations = () => {
     // Enrollment token operations
     createEnrollmentToken: createEnrollmentTokenMutation.mutateAsync,
     isCreatingEnrollmentToken: createEnrollmentTokenMutation.isPending,
+
+    // Instance operations
+    reassignInstances: reassignInstancesMutation.mutateAsync,
+    isReassigningInstances: reassignInstancesMutation.isPending,
 
     // Config operations
     updateConfig: updateConfigMutation.mutateAsync,
