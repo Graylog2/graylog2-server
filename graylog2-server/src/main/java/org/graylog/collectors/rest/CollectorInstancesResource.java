@@ -24,10 +24,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -37,10 +39,13 @@ import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.conversions.Bson;
+import org.bson.Document;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.FleetService;
+import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.SourceService;
+import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.FleetDTO;
@@ -146,6 +151,7 @@ public class CollectorInstancesResource extends RestResource {
     private final FleetService fleetService;
     private final SourceService sourceService;
     private final ClusterConfigService clusterConfigService;
+    private final FleetTransactionLogService txnLogService;
     private final DbQueryCreator dbQueryCreator;
 
     @Inject
@@ -153,11 +159,13 @@ public class CollectorInstancesResource extends RestResource {
                                       FleetService fleetService,
                                       SourceService sourceService,
                                       ComputedFieldRegistry computedFieldRegistry,
-                                      ClusterConfigService clusterConfigService) {
+                                      ClusterConfigService clusterConfigService,
+                                      FleetTransactionLogService txnLogService) {
         this.collectorInstanceService = collectorInstanceService;
         this.fleetService = fleetService;
         this.sourceService = sourceService;
         this.clusterConfigService = clusterConfigService;
+        this.txnLogService = txnLogService;
         this.dbQueryCreator = new DbQueryCreator(CollectorInstanceDTO.FIELD_INSTANCE_UID, ATTRIBUTES, computedFieldRegistry);
     }
 
@@ -232,6 +240,36 @@ public class CollectorInstancesResource extends RestResource {
         if (!deleted) {
             throw new NotFoundException(f("Collector instance <%s> not found", instanceUid));
         }
+        return Response.noContent().build();
+    }
+
+    @POST
+    @Path("/instances/reassign")
+    @Timed
+    @Operation(summary = "Reassign collector instances to a different fleet")
+    @NoAuditEvent("TODO")
+    public Response reassignInstances(ReassignCollectorsRequest request) {
+        final String targetFleetId = request.fleetId();
+        final Set<String> instanceUids = request.instanceUids();
+
+        if (instanceUids == null || instanceUids.isEmpty()) {
+            throw new BadRequestException("instance_uids must not be empty");
+        }
+
+        if (instanceUids.size() > FleetTransactionLogService.MAX_BULK_TARGET_SIZE) {
+            throw new BadRequestException(f("instance_uids must not exceed %d elements", FleetTransactionLogService.MAX_BULK_TARGET_SIZE));
+        }
+
+        if (fleetService.get(targetFleetId).isEmpty()) {
+            throw new NotFoundException(f("Target fleet <%s> not found", targetFleetId));
+        }
+
+        // TODO: Show pending configuration changes per collector instance (#25341)
+        txnLogService.appendCollectorMarker(
+                instanceUids,
+                MarkerType.FLEET_REASSIGNED,
+                new Document("new_fleet_id", targetFleetId));
+
         return Response.noContent().build();
     }
 
