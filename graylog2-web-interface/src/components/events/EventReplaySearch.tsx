@@ -31,6 +31,7 @@ import useReplaySearchContext from 'components/event-definitions/replay-search/h
 
 const ReplaySearchSidebarSection = () => {
   const { alertId, definitionId } = useReplaySearchContext();
+
   return <ReplaySearchSidebar alertId={alertId} definitionId={definitionId} />;
 };
 
@@ -69,7 +70,7 @@ type Props = {
 const EventReplaySearch = ({
   eventDefinitionMappedData,
   eventData,
-  searchPageLayout,
+  searchPageLayout = undefined,
 }: Props) => {
   const { eventDefinition, aggregations } = eventDefinitionMappedData;
   const { openSidebar } = useRightSidebar();
@@ -112,7 +113,7 @@ const EventReplaySearch = ({
 const WithLoadingBarrier = ({
   eventDefinitionMappedData,
   eventData,
-  searchPageLayout,
+  searchPageLayout = undefined,
 }: Props) => (
   <LoadingBarrier eventDefinition={eventDefinitionMappedData.eventDefinition}>
     <EventReplaySearch

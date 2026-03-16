@@ -110,6 +110,7 @@ const useAttributeComponents = () => {
         inRows: true,
       });
     }
+
     return components;
   }, [eventData?.timestamp, eventDefinition, isRightSidebarEnabled, type]);
 };

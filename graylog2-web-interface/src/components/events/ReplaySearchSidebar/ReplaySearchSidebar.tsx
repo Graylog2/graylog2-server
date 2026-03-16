@@ -25,7 +25,7 @@ type Props = {
   definitionId?: string;
 };
 
-const ReplaySearchSidebar = ({ alertId, definitionId }: Props) => {
+const ReplaySearchSidebar = ({ alertId, definitionId = undefined }: Props) => {
 
   const sideBarDetailsPlugin = usePluginEntities('views.components.eventReplay.sideBarDetails');
 

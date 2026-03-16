@@ -55,6 +55,7 @@ const AlertWrapper = styled(Alert)(
 
 const ReplaySearchSidebarSection = () => {
   const { alertId, definitionId } = useReplaySearchContext();
+
   return <ReplaySearchSidebar alertId={alertId} definitionId={definitionId} />;
 };
 
