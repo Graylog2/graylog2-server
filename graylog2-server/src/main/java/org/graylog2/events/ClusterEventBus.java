@@ -45,16 +45,17 @@ public class ClusterEventBus extends AsyncEventBus {
     }
 
     /**
-     * Registers a subscriber that only receives events posted on the local node.
+     * Registers a subscriber for cluster events posted locally on this node.
      *
-     * <p>Events posted to {@link ClusterEventBus} are dispatched to subscribers registered here
-     * <strong>before</strong> they are persisted and replicated to other nodes. On remote nodes,
-     * {@link org.graylog2.events.ClusterEventPeriodical} polls MongoDB and posts the replicated
-     * events to the server {@link com.google.common.eventbus.EventBus} instead, so subscribers
-     * registered here will <strong>not</strong> see those replicated events.</p>
+     * <p>Subscribers registered here receive events directly from this node's
+     * {@code ClusterEventBus}, before they are persisted and replicated to other nodes.
      *
-     * <p>Use this when a handler must run exactly once on the originating node (e.g. reacting to
-     * a license install). For cluster-wide delivery, subscribe on the server EventBus.</p>
+     * <p>Use this method if you need to react to locally posted cluster events. To receive cluster
+     * event updates replicated from across the cluster, subscribe to the regular {@code EventBus}
+     * instead.
+     *
+     * <p>{@link ClusterEventPeriodical} is also a subscriber on this bus. It listens for locally
+     * posted cluster events and persists and replicates them via the regular {@code EventBus}.
      *
      * @param object the subscriber to register
      */
