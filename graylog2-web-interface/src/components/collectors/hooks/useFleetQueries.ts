@@ -18,7 +18,6 @@ import { useQuery } from '@tanstack/react-query';
 
 import { CollectorsFleets } from '@graylog/server-api';
 
-import request from 'routing/request';
 import type { SearchParams } from 'stores/PaginationTypes';
 import { defaultOnError } from 'util/conditional/onError';
 
@@ -67,9 +66,8 @@ export const useFleetStats = (fleetId: string) =>
 
 export const FLEETS_BULK_STATS_KEY = ['collectors', 'fleets', 'stats'];
 
-// TODO: replace with generated CollectorsFleets.bulkStats() after API client regeneration
 const fetchBulkFleetStats = (): Promise<BulkFleetStatsResponse> =>
-  request('GET', '/collectors/fleets/stats', null, {}, { Accept: 'application/json' });
+  CollectorsFleets.bulkStats();
 
 export const useFleetsBulkStats = () =>
   useQuery<BulkFleetStatsResponse>({

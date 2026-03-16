@@ -16,16 +16,16 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import request from 'routing/request';
+import { CollectorsActivity } from '@graylog/server-api';
+
 import { defaultOnError } from 'util/conditional/onError';
 
 import type { RecentActivityResponse } from '../types';
 
 export const ACTIVITY_KEY = ['collectors', 'activity', 'recent'];
 
-// TODO: replace with generated API client after regeneration
 const fetchRecentActivity = (): Promise<RecentActivityResponse> =>
-  request('GET', '/collectors/activity/recent', null, {}, { Accept: 'application/json' });
+  CollectorsActivity.recent() as Promise<RecentActivityResponse>;
 
 export const useRecentActivity = () =>
   useQuery<RecentActivityResponse>({
