@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 
 import static org.graylog.events.event.EventDto.FIELD_ALERT;
 import static org.graylog.events.event.EventDto.FIELD_PRIORITY;
+import static org.graylog.events.event.EventDto.FIELD_SCORES;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
 
 public class EventsSearchService extends AbstractEventsSearchService {
@@ -124,7 +125,7 @@ public class EventsSearchService extends AbstractEventsSearchService {
     /**
      * finding the overall count for one column for MongoDB based queries so we can calculate the "empty" case
      */
-    public Optional<Slice> count(String query, TimeRange timeRange, Subject subject, SearchUser searchUser, final String slicingColumn) {
+    public Optional<Slice> count(String query, TimeRange timeRange, Subject subject, SearchUser searchUser, final String type) {
         try {
             return scriptingApiService.executeAggregation(
                             new AggregationRequestSpec(query, allowedEventStreams(subject), Set.of(), timeRange, List.of(), List.of(new Metric("count", null))),
@@ -132,11 +133,19 @@ public class EventsSearchService extends AbstractEventsSearchService {
                     )
                     .datarows()
                     .stream()
-                    .map(r -> new Slice(r.getFirst().toString(), r.getFirst().toString(), Integer.valueOf(r.getLast().toString())))
+                    .map(r -> new Slice(r.getFirst().toString(), r.getFirst().toString(), type, Integer.valueOf(r.getLast().toString())))
                     .findFirst();
         } catch (QueryFailedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public String getTypeBySliceColumn(final String column) {
+        return switch (column) {
+            case FIELD_PRIORITY -> FIELD_PRIORITY;
+            case FIELD_ALERT ->  FIELD_ALERT;
+            default -> null;
+        };
     }
 
     /**
@@ -144,17 +153,19 @@ public class EventsSearchService extends AbstractEventsSearchService {
      * So we only need a simple mapping function here.
      */
     public Slice mapAggregationResultsToSlice(final String slicingColumn, final List<Object> result) {
-        return new Slice(result.getFirst().toString(), null, Integer.valueOf(result.getLast().toString()));
+        return new Slice(result.getFirst().toString(), null, getTypeBySliceColumn(slicingColumn), Integer.valueOf(result.getLast().toString()));
     }
 
     // the alert can either be true or false
     List<Slice> handleAlertColumn(final List<Slice> slices) {
+        final var type = getTypeBySliceColumn(FIELD_ALERT);
+
         if (slices.size() == 2) {
             return slices;
         }
 
-        final var TRUE = new Slice("true", null, 0);
-        final var FALSE = new Slice("false", null, 0);
+        final var TRUE = new Slice("true", null, type, 0);
+        final var FALSE = new Slice("false", null, type, 0);
 
         if (slices.isEmpty()) {
             return List.of(TRUE, FALSE);
@@ -169,15 +180,17 @@ public class EventsSearchService extends AbstractEventsSearchService {
 
     // priority can be 0 (info) to 4 (critical), see EventDefinitionPriorityEnum.ts
     List<Slice> handlePriorityColumn(final List<Slice> slices) {
+        final var type = getTypeBySliceColumn(FIELD_PRIORITY);
+
         if (slices.size() == 5) {
             return slices;
         }
 
-	final var INFO = new Slice("0", null, 0);
-        final var LOW = new Slice("1", null, 0);
-        final var MEDIUM = new Slice("2", null, 0);
-        final var HIGH = new Slice("3", null, 0);
-        final var CRITICAL = new Slice("4", null, 0);
+	    final var INFO = new Slice("0", null, type, 0);
+        final var LOW = new Slice("1", null, type, 0);
+        final var MEDIUM = new Slice("2", null, type, 0);
+        final var HIGH = new Slice("3", null, type, 0);
+        final var CRITICAL = new Slice("4", null, type, 0);
 
         if (slices.isEmpty()) {
             return List.of(INFO, LOW, MEDIUM, HIGH, CRITICAL);

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { SearchQueryStrings } from '@graylog/server-api';
@@ -92,9 +92,7 @@ describe('useSearchBarSubmit', () => {
     };
     render(<Wrapper onSubmit={onSubmit} values={values} />);
 
-    await act(async () => {
-      await clickSubmit();
-    });
+    await clickSubmit();
 
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith(values);
@@ -113,9 +111,7 @@ describe('useSearchBarSubmit', () => {
     };
     render(<Wrapper onSubmit={onSubmit} values={values} />);
 
-    await act(async () => {
-      await clickSubmit();
-    });
+    await clickSubmit();
 
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith(values);

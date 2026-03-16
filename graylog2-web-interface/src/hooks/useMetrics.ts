@@ -84,8 +84,7 @@ export const useMetricsNames = (
 ): { data: Metric[] | undefined; isLoading: boolean } => {
   const { data, isLoading } = useQuery({
     queryKey: ['metrics', 'names', nodeId, namespace],
-    queryFn: () =>
-      ClusterNodeMetrics.byNamespace(nodeId!, namespace).then(({ metrics }) => metrics as Metric[]),
+    queryFn: () => ClusterNodeMetrics.byNamespace(nodeId!, namespace).then(({ metrics }) => metrics as Metric[]),
     enabled: nodeId !== undefined,
   });
 

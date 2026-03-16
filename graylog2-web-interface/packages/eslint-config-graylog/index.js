@@ -110,7 +110,7 @@ export default [
       'no-loop-func': 'error',
 
       'import/prefer-default-export': 'off',
-      'jsx-a11y/control-has-associated-label': 'error',
+      'jsx-a11y/control-has-associated-label': ['error', { depth: 3, ignoreElements: ['td', 'th'] }],
       'react/no-array-index-key': 'error',
       'react/no-danger': 'error',
       'react/no-unstable-nested-components': 'error',
