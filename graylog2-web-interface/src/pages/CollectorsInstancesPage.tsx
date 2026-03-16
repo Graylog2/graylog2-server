@@ -71,7 +71,7 @@ const CollectorsInstancesPage = () => {
     return OrderedMap({ last_seen: [`${cutoff}><`] });
   }, [config?.collector_default_visibility_threshold]);
 
-  const { entityActions } = useTableElements({
+  const { entityActions, bulkActions, renderReassignModal } = useTableElements({
     onInstanceClick: setSelectedInstance,
   });
 
@@ -109,6 +109,7 @@ const CollectorsInstancesPage = () => {
             entityAttributesAreCamelCase={false}
             columnRenderers={columnRenderers}
             defaultFilters={defaultFilters}
+            bulkSelection={{ actions: bulkActions }}
           />
         </Col>
       </Row>
@@ -121,6 +122,8 @@ const CollectorsInstancesPage = () => {
           onClose={() => setSelectedInstance(null)}
         />
       )}
+
+      {renderReassignModal}
     </DocumentTitle>
   );
 };
