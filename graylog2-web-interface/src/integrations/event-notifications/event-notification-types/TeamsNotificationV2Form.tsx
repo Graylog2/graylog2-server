@@ -215,6 +215,7 @@ const TeamsNotificationV2Form = ({ config, validation, onChange }: TeamsNotifica
           <InputGroup.Addon>
             <input
               id="toggle_backlog_size"
+              aria-label="Enable message backlog limit"
               type="checkbox"
               checked={isBacklogSizeEnabled}
               onChange={toggleBacklogSize}
