@@ -172,7 +172,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         }
 
         if (message.isPresent()) {
-            event.setMessage(postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, message.get(), decodeTime, raw.getPayload().length));
+            event.setMessage(postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, message.get(), decodeTime, raw.getPayloadSize()));
         } else if (messages != null && !messages.isEmpty()) {
             event.setMessages(postProcessMultipleMessages(raw, codec, inputIdOnCurrentNode, baseMetricName, messages, decodeTime));
         }
@@ -192,7 +192,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             }
         }
 
-        distributePayloadSize(processedMessages, raw.getPayload().length);
+        distributePayloadSize(processedMessages, raw.getPayloadSize());
         return processedMessages;
     }
 

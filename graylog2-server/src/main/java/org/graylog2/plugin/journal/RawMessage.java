@@ -197,6 +197,13 @@ public class RawMessage implements Serializable {
         return msgBuilder.getPayload().toByteArray(); // TODO PERFORMANCE array copy
     }
 
+    /**
+     * Returns the payload size without copying the underlying byte array.
+     */
+    public int getPayloadSize() {
+        return msgBuilder.getPayload().size();
+    }
+
     public UUID getId() {
         return id;
     }
