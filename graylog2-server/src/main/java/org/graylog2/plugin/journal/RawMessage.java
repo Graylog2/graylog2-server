@@ -73,9 +73,10 @@ public class RawMessage implements Serializable {
     private int sequenceNr;
     private Configuration codecConfig;
 
-    // Transient: not serialized to the journal. When set (> 0), represents the
-    // proportional share of the original network request size for this message.
-    // Used by transports that split a single request into multiple RawMessages.
+    // Not serialized to the journal. When set (> 0), represents the proportional
+    // share of the original network request size for this message. Codecs that need
+    // this value to survive journal round-trips must persist it in their own payload
+    // (e.g. OTelJournal.Record.input_message_size) and restore it during decoding.
     private int inputMessageSize;
 
     public RawMessage(@Nonnull byte[] payload) {

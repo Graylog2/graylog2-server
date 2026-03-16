@@ -82,6 +82,14 @@ public class OTelCodec implements Codec {
                     "Error parsing OpenTelemetry message", ExceptionUtils.getRootCause(e), rawMessage);
         }
 
+        // Restore the proportional input message size that was embedded in the Record
+        // before journal serialization. This survives the journal round-trip, unlike the
+        // transient RawMessage.inputMessageSize field.
+        final int inputMessageSize = journalRecord.getInputMessageSize();
+        if (inputMessageSize > 0) {
+            rawMessage.setInputMessageSize(inputMessageSize);
+        }
+
         return switch (journalRecord.getPayloadCase()) {
             case LOG ->
                     logsCodec.decode(journalRecord.getLog(), rawMessage.getTimestamp(), rawMessage.getRemoteAddress());

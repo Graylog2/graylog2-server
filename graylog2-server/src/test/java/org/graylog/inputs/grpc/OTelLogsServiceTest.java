@@ -101,7 +101,7 @@ class OTelLogsServiceTest {
     }
 
     @Test
-    void exportDistributesRequestSizeAcrossRawMessages() {
+    void exportDistributesRequestSizeAcrossRecords() {
         final ExportLogsServiceRequest request = ExportLogsServiceRequest.newBuilder()
                 .addResourceLogs(ResourceLogs.newBuilder()
                         .setResource(Resource.newBuilder()
@@ -126,15 +126,18 @@ class OTelLogsServiceTest {
         final List<RawMessage> captured = captor.getAllValues();
         final int expectedPerMessageSize = request.getSerializedSize() / 3;
 
+        // The size is now embedded in the serialized Record payload (survives journal round-trip),
+        // not in the transient RawMessage.inputMessageSize field.
         for (final RawMessage raw : captured) {
-            assertThat(raw.getInputMessageSize())
-                    .as("Each RawMessage should carry the proportional request size")
+            final OTelJournal.Record record = parseJournalRecord(raw.getPayload());
+            assertThat(record.getInputMessageSize())
+                    .as("Each Record should carry the proportional request size")
                     .isEqualTo(expectedPerMessageSize);
         }
 
-        // Total assigned size should approximate the original request size
         final long totalAssigned = captured.stream()
-                .mapToLong(RawMessage::getInputMessageSize)
+                .map(raw -> parseJournalRecord(raw.getPayload()))
+                .mapToLong(OTelJournal.Record::getInputMessageSize)
                 .sum();
         assertThat(totalAssigned).isLessThanOrEqualTo(request.getSerializedSize());
     }
@@ -158,10 +161,23 @@ class OTelLogsServiceTest {
         final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
         verify(input).processRawMessage(captor.capture());
 
-        final RawMessage captured = captor.getValue();
-        assertThat(captured.getInputMessageSize())
+        final OTelJournal.Record record = parseJournalRecord(captor.getValue().getPayload());
+        assertThat(record.getInputMessageSize())
                 .as("Single log record should get the full request serialized size")
                 .isEqualTo(request.getSerializedSize());
+    }
+
+    @Test
+    void inputMessageSizeSurvivesProtobufRoundTrip() {
+        final OTelJournal.Record original = OTelJournal.Record.newBuilder()
+                .setLog(OTelJournal.Log.newBuilder()
+                        .setLogRecord(LogRecord.newBuilder()
+                                .setBody(AnyValue.newBuilder().setStringValue("test"))))
+                .setInputMessageSize(42)
+                .build();
+
+        final OTelJournal.Record deserialized = parseJournalRecord(original.toByteArray());
+        assertThat(deserialized.getInputMessageSize()).isEqualTo(42);
     }
 
     private OTelJournal.Record parseJournalRecord(byte[] payload) {

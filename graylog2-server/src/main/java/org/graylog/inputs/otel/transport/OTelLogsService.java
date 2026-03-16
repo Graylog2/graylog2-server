@@ -81,9 +81,9 @@ public class OTelLogsService extends LogsServiceGrpc.LogsServiceImplBase {
         final int perMessageSize = recordCount > 0 ? request.getSerializedSize() / recordCount : 0;
 
         journalRecords.stream()
+                .map(record -> record.toBuilder().setInputMessageSize(perMessageSize).build())
                 .map(AbstractMessageLite::toByteArray)
                 .map(createRawMessage)
-                .peek(raw -> raw.setInputMessageSize(perMessageSize))
                 .forEach(input::processRawMessage);
 
         responseObserver.onNext(ExportLogsServiceResponse.newBuilder().build());
