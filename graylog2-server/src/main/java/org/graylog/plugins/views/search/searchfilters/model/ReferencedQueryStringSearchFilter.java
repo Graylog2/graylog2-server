@@ -28,17 +28,18 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.entities.DefaultEntityScope;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.graylog2.database.entities.ScopedEntity.FIELD_SCOPE;
+
 @AutoValue
 @JsonTypeName(UsedSearchFilter.REFERENCED_SEARCH_FILTER)
 @JsonDeserialize(builder = ReferencedQueryStringSearchFilter.Builder.class)
 public abstract class ReferencedQueryStringSearchFilter implements ReferencedSearchFilter, QueryStringSearchFilter {
-
-    public static final String SCOPE_FIELD = "_scope";
 
     @JsonProperty(ID_FIELD)
     @Override
@@ -56,7 +57,7 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
     @Nullable
     public abstract String queryString();
 
-    @JsonProperty(SCOPE_FIELD)
+    @JsonProperty(FIELD_SCOPE)
     @Nullable
     public abstract String scope();
 
@@ -98,7 +99,7 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
         @JsonProperty(QUERY_STRING_FIELD)
         public abstract Builder queryString(String queryString);
 
-        @JsonProperty(SCOPE_FIELD)
+        @JsonProperty(FIELD_SCOPE)
         public abstract Builder scope(String scope);
 
         @JsonProperty(value = NEGATION_FIELD, defaultValue = "false")
@@ -111,7 +112,8 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
         public static Builder create() {
             return new AutoValue_ReferencedQueryStringSearchFilter.Builder()
                     .disabled(false)
-                    .negation(false);
+                    .negation(false)
+                    .scope(DefaultEntityScope.NAME);
         }
 
         public abstract ReferencedQueryStringSearchFilter build();
@@ -120,7 +122,7 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
     @Override
     public InlineQueryStringSearchFilter toInlineRepresentation() {
         return InlineQueryStringSearchFilter.builder()
-                // create a new ID for the inlined filter on purpose, so it's not the same as the global one. if you later inline the same global filter a 2nd time, it would crash/overwrite your first 
+                // create a new ID for the inlined filter on purpose, so it's not the same as the global one. if you later inline the same global filter a 2nd time, it would crash/overwrite your first
                 .id(new org.bson.types.ObjectId().toHexString())
                 .queryString(this.queryString())
                 .description(this.description())

@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.searchfilters.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -26,6 +25,8 @@ import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
+
+import static org.graylog2.database.entities.ScopedEntity.FIELD_SCOPE;
 
 @AutoValue
 @JsonTypeName(UsedSearchFilter.INLINE_QUERY_STRING_SEARCH_FILTER)
@@ -67,7 +68,6 @@ public abstract class InlineQueryStringSearchFilter implements UsedSearchFilter,
     }
 
     @AutoValue.Builder
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public abstract static class Builder {
 
         @JsonProperty(TITLE_FIELD)
@@ -87,6 +87,14 @@ public abstract class InlineQueryStringSearchFilter implements UsedSearchFilter,
 
         @JsonProperty(value = DISABLED_FIELD, defaultValue = "false")
         public abstract Builder disabled(boolean disabled);
+
+        // Inline filters do not have scope — it only exists on referenced (DB-stored) filters.
+        // This setter absorbs the _scope field during deserialization so Jackson doesn't fail
+        // when encountering it in JSON that was serialized from a referenced filter.
+        @JsonProperty(FIELD_SCOPE)
+        public Builder scope(String scope) {
+            return this;
+        }
 
         @JsonCreator
         public static Builder create() {
