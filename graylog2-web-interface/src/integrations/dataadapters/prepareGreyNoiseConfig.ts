@@ -14,16 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+export function prepareGreyNoiseConfig(config: Record<string, unknown>): Record<string, unknown> {
+  const apiToken = config.api_token as { is_set?: boolean } | undefined;
 
-import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
-import StringUtils from 'util/StringUtils';
+  if (apiToken && 'is_set' in apiToken) {
+    return {
+      ...config,
+      api_token: apiToken.is_set ? { keep_value: true } : { set_value: '' },
+    };
+  }
 
-type Props = {
-  priority: number | string;
-};
-const PriorityName = ({ priority }: Props) => (
-  <>{StringUtils.capitalizeFirstLetter(EventDefinitionPriorityEnum.properties[priority].name)}</>
-);
-
-export default PriorityName;
+  return config;
+}

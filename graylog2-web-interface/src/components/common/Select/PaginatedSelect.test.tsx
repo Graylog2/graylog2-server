@@ -47,13 +47,7 @@ describe('PaginatedSelect', () => {
     // "str.replace is not a function".
     const onLoadOptions = jest.fn(() => Promise.resolve(mockOptions));
 
-    render(
-      <PaginatedSelect
-        placeholder="Pick one"
-        onLoadOptions={onLoadOptions}
-        onChange={() => {}}
-      />,
-    );
+    render(<PaginatedSelect placeholder="Pick one" onLoadOptions={onLoadOptions} onChange={() => {}} />);
 
     // Wait for initial load
     await act(() => jest.runAllTimersAsync());

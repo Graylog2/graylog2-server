@@ -14,16 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog2.configuration.validators;
 
-import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
-import StringUtils from 'util/StringUtils';
+import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.Validator;
 
-type Props = {
-  priority: number | string;
-};
-const PriorityName = ({ priority }: Props) => (
-  <>{StringUtils.capitalizeFirstLetter(EventDefinitionPriorityEnum.properties[priority].name)}</>
-);
+import java.time.Duration;
 
-export default PriorityName;
+public class PositiveJavaDurationValidator implements Validator<Duration> {
+    @Override
+    public void validate(String name, Duration value) throws ValidationException {
+        if (value == null || value.isZero() || value.isNegative()) {
+            throw new ValidationException("Parameter " + name + " must be a positive duration (found " + value + ")");
+        }
+    }
+}
