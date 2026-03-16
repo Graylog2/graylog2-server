@@ -18,12 +18,11 @@ import * as React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer, IfPermitted, Spinner } from 'components/common';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import Routes from 'routing/Routes';
 import type Role from 'logic/roles/Role';
 import { Button } from 'components/bootstrap';
-import { IfPermitted, Spinner } from 'components/common';
 
 type Props = {
   readOnly: Role['readOnly'];

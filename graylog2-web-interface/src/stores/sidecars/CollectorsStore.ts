@@ -48,14 +48,14 @@ export const CollectorsActions = singletonActions('core.Collectors', () =>
 );
 
 type StoreState = {
-  query: string | undefined;
-  collectors: Array<Collector>;
-  pagination: {
+  query?: string;
+  collectors?: Array<Collector>;
+  pagination?: {
     page: number;
     pageSize: number;
     total: number;
   };
-  total: number;
+  total?: number;
 };
 export const CollectorsStore = singletonStore('core.Collectors', () =>
   Reflux.createStore<StoreState>({

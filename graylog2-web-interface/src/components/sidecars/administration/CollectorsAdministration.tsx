@@ -22,8 +22,7 @@ import without from 'lodash/without';
 import styled, { css } from 'styled-components';
 
 import { naturalSortIgnoreCase } from 'util/SortUtils';
-import { Link } from 'components/common/router';
-import { ControlledTableList, PaginatedList, IconButton } from 'components/common';
+import { Link, ControlledTableList, PaginatedList, IconButton } from 'components/common';
 import Routes from 'routing/Routes';
 import { Col, Row, Input } from 'components/bootstrap';
 import ColorLabel from 'components/sidecars/common/ColorLabel';

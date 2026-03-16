@@ -17,7 +17,7 @@
 import userEvent from '@testing-library/user-event';
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, waitFor, screen, within, act } from 'wrappedTestingLibrary';
+import { render, waitFor, screen, within } from 'wrappedTestingLibrary';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 import { paginatedUsers, alice, bob, admin as adminOverview } from 'fixtures/userOverviews';
@@ -25,7 +25,6 @@ import asMock from 'helpers/mocking/AsMock';
 import mockAction from 'helpers/mocking/MockAction';
 import { UsersActions } from 'stores/users/UsersStore';
 import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import UsersOverview from './UsersOverview';
 
@@ -55,12 +54,7 @@ const clickMoreActions = async (username: string) => {
 const extendedTimeout = applyTimeoutMultiplier(30000);
 
 describe('UsersOverview', () => {
-  const renderSUT = () =>
-    render(
-      <DefaultQueryParamProvider>
-        <UsersOverview />
-      </DefaultQueryParamProvider>,
-    );
+  const renderSUT = () => render(<UsersOverview />);
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -132,10 +126,7 @@ describe('UsersOverview', () => {
         await clickMoreActions(modifiableUser.fullName);
         const deleteButton = await screen.findByTitle(`Delete user ${modifiableUser.fullName}`);
 
-        // eslint-disable-next-line testing-library/no-unnecessary-act
-        await act(async () => {
-          await userEvent.click(deleteButton);
-        });
+        await userEvent.click(deleteButton);
 
         await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
 

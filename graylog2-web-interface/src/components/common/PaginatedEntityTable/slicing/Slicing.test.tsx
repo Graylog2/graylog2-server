@@ -20,7 +20,6 @@ import userEvent from '@testing-library/user-event';
 
 import type { SearchParams } from 'stores/PaginationTypes';
 import TableFetchContext, { type ContextValue } from 'components/common/PaginatedEntityTable/TableFetchContext';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import Slicing from './index';
 
@@ -35,9 +34,9 @@ describe('Slicing', () => {
 
   const renderSUT = (
     props: Partial<React.ComponentProps<typeof Slicing>> = {},
-    contextOverrides: Partial<ContextValue> & { searchParams?: Partial<SearchParams> } = {},
+    contextOverrides: { searchParams?: Partial<SearchParams> } = {},
   ) => {
-    const searchParams = {
+    const searchParams: SearchParams = {
       page: 1,
       pageSize: 10,
       query: '',
@@ -52,21 +51,18 @@ describe('Slicing', () => {
       refetch: jest.fn(),
       attributes: [],
       entityTableId: 'test-entity-table',
-      ...contextOverrides,
     };
 
     return render(
-      <DefaultQueryParamProvider>
-        <TableFetchContext.Provider value={contextValue}>
-          <Slicing
-            appSection="test-app-section"
-            columnSchemas={columnSchemas}
-            onChangeSlicing={() => {}}
-            fetchSlices={() => Promise.resolve({ slices: [] })}
-            {...props}
-          />
-        </TableFetchContext.Provider>
-      </DefaultQueryParamProvider>,
+      <TableFetchContext.Provider value={contextValue}>
+        <Slicing
+          appSection="test-app-section"
+          columnSchemas={columnSchemas}
+          onChangeSlicing={() => {}}
+          fetchSlices={() => Promise.resolve({ slices: [] })}
+          {...props}
+        />
+      </TableFetchContext.Provider>,
     );
   };
 
@@ -117,7 +113,7 @@ describe('Slicing', () => {
 
     await screen.findByText('Alpha');
 
-    await userEvent.type(screen.getByPlaceholderText(/filter status/i), 'alp');
+    await userEvent.type(screen.getByPlaceholderText(/filter/i), 'alp');
 
     expect(screen.getByText('Alpha')).toBeInTheDocument();
     expect(screen.queryByText('Beta')).not.toBeInTheDocument();
@@ -150,6 +146,56 @@ describe('Slicing', () => {
     });
   });
 
+  it('paginates non-empty slices', async () => {
+    renderSUT({
+      fetchSlices: () =>
+        Promise.resolve({
+          slices: Array.from({ length: 11 }, (_, index) => ({
+            value: `Slice-${String(index + 1).padStart(2, '0')}`,
+            count: 1,
+          })),
+        }),
+    });
+
+    await screen.findByText('Slice-01');
+
+    expect(within(screen.getByTestId('slices-list')).getByText('Slice-01')).toBeInTheDocument();
+    expect(within(screen.getByTestId('slices-list')).queryByText('Slice-11')).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /open page 2/i }));
+
+    await waitFor(() => expect(within(screen.getByTestId('slices-list')).getByText('Slice-11')).toBeInTheDocument());
+    expect(within(screen.getByTestId('slices-list')).queryByText('Slice-01')).not.toBeInTheDocument();
+  });
+
+  it('paginates empty slices', async () => {
+    renderSUT({
+      fetchSlices: () =>
+        Promise.resolve({
+          slices: [
+            { value: 'Alpha', count: 1 },
+            ...Array.from({ length: 11 }, (_, index) => ({
+              value: `Empty-${String(index + 1).padStart(2, '0')}`,
+              count: 0,
+            })),
+          ],
+        }),
+    });
+
+    await screen.findByText('Alpha');
+    await userEvent.click(screen.getByRole('button', { name: /show empty slices/i }));
+
+    expect(within(screen.getByTestId('empty-slices-list')).getByText('Empty-01')).toBeInTheDocument();
+    expect(within(screen.getByTestId('empty-slices-list')).queryByText('Empty-11')).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /open page 2/i }));
+
+    await waitFor(() =>
+      expect(within(screen.getByTestId('empty-slices-list')).getByText('Empty-11')).toBeInTheDocument(),
+    );
+    expect(within(screen.getByTestId('empty-slices-list')).queryByText('Empty-01')).not.toBeInTheDocument();
+  });
+
   it('shows empty slices when toggled', async () => {
     renderSUT({
       fetchSlices: () =>
@@ -168,5 +214,86 @@ describe('Slicing', () => {
     await userEvent.click(screen.getByRole('button', { name: /show empty slices/i }));
 
     expect(await screen.findByText('Gamma')).toBeInTheDocument();
+  });
+
+  it('auto-expands empty slices when active slice becomes empty', async () => {
+    renderSUT(
+      {
+        fetchSlices: () =>
+          Promise.resolve({
+            slices: [
+              { value: 'Alpha', count: 1 },
+              { value: 'Gamma', count: 0 },
+            ],
+          }),
+      },
+      { searchParams: { slice: 'Gamma' } },
+    );
+
+    await screen.findByText('Alpha');
+
+    expect(screen.getByRole('button', { name: /hide empty slices/i })).toBeInTheDocument();
+    expect(within(screen.getByTestId('empty-slices-list')).getByText('Gamma')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /hide empty slices/i }));
+
+    expect(screen.getByRole('button', { name: /show empty slices/i })).toBeInTheDocument();
+    expect(screen.queryByTestId('empty-slices-list')).not.toBeInTheDocument();
+  });
+
+  it('shows selected slice in empty list when backend does not return it', async () => {
+    renderSUT(
+      {
+        fetchSlices: () =>
+          Promise.resolve({
+            slices: [{ value: 'Alpha', count: 1 }],
+          }),
+      },
+      { searchParams: { slice: 'Missing-Slice' } },
+    );
+
+    await screen.findByText('Alpha');
+
+    expect(screen.getByRole('button', { name: /hide empty slices/i })).toBeInTheDocument();
+    expect(within(screen.getByTestId('empty-slices-list')).getByText('Missing-Slice')).toBeInTheDocument();
+  });
+
+  it('does not show selected slice when it does not match active filter', async () => {
+    renderSUT(
+      {
+        fetchSlices: () =>
+          Promise.resolve({
+            slices: [{ value: 'Alpha', count: 1 }],
+          }),
+      },
+      { searchParams: { slice: 'Missing-Slice' } },
+    );
+
+    await screen.findByText('Alpha');
+    expect(within(screen.getByTestId('empty-slices-list')).getByText('Missing-Slice')).toBeInTheDocument();
+
+    await userEvent.type(screen.getByPlaceholderText(/filter/i), 'alp');
+
+    await waitFor(() => expect(screen.queryByText('Missing-Slice')).not.toBeInTheDocument());
+    expect(screen.getByText('Empty slices (0)')).toBeInTheDocument();
+  });
+
+  it('refetches slices when selecting a slice', async () => {
+    const fetchSlices = jest.fn(() =>
+      Promise.resolve({
+        slices: [
+          { value: 'Alpha', count: 2 },
+          { value: 'Beta', count: 1 },
+        ],
+      }),
+    );
+    renderSUT({ fetchSlices });
+
+    await screen.findByText('Alpha');
+    expect(fetchSlices).toHaveBeenCalledTimes(1);
+
+    await userEvent.click(within(screen.getByTestId('slices-list')).getByRole('button', { name: /beta/i }));
+
+    await waitFor(() => expect(fetchSlices.mock.calls.length).toBeGreaterThanOrEqual(2));
   });
 });

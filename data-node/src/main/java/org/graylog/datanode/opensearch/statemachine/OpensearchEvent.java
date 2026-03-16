@@ -17,6 +17,7 @@
 package org.graylog.datanode.opensearch.statemachine;
 
 public enum OpensearchEvent {
+    PROCESS_CONFIGURATION_REMOVED,
     PROCESS_PREPARED,
     PROCESS_STARTED,
     HEALTH_CHECK_OK,

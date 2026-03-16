@@ -21,7 +21,6 @@ import userEvent from '@testing-library/user-event';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { GenericEntityType, LookupTable } from 'logic/lookup-tables/types';
 import { LOOKUP_TABLES, CACHES_MAP, ADAPTERS_MAP, ERROR_STATE } from 'components/lookup-tables/fixtures';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import { attributes } from './constants';
 import LookupTableList from './index';
@@ -82,14 +81,10 @@ jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
 }));
 
 const moreActionsName = { name: new RegExp(`More Actions for ${LOOKUP_TABLES[0].name}`, 'i') };
-const renderSUT = () =>
-  render(
-    <DefaultQueryParamProvider>
-      <LookupTableList />
-    </DefaultQueryParamProvider>,
-  );
 
 describe('Lookup Table List', () => {
+  const renderSUT = () => render(<LookupTableList />);
+
   it('should render a list of lookup tables', async () => {
     renderSUT();
 
@@ -123,7 +118,7 @@ describe('Lookup Table List', () => {
   it('should be able to edit a table', async () => {
     renderSUT();
 
-    userEvent.click(await screen.findByRole('button', moreActionsName));
+    await userEvent.click(await screen.findByRole('button', moreActionsName));
 
     await screen.findByRole('menuitem', { name: /edit/i });
   });
@@ -131,9 +126,9 @@ describe('Lookup Table List', () => {
   it('should be able to delete a table', async () => {
     renderSUT();
 
-    userEvent.click(await screen.findByRole('button', moreActionsName));
-    userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
-    userEvent.click(await screen.findByRole('button', { name: /delete/i }));
+    await userEvent.click(await screen.findByRole('button', moreActionsName));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /delete/i }));
 
     expect(mockDeleteLookupTable).toHaveBeenLastCalledWith(LOOKUP_TABLES[0].id);
   });

@@ -23,7 +23,7 @@ import ErrorsActions from 'actions/errors/ErrorsActions';
 import type { ReportedError } from 'logic/errors/ReportedErrors';
 import { createReactError, createUnauthorizedError, createNotFoundError } from 'logic/errors/ReportedErrors';
 import FetchError from 'logic/errors/FetchError';
-import { Link } from 'components/common/router';
+import { Link } from 'components/common';
 import useProductName, { DEFAULT_PRODUCT_NAME } from 'brand-customization/useProductName';
 import asMock from 'helpers/mocking/AsMock';
 
