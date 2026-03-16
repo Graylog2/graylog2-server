@@ -129,11 +129,11 @@ describe('MessageList', () => {
 
   const findTable = () => screen.findByRole('table');
 
-  const clickNextPageButton = () => {
+  const clickNextPageButton = async () => {
     const paginationListItem = screen.getByRole('listitem', { name: /next/i });
 
     const nextPageButton = within(paginationListItem).getByRole('button');
-    userEvent.click(nextPageButton);
+    await userEvent.click(nextPageButton);
   };
 
   const SimpleMessageList = ({

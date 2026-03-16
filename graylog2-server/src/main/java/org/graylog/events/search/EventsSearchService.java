@@ -22,6 +22,7 @@ import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
+import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiService;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedException;
@@ -41,12 +42,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.graylog.events.event.EventDto.FIELD_ALERT;
 import static org.graylog.events.event.EventDto.FIELD_PRIORITY;
+import static org.graylog.events.event.EventDto.FIELD_SCORES;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
 
 public class EventsSearchService extends AbstractEventsSearchService {
@@ -70,7 +73,7 @@ public class EventsSearchService extends AbstractEventsSearchService {
         return new EventsFilterBuilder(parameters).build();
     }
 
-    private Set<String> allowedEventStreams(Subject subject) {
+    public Set<String> allowedEventStreams(Subject subject) {
         final var eventStreams = defaultEventStreams();
         if (subject.isPermitted(RestPermissions.STREAMS_READ)) {
             return eventStreams;
@@ -81,100 +84,22 @@ public class EventsSearchService extends AbstractEventsSearchService {
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * returns the slices for the slice-by functionality for the Alerts/Events table. Used in the core Events/Alerts table
+     */
     public Slices slices(final EventsSlicesRequest request, final Subject subject, final SearchUser searchUser) {
-        // we cover two use cases, if you only want the slices from the resultset that will also be shown in the entity table, we re-use query and timerange for that. Otherwise, we query "all"
+        // we cover two use cases by the include_all flag: if you only want the slices calculated from the resultset that will also be shown in the entity table, we re-use query and timerange for that. Otherwise, we query the table for "all" possible slices
         final var query = request.includeAll() ? "" : request.query();
         final var timeRange = request.includeAll() ? RelativeRange.allTime() : request.timerange();
         final var filter = buildFilter(EventsSearchParameters.builder().query(query).timerange(timeRange).filter(request.filter()).build());
 
         final var queryString = filter.isEmpty() ? query : query.isEmpty() ? filter : query + " AND " + filter;
 
-        return slices(queryString, timeRange, subject, searchUser, request.sliceColumn(), request.includeAll());
+        return this.slices(queryString, timeRange, subject, searchUser, request.sliceColumn(), request.includeAll());
     }
 
     /**
-     * finding the overall count for one column for MongoDB based queries so we can calculate the "empty" case
-     */
-    public Optional<Slice> count(String query, TimeRange timeRange, Subject subject, SearchUser searchUser, final String slicingColumn) {
-        try {
-            return scriptingApiService.executeAggregation(
-                            new AggregationRequestSpec(query, allowedEventStreams(subject), Set.of(), timeRange, List.of(), List.of(new Metric("count", null))),
-                            searchUser
-                    )
-                    .datarows()
-                    .stream()
-                    .map(r -> new Slice(r.getFirst().toString(), r.getFirst().toString(), Integer.valueOf(r.getLast().toString())))
-                    .findFirst();
-        } catch (QueryFailedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * In the Open Source part, we only map priority and type, both of which are augmented in the FE regarding the title.
-     * So we only need a simple mapping function
-     * @param slicingColumn
-     * @param result
-     * @return Slice
-     */
-    Slice mapAggregationResultsToSlice(final String slicingColumn, final List<Object> result) {
-        return new Slice(result.getFirst().toString(), null, Integer.valueOf(result.getLast().toString()));
-    }
-
-    // the alert can either be true or false
-    List<Slice> handleAlertColumn(final List<Slice> slices) {
-        if(slices.size() == 2) {
-            return slices;
-        }
-
-        final var TRUE = new Slice( "true", null, 0);
-        final var FALSE = new Slice( "false", null, 0);
-
-        if(slices.isEmpty()) {
-            return List.of(TRUE, FALSE);
-        }
-
-        if(slices.getFirst().value().equals("true")) {
-            return List.of(slices.getFirst(), FALSE);
-        } else {
-            return List.of(TRUE, slices.getFirst());
-        }
-    }
-
-    // priority can be 1 (low) to 4 (critical), see EventDefinitionPriority.ts
-    List<Slice> handlePriorityColumn(final List<Slice> slices) {
-        if(slices.size() == 4) {
-            return slices;
-        }
-
-        final var LOW = new Slice( "1", null, 0);
-        final var MEDIUM = new Slice( "2", null, 0);
-        final var HIGH = new Slice( "3", null, 0);
-        final var CRITICAL = new Slice( "4", null, 0);
-
-        if(slices.isEmpty()) {
-            return List.of(LOW, MEDIUM, HIGH, CRITICAL);
-        }
-
-        List<Slice> fixedList = new ArrayList<>();
-        fixedList.add(slices.stream().filter(s -> s.value().equals(LOW.value())).findAny().orElse(LOW));
-        fixedList.add(slices.stream().filter(s -> s.value().equals(MEDIUM.value())).findAny().orElse(MEDIUM));
-        fixedList.add(slices.stream().filter(s -> s.value().equals(HIGH.value())).findAny().orElse(HIGH));
-        fixedList.add(slices.stream().filter(s -> s.value().equals(CRITICAL.value())).findAny().orElse(CRITICAL));
-
-        return fixedList;
-    }
-
-    private List<Slice> addMissingOptions(final List<Slice> slices, final String slicingColumn) {
-        return switch (slicingColumn) {
-            case FIELD_ALERT -> handleAlertColumn(slices);
-            case FIELD_PRIORITY -> handlePriorityColumn(slices);
-            default -> slices;
-        };
-    }
-
-    /**
-     * finding all slices for a particular column in the Indexer
+     * Used inside this service for the core Events/Alerts table but also is a provided method, re-used from the enterprise/security part of Graylog
      */
     public Slices slices(String query, TimeRange timeRange, Subject subject, SearchUser searchUser, final String slicingColumn, final boolean includeAll) {
         try {
@@ -189,12 +114,105 @@ public class EventsSearchService extends AbstractEventsSearchService {
 
             final var filtered = includeAll
                     ? addMissingOptions(slices, slicingColumn)
-                    : slices.stream().filter(s -> !"(Empty Value)".equals(s.value())).toList();
+                    : slices.stream().filter(s -> !MissingBucketConstants.MISSING_BUCKET_NAME.equals(s.value())).toList();
 
             return new Slices(filtered);
         } catch (QueryFailedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * finding the overall count for one column for MongoDB based queries so we can calculate the "empty" case
+     */
+    public Optional<Slice> count(String query, TimeRange timeRange, Subject subject, SearchUser searchUser, final String type) {
+        try {
+            return scriptingApiService.executeAggregation(
+                            new AggregationRequestSpec(query, allowedEventStreams(subject), Set.of(), timeRange, List.of(), List.of(new Metric("count", null))),
+                            searchUser
+                    )
+                    .datarows()
+                    .stream()
+                    .map(r -> new Slice(r.getFirst().toString(), r.getFirst().toString(), type, Integer.valueOf(r.getLast().toString())))
+                    .findFirst();
+        } catch (QueryFailedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String getTypeBySliceColumn(final String column) {
+        return switch (column) {
+            case FIELD_PRIORITY -> FIELD_PRIORITY;
+            case FIELD_ALERT ->  FIELD_ALERT;
+            default -> null;
+        };
+    }
+
+    /**
+     * In the Open Source part, we only map priority and type, both of which are augmented in the FE regarding the title.
+     * So we only need a simple mapping function here.
+     */
+    public Slice mapAggregationResultsToSlice(final String slicingColumn, final List<Object> result) {
+        return new Slice(result.getFirst().toString(), null, getTypeBySliceColumn(slicingColumn), Integer.valueOf(result.getLast().toString()));
+    }
+
+    // the alert can either be true or false
+    List<Slice> handleAlertColumn(final List<Slice> slices) {
+        final var type = getTypeBySliceColumn(FIELD_ALERT);
+
+        if (slices.size() == 2) {
+            return slices;
+        }
+
+        final var TRUE = new Slice("true", null, type, 0);
+        final var FALSE = new Slice("false", null, type, 0);
+
+        if (slices.isEmpty()) {
+            return List.of(TRUE, FALSE);
+        }
+
+        if (slices.getFirst().value().equals("true")) {
+            return List.of(slices.getFirst(), FALSE);
+        } else {
+            return List.of(TRUE, slices.getFirst());
+        }
+    }
+
+    // priority can be 0 (info) to 4 (critical), see EventDefinitionPriorityEnum.ts
+    List<Slice> handlePriorityColumn(final List<Slice> slices) {
+        final var type = getTypeBySliceColumn(FIELD_PRIORITY);
+
+        if (slices.size() == 5) {
+            return slices;
+        }
+
+	    final var INFO = new Slice("0", null, type, 0);
+        final var LOW = new Slice("1", null, type, 0);
+        final var MEDIUM = new Slice("2", null, type, 0);
+        final var HIGH = new Slice("3", null, type, 0);
+        final var CRITICAL = new Slice("4", null, type, 0);
+
+        if (slices.isEmpty()) {
+            return List.of(INFO, LOW, MEDIUM, HIGH, CRITICAL);
+        }
+
+        List<Slice> fixedList = new ArrayList<>();
+        fixedList.add(slices.stream().filter(s -> s.value().equals(INFO.value())).findAny().orElse(INFO));
+        fixedList.add(slices.stream().filter(s -> s.value().equals(LOW.value())).findAny().orElse(LOW));
+        fixedList.add(slices.stream().filter(s -> s.value().equals(MEDIUM.value())).findAny().orElse(MEDIUM));
+        fixedList.add(slices.stream().filter(s -> s.value().equals(HIGH.value())).findAny().orElse(HIGH));
+        fixedList.add(slices.stream().filter(s -> s.value().equals(CRITICAL.value())).findAny().orElse(CRITICAL));
+
+        return fixedList;
+    }
+
+    // when slicing, add missing keys that don't exist in the data but you still want to show with cardinality 0
+    public List<Slice> addMissingOptions(final List<Slice> slices, final String slicingColumn) {
+        return switch (slicingColumn) {
+            case FIELD_ALERT -> handleAlertColumn(slices);
+            case FIELD_PRIORITY -> handlePriorityColumn(slices);
+            default -> slices;
+        };
     }
 
     public EventsSearchResult search(EventsSearchParameters parameters, Subject subject) {

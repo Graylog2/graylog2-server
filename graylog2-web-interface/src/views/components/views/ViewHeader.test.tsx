@@ -58,6 +58,8 @@ const ViewHeader = () => (
   </TestStoreProvider>
 );
 
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+
 describe('ViewHeader', () => {
   beforeEach(() => {
     asMock(onSaveView).mockReturnValue(async () => {});
@@ -86,14 +88,14 @@ describe('ViewHeader', () => {
 
     const editButton = await screen.findByTitle('Edit dashboard Some view metadata');
 
-    await userEvent.click(editButton);
+    await setupUser().click(editButton);
     await screen.findByText('Editing saved dashboard', { exact: false });
 
     const titleInput = await screen.findByRole('textbox', { name: /title/i });
-    await userEvent.type(titleInput, ' updated');
+    await setupUser().type(titleInput, ' updated');
 
     const saveButton = await screen.findByRole('button', { name: /save dashboard/i });
-    await userEvent.click(saveButton);
+    await setupUser().click(saveButton);
 
     expect(onSaveView).toHaveBeenCalledWith(expect.objectContaining({ title: 'Some view updated' }));
     expect(updateView).toHaveBeenCalledWith(expect.objectContaining({ title: 'Some view updated' }));

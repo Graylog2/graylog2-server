@@ -62,13 +62,13 @@ describe('<FieldsOverview />', () => {
 
     expect(screen.queryByText('date')).not.toBeInTheDocument();
 
-    userEvent.click(allFields);
+    await userEvent.click(allFields);
 
     await screen.findByText('date');
     await screen.findByText('http_method');
 
     const currentQuery = await screen.findByRole('button', { name: /fields which occur in your current query/i });
-    userEvent.click(currentQuery);
+    await userEvent.click(currentQuery);
 
     await waitFor(() => {
       expect(screen.queryByText('date')).not.toBeInTheDocument();
@@ -81,7 +81,7 @@ describe('<FieldsOverview />', () => {
 
     await searchFor('http');
     const allFields = await screen.findByRole('button', { name: /this shows all fields, but no reserved/i });
-    userEvent.click(allFields);
+    await userEvent.click(allFields);
 
     await screen.findByText('http_method');
     await waitFor(() => {

@@ -53,7 +53,7 @@ export type InputDescriptions = {
 };
 
 type InputTypesStoreState = {
-  sourceUrl: string;
+  sourceUrl?: string;
   inputTypes?: InputTypes;
   inputDescriptions?: InputDescriptions;
 };
@@ -69,7 +69,7 @@ export const InputTypesStore = singletonStore('core.InputTypes', () =>
       this.list();
     },
 
-    getInitialState(): { inputTypes: InputTypes; inputDescriptions: InputDescriptions } {
+    getInitialState() {
       return { inputTypes: this.inputTypes, inputDescriptions: this.inputDescriptions };
     },
 

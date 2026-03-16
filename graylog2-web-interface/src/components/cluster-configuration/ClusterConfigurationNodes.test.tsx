@@ -29,6 +29,8 @@ jest.mock('components/common/PaginatedEntityTable', () => ({
   useTableFetchContext: jest.fn(),
 }));
 
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+
 describe('<ClusterConfigurationNodes />', () => {
   beforeEach(() => {
     jest.useFakeTimers();
@@ -57,7 +59,7 @@ describe('<ClusterConfigurationNodes />', () => {
 
     mockPaginatedEntityTable.mockClear();
 
-    await userEvent.click(screen.getByRole('radio', { name: 'Data Nodes' }));
+    await setupUser().click(screen.getByRole('radio', { name: 'Data Nodes' }));
 
     await waitFor(() => expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(1));
   });
@@ -70,7 +72,7 @@ describe('<ClusterConfigurationNodes />', () => {
 
     mockPaginatedEntityTable.mockClear();
 
-    await userEvent.click(screen.getByRole('radio', { name: 'Data Nodes' }));
+    await setupUser().click(screen.getByRole('radio', { name: 'Data Nodes' }));
 
     await waitFor(() => expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(1));
   });
@@ -83,7 +85,7 @@ describe('<ClusterConfigurationNodes />', () => {
 
     const searchInput = screen.getByPlaceholderText('Search nodes…');
 
-    await userEvent.type(searchInput, '  nodes  ');
+    await setupUser().type(searchInput, '  nodes  ');
     act(() => {
       jest.advanceTimersByTime(SEARCH_DEBOUNCE_THRESHOLD + 10);
     });

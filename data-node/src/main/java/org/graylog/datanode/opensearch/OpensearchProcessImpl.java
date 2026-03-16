@@ -204,6 +204,14 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         );
     }
 
+    @Override
+    public void removeConfiguration() {
+        LOG.info("Opensearch process is stopping now and removing configuration later");
+        stop();
+        LOG.info("Opensearch process has been stopped, removing configuration optional");
+        this.opensearchConfiguration = Optional.empty();
+    }
+
     @VisibleForTesting
     void checkConfiguredHeap() {
         Size heap = Size.parse(configuration.getOpensearchHeap());
@@ -313,6 +321,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     private void stopProcess() {
         if (this.commandLineProcess != null) {
             commandLineProcess.close();
+            this.commandLineProcess = null;
         }
     }
 
