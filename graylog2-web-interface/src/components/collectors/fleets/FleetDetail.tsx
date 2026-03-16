@@ -19,8 +19,9 @@ import { useState, useMemo, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import URI from 'urijs';
 
-import {Button, ButtonToolbar, Label, SegmentedControl} from 'components/bootstrap';
+import {Button, ButtonToolbar, DeleteMenuItem, Label, SegmentedControl} from 'components/bootstrap';
 import { LinkContainer, Spinner } from 'components/common';
+import { MoreActions } from 'components/common/EntityDataTable';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import useHistory from 'routing/useHistory';
 import useQuery from 'routing/useQuery';
@@ -135,11 +136,11 @@ const FleetDetail = ({ fleetId }: Props) => {
   const instanceActions = useCallback(
     (instance: CollectorInstanceView) => (
       <ButtonToolbar>
-        <Button bsStyle="link" bsSize="xs" onClick={() => setSelectedInstance(instance)}>
+        <Button bsSize="xsmall" onClick={() => setSelectedInstance(instance)}>
           Details
         </Button>
         <LinkContainer to={collectorLogsUrl(instance.instance_uid)}>
-          <Button bsStyle="link" bsSize="xs">
+          <Button bsSize="xsmall">
             View Logs
           </Button>
         </LinkContainer>
@@ -160,14 +161,14 @@ const FleetDetail = ({ fleetId }: Props) => {
 
   const sourceActions = useCallback(
     (source: Source) => (
-      <>
-        <Button bsStyle="link" bsSize="xs" onClick={() => setEditingSource(source)}>
+      <ButtonToolbar>
+        <Button bsSize="xsmall" onClick={() => setEditingSource(source)}>
           Edit
         </Button>
-        <Button bsStyle="link" bsSize="xs" onClick={() => handleDeleteSource(source)}>
-          Delete
-        </Button>
-      </>
+        <MoreActions>
+          <DeleteMenuItem onSelect={() => handleDeleteSource(source)} />
+        </MoreActions>
+      </ButtonToolbar>
     ),
     [handleDeleteSource],
   );

@@ -31,11 +31,11 @@ const useTableElements = ({ onInstanceClick }: Props) => {
   const entityActions = useCallback(
     (instance: CollectorInstanceView) => (
       <ButtonToolbar>
-        <Button bsStyle="link" bsSize="xs" onClick={() => onInstanceClick(instance)}>
+        <Button bsSize="xsmall" onClick={() => onInstanceClick(instance)}>
           Details
         </Button>
         <LinkContainer to={collectorLogsUrl(instance.instance_uid)}>
-          <Button bsStyle="link" bsSize="xs">
+          <Button bsSize="xsmall">
             View Logs
           </Button>
         </LinkContainer>
