@@ -24,7 +24,9 @@ const StyledCell = styled.td`
 `;
 // 'data-bulk-select-cell'
 const BulkSelectCell = ({ children = null }: React.PropsWithChildren) => (
-  <StyledCell onClick={(event) => event.stopPropagation()}>{children}</StyledCell>
+  <StyledCell data-bulk-select-cell onClick={(event) => event.stopPropagation()}>
+    {children}
+  </StyledCell>
 );
 
 export default BulkSelectCell;
