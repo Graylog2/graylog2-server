@@ -36,20 +36,27 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.inject.Inject;
 
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
 import java.util.Optional;
 
 public class SessionAuthenticator extends AuthenticatingRealm {
     private static final Logger LOG = LoggerFactory.getLogger(SessionAuthenticator.class);
     public static final String NAME = "mongodb-session";
     public static final String X_GRAYLOG_NO_SESSION_EXTENSION = "X-Graylog-No-Session-Extension";
+    private static final Duration TOUCH_INTERVAL = Duration.ofMinutes(1);
 
     private final UserService userService;
     private final ClusterConfigService clusterConfigService;
+    private final Clock clock;
 
     @Inject
-    SessionAuthenticator(UserService userService, ClusterConfigService clusterConfigService) {
+    SessionAuthenticator(UserService userService, ClusterConfigService clusterConfigService, Clock clock) {
         this.userService = userService;
         this.clusterConfigService = clusterConfigService;
+        this.clock = clock;
         // this realm either rejects a session, or allows the associated user implicitly
         setCredentialsMatcher(new AllowAllCredentialsMatcher());
         setAuthenticationTokenClass(SessionIdToken.class);
@@ -93,12 +100,27 @@ public class SessionAuthenticator extends AuthenticatingRealm {
         final Optional<String> noSessionExtension = ShiroRequestHeadersBinder.getHeaderFromThreadContext(X_GRAYLOG_NO_SESSION_EXTENSION);
         if (noSessionExtension.isPresent() && "true".equalsIgnoreCase(noSessionExtension.get())) {
             LOG.debug("Not extending session because the request indicated not to.");
-        } else {
+        } else if (shouldTouch(session)) {
             session.touch();
         }
         ThreadContext.bind(subject);
 
         return new SimpleAccount(user.getId(), null, "session authenticator");
+    }
+
+    private boolean shouldTouch(Session session) {
+        final Date lastAccessTime = session.getLastAccessTime();
+        if (lastAccessTime == null) {
+            return true;
+        }
+        final var elapsed = Duration.between(lastAccessTime.toInstant(), Instant.now(clock));
+        // A negative elapsed time indicates clock skew between cluster nodes.
+        // Treat that as stale so we touch the session and correct the timestamp to local time.
+        if (elapsed.isNegative()) {
+            LOG.warn("Session last access time is in the future (by {}). This may indicate clock skew between cluster nodes.", elapsed.abs());
+            return true;
+        }
+        return elapsed.compareTo(TOUCH_INTERVAL) >= 0;
     }
 
     private HTTPHeaderAuthConfig loadHTTPHeaderConfig() {

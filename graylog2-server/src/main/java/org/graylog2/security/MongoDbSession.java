@@ -161,4 +161,8 @@ public class MongoDbSession extends PersistedImpl {
     public String getSessionId() {
         return String.valueOf(fields.get(FIELD_SESSION_ID));
     }
+
+    public void setSessionId(String sessionId) {
+        fields.put(FIELD_SESSION_ID, sessionId);
+    }
 }

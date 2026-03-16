@@ -26,6 +26,8 @@ public interface MongoDBSessionService extends PersistedService {
     @Nullable
     MongoDbSession load(String sessionId);
 
+    void updateBySessionId(String sessionId, MongoDbSession session);
+
     Collection<MongoDbSession> loadAll();
     SimpleSession daoToSimpleSession(MongoDbSession mongoDbSession);
 }
