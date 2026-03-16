@@ -31,9 +31,6 @@ public class DataNodeEventService {
     @Inject
     public DataNodeEventService(EventBus eventBus, NotificationService notificationService) {
         this.notificationService = notificationService;
-        // NOTE: Intentionally uses the server EventBus (not ClusterEventBus) because
-        // DataNodeNotficationEvent originates from DataNode processes, not from a Graylog server.
-        // publishIfFirst() provides idempotency, so redundant delivery across nodes is harmless.
         eventBus.register(this);
     }
 
