@@ -176,16 +176,35 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         } else if (messages != null && !messages.isEmpty()) {
             final List<Message> processedMessages = Lists.newArrayListWithCapacity(messages.size());
             final long payloadLength = raw.getPayload().length;
-            boolean first = true;
 
             for (final Message msg : messages) {
-                // Avoid overcounting input traffic by only setting the input size for the first message.
-                final long inputSize = first ? payloadLength : 0L;
-                first = false;
-                final Message processedMessage = postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, msg, decodeTime, inputSize);
-
+                final Message processedMessage = postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, msg, decodeTime, 0L);
                 if (processedMessage != null) {
                     processedMessages.add(processedMessage);
+                }
+            }
+
+            // Distribute raw payload size proportionally based on decoded message sizes.
+            if (!processedMessages.isEmpty()) {
+                final long totalDecodedSize = processedMessages.stream()
+                        .mapToLong(Message::getSize)
+                        .sum();
+
+                long assignedSize = 0L;
+                for (int i = 0; i < processedMessages.size(); i++) {
+                    final Message msg = processedMessages.get(i);
+                    final long inputSize;
+                    if (i == processedMessages.size() - 1) {
+                        // Last message gets the remainder to avoid rounding errors.
+                        inputSize = payloadLength - assignedSize;
+                    } else if (totalDecodedSize > 0) {
+                        inputSize = payloadLength * msg.getSize() / totalDecodedSize;
+                    } else {
+                        // All messages have zero decoded size — distribute evenly.
+                        inputSize = payloadLength / processedMessages.size();
+                    }
+                    assignedSize += inputSize;
+                    msg.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, inputSize);
                 }
             }
 

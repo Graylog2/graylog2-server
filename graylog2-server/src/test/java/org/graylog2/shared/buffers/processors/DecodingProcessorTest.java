@@ -26,6 +26,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.codecs.Codec;
+import org.graylog2.plugin.inputs.codecs.MultiMessageCodec;
 import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.plugin.system.SimpleNodeId;
@@ -33,19 +34,22 @@ import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -67,9 +71,6 @@ class DecodingProcessorTest {
     @Mock
     private ServerStatus serverStatus;
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private MetricRegistry metricRegistry;
-
     @Mock
     private MessageQueueAcknowledger acknowledger;
 
@@ -79,12 +80,14 @@ class DecodingProcessorTest {
     @Captor
     private ArgumentCaptor<InputProcessingException> exceptionCaptor;
 
+    private final MetricRegistry metricRegistry = new MetricRegistry();
+    private final TestMessageFactory messageFactory = new TestMessageFactory();
     private DecodingProcessor processor;
 
     @BeforeEach
     void setUp() {
-        Timer decodeTimer = new Timer();
-        Timer parseTimer = new Timer();
+        final Timer decodeTimer = new Timer();
+        final Timer parseTimer = new Timer();
 
         processor = new DecodingProcessor(
                 Map.of(CODEC_NAME, codecFactory),
@@ -101,15 +104,21 @@ class DecodingProcessorTest {
         when(codecFactory.create(any(Configuration.class))).thenReturn(codec);
     }
 
+    private void setUpRecordingStrategy() {
+        lenient().when(serverStatus.getDetailedMessageRecordingStrategy())
+                .thenReturn(ServerStatus.MessageDetailRecordingStrategy.NEVER);
+    }
+
+    // --- Single-message codec tests (from upstream PR #25025) ---
+
     @Test
     void validMessageIsDecodedAndSetOnEvent() throws Exception {
         setUpCodecFactory();
-        when(serverStatus.getDetailedMessageRecordingStrategy())
-                .thenReturn(ServerStatus.MessageDetailRecordingStrategy.NEVER);
-        Message decoded = new TestMessageFactory().createMessage("message", "source", Tools.nowUTC());
+        setUpRecordingStrategy();
+        final Message decoded = messageFactory.createMessage("message", "source", Tools.nowUTC());
         when(codec.decodeSafe(any(RawMessage.class))).thenReturn(Optional.of(decoded));
 
-        MessageEvent event = createEvent("valid-payload");
+        final MessageEvent event = createEvent("valid-payload");
         assertThat(event.getMessage()).isNull();
 
         processor.onEvent(event, 0, true);
@@ -125,8 +134,8 @@ class DecodingProcessorTest {
         final String errorMessage = "GELF message is missing mandatory 'short_message' field.";
         final String payload = "invalid-gelf";
 
-        RawMessage rawMessage = createRawMessage(payload);
-        InputProcessingException exception = InputProcessingException.create(
+        final RawMessage rawMessage = createRawMessage(payload);
+        final InputProcessingException exception = InputProcessingException.create(
                 errorMessage,
                 new IllegalArgumentException("Missing field: short_message"),
                 rawMessage,
@@ -135,14 +144,14 @@ class DecodingProcessorTest {
 
         when(codec.decodeSafe(any(RawMessage.class))).thenThrow(exception);
 
-        MessageEvent event = new MessageEvent();
+        final MessageEvent event = new MessageEvent();
         event.setRaw(rawMessage);
 
         processor.onEvent(event, 0, true);
 
         verify(failureSubmissionService).submitInputFailure(exceptionCaptor.capture(), eq(INPUT_ID));
 
-        InputProcessingException captured = exceptionCaptor.getValue();
+        final InputProcessingException captured = exceptionCaptor.getValue();
         assertThat(captured.getMessage()).isEqualTo(errorMessage);
         assertThat(captured.getRawMessage()).isSameAs(rawMessage);
         assertThat(captured.getRawMessage().getPayload()).isEqualTo(payload.getBytes(StandardCharsets.UTF_8));
@@ -154,7 +163,7 @@ class DecodingProcessorTest {
     @Test
     void runtimeExceptionIsSubmittedAsFailure() throws Exception {
         setUpCodecFactory();
-        RawMessage rawMessage = createRawMessage("payload");
+        final RawMessage rawMessage = createRawMessage("payload");
 
         final String exceptionMessage = "Unable to decode raw message due to an unexpected error.";
         final String exceptionCause = "unexpected codec error.";
@@ -162,14 +171,14 @@ class DecodingProcessorTest {
         when(codec.decodeSafe(any(RawMessage.class)))
                 .thenThrow(new RuntimeException(exceptionCause));
 
-        MessageEvent event = new MessageEvent();
+        final MessageEvent event = new MessageEvent();
         event.setRaw(rawMessage);
 
         processor.onEvent(event, 0, true);
 
         verify(failureSubmissionService).submitInputFailure(exceptionCaptor.capture(), eq(INPUT_ID));
 
-        InputProcessingException captured = exceptionCaptor.getValue();
+        final InputProcessingException captured = exceptionCaptor.getValue();
         assertThat(captured.getMessage()).isEqualTo(exceptionMessage);
         assertThat(captured.getCause()).isInstanceOf(RuntimeException.class);
         assertThat(captured.getCause().getMessage()).isEqualTo(exceptionCause);
@@ -180,10 +189,10 @@ class DecodingProcessorTest {
 
     @Test
     void missingCodecFactorySkipsMessageWithoutFailure() throws Exception {
-        RawMessage rawMessage = createRawMessage("payload");
+        final RawMessage rawMessage = createRawMessage("payload");
         rawMessage.setCodecName("unknown-codec");
 
-        MessageEvent event = new MessageEvent();
+        final MessageEvent event = new MessageEvent();
         event.setRaw(rawMessage);
 
         processor.onEvent(event, 0, true);
@@ -194,14 +203,148 @@ class DecodingProcessorTest {
         verify(acknowledger).acknowledge(rawMessage.getMessageQueueId());
     }
 
+    // --- Multi-message codec tests ---
+
+    @Test
+    void multiMessageCodecDistributesInputSizeProportionally() throws Exception {
+        setUpRecordingStrategy();
+        final MultiMessageCodec multiCodec = setUpMultiMessageCodec();
+
+        // 1000-byte payload decoded into 3 messages with different content sizes
+        final byte[] payload = new byte[1000];
+        final RawMessage raw = createRawMessage(payload);
+
+        final Message msg1 = messageFactory.createMessage("short", "source", Tools.nowUTC());
+        final Message msg2 = messageFactory.createMessage("a medium length message", "source", Tools.nowUTC());
+        final Message msg3 = messageFactory.createMessage("this is a significantly longer message with more content for testing", "source", Tools.nowUTC());
+
+        when(multiCodec.decodeMessages(any(RawMessage.class))).thenReturn(List.of(msg1, msg2, msg3));
+
+        final MessageEvent event = new MessageEvent();
+        event.setRaw(raw);
+
+        processor.onEvent(event, 0, true);
+
+        final Collection<Message> result = event.getMessages();
+        assertThat(result).hasSize(3);
+
+        final List<Message> resultList = List.copyOf(result);
+        for (final Message msg : resultList) {
+            assertThat((Long) msg.getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE))
+                    .as("Each message should have a positive input size")
+                    .isGreaterThan(0L);
+        }
+
+        // Total assigned input size must equal the original payload length
+        final long totalInputSize = resultList.stream()
+                .mapToLong(m -> (Long) m.getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE))
+                .sum();
+        assertThat(totalInputSize).isEqualTo(payload.length);
+
+        // Larger messages should get a larger share of the input size
+        final long size1 = (Long) resultList.get(0).getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE);
+        final long size2 = (Long) resultList.get(1).getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE);
+        final long size3 = (Long) resultList.get(2).getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE);
+        assertThat(size1).isLessThan(size2);
+        assertThat(size2).isLessThan(size3);
+    }
+
+    @Test
+    void multiMessageCodecWithTwoEqualMessagesDistributesEvenly() throws Exception {
+        setUpRecordingStrategy();
+        final MultiMessageCodec multiCodec = setUpMultiMessageCodec();
+
+        final byte[] payload = new byte[500];
+        final RawMessage raw = createRawMessage(payload);
+
+        final Message msg1 = messageFactory.createMessage("same message", "source", Tools.nowUTC());
+        final Message msg2 = messageFactory.createMessage("same message", "source", Tools.nowUTC());
+
+        when(multiCodec.decodeMessages(any(RawMessage.class))).thenReturn(List.of(msg1, msg2));
+
+        final MessageEvent event = new MessageEvent();
+        event.setRaw(raw);
+
+        processor.onEvent(event, 0, true);
+
+        final List<Message> resultList = List.copyOf(event.getMessages());
+        assertThat(resultList).hasSize(2);
+
+        final long size1 = (Long) resultList.get(0).getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE);
+        final long size2 = (Long) resultList.get(1).getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE);
+
+        assertThat(size1 + size2).isEqualTo(500L);
+        assertThat(size1).isEqualTo(size2);
+    }
+
+    @Test
+    void singleMessageCodecAssignsFullPayloadSize() throws Exception {
+        setUpCodecFactory();
+        setUpRecordingStrategy();
+
+        final byte[] payload = new byte[750];
+        final RawMessage raw = createRawMessage(payload);
+
+        final Message msg = messageFactory.createMessage("test", "source", Tools.nowUTC());
+        when(codec.decodeSafe(any(RawMessage.class))).thenReturn(Optional.of(msg));
+
+        final MessageEvent event = new MessageEvent();
+        event.setRaw(raw);
+
+        processor.onEvent(event, 0, true);
+
+        assertThat(event.getMessage()).isNotNull();
+        assertThat((Long) event.getMessage().getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE))
+                .isEqualTo(750L);
+    }
+
+    @Test
+    void multiMessageCodecWithSingleMessageAssignsFullPayloadSize() throws Exception {
+        setUpRecordingStrategy();
+        final MultiMessageCodec multiCodec = setUpMultiMessageCodec();
+
+        final byte[] payload = new byte[300];
+        final RawMessage raw = createRawMessage(payload);
+
+        final Message msg = messageFactory.createMessage("only message", "source", Tools.nowUTC());
+        when(multiCodec.decodeMessages(any(RawMessage.class))).thenReturn(List.of(msg));
+
+        final MessageEvent event = new MessageEvent();
+        event.setRaw(raw);
+
+        processor.onEvent(event, 0, true);
+
+        final List<Message> resultList = List.copyOf(event.getMessages());
+        assertThat(resultList).hasSize(1);
+        assertThat((Long) resultList.get(0).getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE))
+                .isEqualTo(300L);
+    }
+
+    // --- Helpers ---
+
+    /**
+     * Sets up the codec factory to return a MultiMessageCodec mock.
+     * Returns the mock so tests can configure decodeMessages().
+     */
+    private MultiMessageCodec setUpMultiMessageCodec() {
+        final MultiMessageCodec multiCodec = mock(MultiMessageCodec.class);
+        lenient().when(multiCodec.getConfiguration()).thenReturn(Configuration.EMPTY_CONFIGURATION);
+        when(codecFactory.create(any(Configuration.class))).thenReturn(multiCodec);
+        return multiCodec;
+    }
+
     private MessageEvent createEvent(String payload) {
-        MessageEvent event = new MessageEvent();
+        final MessageEvent event = new MessageEvent();
         event.setRaw(createRawMessage(payload));
         return event;
     }
 
     private RawMessage createRawMessage(String payload) {
-        RawMessage raw = new RawMessage(payload.getBytes(StandardCharsets.UTF_8));
+        return createRawMessage(payload.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private RawMessage createRawMessage(byte[] payload) {
+        final RawMessage raw = new RawMessage(payload);
         raw.setCodecName(CODEC_NAME);
         raw.setCodecConfig(Configuration.EMPTY_CONFIGURATION);
         raw.addSourceNode(INPUT_ID, new SimpleNodeId(NODE_ID));
