@@ -29,7 +29,7 @@ public class ObjectSchemaWithOptionalSupport extends ObjectSchema {
         if (property.getType().isTypeOrSubTypeOf(Optional.class)) {
             jsonSchema.setRequired(false);
         }
-        if (property.getAnnotation(Nullable.class) != null) {
+        if (property.getType().getRawClass().isAnnotationPresent(Nullable.class)) {
             jsonSchema.setRequired(false);
         }
         super.putOptionalProperty(property, jsonSchema);

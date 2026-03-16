@@ -21,7 +21,7 @@ export type Fleet = {
   id: string;
   name: string;
   description?: string;
-  target_version?: string;
+  target_version: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -106,13 +106,13 @@ export type IngestEndpointConfig = {
   enabled: boolean;
   hostname: string;
   port: number;
-  input_id?: string;
+  input_id: string | null;
 };
 
 export type CollectorsConfig = {
-  opamp_ca_id?: string;
-  token_signing_cert_id?: string;
-  otlp_server_cert_id?: string;
+  opamp_ca_id: string | null;
+  token_signing_cert_id: string | null;
+  otlp_server_cert_id: string | null;
   http: IngestEndpointConfig;
   grpc: IngestEndpointConfig;
   collector_offline_threshold: string;

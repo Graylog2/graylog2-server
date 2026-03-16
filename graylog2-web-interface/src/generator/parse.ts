@@ -176,16 +176,7 @@ function createType(rawTypeDefinition: RawType): Type {
 
     const properties = typeDefinition.properties
       ? Object.fromEntries(
-          Object.entries(typeDefinition.properties).map(([propName, propType]) => {
-            const type = createType(propType);
-            const isRequired = 'required' in propType ? propType.required !== false : true;
-
-            if (!isRequired && type.type === 'type_reference') {
-              return [propName, { ...type, optional: true }];
-            }
-
-            return [propName, type];
-          }),
+          Object.entries(typeDefinition.properties).map(([propName, propType]) => [propName, createType(propType)]),
         )
       : {};
 
