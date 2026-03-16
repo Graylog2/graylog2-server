@@ -19,6 +19,7 @@ package org.graylog2.shared.buffers.processors;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import org.graylog.failure.FailureSubmissionService;
+import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.TestMessageFactory;
@@ -250,34 +251,6 @@ class DecodingProcessorTest {
     }
 
     @Test
-    void multiMessageCodecWithTwoEqualMessagesDistributesEvenly() throws Exception {
-        setUpRecordingStrategy();
-        final MultiMessageCodec multiCodec = setUpMultiMessageCodec();
-
-        final byte[] payload = new byte[500];
-        final RawMessage raw = createRawMessage(payload);
-
-        final Message msg1 = messageFactory.createMessage("same message", "source", Tools.nowUTC());
-        final Message msg2 = messageFactory.createMessage("same message", "source", Tools.nowUTC());
-
-        when(multiCodec.decodeMessages(any(RawMessage.class))).thenReturn(List.of(msg1, msg2));
-
-        final MessageEvent event = new MessageEvent();
-        event.setRaw(raw);
-
-        processor.onEvent(event, 0, true);
-
-        final List<Message> resultList = List.copyOf(event.getMessages());
-        assertThat(resultList).hasSize(2);
-
-        final long size1 = (Long) resultList.get(0).getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE);
-        final long size2 = (Long) resultList.get(1).getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE);
-
-        assertThat(size1 + size2).isEqualTo(500L);
-        assertThat(size1).isEqualTo(size2);
-    }
-
-    @Test
     void singleMessageCodecAssignsFullPayloadSize() throws Exception {
         setUpCodecFactory();
         setUpRecordingStrategy();
@@ -340,6 +313,115 @@ class DecodingProcessorTest {
         assertThat(event.getMessage()).isNotNull();
         assertThat((Long) event.getMessage().getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE))
                 .isEqualTo(300L);
+    }
+
+    // --- Traffic accounting tests ---
+
+    @Test
+    void singleMessageCodecIncrementsDecodedTrafficCounter() throws Exception {
+        setUpCodecFactory();
+        setUpRecordingStrategy();
+
+        final byte[] payload = "hello world test message".getBytes(StandardCharsets.UTF_8);
+        final RawMessage raw = createRawMessage(payload);
+
+        final Message msg = messageFactory.createMessage("decoded content", "source", Tools.nowUTC());
+        when(codec.decodeSafe(any(RawMessage.class))).thenReturn(Optional.of(msg));
+
+        final long decodedTrafficBefore = metricRegistry.counter(GlobalMetricNames.DECODED_TRAFFIC).getCount();
+
+        final MessageEvent event = new MessageEvent();
+        event.setRaw(raw);
+
+        processor.onEvent(event, 0, true);
+
+        final long decodedTrafficAfter = metricRegistry.counter(GlobalMetricNames.DECODED_TRAFFIC).getCount();
+
+        assertThat(event.getMessage()).isNotNull();
+        assertThat(decodedTrafficAfter - decodedTrafficBefore).isEqualTo(event.getMessage().getSize());
+    }
+
+    @Test
+    void singleMessageCodecAccountedSizeReflectsDecodedContent() throws Exception {
+        setUpCodecFactory();
+        setUpRecordingStrategy();
+
+        final byte[] payload = new byte[500];
+        final RawMessage raw = createRawMessage(payload);
+
+        final Message msg = messageFactory.createMessage("test content for accounting", "test-source", Tools.nowUTC());
+        when(codec.decodeSafe(any(RawMessage.class))).thenReturn(Optional.of(msg));
+
+        final MessageEvent event = new MessageEvent();
+        event.setRaw(raw);
+
+        processor.onEvent(event, 0, true);
+
+        assertThat(event.getMessage()).isNotNull();
+        final long accountedSize = event.getMessage().getSize();
+        assertThat(accountedSize)
+                .as("Accounted size should be positive and reflect decoded field content, not raw payload size")
+                .isGreaterThan(0L)
+                .isNotEqualTo(500L);
+    }
+
+    @Test
+    void multiMessageCodecIncrementsDecodedTrafficBySumOfMessageSizes() throws Exception {
+        setUpRecordingStrategy();
+        final MultiMessageCodec multiCodec = setUpMultiMessageCodec();
+
+        final byte[] payload = new byte[600];
+        final RawMessage raw = createRawMessage(payload);
+
+        final Message msg1 = messageFactory.createMessage("short", "source", Tools.nowUTC());
+        final Message msg2 = messageFactory.createMessage("a longer message with more content", "source", Tools.nowUTC());
+
+        when(multiCodec.decodeMessages(any(RawMessage.class))).thenReturn(List.of(msg1, msg2));
+
+        final long decodedTrafficBefore = metricRegistry.counter(GlobalMetricNames.DECODED_TRAFFIC).getCount();
+
+        final MessageEvent event = new MessageEvent();
+        event.setRaw(raw);
+
+        processor.onEvent(event, 0, true);
+
+        final long decodedTrafficAfter = metricRegistry.counter(GlobalMetricNames.DECODED_TRAFFIC).getCount();
+        final long expectedTrafficIncrease = event.getMessages().stream()
+                .mapToLong(Message::getSize)
+                .sum();
+
+        assertThat(decodedTrafficAfter - decodedTrafficBefore).isEqualTo(expectedTrafficIncrease);
+    }
+
+    @Test
+    void multiMessageCodecWithInputMessageSizeUsesEffectiveSize() throws Exception {
+        setUpRecordingStrategy();
+        final MultiMessageCodec multiCodec = setUpMultiMessageCodec();
+
+        final byte[] payload = new byte[1000];
+        final RawMessage raw = createRawMessage(payload);
+        raw.setInputMessageSize(500);
+
+        final Message msg1 = messageFactory.createMessage("same message", "source", Tools.nowUTC());
+        final Message msg2 = messageFactory.createMessage("same message", "source", Tools.nowUTC());
+
+        when(multiCodec.decodeMessages(any(RawMessage.class))).thenReturn(List.of(msg1, msg2));
+
+        final MessageEvent event = new MessageEvent();
+        event.setRaw(raw);
+
+        processor.onEvent(event, 0, true);
+
+        final List<Message> resultList = List.copyOf(event.getMessages());
+        assertThat(resultList).hasSize(2);
+
+        final long size1 = (Long) resultList.get(0).getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE);
+        final long size2 = (Long) resultList.get(1).getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE);
+
+        assertThat(size1 + size2)
+                .as("Distribution should use inputMessageSize (500), not payload length (1000)")
+                .isEqualTo(500L);
+        assertThat(size1).isEqualTo(size2);
     }
 
     // --- Helpers ---

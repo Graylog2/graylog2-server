@@ -139,6 +139,31 @@ class OTelLogsServiceTest {
         assertThat(totalAssigned).isLessThanOrEqualTo(request.getSerializedSize());
     }
 
+    @Test
+    void exportWithSingleLogRecordAssignsFullRequestSize() {
+        final ExportLogsServiceRequest request = ExportLogsServiceRequest.newBuilder()
+                .addResourceLogs(ResourceLogs.newBuilder()
+                        .setResource(Resource.newBuilder()
+                                .addAttributes(KeyValue.newBuilder()
+                                        .setKey("service.name")
+                                        .setValue(AnyValue.newBuilder().setStringValue("test-service"))))
+                        .addScopeLogs(ScopeLogs.newBuilder()
+                                .setScope(InstrumentationScope.newBuilder().setName("test-scope"))
+                                .addLogRecords(LogRecord.newBuilder()
+                                        .setBody(AnyValue.newBuilder().setStringValue("single log message")))))
+                .build();
+
+        logsService.export(request, responseObserver);
+
+        final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
+        verify(input).processRawMessage(captor.capture());
+
+        final RawMessage captured = captor.getValue();
+        assertThat(captured.getInputMessageSize())
+                .as("Single log record should get the full request serialized size")
+                .isEqualTo(request.getSerializedSize());
+    }
+
     private OTelJournal.Record parseJournalRecord(byte[] payload) {
         try {
             return OTelJournal.Record.parseFrom(payload);
