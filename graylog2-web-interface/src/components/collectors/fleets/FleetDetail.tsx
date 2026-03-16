@@ -21,7 +21,7 @@ import moment from 'moment';
 import styled, { css } from 'styled-components';
 import URI from 'urijs';
 
-import {Button, ButtonToolbar, DeleteMenuItem, Label, SegmentedControl} from 'components/bootstrap';
+import {Button, ButtonToolbar, DeleteMenuItem, Label, MenuItem, SegmentedControl} from 'components/bootstrap';
 import { LinkContainer, Spinner } from 'components/common';
 import { MoreActions } from 'components/common/EntityDataTable';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
@@ -36,6 +36,8 @@ import collectorLogsUrl from '../common/collectorLogsUrl';
 import { useFleet, useFleetStats, useSources, fetchPaginatedSources, sourcesKeyFn, fetchPaginatedInstances, instancesKeyFn, useCollectorsMutations, useCollectorsConfig } from '../hooks';
 import StatCard from '../common/StatCard';
 import { InstanceDetailDrawer } from '../instances';
+import BulkActions from '../instances/BulkActions';
+import ReassignFleetModal from '../instances/ReassignFleetModal';
 import instanceColumnRenderers from '../instances/ColumnRenderers';
 import { DEFAULT_LAYOUT as INSTANCES_LAYOUT } from '../instances/Constants';
 import sourceColumnRenderers from '../sources/ColumnRenderers';
@@ -83,6 +85,7 @@ const FleetDetail = ({ fleetId }: Props) => {
   const [showSourceModal, setShowSourceModal] = useState(false);
   const [editingSource, setEditingSource] = useState<Source | null>(null);
   const [selectedInstance, setSelectedInstance] = useState<CollectorInstanceView | null>(null);
+  const [reassigningInstance, setReassigningInstance] = useState<CollectorInstanceView | null>(null);
 
   const { tab: tabParam } = useQuery();
   const history = useHistory();
@@ -159,6 +162,11 @@ const FleetDetail = ({ fleetId }: Props) => {
             View Logs
           </Button>
         </LinkContainer>
+        <MoreActions>
+          <MenuItem onSelect={() => setReassigningInstance(instance)}>
+            Reassign to fleet
+          </MenuItem>
+        </MoreActions>
       </ButtonToolbar>
     ),
     [],
@@ -260,6 +268,7 @@ const FleetDetail = ({ fleetId }: Props) => {
           entityAttributesAreCamelCase={false}
           columnRenderers={instanceRenderers}
           defaultFilters={defaultInstanceFilters}
+          bulkSelection={{ actions: <BulkActions /> }}
         />
       )}
 
@@ -301,6 +310,14 @@ const FleetDetail = ({ fleetId }: Props) => {
           sources={getSourcesForInstance(selectedInstance)}
           fleetName={fleetNames[selectedInstance.fleet_id] || selectedInstance.fleet_id}
           onClose={() => setSelectedInstance(null)}
+        />
+      )}
+
+      {reassigningInstance && (
+        <ReassignFleetModal
+          instanceUids={[reassigningInstance.instance_uid]}
+          currentFleetId={reassigningInstance.fleet_id}
+          onClose={() => setReassigningInstance(null)}
         />
       )}
     </div>
