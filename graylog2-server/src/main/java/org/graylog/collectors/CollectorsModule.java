@@ -45,6 +45,8 @@ import org.graylog.collectors.input.transport.CollectorIngestGrpcTransport;
 import org.graylog.collectors.input.transport.CollectorIngestHttpTransport;
 import org.graylog.collectors.input.transport.CollectorIngestLogsService;
 import org.graylog.collectors.migrations.V20260303120000_ConvertCollectorInstanceFleetIdToObjectId;
+import org.graylog.collectors.migrations.V20260316000000_MigrateCollectorsData;
+import org.graylog.collectors.periodical.PurgeExpiredCollectorInstancesPeriodical;
 import org.graylog.collectors.rest.CollectorInstancesResource;
 import org.graylog.collectors.rest.CollectorsConfigResource;
 import org.graylog.collectors.rest.FleetPermissions;
@@ -107,8 +109,12 @@ public class CollectorsModule extends PluginModule {
         addSystemRestResource(SourceResource.class);
         addSystemRestResource(CollectorsActivityResource.class);
 
+        // Periodicals
+        addPeriodical(PurgeExpiredCollectorInstancesPeriodical.class);
+
         // Migrations
         addMigration(V20260303120000_ConvertCollectorInstanceFleetIdToObjectId.class);
+        addMigration(V20260316000000_MigrateCollectorsData.class);
 
         // Fleet permissions
         addPermissions(FleetPermissions.class);

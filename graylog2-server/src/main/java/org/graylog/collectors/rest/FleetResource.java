@@ -45,11 +45,13 @@ import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.collectors.CollectorInstanceService;
+import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.SourceService;
 import org.graylog.collectors.db.FleetDTO;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
@@ -80,18 +82,18 @@ public class FleetResource extends RestResource {
             .sort(Sorting.create("name", Sorting.Direction.ASC))
             .build();
 
-    private static final Duration ONLINE_THRESHOLD = Duration.ofMinutes(5);
-
     private final FleetService fleetService;
     private final CollectorInstanceService instanceService;
     private final SourceService sourceService;
+    private final ClusterConfigService clusterConfigService;
 
     @Inject
     public FleetResource(FleetService fleetService, CollectorInstanceService instanceService,
-                         SourceService sourceService) {
+                         SourceService sourceService, ClusterConfigService clusterConfigService) {
         this.fleetService = fleetService;
         this.instanceService = instanceService;
         this.sourceService = sourceService;
+        this.clusterConfigService = clusterConfigService;
     }
 
     @GET
@@ -144,7 +146,7 @@ public class FleetResource extends RestResource {
     public BulkFleetStatsResponse bulkStats() {
         final var fleets = fleetService.getAllFleets();
         final var instanceCounts = instanceService.countByFleetGrouped(
-                Instant.now().minus(ONLINE_THRESHOLD));
+                Instant.now().minus(getOfflineThreshold()));
         final var sourceCountByFleet = sourceService.countByFleetGrouped();
 
         final List<BulkFleetStatsResponse.FleetStatsSummary> summaries = fleets.stream()
@@ -175,7 +177,7 @@ public class FleetResource extends RestResource {
         }
         final long totalInstances = instanceService.countByFleet(fleetId);
         final long onlineInstances = instanceService.countOnlineByFleet(fleetId,
-                Instant.now().minus(ONLINE_THRESHOLD));
+                Instant.now().minus(getOfflineThreshold()));
         final long totalSources = sourceService.countByFleet(fleetId);
         return new FleetStatsResponse(totalInstances, onlineInstances,
                 totalInstances - onlineInstances, totalSources);
@@ -224,5 +226,10 @@ public class FleetResource extends RestResource {
         if (!fleetService.delete(fleetId)) {
             throw new NotFoundException("Fleet " + fleetId + " not found");
         }
+    }
+
+    private Duration getOfflineThreshold() {
+        return clusterConfigService.getOrDefault(CollectorsConfig.class, CollectorsConfig.DEFAULT)
+                .collectorOfflineThreshold();
     }
 }

@@ -38,10 +38,11 @@ import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.pagination.MongoPaginationHelper;
-import org.graylog2.search.SearchQuery;
 import org.mongojack.Id;
 
+import java.time.Duration;
 import java.time.Instant;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -83,7 +84,8 @@ public class CollectorInstanceService {
                         FIELD_IDENTIFYING_ATTRIBUTES + ".value")),
                 new IndexModel(Indexes.ascending(FIELD_NON_IDENTIFYING_ATTRIBUTES + ".key",
                         FIELD_NON_IDENTIFYING_ATTRIBUTES + ".value")),
-                new IndexModel(Indexes.ascending(FIELD_CERTIFICATE_FINGERPRINT), new IndexOptions().unique(true))
+                new IndexModel(Indexes.ascending(FIELD_CERTIFICATE_FINGERPRINT), new IndexOptions().unique(true)),
+                new IndexModel(Indexes.ascending(FIELD_LAST_SEEN))
         ));
     }
 
@@ -97,7 +99,7 @@ public class CollectorInstanceService {
         final List<Bson> updateOps = new ArrayList<>();
 
         updateOps.add(setOnInsert(FIELD_INSTANCE_UID, update.instanceUid()));
-        updateOps.add(set(FIELD_LAST_SEEN, update.lastSeen()));
+        updateOps.add(set(FIELD_LAST_SEEN, Date.from(update.lastSeen())));
         updateOps.add(set(FIELD_MESSAGE_SEQ_NUM, update.messageSeqNum()));
         updateOps.add(set(FIELD_CAPABILITIES, update.capabilities()));
         if (update.lastProcessedTxnSeq().isPresent()) {
@@ -158,6 +160,15 @@ public class CollectorInstanceService {
         );
     }
 
+    public boolean deleteByInstanceUid(String instanceUid) {
+        return collection.deleteOne(Filters.eq(FIELD_INSTANCE_UID, instanceUid)).getDeletedCount() > 0;
+    }
+
+    public long deleteExpired(Duration expirationThreshold) {
+        final Date cutoff = Date.from(Instant.now().minus(expirationThreshold));
+        return collection.deleteMany(Filters.lt(FIELD_LAST_SEEN, cutoff)).getDeletedCount();
+    }
+
     public PaginatedList<CollectorInstanceDTO> findPaginated(Bson query, DbSortResolver.ResolvedSort resolvedSort,
                                                               int page, int perPage) {
         return paginationHelper
@@ -174,7 +185,7 @@ public class CollectorInstanceService {
     }
 
     public long countOnline(Instant onlineThreshold) {
-        return collection.countDocuments(Filters.gte(FIELD_LAST_SEEN, onlineThreshold));
+        return collection.countDocuments(Filters.gte(FIELD_LAST_SEEN, Date.from(onlineThreshold)));
     }
 
     public long countByFleet(String fleetId) {
@@ -184,7 +195,7 @@ public class CollectorInstanceService {
     public long countOnlineByFleet(String fleetId, Instant onlineThreshold) {
         return collection.countDocuments(Filters.and(
                 Filters.eq(CollectorInstanceDTO.FIELD_FLEET_ID, fleetId),
-                Filters.gte(FIELD_LAST_SEEN, onlineThreshold)
+                Filters.gte(FIELD_LAST_SEEN, Date.from(onlineThreshold))
         ));
     }
 
@@ -194,7 +205,7 @@ public class CollectorInstanceService {
                         Accumulators.sum("total", 1L),
                         Accumulators.sum("online",
                                 new Document("$cond", List.of(
-                                        new Document("$gte", List.of("$" + FIELD_LAST_SEEN, onlineThreshold)),
+                                        new Document("$gte", List.of("$" + FIELD_LAST_SEEN, Date.from(onlineThreshold))),
                                         1L,
                                         0L
                                 ))

@@ -21,7 +21,6 @@ import org.graylog2.plugin.security.Permission;
 import org.graylog2.plugin.security.PluginPermissions;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.graylog2.plugin.security.Permission.create;
 
@@ -36,6 +35,8 @@ public class FleetPermissions implements PluginPermissions {
     public static final String SOURCE_EDIT = "collectors_sources:edit";
     public static final String SOURCE_DELETE = "collectors_sources:delete";
 
+    public static final String INSTANCE_DELETE = "collectors_instances:delete";
+
     private static final ImmutableSet<Permission> PERMISSIONS = ImmutableSet.of(
             create(FLEET_CREATE, "Create a new fleet"),
             create(FLEET_READ, "Read fleet details"),
@@ -44,7 +45,8 @@ public class FleetPermissions implements PluginPermissions {
             create(SOURCE_CREATE, "Create a new source in a fleet"),
             create(SOURCE_READ, "Read a source details in a fleet"),
             create(SOURCE_EDIT, "Edit a source details in a fleet"),
-            create(SOURCE_DELETE, "Delete a source from a fleet")
+            create(SOURCE_DELETE, "Delete a source from a fleet"),
+            create(INSTANCE_DELETE, "Delete a collector instance")
     );
 
     @Override

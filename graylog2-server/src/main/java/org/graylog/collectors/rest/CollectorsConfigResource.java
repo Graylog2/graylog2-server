@@ -45,10 +45,19 @@ import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.database.validators.ValidationResult;
 import org.graylog2.rest.RestTools;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.net.URI;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Tag(name = "Collectors/Config", description = "Managed collector configuration")
 @Path("/collectors/config")
@@ -97,14 +106,18 @@ public class CollectorsConfigResource extends RestResource {
         return new CollectorsConfig(
                 null, null, null,
                 new IngestEndpointConfig(true, hostname, DEFAULT_HTTP_PORT, null),
-                new IngestEndpointConfig(false, hostname, DEFAULT_GRPC_PORT, null)
+                new IngestEndpointConfig(false, hostname, DEFAULT_GRPC_PORT, null),
+                CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD,
+                CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD,
+                CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD
         );
     }
 
     @NoAuditEvent("TODO")
     @PUT
     @Operation(summary = "Update collectors configuration")
-    public CollectorsConfig put(@Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) CollectorsConfigRequest request) {
+    public CollectorsConfig put(@Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) CollectorsConfigRequest request) throws ValidationException {
+        validateThresholds(request);
         opAmpCaService.ensureInitialized();
         collectorLogsDestinationService.ensureExists();
 
@@ -125,6 +138,13 @@ public class CollectorsConfigResource extends RestResource {
                 CollectorIngestGrpcInput.NAME,
                 creatorUserId);
 
+        final Duration effectiveOffline = request.collectorOfflineThreshold() != null
+                ? request.collectorOfflineThreshold() : CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD;
+        final Duration effectiveVisibility = request.collectorDefaultVisibilityThreshold() != null
+                ? request.collectorDefaultVisibilityThreshold() : CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD;
+        final Duration effectiveExpiration = request.collectorExpirationThreshold() != null
+                ? request.collectorExpirationThreshold() : CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD;
+
         final var config = new CollectorsConfig(
                 opAmpCaService.getOpAmpCaId(),
                 opAmpCaService.getTokenSigningCertId(),
@@ -132,7 +152,10 @@ public class CollectorsConfigResource extends RestResource {
                 new IngestEndpointConfig(request.http().enabled(), request.http().hostname(),
                         request.http().port(), httpInputId),
                 new IngestEndpointConfig(request.grpc().enabled(), request.grpc().hostname(),
-                        request.grpc().port(), grpcInputId)
+                        request.grpc().port(), grpcInputId),
+                effectiveOffline,
+                effectiveVisibility,
+                effectiveExpiration
         );
 
         clusterConfigService.write(config);
@@ -144,5 +167,65 @@ public class CollectorsConfigResource extends RestResource {
         }
 
         return config;
+    }
+
+    private static String formatDuration(Duration duration) {
+        final long hours = duration.toHours();
+        if (hours > 0 && hours % 24 == 0) {
+            final long days = hours / 24;
+            return days == 1 ? "1 day" : f("%d days", days);
+        }
+        if (hours > 0) {
+            return hours == 1 ? "1 hour" : f("%d hours", hours);
+        }
+        final long minutes = duration.toMinutes();
+        return minutes == 1 ? "1 minute" : f("%d minutes", minutes);
+    }
+
+    private void validateThresholds(CollectorsConfigRequest request) throws ValidationException {
+        final Duration offlineThreshold = request.collectorOfflineThreshold();
+        final Duration visibilityThreshold = request.collectorDefaultVisibilityThreshold();
+        final Duration expirationThreshold = request.collectorExpirationThreshold();
+        final Map<String, List<ValidationResult>> errors = new HashMap<>();
+
+        if (offlineThreshold != null && (offlineThreshold.isZero() || offlineThreshold.isNegative())) {
+            errors.computeIfAbsent("collector_offline_threshold", k -> new ArrayList<>())
+                    .add(new ValidationResult.ValidationFailed("Must be a positive duration"));
+        }
+        if (visibilityThreshold != null && (visibilityThreshold.isZero() || visibilityThreshold.isNegative())) {
+            errors.computeIfAbsent("collector_default_visibility_threshold", k -> new ArrayList<>())
+                    .add(new ValidationResult.ValidationFailed("Must be a positive duration"));
+        }
+        if (expirationThreshold != null && (expirationThreshold.isZero() || expirationThreshold.isNegative())) {
+            errors.computeIfAbsent("collector_expiration_threshold", k -> new ArrayList<>())
+                    .add(new ValidationResult.ValidationFailed("Must be a positive duration"));
+        }
+
+        final Duration effectiveOffline = offlineThreshold != null
+                ? offlineThreshold : CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD;
+        if (effectiveOffline.toMinutes() < 1) {
+            errors.computeIfAbsent("collector_offline_threshold", k -> new ArrayList<>())
+                    .add(new ValidationResult.ValidationFailed("Must be at least 1 minute"));
+        }
+
+        final Duration effectiveVisibility = visibilityThreshold != null
+                ? visibilityThreshold : CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD;
+        if (!effectiveVisibility.minus(effectiveOffline).isPositive()) {
+            errors.computeIfAbsent("collector_default_visibility_threshold", k -> new ArrayList<>())
+                    .add(new ValidationResult.ValidationFailed(
+                            f("Must be greater than the offline threshold (%s)", formatDuration(effectiveOffline))));
+        }
+
+        final Duration effectiveExpiration = expirationThreshold != null
+                ? expirationThreshold : CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD;
+        if (!effectiveExpiration.minus(effectiveVisibility).isPositive()) {
+            errors.computeIfAbsent("collector_expiration_threshold", k -> new ArrayList<>())
+                    .add(new ValidationResult.ValidationFailed(
+                            f("Must be greater than the visibility threshold (%s)", formatDuration(effectiveVisibility))));
+        }
+
+        if (!errors.isEmpty()) {
+            throw new ValidationException(errors);
+        }
     }
 }

@@ -20,6 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CollectorsConfigTest {
@@ -29,7 +31,10 @@ class CollectorsConfigTest {
     void serializesAndDeserializes() throws Exception {
         final var http = new IngestEndpointConfig(true, "graylog.example.com", 14401, "input-1");
         final var grpc = new IngestEndpointConfig(false, "graylog.example.com", 14402, null);
-        final var config = new CollectorsConfig("ca-id", "token-id", "otlp-id", http, grpc);
+        final var config = new CollectorsConfig("ca-id", "token-id", "otlp-id", http, grpc,
+                CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD,
+                CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD,
+                CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD);
 
         final var json = objectMapper.writeValueAsString(config);
         final var deserialized = objectMapper.readValue(json, CollectorsConfig.class);
@@ -56,7 +61,10 @@ class CollectorsConfigTest {
     void nullableCertIds() throws Exception {
         final var http = new IngestEndpointConfig(true, "host", 14401, null);
         final var grpc = new IngestEndpointConfig(false, "host", 14402, null);
-        final var config = new CollectorsConfig(null, null, null, http, grpc);
+        final var config = new CollectorsConfig(null, null, null, http, grpc,
+                CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD,
+                CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD,
+                CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD);
 
         final var json = objectMapper.writeValueAsString(config);
         final var deserialized = objectMapper.readValue(json, CollectorsConfig.class);
@@ -65,5 +73,39 @@ class CollectorsConfigTest {
         assertThat(deserialized.opampCaId()).isNull();
         assertThat(deserialized.tokenSigningCertId()).isNull();
         assertThat(deserialized.otlpServerCertId()).isNull();
+    }
+
+    @Test
+    void serializesAndDeserializesWithThresholds() throws Exception {
+        final var http = new IngestEndpointConfig(true, "host", 14401, null);
+        final var grpc = new IngestEndpointConfig(false, "host", 14402, null);
+        final var config = new CollectorsConfig("ca-id", "token-id", "otlp-id", http, grpc,
+                Duration.ofMinutes(10), Duration.ofHours(12), Duration.ofDays(3));
+
+        final var json = objectMapper.writeValueAsString(config);
+        final var deserialized = objectMapper.readValue(json, CollectorsConfig.class);
+
+        assertThat(deserialized).isEqualTo(config);
+        assertThat(deserialized.collectorOfflineThreshold()).isEqualTo(Duration.ofMinutes(10));
+        assertThat(deserialized.collectorDefaultVisibilityThreshold()).isEqualTo(Duration.ofHours(12));
+        assertThat(deserialized.collectorExpirationThreshold()).isEqualTo(Duration.ofDays(3));
+    }
+
+    @Test
+    void deserializesWithoutThresholdFields() throws Exception {
+        final var json = """
+                {
+                    "opamp_ca_id": "ca-id",
+                    "token_signing_cert_id": "token-id",
+                    "otlp_server_cert_id": "otlp-id",
+                    "http": {"enabled": true, "hostname": "host", "port": 14401},
+                    "grpc": {"enabled": false, "hostname": "host", "port": 14402}
+                }
+                """;
+        final var deserialized = objectMapper.readValue(json, CollectorsConfig.class);
+
+        assertThat(deserialized.collectorOfflineThreshold()).isNull();
+        assertThat(deserialized.collectorDefaultVisibilityThreshold()).isNull();
+        assertThat(deserialized.collectorExpirationThreshold()).isNull();
     }
 }

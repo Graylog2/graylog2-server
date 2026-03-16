@@ -19,7 +19,10 @@ package org.graylog.collectors.db;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.jackson.MongoInstantDeserializer;
+import org.graylog2.jackson.MongoInstantSerializer;
 import jakarta.annotation.Nullable;
 import org.graylog2.database.BuildableMongoEntity;
 
@@ -55,6 +58,8 @@ public abstract class CollectorInstanceDTO implements BuildableMongoEntity<Colle
     public abstract long capabilities();
 
     @JsonProperty(FIELD_LAST_SEEN)
+    @JsonSerialize(using = MongoInstantSerializer.class)
+    @JsonDeserialize(using = MongoInstantDeserializer.class)
     public abstract Instant lastSeen();
 
     @JsonProperty(FIELD_FLEET_ID)

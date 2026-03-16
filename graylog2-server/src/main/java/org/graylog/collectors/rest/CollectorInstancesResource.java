@@ -24,23 +24,31 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.conversions.Bson;
 import org.graylog.collectors.CollectorInstanceService;
+import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.SourceService;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.FleetDTO;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.database.filtering.DbSortResolver;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.AttributeSortSpec;
@@ -58,6 +66,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -65,6 +74,7 @@ import java.util.Set;
 
 import static java.util.stream.Collectors.toMap;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_LAST_SEEN;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @PublicCloudAPI
 @Tag(name = "Collectors", description = "Collector management")
@@ -75,11 +85,10 @@ import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_LAST_SEEN;
 public class CollectorInstancesResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(CollectorInstancesResource.class);
 
-    private static final Duration ONLINE_THRESHOLD = Duration.ofMinutes(5);
     private static final String DEFAULT_SORT_FIELD = "last_seen";
     private static final String DEFAULT_SORT_DIRECTION = "desc";
 
-    private static final List<EntityAttribute> ATTRIBUTES = List.of(
+    private final List<EntityAttribute> ATTRIBUTES = List.of(
             EntityAttribute.builder().id("status")
                     .title("Status")
                     .filterable(true)
@@ -88,11 +97,12 @@ public class CollectorInstancesResource extends RestResource {
                             FilterOption.create("online", "Online"),
                             FilterOption.create("offline", "Offline")))
                     .bsonFilterCreator((name, value) -> {
-                        final Instant threshold = Instant.now().minus(ONLINE_THRESHOLD);
-                        if (value.getValue().equals("online")) {
-                            return Filters.gte(FIELD_LAST_SEEN, threshold);
-                        }
-                        return Filters.lt(FIELD_LAST_SEEN, threshold);
+                        final Date offlineCutoff = Date.from(Instant.now().minus(getOfflineThreshold()));
+                        return switch (value.getValue().toString()) {
+                            case "online" -> Filters.gte(FIELD_LAST_SEEN, offlineCutoff);
+                            case "offline" -> Filters.lt(FIELD_LAST_SEEN, offlineCutoff);
+                            default -> Filters.gte(FIELD_LAST_SEEN, offlineCutoff);
+                        };
                     })
                     .sortSpec(AttributeSortSpec.field(FIELD_LAST_SEEN))
                     .build(),
@@ -107,7 +117,7 @@ public class CollectorInstancesResource extends RestResource {
                     .filterable(true)
                     .build(),
             EntityAttribute.builder().id("instance_uid").title("Instance UID").sortable(true).searchable(true).build(),
-            EntityAttribute.builder().id("last_seen").title("Last Seen").type(SearchQueryField.Type.DATE).sortable(true).build(),
+            EntityAttribute.builder().id("last_seen").title("Last Seen").type(SearchQueryField.Type.DATE).sortable(true).filterable(true).build(),
             EntityAttribute.builder().id("hostname").title("Hostname")
                     .dbField(CollectorInstanceDTO.FIELD_NON_IDENTIFYING_ATTRIBUTES)
                     .bsonFilterCreator(AttributeFieldFilters.attributeArray("host.name"))
@@ -135,16 +145,19 @@ public class CollectorInstancesResource extends RestResource {
     private final CollectorInstanceService collectorInstanceService;
     private final FleetService fleetService;
     private final SourceService sourceService;
+    private final ClusterConfigService clusterConfigService;
     private final DbQueryCreator dbQueryCreator;
 
     @Inject
     public CollectorInstancesResource(CollectorInstanceService collectorInstanceService,
                                       FleetService fleetService,
                                       SourceService sourceService,
-                                      ComputedFieldRegistry computedFieldRegistry) {
+                                      ComputedFieldRegistry computedFieldRegistry,
+                                      ClusterConfigService clusterConfigService) {
         this.collectorInstanceService = collectorInstanceService;
         this.fleetService = fleetService;
         this.sourceService = sourceService;
+        this.clusterConfigService = clusterConfigService;
         this.dbQueryCreator = new DbQueryCreator(CollectorInstanceDTO.FIELD_INSTANCE_UID, ATTRIBUTES, computedFieldRegistry);
     }
 
@@ -155,7 +168,7 @@ public class CollectorInstancesResource extends RestResource {
     public CollectorStatsResponse stats() {
         final long totalInstances = collectorInstanceService.count();
         final long onlineInstances = collectorInstanceService.countOnline(
-                Instant.now().minus(ONLINE_THRESHOLD));
+                Instant.now().minus(getOfflineThreshold()));
         return new CollectorStatsResponse(
                 totalInstances,
                 onlineInstances,
@@ -173,13 +186,15 @@ public class CollectorInstancesResource extends RestResource {
             @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
             @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
             @Parameter(name = "sort",
-                       description = "The field to sort the result on",
-                       schema = @Schema(allowableValues = {"instance_uid", "last_seen", "status", "hostname", "os", "version"}))
+                    description = "The field to sort the result on",
+                    schema = @Schema(allowableValues = {"instance_uid", "last_seen", "status", "hostname", "os", "version"}))
             @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
             @Parameter(name = "order", description = "The sort direction",
-                       schema = @Schema(allowableValues = {"asc", "desc"}))
+                    schema = @Schema(allowableValues = {"asc", "desc"}))
             @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order
     ) {
+        final Duration offlineThreshold = getOfflineThreshold();
+        final Instant offlineCutoff = Instant.now().minus(offlineThreshold);
         final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
         final var resolvedSort = DbSortResolver.resolve(ATTRIBUTES, sort, order);
         final var list = collectorInstanceService.findPaginated(dbQuery, resolvedSort, page, perPage);
@@ -191,7 +206,7 @@ public class CollectorInstancesResource extends RestResource {
                 sort,
                 order,
                 list.stream().map(dto -> new CollectorInstanceResponse(
-                        dto.lastSeen().isBefore(Instant.now().minus(ONLINE_THRESHOLD)) ? "offline" : "online",
+                        dto.lastSeen().isBefore(offlineCutoff) ? "offline" : "online",
                         dto.instanceUid(),
                         dto.fleetId(),
                         dto.capabilities(),
@@ -203,6 +218,26 @@ public class CollectorInstancesResource extends RestResource {
                 )).toList(),
                 ATTRIBUTES,
                 DEFAULTS);
+    }
+
+    @DELETE
+    @Path("/instances/{instanceUid}")
+    @Timed
+    @Operation(summary = "Delete a collector instance")
+    @NoAuditEvent("TODO")
+    @RequiresPermissions(FleetPermissions.INSTANCE_DELETE)
+    public Response deleteInstance(
+            @Parameter(name = "instanceUid", required = true) @PathParam("instanceUid") String instanceUid) {
+        final boolean deleted = collectorInstanceService.deleteByInstanceUid(instanceUid);
+        if (!deleted) {
+            throw new NotFoundException(f("Collector instance <%s> not found", instanceUid));
+        }
+        return Response.noContent().build();
+    }
+
+    private Duration getOfflineThreshold() {
+        return clusterConfigService.getOrDefault(CollectorsConfig.class, CollectorsConfig.DEFAULT)
+                .collectorOfflineThreshold();
     }
 
     private static Map<String, Object> attributesToMap(Optional<List<Attribute>> attributes) {

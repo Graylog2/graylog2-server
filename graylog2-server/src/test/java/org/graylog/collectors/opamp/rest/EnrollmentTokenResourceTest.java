@@ -52,7 +52,8 @@ class EnrollmentTokenResourceTest {
         when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(
                 new CollectorsConfig("ca-id", "token-id", "otlp-id",
                         new IngestEndpointConfig(true, "host", 14401, "input-1"),
-                        new IngestEndpointConfig(false, "host", 14402, null)));
+                        new IngestEndpointConfig(false, "host", 14402, null),
+                        null, null));
 
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
                 "test-fleet",

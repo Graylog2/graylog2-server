@@ -17,10 +17,16 @@
 package org.graylog.collectors.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nullable;
+
+import java.time.Duration;
 
 public record CollectorsConfigRequest(
         @JsonProperty("http") IngestEndpointRequest http,
-        @JsonProperty("grpc") IngestEndpointRequest grpc
+        @JsonProperty("grpc") IngestEndpointRequest grpc,
+        @JsonProperty("collector_offline_threshold") @Nullable Duration collectorOfflineThreshold,
+        @JsonProperty("collector_default_visibility_threshold") @Nullable Duration collectorDefaultVisibilityThreshold,
+        @JsonProperty("collector_expiration_threshold") @Nullable Duration collectorExpirationThreshold
 ) {
     public record IngestEndpointRequest(
             @JsonProperty("enabled") boolean enabled,

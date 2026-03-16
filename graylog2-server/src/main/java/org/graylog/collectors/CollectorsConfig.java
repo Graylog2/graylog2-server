@@ -19,10 +19,27 @@ package org.graylog.collectors;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
 
+import java.time.Duration;
+
 public record CollectorsConfig(
         @JsonProperty("opamp_ca_id") @Nullable String opampCaId,
         @JsonProperty("token_signing_cert_id") @Nullable String tokenSigningCertId,
         @JsonProperty("otlp_server_cert_id") @Nullable String otlpServerCertId,
         @JsonProperty("http") IngestEndpointConfig http,
-        @JsonProperty("grpc") IngestEndpointConfig grpc
-) {}
+        @JsonProperty("grpc") IngestEndpointConfig grpc,
+        @JsonProperty("collector_offline_threshold") Duration collectorOfflineThreshold,
+        @JsonProperty("collector_default_visibility_threshold") Duration collectorDefaultVisibilityThreshold,
+        @JsonProperty("collector_expiration_threshold") Duration collectorExpirationThreshold
+) {
+    public static final Duration DEFAULT_OFFLINE_THRESHOLD = Duration.ofMinutes(5);
+    public static final Duration DEFAULT_VISIBILITY_THRESHOLD = Duration.ofDays(1);
+    public static final Duration DEFAULT_EXPIRATION_THRESHOLD = Duration.ofDays(7);
+
+    public static final CollectorsConfig DEFAULT = new CollectorsConfig(
+            null, null, null,
+            new IngestEndpointConfig(false, "localhost", 14401, null),
+            new IngestEndpointConfig(false, "localhost", 14402, null),
+            DEFAULT_OFFLINE_THRESHOLD,
+            DEFAULT_VISIBILITY_THRESHOLD,
+            DEFAULT_EXPIRATION_THRESHOLD);
+}

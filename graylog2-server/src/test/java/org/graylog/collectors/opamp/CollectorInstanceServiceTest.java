@@ -31,6 +31,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
@@ -158,6 +159,52 @@ class CollectorInstanceServiceTest {
         Map<String, CollectorInstanceDTO> result = collectorInstanceService.findByInstanceUids(Set.of("nonexistent"));
 
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    void deleteByInstanceUidDeletesExistingInstance() {
+        enroll(collectorInstanceService, "uid-to-delete", "sha256:fp-delete");
+
+        final boolean deleted = collectorInstanceService.deleteByInstanceUid("uid-to-delete");
+
+        assertThat(deleted).isTrue();
+        assertThat(collectorInstanceService.findByInstanceUid("uid-to-delete")).isEmpty();
+    }
+
+    @Test
+    void deleteByInstanceUidReturnsFalseForNonExistent() {
+        final boolean deleted = collectorInstanceService.deleteByInstanceUid("non-existent");
+
+        assertThat(deleted).isFalse();
+    }
+
+    @Test
+    void deleteExpiredRemovesOldInstances() {
+        final Instant now = Instant.now();
+        final Duration threshold = Duration.ofDays(7);
+
+        // Expired: last seen 8 days ago
+        enrollWithFleetAndLastSeen(collectorInstanceService, "uid-expired",
+                "sha256:fp-expired", "507f1f77bcf86cd799439012", now.minus(Duration.ofDays(8)));
+        // Not expired: last seen 3 days ago
+        enrollWithFleetAndLastSeen(collectorInstanceService, "uid-recent",
+                "sha256:fp-recent", "507f1f77bcf86cd799439012", now.minus(Duration.ofDays(3)));
+
+        final long deleted = collectorInstanceService.deleteExpired(threshold);
+
+        assertThat(deleted).isEqualTo(1);
+        assertThat(collectorInstanceService.findByInstanceUid("uid-expired")).isEmpty();
+        assertThat(collectorInstanceService.findByInstanceUid("uid-recent")).isPresent();
+    }
+
+    @Test
+    void deleteExpiredReturnsZeroWhenNothingToDelete() {
+        enrollWithFleetAndLastSeen(collectorInstanceService, "uid-fresh",
+                "sha256:fp-fresh", "507f1f77bcf86cd799439012", Instant.now());
+
+        final long deleted = collectorInstanceService.deleteExpired(Duration.ofDays(7));
+
+        assertThat(deleted).isEqualTo(0);
     }
 
     private static CollectorInstanceDTO enroll(CollectorInstanceService service, String instanceUid, String fingerprint) {
