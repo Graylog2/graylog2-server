@@ -31,16 +31,16 @@ const StaticOptionsList = ({ allActiveFilters, attribute, filterValueRenderer, o
   <>
     {(attribute.id === 'priority'
       ? attribute.filter_options
-      : [...attribute.filter_options].sort((a, b) => a.title.localeCompare(b.title)))
-      .map(({ title, value }) => {
-        const disabled = !!allActiveFilters?.get(attribute.id)?.find(({ value: filterValue }) => value === filterValue);
+      : [...attribute.filter_options].sort((a, b) => a.title.localeCompare(b.title))
+    ).map(({ title, value }) => {
+      const disabled = !!allActiveFilters?.get(attribute.id)?.find(({ value: filterValue }) => value === filterValue);
 
-        return (
-          <MenuItem onSelect={() => onSubmit({ value, title })} key={`filter-value-${title}`} disabled={disabled}>
-            {filterValueRenderer ? filterValueRenderer(value, title) : title}
-          </MenuItem>
-        );
-      })}
+      return (
+        <MenuItem onSelect={() => onSubmit({ value, title })} key={`filter-value-${title}`} disabled={disabled}>
+          {filterValueRenderer ? filterValueRenderer(value, title) : title}
+        </MenuItem>
+      );
+    })}
   </>
 );
 
