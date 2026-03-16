@@ -64,7 +64,9 @@ class OpAmpServiceOtlpSettingsTest {
                 "ca-id", "token-id", "otlp-id",
                 new IngestEndpointConfig(true, "otlp.example.com", 14401, "input-1"),
                 new IngestEndpointConfig(false, "otlp.example.com", 14402, null),
-                null, null
+                CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD,
+                CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD,
+                CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD
         );
 
         final ConnectionSettingsOffers.Builder builder = ConnectionSettingsOffers.newBuilder();
@@ -84,7 +86,9 @@ class OpAmpServiceOtlpSettingsTest {
                 "ca-id", "token-id", "otlp-id",
                 new IngestEndpointConfig(true, "otlp.example.com", 14401, "input-1"),
                 new IngestEndpointConfig(false, "otlp.example.com", 14402, null),
-                null, null
+                CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD,
+                CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD,
+                CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD
         );
 
         final ConnectionSettingsOffers.Builder builder = ConnectionSettingsOffers.newBuilder();
@@ -100,7 +104,9 @@ class OpAmpServiceOtlpSettingsTest {
                 "ca-id", "token-id", "otlp-id",
                 new IngestEndpointConfig(true, "otlp.example.com", 14401, "input-1"),
                 new IngestEndpointConfig(true, "grpc.example.com", 14402, "input-2"),
-                null, null
+                CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD,
+                CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD,
+                CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD
         );
 
         final ConnectionSettingsOffers.Builder builder = ConnectionSettingsOffers.newBuilder();
@@ -118,7 +124,9 @@ class OpAmpServiceOtlpSettingsTest {
                 "ca-id", "token-id", "otlp-id",
                 new IngestEndpointConfig(false, "host", 14401, null),
                 new IngestEndpointConfig(false, "host", 14402, null),
-                null, null
+                CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD,
+                CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD,
+                CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD
         );
 
         final ConnectionSettingsOffers.Builder builder = ConnectionSettingsOffers.newBuilder();
@@ -135,7 +143,9 @@ class OpAmpServiceOtlpSettingsTest {
                 "ca-id", "token-id", "otlp-id",
                 new IngestEndpointConfig(true, "host", 14401, "input-1"),
                 new IngestEndpointConfig(false, "host", 14402, null),
-                null, null
+                CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD,
+                CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD,
+                CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD
         );
 
         final ConnectionSettingsOffers.Builder builder = ConnectionSettingsOffers.newBuilder();

@@ -52,7 +52,9 @@ class PurgeExpiredCollectorInstancesPeriodicalTest {
         final var config = new CollectorsConfig(null, null, null,
                 new IngestEndpointConfig(true, "host", 14401, null),
                 new IngestEndpointConfig(false, "host", 14402, null),
-                null, Duration.ofDays(3));
+                CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD,
+                CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD,
+                Duration.ofDays(3));
         when(clusterConfigService.getOrDefault(CollectorsConfig.class, CollectorsConfig.DEFAULT)).thenReturn(config);
         when(collectorInstanceService.deleteExpired(Duration.ofDays(3))).thenReturn(2L);
 
@@ -65,20 +67,6 @@ class PurgeExpiredCollectorInstancesPeriodicalTest {
     void doRunUsesDefaultThresholdWhenNoConfig() {
         when(clusterConfigService.getOrDefault(CollectorsConfig.class, CollectorsConfig.DEFAULT))
                 .thenReturn(CollectorsConfig.DEFAULT);
-        when(collectorInstanceService.deleteExpired(CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD)).thenReturn(0L);
-
-        periodical.doRun();
-
-        verify(collectorInstanceService).deleteExpired(CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD);
-    }
-
-    @Test
-    void doRunUsesDefaultThresholdWhenConfigFieldIsNull() {
-        final var config = new CollectorsConfig(null, null, null,
-                new IngestEndpointConfig(true, "host", 14401, null),
-                new IngestEndpointConfig(false, "host", 14402, null),
-                null, null);
-        when(clusterConfigService.getOrDefault(CollectorsConfig.class, CollectorsConfig.DEFAULT)).thenReturn(config);
         when(collectorInstanceService.deleteExpired(CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD)).thenReturn(0L);
 
         periodical.doRun();

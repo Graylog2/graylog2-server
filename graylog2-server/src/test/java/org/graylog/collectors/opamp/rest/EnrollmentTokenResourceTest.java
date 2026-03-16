@@ -30,9 +30,7 @@ import java.time.Instant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class EnrollmentTokenResourceTest {
 
@@ -53,7 +51,9 @@ class EnrollmentTokenResourceTest {
                 new CollectorsConfig("ca-id", "token-id", "otlp-id",
                         new IngestEndpointConfig(true, "host", 14401, "input-1"),
                         new IngestEndpointConfig(false, "host", 14402, null),
-                        null, null));
+                        CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD,
+                        CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD,
+                        CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD));
 
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
                 "test-fleet",
