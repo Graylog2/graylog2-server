@@ -48,7 +48,10 @@ const MetricsProvider = ({ children = undefined }: React.PropsWithChildren<{}>) 
   const [subscriptions, setSubscriptions] = useState<Record<string, number>>({});
 
   const subscribedNames = useMemo(
-    () => Object.keys(subscriptions).filter((name) => subscriptions[name] > 0).sort(),
+    () =>
+      Object.keys(subscriptions)
+        .filter((name) => subscriptions[name] > 0)
+        .sort(),
     [subscriptions],
   );
 
@@ -87,29 +90,26 @@ const MetricsProvider = ({ children = undefined }: React.PropsWithChildren<{}>) 
     queryFn: () => {
       const url = qualifyUrl(ApiRoutes.ClusterMetricsApiController.multipleAllNodes().url);
 
-      return fetchPeriodically<Record<string, { metrics: Metric[] } | null>>(
-        'POST',
-        url,
-        { metrics: subscribedNames },
-      ).then(buildMetricsFromResponse);
+      return fetchPeriodically<Record<string, { metrics: Metric[] } | null>>('POST', url, {
+        metrics: subscribedNames,
+      }).then(buildMetricsFromResponse);
     },
     enabled: subscribedNames.length > 0,
     refetchInterval: 2000,
     placeholderData: keepPreviousData,
   });
 
-  const value = useMemo(() => ({
-    metrics: metrics ?? {},
-    isLoading,
-    subscribe,
-    unsubscribe,
-  }), [metrics, isLoading, subscribe, unsubscribe]);
-
-  return (
-    <MetricsContext.Provider value={value}>
-      {children}
-    </MetricsContext.Provider>
+  const value = useMemo(
+    () => ({
+      metrics: metrics ?? {},
+      isLoading,
+      subscribe,
+      unsubscribe,
+    }),
+    [metrics, isLoading, subscribe, unsubscribe],
   );
+
+  return <MetricsContext.Provider value={value}>{children}</MetricsContext.Provider>;
 };
 
 export default MetricsProvider;
