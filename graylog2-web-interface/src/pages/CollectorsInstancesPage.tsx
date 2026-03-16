@@ -16,6 +16,8 @@
  */
 import * as React from 'react';
 import { useState, useMemo, useCallback } from 'react';
+import { OrderedMap } from 'immutable';
+import moment from 'moment';
 import { Navigate } from 'react-router-dom';
 
 import { Row, Col } from 'components/bootstrap';
@@ -31,6 +33,7 @@ import {
   useSources,
 } from 'components/collectors/hooks';
 import { useCollectorsConfig } from 'components/collectors/hooks';
+import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import type { CollectorInstanceView } from 'components/collectors/types';
 import customColumnRenderers from 'components/collectors/instances/ColumnRenderers';
 import useTableElements from 'components/collectors/instances/useTableElements';
@@ -56,6 +59,17 @@ const CollectorsInstancesPage = () => {
     () => customColumnRenderers({ fleetNames }),
     [fleetNames],
   );
+
+  const defaultFilters: UrlQueryFilters | undefined = useMemo(() => {
+    if (!config?.collector_default_visibility_threshold) {
+      return undefined;
+    }
+
+    const threshold = moment.duration(config.collector_default_visibility_threshold);
+    const cutoff = moment().subtract(threshold).utc().toISOString();
+
+    return OrderedMap({ last_seen: [`${cutoff}><`] });
+  }, [config?.collector_default_visibility_threshold]);
 
   const { entityActions } = useTableElements({
     onInstanceClick: setSelectedInstance,
@@ -94,6 +108,7 @@ const CollectorsInstancesPage = () => {
             keyFn={instancesKeyFn}
             entityAttributesAreCamelCase={false}
             columnRenderers={columnRenderers}
+            defaultFilters={defaultFilters}
           />
         </Col>
       </Row>
