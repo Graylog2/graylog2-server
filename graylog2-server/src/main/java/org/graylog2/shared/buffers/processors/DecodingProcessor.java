@@ -94,7 +94,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             processMessage(event);
         } catch (Exception e) {
             final RawMessage rawMessage = event.getRaw();
-            LOG.error("Error processing message " + rawMessage, ExceptionUtils.getRootCause(e));
+            LOG.error("Error processing message {}", rawMessage, ExceptionUtils.getRootCause(e));
 
             // Mark message as processed to avoid keeping it in the journal.
             acknowledger.acknowledge(rawMessage.getMessageQueueId());
@@ -174,41 +174,55 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         if (message.isPresent()) {
             event.setMessage(postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, message.get(), decodeTime, raw.getPayload().length));
         } else if (messages != null && !messages.isEmpty()) {
-            final List<Message> processedMessages = Lists.newArrayListWithCapacity(messages.size());
-            final long payloadLength = raw.getPayload().length;
+            event.setMessages(postProcessMultipleMessages(raw, codec, inputIdOnCurrentNode, baseMetricName, messages, decodeTime));
+        }
+    }
 
-            for (final Message msg : messages) {
-                final Message processedMessage = postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, msg, decodeTime, 0L);
-                if (processedMessage != null) {
-                    processedMessages.add(processedMessage);
-                }
+    private List<Message> postProcessMultipleMessages(RawMessage raw,
+                                                      Codec codec,
+                                                      String inputIdOnCurrentNode,
+                                                      String baseMetricName,
+                                                      Collection<Message> messages,
+                                                      long decodeTime) {
+        final List<Message> processedMessages = Lists.newArrayListWithCapacity(messages.size());
+        for (final Message msg : messages) {
+            final Message processedMessage = postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, msg, decodeTime, 0L);
+            if (processedMessage != null) {
+                processedMessages.add(processedMessage);
             }
+        }
 
-            // Distribute raw payload size proportionally based on decoded message sizes.
-            if (!processedMessages.isEmpty()) {
-                final long totalDecodedSize = processedMessages.stream()
-                        .mapToLong(Message::getSize)
-                        .sum();
+        distributePayloadSize(processedMessages, raw.getPayload().length);
+        return processedMessages;
+    }
 
-                long assignedSize = 0L;
-                for (int i = 0; i < processedMessages.size(); i++) {
-                    final Message msg = processedMessages.get(i);
-                    final long inputSize;
-                    if (i == processedMessages.size() - 1) {
-                        // Last message gets the remainder to avoid rounding errors.
-                        inputSize = payloadLength - assignedSize;
-                    } else if (totalDecodedSize > 0) {
-                        inputSize = payloadLength * msg.getSize() / totalDecodedSize;
-                    } else {
-                        // All messages have zero decoded size — distribute evenly.
-                        inputSize = payloadLength / processedMessages.size();
-                    }
-                    assignedSize += inputSize;
-                    msg.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, inputSize);
-                }
+    /**
+     * Distributes the raw payload size proportionally across messages based on their decoded sizes.
+     * The last message receives the remainder to avoid rounding errors.
+     */
+    private void distributePayloadSize(List<Message> messages, long payloadLength) {
+        if (messages.isEmpty()) {
+            return;
+        }
+        final long totalDecodedSize = messages.stream()
+                .mapToLong(Message::getSize)
+                .sum();
+
+        long assignedSize = 0L;
+        for (int i = 0; i < messages.size(); i++) {
+            final Message msg = messages.get(i);
+            final long inputSize;
+            if (i == messages.size() - 1) {
+                // Last message gets the remainder to avoid rounding errors.
+                inputSize = payloadLength - assignedSize;
+            } else if (totalDecodedSize > 0) {
+                inputSize = payloadLength * msg.getSize() / totalDecodedSize;
+            } else {
+                // All messages have zero decoded size — distribute evenly.
+                inputSize = payloadLength / messages.size();
             }
-
-            event.setMessages(processedMessages);
+            assignedSize += inputSize;
+            msg.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, inputSize);
         }
     }
 
@@ -237,6 +251,41 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         message.recordTiming(serverStatus, "parse", decodeTime);
         metricRegistry.timer(name(baseMetricName, "parseTime")).update(decodeTime, TimeUnit.NANOSECONDS);
 
+        applySourceNodeFields(raw, message);
+
+        if (inputIdOnCurrentNode != null) {
+            try {
+                message.setSourceInputId(inputIdOnCurrentNode);
+            } catch (RuntimeException e) {
+                LOG.warn("Unable to find input with id {}, not setting input id in this message.", inputIdOnCurrentNode, e);
+            }
+        }
+
+        applyRemoteAddressFields(raw, message);
+
+        if (codec.getConfiguration() != null && codec.getConfiguration().stringIsSet(Codec.Config.CK_OVERRIDE_SOURCE)) {
+            message.setSource(codec.getConfiguration().getString(Codec.Config.CK_OVERRIDE_SOURCE));
+        }
+
+        // Make sure that there is a value for the source field.
+        if (Strings.isNullOrEmpty(message.getSource())) {
+            message.setSource("unknown");
+        }
+
+        // The raw message timestamp is the receive time of the message. It has been created before writing the raw
+        // message to the journal.
+        // If the message was received through a forwarder, it might already have a receive time set.
+        if (message.getReceiveTime() == null) {
+            message.setReceiveTime(raw.getTimestamp());
+        }
+
+        metricRegistry.meter(name(baseMetricName, "processedMessages")).mark();
+        decodedTrafficCounter.inc(message.getSize());
+        message.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, inputSize);
+        return message;
+    }
+
+    private void applySourceNodeFields(RawMessage raw, Message message) {
         for (final RawMessage.SourceNode node : raw.getSourceNodes()) {
             switch (node.type) {
                 case SERVER:
@@ -260,15 +309,9 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
                     break;
             }
         }
+    }
 
-        if (inputIdOnCurrentNode != null) {
-            try {
-                message.setSourceInputId(inputIdOnCurrentNode);
-            } catch (RuntimeException e) {
-                LOG.warn("Unable to find input with id " + inputIdOnCurrentNode + ", not setting input id in this message.", e);
-            }
-        }
-
+    private void applyRemoteAddressFields(RawMessage raw, Message message) {
         final ResolvableInetSocketAddress remoteAddress = raw.getRemoteAddress();
         if (remoteAddress != null) {
             final String addrString = InetAddresses.toAddrString(remoteAddress.getAddress());
@@ -283,26 +326,5 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
                 message.setSource(addrString);
             }
         }
-
-        if (codec.getConfiguration() != null && codec.getConfiguration().stringIsSet(Codec.Config.CK_OVERRIDE_SOURCE)) {
-            message.setSource(codec.getConfiguration().getString(Codec.Config.CK_OVERRIDE_SOURCE));
-        }
-
-        // Make sure that there is a value for the source field.
-        if (Strings.isNullOrEmpty(message.getSource())) {
-            message.setSource("unknown");
-        }
-
-        // The raw message timestamp is the receive time of the message. It has been created before writing the raw
-        // message to the journal.
-        // If the message was received through a forwarder, it might already have a receive time set.
-        if (message.getReceiveTime() == null) {
-            message.setReceiveTime(raw.getTimestamp());
-        }
-
-        metricRegistry.meter(name(baseMetricName, "processedMessages")).mark();
-        decodedTrafficCounter.inc(message.getSize());
-        message.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, inputSize);
-        return message;
     }
 }
