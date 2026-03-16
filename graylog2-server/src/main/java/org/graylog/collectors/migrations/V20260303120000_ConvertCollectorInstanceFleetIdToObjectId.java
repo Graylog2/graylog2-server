@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.ZonedDateTime;
+import java.util.Map;
 
 /**
  * Converts {@code fleet_id} and {@code issuing_ca_id} fields in the {@code collector_instances} collection
@@ -57,8 +58,8 @@ public class V20260303120000_ConvertCollectorInstanceFleetIdToObjectId extends M
 
     @Override
     public void upgrade() {
-        final MongoCollection<Document> collection =
-                mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
+        final var db = mongoConnection.getMongoDatabase();
+        final MongoCollection<Document> collection = db.getCollection(COLLECTION_NAME);
 
         long converted = 0;
         converted += convertObjectIdFieldToString(collection, FIELD_FLEET_ID);
@@ -66,6 +67,31 @@ public class V20260303120000_ConvertCollectorInstanceFleetIdToObjectId extends M
 
         if (converted > 0) {
             LOG.info("Converted ObjectId fields to String in {} collector instance document(s)", converted);
+        }
+
+        final var renamedCollections = Map.of(
+                "fleets", "collector_fleets",
+                "fleet_transaction_log", "collector_fleet_transaction_log",
+                "fleet_sources", "collector_fleet_sources"
+        );
+
+        for (final var entry : renamedCollections.entrySet()) {
+            final var fromColl = db.getCollection(entry.getKey());
+            final var toColl = db.getCollection(entry.getValue());
+
+            if (fromColl.countDocuments() > 0) {
+                LOG.info("Migrating collection data from <{}> to <{}>", fromColl.getNamespace(), toColl.getNamespace());
+                fromColl.find().forEach(doc -> {
+                    LOG.info("  Document {}", doc.get("_id"));
+                    toColl.insertOne(doc);
+                    fromColl.deleteOne(Filters.eq("_id", doc.get("_id")));
+                });
+
+                if (fromColl.countDocuments() == 0) {
+                    LOG.info("Dropping old collection <{}>", fromColl.getNamespace());
+                    fromColl.drop();
+                }
+            }
         }
 
         // We renamed the field that contains the source type

@@ -59,6 +59,7 @@ public class SourceService {
             "description", SearchQueryField.create(SourceDTO.FIELD_DESCRIPTION),
             "type", SearchQueryField.create("config.type")
     );
+    private static final String COLLECTION_NAME = "collector_fleet_sources";
 
     private final MongoCollection<SourceDTO> collection;
     private final MongoPaginationHelper<SourceDTO> paginationHelper;
@@ -67,7 +68,7 @@ public class SourceService {
 
     @Inject
     public SourceService(MongoCollections mongoCollections, FleetTransactionLogService txnLogService) {
-        this.collection = mongoCollections.collection("fleet_sources", SourceDTO.class);
+        this.collection = mongoCollections.collection(COLLECTION_NAME, SourceDTO.class);
         this.paginationHelper = mongoCollections.paginationHelper(collection);
         this.searchQueryParser = new SearchQueryParser(SourceDTO.FIELD_NAME, SEARCH_FIELD_MAPPING);
         this.txnLogService = txnLogService;
@@ -89,8 +90,8 @@ public class SourceService {
     }
 
     public PaginatedList<SourceDTO> findByFleet(String fleetId, SearchQuery searchQuery, int page, int perPage,
-                                                 String sortField, SortOrder order,
-                                                 Predicate<SourceDTO> permissionFilter) {
+                                                String sortField, SortOrder order,
+                                                Predicate<SourceDTO> permissionFilter) {
         return paginationHelper
                 .filter(Filters.and(searchQuery.toBson(), Filters.eq(SourceDTO.FIELD_FLEET_ID, fleetId)))
                 .sort(order.toBsonSort(sortField))
@@ -135,7 +136,7 @@ public class SourceService {
     }
 
     public Optional<SourceDTO> update(String fleetId, String sourceId, String name, @Nullable String description,
-                                       boolean enabled, SourceConfig config) {
+                                      boolean enabled, SourceConfig config) {
         return get(fleetId, sourceId).map(existing -> {
             config.validate();
             final SourceDTO updated = existing.toBuilder()

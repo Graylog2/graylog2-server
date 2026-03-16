@@ -42,7 +42,7 @@ import java.util.Set;
 @Singleton
 public class FleetTransactionLogService {
 
-    static final String COLLECTION_NAME = "fleet_transaction_log";
+    static final String COLLECTION_NAME = "collector_fleet_transaction_log";
     static final String SEQUENCE_TOPIC = "fleet_txn_log";
     static final String FIELD_TARGET = "target";
     static final String FIELD_TARGET_ID = "target_id";

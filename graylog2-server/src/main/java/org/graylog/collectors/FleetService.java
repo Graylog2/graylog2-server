@@ -51,7 +51,7 @@ public class FleetService {
             "name", SearchQueryField.create(FleetDTO.FIELD_NAME),
             "description", SearchQueryField.create(FleetDTO.FIELD_DESCRIPTION)
     );
-    public static final String COLLECTION_NAME = "fleets";
+    public static final String COLLECTION_NAME = "collector_fleets";
 
     private final MongoCollection<FleetDTO> collection;
     private final MongoPaginationHelper<FleetDTO> paginationHelper;
