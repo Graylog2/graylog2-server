@@ -67,7 +67,7 @@ const CollectorsInstances = () => {
     <>
       <PaginatedEntityTable<CollectorInstanceView>
         humanName="instances"
-        entityActions={(instance) => <InstanceActions instance={instance} onDetailsClick={setSelectedInstance} />}
+        entityActions={(instance: CollectorInstanceView) => <InstanceActions instance={instance} onDetailsClick={setSelectedInstance} />}
         tableLayout={DEFAULT_LAYOUT}
         fetchEntities={fetchEntities}
         keyFn={instancesKeyFn}
