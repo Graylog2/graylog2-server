@@ -76,11 +76,7 @@ const useAttributeComponents = () => {
       },
       {
         title: 'Event definition',
-        content: (
-          <Link target="_blank" to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>
-            {eventDefinition.title}
-          </Link>
-        ),
+        content: <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>{eventDefinition.title}</Link>,
         show: !isEventDefinition,
       },
       {
