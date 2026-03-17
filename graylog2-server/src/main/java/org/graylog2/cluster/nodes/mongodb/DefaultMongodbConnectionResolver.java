@@ -53,6 +53,6 @@ public class DefaultMongodbConnectionResolver implements MongodbConnectionResolv
             connectionString = String.format(Locale.ROOT, "mongodb://%s/?directConnection=true", nodeName);
         }
 
-        return new MongoClient(connectionString);
+        return new MongoClient(new MongoClientURI(connectionString));
     }
 }
