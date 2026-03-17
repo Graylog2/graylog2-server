@@ -14,30 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.configuration.validators;
 
-import * as React from 'react';
-import { useRef } from 'react';
+import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.Validator;
 
-import type { Stream } from 'stores/streams/StreamsStore';
-import { CountBadge } from 'components/common';
+import java.time.Duration;
 
-type Props = {
-  stream: Stream;
-};
-
-const OutputsCell = ({ stream }: Props) => {
-  const buttonRef = useRef();
-
-  if (stream.is_default || !stream.is_editable) {
-    return null;
-  }
-
-  const outputCount = stream.outputs?.length || 0;
-  if (outputCount === 0) {
-    return null;
-  }
-
-  return <CountBadge count={outputCount} ref={buttonRef} title="Stream Outputs" />;
-};
-
-export default OutputsCell;
+public class PositiveJavaDurationValidator implements Validator<Duration> {
+    @Override
+    public void validate(String name, Duration value) throws ValidationException {
+        if (value == null || value.isZero() || value.isNegative()) {
+            throw new ValidationException("Parameter " + name + " must be a positive duration (found " + value + ")");
+        }
+    }
+}

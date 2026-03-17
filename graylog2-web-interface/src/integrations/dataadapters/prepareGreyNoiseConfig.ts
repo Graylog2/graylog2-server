@@ -14,30 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+export function prepareGreyNoiseConfig(config: Record<string, unknown>): Record<string, unknown> {
+  const apiToken = config.api_token as { is_set?: boolean } | undefined;
 
-import * as React from 'react';
-import { useRef } from 'react';
-
-import type { Stream } from 'stores/streams/StreamsStore';
-import { CountBadge } from 'components/common';
-
-type Props = {
-  stream: Stream;
-};
-
-const OutputsCell = ({ stream }: Props) => {
-  const buttonRef = useRef();
-
-  if (stream.is_default || !stream.is_editable) {
-    return null;
+  if (apiToken && 'is_set' in apiToken) {
+    return {
+      ...config,
+      api_token: apiToken.is_set ? { keep_value: true } : { set_value: '' },
+    };
   }
 
-  const outputCount = stream.outputs?.length || 0;
-  if (outputCount === 0) {
-    return null;
-  }
-
-  return <CountBadge count={outputCount} ref={buttonRef} title="Stream Outputs" />;
-};
-
-export default OutputsCell;
+  return config;
+}
