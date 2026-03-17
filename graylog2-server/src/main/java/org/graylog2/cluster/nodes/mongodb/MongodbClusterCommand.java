@@ -26,9 +26,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -39,14 +47,21 @@ public class MongodbClusterCommand {
 
     public static final String ADMIN_DATABASE_NAME = "admin";
     public static final String GRAYLOG_DATABASE_NAME = "graylog";
+    private static final int DEFAULT_EXECUTION_TIMEOUT_SECOND = 5;
 
     private final MongoClient connection;
     private final MongodbConnectionResolver mongodbConnectionResolver;
+    private final int executionTimeoutSec;
 
     @Inject
     public MongodbClusterCommand(MongoConnection mongoConnection, MongodbConnectionResolver mongodbConnectionResolver) {
+        this(mongoConnection, mongodbConnectionResolver, DEFAULT_EXECUTION_TIMEOUT_SECOND);
+    }
+
+    public MongodbClusterCommand(MongoConnection mongoConnection, MongodbConnectionResolver mongodbConnectionResolver, int executionTimeout) {
         this.connection = mongoConnection.connect();
         this.mongodbConnectionResolver = mongodbConnectionResolver;
+        this.executionTimeoutSec = executionTimeout;
     }
 
     public Map<String, Document> runOnEachNode(Document command) {
@@ -54,14 +69,41 @@ public class MongodbClusterCommand {
     }
 
     public <T> Map<String, T> runOnEachNode(BiFunction<String, MongoClient, T> call) {
-
-        return knownHosts().map(hosts -> hosts.stream()
-                        .parallel()
-                        .collect(Collectors.toMap(host -> host, host -> runCommand(host, call))))
+        return knownHosts().map(hosts -> runInParallel(call, hosts))
                 .orElseGet(() -> {
                     final String host = connection.getClusterDescription().getServerDescriptions().getFirst().getAddress().toString();
                     return Collections.singletonMap(host, runCommand(host, call));
                 });
+    }
+
+    private <T> Map<String, T> runInParallel(BiFunction<String, MongoClient, T> call, List<String> hosts) {
+        ExecutorService executor = Executors.newFixedThreadPool(hosts.size());
+        try {
+            Map<String, Future<T>> futures = hosts.stream()
+                    .collect(Collectors.toMap(host -> host, host -> executor.submit(() -> runCommand(host, call))));
+
+            Map<String, T> results = new HashMap<>();
+            Set<String> failedHosts = new HashSet<>();
+
+            for (Map.Entry<String, Future<T>> entry : futures.entrySet()) {
+                try {
+                    results.put(entry.getKey(), entry.getValue().get(executionTimeoutSec, TimeUnit.SECONDS));
+                } catch (TimeoutException e) {
+                    failedHosts.add(entry.getKey());
+                    entry.getValue().cancel(true);
+                } catch (Exception e) {
+                    failedHosts.add(entry.getKey());
+                }
+            }
+
+            if (!failedHosts.isEmpty()) {
+                LOG.warn("Failed to execute action in following mongodb host: {}", failedHosts);
+            }
+
+            return results;
+        } finally {
+            executor.shutdownNow();
+        }
     }
 
     private Optional<List<String>> knownHosts() {
