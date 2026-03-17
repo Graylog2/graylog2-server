@@ -122,7 +122,7 @@ class AgentTokenServiceTest {
                 certPem,
                 enrollmentCa.id(),
                 Instant.now(),
-                "unknown"
+                "000000000000000000000000"
         );
 
         // Create agent JWT with x5t#S256 header (RFC 7515 format)
@@ -223,7 +223,7 @@ class AgentTokenServiceTest {
                 certPem,
                 enrollmentCa.id(),
                 Instant.now(),
-                "unknown"
+                "000000000000000000000000"
         );
 
         // Create JWT signed with a DIFFERENT key

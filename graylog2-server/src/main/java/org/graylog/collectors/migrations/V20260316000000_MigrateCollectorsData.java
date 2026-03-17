@@ -104,7 +104,7 @@ public class V20260316000000_MigrateCollectorsData extends Migration {
 
         final long updated = collection.updateMany(
                 Filters.not(Filters.exists(FIELD_ENROLLMENT_TOKEN_ID)),
-                Updates.set(FIELD_ENROLLMENT_TOKEN_ID, "unknown")
+                Updates.set(FIELD_ENROLLMENT_TOKEN_ID, "000000000000000000000000")
         ).getModifiedCount();
 
         if (updated > 0) {

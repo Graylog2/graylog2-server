@@ -93,14 +93,17 @@ public class EnrollmentTokenResource extends RestResource {
 
     private final EnrollmentTokenService enrollmentTokenService;
     private final ClusterConfigService clusterConfigService;
+    private final FleetService fleetService;
     private final DbQueryCreator dbQueryCreator;
 
     @Inject
     public EnrollmentTokenResource(EnrollmentTokenService enrollmentTokenService,
                                    ClusterConfigService clusterConfigService,
+                                   FleetService fleetService,
                                    ComputedFieldRegistry computedFieldRegistry) {
         this.enrollmentTokenService = enrollmentTokenService;
         this.clusterConfigService = clusterConfigService;
+        this.fleetService = fleetService;
         this.dbQueryCreator = new DbQueryCreator(EnrollmentTokenDTO.FIELD_FLEET_ID, ATTRIBUTES, computedFieldRegistry);
     }
 
@@ -118,6 +121,9 @@ public class EnrollmentTokenResource extends RestResource {
             throw new BadRequestException(
                     "Collectors must be configured before creating enrollment tokens. " +
                             "Configure collectors at /api/collectors/config first.");
+        }
+        if (fleetService.get(request.fleetId()).isEmpty()) {
+            throw new BadRequestException("Fleet not found: " + request.fleetId());
         }
         final var user = getCurrentUser();
         final var creator = new EnrollmentTokenCreator(user.getId(), user.getName());
@@ -155,6 +161,9 @@ public class EnrollmentTokenResource extends RestResource {
     @Operation(summary = "Delete an enrollment token")
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_CREATE)
     public Response delete(@Parameter(name = "tokenId", required = true) @PathParam("tokenId") String tokenId) {
+        if (!org.bson.types.ObjectId.isValid(tokenId)) {
+            throw new BadRequestException("Invalid token ID format");
+        }
         if (!enrollmentTokenService.delete(tokenId)) {
             throw new jakarta.ws.rs.NotFoundException("Enrollment token not found");
         }

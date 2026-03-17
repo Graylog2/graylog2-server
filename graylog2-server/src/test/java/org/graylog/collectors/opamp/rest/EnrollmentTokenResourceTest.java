@@ -24,9 +24,11 @@ import jakarta.ws.rs.core.SecurityContext;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.FleetService;
 import org.graylog.collectors.IngestEndpointConfig;
 import org.graylog.collectors.db.EnrollmentTokenCreator;
 import org.graylog.collectors.db.EnrollmentTokenDTO;
+import org.graylog.collectors.db.FleetDTO;
 import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.ComputedFieldRegistry;
@@ -67,6 +69,8 @@ class EnrollmentTokenResourceTest {
     @Mock
     private ClusterConfigService clusterConfigService;
     @Mock
+    private FleetService fleetService;
+    @Mock
     private UserService userService;
 
     private EnrollmentTokenResource resource;
@@ -85,7 +89,7 @@ class EnrollmentTokenResourceTest {
         ThreadContext.bind(subject);
 
         resource = new EnrollmentTokenResource(
-                enrollmentTokenService, clusterConfigService, mock(ComputedFieldRegistry.class));
+                enrollmentTokenService, clusterConfigService, fleetService, mock(ComputedFieldRegistry.class));
 
         // Set userService and securityContext on RestResource using VarHandle (setAccessible is forbidden)
         final var lookup = MethodHandles.privateLookupIn(RestResource.class, MethodHandles.lookup());
@@ -113,6 +117,7 @@ class EnrollmentTokenResourceTest {
                         CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD,
                         CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD,
                         CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD));
+        when(fleetService.get("test-fleet")).thenReturn(java.util.Optional.of(mock(FleetDTO.class)));
 
         final var request = new CreateEnrollmentTokenRequest(
                 "test-fleet",
@@ -147,6 +152,31 @@ class EnrollmentTokenResourceTest {
     }
 
     @Test
+    void createTokenThrowsWhenFleetNotFound() {
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(
+                new CollectorsConfig("ca-id", "token-id", "otlp-id",
+                        new IngestEndpointConfig(true, "host", 14401, "input-1"),
+                        new IngestEndpointConfig(false, "host", 14402, null),
+                        CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD,
+                        CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD,
+                        CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD));
+        when(fleetService.get("nonexistent-fleet")).thenReturn(java.util.Optional.empty());
+
+        final var request = new CreateEnrollmentTokenRequest("nonexistent-fleet", Duration.ofDays(1));
+
+        assertThatThrownBy(() -> resource.createToken(request))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Fleet not found");
+    }
+
+    @Test
+    void deleteReturnsBadRequestForInvalidIdFormat() {
+        assertThatThrownBy(() -> resource.delete("not-a-valid-objectid"))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Invalid token ID format");
+    }
+
+    @Test
     void listReturnsPaginatedTokens() {
         final var token = new EnrollmentTokenDTO(
                 "token-id", "jti-1", "kid-1", "fleet-1",
@@ -167,19 +197,21 @@ class EnrollmentTokenResourceTest {
 
     @Test
     void deleteReturns204WhenTokenExists() {
-        when(enrollmentTokenService.delete("token-id")).thenReturn(true);
+        final String validId = "507f1f77bcf86cd799439011";
+        when(enrollmentTokenService.delete(validId)).thenReturn(true);
 
-        final Response response = resource.delete("token-id");
+        final Response response = resource.delete(validId);
 
         assertThat(response.getStatus()).isEqualTo(204);
-        verify(enrollmentTokenService).delete("token-id");
+        verify(enrollmentTokenService).delete(validId);
     }
 
     @Test
     void deleteReturns404WhenTokenNotFound() {
-        when(enrollmentTokenService.delete("nonexistent")).thenReturn(false);
+        final String validId = "507f1f77bcf86cd799439012";
+        when(enrollmentTokenService.delete(validId)).thenReturn(false);
 
-        assertThatThrownBy(() -> resource.delete("nonexistent"))
+        assertThatThrownBy(() -> resource.delete(validId))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Enrollment token not found");
     }
