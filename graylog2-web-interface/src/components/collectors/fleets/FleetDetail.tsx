@@ -22,7 +22,7 @@ import styled, { css } from 'styled-components';
 import URI from 'urijs';
 
 import {Button, ButtonToolbar, DeleteMenuItem, Label, MenuItem, SegmentedControl} from 'components/bootstrap';
-import { LinkContainer, Spinner } from 'components/common';
+import { ConfirmDialog, LinkContainer, Spinner } from 'components/common';
 import { MoreActions } from 'components/common/EntityDataTable';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import useHistory from 'routing/useHistory';
@@ -81,11 +81,12 @@ const FleetDetail = ({ fleetId }: Props) => {
   const { data: stats, isLoading: statsLoading } = useFleetStats(fleetId);
   const { data: collectorsConfig } = useCollectorsConfig();
   const { data: sources } = useSources(fleetId);
-  const { createSource, isCreatingSource, updateSource, isUpdatingSource, deleteSource, updateFleet, isUpdatingFleet, deleteFleet, isDeletingFleet } = useCollectorsMutations();
+  const { createSource, isCreatingSource, updateSource, isUpdatingSource, deleteSource, updateFleet, isUpdatingFleet, deleteFleet, isDeletingFleet, deleteInstance } = useCollectorsMutations();
   const [showSourceModal, setShowSourceModal] = useState(false);
   const [editingSource, setEditingSource] = useState<Source | null>(null);
   const [selectedInstance, setSelectedInstance] = useState<CollectorInstanceView | null>(null);
   const [reassigningInstance, setReassigningInstance] = useState<CollectorInstanceView | null>(null);
+  const [deletingInstance, setDeletingInstance] = useState<CollectorInstanceView | null>(null);
 
   const { tab: tabParam } = useQuery();
   const history = useHistory();
@@ -166,11 +167,20 @@ const FleetDetail = ({ fleetId }: Props) => {
           <MenuItem onSelect={() => setReassigningInstance(instance)}>
             Reassign to fleet
           </MenuItem>
+          <MenuItem divider />
+          <DeleteMenuItem onSelect={() => setDeletingInstance(instance)} />
         </MoreActions>
       </ButtonToolbar>
     ),
     [],
   );
+
+  const handleConfirmDeleteInstance = useCallback(async () => {
+    if (!deletingInstance) return;
+
+    await deleteInstance(deletingInstance.instance_uid);
+    setDeletingInstance(null);
+  }, [deletingInstance, deleteInstance]);
 
   const handleDeleteSource = useCallback(
     async (source: Source) => {
@@ -319,6 +329,17 @@ const FleetDetail = ({ fleetId }: Props) => {
           currentFleetId={reassigningInstance.fleet_id}
           onClose={() => setReassigningInstance(null)}
         />
+      )}
+
+      {deletingInstance && (
+        <ConfirmDialog
+          title="Delete collector instance"
+          show
+          onConfirm={handleConfirmDeleteInstance}
+          onCancel={() => setDeletingInstance(null)}>
+          Are you sure you want to delete instance <strong>{deletingInstance.hostname || deletingInstance.instance_uid}</strong>?
+          The collector will need to be re-enrolled to appear again.
+        </ConfirmDialog>
       )}
     </div>
   );

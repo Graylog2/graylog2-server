@@ -17,11 +17,12 @@
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 
-import { Button, ButtonToolbar, MenuItem } from 'components/bootstrap';
-import { LinkContainer } from 'components/common';
+import { Button, ButtonToolbar, DeleteMenuItem, MenuItem } from 'components/bootstrap';
+import { ConfirmDialog, LinkContainer } from 'components/common';
 import { MoreActions } from 'components/common/EntityDataTable';
 
 import collectorLogsUrl from '../common/collectorLogsUrl';
+import { useCollectorsMutations } from '../hooks';
 import type { CollectorInstanceView } from '../types';
 
 import ReassignFleetModal from './ReassignFleetModal';
@@ -33,6 +34,15 @@ type Props = {
 
 const useTableElements = ({ onInstanceClick }: Props) => {
   const [reassigningInstance, setReassigningInstance] = useState<CollectorInstanceView | null>(null);
+  const [deletingInstance, setDeletingInstance] = useState<CollectorInstanceView | null>(null);
+  const { deleteInstance } = useCollectorsMutations();
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!deletingInstance) return;
+
+    await deleteInstance(deletingInstance.instance_uid);
+    setDeletingInstance(null);
+  }, [deletingInstance, deleteInstance]);
 
   const entityActions = useCallback(
     (instance: CollectorInstanceView) => (
@@ -49,6 +59,8 @@ const useTableElements = ({ onInstanceClick }: Props) => {
           <MenuItem onSelect={() => setReassigningInstance(instance)}>
             Reassign to fleet
           </MenuItem>
+          <MenuItem divider />
+          <DeleteMenuItem onSelect={() => setDeletingInstance(instance)} />
         </MoreActions>
       </ButtonToolbar>
     ),
@@ -65,10 +77,22 @@ const useTableElements = ({ onInstanceClick }: Props) => {
     />
   ) : null;
 
+  const renderDeleteConfirmDialog = deletingInstance ? (
+    <ConfirmDialog
+      title="Delete collector instance"
+      show
+      onConfirm={handleConfirmDelete}
+      onCancel={() => setDeletingInstance(null)}>
+      Are you sure you want to delete instance <strong>{deletingInstance.hostname || deletingInstance.instance_uid}</strong>?
+      The collector will need to be re-enrolled to appear again.
+    </ConfirmDialog>
+  ) : null;
+
   return {
     entityActions,
     bulkActions,
     renderReassignModal,
+    renderDeleteConfirmDialog,
   };
 };
 

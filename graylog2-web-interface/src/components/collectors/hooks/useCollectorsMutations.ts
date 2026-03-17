@@ -16,7 +16,7 @@
  */
 import {useMutation, useQueryClient} from '@tanstack/react-query';
 
-import { CollectorsFleets, CollectorsSources, CollectorsConfig as CollectorsConfigApi, OpAMPEnrollment } from '@graylog/server-api';
+import { Collectors, CollectorsFleets, CollectorsSources, CollectorsConfig as CollectorsConfigApi, OpAMPEnrollment } from '@graylog/server-api';
 
 import request from 'routing/request';
 import UserNotification from 'util/UserNotification';
@@ -186,6 +186,22 @@ const useCollectorsMutations = () => {
     },
   });
 
+  // Instance delete mutation
+  const deleteInstanceMutation = useMutation({
+    mutationFn: (instanceUid: string) => Collectors.deleteInstance(instanceUid),
+    onError: (errorThrown) => {
+      UserNotification.error(
+        `Deleting instance failed: ${errorThrown}`,
+        'Could not delete instance',
+      );
+    },
+    onSuccess: () => {
+      UserNotification.success('Instance has been deleted.', 'Success!');
+
+      return invalidateCollectorsQueries();
+    },
+  });
+
   // Config mutation
   const updateConfigMutation = useMutation({
     mutationFn: (config: CollectorsConfigRequest) => CollectorsConfigApi.put(config),
@@ -233,6 +249,8 @@ const useCollectorsMutations = () => {
     // Instance operations
     reassignInstances: reassignInstancesMutation.mutateAsync,
     isReassigningInstances: reassignInstancesMutation.isPending,
+    deleteInstance: deleteInstanceMutation.mutateAsync,
+    isDeletingInstance: deleteInstanceMutation.isPending,
 
     // Config operations
     updateConfig: updateConfigMutation.mutateAsync,

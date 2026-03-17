@@ -71,7 +71,7 @@ const CollectorsInstancesPage = () => {
     return OrderedMap({ last_seen: [`${cutoff}><`] });
   }, [config?.collector_default_visibility_threshold]);
 
-  const { entityActions, bulkActions, renderReassignModal } = useTableElements({
+  const { entityActions, bulkActions, renderReassignModal, renderDeleteConfirmDialog } = useTableElements({
     onInstanceClick: setSelectedInstance,
   });
 
@@ -124,6 +124,7 @@ const CollectorsInstancesPage = () => {
       )}
 
       {renderReassignModal}
+      {renderDeleteConfirmDialog}
     </DocumentTitle>
   );
 };
