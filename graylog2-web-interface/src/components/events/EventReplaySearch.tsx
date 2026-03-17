@@ -67,12 +67,15 @@ type Props = {
   searchPageLayout?: Partial<LayoutState>;
 };
 
-const EventReplaySearch = ({ eventDefinitionMappedData, eventData, searchPageLayout = undefined }: Props) => {
+const EventReplaySearch = ({
+  eventDefinitionMappedData,
+  eventData,
+  searchPageLayout = undefined,
+}: Props) => {
   const { eventDefinition, aggregations } = eventDefinitionMappedData;
-  const { closeSidebar, openSidebar, isOpen } = useRightSidebar();
+  const { openSidebar } = useRightSidebar();
   const isRightSidebarEnabled = useFeature('replay_search_right_sidebar');
-  const effectiveLayout =
-    searchPageLayout ?? (isRightSidebarEnabled ? defaultSearchPageLayout : legacySearchPageLayout);
+  const effectiveLayout = searchPageLayout ?? (isRightSidebarEnabled ? defaultSearchPageLayout : legacySearchPageLayout);
 
   const view = useCreateViewForEvent({
     eventData,
@@ -93,20 +96,12 @@ const EventReplaySearch = ({ eventDefinitionMappedData, eventData, searchPageLay
     if (isRightSidebarEnabled) {
       openSidebar({
         id: 'replay-search-sidebar',
-        title: 'Alert/Event Overview',
+        title: 'Replay Details',
         component: ReplaySearchSidebar,
         props: { alertId: eventData?.id, definitionId: eventDefinition?.id },
       });
     }
-
-    return () => {
-      if (!isOpen) {
-        closeSidebar();
-      }
-    };
-    // Leaving out `isOpen` on purpose, we want to close the sidebar only if it was not open previously
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isRightSidebarEnabled, openSidebar, closeSidebar, eventData?.id, eventDefinition?.id]);
+  }, [isRightSidebarEnabled, openSidebar, eventData?.id, eventDefinition?.id]);
 
   return (
     <ReplaySearchContext.Provider value={replaySearchContext}>
@@ -115,7 +110,11 @@ const EventReplaySearch = ({ eventDefinitionMappedData, eventData, searchPageLay
   );
 };
 
-const WithLoadingBarrier = ({ eventDefinitionMappedData, eventData, searchPageLayout = undefined }: Props) => (
+const WithLoadingBarrier = ({
+  eventDefinitionMappedData,
+  eventData,
+  searchPageLayout = undefined,
+}: Props) => (
   <LoadingBarrier eventDefinition={eventDefinitionMappedData.eventDefinition}>
     <EventReplaySearch
       eventDefinitionMappedData={eventDefinitionMappedData}
