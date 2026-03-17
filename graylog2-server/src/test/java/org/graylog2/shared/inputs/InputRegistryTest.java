@@ -31,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -116,7 +117,7 @@ class InputRegistryTest {
         MessageInput messageInput = mock(MessageInput.class);
         when(messageInput.getId()).thenReturn(inputId);
         when(ioState.getStoppable()).thenReturn(messageInput);
-        when(ioState.getState()).thenReturn(state);
+        lenient().when(ioState.getState()).thenReturn(state);
         return ioState;
     }
 }
