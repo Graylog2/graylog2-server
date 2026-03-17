@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fixed per-message MongoDB query caused by TimeStampConfig grace period cache unable to store null values."
+
+pulls = ["25344"]
