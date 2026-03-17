@@ -16,12 +16,15 @@
  */
 package org.graylog2.cluster.nodes.mongodb;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoCommandException;
 import com.mongodb.MongoSecurityException;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.bson.Document;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +38,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BiFunction;
@@ -77,7 +81,9 @@ public class MongodbClusterCommand {
     }
 
     private <T> Map<String, T> runInParallel(BiFunction<String, MongoClient, T> call, List<String> hosts) {
-        ExecutorService executor = Executors.newFixedThreadPool(hosts.size());
+        ExecutorService executor = Executors.newFixedThreadPool(hosts.size(), new ThreadFactoryBuilder()
+                .setNameFormat("mongodb-cluster-call-%d")
+                .build());
         try {
             Map<String, Future<T>> futures = hosts.stream()
                     .collect(Collectors.toMap(host -> host, host -> executor.submit(() -> runCommand(host, call))));
