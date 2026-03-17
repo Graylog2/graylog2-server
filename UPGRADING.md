@@ -64,9 +64,6 @@ configuration (indices, feature fields, intervals, etc.) will not be displayed a
 edited or re-enabled. **Note: If you have custom anomaly detectors, you should note down their configuration 
 before upgrading.**
 
-To install Random Cut Forest (RCF) detectors, enable the anomaly detection content pack in Illuminate. 
-New detector types can be created by defining Event Definitions using the `Anomaly Events` type.
-
 ## Configuration File Changes
 
 | Option | Action    | Description |
