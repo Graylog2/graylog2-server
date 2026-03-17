@@ -17,10 +17,42 @@
 package org.graylog2.cluster.nodes.mongodb;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import jakarta.inject.Inject;
+import org.graylog2.configuration.MongoDbConfiguration;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
 public class DefaultMongodbConnectionResolver implements MongodbConnectionResolver {
+
+    private final MongoClientURI mongoClientURI;
+
+    @Inject
+    public DefaultMongodbConnectionResolver(MongoDbConfiguration configuration) {
+        this.mongoClientURI = configuration.getMongoClientURI();
+    }
+
     @Override
     public MongoClient resolve(String nodeName) {
-        return new MongoClient("mongodb://" + nodeName + "/?directConnection=true");
+        // Extract credentials from the original connection URI
+        final String username = mongoClientURI.getUsername();
+        final char[] password = mongoClientURI.getPassword();
+        final String database = mongoClientURI.getDatabase();
+
+        // Build connection string with credentials if they exist
+        final String connectionString;
+        if (username != null && password != null) {
+            // URL encode username and password to handle special characters
+            final String encodedUsername = URLEncoder.encode(username, StandardCharsets.UTF_8);
+            final String encodedPassword = URLEncoder.encode(new String(password), StandardCharsets.UTF_8);
+            connectionString = String.format(Locale.ROOT, "mongodb://%s:%s@%s/%s?directConnection=true",
+                    encodedUsername, encodedPassword, nodeName, database);
+        } else {
+            connectionString = String.format(Locale.ROOT, "mongodb://%s/?directConnection=true", nodeName);
+        }
+
+        return new MongoClient(connectionString);
     }
 }
