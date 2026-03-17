@@ -94,6 +94,23 @@ export type EnrollmentToken = {
   token: string;
 };
 
+export type EnrollmentTokenCreator = {
+  user_id: string;
+  username: string;
+};
+
+export type EnrollmentTokenMetadata = {
+  id: string;
+  jti: string;
+  kid: string;
+  fleet_id: string;
+  created_by: EnrollmentTokenCreator;
+  created_at: string;
+  expires_at: string | null;
+  usage_count: number;
+  last_used_at: string | null;
+};
+
 export type CollectorStats = {
   total_instances: number;
   online_instances: number;

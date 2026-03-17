@@ -24,6 +24,8 @@ import SectionGrid from 'components/common/Section/SectionGrid';
 
 import { useFleets, useCollectorsMutations } from '../hooks';
 
+import EnrollmentTokenList from './EnrollmentTokenList';
+
 type Platform = 'linux' | 'windows' | 'macos' | 'container';
 type TokenExpiry = 'PT24H' | 'P7D' | 'P30D' | 'never';
 
@@ -101,7 +103,7 @@ const ResultSection = styled.div(
 
 type TokenResponse = {
   token: string;
-  expiresAt: string;
+  expiresAt: string | null;
 };
 
 const DeploymentForm = () => {
@@ -213,7 +215,7 @@ const DeploymentForm = () => {
               </TokenRow>
               <InfoText>
                 Fleet: {fleets?.find((f) => f.id === fleetId)?.name} | Expires:{' '}
-                {new Date(tokenResponse.expiresAt).toLocaleString()}
+                {tokenResponse.expiresAt ? new Date(tokenResponse.expiresAt).toLocaleString() : 'Never'}
               </InfoText>
             </ResultSection>
 
@@ -227,6 +229,8 @@ const DeploymentForm = () => {
           </SectionGrid>
         </ResultsContainer>
       )}
+
+      <EnrollmentTokenList />
     </div>
   );
 };
