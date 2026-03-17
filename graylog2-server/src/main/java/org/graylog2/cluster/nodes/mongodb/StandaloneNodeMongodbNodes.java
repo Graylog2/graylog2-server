@@ -50,7 +50,7 @@ public class StandaloneNodeMongodbNodes implements MongodbNodesService {
         Document connections = serverStatus.get("connections", Document.class);
         final Integer availableConnections = connections.getInteger("available");
         final Integer currentConnections = connections.getInteger("current");
-        final double connectionsPercent = 100.0d / availableConnections * currentConnections;
+        final double connectionsPercent = 100.d * currentConnections / (availableConnections + currentConnections);
 
         // Get storage information
         double storageUsedPercent = MongodbNodeUtils.calculateStorageUsedPercent(mongoConnection);
