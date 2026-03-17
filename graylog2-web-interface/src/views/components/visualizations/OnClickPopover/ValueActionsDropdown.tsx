@@ -14,10 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext, useMemo } from 'react';
+import React, { useContext } from 'react';
 
 import type { FieldData, Step } from 'views/components/visualizations/OnClickPopover/Types';
-import useCurrentQueryId from 'views/logic/queries/useCurrentQueryId';
 import { ActionContext } from 'views/logic/ActionContext';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import ActionDropdown from 'views/components/actions/ActionDropdown';
@@ -28,6 +27,7 @@ import Popover from 'components/common/Popover';
 import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
 import { humanSeparator } from 'views/Constants';
 import PopoverTitle from 'views/components/visualizations/OnClickPopover/PopoverTitle';
+import useFieldActionsContext from 'views/components/actions/useFieldActionsContext';
 
 type Props = {
   onActionRun: () => void;
@@ -37,15 +37,12 @@ type Props = {
 };
 
 const ValueActionsDropdown = ({ value, field, onActionRun, setStep }: Props) => {
-  const queryId = useCurrentQueryId();
   const actionContext = useContext(ActionContext);
+  const { additionalHandlerArgs } = useFieldActionsContext();
   const { overflowingComponents, setOverflowingComponents } = useOverflowingComponents();
 
-  const handlerArgs = useMemo(() => {
-    const type = fieldTypeFor(field, actionContext.fieldTypes);
-
-    return { queryId, field, type, value, contexts: actionContext };
-  }, [actionContext, field, queryId, value]);
+  const type = fieldTypeFor(field, actionContext.fieldTypes);
+  const handlerArgs = { field, type, value, contexts: actionContext, ...additionalHandlerArgs };
 
   const showMultipleValueHeader = hasMultipleValueForActions(actionContext);
 

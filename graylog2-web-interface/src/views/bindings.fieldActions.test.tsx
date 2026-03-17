@@ -17,7 +17,6 @@
 import MockStore from 'helpers/mocking/StoreMock';
 import MockAction from 'helpers/mocking/MockAction';
 import FieldType, { FieldTypes, Properties } from 'views/logic/fieldtypes/FieldType';
-import type { ActionDefinition } from 'views/components/actions/ActionHandler';
 import { createSearch } from 'fixtures/searches';
 import type { RootState } from 'views/types';
 
@@ -41,8 +40,7 @@ describe('Views bindings field actions', () => {
     contexts: {},
     type: FieldType.Unknown,
   };
-  const findAction = (type: string): ActionDefinition<{ analysisDisabledFields?: Array<string> }> =>
-    fieldActions.find((binding) => binding.type === type);
+  const findAction = (type: string) => fieldActions.find((binding) => binding.type === type);
   const view = createSearch({ queryId: 'query1' });
   const rootState = { view: { view } } as RootState;
   const getState = jest.fn(() => rootState);

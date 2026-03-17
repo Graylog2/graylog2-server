@@ -17,55 +17,28 @@
 import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
-import type { QueryId } from 'views/logic/queries/Query';
-import type { GetState } from 'views/types';
-import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 
 import type {
   ActionDefinition,
-  ActionHandlerArguments,
   ActionHandlerCondition,
   ExecuteThunkAction,
+  ResolvedActionHandlerArguments,
 } from './ActionHandler';
 
-const defaultGetState: GetState = () => ({}) as ReturnType<GetState>;
-
-export type EvaluateActionCondition = <Contexts = unknown>(
-  condition: ActionHandlerCondition<Contexts> | undefined,
-  args: ActionHandlerArguments<Contexts>,
+export type EvaluateActionCondition<T extends object = object> = (
+  condition: ActionHandlerCondition<T> | undefined,
+  args: ResolvedActionHandlerArguments<T>,
   fallbackValue: boolean,
 ) => boolean;
 
-const defaultEvaluateCondition: EvaluateActionCondition = (condition, args, fallbackValue) => {
-  if (!condition) {
-    return fallbackValue;
-  }
-
-  return condition(args, defaultGetState);
-};
-
-const defaultExecuteThunkAction: ExecuteThunkAction = () => Promise.resolve(undefined);
-
-export type FieldActionsContextValue = {
-  queryId?: QueryId;
-  dispatch?: ViewsDispatch;
-  getState: GetState;
-  evaluateCondition: EvaluateActionCondition;
+export type FieldActionsContextValue<TAdditional extends object = object> = {
+  evaluateCondition: EvaluateActionCondition<TAdditional>;
   executeThunkAction: ExecuteThunkAction;
-  valueActions?: Array<ActionDefinition>;
-  fieldActions?: Array<ActionDefinition>;
+  additionalHandlerArgs: TAdditional;
+  valueActions?: Array<ActionDefinition<TAdditional>>;
+  fieldActions?: Array<ActionDefinition<TAdditional>>;
 };
 
-export const DEFAULT_FIELD_ACTIONS_CONTEXT: FieldActionsContextValue = {
-  queryId: undefined,
-  dispatch: undefined,
-  getState: defaultGetState,
-  evaluateCondition: defaultEvaluateCondition,
-  executeThunkAction: defaultExecuteThunkAction,
-  valueActions: [],
-  fieldActions: [],
-};
-
-const FieldActionsContext = React.createContext<FieldActionsContextValue>(DEFAULT_FIELD_ACTIONS_CONTEXT);
+const FieldActionsContext = React.createContext<FieldActionsContextValue | undefined>(undefined);
 
 export default singleton('contexts.FieldActionsContext', () => FieldActionsContext);

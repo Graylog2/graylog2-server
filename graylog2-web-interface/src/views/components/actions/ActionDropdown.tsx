@@ -15,20 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 import styled from 'styled-components';
 
 import { MenuItem } from 'components/bootstrap';
 import ActionMenuItem from 'views/components/actions/ActionMenuItem';
 import type {
-  ActionDefinition,
   ActionHandlerArguments,
   ActionComponents,
+  ActionDefinition,
 } from 'views/components/actions/ActionHandler';
 import { Spinner } from 'components/common';
 import useExternalValueActions from 'views/hooks/useExternalValueActions';
-import FieldActionsContext from 'views/components/actions/FieldActionsContext';
-import type { EvaluateActionCondition } from 'views/components/actions/FieldActionsContext';
+import { type EvaluateActionCondition } from 'views/components/actions/FieldActionsContext';
+import useFieldActionsContext from 'views/components/actions/useFieldActionsContext';
 
 const DropdownHeader = styled.span`
   padding-left: 10px;
@@ -56,7 +55,7 @@ const filterVisibleActions = (
   });
 
 const useInternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
-  const { evaluateCondition, valueActions, fieldActions } = useContext(FieldActionsContext);
+  const { evaluateCondition, valueActions, fieldActions } = useFieldActionsContext();
   const actions = type === 'value' ? valueActions : fieldActions;
 
   if (type === 'value') {
@@ -72,7 +71,7 @@ const useInternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs
 
 const useExternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
   const { isLoading, isError, externalValueActions } = useExternalValueActions();
-  const { evaluateCondition } = useContext(FieldActionsContext);
+  const { evaluateCondition } = useFieldActionsContext();
 
   if (type !== 'value') {
     return { isLoading, isError, externalActions: [] };
