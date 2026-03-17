@@ -25,6 +25,4 @@ import java.time.Duration;
 public record CreateEnrollmentTokenRequest(
         @JsonProperty("fleet_id") @NotBlank String fleetId,
         @JsonProperty("expires_in") @Nullable Duration expiresIn
-) {
-    public static final Duration DEFAULT_EXPIRY = Duration.ofDays(7);
-}
+) {}

@@ -16,28 +16,42 @@
  */
 package org.graylog.collectors.opamp.auth;
 
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.IndexModel;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Updates;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
+import org.graylog.collectors.db.EnrollmentTokenCreator;
+import org.graylog.collectors.db.EnrollmentTokenDTO;
 import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog.collectors.opamp.rest.CreateEnrollmentTokenRequest;
 import org.graylog.collectors.opamp.rest.EnrollmentTokenResponse;
-import org.graylog.collectors.opamp.transport.OpAmpAuthContext;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
 import org.graylog.security.pki.PemUtils;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.PaginatedList;
+import org.graylog2.database.filtering.DbSortResolver;
+import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.PrivateKey;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -55,17 +69,29 @@ public class EnrollmentTokenService {
 
     private static final String AUDIENCE_SUFFIX = ":opamp";
 
+    public static final String COLLECTION_NAME = "collector_enrollment_tokens";
+
     private final CertificateService certificateService;
     private final ClusterConfigService clusterConfigService;
     private final OpAmpCaService opAmpCaService;
+    private final org.graylog2.database.MongoCollection<EnrollmentTokenDTO> tokenCollection;
+    private final MongoPaginationHelper<EnrollmentTokenDTO> paginationHelper;
 
     @Inject
     public EnrollmentTokenService(CertificateService certificateService,
                                   ClusterConfigService clusterConfigService,
-                                  OpAmpCaService opAmpCaService) {
+                                  OpAmpCaService opAmpCaService,
+                                  MongoCollections mongoCollections) {
         this.certificateService = certificateService;
         this.clusterConfigService = clusterConfigService;
         this.opAmpCaService = opAmpCaService;
+        this.tokenCollection = mongoCollections.collection(COLLECTION_NAME, EnrollmentTokenDTO.class);
+        this.paginationHelper = mongoCollections.paginationHelper(tokenCollection);
+        tokenCollection.createIndexes(List.of(
+                new IndexModel(Indexes.ascending(EnrollmentTokenDTO.FIELD_JTI), new IndexOptions().unique(true)),
+                new IndexModel(Indexes.ascending(EnrollmentTokenDTO.FIELD_FLEET_ID)),
+                new IndexModel(Indexes.ascending(EnrollmentTokenDTO.FIELD_EXPIRES_AT))
+        ));
     }
 
     private String getClusterId() {
@@ -108,52 +134,55 @@ public class EnrollmentTokenService {
      *   <li>{@code iss}: cluster ID (informational, not validated)</li>
      *   <li>{@code aud}: {@code {cluster_id}:opamp} (validated on receipt)</li>
      *   <li>{@code iat}: current timestamp</li>
-     *   <li>{@code exp}: expiration timestamp</li>
-     *   <li>{@code fleet_id}: optional fleet identifier</li>
+     *   <li>{@code exp}: expiration timestamp (if expiry specified)</li>
+     *   <li>{@code jti}: unique token identifier</li>
      * </ul>
      *
      * @param request the token creation request
+     * @param creator the user who created the token
      * @return the created token and its expiration time
      * @throws IllegalArgumentException if the requested expiry exceeds the signing certificate's validity
      */
-    public EnrollmentTokenResponse createToken(CreateEnrollmentTokenRequest request) {
+    public EnrollmentTokenResponse createToken(CreateEnrollmentTokenRequest request, EnrollmentTokenCreator creator) {
         final CertificateEntry signingCert = opAmpCaService.getTokenSigningCert();
 
-        final Duration expiresIn = request.expiresIn() != null
-                ? request.expiresIn()
-                : CreateEnrollmentTokenRequest.DEFAULT_EXPIRY;
-
         final Instant now = Instant.now();
-        final Instant expiresAt = now.plus(expiresIn);
+        final @Nullable Instant expiresAt = request.expiresIn() != null ? now.plus(request.expiresIn()) : null;
 
-        // Validate against cert expiry
-        final Instant certExpiry = signingCert.notAfter();
-        if (expiresAt.isAfter(certExpiry)) {
-            throw new IllegalArgumentException(
-                    f("Token expiry %s exceeds signing certificate expiry %s", expiresAt, certExpiry));
+        // Validate against cert expiry only when token has an expiry
+        if (expiresAt != null) {
+            final Instant certExpiry = signingCert.notAfter();
+            if (expiresAt.isAfter(certExpiry)) {
+                throw new IllegalArgumentException(
+                        f("Token expiry %s exceeds signing certificate expiry %s", expiresAt, certExpiry));
+            }
         }
 
-        final String token = buildJwt(signingCert, request.fleetId(), now, expiresAt);
+        final String jti = UUID.randomUUID().toString();
+        final String token = buildJwt(signingCert, jti, now, expiresAt);
+
+        tokenCollection.insertOne(new EnrollmentTokenDTO(null, jti, signingCert.fingerprint(),
+                request.fleetId(), creator, now, expiresAt, 0, null));
 
         return new EnrollmentTokenResponse(token, expiresAt);
     }
 
     /**
-     * Validates an enrollment token and extracts the auth context.
+     * Validates an enrollment token and extracts the token metadata.
      * <p>
      * Validation includes:
      * <ul>
      *   <li>Signature verification using the cert identified by {@code kid} header</li>
      *   <li>Expiration check (handled automatically by JJWT)</li>
      *   <li>Audience validation (must be {@code {cluster_id}:opamp})</li>
-     *   <li>Required {@code fleet_id} claim</li>
+     *   <li>JTI lookup against persisted metadata (token must not be deleted)</li>
      * </ul>
      *
      * @param token     the JWT token string
      * @param transport the transport type (HTTP or WEBSOCKET)
-     * @return the enrollment context if valid, empty otherwise
+     * @return the enrollment token metadata if valid, empty otherwise
      */
-    public Optional<OpAmpAuthContext.Enrollment> validateToken(String token, OpAmpAuthContext.Transport transport) {
+    public Optional<EnrollmentTokenDTO> validateToken(String token, @SuppressWarnings("unused") Object transport) {
         try {
             final String expectedAudience = getClusterId() + AUDIENCE_SUFFIX;
 
@@ -177,21 +206,58 @@ public class EnrollmentTokenService {
                     .build()
                     .parseSignedClaims(token);
 
-            final String fleetId = jws.getPayload().get("fleet_id", String.class);
-            if (fleetId == null || fleetId.isBlank()) {
-                LOG.warn("Enrollment token validation failed: missing fleet_id");
+            final String jti = jws.getPayload().getId();
+            if (jti == null || jti.isBlank()) {
+                LOG.warn("Enrollment token validation failed: missing jti");
                 return Optional.empty();
             }
 
-            return Optional.of(new OpAmpAuthContext.Enrollment(fleetId, transport));
+            final EnrollmentTokenDTO metadata = tokenCollection.find(
+                    Filters.eq(EnrollmentTokenDTO.FIELD_JTI, jti)).first();
+            if (metadata == null) {
+                LOG.warn("Enrollment token validation failed: token metadata not found (deleted?)");
+                return Optional.empty();
+            }
+
+            return Optional.of(metadata);
         } catch (Exception e) {
             LOG.warn("Enrollment token validation failed: {}", e.getMessage());
             return Optional.empty();
         }
     }
 
-    private String buildJwt(CertificateEntry signingCert, String fleetId,
-                            Instant issuedAt, Instant expiresAt) {
+    public boolean delete(String id) {
+        return tokenCollection.deleteOne(Filters.eq("_id", new ObjectId(id))).getDeletedCount() > 0;
+    }
+
+    public void deleteAllByFleet(String fleetId) {
+        tokenCollection.deleteMany(Filters.eq(EnrollmentTokenDTO.FIELD_FLEET_ID, fleetId));
+    }
+
+    public void incrementUsage(String id) {
+        tokenCollection.updateOne(
+                Filters.eq("_id", new ObjectId(id)),
+                Updates.combine(
+                        Updates.inc(EnrollmentTokenDTO.FIELD_USAGE_COUNT, 1),
+                        Updates.set(EnrollmentTokenDTO.FIELD_LAST_USED_AT, Date.from(Instant.now()))
+                )
+        );
+    }
+
+    public PaginatedList<EnrollmentTokenDTO> findPaginated(Bson query,
+                                                            DbSortResolver.ResolvedSort resolvedSort,
+                                                            int page, int perPage) {
+        return paginationHelper
+                .filter(query)
+                .sort(resolvedSort.sort())
+                .pipeline(resolvedSort.preSortStages())
+                .postSortPipeline(resolvedSort.postSortStages())
+                .perPage(perPage)
+                .page(page);
+    }
+
+    private String buildJwt(CertificateEntry signingCert, String jti,
+                            Instant issuedAt, @Nullable Instant expiresAt) {
         try {
             final String privateKeyPem = certificateService.encryptedValueService()
                     .decrypt(signingCert.privateKey());
@@ -205,13 +271,13 @@ public class EnrollmentTokenService {
                     .add("ctt", "enrollment")
                     .add("kid", signingCert.fingerprint())
                     .and()
+                    .id(jti)
                     .issuer(clusterId)
                     .audience().add(audience).and()
-                    .issuedAt(Date.from(issuedAt))
-                    .expiration(Date.from(expiresAt));
+                    .issuedAt(Date.from(issuedAt));
 
-            if (fleetId != null) {
-                builder.claim("fleet_id", fleetId);
+            if (expiresAt != null) {
+                builder.expiration(Date.from(expiresAt));
             }
 
             return builder.signWith(privateKey).compact();

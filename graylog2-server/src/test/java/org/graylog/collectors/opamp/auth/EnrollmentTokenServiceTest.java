@@ -21,6 +21,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.db.EnrollmentTokenCreator;
+import org.graylog.collectors.db.EnrollmentTokenDTO;
 import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog.collectors.opamp.rest.CreateEnrollmentTokenRequest;
 import org.graylog.collectors.opamp.rest.EnrollmentTokenResponse;
@@ -54,7 +56,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.within;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -65,6 +66,7 @@ import static org.mockito.Mockito.when;
 class EnrollmentTokenServiceTest {
 
     private static final String TEST_CLUSTER_ID = "test-cluster-id-12345";
+    private static final EnrollmentTokenCreator TEST_CREATOR = new EnrollmentTokenCreator("test-user-id", "testuser");
 
     private ClusterConfigService clusterConfigService;
     private EnrollmentTokenService enrollmentTokenService;
@@ -89,7 +91,7 @@ class EnrollmentTokenServiceTest {
         when(clusterConfigService.get(ClusterId.class))
                 .thenReturn(ClusterId.create(TEST_CLUSTER_ID));
         final OpAmpCaService opAmpCaService = new OpAmpCaService(certificateService, clusterConfigService);
-        enrollmentTokenService = new EnrollmentTokenService(certificateService, clusterConfigService, opAmpCaService);
+        enrollmentTokenService = new EnrollmentTokenService(certificateService, clusterConfigService, opAmpCaService, mongoCollections);
     }
 
     @Test
@@ -163,7 +165,7 @@ class EnrollmentTokenServiceTest {
                 Duration.ofDays(1)
         );
 
-        final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request);
+        final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_CREATOR);
 
         assertThat(response.token()).isNotNull();
         assertThat(response.expiresAt()).isAfter(Instant.now());
@@ -181,22 +183,33 @@ class EnrollmentTokenServiceTest {
 
         assertThat(jws.getPayload().getIssuer()).isEqualTo(TEST_CLUSTER_ID);
         assertThat(jws.getPayload().getAudience()).containsExactly(TEST_CLUSTER_ID + ":opamp");
-        assertThat(jws.getPayload().get("fleet_id", String.class)).isEqualTo("test-fleet");
+        assertThat(jws.getPayload().getId()).isNotNull();
         assertThat(jws.getHeader().get("kid")).isEqualTo(signingCert.fingerprint());
     }
 
     @Test
-    void createTokenUsesDefaultExpiryWhenNotSpecified() {
+    void createTokenWithNullExpiryProducesNonExpiringJwt() throws Exception {
         // No existing CollectorsConfig - service will create certs and cache in memory
         when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
 
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest("default-fleet", null);
 
-        final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request);
+        final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_CREATOR);
 
-        // Default is 7 days
-        final Instant expectedExpiry = Instant.now().plus(CreateEnrollmentTokenRequest.DEFAULT_EXPIRY);
-        assertThat(response.expiresAt()).isCloseTo(expectedExpiry, within(1, ChronoUnit.MINUTES));
+        // Null expiresIn means no expiry
+        assertThat(response.expiresAt()).isNull();
+
+        // Verify JWT has no exp claim
+        final CertificateEntry signingCert = enrollmentTokenService.getTokenSigningCert();
+        final X509Certificate cert = PemUtils.parseCertificate(signingCert.certificate());
+        final PublicKey publicKey = cert.getPublicKey();
+
+        final Jws<Claims> jws = Jwts.parser()
+                .verifyWith(publicKey)
+                .build()
+                .parseSignedClaims(response.token());
+
+        assertThat(jws.getPayload().getExpiration()).isNull();
     }
 
     @Test
@@ -210,7 +223,7 @@ class EnrollmentTokenServiceTest {
                 Duration.ofDays(3 * 365)
         );
 
-        assertThatThrownBy(() -> enrollmentTokenService.createToken(request))
+        assertThatThrownBy(() -> enrollmentTokenService.createToken(request, TEST_CREATOR))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("exceeds signing certificate expiry");
     }
@@ -225,14 +238,13 @@ class EnrollmentTokenServiceTest {
                 Duration.ofDays(1)
         );
 
-        final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request);
+        final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_CREATOR);
 
-        final Optional<OpAmpAuthContext.Enrollment> result = enrollmentTokenService.validateToken(
+        final Optional<EnrollmentTokenDTO> result = enrollmentTokenService.validateToken(
                 response.token(), OpAmpAuthContext.Transport.HTTP);
 
         assertThat(result).isPresent();
         assertThat(result.get().fleetId()).isEqualTo("test-fleet");
-        assertThat(result.get().transport()).isEqualTo(OpAmpAuthContext.Transport.HTTP);
     }
 
     @Test
@@ -245,12 +257,12 @@ class EnrollmentTokenServiceTest {
                 "test-fleet",
                 Duration.ofSeconds(1)
         );
-        final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request);
+        final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_CREATOR);
 
         // Wait for expiry
         Thread.sleep(1500);
 
-        final Optional<OpAmpAuthContext.Enrollment> result = enrollmentTokenService.validateToken(
+        final Optional<EnrollmentTokenDTO> result = enrollmentTokenService.validateToken(
                 response.token(), OpAmpAuthContext.Transport.HTTP);
 
         assertThat(result).isEmpty();
@@ -265,13 +277,13 @@ class EnrollmentTokenServiceTest {
                 "test-fleet",
                 Duration.ofDays(1)
         );
-        final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request);
+        final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_CREATOR);
 
         // Switch cluster ID so validation audience check fails
         when(clusterConfigService.get(ClusterId.class))
                 .thenReturn(ClusterId.create("different-cluster-id"));
 
-        final Optional<OpAmpAuthContext.Enrollment> result = enrollmentTokenService.validateToken(
+        final Optional<EnrollmentTokenDTO> result = enrollmentTokenService.validateToken(
                 response.token(), OpAmpAuthContext.Transport.HTTP);
 
         assertThat(result).isEmpty();
@@ -286,12 +298,12 @@ class EnrollmentTokenServiceTest {
                 "test-fleet",
                 Duration.ofDays(1)
         );
-        final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request);
+        final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_CREATOR);
 
         // Tamper with the signature (last part of JWT)
         final String tamperedToken = response.token().substring(0, response.token().lastIndexOf('.') + 1) + "invalid";
 
-        final Optional<OpAmpAuthContext.Enrollment> result = enrollmentTokenService.validateToken(
+        final Optional<EnrollmentTokenDTO> result = enrollmentTokenService.validateToken(
                 tamperedToken, OpAmpAuthContext.Transport.HTTP);
 
         assertThat(result).isEmpty();
@@ -303,7 +315,7 @@ class EnrollmentTokenServiceTest {
         when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
 
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest("test-fleet", Duration.ofDays(1));
-        final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request);
+        final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_CREATOR);
 
         // Decode header without verification
         final String[] parts = response.token().split("\\.");
@@ -321,9 +333,90 @@ class EnrollmentTokenServiceTest {
         // This is a token with header {"alg":"EdDSA","kid":"sha256:unknown"}
         final String fakeToken = "eyJhbGciOiJFZERTQSIsImtpZCI6InNoYTI1Njp1bmtub3duIn0.eyJpc3MiOiJodHRwczovL2dyYXlsb2cuZXhhbXBsZS5jb20vIn0.invalidsig";
 
-        final Optional<OpAmpAuthContext.Enrollment> result = enrollmentTokenService.validateToken(
+        final Optional<EnrollmentTokenDTO> result = enrollmentTokenService.validateToken(
                 fakeToken, OpAmpAuthContext.Transport.HTTP);
 
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    void createTokenPersistsMetadata() {
+        // No existing CollectorsConfig - service will create certs and cache in memory
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+
+        final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
+                "persist-fleet",
+                Duration.ofDays(1)
+        );
+        final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_CREATOR);
+
+        // Validate the token to retrieve the persisted DTO
+        final Optional<EnrollmentTokenDTO> result = enrollmentTokenService.validateToken(
+                response.token(), OpAmpAuthContext.Transport.HTTP);
+
+        assertThat(result).isPresent();
+        final EnrollmentTokenDTO dto = result.get();
+        assertThat(dto.fleetId()).isEqualTo("persist-fleet");
+        assertThat(dto.createdBy()).isEqualTo(TEST_CREATOR);
+        assertThat(dto.jti()).isNotNull();
+        assertThat(dto.kid()).isNotNull();
+        assertThat(dto.createdAt()).isNotNull();
+        assertThat(dto.usageCount()).isEqualTo(0);
+        assertThat(dto.lastUsedAt()).isNull();
+    }
+
+    @Test
+    void validateTokenRejectsDeletedToken() {
+        // No existing CollectorsConfig - service will create certs and cache in memory
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+
+        final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
+                "delete-fleet",
+                Duration.ofDays(1)
+        );
+        final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_CREATOR);
+
+        // Validate first to get the DTO with its ID
+        final Optional<EnrollmentTokenDTO> beforeDelete = enrollmentTokenService.validateToken(
+                response.token(), OpAmpAuthContext.Transport.HTTP);
+        assertThat(beforeDelete).isPresent();
+
+        // Delete the token
+        final boolean deleted = enrollmentTokenService.delete(beforeDelete.get().id());
+        assertThat(deleted).isTrue();
+
+        // Try to validate again - should be empty since metadata was deleted
+        final Optional<EnrollmentTokenDTO> afterDelete = enrollmentTokenService.validateToken(
+                response.token(), OpAmpAuthContext.Transport.HTTP);
+        assertThat(afterDelete).isEmpty();
+    }
+
+    @Test
+    void incrementUsageUpdatesCountAndLastUsed() {
+        // No existing CollectorsConfig - service will create certs and cache in memory
+        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+
+        final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
+                "usage-fleet",
+                Duration.ofDays(1)
+        );
+        final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_CREATOR);
+
+        // Validate to get the DTO
+        final Optional<EnrollmentTokenDTO> initial = enrollmentTokenService.validateToken(
+                response.token(), OpAmpAuthContext.Transport.HTTP);
+        assertThat(initial).isPresent();
+        assertThat(initial.get().usageCount()).isEqualTo(0);
+        assertThat(initial.get().lastUsedAt()).isNull();
+
+        // Increment usage
+        enrollmentTokenService.incrementUsage(initial.get().id());
+
+        // Validate again to get the updated DTO
+        final Optional<EnrollmentTokenDTO> updated = enrollmentTokenService.validateToken(
+                response.token(), OpAmpAuthContext.Transport.HTTP);
+        assertThat(updated).isPresent();
+        assertThat(updated.get().usageCount()).isEqualTo(1);
+        assertThat(updated.get().lastUsedAt()).isNotNull();
     }
 }
