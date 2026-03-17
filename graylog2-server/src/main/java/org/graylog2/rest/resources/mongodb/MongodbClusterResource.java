@@ -124,7 +124,7 @@ public class MongodbClusterResource extends RestResource {
     @Timed
     @RequiresPermissions(RestPermissions.MONGODB_NODES_READ)
     @Operation(summary = "Get a paginated list of all MongoDB nodes in this cluster")
-    public PageListResponse<MongodbNode> dataNodes(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+    public PageListResponse<MongodbNode> listNodes(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                    @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                    @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                                    @Parameter(name = "sort",
