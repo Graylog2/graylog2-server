@@ -46,20 +46,13 @@ const ProcessingConfigModalForm = ({ closeModal, formConfig }: Props) => {
   const saveConfig = (values: FormConfig) => {
     if (!hasNoActiveProcessor()) {
       const { processor_order, disabled_processors, grace_period } = values;
-      const updates: Array<Promise<void>> = [
+      Promise.allSettled([
         ConfigurationsActions.updateMessageProcessorsConfig(ConfigurationType.MESSAGE_PROCESSORS_CONFIG, {
           processor_order,
           disabled_processors,
         }),
-      ];
-
-      if (grace_period) {
-        updates.push(ConfigurationsActions.update(ConfigurationType.GLOBAL_PROCESSING_RULE_CONFIG, { grace_period }));
-      } else {
-        updates.push(ConfigurationsActions.remove(ConfigurationType.GLOBAL_PROCESSING_RULE_CONFIG));
-      }
-
-      Promise.allSettled(updates).then(() => {
+        ConfigurationsActions.update(ConfigurationType.GLOBAL_PROCESSING_RULE_CONFIG, { grace_period }),
+      ]).then(() => {
         closeModal();
       });
     }
