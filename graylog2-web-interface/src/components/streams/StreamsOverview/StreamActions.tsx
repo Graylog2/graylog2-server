@@ -195,12 +195,12 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
         </IfPermitted>
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
           <MenuItem onSelect={toggleStreamRuleModal} disabled={isDefaultStream}>
-            Quick add rule {isDefaultStream && <DefaultStreamHelp />}
+            Quick Add Rule {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
           <MenuItem onSelect={toggleUpdateModal} disabled={isDefaultStream}>
-            Edit stream {isDefaultStream && <DefaultStreamHelp />}
+            Edit Stream {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>
 
@@ -227,18 +227,18 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
         </IfPermitted>
 
         <MenuItem onSelect={setStartpage} disabled={currentUser.readOnly}>
-          Set as startpage
+          Set as Start Page
         </MenuItem>
 
         <IfPermitted permissions={['streams:create', `streams:read:${stream.id}`]}>
           <MenuItem onSelect={toggleCloneModal} disabled={isDefaultStream}>
-            Clone this stream {isDefaultStream && <DefaultStreamHelp />}
+            Clone Stream {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>
 
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
           <DeleteMenuItem onSelect={toggleDeleteModal} disabled={isDefaultStream}>
-            Delete this stream {isDefaultStream && <DefaultStreamHelp />}
+            Delete Stream {isDefaultStream && <DefaultStreamHelp />}
           </DeleteMenuItem>
         </IfPermitted>
       </MoreActions>
