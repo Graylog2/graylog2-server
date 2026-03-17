@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
 
