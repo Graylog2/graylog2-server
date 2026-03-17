@@ -25,9 +25,6 @@ import type { StartPage } from 'logic/users/User';
 import ContentStreamContainer from 'components/content-stream/ContentStreamContainer';
 import useProductName from 'brand-customization/useProductName';
 import { hasAdminPermission } from 'util/PermissionsMixin';
-import Button from 'components/bootstrap/Button';
-import useRightSidebar from 'hooks/useRightSidebar';
-import ExampleSidebarContent from 'components/layout/RightSidebar/ExampleSidebarContent';
 
 import LastOpenList from './LastOpenList';
 import FavoriteItemsList from './FavoriteItemsList';
