@@ -93,14 +93,14 @@ class OpAmpServiceTest {
         final EnrollmentTokenDTO tokenDto = new EnrollmentTokenDTO("token-id", "jti-1", "kid-1", "test-fleet",
                 new EnrollmentTokenCreator("user-id", "admin"), Instant.now(), null, 0, null);
 
-        when(enrollmentTokenService.validateToken(eq(token), eq(TRANSPORT)))
+        when(enrollmentTokenService.validateToken(eq(token)))
                 .thenReturn(Optional.of(tokenDto));
 
         final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, TRANSPORT);
 
         assertThat(result).isPresent();
         assertThat(result.get()).isInstanceOf(OpAmpAuthContext.Enrollment.class);
-        verify(enrollmentTokenService).validateToken(token, TRANSPORT);
+        verify(enrollmentTokenService).validateToken(token);
         verify(agentTokenService, never()).validateAgentToken(any(), any());
     }
 
@@ -120,7 +120,7 @@ class OpAmpServiceTest {
         assertThat(result).isPresent();
         assertThat(result.get()).isInstanceOf(OpAmpAuthContext.Identified.class);
         verify(agentTokenService).validateAgentToken(token, TRANSPORT);
-        verify(enrollmentTokenService, never()).validateToken(any(), any());
+        verify(enrollmentTokenService, never()).validateToken(any());
     }
 
     @Test
@@ -132,7 +132,7 @@ class OpAmpServiceTest {
         final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, TRANSPORT);
 
         assertThat(result).isEmpty();
-        verify(enrollmentTokenService, never()).validateToken(any(), any());
+        verify(enrollmentTokenService, never()).validateToken(any());
         verify(agentTokenService, never()).validateAgentToken(any(), any());
     }
 
@@ -145,7 +145,7 @@ class OpAmpServiceTest {
         final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, TRANSPORT);
 
         assertThat(result).isEmpty();
-        verify(enrollmentTokenService, never()).validateToken(any(), any());
+        verify(enrollmentTokenService, never()).validateToken(any());
         verify(agentTokenService, never()).validateAgentToken(any(), any());
     }
 
@@ -156,7 +156,7 @@ class OpAmpServiceTest {
         final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, TRANSPORT);
 
         assertThat(result).isEmpty();
-        verify(enrollmentTokenService, never()).validateToken(any(), any());
+        verify(enrollmentTokenService, never()).validateToken(any());
         verify(agentTokenService, never()).validateAgentToken(any(), any());
     }
 
@@ -165,7 +165,7 @@ class OpAmpServiceTest {
         final Optional<OpAmpAuthContext> result = opAmpService.authenticate(null, TRANSPORT);
 
         assertThat(result).isEmpty();
-        verify(enrollmentTokenService, never()).validateToken(any(), any());
+        verify(enrollmentTokenService, never()).validateToken(any());
         verify(agentTokenService, never()).validateAgentToken(any(), any());
     }
 
@@ -176,7 +176,7 @@ class OpAmpServiceTest {
         final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, TRANSPORT);
 
         assertThat(result).isEmpty();
-        verify(enrollmentTokenService, never()).validateToken(any(), any());
+        verify(enrollmentTokenService, never()).validateToken(any());
         verify(agentTokenService, never()).validateAgentToken(any(), any());
     }
 
@@ -187,7 +187,7 @@ class OpAmpServiceTest {
         final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, TRANSPORT);
 
         assertThat(result).isEmpty();
-        verify(enrollmentTokenService, never()).validateToken(any(), any());
+        verify(enrollmentTokenService, never()).validateToken(any());
         verify(agentTokenService, never()).validateAgentToken(any(), any());
     }
 

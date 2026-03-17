@@ -87,7 +87,6 @@ public abstract class CollectorInstanceDTO implements BuildableMongoEntity<Colle
     @JsonProperty(FIELD_LAST_PROCESSED_TXN_SEQ)
     public abstract long lastProcessedTxnSeq();
 
-    @Nullable
     @JsonProperty(FIELD_ENROLLMENT_TOKEN_ID)
     public abstract String enrollmentTokenId();
 
@@ -143,7 +142,7 @@ public abstract class CollectorInstanceDTO implements BuildableMongoEntity<Colle
         public abstract Builder lastProcessedTxnSeq(long lastProcessedTxnSeq);
 
         @JsonProperty(FIELD_ENROLLMENT_TOKEN_ID)
-        public abstract Builder enrollmentTokenId(@Nullable String enrollmentTokenId);
+        public abstract Builder enrollmentTokenId(String enrollmentTokenId);
 
         public abstract CollectorInstanceDTO build();
     }

@@ -142,7 +142,7 @@ public class CollectorInstanceService {
         return collection.countDocuments(Filters.eq(FIELD_INSTANCE_UID, instanceUid)) == 1L;
     }
 
-    public CollectorInstanceDTO enroll(String instanceUid, String fleetId, String fingerprint, String certPem, String caId, Instant enrolledAt, @Nullable String enrollmentTokenId) {
+    public CollectorInstanceDTO enroll(String instanceUid, String fleetId, String fingerprint, String certPem, String caId, Instant enrolledAt, String enrollmentTokenId) {
         final CollectorInstanceDTO dto = CollectorInstanceDTO.builder()
                 .instanceUid(instanceUid)
                 .lastSeen(enrolledAt)

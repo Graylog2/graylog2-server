@@ -164,7 +164,7 @@ public class OpAmpService {
         }
 
         return switch (typ) {
-            case "enrollment" -> enrollmentTokenService.validateToken(token, transport)
+            case "enrollment" -> enrollmentTokenService.validateToken(token)
                     .map(dto -> new OpAmpAuthContext.Enrollment(dto, transport));
             case "agent" -> agentTokenService.validateAgentToken(token, transport).map(i -> i);
             default -> {

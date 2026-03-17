@@ -40,8 +40,10 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.conversions.Bson;
 import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.FleetService;
 import org.graylog.collectors.db.EnrollmentTokenCreator;
 import org.graylog.collectors.db.EnrollmentTokenDTO;
+import org.graylog.collectors.db.FleetDTO;
 import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -69,7 +71,15 @@ public class EnrollmentTokenResource extends RestResource {
     private static final String DEFAULT_SORT_DIRECTION = "desc";
 
     private static final List<EntityAttribute> ATTRIBUTES = List.of(
-            EntityAttribute.builder().id(EnrollmentTokenDTO.FIELD_FLEET_ID).title("Fleet").filterable(true).sortable(false).build(),
+            EntityAttribute.builder().id(EnrollmentTokenDTO.FIELD_FLEET_ID).title("Fleet")
+                    .relatedCollection(FleetService.COLLECTION_NAME)
+                    .relatedIdentifier("_id")
+                    .relatedDisplayFields(List.of(FleetDTO.FIELD_NAME))
+                    .relatedDisplayTemplate("{name}")
+                    .sortable(false)
+                    .searchable(true)
+                    .filterable(true)
+                    .build(),
             EntityAttribute.builder().id(EnrollmentTokenDTO.FIELD_CREATED_BY).title("Created By").sortable(false).build(),
             EntityAttribute.builder().id(EnrollmentTokenDTO.FIELD_CREATED_AT).title("Created At").sortable(true).build(),
             EntityAttribute.builder().id(EnrollmentTokenDTO.FIELD_EXPIRES_AT).title("Expires").sortable(true).build(),

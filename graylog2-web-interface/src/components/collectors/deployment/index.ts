@@ -15,3 +15,4 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 export { default as DeploymentForm } from './DeploymentForm';
+export { default as EnrollmentTokenList } from './EnrollmentTokenList';

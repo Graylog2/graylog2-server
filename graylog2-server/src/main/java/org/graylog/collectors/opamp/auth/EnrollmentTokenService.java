@@ -178,11 +178,10 @@ public class EnrollmentTokenService {
      *   <li>JTI lookup against persisted metadata (token must not be deleted)</li>
      * </ul>
      *
-     * @param token     the JWT token string
-     * @param transport the transport type (HTTP or WEBSOCKET)
+     * @param token the JWT token string
      * @return the enrollment token metadata if valid, empty otherwise
      */
-    public Optional<EnrollmentTokenDTO> validateToken(String token, @SuppressWarnings("unused") Object transport) {
+    public Optional<EnrollmentTokenDTO> validateToken(String token) {
         try {
             final String expectedAudience = getClusterId() + AUDIENCE_SUFFIX;
 

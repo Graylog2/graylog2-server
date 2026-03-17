@@ -19,7 +19,7 @@ import { Navigate } from 'react-router-dom';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { DeploymentForm } from 'components/collectors/deployment';
+import { DeploymentForm, EnrollmentTokenList } from 'components/collectors/deployment';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 import { useCollectorsConfig } from 'components/collectors/hooks';
 import Routes from 'routing/Routes';
@@ -44,6 +44,12 @@ const CollectorsDeploymentPage = () => {
       <Row className="content">
         <Col md={12}>
           <DeploymentForm />
+        </Col>
+      </Row>
+      <Row className="content">
+        <Col md={12}>
+          <h2>Enrollment Tokens</h2>
+          <EnrollmentTokenList />
         </Col>
       </Row>
     </DocumentTitle>

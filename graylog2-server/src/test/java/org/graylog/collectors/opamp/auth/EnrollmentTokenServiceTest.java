@@ -240,8 +240,7 @@ class EnrollmentTokenServiceTest {
 
         final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_CREATOR);
 
-        final Optional<EnrollmentTokenDTO> result = enrollmentTokenService.validateToken(
-                response.token(), OpAmpAuthContext.Transport.HTTP);
+        final Optional<EnrollmentTokenDTO> result = enrollmentTokenService.validateToken(response.token());
 
         assertThat(result).isPresent();
         assertThat(result.get().fleetId()).isEqualTo("test-fleet");
@@ -262,8 +261,7 @@ class EnrollmentTokenServiceTest {
         // Wait for expiry
         Thread.sleep(1500);
 
-        final Optional<EnrollmentTokenDTO> result = enrollmentTokenService.validateToken(
-                response.token(), OpAmpAuthContext.Transport.HTTP);
+        final Optional<EnrollmentTokenDTO> result = enrollmentTokenService.validateToken(response.token());
 
         assertThat(result).isEmpty();
     }
@@ -283,8 +281,7 @@ class EnrollmentTokenServiceTest {
         when(clusterConfigService.get(ClusterId.class))
                 .thenReturn(ClusterId.create("different-cluster-id"));
 
-        final Optional<EnrollmentTokenDTO> result = enrollmentTokenService.validateToken(
-                response.token(), OpAmpAuthContext.Transport.HTTP);
+        final Optional<EnrollmentTokenDTO> result = enrollmentTokenService.validateToken(response.token());
 
         assertThat(result).isEmpty();
     }
@@ -303,8 +300,7 @@ class EnrollmentTokenServiceTest {
         // Tamper with the signature (last part of JWT)
         final String tamperedToken = response.token().substring(0, response.token().lastIndexOf('.') + 1) + "invalid";
 
-        final Optional<EnrollmentTokenDTO> result = enrollmentTokenService.validateToken(
-                tamperedToken, OpAmpAuthContext.Transport.HTTP);
+        final Optional<EnrollmentTokenDTO> result = enrollmentTokenService.validateToken(tamperedToken);
 
         assertThat(result).isEmpty();
     }
@@ -333,8 +329,7 @@ class EnrollmentTokenServiceTest {
         // This is a token with header {"alg":"EdDSA","kid":"sha256:unknown"}
         final String fakeToken = "eyJhbGciOiJFZERTQSIsImtpZCI6InNoYTI1Njp1bmtub3duIn0.eyJpc3MiOiJodHRwczovL2dyYXlsb2cuZXhhbXBsZS5jb20vIn0.invalidsig";
 
-        final Optional<EnrollmentTokenDTO> result = enrollmentTokenService.validateToken(
-                fakeToken, OpAmpAuthContext.Transport.HTTP);
+        final Optional<EnrollmentTokenDTO> result = enrollmentTokenService.validateToken(fakeToken);
 
         assertThat(result).isEmpty();
     }
@@ -351,8 +346,7 @@ class EnrollmentTokenServiceTest {
         final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_CREATOR);
 
         // Validate the token to retrieve the persisted DTO
-        final Optional<EnrollmentTokenDTO> result = enrollmentTokenService.validateToken(
-                response.token(), OpAmpAuthContext.Transport.HTTP);
+        final Optional<EnrollmentTokenDTO> result = enrollmentTokenService.validateToken(response.token());
 
         assertThat(result).isPresent();
         final EnrollmentTokenDTO dto = result.get();
@@ -377,8 +371,7 @@ class EnrollmentTokenServiceTest {
         final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_CREATOR);
 
         // Validate first to get the DTO with its ID
-        final Optional<EnrollmentTokenDTO> beforeDelete = enrollmentTokenService.validateToken(
-                response.token(), OpAmpAuthContext.Transport.HTTP);
+        final Optional<EnrollmentTokenDTO> beforeDelete = enrollmentTokenService.validateToken(response.token());
         assertThat(beforeDelete).isPresent();
 
         // Delete the token
@@ -386,8 +379,7 @@ class EnrollmentTokenServiceTest {
         assertThat(deleted).isTrue();
 
         // Try to validate again - should be empty since metadata was deleted
-        final Optional<EnrollmentTokenDTO> afterDelete = enrollmentTokenService.validateToken(
-                response.token(), OpAmpAuthContext.Transport.HTTP);
+        final Optional<EnrollmentTokenDTO> afterDelete = enrollmentTokenService.validateToken(response.token());
         assertThat(afterDelete).isEmpty();
     }
 
@@ -403,8 +395,7 @@ class EnrollmentTokenServiceTest {
         final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_CREATOR);
 
         // Validate to get the DTO
-        final Optional<EnrollmentTokenDTO> initial = enrollmentTokenService.validateToken(
-                response.token(), OpAmpAuthContext.Transport.HTTP);
+        final Optional<EnrollmentTokenDTO> initial = enrollmentTokenService.validateToken(response.token());
         assertThat(initial).isPresent();
         assertThat(initial.get().usageCount()).isEqualTo(0);
         assertThat(initial.get().lastUsedAt()).isNull();
@@ -413,8 +404,7 @@ class EnrollmentTokenServiceTest {
         enrollmentTokenService.incrementUsage(initial.get().id());
 
         // Validate again to get the updated DTO
-        final Optional<EnrollmentTokenDTO> updated = enrollmentTokenService.validateToken(
-                response.token(), OpAmpAuthContext.Transport.HTTP);
+        final Optional<EnrollmentTokenDTO> updated = enrollmentTokenService.validateToken(response.token());
         assertThat(updated).isPresent();
         assertThat(updated.get().usageCount()).isEqualTo(1);
         assertThat(updated.get().lastUsedAt()).isNotNull();

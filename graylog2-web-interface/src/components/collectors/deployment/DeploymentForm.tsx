@@ -24,8 +24,6 @@ import SectionGrid from 'components/common/Section/SectionGrid';
 
 import { useFleets, useCollectorsMutations } from '../hooks';
 
-import EnrollmentTokenList from './EnrollmentTokenList';
-
 type Platform = 'linux' | 'windows' | 'macos' | 'container';
 type TokenExpiry = 'PT24H' | 'P7D' | 'P30D' | 'never';
 
@@ -230,7 +228,6 @@ const DeploymentForm = () => {
         </ResultsContainer>
       )}
 
-      <EnrollmentTokenList />
     </div>
   );
 };

@@ -19,13 +19,14 @@ import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 
 import { DeleteMenuItem } from 'components/bootstrap';
-import { RelativeTime } from 'components/common';
+import { Link, RelativeTime } from 'components/common';
 import { MoreActions } from 'components/common/EntityDataTable';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
+import Routes from 'routing/Routes';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type { Sort } from 'stores/PaginationTypes';
 
-import { fetchPaginatedEnrollmentTokens, enrollmentTokensKeyFn, useCollectorsMutations } from '../hooks';
+import { fetchPaginatedEnrollmentTokens, enrollmentTokensKeyFn, useCollectorsMutations, useFleets } from '../hooks';
 import type { EnrollmentTokenMetadata } from '../types';
 
 const DEFAULT_LAYOUT = {
@@ -54,17 +55,26 @@ const ExpiresCell = ({ expiresAt }: { expiresAt: string | null }) => {
   return <RelativeTime dateTime={expiresAt} />;
 };
 
-const columnRenderers: ColumnRenderers<EnrollmentTokenMetadata> = {
+// TODO: Use useBasicUser to resolve the full name and link to the user profile.
+//       Currently useBasicUser shows an error toast when the user doesn't exist (deleted).
+//       It should gracefully fall back to displaying the username instead.
+const CreatedByCell = ({ username }: { username: string }) => (
+  <span>{username}</span>
+);
+
+const customColumnRenderers = (fleetNames: Record<string, string>): ColumnRenderers<EnrollmentTokenMetadata> => ({
   attributes: {
     fleet_id: {
       renderCell: (_fleetId: string, token: EnrollmentTokenMetadata) => (
-        <span>{token.fleet_id}</span>
+        <Link to={Routes.SYSTEM.COLLECTORS.FLEET(token.fleet_id)}>
+          {fleetNames[token.fleet_id] || token.fleet_id}
+        </Link>
       ),
       width: 0.2,
     },
     created_by: {
       renderCell: (_createdBy: unknown, token: EnrollmentTokenMetadata) => (
-        <span>{token.created_by.username}</span>
+        <CreatedByCell username={token.created_by.username} />
       ),
       width: 0.15,
     },
@@ -91,10 +101,19 @@ const columnRenderers: ColumnRenderers<EnrollmentTokenMetadata> = {
       width: 0.15,
     },
   },
-};
+});
 
 const EnrollmentTokenList = () => {
   const { deleteEnrollmentToken } = useCollectorsMutations();
+  const { data: fleets } = useFleets();
+
+  const fleetNames = useMemo(() => {
+    const map: Record<string, string> = {};
+
+    (fleets || []).forEach((f) => { map[f.id] = f.name; });
+
+    return map;
+  }, [fleets]);
 
   const handleDelete = useCallback(
     async (token: EnrollmentTokenMetadata) => {
@@ -115,7 +134,7 @@ const EnrollmentTokenList = () => {
     [handleDelete],
   );
 
-  const renderers = useMemo(() => columnRenderers, []);
+  const renderers = useMemo(() => customColumnRenderers(fleetNames), [fleetNames]);
 
   return (
     <PaginatedEntityTable<EnrollmentTokenMetadata>

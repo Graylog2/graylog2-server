@@ -215,7 +215,7 @@ class CollectorInstanceServiceTest {
                 "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----",
                 "507f1f77bcf86cd799439011", // Valid 24-char hex ObjectId
                 Instant.now(),
-                null
+                "unknown"
         );
     }
 
@@ -229,7 +229,7 @@ class CollectorInstanceServiceTest {
                 "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----",
                 "507f1f77bcf86cd799439011",
                 lastSeen,
-                null
+                "unknown"
         );
     }
 }

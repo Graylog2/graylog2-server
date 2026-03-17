@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_ENROLLMENT_TOKEN_ID;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_LAST_SEEN;
 
 public class V20260316000000_MigrateCollectorsData extends Migration {
@@ -58,6 +59,7 @@ public class V20260316000000_MigrateCollectorsData extends Migration {
     public void upgrade() {
         backfillThresholdDefaults();
         convertLastSeenToBsonDate();
+        backfillEnrollmentTokenId();
     }
 
     private void backfillThresholdDefaults() {
@@ -93,6 +95,20 @@ public class V20260316000000_MigrateCollectorsData extends Migration {
         if (!updates.isEmpty()) {
             collection.updateOne(Filters.eq("type", CONFIG_TYPE), Updates.combine(updates));
             LOG.info("Backfilled collectors config threshold defaults.");
+        }
+    }
+
+    private void backfillEnrollmentTokenId() {
+        final MongoCollection<Document> collection =
+                mongoConnection.getMongoDatabase().getCollection(INSTANCES_COLLECTION);
+
+        final long updated = collection.updateMany(
+                Filters.not(Filters.exists(FIELD_ENROLLMENT_TOKEN_ID)),
+                Updates.set(FIELD_ENROLLMENT_TOKEN_ID, "unknown")
+        ).getModifiedCount();
+
+        if (updated > 0) {
+            LOG.info("Backfilled enrollment_token_id in {} collector instance document(s).", updated);
         }
     }
 
