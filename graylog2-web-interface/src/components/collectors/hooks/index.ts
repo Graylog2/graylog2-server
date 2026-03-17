@@ -46,6 +46,7 @@ export {
 } from './useCollectorConfig';
 
 export { default as useCollectorsMutations } from './useCollectorsMutations';
+export { default as useDefaultInstanceFilters } from './useDefaultInstanceFilters';
 
 export {
   useRecentActivity,

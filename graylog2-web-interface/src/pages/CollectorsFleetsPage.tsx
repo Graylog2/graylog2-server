@@ -15,50 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
-import type { SearchParams } from 'stores/PaginationTypes';
 import { CollectorsPageNavigation } from 'components/collectors/common';
-import { FleetFormModal } from 'components/collectors/fleets';
-import { fetchPaginatedFleets, fleetsKeyFn, useCollectorsMutations } from 'components/collectors/hooks';
+import CollectorsFleets from 'components/collectors/fleets/CollectorsFleets';
 import { useCollectorsConfig } from 'components/collectors/hooks';
-import type { Fleet } from 'components/collectors/types';
-import customColumnRenderers from 'components/collectors/fleets/ColumnRenderers';
-import { DEFAULT_LAYOUT } from 'components/collectors/fleets/Constants';
-import Routes from 'routing/Routes';
-import useHistory from 'routing/useHistory';
 import CreateButton from 'components/common/CreateButton';
+import Routes from 'routing/Routes';
 
 const CollectorsFleetsPage = () => {
   const { data: config, isLoading } = useCollectorsConfig();
-  const [showFleetModal, setShowFleetModal] = useState(false);
-  const { createFleet, isCreatingFleet } = useCollectorsMutations();
-  const { pathname } = useLocation();
-  const history = useHistory();
-
-  useEffect(() => {
-    setShowFleetModal(pathname === Routes.SYSTEM.COLLECTORS.FLEETS_NEW);
-  }, [pathname]);
-
-  const columnRenderers = useMemo(() => customColumnRenderers(), []);
-
-  const fetchEntities = useCallback(
-    (searchParams: SearchParams) => fetchPaginatedFleets(searchParams),
-    [],
-  );
-
-  const closeCreateModal = useCallback(() => {
-    history.push(Routes.SYSTEM.COLLECTORS.FLEETS);
-  }, [history]);
-
-  const handleSaveFleet = async (fleet: Omit<Fleet, 'id' | 'created_at' | 'updated_at'>) => {
-    await createFleet(fleet);
-    closeCreateModal();
-  };
 
   if (isLoading) {
     return <Spinner />;
@@ -80,25 +48,9 @@ const CollectorsFleetsPage = () => {
 
       <Row className="content">
         <Col md={12}>
-          <PaginatedEntityTable<Fleet>
-            humanName="fleets"
-            tableLayout={DEFAULT_LAYOUT}
-            fetchEntities={fetchEntities}
-            keyFn={fleetsKeyFn}
-            entityAttributesAreCamelCase={false}
-            columnRenderers={columnRenderers}
-            entityActions={() => null}
-          />
+          <CollectorsFleets />
         </Col>
       </Row>
-
-      {showFleetModal && (
-        <FleetFormModal
-          onClose={closeCreateModal}
-          onSave={handleSaveFleet}
-          isLoading={isCreatingFleet}
-        />
-      )}
     </DocumentTitle>
   );
 };

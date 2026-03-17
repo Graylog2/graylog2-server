@@ -16,8 +16,6 @@
  */
 import * as React from 'react';
 import { useState, useMemo, useCallback } from 'react';
-import { OrderedMap } from 'immutable';
-import moment from 'moment';
 import styled, { css } from 'styled-components';
 import URI from 'urijs';
 
@@ -28,11 +26,10 @@ import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import useHistory from 'routing/useHistory';
 import useQuery from 'routing/useQuery';
 import type { SearchParams } from 'stores/PaginationTypes';
-import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
 import FleetSettings from './FleetSettings';
 
-import { useFleet, useFleetStats, useSources, fetchPaginatedSources, sourcesKeyFn, fetchPaginatedInstances, instancesKeyFn, useCollectorsMutations, useCollectorsConfig } from '../hooks';
+import { useFleet, useFleetStats, useSources, fetchPaginatedSources, sourcesKeyFn, fetchPaginatedInstances, instancesKeyFn, useCollectorsMutations, useDefaultInstanceFilters } from '../hooks';
 import StatCard from '../common/StatCard';
 import { InstanceDetailDrawer } from '../instances';
 import BulkActions from '../instances/BulkActions';
@@ -78,7 +75,7 @@ const SEGMENTS = [
 const FleetDetail = ({ fleetId }: Props) => {
   const { data: fleet, isLoading: fleetLoading } = useFleet(fleetId);
   const { data: stats, isLoading: statsLoading } = useFleetStats(fleetId);
-  const { data: collectorsConfig } = useCollectorsConfig();
+  const defaultInstanceFilters = useDefaultInstanceFilters();
   const { data: sources } = useSources(fleetId);
   const { createSource, isCreatingSource, updateSource, isUpdatingSource, deleteSource, updateFleet, isUpdatingFleet, deleteFleet, isDeletingFleet } = useCollectorsMutations();
   const [showSourceModal, setShowSourceModal] = useState(false);
@@ -120,17 +117,6 @@ const FleetDetail = ({ fleetId }: Props) => {
   );
 
   const sourceRenderers = useMemo(() => sourceColumnRenderers(), []);
-
-  const defaultInstanceFilters: UrlQueryFilters | undefined = useMemo(() => {
-    if (!collectorsConfig?.collector_default_visibility_threshold) {
-      return undefined;
-    }
-
-    const threshold = moment.duration(collectorsConfig.collector_default_visibility_threshold);
-    const cutoff = moment().subtract(threshold).utc().toISOString();
-
-    return OrderedMap({ last_seen: [`${cutoff}><`] });
-  }, [collectorsConfig?.collector_default_visibility_threshold]);
 
   const fetchInstances = useCallback(
     (searchParams: SearchParams) => {

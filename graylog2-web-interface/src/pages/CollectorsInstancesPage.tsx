@@ -15,70 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useMemo, useCallback } from 'react';
-import { OrderedMap } from 'immutable';
-import moment from 'moment';
 import { Navigate } from 'react-router-dom';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
-import type { SearchParams } from 'stores/PaginationTypes';
 import { CollectorsPageNavigation } from 'components/collectors/common';
-import { InstanceDetailDrawer } from 'components/collectors/instances';
-import {
-  fetchPaginatedInstances,
-  instancesKeyFn,
-  useFleets,
-  useSources,
-} from 'components/collectors/hooks';
+import CollectorsInstances from 'components/collectors/instances/CollectorsInstances';
 import { useCollectorsConfig } from 'components/collectors/hooks';
-import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
-import type { CollectorInstanceView } from 'components/collectors/types';
-import customColumnRenderers from 'components/collectors/instances/ColumnRenderers';
-import InstanceActions from 'components/collectors/instances/InstanceActions';
-import BulkActions from 'components/collectors/instances/BulkActions';
-import { DEFAULT_LAYOUT } from 'components/collectors/instances/Constants';
 import Routes from 'routing/Routes';
 
 const CollectorsInstancesPage = () => {
   const { data: config, isLoading } = useCollectorsConfig();
-  const [selectedInstance, setSelectedInstance] = useState<CollectorInstanceView | null>(null);
-  const { data: fleets } = useFleets();
-  const { data: sources } = useSources();
-
-  const fleetNames = useMemo(
-    () =>
-      (fleets || []).reduce(
-        (acc, fleet) => ({ ...acc, [fleet.id]: fleet.name }),
-        {} as Record<string, string>,
-      ),
-    [fleets],
-  );
-
-  const columnRenderers = useMemo(
-    () => customColumnRenderers({ fleetNames }),
-    [fleetNames],
-  );
-
-  const defaultFilters: UrlQueryFilters | undefined = useMemo(() => {
-    if (!config?.collector_default_visibility_threshold) {
-      return undefined;
-    }
-
-    const threshold = moment.duration(config.collector_default_visibility_threshold);
-    const cutoff = moment().subtract(threshold).utc().toISOString();
-
-    return OrderedMap({ last_seen: [`${cutoff}><`] });
-  }, [config?.collector_default_visibility_threshold]);
-
-  const fetchEntities = useCallback(
-    (searchParams: SearchParams) => fetchPaginatedInstances(searchParams),
-    [],
-  );
-
-  const getSourcesForInstance = (instance: CollectorInstanceView) =>
-    (sources || []).filter((s) => s.fleet_id === instance.fleet_id);
 
   if (isLoading) {
     return <Spinner />;
@@ -97,29 +44,9 @@ const CollectorsInstancesPage = () => {
 
       <Row className="content">
         <Col md={12}>
-          <PaginatedEntityTable<CollectorInstanceView>
-            humanName="instances"
-            entityActions={(instance) => <InstanceActions instance={instance} onDetailsClick={setSelectedInstance} />}
-            tableLayout={DEFAULT_LAYOUT}
-            fetchEntities={fetchEntities}
-            keyFn={instancesKeyFn}
-            entityAttributesAreCamelCase={false}
-            columnRenderers={columnRenderers}
-            defaultFilters={defaultFilters}
-            bulkSelection={{ actions: <BulkActions /> }}
-          />
+          <CollectorsInstances />
         </Col>
       </Row>
-
-      {selectedInstance && (
-        <InstanceDetailDrawer
-          instance={selectedInstance}
-          sources={getSourcesForInstance(selectedInstance)}
-          fleetName={fleetNames[selectedInstance.fleet_id] || selectedInstance.fleet_id}
-          onClose={() => setSelectedInstance(null)}
-        />
-      )}
-
     </DocumentTitle>
   );
 };
