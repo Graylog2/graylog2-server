@@ -19,6 +19,8 @@ package org.graylog.collectors.opamp;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.SourceService;
+import org.graylog.collectors.db.EnrollmentTokenCreator;
+import org.graylog.collectors.db.EnrollmentTokenDTO;
 import org.graylog.collectors.opamp.auth.AgentTokenService;
 import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog.collectors.opamp.transport.OpAmpAuthContext;
@@ -31,6 +33,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.Optional;
 
@@ -87,10 +90,11 @@ class OpAmpServiceTest {
         // Create a token with ctt: enrollment
         final String token = createTokenWithCtt("enrollment");
         final String authHeader = "Bearer " + token;
-        final OpAmpAuthContext.Enrollment expectedContext = new OpAmpAuthContext.Enrollment("test-fleet", TRANSPORT);
+        final EnrollmentTokenDTO tokenDto = new EnrollmentTokenDTO("token-id", "jti-1", "kid-1", "test-fleet",
+                new EnrollmentTokenCreator("user-id", "admin"), Instant.now(), null, 0, null);
 
         when(enrollmentTokenService.validateToken(eq(token), eq(TRANSPORT)))
-                .thenReturn(Optional.of(expectedContext));
+                .thenReturn(Optional.of(tokenDto));
 
         final Optional<OpAmpAuthContext> result = opAmpService.authenticate(authHeader, TRANSPORT);
 

@@ -28,6 +28,7 @@ import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.ReturnDocument;
 import com.mongodb.client.result.InsertOneResult;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bson.Document;
@@ -141,7 +142,7 @@ public class CollectorInstanceService {
         return collection.countDocuments(Filters.eq(FIELD_INSTANCE_UID, instanceUid)) == 1L;
     }
 
-    public CollectorInstanceDTO enroll(String instanceUid, String fleetId, String fingerprint, String certPem, String caId, Instant enrolledAt) {
+    public CollectorInstanceDTO enroll(String instanceUid, String fleetId, String fingerprint, String certPem, String caId, Instant enrolledAt, @Nullable String enrollmentTokenId) {
         final CollectorInstanceDTO dto = CollectorInstanceDTO.builder()
                 .instanceUid(instanceUid)
                 .lastSeen(enrolledAt)
@@ -152,6 +153,7 @@ public class CollectorInstanceService {
                 .certificatePem(certPem)
                 .issuingCaId(caId)
                 .enrolledAt(enrolledAt)
+                .enrollmentTokenId(enrollmentTokenId)
                 .build();
         final InsertOneResult insertOneResult = collection.insertOne(dto);
         return dto.toBuilder()

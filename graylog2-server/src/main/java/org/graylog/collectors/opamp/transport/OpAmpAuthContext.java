@@ -16,6 +16,7 @@
  */
 package org.graylog.collectors.opamp.transport;
 
+import org.graylog.collectors.db.EnrollmentTokenDTO;
 import org.glassfish.grizzly.http.HttpRequestPacket;
 
 import java.util.Optional;
@@ -26,7 +27,7 @@ import java.util.Optional;
  * Sealed interface enables type-safe dispatch in message handlers:
  * <pre>{@code
  * switch (authContext) {
- *     case Enrollment e -> handleEnrollment(message, e.fleetId());
+ *     case Enrollment e -> handleEnrollment(message, e.token().fleetId());
  * }
  * }</pre>
  */
@@ -43,7 +44,7 @@ public sealed interface OpAmpAuthContext {
     /**
      * Context for agents authenticating with enrollment tokens.
      */
-    record Enrollment(String fleetId, Transport transport) implements OpAmpAuthContext {}
+    record Enrollment(EnrollmentTokenDTO token, Transport transport) implements OpAmpAuthContext {}
 
     /**
      * Context for enrolled agents authenticating with signed JWTs.

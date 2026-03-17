@@ -121,7 +121,8 @@ class AgentTokenServiceTest {
                 certFingerprint,
                 certPem,
                 enrollmentCa.id(),
-                Instant.now()
+                Instant.now(),
+                null
         );
 
         // Create agent JWT with x5t#S256 header (RFC 7515 format)
@@ -221,7 +222,8 @@ class AgentTokenServiceTest {
                 certFingerprint,
                 certPem,
                 enrollmentCa.id(),
-                Instant.now()
+                Instant.now(),
+                null
         );
 
         // Create JWT signed with a DIFFERENT key

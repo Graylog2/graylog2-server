@@ -164,7 +164,8 @@ public class OpAmpService {
         }
 
         return switch (typ) {
-            case "enrollment" -> enrollmentTokenService.validateToken(token, transport).map(e -> e);
+            case "enrollment" -> enrollmentTokenService.validateToken(token, transport)
+                    .map(dto -> new OpAmpAuthContext.Enrollment(dto, transport));
             case "agent" -> agentTokenService.validateAgentToken(token, transport).map(i -> i);
             default -> {
                 LOG.warn("Unknown token type: {}", typ);
@@ -236,8 +237,9 @@ public class OpAmpService {
             final String fingerprint = PemUtils.computeFingerprint(agentCert);
             final String certPem = PemUtils.toPem(agentCert);
 
-            final CollectorInstanceDTO enroll = collectorInstanceService.enroll(instanceUid, auth.fleetId(), fingerprint, certPem, enrollmentCa.id(), Instant.now());
+            final CollectorInstanceDTO enroll = collectorInstanceService.enroll(instanceUid, auth.token().fleetId(), fingerprint, certPem, enrollmentCa.id(), Instant.now(), auth.token().id());
             LOG.info("[{}/{}] Enrolled collector in fleet {}", enroll.instanceUid(), enroll.messageSeqNum(), enroll.fleetId());
+            enrollmentTokenService.incrementUsage(auth.token().id());
 
             // 5. Return certificate and connection settings
             final var connectionSettingsBuilder = ConnectionSettingsOffers.newBuilder().setOpamp(OpAMPConnectionSettings.newBuilder().setHeartbeatIntervalSeconds(30).setCertificate(TLSCertificate.newBuilder().setCert(ByteString.copyFromUtf8(certPem))));
