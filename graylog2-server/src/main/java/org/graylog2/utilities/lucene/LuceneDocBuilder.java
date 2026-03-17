@@ -74,7 +74,10 @@ public class LuceneDocBuilder {
     }
 
     public LuceneDocBuilder boolVal(String key, Boolean value) {
-        return intVal(key, value ? 1 : 0);
+        if (value != null) {
+            return intVal(key, value ? 1 : 0);
+        }
+        return this;
     }
 
     public Document getDoc() {
