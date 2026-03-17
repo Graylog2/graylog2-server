@@ -127,11 +127,11 @@ class EnrollmentTokenServiceTest {
     }
 
     @Test
-    void getEnrollmentCaCreatesHierarchyOnFirstCall() {
+    void getEnrollmentSigningCertCreatesHierarchyOnFirstCall() {
         // No existing CollectorsConfig - service will create certs and cache in memory
         when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
-        final CertificateEntry cert = enrollmentTokenService.getEnrollmentCa();
+        final CertificateEntry cert = enrollmentTokenService.getEnrollmentSigningCert();
 
         assertThat(cert).isNotNull();
         assertThat(cert.id()).isNotNull();
@@ -142,15 +142,15 @@ class EnrollmentTokenServiceTest {
     }
 
     @Test
-    void getEnrollmentCaUsesExistingConfigOnSubsequentCalls() {
+    void getEnrollmentSigningCertUsesExistingConfigOnSubsequentCalls() {
         // No existing CollectorsConfig - service will create certs and cache in memory
         when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
         // First call - no config, creates hierarchy
-        final CertificateEntry firstCert = enrollmentTokenService.getEnrollmentCa();
+        final CertificateEntry firstCert = enrollmentTokenService.getEnrollmentSigningCert();
 
         // Second call - cached hierarchy, should return same cert
-        final CertificateEntry secondCert = enrollmentTokenService.getEnrollmentCa();
+        final CertificateEntry secondCert = enrollmentTokenService.getEnrollmentSigningCert();
 
         assertThat(secondCert.id()).isEqualTo(firstCert.id());
         assertThat(secondCert.fingerprint()).isEqualTo(firstCert.fingerprint());

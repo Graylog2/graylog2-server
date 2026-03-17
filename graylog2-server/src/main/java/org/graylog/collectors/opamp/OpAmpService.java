@@ -44,7 +44,6 @@ import opamp.proto.Opamp.ServerErrorResponse;
 import opamp.proto.Opamp.ServerToAgent;
 import opamp.proto.Opamp.TLSCertificate;
 import org.graylog.collectors.CollectorInstanceService;
-import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.SourceService;
@@ -233,14 +232,14 @@ public class OpAmpService {
 
         try {
             // 3. Sign CSR with OpAMP CA
-            final CertificateEntry enrollmentCa = opAmpCaService.getOpAmpCa();
-            final X509Certificate agentCert = certificateService.builder().signCsr(csrBytes.toByteArray(), enrollmentCa, instanceUid, Duration.ofDays(365));
+            final CertificateEntry issuerCert = opAmpCaService.getSigningCert();
+            final X509Certificate agentCert = certificateService.builder().signCsr(csrBytes.toByteArray(), issuerCert, instanceUid, Duration.ofDays(365));
 
             // 4. Save agent record
             final String fingerprint = PemUtils.computeFingerprint(agentCert);
             final String certPem = PemUtils.toPem(agentCert);
 
-            final CollectorInstanceDTO enroll = collectorInstanceService.enroll(instanceUid, auth.fleetId(), fingerprint, certPem, enrollmentCa.id(), Instant.now());
+            final CollectorInstanceDTO enroll = collectorInstanceService.enroll(instanceUid, auth.fleetId(), fingerprint, certPem, issuerCert.id(), Instant.now());
             LOG.info("[{}/{}] Enrolled collector in fleet {}", enroll.instanceUid(), enroll.messageSeqNum(), enroll.fleetId());
 
             // 5. Return certificate and connection settings
@@ -568,7 +567,7 @@ public class OpAmpService {
         }
 
         final var clusterId = requireNonNull(clusterConfigService.get(ClusterId.class), "Cluster ID config cannot be null.");
-        final var caCert = opAmpCaService.getOpAmpCa().certificate();
+        final var caCert = opAmpCaService.getSigningCert().certificate();
         final var tlsSettings = TLSConfigurationSettings.withCACert(clusterId.clusterId(), caCert);
         final var builder = ExporterConfigs.builder();
 

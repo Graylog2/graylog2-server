@@ -303,7 +303,7 @@ class CollectorsConfigResourceTest {
 
     private void stubCaService() {
         when(collectorsConfigService.get()).thenReturn(Optional.empty());
-        when(opAmpCaService.getOpAmpCaId()).thenReturn("ca-id");
+        when(opAmpCaService.getSigningCertId()).thenReturn("ca-id");
         when(opAmpCaService.getTokenSigningCertId()).thenReturn("token-id");
         when(opAmpCaService.getOtlpServerCertId()).thenReturn("otlp-id");
     }

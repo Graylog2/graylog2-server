@@ -105,7 +105,7 @@ class AgentTokenServiceTest {
         when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
         // Create CA hierarchy
-        final CertificateEntry enrollmentCa = opAmpCaService.getOpAmpCa();
+        final CertificateEntry enrollmentCa = opAmpCaService.getSigningCert();
 
         // Generate agent key pair and CSR (use Ed25519 to match CA)
         final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();
@@ -205,7 +205,7 @@ class AgentTokenServiceTest {
         when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
         // Create CA hierarchy
-        final CertificateEntry enrollmentCa = opAmpCaService.getOpAmpCa();
+        final CertificateEntry enrollmentCa = opAmpCaService.getSigningCert();
 
         // Generate agent key pair and CSR (use Ed25519 to match CA)
         final KeyPair agentKeyPair = KeyPairGenerator.getInstance("Ed25519").generateKeyPair();

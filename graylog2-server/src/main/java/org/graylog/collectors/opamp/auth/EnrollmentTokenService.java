@@ -88,14 +88,14 @@ public class EnrollmentTokenService {
     }
 
     /**
-     * Returns the enrollment CA certificate for signing agent CSRs.
+     * Returns the certificate for signing agent enrollment CSRs.
      * <p>
      * Delegates to {@link OpAmpCaService} which creates the CA hierarchy on first call if it doesn't exist.
      *
      * @return the enrollment CA certificate entry
      */
-    public CertificateEntry getEnrollmentCa() {
-        return opAmpCaService.getOpAmpCa();
+    public CertificateEntry getEnrollmentSigningCert() {
+        return opAmpCaService.getSigningCert();
     }
 
     /**

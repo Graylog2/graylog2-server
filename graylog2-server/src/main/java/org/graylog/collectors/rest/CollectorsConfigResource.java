@@ -132,7 +132,7 @@ public class CollectorsConfigResource extends RestResource {
                 ? request.collectorExpirationThreshold() : CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD;
 
         final var config = CollectorsConfig.builder()
-                .opampCaId(opAmpCaService.getOpAmpCaId())
+                .signingCertId(opAmpCaService.getSigningCertId())
                 .tokenSigningCertId(opAmpCaService.getTokenSigningCertId())
                 .otlpServerCertId(opAmpCaService.getOtlpServerCertId())
                 .http(request.http().toConfig(httpInputId))

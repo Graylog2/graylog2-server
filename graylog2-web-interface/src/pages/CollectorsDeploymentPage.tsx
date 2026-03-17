@@ -31,7 +31,7 @@ const CollectorsDeploymentPage = () => {
     return <Spinner />;
   }
 
-  if (!config?.opamp_ca_id) {
+  if (!config?.signing_cert_id) {
     return <Navigate to={Routes.SYSTEM.COLLECTORS.SETTINGS} />;
   }
 

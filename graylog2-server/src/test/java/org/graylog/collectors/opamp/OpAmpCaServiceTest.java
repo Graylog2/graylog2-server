@@ -91,9 +91,9 @@ class OpAmpCaServiceTest {
 
         final OpAmpCaService.CaHierarchy hierarchy = opAmpCaService.ensureInitialized();
 
-        assertThat(hierarchy.opAmpCa()).isNotNull();
-        assertThat(hierarchy.opAmpCa().id()).isNotNull();
-        assertThat(hierarchy.opAmpCa().fingerprint()).startsWith("sha256:");
+        assertThat(hierarchy.signingCert()).isNotNull();
+        assertThat(hierarchy.signingCert().id()).isNotNull();
+        assertThat(hierarchy.signingCert().fingerprint()).startsWith("sha256:");
 
         assertThat(hierarchy.tokenSigningCert()).isNotNull();
         assertThat(hierarchy.tokenSigningCert().id()).isNotNull();
@@ -114,7 +114,7 @@ class OpAmpCaServiceTest {
         final OpAmpCaService.CaHierarchy first = opAmpCaService.ensureInitialized();
         final OpAmpCaService.CaHierarchy second = opAmpCaService.ensureInitialized();
 
-        assertThat(second.opAmpCa().id()).isEqualTo(first.opAmpCa().id());
+        assertThat(second.signingCert().id()).isEqualTo(first.signingCert().id());
         assertThat(second.tokenSigningCert().id()).isEqualTo(first.tokenSigningCert().id());
         assertThat(second.otlpServerCert().id()).isEqualTo(first.otlpServerCert().id());
 

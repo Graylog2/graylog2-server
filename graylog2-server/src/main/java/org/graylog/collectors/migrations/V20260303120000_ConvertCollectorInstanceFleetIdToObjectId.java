@@ -17,6 +17,7 @@
 package org.graylog.collectors.migrations;
 
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
@@ -32,6 +33,9 @@ import org.slf4j.LoggerFactory;
 
 import java.time.ZonedDateTime;
 import java.util.Map;
+import java.util.Optional;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * Converts {@code fleet_id} and {@code issuing_ca_id} fields in the {@code collector_instances} collection
@@ -94,6 +98,8 @@ public class V20260303120000_ConvertCollectorInstanceFleetIdToObjectId extends M
             }
         }
 
+        renameCollectorsConfigFields(db);
+
         // We renamed the field that contains the source type
         final var updateResult = mongoConnection.getMongoDatabase().getCollection("streamrules")
                 .updateOne(
@@ -102,6 +108,33 @@ public class V20260303120000_ConvertCollectorInstanceFleetIdToObjectId extends M
                 );
         if (updateResult.getModifiedCount() > 0) {
             LOG.info("Updated Collector stream rule to match on field <{}>", CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_TYPE);
+        }
+    }
+
+    private static Optional<Document> loadCollectorsConfig(MongoDatabase db) {
+        return Optional.ofNullable(db.getCollection("cluster_config")
+                .find(Filters.eq("type", "org.graylog.collectors.CollectorsConfig"))
+                .first());
+    }
+
+    private static void renameCollectorsConfigFields(MongoDatabase db) {
+        final var oldName = "opamp_ca_id";
+        final var newName = "signing_cert_id";
+        final var payload = loadCollectorsConfig(db).map(c -> c.get("payload", Document.class));
+
+        if (payload.isPresent() && isNotBlank(payload.get().getString(oldName))) {
+            final var result = db.getCollection("cluster_config").updateOne(
+                    Filters.eq("type", "org.graylog.collectors.CollectorsConfig"),
+                    Updates.combine(
+                            Updates.set("payload." + newName, payload.get().getString(oldName)),
+                            Updates.unset("payload." + oldName)
+                    )
+            );
+            if (result.getModifiedCount() > 0) {
+                LOG.info("Renamed CollectorsConfig field <{}> to <{}>", oldName, newName);
+            } else {
+                LOG.warn("Couldn't rename CollectorsConfig field <{}> to <{}>", oldName, newName);
+            }
         }
     }
 

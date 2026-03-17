@@ -225,7 +225,7 @@ class CollectorIngestMtlsIT {
     // ----- gRPC mTLS Tests -----
 
     @Test
-    void grpcMtlsSuccessWithAgentCertSignedByOpAmpCa() throws Exception {
+    void grpcMtlsSuccessWithAgentCertSignedBySigningCert() throws Exception {
         final int port = startGrpcServer();
         final ManagedChannel channel = createGrpcChannel(agentKey, agentCert, port);
 
@@ -316,7 +316,7 @@ class CollectorIngestMtlsIT {
     // ----- HTTP mTLS Tests -----
 
     @Test
-    void httpMtlsSuccessWithAgentCertSignedByOpAmpCa() throws Exception {
+    void httpMtlsSuccessWithAgentCertSignedBySigningCert() throws Exception {
         final int port = startHttpServer();
         final HttpClient client = createHttpClient(agentKey, agentCert);
 
@@ -440,7 +440,7 @@ class CollectorIngestMtlsIT {
     }
 
     private ManagedChannel createGrpcChannel(PrivateKey clientKey, X509Certificate clientCert,
-                                              int port) throws SSLException {
+                                             int port) throws SSLException {
         final SslContext clientSsl = GrpcSslContexts.configure(
                 SslContextBuilder.forClient()
                         .keyManager(clientKey, clientCert)

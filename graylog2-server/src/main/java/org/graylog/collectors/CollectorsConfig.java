@@ -25,7 +25,7 @@ import java.time.Duration;
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
 public record CollectorsConfig(
-        @JsonProperty("opamp_ca_id") @Nullable String opampCaId,
+        @JsonProperty("signing_cert_id") @Nullable String signingCertId,
         @JsonProperty("token_signing_cert_id") @Nullable String tokenSigningCertId,
         @JsonProperty("otlp_server_cert_id") @Nullable String otlpServerCertId,
         @JsonProperty("http") IngestEndpointConfig http,
@@ -62,7 +62,7 @@ public record CollectorsConfig(
 
     @AutoBuilder
     public interface Builder {
-        Builder opampCaId(String opampCaId);
+        Builder signingCertId(String signingCertId);
 
         Builder tokenSigningCertId(String tokenSigningCertId);
 

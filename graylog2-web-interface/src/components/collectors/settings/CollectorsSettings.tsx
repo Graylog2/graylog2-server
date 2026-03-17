@@ -44,7 +44,7 @@ const THRESHOLD_UNITS = ['DAYS', 'HOURS', 'MINUTES'];
 const CollectorsSettings = () => {
   const { data: config, isLoading: isLoadingConfig } = useCollectorsConfig();
   const { updateConfig, isUpdatingConfig } = useCollectorsMutations();
-  const isConfigured = !!config?.opamp_ca_id;
+  const isConfigured = !!config?.signing_cert_id;
   const { data: inputStates } = useInputsStates({ enabled: isConfigured });
   const { data: httpInput } = useInput(config?.http?.input_id);
   const { data: grpcInput } = useInput(config?.grpc?.input_id);

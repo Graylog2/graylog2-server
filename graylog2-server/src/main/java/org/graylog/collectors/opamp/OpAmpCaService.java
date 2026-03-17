@@ -85,12 +85,12 @@ public class OpAmpCaService {
     }
 
     /**
-     * Returns the OpAMP CA certificate for signing agent CSRs.
+     * Returns the signing certificate for signing agent CSRs.
      *
-     * @return the OpAMP CA certificate entry
+     * @return the signing certificate entry
      */
-    public CertificateEntry getOpAmpCa() {
-        return ensureInitialized().opAmpCa();
+    public CertificateEntry getSigningCert() {
+        return ensureInitialized().signingCert();
     }
 
     /**
@@ -111,8 +111,8 @@ public class OpAmpCaService {
         return ensureInitialized().otlpServerCert();
     }
 
-    public String getOpAmpCaId() {
-        return ensureInitialized().opAmpCa().id();
+    public String getSigningCertId() {
+        return ensureInitialized().signingCert().id();
     }
 
     public String getTokenSigningCertId() {
@@ -138,20 +138,20 @@ public class OpAmpCaService {
     public SslContextBuilder newServerSslContextBuilder() {
         ensureInitialized();
         final CertificateEntry otlpServerCert = getOtlpServerCert();
-        final CertificateEntry opAmpCa = getOpAmpCa();
+        final CertificateEntry signingCert = getSigningCert();
 
         try {
             final PrivateKey key = PemUtils.parsePrivateKey(
                     certificateService.encryptedValueService().decrypt(otlpServerCert.privateKey()));
             final X509Certificate cert = PemUtils.parseCertificate(otlpServerCert.certificate());
-            final X509Certificate caCert = PemUtils.parseCertificate(opAmpCa.certificate());
+            final X509Certificate trustedCert = PemUtils.parseCertificate(signingCert.certificate());
 
             // JDK provider required: BoringSSL (OPENSSL) can load Ed25519 keys but cannot
             // complete TLS handshakes — its cipher suite negotiation doesn't recognize Ed25519.
             return SslContextBuilder.forServer(key, cert)
                     .sslProvider(SslProvider.JDK)
                     .clientAuth(ClientAuth.REQUIRE)
-                    .trustManager(caCert);
+                    .trustManager(trustedCert);
         } catch (Exception e) {
             throw new RuntimeException("Failed to create OTLP server SSL context", e);
         }
@@ -180,7 +180,7 @@ public class OpAmpCaService {
         if (maybeConfig.isPresent()) {
             final var config = maybeConfig.get();
 
-            if (config.opampCaId() != null && config.otlpServerCertId() != null) {
+            if (config.signingCertId() != null && config.otlpServerCertId() != null) {
                 cachedHierarchy = loadFromConfig(config);
                 return cachedHierarchy;
             }
@@ -193,17 +193,17 @@ public class OpAmpCaService {
 
             final CertificateEntry rootCa = certificateService.save(
                     builder.createRootCa(ROOT_CA_CN, Algorithm.ED25519, ROOT_CA_VALIDITY));
-            final CertificateEntry opAmpCa = certificateService.save(
+            final CertificateEntry signingCert = certificateService.save(
                     builder.createIntermediateCa(OPAMP_CA_CN, rootCa, OPAMP_CA_VALIDITY));
             final CertificateEntry tokenSigningCert = certificateService.save(
-                    builder.createEndEntityCert(TOKEN_SIGNING_CN, opAmpCa, KeyUsage.digitalSignature, TOKEN_SIGNING_VALIDITY));
+                    builder.createEndEntityCert(TOKEN_SIGNING_CN, signingCert, KeyUsage.digitalSignature, TOKEN_SIGNING_VALIDITY));
             final List<String> otlpSans = getClusterIdSans();
             final CertificateEntry otlpServerCert = certificateService.save(
-                    builder.createEndEntityCert(OTLP_SERVER_CN, opAmpCa,
+                    builder.createEndEntityCert(OTLP_SERVER_CN, signingCert,
                             KeyUsage.digitalSignature | KeyUsage.keyEncipherment,
                             KeyPurposeId.id_kp_serverAuth, OTLP_SERVER_VALIDITY, otlpSans));
 
-            cachedHierarchy = new CaHierarchy(opAmpCa, tokenSigningCert, otlpServerCert);
+            cachedHierarchy = new CaHierarchy(signingCert, tokenSigningCert, otlpServerCert);
             return cachedHierarchy;
         } catch (Exception e) {
             throw new RuntimeException("Failed to create OpAMP CA hierarchy", e);
@@ -211,13 +211,13 @@ public class OpAmpCaService {
     }
 
     private CaHierarchy loadFromConfig(CollectorsConfig config) {
-        final CertificateEntry opAmpCa = certificateService.findById(config.opampCaId())
-                .orElseThrow(() -> new IllegalStateException("OpAMP CA not found: " + config.opampCaId()));
+        final CertificateEntry signingCert = certificateService.findById(config.signingCertId())
+                .orElseThrow(() -> new IllegalStateException("Signing cert not found: " + config.signingCertId()));
         final CertificateEntry tokenSigningCert = certificateService.findById(config.tokenSigningCertId())
                 .orElseThrow(() -> new IllegalStateException("Token signing cert not found: " + config.tokenSigningCertId()));
         final CertificateEntry otlpServerCert = certificateService.findById(config.otlpServerCertId())
                 .orElseThrow(() -> new IllegalStateException("OTLP server cert not found: " + config.otlpServerCertId()));
-        return new CaHierarchy(opAmpCa, tokenSigningCert, otlpServerCert);
+        return new CaHierarchy(signingCert, tokenSigningCert, otlpServerCert);
     }
 
     private List<String> getClusterIdSans() {
@@ -229,6 +229,7 @@ public class OpAmpCaService {
         return List.of();
     }
 
-    public record CaHierarchy(CertificateEntry opAmpCa, CertificateEntry tokenSigningCert,
+    public record CaHierarchy(CertificateEntry signingCert,
+                              CertificateEntry tokenSigningCert,
                               CertificateEntry otlpServerCert) {}
 }
