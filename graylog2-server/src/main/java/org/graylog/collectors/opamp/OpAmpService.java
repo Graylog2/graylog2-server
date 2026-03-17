@@ -567,7 +567,7 @@ public class OpAmpService {
             throw new IllegalStateException("No collector input configured, cannot send remote config.");
         }
 
-        final var clusterId = clusterConfigService.get(ClusterId.class);
+        final var clusterId = requireNonNull(clusterConfigService.get(ClusterId.class), "Cluster ID config cannot be null.");
         final var caCert = opAmpCaService.getOpAmpCa().certificate();
         final var tlsSettings = TLSConfigurationSettings.withCACert(clusterId.clusterId(), caCert);
         final var builder = ExporterConfigs.builder();
