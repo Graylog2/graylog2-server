@@ -97,7 +97,6 @@ import org.graylog2.rest.resources.system.indexer.IndicesResource;
 import org.graylog2.rest.resources.system.indices.RetentionStrategyResource;
 import org.graylog2.rest.resources.system.indices.RotationStrategyResource;
 import org.graylog2.rest.resources.system.inputs.ExtractorsResource;
-import org.graylog2.rest.resources.system.inputs.InputPipelineRulesResource;
 import org.graylog2.rest.resources.system.inputs.InputStatesResource;
 import org.graylog2.rest.resources.system.inputs.InputsResource;
 import org.graylog2.rest.resources.system.inputs.StaticFieldsResource;
@@ -242,7 +241,6 @@ public class RestResourcesModule extends Graylog2Module {
     private void addProcessingResources() {
         addSystemRestResource(GrokResource.class);
         addSystemRestResource(InputsResource.class);
-        addSystemRestResource(InputPipelineRulesResource.class);
         addSystemRestResource(InputStatesResource.class);
         addSystemRestResource(StaticFieldsResource.class);
         addSystemRestResource(LookupTableResource.class);

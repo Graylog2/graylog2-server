@@ -17,7 +17,7 @@
 import React from 'react';
 import { render, screen, within } from 'wrappedTestingLibrary';
 
-import { SystemInputsRoutingRules } from '@graylog/server-api';
+import { SystemInputs } from '@graylog/server-api';
 
 import type { Attribute } from 'stores/PaginationTypes';
 import { asMock } from 'helpers/mocking';
@@ -25,7 +25,7 @@ import { asMock } from 'helpers/mocking';
 import InputDiagnosisRulesTab from './InputDiagnosisRulesTab';
 
 jest.mock('@graylog/server-api', () => ({
-  SystemInputsRoutingRules: {
+  SystemInputs: {
     getPipelineRulesPage: jest.fn(),
     getStreamRulesPage: jest.fn(),
   },
@@ -118,8 +118,8 @@ const streamRulesResponse = {
 
 describe('<InputDiagnosisRulesTab />', () => {
   beforeEach(() => {
-    asMock(SystemInputsRoutingRules.getPipelineRulesPage).mockReturnValue(Promise.resolve(pipelineRulesResponse) as any);
-    asMock(SystemInputsRoutingRules.getStreamRulesPage).mockReturnValue(Promise.resolve(streamRulesResponse) as any);
+    asMock(SystemInputs.getPipelineRulesPage).mockReturnValue(Promise.resolve(pipelineRulesResponse) as any);
+    asMock(SystemInputs.getStreamRulesPage).mockReturnValue(Promise.resolve(streamRulesResponse) as any);
   });
 
   it('should render pipeline rules', async () => {

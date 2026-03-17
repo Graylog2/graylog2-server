@@ -16,7 +16,7 @@
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import { SystemInputsRoutingRules } from '@graylog/server-api';
+import { SystemInputs } from '@graylog/server-api';
 
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
@@ -50,7 +50,7 @@ export const fetchInputPipelineRules = async (
   inputId: string,
   searchParams: SearchParams,
 ): Promise<PaginatedResponse<InputPipelineRule>> =>
-  SystemInputsRoutingRules.getPipelineRulesPage(
+  SystemInputs.getPipelineRulesPage(
     inputId,
     searchParams.sort.attributeId as SortType,
     searchParams.page,
