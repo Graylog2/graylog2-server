@@ -34,10 +34,12 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
+import org.graylog2.inputs.persistence.InputStateService;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -53,6 +55,7 @@ import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -65,16 +68,19 @@ public class InputStatesResource extends AbstractInputsResource {
     private final InputRegistry inputRegistry;
     private final EventBus serverEventBus;
     private final InputService inputService;
+    private final InputStateService inputStateService;
 
     @Inject
     public InputStatesResource(InputRegistry inputRegistry,
                                EventBus serverEventBus,
                                InputService inputService,
-                               MessageInputFactory messageInputFactory) {
+                               MessageInputFactory messageInputFactory,
+                               InputStateService inputStateService) {
         super(messageInputFactory.getAvailableInputs());
         this.inputRegistry = inputRegistry;
         this.serverEventBus = serverEventBus;
         this.inputService = inputService;
+        this.inputStateService = inputStateService;
     }
 
     @GET
@@ -87,6 +93,15 @@ public class InputStatesResource extends AbstractInputsResource {
                 .collect(Collectors.toSet());
 
         return InputStatesList.create(result);
+    }
+
+    @GET
+    @Path("/summary")
+    @Timed
+    @Operation(summary = "Get lightweight cluster input state summary from DB")
+    @RequiresPermissions(RestPermissions.INPUTS_READ)
+    public Map<String, Set<String>> summary() {
+        return inputStateService.getClusterStatuses();
     }
 
     @GET
