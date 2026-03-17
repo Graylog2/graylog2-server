@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests for OTLP connection settings construction in {@link OpAmpService}.
  */
-class OpAmpServiceOtlpSettingsTest {
+class OpAmpServiceConnectionSettingsTest {
 
     private static final String CA_PEM = "-----BEGIN CERTIFICATE-----\nfake-ca-pem\n-----END CERTIFICATE-----";
     private static final String CLUSTER_ID = "2209F727-F7E1-4123-9386-94FE3B354A07";
@@ -55,6 +55,19 @@ class OpAmpServiceOtlpSettingsTest {
     }
 
     @Test
+    void setsTLSMinMaxVersions() {
+        final var exporterConfig = createExporterConfig();
+
+        final var builder = Opamp.ServerToAgent.newBuilder();
+        OpAmpService.buildConnectionSettings(builder, exporterConfig);
+
+        final var httpSettings = builder.getConnectionSettings().getOwnLogs();
+
+        assertThat(httpSettings.getTls().getMinVersion()).isEqualTo(exporterConfig.tls().minVersion());
+        assertThat(httpSettings.getTls().getMaxVersion()).isEqualTo(exporterConfig.tls().maxVersion().orElse(""));
+    }
+
+    @Test
     void setsCorrectDestinationEndpoint() {
         final var exporterConfig = createExporterConfig();
 
@@ -65,5 +78,15 @@ class OpAmpServiceOtlpSettingsTest {
 
         assertThat(httpSettings.getDestinationEndpoint())
                 .isEqualTo("https://otlp.example.com:14401/?tls_server_name=" + CLUSTER_ID + "&log_level=info");
+    }
+
+    @Test
+    void returnsEmptyWhenExporterConfigIsNull() {
+        final var builder = Opamp.ServerToAgent.newBuilder();
+        OpAmpService.buildConnectionSettings(builder, null);
+
+        final var httpSettings = builder.getConnectionSettings().getOwnLogs();
+
+        assertThat(httpSettings.getDestinationEndpoint()).isEmpty();
     }
 }

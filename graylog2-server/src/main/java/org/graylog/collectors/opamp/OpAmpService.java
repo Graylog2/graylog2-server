@@ -244,48 +244,24 @@ public class OpAmpService {
             LOG.info("[{}/{}] Enrolled collector in fleet {}", enroll.instanceUid(), enroll.messageSeqNum(), enroll.fleetId());
 
             // 5. Return certificate and connection settings
-            final var connectionSettingsBuilder = ConnectionSettingsOffers.newBuilder().setOpamp(OpAMPConnectionSettings.newBuilder().setHeartbeatIntervalSeconds(30).setCertificate(TLSCertificate.newBuilder().setCert(ByteString.copyFromUtf8(certPem))));
+            final var connectionSettingsBuilder = ConnectionSettingsOffers.newBuilder()
+                    .setOpamp(OpAMPConnectionSettings.newBuilder()
+                            .setHeartbeatIntervalSeconds(30)
+                            .setCertificate(TLSCertificate.newBuilder().setCert(ByteString.copyFromUtf8(certPem))));
 
-            // Add OTLP connection settings from CollectorsConfig
-            final var collectorsConfig = clusterConfigService.get(CollectorsConfig.class);
-            if (collectorsConfig != null) {
-                buildOtherConnectionSettings(connectionSettingsBuilder, collectorsConfig, opAmpCaService, clusterConfigService);
+            final var responseBuilder = serverToAgentBuilder(message).setConnectionSettings(connectionSettingsBuilder);
+
+            if (fromBitmask(message.getCapabilities()).contains(Opamp.AgentCapabilities.AgentCapabilities_ReportsOwnLogs)) {
+                final var exporterConfigs = getExporterConfigs();
+
+                // The "own_logs" are always transmitted via HTTP according to OpAMP.
+                buildConnectionSettings(responseBuilder, exporterConfigs.httpConfig().orElse(null));
             }
 
-            return ServerToAgent.newBuilder().setInstanceUid(message.getInstanceUid()).setConnectionSettings(connectionSettingsBuilder).build();
+            return responseBuilder.build();
         } catch (Exception e) {
             LOG.error("Enrollment failed for collector {}", instanceUid, e);
             return errorResponse(message, "Enrollment failed: " + e.getMessage());
-        }
-    }
-
-    // TODO: Do we still need the "other_settings" now that we have the "own_logs" settings in place?
-    static void buildOtherConnectionSettings(ConnectionSettingsOffers.Builder builder, CollectorsConfig config, OpAmpCaService opAmpCaService, ClusterConfigService clusterConfigService) {
-        try {
-            final CertificateEntry opAmpCa = opAmpCaService.getOpAmpCa();
-            final String caPem = opAmpCa.certificate();
-
-            final Opamp.TLSConnectionSettings tlsSettings = Opamp.TLSConnectionSettings.newBuilder().setCaPemContents(caPem).build();
-
-            final ClusterId clusterId = clusterConfigService.get(ClusterId.class);
-            final String serverName = (clusterId != null && clusterId.clusterId() != null) ? clusterId.clusterId() : "";
-
-            if (config.http() != null && config.http().enabled()) {
-                final var settingsBuilder = Opamp.OtherConnectionSettings.newBuilder().setDestinationEndpoint(f("https://%s:%d", config.http().hostname(), config.http().port())).setTls(tlsSettings);
-                if (!serverName.isEmpty()) {
-                    settingsBuilder.putOtherSettings("server_name", serverName);
-                }
-                builder.putOtherConnections("otlp-http", settingsBuilder.build());
-            }
-            if (config.grpc() != null && config.grpc().enabled()) {
-                final var settingsBuilder = Opamp.OtherConnectionSettings.newBuilder().setDestinationEndpoint(f("https://%s:%d", config.grpc().hostname(), config.grpc().port())).setTls(tlsSettings);
-                if (!serverName.isEmpty()) {
-                    settingsBuilder.putOtherSettings("server_name", serverName);
-                }
-                builder.putOtherConnections("otlp-grpc", settingsBuilder.build());
-            }
-        } catch (Exception e) {
-            LOG.warn("Failed to add OTLP connection settings to enrollment response", e);
         }
     }
 
@@ -317,6 +293,25 @@ public class OpAmpService {
                                 .setMinVersion(minVersion)
                                 .setMaxVersion(maxVersion)
                                 .setCaPemContents(caCert))));
+    }
+
+    private ServerToAgent.Builder serverToAgentBuilder(AgentToServer message) {
+        final var builder = ServerToAgent.newBuilder().setInstanceUid(message.getInstanceUid());
+
+        // This field MUST be set in the first ServerToAgent sent by the Server and MAY be omitted in subsequent
+        // ServerToAgent messages by setting it to UnspecifiedServerCapability value.
+        if (message.getSequenceNum() < 1) {
+            builder.setCapabilities(
+                    Opamp.ServerCapabilities.ServerCapabilities_AcceptsStatus_VALUE
+                            | Opamp.ServerCapabilities.ServerCapabilities_OffersRemoteConfig_VALUE
+                            | Opamp.ServerCapabilities.ServerCapabilities_AcceptsEffectiveConfig_VALUE
+                            | Opamp.ServerCapabilities.ServerCapabilities_OffersConnectionSettings_VALUE
+            );
+        } else {
+            builder.setCapabilities(Opamp.ServerCapabilities.ServerCapabilities_Unspecified_VALUE);
+        }
+
+        return builder;
     }
 
     @WithSpan
@@ -378,9 +373,7 @@ public class OpAmpService {
                 .isPresent();
 
         // determine our response
-        final ServerToAgent.Builder responseBuilder = ServerToAgent.newBuilder()
-                .setCapabilities(Opamp.ServerCapabilities.ServerCapabilities_AcceptsStatus_VALUE)
-                .setInstanceUid(message.getInstanceUid());
+        final ServerToAgent.Builder responseBuilder = serverToAgentBuilder(message);
 
         LOG.debug("[{}/{}] previously seen state {} - consecutive: {}", instanceUid, sequenceNum, previousState, seqConsecutive);
         if (!seqConsecutive) {
