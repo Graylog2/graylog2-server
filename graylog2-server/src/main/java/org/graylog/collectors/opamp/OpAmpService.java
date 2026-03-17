@@ -248,16 +248,9 @@ public class OpAmpService {
                             .setHeartbeatIntervalSeconds(30)
                             .setCertificate(TLSCertificate.newBuilder().setCert(ByteString.copyFromUtf8(certPem))));
 
-            final var responseBuilder = serverToAgentBuilder(message).setConnectionSettings(connectionSettingsBuilder);
-
-            if (fromBitmask(message.getCapabilities()).contains(Opamp.AgentCapabilities.AgentCapabilities_ReportsOwnLogs)) {
-                final var exporterConfigs = getExporterConfigs();
-
-                // The "own_logs" are always transmitted via HTTP according to OpAMP.
-                buildConnectionSettings(responseBuilder, exporterConfigs.httpConfig().orElse(null));
-            }
-
-            return responseBuilder.build();
+            return serverToAgentBuilder(message)
+                    .setConnectionSettings(connectionSettingsBuilder)
+                    .build();
         } catch (Exception e) {
             LOG.error("Enrollment failed for collector {}", instanceUid, e);
             return errorResponse(message, "Enrollment failed: " + e.getMessage());
