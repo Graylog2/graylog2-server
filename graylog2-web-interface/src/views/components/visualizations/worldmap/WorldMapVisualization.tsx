@@ -17,11 +17,11 @@
 import React, { useContext } from 'react';
 import flow from 'lodash/flow';
 import fromPairs from 'lodash/fromPairs';
-import get from 'lodash/get';
 import zip from 'lodash/zip';
 import isEmpty from 'lodash/isEmpty';
 
 import type Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
+import type WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
@@ -84,7 +84,7 @@ const WorldMapVisualization = makeVisualization(
 
     const series = pipeline(rows);
 
-    const viewport = get(config, 'visualizationConfig.viewport');
+    const viewport = (config?.visualizationConfig as WorldMapVisualizationConfig | undefined)?.viewport;
 
     const _onChange = (newViewport: Viewport) => {
       if (editing) {

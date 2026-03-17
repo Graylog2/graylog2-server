@@ -27,10 +27,10 @@ import { type SortMode } from './SliceFilters';
 import SlicesOverview from './SlicesOverview';
 import type { FetchSlices } from './useFetchSlices';
 
-export type Slice = { value: string | number; count: number; title?: string };
+export type Slice = { value: string | number; count: number; title?: string; type?: unknown };
 export type SliceRenderer = {
   extendSlices?: (slices: Array<Slice>) => Array<Slice>;
-  render?: (value: string | number) => React.ReactNode;
+  render?: (slice: Slice) => React.ReactNode;
 };
 export type SliceRenderers = { [col: string]: SliceRenderer };
 export type Slices = Array<Slice>;

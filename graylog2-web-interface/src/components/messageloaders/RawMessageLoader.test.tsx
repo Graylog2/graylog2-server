@@ -32,6 +32,7 @@ jest.mock('stores/nodes/NodesStore', () => ({ NodesStore: MockStore() }));
 
 jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
+  gl2ServerUrl: jest.fn(() => ''),
   isCloud: jest.fn(() => false),
 }));
 
@@ -68,7 +69,7 @@ describe('<RawMessageLoader.test>', () => {
       );
     });
 
-    it('allows user to select between server and forwarder input on premise', () => {
+    it('allows user to select between server and forwarder input on premise', async () => {
       asMock(AppConfig.isCloud).mockImplementation(() => false);
 
       render(<RawMessageLoader inputs={inputs} onMessageLoaded={jest.fn()} codecTypes={{}} inputIdSelector />);
@@ -77,13 +78,13 @@ describe('<RawMessageLoader.test>', () => {
 
       expect(inputTypeSelect).toBeInTheDocument();
 
-      userEvent.selectOptions(inputTypeSelect, ['server']);
+      await userEvent.selectOptions(inputTypeSelect, ['server']);
 
       expect(screen.getByLabelText(/message input \(optional\)/i)).toBeInTheDocument();
       expect(screen.getByText(/select input/i)).toBeInTheDocument();
       expect(screen.queryByText(/forwarder inputs/i)).not.toBeInTheDocument();
 
-      userEvent.selectOptions(inputTypeSelect, ['forwarder']);
+      await userEvent.selectOptions(inputTypeSelect, ['forwarder']);
 
       expect(screen.getByText(/forwarder inputs/i)).toBeInTheDocument();
       expect(screen.queryByLabelText(/message input \(optional\)/i)).not.toBeInTheDocument();
