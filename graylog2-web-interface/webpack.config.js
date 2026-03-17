@@ -23,11 +23,13 @@ const { merge } = require('webpack-merge');
 
 const supportedBrowsers = require('./supportedBrowsers');
 const core = require('./webpack/core');
+const { DEFAULT_API_URL } = require('./webpack.vendor');
 
 const ROOT_PATH = path.resolve(__dirname);
 const APP_PATH = path.resolve(ROOT_PATH, 'src');
 const BUILD_PATH = path.resolve(ROOT_PATH, 'target/web/build');
 const TARGET = process.env.npm_lifecycle_event || 'build';
+const apiUrl = process.env.GRAYLOG_API_URL ?? DEFAULT_API_URL;
 process.env.BABEL_ENV = TARGET;
 
 const BOOTSTRAPVARS = require(path.resolve(ROOT_PATH, 'public', 'stylesheets', 'bootstrap-config.json')).vars;
@@ -107,9 +109,32 @@ const webpackConfig = merge(coreConfig, {
 
 if (TARGET === 'start') {
   // eslint-disable-next-line no-console
-  console.error('Running in development (no HMR) mode');
+  console.error('Running in development mode with React Fast Refresh');
 
   module.exports = merge(webpackConfig, {
+    devServer: {
+      hot: 'only',
+      liveReload: false,
+      compress: true,
+      historyApiFallback: {
+        disableDotRule: true,
+      },
+      proxy: [
+        {
+          context: ['/api', '/config.js', '/sso'],
+          target: apiUrl,
+          // Skip proxying for /api-browser - it's a frontend route, not an API endpoint
+          bypass: (req) => (req.path.startsWith('/api-browser') ? req.path : null),
+          onProxyReq: (proxyReq, req) => {
+            const existingHeader = proxyReq.getHeader('X-Graylog-Server-URL');
+            if (!existingHeader?.trim()) {
+              const serverUrl = `${req.protocol}://${req.get('host')}`;
+              proxyReq.setHeader('X-Graylog-Server-URL', serverUrl);
+            }
+          },
+        },
+      ],
+    },
     plugins: [
       new webpack.DefinePlugin({
         IS_CLOUD: process.env.IS_CLOUD,
