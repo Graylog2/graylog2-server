@@ -18,7 +18,6 @@ package org.graylog2.streams.filters;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Accumulators;
@@ -81,7 +80,6 @@ public class StreamDestinationFilterService {
     @Inject
     public StreamDestinationFilterService(MongoCollections mongoCollections,
                                           ClusterEventBus clusterEventBus,
-                                          EventBus eventBus,
                                           Optional<DestinationFilterCreationValidator> optionalDestinationFilterCreationValidator) {
         this.collection = mongoCollections.collection(COLLECTION, StreamDestinationFilterRuleDTO.class);
         this.paginationHelper = mongoCollections.paginationHelper(collection);
@@ -93,7 +91,8 @@ public class StreamDestinationFilterService {
         collection.createIndex(Indexes.ascending(FIELD_DESTINATION_TYPE));
         collection.createIndex(Indexes.ascending(FIELD_STATUS));
 
-        eventBus.register(this);
+        // Subscribe on ClusterEventBus to only receive events originating on this node (local-only delivery).
+        clusterEventBus.registerClusterEventSubscriber(this);
     }
 
     private Bson parseQuery(String queryString) {
