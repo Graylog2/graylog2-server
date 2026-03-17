@@ -67,30 +67,12 @@ const Welcome = () => {
   const productName = useProductName();
   const { permissions, readOnly, id: userId, startpage } = useCurrentUser();
   const isAdmin = hasAdminPermission(permissions);
-  const { openSidebar } = useRightSidebar();
-
-  const handleOpenSidebar = () => {
-    openSidebar({
-      id: 'test-sidebar',
-      title: 'Test Right Sidebar',
-      component: ExampleSidebarContent,
-      props: {
-        message: 'Hello from the right sidebar!',
-        userId: userId,
-      },
-    });
-  };
 
   return (
     <>
       <PageHeader title={`Welcome to ${productName}!`}>
         <ChangeStartPageHelper userId={userId} readOnly={readOnly} startpage={startpage} />
       </PageHeader>
-      <div style={{ marginBottom: '20px' }}>
-        <Button bsStyle="primary" onClick={handleOpenSidebar}>
-          Test Right Sidebar
-        </Button>
-      </div>
       <SectionGrid>
         <StyledSectionComponent title="Last Opened">
           <p className="description">Overview of recently visited saved searches and dashboards.</p>
