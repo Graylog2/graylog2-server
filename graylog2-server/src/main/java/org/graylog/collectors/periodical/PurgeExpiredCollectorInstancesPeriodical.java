@@ -18,8 +18,7 @@ package org.graylog.collectors.periodical;
 
 import jakarta.inject.Inject;
 import org.graylog.collectors.CollectorInstanceService;
-import org.graylog.collectors.CollectorsConfig;
-import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog.collectors.CollectorsConfigService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,19 +27,19 @@ public class PurgeExpiredCollectorInstancesPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(PurgeExpiredCollectorInstancesPeriodical.class);
 
     private final CollectorInstanceService collectorInstanceService;
-    private final ClusterConfigService clusterConfigService;
+    private final CollectorsConfigService collectorsConfigService;
 
     @Inject
     public PurgeExpiredCollectorInstancesPeriodical(CollectorInstanceService collectorInstanceService,
-                                                    ClusterConfigService clusterConfigService) {
+                                                    CollectorsConfigService collectorsConfigService) {
         this.collectorInstanceService = collectorInstanceService;
-        this.clusterConfigService = clusterConfigService;
+        this.collectorsConfigService = collectorsConfigService;
     }
 
     @Override
     public void doRun() {
-        final var config = clusterConfigService.getOrDefault(CollectorsConfig.class, CollectorsConfig.DEFAULT);
-        final long purged = collectorInstanceService.deleteExpired(config.collectorExpirationThreshold());
+        final var expirationThreshold = collectorsConfigService.getOrDefault().collectorExpirationThreshold();
+        final long purged = collectorInstanceService.deleteExpired(expirationThreshold);
         LOG.debug("Purged {} expired collector instances.", purged);
     }
 

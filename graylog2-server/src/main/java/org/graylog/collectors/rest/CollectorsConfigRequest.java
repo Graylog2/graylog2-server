@@ -18,6 +18,7 @@ package org.graylog.collectors.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
+import org.graylog.collectors.IngestEndpointConfig;
 
 import java.time.Duration;
 
@@ -32,5 +33,9 @@ public record CollectorsConfigRequest(
             @JsonProperty("enabled") boolean enabled,
             @JsonProperty("hostname") String hostname,
             @JsonProperty("port") int port
-    ) {}
+    ) {
+        public IngestEndpointConfig toConfig(String inputId) {
+            return new IngestEndpointConfig(enabled(), hostname(), port(), inputId);
+        }
+    }
 }

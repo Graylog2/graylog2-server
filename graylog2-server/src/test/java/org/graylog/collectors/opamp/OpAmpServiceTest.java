@@ -17,6 +17,7 @@
 package org.graylog.collectors.opamp;
 
 import org.graylog.collectors.CollectorInstanceService;
+import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.SourceService;
 import org.graylog.collectors.opamp.auth.AgentTokenService;
@@ -64,6 +65,9 @@ class OpAmpServiceTest {
     private CollectorInstanceService collectorInstanceService;
 
     @Mock
+    private CollectorsConfigService collectorsConfigService;
+
+    @Mock
     private ClusterConfigService clusterConfigService;
 
     @Mock
@@ -79,7 +83,7 @@ class OpAmpServiceTest {
     @BeforeEach
     void setUp() {
         opAmpService = new OpAmpService(enrollmentTokenService, agentTokenService, opAmpCaService, certificateService,
-                collectorInstanceService, clusterConfigService, fleetTransactionLogService, sourceService);
+                collectorInstanceService, collectorsConfigService, clusterConfigService, fleetTransactionLogService, sourceService);
     }
 
     @Test

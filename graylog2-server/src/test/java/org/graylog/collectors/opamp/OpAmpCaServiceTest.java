@@ -22,7 +22,7 @@ import io.netty.handler.ssl.SslContextBuilder;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
-import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
@@ -43,6 +43,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.security.cert.X509Certificate;
 import java.util.Collections;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -55,6 +56,7 @@ import static org.mockito.Mockito.when;
 class OpAmpCaServiceTest {
 
     private CertificateService certificateService;
+    private CollectorsConfigService collectorsConfigService;
     private ClusterConfigService clusterConfigService;
     private OpAmpCaService opAmpCaService;
 
@@ -75,11 +77,12 @@ class OpAmpCaServiceTest {
         );
         certificateService = new CertificateService(mongoCollections, encryptedValueService, CustomizationConfig.empty());
         clusterConfigService = mock(ClusterConfigService.class);
-        opAmpCaService = new OpAmpCaService(certificateService, clusterConfigService);
+        collectorsConfigService = mock(CollectorsConfigService.class);
+        opAmpCaService = new OpAmpCaService(certificateService, clusterConfigService, collectorsConfigService);
     }
 
     private void mockClusterConfigStorage() {
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
     }
 
     @Test

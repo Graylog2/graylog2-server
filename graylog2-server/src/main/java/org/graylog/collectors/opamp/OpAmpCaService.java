@@ -24,6 +24,7 @@ import jakarta.inject.Singleton;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.rest.CollectorsConfigResource;
 import org.graylog.security.pki.Algorithm;
 import org.graylog.security.pki.CertificateEntry;
@@ -69,15 +70,18 @@ public class OpAmpCaService {
     static final String OTLP_SERVER_CN = "Graylog OpAMP OTLP Server";
 
     private final CertificateService certificateService;
+    private final CollectorsConfigService collectorsConfigService;
     private final ClusterConfigService clusterConfigService;
 
     private volatile CaHierarchy cachedHierarchy;
 
     @Inject
     public OpAmpCaService(CertificateService certificateService,
-                          ClusterConfigService clusterConfigService) {
+                          ClusterConfigService clusterConfigService,
+                          CollectorsConfigService collectorsConfigService) {
         this.certificateService = certificateService;
         this.clusterConfigService = clusterConfigService;
+        this.collectorsConfigService = collectorsConfigService;
     }
 
     /**
@@ -172,10 +176,14 @@ public class OpAmpCaService {
             return cachedHierarchy;
         }
 
-        final CollectorsConfig config = clusterConfigService.get(CollectorsConfig.class);
-        if (config != null && config.opampCaId() != null && config.otlpServerCertId() != null) {
-            cachedHierarchy = loadFromConfig(config);
-            return cachedHierarchy;
+        final var maybeConfig = collectorsConfigService.get();
+        if (maybeConfig.isPresent()) {
+            final var config = maybeConfig.get();
+
+            if (config.opampCaId() != null && config.otlpServerCertId() != null) {
+                cachedHierarchy = loadFromConfig(config);
+                return cachedHierarchy;
+            }
         }
 
         LOG.info("Creating OpAMP CA hierarchy");

@@ -18,8 +18,7 @@ package org.graylog.collectors.periodical;
 
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorsConfig;
-import org.graylog.collectors.IngestEndpointConfig;
-import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog.collectors.CollectorsConfigService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,24 +37,22 @@ class PurgeExpiredCollectorInstancesPeriodicalTest {
     @Mock
     private CollectorInstanceService collectorInstanceService;
     @Mock
-    private ClusterConfigService clusterConfigService;
+    private CollectorsConfigService collectorsConfigService;
 
     private PurgeExpiredCollectorInstancesPeriodical periodical;
 
     @BeforeEach
     void setUp() {
-        periodical = new PurgeExpiredCollectorInstancesPeriodical(collectorInstanceService, clusterConfigService);
+        periodical = new PurgeExpiredCollectorInstancesPeriodical(collectorInstanceService, collectorsConfigService);
     }
 
     @Test
     void doRunUsesConfiguredThreshold() {
-        final var config = new CollectorsConfig(null, null, null,
-                new IngestEndpointConfig(true, "host", 14401, null),
-                new IngestEndpointConfig(false, "host", 14402, null),
-                CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD,
-                CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD,
-                Duration.ofDays(3));
-        when(clusterConfigService.getOrDefault(CollectorsConfig.class, CollectorsConfig.DEFAULT)).thenReturn(config);
+        final var config = CollectorsConfig.createDefaultBuilder("host")
+                .collectorExpirationThreshold(Duration.ofDays(3))
+                .build();
+
+        when(collectorsConfigService.getOrDefault()).thenReturn(config);
         when(collectorInstanceService.deleteExpired(Duration.ofDays(3))).thenReturn(2L);
 
         periodical.doRun();
@@ -65,8 +62,7 @@ class PurgeExpiredCollectorInstancesPeriodicalTest {
 
     @Test
     void doRunUsesDefaultThresholdWhenNoConfig() {
-        when(clusterConfigService.getOrDefault(CollectorsConfig.class, CollectorsConfig.DEFAULT))
-                .thenReturn(CollectorsConfig.DEFAULT);
+        when(collectorsConfigService.getOrDefault()).thenReturn(CollectorsConfig.createDefault("localhost"));
         when(collectorInstanceService.deleteExpired(CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD)).thenReturn(0L);
 
         periodical.doRun();

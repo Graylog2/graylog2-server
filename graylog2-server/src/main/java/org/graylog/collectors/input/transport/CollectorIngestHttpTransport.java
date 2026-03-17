@@ -24,13 +24,14 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.handler.ssl.SslContext;
 import jakarta.inject.Named;
 import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.CollectorsConfigService;
+import org.graylog.collectors.IngestEndpointConfig;
 import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog.inputs.otel.transport.OTelHttpTransport;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.plugin.LocalMetricRegistry;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -70,16 +71,18 @@ public class CollectorIngestHttpTransport extends OTelHttpTransport {
                                         TLSProtocolsConfiguration tlsConfiguration,
                                         @Named("trusted_proxies") Set<IpSubnet> trustedProxies,
                                         OpAmpCaService opAmpCaService,
-                                        ClusterConfigService clusterConfigService) {
-        super(buildTransportConfig(clusterConfigService), eventLoopGroup, eventLoopGroupFactory,
+                                        CollectorsConfigService collectorsConfigService) {
+        super(buildTransportConfig(collectorsConfigService), eventLoopGroup, eventLoopGroupFactory,
                 nettyTransportConfiguration, throughputCounter, localMetricRegistry,
                 tlsConfiguration, trustedProxies);
         this.opAmpCaService = opAmpCaService;
     }
 
-    private static Configuration buildTransportConfig(ClusterConfigService clusterConfigService) {
-        final var config = clusterConfigService.get(CollectorsConfig.class);
-        final int port = (config != null && config.http() != null) ? config.http().port() : DEFAULT_HTTP_PORT;
+    private static Configuration buildTransportConfig(CollectorsConfigService collectorsConfigService) {
+        final var port = collectorsConfigService.get()
+                .map(CollectorsConfig::http)
+                .map(IngestEndpointConfig::port)
+                .orElse(DEFAULT_HTTP_PORT);
         return new Configuration(Map.of(
                 OTelHttpTransport.CK_BIND_ADDRESS, "0.0.0.0",
                 OTelHttpTransport.CK_PORT, port,

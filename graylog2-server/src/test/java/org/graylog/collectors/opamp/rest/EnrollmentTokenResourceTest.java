@@ -18,42 +18,43 @@ package org.graylog.collectors.opamp.rest;
 
 import jakarta.ws.rs.BadRequestException;
 import org.graylog.collectors.CollectorsConfig;
-import org.graylog.collectors.IngestEndpointConfig;
+import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class EnrollmentTokenResourceTest {
 
     private EnrollmentTokenResource resource;
     private EnrollmentTokenService enrollmentTokenService;
-    private ClusterConfigService clusterConfigService;
+    private CollectorsConfigService collectorsConfigService;
 
     @BeforeEach
     void setUp() {
         enrollmentTokenService = mock(EnrollmentTokenService.class);
-        clusterConfigService = mock(ClusterConfigService.class);
-        resource = new EnrollmentTokenResource(enrollmentTokenService, clusterConfigService);
+        collectorsConfigService = mock(CollectorsConfigService.class);
+        resource = new EnrollmentTokenResource(enrollmentTokenService, collectorsConfigService);
     }
 
     @Test
     void createTokenDelegatesToService() {
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(
-                new CollectorsConfig("ca-id", "token-id", "otlp-id",
-                        new IngestEndpointConfig(true, "host", 14401, "input-1"),
-                        new IngestEndpointConfig(false, "host", 14402, null),
-                        CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD,
-                        CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD,
-                        CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD));
+        when(collectorsConfigService.get()).thenReturn(Optional.of(
+                CollectorsConfig.createDefaultBuilder("host")
+                        .opampCaId("ca-id")
+                        .tokenSigningCertId("token-id")
+                        .otlpServerCertId("otlp-id")
+                        .build()));
 
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
                 "test-fleet",
@@ -74,7 +75,7 @@ class EnrollmentTokenResourceTest {
 
     @Test
     void createTokenThrowsWhenCollectorsNotConfigured() {
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
                 "test-fleet",

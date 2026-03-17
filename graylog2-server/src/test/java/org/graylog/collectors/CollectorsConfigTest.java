@@ -31,10 +31,13 @@ class CollectorsConfigTest {
     void serializesAndDeserializes() throws Exception {
         final var http = new IngestEndpointConfig(true, "graylog.example.com", 14401, "input-1");
         final var grpc = new IngestEndpointConfig(false, "graylog.example.com", 14402, null);
-        final var config = new CollectorsConfig("ca-id", "token-id", "otlp-id", http, grpc,
-                CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD,
-                CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD,
-                CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD);
+        final var config = CollectorsConfig.builder()
+                .opampCaId("ca-id")
+                .tokenSigningCertId("token-id")
+                .otlpServerCertId("otlp-server-id")
+                .http(http)
+                .grpc(grpc)
+                .build();
 
         final var json = objectMapper.writeValueAsString(config);
         final var deserialized = objectMapper.readValue(json, CollectorsConfig.class);
@@ -59,12 +62,11 @@ class CollectorsConfigTest {
 
     @Test
     void nullableCertIds() throws Exception {
-        final var http = new IngestEndpointConfig(true, "host", 14401, null);
-        final var grpc = new IngestEndpointConfig(false, "host", 14402, null);
-        final var config = new CollectorsConfig(null, null, null, http, grpc,
-                CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD,
-                CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD,
-                CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD);
+        final var config = CollectorsConfig.createDefaultBuilder("host")
+                .opampCaId(null)
+                .tokenSigningCertId(null)
+                .otlpServerCertId(null)
+                .build();
 
         final var json = objectMapper.writeValueAsString(config);
         final var deserialized = objectMapper.readValue(json, CollectorsConfig.class);
@@ -77,10 +79,11 @@ class CollectorsConfigTest {
 
     @Test
     void serializesAndDeserializesWithThresholds() throws Exception {
-        final var http = new IngestEndpointConfig(true, "host", 14401, null);
-        final var grpc = new IngestEndpointConfig(false, "host", 14402, null);
-        final var config = new CollectorsConfig("ca-id", "token-id", "otlp-id", http, grpc,
-                Duration.ofMinutes(10), Duration.ofHours(12), Duration.ofDays(3));
+        final var config = CollectorsConfig.createDefaultBuilder("host")
+                .collectorOfflineThreshold(Duration.ofMinutes(10))
+                .collectorDefaultVisibilityThreshold(Duration.ofHours(12))
+                .collectorExpirationThreshold(Duration.ofDays(3))
+                .build();
 
         final var json = objectMapper.writeValueAsString(config);
         final var deserialized = objectMapper.readValue(json, CollectorsConfig.class);
@@ -90,5 +93,4 @@ class CollectorsConfigTest {
         assertThat(deserialized.collectorDefaultVisibilityThreshold()).isEqualTo(Duration.ofHours(12));
         assertThat(deserialized.collectorExpirationThreshold()).isEqualTo(Duration.ofDays(3));
     }
-
 }

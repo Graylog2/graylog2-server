@@ -23,14 +23,13 @@ import org.apache.shiro.util.ThreadContext;
 import org.graylog.collectors.CollectorInputService;
 import org.graylog.collectors.CollectorLogsDestinationService;
 import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.FleetTransactionLogService;
-import org.graylog.collectors.IngestEndpointConfig;
 import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
 import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog2.configuration.HttpConfiguration;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.validators.ValidationResult;
 import org.junit.jupiter.api.AfterEach;
@@ -42,6 +41,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.net.URI;
 import java.time.Duration;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,7 +59,7 @@ import static org.mockito.Mockito.when;
 class CollectorsConfigResourceTest {
 
     @Mock
-    private ClusterConfigService clusterConfigService;
+    private CollectorsConfigService collectorsConfigService;
     @Mock
     private CollectorInputService collectorInputService;
     @Mock
@@ -81,7 +81,7 @@ class CollectorsConfigResourceTest {
     void setUp() {
         when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("https://graylog.example.com:443/"));
         resource = new CollectorsConfigResource(
-                clusterConfigService,
+                collectorsConfigService,
                 collectorInputService,
                 collectorLogsDestinationService,
                 httpConfiguration,
@@ -102,13 +102,8 @@ class CollectorsConfigResourceTest {
 
     @Test
     void getReturnsExistingConfig() {
-        final var existing = new CollectorsConfig(
-                "ca-id", "token-id", "otlp-id",
-                new IngestEndpointConfig(true, "graylog.example.com", 14401, "input-1"),
-                new IngestEndpointConfig(false, "graylog.example.com", 14402, null),
-                Duration.ofMinutes(10), Duration.ofDays(2), Duration.ofDays(14)
-        );
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(existing);
+        final var existing = CollectorsConfig.createDefault("graylog.example.com");
+        when(collectorsConfigService.get()).thenReturn(Optional.of(existing));
 
         final var result = resource.get(requestContext);
 
@@ -117,7 +112,7 @@ class CollectorsConfigResourceTest {
 
     @Test
     void getReturnsDefaultWhenNoConfigExists() {
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
         when(requestContext.getHeaders()).thenReturn(new MultivaluedHashMap<>());
 
         final var result = resource.get(requestContext);
@@ -181,7 +176,7 @@ class CollectorsConfigResourceTest {
 
         resource.put(request);
 
-        verify(clusterConfigService).write(any(CollectorsConfig.class));
+        verify(collectorsConfigService).save(any(CollectorsConfig.class));
         verify(fleetTransactionLogService).appendFleetMarker(eq(fleetIds), eq(MarkerType.INGEST_CONFIG_CHANGED));
     }
 
@@ -307,7 +302,7 @@ class CollectorsConfigResourceTest {
     }
 
     private void stubCaService() {
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
         when(opAmpCaService.getOpAmpCaId()).thenReturn("ca-id");
         when(opAmpCaService.getTokenSigningCertId()).thenReturn("token-id");
         when(opAmpCaService.getOtlpServerCertId()).thenReturn("otlp-id");

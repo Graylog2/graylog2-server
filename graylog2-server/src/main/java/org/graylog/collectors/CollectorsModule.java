@@ -19,12 +19,12 @@ package org.graylog.collectors;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
-import org.graylog.collectors.db.FleetDTO;
 import org.graylog.collectors.config.receiver.FilelogReceiverConfig;
 import org.graylog.collectors.config.receiver.JournaldReceiverConfig;
 import org.graylog.collectors.config.receiver.MacOSUnifiedLoggingReceiverConfig;
 import org.graylog.collectors.config.receiver.WindowsEventLogReceiverConfig;
 import org.graylog.collectors.db.FileSourceConfig;
+import org.graylog.collectors.db.FleetDTO;
 import org.graylog.collectors.db.JournaldSourceConfig;
 import org.graylog.collectors.db.MacOSUnifiedLoggingSourceConfig;
 import org.graylog.collectors.db.WindowsEventLogSourceConfig;
@@ -48,10 +48,10 @@ import org.graylog.collectors.migrations.V20260303120000_ConvertCollectorInstanc
 import org.graylog.collectors.migrations.V20260316000000_MigrateCollectorsData;
 import org.graylog.collectors.periodical.PurgeExpiredCollectorInstancesPeriodical;
 import org.graylog.collectors.rest.CollectorInstancesResource;
+import org.graylog.collectors.rest.CollectorsActivityResource;
 import org.graylog.collectors.rest.CollectorsConfigResource;
 import org.graylog.collectors.rest.FleetPermissions;
 import org.graylog.collectors.rest.FleetResource;
-import org.graylog.collectors.rest.CollectorsActivityResource;
 import org.graylog.collectors.rest.SourceResource;
 import org.graylog2.database.SequenceTopics;
 import org.graylog2.featureflag.FeatureFlags;
@@ -72,7 +72,7 @@ public class CollectorsModule extends PluginModule {
         // Fleet transaction log
         Multibinder.newSetBinder(binder(), String.class, SequenceTopics.class)
                 .addBinding().toInstance("fleet_txn_log");
-        bind(FleetTransactionLogService.class);
+        bind(FleetTransactionLogService.class).asEagerSingleton();
 
         addMessageInput(CollectorIngestGrpcInput.class);
         addMessageInput(CollectorIngestHttpInput.class);
@@ -100,9 +100,12 @@ public class CollectorsModule extends PluginModule {
         addSystemRestResource(CollectorsConfigResource.class);
         addSystemRestResource(CollectorInstancesResource.class);
 
+        // Collectors config
+        bind(CollectorsConfigService.class).asEagerSingleton();
+
         // Fleet management services
-        bind(FleetService.class);
-        bind(SourceService.class);
+        bind(FleetService.class).asEagerSingleton();
+        bind(SourceService.class).asEagerSingleton();
 
         // Fleet management REST resources
         addSystemRestResource(FleetResource.class);

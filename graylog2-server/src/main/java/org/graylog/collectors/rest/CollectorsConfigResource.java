@@ -35,16 +35,15 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.collectors.CollectorInputService;
 import org.graylog.collectors.CollectorLogsDestinationService;
 import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.FleetTransactionLogService;
-import org.graylog.collectors.IngestEndpointConfig;
 import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.input.CollectorIngestGrpcInput;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
 import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.configuration.HttpConfiguration;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.validators.ValidationResult;
 import org.graylog2.rest.RestTools;
@@ -66,10 +65,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @RequiresAuthentication
 public class CollectorsConfigResource extends RestResource {
 
-    static final int DEFAULT_HTTP_PORT = 14401;
-    static final int DEFAULT_GRPC_PORT = 14402;
-
-    private final ClusterConfigService clusterConfigService;
+    private final CollectorsConfigService collectorsConfigService;
     private final CollectorInputService collectorInputService;
     private final CollectorLogsDestinationService collectorLogsDestinationService;
     private final URI httpExternalUri;
@@ -78,14 +74,14 @@ public class CollectorsConfigResource extends RestResource {
     private final OpAmpCaService opAmpCaService;
 
     @Inject
-    public CollectorsConfigResource(ClusterConfigService clusterConfigService,
+    public CollectorsConfigResource(CollectorsConfigService collectorsConfigService,
                                     CollectorInputService collectorInputService,
                                     CollectorLogsDestinationService collectorLogsDestinationService,
                                     HttpConfiguration httpConfiguration,
                                     FleetService fleetService,
                                     FleetTransactionLogService fleetTransactionLogService,
                                     OpAmpCaService opAmpCaService) {
-        this.clusterConfigService = clusterConfigService;
+        this.collectorsConfigService = collectorsConfigService;
         this.collectorInputService = collectorInputService;
         this.collectorLogsDestinationService = collectorLogsDestinationService;
         this.httpExternalUri = httpConfiguration.getHttpExternalUri();
@@ -97,20 +93,10 @@ public class CollectorsConfigResource extends RestResource {
     @GET
     @Operation(summary = "Get collectors configuration")
     public CollectorsConfig get(@Context ContainerRequestContext requestContext) {
-        final var existing = clusterConfigService.get(CollectorsConfig.class);
-        if (existing != null) {
-            return existing;
-        }
-
-        final var hostname = RestTools.buildExternalUri(requestContext.getHeaders(), httpExternalUri).getHost();
-        return new CollectorsConfig(
-                null, null, null,
-                new IngestEndpointConfig(true, hostname, DEFAULT_HTTP_PORT, null),
-                new IngestEndpointConfig(false, hostname, DEFAULT_GRPC_PORT, null),
-                CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD,
-                CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD,
-                CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD
-        );
+        return collectorsConfigService.get().orElseGet(() -> {
+            final var hostname = RestTools.buildExternalUri(requestContext.getHeaders(), httpExternalUri).getHost();
+            return CollectorsConfig.createDefault(hostname);
+        });
     }
 
     @NoAuditEvent("TODO")
@@ -121,19 +107,19 @@ public class CollectorsConfigResource extends RestResource {
         opAmpCaService.ensureInitialized();
         collectorLogsDestinationService.ensureExists();
 
-        final var existing = clusterConfigService.get(CollectorsConfig.class);
+        final var existing = collectorsConfigService.get();
         final String creatorUserId = SecurityUtils.getSubject().getPrincipal().toString();
 
         final String httpInputId = collectorInputService.reconcile(
                 request.http(),
-                existing != null ? existing.http() : null,
+                existing.map(CollectorsConfig::http).orElse(null),
                 CollectorIngestHttpInput.class.getCanonicalName(),
                 CollectorIngestHttpInput.NAME,
                 creatorUserId);
 
         final String grpcInputId = collectorInputService.reconcile(
                 request.grpc(),
-                existing != null ? existing.grpc() : null,
+                existing.map(CollectorsConfig::grpc).orElse(null),
                 CollectorIngestGrpcInput.class.getCanonicalName(),
                 CollectorIngestGrpcInput.NAME,
                 creatorUserId);
@@ -145,20 +131,18 @@ public class CollectorsConfigResource extends RestResource {
         final Duration effectiveExpiration = request.collectorExpirationThreshold() != null
                 ? request.collectorExpirationThreshold() : CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD;
 
-        final var config = new CollectorsConfig(
-                opAmpCaService.getOpAmpCaId(),
-                opAmpCaService.getTokenSigningCertId(),
-                opAmpCaService.getOtlpServerCertId(),
-                new IngestEndpointConfig(request.http().enabled(), request.http().hostname(),
-                        request.http().port(), httpInputId),
-                new IngestEndpointConfig(request.grpc().enabled(), request.grpc().hostname(),
-                        request.grpc().port(), grpcInputId),
-                effectiveOffline,
-                effectiveVisibility,
-                effectiveExpiration
-        );
+        final var config = CollectorsConfig.builder()
+                .opampCaId(opAmpCaService.getOpAmpCaId())
+                .tokenSigningCertId(opAmpCaService.getTokenSigningCertId())
+                .otlpServerCertId(opAmpCaService.getOtlpServerCertId())
+                .http(request.http().toConfig(httpInputId))
+                .grpc(request.grpc().toConfig(grpcInputId))
+                .collectorOfflineThreshold(effectiveOffline)
+                .collectorDefaultVisibilityThreshold(effectiveVisibility)
+                .collectorExpirationThreshold(effectiveExpiration)
+                .build();
 
-        clusterConfigService.write(config);
+        collectorsConfigService.save(config);
 
         // TODO: We should probably compare the existing and new config to avoid the marker for unrelated changes.
         final var fleetIds = fleetService.getAllFleetIds();

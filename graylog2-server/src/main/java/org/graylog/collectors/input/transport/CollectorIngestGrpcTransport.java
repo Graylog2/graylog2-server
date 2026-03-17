@@ -28,9 +28,10 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslProvider;
 import jakarta.inject.Inject;
 import org.graylog.collectors.CollectorsConfig;
-import org.graylog.inputs.grpc.RemoteAddressProviderInterceptor;
+import org.graylog.collectors.CollectorsConfigService;
+import org.graylog.collectors.IngestEndpointConfig;
 import org.graylog.collectors.opamp.OpAmpCaService;
-import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog.inputs.grpc.RemoteAddressProviderInterceptor;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
@@ -69,7 +70,7 @@ public class CollectorIngestGrpcTransport extends ThrottleableTransport2 {
     private final LocalMetricRegistry localMetricRegistry;
     private final CollectorIngestLogsService.Factory logsServiceFactory;
     private final OpAmpCaService opAmpCaService;
-    private final ClusterConfigService clusterConfigService;
+    private final CollectorsConfigService collectorsConfigService;
 
     private Server server;
 
@@ -79,12 +80,12 @@ public class CollectorIngestGrpcTransport extends ThrottleableTransport2 {
                                         LocalMetricRegistry localMetricRegistry,
                                         CollectorIngestLogsService.Factory logsServiceFactory,
                                         OpAmpCaService opAmpCaService,
-                                        ClusterConfigService clusterConfigService) {
+                                        CollectorsConfigService collectorsConfigService) {
         super(eventBus, configuration);
         this.localMetricRegistry = localMetricRegistry;
         this.logsServiceFactory = logsServiceFactory;
         this.opAmpCaService = opAmpCaService;
-        this.clusterConfigService = clusterConfigService;
+        this.collectorsConfigService = collectorsConfigService;
     }
 
     @Override
@@ -99,8 +100,10 @@ public class CollectorIngestGrpcTransport extends ThrottleableTransport2 {
             throw new MisfireException("Failed to configure TLS for Collector Ingest gRPC input", e);
         }
 
-        final var config = clusterConfigService.get(CollectorsConfig.class);
-        final var port = (config != null && config.grpc() != null) ? config.grpc().port() : DEFAULT_GRPC_PORT;
+        final var port = collectorsConfigService.get()
+                .map(CollectorsConfig::grpc)
+                .map(IngestEndpointConfig::port)
+                .orElse(DEFAULT_GRPC_PORT);
         final var bindAddress = "0.0.0.0";
 
         final List<ServerServiceDefinition> services = List.of(

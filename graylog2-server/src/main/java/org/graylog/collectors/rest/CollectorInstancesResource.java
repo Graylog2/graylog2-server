@@ -23,8 +23,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -38,22 +38,21 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.bson.conversions.Bson;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.graylog.collectors.CollectorInstanceService;
-import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.SourceService;
-import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.db.Attribute;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.db.FleetDTO;
+import org.graylog.collectors.db.MarkerType;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.filtering.ComputedFieldRegistry;
 import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.database.filtering.DbSortResolver;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.AttributeSortSpec;
@@ -150,8 +149,8 @@ public class CollectorInstancesResource extends RestResource {
     private final CollectorInstanceService collectorInstanceService;
     private final FleetService fleetService;
     private final SourceService sourceService;
-    private final ClusterConfigService clusterConfigService;
     private final FleetTransactionLogService txnLogService;
+    private final CollectorsConfigService collectorsConfigService;
     private final DbQueryCreator dbQueryCreator;
 
     @Inject
@@ -159,14 +158,14 @@ public class CollectorInstancesResource extends RestResource {
                                       FleetService fleetService,
                                       SourceService sourceService,
                                       ComputedFieldRegistry computedFieldRegistry,
-                                      ClusterConfigService clusterConfigService,
-                                      FleetTransactionLogService txnLogService) {
+                                      FleetTransactionLogService txnLogService,
+                                      CollectorsConfigService collectorsConfigService) {
         this.collectorInstanceService = collectorInstanceService;
         this.fleetService = fleetService;
         this.sourceService = sourceService;
-        this.clusterConfigService = clusterConfigService;
         this.txnLogService = txnLogService;
         this.dbQueryCreator = new DbQueryCreator(CollectorInstanceDTO.FIELD_INSTANCE_UID, ATTRIBUTES, computedFieldRegistry);
+        this.collectorsConfigService = collectorsConfigService;
     }
 
     @GET
@@ -194,11 +193,11 @@ public class CollectorInstancesResource extends RestResource {
             @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
             @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
             @Parameter(name = "sort",
-                    description = "The field to sort the result on",
-                    schema = @Schema(allowableValues = {"instance_uid", "last_seen", "status", "hostname", "os", "version"}))
+                       description = "The field to sort the result on",
+                       schema = @Schema(allowableValues = {"instance_uid", "last_seen", "status", "hostname", "os", "version"}))
             @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
             @Parameter(name = "order", description = "The sort direction",
-                    schema = @Schema(allowableValues = {"asc", "desc"}))
+                       schema = @Schema(allowableValues = {"asc", "desc"}))
             @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order
     ) {
         final Duration offlineThreshold = getOfflineThreshold();
@@ -274,8 +273,7 @@ public class CollectorInstancesResource extends RestResource {
     }
 
     private Duration getOfflineThreshold() {
-        return clusterConfigService.getOrDefault(CollectorsConfig.class, CollectorsConfig.DEFAULT)
-                .collectorOfflineThreshold();
+        return collectorsConfigService.getOrDefault().collectorOfflineThreshold();
     }
 
     private static Map<String, Object> attributesToMap(Optional<List<Attribute>> attributes) {

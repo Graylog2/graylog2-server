@@ -25,7 +25,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.graylog.collectors.CollectorInstanceService;
-import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.db.CollectorInstanceDTO;
 import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog.collectors.opamp.transport.OpAmpAuthContext;
@@ -72,6 +72,7 @@ class AgentTokenServiceTest {
     private OpAmpCaService opAmpCaService;
     private CollectorInstanceService collectorInstanceService;
     private AgentTokenService agentTokenService;
+    private CollectorsConfigService collectorsConfigService;
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
@@ -93,14 +94,15 @@ class AgentTokenServiceTest {
         when(clusterConfigService.get(ClusterId.class))
                 .thenReturn(ClusterId.create(TEST_CLUSTER_ID));
         collectorInstanceService = new CollectorInstanceService(mongoCollections);
-        opAmpCaService = new OpAmpCaService(certificateService, clusterConfigService);
+        collectorsConfigService = mock(CollectorsConfigService.class);
+        opAmpCaService = new OpAmpCaService(certificateService, clusterConfigService, collectorsConfigService);
         agentTokenService = new AgentTokenService(collectorInstanceService);
     }
 
     @Test
     void validateAgentTokenReturnsIdentifiedForValidToken() throws Exception {
         // No existing CollectorsConfig - service will create certs and cache in memory
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
         // Create CA hierarchy
         final CertificateEntry enrollmentCa = opAmpCaService.getOpAmpCa();
@@ -148,7 +150,7 @@ class AgentTokenServiceTest {
     @Test
     void validateAgentTokenReturnsEmptyForUnknownFingerprint() throws Exception {
         // No existing CollectorsConfig - service will create certs and cache in memory
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
         // Generate agent key pair (not enrolled)
         final KeyPair agentKeyPair = KeyPairGenerator.getInstance("EC").generateKeyPair();
@@ -200,7 +202,7 @@ class AgentTokenServiceTest {
     @Test
     void validateAgentTokenReturnsEmptyForInvalidSignature() throws Exception {
         // No existing CollectorsConfig - service will create certs and cache in memory
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
         // Create CA hierarchy
         final CertificateEntry enrollmentCa = opAmpCaService.getOpAmpCa();

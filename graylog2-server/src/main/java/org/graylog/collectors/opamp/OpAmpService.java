@@ -45,6 +45,7 @@ import opamp.proto.Opamp.ServerToAgent;
 import opamp.proto.Opamp.TLSCertificate;
 import org.graylog.collectors.CollectorInstanceService;
 import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.SourceService;
 import org.graylog.collectors.config.CollectorConfig;
@@ -109,6 +110,7 @@ public class OpAmpService {
     private final OpAmpCaService opAmpCaService;
     private final CertificateService certificateService;
     private final CollectorInstanceService collectorInstanceService;
+    private final CollectorsConfigService collectorsConfigService;
     private final ClusterConfigService clusterConfigService;
     private final FleetTransactionLogService txnLogService;
     private final SourceService sourceService;
@@ -120,6 +122,7 @@ public class OpAmpService {
                         OpAmpCaService opAmpCaService,
                         CertificateService certificateService,
                         CollectorInstanceService collectorInstanceService,
+                        CollectorsConfigService collectorsConfigService,
                         ClusterConfigService clusterConfigService,
                         FleetTransactionLogService txnLogService,
                         SourceService sourceService) {
@@ -128,6 +131,7 @@ public class OpAmpService {
         this.opAmpCaService = opAmpCaService;
         this.certificateService = certificateService;
         this.collectorInstanceService = collectorInstanceService;
+        this.collectorsConfigService = collectorsConfigService;
         this.clusterConfigService = clusterConfigService;
         this.txnLogService = txnLogService;
         this.sourceService = sourceService;
@@ -466,7 +470,7 @@ public class OpAmpService {
                     if (coalesced.newFleetId() != null) {
                         // once everything has worked and if we have reassigned the collector to a new fleet, update the instance document
                         collectorInstanceService.updateCurrentFleet(instanceUid, coalesced.newFleetId());
-                        LOG.debug("[{}/{}] Updated current fleet ID to {}",  instanceUid, sequenceNum,  coalesced.newFleetId());
+                        LOG.debug("[{}/{}] Updated current fleet ID to {}", instanceUid, sequenceNum, coalesced.newFleetId());
                     }
                 } catch (JsonProcessingException e) {
                     LOG.error("[{}/{}] Remote config could not be serialized", instanceUid, sequenceNum, e);
@@ -561,10 +565,9 @@ public class OpAmpService {
 
     @Nonnull
     private ExporterConfigs getExporterConfigs() {
-        final CollectorsConfig collectorsConfig = clusterConfigService.get(CollectorsConfig.class);
-        if (collectorsConfig == null) {
-            throw new IllegalStateException("Unable to determine collector input config, cannot send remote config.");
-        }
+        final var collectorsConfig = collectorsConfigService.get()
+                .orElseThrow(() -> new IllegalStateException("Unable to determine collector input config, cannot send remote config."));
+
         var httpEndpoint = collectorsConfig.http();
         var grpcEndpoint = collectorsConfig.grpc();
         if (httpEndpoint == null && grpcEndpoint == null) {

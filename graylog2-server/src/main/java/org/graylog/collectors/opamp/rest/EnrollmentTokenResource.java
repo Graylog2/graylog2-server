@@ -30,11 +30,10 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.CollectorsConfigService;
+import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 
 @Tag(name = "OpAMP Enrollment", description = "OpAMP agent enrollment management")
 @Path("/opamp/enrollment-tokens")
@@ -44,13 +43,13 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 public class EnrollmentTokenResource {
 
     private final EnrollmentTokenService enrollmentTokenService;
-    private final ClusterConfigService clusterConfigService;
+    private final CollectorsConfigService collectorsConfigService;
 
     @Inject
     public EnrollmentTokenResource(EnrollmentTokenService enrollmentTokenService,
-                                   ClusterConfigService clusterConfigService) {
+                                   CollectorsConfigService collectorsConfigService) {
         this.enrollmentTokenService = enrollmentTokenService;
-        this.clusterConfigService = clusterConfigService;
+        this.collectorsConfigService = collectorsConfigService;
     }
 
     // TODO: Add @AuditEvent for security audit logging of token creation
@@ -62,12 +61,10 @@ public class EnrollmentTokenResource {
     public EnrollmentTokenResponse createToken(
             @RequestBody(description = "Enrollment token creation request")
             @Valid @NotNull CreateEnrollmentTokenRequest request) {
-        final var collectorsConfig = clusterConfigService.get(CollectorsConfig.class);
-        if (collectorsConfig == null) {
-            throw new BadRequestException(
-                    "Collectors must be configured before creating enrollment tokens. " +
-                            "Configure collectors at /api/collectors/config first.");
-        }
+        collectorsConfigService.get().orElseThrow(() ->
+                new BadRequestException("Collectors must be configured before creating enrollment tokens. " +
+                        "Configure collectors at /api/collectors/config first.")
+        );
         return enrollmentTokenService.createToken(request);
     }
 }

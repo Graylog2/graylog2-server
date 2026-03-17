@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
-import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog.collectors.opamp.rest.CreateEnrollmentTokenRequest;
 import org.graylog.collectors.opamp.rest.EnrollmentTokenResponse;
@@ -42,6 +42,7 @@ import org.graylog2.web.customization.CustomizationConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
@@ -68,6 +69,7 @@ class EnrollmentTokenServiceTest {
 
     private ClusterConfigService clusterConfigService;
     private EnrollmentTokenService enrollmentTokenService;
+    private CollectorsConfigService collectorsConfigService;
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
@@ -88,14 +90,15 @@ class EnrollmentTokenServiceTest {
         clusterConfigService = mock(ClusterConfigService.class);
         when(clusterConfigService.get(ClusterId.class))
                 .thenReturn(ClusterId.create(TEST_CLUSTER_ID));
-        final OpAmpCaService opAmpCaService = new OpAmpCaService(certificateService, clusterConfigService);
+        collectorsConfigService = Mockito.mock(CollectorsConfigService.class);
+        final OpAmpCaService opAmpCaService = new OpAmpCaService(certificateService, clusterConfigService, collectorsConfigService);
         enrollmentTokenService = new EnrollmentTokenService(certificateService, clusterConfigService, opAmpCaService);
     }
 
     @Test
     void getTokenSigningCertCreatesHierarchyOnFirstCall() {
         // No existing CollectorsConfig - service will create certs and cache in memory
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
         final CertificateEntry cert = enrollmentTokenService.getTokenSigningCert();
 
@@ -111,7 +114,7 @@ class EnrollmentTokenServiceTest {
     @Test
     void getTokenSigningCertUsesExistingConfigOnSubsequentCalls() {
         // No existing CollectorsConfig - service will create certs and cache in memory
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
         // First call - no config, creates hierarchy
         final CertificateEntry firstCert = enrollmentTokenService.getTokenSigningCert();
@@ -126,7 +129,7 @@ class EnrollmentTokenServiceTest {
     @Test
     void getEnrollmentCaCreatesHierarchyOnFirstCall() {
         // No existing CollectorsConfig - service will create certs and cache in memory
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
         final CertificateEntry cert = enrollmentTokenService.getEnrollmentCa();
 
@@ -141,7 +144,7 @@ class EnrollmentTokenServiceTest {
     @Test
     void getEnrollmentCaUsesExistingConfigOnSubsequentCalls() {
         // No existing CollectorsConfig - service will create certs and cache in memory
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
         // First call - no config, creates hierarchy
         final CertificateEntry firstCert = enrollmentTokenService.getEnrollmentCa();
@@ -156,7 +159,7 @@ class EnrollmentTokenServiceTest {
     @Test
     void createTokenReturnsValidJwt() throws Exception {
         // No existing CollectorsConfig - service will create certs and cache in memory
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
                 "test-fleet",
@@ -188,7 +191,7 @@ class EnrollmentTokenServiceTest {
     @Test
     void createTokenUsesDefaultExpiryWhenNotSpecified() {
         // No existing CollectorsConfig - service will create certs and cache in memory
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest("default-fleet", null);
 
@@ -202,7 +205,7 @@ class EnrollmentTokenServiceTest {
     @Test
     void createTokenRejectsExpiryBeyondCertValidity() {
         // No existing CollectorsConfig - service will create certs and cache in memory
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
         // Token signing cert is valid for 2 years, so 3 years should fail
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
@@ -218,7 +221,7 @@ class EnrollmentTokenServiceTest {
     @Test
     void validateTokenReturnsEnrollmentForValidToken() {
         // No existing CollectorsConfig - service will create certs and cache in memory
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
                 "test-fleet",
@@ -238,7 +241,7 @@ class EnrollmentTokenServiceTest {
     @Test
     void validateTokenReturnsEmptyForExpiredToken() throws Exception {
         // No existing CollectorsConfig - service will create certs and cache in memory
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
         // Create token that expires in 1 second
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
@@ -259,7 +262,7 @@ class EnrollmentTokenServiceTest {
     @Test
     void validateTokenReturnsEmptyForWrongClusterId() {
         // No existing CollectorsConfig - service will create certs and cache in memory
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
                 "test-fleet",
@@ -280,7 +283,7 @@ class EnrollmentTokenServiceTest {
     @Test
     void validateTokenReturnsEmptyForInvalidSignature() {
         // No existing CollectorsConfig - service will create certs and cache in memory
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
                 "test-fleet",
@@ -300,7 +303,7 @@ class EnrollmentTokenServiceTest {
     @Test
     void createTokenIncludesCttHeader() {
         // No existing CollectorsConfig - service will create certs and cache in memory
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest("test-fleet", Duration.ofDays(1));
         final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request);
@@ -315,7 +318,7 @@ class EnrollmentTokenServiceTest {
     @Test
     void validateTokenReturnsEmptyForUnknownKid() {
         // No existing CollectorsConfig - service will create certs and cache in memory
-        when(clusterConfigService.get(CollectorsConfig.class)).thenReturn(null);
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
         // Create a valid token structure but with unknown kid
         // This is a token with header {"alg":"EdDSA","kid":"sha256:unknown"}

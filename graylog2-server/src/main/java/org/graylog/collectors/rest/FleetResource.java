@@ -45,13 +45,12 @@ import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.collectors.CollectorInstanceService;
-import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.SourceService;
 import org.graylog.collectors.db.FleetDTO;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
@@ -85,15 +84,15 @@ public class FleetResource extends RestResource {
     private final FleetService fleetService;
     private final CollectorInstanceService instanceService;
     private final SourceService sourceService;
-    private final ClusterConfigService clusterConfigService;
+    private final CollectorsConfigService collectorsConfigService;
 
     @Inject
     public FleetResource(FleetService fleetService, CollectorInstanceService instanceService,
-                         SourceService sourceService, ClusterConfigService clusterConfigService) {
+                         SourceService sourceService, CollectorsConfigService collectorsConfigService) {
         this.fleetService = fleetService;
         this.instanceService = instanceService;
         this.sourceService = sourceService;
-        this.clusterConfigService = clusterConfigService;
+        this.collectorsConfigService = collectorsConfigService;
     }
 
     @GET
@@ -188,7 +187,7 @@ public class FleetResource extends RestResource {
     @Operation(summary = "Create a new fleet")
     @RequiresPermissions(FleetPermissions.FLEET_CREATE)
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "The newly created fleet", content = @Content(schema = @Schema(implementation =  FleetResponse.class))),
+            @ApiResponse(responseCode = "200", description = "The newly created fleet", content = @Content(schema = @Schema(implementation = FleetResponse.class))),
     })
     // TODO: audit event
     @NoAuditEvent("todo")
@@ -229,7 +228,6 @@ public class FleetResource extends RestResource {
     }
 
     private Duration getOfflineThreshold() {
-        return clusterConfigService.getOrDefault(CollectorsConfig.class, CollectorsConfig.DEFAULT)
-                .collectorOfflineThreshold();
+        return collectorsConfigService.getOrDefault().collectorOfflineThreshold();
     }
 }
