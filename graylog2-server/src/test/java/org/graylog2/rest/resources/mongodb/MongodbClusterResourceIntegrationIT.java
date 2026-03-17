@@ -117,12 +117,12 @@ class MongodbClusterResourceIntegrationIT {
     }
 
     @Test
-    void enableProfiling_returns403_whenUserLacksPermissions() {
+    void changeProfiling_returns403_whenUserLacksPermissions() {
         // Given: Create resource with restricted MongoDB connection
         MongodbClusterResource resource = createResourceWithRestrictedUser();
 
         // When: Try to enable profiling (should fail due to lack of permissions)
-        Response response = resource.enableProfiling(ProfilingLevel.ALL);
+        Response response = resource.changeProfiling(ProfilingLevel.SLOW_OPS);
 
         // Then: Should return 403 Forbidden
         assertThat(response.getStatus()).isEqualTo(403);
@@ -157,15 +157,36 @@ class MongodbClusterResourceIntegrationIT {
     }
 
     @Test
-    void enableProfiling_succeeds_whenUserHasPermissions() {
+    void changeProfiling_succeeds_whenUserHasPermissions() {
         // Given: Create resource with admin MongoDB connection
         MongodbClusterResource resource = createResourceWithAdminUser();
 
         // When: Try to enable profiling with proper permissions
-        Response response = resource.enableProfiling(ProfilingLevel.ALL);
+        Response response = resource.changeProfiling(ProfilingLevel.SLOW_OPS);
 
         // Then: Should succeed
         assertThat(response.getStatus()).isEqualTo(200);
+    }
+
+    @Test
+    void changeProfiling_returns403_whenLevelIsALL() {
+        // Given: Create resource with admin MongoDB connection (permissions are sufficient)
+        MongodbClusterResource resource = createResourceWithAdminUser();
+
+        // When: Try to set profiling to ALL (not allowed regardless of permissions)
+        Response response = resource.changeProfiling(ProfilingLevel.ALL);
+
+        // Then: Should return 403 Forbidden with appropriate error message
+        assertThat(response.getStatus()).isEqualTo(403);
+
+        @SuppressWarnings("unchecked")
+        Map<String, String> entity = (Map<String, String>) response.getEntity();
+        assertThat(entity).containsKey("error");
+        assertThat(entity).containsKey("message");
+        assertThat(entity).containsKey("hint");
+        assertThat(entity.get("error")).isEqualTo("Invalid profiling level provided");
+        assertThat(entity.get("message")).contains("ALL");
+        assertThat(entity.get("hint")).contains("performance");
     }
 
     @Test

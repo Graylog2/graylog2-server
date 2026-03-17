@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
@@ -37,7 +38,6 @@ import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.Document;
-import org.graylog.security.certutil.audit.CaAuditEventTypes;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.cluster.nodes.mongodb.MongodbClusterCommand;
@@ -145,10 +145,22 @@ public class MongodbClusterResource extends RestResource {
 
     @PUT
     @Path("/profiling/{level}")
-    @AuditEvent(type = AuditEventTypes.MONGODB_ENABLE_PROFILING)
-    @Operation(summary = "Enables profiling for all mongodb nodes")
+    @AuditEvent(type = AuditEventTypes.MONGODB_CHANGE_PROFILING)
+    @Operation(summary = "Enables or disables profiling for all mongodb nodes")
     @RequiresPermissions(RestPermissions.MONGODB_ENABLE_PROFILING)
-    public Response enableProfiling(@Parameter(name = "level", required = true, description = "Profiling level") @PathParam("level") ProfilingLevel level) {
+    public Response changeProfiling(@Parameter(name = "level", required = true, description = "Profiling level") @PathParam("level") ProfilingLevel level) {
+
+        // we want to alternate between off and slow ops, don't want to allow setting ALL.
+        if (level != ProfilingLevel.OFF && level != ProfilingLevel.SLOW_OPS) {
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity(Map.of(
+                            "error", "Invalid profiling level provided",
+                            "message", "Profiling level " + level + " is not supported in this API call",
+                            "hint", "Setting profiling level to ALL could severely degrade performance of your mongodb cluster and should not be activated here, via this API call."
+                    ))
+                    .build();
+        }
+
         try {
             Document command = new Document("profile", level.getNumericalValue())
                     .append("slowms", MongodbNodeUtils.SLOW_QUERIES_THRESHOLD);
