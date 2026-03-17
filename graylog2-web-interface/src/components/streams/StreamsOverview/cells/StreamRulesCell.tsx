@@ -36,15 +36,21 @@ const StreamRulesCell = ({ stream }: Props) => {
     return null;
   }
 
+  const streamRulesCount = stream.rules.length;
+  if (streamRulesCount === 0) {
+    return null;
+  }
+
   const streamRulesSectionIsOpen = expandedSections?.[stream.id]?.includes('rules');
+  const streamRulesSectionTitle = `${streamRulesSectionIsOpen ? 'Hide' : 'Show'} stream rules`;
 
   return (
     <CountBadge
-      count={stream.rules.length}
+      count={streamRulesCount}
+      iconName={streamRulesSectionIsOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
       onClick={toggleRulesSection}
       ref={buttonRef}
-      title={`${streamRulesSectionIsOpen ? 'Hide' : 'Show'} stream rules`}
-    />
+      title={streamRulesSectionTitle} />
   );
 };
 
