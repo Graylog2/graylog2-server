@@ -32,9 +32,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
@@ -98,7 +100,9 @@ public class V20260303120000_ConvertCollectorInstanceFleetIdToObjectId extends M
             }
         }
 
+        // Order is important!
         renameCollectorsConfigFields(db);
+        addCaCertIdToClusterConfig(db);
 
         // We renamed the field that contains the source type
         final var updateResult = mongoConnection.getMongoDatabase().getCollection("streamrules")
@@ -134,6 +138,40 @@ public class V20260303120000_ConvertCollectorInstanceFleetIdToObjectId extends M
                 LOG.info("Renamed CollectorsConfig field <{}> to <{}>", oldName, newName);
             } else {
                 LOG.warn("Couldn't rename CollectorsConfig field <{}> to <{}>", oldName, newName);
+            }
+        }
+    }
+
+    private static void addCaCertIdToClusterConfig(MongoDatabase db) {
+        final var payload = loadCollectorsConfig(db).map(c -> c.get("payload", Document.class));
+        final var newField = "ca_cert_id";
+
+        if (payload.isPresent() && isBlank(payload.get().getString(newField))) {
+            final var signingCertId = payload.get().getString("signing_cert_id");
+
+            final var signingCert = db.getCollection("pki_certificates")
+                    .find(Filters.eq("_id", new ObjectId(signingCertId)))
+                    .first();
+
+            if (signingCert != null) {
+                final var issuerCert = signingCert.getList("issuer_chain", String.class, List.of()).getFirst();
+
+                final var caCert = db.getCollection("pki_certificates")
+                        .find(Filters.eq("certificate", issuerCert))
+                        .first();
+
+                if (caCert != null) {
+                    final var caCertId = caCert.getObjectId("_id").toHexString();
+                    final var result = db.getCollection("cluster_config").updateOne(
+                            Filters.eq("type", "org.graylog.collectors.CollectorsConfig"),
+                            Updates.set("payload." + newField, caCertId)
+                    );
+                    if (result.getModifiedCount() > 0) {
+                        LOG.info("Added {} field <{}> to CollectorsConfig cluster config value", newField, caCertId);
+                    } else {
+                        LOG.warn("Couldn't add {} field to CollectorsConfig cluster config value", newField);
+                    }
+                }
             }
         }
     }

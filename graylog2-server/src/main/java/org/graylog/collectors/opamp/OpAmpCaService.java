@@ -40,6 +40,8 @@ import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.List;
 
+import static java.util.Objects.nonNull;
+
 /**
  * Service for managing the OpAMP CA hierarchy and providing certificate accessors.
  * <p>
@@ -85,6 +87,15 @@ public class OpAmpCaService {
     }
 
     /**
+     * Returns the CA certificate.
+     *
+     * @return the CA certificate entry
+     */
+    public CertificateEntry getCaCert() {
+        return ensureInitialized().caCert();
+    }
+
+    /**
      * Returns the signing certificate for signing agent CSRs.
      *
      * @return the signing certificate entry
@@ -109,6 +120,10 @@ public class OpAmpCaService {
      */
     public CertificateEntry getOtlpServerCert() {
         return ensureInitialized().otlpServerCert();
+    }
+
+    public String getCaCertId() {
+        return ensureInitialized().caCert().id();
     }
 
     public String getSigningCertId() {
@@ -180,7 +195,7 @@ public class OpAmpCaService {
         if (maybeConfig.isPresent()) {
             final var config = maybeConfig.get();
 
-            if (config.signingCertId() != null && config.otlpServerCertId() != null) {
+            if (nonNull(config.caCertId()) && nonNull(config.signingCertId()) && nonNull(config.otlpServerCertId())) {
                 cachedHierarchy = loadFromConfig(config);
                 return cachedHierarchy;
             }
@@ -191,10 +206,10 @@ public class OpAmpCaService {
         try {
             final var builder = certificateService.builder();
 
-            final CertificateEntry rootCa = certificateService.save(
+            final CertificateEntry caCert = certificateService.save(
                     builder.createRootCa(ROOT_CA_CN, Algorithm.ED25519, ROOT_CA_VALIDITY));
             final CertificateEntry signingCert = certificateService.save(
-                    builder.createIntermediateCa(OPAMP_CA_CN, rootCa, OPAMP_CA_VALIDITY));
+                    builder.createIntermediateCa(OPAMP_CA_CN, caCert, OPAMP_CA_VALIDITY));
             final CertificateEntry tokenSigningCert = certificateService.save(
                     builder.createEndEntityCert(TOKEN_SIGNING_CN, signingCert, KeyUsage.digitalSignature, TOKEN_SIGNING_VALIDITY));
             final List<String> otlpSans = getClusterIdSans();
@@ -203,7 +218,7 @@ public class OpAmpCaService {
                             KeyUsage.digitalSignature | KeyUsage.keyEncipherment,
                             KeyPurposeId.id_kp_serverAuth, OTLP_SERVER_VALIDITY, otlpSans));
 
-            cachedHierarchy = new CaHierarchy(signingCert, tokenSigningCert, otlpServerCert);
+            cachedHierarchy = new CaHierarchy(caCert, signingCert, tokenSigningCert, otlpServerCert);
             return cachedHierarchy;
         } catch (Exception e) {
             throw new RuntimeException("Failed to create OpAMP CA hierarchy", e);
@@ -211,13 +226,15 @@ public class OpAmpCaService {
     }
 
     private CaHierarchy loadFromConfig(CollectorsConfig config) {
+        final CertificateEntry caCert = certificateService.findById(config.caCertId())
+                .orElseThrow(() -> new IllegalStateException("CA cert not found: " + config.caCertId()));
         final CertificateEntry signingCert = certificateService.findById(config.signingCertId())
                 .orElseThrow(() -> new IllegalStateException("Signing cert not found: " + config.signingCertId()));
         final CertificateEntry tokenSigningCert = certificateService.findById(config.tokenSigningCertId())
                 .orElseThrow(() -> new IllegalStateException("Token signing cert not found: " + config.tokenSigningCertId()));
         final CertificateEntry otlpServerCert = certificateService.findById(config.otlpServerCertId())
                 .orElseThrow(() -> new IllegalStateException("OTLP server cert not found: " + config.otlpServerCertId()));
-        return new CaHierarchy(signingCert, tokenSigningCert, otlpServerCert);
+        return new CaHierarchy(caCert, signingCert, tokenSigningCert, otlpServerCert);
     }
 
     private List<String> getClusterIdSans() {
@@ -229,7 +246,8 @@ public class OpAmpCaService {
         return List.of();
     }
 
-    public record CaHierarchy(CertificateEntry signingCert,
+    public record CaHierarchy(CertificateEntry caCert,
+                              CertificateEntry signingCert,
                               CertificateEntry tokenSigningCert,
                               CertificateEntry otlpServerCert) {}
 }

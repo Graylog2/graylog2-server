@@ -32,7 +32,8 @@ class CollectorsConfigTest {
         final var http = new IngestEndpointConfig(true, "graylog.example.com", 14401, "input-1");
         final var grpc = new IngestEndpointConfig(false, "graylog.example.com", 14402, null);
         final var config = CollectorsConfig.builder()
-                .signingCertId("ca-id")
+                .caCertId("ca-cert-id")
+                .signingCertId("signing-cert-id")
                 .tokenSigningCertId("token-id")
                 .otlpServerCertId("otlp-server-id")
                 .http(http)
@@ -43,6 +44,7 @@ class CollectorsConfigTest {
         final var deserialized = objectMapper.readValue(json, CollectorsConfig.class);
 
         assertThat(deserialized).isEqualTo(config);
+        assertThat(json).contains("\"ca_cert_id\"");
         assertThat(json).contains("\"signing_cert_id\"");
         assertThat(json).contains("\"token_signing_cert_id\"");
         assertThat(json).contains("\"otlp_server_cert_id\"");
@@ -63,6 +65,7 @@ class CollectorsConfigTest {
     @Test
     void nullableCertIds() throws Exception {
         final var config = CollectorsConfig.createDefaultBuilder("host")
+                .caCertId(null)
                 .signingCertId(null)
                 .tokenSigningCertId(null)
                 .otlpServerCertId(null)
@@ -72,6 +75,7 @@ class CollectorsConfigTest {
         final var deserialized = objectMapper.readValue(json, CollectorsConfig.class);
 
         assertThat(deserialized).isEqualTo(config);
+        assertThat(deserialized.caCertId()).isNull();
         assertThat(deserialized.signingCertId()).isNull();
         assertThat(deserialized.tokenSigningCertId()).isNull();
         assertThat(deserialized.otlpServerCertId()).isNull();

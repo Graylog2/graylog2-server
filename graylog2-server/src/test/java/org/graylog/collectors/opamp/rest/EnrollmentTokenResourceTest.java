@@ -51,7 +51,8 @@ class EnrollmentTokenResourceTest {
     void createTokenDelegatesToService() {
         when(collectorsConfigService.get()).thenReturn(Optional.of(
                 CollectorsConfig.createDefaultBuilder("host")
-                        .signingCertId("ca-id")
+                        .caCertId("ca-cert-id")
+                        .signingCertId("signing-cert-id")
                         .tokenSigningCertId("token-id")
                         .otlpServerCertId("otlp-id")
                         .build()));

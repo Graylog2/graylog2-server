@@ -25,6 +25,7 @@ import java.time.Duration;
 import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
 public record CollectorsConfig(
+        @JsonProperty("ca_cert_id") @Nullable String caCertId,
         @JsonProperty("signing_cert_id") @Nullable String signingCertId,
         @JsonProperty("token_signing_cert_id") @Nullable String tokenSigningCertId,
         @JsonProperty("otlp_server_cert_id") @Nullable String otlpServerCertId,
@@ -62,6 +63,8 @@ public record CollectorsConfig(
 
     @AutoBuilder
     public interface Builder {
+        Builder caCertId(String caCertId);
+
         Builder signingCertId(String signingCertId);
 
         Builder tokenSigningCertId(String tokenSigningCertId);
