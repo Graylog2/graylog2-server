@@ -27,6 +27,7 @@ import jakarta.inject.Singleton;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
@@ -37,10 +38,10 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.graylog2.inputs.persistence.InputStateDto.FIELD_DETAILED_MESSAGE;
 import static org.graylog2.inputs.persistence.InputStateDto.FIELD_INPUT_ID;
@@ -56,11 +57,13 @@ public class InputStateService {
     private static final String COLLECTION_NAME = "input_runtime_states";
 
     private final MongoCollection<InputStateDto> collection;
+    private final MongoUtils<InputStateDto> mongoUtils;
     private final String thisNodeId;
 
     @Inject
     public InputStateService(MongoCollections mongoCollections, NodeId nodeId) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, InputStateDto.class);
+        this.mongoUtils = mongoCollections.utils(collection);
         this.thisNodeId = nodeId.getNodeId();
 
         collection.createIndex(
@@ -120,36 +123,32 @@ public class InputStateService {
 
 
     public Map<String, Set<String>> getClusterStatuses() {
-        final Map<String, Set<String>> result = new HashMap<>();
-        for (InputStateDto doc : collection.find()) {
-            result.computeIfAbsent(doc.inputId(), k -> new HashSet<>()).add(doc.state());
+        try (var stream = MongoUtils.stream(collection.find())) {
+            return stream.collect(Collectors.groupingBy(
+                    InputStateDto::inputId,
+                    HashMap::new,
+                    Collectors.mapping(InputStateDto::state, Collectors.toSet())
+            ));
         }
-        return result;
     }
 
     public Set<String> getByState(IOState.Type state) {
-        final Set<String> inputIds = new HashSet<>();
-        for (InputStateDto doc : collection.find(Filters.eq(FIELD_STATE, state.toString()))) {
-            inputIds.add(doc.inputId());
+        try (var stream = MongoUtils.stream(collection.find(Filters.eq(FIELD_STATE, state.toString())))) {
+            return stream.map(InputStateDto::inputId).collect(Collectors.toSet());
         }
-        return inputIds;
     }
 
     public Set<InputStateDto> getByStates(Collection<IOState.Type> states) {
         List<String> stateStrings = states.stream().map(IOState.Type::toString).toList();
         Bson filter = Filters.in(FIELD_STATE, stateStrings);
-        Set<InputStateDto> result = new HashSet<>();
-        for (InputStateDto doc : collection.find(filter)) {
-            result.add(doc);
+        try (var stream = MongoUtils.stream(collection.find(filter))) {
+            return stream.collect(Collectors.toSet());
         }
-        return result;
     }
 
     public Set<String> getDistinctNodeIds() {
-        final Set<String> nodeIds = new HashSet<>();
-        for (String nodeId : collection.distinct(FIELD_NODE_ID, String.class)) {
-            nodeIds.add(nodeId);
+        try (var stream = MongoUtils.stream(collection.distinct(FIELD_NODE_ID, String.class))) {
+            return stream.collect(Collectors.toSet());
         }
-        return nodeIds;
     }
 }
