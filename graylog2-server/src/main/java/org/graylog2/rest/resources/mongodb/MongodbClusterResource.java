@@ -130,7 +130,19 @@ public class MongodbClusterResource extends RestResource {
                                                    @Parameter(name = "sort",
                                                               description = "The field to sort the result on",
                                                               required = true,
-                                                              schema = @Schema(allowableValues = {"name", "role", "version", "status", "cpuUsage", "memoryUsage", "replicationLag", "slowQueryCount", "storageUsedPercent"}))
+                                                              schema = @Schema(allowableValues = {
+                                                                      MongodbNode.FIELD_ID,
+                                                                      MongodbNode.FIELD_NAME,
+                                                                      MongodbNode.FIELD_ROLE,
+                                                                      MongodbNode.FIELD_VERSION,
+                                                                      MongodbNode.FIELD_PROFILING_LEVEL,
+                                                                      MongodbNode.FIELD_REPLICATION_LAG,
+                                                                      MongodbNode.FIELD_SLOW_QUERY_COUNT,
+                                                                      MongodbNode.FIELD_STORAGE_USED_PERCENT,
+                                                                      MongodbNode.FIELD_AVAILABLE_CONNECTIONS,
+                                                                      MongodbNode.FIELD_CURRENT_CONNECTIONS,
+                                                                      MongodbNode.FIELD_CONNECTIONS_USED_PERCENT
+                                                              }))
                                                    @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
                                                    @Parameter(name = "order", description = "The sort direction",
                                                               schema = @Schema(allowableValues = {"asc", "desc"}))
