@@ -35,7 +35,7 @@ type Props = {
 
 const replaySection: SidebarSection = {
   key: 'eventDescription',
-  hoverTitle: 'Alert/Event Details',
+  hoverTitle: 'Replay Details',
   title: null,
   icon: 'play_arrow',
   content: EventDefinitionSideBar,
@@ -74,7 +74,7 @@ const EventDefinitionReplaySearch = ({ eventDefinitionMappedData }: Props) => {
     if (isRightSidebarEnabled) {
       openSidebar({
         id: 'replay-search-sidebar',
-        title: 'Event Definition Details',
+        title: 'Replay Details',
         component: ReplaySearchSidebar,
         props: { alertId: undefined, definitionId: eventDefinition.id },
       });
