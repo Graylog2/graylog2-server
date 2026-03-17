@@ -15,10 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import { HoverForHelp } from 'components/common';
-import TableFetchContext from 'components/common/PaginatedEntityTable/TableFetchContext';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -29,8 +28,10 @@ import RefreshControls from 'components/common/RefreshControls';
 import useDefaultInterval from 'views/hooks/useDefaultIntervalForRefresh';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 
+import useTableFetchContext from '../../common/PaginatedEntityTable/useTableFetchContext';
+
 const useDisableRefreshWhileSlicing = () => {
-  const tableFetchContext = useContext(TableFetchContext);
+  const tableFetchContext = useTableFetchContext();
   const { refreshConfig, stopAutoRefresh } = useAutoRefresh();
   const isSlicingEnabled = Boolean(tableFetchContext?.searchParams.sliceCol);
 

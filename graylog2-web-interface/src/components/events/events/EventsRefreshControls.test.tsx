@@ -119,7 +119,9 @@ describe('EventsRefreshControls', () => {
 
     await user.hover(screen.getByRole('button', { name: /auto refresh unavailable/i }));
 
-    expect(await screen.findByText(/auto refresh is turned off during slicing to avoid performance issues/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/auto refresh is turned off during slicing to avoid performance issues/i),
+    ).toBeInTheDocument();
   });
 
   it('stops auto refresh when slicing becomes active and refresh is enabled', async () => {
@@ -151,7 +153,6 @@ describe('EventsRefreshControls', () => {
   });
 
   it('starts auto refresh when slicing is inactive', async () => {
-    const user = userEvent.setup();
     const startAutoRefresh = jest.fn();
 
     asMock(useAutoRefresh).mockReturnValue({
@@ -162,7 +163,7 @@ describe('EventsRefreshControls', () => {
 
     renderSUT();
 
-    await user.click(await screen.findByTitle(/start refresh/i));
+    await userEvent.click(await screen.findByTitle(/start refresh/i));
 
     expect(startAutoRefresh).toHaveBeenCalledWith(1000);
   });
