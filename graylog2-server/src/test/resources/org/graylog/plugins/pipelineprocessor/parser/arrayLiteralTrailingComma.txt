@@ -1,0 +1,7 @@
+rule "array_trailing_comma"
+when
+    true
+then
+    let a = [1, 2, 3,];
+    trigger_test();
+end
