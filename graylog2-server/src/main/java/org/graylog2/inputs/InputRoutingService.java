@@ -16,10 +16,10 @@
  */
 package org.graylog2.inputs;
 
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
@@ -67,14 +67,15 @@ public class InputRoutingService {
             StreamService streamService,
             PipelineService pipelineService,
             PipelineRuleParser pipelineRuleParser,
-            EventBus eventBus) {
+            ClusterEventBus clusterEventBus) {
         this.ruleService = ruleService;
         this.inputService = inputService;
         this.streamService = streamService;
         this.pipelineService = pipelineService;
         this.pipelineRuleParser = pipelineRuleParser;
 
-        eventBus.register(this);
+        // Subscribe on ClusterEventBus to only receive events originating on this node (local-only delivery).
+        clusterEventBus.registerClusterEventSubscriber(this);
     }
 
     /**

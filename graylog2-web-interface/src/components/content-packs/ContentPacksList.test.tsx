@@ -98,7 +98,7 @@ describe('<ContentPacksList />', () => {
 
     expect(await screen.findAllByText(/Latest Version:/)).toHaveLength(10);
 
-    userEvent.click((await screen.findAllByRole('button', { name: /open page 2/i }))[0]);
+    await userEvent.click((await screen.findAllByRole('button', { name: /open page 2/i }))[0]);
 
     const activePage = (await screen.findAllByTitle('Active page'))[0];
 
@@ -110,9 +110,9 @@ describe('<ContentPacksList />', () => {
     const deleteFn = jest.fn();
     render(<ContentPacksList contentPacks={contentPacks} onDeletePack={deleteFn} />);
 
-    userEvent.click((await screen.findAllByRole('button', { name: /more actions/i }))[0]);
+    await userEvent.click((await screen.findAllByRole('button', { name: /more actions/i }))[0]);
 
-    userEvent.click(await screen.findByRole('menuitem', { name: 'Delete All Versions' }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Delete All Versions' }));
 
     expect(deleteFn).toHaveBeenCalledTimes(1);
   });

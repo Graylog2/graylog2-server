@@ -44,7 +44,7 @@ describe('ActionDropdown', () => {
     const onClick = jest.fn((e) => e.persist());
 
     render(
-      <button type="button" onClick={onClick}>
+      <button type="button" aria-label="Wrapper" onClick={onClick}>
         <ActionDropdown element={<div className="my-trigger-element">Trigger!</div>}>
           <MenuItem>Foo</MenuItem>
         </ActionDropdown>
@@ -122,7 +122,7 @@ describe('ActionDropdown', () => {
     const onSelect = jest.fn();
 
     render(
-      <button type="button" onClick={onClick}>
+      <button type="button" aria-label="Wrapper" onClick={onClick}>
         <ActionDropdown element={<div>Trigger!</div>}>
           <MenuItem onSelect={onSelect}>Foo</MenuItem>
         </ActionDropdown>

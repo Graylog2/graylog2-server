@@ -152,13 +152,12 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     }
 
     public OpensearchInfo processInfo() {
-        return new OpensearchInfo(configuration.getDatanodeNodeName(), processState.getState(), getOpensearchBaseUrl().toString(), commandLineProcess != null ? commandLineProcess.processInfo() : ProcessInformation.empty());
+        return new OpensearchInfo(configuration.getDatanodeNodeName(), processState.getState(), getOpensearchBaseUrl().map(URI::toString).orElse(null), commandLineProcess != null ? commandLineProcess.processInfo() : ProcessInformation.empty());
     }
 
     @Override
-    public URI getOpensearchBaseUrl() {
-        return opensearchConfiguration.map(OpensearchConfiguration::getRestBaseUrl)
-                .orElse(URI.create("")); // Empty address will cause problems for opensearch clients. Has to be filtered out in IndexerDiscoveryProvider
+    public Optional<URI> getOpensearchBaseUrl() {
+        return opensearchConfiguration.map(OpensearchConfiguration::getRestBaseUrl);
     }
 
     @Override
@@ -203,6 +202,14 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
                 }),
                 () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
         );
+    }
+
+    @Override
+    public void removeConfiguration() {
+        LOG.info("Opensearch process is stopping now and removing configuration later");
+        stop();
+        LOG.info("Opensearch process has been stopped, removing configuration optional");
+        this.opensearchConfiguration = Optional.empty();
     }
 
     @VisibleForTesting
@@ -314,6 +321,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     private void stopProcess() {
         if (this.commandLineProcess != null) {
             commandLineProcess.close();
+            this.commandLineProcess = null;
         }
     }
 
