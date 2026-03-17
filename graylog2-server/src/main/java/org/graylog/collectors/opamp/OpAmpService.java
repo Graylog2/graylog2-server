@@ -560,7 +560,8 @@ public class OpAmpService {
         }
 
         final var clusterId = requireNonNull(clusterConfigService.get(ClusterId.class), "Cluster ID config cannot be null.");
-        final var caCert = opAmpCaService.getSigningCert().certificate();
+        // We use the long-lived CA cert so intermediate cert rotation is not an issue for Collector mTLS connections.
+        final var caCert = opAmpCaService.getCaCert().certificate();
         final var tlsSettings = TLSConfigurationSettings.withCACert(clusterId.clusterId(), caCert);
         final var builder = ExporterConfigs.builder();
 

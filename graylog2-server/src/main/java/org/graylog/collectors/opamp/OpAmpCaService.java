@@ -156,14 +156,17 @@ public class OpAmpCaService {
         final CertificateEntry signingCert = getSigningCert();
 
         try {
-            final PrivateKey key = PemUtils.parsePrivateKey(
-                    certificateService.encryptedValueService().decrypt(otlpServerCert.privateKey()));
-            final X509Certificate cert = PemUtils.parseCertificate(otlpServerCert.certificate());
+            final PrivateKey key = PemUtils.parsePrivateKey(certificateService.encryptedValueService().decrypt(otlpServerCert.privateKey()));
+
+            final X509Certificate signingCertPem = PemUtils.parseCertificate(signingCert.certificate());
+            final X509Certificate serverCertPem = PemUtils.parseCertificate(otlpServerCert.certificate());
             final X509Certificate trustedCert = PemUtils.parseCertificate(signingCert.certificate());
 
-            // JDK provider required: BoringSSL (OPENSSL) can load Ed25519 keys but cannot
-            // complete TLS handshakes — its cipher suite negotiation doesn't recognize Ed25519.
-            return SslContextBuilder.forServer(key, cert)
+            // The Collector only has access to the CA cert, so we need to have the intermediate signing cert
+            // in the key cert chain.
+            return SslContextBuilder.forServer(key, serverCertPem, signingCertPem)
+                    // JDK provider required: BoringSSL (OPENSSL) can load Ed25519 keys but cannot
+                    // complete TLS handshakes — its cipher suite negotiation doesn't recognize Ed25519.
                     .sslProvider(SslProvider.JDK)
                     .clientAuth(ClientAuth.REQUIRE)
                     .trustManager(trustedCert);
