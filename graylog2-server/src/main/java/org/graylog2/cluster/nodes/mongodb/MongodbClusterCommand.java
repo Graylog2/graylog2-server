@@ -25,7 +25,7 @@ import org.graylog2.database.MongoConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-  import java.util.Collections;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -60,7 +60,7 @@ public class MongodbClusterCommand {
                         .collect(Collectors.toMap(host -> host, host -> runCommand(host, call))))
                 .orElseGet(() -> {
                     final String host = connection.getClusterDescription().getServerDescriptions().getFirst().getAddress().toString();
-                    return Collections.singletonMap(host, runCommand(host, (h, c) -> call.apply(h, connection)));
+                    return Collections.singletonMap(host, runCommand(host, call));
                 });
     }
 
