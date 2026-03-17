@@ -33,6 +33,7 @@ const DEFAULT_LAYOUT = {
   defaultPageSize: 20,
   defaultSort: { attributeId: 'created_at', direction: 'desc' } as Sort,
   defaultDisplayedAttributes: ['fleet_id', 'created_by', 'created_at', 'expires_at', 'usage_count', 'last_used_at'],
+  defaultColumnOrder: ['fleet_id', 'created_by', 'created_at', 'expires_at', 'usage_count', 'last_used_at'],
 };
 
 const ExpiredText = styled.span`

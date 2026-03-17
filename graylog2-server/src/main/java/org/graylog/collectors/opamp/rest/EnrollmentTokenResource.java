@@ -17,6 +17,8 @@
 package org.graylog.collectors.opamp.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
@@ -117,11 +119,15 @@ public class EnrollmentTokenResource extends RestResource {
     @Operation(summary = "List enrollment tokens")
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_CREATE)
     public PageListResponse<EnrollmentTokenDTO> list(
-            @QueryParam("page") @DefaultValue("1") int page,
-            @QueryParam("per_page") @DefaultValue("50") int perPage,
-            @QueryParam("query") @DefaultValue("") String query,
-            @QueryParam("filters") List<String> filters,
+            @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+            @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+            @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+            @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
+            @Parameter(name = "sort", description = "The field to sort the result on",
+                    schema = @Schema(allowableValues = {"created_at", "expires_at", "usage_count", "last_used_at"}))
             @QueryParam("sort") @DefaultValue(DEFAULT_SORT_FIELD) String sort,
+            @Parameter(name = "order", description = "The sort direction",
+                    schema = @Schema(allowableValues = {"asc", "desc"}))
             @QueryParam("order") @DefaultValue(DEFAULT_SORT_DIRECTION) SortOrder order) {
         final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
         final var resolvedSort = DbSortResolver.resolve(ATTRIBUTES, sort, order);
@@ -138,7 +144,7 @@ public class EnrollmentTokenResource extends RestResource {
     @Path("/{tokenId}")
     @Operation(summary = "Delete an enrollment token")
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_CREATE)
-    public Response delete(@PathParam("tokenId") String tokenId) {
+    public Response delete(@Parameter(name = "tokenId", required = true) @PathParam("tokenId") String tokenId) {
         if (!enrollmentTokenService.delete(tokenId)) {
             throw new jakarta.ws.rs.NotFoundException("Enrollment token not found");
         }

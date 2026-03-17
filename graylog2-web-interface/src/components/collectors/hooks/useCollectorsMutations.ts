@@ -167,7 +167,7 @@ const useCollectorsMutations = () => {
   });
 
   const deleteEnrollmentTokenMutation = useMutation({
-    mutationFn: (tokenId: string) => OpAMPEnrollment.deleteToken(tokenId),
+    mutationFn: (tokenId: string) => OpAMPEnrollment.remove(tokenId),
     onError: (errorThrown) => {
       UserNotification.error(
         `Deleting enrollment token failed: ${errorThrown}`,

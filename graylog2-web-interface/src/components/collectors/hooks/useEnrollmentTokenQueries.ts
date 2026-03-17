@@ -40,7 +40,7 @@ export const fetchPaginatedEnrollmentTokens = async (
       searchParams.pageSize,
       searchParams.query,
       FiltersForQueryParams(searchParams.filters),
-      searchParams.sort?.attributeId,
+      searchParams.sort?.attributeId as 'created_at' | 'expires_at' | 'usage_count' | 'last_used_at',
       searchParams.sort?.direction,
     ).then((response) => ({
       list: response.elements.map((el) => ({ ...el, id: el.id })),
