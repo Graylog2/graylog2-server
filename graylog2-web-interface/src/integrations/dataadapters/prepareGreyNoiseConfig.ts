@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export function prepareGreyNoiseConfig(config: Record<string, unknown>): Record<string, unknown> {
+export default function prepareGreyNoiseConfig(config: Record<string, unknown>): Record<string, unknown> {
   const apiToken = config.api_token as { is_set?: boolean } | undefined;
 
   if (apiToken && 'is_set' in apiToken) {
