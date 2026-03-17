@@ -23,7 +23,9 @@ export const EVENTS_ENTITY_TABLE_ID = 'events';
 export const commonEventAttributes: Array<Attribute> = [
   {
     filter_options: [
-      ...Object.keys(EventDefinitionPriorityEnum.properties).reverse().map((num) => ({ value: num, title: num })),
+      ...Object.keys(EventDefinitionPriorityEnum.properties)
+        .reverse()
+        .map((num) => ({ value: num, title: num })),
     ],
     filterable: true,
     id: 'priority',
