@@ -89,7 +89,7 @@ class SessionConverterTest {
         simpleSession.setAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY,
                 new SimplePrincipalCollection("user-id", "realm"));
 
-        final var sessionDTO = SessionConverter.simpleSessionToSessionDTO(simpleSession);
+        final var sessionDTO = SessionConverter.simpleSessionToSessionDTOBuilder(simpleSession).build();
 
         assertThat(sessionDTO.sessionId()).isEqualTo("session-id");
         assertThat(sessionDTO.host()).contains("localhost");
@@ -111,7 +111,7 @@ class SessionConverterTest {
         simpleSession.setHost("localhost");
         simpleSession.setAttribute("unknown-key", "some-value");
 
-        assertThatThrownBy(() -> SessionConverter.simpleSessionToSessionDTO(simpleSession))
+        assertThatThrownBy(() -> SessionConverter.simpleSessionToSessionDTOBuilder(simpleSession).build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("unknown attribute keys");
     }
@@ -122,25 +122,25 @@ class SessionConverterTest {
         simpleSession.setId("session-id");
         simpleSession.setHost("localhost");
 
-        assertThat(SessionConverter.simpleSessionToSessionDTO(simpleSession).userId()).isEmpty();
+        assertThat(SessionConverter.simpleSessionToSessionDTOBuilder(simpleSession).build().userId()).isEmpty();
 
         simpleSession.setAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY, new SimplePrincipalCollection());
-        assertThat(SessionConverter.simpleSessionToSessionDTO(simpleSession).userId()).isEmpty();
+        assertThat(SessionConverter.simpleSessionToSessionDTOBuilder(simpleSession).build().userId()).isEmpty();
 
         simpleSession.setAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY, "not-a-collection");
-        assertThatThrownBy(() -> SessionConverter.simpleSessionToSessionDTO(simpleSession))
+        assertThatThrownBy(() -> SessionConverter.simpleSessionToSessionDTOBuilder(simpleSession).build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Unexpected type");
 
         simpleSession.setAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY,
                 new SimplePrincipalCollection(List.of("a", "b", "c"), "realm"));
-        assertThatThrownBy(() -> SessionConverter.simpleSessionToSessionDTO(simpleSession))
+        assertThatThrownBy(() -> SessionConverter.simpleSessionToSessionDTOBuilder(simpleSession).build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Expected a single principal");
 
         simpleSession.setAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY,
                 new SimplePrincipalCollection(1, "realm"));
-        assertThatThrownBy(() -> SessionConverter.simpleSessionToSessionDTO(simpleSession))
+        assertThatThrownBy(() -> SessionConverter.simpleSessionToSessionDTOBuilder(simpleSession).build())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Unexpected type");
     }
