@@ -24,7 +24,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
@@ -123,6 +122,7 @@ public class MongodbClusterResource extends RestResource {
 
     @GET
     @Timed
+    @RequiresPermissions(RestPermissions.MONGODB_NODES_READ)
     @Operation(summary = "Get a paginated list of all MongoDB nodes in this cluster")
     public PageListResponse<MongodbNode> dataNodes(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                    @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
@@ -147,7 +147,7 @@ public class MongodbClusterResource extends RestResource {
     @Path("/profiling/{level}")
     @AuditEvent(type = AuditEventTypes.MONGODB_CHANGE_PROFILING)
     @Operation(summary = "Enables or disables profiling for all mongodb nodes")
-    @RequiresPermissions(RestPermissions.MONGODB_ENABLE_PROFILING)
+    @RequiresPermissions(RestPermissions.MONGODB_NODES_PROFILING_CHANGE)
     public Response changeProfiling(@Parameter(name = "level", required = true, description = "Profiling level") @PathParam("level") ProfilingLevel level) {
 
         // we want to alternate between off and slow ops, don't want to allow setting ALL.

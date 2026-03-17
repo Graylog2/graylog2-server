@@ -195,7 +195,8 @@ public class RestPermissions implements PluginPermissions {
     public static final String USERS_TOKENCREATE = "users:tokencreate";
     public static final String USERS_TOKENLIST = "users:tokenlist";
     public static final String USERS_TOKENREMOVE = "users:tokenremove";
-    public static final String MONGODB_ENABLE_PROFILING = "mongodb:enableprofiling";
+    public static final String MONGODB_NODES_READ = "mongodb_read:read";
+    public static final String MONGODB_NODES_PROFILING_CHANGE = "mongodb_nodes:changeprofiling";
 
     protected static final ImmutableSet<Permission> PERMISSIONS = ImmutableSet.<Permission>builder()
             .add(create(API_BROWSER_READ, ""))
@@ -351,7 +352,8 @@ public class RestPermissions implements PluginPermissions {
             .add(create(MAPPING_PROFILES_DELETE, ""))
             .add(create(MAPPING_PROFILES_EDIT, ""))
             .add(create(MAPPING_PROFILES_READ, ""))
-            .add(create(MONGODB_ENABLE_PROFILING, ""))
+            .add(create(MONGODB_NODES_PROFILING_CHANGE, ""))
+            .add(create(MONGODB_NODES_READ, ""))
             .build();
 
     // Standard set of PERMISSIONS of readers.
@@ -370,7 +372,8 @@ public class RestPermissions implements PluginPermissions {
             METRICS_READ,
             SYSTEM_READ,
             THROUGHPUT_READ,
-            DATANODE_READ
+            DATANODE_READ,
+            MONGODB_NODES_READ
     ).build();
 
     protected static final Set<Permission> READER_BASE_PERMISSIONS = PERMISSIONS.stream()
