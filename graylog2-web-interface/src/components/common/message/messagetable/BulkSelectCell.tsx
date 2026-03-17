@@ -22,7 +22,7 @@ import { BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Cons
 const StyledCell = styled.td`
   width: ${BULK_SELECT_COLUMN_WIDTH}px;
 `;
-// 'data-bulk-select-cell'
+
 const BulkSelectCell = ({ children = null }: React.PropsWithChildren) => (
   <StyledCell data-bulk-select-cell onClick={(event) => event.stopPropagation()}>
     {children}
