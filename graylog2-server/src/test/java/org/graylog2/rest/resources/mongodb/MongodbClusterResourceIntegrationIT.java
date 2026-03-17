@@ -186,15 +186,18 @@ class MongodbClusterResourceIntegrationIT {
 
     private MongodbClusterResource createResourceWithRestrictedUser() {
         MongoConnection mongoConnection = createMongoConnection(RESTRICTED_USER, RESTRICTED_PASSWORD);
-        return createResource(mongoConnection);
+        return createResource(mongoConnection, RESTRICTED_USER, RESTRICTED_PASSWORD, TEST_DATABASE);
     }
 
     private MongodbClusterResource createResourceWithAdminUser() {
         MongoConnection mongoConnection = createMongoConnection(ADMIN_USER, ADMIN_PASSWORD, "admin");
-        return createResource(mongoConnection);
+        return createResource(mongoConnection, ADMIN_USER, ADMIN_PASSWORD, "admin");
     }
 
-    private MongodbClusterResource createResource(MongoConnection mongoConnection) {
+    private MongodbClusterResource createResource(MongoConnection mongoConnection,
+                                                   String username,
+                                                   String password,
+                                                   String authDatabase) {
         MongodbNodesProvider nodesProvider = new MongodbNodesProvider(Set.of(new MongodbNodesService() {
             @Override
             public List<MongodbNode> allNodes() {
@@ -208,8 +211,9 @@ class MongodbClusterResourceIntegrationIT {
         }));
 
         MongodbConnectionResolver connectionResolver = host -> {
-            // For standalone setup, return the same client
-            return restrictedClient;
+            // Create a new client for each call (matching production behavior)
+            String uri = buildConnectionUri(username, password, authDatabase);
+            return new MongoClient(uri);
         };
 
         MongodbClusterCommand clusterCommand = new MongodbClusterCommand(
@@ -225,11 +229,15 @@ class MongodbClusterResourceIntegrationIT {
     }
 
     private MongoConnection createMongoConnection(String username, String password, String authDatabase) {
+        MongoDbConfiguration config = new MongoDbConfiguration();
+        config.setUri(buildConnectionUri(username, password, authDatabase));
+        return new MongoConnectionImpl(config);
+    }
+
+    private String buildConnectionUri(String username, String password, String authDatabase) {
         String host = mongoContainer.getHost();
         int port = mongoContainer.getFirstMappedPort();
-
-        MongoDbConfiguration config = new MongoDbConfiguration();
-        config.setUri(String.format(Locale.ROOT,
+        return String.format(Locale.ROOT,
                 "mongodb://%s:%s@%s:%d/%s?authSource=%s",
                 username,
                 password,
@@ -237,8 +245,6 @@ class MongodbClusterResourceIntegrationIT {
                 port,
                 TEST_DATABASE,
                 authDatabase
-        ));
-
-        return new MongoConnectionImpl(config);
+        );
     }
 }
