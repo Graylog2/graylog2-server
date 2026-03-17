@@ -340,8 +340,13 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
             final MultiSearchResponseItem<JsonData> multiSearchResponse = results.get(searchTypeIndex);
             if (multiSearchResponse.isFailure()) {
                 String errorResponse = multiSearchResponse.failure().toJsonString();
-                ElasticsearchException e = new ElasticsearchException("Search type returned error: ",
-                        new OpenSearchException(OSSerializationUtils.fromJson(errorResponse, ErrorResponse._DESERIALIZER)));
+                OpenSearchException cause = new OpenSearchException(OSSerializationUtils.fromJson(errorResponse, ErrorResponse._DESERIALIZER));
+                ErrorCause ec = cause.error();
+                while (ec != null) {
+                    LOG.error("  Search type error: {} - {}", ec.type(), ec.reason());
+                    ec = ec.causedBy();
+                }
+                ElasticsearchException e = new ElasticsearchException("Search type returned error: ", cause);
                 queryContext.addError(SearchTypeErrorParser.parse(query, searchTypeId, e));
             } else {
                 Optional<ElasticsearchException> failedShards = checkForFailedShards(multiSearchResponse);
