@@ -215,15 +215,16 @@ class MessageTimestampTest {
     @Test
     void testDefaultConfigWhenNoDocumentExists() {
         // Simulates fresh install: no TimeStampConfig document in MongoDB
-        // getOrDefault returns TimeStampConfig.getDefault() which has null gracePeriod
+        // getOrDefault returns TimeStampConfig.getDefault() which has a distant-future grace period
         clusterConfigService = Mockito.mock(ClusterConfigService.class);
         when(clusterConfigService.getOrDefault(eq(TimeStampConfig.class), Mockito.any()))
                 .thenAnswer(invocation -> invocation.getArgument(1));
         final ProcessBufferProcessor processor = createProcessorWithConfigService(clusterConfigService);
+        final Duration expectedDefault = TimeStampConfig.getDefault().gracePeriod();
 
         // Multiple messages processed — should only query once
         for (int i = 0; i < 100; i++) {
-            assertThat(processor.getTimeStampGracePeriod()).isNull();
+            assertThat(processor.getTimeStampGracePeriod()).isEqualTo(expectedDefault);
         }
 
         verify(clusterConfigService, Mockito.times(1))

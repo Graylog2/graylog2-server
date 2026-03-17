@@ -33,7 +33,6 @@ type ConfigurationsActionsType = {
   listPermissionsConfig: (configType: string) => Promise<unknown>;
   listUserConfig: (configType: string) => Promise<unknown>;
   update: (configType: any, config: any) => Promise<void>;
-  remove: (configType: string) => Promise<void>;
   updateAllowlist: (configType: any, config: any) => Promise<void>;
   updateIndexSetDefaults: (configType: any, config: any) => Promise<void>;
   updateMessageProcessorsConfig: (configType: any, config: any) => Promise<void>;
@@ -49,7 +48,6 @@ export const ConfigurationsActions = singletonActions('core.Configuration', () =
     listPermissionsConfig: { asyncResult: true },
     listUserConfig: { asyncResult: true },
     update: { asyncResult: true },
-    remove: { asyncResult: true },
     updateAllowlist: { asyncResult: true },
     updateIndexSetDefaults: { asyncResult: true },
     updateMessageProcessorsConfig: { asyncResult: true },
@@ -265,28 +263,6 @@ export const ConfigurationsStore = singletonStore('core.Configuration', () =>
       );
 
       ConfigurationsActions.update.promise(promise);
-    },
-
-    remove(configType) {
-      const promise = fetch('DELETE', this._url(`/${configType}`));
-
-      promise.then(
-        () => {
-          const { [configType]: _, ...rest } = this.configuration;
-          this.configuration = rest;
-          this.propagateChanges();
-
-          return undefined;
-        },
-        (error) => {
-          UserNotification.error(
-            `Config removal failed: ${error}`,
-            `Could not remove config: ${configType}`,
-          );
-        },
-      );
-
-      ConfigurationsActions.remove.promise(promise);
     },
 
     updateAllowlist(configType, config) {
