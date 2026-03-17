@@ -18,10 +18,14 @@ package org.graylog2.cluster.nodes.mongodb;
 
 import com.mongodb.MongoClient;
 import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
 public class MongodbNodeUtils {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MongodbNodeUtils.class);
 
     public static final int SLOW_QUERIES_THRESHOLD = 100;
 
@@ -55,7 +59,7 @@ public class MongodbNodeUtils {
                 return 100.0d * fsUsedSize / fsTotalSize;
             }
         } catch (Exception e) {
-            // Stats may not be available or accessible
+            LOG.warn("Failed to calculate disk usage for mongodb node", e);
         }
         return 0.0;
     }
