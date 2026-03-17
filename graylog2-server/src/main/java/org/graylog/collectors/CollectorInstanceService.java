@@ -27,6 +27,7 @@ import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.ReturnDocument;
 import com.mongodb.client.result.InsertOneResult;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bson.Document;
@@ -124,6 +125,16 @@ public class CollectorInstanceService {
                         .upsert(true));
 
         return Optional.ofNullable(previousInstanceDto);
+    }
+
+    /**
+     * Updates an existing collector instance to a new fleet id.
+     *
+     * @param instanceUid the instance to update
+     * @param newFleetId the new fleet id to save
+     */
+    public void updateCurrentFleet(@Nonnull String instanceUid, @Nonnull String newFleetId) {
+        collection.updateOne(Filters.eq(FIELD_INSTANCE_UID, instanceUid), set(FIELD_FLEET_ID, newFleetId));
     }
 
     public boolean existsByInstanceUid(String instanceUid) {

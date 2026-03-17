@@ -463,6 +463,11 @@ public class OpAmpService {
                                     .build())
                             .setConfigHash(ByteString.copyFromUtf8(String.valueOf(coalesced.maxSeq()))).build() // TODO consistent hashing
                     );
+                    if (coalesced.newFleetId() != null) {
+                        // once everything has worked and if we have reassigned the collector to a new fleet, update the instance document
+                        collectorInstanceService.updateCurrentFleet(instanceUid, coalesced.newFleetId());
+                        LOG.debug("[{}/{}] Updated current fleet ID to {}",  instanceUid, sequenceNum,  coalesced.newFleetId());
+                    }
                 } catch (JsonProcessingException e) {
                     LOG.error("[{}/{}] Remote config could not be serialized", instanceUid, sequenceNum, e);
                 }
