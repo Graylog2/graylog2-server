@@ -56,10 +56,12 @@ const mockTimestampConfig: GlobalProcessingConfig = {
 };
 
 let mockUpdate;
+let mockRemove;
 let mockUpdateMessageProcessorsConfig;
 
 jest.mock('stores/configurations/ConfigurationsStore', () => {
   mockUpdate = jest.fn().mockReturnValue(Promise.resolve());
+  mockRemove = jest.fn().mockReturnValue(Promise.resolve());
   mockUpdateMessageProcessorsConfig = jest.fn().mockReturnValue(Promise.resolve());
 
   return {
@@ -75,6 +77,7 @@ jest.mock('stores/configurations/ConfigurationsStore', () => {
     ConfigurationsActions: {
       list: jest.fn(() => Promise.resolve()),
       update: mockUpdate,
+      remove: mockRemove,
       updateMessageProcessorsConfig: mockUpdateMessageProcessorsConfig,
       listMessageProcessorsConfig: jest.fn(),
     },
@@ -124,7 +127,7 @@ describe('MessageProcessorsConfig', () => {
     });
   });
 
-  it('update configuration when timestamp is disabled', async () => {
+  it('deletes TimeStampConfig when timestamp normalization is disabled', async () => {
     const formConfig = {
       ...mockMessageProcessingConfig,
       ...mockTimestampConfig,
@@ -150,9 +153,34 @@ describe('MessageProcessorsConfig', () => {
     );
 
     await waitFor(() => {
-      expect(mockUpdate).toHaveBeenCalledWith('org.graylog2.shared.buffers.processors.TimeStampConfig', {
-        grace_period: undefined,
-      });
+      expect(mockRemove).toHaveBeenCalledWith('org.graylog2.shared.buffers.processors.TimeStampConfig');
     });
+
+    expect(mockUpdate).not.toHaveBeenCalled();
+  });
+
+  it('deletes TimeStampConfig when normalization was never enabled', async () => {
+    const formConfig = {
+      ...mockMessageProcessingConfig,
+      grace_period: undefined,
+      enableFutureTimestampNormalization: false,
+    };
+    render(<SUT formConfig={formConfig} />);
+
+    await screen.findByRole('heading', {
+      name: /update message processors configuration/i,
+    });
+
+    await userEvent.click(
+      await screen.findByRole('button', {
+        name: /update configuration/i,
+      }),
+    );
+
+    await waitFor(() => {
+      expect(mockRemove).toHaveBeenCalledWith('org.graylog2.shared.buffers.processors.TimeStampConfig');
+    });
+
+    expect(mockUpdate).not.toHaveBeenCalled();
   });
 });
