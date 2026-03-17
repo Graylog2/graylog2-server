@@ -68,6 +68,20 @@ class LuceneInMemorySearchTest {
     }
 
     @Test
+    void testNumericalExpressions() throws QueryNodeException, IOException {
+        Assertions.assertThat(search.search(searchQueryParser.parse("age:>35"), "name", SortOrder.ASCENDING, 1, 10))
+                .hasSize(2)
+                .extracting(SearchableItem::name)
+                .contains("Jane Doe", "Alan Smithee");
+
+        Assertions.assertThat(search.search(searchQueryParser.parse("age:<=30"), "name", SortOrder.ASCENDING, 1, 10))
+                .hasSize(2)
+                .extracting(SearchableItem::name)
+                .contains("John Doe", "Max Mustermann");
+
+    }
+
+    @Test
     void testSorting() throws QueryNodeException, IOException {
         Assertions.assertThat(search.search(searchQueryParser.parse("name:john name:max"), "age", SortOrder.DESCENDING, 1, 10))
                 .hasSize(3)

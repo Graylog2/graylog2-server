@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class LuceneInMemorySearchEngine<U extends InMemorySearchableEntity> implements InMemorySearchEngine<U> {
@@ -59,12 +60,16 @@ public class LuceneInMemorySearchEngine<U extends InMemorySearchableEntity> impl
     private final List<EntityAttribute> attributes;
     private final Supplier<List<U>> datasource;
     private final Analyzer analyzer;
-    private static final LuceneQueryBuilder LUCENE_QUERY_BUILDER = new LuceneQueryBuilder();
+    private final LuceneQueryBuilder luceneQueryBuilder;
 
     public LuceneInMemorySearchEngine(List<EntityAttribute> attributes, Supplier<List<U>> datasource) {
         this.attributes = attributes;
         this.datasource = datasource;
         this.analyzer = new StandardAnalyzer();
+        // Build field type map from attributes
+        Map<String, SearchQueryField.Type> fieldTypes = attributes.stream()
+                .collect(Collectors.toMap(EntityAttribute::id, EntityAttribute::type));
+        this.luceneQueryBuilder = new LuceneQueryBuilder(fieldTypes);
     }
 
     @Override
@@ -74,7 +79,7 @@ public class LuceneInMemorySearchEngine<U extends InMemorySearchableEntity> impl
             final List<U> entries = datasource.get();
             indexEntries(entries, directory, config);
 
-            Query luceneQuery = LUCENE_QUERY_BUILDER.toLuceneQuery(query);
+            Query luceneQuery = luceneQueryBuilder.toLuceneQuery(query);
 
             try (IndexReader reader = DirectoryReader.open(directory)) {
                 IndexSearcher searcher = new IndexSearcher(reader);
@@ -91,14 +96,6 @@ public class LuceneInMemorySearchEngine<U extends InMemorySearchableEntity> impl
                 return new PaginatedList<>(searchResults, totalCount, page, perPage);
             }
         }
-    }
-
-    @Nonnull
-    private StandardQueryParser createQueryParser(Analyzer analyzer) {
-        StandardQueryParser parser = new StandardQueryParser(analyzer);
-        parser.setAllowLeadingWildcard(true);
-        parser.setPointsConfigMap(getStringPointsConfigMap());
-        return parser;
     }
 
     private static <U extends InMemorySearchableEntity> @Nonnull List<U> extractSearchResults(TopDocs results, IndexSearcher searcher, int offset, int perPage, List<U> entries) {
@@ -146,28 +143,6 @@ public class LuceneInMemorySearchEngine<U extends InMemorySearchableEntity> impl
         return new Sort(
                 new SortField(sortField, type, order != SortOrder.ASCENDING)
         );
-    }
-
-    @Nonnull
-    private Map<String, PointsConfig> getStringPointsConfigMap() {
-        Map<String, PointsConfig> pointsConfig = new HashMap<>();
-        attributes.stream()
-                .filter(a -> a.type() == SearchQueryField.Type.INT)
-                .forEach(a -> pointsConfig.put(a.id(), new PointsConfig(NumberFormat.getIntegerInstance(Locale.ROOT), Integer.class)));
-        attributes.stream()
-                .filter(a -> a.type() == SearchQueryField.Type.LONG)
-                .forEach(a -> pointsConfig.put(a.id(), new PointsConfig(NumberFormat.getNumberInstance(Locale.ROOT), Long.class)));
-        attributes.stream()
-                .filter(a -> a.type() == SearchQueryField.Type.DOUBLE)
-                .forEach(a -> pointsConfig.put(a.id(), new PointsConfig(NumberFormat.getNumberInstance(Locale.ROOT), Double.class)));
-        return pointsConfig;
-    }
-
-    private static String wrapEmptyQuery(String queryString) {
-        if (queryString == null || queryString.isEmpty()) {
-            return "*";
-        }
-        return queryString;
     }
 
     private SortField.Type toLuceneType(SearchQueryField.Type type) {

@@ -17,6 +17,9 @@
 package org.graylog2.utilities.lucene;
 
 import com.google.common.collect.Multimap;
+import org.apache.lucene.document.DoublePoint;
+import org.apache.lucene.document.IntPoint;
+import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -26,6 +29,7 @@ import org.apache.lucene.search.RegexpQuery;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
 import org.graylog2.search.SearchQuery;
+import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryOperator;
 import org.graylog2.search.SearchQueryOperators;
 import org.graylog2.search.SearchQueryParser;
@@ -37,6 +41,12 @@ import java.util.Map;
  * Builder for converting parsed search queries into Lucene Query objects.
  */
 public class LuceneQueryBuilder {
+
+    private final Map<String, SearchQueryField.Type> fieldTypes;
+
+    public LuceneQueryBuilder(Map<String, SearchQueryField.Type> fieldTypes) {
+        this.fieldTypes = fieldTypes;
+    }
 
     /**
      * Converts a multimap of field values into a Lucene Query.
@@ -88,11 +98,15 @@ public class LuceneQueryBuilder {
             return null;
         }
 
+        // Get field type, default to STRING if not found
+        SearchQueryField.Type fieldType = fieldTypes.getOrDefault(fieldName, SearchQueryField.Type.STRING);
+
         // Lowercase string values to match StandardAnalyzer's behavior (case-insensitive search)
         // This matches MongoDB's REGEXP operator which uses Pattern.CASE_INSENSITIVE
         String stringValue = value.toString().toLowerCase(Locale.ROOT);
 
         if (operator == SearchQueryOperators.REGEXP) {
+            // REGEXP only works on string fields
             // Check if user provided any explicit wildcards
             boolean hasWildcards = stringValue.contains("*") || stringValue.contains("?");
 
@@ -107,18 +121,72 @@ public class LuceneQueryBuilder {
 
             return new RegexpQuery(new Term(fieldName, pattern));
         } else if (operator == SearchQueryOperators.EQUALS) {
-            return new TermQuery(new Term(fieldName, stringValue));
+            // For numeric types, use point queries for exact match
+            return buildNumericOrTermQuery(fieldName, stringValue, fieldType);
         } else if (operator == SearchQueryOperators.GREATER) {
-            return TermRangeQuery.newStringRange(fieldName, stringValue, null, false, false);
+            return buildRangeQuery(fieldName, stringValue, null, false, false, fieldType);
         } else if (operator == SearchQueryOperators.GREATER_EQUALS) {
-            return TermRangeQuery.newStringRange(fieldName, stringValue, null, true, false);
+            return buildRangeQuery(fieldName, stringValue, null, true, false, fieldType);
         } else if (operator == SearchQueryOperators.LESS) {
-            return TermRangeQuery.newStringRange(fieldName, null, stringValue, false, false);
+            return buildRangeQuery(fieldName, null, stringValue, false, false, fieldType);
         } else if (operator == SearchQueryOperators.LESS_EQUALS) {
-            return TermRangeQuery.newStringRange(fieldName, null, stringValue, false, true);
+            return buildRangeQuery(fieldName, null, stringValue, false, true, fieldType);
         }
 
         // Default to term query for unknown operators
         return new TermQuery(new Term(fieldName, stringValue));
+    }
+
+    private Query buildNumericOrTermQuery(String fieldName, String stringValue, SearchQueryField.Type fieldType) {
+        return switch (fieldType) {
+            case INT, BOOLEAN -> IntPoint.newExactQuery(fieldName, Integer.parseInt(stringValue));
+            case LONG, DATE -> LongPoint.newExactQuery(fieldName, Long.parseLong(stringValue));
+            case DOUBLE -> DoublePoint.newExactQuery(fieldName, Double.parseDouble(stringValue));
+            default -> new TermQuery(new Term(fieldName, stringValue));
+        };
+    }
+
+    private Query buildRangeQuery(String fieldName, String lowerValue, String upperValue,
+                                   boolean lowerInclusive, boolean upperInclusive,
+                                   SearchQueryField.Type fieldType) {
+        return switch (fieldType) {
+            case INT, BOOLEAN -> {
+                int lower = lowerValue != null ? Integer.parseInt(lowerValue) : Integer.MIN_VALUE;
+                int upper = upperValue != null ? Integer.parseInt(upperValue) : Integer.MAX_VALUE;
+                // Adjust bounds for exclusive ranges
+                if (lowerValue != null && !lowerInclusive) {
+                    lower = Math.addExact(lower, 1);
+                }
+                if (upperValue != null && !upperInclusive) {
+                    upper = Math.addExact(upper, -1);
+                }
+                yield IntPoint.newRangeQuery(fieldName, lower, upper);
+            }
+            case LONG, DATE -> {
+                long lower = lowerValue != null ? Long.parseLong(lowerValue) : Long.MIN_VALUE;
+                long upper = upperValue != null ? Long.parseLong(upperValue) : Long.MAX_VALUE;
+                // Adjust bounds for exclusive ranges
+                if (lowerValue != null && !lowerInclusive) {
+                    lower = Math.addExact(lower, 1);
+                }
+                if (upperValue != null && !upperInclusive) {
+                    upper = Math.addExact(upper, -1);
+                }
+                yield LongPoint.newRangeQuery(fieldName, lower, upper);
+            }
+            case DOUBLE -> {
+                double lower = lowerValue != null ? Double.parseDouble(lowerValue) : Double.NEGATIVE_INFINITY;
+                double upper = upperValue != null ? Double.parseDouble(upperValue) : Double.POSITIVE_INFINITY;
+                // For doubles, use nextUp/nextDown for exclusive ranges
+                if (lowerValue != null && !lowerInclusive) {
+                    lower = Math.nextUp(lower);
+                }
+                if (upperValue != null && !upperInclusive) {
+                    upper = Math.nextDown(upper);
+                }
+                yield DoublePoint.newRangeQuery(fieldName, lower, upper);
+            }
+            default -> TermRangeQuery.newStringRange(fieldName, lowerValue, upperValue, lowerInclusive, upperInclusive);
+        };
     }
 }

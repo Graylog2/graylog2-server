@@ -20,14 +20,18 @@ import com.google.common.collect.ImmutableSet;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.PointRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.RegexpQuery;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
 import org.graylog2.search.SearchQuery;
+import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,7 +42,12 @@ class LuceneQueryBuilderTest {
 
     @BeforeEach
     void setUp() {
-        builder = new LuceneQueryBuilder();
+        builder = new LuceneQueryBuilder(Map.of(
+                "name", SearchQueryField.Type.STRING,
+                "age", SearchQueryField.Type.INT,
+                "status", SearchQueryField.Type.STRING,
+                "role", SearchQueryField.Type.STRING
+        ));
         parser = new SearchQueryParser("defaultfield", ImmutableSet.of("name", "age", "status", "role"));
     }
 
@@ -178,12 +187,12 @@ class LuceneQueryBuilderTest {
         assertThat(query).isInstanceOf(BooleanQuery.class);
         BooleanQuery booleanQuery = (BooleanQuery) query;
         BooleanClause clause = booleanQuery.clauses().getFirst();
-        assertThat(clause.getQuery()).isInstanceOf(TermRangeQuery.class);
+        assertThat(clause.getQuery()).isInstanceOf(PointRangeQuery.class);
 
-        TermRangeQuery rangeQuery = (TermRangeQuery) clause.getQuery();
+        PointRangeQuery rangeQuery = (PointRangeQuery) clause.getQuery();
         assertThat(rangeQuery.getField()).isEqualTo("age");
-        assertThat(rangeQuery.includesLower()).isFalse();
-        assertThat(rangeQuery.includesUpper()).isFalse();
+        // For age:>30, the range should be [31, MAX_VALUE] (exclusive converted to inclusive by adding 1)
+        assertThat(rangeQuery.toString()).contains("age:[31 TO 2147483647]");
     }
 
     @Test
@@ -194,12 +203,12 @@ class LuceneQueryBuilderTest {
         assertThat(query).isInstanceOf(BooleanQuery.class);
         BooleanQuery booleanQuery = (BooleanQuery) query;
         BooleanClause clause = booleanQuery.clauses().getFirst();
-        assertThat(clause.getQuery()).isInstanceOf(TermRangeQuery.class);
+        assertThat(clause.getQuery()).isInstanceOf(PointRangeQuery.class);
 
-        TermRangeQuery rangeQuery = (TermRangeQuery) clause.getQuery();
+        PointRangeQuery rangeQuery = (PointRangeQuery) clause.getQuery();
         assertThat(rangeQuery.getField()).isEqualTo("age");
-        assertThat(rangeQuery.includesLower()).isTrue();
-        assertThat(rangeQuery.includesUpper()).isFalse();
+        // For age:>=30, the range should be [30, MAX_VALUE]
+        assertThat(rangeQuery.toString()).contains("age:[30 TO 2147483647]");
     }
 
     @Test
@@ -210,12 +219,12 @@ class LuceneQueryBuilderTest {
         assertThat(query).isInstanceOf(BooleanQuery.class);
         BooleanQuery booleanQuery = (BooleanQuery) query;
         BooleanClause clause = booleanQuery.clauses().getFirst();
-        assertThat(clause.getQuery()).isInstanceOf(TermRangeQuery.class);
+        assertThat(clause.getQuery()).isInstanceOf(PointRangeQuery.class);
 
-        TermRangeQuery rangeQuery = (TermRangeQuery) clause.getQuery();
+        PointRangeQuery rangeQuery = (PointRangeQuery) clause.getQuery();
         assertThat(rangeQuery.getField()).isEqualTo("age");
-        assertThat(rangeQuery.includesLower()).isFalse();
-        assertThat(rangeQuery.includesUpper()).isFalse();
+        // For age:<30, the range should be [MIN_VALUE, 29] (exclusive converted to inclusive by subtracting 1)
+        assertThat(rangeQuery.toString()).contains("age:[-2147483648 TO 29]");
     }
 
     @Test
@@ -226,12 +235,12 @@ class LuceneQueryBuilderTest {
         assertThat(query).isInstanceOf(BooleanQuery.class);
         BooleanQuery booleanQuery = (BooleanQuery) query;
         BooleanClause clause = booleanQuery.clauses().getFirst();
-        assertThat(clause.getQuery()).isInstanceOf(TermRangeQuery.class);
+        assertThat(clause.getQuery()).isInstanceOf(PointRangeQuery.class);
 
-        TermRangeQuery rangeQuery = (TermRangeQuery) clause.getQuery();
+        PointRangeQuery rangeQuery = (PointRangeQuery) clause.getQuery();
         assertThat(rangeQuery.getField()).isEqualTo("age");
-        assertThat(rangeQuery.includesLower()).isFalse();
-        assertThat(rangeQuery.includesUpper()).isTrue();
+        // For age:<=30, the range should be [MIN_VALUE, 30]
+        assertThat(rangeQuery.toString()).contains("age:[-2147483648 TO 30]");
     }
 
     @Test
@@ -261,8 +270,8 @@ class LuceneQueryBuilderTest {
 
         // First clause should be RegexpQuery for name
         assertThat(booleanQuery.clauses().get(0).getQuery()).isInstanceOf(RegexpQuery.class);
-        // Second clause should be TermRangeQuery for age
-        assertThat(booleanQuery.clauses().get(1).getQuery()).isInstanceOf(TermRangeQuery.class);
+        // Second clause should be PointRangeQuery for age (numeric field)
+        assertThat(booleanQuery.clauses().get(1).getQuery()).isInstanceOf(PointRangeQuery.class);
     }
 
     @Test
