@@ -108,6 +108,8 @@ public class FleetService {
                 .id(insertedIdAsString(result))
                 .build();
         txnLogService.appendFleetMarker(saved.id(), MarkerType.CONFIG_CHANGED);
+        // We need the ingest config marker to ensure that collectors get the config on first contact.
+        txnLogService.appendFleetMarker(saved.id(), MarkerType.INGEST_CONFIG_CHANGED);
         return saved;
     }
 
