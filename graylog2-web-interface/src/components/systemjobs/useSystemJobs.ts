@@ -14,21 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Reflux from 'reflux';
+import { useEffect } from 'react';
 
-import * as URLUtils from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
-import { fetchPeriodically } from 'logic/rest/FetchProvider';
-import { singletonStore } from 'logic/singleton';
+import { useStore } from 'stores/connect';
+import { SystemJobsActions, SystemJobsStore } from 'stores/systemjobs/SystemJobsStore';
 
-export const SystemMessagesStore = singletonStore('core.SystemMessages', () =>
-  Reflux.createStore({
-    listenables: [],
+const useSystemJobs = (): Record<string, { jobs?: unknown[]; systemJobs?: unknown[] }> => {
+  useEffect(() => {
+    SystemJobsActions.list();
+    const interval = setInterval(SystemJobsActions.list, 2000);
 
-    all(page: number): Promise<unknown> {
-      const url = URLUtils.qualifyUrl(ApiRoutes.SystemMessagesApiController.all(page).url);
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
-      return fetchPeriodically('GET', url);
-    },
-  }),
-);
+  return useStore(SystemJobsStore, ({ jobs }) => jobs);
+};
+
+export default useSystemJobs;
