@@ -30,10 +30,10 @@ class LuceneDocBuilderTest {
     private void assertTwoFieldsForQueryingAndSorting(Document doc, String fieldName) {
         List<IndexableField> fields = doc.getFields();
         assertThat(fields).hasSize(2);
-        // First field: for searching/range queries
-        assertThat(fields.get(0).name()).isEqualTo(fieldName);
-        // Second field: for sorting
-        assertThat(fields.get(1).name()).isEqualTo(fieldName);
+        // Both fields should have the same name: one for searching/range queries, one for sorting
+        assertThat(fields)
+                .extracting(IndexableField::name)
+                .containsOnly(fieldName);
     }
 
     @Test
@@ -42,7 +42,11 @@ class LuceneDocBuilderTest {
         Document doc = builder.stringVal("name", "test").getDoc();
 
         assertTwoFieldsForQueryingAndSorting(doc, "name");
-        assertThat(doc.getFields().get(0).stringValue()).isEqualTo("test");
+        // Find the field with a string value (not all fields may have stringValue())
+        assertThat(doc.getFields())
+                .filteredOn(f -> f.stringValue() != null)
+                .extracting(IndexableField::stringValue)
+                .contains("test");
     }
 
     @Test
@@ -141,7 +145,11 @@ class LuceneDocBuilderTest {
         Document doc = builder.objectVal("id", obj).getDoc();
 
         assertTwoFieldsForQueryingAndSorting(doc, "id");
-        assertThat(doc.getFields().get(0).stringValue()).isEqualTo("12345");
+        // Find the field with a string value (not all fields may have stringValue())
+        assertThat(doc.getFields())
+                .filteredOn(f -> f.stringValue() != null)
+                .extracting(IndexableField::stringValue)
+                .contains("12345");
     }
 
     @Test
