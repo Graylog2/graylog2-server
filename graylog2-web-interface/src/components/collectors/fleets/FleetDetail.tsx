@@ -21,8 +21,8 @@ import moment from 'moment';
 import styled, { css } from 'styled-components';
 import URI from 'urijs';
 
-import {Button, ButtonToolbar, DeleteMenuItem, Label, MenuItem, SegmentedControl} from 'components/bootstrap';
-import { ConfirmDialog, LinkContainer, Spinner } from 'components/common';
+import {Button, ButtonToolbar, DeleteMenuItem, Label, SegmentedControl} from 'components/bootstrap';
+import { Spinner } from 'components/common';
 import { MoreActions } from 'components/common/EntityDataTable';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import useHistory from 'routing/useHistory';
@@ -32,12 +32,11 @@ import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
 import FleetSettings from './FleetSettings';
 
-import collectorLogsUrl from '../common/collectorLogsUrl';
 import { useFleet, useFleetStats, useSources, fetchPaginatedSources, sourcesKeyFn, fetchPaginatedInstances, instancesKeyFn, useCollectorsMutations, useCollectorsConfig } from '../hooks';
 import StatCard from '../common/StatCard';
 import { InstanceDetailDrawer } from '../instances';
 import BulkActions from '../instances/BulkActions';
-import ReassignFleetModal from '../instances/ReassignFleetModal';
+import InstanceActions from '../instances/InstanceActions';
 import instanceColumnRenderers from '../instances/ColumnRenderers';
 import { DEFAULT_LAYOUT as INSTANCES_LAYOUT } from '../instances/Constants';
 import sourceColumnRenderers from '../sources/ColumnRenderers';
@@ -81,12 +80,10 @@ const FleetDetail = ({ fleetId }: Props) => {
   const { data: stats, isLoading: statsLoading } = useFleetStats(fleetId);
   const { data: collectorsConfig } = useCollectorsConfig();
   const { data: sources } = useSources(fleetId);
-  const { createSource, isCreatingSource, updateSource, isUpdatingSource, deleteSource, updateFleet, isUpdatingFleet, deleteFleet, isDeletingFleet, deleteInstance } = useCollectorsMutations();
+  const { createSource, isCreatingSource, updateSource, isUpdatingSource, deleteSource, updateFleet, isUpdatingFleet, deleteFleet, isDeletingFleet } = useCollectorsMutations();
   const [showSourceModal, setShowSourceModal] = useState(false);
   const [editingSource, setEditingSource] = useState<Source | null>(null);
   const [selectedInstance, setSelectedInstance] = useState<CollectorInstanceView | null>(null);
-  const [reassigningInstance, setReassigningInstance] = useState<CollectorInstanceView | null>(null);
-  const [deletingInstance, setDeletingInstance] = useState<CollectorInstanceView | null>(null);
 
   const { tab: tabParam } = useQuery();
   const history = useHistory();
@@ -154,33 +151,10 @@ const FleetDetail = ({ fleetId }: Props) => {
 
   const instanceActions = useCallback(
     (instance: CollectorInstanceView) => (
-      <ButtonToolbar>
-        <Button bsSize="xsmall" onClick={() => setSelectedInstance(instance)}>
-          Details
-        </Button>
-        <LinkContainer to={collectorLogsUrl(instance.instance_uid)}>
-          <Button bsSize="xsmall">
-            View Logs
-          </Button>
-        </LinkContainer>
-        <MoreActions>
-          <MenuItem onSelect={() => setReassigningInstance(instance)}>
-            Reassign to fleet
-          </MenuItem>
-          <MenuItem divider />
-          <DeleteMenuItem onSelect={() => setDeletingInstance(instance)} />
-        </MoreActions>
-      </ButtonToolbar>
+      <InstanceActions instance={instance} onDetailsClick={setSelectedInstance} />
     ),
     [],
   );
-
-  const handleConfirmDeleteInstance = useCallback(async () => {
-    if (!deletingInstance) return;
-
-    await deleteInstance(deletingInstance.instance_uid);
-    setDeletingInstance(null);
-  }, [deletingInstance, deleteInstance]);
 
   const handleDeleteSource = useCallback(
     async (source: Source) => {
@@ -323,24 +297,6 @@ const FleetDetail = ({ fleetId }: Props) => {
         />
       )}
 
-      {reassigningInstance && (
-        <ReassignFleetModal
-          instanceUids={[reassigningInstance.instance_uid]}
-          currentFleetId={reassigningInstance.fleet_id}
-          onClose={() => setReassigningInstance(null)}
-        />
-      )}
-
-      {deletingInstance && (
-        <ConfirmDialog
-          title="Delete collector instance"
-          show
-          onConfirm={handleConfirmDeleteInstance}
-          onCancel={() => setDeletingInstance(null)}>
-          Are you sure you want to delete instance <strong>{deletingInstance.hostname || deletingInstance.instance_uid}</strong>?
-          The collector will need to be re-enrolled to appear again.
-        </ConfirmDialog>
-      )}
     </div>
   );
 };

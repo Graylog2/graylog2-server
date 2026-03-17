@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 export { default as InstanceDetailDrawer } from './InstanceDetailDrawer';
+export { default as InstanceActions } from './InstanceActions';
+export { default as BulkActions } from './BulkActions';
 export { default as customColumnRenderers } from './ColumnRenderers';
-export { default as useTableElements } from './useTableElements';
 export * from './Constants';

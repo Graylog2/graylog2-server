@@ -36,7 +36,8 @@ import { useCollectorsConfig } from 'components/collectors/hooks';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import type { CollectorInstanceView } from 'components/collectors/types';
 import customColumnRenderers from 'components/collectors/instances/ColumnRenderers';
-import useTableElements from 'components/collectors/instances/useTableElements';
+import InstanceActions from 'components/collectors/instances/InstanceActions';
+import BulkActions from 'components/collectors/instances/BulkActions';
 import { DEFAULT_LAYOUT } from 'components/collectors/instances/Constants';
 import Routes from 'routing/Routes';
 
@@ -71,10 +72,6 @@ const CollectorsInstancesPage = () => {
     return OrderedMap({ last_seen: [`${cutoff}><`] });
   }, [config?.collector_default_visibility_threshold]);
 
-  const { entityActions, bulkActions, renderReassignModal, renderDeleteConfirmDialog } = useTableElements({
-    onInstanceClick: setSelectedInstance,
-  });
-
   const fetchEntities = useCallback(
     (searchParams: SearchParams) => fetchPaginatedInstances(searchParams),
     [],
@@ -102,14 +99,14 @@ const CollectorsInstancesPage = () => {
         <Col md={12}>
           <PaginatedEntityTable<CollectorInstanceView>
             humanName="instances"
-            entityActions={entityActions}
+            entityActions={(instance) => <InstanceActions instance={instance} onDetailsClick={setSelectedInstance} />}
             tableLayout={DEFAULT_LAYOUT}
             fetchEntities={fetchEntities}
             keyFn={instancesKeyFn}
             entityAttributesAreCamelCase={false}
             columnRenderers={columnRenderers}
             defaultFilters={defaultFilters}
-            bulkSelection={{ actions: bulkActions }}
+            bulkSelection={{ actions: <BulkActions /> }}
           />
         </Col>
       </Row>
@@ -123,8 +120,6 @@ const CollectorsInstancesPage = () => {
         />
       )}
 
-      {renderReassignModal}
-      {renderDeleteConfirmDialog}
     </DocumentTitle>
   );
 };
