@@ -315,7 +315,7 @@ public class OpAmpService {
             return errorResponse(message, "Invalid instanceUid");
         }
         final long sequenceNum = message.getSequenceNum();
-        LOG.debug("[{}/{}] Handling OpAMP message from agent: {}", instanceUid, sequenceNum, message);
+        LOG.debug("[{}/{}] Handling OpAMP message from collector: {}", instanceUid, sequenceNum, message);
 
 
         final CollectorInstanceReport.Builder updateBuilder = CollectorInstanceReport.builder().instanceUid(instanceUid).messageSeqNum(sequenceNum).capabilities(message.getCapabilities());
@@ -349,7 +349,7 @@ public class OpAmpService {
                     // there are other messages that reset the timer
                 }
                 case AgentCapabilities_AcceptsRemoteConfig -> {
-                    // TODO determine whether applicable config has changed for this agent and include updated config in our response
+                    // TODO determine whether applicable config has changed for this collector and include updated config in our response
                 }
                 case AgentCapabilities_ReportsRemoteConfig ->
                         handleRemoteConfig(instanceUid, sequenceNum, message, updateBuilder);

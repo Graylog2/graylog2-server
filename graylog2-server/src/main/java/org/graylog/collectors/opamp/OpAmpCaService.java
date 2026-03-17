@@ -43,13 +43,13 @@ import java.util.List;
 import static java.util.Objects.nonNull;
 
 /**
- * Service for managing the OpAMP CA hierarchy and providing certificate accessors.
+ * Service for managing the Collectors CA hierarchy and providing certificate accessors.
  * <p>
  * The CA hierarchy consists of:
  * <ul>
- *   <li>Root CA (Ed25519, 30 years) - self-signed trust anchor</li>
- *   <li>OpAMP CA (intermediate, 5 years) - signs agent CSRs and issues OTLP server certs</li>
- *   <li>Token Signing cert (end-entity, 2 years) - signs enrollment JWTs</li>
+ *   <li>CA cert (Ed25519, 30 years) - self-signed trust anchor</li>
+ *   <li>Signing cert (intermediate, 5 years) - signs agent CSRs and issues OTLP server certs</li>
+ *   <li>Token signing cert (end-entity, 2 years) - signs enrollment JWTs</li>
  *   <li>OTLP Server cert (end-entity, 2 years) - TLS server certificate for OTLP ingest endpoint</li>
  * </ul>
  * <p>
@@ -61,15 +61,15 @@ import static java.util.Objects.nonNull;
 public class OpAmpCaService {
     private static final Logger LOG = LoggerFactory.getLogger(OpAmpCaService.class);
 
-    static final Duration ROOT_CA_VALIDITY = Duration.ofDays(30 * 365);
-    static final Duration OPAMP_CA_VALIDITY = Duration.ofDays(5 * 365);
+    static final Duration CA_CERT_VALIDITY = Duration.ofDays(30 * 365);
+    static final Duration SIGNING_CERT_VALIDITY = Duration.ofDays(5 * 365);
     static final Duration TOKEN_SIGNING_VALIDITY = Duration.ofDays(2 * 365);
-    static final Duration OTLP_SERVER_VALIDITY = Duration.ofDays(2 * 365);
+    static final Duration OTLP_SERVER_CERT_VALIDITY = Duration.ofDays(2 * 365);
 
-    static final String ROOT_CA_CN = "Graylog OpAMP Root CA";
-    static final String OPAMP_CA_CN = "Graylog OpAMP CA";
-    static final String TOKEN_SIGNING_CN = "Graylog OpAMP Token Signing";
-    static final String OTLP_SERVER_CN = "Graylog OpAMP OTLP Server";
+    static final String CA_CERT_CN = "Collectors CA";
+    static final String SIGNING_CERT_CN = "Collectors Signing";
+    static final String TOKEN_SIGNING_CN = "Collectors Token Signing";
+    static final String OTLP_SERVER_CERT_CN = "Collectors OTLP Server";
 
     private final CertificateService certificateService;
     private final CollectorsConfigService collectorsConfigService;
@@ -145,7 +145,7 @@ public class OpAmpCaService {
      * <ul>
      *   <li>The OTLP server certificate and private key for server identity</li>
      *   <li>Client authentication required (mTLS)</li>
-     *   <li>The OpAMP CA as the trust anchor for validating client certificates</li>
+     *   <li>The signing cert as the trust anchor for validating client certificates</li>
      * </ul>
      *
      * @return a configured SslContextBuilder ready to be built
@@ -204,27 +204,27 @@ public class OpAmpCaService {
             }
         }
 
-        LOG.info("Creating OpAMP CA hierarchy");
+        LOG.info("Creating Collectors CA hierarchy");
 
         try {
             final var builder = certificateService.builder();
 
             final CertificateEntry caCert = certificateService.save(
-                    builder.createRootCa(ROOT_CA_CN, Algorithm.ED25519, ROOT_CA_VALIDITY));
+                    builder.createRootCa(CA_CERT_CN, Algorithm.ED25519, CA_CERT_VALIDITY));
             final CertificateEntry signingCert = certificateService.save(
-                    builder.createIntermediateCa(OPAMP_CA_CN, caCert, OPAMP_CA_VALIDITY));
+                    builder.createIntermediateCa(SIGNING_CERT_CN, caCert, SIGNING_CERT_VALIDITY));
             final CertificateEntry tokenSigningCert = certificateService.save(
                     builder.createEndEntityCert(TOKEN_SIGNING_CN, signingCert, KeyUsage.digitalSignature, TOKEN_SIGNING_VALIDITY));
             final List<String> otlpSans = getClusterIdSans();
             final CertificateEntry otlpServerCert = certificateService.save(
-                    builder.createEndEntityCert(OTLP_SERVER_CN, signingCert,
+                    builder.createEndEntityCert(OTLP_SERVER_CERT_CN, signingCert,
                             KeyUsage.digitalSignature | KeyUsage.keyEncipherment,
-                            KeyPurposeId.id_kp_serverAuth, OTLP_SERVER_VALIDITY, otlpSans));
+                            KeyPurposeId.id_kp_serverAuth, OTLP_SERVER_CERT_VALIDITY, otlpSans));
 
             cachedHierarchy = new CaHierarchy(caCert, signingCert, tokenSigningCert, otlpServerCert);
             return cachedHierarchy;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to create OpAMP CA hierarchy", e);
+            throw new RuntimeException("Failed to create Collectors CA hierarchy", e);
         }
     }
 
