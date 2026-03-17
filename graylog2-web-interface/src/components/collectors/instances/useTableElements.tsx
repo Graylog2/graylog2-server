@@ -83,7 +83,7 @@ const useTableElements = ({ onInstanceClick }: Props) => {
       show
       onConfirm={handleConfirmDelete}
       onCancel={() => setDeletingInstance(null)}>
-      Are you sure you want to delete instance <strong>{deletingInstance.hostname || deletingInstance.instance_uid}</strong>?
+      Are you sure you want to delete instance <strong>{deletingInstance.hostname || deletingInstance.instance_uid}</strong>?<br />
       The collector will need to be re-enrolled to appear again.
     </ConfirmDialog>
   ) : null;
