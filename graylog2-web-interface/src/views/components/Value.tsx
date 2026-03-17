@@ -15,14 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { ValueRenderer, ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import CustomHighlighting from 'views/components/highlighting/CustomHighlighting';
-import FieldActionsContext from 'views/components/actions/FieldActionsContext';
 
 import ValueActions from './actions/ValueActions';
 import TypeSpecificValue from './TypeSpecificValue';
@@ -68,8 +67,6 @@ const InteractiveValue = ({
   type = FieldType.Unknown,
   unit = undefined,
 }: Props) => {
-  const { queryId: configuredQueryId } = useContext(FieldActionsContext);
-  const queryId = configuredQueryId;
   const RenderComponent: ValueRenderer = useMemo(
     () => render ?? ((props: ValueRendererProps) => props.value),
     [render],
@@ -83,7 +80,7 @@ const InteractiveValue = ({
   );
 
   return (
-    <ValueActions element={element} field={field} queryId={queryId} type={type} value={value}>
+    <ValueActions element={element} field={field} type={type} value={value}>
       <ValueActionTitle data-testid="value-actions-title">
         {field} = <TypeSpecificValue field={field} value={value} type={type} truncate />
       </ValueActionTitle>

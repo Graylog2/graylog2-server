@@ -17,7 +17,7 @@
 import React from 'react';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
-import type { WidgetComponentProps } from 'views/types';
+import type { WidgetComponentProps, AdditionalViewsActionHandlerArguments } from 'views/types';
 import Routes from 'routing/Routes';
 import App from 'routing/App';
 import { MessageListHandler } from 'views/logic/searchtypes/messages';
@@ -124,7 +124,7 @@ import TextWidgetEdit from 'views/components/widgets/text/TextWidgetEdit';
 import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
 import ToggleFavoriteField from 'views/logic/fieldactions/ToggleFavoriteField';
 
-import type { ActionHandlerArguments } from './components/actions/ActionHandler';
+import type { ActionDefinition } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import AreaVisualization from './components/visualizations/area/AreaVisualization';
 import LineVisualizationConfig from './logic/aggregationbuilder/visualizations/LineVisualizationConfig';
@@ -379,7 +379,7 @@ const exports: PluginExports = {
         type: 'exclude',
         title: 'Exclude from results',
         thunk: ExcludeFromQueryHandler,
-        isEnabled: ({ field, type, contexts }: ActionHandlerArguments) =>
+        isEnabled: ({ field, type, contexts }) =>
           (!isFunction(field) || hasMultipleValueForActions(contexts)) && !type.isDecorated(),
         resetFocus: false,
       },
@@ -387,7 +387,7 @@ const exports: PluginExports = {
         type: 'add-to-query',
         title: 'Add to query',
         thunk: AddToQueryHandler,
-        isEnabled: ({ field, type, contexts }: ActionHandlerArguments) =>
+        isEnabled: ({ field, type, contexts }) =>
           (!isFunction(field) || hasMultipleValueForActions(contexts)) && !type.isDecorated(),
         resetFocus: false,
       },
@@ -397,7 +397,7 @@ const exports: PluginExports = {
         thunk: ShowDocumentsHandler,
         isEnabled: ShowDocumentsHandler.isEnabled,
         resetFocus: true,
-      },
+      } as ActionDefinition<AdditionalViewsActionHandlerArguments>,
       {
         type: 'create-extractor',
         title: 'Create extractor',

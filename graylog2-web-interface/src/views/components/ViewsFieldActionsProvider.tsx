@@ -16,27 +16,26 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import { useStore } from 'react-redux';
 
 import usePluginEntities from 'hooks/usePluginEntities';
-import type { RootState } from 'views/types';
-import FieldActionsContext from 'views/components/actions/FieldActionsContext';
+import type { AdditionalViewsActionHandlerArguments } from 'views/types';
+import FieldActionsContext, { type FieldActionsContextValue } from 'views/components/actions/FieldActionsContext';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import type { ActionHandlerCondition, ResolvedActionHandlerArguments } from 'views/components/actions/ActionHandler';
 
-type Props = {
-  children: React.ReactNode;
-};
-
-const ViewsFieldActionsProvider = ({ children }: Props) => {
+const ViewsFieldActionsProvider = ({ children }: React.PropsWithChildren) => {
   const dispatch = useViewsDispatch();
   const queryId = useActiveQueryId();
   const valueActions = usePluginEntities('valueActions');
   const fieldActions = usePluginEntities('fieldActions');
-  const store = useStore<RootState>();
-  const getState = useCallback(() => store.getState(), [store]);
+  const additionalHandlerArgs = useMemo(() => ({ queryId }), [queryId]);
   const evaluateCondition = useCallback(
-    (condition, args, fallbackValue) => {
+    (
+      condition: ActionHandlerCondition<AdditionalViewsActionHandlerArguments>,
+      args: ResolvedActionHandlerArguments<AdditionalViewsActionHandlerArguments>,
+      fallbackValue: boolean,
+    ) => {
       if (!condition) {
         return fallbackValue;
       }
@@ -45,21 +44,16 @@ const ViewsFieldActionsProvider = ({ children }: Props) => {
     },
     [dispatch],
   );
-  const executeThunkAction = useCallback(
-    (thunk, args) => Promise.resolve(dispatch(thunk(args))),
-    [dispatch],
-  );
+  const executeThunkAction = useCallback((thunk, args) => Promise.resolve(dispatch(thunk(args))), [dispatch]);
   const actionConfig = useMemo(
-    () => ({
-      queryId,
-      dispatch,
-      getState,
+    (): FieldActionsContextValue<AdditionalViewsActionHandlerArguments> => ({
       evaluateCondition,
       executeThunkAction,
+      additionalHandlerArgs,
       valueActions,
       fieldActions,
     }),
-    [dispatch, evaluateCondition, executeThunkAction, fieldActions, getState, queryId, valueActions],
+    [evaluateCondition, executeThunkAction, additionalHandlerArgs, fieldActions, valueActions],
   );
 
   return <FieldActionsContext.Provider value={actionConfig}>{children}</FieldActionsContext.Provider>;

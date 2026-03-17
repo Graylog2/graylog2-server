@@ -18,6 +18,7 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
+import type { ActionContexts } from 'views/types';
 import ChangeFieldType from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
@@ -52,7 +53,10 @@ const renderChangeTypeAction = ({
 }) =>
   render(
     <TestStoreProvider>
-      <ChangeFieldType onClose={onClose} queryId={queryId} field={field} type={type} value={value} />
+      <ChangeFieldType
+        onClose={onClose}
+        handlerArgs={{ queryId, field, type, value, contexts: {} as ActionContexts }}
+      />
     </TestStoreProvider>,
   );
 

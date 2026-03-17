@@ -20,7 +20,7 @@ import { ActionContext } from 'views/logic/ActionContext';
 import ExtractorUtils from 'util/ExtractorUtils';
 import Select from 'components/common/Select';
 import { BootstrapModalForm } from 'components/bootstrap';
-import type { ActionContexts } from 'views/types';
+import type { ActionContexts, AdditionalViewsActionHandlerArguments } from 'views/types';
 
 import type { ActionComponentProps } from '../../components/actions/ActionHandler';
 
@@ -36,7 +36,7 @@ const _getExtractorTypes = () =>
     value: extractorType,
   }));
 
-class SelectExtractorType extends React.Component<ActionComponentProps, State> {
+class SelectExtractorType extends React.Component<ActionComponentProps<AdditionalViewsActionHandlerArguments>, State> {
   constructor(props) {
     super(props);
 
@@ -48,7 +48,9 @@ class SelectExtractorType extends React.Component<ActionComponentProps, State> {
   componentDidMount() {
     const { message } = this.context;
     const { gl2_source_node, gl2_source_input } = message.fields;
-    const { field } = this.props;
+    const {
+      handlerArgs: { field },
+    } = this.props;
 
     this.extractorRoutes = ExtractorUtils.getNewExtractorRoutes(
       gl2_source_node,

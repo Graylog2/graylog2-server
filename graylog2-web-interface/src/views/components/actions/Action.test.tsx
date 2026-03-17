@@ -26,10 +26,7 @@ import useViewsDispatch from 'views/stores/useViewsDispatch';
 import mockDispatch from 'views/test/mockDispatch';
 import { createSearch } from 'fixtures/searches';
 import useExternalValueActions from 'views/hooks/useExternalValueActions';
-import FieldActionsContext, {
-  DEFAULT_FIELD_ACTIONS_CONTEXT,
-  type FieldActionsContextValue,
-} from 'views/components/actions/FieldActionsContext';
+import FieldActionsContext, { type FieldActionsContextValue } from 'views/components/actions/FieldActionsContext';
 
 import Action from './Action';
 
@@ -62,6 +59,14 @@ describe('Action', () => {
     contexts: {} as ActionContexts,
   };
 
+  const actionsContextValue = {
+    evaluateCondition: () => true,
+    executeThunkAction: () => Promise.resolve(),
+    additionalHandlerArgs: {},
+    valueActions: [],
+    fieldActions: [],
+  };
+
   type Props = Partial<React.ComponentProps<typeof Action>> & {
     actionConfig?: FieldActionsContextValue;
   };
@@ -73,7 +78,7 @@ describe('Action', () => {
     handlerArgs = exampleHandlerArgs,
     menuContainer = undefined,
     type = 'field',
-    actionConfig = DEFAULT_FIELD_ACTIONS_CONTEXT,
+    actionConfig = actionsContextValue,
   }: Props) => (
     <FieldActionsContext.Provider value={actionConfig}>
       <Action element={OpenActionsMenu} handlerArgs={handlerArgs} menuContainer={menuContainer} type={type}>
@@ -107,7 +112,7 @@ describe('Action', () => {
       },
     ];
 
-    render(<SimpleAction type="field" actionConfig={{ ...DEFAULT_FIELD_ACTIONS_CONTEXT, fieldActions }} />);
+    render(<SimpleAction type="field" actionConfig={{ ...actionsContextValue, fieldActions }} />);
 
     await openDropdown();
 
