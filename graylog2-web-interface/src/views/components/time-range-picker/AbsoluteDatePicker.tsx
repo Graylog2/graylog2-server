@@ -32,11 +32,12 @@ const AbsoluteDatePicker = ({ dateTime, onChange = () => {}, startDate = undefin
   const initialDate = formatTime(initialDateTime, 'date');
 
   const _onDatePicked = (selectedDate: Date) => {
-    if (!!startDate && toDateObject(selectedDate).isBefore(toDateObject(startDate), 'day')) {
+    const selectedDateObject = toDateObject(selectedDate, undefined, userTimezone);
+
+    if (!!startDate && selectedDateObject.isBefore(toDateObject(startDate, undefined, userTimezone), 'day')) {
       return false;
     }
 
-    const selectedDateObject = toDateObject(selectedDate);
     const validInitialDateTime = initialDateTime.isValid() ? initialDateTime : toUTCFromTz(undefined, userTimezone);
     const newDate = validInitialDateTime.set({
       year: selectedDateObject.year(),
@@ -47,7 +48,7 @@ const AbsoluteDatePicker = ({ dateTime, onChange = () => {}, startDate = undefin
     return onChange(formatTime(newDate, 'default'));
   };
 
-  return <DatePicker date={initialDate} onChange={_onDatePicked} fromDate={startDate} />;
+  return <DatePicker date={initialDate} onChange={_onDatePicked} fromDate={startDate} timeZone={userTimezone} />;
 };
 
 export default AbsoluteDatePicker;

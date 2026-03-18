@@ -38,7 +38,7 @@ public class SessionConverter {
             SessionUtils.AUTH_CONTEXT_SESSION_KEY
     );
 
-    public static SessionDTO simpleSessionToSessionDTO(SimpleSession simpleSession) {
+    public static SessionDTO.Builder simpleSessionToSessionDTOBuilder(SimpleSession simpleSession) {
 
         final var unknownKeys = unknownSessionKeys(simpleSession);
         if (!unknownKeys.isEmpty()) {
@@ -60,8 +60,7 @@ public class SessionConverter {
                 .authenticationRealm(principalInfo.map(PrincipalInfo::realm).orElse(null))
                 .authenticated((Boolean) simpleSession.getAttribute(DefaultSubjectContext.AUTHENTICATED_SESSION_KEY))
                 .userName((String) simpleSession.getAttribute(SessionUtils.USERNAME_SESSION_KEY))
-                .authContext((SessionAuthContext) simpleSession.getAttribute(SessionUtils.AUTH_CONTEXT_SESSION_KEY))
-                .build();
+                .authContext((SessionAuthContext) simpleSession.getAttribute(SessionUtils.AUTH_CONTEXT_SESSION_KEY));
     }
 
     private static Set<Object> unknownSessionKeys(SimpleSession simpleSession) {
