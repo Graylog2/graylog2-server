@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import { DeleteMenuItem } from 'components/bootstrap';
-import { Link, RelativeTime } from 'components/common';
+import { ConfirmDialog, Link, RelativeTime } from 'components/common';
 import { MoreActions } from 'components/common/EntityDataTable';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import Routes from 'routing/Routes';
@@ -106,46 +106,56 @@ const customColumnRenderers = (fleetNames: Record<string, string>): ColumnRender
 const EnrollmentTokenList = () => {
   const { deleteEnrollmentToken } = useCollectorsMutations();
   const { data: fleets } = useFleets();
+  const [deletingToken, setDeletingToken] = useState<EnrollmentTokenMetadata | null>(null);
 
   const fleetNames = useMemo(() => {
     const map: Record<string, string> = {};
 
-    (fleets || []).forEach((f) => { map[f.id] = f.name; });
+    (fleets ?? []).forEach((f) => { map[f.id] = f.name; });
 
     return map;
   }, [fleets]);
 
-  const handleDelete = useCallback(
-    async (token: EnrollmentTokenMetadata) => {
-      // eslint-disable-next-line no-alert
-      if (window.confirm('Are you sure you want to delete this enrollment token?')) {
-        await deleteEnrollmentToken(token.id);
-      }
-    },
-    [deleteEnrollmentToken],
-  );
+  const handleConfirmDelete = useCallback(async () => {
+    if (!deletingToken) return;
+
+    await deleteEnrollmentToken(deletingToken.id);
+    setDeletingToken(null);
+  }, [deletingToken, deleteEnrollmentToken]);
 
   const entityActions = useCallback(
     (token: EnrollmentTokenMetadata) => (
       <MoreActions>
-        <DeleteMenuItem onSelect={() => handleDelete(token)} />
+        <DeleteMenuItem onSelect={() => setDeletingToken(token)} />
       </MoreActions>
     ),
-    [handleDelete],
+    [],
   );
 
   const renderers = useMemo(() => customColumnRenderers(fleetNames), [fleetNames]);
 
   return (
-    <PaginatedEntityTable<EnrollmentTokenMetadata>
-      humanName="enrollment tokens"
-      tableLayout={DEFAULT_LAYOUT}
-      fetchEntities={fetchPaginatedEnrollmentTokens}
-      keyFn={enrollmentTokensKeyFn}
-      entityAttributesAreCamelCase={false}
-      columnRenderers={renderers}
-      entityActions={entityActions}
-    />
+    <>
+      <PaginatedEntityTable<EnrollmentTokenMetadata>
+        humanName="enrollment tokens"
+        tableLayout={DEFAULT_LAYOUT}
+        fetchEntities={fetchPaginatedEnrollmentTokens}
+        keyFn={enrollmentTokensKeyFn}
+        entityAttributesAreCamelCase={false}
+        columnRenderers={renderers}
+        entityActions={entityActions}
+      />
+      {deletingToken && (
+        <ConfirmDialog
+          title="Delete enrollment token"
+          show
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setDeletingToken(null)}>
+          Are you sure you want to delete this enrollment token?
+          Collectors using this token will not be able to re-enroll.
+        </ConfirmDialog>
+      )}
+    </>
   );
 };
 

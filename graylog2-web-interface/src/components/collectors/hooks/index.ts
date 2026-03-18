@@ -47,8 +47,6 @@ export {
   ENROLLMENT_TOKENS_KEY_PREFIX,
 } from './useEnrollmentTokenQueries';
 
-export type { PaginatedEnrollmentTokensResponse } from './useEnrollmentTokenQueries';
-
 export { default as useCollectorsMutations } from './useCollectorsMutations';
 export { default as useDefaultInstanceFilters } from './useDefaultInstanceFilters';
 
