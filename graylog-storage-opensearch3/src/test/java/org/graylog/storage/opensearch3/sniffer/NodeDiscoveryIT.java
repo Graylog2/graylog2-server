@@ -49,7 +49,8 @@ class NodeDiscoveryIT {
 
         final OpensearchClusterSniffer sniffer = new OpensearchClusterSniffer(
                 openSearchInstance.getOfficialOpensearchClient(),
-                configuration
+                configuration,
+                false
         );
 
         final List<DiscoveredNode> nodes = sniffer.sniff();
@@ -75,7 +76,8 @@ class NodeDiscoveryIT {
 
         final OpensearchClusterSniffer sniffer = new OpensearchClusterSniffer(
                 openSearchInstance.getOfficialOpensearchClient(),
-                configuration
+                configuration,
+                false
         );
 
         final SnifferAggregator aggregator = new SnifferAggregator(

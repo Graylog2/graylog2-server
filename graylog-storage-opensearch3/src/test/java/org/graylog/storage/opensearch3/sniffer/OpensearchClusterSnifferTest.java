@@ -66,7 +66,7 @@ class OpensearchClusterSnifferTest {
         when(client.performRequest(any(Request.class), anyString())).thenReturn(jsonNode);
         when(configuration.discoveryEnabled()).thenReturn(true);
 
-        final var sniffer = new OpensearchClusterSniffer(client, configuration);
+        final var sniffer = new OpensearchClusterSniffer(client, configuration, false);
         final List<DiscoveredNode> nodes = sniffer.sniff();
 
         assertThat(nodes).hasSize(2);
@@ -99,7 +99,7 @@ class OpensearchClusterSnifferTest {
         when(client.performRequest(any(Request.class), anyString())).thenReturn(jsonNode);
         when(configuration.discoveryEnabled()).thenReturn(true);
 
-        final var sniffer = new OpensearchClusterSniffer(client, configuration);
+        final var sniffer = new OpensearchClusterSniffer(client, configuration, false);
         final List<DiscoveredNode> nodes = sniffer.sniff();
 
         assertThat(nodes).hasSize(1);
@@ -123,7 +123,7 @@ class OpensearchClusterSnifferTest {
         when(client.performRequest(any(Request.class), anyString())).thenReturn(jsonNode);
         when(configuration.discoveryEnabled()).thenReturn(true);
 
-        final var sniffer = new OpensearchClusterSniffer(client, configuration);
+        final var sniffer = new OpensearchClusterSniffer(client, configuration, false);
         final List<DiscoveredNode> nodes = sniffer.sniff();
 
         assertThat(nodes).hasSize(1);
@@ -147,7 +147,7 @@ class OpensearchClusterSnifferTest {
         when(client.performRequest(any(Request.class), anyString())).thenReturn(jsonNode);
         when(configuration.discoveryEnabled()).thenReturn(true);
 
-        final var sniffer = new OpensearchClusterSniffer(client, configuration);
+        final var sniffer = new OpensearchClusterSniffer(client, configuration, false);
         final List<DiscoveredNode> nodes = sniffer.sniff();
 
         assertThat(nodes).hasSize(1);
@@ -159,16 +159,16 @@ class OpensearchClusterSnifferTest {
     void enabledWhenDiscoveryEnabledOrNodeActivityLogger() {
         when(configuration.discoveryEnabled()).thenReturn(false);
         when(configuration.isNodeActivityLogger()).thenReturn(false);
-        final var sniffer = new OpensearchClusterSniffer(client, configuration);
+        final var sniffer = new OpensearchClusterSniffer(client, configuration, false);
         assertThat(sniffer.enabled()).isFalse();
 
         when(configuration.discoveryEnabled()).thenReturn(true);
-        final var sniffer2 = new OpensearchClusterSniffer(client, configuration);
+        final var sniffer2 = new OpensearchClusterSniffer(client, configuration, false);
         assertThat(sniffer2.enabled()).isTrue();
 
         when(configuration.discoveryEnabled()).thenReturn(false);
         when(configuration.isNodeActivityLogger()).thenReturn(true);
-        final var sniffer3 = new OpensearchClusterSniffer(client, configuration);
+        final var sniffer3 = new OpensearchClusterSniffer(client, configuration, false);
         assertThat(sniffer3.enabled()).isTrue();
     }
 }
