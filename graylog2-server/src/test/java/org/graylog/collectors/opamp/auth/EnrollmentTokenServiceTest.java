@@ -21,6 +21,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import org.graylog.collectors.CollectorsConfigService;
+import org.graylog.collectors.TokenSigningKey;
 import org.graylog.collectors.db.EnrollmentTokenCreator;
 import org.graylog.collectors.db.EnrollmentTokenDTO;
 import org.graylog.collectors.opamp.OpAmpCaService;
@@ -72,10 +73,10 @@ class EnrollmentTokenServiceTest {
     private CollectorsConfigService collectorsConfigService;
     private final MutableClock mutableClock = TestClocks.mutableFixedEpoch();
     private ClusterIdService clusterIdService;
+    private final EncryptedValueService encryptedValueService = new EncryptedValueService("1234567890abcdef");
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
-        final EncryptedValueService encryptedValueService = new EncryptedValueService("1234567890abcdef");
         final ObjectMapper objectMapper = new ObjectMapperProvider(
                 ObjectMapperProvider.class.getClassLoader(),
                 Collections.emptySet(),
@@ -93,7 +94,7 @@ class EnrollmentTokenServiceTest {
         when(clusterIdService.getString()).thenReturn(TEST_CLUSTER_ID);
         collectorsConfigService = mock(CollectorsConfigService.class);
         final OpAmpCaService opAmpCaService = new OpAmpCaService(certificateService, clusterIdService, collectorsConfigService);
-        enrollmentTokenService = new EnrollmentTokenService(certificateService, clusterIdService, opAmpCaService, mutableClock, mongoCollections);
+        enrollmentTokenService = new EnrollmentTokenService(certificateService, clusterIdService, opAmpCaService, mutableClock, encryptedValueService, mongoCollections);
     }
 
     @Test
@@ -379,6 +380,40 @@ class EnrollmentTokenServiceTest {
         // Try to validate again - should be empty since metadata was deleted
         final Optional<EnrollmentTokenDTO> afterDelete = enrollmentTokenService.validateToken(response.token());
         assertThat(afterDelete).isEmpty();
+    }
+
+    @Test
+    void createTokenSigningKeyReturnsValidKey() throws Exception {
+        final TokenSigningKey signingKey = enrollmentTokenService.createTokenSigningKey();
+
+        assertThat(signingKey).isNotNull();
+        assertThat(signingKey.privateKey()).isNotNull();
+        assertThat(signingKey.privateKey().isSet()).isTrue();
+        assertThat(signingKey.fingerprint()).startsWith("SHA256:");
+        assertThat(signingKey.createdAt()).isEqualTo(mutableClock.instant());
+    }
+
+    @Test
+    void createTokenSigningKeyGeneratesUniqueKeys() throws Exception {
+        final TokenSigningKey first = enrollmentTokenService.createTokenSigningKey();
+        final TokenSigningKey second = enrollmentTokenService.createTokenSigningKey();
+
+        assertThat(first.fingerprint()).isNotEqualTo(second.fingerprint());
+    }
+
+    @Test
+    void createTokenSigningKeyPrivateKeyIsDecryptable() throws Exception {
+        final TokenSigningKey signingKey = enrollmentTokenService.createTokenSigningKey();
+
+        final String decryptedPem = encryptedValueService.decrypt(signingKey.privateKey());
+
+        assertThat(decryptedPem).startsWith("-----BEGIN PRIVATE KEY-----");
+        // Verify the PEM can be parsed back into a PrivateKey
+        final var privateKey = PemUtils.parsePrivateKey(decryptedPem);
+        assertThat(privateKey).isNotNull();
+        // BouncyCastle's PEM parser returns "EdDSA" as the algorithm family,
+        // while the original KeyPairGenerator("Ed25519") reports "Ed25519"
+        assertThat(privateKey.getAlgorithm()).isIn("Ed25519", "EdDSA");
     }
 
     @Test

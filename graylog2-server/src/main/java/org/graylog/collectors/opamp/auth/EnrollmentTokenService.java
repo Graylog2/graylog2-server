@@ -29,22 +29,29 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.graylog.collectors.TokenSigningKey;
 import org.graylog.collectors.db.EnrollmentTokenCreator;
 import org.graylog.collectors.db.EnrollmentTokenDTO;
 import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog.collectors.opamp.rest.CreateEnrollmentTokenRequest;
 import org.graylog.collectors.opamp.rest.EnrollmentTokenResponse;
+import org.graylog.security.pki.Algorithm;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
+import org.graylog.security.pki.KeyUtils;
 import org.graylog.security.pki.PemUtils;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbSortResolver;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.plugin.cluster.ClusterIdService;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.time.Clock;
 import java.time.Instant;
@@ -74,6 +81,7 @@ public class EnrollmentTokenService {
     private final ClusterIdService clusterIdService;
     private final OpAmpCaService opAmpCaService;
     private final Clock clock;
+    private final EncryptedValueService encryptedValueService;
     private final org.graylog2.database.MongoCollection<EnrollmentTokenDTO> tokenCollection;
     private final MongoPaginationHelper<EnrollmentTokenDTO> paginationHelper;
 
@@ -82,11 +90,13 @@ public class EnrollmentTokenService {
                                   ClusterIdService clusterIdService,
                                   OpAmpCaService opAmpCaService,
                                   Clock clock,
+                                  EncryptedValueService encryptedValueService,
                                   MongoCollections mongoCollections) {
         this.certificateService = certificateService;
         this.clusterIdService = clusterIdService;
         this.opAmpCaService = opAmpCaService;
         this.clock = clock;
+        this.encryptedValueService = encryptedValueService;
         this.tokenCollection = mongoCollections.collection(COLLECTION_NAME, EnrollmentTokenDTO.class);
         this.paginationHelper = mongoCollections.paginationHelper(tokenCollection);
         tokenCollection.createIndexes(List.of(
@@ -116,6 +126,22 @@ public class EnrollmentTokenService {
      */
     public CertificateEntry getEnrollmentSigningCert() {
         return opAmpCaService.getSigningCert();
+    }
+
+    /**
+     * Creates a new token signing key.
+     *
+     * @return the new token signing key
+     */
+    public TokenSigningKey createTokenSigningKey() throws NoSuchAlgorithmException, NoSuchProviderException, IOException {
+        final var keyPair = KeyUtils.generateKeyPair(Algorithm.ED25519);
+        final var privateKeyPem = PemUtils.toPem(keyPair.getPrivate());
+
+        return new TokenSigningKey(
+                encryptedValueService.encrypt(privateKeyPem),
+                KeyUtils.sha256Fingerprint(keyPair),
+                Instant.now(clock)
+        );
     }
 
     /**
