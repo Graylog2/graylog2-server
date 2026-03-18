@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { Sort } from 'stores/PaginationTypes';
+import type { SourceType } from '../types';
 
 export const ENTITY_TABLE_ID = 'collectors-sources';
 
@@ -24,5 +25,12 @@ export const DEFAULT_LAYOUT = {
   defaultSort: { attributeId: 'name', direction: 'asc' } as Sort,
   defaultDisplayedAttributes: ['name', 'type', 'enabled', 'description'],
   defaultColumnOrder: ['name', 'type', 'enabled', 'description'],
+};
+
+export const SOURCE_TYPE_LABELS: Record<SourceType, string> = {
+  file: 'File',
+  journald: 'Journald',
+  windows_event_log: 'Windows Event Log',
+  macos_unified_logging: 'macOS Unified Logging',
 };
 

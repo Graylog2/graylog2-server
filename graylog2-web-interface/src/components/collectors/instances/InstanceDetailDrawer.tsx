@@ -47,18 +47,36 @@ const SectionTitle = styled.h4(
   `,
 );
 
-const DetailRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-`;
+const DetailRow = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacings.xs};
+    margin-bottom: ${theme.spacings.xs};
+  `,
+);
 
-const Title = styled.span`
-  font-weight: 500;
-  min-width: 120px;
-  font-size: 0.875rem;
-`;
+const Title = styled.span(
+  ({ theme }) => css`
+    font-weight: 500;
+    min-width: 120px;
+    font-size: ${theme.fonts.size.small};
+  `,
+);
+
+const EmptyText = styled.span(
+  ({ theme }) => css`
+    color: ${theme.colors.gray[60]};
+  `,
+);
+
+const SourceItem = styled.span(
+  ({ theme }) => css`
+    display: inline-flex;
+    gap: ${theme.spacings.xxs};
+    align-items: center;
+  `,
+);
 
 const SourceList = styled.div`
   display: flex;
@@ -132,14 +150,14 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
       <Section>
         <SectionTitle>Active Sources ({sources.length})</SectionTitle>
         {sources.length === 0 ? (
-          <span style={{ color: '#666' }}>No sources configured for this fleet.</span>
+          <EmptyText>No sources configured for this fleet.</EmptyText>
         ) : (
           <SourceList>
             {sources.map((source) => (
-              <span key={source.id} style={{ display: 'inline-flex', gap: '0.25rem', alignItems: 'center' }}>
+              <SourceItem key={source.id}>
                 <span>• {source.name}</span>
                 <Label bsStyle="info">{source.type}</Label>
-              </span>
+              </SourceItem>
             ))}
           </SourceList>
         )}

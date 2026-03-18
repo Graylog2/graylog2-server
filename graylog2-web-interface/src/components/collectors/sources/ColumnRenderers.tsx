@@ -21,12 +21,7 @@ import type { ColumnRenderers } from 'components/common/EntityDataTable';
 
 import type { Source } from '../types';
 
-const sourceTypeLabels: Record<string, string> = {
-  file: 'File',
-  journald: 'Journald',
-  windows_event_log: 'Windows Event Log',
-  macos_unified_logging: 'macOS Unified Log',
-};
+import { SOURCE_TYPE_LABELS } from './Constants';
 
 const customColumnRenderers = (): ColumnRenderers<Source> => ({
   attributes: {
@@ -37,7 +32,7 @@ const customColumnRenderers = (): ColumnRenderers<Source> => ({
     type: {
       renderCell: (type: string) => (
         <Label bsStyle="info">
-          {sourceTypeLabels[type] || type}
+          {SOURCE_TYPE_LABELS[type] ?? type}
         </Label>
       ),
       staticWidth: 140,

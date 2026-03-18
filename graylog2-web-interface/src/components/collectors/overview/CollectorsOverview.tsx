@@ -69,28 +69,28 @@ const CollectorsOverview = () => {
       ) : (
         <StatsRow>
           <StatCard
-            value={stats?.total_instances || 0}
+            value={stats?.total_instances ?? 0}
             label="Instances"
             onClick={() => history.push(Routes.SYSTEM.COLLECTORS.INSTANCES)}
           />
           <StatCard
-            value={stats?.online_instances || 0}
+            value={stats?.online_instances ?? 0}
             label="Online"
             variant="success"
             onClick={() => history.push(`${Routes.SYSTEM.COLLECTORS.INSTANCES}?filters=status%3Donline`)}
           />
           <StatCard
-            value={stats?.offline_instances || 0}
+            value={stats?.offline_instances ?? 0}
             label="Offline"
             variant="warning"
             onClick={() => history.push(`${Routes.SYSTEM.COLLECTORS.INSTANCES}?filters=status%3Doffline`)}
           />
           <StatCard
-            value={stats?.total_fleets || 0}
+            value={stats?.total_fleets ?? 0}
             label="Fleets"
             onClick={() => history.push(Routes.SYSTEM.COLLECTORS.FLEETS)}
           />
-          <StatCard value={stats?.total_sources || 0} label="Sources" />
+          <StatCard value={stats?.total_sources ?? 0} label="Sources" />
         </StatsRow>
       )}
 

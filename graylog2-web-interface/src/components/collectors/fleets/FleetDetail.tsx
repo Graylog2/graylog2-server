@@ -25,6 +25,7 @@ import { MoreActions } from 'components/common/EntityDataTable';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import useHistory from 'routing/useHistory';
 import useQuery from 'routing/useQuery';
+import Routes from 'routing/Routes';
 import type { SearchParams } from 'stores/PaginationTypes';
 
 import FleetSettings from './FleetSettings';
@@ -51,6 +52,14 @@ const Header = styled.div(
     margin-bottom: ${theme.spacings.lg};
     gap: ${theme.spacings.md};
     align-items: center;
+  `,
+);
+
+const ActionsRow = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: ${theme.spacings.md};
   `,
 );
 
@@ -193,13 +202,13 @@ const FleetDetail = ({ fleetId }: Props) => {
       </Header>
 
       <StatsRow>
-        <StatCard value={stats?.total_instances || 0} label="Instances"
+        <StatCard value={stats?.total_instances ?? 0} label="Instances"
                   onClick={() => navigateToTab('instances')} />
-        <StatCard value={stats?.online_instances || 0} label="Online" variant="success"
+        <StatCard value={stats?.online_instances ?? 0} label="Online" variant="success"
                   onClick={() => navigateToTab('instances', ['status=online'])} />
-        <StatCard value={stats?.offline_instances || 0} label="Offline" variant="warning"
+        <StatCard value={stats?.offline_instances ?? 0} label="Offline" variant="warning"
                   onClick={() => navigateToTab('instances', ['status=offline'])} />
-        <StatCard value={stats?.total_sources || 0} label="Sources"
+        <StatCard value={stats?.total_sources ?? 0} label="Sources"
                   onClick={() => navigateToTab('sources')} />
       </StatsRow>
 
@@ -211,9 +220,9 @@ const FleetDetail = ({ fleetId }: Props) => {
 
       {activeTab === 'sources' && (
         <>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+          <ActionsRow>
             <Button bsStyle="success" onClick={() => setShowSourceModal(true)}>Add Source</Button>
-          </div>
+          </ActionsRow>
           <PaginatedEntityTable<Source>
             humanName="sources"
             tableLayout={SOURCES_LAYOUT}
@@ -248,6 +257,7 @@ const FleetDetail = ({ fleetId }: Props) => {
           }}
           onDelete={async () => {
             await deleteFleet(fleet.id);
+            history.push(Routes.SYSTEM.COLLECTORS.FLEETS);
           }}
           isLoading={isUpdatingFleet || isDeletingFleet}
         />
