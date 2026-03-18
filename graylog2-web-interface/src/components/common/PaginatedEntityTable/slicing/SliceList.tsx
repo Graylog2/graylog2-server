@@ -72,7 +72,9 @@ const SliceList = ({
         <SliceInner>
           <Title>{sliceRenderers?.[sliceCol]?.render?.(slice) ?? slice.title ?? String(slice.value)}</Title>
 
-          <CountBadge title={String(slice.count)}>{formatReadableNumber(slice.count)}</CountBadge>
+          {
+            // <CountBadge title={String(slice.count)}>{formatReadableNumber(slice.count)}</CountBadge>
+          }
         </SliceInner>
       </ListGroupItem>
     ))}
