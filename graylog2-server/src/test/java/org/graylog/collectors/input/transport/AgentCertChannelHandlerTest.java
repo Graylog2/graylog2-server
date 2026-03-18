@@ -25,6 +25,7 @@ import org.graylog.security.pki.Algorithm;
 import org.graylog.security.pki.CertificateBuilder;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.PemUtils;
+import org.graylog.testing.TestClocks;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,7 @@ class AgentCertChannelHandlerTest {
     @BeforeEach
     void setUp() {
         final EncryptedValueService evs = new EncryptedValueService("1234567890abcdef");
-        builder = new CertificateBuilder(evs, "Test");
+        builder = new CertificateBuilder(evs, "Test", TestClocks.fixedEpoch());
     }
 
     @Test

@@ -33,6 +33,7 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
 import org.graylog.security.pki.PemUtils;
+import org.graylog.testing.TestClocks;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -52,6 +53,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.cert.X509Certificate;
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -73,6 +75,7 @@ class AgentTokenServiceTest {
     private CollectorInstanceService collectorInstanceService;
     private AgentTokenService agentTokenService;
     private CollectorsConfigService collectorsConfigService;
+    private Clock clock = TestClocks.fixedEpoch();
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
@@ -89,14 +92,14 @@ class AgentTokenServiceTest {
                 new MongoJackObjectMapperProvider(objectMapper),
                 mongodb.mongoConnection()
         );
-        certificateService = new CertificateService(mongoCollections, encryptedValueService, CustomizationConfig.empty());
+        certificateService = new CertificateService(mongoCollections, encryptedValueService, CustomizationConfig.empty(), clock);
         clusterConfigService = mock(ClusterConfigService.class);
         when(clusterConfigService.get(ClusterId.class))
                 .thenReturn(ClusterId.create(TEST_CLUSTER_ID));
         collectorInstanceService = new CollectorInstanceService(mongoCollections);
         collectorsConfigService = mock(CollectorsConfigService.class);
         opAmpCaService = new OpAmpCaService(certificateService, clusterConfigService, collectorsConfigService);
-        agentTokenService = new AgentTokenService(collectorInstanceService);
+        agentTokenService = new AgentTokenService(collectorInstanceService, clock);
     }
 
     @Test
@@ -123,7 +126,7 @@ class AgentTokenServiceTest {
                 certFingerprint,
                 certPem,
                 enrollmentCa.id(),
-                Instant.now(),
+                Instant.now(clock),
                 "000000000000000000000000"
         );
 
@@ -134,8 +137,8 @@ class AgentTokenServiceTest {
                 .add("x5t#S256", PemUtils.fingerprintToX5t(certFingerprint))
                 .and()
                 .subject(collectorInstanceDTO.instanceUid())
-                .issuedAt(Date.from(Instant.now()))
-                .expiration(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
+                .issuedAt(Date.from(Instant.now(clock)))
+                .expiration(Date.from(Instant.now(clock).plus(1, ChronoUnit.HOURS)))
                 .signWith(agentKeyPair.getPrivate())
                 .compact();
 

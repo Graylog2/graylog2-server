@@ -56,6 +56,7 @@ import java.security.SecureRandom;
 import java.security.Security;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -82,16 +83,18 @@ public class CertificateBuilder {
 
     private final EncryptedValueService encryptedValueService;
     private final String productName;
+    private final Clock clock;
 
     /**
      * Creates a new CertificateBuilder.
      *
      * @param encryptedValueService service for encrypting private keys before storage
-     * @param productName the product name to include as Organization (O=) in certificate subject DNs
+     * @param productName           the product name to include as Organization (O=) in certificate subject DNs
      */
-    public CertificateBuilder(EncryptedValueService encryptedValueService, String productName) {
+    public CertificateBuilder(EncryptedValueService encryptedValueService, String productName, Clock clock) {
         this.encryptedValueService = encryptedValueService;
         this.productName = productName;
+        this.clock = clock;
     }
 
     /**
@@ -101,7 +104,7 @@ public class CertificateBuilder {
      * @param algorithm the algorithm to use for key generation
      * @return a newly generated key pair
      * @throws NoSuchAlgorithmException if the algorithm is not available
-     * @throws NoSuchProviderException if the BouncyCastle provider is not available
+     * @throws NoSuchProviderException  if the BouncyCastle provider is not available
      */
     public KeyPair generateKeyPair(Algorithm algorithm) throws NoSuchAlgorithmException, NoSuchProviderException {
         final KeyPairGenerator keyGen = KeyPairGenerator.getInstance(algorithm.keyAlgorithm(), "BC");
@@ -122,8 +125,8 @@ public class CertificateBuilder {
      * </ul>
      *
      * @param commonName the common name for the CA certificate
-     * @param algorithm the algorithm to use for key generation and signing
-     * @param validity the validity period of the certificate
+     * @param algorithm  the algorithm to use for key generation and signing
+     * @param validity   the validity period of the certificate
      * @return a CertificateEntry with encrypted private key and PEM-encoded certificate (no ID - not yet saved)
      * @throws Exception if certificate creation fails
      */
@@ -135,7 +138,7 @@ public class CertificateBuilder {
                 .addRDN(BCStyle.O, productName)
                 .build();
 
-        final Instant now = Instant.now();
+        final Instant now = Instant.now(clock);
         final Instant notAfter = now.plus(validity);
         final BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
 
@@ -178,8 +181,8 @@ public class CertificateBuilder {
      * certificates, not sub-CAs.
      *
      * @param commonName the common name for the intermediate CA certificate
-     * @param issuer the issuing CA's certificate entry (must contain the private key)
-     * @param validity the validity period of the certificate
+     * @param issuer     the issuing CA's certificate entry (must contain the private key)
+     * @param validity   the validity period of the certificate
      * @return a CertificateEntry with encrypted private key and PEM-encoded certificate (no ID - not yet saved)
      * @throws Exception if certificate creation fails
      */
@@ -207,7 +210,7 @@ public class CertificateBuilder {
         // which is critical for PKIX path building (X500Principal.equals() compares DER bytes).
         final X500Name issuerDn = X500Name.getInstance(issuerCert.getSubjectX500Principal().getEncoded());
 
-        final Instant now = Instant.now();
+        final Instant now = Instant.now(clock);
         final Instant notAfter = now.plus(validity);
         final BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
 
@@ -255,10 +258,10 @@ public class CertificateBuilder {
      * End-entity certificates cannot issue other certificates. Use this for
      * certificates like token signing keys.
      *
-     * @param commonName the common name for the end-entity certificate
-     * @param issuer the issuing CA's certificate entry (must contain the private key)
+     * @param commonName   the common name for the end-entity certificate
+     * @param issuer       the issuing CA's certificate entry (must contain the private key)
      * @param keyUsageBits the key usage bits (e.g., {@link KeyUsage#digitalSignature})
-     * @param validity the validity period of the certificate
+     * @param validity     the validity period of the certificate
      * @return a CertificateEntry with encrypted private key and PEM-encoded certificate (no ID - not yet saved)
      * @throws Exception if certificate creation fails
      */
@@ -282,11 +285,11 @@ public class CertificateBuilder {
      * server certificates (with {@link KeyPurposeId#id_kp_serverAuth}) or
      * client certificates (with {@link KeyPurposeId#id_kp_clientAuth}).
      *
-     * @param commonName the common name for the end-entity certificate
-     * @param issuer the issuing CA's certificate entry (must contain the private key)
+     * @param commonName   the common name for the end-entity certificate
+     * @param issuer       the issuing CA's certificate entry (must contain the private key)
      * @param keyUsageBits the key usage bits (e.g., {@link KeyUsage#digitalSignature})
-     * @param ekuPurpose the extended key usage purpose (e.g., {@link KeyPurposeId#id_kp_serverAuth}), or null to omit EKU
-     * @param validity the validity period of the certificate
+     * @param ekuPurpose   the extended key usage purpose (e.g., {@link KeyPurposeId#id_kp_serverAuth}), or null to omit EKU
+     * @param validity     the validity period of the certificate
      * @return a CertificateEntry with encrypted private key and PEM-encoded certificate (no ID - not yet saved)
      * @throws Exception if certificate creation fails
      */
@@ -309,12 +312,12 @@ public class CertificateBuilder {
      *   <li>Algorithm: derived from issuer certificate</li>
      * </ul>
      *
-     * @param commonName the common name for the end-entity certificate
-     * @param issuer the issuing CA's certificate entry (must contain the private key)
+     * @param commonName   the common name for the end-entity certificate
+     * @param issuer       the issuing CA's certificate entry (must contain the private key)
      * @param keyUsageBits the key usage bits (e.g., {@link KeyUsage#digitalSignature})
-     * @param ekuPurpose the extended key usage purpose (e.g., {@link KeyPurposeId#id_kp_serverAuth}), or null to omit EKU
-     * @param validity the validity period of the certificate
-     * @param dnsNames DNS names to include as Subject Alternative Names, or empty list to omit SAN
+     * @param ekuPurpose   the extended key usage purpose (e.g., {@link KeyPurposeId#id_kp_serverAuth}), or null to omit EKU
+     * @param validity     the validity period of the certificate
+     * @param dnsNames     DNS names to include as Subject Alternative Names, or empty list to omit SAN
      * @return a CertificateEntry with encrypted private key and PEM-encoded certificate (no ID - not yet saved)
      * @throws Exception if certificate creation fails
      */
@@ -344,7 +347,7 @@ public class CertificateBuilder {
         // which is critical for PKIX path building (X500Principal.equals() compares DER bytes).
         final X500Name issuerDn = X500Name.getInstance(issuerCert.getSubjectX500Principal().getEncoded());
 
-        final Instant now = Instant.now();
+        final Instant now = Instant.now(clock);
         final Instant notAfter = now.plus(validity);
         final BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
 
@@ -422,7 +425,7 @@ public class CertificateBuilder {
                 null, // issuerDn - extracted on save
                 certificate.getNotBefore().toInstant(),
                 certificate.getNotAfter().toInstant(),
-                Instant.now()
+                Instant.now(clock)
         );
     }
 
@@ -431,10 +434,10 @@ public class CertificateBuilder {
      * <p>
      * This method is primarily used for testing; in production, agents generate their own CSRs.
      *
-     * @param keyPair the key pair to create the CSR for
+     * @param keyPair    the key pair to create the CSR for
      * @param commonName the common name to include in the CSR subject
      * @return the PEM-encoded CSR as a byte array
-     * @throws IOException if encoding fails
+     * @throws IOException               if encoding fails
      * @throws OperatorCreationException if the content signer cannot be created
      */
     public byte[] createCsr(KeyPair keyPair, String commonName) throws IOException, OperatorCreationException {
@@ -474,12 +477,12 @@ public class CertificateBuilder {
      *       ExtendedKeyUsage clientAuth</li>
      * </ul>
      *
-     * @param csrPem the PEM-encoded CSR
-     * @param issuer the issuing CA's certificate entry (must contain the private key)
+     * @param csrPem    the PEM-encoded CSR
+     * @param issuer    the issuing CA's certificate entry (must contain the private key)
      * @param subjectCn the common name for the certificate subject (CSR subject is ignored)
-     * @param validity the validity period of the certificate
+     * @param validity  the validity period of the certificate
      * @return the signed X509Certificate
-     * @throws Exception if signing fails
+     * @throws Exception                if signing fails
      * @throws IllegalArgumentException if the CSR public key is not Ed25519
      */
     public X509Certificate signCsr(byte[] csrPem, CertificateEntry issuer, String subjectCn, Duration validity)
@@ -534,7 +537,7 @@ public class CertificateBuilder {
         // which is critical for PKIX path building (X500Principal.equals() compares DER bytes).
         final X500Name issuerDn = X500Name.getInstance(issuerCert.getSubjectX500Principal().getEncoded());
 
-        final Instant now = Instant.now();
+        final Instant now = Instant.now(clock);
         final Instant notAfter = now.plus(validity);
         final BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
 

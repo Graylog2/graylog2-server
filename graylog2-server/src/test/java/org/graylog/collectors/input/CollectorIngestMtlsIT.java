@@ -70,6 +70,7 @@ import org.graylog.security.pki.Algorithm;
 import org.graylog.security.pki.CertificateBuilder;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.PemUtils;
+import org.graylog.testing.TestClocks;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.journal.RawMessage;
@@ -156,6 +157,7 @@ class CollectorIngestMtlsIT {
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
 
+
     @BeforeAll
     static void setupCerts() throws Exception {
         // Register BC for cert generation (JDK has no certificate builder API).
@@ -164,7 +166,7 @@ class CollectorIngestMtlsIT {
         }
 
         final EncryptedValueService encryptedValueService = new EncryptedValueService("1234567890abcdef");
-        final CertificateBuilder certificateBuilder = new CertificateBuilder(encryptedValueService, "Test");
+        final CertificateBuilder certificateBuilder = new CertificateBuilder(encryptedValueService, "Test", TestClocks.fixedEpoch());
 
         // Create a flat CA hierarchy: self-signed root CA signs all end-entity certs
         final CertificateEntry caEntry = certificateBuilder.createRootCa("Test CA", Algorithm.ED25519, CERT_VALIDITY);

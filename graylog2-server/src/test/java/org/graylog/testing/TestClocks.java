@@ -16,6 +16,8 @@
  */
 package org.graylog.testing;
 
+import org.threeten.extra.MutableClock;
+
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -28,11 +30,20 @@ public final class TestClocks {
     }
 
     /**
-     * Returns a new fixed clock for the epoch in UTC. (1970-01-01T00:00:00.000Z)
+     * Returns an immutable fixed clock for the epoch in UTC. (1970-01-01T00:00:00.000Z)
      *
-     * @return the fixed clock
+     * @return the clock
      */
     public static Clock fixedEpoch() {
         return Clock.fixed(Instant.ofEpochMilli(0), ZoneOffset.UTC);
+    }
+
+    /**
+     * Returns a mutable fixed clock for the epoch in UTC. (1970-01-01T00:00:00.000Z)
+     *
+     * @return the clock
+     */
+    public static MutableClock mutableFixedEpoch() {
+        return MutableClock.epochUTC();
     }
 }

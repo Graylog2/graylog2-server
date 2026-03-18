@@ -30,6 +30,7 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
 import org.graylog.security.pki.PemUtils;
+import org.graylog.testing.TestClocks;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -43,15 +44,15 @@ import org.graylog2.web.customization.CustomizationConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
+import org.threeten.extra.MutableClock;
 
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -71,6 +72,7 @@ class EnrollmentTokenServiceTest {
     private ClusterConfigService clusterConfigService;
     private EnrollmentTokenService enrollmentTokenService;
     private CollectorsConfigService collectorsConfigService;
+    private MutableClock mutableClock = TestClocks.mutableFixedEpoch();
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
@@ -87,13 +89,13 @@ class EnrollmentTokenServiceTest {
                 new MongoJackObjectMapperProvider(objectMapper),
                 mongodb.mongoConnection()
         );
-        final CertificateService certificateService = new CertificateService(mongoCollections, encryptedValueService, CustomizationConfig.empty());
+        final CertificateService certificateService = new CertificateService(mongoCollections, encryptedValueService, CustomizationConfig.empty(), mutableClock);
         clusterConfigService = mock(ClusterConfigService.class);
         when(clusterConfigService.get(ClusterId.class))
                 .thenReturn(ClusterId.create(TEST_CLUSTER_ID));
-        collectorsConfigService = Mockito.mock(CollectorsConfigService.class);
+        collectorsConfigService = mock(CollectorsConfigService.class);
         final OpAmpCaService opAmpCaService = new OpAmpCaService(certificateService, clusterConfigService, collectorsConfigService);
-        enrollmentTokenService = new EnrollmentTokenService(certificateService, clusterConfigService, opAmpCaService, mongoCollections);
+        enrollmentTokenService = new EnrollmentTokenService(certificateService, clusterConfigService, opAmpCaService, mutableClock, mongoCollections);
     }
 
     @Test
@@ -170,8 +172,7 @@ class EnrollmentTokenServiceTest {
         final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_CREATOR);
 
         assertThat(response.token()).isNotNull();
-        assertThat(response.expiresAt()).isAfter(Instant.now());
-        assertThat(response.expiresAt()).isBefore(Instant.now().plus(2, ChronoUnit.DAYS));
+        assertThat(response.expiresAt()).isEqualTo(Clock.offset(mutableClock, Duration.ofDays(1)).instant());
 
         // Verify JWT can be parsed and has correct claims
         final CertificateEntry signingCert = enrollmentTokenService.getTokenSigningCert();
@@ -179,6 +180,7 @@ class EnrollmentTokenServiceTest {
         final PublicKey publicKey = cert.getPublicKey();
 
         final Jws<Claims> jws = Jwts.parser()
+                .clock(() -> Date.from(mutableClock.instant()))
                 .verifyWith(publicKey)
                 .build()
                 .parseSignedClaims(response.token());
@@ -261,7 +263,7 @@ class EnrollmentTokenServiceTest {
         final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_CREATOR);
 
         // Wait for expiry
-        Thread.sleep(1500);
+        mutableClock.add(Duration.ofSeconds(2));
 
         final Optional<EnrollmentTokenDTO> result = enrollmentTokenService.validateToken(response.token());
 
@@ -324,9 +326,6 @@ class EnrollmentTokenServiceTest {
 
     @Test
     void validateTokenReturnsEmptyForUnknownKid() {
-        // No existing CollectorsConfig - service will create certs and cache in memory
-        when(collectorsConfigService.get()).thenReturn(Optional.empty());
-
         // Create a valid token structure but with unknown kid
         // This is a token with header {"alg":"EdDSA","kid":"sha256:unknown"}
         final String fakeToken = "eyJhbGciOiJFZERTQSIsImtpZCI6InNoYTI1Njp1bmtub3duIn0.eyJpc3MiOiJodHRwczovL2dyYXlsb2cuZXhhbXBsZS5jb20vIn0.invalidsig";

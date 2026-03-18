@@ -20,6 +20,8 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReplaceOptions;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
@@ -29,10 +31,8 @@ import org.graylog2.web.customization.CustomizationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
 import java.security.cert.X509Certificate;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -56,15 +56,18 @@ public class CertificateService {
     private final MongoUtils<CertificateEntry> utils;
     private final EncryptedValueService encryptedValueService;
     private final String productName;
+    private final Clock clock;
 
     @Inject
     public CertificateService(MongoCollections mongoCollections,
                               EncryptedValueService encryptedValueService,
-                              CustomizationConfig customizationConfig) {
+                              CustomizationConfig customizationConfig,
+                              Clock clock) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, CertificateEntry.class);
         this.utils = mongoCollections.utils(collection);
         this.encryptedValueService = encryptedValueService;
         this.productName = customizationConfig.productName();
+        this.clock = clock;
 
         collection.createIndex(
                 Indexes.ascending(CertificateEntry.FIELD_FINGERPRINT),
@@ -94,7 +97,7 @@ public class CertificateService {
      * @return a new CertificateBuilder instance
      */
     public CertificateBuilder builder() {
-        return new CertificateBuilder(encryptedValueService, productName);
+        return new CertificateBuilder(encryptedValueService, productName, clock);
     }
 
     /**

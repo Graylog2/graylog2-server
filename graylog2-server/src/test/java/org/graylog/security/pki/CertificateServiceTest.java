@@ -18,6 +18,7 @@ package org.graylog.security.pki;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.grn.GRNRegistry;
+import org.graylog.testing.TestClocks;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -65,7 +66,7 @@ class CertificateServiceTest {
                 new MongoJackObjectMapperProvider(objectMapper),
                 mongodb.mongoConnection()
         );
-        certificateService = new CertificateService(mongoCollections, encryptedValueService, CustomizationConfig.empty());
+        certificateService = new CertificateService(mongoCollections, encryptedValueService, CustomizationConfig.empty(), TestClocks.fixedEpoch());
     }
 
     @Test

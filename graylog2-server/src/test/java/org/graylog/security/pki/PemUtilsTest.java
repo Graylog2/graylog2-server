@@ -16,6 +16,7 @@
  */
 package org.graylog.security.pki;
 
+import org.graylog.testing.TestClocks;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,7 +41,7 @@ class PemUtilsTest {
     @BeforeEach
     void setUp() {
         encryptedValueService = new EncryptedValueService("1234567890abcdef");
-        builder = new CertificateBuilder(encryptedValueService, "Graylog");
+        builder = new CertificateBuilder(encryptedValueService, "Graylog", TestClocks.fixedEpoch());
     }
 
     // toPem(X509Certificate) tests

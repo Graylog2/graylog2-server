@@ -27,6 +27,7 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
 import org.graylog.security.pki.PemUtils;
+import org.graylog.testing.TestClocks;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -42,6 +43,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.security.cert.X509Certificate;
+import java.time.Clock;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -59,6 +62,7 @@ class OpAmpCaServiceTest {
     private CollectorsConfigService collectorsConfigService;
     private ClusterConfigService clusterConfigService;
     private OpAmpCaService opAmpCaService;
+    private Clock clock = TestClocks.fixedEpoch();
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
@@ -75,7 +79,7 @@ class OpAmpCaServiceTest {
                 new MongoJackObjectMapperProvider(objectMapper),
                 mongodb.mongoConnection()
         );
-        certificateService = new CertificateService(mongoCollections, encryptedValueService, CustomizationConfig.empty());
+        certificateService = new CertificateService(mongoCollections, encryptedValueService, CustomizationConfig.empty(), clock);
         clusterConfigService = mock(ClusterConfigService.class);
         collectorsConfigService = mock(CollectorsConfigService.class);
         opAmpCaService = new OpAmpCaService(certificateService, clusterConfigService, collectorsConfigService);

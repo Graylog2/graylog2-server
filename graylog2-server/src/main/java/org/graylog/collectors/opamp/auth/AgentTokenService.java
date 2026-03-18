@@ -27,6 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.cert.X509Certificate;
+import java.time.Clock;
+import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -35,10 +37,12 @@ public class AgentTokenService {
     private static final Logger LOG = LoggerFactory.getLogger(AgentTokenService.class);
 
     private final CollectorInstanceService collectorInstanceService;
+    private final Clock clock;
 
     @Inject
-    public AgentTokenService(CollectorInstanceService collectorInstanceService) {
+    public AgentTokenService(CollectorInstanceService collectorInstanceService, Clock clock) {
         this.collectorInstanceService = collectorInstanceService;
+        this.clock = clock;
     }
 
     /**
@@ -65,6 +69,7 @@ public class AgentTokenService {
     public Optional<OpAmpAuthContext.Identified> validateAgentToken(String token, OpAmpAuthContext.Transport transport) {
         try {
             final AtomicReference<CollectorInstanceDTO> collectorRef = new AtomicReference<>();
+            final var now = Date.from(clock.instant());
 
             Jwts.parser()
                     .keyLocator(header -> {
@@ -87,12 +92,13 @@ public class AgentTokenService {
                         collectorRef.set(collector);
                         try {
                             final X509Certificate cert = PemUtils.parseCertificate(collector.certificatePem());
-                            cert.checkValidity();
+                            cert.checkValidity(now);
                             return cert.getPublicKey();
                         } catch (Exception e) {
                             throw new SecurityException("Failed to parse collector certificate", e);
                         }
                     })
+                    .clock(() -> now)
                     .build()
                     .parseSignedClaims(token);
 

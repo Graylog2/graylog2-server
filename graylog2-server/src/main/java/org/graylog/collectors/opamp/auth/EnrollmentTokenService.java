@@ -47,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.PrivateKey;
+import java.time.Clock;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
@@ -74,6 +75,7 @@ public class EnrollmentTokenService {
     private final CertificateService certificateService;
     private final ClusterConfigService clusterConfigService;
     private final OpAmpCaService opAmpCaService;
+    private final Clock clock;
     private final org.graylog2.database.MongoCollection<EnrollmentTokenDTO> tokenCollection;
     private final MongoPaginationHelper<EnrollmentTokenDTO> paginationHelper;
 
@@ -81,10 +83,12 @@ public class EnrollmentTokenService {
     public EnrollmentTokenService(CertificateService certificateService,
                                   ClusterConfigService clusterConfigService,
                                   OpAmpCaService opAmpCaService,
+                                  Clock clock,
                                   MongoCollections mongoCollections) {
         this.certificateService = certificateService;
         this.clusterConfigService = clusterConfigService;
         this.opAmpCaService = opAmpCaService;
+        this.clock = clock;
         this.tokenCollection = mongoCollections.collection(COLLECTION_NAME, EnrollmentTokenDTO.class);
         this.paginationHelper = mongoCollections.paginationHelper(tokenCollection);
         tokenCollection.createIndexes(List.of(
@@ -146,7 +150,7 @@ public class EnrollmentTokenService {
     public EnrollmentTokenResponse createToken(CreateEnrollmentTokenRequest request, EnrollmentTokenCreator creator) {
         final CertificateEntry signingCert = opAmpCaService.getTokenSigningCert();
 
-        final Instant now = Instant.now();
+        final Instant now = Instant.now(clock);
         final @Nullable Instant expiresAt = request.expiresIn() != null ? now.plus(request.expiresIn()) : null;
 
         // Validate against cert expiry only when token has an expiry
@@ -186,6 +190,7 @@ public class EnrollmentTokenService {
             final String expectedAudience = getClusterId() + AUDIENCE_SUFFIX;
 
             final Jws<Claims> jws = Jwts.parser()
+                    .clock(() -> Date.from(clock.instant()))
                     .keyLocator(header -> {
                         final String kid = (String) header.get("kid");
                         if (kid == null) {
@@ -238,14 +243,14 @@ public class EnrollmentTokenService {
                 Filters.eq("_id", new ObjectId(id)),
                 Updates.combine(
                         Updates.inc(EnrollmentTokenDTO.FIELD_USAGE_COUNT, 1),
-                        Updates.set(EnrollmentTokenDTO.FIELD_LAST_USED_AT, Date.from(Instant.now()))
+                        Updates.set(EnrollmentTokenDTO.FIELD_LAST_USED_AT, Date.from(Instant.now(clock)))
                 )
         );
     }
 
     public PaginatedList<EnrollmentTokenDTO> findPaginated(Bson query,
-                                                            DbSortResolver.ResolvedSort resolvedSort,
-                                                            int page, int perPage) {
+                                                           DbSortResolver.ResolvedSort resolvedSort,
+                                                           int page, int perPage) {
         return paginationHelper
                 .filter(query)
                 .sort(resolvedSort.sort())
