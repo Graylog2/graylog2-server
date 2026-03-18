@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 import URI from 'urijs';
 
 import {Button, ButtonToolbar, DeleteMenuItem, Label, SegmentedControl} from 'components/bootstrap';
-import { Spinner } from 'components/common';
+import { ConfirmDialog, Spinner } from 'components/common';
 import { MoreActions } from 'components/common/EntityDataTable';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import useHistory from 'routing/useHistory';
@@ -80,6 +80,7 @@ const FleetDetail = ({ fleetId }: Props) => {
   const { createSource, isCreatingSource, updateSource, isUpdatingSource, deleteSource, updateFleet, isUpdatingFleet, deleteFleet, isDeletingFleet } = useCollectorsMutations();
   const [showSourceModal, setShowSourceModal] = useState(false);
   const [editingSource, setEditingSource] = useState<Source | null>(null);
+  const [deletingSource, setDeletingSource] = useState<Source | null>(null);
   const [selectedInstance, setSelectedInstance] = useState<CollectorInstanceView | null>(null);
 
   const { tab: tabParam } = useQuery();
@@ -142,15 +143,12 @@ const FleetDetail = ({ fleetId }: Props) => {
     [],
   );
 
-  const handleDeleteSource = useCallback(
-    async (source: Source) => {
-      // eslint-disable-next-line no-alert
-      if (window.confirm(`Are you sure you want to delete source "${source.name}"?`)) {
-        await deleteSource({ fleetId, sourceId: source.id });
-      }
-    },
-    [deleteSource, fleetId],
-  );
+  const handleConfirmDeleteSource = useCallback(async () => {
+    if (!deletingSource) return;
+
+    await deleteSource({ fleetId, sourceId: deletingSource.id });
+    setDeletingSource(null);
+  }, [deletingSource, deleteSource, fleetId]);
 
   const sourceActions = useCallback(
     (source: Source) => (
@@ -159,11 +157,11 @@ const FleetDetail = ({ fleetId }: Props) => {
           Edit
         </Button>
         <MoreActions>
-          <DeleteMenuItem onSelect={() => handleDeleteSource(source)} />
+          <DeleteMenuItem onSelect={() => setDeletingSource(source)} />
         </MoreActions>
       </ButtonToolbar>
     ),
-    [handleDeleteSource],
+    [],
   );
 
   const getSourcesForInstance = (instance: CollectorInstanceView) =>
@@ -283,6 +281,15 @@ const FleetDetail = ({ fleetId }: Props) => {
         />
       )}
 
+      {deletingSource && (
+        <ConfirmDialog
+          title="Delete source"
+          show
+          onConfirm={handleConfirmDeleteSource}
+          onCancel={() => setDeletingSource(null)}>
+          Are you sure you want to delete source <strong>{deletingSource.name}</strong>?
+        </ConfirmDialog>
+      )}
     </div>
   );
 };

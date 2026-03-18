@@ -46,62 +46,62 @@ describe('Instance ColumnRenderers', () => {
   const renderers = customColumnRenderers({ fleetNames });
 
   describe('status', () => {
-    it('renders Online label for online instances', () => {
+    it('renders Online label for online instances', async () => {
       render(<>{renderers.attributes.status.renderCell('online', baseInstance, {})}</>);
 
-      expect(screen.getByText('Online')).toBeInTheDocument();
+      await screen.findByText('Online');
     });
 
-    it('renders Offline label for offline instances', () => {
+    it('renders Offline label for offline instances', async () => {
       const offlineInstance = { ...baseInstance, status: 'offline' as const };
       render(<>{renderers.attributes.status.renderCell('offline', offlineInstance, {})}</>);
 
-      expect(screen.getByText('Offline')).toBeInTheDocument();
+      await screen.findByText('Offline');
     });
   });
 
   describe('hostname', () => {
-    it('renders hostname when available', () => {
+    it('renders hostname when available', async () => {
       render(<>{renderers.attributes.hostname.renderCell('prod-web-01', baseInstance, {})}</>);
 
-      expect(screen.getByText('prod-web-01')).toBeInTheDocument();
+      await screen.findByText('prod-web-01');
     });
 
-    it('falls back to instance_uid when hostname is null', () => {
+    it('falls back to instance_uid when hostname is null', async () => {
       const noHostname = { ...baseInstance, hostname: null };
       render(<>{renderers.attributes.hostname.renderCell(null, noHostname, {})}</>);
 
-      expect(screen.getByText('uid-1')).toBeInTheDocument();
+      await screen.findByText('uid-1');
     });
   });
 
   describe('os', () => {
-    it('renders Linux icon', () => {
+    it('renders Linux icon', async () => {
       render(<>{renderers.attributes.os.renderCell('linux', baseInstance, {})}</>);
 
-      expect(screen.getByTitle('Linux')).toBeInTheDocument();
+      await screen.findByTitle('Linux');
     });
 
-    it('renders Unknown icon for null os', () => {
+    it('renders Unknown icon for null os', async () => {
       const noOs = { ...baseInstance, os: null };
       render(<>{renderers.attributes.os.renderCell(null, noOs, {})}</>);
 
-      expect(screen.getByTitle('Unknown')).toBeInTheDocument();
+      await screen.findByTitle('Unknown');
     });
   });
 
   describe('fleet_id', () => {
-    it('renders fleet name as link', () => {
+    it('renders fleet name as link', async () => {
       render(<>{renderers.attributes.fleet_id.renderCell('fleet-1', baseInstance, {})}</>);
 
-      expect(screen.getByText('Production')).toBeInTheDocument();
+      await screen.findByText('Production');
     });
 
-    it('falls back to fleet_id when name not found', () => {
+    it('falls back to fleet_id when name not found', async () => {
       const unknownFleet = { ...baseInstance, fleet_id: 'fleet-unknown' };
       render(<>{renderers.attributes.fleet_id.renderCell('fleet-unknown', unknownFleet, {})}</>);
 
-      expect(screen.getByText('fleet-unknown')).toBeInTheDocument();
+      await screen.findByText('fleet-unknown');
     });
   });
 });
