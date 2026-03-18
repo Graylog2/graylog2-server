@@ -271,6 +271,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
 };
 
 type WrapperProps<T, M> = PaginatedEntityTableProps<T, M> & {
+  defaultFilters?: UrlQueryFilters;
   isLoadingLayoutPreferences: boolean;
   layoutConfig: LayoutConfig;
   reactQueryOptions: FetchOptions;
@@ -325,7 +326,6 @@ export type PaginatedEntityTableProps<T, M> = {
   additionalAttributes?: Array<Attribute>;
   bulkSelection?: EntityDataTableProps['bulkSelection'];
   columnRenderers: EntityDataTableProps['columnRenderers'];
-  defaultFilters?: UrlQueryFilters;
   entityActions?: EntityDataTableProps['entityActions'];
   entityAttributesAreCamelCase: boolean;
   expandedSectionRenderers?: ExpandedSectionRenderers<T>;
