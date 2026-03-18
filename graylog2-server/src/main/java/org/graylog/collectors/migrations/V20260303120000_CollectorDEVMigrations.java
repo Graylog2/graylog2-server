@@ -44,8 +44,8 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  * from ObjectId back to String for consistency with the rest of the codebase.
  * This can be removed once all deployments have been migrated.
  */
-public class V20260303120000_ConvertCollectorInstanceFleetIdToObjectId extends Migration {
-    private static final Logger LOG = LoggerFactory.getLogger(V20260303120000_ConvertCollectorInstanceFleetIdToObjectId.class);
+public class V20260303120000_CollectorDEVMigrations extends Migration {
+    private static final Logger LOG = LoggerFactory.getLogger(V20260303120000_CollectorDEVMigrations.class);
     private static final String COLLECTION_NAME = "collector_instances";
     private static final String FIELD_FLEET_ID = "fleet_id";
     private static final String FIELD_ISSUING_CA_ID = "issuing_ca_id";
@@ -53,7 +53,7 @@ public class V20260303120000_ConvertCollectorInstanceFleetIdToObjectId extends M
     private final MongoConnection mongoConnection;
 
     @Inject
-    public V20260303120000_ConvertCollectorInstanceFleetIdToObjectId(MongoConnection mongoConnection) {
+    public V20260303120000_CollectorDEVMigrations(MongoConnection mongoConnection) {
         this.mongoConnection = mongoConnection;
     }
 
@@ -64,7 +64,19 @@ public class V20260303120000_ConvertCollectorInstanceFleetIdToObjectId extends M
 
     @Override
     public void upgrade() {
+        LOG.warn("This migration MUST be removed before the final 7.1 release!");
+
         final var db = mongoConnection.getMongoDatabase();
+
+        // Order is important!
+        convertObjectIdFields(db);
+        renameCollections(db);
+        renameCollectorsConfigFields(db);
+        addCaCertIdToClusterConfig(db);
+        updateStreamRule();
+    }
+
+    private void convertObjectIdFields(MongoDatabase db) {
         final MongoCollection<Document> collection = db.getCollection(COLLECTION_NAME);
 
         long converted = 0;
@@ -74,7 +86,25 @@ public class V20260303120000_ConvertCollectorInstanceFleetIdToObjectId extends M
         if (converted > 0) {
             LOG.info("Converted ObjectId fields to String in {} collector instance document(s)", converted);
         }
+    }
 
+    private long convertObjectIdFieldToString(MongoCollection<Document> collection, String fieldName) {
+        final var cursor = collection.find(Filters.type(fieldName, "objectId"));
+
+        long converted = 0;
+        for (final Document doc : cursor) {
+            final ObjectId objectId = doc.getObjectId(fieldName);
+            collection.updateOne(
+                    Filters.eq("_id", doc.getObjectId("_id")),
+                    Updates.set(fieldName, objectId.toHexString())
+            );
+            converted++;
+        }
+
+        return converted;
+    }
+
+    private static void renameCollections(MongoDatabase db) {
         final var renamedCollections = Map.of(
                 "fleets", "collector_fleets",
                 "fleet_transaction_log", "collector_fleet_transaction_log",
@@ -98,20 +128,6 @@ public class V20260303120000_ConvertCollectorInstanceFleetIdToObjectId extends M
                     fromColl.drop();
                 }
             }
-        }
-
-        // Order is important!
-        renameCollectorsConfigFields(db);
-        addCaCertIdToClusterConfig(db);
-
-        // We renamed the field that contains the source type
-        final var updateResult = mongoConnection.getMongoDatabase().getCollection("streamrules")
-                .updateOne(
-                        Filters.eq(StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(Stream.COLLECTOR_LOGS_STREAM_ID)),
-                        Updates.set(StreamRuleImpl.FIELD_FIELD, CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_TYPE)
-                );
-        if (updateResult.getModifiedCount() > 0) {
-            LOG.info("Updated Collector stream rule to match on field <{}>", CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_TYPE);
         }
     }
 
@@ -176,19 +192,15 @@ public class V20260303120000_ConvertCollectorInstanceFleetIdToObjectId extends M
         }
     }
 
-    private long convertObjectIdFieldToString(MongoCollection<Document> collection, String fieldName) {
-        final var cursor = collection.find(Filters.type(fieldName, "objectId"));
-
-        long converted = 0;
-        for (final Document doc : cursor) {
-            final ObjectId objectId = doc.getObjectId(fieldName);
-            collection.updateOne(
-                    Filters.eq("_id", doc.getObjectId("_id")),
-                    Updates.set(fieldName, objectId.toHexString())
-            );
-            converted++;
+    private void updateStreamRule() {
+        // We renamed the field that contains the source type
+        final var updateResult = mongoConnection.getMongoDatabase().getCollection("streamrules")
+                .updateOne(
+                        Filters.eq(StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(Stream.COLLECTOR_LOGS_STREAM_ID)),
+                        Updates.set(StreamRuleImpl.FIELD_FIELD, CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_TYPE)
+                );
+        if (updateResult.getModifiedCount() > 0) {
+            LOG.info("Updated Collector stream rule to match on field <{}>", CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_TYPE);
         }
-
-        return converted;
     }
 }

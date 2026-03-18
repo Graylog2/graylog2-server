@@ -40,7 +40,7 @@ import org.graylog.collectors.input.processor.LogRecordProcessor;
 import org.graylog.collectors.input.processor.MacOSUnifiedLoggingRecordProcessor;
 import org.graylog.collectors.input.processor.WindowsEventLogRecordProcessor;
 import org.graylog.collectors.input.transport.CollectorIngestHttpTransport;
-import org.graylog.collectors.migrations.V20260303120000_ConvertCollectorInstanceFleetIdToObjectId;
+import org.graylog.collectors.migrations.V20260303120000_CollectorDEVMigrations;
 import org.graylog.collectors.migrations.V20260316000000_MigrateCollectorsData;
 import org.graylog.collectors.periodical.PurgeExpiredCollectorInstancesPeriodical;
 import org.graylog.collectors.rest.CollectorInstancesResource;
@@ -112,7 +112,7 @@ public class CollectorsModule extends PluginModule {
         addPeriodical(PurgeExpiredCollectorInstancesPeriodical.class);
 
         // Migrations
-        addMigration(V20260303120000_ConvertCollectorInstanceFleetIdToObjectId.class);
+        addMigration(V20260303120000_CollectorDEVMigrations.class);
         addMigration(V20260316000000_MigrateCollectorsData.class);
 
         // Fleet permissions
