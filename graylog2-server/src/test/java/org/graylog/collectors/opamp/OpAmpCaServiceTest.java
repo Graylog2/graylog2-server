@@ -19,6 +19,8 @@ package org.graylog.collectors.opamp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
+import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
@@ -49,6 +51,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bouncycastle.asn1.ASN1OctetString.getInstance;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -131,12 +134,34 @@ class OpAmpCaServiceTest {
     }
 
     @Test
-    void checkCertCNs() throws Exception {
+    void checkCaCert() throws Exception {
         mockClusterConfigStorage();
 
-        assertThat(getCN(opAmpCaService.getCaCert())).isEqualTo("O=Graylog,CN=Collectors CA");
-        assertThat(getCN(opAmpCaService.getSigningCert())).isEqualTo("O=Graylog,CN=Collectors Signing");
-        assertThat(getCN(opAmpCaService.getOtlpServerCert())).isEqualTo("O=Graylog,CN=Collectors OTLP Server");
+        final var cert = opAmpCaService.getCaCert();
+
+        assertThat(getCN(cert)).isEqualTo("O=Graylog,CN=Collectors CA");
+        assertThat(PemUtils.parseCertificate(cert.certificate()).getSigAlgName()).isEqualTo("Ed25519");
+    }
+
+    @Test
+    void checkSigningCert() throws Exception {
+        mockClusterConfigStorage();
+
+        final var cert = opAmpCaService.getSigningCert();
+
+        assertThat(getCN(cert)).isEqualTo("O=Graylog,CN=Collectors Signing");
+        assertThat(PemUtils.parseCertificate(cert.certificate()).getSigAlgName()).isEqualTo("Ed25519");
+        assertThat(PemUtils.parseCertificate(cert.certificate()).getNotAfter()).isEqualTo(Clock.offset(clock, Duration.ofDays(5 * 365)).instant());
+    }
+
+    @Test
+    void checkOTLPServerCert() throws Exception {
+        mockClusterConfigStorage();
+
+        final var cert = opAmpCaService.getOtlpServerCert();
+
+        assertThat(getCN(cert)).isEqualTo("O=Graylog,CN=Collectors OTLP Server");
+        assertThat(PemUtils.parseCertificate(cert.certificate()).getSigAlgName()).isEqualTo("Ed25519");
     }
 
     @Test
@@ -151,10 +176,9 @@ class OpAmpCaServiceTest {
         assertThat(ekuBytes).isNotNull();
 
         // Parse the EKU extension
-        final org.bouncycastle.asn1.ASN1OctetString octetString =
-                org.bouncycastle.asn1.ASN1OctetString.getInstance(ekuBytes);
-        final ExtendedKeyUsage eku = ExtendedKeyUsage.getInstance(
-                org.bouncycastle.asn1.ASN1Sequence.getInstance(octetString.getOctets()));
+        final ASN1OctetString octetString = getInstance(ekuBytes);
+        final ExtendedKeyUsage eku = ExtendedKeyUsage.getInstance(ASN1Sequence.getInstance(octetString.getOctets()));
+
         assertThat(eku.hasKeyPurposeId(KeyPurposeId.id_kp_serverAuth)).isTrue();
     }
 
