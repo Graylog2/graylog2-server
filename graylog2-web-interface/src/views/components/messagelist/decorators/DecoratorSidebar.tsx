@@ -36,7 +36,7 @@ type Props = {
 const DecoratorSidebar = ({ decorators, onChange }: Props) => {
   const { data: decoratorTypes } = useQuery({
     queryKey: ['decorators', 'types'],
-    queryFn: SearchDecorators.getAvailable,
+    queryFn: () => SearchDecorators.getAvailable(),
   });
 
   const formatDecorator = useCallback(
