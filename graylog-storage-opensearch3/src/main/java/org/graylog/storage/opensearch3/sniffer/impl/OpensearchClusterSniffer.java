@@ -22,8 +22,8 @@ import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog.storage.opensearch3.sniffer.DiscoveredNode;
 import org.graylog.storage.opensearch3.sniffer.NodesSniffer;
 import org.graylog2.configuration.ElasticsearchClientConfiguration;
+import org.graylog2.configuration.RunsWithDataNode;
 import org.opensearch.client.opensearch.generic.Requests;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,18 +44,21 @@ public class OpensearchClusterSniffer implements NodesSniffer {
     private final OfficialOpensearchClient client;
     private final String scheme;
     private final ElasticsearchClientConfiguration configuration;
+    private final boolean runsWithDataNode;
 
     @Inject
     public OpensearchClusterSniffer(OfficialOpensearchClient client,
-                                    ElasticsearchClientConfiguration configuration) {
+                                    ElasticsearchClientConfiguration configuration,
+                                    @RunsWithDataNode boolean runsWithDataNode) {
         this.client = client;
         this.configuration = configuration;
         this.scheme = configuration.defaultSchemeForDiscoveredNodes().toLowerCase(Locale.ENGLISH);
+        this.runsWithDataNode = runsWithDataNode;
     }
 
     @Override
     public boolean enabled() {
-        return configuration.discoveryEnabled() || configuration.isNodeActivityLogger();
+        return !runsWithDataNode && (configuration.discoveryEnabled() || configuration.isNodeActivityLogger());
     }
 
     @Override
