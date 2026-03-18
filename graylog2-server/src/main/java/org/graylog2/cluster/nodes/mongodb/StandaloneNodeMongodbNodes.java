@@ -58,14 +58,16 @@ public class StandaloneNodeMongodbNodes implements MongodbNodesService {
         // Get slow query count
         ProfilingResult profilingResults = MongodbNodeUtils.getProfilingResults(mongoConnection);
 
-        // For standalone nodes: role is "STANDALONE", status is 1 (primary equivalent), no replication lag
-        return new MongodbNode("0", host, "STANDALONE", version, profilingResults.profilingLevel(), 0, profilingResults.slowQueryCount(), storageUsedPercent, availableConnections, currentConnections, connectionsPercent);
+        ClusterDescription clusterDescription = mongoConnection.getClusterDescription();
+        ClusterType clusterType = clusterDescription.getType();
+
+        return new MongodbNode("0", host, clusterType.name(), version, profilingResults.profilingLevel(), 0, profilingResults.slowQueryCount(), storageUsedPercent, availableConnections, currentConnections, connectionsPercent);
     }
 
     @Override
     public boolean available() {
         ClusterDescription clusterDescription = mongoConnection.getClusterDescription();
         ClusterType clusterType = clusterDescription.getType();
-        return clusterType == ClusterType.STANDALONE;  // TODO: SHARDED and UNKNOWN?
+        return clusterType != ClusterType.REPLICA_SET;
     }
 }
