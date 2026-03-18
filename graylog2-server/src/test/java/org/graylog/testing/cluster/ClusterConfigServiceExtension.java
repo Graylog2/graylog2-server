@@ -38,6 +38,8 @@ import java.util.UUID;
  * Provides a {@link ClusterConfigService} instance for injection in tests.
  */
 public class ClusterConfigServiceExtension implements ParameterResolver {
+    private static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(ClusterConfigServiceExtension.class);
+
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, @NonNull ExtensionContext context) throws ParameterResolutionException {
         return ClusterConfigService.class.equals(parameterContext.getParameter().getType());
@@ -45,12 +47,16 @@ public class ClusterConfigServiceExtension implements ParameterResolver {
 
     @Override
     public Object resolveParameter(@NonNull ParameterContext parameterContext, @NonNull ExtensionContext context) throws ParameterResolutionException {
-        return new ClusterConfigServiceImpl(
-                new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()),
-                MongoDBExtension.getInstance(context).mongoConnection(),
-                new SimpleNodeId(UUID.randomUUID().toString()),
-                new RestrictedChainingClassLoader(new ChainingClassLoader(ClusterConfigService.class.getClassLoader()), SafeClasses.allGraylogInternal()),
-                new ClusterEventBus()
+        return context.getStore(NAMESPACE).computeIfAbsent(
+                ClusterConfigService.class,
+                key -> new ClusterConfigServiceImpl(
+                        new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()),
+                        MongoDBExtension.getInstance(context).mongoConnection(),
+                        new SimpleNodeId(UUID.randomUUID().toString()),
+                        new RestrictedChainingClassLoader(new ChainingClassLoader(ClusterConfigService.class.getClassLoader()), SafeClasses.allGraylogInternal()),
+                        new ClusterEventBus()
+                ),
+                ClusterConfigService.class
         );
     }
 }
