@@ -118,7 +118,7 @@ const ScrollToHint = ({
 
   return (
     <>
-      <div ref={scrollTargetRef} style={{ position: 'absolute' }} />
+      <div ref={scrollTargetRef} />
       {showHint && (
         <ScrollHint
           onClick={scrollToTarget}

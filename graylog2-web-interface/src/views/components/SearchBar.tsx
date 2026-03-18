@@ -245,12 +245,12 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
               return (
                 <>
                   <ValidateOnParameterChange parameters={parameters} />
+                  <ScrollToHint
+                    scrollContainer={scrollContainer}
+                    ifValueChanges={query.query_string}
+                    title="Scroll to search bar"
+                  />
                   <SearchBarContainer>
-                    <ScrollToHint
-                      scrollContainer={scrollContainer}
-                      ifValueChanges={query.query_string}
-                      title="Scroll to search bar"
-                    />
                     <TimeRangeRow>
                       <TimeRangeFilter
                         limitDuration={limitDuration}
