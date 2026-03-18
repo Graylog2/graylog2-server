@@ -14,26 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { SearchParams, Attribute } from 'stores/PaginationTypes';
+import type { SearchParams } from 'stores/PaginationTypes';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 import { defaultOnError } from 'util/conditional/onError';
+import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
 import { OpAMPEnrollment } from '@graylog/server-api';
 
 import type { EnrollmentTokenMetadata } from '../types';
-
-export type PaginatedEnrollmentTokensResponse = {
-  list: EnrollmentTokenMetadata[];
-  pagination: { total: number };
-  attributes: Attribute[];
-};
 
 export const ENROLLMENT_TOKENS_KEY_PREFIX = ['collectors', 'enrollment-tokens'];
 export const enrollmentTokensKeyFn = (searchParams: SearchParams) => [...ENROLLMENT_TOKENS_KEY_PREFIX, 'paginated', searchParams];
 
 export const fetchPaginatedEnrollmentTokens = async (
   searchParams: SearchParams,
-): Promise<PaginatedEnrollmentTokensResponse> =>
+): Promise<PaginatedResponse<EnrollmentTokenMetadata>> =>
   defaultOnError(
     OpAMPEnrollment.list(
       searchParams.page,

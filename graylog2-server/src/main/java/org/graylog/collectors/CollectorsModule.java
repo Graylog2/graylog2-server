@@ -16,7 +16,6 @@
  */
 package org.graylog.collectors;
 
-import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog.collectors.config.receiver.FilelogReceiverConfig;
@@ -30,7 +29,6 @@ import org.graylog.collectors.db.MacOSUnifiedLoggingSourceConfig;
 import org.graylog.collectors.db.WindowsEventLogSourceConfig;
 import org.graylog.collectors.indexer.CollectorLogsIndexTemplateProvider;
 import org.graylog.collectors.input.CollectorIngestCodec;
-import org.graylog.collectors.input.CollectorIngestGrpcInput;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
 import org.graylog.collectors.input.debug.NoOpOtlpTrafficDump;
 import org.graylog.collectors.input.debug.OtlpTrafficDump;
@@ -41,9 +39,7 @@ import org.graylog.collectors.input.processor.JournaldRecordProcessor;
 import org.graylog.collectors.input.processor.LogRecordProcessor;
 import org.graylog.collectors.input.processor.MacOSUnifiedLoggingRecordProcessor;
 import org.graylog.collectors.input.processor.WindowsEventLogRecordProcessor;
-import org.graylog.collectors.input.transport.CollectorIngestGrpcTransport;
 import org.graylog.collectors.input.transport.CollectorIngestHttpTransport;
-import org.graylog.collectors.input.transport.CollectorIngestLogsService;
 import org.graylog.collectors.migrations.V20260303120000_ConvertCollectorInstanceFleetIdToObjectId;
 import org.graylog.collectors.migrations.V20260316000000_MigrateCollectorsData;
 import org.graylog.collectors.periodical.PurgeExpiredCollectorInstancesPeriodical;
@@ -74,9 +70,11 @@ public class CollectorsModule extends PluginModule {
                 .addBinding().toInstance("fleet_txn_log");
         bind(FleetTransactionLogService.class).asEagerSingleton();
 
-        addMessageInput(CollectorIngestGrpcInput.class);
+        // Currently only HTTP is supported. A gRPC variant was removed to simplify the initial
+        // release. See https://github.com/Graylog2/graylog2-server/pull/24815 for the removed
+        // implementation. The shared codec, journal record factory, and cert infrastructure
+        // are transport-agnostic and can be reused for a gRPC input.
         addMessageInput(CollectorIngestHttpInput.class);
-        addTransport(CollectorIngestGrpcTransport.NAME, CollectorIngestGrpcTransport.class);
         addTransport(CollectorIngestHttpTransport.NAME, CollectorIngestHttpTransport.class);
         addCodec(CollectorIngestCodec.NAME, CollectorIngestCodec.class);
 
@@ -94,8 +92,6 @@ public class CollectorsModule extends PluginModule {
         } else {
             bind(OtlpTrafficDump.class).to(NoOpOtlpTrafficDump.class);
         }
-
-        install(new FactoryModuleBuilder().build(CollectorIngestLogsService.Factory.class));
 
         addSystemRestResource(CollectorsConfigResource.class);
         addSystemRestResource(CollectorInstancesResource.class);

@@ -16,6 +16,7 @@
  */
 package org.graylog.collectors.opamp.rest;
 
+import com.mongodb.client.model.Filters;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -55,6 +56,7 @@ import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
+import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.List;
@@ -70,11 +72,14 @@ public class EnrollmentTokenResource extends RestResource {
     private static final String DEFAULT_SORT_DIRECTION = "desc";
 
     private static final List<EntityAttribute> ATTRIBUTES = List.of(
+            // See CollectorInstancesResource for explanation of the type(OBJECT_ID) + bsonFilterCreator workaround.
             EntityAttribute.builder().id(EnrollmentTokenDTO.FIELD_FLEET_ID).title("Fleet")
                     .relatedCollection(FleetService.COLLECTION_NAME)
                     .relatedIdentifier("_id")
                     .relatedDisplayFields(List.of(FleetDTO.FIELD_NAME))
                     .relatedDisplayTemplate("{name}")
+                    .type(SearchQueryField.Type.OBJECT_ID)
+                    .bsonFilterCreator((name, value) -> Filters.eq(name, value.getValue().toString()))
                     .sortable(false)
                     .searchable(true)
                     .filterable(true)

@@ -87,13 +87,6 @@ export type MacOSUnifiedLoggingSource = SourceBase & {
 
 export type Source = FileSource | JournaldSource | WindowsEventLogSource | MacOSUnifiedLoggingSource;
 
-export type EnrollmentToken = {
-  id: string;
-  fleet_id: string;
-  expires_at: string;
-  token: string;
-};
-
 export type EnrollmentTokenCreator = {
   user_id: string;
   username: string;
@@ -127,11 +120,11 @@ export type IngestEndpointConfig = {
 };
 
 export type CollectorsConfig = {
+  ca_cert_id: string | null;
   signing_cert_id: string | null;
   token_signing_cert_id: string | null;
   otlp_server_cert_id: string | null;
   http: IngestEndpointConfig;
-  grpc: IngestEndpointConfig;
   collector_offline_threshold: string;
   collector_default_visibility_threshold: string;
   collector_expiration_threshold: string;
@@ -139,11 +132,6 @@ export type CollectorsConfig = {
 
 export type CollectorsConfigRequest = {
   http: {
-    enabled: boolean;
-    hostname: string;
-    port: number;
-  };
-  grpc: {
     enabled: boolean;
     hostname: string;
     port: number;

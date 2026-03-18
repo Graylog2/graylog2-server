@@ -55,7 +55,7 @@ class JwksServiceTest {
     void setUp() {
         encryptedValueService = new EncryptedValueService("1234567890abcdef");
         builder = new CertificateBuilder(encryptedValueService, "Graylog", TestClocks.fixedEpoch());
-        jwksService = new JwksService(certificateService);
+        jwksService = new JwksService(certificateService, TestClocks.fixedEpoch());
     }
 
     // getJwks tests

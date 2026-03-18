@@ -21,8 +21,11 @@ import com.mongodb.client.model.Filters;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -110,12 +113,21 @@ public class CollectorInstancesResource extends RestResource {
                     })
                     .sortSpec(AttributeSortSpec.field(FIELD_LAST_SEEN))
                     .build(),
+            // Workaround: type(OBJECT_ID) is needed so the frontend sends identifier_type=OBJECT_ID
+            // to the entity title service (POST /system/catalog/entities/titles), which converts the
+            // string fleet_id to an ObjectId for the _id lookup in the fleets collection.
+            // Without it, the title service receives identifier_type=STRING (the attribute type default),
+            // fails to match the ObjectId _id, and filter pills show "Loading..." indefinitely.
+            // The bsonFilterCreator prevents type(OBJECT_ID) from breaking filter queries on the
+            // fleet_id field itself, which stores string values (not ObjectIds).
             EntityAttribute.builder().id("fleet_id")
                     .title("Fleet")
                     .relatedCollection(FleetService.COLLECTION_NAME)
                     .relatedIdentifier("_id")
                     .relatedDisplayFields(List.of(FleetDTO.FIELD_NAME))
                     .relatedDisplayTemplate("{name}")
+                    .type(SearchQueryField.Type.OBJECT_ID)
+                    .bsonFilterCreator((name, value) -> Filters.eq(name, value.getValue().toString()))
                     .sortable(false)
                     .searchable(true)
                     .filterable(true)
@@ -247,7 +259,7 @@ public class CollectorInstancesResource extends RestResource {
     @Timed
     @Operation(summary = "Reassign collector instances to a different fleet")
     @NoAuditEvent("TODO")
-    public Response reassignInstances(ReassignCollectorsRequest request) {
+    public Response reassignInstances(@Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) ReassignCollectorsRequest request) {
         final String targetFleetId = request.fleetId();
         final Set<String> instanceUids = request.instanceUids();
 

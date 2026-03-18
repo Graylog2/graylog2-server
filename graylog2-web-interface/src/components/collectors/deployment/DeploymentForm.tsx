@@ -57,6 +57,7 @@ const ScriptBlock = styled.pre(
 
 const CodeInline = styled.code(
   ({ theme }) => css`
+    flex: 1;
     padding: 2px 6px;
     background: ${theme.colors.global.contentBackground};
     border: 1px solid ${theme.colors.gray[80]};
@@ -65,11 +66,13 @@ const CodeInline = styled.code(
   `,
 );
 
-const TokenRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-`;
+const TokenRow = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacings.xs};
+  `,
+);
 
 const InfoText = styled.span(
   ({ theme }) => css`
@@ -213,7 +216,7 @@ const DeploymentForm = () => {
                 <ClipboardButton text={tokenResponse.token} title="Copy Token" bsSize="xs" />
               </h4>
               <TokenRow>
-                <CodeInline style={{ flex: 1 }}>{tokenResponse.token.slice(0, 50)}...</CodeInline>
+                <CodeInline>{tokenResponse.token.slice(0, 50)}...</CodeInline>
               </TokenRow>
               <InfoText>
                 Fleet: {fleets?.find((f) => f.id === fleetId)?.name} | Expires:{' '}

@@ -41,7 +41,9 @@ public class V20260316000000_MigrateCollectorsData extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20260316000000_MigrateCollectorsData.class);
     private static final String CLUSTER_CONFIG_COLLECTION = "cluster_config";
     private static final String INSTANCES_COLLECTION = "collector_instances";
+    private static final String INPUTS_COLLECTION = "inputs";
     private static final String CONFIG_TYPE = "org.graylog.collectors.CollectorsConfig";
+    private static final String GRPC_INPUT_TYPE = "org.graylog.collectors.input.CollectorIngestGrpcInput";
 
     private final MongoConnection mongoConnection;
 
@@ -60,6 +62,8 @@ public class V20260316000000_MigrateCollectorsData extends Migration {
         backfillThresholdDefaults();
         convertLastSeenToBsonDate();
         backfillEnrollmentTokenId();
+        deletePersistedGrpcInputs();
+        removeGrpcConfig();
     }
 
     private void backfillThresholdDefaults() {
@@ -130,6 +134,38 @@ public class V20260316000000_MigrateCollectorsData extends Migration {
 
         if (converted > 0) {
             LOG.info("Converted last_seen to BSON Date in {} collector instance document(s).", converted);
+        }
+    }
+
+    private void deletePersistedGrpcInputs() {
+        final MongoCollection<Document> collection =
+                mongoConnection.getMongoDatabase().getCollection(INPUTS_COLLECTION);
+
+        final long deleted = collection.deleteMany(Filters.eq("type", GRPC_INPUT_TYPE)).getDeletedCount();
+        if (deleted > 0) {
+            LOG.info("Deleted {} persisted collector gRPC input(s).", deleted);
+        }
+    }
+
+    private void removeGrpcConfig() {
+        final MongoCollection<Document> collection =
+                mongoConnection.getMongoDatabase().getCollection(CLUSTER_CONFIG_COLLECTION);
+        final Document doc = collection.find(Filters.eq("type", CONFIG_TYPE)).first();
+        if (doc == null) {
+            return;
+        }
+
+        final Document payload = doc.get("payload", Document.class);
+        if (payload == null || !payload.containsKey("grpc")) {
+            return;
+        }
+
+        final long updated = collection.updateOne(
+                Filters.eq("type", CONFIG_TYPE),
+                Updates.unset("payload.grpc")
+        ).getModifiedCount();
+        if (updated > 0) {
+            LOG.info("Removed gRPC settings from collectors config.");
         }
     }
 }

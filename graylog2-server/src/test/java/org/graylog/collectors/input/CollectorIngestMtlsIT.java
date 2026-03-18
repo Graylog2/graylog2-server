@@ -16,12 +16,6 @@
  */
 package org.graylog.collectors.input;
 
-import io.grpc.ManagedChannel;
-import io.grpc.Server;
-import io.grpc.StatusRuntimeException;
-import io.grpc.netty.GrpcSslContexts;
-import io.grpc.netty.NettyChannelBuilder;
-import io.grpc.netty.NettyServerBuilder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -38,8 +32,6 @@ import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslProvider;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
-import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse;
-import io.opentelemetry.proto.collector.logs.v1.LogsServiceGrpc;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import io.opentelemetry.proto.logs.v1.ResourceLogs;
@@ -60,19 +52,14 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.graylog.collectors.CollectorJournal;
-import org.graylog.collectors.input.transport.AgentCertAuthInterceptor;
 import org.graylog.collectors.input.transport.AgentCertChannelHandler;
-import org.graylog.collectors.input.transport.AgentCertTransportFilter;
 import org.graylog.collectors.input.transport.CollectorIngestHttpHandler;
-import org.graylog.collectors.input.transport.CollectorIngestLogsService;
-import org.graylog.inputs.grpc.RemoteAddressProviderInterceptor;
 import org.graylog.security.pki.Algorithm;
 import org.graylog.security.pki.CertificateBuilder;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.PemUtils;
 import org.graylog.testing.TestClocks;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.jupiter.api.AfterEach;
@@ -87,7 +74,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedKeyManager;
@@ -108,18 +94,18 @@ import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 
 /**
- * Integration tests for Ed25519 mTLS end-to-end.
+ * Integration tests for Ed25519 mTLS over the managed HTTP ingest path.
  * <p>
- * These tests verify the main technical risk: Ed25519 mTLS works for both gRPC and HTTP
- * transports. Each test starts a real server with TLS, creates client connections using
- * Ed25519 certificates, and validates that authentication and data flow work correctly.
+ * These tests verify the remaining technical risk after removing the unpublished gRPC path:
+ * Ed25519 mTLS still works end-to-end for the HTTP OTLP transport. Each test starts a real
+ * server with TLS, creates client connections using Ed25519 certificates, and validates
+ * authentication and data flow.
  * <p>
  * BouncyCastle is used to generate Ed25519 certificates (JDK does not provide a
  * certificate builder API). All keys and certs are parsed through {@link PemUtils}
@@ -149,10 +135,7 @@ class CollectorIngestMtlsIT {
 
     @Mock
     private MessageInput input;
-    @Mock
-    private ThrottleableTransport2 transport;
 
-    private Server grpcServer;
     private Channel httpServerChannel;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
@@ -213,10 +196,6 @@ class CollectorIngestMtlsIT {
 
     @AfterEach
     void tearDown() throws Exception {
-        if (grpcServer != null) {
-            grpcServer.shutdownNow();
-            grpcServer.awaitTermination(5, TimeUnit.SECONDS);
-        }
         if (httpServerChannel != null) {
             httpServerChannel.close().sync();
         }
@@ -224,101 +203,10 @@ class CollectorIngestMtlsIT {
         workerGroup.shutdownGracefully().sync();
     }
 
-    // ----- gRPC mTLS Tests -----
-
-    @Test
-    void grpcMtlsSuccessWithAgentCertSignedBySigningCert() throws Exception {
-        final int port = startGrpcServer();
-        final ManagedChannel channel = createGrpcChannel(agentKey, agentCert, port);
-
-        try {
-            final LogsServiceGrpc.LogsServiceBlockingStub stub = LogsServiceGrpc.newBlockingStub(channel);
-            final ExportLogsServiceResponse response = stub.export(createTestRequest());
-
-            assertThat(response).isNotNull();
-        } finally {
-            channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
-        }
-    }
-
-    @Test
-    void grpcMtlsRejectsConnectionWithNoClientCert() throws Exception {
-        final int port = startGrpcServer();
-
-        // Build a client SSL context with no client cert (no keyManager)
-        final SslContext clientSsl = GrpcSslContexts.configure(
-                SslContextBuilder.forClient()
-                        .trustManager(InsecureTrustManagerFactory.INSTANCE),
-                SslProvider.JDK
-        ).build();
-
-        final ManagedChannel channel = NettyChannelBuilder
-                .forAddress("127.0.0.1", port)
-                .sslContext(clientSsl)
-                .build();
-
-        try {
-            final LogsServiceGrpc.LogsServiceBlockingStub stub = LogsServiceGrpc.newBlockingStub(channel);
-            assertThatThrownBy(() -> stub.export(createTestRequest()))
-                    .isInstanceOf(StatusRuntimeException.class)
-                    .satisfies(e -> assertThat(((StatusRuntimeException) e).getStatus().getCode())
-                            .isIn(io.grpc.Status.Code.UNAVAILABLE, io.grpc.Status.Code.UNAUTHENTICATED));
-        } finally {
-            channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
-        }
-    }
-
-    @Test
-    void grpcMtlsSetsCollectorInstanceUidInJournalRecord() throws Exception {
-        final int port = startGrpcServer();
-        final ManagedChannel channel = createGrpcChannel(agentKey, agentCert, port);
-
-        try {
-            final LogsServiceGrpc.LogsServiceBlockingStub stub = LogsServiceGrpc.newBlockingStub(channel);
-            stub.export(createTestRequest());
-
-            final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
-            verify(input).processRawMessage(captor.capture());
-
-            final CollectorJournal.Record record = CollectorJournal.Record.parseFrom(captor.getValue().getPayload());
-
-            assertThat(record.getCollectorInstanceUid()).isEqualTo(AGENT_INSTANCE_UID);
-        } finally {
-            channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
-        }
-    }
-
-    @Test
-    void grpcTransportFilterFiresAfterTlsHandshake() throws Exception {
-        // This test verifies that ServerTransportFilter.transportReady() fires after TLS handshake
-        // and that the agent instance UID is available via the gRPC interceptor chain.
-        // If the filter did NOT fire, the interceptor would reject with UNAUTHENTICATED.
-        final int port = startGrpcServer();
-        final ManagedChannel channel = createGrpcChannel(agentKey, agentCert, port);
-
-        try {
-            final LogsServiceGrpc.LogsServiceBlockingStub stub = LogsServiceGrpc.newBlockingStub(channel);
-            final ExportLogsServiceResponse response = stub.export(createTestRequest());
-
-            // If we got a successful response, the transport filter fired and
-            // the interceptor found the UID - the whole chain worked.
-            assertThat(response).isNotNull();
-
-            // Double check: the journal record should have the UID set,
-            // proving the entire chain from transport filter -> interceptor -> service worked
-            final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
-            verify(input).processRawMessage(captor.capture());
-            final CollectorJournal.Record record = CollectorJournal.Record.parseFrom(captor.getValue().getPayload());
-            assertThat(record.getCollectorInstanceUid()).isEqualTo(AGENT_INSTANCE_UID);
-        } finally {
-            channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
-        }
-    }
-
     // ----- HTTP mTLS Tests -----
 
     @Test
-    void httpMtlsSuccessWithAgentCertSignedBySigningCert() throws Exception {
+    void httpMtlsSuccessWithAgentCertSignedByOpAmpCa() throws Exception {
         final int port = startHttpServer();
         final HttpClient client = createHttpClient(agentKey, agentCert);
 
@@ -413,48 +301,6 @@ class CollectorIngestMtlsIT {
     }
 
     // ----- Helper methods -----
-
-    private int startGrpcServer() throws Exception {
-        // InsecureTrustManagerFactory accepts any client cert. ClientAuth.REQUIRE
-        // still enforces that a cert MUST be presented. The cert is then available
-        // in the SSL session for CN extraction by AgentCertTransportFilter.
-        final SslContext sslContext = GrpcSslContexts.configure(
-                SslContextBuilder.forServer(serverKey, serverCert)
-                        .clientAuth(ClientAuth.REQUIRE)
-                        .trustManager(InsecureTrustManagerFactory.INSTANCE),
-                SslProvider.JDK
-        ).build();
-
-        final CollectorIngestLogsService logsService = new CollectorIngestLogsService(
-                transport, input);
-
-        grpcServer = NettyServerBuilder
-                .forAddress(new InetSocketAddress("127.0.0.1", 0))
-                .sslContext(sslContext)
-                .addTransportFilter(new AgentCertTransportFilter())
-                .intercept(new AgentCertAuthInterceptor())
-                .intercept(new RemoteAddressProviderInterceptor())
-                .addService(logsService)
-                .build()
-                .start();
-
-        return grpcServer.getPort();
-    }
-
-    private ManagedChannel createGrpcChannel(PrivateKey clientKey, X509Certificate clientCert,
-                                             int port) throws SSLException {
-        final SslContext clientSsl = GrpcSslContexts.configure(
-                SslContextBuilder.forClient()
-                        .keyManager(clientKey, clientCert)
-                        .trustManager(InsecureTrustManagerFactory.INSTANCE),
-                SslProvider.JDK
-        ).build();
-
-        return NettyChannelBuilder
-                .forAddress("127.0.0.1", port)
-                .sslContext(clientSsl)
-                .build();
-    }
 
     private int startHttpServer() throws Exception {
         // InsecureTrustManagerFactory accepts any client cert. ClientAuth.REQUIRE

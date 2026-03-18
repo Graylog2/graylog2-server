@@ -31,7 +31,9 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.PKIXParameters;
 import java.security.cert.TrustAnchor;
 import java.security.cert.X509Certificate;
+import java.time.Clock;
 import java.time.Duration;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -46,11 +48,13 @@ class CertificateBuilderTest {
 
     private CertificateBuilder builder;
     private EncryptedValueService encryptedValueService;
+    private Clock clock;
 
     @BeforeEach
     void setUp() {
         encryptedValueService = new EncryptedValueService("1234567890abcdef");
-        builder = new CertificateBuilder(encryptedValueService, "Graylog", TestClocks.fixedEpoch());
+        clock = TestClocks.fixedEpoch();
+        builder = new CertificateBuilder(encryptedValueService, "Graylog", clock);
     }
 
     // Key pair generation tests
@@ -436,6 +440,7 @@ class CertificateBuilderTest {
         final var certPath = cf.generateCertPath(List.of(endEntityCert));
         final var params = new PKIXParameters(Set.of(new TrustAnchor(intermediateCert, null)));
         params.setRevocationEnabled(false);
+        params.setDate(Date.from(clock.instant()));
 
         assertThatCode(() -> validator.validate(certPath, params)).doesNotThrowAnyException();
     }
@@ -456,6 +461,7 @@ class CertificateBuilderTest {
         final var certPath = cf.generateCertPath(List.of(endEntityCert, intermediateCert));
         final var params = new PKIXParameters(Set.of(new TrustAnchor(rootCert, null)));
         params.setRevocationEnabled(false);
+        params.setDate(Date.from(clock.instant()));
 
         assertThatCode(() -> validator.validate(certPath, params)).doesNotThrowAnyException();
     }
@@ -498,6 +504,7 @@ class CertificateBuilderTest {
         final var certPath = cf.generateCertPath(List.of(endEntityCert));
         final var params = new PKIXParameters(Set.of(new TrustAnchor(intermediateCert, null)));
         params.setRevocationEnabled(false);
+        params.setDate(Date.from(clock.instant()));
 
         assertThatCode(() -> validator.validate(certPath, params)).doesNotThrowAnyException();
     }
