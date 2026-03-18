@@ -57,6 +57,7 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
     @Nullable
     public abstract String queryString();
 
+    // Nullable for backward compat with old JSON that lacks the scope field
     @JsonProperty(FIELD_SCOPE)
     @Nullable
     public abstract String scope();
