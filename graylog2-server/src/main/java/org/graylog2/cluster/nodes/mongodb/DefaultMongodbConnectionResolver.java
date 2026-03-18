@@ -16,14 +16,21 @@
  */
 package org.graylog2.cluster.nodes.mongodb;
 
+import com.google.common.base.Splitter;
+import com.google.common.net.HostAndPort;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
+import org.apache.http.client.utils.URIBuilder;
 import org.graylog2.configuration.MongoDbConfiguration;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Locale;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 
 public class DefaultMongodbConnectionResolver implements MongodbConnectionResolver {
 
@@ -36,23 +43,44 @@ public class DefaultMongodbConnectionResolver implements MongodbConnectionResolv
 
     @Override
     public MongoClient resolve(String nodeName) {
+        return new MongoClient(new MongoClientURI(buildConnectionString(nodeName)));
+    }
+
+    private String buildConnectionString(String nodeName) {
         // Extract credentials from the original connection URI
         final String username = mongoClientURI.getUsername();
         final char[] password = mongoClientURI.getPassword();
         final String database = mongoClientURI.getDatabase();
 
-        // Build connection string with credentials if they exist
-        final String connectionString;
-        if (username != null && password != null) {
-            // URL encode username and password to handle special characters
-            final String encodedUsername = URLEncoder.encode(username, StandardCharsets.UTF_8);
-            final String encodedPassword = URLEncoder.encode(new String(password), StandardCharsets.UTF_8);
-            connectionString = String.format(Locale.ROOT, "mongodb://%s:%s@%s/%s?directConnection=true",
-                    encodedUsername, encodedPassword, nodeName, database);
-        } else {
-            connectionString = String.format(Locale.ROOT, "mongodb://%s/?directConnection=true", nodeName);
-        }
+        // Parse host and port from the nodeName (supports both IPv4 and IPv6)
+        final HostAndPort hostAndPort = HostAndPort.fromString(nodeName);
 
-        return new MongoClient(new MongoClientURI(connectionString));
+        try {
+            URIBuilder builder = new URIBuilder();
+            builder.setScheme("mongodb");
+            builder.setHost(hostAndPort.getHost());
+            builder.setPort(hostAndPort.getPort());
+            if (username != null && password != null) {
+                builder.setUserInfo(String.format("%s:%s", username, new String(password)));
+            }
+            builder.setPath(database);
+            final Map<String, String> configParams = new LinkedHashMap<>(configParamsFromQuery());
+            configParams.put("directConnection", "true");
+            configParams.forEach(builder::addParameter);
+
+            return builder.build().toString();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Nonnull
+    private Map<String, String> configParamsFromQuery() {
+        final URI uri = URI.create(mongoClientURI.getURI());
+        return Optional.ofNullable(uri.getQuery())
+                .map(query -> Splitter.on('&')
+                        .withKeyValueSeparator('=')
+                        .split(query))
+                .orElseGet(Collections::emptyMap);
     }
 }

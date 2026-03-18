@@ -140,6 +140,23 @@ class DefaultMongodbConnectionResolverTest {
                 .satisfies(assertCredentials("graylog", "user", ""));
     }
 
+    @Test
+    void testResolvePreservesQueryParameters() throws Exception {
+        // Original connection string has query parameters
+        MongoDbConfiguration config = createConfiguration("mongodb://user:pass@localhost:27017/graylog?ssl=true&authSource=admin&maxPoolSize=50");
+        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config);
+
+        MongoClient client = resolver.resolve("host1:27017");
+        assertThat(client).isNotNull();
+
+        // Verify the MongoClientOptions reflect the query parameters from the original connection string
+        assertThat(client.getMongoClientOptions().isSslEnabled()).isTrue();
+        assertThat(client.getMongoClientOptions().getConnectionsPerHost()).isEqualTo(50); // maxPoolSize
+
+        // Verify credentials use the authSource from query params
+        assertThat(client.getCredential().getSource()).isEqualTo("admin");
+    }
+
     private MongoDbConfiguration createConfiguration(String uri) throws RepositoryException, ValidationException {
         MongoDbConfiguration config = new MongoDbConfiguration();
         new JadConfig(new InMemoryRepository(singletonMap("mongodb_uri", uri)), config).process();
