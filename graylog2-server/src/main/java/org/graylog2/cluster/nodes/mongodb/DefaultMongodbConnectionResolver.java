@@ -32,6 +32,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 public class DefaultMongodbConnectionResolver implements MongodbConnectionResolver {
 
     private final MongoClientURI mongoClientURI;
@@ -61,7 +63,7 @@ public class DefaultMongodbConnectionResolver implements MongodbConnectionResolv
             builder.setHost(hostAndPort.getHost());
             builder.setPort(hostAndPort.getPort());
             if (username != null && password != null) {
-                builder.setUserInfo(String.format("%s:%s", username, new String(password)));
+                builder.setUserInfo(f("%s:%s", username, new String(password)));
             }
             builder.setPath(database);
             final Map<String, String> configParams = new LinkedHashMap<>(configParamsFromQuery());
