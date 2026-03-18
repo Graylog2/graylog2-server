@@ -37,7 +37,7 @@ public class ClusterIdService {
     /**
      * Returns the cluster ID string value.
      *
-     * @return the clusterID string
+     * @return the cluster ID string
      * @throws IllegalStateException when the cluster ID doesn't exist in the database or the string value is blank
      */
     @NonNull
@@ -48,7 +48,7 @@ public class ClusterIdService {
     /**
      * Returns the cluster ID object.
      *
-     * @return the clusterID object
+     * @return the cluster ID object
      * @throws IllegalStateException when the cluster ID doesn't exist in the database or the string value is blank
      */
     @NonNull

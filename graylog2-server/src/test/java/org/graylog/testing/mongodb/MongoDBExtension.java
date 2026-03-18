@@ -24,6 +24,7 @@ import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionConfigurationException;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.InvocationInterceptor;
 import org.junit.jupiter.api.extension.ParameterContext;
@@ -115,10 +116,14 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
      *
      * @param context the extension context
      * @return the MongoDB instance
+     * @throws IllegalStateException when the extension is not initialized
      */
     public static MongoDBTestService getInstance(ExtensionContext context) {
-        return requireNonNull((MongoDBTestService) context.getStore(NAMESPACE).get(MongoDBTestService.class),
-                "MongoDBTestService hasn't been initialized yet");
+        final var service = (MongoDBTestService) context.getStore(NAMESPACE).get(MongoDBTestService.class);
+        if (service == null) {
+            throw new ExtensionConfigurationException("MongoDBExtension hasn't been initialized. Make sure to add the MongoDBExtension to your test class!");
+        }
+        return service;
     }
 
     @Override

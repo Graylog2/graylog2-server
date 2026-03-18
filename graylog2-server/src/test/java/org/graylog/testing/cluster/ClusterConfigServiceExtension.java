@@ -19,7 +19,6 @@ package org.graylog.testing.cluster;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
-import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.SimpleNodeId;
@@ -48,18 +47,10 @@ public class ClusterConfigServiceExtension implements ParameterResolver {
     public Object resolveParameter(@NonNull ParameterContext parameterContext, @NonNull ExtensionContext context) throws ParameterResolutionException {
         return new ClusterConfigServiceImpl(
                 new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()),
-                mongoConnection(context),
+                MongoDBExtension.getInstance(context).mongoConnection(),
                 new SimpleNodeId(UUID.randomUUID().toString()),
                 new RestrictedChainingClassLoader(new ChainingClassLoader(ClusterConfigService.class.getClassLoader()), SafeClasses.allGraylogInternal()),
                 new ClusterEventBus()
         );
-    }
-
-    private MongoConnection mongoConnection(ExtensionContext context) {
-        try {
-            return MongoDBExtension.getInstance(context).mongoConnection();
-        } catch (NullPointerException e) {
-            throw new IllegalStateException("MongoDBExtension hasn't been initialized. Make sure to add the MongoDBExtension to your test class!", e);
-        }
     }
 }
