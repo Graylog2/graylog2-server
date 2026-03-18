@@ -33,11 +33,11 @@ const Container = styled.div(
   `,
 );
 
-const PaddingContainer = styled.div(
-  ({ theme }) => css`
-    padding: 0 ${theme.spacings.sm};
-  `,
-);
+const sidePaddings = ({ theme }) => css`
+  padding: 0 ${theme.spacings.sm};
+`;
+
+const PaddingContainer = styled.div(sidePaddings);
 
 const SearchInput = styled(Input)`
   margin-bottom: 6px;
@@ -58,11 +58,7 @@ const Hint = styled.div(
   `,
 );
 
-const StyledPaginatedList = styled(PaginatedList)(
-  ({ theme }) => css`
-    padding: 0 ${theme.spacings.sm};
-  `,
-);
+const StyledPaginatedList = styled(PaginatedList)(sidePaddings);
 
 type SearchParams = {
   query: string;
