@@ -26,6 +26,7 @@ import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.NumberRange;
 import org.graylog2.indexer.results.ChunkedResult;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.results.ResultChunk;
@@ -43,11 +44,13 @@ import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.SortOptions;
 import org.opensearch.client.opensearch._types.SortOrder;
 import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.AggregationRange;
 import org.opensearch.client.opensearch._types.aggregations.DateHistogramAggregate;
 import org.opensearch.client.opensearch._types.aggregations.DateHistogramBucket;
 import org.opensearch.client.opensearch._types.aggregations.FieldDateMath;
 import org.opensearch.client.opensearch._types.aggregations.LongTermsAggregate;
 import org.opensearch.client.opensearch._types.aggregations.MultiBucketBase;
+import org.opensearch.client.opensearch._types.aggregations.RangeAggregation;
 import org.opensearch.client.opensearch._types.mapping.FieldType;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
@@ -368,6 +371,56 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
         } else if (termsAgg.isDterms()) {
             termsAgg.dterms().buckets().array().forEach(b -> result.put(b.keyAsString(), b.docCount()));
         }
+        return result;
+    }
+
+    @Override
+    public Map<String, Long> aggregateRangeSlices(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                                  Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                                  Map<String, Set<String>> extraFilters, String slicingColumn, List<NumberRange> ranges) {
+        final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
+
+        final RangeAggregation.Builder rangeBuilder = new RangeAggregation.Builder().field(slicingColumn);
+        ranges.forEach(r -> {
+            final AggregationRange.Builder range = new AggregationRange.Builder();
+            if (r.from() != null) {
+                range.from(JsonData.of(r.from()));
+            }
+            if (r.to() != null) {
+                range.to(JsonData.of(r.to()));
+            }
+            rangeBuilder.ranges(range.build());
+        });
+        rangeBuilder.keyed(false);
+
+        final org.opensearch.client.opensearch.core.SearchRequest searchRequest = org.opensearch.client.opensearch.core.SearchRequest.of(builder -> {
+            builder.query(filter);
+            builder.size(0);
+            builder.ignoreUnavailable(true);
+            builder.allowNoIndices(true);
+            builder.expandWildcards(ExpandWildcard.Open);
+
+            if (!affectedIndices.isEmpty()) {
+                builder.index(new ArrayList<>(affectedIndices));
+            }
+
+            builder.aggregations(SLICES_AGGREGATION_NAME, Aggregation.builder()
+                    .range(rangeBuilder.build())
+                    .build());
+
+            return builder;
+        });
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Query:\n{}", searchRequest.query().toJsonString());
+            LOG.debug("Execute range aggregation: {}", searchRequest.toJsonString());
+        }
+
+        final SearchResponse<Map> searchResult = opensearchClient.sync(c -> c.search(searchRequest, Map.class), "Unable to perform range slice aggregation query");
+        final var rangeAgg = searchResult.aggregations().get(SLICES_AGGREGATION_NAME).range();
+
+        final Map<String, Long> result = new java.util.LinkedHashMap<>();
+        rangeAgg.buckets().array().forEach(b -> result.put(b.key(), b.docCount()));
         return result;
     }
 

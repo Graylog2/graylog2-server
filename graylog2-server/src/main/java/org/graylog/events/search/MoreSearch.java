@@ -23,6 +23,7 @@ import org.graylog.plugins.views.search.IndexRangeContainsOneOfStreams;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.NumberRange;
 import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
@@ -218,6 +219,30 @@ public class MoreSearch {
         // TODO: add extra filters if necessary
         return moreSearchAdapter.aggregateSlices(queryString, timeRange, affectedIndices, eventStreams,
                 filterString, forbiddenSourceStreams, Map.of(), slicingColumn, maxBuckets);
+    }
+
+    /**
+     * Executes a range aggregation on the given {@code slicingColumn} and returns the bucket counts.
+     * This is the indexer-native equivalent of using ScriptingApiService for range-based slice aggregations.
+     *
+     * @param queryString           the search query string
+     * @param timeRange             the time range for the search
+     * @param eventStreams          event streams to search in
+     * @param filterString          additional filter string
+     * @param forbiddenSourceStreams source streams the caller must not access
+     * @param slicingColumn         the field to aggregate on
+     * @param ranges                the numeric ranges to bucket by
+     * @return a map of range key to document count, in bucket order
+     */
+    public Map<String, Long> aggregateRangeSlices(String queryString, TimeRange timeRange, Set<String> eventStreams,
+                                                  String filterString, Set<String> forbiddenSourceStreams,
+                                                  String slicingColumn, List<NumberRange> ranges) {
+        final Set<String> affectedIndices = getAffectedIndices(eventStreams, timeRange);
+        if (affectedIndices == null || affectedIndices.isEmpty()) {
+            return Map.of();
+        }
+        return moreSearchAdapter.aggregateRangeSlices(queryString, timeRange, affectedIndices, eventStreams,
+                filterString, forbiddenSourceStreams, Map.of(), slicingColumn, ranges);
     }
 
     /**

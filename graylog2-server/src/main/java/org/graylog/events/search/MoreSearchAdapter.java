@@ -18,6 +18,7 @@ package org.graylog.events.search;
 
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.NumberRange;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.Sorting;
@@ -55,6 +56,10 @@ public interface MoreSearchAdapter {
     Map<String, Long> aggregateSlices(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                       Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
                                       Map<String, Set<String>> extraFilters, String slicingColumn, int maxBuckets);
+
+    Map<String, Long> aggregateRangeSlices(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                           Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                           Map<String, Set<String>> extraFilters, String slicingColumn, List<NumberRange> ranges);
 
     default ChunkCommand buildScrollCommand(String queryString, TimeRange timeRange, Set<String> affectedIndices, List<UsedSearchFilter> filters, Set<String> streams, int batchSize) {
         ChunkCommand.Builder commandBuilder = ChunkCommand.builder()

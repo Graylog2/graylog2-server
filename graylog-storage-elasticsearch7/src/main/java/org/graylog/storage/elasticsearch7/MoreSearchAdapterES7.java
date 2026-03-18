@@ -26,6 +26,7 @@ import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.NumberRange;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
@@ -39,6 +40,8 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.b
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.ExtendedBounds;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.range.ParsedRange;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.range.RangeAggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.ParsedTerms;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.FieldSortBuilder;
@@ -301,6 +304,50 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
         final ParsedTerms termsResult = searchResult.getAggregations().get(slicesAggregationName);
 
         return termsResult.getBuckets().stream()
+                .collect(Collectors.toMap(
+                        MultiBucketsAggregation.Bucket::getKeyAsString,
+                        MultiBucketsAggregation.Bucket::getDocCount
+                ));
+    }
+
+    @Override
+    public Map<String, Long> aggregateRangeSlices(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                                  Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                                  Map<String, Set<String>> extraFilters, String slicingColumn, List<NumberRange> ranges) {
+        final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
+
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
+                .query(filter)
+                .size(0);
+
+        final RangeAggregationBuilder rangeAgg = AggregationBuilders.range(slicesAggregationName).field(slicingColumn);
+        ranges.forEach(r -> {
+            final Double from = r.from();
+            final Double to = r.to();
+            if (from != null && to != null) {
+                rangeAgg.addRange(from, to);
+            } else if (to != null) {
+                rangeAgg.addUnboundedTo(to);
+            } else if (from != null) {
+                rangeAgg.addUnboundedFrom(from);
+            }
+        });
+        searchSourceBuilder.aggregation(rangeAgg);
+
+        final Set<String> indices = affectedIndices.isEmpty() ? Collections.singleton("") : affectedIndices;
+        final SearchRequest searchRequest = new SearchRequest(indices.toArray(new String[0]))
+                .source(searchSourceBuilder)
+                .indicesOptions(INDICES_OPTIONS);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Query:\n{}", searchSourceBuilder.toString(new ToXContent.MapParams(Collections.singletonMap("pretty", "true"))));
+            LOG.debug("Execute range aggregation: {}", searchRequest);
+        }
+
+        final SearchResponse searchResult = client.search(searchRequest, "Unable to perform range slice aggregation query");
+        final ParsedRange rangeResult = searchResult.getAggregations().get(slicesAggregationName);
+
+        return rangeResult.getBuckets().stream()
                 .collect(Collectors.toMap(
                         MultiBucketsAggregation.Bucket::getKeyAsString,
                         MultiBucketsAggregation.Bucket::getDocCount
