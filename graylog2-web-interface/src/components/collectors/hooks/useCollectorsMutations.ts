@@ -150,7 +150,7 @@ const useCollectorsMutations = () => {
     },
   });
 
-  // Enrollment token mutation
+  // Enrollment token mutations
   const createEnrollmentTokenMutation = useMutation({
     mutationFn: (input: { fleetId: string; expiresIn: string | null }) =>
       OpAMPEnrollment.createToken({
@@ -162,6 +162,22 @@ const useCollectorsMutations = () => {
         `Creating enrollment token failed: ${errorThrown}`,
         'Could not create token',
       );
+    },
+    onSuccess: () => invalidateCollectorsQueries(),
+  });
+
+  const deleteEnrollmentTokenMutation = useMutation({
+    mutationFn: (tokenId: string) => OpAMPEnrollment.remove(tokenId),
+    onError: (errorThrown) => {
+      UserNotification.error(
+        `Deleting enrollment token failed: ${errorThrown}`,
+        'Could not delete token',
+      );
+    },
+    onSuccess: () => {
+      UserNotification.success('Enrollment token has been deleted.', 'Success!');
+
+      return invalidateCollectorsQueries();
     },
   });
 
@@ -245,6 +261,8 @@ const useCollectorsMutations = () => {
     // Enrollment token operations
     createEnrollmentToken: createEnrollmentTokenMutation.mutateAsync,
     isCreatingEnrollmentToken: createEnrollmentTokenMutation.isPending,
+    deleteEnrollmentToken: deleteEnrollmentTokenMutation.mutateAsync,
+    isDeletingEnrollmentToken: deleteEnrollmentTokenMutation.isPending,
 
     // Instance operations
     reassignInstances: reassignInstancesMutation.mutateAsync,

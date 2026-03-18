@@ -29,6 +29,8 @@ import opamp.proto.Opamp.ServerErrorResponse;
 import opamp.proto.Opamp.ServerErrorResponseType;
 import opamp.proto.Opamp.ServerToAgent;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.graylog.collectors.db.EnrollmentTokenCreator;
+import org.graylog.collectors.db.EnrollmentTokenDTO;
 import org.graylog.collectors.opamp.OpAmpConstants;
 import org.graylog.collectors.opamp.OpAmpService;
 import org.junit.jupiter.api.AfterEach;
@@ -38,6 +40,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 
@@ -51,6 +54,9 @@ class OpAmpHttpHandlerIT {
 
     private static final MediaType PROTOBUF = MediaType.parse("application/x-protobuf");
     private static final int TEST_MAX_MESSAGE_SIZE = 1024; // 1 KB for tests
+    private static final EnrollmentTokenDTO TEST_TOKEN_DTO = new EnrollmentTokenDTO(
+            "token-id", "jti-1", "kid-1", "test-fleet",
+            new EnrollmentTokenCreator("user-id", "admin"), Instant.now(), null, 0, null);
 
     private HttpServer httpServer;
     private OpAmpService opAmpService;
@@ -89,7 +95,7 @@ class OpAmpHttpHandlerIT {
 
     @Test
     void rejectsGetRequest() throws Exception {
-        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet", OpAmpAuthContext.Transport.HTTP)));
+        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment(TEST_TOKEN_DTO, OpAmpAuthContext.Transport.HTTP)));
 
         final Request request = new Request.Builder()
                 .url(opampUrl())
@@ -133,7 +139,7 @@ class OpAmpHttpHandlerIT {
 
     @Test
     void rejectsEmptyBody() throws Exception {
-        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet", OpAmpAuthContext.Transport.HTTP)));
+        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment(TEST_TOKEN_DTO, OpAmpAuthContext.Transport.HTTP)));
 
         final Request request = new Request.Builder()
                 .url(opampUrl())
@@ -149,7 +155,7 @@ class OpAmpHttpHandlerIT {
 
     @Test
     void rejectsInvalidProtobuf() throws Exception {
-        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet", OpAmpAuthContext.Transport.HTTP)));
+        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment(TEST_TOKEN_DTO, OpAmpAuthContext.Transport.HTTP)));
 
         final Request request = new Request.Builder()
                 .url(opampUrl())
@@ -165,7 +171,7 @@ class OpAmpHttpHandlerIT {
 
     @Test
     void processesValidMessage() throws Exception {
-        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet", OpAmpAuthContext.Transport.HTTP)));
+        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment(TEST_TOKEN_DTO, OpAmpAuthContext.Transport.HTTP)));
 
         final AgentToServer agentMsg = AgentToServer.newBuilder()
                 .setInstanceUid(ByteString.copyFromUtf8("test-instance-uid"))
@@ -198,7 +204,7 @@ class OpAmpHttpHandlerIT {
      */
     @Test
     void processesRequestWithChunkedTransferEncoding() throws Exception {
-        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet", OpAmpAuthContext.Transport.HTTP)));
+        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment(TEST_TOKEN_DTO, OpAmpAuthContext.Transport.HTTP)));
 
         // Streaming body forces chunked transfer encoding (no Content-Length header)
         final RequestBody chunkedBody = new RequestBody() {
@@ -226,7 +232,7 @@ class OpAmpHttpHandlerIT {
 
     @Test
     void returnsServerErrorResponseOnServiceException() throws Exception {
-        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet", OpAmpAuthContext.Transport.HTTP)));
+        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment(TEST_TOKEN_DTO, OpAmpAuthContext.Transport.HTTP)));
 
         final AgentToServer agentMsg = AgentToServer.newBuilder()
                 .setInstanceUid(ByteString.copyFromUtf8("test-instance-uid"))
@@ -256,7 +262,7 @@ class OpAmpHttpHandlerIT {
 
     @Test
     void rejectsOversizedBody() throws Exception {
-        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment("test-fleet", OpAmpAuthContext.Transport.HTTP)));
+        when(opAmpService.authenticate(eq("Bearer valid"), any())).thenReturn(Optional.of(new OpAmpAuthContext.Enrollment(TEST_TOKEN_DTO, OpAmpAuthContext.Transport.HTTP)));
 
         // Create a body larger than TEST_MAX_MESSAGE_SIZE (1 KB)
         final byte[] oversizedBody = new byte[TEST_MAX_MESSAGE_SIZE + 100];

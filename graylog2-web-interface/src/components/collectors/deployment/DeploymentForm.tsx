@@ -101,7 +101,7 @@ const ResultSection = styled.div(
 
 type TokenResponse = {
   token: string;
-  expiresAt: string;
+  expiresAt: string | null;
 };
 
 const DeploymentForm = () => {
@@ -213,7 +213,7 @@ const DeploymentForm = () => {
               </TokenRow>
               <InfoText>
                 Fleet: {fleets?.find((f) => f.id === fleetId)?.name} | Expires:{' '}
-                {new Date(tokenResponse.expiresAt).toLocaleString()}
+                {tokenResponse.expiresAt ? new Date(tokenResponse.expiresAt).toLocaleString() : 'Never'}
               </InfoText>
             </ResultSection>
 
@@ -227,6 +227,7 @@ const DeploymentForm = () => {
           </SectionGrid>
         </ResultsContainer>
       )}
+
     </div>
   );
 };

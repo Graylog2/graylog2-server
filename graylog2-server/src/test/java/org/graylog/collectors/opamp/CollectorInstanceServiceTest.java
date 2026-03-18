@@ -214,7 +214,8 @@ class CollectorInstanceServiceTest {
                 fingerprint,
                 "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----",
                 "507f1f77bcf86cd799439011", // Valid 24-char hex ObjectId
-                Instant.now()
+                Instant.now(),
+                "000000000000000000000000"
         );
     }
 
@@ -227,7 +228,8 @@ class CollectorInstanceServiceTest {
                 fingerprint,
                 "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----",
                 "507f1f77bcf86cd799439011",
-                lastSeen
+                lastSeen,
+                "000000000000000000000000"
         );
     }
 }

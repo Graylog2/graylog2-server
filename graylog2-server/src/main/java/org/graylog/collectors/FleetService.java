@@ -23,6 +23,7 @@ import org.bson.Document;
 import org.graylog.collectors.db.FleetConfig;
 import org.graylog.collectors.db.FleetDTO;
 import org.graylog.collectors.db.MarkerType;
+import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
@@ -58,17 +59,19 @@ public class FleetService {
     private final SearchQueryParser searchQueryParser;
     private final FleetTransactionLogService txnLogService;
     private final SourceService sourceService;
+    private final EnrollmentTokenService enrollmentTokenService;
     private final com.mongodb.client.MongoCollection<Document> nonEntityCollection;
 
     @Inject
     public FleetService(MongoCollections mongoCollections, FleetTransactionLogService txnLogService,
-                        SourceService sourceService) {
+                        SourceService sourceService, EnrollmentTokenService enrollmentTokenService) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, FleetDTO.class);
         this.nonEntityCollection = mongoCollections.nonEntityCollection(COLLECTION_NAME, Document.class);
         this.paginationHelper = mongoCollections.paginationHelper(collection);
         this.searchQueryParser = new SearchQueryParser(FleetDTO.FIELD_NAME, SEARCH_FIELD_MAPPING);
         this.txnLogService = txnLogService;
         this.sourceService = sourceService;
+        this.enrollmentTokenService = enrollmentTokenService;
     }
 
     public SearchQuery parseSearchQuery(String query) {
@@ -128,6 +131,7 @@ public class FleetService {
     }
 
     public boolean delete(String fleetId) {
+        enrollmentTokenService.deleteAllByFleet(fleetId);
         sourceService.deleteAllByFleet(fleetId, false);
         final boolean deleted = collection.deleteOne(idEq(fleetId)).getDeletedCount() > 0;
         if (deleted) {

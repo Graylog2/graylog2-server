@@ -23,6 +23,7 @@ import org.graylog.collectors.db.FleetDTO;
 import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.db.SourceConfig;
 import org.graylog.collectors.db.TransactionMarker;
+import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.database.MongoCollections;
@@ -41,6 +42,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
@@ -61,7 +63,7 @@ class FleetServiceTest {
         );
         txnLogService = new FleetTransactionLogService(mongoCollections, sequenceService, NODE_ID);
         sourceService = new SourceService(mongoCollections, txnLogService);
-        fleetService = new FleetService(mongoCollections, txnLogService, sourceService);
+        fleetService = new FleetService(mongoCollections, txnLogService, sourceService, mock(EnrollmentTokenService.class));
     }
 
     private SourceConfig validFileConfig() {
