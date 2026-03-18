@@ -21,8 +21,11 @@ import com.mongodb.client.model.Filters;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -247,7 +250,7 @@ public class CollectorInstancesResource extends RestResource {
     @Timed
     @Operation(summary = "Reassign collector instances to a different fleet")
     @NoAuditEvent("TODO")
-    public Response reassignInstances(ReassignCollectorsRequest request) {
+    public Response reassignInstances(@Valid @NotNull @RequestBody(required = true, useParameterTypeSchema = true) ReassignCollectorsRequest request) {
         final String targetFleetId = request.fleetId();
         final Set<String> instanceUids = request.instanceUids();
 
