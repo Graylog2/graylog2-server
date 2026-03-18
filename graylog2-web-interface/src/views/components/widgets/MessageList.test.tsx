@@ -39,6 +39,7 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import useMessageListPluggableBulkActions from 'views/components/widgets/useMessageListPluggableBulkActions';
+import useSelectedMessageEntities from 'views/hooks/useSelectedMessageEntities';
 
 import type { MessageListResult } from './MessageList';
 import MessageList from './MessageList';
@@ -409,5 +410,40 @@ describe('MessageList', () => {
 
     await waitFor(() => expect(screen.queryByText(/1 item selected/i)).not.toBeInTheDocument());
     expect(await screen.findByRole('checkbox', { name: /select message/i })).not.toBeChecked();
+  });
+
+  it('preserves selected message data across pages for bulk actions', async () => {
+    const dispatch = jest.fn().mockResolvedValue(
+      finishedLoading({
+        result: new SearchResult(dummySearchJobResults),
+      }),
+    );
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
+
+    const BulkActions = () => {
+      const { selectedEntities } = useSelectedMessageEntities();
+
+      return <span>{selectedEntities.map(({ index }) => index).join(',')}</span>;
+    };
+
+    asMock(useMessageListPluggableBulkActions).mockReturnValue({
+      pluggableBulkActions: <BulkActions />,
+      pluggableBulkActionModals: null,
+    });
+
+    render(<SimpleMessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + 1 }} />);
+
+    const rowCheckbox = await screen.findByRole('checkbox', { name: /select message/i });
+    await userEvent.click(rowCheckbox);
+
+    await screen.findByText('1 item selected');
+    await openBulkActionsMenu();
+    await screen.findByText('graylog_42');
+
+    await clickNextPageButton();
+
+    await waitFor(() => expect(reexecuteSearchTypes).toHaveBeenCalled());
+    await openBulkActionsMenu();
+    await screen.findByText('graylog_42');
   });
 });
