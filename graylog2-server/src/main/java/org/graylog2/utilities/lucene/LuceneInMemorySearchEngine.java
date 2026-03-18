@@ -85,12 +85,11 @@ public class LuceneInMemorySearchEngine<U extends InMemorySearchableEntity> impl
                 IndexSearcher searcher = new IndexSearcher(reader);
                 final Sort sort = createSort(sortField, order);
 
-                final int start = page * perPage;
+                final int start = (page - 1) * perPage;
                 final int end = start + perPage;
-                final int offset = (page - 1) * perPage;
 
                 TopDocs results = searcher.search(luceneQuery, end, sort); // fetch enough docs
-                final List<U> searchResults = extractSearchResults(results, searcher, offset, perPage, entries);
+                final List<U> searchResults = extractSearchResults(results, searcher, start, perPage, entries);
 
                 final int totalCount = Math.toIntExact(results.totalHits.value);
                 return new PaginatedList<>(searchResults, totalCount, page, perPage);
