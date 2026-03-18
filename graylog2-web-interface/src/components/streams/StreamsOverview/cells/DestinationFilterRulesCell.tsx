@@ -51,7 +51,8 @@ const DestinationFilterRulesCell = ({ stream }: Props) => {
       iconName={destinationFilterRulesSectionIsOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
       onClick={toggleDestinationFilterRulesSection}
       ref={buttonRef}
-      title={destinationFilterRulesSectionTitle} />
+      title={destinationFilterRulesSectionTitle}
+    />
   );
 };
 
