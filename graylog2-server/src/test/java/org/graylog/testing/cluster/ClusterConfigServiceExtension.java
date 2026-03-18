@@ -19,6 +19,7 @@ package org.graylog.testing.cluster;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
+import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.SimpleNodeId;
@@ -32,7 +33,6 @@ import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -46,16 +46,18 @@ public class ClusterConfigServiceExtension implements ParameterResolver {
 
     @Override
     public Object resolveParameter(@NonNull ParameterContext parameterContext, @NonNull ExtensionContext context) throws ParameterResolutionException {
-        try {
-            final var mongodb = MongoDBExtension.getInstance(context);
+        return new ClusterConfigServiceImpl(
+                new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()),
+                mongoConnection(context),
+                new SimpleNodeId(UUID.randomUUID().toString()),
+                new RestrictedChainingClassLoader(new ChainingClassLoader(ClusterConfigService.class.getClassLoader()), SafeClasses.allGraylogInternal()),
+                new ClusterEventBus()
+        );
+    }
 
-            return new ClusterConfigServiceImpl(
-                    new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()),
-                    mongodb.mongoConnection(),
-                    new SimpleNodeId(UUID.randomUUID().toString()),
-                    new RestrictedChainingClassLoader(new ChainingClassLoader(ClusterConfigService.class.getClassLoader()), new SafeClasses(Set.of())),
-                    new ClusterEventBus()
-            );
+    private MongoConnection mongoConnection(ExtensionContext context) {
+        try {
+            return MongoDBExtension.getInstance(context).mongoConnection();
         } catch (NullPointerException e) {
             throw new IllegalStateException("MongoDBExtension hasn't been initialized. Make sure to add the MongoDBExtension to your test class!", e);
         }

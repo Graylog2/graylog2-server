@@ -49,7 +49,7 @@ public class ClusterIdService {
      * Returns the cluster ID object.
      *
      * @return the clusterID object
-     * @throws IllegalStateException when the cluster ID doesn't exist in the database
+     * @throws IllegalStateException when the cluster ID doesn't exist in the database or the string value is blank
      */
     @NonNull
     public ClusterId get() {
