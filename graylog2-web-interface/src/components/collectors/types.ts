@@ -127,6 +127,7 @@ export type IngestEndpointConfig = {
 };
 
 export type CollectorsConfig = {
+  ca_cert_id: string | null;
   signing_cert_id: string | null;
   token_signing_cert_id: string | null;
   otlp_server_cert_id: string | null;
