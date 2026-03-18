@@ -15,22 +15,30 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useQuery } from '@tanstack/react-query';
+import groupBy from 'lodash/groupBy';
 
-import { ClusterJobs } from '@graylog/server-api';
+import { SystemCatalog } from '@graylog/server-api';
 
+import EntityIndex from 'logic/content-packs/EntityIndex';
 import { defaultOnError } from 'util/conditional/onError';
 
-export const SYSTEM_JOBS_QUERY_KEY = ['system', 'jobs'];
-
-const useSystemJobs = () => {
-  const { data: jobs } = useQuery({
-    queryKey: SYSTEM_JOBS_QUERY_KEY,
+const useEntityIndex = () => {
+  const { data: entityIndex, isLoading } = useQuery({
+    queryKey: ['catalog', 'entity-index'],
     queryFn: () =>
-      defaultOnError(ClusterJobs.list(), 'Loading system jobs failed with status', 'Could not load system jobs'),
-    refetchInterval: 2000,
+      defaultOnError(
+        SystemCatalog.showEntityIndex(),
+        'Loading entity index failed with status',
+        'Could not load entity index',
+      ),
+    select: (result) =>
+      groupBy(
+        result.entities.map((e) => EntityIndex.fromJSON(e)),
+        'type.name',
+      ),
   });
 
-  return jobs;
+  return { entityIndex, isLoading };
 };
 
-export default useSystemJobs;
+export default useEntityIndex;
