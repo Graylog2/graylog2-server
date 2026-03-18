@@ -52,6 +52,10 @@ public interface MoreSearchAdapter {
     void scrollEvents(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams,
                       List<UsedSearchFilter> filters, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException;
 
+    Map<String, Long> aggregateSlices(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                      Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                      Map<String, Set<String>> extraFilters, String slicingColumn, int maxBuckets);
+
     default ChunkCommand buildScrollCommand(String queryString, TimeRange timeRange, Set<String> affectedIndices, List<UsedSearchFilter> filters, Set<String> streams, int batchSize) {
         ChunkCommand.Builder commandBuilder = ChunkCommand.builder()
                 .query(queryString)

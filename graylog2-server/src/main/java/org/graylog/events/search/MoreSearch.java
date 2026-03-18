@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -193,6 +194,31 @@ public class MoreSearch {
         return queryDecorators.decorate(queryString, ParameterProvider.of(queryParameters));
     }
 
+
+    /**
+     * Executes a terms aggregation on the given {@code slicingColumn} and returns the bucket counts.
+     * This is the indexer-native equivalent of using ScriptingApiService for slice aggregations.
+     *
+     * @param queryString           the search query string
+     * @param timeRange             the time range for the search
+     * @param eventStreams          event streams to search in
+     * @param filterString          additional filter string
+     * @param forbiddenSourceStreams source streams the caller must not access
+     * @param slicingColumn         the field to aggregate on
+     * @param maxBuckets            maximum number of buckets to return
+     * @return a map of field value to document count, in bucket order
+     */
+    public Map<String, Long> aggregateSlices(String queryString, TimeRange timeRange, Set<String> eventStreams,
+                                             String filterString, Set<String> forbiddenSourceStreams,
+                                             String slicingColumn, int maxBuckets) {
+        final Set<String> affectedIndices = getAffectedIndices(eventStreams, timeRange);
+        if (affectedIndices == null || affectedIndices.isEmpty()) {
+            return Map.of();
+        }
+        // TODO: add extra filters if necessary
+        return moreSearchAdapter.aggregateSlices(queryString, timeRange, affectedIndices, eventStreams,
+                filterString, forbiddenSourceStreams, Map.of(), slicingColumn, maxBuckets);
+    }
 
     /**
      * Helper to perform basic Lucene escaping of query string values

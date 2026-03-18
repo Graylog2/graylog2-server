@@ -83,6 +83,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     public static final IndicesOptions INDICES_OPTIONS = IndicesOptions.LENIENT_EXPAND_OPEN;
     private static final String termsAggregationName = "alert_type";
     private static final String histogramAggregationName = "histogram";
+    private static final String slicesAggregationName = "slices";
 
     private final OpenSearchClient client;
     private final Boolean allowLeadingWildcard;
@@ -267,6 +268,42 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
                     return sortBuilder.order(order);
                 })
                 .toList();
+    }
+
+    @Override
+    public Map<String, Long> aggregateSlices(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                             Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                             Map<String, Set<String>> extraFilters, String slicingColumn, int maxBuckets) {
+        final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
+
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
+                .query(filter)
+                .size(0);
+
+        searchSourceBuilder.aggregation(
+                AggregationBuilders.terms(slicesAggregationName)
+                        .field(slicingColumn)
+                        .size(maxBuckets)
+        );
+
+        final Set<String> indices = affectedIndices.isEmpty() ? Collections.singleton("") : affectedIndices;
+        final SearchRequest searchRequest = new SearchRequest(indices.toArray(new String[0]))
+                .source(searchSourceBuilder)
+                .indicesOptions(INDICES_OPTIONS);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Query:\n{}", searchSourceBuilder.toString(new ToXContent.MapParams(Collections.singletonMap("pretty", "true"))));
+            LOG.debug("Execute aggregation: {}", searchRequest);
+        }
+
+        final SearchResponse searchResult = client.search(searchRequest, "Unable to perform slice aggregation query");
+        final ParsedTerms termsResult = searchResult.getAggregations().get(slicesAggregationName);
+
+        return termsResult.getBuckets().stream()
+                .collect(Collectors.toMap(
+                        MultiBucketsAggregation.Bucket::getKeyAsString,
+                        MultiBucketsAggregation.Bucket::getDocCount
+                ));
     }
 
     @Override

@@ -78,6 +78,7 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(MoreSearchAdapterOS.class);
     private static final String TERMS_AGGREGATION_NAME = "alert_type";
     private static final String HISTOGRAM_AGGREGATION_NAME = "histogram";
+    private static final String SLICES_AGGREGATION_NAME = "slices";
 
     private final OfficialOpensearchClient opensearchClient;
     private final Boolean allowLeadingWildcard;
@@ -223,17 +224,17 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
 
             final Aggregation histogramAggregation = Aggregation.builder().dateHistogram(dh -> {
 
-                dh.interval(t -> t.time(interval.getQuantity().toString() + interval.getUnit()));
+                        dh.interval(t -> t.time(interval.getQuantity().toString() + interval.getUnit()));
 
-                dh.field(EventDto.FIELD_EVENT_TIMESTAMP)
-                        .timeZone(timeZone.getId())
-                        .minDocCount(0)
-                        .extendedBounds(bounds -> bounds
-                                .min(FieldDateMath.builder().expr(Tools.buildElasticSearchTimeFormat(timerange.from())).build())
-                                .max(FieldDateMath.builder().expr(Tools.buildElasticSearchTimeFormat(timerange.to())).build()));
+                        dh.field(EventDto.FIELD_EVENT_TIMESTAMP)
+                                .timeZone(timeZone.getId())
+                                .minDocCount(0)
+                                .extendedBounds(bounds -> bounds
+                                        .min(FieldDateMath.builder().expr(Tools.buildElasticSearchTimeFormat(timerange.from())).build())
+                                        .max(FieldDateMath.builder().expr(Tools.buildElasticSearchTimeFormat(timerange.to())).build()));
 
-                return dh;
-            })
+                        return dh;
+                    })
                     .aggregations(TERMS_AGGREGATION_NAME, Aggregation.builder().terms(terms -> terms.minDocCount(0).field(EventDto.FIELD_ALERT)).build())
                     .build();
 
@@ -325,6 +326,49 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
                 .filter(s -> s.name().equalsIgnoreCase(sorting.getUppercasedDirection()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No sorting option named " + sorting.getUppercasedDirection()));
+    }
+
+    @Override
+    public Map<String, Long> aggregateSlices(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                             Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                             Map<String, Set<String>> extraFilters, String slicingColumn, int maxBuckets) {
+        final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
+
+        final org.opensearch.client.opensearch.core.SearchRequest searchRequest = org.opensearch.client.opensearch.core.SearchRequest.of(builder -> {
+            builder.query(filter);
+            builder.size(0);
+            builder.ignoreUnavailable(true);
+            builder.allowNoIndices(true);
+            builder.expandWildcards(ExpandWildcard.Open);
+
+            if (!affectedIndices.isEmpty()) {
+                builder.index(new ArrayList<>(affectedIndices));
+            }
+
+            builder.aggregations(SLICES_AGGREGATION_NAME, Aggregation.builder()
+                    .terms(terms -> terms.field(slicingColumn).size(maxBuckets))
+                    .build());
+
+            return builder;
+        });
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Query:\n{}", searchRequest.query().toJsonString());
+            LOG.debug("Execute aggregation: {}", searchRequest.toJsonString());
+        }
+
+        final SearchResponse<Map> searchResult = opensearchClient.sync(c -> c.search(searchRequest, Map.class), "Unable to perform slice aggregation query");
+        final var termsAgg = searchResult.aggregations().get(SLICES_AGGREGATION_NAME);
+
+        final Map<String, Long> result = new java.util.LinkedHashMap<>();
+        if (termsAgg.isSterms()) {
+            termsAgg.sterms().buckets().array().forEach(b -> result.put(b.key(), b.docCount()));
+        } else if (termsAgg.isLterms()) {
+            termsAgg.lterms().buckets().array().forEach(b -> result.put(b.keyAsString(), b.docCount()));
+        } else if (termsAgg.isDterms()) {
+            termsAgg.dterms().buckets().array().forEach(b -> result.put(b.keyAsString(), b.docCount()));
+        }
+        return result;
     }
 
     @Override
