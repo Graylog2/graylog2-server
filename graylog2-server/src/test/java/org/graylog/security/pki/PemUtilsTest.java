@@ -61,7 +61,7 @@ class PemUtilsTest {
 
     @Test
     void toPemPrivateKeyProducesValidPem() throws Exception {
-        final KeyPair keyPair = builder.generateKeyPair(Algorithm.ED25519);
+        final KeyPair keyPair = KeyUtils.generateKeyPair(Algorithm.ED25519);
 
         final String pem = PemUtils.toPem(keyPair.getPrivate());
 
@@ -93,7 +93,7 @@ class PemUtilsTest {
 
     @Test
     void parsePrivateKeyRoundTrips() throws Exception {
-        final KeyPair keyPair = builder.generateKeyPair(Algorithm.ED25519);
+        final KeyPair keyPair = KeyUtils.generateKeyPair(Algorithm.ED25519);
 
         final String pem = PemUtils.toPem(keyPair.getPrivate());
         final PrivateKey parsedKey = PemUtils.parsePrivateKey(pem);
@@ -113,7 +113,7 @@ class PemUtilsTest {
 
     @Test
     void parsePrivateKeyWorksWithRsa() throws Exception {
-        final KeyPair keyPair = builder.generateKeyPair(Algorithm.RSA_4096);
+        final KeyPair keyPair = KeyUtils.generateKeyPair(Algorithm.RSA_4096);
 
         final String pem = PemUtils.toPem(keyPair.getPrivate());
         final PrivateKey parsedKey = PemUtils.parsePrivateKey(pem);

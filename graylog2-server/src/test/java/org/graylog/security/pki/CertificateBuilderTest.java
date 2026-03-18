@@ -24,7 +24,6 @@ import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.security.KeyPair;
 import java.security.cert.CertPathValidator;
 import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertificateFactory;
@@ -55,34 +54,6 @@ class CertificateBuilderTest {
         encryptedValueService = new EncryptedValueService("1234567890abcdef");
         clock = TestClocks.fixedEpoch();
         builder = new CertificateBuilder(encryptedValueService, "Graylog", clock);
-    }
-
-    // Key pair generation tests
-
-    @Test
-    void generateKeyPairEd25519() throws Exception {
-        final KeyPair keyPair = builder.generateKeyPair(Algorithm.ED25519);
-
-        assertThat(keyPair).isNotNull();
-        assertThat(keyPair.getPublic().getAlgorithm()).isEqualTo("Ed25519");
-        assertThat(keyPair.getPrivate().getAlgorithm()).isEqualTo("Ed25519");
-    }
-
-    @Test
-    void generateKeyPairRsa4096() throws Exception {
-        final KeyPair keyPair = builder.generateKeyPair(Algorithm.RSA_4096);
-
-        assertThat(keyPair).isNotNull();
-        assertThat(keyPair.getPublic().getAlgorithm()).isEqualTo("RSA");
-        assertThat(keyPair.getPrivate().getAlgorithm()).isEqualTo("RSA");
-    }
-
-    @Test
-    void generateKeyPairProducesUniqueKeys() throws Exception {
-        final KeyPair keyPair1 = builder.generateKeyPair(Algorithm.ED25519);
-        final KeyPair keyPair2 = builder.generateKeyPair(Algorithm.ED25519);
-
-        assertThat(keyPair1.getPublic().getEncoded()).isNotEqualTo(keyPair2.getPublic().getEncoded());
     }
 
     // Root CA creation tests

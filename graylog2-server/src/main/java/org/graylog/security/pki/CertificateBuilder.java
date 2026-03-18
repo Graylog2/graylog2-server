@@ -47,12 +47,8 @@ import java.io.StringWriter;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.Security;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -98,23 +94,6 @@ public class CertificateBuilder {
     }
 
     /**
-     * Generates a cryptographic key pair using the specified algorithm.
-     * Uses the BouncyCastle provider for key generation.
-     *
-     * @param algorithm the algorithm to use for key generation
-     * @return a newly generated key pair
-     * @throws NoSuchAlgorithmException if the algorithm is not available
-     * @throws NoSuchProviderException  if the BouncyCastle provider is not available
-     */
-    public KeyPair generateKeyPair(Algorithm algorithm) throws NoSuchAlgorithmException, NoSuchProviderException {
-        final KeyPairGenerator keyGen = KeyPairGenerator.getInstance(algorithm.keyAlgorithm(), "BC");
-        if (algorithm == Algorithm.RSA_4096) {
-            keyGen.initialize(algorithm.keySize(), new SecureRandom());
-        }
-        return keyGen.generateKeyPair();
-    }
-
-    /**
      * Creates a self-signed root CA certificate.
      * The certificate includes:
      * <ul>
@@ -131,7 +110,7 @@ public class CertificateBuilder {
      * @throws Exception if certificate creation fails
      */
     public CertificateEntry createRootCa(String commonName, Algorithm algorithm, Duration validity) throws Exception {
-        final KeyPair keyPair = generateKeyPair(algorithm);
+        final KeyPair keyPair = KeyUtils.generateKeyPair(algorithm);
 
         final X500Name subject = new X500NameBuilder(BCStyle.INSTANCE)
                 .addRDN(BCStyle.CN, commonName)
@@ -197,7 +176,7 @@ public class CertificateBuilder {
         final Algorithm algorithm = PemUtils.detectAlgorithm(issuerCert);
 
         // Generate key pair for the new intermediate CA
-        final KeyPair keyPair = generateKeyPair(algorithm);
+        final KeyPair keyPair = KeyUtils.generateKeyPair(algorithm);
 
         // Build the subject DN
         final X500Name subject = new X500NameBuilder(BCStyle.INSTANCE)
@@ -334,7 +313,7 @@ public class CertificateBuilder {
         final Algorithm algorithm = PemUtils.detectAlgorithm(issuerCert);
 
         // Generate key pair for the new end-entity certificate
-        final KeyPair keyPair = generateKeyPair(algorithm);
+        final KeyPair keyPair = KeyUtils.generateKeyPair(algorithm);
 
         // Build the subject DN
         final X500Name subject = new X500NameBuilder(BCStyle.INSTANCE)
