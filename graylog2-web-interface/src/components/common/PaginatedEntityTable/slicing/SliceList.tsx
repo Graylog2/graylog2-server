@@ -18,8 +18,8 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { Badge, ListGroup, ListGroupItem } from 'components/bootstrap';
-import { formatReadableNumber } from 'util/NumberFormatting';
+import { /* Badge, */ ListGroup, ListGroupItem } from 'components/bootstrap';
+// import { formatReadableNumber } from 'util/NumberFormatting';
 
 import type { SliceRenderers, Slices } from './Slicing';
 
@@ -36,6 +36,7 @@ const Title = styled.div`
   word-break: break-word;
 `;
 
+/*
 const CountBadge = styled(Badge)`
   overflow: visible;
 
@@ -43,6 +44,7 @@ const CountBadge = styled(Badge)`
     overflow: visible;
   }
 `;
+*/
 
 type Props = {
   slices: Slices;
