@@ -109,7 +109,14 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
         getInstance(context).dropDatabase();
     }
 
-    private MongoDBTestService getInstance(ExtensionContext context) {
+    /**
+     * Gets an initialized {@link MongoDBTestService} from the context store. Should only be used from other
+     * JUnit extensions.
+     *
+     * @param context the extension context
+     * @return the MongoDB instance
+     */
+    public static MongoDBTestService getInstance(ExtensionContext context) {
         return requireNonNull((MongoDBTestService) context.getStore(NAMESPACE).get(MongoDBTestService.class),
                 "MongoDBTestService hasn't been initialized yet");
     }
