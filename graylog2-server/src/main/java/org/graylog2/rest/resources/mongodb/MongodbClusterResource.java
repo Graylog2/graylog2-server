@@ -193,6 +193,7 @@ public class MongodbClusterResource extends RestResource {
     @GET
     @Path("/profiling/status")
     @Operation(summary = "Aggregates profiling status for all mongodb nodes")
+    @RequiresPermissions(RestPermissions.MONGODB_NODES_READ)
     @Timed
     public Response profilingStatus() {
         try {
