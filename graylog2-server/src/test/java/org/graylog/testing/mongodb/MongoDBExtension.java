@@ -116,7 +116,7 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
      *
      * @param context the extension context
      * @return the MongoDB instance
-     * @throws IllegalStateException when the extension is not initialized
+     * @throws ExtensionConfigurationException when the extension is not initialized
      */
     public static MongoDBTestService getInstance(ExtensionContext context) {
         final var service = (MongoDBTestService) context.getStore(NAMESPACE).get(MongoDBTestService.class);
