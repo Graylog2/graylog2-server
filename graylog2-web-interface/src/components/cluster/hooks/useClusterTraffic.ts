@@ -14,23 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import { ClusterJobs } from '@graylog/server-api';
+import { SystemClusterTraffic } from '@graylog/server-api';
 
+import type { Traffic } from 'components/cluster/types';
 import { defaultOnError } from 'util/conditional/onError';
 
-export const SYSTEM_JOBS_QUERY_KEY = ['system', 'jobs'];
-
-const useSystemJobs = () => {
-  const { data: jobs } = useQuery({
-    queryKey: SYSTEM_JOBS_QUERY_KEY,
+const useClusterTraffic = (days: number) => {
+  const { data: traffic, isLoading } = useQuery<Traffic>({
+    queryKey: ['cluster', 'traffic', days],
     queryFn: () =>
-      defaultOnError(ClusterJobs.list(), 'Loading system jobs failed with status', 'Could not load system jobs'),
-    refetchInterval: 2000,
+      defaultOnError(
+        SystemClusterTraffic.get(days, false),
+        'Loading cluster traffic failed with status',
+        'Could not load cluster traffic',
+      ),
+    enabled: !!days,
+    placeholderData: keepPreviousData,
   });
 
-  return jobs;
+  return { traffic, isLoading };
 };
 
-export default useSystemJobs;
+export default useClusterTraffic;
