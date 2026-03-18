@@ -91,7 +91,7 @@ type Props = {
   config: MessagesWidgetConfig;
   fields: Immutable.List<FieldTypeMapping>;
   messages: Array<BackendMessage>;
-  onSortChange: (newSortConfig: SortConfig[]) => Promise<void>;
+  onSortChange?: (newSortConfig: SortConfig[]) => Promise<void>;
   scrollContainerRef: React.MutableRefObject<HTMLDivElement>;
   setLoadingState: (loading: boolean) => void;
 };
@@ -127,14 +127,7 @@ const _toggleMessageDetail = (
   setExpandedMessages(newSet);
 };
 
-const MessageTable = ({
-  fields,
-  messages,
-  config,
-  onSortChange,
-  setLoadingState,
-  scrollContainerRef,
-}: Props) => {
+const MessageTable = ({ fields, messages, config, onSortChange, setLoadingState, scrollContainerRef }: Props) => {
   const { stopAutoRefresh } = useAutoRefresh();
   const [expandedMessages, setExpandedMessages] = useState(Immutable.Set<string>());
   const formattedMessages = useMemo(() => _getFormattedMessages(messages), [messages]);
