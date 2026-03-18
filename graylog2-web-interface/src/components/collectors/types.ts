@@ -87,13 +87,6 @@ export type MacOSUnifiedLoggingSource = SourceBase & {
 
 export type Source = FileSource | JournaldSource | WindowsEventLogSource | MacOSUnifiedLoggingSource;
 
-export type EnrollmentToken = {
-  id: string;
-  fleet_id: string;
-  expires_at: string;
-  token: string;
-};
-
 export type EnrollmentTokenCreator = {
   user_id: string;
   username: string;
