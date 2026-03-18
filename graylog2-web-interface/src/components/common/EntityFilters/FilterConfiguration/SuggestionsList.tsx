@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 import { Input, ListGroupItem } from 'components/bootstrap';
 import type { Attribute } from 'stores/PaginationTypes';
 import type { Filters } from 'components/common/EntityFilters/types';
-import { NoSearchResult } from 'components/common';
+import NoSearchResult from 'components/common/NoSearchResult';
 import useIsKeyHeld from 'hooks/useIsKeyHeld';
 import Spinner from 'components/common/Spinner';
 import PaginatedList from 'components/common/PaginatedList';
@@ -33,11 +33,11 @@ const Container = styled.div(
   `,
 );
 
-const sidePaddings = ({ theme }) => css`
-  padding: 0 ${theme.spacings.sm};
-`;
-
-const PaddingContainer = styled.div(sidePaddings);
+const PaddingContainer = styled.div(
+  ({ theme }) => css`
+    padding: 0 ${theme.spacings.sm};
+  `,
+);
 
 const SearchInput = styled(Input)`
   margin-bottom: 6px;
@@ -58,7 +58,11 @@ const Hint = styled.div(
   `,
 );
 
-const StyledPaginatedList = styled(PaginatedList)(sidePaddings);
+const StyledPaginatedList = styled(PaginatedList)(
+  ({ theme }) => css`
+    padding: 0 ${theme.spacings.sm};
+  `,
+);
 
 type SearchParams = {
   query: string;
