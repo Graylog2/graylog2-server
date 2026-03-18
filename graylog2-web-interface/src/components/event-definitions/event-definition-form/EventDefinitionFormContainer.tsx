@@ -24,7 +24,7 @@ import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnu
 import { ConfirmLeaveDialog, Spinner } from 'components/common';
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { qualifyUrl, getPathnameWithoutId } from 'util/URLUtils';
 import { defaultOnError } from 'util/conditional/onError';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
@@ -35,7 +35,6 @@ import type {
 } from 'components/event-definitions/event-definitions-types';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useEventDefinitionConfigFromLocalStorage from 'components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
