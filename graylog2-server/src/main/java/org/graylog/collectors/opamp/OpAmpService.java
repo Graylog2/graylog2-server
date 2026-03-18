@@ -70,8 +70,7 @@ import org.graylog.collectors.opamp.transport.OpAmpAuthContext;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
 import org.graylog.security.pki.PemUtils;
-import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.cluster.ClusterId;
+import org.graylog2.plugin.cluster.ClusterIdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,7 +109,7 @@ public class OpAmpService {
     private final CertificateService certificateService;
     private final CollectorInstanceService collectorInstanceService;
     private final CollectorsConfigService collectorsConfigService;
-    private final ClusterConfigService clusterConfigService;
+    private final ClusterIdService clusterIdService;
     private final FleetTransactionLogService txnLogService;
     private final SourceService sourceService;
     private final ObjectMapper yamlObjectMapper;
@@ -122,7 +121,7 @@ public class OpAmpService {
                         CertificateService certificateService,
                         CollectorInstanceService collectorInstanceService,
                         CollectorsConfigService collectorsConfigService,
-                        ClusterConfigService clusterConfigService,
+                        ClusterIdService clusterIdService,
                         FleetTransactionLogService txnLogService,
                         SourceService sourceService) {
         this.enrollmentTokenService = enrollmentTokenService;
@@ -131,7 +130,7 @@ public class OpAmpService {
         this.certificateService = certificateService;
         this.collectorInstanceService = collectorInstanceService;
         this.collectorsConfigService = collectorsConfigService;
-        this.clusterConfigService = clusterConfigService;
+        this.clusterIdService = clusterIdService;
         this.txnLogService = txnLogService;
         this.sourceService = sourceService;
         this.yamlObjectMapper = new ObjectMapper(new YAMLFactory()
@@ -561,10 +560,9 @@ public class OpAmpService {
             throw new IllegalStateException("No collector input configured, cannot send remote config.");
         }
 
-        final var clusterId = requireNonNull(clusterConfigService.get(ClusterId.class), "Cluster ID config cannot be null.");
         // We use the long-lived CA cert so intermediate cert rotation is not an issue for Collector mTLS connections.
         final var caCert = opAmpCaService.getCaCert().certificate();
-        final var tlsSettings = TLSConfigurationSettings.withCACert(clusterId.clusterId(), caCert);
+        final var tlsSettings = TLSConfigurationSettings.withCACert(clusterIdService.getString(), caCert);
         final var builder = ExporterConfigs.builder();
 
         if (grpcEndpoint != null && grpcEndpoint.enabled()) {

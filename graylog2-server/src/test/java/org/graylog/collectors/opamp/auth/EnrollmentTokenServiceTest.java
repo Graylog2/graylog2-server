@@ -36,8 +36,7 @@ import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
-import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.cluster.ClusterId;
+import org.graylog2.plugin.cluster.ClusterIdService;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.web.customization.CustomizationConfig;
@@ -69,10 +68,10 @@ class EnrollmentTokenServiceTest {
     private static final String TEST_CLUSTER_ID = "test-cluster-id-12345";
     private static final EnrollmentTokenCreator TEST_CREATOR = new EnrollmentTokenCreator("test-user-id", "testuser");
 
-    private ClusterConfigService clusterConfigService;
     private EnrollmentTokenService enrollmentTokenService;
     private CollectorsConfigService collectorsConfigService;
-    private MutableClock mutableClock = TestClocks.mutableFixedEpoch();
+    private final MutableClock mutableClock = TestClocks.mutableFixedEpoch();
+    private ClusterIdService clusterIdService;
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
@@ -90,12 +89,11 @@ class EnrollmentTokenServiceTest {
                 mongodb.mongoConnection()
         );
         final CertificateService certificateService = new CertificateService(mongoCollections, encryptedValueService, CustomizationConfig.empty(), mutableClock);
-        clusterConfigService = mock(ClusterConfigService.class);
-        when(clusterConfigService.get(ClusterId.class))
-                .thenReturn(ClusterId.create(TEST_CLUSTER_ID));
+        clusterIdService = mock(ClusterIdService.class);
+        when(clusterIdService.getString()).thenReturn(TEST_CLUSTER_ID);
         collectorsConfigService = mock(CollectorsConfigService.class);
-        final OpAmpCaService opAmpCaService = new OpAmpCaService(certificateService, clusterConfigService, collectorsConfigService);
-        enrollmentTokenService = new EnrollmentTokenService(certificateService, clusterConfigService, opAmpCaService, mutableClock, mongoCollections);
+        final OpAmpCaService opAmpCaService = new OpAmpCaService(certificateService, clusterIdService, collectorsConfigService);
+        enrollmentTokenService = new EnrollmentTokenService(certificateService, clusterIdService, opAmpCaService, mutableClock, mongoCollections);
     }
 
     @Test
@@ -282,8 +280,7 @@ class EnrollmentTokenServiceTest {
         final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_CREATOR);
 
         // Switch cluster ID so validation audience check fails
-        when(clusterConfigService.get(ClusterId.class))
-                .thenReturn(ClusterId.create("different-cluster-id"));
+        when(clusterIdService.getString()).thenReturn("different-cluster-id");
 
         final Optional<EnrollmentTokenDTO> result = enrollmentTokenService.validateToken(response.token());
 

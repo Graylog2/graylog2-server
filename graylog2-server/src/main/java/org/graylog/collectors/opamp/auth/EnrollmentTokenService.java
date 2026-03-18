@@ -41,8 +41,7 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbSortResolver;
 import org.graylog2.database.pagination.MongoPaginationHelper;
-import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.cluster.ClusterId;
+import org.graylog2.plugin.cluster.ClusterIdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +53,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
@@ -73,7 +71,7 @@ public class EnrollmentTokenService {
     public static final String COLLECTION_NAME = "collector_enrollment_tokens";
 
     private final CertificateService certificateService;
-    private final ClusterConfigService clusterConfigService;
+    private final ClusterIdService clusterIdService;
     private final OpAmpCaService opAmpCaService;
     private final Clock clock;
     private final org.graylog2.database.MongoCollection<EnrollmentTokenDTO> tokenCollection;
@@ -81,12 +79,12 @@ public class EnrollmentTokenService {
 
     @Inject
     public EnrollmentTokenService(CertificateService certificateService,
-                                  ClusterConfigService clusterConfigService,
+                                  ClusterIdService clusterIdService,
                                   OpAmpCaService opAmpCaService,
                                   Clock clock,
                                   MongoCollections mongoCollections) {
         this.certificateService = certificateService;
-        this.clusterConfigService = clusterConfigService;
+        this.clusterIdService = clusterIdService;
         this.opAmpCaService = opAmpCaService;
         this.clock = clock;
         this.tokenCollection = mongoCollections.collection(COLLECTION_NAME, EnrollmentTokenDTO.class);
@@ -96,14 +94,6 @@ public class EnrollmentTokenService {
                 new IndexModel(Indexes.ascending(EnrollmentTokenDTO.FIELD_FLEET_ID)),
                 new IndexModel(Indexes.ascending(EnrollmentTokenDTO.FIELD_EXPIRES_AT))
         ));
-    }
-
-    private String getClusterId() {
-        final var clusterId = clusterConfigService.get(ClusterId.class);
-        if (clusterId == null || isNullOrEmpty(clusterId.clusterId())) {
-            throw new IllegalStateException("Missing or empty Cluster ID. This should not happen.");
-        }
-        return clusterId.clusterId();
     }
 
     /**
@@ -187,7 +177,7 @@ public class EnrollmentTokenService {
      */
     public Optional<EnrollmentTokenDTO> validateToken(String token) {
         try {
-            final String expectedAudience = getClusterId() + AUDIENCE_SUFFIX;
+            final String expectedAudience = clusterIdService.getString() + AUDIENCE_SUFFIX;
 
             final Jws<Claims> jws = Jwts.parser()
                     .clock(() -> Date.from(clock.instant()))
@@ -267,7 +257,7 @@ public class EnrollmentTokenService {
                     .decrypt(signingCert.privateKey());
             final PrivateKey privateKey = PemUtils.parsePrivateKey(privateKeyPem);
 
-            final String clusterId = getClusterId();
+            final String clusterId = clusterIdService.getString();
             final String audience = clusterId + AUDIENCE_SUFFIX;
 
             var builder = Jwts.builder()

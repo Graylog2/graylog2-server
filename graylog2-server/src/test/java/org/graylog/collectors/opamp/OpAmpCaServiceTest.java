@@ -35,8 +35,7 @@ import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
-import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.cluster.ClusterId;
+import org.graylog2.plugin.cluster.ClusterIdService;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.web.customization.CustomizationConfig;
@@ -63,7 +62,7 @@ class OpAmpCaServiceTest {
 
     private CertificateService certificateService;
     private CollectorsConfigService collectorsConfigService;
-    private ClusterConfigService clusterConfigService;
+    private ClusterIdService clusterIdService;
     private OpAmpCaService opAmpCaService;
     private Clock clock = TestClocks.fixedEpoch();
 
@@ -83,9 +82,10 @@ class OpAmpCaServiceTest {
                 mongodb.mongoConnection()
         );
         certificateService = new CertificateService(mongoCollections, encryptedValueService, CustomizationConfig.empty(), clock);
-        clusterConfigService = mock(ClusterConfigService.class);
+        clusterIdService = mock(ClusterIdService.class);
+        when(clusterIdService.getString()).thenReturn("cluster-id");
         collectorsConfigService = mock(CollectorsConfigService.class);
-        opAmpCaService = new OpAmpCaService(certificateService, clusterConfigService, collectorsConfigService);
+        opAmpCaService = new OpAmpCaService(certificateService, clusterIdService, collectorsConfigService);
     }
 
     private void mockClusterConfigStorage() {
@@ -185,7 +185,7 @@ class OpAmpCaServiceTest {
     @Test
     void otlpServerCert_hasClusterIdAsDnsSan() throws Exception {
         final String testClusterId = "2209F727-F7E1-4123-9386-94FE3B354A07";
-        when(clusterConfigService.get(ClusterId.class)).thenReturn(ClusterId.create(testClusterId));
+        when(clusterIdService.getString()).thenReturn(testClusterId);
         mockClusterConfigStorage();
 
         final CertificateEntry otlpServerCert = opAmpCaService.getOtlpServerCert();

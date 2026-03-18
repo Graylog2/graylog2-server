@@ -30,8 +30,7 @@ import org.graylog.security.pki.Algorithm;
 import org.graylog.security.pki.CertificateEntry;
 import org.graylog.security.pki.CertificateService;
 import org.graylog.security.pki.PemUtils;
-import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.cluster.ClusterId;
+import org.graylog2.plugin.cluster.ClusterIdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,17 +71,17 @@ public class OpAmpCaService {
     static final String OTLP_SERVER_CERT_CN = "Collectors OTLP Server";
 
     private final CertificateService certificateService;
+    private final ClusterIdService clusterIdService;
     private final CollectorsConfigService collectorsConfigService;
-    private final ClusterConfigService clusterConfigService;
 
     private volatile CaHierarchy cachedHierarchy;
 
     @Inject
     public OpAmpCaService(CertificateService certificateService,
-                          ClusterConfigService clusterConfigService,
+                          ClusterIdService clusterIdService,
                           CollectorsConfigService collectorsConfigService) {
         this.certificateService = certificateService;
-        this.clusterConfigService = clusterConfigService;
+        this.clusterIdService = clusterIdService;
         this.collectorsConfigService = collectorsConfigService;
     }
 
@@ -215,7 +214,7 @@ public class OpAmpCaService {
                     builder.createIntermediateCa(SIGNING_CERT_CN, caCert, SIGNING_CERT_VALIDITY));
             final CertificateEntry tokenSigningCert = certificateService.save(
                     builder.createEndEntityCert(TOKEN_SIGNING_CN, signingCert, KeyUsage.digitalSignature, TOKEN_SIGNING_VALIDITY));
-            final List<String> otlpSans = getClusterIdSans();
+            final List<String> otlpSans = List.of(clusterIdService.getString());
             final CertificateEntry otlpServerCert = certificateService.save(
                     builder.createEndEntityCert(OTLP_SERVER_CERT_CN, signingCert,
                             KeyUsage.digitalSignature | KeyUsage.keyEncipherment,
@@ -238,15 +237,6 @@ public class OpAmpCaService {
         final CertificateEntry otlpServerCert = certificateService.findById(config.otlpServerCertId())
                 .orElseThrow(() -> new IllegalStateException("OTLP server cert not found: " + config.otlpServerCertId()));
         return new CaHierarchy(caCert, signingCert, tokenSigningCert, otlpServerCert);
-    }
-
-    private List<String> getClusterIdSans() {
-        final ClusterId clusterId = clusterConfigService.get(ClusterId.class);
-        if (clusterId != null && clusterId.clusterId() != null && !clusterId.clusterId().isEmpty()) {
-            return List.of(clusterId.clusterId());
-        }
-        LOG.warn("Cluster ID not available — OTLP server cert will have no DNS SAN");
-        return List.of();
     }
 
     public record CaHierarchy(CertificateEntry caCert,

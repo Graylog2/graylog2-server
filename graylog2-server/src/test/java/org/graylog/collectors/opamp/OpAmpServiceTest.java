@@ -26,7 +26,7 @@ import org.graylog.collectors.opamp.auth.AgentTokenService;
 import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog.collectors.opamp.transport.OpAmpAuthContext;
 import org.graylog.security.pki.CertificateService;
-import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.cluster.ClusterIdService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,6 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -71,7 +72,7 @@ class OpAmpServiceTest {
     private CollectorsConfigService collectorsConfigService;
 
     @Mock
-    private ClusterConfigService clusterConfigService;
+    private ClusterIdService clusterIdService;
 
     @Mock
     private FleetTransactionLogService fleetTransactionLogService;
@@ -85,8 +86,9 @@ class OpAmpServiceTest {
 
     @BeforeEach
     void setUp() {
+        lenient().when(clusterIdService.getString()).thenReturn("clusterId");
         opAmpService = new OpAmpService(enrollmentTokenService, agentTokenService, opAmpCaService, certificateService,
-                collectorInstanceService, collectorsConfigService, clusterConfigService, fleetTransactionLogService, sourceService);
+                collectorInstanceService, collectorsConfigService, clusterIdService, fleetTransactionLogService, sourceService);
     }
 
     @Test
