@@ -31,7 +31,7 @@ export {
   INSTANCES_KEY_PREFIX,
 } from './useInstanceQueries';
 
-export type { PaginatedCollectorsResponse } from './useInstanceQueries';
+export type { PaginatedCollectorsResponse } from '../types';
 
 export {
   useSources,
@@ -40,10 +40,8 @@ export {
   SOURCES_KEY_PREFIX,
 } from './useSourceQueries';
 
-export {
-  useCollectorStats,
-  useCollectorsConfig,
-} from './useCollectorConfig';
+export { useCollectorStats } from './useCollectorStats';
+export { useCollectorsConfig } from './useCollectorsConfig';
 
 export {
   fetchPaginatedEnrollmentTokens,

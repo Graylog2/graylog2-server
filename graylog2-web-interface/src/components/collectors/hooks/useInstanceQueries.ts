@@ -18,17 +18,11 @@ import { useQuery } from '@tanstack/react-query';
 
 import { Collectors } from '@graylog/server-api';
 
-import type { SearchParams, Attribute } from 'stores/PaginationTypes';
+import type { SearchParams } from 'stores/PaginationTypes';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 import { defaultOnError } from 'util/conditional/onError';
 
-import type { CollectorInstanceView } from '../types';
-
-export type PaginatedCollectorsResponse<T> = {
-  list: T[];
-  pagination: { total: number };
-  attributes: Attribute[];
-};
+import type { CollectorInstanceView, PaginatedCollectorsResponse } from '../types';
 
 export const INSTANCES_KEY_PREFIX = ['collectors', 'instances'];
 export const instancesKeyFn = (searchParams: SearchParams) => [...INSTANCES_KEY_PREFIX, 'paginated', searchParams];

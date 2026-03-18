@@ -19,9 +19,9 @@ import { renderHook } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 
 import useDefaultInstanceFilters from './useDefaultInstanceFilters';
-import { useCollectorsConfig } from './useCollectorConfig';
+import { useCollectorsConfig } from './useCollectorsConfig';
 
-jest.mock('./useCollectorConfig');
+jest.mock('./useCollectorsConfig');
 
 describe('useDefaultInstanceFilters', () => {
   beforeEach(() => {

@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import type { Attribute } from 'stores/PaginationTypes';
+
 // Domain types aligned with OpAMP backend schema
 
 export type Fleet = {
@@ -189,3 +191,10 @@ export type ActivityEntry = {
 export type RecentActivityResponse = {
   activities: ActivityEntry[];
 };
+
+export type PaginatedCollectorsResponse<T> = {
+  list: T[];
+  pagination: { total: number };
+  attributes: Attribute[];
+};
+

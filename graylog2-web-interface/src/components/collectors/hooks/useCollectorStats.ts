@@ -14,6 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as StatCard } from './StatCard';
-export { default as CollectorsPageNavigation } from './CollectorsPageNavigation';
-export { default as collectorLogsUrl } from './collectorLogsUrl';
+import { useQuery } from '@tanstack/react-query';
+
+import { Collectors } from '@graylog/server-api';
+
+import { defaultOnError } from 'util/conditional/onError';
+
+import type { CollectorStats } from '../types';
+
+export const STATS_KEY_PREFIX = ['collectors', 'stats'];
+
+export const useCollectorStats = () =>
+  useQuery<CollectorStats>({
+    queryKey: STATS_KEY_PREFIX,
+    queryFn: () => defaultOnError(Collectors.stats(), 'Loading collector stats failed with status', 'Could not load collector stats.'),
+  });

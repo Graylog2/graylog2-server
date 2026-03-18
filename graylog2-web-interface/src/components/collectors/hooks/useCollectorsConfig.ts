@@ -16,20 +16,13 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { Collectors, CollectorsConfig as CollectorsConfigApi } from '@graylog/server-api';
+import { CollectorsConfig as CollectorsConfigApi } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
 
-import type { CollectorStats, CollectorsConfig } from '../types';
+import type { CollectorsConfig } from '../types';
 
 export const CONFIG_KEY_PREFIX = ['collectors', 'config'];
-export const STATS_KEY_PREFIX = ['collectors', 'stats'];
-
-export const useCollectorStats = () =>
-  useQuery<CollectorStats>({
-    queryKey: STATS_KEY_PREFIX,
-    queryFn: () => defaultOnError(Collectors.stats(), 'Loading collector stats failed with status', 'Could not load collector stats.'),
-  });
 
 export const useCollectorsConfig = () =>
   useQuery<CollectorsConfig>({

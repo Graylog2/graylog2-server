@@ -20,7 +20,7 @@ import moment from 'moment';
 
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
-import { useCollectorsConfig } from './useCollectorConfig';
+import { useCollectorsConfig } from './useCollectorsConfig';
 
 const useDefaultInstanceFilters = (): UrlQueryFilters | undefined => {
   const { data: config } = useCollectorsConfig();

@@ -21,9 +21,7 @@ import { CollectorsSources } from '@graylog/server-api';
 import type { SearchParams } from 'stores/PaginationTypes';
 import { defaultOnError } from 'util/conditional/onError';
 
-import type { PaginatedCollectorsResponse } from './useInstanceQueries';
-
-import type { Source } from '../types';
+import type { PaginatedCollectorsResponse, Source } from '../types';
 
 export const SOURCES_KEY_PREFIX = ['collectors', 'sources'];
 export const sourcesKeyFn = (searchParams: SearchParams) => [...SOURCES_KEY_PREFIX, 'paginated', searchParams];

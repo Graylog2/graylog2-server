@@ -21,13 +21,10 @@ import { CollectorsFleets } from '@graylog/server-api';
 import type { SearchParams } from 'stores/PaginationTypes';
 import { defaultOnError } from 'util/conditional/onError';
 
-import type { PaginatedCollectorsResponse } from './useInstanceQueries';
-
-import type { BulkFleetStatsResponse, Fleet } from '../types';
+import type { BulkFleetStatsResponse, Fleet, PaginatedCollectorsResponse } from '../types';
 
 export const FLEETS_KEY_PREFIX = ['collectors', 'fleets'];
-export const FLEETS_PAGINATED_KEY_PREFIX = ['collectors', 'fleets', 'paginated'];
-export const fleetsKeyFn = (searchParams: SearchParams) => [...FLEETS_PAGINATED_KEY_PREFIX, searchParams];
+export const fleetsKeyFn = (searchParams: SearchParams) => [...FLEETS_KEY_PREFIX, 'paginated', searchParams];
 
 export const useFleets = () =>
   useQuery<Fleet[]>({

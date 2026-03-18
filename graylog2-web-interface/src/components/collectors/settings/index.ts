@@ -14,6 +14,4 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as StatCard } from './StatCard';
-export { default as CollectorsPageNavigation } from './CollectorsPageNavigation';
-export { default as collectorLogsUrl } from './collectorLogsUrl';
+export { default as CollectorsSettings } from './CollectorsSettings';
