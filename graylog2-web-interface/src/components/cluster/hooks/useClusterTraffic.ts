@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { SystemClusterTraffic } from '@graylog/server-api';
 
@@ -31,6 +31,7 @@ const useClusterTraffic = (days: number) => {
         'Could not load cluster traffic',
       ),
     enabled: !!days,
+    placeholderData: keepPreviousData,
   });
 
   return { traffic, isLoading };
