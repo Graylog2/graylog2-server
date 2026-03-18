@@ -48,6 +48,22 @@ underscores instead, e.g. `${aggregation_conditions.count}`, `${aggregation_cond
 existing notifications using the escaping of parentheses in explicit `aggregation_conditions` key names will need to
 be modified to instead use the underscore format.
 
+### OpenSearch-Based Anomaly Detection Removed
+
+Anomaly detection now runs natively within Graylog, removing the dependency on OpenSearch's Anomaly Detection plugin. 
+This provides a more integrated experience with Alerts and Events, and does not require OpenSearch-specific
+configuration.
+
+As part of this change, existing OpenSearch-based anomaly detectors are no longer supported and will be
+automatically disabled during the upgrade to Graylog 7.1. A software migration will stop and remove all
+OpenSearch anomaly detectors and delete their associated event definitions.
+
+After the upgrade, previously configured detectors will remain visible in the Anomaly Detection Configuration page 
+for reference, showing their name and whether they were previously enabled. However, the full detector
+configuration (indices, feature fields, intervals, etc.) will not be displayed and detectors can no longer be
+edited or re-enabled. **Note: If you have custom anomaly detectors, you should note down their configuration 
+before upgrading.**
+
 ## Configuration File Changes
 
 | Option | Action    | Description |
