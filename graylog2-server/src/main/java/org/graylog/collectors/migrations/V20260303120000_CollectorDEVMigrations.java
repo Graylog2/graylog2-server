@@ -40,9 +40,8 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
- * Converts {@code fleet_id} and {@code issuing_ca_id} fields in the {@code collector_instances} collection
- * from ObjectId back to String for consistency with the rest of the codebase.
- * This can be removed once all deployments have been migrated.
+ * Migration for Collector changes during the 7.1 development.
+ * Must be removed before 7.1.
  */
 public class V20260303120000_CollectorDEVMigrations extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20260303120000_CollectorDEVMigrations.class);
