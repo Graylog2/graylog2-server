@@ -45,9 +45,6 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  */
 public class V20260303120000_CollectorDEVMigrations extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20260303120000_CollectorDEVMigrations.class);
-    private static final String COLLECTION_NAME = "collector_instances";
-    private static final String FIELD_FLEET_ID = "fleet_id";
-    private static final String FIELD_ISSUING_CA_ID = "issuing_ca_id";
 
     private final MongoConnection mongoConnection;
 
@@ -76,11 +73,11 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
     }
 
     private void convertObjectIdFields(MongoDatabase db) {
-        final MongoCollection<Document> collection = db.getCollection(COLLECTION_NAME);
+        final MongoCollection<Document> collection = db.getCollection("collector_instances");
 
         long converted = 0;
-        converted += convertObjectIdFieldToString(collection, FIELD_FLEET_ID);
-        converted += convertObjectIdFieldToString(collection, FIELD_ISSUING_CA_ID);
+        converted += convertObjectIdFieldToString(collection, "fleet_id");
+        converted += convertObjectIdFieldToString(collection, "issuing_ca_id");
 
         if (converted > 0) {
             LOG.info("Converted ObjectId fields to String in {} collector instance document(s)", converted);
