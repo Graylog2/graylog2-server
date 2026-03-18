@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useMemo, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
 import URI from 'urijs';
 
@@ -82,6 +83,7 @@ const SEGMENTS = [
 ];
 
 const FleetDetail = ({ fleetId }: Props) => {
+  const queryClient = useQueryClient();
   const { data: fleet, isLoading: fleetLoading } = useFleet(fleetId);
   const { data: stats, isLoading: statsLoading } = useFleetStats(fleetId);
   const defaultInstanceFilters = useDefaultInstanceFilters();
@@ -258,6 +260,9 @@ const FleetDetail = ({ fleetId }: Props) => {
           onDelete={async () => {
             await deleteFleet(fleet.id);
             history.push(Routes.SYSTEM.COLLECTORS.FLEETS);
+            // Invalidate after navigation so the fleets list refetches.
+            // Fleet-specific queries were already removed by the mutation's onSuccess.
+            queryClient.invalidateQueries({ queryKey: ['collectors'] });
           }}
           isLoading={isUpdatingFleet || isDeletingFleet}
         />

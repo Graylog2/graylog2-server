@@ -83,9 +83,10 @@ const useCollectorsMutations = () => {
     onError: onMutationError('Deleting fleet'),
     onSuccess: (_data, fleetId) => {
       UserNotification.success('Fleet has been deleted.', 'Success!');
+      // Remove fleet-specific queries from cache. Don't invalidate broadly here —
+      // the caller navigates away first (unmounting fleet detail queries), then the
+      // target page fetches fresh data on mount.
       queryClient.removeQueries({ queryKey: ['collectors', 'fleets', fleetId] });
-
-      return invalidateCollectorsQueries();
     },
   });
 
