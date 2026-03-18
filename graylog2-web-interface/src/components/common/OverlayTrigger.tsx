@@ -33,6 +33,7 @@ type Props = {
   trigger?: Triggers | Array<Triggers>;
   className?: string;
   rootClose?: boolean;
+  triggerTitle?: string;
   width?: number;
   title?: React.ReactNode;
 };
@@ -59,6 +60,7 @@ const OverlayTrigger = (
     trigger = 'click',
     testId = undefined,
     className = undefined,
+    triggerTitle = undefined,
     title = undefined,
     width = 275,
   }: Props,
@@ -75,6 +77,7 @@ const OverlayTrigger = (
   );
 
   // @ts-ignore
+  // eslint-disable-next-line react-hooks/immutability
   OverlayTrigger.hide = close;
 
   const containerRef = useRef();
@@ -97,6 +100,8 @@ const OverlayTrigger = (
             className={children.props.className}
             ref={setControl}
             role="button"
+            aria-label={triggerTitle ?? (typeof title === 'string' ? title : undefined)}
+            title={triggerTitle}
             onClick={click ? toggle : undefined}
             onMouseEnter={hover ? open : undefined}
             onMouseLeave={hover ? close : undefined}

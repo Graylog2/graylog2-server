@@ -16,9 +16,9 @@
  */
 package org.graylog2.notifications;
 
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import jakarta.inject.Inject;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.streams.events.StreamDeletedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,9 +30,10 @@ public class DeletedStreamNotificationListener {
     private final NotificationService notificationService;
 
     @Inject
-    public DeletedStreamNotificationListener(EventBus eventBus, NotificationService notificationService) {
+    public DeletedStreamNotificationListener(ClusterEventBus clusterEventBus, NotificationService notificationService) {
         this.notificationService = notificationService;
-        eventBus.register(this);
+        // Subscribe on ClusterEventBus to only receive events originating on this node (local-only delivery).
+        clusterEventBus.registerClusterEventSubscriber(this);
     }
 
     @Subscribe
