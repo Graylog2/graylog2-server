@@ -21,6 +21,7 @@ import { FlatContentRow } from 'components/common';
 export const SEARCH_BAR_GAP = '10px';
 
 export const SearchBarContainer = styled(FlatContentRow)`
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: ${SEARCH_BAR_GAP};
