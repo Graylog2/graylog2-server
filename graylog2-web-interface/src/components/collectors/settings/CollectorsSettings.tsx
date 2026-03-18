@@ -26,8 +26,7 @@ import InputStateBadge from 'components/inputs/InputStateBadge';
 import useInput from 'hooks/useInput';
 import useInputsStates from 'hooks/useInputsStates';
 
-import { useCollectorsConfig } from '../hooks';
-import useCollectorsMutations from '../hooks/useCollectorsMutations';
+import { useCollectorsConfig, useCollectorsMutations } from '../hooks';
 import type { CollectorsConfigRequest } from '../types';
 
 type EndpointFormState = {
