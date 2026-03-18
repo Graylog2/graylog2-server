@@ -37,7 +37,6 @@ type EndpointFormState = {
 };
 
 const DEFAULT_HTTP: EndpointFormState = { enabled: false, hostname: '', port: 14401 };
-const DEFAULT_GRPC: EndpointFormState = { enabled: false, hostname: '', port: 14402 };
 
 const THRESHOLD_UNITS = ['DAYS', 'HOURS', 'MINUTES'];
 
@@ -47,10 +46,8 @@ const CollectorsSettings = () => {
   const isConfigured = !!config?.signing_cert_id;
   const { data: inputStates } = useInputsStates({ enabled: isConfigured });
   const { data: httpInput } = useInput(config?.http?.input_id);
-  const { data: grpcInput } = useInput(config?.grpc?.input_id);
 
   const [http, setHttp] = useState<EndpointFormState>(DEFAULT_HTTP);
-  const [grpc, setGrpc] = useState<EndpointFormState>(DEFAULT_GRPC);
   const [initialized, setInitialized] = useState(false);
   const [offlineValue, setOfflineValue] = useState<number>(5);
   const [offlineUnit, setOfflineUnit] = useState<string>('MINUTES');
@@ -66,11 +63,6 @@ const CollectorsSettings = () => {
         enabled: config.http.enabled,
         hostname: config.http.hostname,
         port: config.http.port,
-      });
-      setGrpc({
-        enabled: config.grpc.enabled,
-        hostname: config.grpc.hostname,
-        port: config.grpc.port,
       });
 
       const offline = extractDurationAndUnit(config.collector_offline_threshold, THRESHOLD_UNITS);
@@ -114,7 +106,6 @@ const CollectorsSettings = () => {
   const handleSave = async () => {
     const request: CollectorsConfigRequest = {
       http: { enabled: http.enabled, hostname: http.hostname, port: http.port },
-      grpc: { enabled: grpc.enabled, hostname: grpc.hostname, port: grpc.port },
       collector_offline_threshold: moment.duration(offlineValue, offlineUnit as moment.unitOfTime.DurationConstructor).toISOString(),
       collector_default_visibility_threshold: moment.duration(visibilityValue, visibilityUnit as moment.unitOfTime.DurationConstructor).toISOString(),
       collector_expiration_threshold: moment.duration(expirationValue, expirationUnit as moment.unitOfTime.DurationConstructor).toISOString(),
@@ -183,26 +174,6 @@ const CollectorsSettings = () => {
                  onChange={(e) => setHttp({ ...http, port: Number((e.target as HTMLInputElement).value) })}
                  disabled={!http.enabled} />
 
-          <h3>gRPC</h3>
-          <Input id="grpc-enabled"
-                 type="checkbox"
-                 label="Enabled"
-                 checked={grpc.enabled}
-                 onChange={(e) => setGrpc({ ...grpc, enabled: (e.target as HTMLInputElement).checked })} />
-          <Input id="grpc-hostname"
-                 type="text"
-                 label="Hostname"
-                 value={grpc.hostname}
-                 placeholder="e.g. otlp-grpc.example.com"
-                 onChange={(e) => setGrpc({ ...grpc, hostname: (e.target as HTMLInputElement).value })}
-                 disabled={!grpc.enabled} />
-          <Input id="grpc-port"
-                 type="number"
-                 label="Port"
-                 value={grpc.port}
-                 onChange={(e) => setGrpc({ ...grpc, port: Number((e.target as HTMLInputElement).value) })}
-                 disabled={!grpc.enabled} />
-
           <h2>Collector Lifecycle</h2>
 
           <TimeUnitInput
@@ -260,14 +231,7 @@ const CollectorsSettings = () => {
                 <Link to={Routes.SYSTEM.INPUT_DIAGNOSIS(httpInput.id)}>View Diagnostics</Link>
               </p>
             )}
-            {grpcInput && (
-              <p>
-                <strong>gRPC:</strong>{' '}
-                <InputStateBadge input={grpcInput} inputStates={inputStates} />{' '}
-                <Link to={Routes.SYSTEM.INPUT_DIAGNOSIS(grpcInput.id)}>View Diagnostics</Link>
-              </p>
-            )}
-            {!httpInput && !grpcInput && (
+            {!httpInput && (
               <p>No ingest endpoints are running.</p>
             )}
           </Col>

@@ -30,14 +30,12 @@ class CollectorsConfigTest {
     @Test
     void serializesAndDeserializes() throws Exception {
         final var http = new IngestEndpointConfig(true, "graylog.example.com", 14401, "input-1");
-        final var grpc = new IngestEndpointConfig(false, "graylog.example.com", 14402, null);
         final var config = CollectorsConfig.builder()
                 .caCertId("ca-cert-id")
                 .signingCertId("signing-cert-id")
                 .tokenSigningCertId("token-id")
                 .otlpServerCertId("otlp-server-id")
                 .http(http)
-                .grpc(grpc)
                 .build();
 
         final var json = objectMapper.writeValueAsString(config);

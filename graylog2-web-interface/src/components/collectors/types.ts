@@ -125,7 +125,6 @@ export type CollectorsConfig = {
   token_signing_cert_id: string | null;
   otlp_server_cert_id: string | null;
   http: IngestEndpointConfig;
-  grpc: IngestEndpointConfig;
   collector_offline_threshold: string;
   collector_default_visibility_threshold: string;
   collector_expiration_threshold: string;
@@ -133,11 +132,6 @@ export type CollectorsConfig = {
 
 export type CollectorsConfigRequest = {
   http: {
-    enabled: boolean;
-    hostname: string;
-    port: number;
-  };
-  grpc: {
     enabled: boolean;
     hostname: string;
     port: number;

@@ -39,7 +39,6 @@ import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.db.MarkerType;
-import org.graylog.collectors.input.CollectorIngestGrpcInput;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
 import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -64,7 +63,6 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class CollectorsConfigResource extends RestResource {
-
     private final CollectorsConfigService collectorsConfigService;
     private final CollectorInputService collectorInputService;
     private final CollectorLogsDestinationService collectorLogsDestinationService;
@@ -116,14 +114,6 @@ public class CollectorsConfigResource extends RestResource {
                 CollectorIngestHttpInput.class.getCanonicalName(),
                 CollectorIngestHttpInput.NAME,
                 creatorUserId);
-
-        final String grpcInputId = collectorInputService.reconcile(
-                request.grpc(),
-                existing.map(CollectorsConfig::grpc).orElse(null),
-                CollectorIngestGrpcInput.class.getCanonicalName(),
-                CollectorIngestGrpcInput.NAME,
-                creatorUserId);
-
         final Duration effectiveOffline = request.collectorOfflineThreshold() != null
                 ? request.collectorOfflineThreshold() : CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD;
         final Duration effectiveVisibility = request.collectorDefaultVisibilityThreshold() != null
@@ -137,7 +127,6 @@ public class CollectorsConfigResource extends RestResource {
                 .tokenSigningCertId(opAmpCaService.getTokenSigningCertId())
                 .otlpServerCertId(opAmpCaService.getOtlpServerCertId())
                 .http(request.http().toConfig(httpInputId))
-                .grpc(request.grpc().toConfig(grpcInputId))
                 .collectorOfflineThreshold(effectiveOffline)
                 .collectorDefaultVisibilityThreshold(effectiveVisibility)
                 .collectorExpirationThreshold(effectiveExpiration)

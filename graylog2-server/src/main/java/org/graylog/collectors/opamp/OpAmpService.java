@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.google.auto.value.AutoValue;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Longs;
@@ -44,6 +43,7 @@ import opamp.proto.Opamp.ServerErrorResponse;
 import opamp.proto.Opamp.ServerToAgent;
 import opamp.proto.Opamp.TLSCertificate;
 import org.graylog.collectors.CollectorInstanceService;
+import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.FleetTransactionLogService;
 import org.graylog.collectors.SourceService;
@@ -52,7 +52,6 @@ import org.graylog.collectors.config.CollectorPipelineConfig;
 import org.graylog.collectors.config.CollectorServiceConfig;
 import org.graylog.collectors.config.TLSConfigurationSettings;
 import org.graylog.collectors.config.exporter.OtlpExporterConfig;
-import org.graylog.collectors.config.exporter.OtlpGrpcExporterConfig;
 import org.graylog.collectors.config.exporter.OtlpHttpExporterConfig;
 import org.graylog.collectors.config.processor.CollectorProcessorConfig;
 import org.graylog.collectors.config.processor.ResourceProcessorConfig;
@@ -386,19 +385,19 @@ public class OpAmpService {
                     instanceUid, sequenceNum, unprocessedMarkers.size(), lastProcessedTxnSeq, coalesced);
 
             // do this first. in case there's no configured endpoint we don't have to perform the more expensive stuff
-            final ExporterConfigs exporterConfigs = getExporterConfigs();
+            final Optional<OtlpExporterConfig> exporterConfig = getExporterConfig();
 
             if (coalesced.recomputeIngestConfig()) {
                 // The connection settings should only be sent when they change. Not having a config is a change, too.
                 if (agentCapabilities.contains(Opamp.AgentCapabilities.AgentCapabilities_ReportsOwnLogs)) {
                     // The "own_logs" are always transmitted via HTTP according to OpAMP.
-                    buildConnectionSettings(responseBuilder, exporterConfigs.httpConfig().orElse(null));
+                    buildConnectionSettings(responseBuilder, exporterConfig.orElse(null));
                 }
             }
 
             final var configBuilder = CollectorConfig.builder();
             if (coalesced.recomputeConfig() || coalesced.recomputeIngestConfig()) {
-                final var effectiveEndpoint = exporterConfigs.getDefault().orElseThrow();
+                final var effectiveEndpoint = exporterConfig.orElseThrow();
                 final var effectiveFleetId = (coalesced.newFleetId() == null) ? fleetId : coalesced.newFleetId();
                 LOG.debug("[{}/{}] Computing new collector config for fleet id {}", instanceUid, sequenceNum, effectiveFleetId);
 
@@ -519,45 +518,12 @@ public class OpAmpService {
         }
     }
 
-    @AutoValue
-    abstract static class ExporterConfigs {
-        abstract Optional<OtlpExporterConfig> grpcConfig();
-
-        abstract Optional<OtlpExporterConfig> httpConfig();
-
-        /**
-         * Returns the default exporter config. Prefers gRPC to HTTP.
-         */
-        Optional<OtlpExporterConfig> getDefault() {
-            return grpcConfig().or(this::httpConfig);
-        }
-
-        boolean isEmpty() {
-            return grpcConfig().isEmpty() && httpConfig().isEmpty();
-        }
-
-        static Builder builder() {
-            return new AutoValue_OpAmpService_ExporterConfigs.Builder();
-        }
-
-        @AutoValue.Builder
-        abstract static class Builder {
-            abstract Builder grpcConfig(OtlpExporterConfig grpcConfig);
-
-            abstract Builder httpConfig(OtlpExporterConfig httpConfig);
-
-            abstract ExporterConfigs build();
-        }
-    }
-
     @Nonnull
-    private ExporterConfigs getExporterConfigs() {
-        final var collectorsConfig = collectorsConfigService.get()
+    private Optional<OtlpExporterConfig> getExporterConfig() {
+        final CollectorsConfig collectorsConfig = collectorsConfigService.get()
                 .orElseThrow(() -> new IllegalStateException("Unable to determine collector input config, cannot send remote config."));
-
-        var httpEndpoint = collectorsConfig.http();
-        var grpcEndpoint = collectorsConfig.grpc();
-        if (httpEndpoint == null && grpcEndpoint == null) {
+        final var httpEndpoint = collectorsConfig.http();
+        if (httpEndpoint == null) {
             throw new IllegalStateException("No collector input configured, cannot send remote config.");
         }
 
@@ -565,22 +531,15 @@ public class OpAmpService {
         // We use the long-lived CA cert so intermediate cert rotation is not an issue for Collector mTLS connections.
         final var caCert = opAmpCaService.getCaCert().certificate();
         final var tlsSettings = TLSConfigurationSettings.withCACert(clusterId.clusterId(), caCert);
-        final var builder = ExporterConfigs.builder();
 
-        if (grpcEndpoint != null && grpcEndpoint.enabled()) {
-            builder.grpcConfig(OtlpGrpcExporterConfig.builder()
-                    .endpoint(f("%s:%s", grpcEndpoint.hostname(), grpcEndpoint.port()))
-                    .tls(tlsSettings)
-                    .build());
-        }
-        if (httpEndpoint != null && httpEndpoint.enabled()) {
-            builder.httpConfig(OtlpHttpExporterConfig.builder()
+        if (httpEndpoint.enabled()) {
+            return Optional.of(OtlpHttpExporterConfig.builder()
                     .endpoint(f("https://%s:%s", httpEndpoint.hostname(), httpEndpoint.port()))
                     .tls(tlsSettings)
                     .build());
         }
 
-        return builder.build();
+        return Optional.empty();
     }
 
     @Nonnull

@@ -28,9 +28,10 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 
 /**
- * An HTTP input for OpAMP-managed agents that auto-configures Ed25519 mTLS from the
- * OpAMP CA hierarchy. TLS is always enabled — the configuration is forced at construction
- * time so that the parent transport adds the TLS handler to the Netty pipeline.
+ * The only managed ingest input for OpAMP-managed agents. It auto-configures Ed25519 mTLS
+ * from the OpAMP CA hierarchy, and TLS is always enabled so the parent transport adds the
+ * TLS handler to the Netty pipeline at construction time. See PR #24815:
+ * https://github.com/Graylog2/graylog2-server/pull/24815
  */
 public class CollectorIngestHttpInput extends MessageInput {
     public static final String NAME = "Collector Ingest (HTTP)";

@@ -30,13 +30,11 @@ public record CollectorsConfig(
         @JsonProperty("token_signing_cert_id") @Nullable String tokenSigningCertId,
         @JsonProperty("otlp_server_cert_id") @Nullable String otlpServerCertId,
         @JsonProperty("http") IngestEndpointConfig http,
-        @JsonProperty("grpc") IngestEndpointConfig grpc,
         @JsonProperty("collector_offline_threshold") Duration collectorOfflineThreshold,
         @JsonProperty("collector_default_visibility_threshold") Duration collectorDefaultVisibilityThreshold,
         @JsonProperty("collector_expiration_threshold") Duration collectorExpirationThreshold
 ) {
     public static final int DEFAULT_HTTP_PORT = 14401;
-    public static final int DEFAULT_GRPC_PORT = 14402;
 
     public static final Duration DEFAULT_OFFLINE_THRESHOLD = Duration.ofMinutes(5);
     public static final Duration DEFAULT_VISIBILITY_THRESHOLD = Duration.ofDays(1);
@@ -46,8 +44,7 @@ public record CollectorsConfig(
         requireNonBlank(hostname, "hostname can't be blank");
 
         return CollectorsConfig.builder()
-                .http(new IngestEndpointConfig(true, hostname, DEFAULT_HTTP_PORT, null))
-                .grpc(new IngestEndpointConfig(false, hostname, DEFAULT_GRPC_PORT, null));
+                .http(new IngestEndpointConfig(true, hostname, DEFAULT_HTTP_PORT, null));
     }
 
     public static CollectorsConfig createDefault(String hostname) {
@@ -72,8 +69,6 @@ public record CollectorsConfig(
         Builder otlpServerCertId(String otlpServerCertId);
 
         Builder http(IngestEndpointConfig http);
-
-        Builder grpc(IngestEndpointConfig grpc);
 
         Builder collectorOfflineThreshold(Duration collectorOfflineThreshold);
 

@@ -121,7 +121,6 @@ class CollectorsConfigResourceTest {
         assertThat(result.http().hostname()).isEqualTo("graylog.example.com");
         assertThat(result.http().port()).isEqualTo(14401);
         assertThat(result.http().inputId()).isNull();
-        assertThat(result.grpc().enabled()).isFalse();
         assertThat(result.collectorOfflineThreshold()).isEqualTo(CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD);
         assertThat(result.collectorDefaultVisibilityThreshold()).isEqualTo(CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD);
         assertThat(result.collectorExpirationThreshold()).isEqualTo(CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD);
@@ -133,7 +132,6 @@ class CollectorsConfigResourceTest {
 
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
-                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14402),
                 null, null, null
         );
 
@@ -151,14 +149,12 @@ class CollectorsConfigResourceTest {
 
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest(true, "host", 14401),
-                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14402),
                 null, null, null
         );
 
         final var result = resource.put(request);
 
         assertThat(result.http().inputId()).isEqualTo("new-input-id");
-        assertThat(result.grpc().inputId()).isNull();
     }
 
     @Test
@@ -167,7 +163,6 @@ class CollectorsConfigResourceTest {
 
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
-                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14402),
                 null, null, null
         );
 
@@ -184,7 +179,6 @@ class CollectorsConfigResourceTest {
     void putRejectsZeroVisibilityThreshold() {
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
-                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14402),
                 null, Duration.ZERO, null
         );
 
@@ -202,7 +196,6 @@ class CollectorsConfigResourceTest {
     void putRejectsVisibilityThresholdBelowOfflineThreshold() {
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
-                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14402),
                 null, Duration.ofMinutes(3), null
         );
 
@@ -220,7 +213,6 @@ class CollectorsConfigResourceTest {
     void putRejectsExpirationNotGreaterThanVisibility() {
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
-                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14402),
                 null, Duration.ofDays(2), Duration.ofDays(1)
         );
 
@@ -238,7 +230,6 @@ class CollectorsConfigResourceTest {
     void putRejectsMultipleInvalidThresholds() {
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
-                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14402),
                 null, Duration.ofMinutes(-5), Duration.ofMinutes(-10)
         );
 
@@ -257,7 +248,6 @@ class CollectorsConfigResourceTest {
 
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
-                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14402),
                 Duration.ofMinutes(10), Duration.ofHours(12), Duration.ofDays(3)
         );
 
@@ -274,7 +264,6 @@ class CollectorsConfigResourceTest {
 
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
-                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14402),
                 null, null, null
         );
 
@@ -289,7 +278,6 @@ class CollectorsConfigResourceTest {
     void putRejectsOfflineThresholdBelowOneMinute() {
         final var request = new CollectorsConfigRequest(
                 new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
-                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14402),
                 Duration.ofSeconds(30), null, null
         );
 
@@ -303,7 +291,8 @@ class CollectorsConfigResourceTest {
 
     private void stubCaService() {
         when(collectorsConfigService.get()).thenReturn(Optional.empty());
-        when(opAmpCaService.getSigningCertId()).thenReturn("ca-id");
+        when(opAmpCaService.getCaCertId()).thenReturn("ca-id");
+        when(opAmpCaService.getSigningCertId()).thenReturn("signing-cert-id");
         when(opAmpCaService.getTokenSigningCertId()).thenReturn("token-id");
         when(opAmpCaService.getOtlpServerCertId()).thenReturn("otlp-id");
     }

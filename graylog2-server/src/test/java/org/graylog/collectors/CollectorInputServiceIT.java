@@ -136,22 +136,21 @@ class CollectorInputServiceIT {
     }
 
     @Test
-    void reconcileCreatesBothProtocols() {
-        final String httpId = collectorInputService.reconcile(
+    void reconcileRestartsExistingInputWhenPortChanges() {
+        final String firstId = collectorInputService.reconcile(
                 new CollectorsConfigRequest.IngestEndpointRequest(true, "host", 14401),
                 null,
                 "org.graylog.collectors.input.CollectorIngestHttpInput",
                 "Collector Ingest (HTTP)", "admin");
 
-        final String grpcId = collectorInputService.reconcile(
+        final var existing = new IngestEndpointConfig(true, "host", 14401, firstId);
+        final String secondId = collectorInputService.reconcile(
                 new CollectorsConfigRequest.IngestEndpointRequest(true, "host", 14402),
-                null,
-                "org.graylog.collectors.input.CollectorIngestGrpcInput",
-                "Collector Ingest (gRPC)", "admin");
+                existing,
+                "org.graylog.collectors.input.CollectorIngestHttpInput",
+                "Collector Ingest (HTTP)", "admin");
 
-        assertThat(httpId).isNotNull();
-        assertThat(grpcId).isNotNull();
-        assertThat(httpId).isNotEqualTo(grpcId);
-        assertThat(inputService.all()).hasSize(2);
+        assertThat(secondId).isEqualTo(firstId);
+        assertThat(inputService.all()).hasSize(1);
     }
 }
