@@ -620,6 +620,7 @@ type MarkdownAugmentation = {
 
 export type EventReplaySideBarDetailsProps = {
   alertId: string;
+  definitionId?: string;
 };
 
 export type EventReplaySideBarPlugin = {
@@ -628,8 +629,14 @@ export type EventReplaySideBarPlugin = {
   useCondition?: () => boolean;
 };
 
+export type SidebarComponentPlugin = {
+  key: string;
+  component: React.ComponentType<any>;
+};
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
+    'sidebar.components'?: Array<SidebarComponentPlugin>;
     creators?: Array<Creator>;
     enterpriseWidgets?: Array<WidgetExport>;
     useExternalActions?: Array<() => ExternalActionsHookData>;
