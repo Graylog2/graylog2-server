@@ -81,7 +81,12 @@ const useCollectorsMutations = () => {
   const deleteFleetMutation = useMutation({
     mutationFn: (fleetId: string) => CollectorsFleets.remove(fleetId),
     onError: onMutationError('Deleting fleet'),
-    onSuccess: onSuccess('Fleet has been deleted.'),
+    onSuccess: (_data, fleetId) => {
+      UserNotification.success('Fleet has been deleted.', 'Success!');
+      queryClient.removeQueries({ queryKey: ['collectors', 'fleets', fleetId] });
+
+      return invalidateCollectorsQueries();
+    },
   });
 
   // Source mutations
