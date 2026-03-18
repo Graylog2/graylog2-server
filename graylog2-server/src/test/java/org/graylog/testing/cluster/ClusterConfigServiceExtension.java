@@ -32,8 +32,6 @@ import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 
-import java.util.UUID;
-
 /**
  * Provides a {@link ClusterConfigService} instance for injection in tests.
  */
@@ -47,12 +45,13 @@ public class ClusterConfigServiceExtension implements ParameterResolver {
 
     @Override
     public Object resolveParameter(@NonNull ParameterContext parameterContext, @NonNull ExtensionContext context) throws ParameterResolutionException {
-        return context.getStore(NAMESPACE).computeIfAbsent(
+        // We cache the cluster config service in the root store because it's reusable between test classes.
+        return context.getRoot().getStore(NAMESPACE).computeIfAbsent(
                 ClusterConfigService.class,
                 key -> new ClusterConfigServiceImpl(
                         new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()),
                         MongoDBExtension.getInstance(context).mongoConnection(),
-                        new SimpleNodeId(UUID.randomUUID().toString()),
+                        new SimpleNodeId("00000000-0000-0000-0000-000000000000"),
                         new RestrictedChainingClassLoader(new ChainingClassLoader(ClusterConfigService.class.getClassLoader()), SafeClasses.allGraylogInternal()),
                         new ClusterEventBus()
                 ),
