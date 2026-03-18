@@ -195,7 +195,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String USERS_TOKENCREATE = "users:tokencreate";
     public static final String USERS_TOKENLIST = "users:tokenlist";
     public static final String USERS_TOKENREMOVE = "users:tokenremove";
-    public static final String MONGODB_NODES_READ = "mongodb_read:read";
+    public static final String MONGODB_NODES_READ = "mongodb_nodes:read";
     public static final String MONGODB_NODES_PROFILING_CHANGE = "mongodb_nodes:changeprofiling";
 
     protected static final ImmutableSet<Permission> PERMISSIONS = ImmutableSet.<Permission>builder()
