@@ -45,6 +45,7 @@ import java.util.HashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class MessageTimestampTest {
@@ -111,10 +112,123 @@ class MessageTimestampTest {
         Duration currentGracePeriod = processBufferProcessor.getTimeStampGracePeriod();
         Duration newGracePeriod = currentGracePeriod.plusDays(1);
         setClusterConfigValue(newGracePeriod);
-        
+
         processBufferProcessor.handleGracePeriodUpdated(getClusterConfigChangedEvent());
 
         assertThat(processBufferProcessor.getTimeStampGracePeriod()).isEqualTo(newGracePeriod);
+    }
+
+    @Test
+    void testNullGracePeriodIsCached() {
+        final ProcessBufferProcessor processor = createProcessor(null);
+
+        // First call loads from cluster config
+        assertThat(processor.getTimeStampGracePeriod()).isNull();
+        // Second call should use cache, not hit cluster config again
+        assertThat(processor.getTimeStampGracePeriod()).isNull();
+
+        // getOrDefault should have been called exactly once, proving the cache works for null
+        verify(clusterConfigService, Mockito.times(1))
+                .getOrDefault(eq(TimeStampConfig.class), Mockito.any());
+    }
+
+    @Test
+    void testNullGracePeriodCacheInvalidatesOnEvent() {
+        final ProcessBufferProcessor processor = createProcessor(null);
+
+        // Load and cache null value
+        assertThat(processor.getTimeStampGracePeriod()).isNull();
+
+        // Update config to a real value and invalidate cache
+        final Duration newGracePeriod = Duration.ofDays(5);
+        setClusterConfigValue(newGracePeriod);
+        processor.handleGracePeriodUpdated(getClusterConfigChangedEvent());
+
+        // Should read from cluster config again and get the new value
+        assertThat(processor.getTimeStampGracePeriod()).isEqualTo(newGracePeriod);
+    }
+
+    @Test
+    void testNonNullGracePeriodIsCached() {
+        // First call loads from cluster config
+        assertThat(processBufferProcessor.getTimeStampGracePeriod()).isEqualTo(Duration.ofDays(GRACE_PERIOD_DAYS));
+        // Second call should use cache
+        assertThat(processBufferProcessor.getTimeStampGracePeriod()).isEqualTo(Duration.ofDays(GRACE_PERIOD_DAYS));
+
+        verify(clusterConfigService, Mockito.times(1))
+                .getOrDefault(eq(TimeStampConfig.class), Mockito.any());
+    }
+
+    @Test
+    void testTransitionFromEnabledToDisabled() {
+        // Start with normalization enabled
+        final ProcessBufferProcessor processor = createProcessor(Duration.ofDays(2));
+        assertThat(processor.getTimeStampGracePeriod()).isEqualTo(Duration.ofDays(2));
+
+        // User disables normalization — config changes to null grace period
+        setClusterConfigValue(null);
+        processor.handleGracePeriodUpdated(getClusterConfigChangedEvent());
+
+        // Should read null and cache it (not query again)
+        assertThat(processor.getTimeStampGracePeriod()).isNull();
+        assertThat(processor.getTimeStampGracePeriod()).isNull();
+
+        // Two getOrDefault calls total: one for initial load, one after invalidation
+        verify(clusterConfigService, Mockito.times(2))
+                .getOrDefault(eq(TimeStampConfig.class), Mockito.any());
+    }
+
+    @Test
+    void testTransitionFromDisabledToEnabled() {
+        // Start with normalization disabled (null grace period)
+        final ProcessBufferProcessor processor = createProcessor(null);
+        assertThat(processor.getTimeStampGracePeriod()).isNull();
+
+        // User enables normalization
+        final Duration newGracePeriod = Duration.ofDays(2);
+        setClusterConfigValue(newGracePeriod);
+        processor.handleGracePeriodUpdated(getClusterConfigChangedEvent());
+
+        assertThat(processor.getTimeStampGracePeriod()).isEqualTo(newGracePeriod);
+        assertThat(processor.getTimeStampGracePeriod()).isEqualTo(newGracePeriod);
+
+        // Two getOrDefault calls total: one for initial load, one after invalidation
+        verify(clusterConfigService, Mockito.times(2))
+                .getOrDefault(eq(TimeStampConfig.class), Mockito.any());
+    }
+
+    @Test
+    void testExistingNullDocumentInMongoDB() {
+        // Simulates backwards-compatible case: install already has a TimeStampConfig
+        // document with null grace_period from a previous save
+        final ProcessBufferProcessor processor = createProcessor(null);
+
+        // Multiple messages processed — should only query once
+        for (int i = 0; i < 100; i++) {
+            assertThat(processor.getTimeStampGracePeriod()).isNull();
+        }
+
+        verify(clusterConfigService, Mockito.times(1))
+                .getOrDefault(eq(TimeStampConfig.class), Mockito.any());
+    }
+
+    @Test
+    void testDefaultConfigWhenNoDocumentExists() {
+        // Simulates fresh install: no TimeStampConfig document in MongoDB
+        // getOrDefault returns TimeStampConfig.getDefault() which has a distant-future grace period
+        clusterConfigService = Mockito.mock(ClusterConfigService.class);
+        when(clusterConfigService.getOrDefault(eq(TimeStampConfig.class), Mockito.any()))
+                .thenAnswer(invocation -> invocation.getArgument(1));
+        final ProcessBufferProcessor processor = createProcessorWithConfigService(clusterConfigService);
+        final Duration expectedDefault = TimeStampConfig.getDefault().gracePeriod();
+
+        // Multiple messages processed — should only query once
+        for (int i = 0; i < 100; i++) {
+            assertThat(processor.getTimeStampGracePeriod()).isEqualTo(expectedDefault);
+        }
+
+        verify(clusterConfigService, Mockito.times(1))
+                .getOrDefault(eq(TimeStampConfig.class), Mockito.any());
     }
 
     private void setClusterConfigValue(Duration gracePeriod) {
@@ -127,20 +241,23 @@ class MessageTimestampTest {
     }
 
     ProcessBufferProcessor createProcessor(Duration gracePeriod) {
-        MetricRegistry metricRegistry = new MetricRegistry();
-        StreamMetrics streamMetrics = new StreamMetrics(metricRegistry);
+        clusterConfigService = Mockito.mock(ClusterConfigService.class);
+        setClusterConfigValue(gracePeriod);
+        return createProcessorWithConfigService(clusterConfigService);
+    }
 
-        Provider<Stream> defaultStreamProvider = Mockito.mock(Provider.class);
+    ProcessBufferProcessor createProcessorWithConfigService(ClusterConfigService configService) {
+        final MetricRegistry metricRegistry = new MetricRegistry();
+        final StreamMetrics streamMetrics = new StreamMetrics(metricRegistry);
+
+        final Provider<Stream> defaultStreamProvider = Mockito.mock(Provider.class);
         when(defaultStreamProvider.get()).thenReturn(Mockito.mock(Stream.class));
 
-        OrderedMessageProcessors orderedMessageProcessors = new OrderedMessageProcessors(
+        final OrderedMessageProcessors orderedMessageProcessors = new OrderedMessageProcessors(
                 new HashSet<>(0),
                 Mockito.mock(ClusterConfigService.class),
                 Mockito.mock(EventBus.class)
         );
-
-        clusterConfigService = Mockito.mock(ClusterConfigService.class);
-        setClusterConfigValue(gracePeriod);
 
         return new ProcessBufferProcessor(
                 metricRegistry,
@@ -152,7 +269,7 @@ class MessageTimestampTest {
                 defaultStreamProvider,
                 Mockito.mock(FailureSubmissionService.class),
                 streamMetrics,
-                clusterConfigService,
+                configService,
                 Mockito.mock(EventBus.class)
         );
     }
