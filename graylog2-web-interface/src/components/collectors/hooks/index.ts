@@ -31,8 +31,6 @@ export {
   INSTANCES_KEY_PREFIX,
 } from './useInstanceQueries';
 
-export type { PaginatedCollectorsResponse } from '../types';
-
 export {
   useSources,
   fetchPaginatedSources,
