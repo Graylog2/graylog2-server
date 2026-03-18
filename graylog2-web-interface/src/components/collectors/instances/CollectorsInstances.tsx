@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useState, useMemo, useCallback } from 'react';
 
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
-import type { SearchParams } from 'stores/PaginationTypes';
 
 import {
   fetchPaginatedInstances,
@@ -38,12 +37,12 @@ import { InstanceDetailDrawer } from './index';
 const CollectorsInstances = () => {
   const [selectedInstance, setSelectedInstance] = useState<CollectorInstanceView | null>(null);
   const { data: fleets } = useFleets();
-  const { data: sources } = useSources();
+  const { data: sources } = useSources(selectedInstance?.fleet_id);
   const defaultFilters = useDefaultInstanceFilters();
 
   const fleetNames = useMemo(
     () =>
-      (fleets || []).reduce(
+      (fleets ?? []).reduce(
         (acc, fleet) => ({ ...acc, [fleet.id]: fleet.name }),
         {} as Record<string, string>,
       ),
@@ -55,21 +54,20 @@ const CollectorsInstances = () => {
     [fleetNames],
   );
 
-  const fetchEntities = useCallback(
-    (searchParams: SearchParams) => fetchPaginatedInstances(searchParams),
+  const entityActions = useCallback(
+    (instance: CollectorInstanceView) => (
+      <InstanceActions instance={instance} onDetailsClick={setSelectedInstance} />
+    ),
     [],
   );
-
-  const getSourcesForInstance = (instance: CollectorInstanceView) =>
-    (sources || []).filter((s) => s.fleet_id === instance.fleet_id);
 
   return (
     <>
       <PaginatedEntityTable<CollectorInstanceView>
         humanName="instances"
-        entityActions={(instance: CollectorInstanceView) => <InstanceActions instance={instance} onDetailsClick={setSelectedInstance} />}
+        entityActions={entityActions}
         tableLayout={DEFAULT_LAYOUT}
-        fetchEntities={fetchEntities}
+        fetchEntities={fetchPaginatedInstances}
         keyFn={instancesKeyFn}
         entityAttributesAreCamelCase={false}
         columnRenderers={columnRenderers}
@@ -80,8 +78,8 @@ const CollectorsInstances = () => {
       {selectedInstance && (
         <InstanceDetailDrawer
           instance={selectedInstance}
-          sources={getSourcesForInstance(selectedInstance)}
-          fleetName={fleetNames[selectedInstance.fleet_id] || selectedInstance.fleet_id}
+          sources={sources ?? []}
+          fleetName={fleetNames[selectedInstance.fleet_id] ?? selectedInstance.fleet_id}
           onClose={() => setSelectedInstance(null)}
         />
       )}

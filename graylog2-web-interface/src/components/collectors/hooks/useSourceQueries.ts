@@ -21,7 +21,7 @@ import { CollectorsSources } from '@graylog/server-api';
 import type { SearchParams } from 'stores/PaginationTypes';
 import { defaultOnError } from 'util/conditional/onError';
 
-import type { PaginatedCollectorsResponse } from './useInstanceQueries';
+import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
 import type { Source } from '../types';
 
@@ -31,7 +31,7 @@ export const sourcesKeyFn = (searchParams: SearchParams) => [...SOURCES_KEY_PREF
 export const fetchPaginatedSources = async (
   searchParams: SearchParams,
   fleetId: string,
-): Promise<PaginatedCollectorsResponse<Source>> =>
+): Promise<PaginatedResponse<Source>> =>
   defaultOnError(
     CollectorsSources.list(
       fleetId,

@@ -50,7 +50,8 @@ const StreamRulesCell = ({ stream }: Props) => {
       iconName={streamRulesSectionIsOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
       onClick={toggleRulesSection}
       ref={buttonRef}
-      title={streamRulesSectionTitle} />
+      title={streamRulesSectionTitle}
+    />
   );
 };
 

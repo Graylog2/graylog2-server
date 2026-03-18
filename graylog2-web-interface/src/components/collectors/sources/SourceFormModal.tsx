@@ -46,12 +46,7 @@ const DEFAULT_MACOS_PREDICATE =
   "'com.apple.DiskManagement','com.apple.CoreStorage','com.apple.endpointsecurity'," +
   "'com.apple.syspolicyd','com.apple.launchd'} AND messageType >= error";
 
-const sourceTypeLabels: Record<SourceType, string> = {
-  file: 'File',
-  journald: 'Journald',
-  windows_event_log: 'Windows Event Log',
-  macos_unified_logging: 'macOS Unified Log',
-};
+import { SOURCE_TYPE_LABELS } from './Constants';
 
 const defaultConfigs: Record<
   SourceType,
@@ -264,7 +259,7 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
           <SegmentedControl
             value={sourceType}
             onChange={handleTypeChange}
-            data={Object.entries(sourceTypeLabels).map(([value, label]) => ({ value, label }))}
+            data={Object.entries(SOURCE_TYPE_LABELS).map(([value, label]) => ({ value, label }))}
             disabled={isEdit}
           />
         </div>

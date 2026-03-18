@@ -15,18 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Button, Input } from 'components/bootstrap';
-import { Card, RelativeTime } from 'components/common';
+import { Card, ConfirmDialog, RelativeTime } from 'components/common';
 
 import type { Fleet } from '../types';
 
 type Props = {
   fleet: Fleet;
-  onSave: (updates: Partial<Fleet>) => void;
-  onDelete?: () => void;
+  onSave: (updates: Partial<Fleet>) => Promise<void>;
+  onDelete?: () => Promise<void>;
   isLoading?: boolean;
 };
 
@@ -75,27 +75,32 @@ const SectionTitle = styled.h4(
 const FleetSettings = ({ fleet, onSave, onDelete = undefined, isLoading = false }: Props) => {
   const [name, setName] = useState(fleet.name);
   const [description, setDescription] = useState(fleet.description);
-  const [targetVersion, setTargetVersion] = useState(fleet.target_version || '');
+  const [targetVersion, setTargetVersion] = useState(fleet.target_version ?? '');
   const [isDirty, setIsDirty] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleChange = <T,>(setter: React.Dispatch<React.SetStateAction<T>>, value: T) => {
     setter(value);
     setIsDirty(true);
   };
 
-  const handleSave = () => {
-    onSave({
+  const handleSave = useCallback(async () => {
+    await onSave({
       name,
       description,
       target_version: targetVersion || null,
     });
     setIsDirty(false);
-  };
+  }, [name, description, targetVersion, onSave]);
+
+  const handleConfirmDelete = useCallback(async () => {
+    await onDelete?.();
+  }, [onDelete]);
 
   const handleReset = () => {
     setName(fleet.name);
     setDescription(fleet.description);
-    setTargetVersion(fleet.target_version || '');
+    setTargetVersion(fleet.target_version ?? '');
     setIsDirty(false);
   };
 
@@ -158,8 +163,19 @@ const FleetSettings = ({ fleet, onSave, onDelete = undefined, isLoading = false 
         <WarningText>
           Deleting a fleet will remove all configuration. Instances will need to be re-enrolled.
         </WarningText>
-        <Button bsStyle="danger" onClick={onDelete} disabled={!onDelete}>Delete Fleet</Button>
+        <Button bsStyle="danger" onClick={() => setShowDeleteConfirm(true)} disabled={!onDelete}>Delete Fleet</Button>
       </Section>
+
+      {showDeleteConfirm && (
+        <ConfirmDialog
+          title="Delete fleet"
+          show
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setShowDeleteConfirm(false)}>
+          Are you sure you want to delete fleet <strong>{fleet.name}</strong>?
+          All configuration will be removed and instances will need to be re-enrolled.
+        </ConfirmDialog>
+      )}
     </div>
   );
 };

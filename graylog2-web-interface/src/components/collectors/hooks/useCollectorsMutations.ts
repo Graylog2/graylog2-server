@@ -33,22 +33,29 @@ type UpdateSourceInput = {
   updates: Omit<Source, 'id' | 'fleet_id'>;
 };
 
+const onMutationError = (action: string) => (errorThrown: unknown) => {
+  UserNotification.error(`${action} failed: ${errorThrown}`, `Could not ${action.toLowerCase()}`);
+};
+
+const onMutationSuccess = (message: string, invalidate: () => Promise<void>) => () => {
+  UserNotification.success(message, 'Success!');
+
+  return invalidate();
+};
+
 const useCollectorsMutations = () => {
   const queryClient = useQueryClient();
 
   const invalidateCollectorsQueries = () =>
     queryClient.invalidateQueries({ queryKey: ['collectors'] });
 
+  const onSuccess = (message: string) => onMutationSuccess(message, invalidateCollectorsQueries);
+
   // Fleet mutations
   const createFleetMutation = useMutation({
     mutationFn: (input: { name: string; description?: string; target_version?: string | null }) =>
       CollectorsFleets.create({ name: input.name, description: input.description, target_version: input.target_version ?? null }),
-    onError: (errorThrown) => {
-      UserNotification.error(
-        `Creating fleet failed: ${errorThrown}`,
-        'Could not create fleet',
-      );
-    },
+    onError: onMutationError('Creating fleet'),
     onSuccess: (fleet) => {
       UserNotification.success(`Fleet "${fleet.name}" has been created.`, 'Success!');
 
@@ -63,12 +70,7 @@ const useCollectorsMutations = () => {
         description: updates.description,
         target_version: updates.target_version ?? null,
       }),
-    onError: (errorThrown) => {
-      UserNotification.error(
-        `Updating fleet failed: ${errorThrown}`,
-        'Could not update fleet',
-      );
-    },
+    onError: onMutationError('Updating fleet'),
     onSuccess: (fleet) => {
       UserNotification.success(`Fleet "${fleet.name}" has been updated.`, 'Success!');
 
@@ -78,16 +80,13 @@ const useCollectorsMutations = () => {
 
   const deleteFleetMutation = useMutation({
     mutationFn: (fleetId: string) => CollectorsFleets.remove(fleetId),
-    onError: (errorThrown) => {
-      UserNotification.error(
-        `Deleting fleet failed: ${errorThrown}`,
-        'Could not delete fleet',
-      );
-    },
-    onSuccess: () => {
+    onError: onMutationError('Deleting fleet'),
+    onSuccess: (_data, fleetId) => {
       UserNotification.success('Fleet has been deleted.', 'Success!');
-
-      return invalidateCollectorsQueries();
+      // Remove fleet-specific queries from cache. Don't invalidate broadly here —
+      // the caller navigates away first (unmounting fleet detail queries), then the
+      // target page fetches fresh data on mount.
+      queryClient.removeQueries({ queryKey: ['collectors', 'fleets', fleetId] });
     },
   });
 
@@ -100,12 +99,7 @@ const useCollectorsMutations = () => {
         enabled: source.enabled,
         config: { type: source.type, ...source.config },
       }) as Promise<Source>,
-    onError: (errorThrown) => {
-      UserNotification.error(
-        `Creating source failed: ${errorThrown}`,
-        'Could not create source',
-      );
-    },
+    onError: onMutationError('Creating source'),
     onSuccess: (source) => {
       UserNotification.success(`Source "${source.name}" has been created.`, 'Success!');
 
@@ -121,12 +115,7 @@ const useCollectorsMutations = () => {
         enabled: updates.enabled,
         config: { type: updates.type, ...updates.config },
       }) as Promise<Source>,
-    onError: (errorThrown) => {
-      UserNotification.error(
-        `Updating source failed: ${errorThrown}`,
-        'Could not update source',
-      );
-    },
+    onError: onMutationError('Updating source'),
     onSuccess: (source) => {
       UserNotification.success(`Source "${source.name}" has been updated.`, 'Success!');
 
@@ -137,17 +126,8 @@ const useCollectorsMutations = () => {
   const deleteSourceMutation = useMutation({
     mutationFn: ({ fleetId, sourceId }: { fleetId: string; sourceId: string }) =>
       CollectorsSources.remove(fleetId, sourceId),
-    onError: (errorThrown) => {
-      UserNotification.error(
-        `Deleting source failed: ${errorThrown}`,
-        'Could not delete source',
-      );
-    },
-    onSuccess: () => {
-      UserNotification.success('Source has been deleted.', 'Success!');
-
-      return invalidateCollectorsQueries();
-    },
+    onError: onMutationError('Deleting source'),
+    onSuccess: onSuccess('Source has been deleted.'),
   });
 
   // Enrollment token mutations
@@ -157,28 +137,14 @@ const useCollectorsMutations = () => {
         fleet_id: input.fleetId,
         expires_in: input.expiresIn,
       }),
-    onError: (errorThrown) => {
-      UserNotification.error(
-        `Creating enrollment token failed: ${errorThrown}`,
-        'Could not create token',
-      );
-    },
+    onError: onMutationError('Creating enrollment token'),
     onSuccess: () => invalidateCollectorsQueries(),
   });
 
   const deleteEnrollmentTokenMutation = useMutation({
     mutationFn: (tokenId: string) => OpAMPEnrollment.remove(tokenId),
-    onError: (errorThrown) => {
-      UserNotification.error(
-        `Deleting enrollment token failed: ${errorThrown}`,
-        'Could not delete token',
-      );
-    },
-    onSuccess: () => {
-      UserNotification.success('Enrollment token has been deleted.', 'Success!');
-
-      return invalidateCollectorsQueries();
-    },
+    onError: onMutationError('Deleting enrollment token'),
+    onSuccess: onSuccess('Enrollment token has been deleted.'),
   });
 
   // Instance reassignment mutation
@@ -189,33 +155,15 @@ const useCollectorsMutations = () => {
         instance_uids: input.instanceUids,
         fleet_id: input.fleetId,
       }, {}, { Accept: 'application/json' }),
-    onError: (errorThrown) => {
-      UserNotification.error(
-        `Reassigning instances failed: ${errorThrown}`,
-        'Could not reassign instances',
-      );
-    },
-    onSuccess: () => {
-      UserNotification.success('Instances have been reassigned.', 'Success!');
-
-      return invalidateCollectorsQueries();
-    },
+    onError: onMutationError('Reassigning instances'),
+    onSuccess: onSuccess('Instances have been reassigned.'),
   });
 
   // Instance delete mutation
   const deleteInstanceMutation = useMutation({
     mutationFn: (instanceUid: string) => Collectors.deleteInstance(instanceUid),
-    onError: (errorThrown) => {
-      UserNotification.error(
-        `Deleting instance failed: ${errorThrown}`,
-        'Could not delete instance',
-      );
-    },
-    onSuccess: () => {
-      UserNotification.success('Instance has been deleted.', 'Success!');
-
-      return invalidateCollectorsQueries();
-    },
+    onError: onMutationError('Deleting instance'),
+    onSuccess: onSuccess('Instance has been deleted.'),
   });
 
   // Config mutation
@@ -234,11 +182,7 @@ const useCollectorsMutations = () => {
         'Could not save config',
       );
     },
-    onSuccess: () => {
-      UserNotification.success('Collectors config saved.', 'Success!');
-
-      return invalidateCollectorsQueries();
-    },
+    onSuccess: onSuccess('Collectors config saved.'),
   });
 
   return {

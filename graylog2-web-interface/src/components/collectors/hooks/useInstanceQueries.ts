@@ -18,17 +18,13 @@ import { useQuery } from '@tanstack/react-query';
 
 import { Collectors } from '@graylog/server-api';
 
-import type { SearchParams, Attribute } from 'stores/PaginationTypes';
+import type { SearchParams } from 'stores/PaginationTypes';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 import { defaultOnError } from 'util/conditional/onError';
 
-import type { CollectorInstanceView } from '../types';
+import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
-export type PaginatedCollectorsResponse<T> = {
-  list: T[];
-  pagination: { total: number };
-  attributes: Attribute[];
-};
+import type { CollectorInstanceView } from '../types';
 
 export const INSTANCES_KEY_PREFIX = ['collectors', 'instances'];
 export const instancesKeyFn = (searchParams: SearchParams) => [...INSTANCES_KEY_PREFIX, 'paginated', searchParams];
@@ -57,7 +53,7 @@ const toView = (dto: ApiInstanceResponse): CollectorInstanceView => {
 
 export const fetchPaginatedInstances = async (
   searchParams: SearchParams,
-): Promise<PaginatedCollectorsResponse<CollectorInstanceView>> =>
+): Promise<PaginatedResponse<CollectorInstanceView>> =>
   defaultOnError(
     Collectors.findInstances(
       searchParams.page,

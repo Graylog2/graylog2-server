@@ -189,3 +189,5 @@ export type ActivityEntry = {
 export type RecentActivityResponse = {
   activities: ActivityEntry[];
 };
+
+

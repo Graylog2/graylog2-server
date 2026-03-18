@@ -21,13 +21,12 @@ import { CollectorsFleets } from '@graylog/server-api';
 import type { SearchParams } from 'stores/PaginationTypes';
 import { defaultOnError } from 'util/conditional/onError';
 
-import type { PaginatedCollectorsResponse } from './useInstanceQueries';
+import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
 import type { BulkFleetStatsResponse, Fleet } from '../types';
 
 export const FLEETS_KEY_PREFIX = ['collectors', 'fleets'];
-export const FLEETS_PAGINATED_KEY_PREFIX = ['collectors', 'fleets', 'paginated'];
-export const fleetsKeyFn = (searchParams: SearchParams) => [...FLEETS_PAGINATED_KEY_PREFIX, searchParams];
+export const fleetsKeyFn = (searchParams: SearchParams) => [...FLEETS_KEY_PREFIX, 'paginated', searchParams];
 
 export const useFleets = () =>
   useQuery<Fleet[]>({
@@ -82,7 +81,7 @@ export const useFleetsBulkStats = () =>
 
 export const fetchPaginatedFleets = async (
   searchParams: SearchParams,
-): Promise<PaginatedCollectorsResponse<Fleet>> =>
+): Promise<PaginatedResponse<Fleet>> =>
   defaultOnError(
     CollectorsFleets.list(
       searchParams.page,

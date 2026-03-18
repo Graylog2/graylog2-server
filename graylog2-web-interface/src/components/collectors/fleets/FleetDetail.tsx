@@ -16,15 +16,17 @@
  */
 import * as React from 'react';
 import { useState, useMemo, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
 import URI from 'urijs';
 
 import {Button, ButtonToolbar, DeleteMenuItem, Label, SegmentedControl} from 'components/bootstrap';
-import { Spinner } from 'components/common';
+import { ConfirmDialog, Spinner } from 'components/common';
 import { MoreActions } from 'components/common/EntityDataTable';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import useHistory from 'routing/useHistory';
 import useQuery from 'routing/useQuery';
+import Routes from 'routing/Routes';
 import type { SearchParams } from 'stores/PaginationTypes';
 
 import FleetSettings from './FleetSettings';
@@ -54,6 +56,14 @@ const Header = styled.div(
   `,
 );
 
+const ActionsRow = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: ${theme.spacings.md};
+  `,
+);
+
 const StatsRow = styled.div(
   ({ theme }) => css`
     display: flex;
@@ -73,6 +83,7 @@ const SEGMENTS = [
 ];
 
 const FleetDetail = ({ fleetId }: Props) => {
+  const queryClient = useQueryClient();
   const { data: fleet, isLoading: fleetLoading } = useFleet(fleetId);
   const { data: stats, isLoading: statsLoading } = useFleetStats(fleetId);
   const defaultInstanceFilters = useDefaultInstanceFilters();
@@ -80,6 +91,7 @@ const FleetDetail = ({ fleetId }: Props) => {
   const { createSource, isCreatingSource, updateSource, isUpdatingSource, deleteSource, updateFleet, isUpdatingFleet, deleteFleet, isDeletingFleet } = useCollectorsMutations();
   const [showSourceModal, setShowSourceModal] = useState(false);
   const [editingSource, setEditingSource] = useState<Source | null>(null);
+  const [deletingSource, setDeletingSource] = useState<Source | null>(null);
   const [selectedInstance, setSelectedInstance] = useState<CollectorInstanceView | null>(null);
 
   const { tab: tabParam } = useQuery();
@@ -142,15 +154,12 @@ const FleetDetail = ({ fleetId }: Props) => {
     [],
   );
 
-  const handleDeleteSource = useCallback(
-    async (source: Source) => {
-      // eslint-disable-next-line no-alert
-      if (window.confirm(`Are you sure you want to delete source "${source.name}"?`)) {
-        await deleteSource({ fleetId, sourceId: source.id });
-      }
-    },
-    [deleteSource, fleetId],
-  );
+  const handleConfirmDeleteSource = useCallback(async () => {
+    if (!deletingSource) return;
+
+    await deleteSource({ fleetId, sourceId: deletingSource.id });
+    setDeletingSource(null);
+  }, [deletingSource, deleteSource, fleetId]);
 
   const sourceActions = useCallback(
     (source: Source) => (
@@ -159,11 +168,11 @@ const FleetDetail = ({ fleetId }: Props) => {
           Edit
         </Button>
         <MoreActions>
-          <DeleteMenuItem onSelect={() => handleDeleteSource(source)} />
+          <DeleteMenuItem onSelect={() => setDeletingSource(source)} />
         </MoreActions>
       </ButtonToolbar>
     ),
-    [handleDeleteSource],
+    [],
   );
 
   const getSourcesForInstance = (instance: CollectorInstanceView) =>
@@ -195,13 +204,13 @@ const FleetDetail = ({ fleetId }: Props) => {
       </Header>
 
       <StatsRow>
-        <StatCard value={stats?.total_instances || 0} label="Instances"
+        <StatCard value={stats?.total_instances ?? 0} label="Instances"
                   onClick={() => navigateToTab('instances')} />
-        <StatCard value={stats?.online_instances || 0} label="Online" variant="success"
+        <StatCard value={stats?.online_instances ?? 0} label="Online" variant="success"
                   onClick={() => navigateToTab('instances', ['status=online'])} />
-        <StatCard value={stats?.offline_instances || 0} label="Offline" variant="warning"
+        <StatCard value={stats?.offline_instances ?? 0} label="Offline" variant="warning"
                   onClick={() => navigateToTab('instances', ['status=offline'])} />
-        <StatCard value={stats?.total_sources || 0} label="Sources"
+        <StatCard value={stats?.total_sources ?? 0} label="Sources"
                   onClick={() => navigateToTab('sources')} />
       </StatsRow>
 
@@ -213,9 +222,9 @@ const FleetDetail = ({ fleetId }: Props) => {
 
       {activeTab === 'sources' && (
         <>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+          <ActionsRow>
             <Button bsStyle="success" onClick={() => setShowSourceModal(true)}>Add Source</Button>
-          </div>
+          </ActionsRow>
           <PaginatedEntityTable<Source>
             humanName="sources"
             tableLayout={SOURCES_LAYOUT}
@@ -250,6 +259,10 @@ const FleetDetail = ({ fleetId }: Props) => {
           }}
           onDelete={async () => {
             await deleteFleet(fleet.id);
+            history.push(Routes.SYSTEM.COLLECTORS.FLEETS);
+            // Invalidate after navigation so the fleets list refetches.
+            // Fleet-specific queries were already removed by the mutation's onSuccess.
+            queryClient.invalidateQueries({ queryKey: ['collectors'] });
           }}
           isLoading={isUpdatingFleet || isDeletingFleet}
         />
@@ -283,6 +296,15 @@ const FleetDetail = ({ fleetId }: Props) => {
         />
       )}
 
+      {deletingSource && (
+        <ConfirmDialog
+          title="Delete source"
+          show
+          onConfirm={handleConfirmDeleteSource}
+          onCancel={() => setDeletingSource(null)}>
+          Are you sure you want to delete source <strong>{deletingSource.name}</strong>?
+        </ConfirmDialog>
+      )}
     </div>
   );
 };

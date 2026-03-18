@@ -117,15 +117,19 @@ const DeploymentForm = () => {
   const handleGenerate = async () => {
     if (!fleetId) return;
 
-    const response = await createEnrollmentToken({
-      fleetId,
-      expiresIn: expiry === 'never' ? null : expiry,
-    });
+    try {
+      const response = await createEnrollmentToken({
+        fleetId,
+        expiresIn: expiry === 'never' ? null : expiry,
+      });
 
-    setTokenResponse({
-      token: response.token,
-      expiresAt: response.expires_at,
-    });
+      setTokenResponse({
+        token: response.token,
+        expiresAt: response.expires_at,
+      });
+    } catch {
+      // Error notification handled by useCollectorsMutations onError callback
+    }
   };
 
   const getInstallScript = () => {
