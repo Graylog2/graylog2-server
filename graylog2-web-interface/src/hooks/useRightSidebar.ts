@@ -14,22 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { useContext } from 'react';
 
-import { SystemNotifications } from '@graylog/server-api';
+import RightSidebarContext from 'contexts/RightSidebarContext';
 
-import { NOTIFICATIONS_QUERY_KEY } from 'components/notifications/constants';
+const useRightSidebar = () => {
+  const context = useContext(RightSidebarContext);
 
-const POLL_INTERVAL = 3000;
+  if (!context) {
+    throw new Error('useRightSidebar hook needs to be used inside RightSidebarProvider');
+  }
 
-const fetchNotifications = () => SystemNotifications.listNotifications({ requestShouldExtendSession: false });
-const useNotifications = () => {
-  const { data, isLoading } = useQuery({
-    queryKey: NOTIFICATIONS_QUERY_KEY,
-    queryFn: fetchNotifications,
-    refetchInterval: POLL_INTERVAL,
-  });
-
-  return { data, isLoading };
+  return context;
 };
-export default useNotifications;
+
+export default useRightSidebar;
