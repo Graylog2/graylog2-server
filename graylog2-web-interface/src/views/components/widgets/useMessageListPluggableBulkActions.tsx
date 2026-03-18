@@ -19,10 +19,16 @@ import { useRef } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 
-const useMessageListPluggableBulkActions = () => {
+const useMessageListPluggableBulkActions = (): {
+  pluggableBulkActions: React.ReactNode;
+  pluggableBulkActionModals: React.ReactNode;
+} => {
   const modalRefs = useRef({});
   const pluggableActions = usePluginEntities('views.components.widgets.messageTable.messageBulkActions');
   const availableActions = pluggableActions.filter((action) => (action.useCondition ? !!action.useCondition() : true));
+
+  if (!availableActions.length) return { pluggableBulkActions: null, pluggableBulkActionModals: null };
+
   const actions = availableActions.map(({ component: PluggableMessageBulkAction, key }) => (
     <PluggableMessageBulkAction key={`bulk-message-action-${key}`} modalRef={() => modalRefs.current[key]} />
   ));
@@ -38,7 +44,7 @@ const useMessageListPluggableBulkActions = () => {
       />
     ));
 
-  return { actions, actionModals };
+  return { pluggableBulkActions: actions, pluggableBulkActionModals: actionModals };
 };
 
 export default useMessageListPluggableBulkActions;

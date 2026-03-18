@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 import type { WidgetComponentProps, MessageResult } from 'views/types';
 import { Messages } from 'views/Constants';
@@ -59,10 +59,8 @@ const StyledBulkActionsRow = styled(BulkActionsRow)`
   padding-bottom: 10px;
 `;
 
-const BulkActions = () => {
-  const { actions, actionModals } = useMessageListPluggableBulkActions();
-
-  if (!actions?.length) return null;
+const BulkActions = ({ actions, actionModals }: { actions: React.ReactNode; actionModals: React.ReactNode }) => {
+  if (!actions) return null;
 
   return (
     <>
@@ -97,7 +95,6 @@ export type MessageTableBulkSelection = {
 
 type Props = WidgetComponentProps<MessagesWidgetConfig, MessageListResult> & {
   pageSize?: number;
-  bulkSelection?: MessageTableBulkSelection;
 };
 
 const useResetPaginationOnSearchExecution = (setCurrentPage: (pageNr: number) => void, currentPage) => {
@@ -144,9 +141,9 @@ const MessageList = ({
   pageSize = Messages.DEFAULT_LIMIT,
   setLoadingState,
   editing,
-  bulkSelection = { actions: <BulkActions /> },
 }: Props) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const { pluggableBulkActions, pluggableBulkActionModals } = useMessageListPluggableBulkActions();
   const { stopAutoRefresh } = useAutoRefresh();
 
   const pageErrors = usePageErrors(searchTypeId);
@@ -156,23 +153,15 @@ const MessageList = ({
   const dispatch = useViewsDispatch();
   useResetPaginationOnSearchExecution(setCurrentPage, currentPage);
   useRenderCompletionCallback();
-  const displayBulkAction = !!bulkSelection?.actions && !editing;
-  const displayBulkSelectCol =
-    (typeof bulkSelection?.onChangeSelection === 'function' || displayBulkAction) && !editing;
-  const isEntitySelectable = useCallback(
-    (entity: BackendMessage) => {
-      if (!displayBulkSelectCol || !entity.message?._id) {
-        return false;
-      }
+  const displayBulkSelectCol = !!pluggableBulkActions && !editing;
 
-      if (typeof bulkSelection?.isEntitySelectable === 'function') {
-        return bulkSelection.isEntitySelectable(entity);
-      }
-
-      return true;
-    },
-    [bulkSelection, displayBulkSelectCol],
+  const bulkSelection = useMemo(
+    () => ({
+      actions: <BulkActions actions={pluggableBulkActions} actionModals={pluggableBulkActionModals} />,
+    }),
+    [pluggableBulkActions, pluggableBulkActionModals],
   );
+  const isEntitySelectable = (entity: BackendMessage) => Boolean(displayBulkSelectCol && entity.message?._id);
 
   const handlePageChange = useCallback(
     (newCurrentPage: number) => {
@@ -210,7 +199,7 @@ const MessageList = ({
 
   const content = (
     <Wrapper>
-      {displayBulkAction && <StyledBulkActionsRow bulkActions={bulkSelection.actions} />}
+      {displayBulkSelectCol && <StyledBulkActionsRow bulkActions={bulkSelection.actions} />}
       <PaginatedList
         onChange={handlePageChange}
         activePage={Number(currentPage)}

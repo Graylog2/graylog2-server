@@ -38,8 +38,9 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import useMessageListPluggableBulkActions from 'views/components/widgets/useMessageListPluggableBulkActions';
 
-import type { MessageListResult, MessageTableBulkSelection } from './MessageList';
+import type { MessageListResult } from './MessageList';
 import MessageList from './MessageList';
 import type { TRenderCompletionCallback } from './RenderCompletionCallback';
 import RenderCompletionCallback from './RenderCompletionCallback';
@@ -84,6 +85,7 @@ jest.mock('views/hooks/useActiveQueryId');
 jest.mock('views/components/widgets/useCurrentSearchTypesResults');
 jest.mock('views/components/widgets/reexecuteSearchTypes');
 jest.mock('views/stores/useViewsDispatch');
+jest.mock('views/components/widgets/useMessageListPluggableBulkActions');
 
 describe('MessageList', () => {
   const config = MessagesWidgetConfig.builder().fields([]).build();
@@ -122,10 +124,14 @@ describe('MessageList', () => {
     // @ts-expect-error
     asMock(useCurrentSearchTypesResults).mockReturnValue(searchTypeResults);
     asMock(InputsStore.getInitialState).mockReturnValue({ inputs: [] });
+    asMock(useMessageListPluggableBulkActions).mockReturnValue({
+      pluggableBulkActions: null,
+      pluggableBulkActionModals: null,
+    });
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    asMock(useSearchResult).mockReset();
   });
 
   const findTable = () => screen.findByRole('table');
@@ -137,12 +143,18 @@ describe('MessageList', () => {
     await userEvent.click(nextPageButton);
   };
 
+  const openBulkActionsMenu = async () => {
+    const bulkActionsButton = await screen.findByRole('button', { name: /bulk actions/i });
+
+    await userEvent.click(bulkActionsButton);
+  };
+
   const SimpleMessageList = ({
     data: _data = data,
     config: _config = config,
     fields = Immutable.List([]),
     ...props
-  }: Partial<React.ComponentProps<typeof MessageList>> & { bulkSelection?: MessageTableBulkSelection }) => (
+  }: Partial<React.ComponentProps<typeof MessageList>>) => (
     <TestStoreProvider>
       <MessageList
         title="Message List"
@@ -289,7 +301,6 @@ describe('MessageList', () => {
   });
 
   it('bulk actions and row checkboxes update selected message state', async () => {
-    const selectedItemInfo = '1 item selected';
     const BulkActions = () => {
       const { setSelectedEntities } = useSelectedEntities();
 
@@ -300,22 +311,33 @@ describe('MessageList', () => {
       );
     };
 
-    render(<SimpleMessageList bulkSelection={{ actions: <BulkActions /> }} />);
+    asMock(useMessageListPluggableBulkActions).mockReturnValue({
+      pluggableBulkActions: <BulkActions />,
+      pluggableBulkActionModals: null,
+    });
+
+    render(<SimpleMessageList />);
 
     const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select message/i });
     await userEvent.click(rowCheckboxes[0]);
 
-    await screen.findByText(selectedItemInfo);
+    await screen.findByText('1 item selected');
+    await openBulkActionsMenu();
     const customBulkAction = await screen.findByRole('button', { name: /reset selection/i });
 
     await userEvent.click(customBulkAction);
 
-    expect(screen.queryByText(selectedItemInfo)).not.toBeInTheDocument();
-    expect(rowCheckboxes[0]).not.toBeChecked();
+    await waitFor(() => expect(screen.queryByText('1 item selected')).not.toBeInTheDocument());
+    await waitFor(() => expect(rowCheckboxes[0]).not.toBeChecked());
   });
 
   it('selects and deselects all visible messages', async () => {
     const secondMessageId = 'feedface';
+
+    asMock(useMessageListPluggableBulkActions).mockReturnValue({
+      pluggableBulkActions: <div>Example bulk action</div>,
+      pluggableBulkActionModals: null,
+    });
 
     render(
       <SimpleMessageList
@@ -335,7 +357,6 @@ describe('MessageList', () => {
           ],
           total: 2,
         }}
-        bulkSelection={{ actions: <div /> }}
       />,
     );
 
@@ -347,18 +368,18 @@ describe('MessageList', () => {
     const selectAllCheckbox = await screen.findByRole('checkbox', { name: /select all visible messages/i });
     await userEvent.click(selectAllCheckbox);
 
-    expect(rowCheckboxes[0]).toBeChecked();
-    expect(rowCheckboxes[1]).toBeChecked();
+    await waitFor(() => expect(rowCheckboxes[0]).toBeChecked());
+    await waitFor(() => expect(rowCheckboxes[1]).toBeChecked());
     await screen.findByText(/2 items selected/i);
 
-    await userEvent.click(selectAllCheckbox);
+    const deselectAllCheckbox = await screen.findByRole('checkbox', { name: /deselect all visible messages/i });
+    await userEvent.click(deselectAllCheckbox);
 
-    expect(rowCheckboxes[0]).not.toBeChecked();
-    expect(rowCheckboxes[1]).not.toBeChecked();
+    await waitFor(() => expect(rowCheckboxes[0]).not.toBeChecked());
+    await waitFor(() => expect(rowCheckboxes[1]).not.toBeChecked());
   });
 
   it('supports a complete bulk selection setup as example usage', async () => {
-    const onChangeSelection = jest.fn();
     const BulkActions = () => {
       const { selectedEntities, setSelectedEntities } = useSelectedEntities();
 
@@ -369,41 +390,24 @@ describe('MessageList', () => {
       );
     };
 
-    render(
-      <SimpleMessageList
-        bulkSelection={{
-          actions: <BulkActions />,
-          initialSelection: ['deadbeef'],
-          isEntitySelectable: (message) => message.message.file_name === 'frank.txt',
-          onChangeSelection,
-        }}
-      />,
-    );
+    asMock(useMessageListPluggableBulkActions).mockReturnValue({
+      pluggableBulkActions: <BulkActions />,
+      pluggableBulkActionModals: null,
+    });
 
-    const rowCheckbox = await screen.findByRole('checkbox', { name: /deselect message/i });
+    render(<SimpleMessageList />);
 
-    expect(rowCheckbox).toBeChecked();
-    expect(screen.getByRole('button', { name: /clear 1/i })).toBeInTheDocument();
-    expect(onChangeSelection).not.toHaveBeenCalled();
-
+    const rowCheckbox = await screen.findByRole('checkbox', { name: /select message/i });
     await userEvent.click(rowCheckbox);
 
-    expect(onChangeSelection).toHaveBeenLastCalledWith([], [
-      {
-        id: 'deadbeef',
-        index: 'graylog_42',
-        timestamp: '2018-09-26T12:42:49.234Z',
-      },
-    ]);
+    await screen.findByText(/1 item selected/i);
+    expect(await screen.findByRole('checkbox', { name: /deselect message/i })).toBeChecked();
 
-    await userEvent.click(rowCheckbox);
+    await openBulkActionsMenu();
+    const clearButton = await screen.findByRole('button', { name: /clear 1/i });
+    await userEvent.click(clearButton);
 
-    expect(onChangeSelection).toHaveBeenLastCalledWith(['deadbeef'], [
-      {
-        id: 'deadbeef',
-        index: 'graylog_42',
-        timestamp: '2018-09-26T12:42:49.234Z',
-      },
-    ]);
+    await waitFor(() => expect(screen.queryByText(/1 item selected/i)).not.toBeInTheDocument());
+    expect(await screen.findByRole('checkbox', { name: /select message/i })).not.toBeChecked();
   });
 });
