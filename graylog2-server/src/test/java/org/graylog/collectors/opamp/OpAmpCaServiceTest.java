@@ -122,6 +122,19 @@ class OpAmpCaServiceTest {
         assertThat(certificateService.findAll()).hasSize(4);
     }
 
+    private String getCN(CertificateEntry entry) throws Exception {
+        return PemUtils.parseCertificate(entry.certificate()).getSubjectX500Principal().getName();
+    }
+
+    @Test
+    void checkCertCNs() throws Exception {
+        mockClusterConfigStorage();
+
+        assertThat(getCN(opAmpCaService.getCaCert())).isEqualTo("O=Graylog,CN=Collectors CA");
+        assertThat(getCN(opAmpCaService.getSigningCert())).isEqualTo("O=Graylog,CN=Collectors Signing");
+        assertThat(getCN(opAmpCaService.getOtlpServerCert())).isEqualTo("O=Graylog,CN=Collectors OTLP Server");
+    }
+
     @Test
     void otlpServerCert_hasServerAuthEku() throws Exception {
         mockClusterConfigStorage();
@@ -139,16 +152,6 @@ class OpAmpCaServiceTest {
         final ExtendedKeyUsage eku = ExtendedKeyUsage.getInstance(
                 org.bouncycastle.asn1.ASN1Sequence.getInstance(octetString.getOctets()));
         assertThat(eku.hasKeyPurposeId(KeyPurposeId.id_kp_serverAuth)).isTrue();
-    }
-
-    @Test
-    void otlpServerCert_hasCorrectCn() throws Exception {
-        mockClusterConfigStorage();
-
-        final CertificateEntry otlpServerCert = opAmpCaService.getOtlpServerCert();
-        final X509Certificate cert = PemUtils.parseCertificate(otlpServerCert.certificate());
-
-        assertThat(cert.getSubjectX500Principal().getName()).contains("CN=Graylog OpAMP OTLP Server");
     }
 
     @Test

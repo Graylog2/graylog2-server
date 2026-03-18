@@ -87,8 +87,11 @@ class FleetServiceTest {
         FleetDTO fleet = fleetService.create("test-fleet", "A test fleet", null);
 
         List<TransactionMarker> markers = txnLogService.getUnprocessedMarkers(fleet.id(), null, 0L);
-        assertThat(markers).hasSize(1);
-        assertThat(markers.getFirst().type()).isEqualTo(MarkerType.CONFIG_CHANGED);
+        assertThat(markers).hasSize(2);
+        assertThat(markers.stream().map(TransactionMarker::type).toList()).containsExactlyInAnyOrder(
+                MarkerType.CONFIG_CHANGED,
+                MarkerType.INGEST_CONFIG_CHANGED
+        );
     }
 
     @Test
