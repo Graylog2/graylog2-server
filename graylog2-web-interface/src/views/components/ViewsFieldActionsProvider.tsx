@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useContext } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import type { AdditionalViewsActionHandlerArguments } from 'views/types';
@@ -23,6 +23,24 @@ import FieldActionsContext, { type FieldActionsContextValue } from 'views/compon
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import type { ActionHandlerCondition, ResolvedActionHandlerArguments } from 'views/components/actions/ActionHandler';
+import { Button } from 'components/bootstrap';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import AddToQueryHandler from 'views/logic/valueactions/AddToQueryHandler';
+
+const AssetDetailsActions = ({ assetId }: { assetId: string }) => {
+  const { all } = useContext(FieldTypesContext);
+  const fieldType = all.find((f) => f.name === 'associated_assets')?.type;
+  const queryId = useActiveQueryId();
+  const dispatch = useViewsDispatch();
+  const handleAddToQuery = () =>
+    dispatch(AddToQueryHandler({ queryId, field: 'associated_assets', value: assetId, type: fieldType }));
+
+  return (
+    <Button bsSize="xs" bsStyle="primary" onClick={() => handleAddToQuery()}>
+      Add to query
+    </Button>
+  );
+};
 
 const ViewsFieldActionsProvider = ({ children }: React.PropsWithChildren) => {
   const dispatch = useViewsDispatch();
@@ -52,6 +70,7 @@ const ViewsFieldActionsProvider = ({ children }: React.PropsWithChildren) => {
       additionalHandlerArgs,
       valueActions,
       fieldActions,
+      assetDetailsActions: AssetDetailsActions,
     }),
     [evaluateCondition, executeThunkAction, additionalHandlerArgs, fieldActions, valueActions],
   );

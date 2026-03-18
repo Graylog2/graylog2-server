@@ -37,6 +37,7 @@ export type FieldActionsContextValue<TAdditional extends object = object> = {
   additionalHandlerArgs: TAdditional;
   valueActions?: Array<ActionDefinition<TAdditional>>;
   fieldActions?: Array<ActionDefinition<TAdditional>>;
+  assetDetailsActions?: React.FunctionComponent<{ assetId: string }>;
 };
 
 const FieldActionsContext = React.createContext<FieldActionsContextValue | undefined>(undefined);
