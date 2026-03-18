@@ -36,7 +36,7 @@ const ArchivingsCell = ({ stream, indexSets }: Props) => {
 
   const archivingEnabled = Boolean(
     (indexSet?.use_legacy_rotation && indexSet?.retention_strategy_class === ARCHIVE_RETENTION_STRATEGY) ||
-      indexSet?.data_tiering?.archive_before_deletion,
+    indexSet?.data_tiering?.archive_before_deletion,
   );
 
   if (!archivingEnabled) {
