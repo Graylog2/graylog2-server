@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.EdECPublicKey;
+import java.time.Clock;
 import java.time.Instant;
 import java.util.Optional;
 
@@ -59,10 +60,12 @@ public class JwksService {
     private static final Logger LOG = LoggerFactory.getLogger(JwksService.class);
 
     private final CertificateService certificateService;
+    private final Clock clock;
 
     @Inject
-    public JwksService(CertificateService certificateService) {
+    public JwksService(CertificateService certificateService, Clock clock) {
         this.certificateService = certificateService;
+        this.clock = clock;
     }
 
     /**
@@ -115,7 +118,7 @@ public class JwksService {
      * @return true if notBefore &lt;= now &lt; notAfter
      */
     private boolean isCurrentlyValid(CertificateEntry entry) {
-        final Instant now = Instant.now();
+        final Instant now = clock.instant();
         return !now.isBefore(entry.notBefore()) && now.isBefore(entry.notAfter());
     }
 
