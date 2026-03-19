@@ -22,7 +22,9 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.input.CollectorIngestCodec;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
@@ -31,13 +33,18 @@ import org.graylog2.streams.StreamRuleImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_ENROLLMENT_TOKEN_ID;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_LAST_SEEN;
 
 /**
  * Migration for Collector changes during the 7.1 development.
@@ -45,6 +52,11 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  */
 public class V20260303120000_CollectorDEVMigrations extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20260303120000_CollectorDEVMigrations.class);
+    private static final String CLUSTER_CONFIG_COLLECTION = "cluster_config";
+    private static final String INSTANCES_COLLECTION = "collector_instances";
+    private static final String INPUTS_COLLECTION = "inputs";
+    private static final String CONFIG_TYPE = "org.graylog.collectors.CollectorsConfig";
+    private static final String GRPC_INPUT_TYPE = "org.graylog.collectors.input.CollectorIngestGrpcInput";
 
     private final MongoConnection mongoConnection;
 
@@ -70,6 +82,11 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
         renameCollectorsConfigFields(db);
         addCaCertIdToClusterConfig(db);
         updateStreamRule();
+        backfillThresholdDefaults(db);
+        convertLastSeenToBsonDate(db);
+        backfillEnrollmentTokenId(db);
+        deletePersistedGrpcInputs(db);
+        removeGrpcConfig(db);
     }
 
     private void convertObjectIdFields(MongoDatabase db) {
@@ -197,6 +214,105 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
                 );
         if (updateResult.getModifiedCount() > 0) {
             LOG.info("Updated Collector stream rule to match on field <{}>", CollectorIngestCodec.FIELD_COLLECTOR_SOURCE_TYPE);
+        }
+    }
+
+    private static void backfillThresholdDefaults(MongoDatabase db) {
+        final MongoCollection<Document> collection = db.getCollection(CLUSTER_CONFIG_COLLECTION);
+        final Document doc = collection.find(Filters.eq("type", CONFIG_TYPE)).first();
+        if (doc == null) {
+            LOG.debug("No collectors config found, skipping threshold backfill.");
+            return;
+        }
+
+        final Document payload = doc.get("payload", Document.class);
+        if (payload == null) {
+            return;
+        }
+
+        final List<Bson> updates = new ArrayList<>();
+
+        if (!payload.containsKey("collector_offline_threshold")) {
+            updates.add(Updates.set("payload.collector_offline_threshold",
+                    CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD.toString()));
+        }
+
+        if (!payload.containsKey("collector_default_visibility_threshold")) {
+            updates.add(Updates.set("payload.collector_default_visibility_threshold",
+                    CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD.toString()));
+        }
+
+        if (!payload.containsKey("collector_expiration_threshold")) {
+            updates.add(Updates.set("payload.collector_expiration_threshold",
+                    CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD.toString()));
+        }
+
+        if (!updates.isEmpty()) {
+            collection.updateOne(Filters.eq("type", CONFIG_TYPE), Updates.combine(updates));
+            LOG.info("Backfilled collectors config threshold defaults.");
+        }
+    }
+
+    private static void convertLastSeenToBsonDate(MongoDatabase db) {
+        final MongoCollection<Document> collection = db.getCollection(INSTANCES_COLLECTION);
+
+        long converted = 0;
+
+        for (final Document doc : collection.find(Filters.type(FIELD_LAST_SEEN, "string"))) {
+            final String value = doc.getString(FIELD_LAST_SEEN);
+            final Date date = Date.from(Instant.parse(value));
+            collection.updateOne(
+                    Filters.eq("_id", doc.getObjectId("_id")),
+                    Updates.set(FIELD_LAST_SEEN, date)
+            );
+            converted++;
+        }
+
+        if (converted > 0) {
+            LOG.info("Converted last_seen to BSON Date in {} collector instance document(s).", converted);
+        }
+    }
+
+    private static void backfillEnrollmentTokenId(MongoDatabase db) {
+        final MongoCollection<Document> collection = db.getCollection(INSTANCES_COLLECTION);
+
+        final long updated = collection.updateMany(
+                Filters.not(Filters.exists(FIELD_ENROLLMENT_TOKEN_ID)),
+                Updates.set(FIELD_ENROLLMENT_TOKEN_ID, "000000000000000000000000")
+        ).getModifiedCount();
+
+        if (updated > 0) {
+            LOG.info("Backfilled enrollment_token_id in {} collector instance document(s).", updated);
+        }
+    }
+
+    private static void deletePersistedGrpcInputs(MongoDatabase db) {
+        final MongoCollection<Document> collection = db.getCollection(INPUTS_COLLECTION);
+
+        final long deleted = collection.deleteMany(Filters.eq("type", GRPC_INPUT_TYPE)).getDeletedCount();
+        if (deleted > 0) {
+            LOG.info("Deleted {} persisted collector gRPC input(s).", deleted);
+        }
+    }
+
+    private static void removeGrpcConfig(MongoDatabase db) {
+        final MongoCollection<Document> collection = db.getCollection(CLUSTER_CONFIG_COLLECTION);
+        final Document doc = collection.find(Filters.eq("type", CONFIG_TYPE)).first();
+        if (doc == null) {
+            return;
+        }
+
+        final Document payload = doc.get("payload", Document.class);
+        if (payload == null || !payload.containsKey("grpc")) {
+            return;
+        }
+
+        final long updated = collection.updateOne(
+                Filters.eq("type", CONFIG_TYPE),
+                Updates.unset("payload.grpc")
+        ).getModifiedCount();
+        if (updated > 0) {
+            LOG.info("Removed gRPC settings from collectors config.");
         }
     }
 }
