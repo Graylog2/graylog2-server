@@ -21,7 +21,7 @@ import { useTheme } from 'styled-components';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import type { TelemetryEventType, TelemetryEvent } from 'logic/telemetry/TelemetryContext';
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
-import { TelemetrySettingsActions } from 'stores/telemetry/TelemetrySettingsStore';
+import { useUpdateTelemetrySettings } from 'logic/telemetry/useTelemetrySettings';
 import TelemetryInfoModal from 'logic/telemetry/TelemetryInfoModal';
 import type { TelemetryDataType } from 'logic/telemetry/useTelemetryData';
 import useTelemetryData from 'logic/telemetry/useTelemetryData';
@@ -66,6 +66,7 @@ const PostHogTelemetryProvider = ({ children }: { children: React.ReactElement }
   const isPosthogLoaded = useCallback(() => posthog?.__loaded === true, [posthog]);
 
   const { data: telemetryData, isSuccess: isTelemetryDataLoaded, refetch: refetchTelemetryData } = useTelemetryData();
+  const { mutateAsync: updateSettings } = useUpdateTelemetrySettings();
   const [showTelemetryInfo, setShowTelemetryInfo] = useState<boolean>(false);
   const [globalProps, setGlobalProps] = useState(undefined);
 
@@ -137,7 +138,7 @@ const PostHogTelemetryProvider = ({ children }: { children: React.ReactElement }
   }, [globalProps, isPosthogLoaded, posthog, theme.mode, system]);
 
   const handleConfirmTelemetryDialog = () => {
-    TelemetrySettingsActions.update({ telemetry_permission_asked: true, telemetry_enabled: true }).then(() => {
+    updateSettings({ telemetry_permission_asked: true, telemetry_enabled: true }).then(() => {
       refetchTelemetryData();
     });
 

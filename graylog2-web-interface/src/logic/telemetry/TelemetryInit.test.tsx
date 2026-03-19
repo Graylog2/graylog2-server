@@ -18,10 +18,10 @@ import * as React from 'react';
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { usePostHog } from 'posthog-js/react';
 
-import { asMock, MockStore } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import TelemetryInit from 'logic/telemetry/TelemetryInit';
 import AppConfig from 'util/AppConfig';
-import { TelemetrySettingsStore } from 'stores/telemetry/TelemetrySettingsStore';
+import useTelemetrySettings from 'logic/telemetry/useTelemetrySettings';
 
 const mockedTelemetryConfig = {
   api_key: 'key',
@@ -36,12 +36,7 @@ jest.mock('util/AppConfig', () => ({
   telemetry: jest.fn(() => mockedTelemetryConfig),
 }));
 
-jest.mock('stores/telemetry/TelemetrySettingsStore', () => ({
-  TelemetrySettingsActions: {
-    get: jest.fn(),
-  },
-  TelemetrySettingsStore: MockStore(),
-}));
+jest.mock('logic/telemetry/useTelemetrySettings');
 
 const Wrapper = ({ children }: { children: React.ReactElement }) => <TelemetryInit>{children}</TelemetryInit>;
 
@@ -57,12 +52,12 @@ describe('<TelemetryInit>', () => {
       enabled: false,
     }));
 
-    asMock(TelemetrySettingsStore.getInitialState).mockReturnValue({
-      telemetrySetting: {
+    asMock(useTelemetrySettings).mockReturnValue({
+      data: {
         telemetry_permission_asked: false,
         telemetry_enabled: false,
       },
-    });
+    } as any);
 
     const { result } = renderHook(() => usePostHog(), { wrapper: Wrapper });
 
@@ -70,12 +65,12 @@ describe('<TelemetryInit>', () => {
   });
 
   it('should render Telemetry and make usePosthog available', () => {
-    asMock(TelemetrySettingsStore.getInitialState).mockReturnValue({
-      telemetrySetting: {
+    asMock(useTelemetrySettings).mockReturnValue({
+      data: {
         telemetry_permission_asked: false,
         telemetry_enabled: true,
       },
-    });
+    } as any);
 
     asMock(AppConfig.telemetry).mockImplementation(() => ({
       api_key: 'key',
