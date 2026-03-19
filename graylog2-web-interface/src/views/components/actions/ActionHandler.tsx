@@ -33,8 +33,7 @@ export type ResolvedActionHandlerArguments<T extends object = object> = ActionHa
 
 export type ActionComponentProps<T extends object = object> = {
   onClose: () => void;
-  handlerArgs: ResolvedActionHandlerArguments<T>;
-};
+} & ResolvedActionHandlerArguments<T>;
 
 export type ActionComponentType<T extends object = object> = React.ComponentType<ActionComponentProps<T>>;
 
@@ -120,16 +119,19 @@ export function createHandlerFor<T extends object = object>(
   if (action.component) {
     const ActionComponent = action.component;
 
-    return (args: ResolvedActionHandlerArguments<T>) => {
+    return ({ field, value, type, contexts, ...restArgs }: ResolvedActionHandlerArguments<T>) => {
       const id = generateId();
       const onClose = () => setActionComponents(({ [id]: _, ...rest }) => rest);
-      const commonProps = {
-        key: action.title,
+      const componentProps = {
         onClose,
-        handlerArgs: args,
-      };
+        field,
+        value,
+        type,
+        contexts,
+        ...restArgs,
+      } as ActionComponentProps<T>;
 
-      const renderedComponent = <ActionComponent {...commonProps} />;
+      const renderedComponent = <ActionComponent key={action.title} {...componentProps} />;
 
       setActionComponents(
         (actionComponents) =>

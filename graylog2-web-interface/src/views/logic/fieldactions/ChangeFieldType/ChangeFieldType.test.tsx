@@ -55,7 +55,11 @@ const renderChangeTypeAction = ({
     <TestStoreProvider>
       <ChangeFieldType
         onClose={onClose}
-        handlerArgs={{ queryId, field, type, value, contexts: {} as ActionContexts }}
+        queryId={queryId}
+        field={field}
+        type={type}
+        value={value}
+        contexts={{} as ActionContexts}
       />
     </TestStoreProvider>,
   );

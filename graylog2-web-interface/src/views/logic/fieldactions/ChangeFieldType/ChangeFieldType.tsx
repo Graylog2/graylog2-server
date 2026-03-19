@@ -26,7 +26,7 @@ import useInitialSelection from 'views/logic/fieldactions/ChangeFieldType/hooks/
 import { isPermitted } from 'util/PermissionsMixin';
 
 const ChangeFieldType = ({
-  handlerArgs: { field },
+  field,
   onClose,
 }: ActionComponentProps<AdditionalViewsActionHandlerArguments>) => {
   const [show, setShow] = useState(true);

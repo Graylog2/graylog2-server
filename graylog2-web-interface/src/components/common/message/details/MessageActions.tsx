@@ -116,7 +116,7 @@ const MessageActions = ({
   const { timestamp, ...remainingFields } = fields;
 
   const surroundingSearchButton = disableSurroundingSearch || (
-    <SurroundingSearchButton id={id} timestamp={timestamp as string} messageFields={remainingFields} />
+    <SurroundingSearchButton id={id} timestamp={String(timestamp)} messageFields={remainingFields} />
   );
 
   const showChanges = decorationStats && (

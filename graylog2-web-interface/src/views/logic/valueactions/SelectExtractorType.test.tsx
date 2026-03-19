@@ -49,7 +49,11 @@ describe('SelectExtractorType', () => {
       <AdditionalContext.Provider key="message-key" value={{ message }}>
         <SelectExtractorType
           onClose={() => {}}
-          handlerArgs={{ queryId: 'query-id', field, type: FieldType.Unknown, value, contexts: {} as ActionContexts }}
+          queryId="query-id"
+          field={field}
+          type={FieldType.Unknown}
+          value={value}
+          contexts={{} as ActionContexts}
         />
       </AdditionalContext.Provider>,
     );
@@ -62,7 +66,11 @@ describe('SelectExtractorType', () => {
       <AdditionalContext.Provider key="message-key" value={{ message }}>
         <SelectExtractorType
           onClose={() => {}}
-          handlerArgs={{ queryId: 'query-id', field, type: FieldType.Unknown, value, contexts: {} as ActionContexts }}
+          queryId="query-id"
+          field={field}
+          type={FieldType.Unknown}
+          value={value}
+          contexts={{} as ActionContexts}
         />
       </AdditionalContext.Provider>,
     );

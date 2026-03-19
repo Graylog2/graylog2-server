@@ -48,9 +48,7 @@ class SelectExtractorType extends React.Component<ActionComponentProps<Additiona
   componentDidMount() {
     const { message } = this.context;
     const { gl2_source_node, gl2_source_input } = message.fields;
-    const {
-      handlerArgs: { field },
-    } = this.props;
+    const { field } = this.props;
 
     this.extractorRoutes = ExtractorUtils.getNewExtractorRoutes(
       gl2_source_node,
