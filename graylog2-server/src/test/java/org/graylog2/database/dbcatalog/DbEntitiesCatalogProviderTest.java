@@ -57,6 +57,6 @@ class DbEntitiesCatalogProviderTest {
 
         final DbEntityCatalogEntry entryByCollectionName = dbEntitiesCatalog.getByCollectionName(UserImpl.COLLECTION_NAME).get();
 
-        assertEquals(new DbEntityCatalogEntry(UserImpl.COLLECTION_NAME, UserImpl.USERNAME, UserImpl.class, USERS_READ), entryByCollectionName);
+        assertEquals(new DbEntityCatalogEntry(UserImpl.COLLECTION_NAME, UserImpl.FULL_NAME, UserImpl.class, USERS_READ), entryByCollectionName);
     }
 }

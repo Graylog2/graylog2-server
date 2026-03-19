@@ -17,7 +17,6 @@
 package org.graylog2.streams.filters;
 
 import com.google.common.collect.ImmutableMultimap;
-import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.mongodb.client.model.Sorts;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
@@ -49,12 +48,12 @@ class StreamDestinationFilterServiceTest {
     @Mock
     private DestinationFilterCreationValidator mockedFilterLicenseCheck;
     private StreamDestinationFilterService service;
-    private EventBus eventBus;
+    private ClusterEventBus clusterEventBus;
 
     @BeforeEach
     void setUp(MongoCollections mongoCollections) {
-        this.eventBus = new EventBus("stream-destination-filter-service");
-        this.service = new StreamDestinationFilterService(mongoCollections, new ClusterEventBus(MoreExecutors.directExecutor()), eventBus, Optional.of(mockedFilterLicenseCheck));
+        this.clusterEventBus = new ClusterEventBus(MoreExecutors.directExecutor());
+        this.service = new StreamDestinationFilterService(mongoCollections, clusterEventBus, Optional.of(mockedFilterLicenseCheck));
     }
 
     @Test
@@ -89,6 +88,16 @@ class StreamDestinationFilterServiceTest {
 
         assertThat(result.delegate()).hasSize(1);
         assertThat(result.delegate().get(0).status()).isEqualTo(StreamDestinationFilterRuleDTO.Status.DISABLED);
+    }
+
+    @Test
+    @MongoDBFixtures("StreamDestinationFilterServiceTest-2024-07-01-1.json")
+    void countByStreamIds() {
+        final var countByStreamIds = service.countByStreamIds(List.of("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef2000"), id -> !"54e3deadbeefdeadbeef0001".equals(id));
+
+        assertThat(countByStreamIds)
+                .containsEntry("54e3deadbeefdeadbeef1000", 2L)
+                .containsEntry("54e3deadbeefdeadbeef2000", 1L);
     }
 
     @Test
@@ -304,7 +313,7 @@ class StreamDestinationFilterServiceTest {
         optionalDto = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0002");
         assertThat(optionalDto).isPresent();
 
-        eventBus.post(new StreamDeletedEvent("54e3deadbeefdeadbeef1000", "Test Stream 1"));
+        clusterEventBus.post(new StreamDeletedEvent("54e3deadbeefdeadbeef1000", "Test Stream 1"));
 
         var afterDeletionEvent = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0000");
         assertThat(afterDeletionEvent).isNotPresent();

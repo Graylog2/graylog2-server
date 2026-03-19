@@ -15,24 +15,38 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import type { Filters, Filter } from 'components/common/EntityFilters/types';
 import type { Attributes } from 'stores/PaginationTypes';
 import ActiveFilter from 'components/common/EntityFilters/ActiveFilter';
+import HoverForHelp from 'components/common/HoverForHelp';
 import { ROW_MIN_HEIGHT } from 'components/common/EntityFilters/Constants';
 
-const FilterGroup = styled.div`
-  display: inline-flex;
-  align-items: center;
-  min-height: ${ROW_MIN_HEIGHT}px;
-  gap: 3px;
-  flex-wrap: wrap;
-`;
+const FilterGroup = styled.div(
+  ({ theme }) => css`
+    display: inline-flex;
+    align-items: center;
+    min-height: ${ROW_MIN_HEIGHT}px;
+    gap: ${theme.spacings.xxs};
+    flex-wrap: wrap;
 
-const FilterGroupTitle = styled.div`
-  margin-right: 3px;
-`;
+    &:not(:last-child) {
+      margin-right: ${theme.spacings.xs};
+    }
+  `,
+);
+
+const FilterGroupTitle = styled.div(
+  ({ theme }) => css`
+    display: inline-flex;
+    align-items: center;
+    gap: ${theme.spacings.xxs};
+  `,
+);
+
+const SLICE_FILTER_CONFLICT_HELP =
+  'This filter is ignored because a slice is active for this attribute. Clear the slice to apply the filter.';
 
 type Props = {
   attributes: Attributes;
@@ -40,18 +54,36 @@ type Props = {
   filters: Filters;
   onChangeFilter: (attributeId: string, prevValue: string, newFilter: Filter) => void;
   onDeleteFilter: (attributeId: string, filterValue: string) => void;
+  activeSliceCol?: string;
+  activeSlice?: string;
 };
 
-const ActiveFilters = ({ attributes, filters, filterValueRenderers, onDeleteFilter, onChangeFilter }: Props) => (
+const ActiveFilters = ({
+  attributes,
+  filters,
+  filterValueRenderers,
+  onDeleteFilter,
+  onChangeFilter,
+  activeSliceCol = undefined,
+  activeSlice = undefined,
+}: Props) => (
   <>
     {filters
       .entrySeq()
       .map(([attributeId, filterValues]) => {
         const attribute = attributes?.find(({ id }) => id === attributeId);
+        const isConflictingAttribute = !!activeSliceCol && !!activeSlice && activeSliceCol === attributeId;
 
         return (
           <FilterGroup key={attributeId}>
-            <FilterGroupTitle>{attribute.title}:</FilterGroupTitle>
+            <FilterGroupTitle>
+              <span>{attribute.title}:</span>
+              {isConflictingAttribute && (
+                <HoverForHelp title="Filter ignored" pullRight={false}>
+                  {SLICE_FILTER_CONFLICT_HELP}
+                </HoverForHelp>
+              )}
+            </FilterGroupTitle>
             {filterValues.map((filter) => (
               <ActiveFilter
                 filter={filter}
@@ -61,6 +93,7 @@ const ActiveFilters = ({ attributes, filters, filterValueRenderers, onDeleteFilt
                 filterValueRenderer={filterValueRenderers?.[attributeId]}
                 onChangeFilter={onChangeFilter}
                 onDeleteFilter={onDeleteFilter}
+                isConflicting={isConflictingAttribute}
               />
             ))}
           </FilterGroup>

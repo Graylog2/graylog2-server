@@ -18,18 +18,19 @@ package org.graylog.storage.opensearch3.views.searchtypes.pivot;
 
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Max;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Min;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.aggregations.MaxAggregate;
+import org.opensearch.client.opensearch._types.aggregations.MinAggregate;
+import org.opensearch.client.opensearch.core.msearch.MultiSearchItem;
 
 public class EffectiveTimeRangeExtractor {
-    AbsoluteRange extract(SearchResponse queryResult, Query query, Pivot pivot) {
-        if (queryResult.getHits().getTotalHits().value != 0) {
+    AbsoluteRange extract(MultiSearchItem<JsonData> queryResult, Query query, Pivot pivot) {
+        if (queryResult.hits().total().value() != 0) {
             return getAbsoluteRangeFromAggregations(queryResult, query, pivot);
         } else {
             return getAbsoluteRangeFromPivot(query, pivot);
@@ -40,11 +41,11 @@ public class EffectiveTimeRangeExtractor {
         return AbsoluteRange.create(pivotRange.getFrom(), pivotRange.getTo());
     }
 
-    private AbsoluteRange getAbsoluteRangeFromAggregations(final SearchResponse queryResult, final Query query, final Pivot pivot) {
-        final Min min = queryResult.getAggregations().get("timestamp-min");
-        final Double from = min.getValue();
-        final Max max = queryResult.getAggregations().get("timestamp-max");
-        final Double to = max.getValue();
+    private AbsoluteRange getAbsoluteRangeFromAggregations(final MultiSearchItem<JsonData> queryResult, final Query query, final Pivot pivot) {
+        final MinAggregate min = queryResult.aggregations().get("timestamp-min").min();
+        final Double from = min.value();
+        final MaxAggregate max = queryResult.aggregations().get("timestamp-max").max();
+        final Double to = max.value();
         final TimeRange pivotRange = query.effectiveTimeRange(pivot);
         return AbsoluteRange.create(
                 isAllMessagesTimeRange(pivotRange) && from != 0

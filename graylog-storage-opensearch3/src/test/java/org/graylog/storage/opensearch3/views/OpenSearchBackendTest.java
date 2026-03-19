@@ -39,10 +39,6 @@ import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.MatchAllQueryBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryStringQueryBuilder;
 import org.graylog.storage.opensearch3.views.searchtypes.OSMessageList;
 import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.EffectiveTimeRangeExtractor;
@@ -64,6 +60,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.opensearch.client.opensearch._types.query_dsl.QueryStringQuery;
 
 import java.util.Collections;
 import java.util.List;
@@ -103,7 +100,8 @@ public class OpenSearchBackendTest {
                 usedSearchFiltersToQueryStringsMapper,
                 new NoOpStatsCollector<>(),
                 mock(StreamService.class),
-                false);
+                false,
+                1, 1);
     }
 
     @Test
@@ -152,22 +150,22 @@ public class OpenSearchBackendTest {
                 .build();
 
         final OSGeneratedQueryContext queryContext = backend.generate(query, Collections.emptySet(), DateTimeZone.UTC);
-        final QueryBuilder esQuery = queryContext.searchSourceBuilder(new SearchType.Fallback()).query();
+        org.opensearch.client.opensearch._types.query_dsl.Query esQuery = queryContext.searchSourceBuilder(new SearchType.Fallback()).build().query();
         assertThat(esQuery)
                 .isNotNull()
-                .isInstanceOf(BoolQueryBuilder.class);
+                .matches(org.opensearch.client.opensearch._types.query_dsl.Query::isBool);
 
-        final List<QueryBuilder> filters = ((BoolQueryBuilder) esQuery).filter();
+        final List<org.opensearch.client.opensearch._types.query_dsl.Query> filters = esQuery.bool().filter();
 
         //filter for empty ES query
         assertThat(filters)
-                .anyMatch(queryBuilder -> queryBuilder instanceof MatchAllQueryBuilder);
+                .anyMatch(org.opensearch.client.opensearch._types.query_dsl.Query::isMatchAll);
 
         //2 filters from search filters
         assertThat(filters)
-                .filteredOn(queryBuilder -> queryBuilder instanceof QueryStringQueryBuilder)
-                .extracting(queryBuilder -> (QueryStringQueryBuilder) queryBuilder)
-                .extracting(QueryStringQueryBuilder::queryString)
+                .filteredOn(org.opensearch.client.opensearch._types.query_dsl.Query::isQueryString)
+                .extracting(org.opensearch.client.opensearch._types.query_dsl.Query::queryString)
+                .extracting(QueryStringQuery::query)
                 .contains("method:POST")
                 .contains("method:GET");
     }

@@ -44,8 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
 @RequiresAuthentication
 @PublicCloudAPI
 @Tag(name = "FavoriteFields", description = "Retrieve/set favorite fields per stream")

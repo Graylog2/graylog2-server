@@ -17,6 +17,7 @@
 import uniq from 'lodash/uniq';
 
 import type FieldType from 'views/logic/fieldtypes/FieldType';
+import recordQueryStringUsage from 'views/logic/queries/recordQueryStringUsage';
 import { escape, addToQuery, formatTimestamp, predicate } from 'views/logic/queries/QueryHelper';
 import { updateQueryString } from 'views/logic/slices/viewSlice';
 import { selectQueryString } from 'views/logic/slices/viewSelectors';
@@ -58,6 +59,8 @@ const AddToQueryHandler =
         formatNewQuery(prev, valueToAdd.field, valueToAdd.value as string | number, valueToAdd.type),
       oldQuery,
     );
+
+    await recordQueryStringUsage(newQuery, oldQuery);
 
     return dispatch(updateQueryString(queryId, newQuery));
   };

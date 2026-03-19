@@ -20,6 +20,7 @@ import { PaginatedEntityTable } from 'components/common';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
 import type { FetchOptions } from 'components/common/PaginatedEntityTable/useFetchEntities';
+import useProductName from 'brand-customization/useProductName';
 
 import {
   createColumnDefinitions,
@@ -47,9 +48,10 @@ const DataNodesExpandable = ({
   refetchInterval = undefined,
 }: Props) => {
   const [totalDataNodes, setTotalDataNodes] = useState<number | undefined>(undefined);
+  const productName = useProductName();
 
   const columnSchemas = useMemo<Array<ColumnSchema>>(() => createColumnDefinitions(), []);
-  const columnRenderers = useMemo(() => createColumnRenderers(), []);
+  const columnRenderers = useMemo(() => createColumnRenderers(productName), [productName]);
 
   const renderActions = useCallback((entity: ClusterDataNode) => <DataNodeActions dataNode={entity} />, []);
   const tableLayout = useMemo(

@@ -40,7 +40,6 @@ import {
 import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfile';
 import useIndexProfileWithMappingsByField from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
 import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
-import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 const getData = (list = [defaultField]) => ({
   list,
@@ -52,12 +51,9 @@ const getData = (list = [defaultField]) => ({
 
 const renderIndexSetFieldTypesList = () =>
   render(
-    <DefaultQueryParamProvider>
-      <TestStoreProvider>
-        <IndexSetFieldTypesList />
-      </TestStoreProvider>
-      ,
-    </DefaultQueryParamProvider>,
+    <TestStoreProvider>
+      <IndexSetFieldTypesList />
+    </TestStoreProvider>,
   );
 
 jest.mock('stores/indices/IndexSetsStore', () => ({
@@ -167,7 +163,7 @@ describe('IndexSetFieldTypesList', () => {
       await within(tableRow).findByText('Boolean');
       await within(tableRow).findByText('Index');
 
-      const editButton = await within(tableRow).findByRole('button', { name: /edit/i });
+      const editButton = await within(tableRow).findByRole('button', { name: 'Edit field type for field' });
 
       expect(editButton).not.toBeDisabled();
     });
@@ -185,7 +181,7 @@ describe('IndexSetFieldTypesList', () => {
       await within(tableRow).findByText('field-1');
       await within(tableRow).findByText('Boolean');
       await within(tableRow).findByText(/overridden index/i);
-      const editButton = await within(tableRow).findByRole('button', { name: /edit/i });
+      const editButton = await within(tableRow).findByRole('button', { name: 'Edit field type for field-1' });
 
       expect(editButton).not.toBeDisabled();
     });
@@ -203,7 +199,7 @@ describe('IndexSetFieldTypesList', () => {
       await within(tableRow).findByText('field-2');
       await within(tableRow).findByText('Boolean');
       await within(tableRow).findByText(/overridden profile/i);
-      const editButton = await within(tableRow).findByRole('button', { name: /edit/i });
+      const editButton = await within(tableRow).findByRole('button', { name: 'Edit field type for field-2' });
 
       expect(editButton).not.toBeDisabled();
     });
@@ -221,7 +217,7 @@ describe('IndexSetFieldTypesList', () => {
       await within(tableRow).findByText('field-3');
       await within(tableRow).findByText('String type');
       await within(tableRow).findByText(/profile/i);
-      const editButton = await within(tableRow).findByRole('button', { name: /edit/i });
+      const editButton = await within(tableRow).findByRole('button', { name: 'Edit field type for field-3' });
 
       expect(editButton).not.toBeDisabled();
     });
@@ -250,7 +246,7 @@ describe('IndexSetFieldTypesList', () => {
       const tableRow = await screen.findByTestId('table-row-field-4');
 
       await within(tableRow).findByTitle('Field has reserved field type');
-      const editButton = await within(tableRow).findByRole('button', { name: /edit/i });
+      const editButton = await within(tableRow).findByRole('button', { name: 'Edit field type for field-4' });
 
       expect(editButton).toBeDisabled();
     });

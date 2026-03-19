@@ -40,7 +40,6 @@ import org.opensearch.client.opensearch.core.BulkRequest.Builder;
 import org.opensearch.client.opensearch.indices.GetIndexResponse;
 import org.opensearch.client.opensearch.indices.GetMappingResponse;
 import org.opensearch.client.opensearch.indices.IndexSettings;
-import org.opensearch.client.opensearch.indices.add_block.IndicesBlockOptions;
 import org.opensearch.client.opensearch.indices.get_mapping.IndexMappingRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,10 +86,13 @@ public class ClientOS implements Client {
 
     @Override
     public void deleteIndices(String... indices) {
-        final List<String> toDelete = Arrays.stream(indices).filter(i -> !PROTECTED_INDICES.contains(i)).toList();
-        if (!toDelete.isEmpty()) {
-            opensearchClient.sync(c -> c.indices().delete(r -> r.index(toDelete).ignoreUnavailable(true)), "Failed to delete indices");
-        }
+        Arrays.stream(indices)
+                .filter(i -> !PROTECTED_INDICES.contains(i))
+                .forEach(this::deleteIndex);
+    }
+
+    private void deleteIndex(String index) {
+        opensearchClient.sync(c -> c.indices().delete(r -> r.index(index).ignoreUnavailable(true)), "Failed to delete index " + index);
     }
 
     public void deleteDataStreams() {
@@ -215,7 +217,7 @@ public class ClientOS implements Client {
 
     @Override
     public void setIndexBlock(String index) {
-        opensearchClient.sync(c -> c.indices().addBlock(req -> req.index(index).block(IndicesBlockOptions.ReadOnly)), "Unable to set index block for " + index);
+        opensearchClient.sync(c -> c.indices().putSettings(req -> req.index(index).settings(s -> s.customSettings("index.blocks.read_only_allow_delete", JsonData.of(true)))), "Unable to set index block for " + index);
     }
 
     @Override

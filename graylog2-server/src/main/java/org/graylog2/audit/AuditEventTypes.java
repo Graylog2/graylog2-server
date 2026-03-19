@@ -167,6 +167,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String SUPPORT_BUNDLE_DOWNLOAD = PREFIX + "support_bundle:download";
     public static final String SYSTEM_JOB_START = PREFIX + "system_job:start";
     public static final String SYSTEM_JOB_STOP = PREFIX + "system_job:stop";
+    public static final String MONGODB_CHANGE_PROFILING = PREFIX + "mongodb:changeprofiling";
 
     public static final String SYSTEM_JOB_ACKNOWLEDGE = PREFIX + "system_job:acknowledge";
     public static final String SYSTEM_NOTIFICATION_CREATE = PREFIX + "system_notification:create";
@@ -364,6 +365,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(MCP_TOOL_CALL)
             .add(MCP_PROMPT_LIST)
             .add(MCP_PROMPT_GET)
+            .add(MONGODB_CHANGE_PROFILING)
             .build();
 
     @Override

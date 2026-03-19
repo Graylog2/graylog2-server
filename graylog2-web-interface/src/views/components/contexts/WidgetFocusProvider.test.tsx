@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { useLocation } from 'react-router-dom';
 import Immutable from 'immutable';
 import userEvent from '@testing-library/user-event';
 
@@ -34,16 +33,15 @@ import useView from 'views/hooks/useView';
 import View from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
 import { setNewWidget } from 'views/logic/slices/widgetsSlice';
+import useLocation from 'routing/useLocation';
+
+jest.mock('routing/useLocation');
 
 const mockNavigate = jest.fn();
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => mockNavigate,
-  useLocation: jest.fn(() => ({
-    pathname: '',
-    search: '',
-  })),
 }));
 
 jest.mock('views/stores/useViewsDispatch');
@@ -118,7 +116,7 @@ describe('WidgetFocusProvider', () => {
   });
 
   it('should update url on widget focus close', async () => {
-    asMock(useLocation).mockReturnValueOnce({
+    asMock(useLocation).mockReturnValue({
       ...emptyLocation,
       search: '?focusedId=widget-id&focusing=true',
     });

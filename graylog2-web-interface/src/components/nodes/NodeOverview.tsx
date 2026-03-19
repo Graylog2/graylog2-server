@@ -17,7 +17,7 @@
 import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { LinkContainer } from 'components/common/router';
+import { LinkContainer } from 'components/common';
 import { Row, Col, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
@@ -30,10 +30,20 @@ import RestApiOverview from 'components/nodes/RestApiOverview';
 import PluginsDataTable from 'components/nodes/PluginsDataTable';
 import InputTypesDataTable from 'components/nodes/InputTypesDataTable';
 import type { NodeInfo } from 'stores/nodes/NodesStore';
-import type { Plugin } from 'stores/system/SystemPluginsStore';
 import type { Input } from 'components/messageloaders/Types';
 import type { InputDescription } from 'stores/inputs/InputTypesStore';
 import type { SystemOverview } from 'stores/cluster/types';
+
+type Plugin = {
+  unique_id: string;
+  required_version: string;
+  author: string;
+  required_capabilities: Array<string>;
+  name: string;
+  description: string;
+  version: string;
+  url: string;
+};
 
 type InputState = {
   detailed_message: string;

@@ -29,6 +29,7 @@ import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateM
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineImpl;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStep;
+import org.graylog.plugins.views.storage.migration.state.machine.TestableMigrationActions;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -80,14 +81,14 @@ public class MigrationStateResourceTest {
     public void requestReturns500OnError() {
         final MigrationStateResource resource = new MigrationStateResource(createStateMachine(), mockHttpHeaders(), journalConfiguration);
         // trigger a step that's not allowed in this state. That should cause and propagate an error
-        try (Response response = resource.trigger(new MigrationStepRequest(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED, Map.of()))) {
+        try (Response response = resource.trigger(new MigrationStepRequest(MigrationStep.PROVISION_DATANODE_CERTIFICATES, Map.of()))) {
             assertThat(response.getStatus()).isEqualTo(500);
             final Object entity = response.getEntity();
             assertThat(entity)
                     .isInstanceOf(CurrentStateInformation.class)
                     .extracting(e -> (CurrentStateInformation) e)
                     .extracting(CurrentStateInformation::errorMessage)
-                    .isEqualTo("No valid leaving transitions are permitted from state 'NEW' for trigger 'CONFIRM_OLD_CLUSTER_STOPPED'. Consider ignoring the trigger.");
+                    .isEqualTo("No valid leaving transitions are permitted from state 'NEW' for trigger 'PROVISION_DATANODE_CERTIFICATES'. Consider ignoring the trigger.");
         }
     }
 
@@ -122,7 +123,7 @@ public class MigrationStateResourceTest {
     private MigrationStateMachine createStateMachine() {
         final InMemoryStateMachinePersistence persistence = new InMemoryStateMachinePersistence();
         final MigrationStateMachineContext context = new MigrationStateMachineContext();
-        final MigrationActionsAdapter actions = new MigrationActionsAdapter(context);
+        final TestableMigrationActions actions = TestableMigrationActions.initialConfig().build();
         return new MigrationStateMachineImpl(
                 MigrationStateMachineBuilder.buildFromPersistedState(persistence, actions),
                 persistence,

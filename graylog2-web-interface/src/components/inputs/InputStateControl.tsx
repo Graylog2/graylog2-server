@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { isInputRunning, isInputInSetupMode } from 'components/inputs/helpers/inputState';
@@ -28,7 +29,6 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { Button } from 'components/bootstrap';
 import { INPUT_SETUP_MODE_FEATURE_FLAG } from 'components/inputs/InputSetupWizard';
 import type { InputStates } from 'hooks/useInputsStates';
-import useIsInitialUnknownInputState from 'components/inputs/hooks/useIsInitialUnknownInputState';
 
 type Props = {
   input: Input;
@@ -36,12 +36,18 @@ type Props = {
   openWizard: () => void;
 };
 
+const StateActionButton = styled(Button)(
+  () => css`
+    min-width: 95px;
+  `,
+);
+
 const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
-  const isInitialUnknownState = useIsInitialUnknownInputState(inputStates, input.id);
+
   const startInput = () => {
     setIsLoading(true);
 
@@ -77,26 +83,26 @@ const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
     openWizard();
   };
 
-  if (inputSetupFeatureFlagIsEnabled && (isInputInSetupMode(inputStates, input.id) || isInitialUnknownState)) {
+  if (inputSetupFeatureFlagIsEnabled && isInputInSetupMode(inputStates, input.id)) {
     return (
-      <Button bsStyle="warning" bsSize="xsmall" onClick={setupInput}>
+      <StateActionButton bsStyle="warning" bsSize="xsmall" onClick={setupInput}>
         Set-up Input
-      </Button>
+      </StateActionButton>
     );
   }
 
   if (isInputRunning(inputStates, input.id)) {
     return (
-      <Button bsSize="xsmall" onClick={stopInput} disabled={isLoading}>
+      <StateActionButton bsSize="xsmall" onClick={stopInput} disabled={isLoading}>
         {isLoading ? 'Stopping...' : 'Stop input'}
-      </Button>
+      </StateActionButton>
     );
   }
 
   return (
-    <Button bsStyle="primary" bsSize="xsmall" onClick={startInput} disabled={isLoading}>
+    <StateActionButton bsStyle="primary" bsSize="xsmall" onClick={startInput} disabled={isLoading}>
       {isLoading ? 'Starting...' : 'Start input'}
-    </Button>
+    </StateActionButton>
   );
 };
 

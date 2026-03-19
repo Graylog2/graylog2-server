@@ -26,6 +26,8 @@ import { SEARCH_DEBOUNCE_THRESHOLD } from '../common/SearchForm';
 
 jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));
 
+const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+
 describe('<ContentPackParameterList />', () => {
   beforeAll(() => {
     jest.useFakeTimers();
@@ -165,7 +167,7 @@ describe('<ContentPackParameterList />', () => {
     await screen.findByText('PARAM');
 
     const input = await screen.findByPlaceholderText('Enter search query...');
-    userEvent.type(input, 'Bad');
+    await setupUser().type(input, 'Bad');
 
     act(() => {
       jest.advanceTimersByTime(SEARCH_DEBOUNCE_THRESHOLD);
@@ -175,7 +177,7 @@ describe('<ContentPackParameterList />', () => {
       expect(screen.queryByText('PARAM')).not.toBeInTheDocument();
     });
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Reset search' }));
+    await setupUser().click(await screen.findByRole('button', { name: 'Reset search' }));
 
     await screen.findByText('PARAM');
   });

@@ -35,19 +35,20 @@ type Props = {
 
 export const ScratchpadProvider = ({ children, loginName }: Props) => {
   const localStorageItem = `gl-scratchpad-${loginName}`;
-  const scratchpadStore = Store.get(localStorageItem) || {};
+  type ScratchpadStoreData = Record<string, unknown> & { opened?: boolean };
+  const scratchpadStore = Store.get<ScratchpadStoreData>(localStorageItem) || {};
   const [isScratchpadVisible, setVisibility] = useState(scratchpadStore.opened || false);
 
   const scratchpadContextValue = useMemo(() => {
     const toggleScratchpadVisibility = () => {
-      const currentStorage = Store.get(localStorageItem);
+      const currentStorage = Store.get<ScratchpadStoreData>(localStorageItem);
 
       Store.set(localStorageItem, { ...currentStorage, opened: !isScratchpadVisible });
       setVisibility(!isScratchpadVisible);
     };
 
     const setScratchpadVisibility = (opened: boolean) => {
-      const currentStorage = Store.get(localStorageItem);
+      const currentStorage = Store.get<ScratchpadStoreData>(localStorageItem);
 
       Store.set(localStorageItem, { ...currentStorage, opened });
       setVisibility(opened);

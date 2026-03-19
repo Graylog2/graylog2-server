@@ -126,6 +126,15 @@ export class Builder {
     return this;
   }
 
+  setHeaders(headers: { [key: string]: string | number | boolean | string[] }) {
+    this.options = {
+      ...this.options,
+      ...headers,
+    };
+
+    return this;
+  }
+
   json(body?: any) {
     this.body = { body: maybeStringify(body), mimeType: 'application/json' };
     this.accept = 'application/json';
@@ -208,7 +217,7 @@ export class Builder {
   }
 
   ignoreUnauthorized() {
-    this.errorHandler = (error: Response) => onServerError(error, () => {});
+    this.errorHandler = (error: Response) => onServerError(error, () => Promise.resolve());
 
     return this;
   }

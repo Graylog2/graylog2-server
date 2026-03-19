@@ -16,6 +16,9 @@
  */
 package org.graylog.storage.opensearch3;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import org.apache.hc.core5.http.ContentTooLongException;
 import org.graylog.storage.exceptions.ParsedOpenSearchException;
@@ -25,25 +28,40 @@ import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.MapperParsingException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
 import org.graylog2.indexer.ParentCircuitBreakingException;
+import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch.OpenSearchAsyncClient;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.ErrorCause;
 import org.opensearch.client.opensearch._types.OpenSearchException;
+import org.opensearch.client.opensearch.generic.Body;
+import org.opensearch.client.opensearch.generic.Request;
+import org.opensearch.client.opensearch.generic.Response;
 import org.opensearch.client.transport.httpclient5.ResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncClient async) {
+public final class OfficialOpensearchClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(OfficialOpensearchClient.class);
     private static final Pattern invalidWriteTarget = Pattern.compile("no write index is defined for alias \\[(?<target>[\\w_]+)\\]");
+
+    private final OpenSearchClient sync;
+    private final OpenSearchAsyncClient async;
+    private final ObjectMapper objectMapper;
+
+    public OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncClient async, ObjectMapper objectMapper) {
+        this.sync = sync;
+        this.async = async;
+        this.objectMapper = objectMapper;
+    }
 
     public <T> T execute(ThrowingSupplier<T> operation, String errorMessage) {
         try {
@@ -94,6 +112,19 @@ public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncCli
         }
     }
 
+    /**
+     * This shouldn't be used unless you have very specific needs and require JsonNode as a response from plain json API
+     */
+    public JsonNode performRequest(Request request, String errorMessage) {
+        String rawJson;
+        try (Response response = sync.generic().execute(request)) {
+            rawJson = response.getBody().map(Body::bodyAsString).orElse("");
+            return objectMapper.readTree(rawJson);
+        } catch (Exception e) {
+            throw mapException(e, errorMessage);
+        }
+    }
+
     public void close() {
         try {
             sync()._transport().close();
@@ -124,10 +155,14 @@ public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncCli
 
     public static RuntimeException mapException(Throwable t, String message) {
         if (t instanceof OpenSearchException openSearchException) {
-            if (isIndexNotFoundException(openSearchException)) {
+            if (isIndexNotFoundException(openSearchException) || isIndexClosedException(openSearchException)) {
                 return Optional.ofNullable(openSearchException.response().error())
                         .map(ErrorCause::metadata)
-                        .map(metadata -> IndexNotFoundException.create(message + metadata.get("resource.id").toString(), metadata.get("index").toString()))
+                        .map(metadata -> {
+                            JsonData index = metadata.get("index");
+                            JsonData resourceId = metadata.getOrDefault("resource.id", index);
+                            return IndexNotFoundException.create(message + resourceId.toString(), index.toString());
+                        })
                         .orElse(new IndexNotFoundException(t.getMessage()));
             }
             if (isMasterNotDiscoveredException(openSearchException)) {
@@ -182,6 +217,10 @@ public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncCli
         return openSearchException.getMessage().contains("index_not_found_exception");
     }
 
+    private static boolean isIndexClosedException(OpenSearchException openSearchException) {
+        return openSearchException.getMessage().contains("index_closed_exception");
+    }
+
     private static boolean isMapperParsingExceptionException(OpenSearchException openSearchException) {
         return openSearchException.getMessage().contains("mapper_parsing_exception");
     }
@@ -210,5 +249,23 @@ public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncCli
             return false;
         }
         return false;
+    }
+
+    @Deprecated
+    public OpenSearchClient sync() {
+        return sync;
+    }
+
+    @Deprecated
+    public OpenSearchAsyncClient async() {
+        return async;
+    }
+
+    public OpenSearchClient syncWithoutErrorMapping() {
+        return sync;
+    }
+
+    public OpenSearchAsyncClient asyncWithoutErrorMapping() {
+        return async;
     }
 }

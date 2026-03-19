@@ -28,14 +28,6 @@ import { formatTrend } from 'util/NumberFormatting';
 
 type TrendDirection = 'good' | 'bad' | 'neutral';
 
-type Props = {
-  current: number;
-  previous: number | undefined | null;
-  trendPreference: TrendPreference;
-  // eslint-disable-next-line react/require-default-props
-  unit?: FieldUnit;
-};
-
 const background = (theme: DefaultTheme, trend: TrendDirection = 'neutral') =>
   ({
     good: theme.colors.variant.success,
@@ -79,6 +71,9 @@ const StyledIcon = styled(Icon)<{ $trend: TrendDirection | undefined }>(({ theme
 });
 
 const _trendDirection = (delta: number, trendPreference: TrendPreference): TrendDirection => {
+  if (delta === 0) {
+    return 'neutral';
+  }
   switch (trendPreference) {
     case 'LOWER':
       return delta > 0 ? 'bad' : 'good';
@@ -140,36 +135,45 @@ const getTrendConvertedValues = (
   };
 };
 
-const Trend = React.forwardRef<HTMLSpanElement, Props>(
-  ({ current, previous, trendPreference, unit = undefined }: Props, ref) => {
-    const { differenceConverted, differencePercent, unitAbbrevString, previousConverted } = getTrendConvertedValues(
-      current,
-      previous,
-      unit,
-    );
+type Props = {
+  current: number;
+  previous: number | undefined | null;
+  trendPreference: TrendPreference;
+  unit?: FieldUnit;
+};
 
-    const backgroundTrend = _trendDirection(differenceConverted, trendPreference);
-    const trendIcon = _trendIcon(differenceConverted);
+const Trend = (
+  { current, previous, trendPreference, unit = undefined }: Props,
+  ref: React.ForwardedRef<HTMLSpanElement>,
+) => {
+  const { differenceConverted, differencePercent, unitAbbrevString, previousConverted } = getTrendConvertedValues(
+    current,
+    previous,
+    unit,
+  );
 
-    const absoluteDifference = Number.isFinite(differenceConverted)
-      ? `${formatTrend(differenceConverted)}${unitAbbrevString}`
-      : '--';
-    const relativeDifference = Number.isFinite(differencePercent)
-      ? formatTrend(differencePercent, { percentage: true })
-      : '--';
+  const backgroundTrend = _trendDirection(differenceConverted, trendPreference);
+  const trendIcon = _trendIcon(differenceConverted);
 
-    return (
-      <Background $trend={backgroundTrend} data-testid="trend-background">
-        <TextContainer $trend={backgroundTrend} ref={ref}>
-          <StyledIcon name={trendIcon} $trend={backgroundTrend} data-testid="trend-icon" />{' '}
-          <span data-testid="trend-value" title={`Previous value: ${previousConverted}`}>
-            {absoluteDifference} / {relativeDifference}
-          </span>
-        </TextContainer>
-      </Background>
-    );
-  },
-);
+  const absoluteDifference = Number.isFinite(differenceConverted)
+    ? `${formatTrend(differenceConverted)}${unitAbbrevString}`
+    : '--';
+  const relativeDifference = Number.isFinite(differencePercent)
+    ? formatTrend(differencePercent, { percentage: true })
+    : '--';
+
+  return (
+    <Background $trend={backgroundTrend} data-testid="trend-background">
+      <TextContainer $trend={backgroundTrend} ref={ref}>
+        <StyledIcon name={trendIcon} $trend={backgroundTrend} data-testid="trend-icon" />{' '}
+        <span data-testid="trend-value" title={`Previous value: ${previousConverted}`}>
+          {absoluteDifference} / {relativeDifference}
+        </span>
+      </TextContainer>
+    </Background>
+  );
+};
+
 Trend.displayName = 'Trend';
 
-export default Trend;
+export default React.forwardRef(Trend);

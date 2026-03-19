@@ -101,6 +101,28 @@ describe('useColumnWidths hook test', () => {
     });
   });
 
+  it('should use actions column to fill remaining width when all columns are static', async () => {
+    const columnRenderersByAttribute = {
+      title: { staticWidth: 200 },
+      description: { staticWidth: 200 },
+    };
+    const columnIds = ['title', 'description'];
+
+    const { result } = renderHook(() =>
+      useColumnWidths({
+        ...defaultProps,
+        columnRenderersByAttribute,
+        columnIds,
+      }),
+    );
+
+    expect(result.current).toEqual({
+      actions: 200,
+      description: 200,
+      title: 200,
+    });
+  });
+
   it('should consider header min widths', async () => {
     const columnRenderersByAttribute = {
       title: { width: 1 },
