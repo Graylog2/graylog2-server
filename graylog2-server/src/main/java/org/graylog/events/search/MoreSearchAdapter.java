@@ -25,6 +25,7 @@ import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.rest.resources.entities.Slice;
 
 import java.time.ZoneId;
 import java.util.Collections;
@@ -53,13 +54,13 @@ public interface MoreSearchAdapter {
     void scrollEvents(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams,
                       List<UsedSearchFilter> filters, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException;
 
-    Map<String, Long> aggregateSlices(String queryString, TimeRange timerange, Set<String> affectedIndices,
-                                      Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
-                                      Map<String, Set<String>> extraFilters, String slicingColumn, int maxBuckets);
+    List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                Map<String, Set<String>> extraFilters, String slicingColumn, String type, int maxBuckets);
 
-    Map<String, Long> aggregateRangeSlices(String queryString, TimeRange timerange, Set<String> affectedIndices,
+    List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                            Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
-                                           Map<String, Set<String>> extraFilters, String slicingColumn, List<NumberRange> ranges);
+                                           Map<String, Set<String>> extraFilters, String slicingColumn, String type, List<NumberRange> ranges);
 
     default ChunkCommand buildScrollCommand(String queryString, TimeRange timeRange, Set<String> affectedIndices, List<UsedSearchFilter> filters, Set<String> streams, int batchSize) {
         ChunkCommand.Builder commandBuilder = ChunkCommand.builder()

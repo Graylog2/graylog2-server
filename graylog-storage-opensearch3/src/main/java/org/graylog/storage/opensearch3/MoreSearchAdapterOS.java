@@ -37,6 +37,7 @@ import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.rest.resources.entities.Slice;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.ExpandWildcard;
 import org.opensearch.client.opensearch._types.FieldSort;
@@ -332,9 +333,9 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
     }
 
     @Override
-    public Map<String, Long> aggregateSlices(String queryString, TimeRange timerange, Set<String> affectedIndices,
+    public List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                              Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
-                                             Map<String, Set<String>> extraFilters, String slicingColumn, int maxBuckets) {
+                                             Map<String, Set<String>> extraFilters, String slicingColumn, String type, int maxBuckets) {
         final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
 
         final org.opensearch.client.opensearch.core.SearchRequest searchRequest = org.opensearch.client.opensearch.core.SearchRequest.of(builder -> {
@@ -363,21 +364,21 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
         final SearchResponse<Map> searchResult = opensearchClient.sync(c -> c.search(searchRequest, Map.class), "Unable to perform slice aggregation query");
         final var termsAgg = searchResult.aggregations().get(SLICES_AGGREGATION_NAME);
 
-        final Map<String, Long> result = new java.util.LinkedHashMap<>();
+        final List<Slice> result = new ArrayList<>();
         if (termsAgg.isSterms()) {
-            termsAgg.sterms().buckets().array().forEach(b -> result.put(b.key(), b.docCount()));
+            termsAgg.sterms().buckets().array().forEach(b -> result.add(new Slice(b.key(), null, type, Math.toIntExact(b.docCount()))));
         } else if (termsAgg.isLterms()) {
-            termsAgg.lterms().buckets().array().forEach(b -> result.put(b.keyAsString(), b.docCount()));
+            termsAgg.lterms().buckets().array().forEach(b -> result.add(new Slice(b.keyAsString(), null, type, Math.toIntExact(b.docCount()))));
         } else if (termsAgg.isDterms()) {
-            termsAgg.dterms().buckets().array().forEach(b -> result.put(b.keyAsString(), b.docCount()));
+            termsAgg.dterms().buckets().array().forEach(b -> result.add(new Slice(b.keyAsString(), null, type, Math.toIntExact(b.docCount()))));
         }
         return result;
     }
 
     @Override
-    public Map<String, Long> aggregateRangeSlices(String queryString, TimeRange timerange, Set<String> affectedIndices,
-                                                  Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
-                                                  Map<String, Set<String>> extraFilters, String slicingColumn, List<NumberRange> ranges) {
+    public List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                            Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                            Map<String, Set<String>> extraFilters, String slicingColumn, String type, List<NumberRange> ranges) {
         final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
 
         final RangeAggregation.Builder rangeBuilder = new RangeAggregation.Builder().field(slicingColumn);
@@ -419,8 +420,8 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
         final SearchResponse<Map> searchResult = opensearchClient.sync(c -> c.search(searchRequest, Map.class), "Unable to perform range slice aggregation query");
         final var rangeAgg = searchResult.aggregations().get(SLICES_AGGREGATION_NAME).range();
 
-        final Map<String, Long> result = new java.util.LinkedHashMap<>();
-        rangeAgg.buckets().array().forEach(b -> result.put(b.key(), b.docCount()));
+        final List<Slice> result = new ArrayList<>();
+        rangeAgg.buckets().array().forEach(b -> result.add(new Slice(b.key(), null, type, Math.toIntExact(b.docCount()))));
         return result;
     }
 

@@ -56,6 +56,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.rest.resources.entities.Slice;
 import org.graylog2.search.QueryStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -275,9 +276,9 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     }
 
     @Override
-    public Map<String, Long> aggregateSlices(String queryString, TimeRange timerange, Set<String> affectedIndices,
-                                             Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
-                                             Map<String, Set<String>> extraFilters, String slicingColumn, int maxBuckets) {
+    public List<Slice> aggregateSlicesForColumn(String queryString, TimeRange timerange, Set<String> affectedIndices,
+                                                Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
+                                                Map<String, Set<String>> extraFilters, String slicingColumn, String type, int maxBuckets) {
         final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
@@ -303,17 +304,13 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
         final SearchResponse searchResult = client.search(searchRequest, "Unable to perform slice aggregation query");
         final ParsedTerms termsResult = searchResult.getAggregations().get(slicesAggregationName);
 
-        return termsResult.getBuckets().stream()
-                .collect(Collectors.toMap(
-                        MultiBucketsAggregation.Bucket::getKeyAsString,
-                        MultiBucketsAggregation.Bucket::getDocCount
-                ));
+        return termsResult.getBuckets().stream().map(e -> new Slice(e.getKeyAsString(), null, type, Math.toIntExact(e.getDocCount()))).toList();
     }
 
     @Override
-    public Map<String, Long> aggregateRangeSlices(String queryString, TimeRange timerange, Set<String> affectedIndices,
+    public List<Slice> aggregateSlicesForRangeQuery(String queryString, TimeRange timerange, Set<String> affectedIndices,
                                                   Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams,
-                                                  Map<String, Set<String>> extraFilters, String slicingColumn, List<NumberRange> ranges) {
+                                                  Map<String, Set<String>> extraFilters, String slicingColumn, String type, List<NumberRange> ranges) {
         final var filter = createQuery(queryString, timerange, eventStreams, filterString, forbiddenSourceStreams, extraFilters);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
@@ -347,11 +344,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
         final SearchResponse searchResult = client.search(searchRequest, "Unable to perform range slice aggregation query");
         final ParsedRange rangeResult = searchResult.getAggregations().get(slicesAggregationName);
 
-        return rangeResult.getBuckets().stream()
-                .collect(Collectors.toMap(
-                        MultiBucketsAggregation.Bucket::getKeyAsString,
-                        MultiBucketsAggregation.Bucket::getDocCount
-                ));
+        return rangeResult.getBuckets().stream().map(e -> new Slice(e.getKeyAsString(), null, type, Math.toIntExact(e.getDocCount()))).toList();
     }
 
     @Override
