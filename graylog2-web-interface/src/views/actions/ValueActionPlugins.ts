@@ -15,12 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import CopyFieldToClipboard from 'views/logic/fieldactions/CopyFieldToClipboard';
+import CopyValueToClipboard from 'views/logic/valueactions/CopyValueToClipboard';
+import SelectExtractorType from 'views/logic/valueactions/SelectExtractorType';
 
-export const CopyToClipboardFieldActionPlugin = {
-  type: 'copy-field-to-clipboard',
-  title: 'Copy field name to clipboard',
-  handler: CopyFieldToClipboard,
-  isEnabled: () => true,
+export const CopyToClipBoardValueActionPlugin = {
+  type: 'copy-value-to-clipboard',
+  title: 'Copy value to clipboard',
+  handler: CopyValueToClipboard,
+  isEnabled: CopyValueToClipboard.isEnabled,
+  resetFocus: false,
+};
+
+export const CreateExtractorValueActionPlugin = {
+  type: 'create-extractor',
+  title: 'Create extractor',
+  isEnabled: ({ type, contexts }) => !!contexts.message && !type.isDecorated() && !!contexts.isLocalNode,
+  component: SelectExtractorType,
   resetFocus: false,
 };

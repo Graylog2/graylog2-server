@@ -93,7 +93,6 @@ import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualiza
 import visualizationBindings from 'views/components/visualizations/bindings';
 import { AggregationWizard } from 'views/components/aggregationwizard';
 import { filterCloudValueActions } from 'util/conditional/filterValueActions';
-import CopyValueToClipboard from 'views/logic/valueactions/CopyValueToClipboard';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import ViewHeader from 'views/components/views/ViewHeader';
 import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/ScatterVisualizationConfig';
@@ -122,7 +121,8 @@ import TextVisualization from 'views/components/widgets/text/TextVisualization';
 import TextWidgetEdit from 'views/components/widgets/text/TextWidgetEdit';
 import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
 import ToggleFavoriteField from 'views/logic/fieldactions/ToggleFavoriteField';
-import { CopyToClipBoardFieldActionPlugin } from 'views/actions/FieldActionPlugins';
+import { CopyToClipboardFieldActionPlugin } from 'views/actions/FieldActionPlugins';
+import { CopyToClipBoardValueActionPlugin } from 'views/actions/ValueActionPlugins';
 
 import type { ActionDefinition } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -341,7 +341,7 @@ const exports: PluginExports = {
       isEnabled: ({ field, type }) => !isFunction(field) && !type.isDecorated(),
       resetFocus: false,
     },
-    CopyToClipBoardFieldActionPlugin,
+    CopyToClipboardFieldActionPlugin,
     {
       type: 'change-field-type',
       title: 'Change field type',
@@ -406,13 +406,7 @@ const exports: PluginExports = {
         isEnabled: HighlightValueHandler.isEnabled,
         resetFocus: false,
       },
-      {
-        type: 'copy-value-to-clipboard',
-        title: 'Copy value to clipboard',
-        handler: CopyValueToClipboard,
-        isEnabled: CopyValueToClipboard.isEnabled,
-        resetFocus: false,
-      },
+      CopyToClipBoardValueActionPlugin,
       {
         type: 'create-event-definition-from-value',
         title: 'Create event definition',
