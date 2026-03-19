@@ -20,16 +20,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.TokenSigningKey;
 import org.graylog.collectors.db.EnrollmentTokenCreator;
 import org.graylog.collectors.db.EnrollmentTokenDTO;
-import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog.collectors.opamp.rest.CreateEnrollmentTokenRequest;
 import org.graylog.collectors.opamp.rest.EnrollmentTokenResponse;
 import org.graylog.grn.GRNRegistry;
-import org.graylog.security.pki.CertificateEntry;
-import org.graylog.security.pki.CertificateService;
+import org.graylog.security.pki.Algorithm;
+import org.graylog.security.pki.KeyUtils;
 import org.graylog.security.pki.PemUtils;
 import org.graylog.testing.TestClocks;
 import org.graylog.testing.mongodb.MongoDBExtension;
@@ -40,7 +40,6 @@ import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.plugin.cluster.ClusterIdService;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.graylog2.web.customization.CustomizationConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,15 +47,14 @@ import org.threeten.extra.MutableClock;
 
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -76,7 +74,7 @@ class EnrollmentTokenServiceTest {
     private final EncryptedValueService encryptedValueService = new EncryptedValueService("1234567890abcdef");
 
     @BeforeEach
-    void setUp(MongoDBTestService mongodb) {
+    void setUp(MongoDBTestService mongodb) throws Exception {
         final ObjectMapper objectMapper = new ObjectMapperProvider(
                 ObjectMapperProvider.class.getClassLoader(),
                 Collections.emptySet(),
@@ -89,80 +87,26 @@ class EnrollmentTokenServiceTest {
                 new MongoJackObjectMapperProvider(objectMapper),
                 mongodb.mongoConnection()
         );
-        final CertificateService certificateService = new CertificateService(mongoCollections, encryptedValueService, CustomizationConfig.empty(), mutableClock);
         clusterIdService = mock(ClusterIdService.class);
         when(clusterIdService.getString()).thenReturn(TEST_CLUSTER_ID);
         collectorsConfigService = mock(CollectorsConfigService.class);
-        final OpAmpCaService opAmpCaService = new OpAmpCaService(certificateService, clusterIdService, collectorsConfigService);
-        enrollmentTokenService = new EnrollmentTokenService(certificateService, clusterIdService, opAmpCaService, mutableClock, encryptedValueService, mongoCollections);
-    }
+        enrollmentTokenService = new EnrollmentTokenService(clusterIdService, mutableClock, encryptedValueService, collectorsConfigService, mongoCollections);
 
-    @Test
-    void getTokenSigningCertCreatesHierarchyOnFirstCall() {
-        // No existing CollectorsConfig - service will create certs and cache in memory
-        when(collectorsConfigService.get()).thenReturn(Optional.empty());
+        final var collectorsConfig = mock(CollectorsConfig.class);
 
-        final CertificateEntry cert = enrollmentTokenService.getTokenSigningCert();
+        when(collectorsConfigService.get()).thenReturn(Optional.of(collectorsConfig));
 
-        assertThat(cert).isNotNull();
-        assertThat(cert.id()).isNotNull();
-        assertThat(cert.fingerprint()).startsWith("sha256:");
-        assertThat(cert.certificate()).startsWith("-----BEGIN CERTIFICATE-----");
-
-        // Token signing cert should have issuer chain (enrollment CA + root CA)
-        assertThat(cert.issuerChain()).hasSize(2);
-    }
-
-    @Test
-    void getTokenSigningCertUsesExistingConfigOnSubsequentCalls() {
-        // No existing CollectorsConfig - service will create certs and cache in memory
-        when(collectorsConfigService.get()).thenReturn(Optional.empty());
-
-        // First call - no config, creates hierarchy
-        final CertificateEntry firstCert = enrollmentTokenService.getTokenSigningCert();
-
-        // Second call - cached hierarchy, should return same cert
-        final CertificateEntry secondCert = enrollmentTokenService.getTokenSigningCert();
-
-        assertThat(secondCert.id()).isEqualTo(firstCert.id());
-        assertThat(secondCert.fingerprint()).isEqualTo(firstCert.fingerprint());
-    }
-
-    @Test
-    void getEnrollmentSigningCertCreatesHierarchyOnFirstCall() {
-        // No existing CollectorsConfig - service will create certs and cache in memory
-        when(collectorsConfigService.get()).thenReturn(Optional.empty());
-
-        final CertificateEntry cert = enrollmentTokenService.getEnrollmentSigningCert();
-
-        assertThat(cert).isNotNull();
-        assertThat(cert.id()).isNotNull();
-        assertThat(cert.fingerprint()).startsWith("sha256:");
-
-        // Enrollment CA should have issuer chain (root CA only)
-        assertThat(cert.issuerChain()).hasSize(1);
-    }
-
-    @Test
-    void getEnrollmentSigningCertUsesExistingConfigOnSubsequentCalls() {
-        // No existing CollectorsConfig - service will create certs and cache in memory
-        when(collectorsConfigService.get()).thenReturn(Optional.empty());
-
-        // First call - no config, creates hierarchy
-        final CertificateEntry firstCert = enrollmentTokenService.getEnrollmentSigningCert();
-
-        // Second call - cached hierarchy, should return same cert
-        final CertificateEntry secondCert = enrollmentTokenService.getEnrollmentSigningCert();
-
-        assertThat(secondCert.id()).isEqualTo(firstCert.id());
-        assertThat(secondCert.fingerprint()).isEqualTo(firstCert.fingerprint());
+        final var keyPair = KeyUtils.generateKeyPair(Algorithm.ED25519);
+        when(collectorsConfig.tokenSigningKey()).thenReturn(new TokenSigningKey(
+                encryptedValueService.encrypt(PemUtils.toPem(keyPair.getPrivate())),
+                PemUtils.toPem(keyPair.getPublic()),
+                KeyUtils.sha256Fingerprint(keyPair),
+                Instant.now(mutableClock)
+        ));
     }
 
     @Test
     void createTokenReturnsValidJwt() throws Exception {
-        // No existing CollectorsConfig - service will create certs and cache in memory
-        when(collectorsConfigService.get()).thenReturn(Optional.empty());
-
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
                 "test-fleet",
                 Duration.ofDays(1)
@@ -174,9 +118,10 @@ class EnrollmentTokenServiceTest {
         assertThat(response.expiresAt()).isEqualTo(Clock.offset(mutableClock, Duration.ofDays(1)).instant());
 
         // Verify JWT can be parsed and has correct claims
-        final CertificateEntry signingCert = enrollmentTokenService.getTokenSigningCert();
-        final X509Certificate cert = PemUtils.parseCertificate(signingCert.certificate());
-        final PublicKey publicKey = cert.getPublicKey();
+        final var tokenSigningKey = collectorsConfigService.get()
+                .map(CollectorsConfig::tokenSigningKey)
+                .orElseThrow(AssertionError::new);
+        final PublicKey publicKey = PemUtils.parsePublicKey(tokenSigningKey.publicKey());
 
         final Jws<Claims> jws = Jwts.parser()
                 .clock(() -> Date.from(mutableClock.instant()))
@@ -187,14 +132,11 @@ class EnrollmentTokenServiceTest {
         assertThat(jws.getPayload().getIssuer()).isEqualTo(TEST_CLUSTER_ID);
         assertThat(jws.getPayload().getAudience()).containsExactly(TEST_CLUSTER_ID + ":opamp");
         assertThat(jws.getPayload().getId()).isNotNull();
-        assertThat(jws.getHeader().get("kid")).isEqualTo(signingCert.fingerprint());
+        assertThat(jws.getHeader().get("kid")).isEqualTo(tokenSigningKey.fingerprint());
     }
 
     @Test
     void createTokenWithNullExpiryProducesNonExpiringJwt() throws Exception {
-        // No existing CollectorsConfig - service will create certs and cache in memory
-        when(collectorsConfigService.get()).thenReturn(Optional.empty());
-
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest("default-fleet", null);
 
         final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_CREATOR);
@@ -203,12 +145,10 @@ class EnrollmentTokenServiceTest {
         assertThat(response.expiresAt()).isNull();
 
         // Verify JWT has no exp claim
-        final CertificateEntry signingCert = enrollmentTokenService.getTokenSigningCert();
-        final X509Certificate cert = PemUtils.parseCertificate(signingCert.certificate());
-        final PublicKey publicKey = cert.getPublicKey();
+        final var tokenSigningKey = collectorsConfigService.get().map(CollectorsConfig::tokenSigningKey).orElseThrow(AssertionError::new);
 
         final Jws<Claims> jws = Jwts.parser()
-                .verifyWith(publicKey)
+                .verifyWith(PemUtils.parsePublicKey(tokenSigningKey.publicKey()))
                 .build()
                 .parseSignedClaims(response.token());
 
@@ -216,26 +156,7 @@ class EnrollmentTokenServiceTest {
     }
 
     @Test
-    void createTokenRejectsExpiryBeyondCertValidity() {
-        // No existing CollectorsConfig - service will create certs and cache in memory
-        when(collectorsConfigService.get()).thenReturn(Optional.empty());
-
-        // Token signing cert is valid for 2 years, so 3 years should fail
-        final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
-                "test-fleet",
-                Duration.ofDays(3 * 365)
-        );
-
-        assertThatThrownBy(() -> enrollmentTokenService.createToken(request, TEST_CREATOR))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("exceeds signing certificate expiry");
-    }
-
-    @Test
     void validateTokenReturnsEnrollmentForValidToken() {
-        // No existing CollectorsConfig - service will create certs and cache in memory
-        when(collectorsConfigService.get()).thenReturn(Optional.empty());
-
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
                 "test-fleet",
                 Duration.ofDays(1)
@@ -251,9 +172,6 @@ class EnrollmentTokenServiceTest {
 
     @Test
     void validateTokenReturnsEmptyForExpiredToken() throws Exception {
-        // No existing CollectorsConfig - service will create certs and cache in memory
-        when(collectorsConfigService.get()).thenReturn(Optional.empty());
-
         // Create token that expires in 1 second
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
                 "test-fleet",
@@ -271,9 +189,6 @@ class EnrollmentTokenServiceTest {
 
     @Test
     void validateTokenReturnsEmptyForWrongClusterId() {
-        // No existing CollectorsConfig - service will create certs and cache in memory
-        when(collectorsConfigService.get()).thenReturn(Optional.empty());
-
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
                 "test-fleet",
                 Duration.ofDays(1)
@@ -290,9 +205,6 @@ class EnrollmentTokenServiceTest {
 
     @Test
     void validateTokenReturnsEmptyForInvalidSignature() {
-        // No existing CollectorsConfig - service will create certs and cache in memory
-        when(collectorsConfigService.get()).thenReturn(Optional.empty());
-
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
                 "test-fleet",
                 Duration.ofDays(1)
@@ -309,9 +221,6 @@ class EnrollmentTokenServiceTest {
 
     @Test
     void createTokenIncludesCttHeader() {
-        // No existing CollectorsConfig - service will create certs and cache in memory
-        when(collectorsConfigService.get()).thenReturn(Optional.empty());
-
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest("test-fleet", Duration.ofDays(1));
         final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_CREATOR);
 
@@ -335,9 +244,6 @@ class EnrollmentTokenServiceTest {
 
     @Test
     void createTokenPersistsMetadata() {
-        // No existing CollectorsConfig - service will create certs and cache in memory
-        when(collectorsConfigService.get()).thenReturn(Optional.empty());
-
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
                 "persist-fleet",
                 Duration.ofDays(1)
@@ -360,9 +266,6 @@ class EnrollmentTokenServiceTest {
 
     @Test
     void validateTokenRejectsDeletedToken() {
-        // No existing CollectorsConfig - service will create certs and cache in memory
-        when(collectorsConfigService.get()).thenReturn(Optional.empty());
-
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
                 "delete-fleet",
                 Duration.ofDays(1)
@@ -418,9 +321,6 @@ class EnrollmentTokenServiceTest {
 
     @Test
     void incrementUsageUpdatesCountAndLastUsed() {
-        // No existing CollectorsConfig - service will create certs and cache in memory
-        when(collectorsConfigService.get()).thenReturn(Optional.empty());
-
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
                 "usage-fleet",
                 Duration.ofDays(1)

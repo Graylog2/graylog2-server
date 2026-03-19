@@ -114,7 +114,6 @@ class EnrollmentTokenResourceTest {
                 CollectorsConfig.createDefaultBuilder("host")
                         .caCertId("ca-cert-id")
                         .signingCertId("signing-cert-id")
-                        .tokenSigningCertId("token-id")
                         .otlpServerCertId("otlp-id")
                         .build()));
         when(fleetService.get("test-fleet")).thenReturn(java.util.Optional.of(mock(FleetDTO.class)));
@@ -157,7 +156,6 @@ class EnrollmentTokenResourceTest {
                 CollectorsConfig.createDefaultBuilder("host")
                         .caCertId("ca-cert-id")
                         .signingCertId("signing-cert-id")
-                        .tokenSigningCertId("token-id")
                         .otlpServerCertId("otlp-id")
                         .build()));
         when(fleetService.get("nonexistent-fleet")).thenReturn(java.util.Optional.empty());

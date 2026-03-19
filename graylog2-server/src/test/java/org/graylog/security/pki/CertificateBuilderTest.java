@@ -46,14 +46,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class CertificateBuilderTest {
 
     private CertificateBuilder builder;
-    private EncryptedValueService encryptedValueService;
     private Clock clock;
 
     @BeforeEach
     void setUp() {
-        encryptedValueService = new EncryptedValueService("1234567890abcdef");
         clock = TestClocks.fixedEpoch();
-        builder = new CertificateBuilder(encryptedValueService, "Graylog", clock);
+        builder = new CertificateBuilder(new EncryptedValueService("1234567890abcdef"), "Graylog", clock);
     }
 
     // Root CA creation tests
@@ -270,26 +268,19 @@ class CertificateBuilderTest {
         final CertificateEntry intermediateCa = builder.createIntermediateCa(
                 "Graylog Enrollment CA", rootCa, Duration.ofDays(5 * 365)
         );
-        final CertificateEntry tokenSigningCert = builder.createEndEntityCert(
-                "Token Signing", intermediateCa, KeyUsage.digitalSignature, Duration.ofDays(2 * 365)
-        );
 
         // Verify the chain
         final X509Certificate rootCert = PemUtils.parseCertificate(rootCa.certificate());
         final X509Certificate intermediateCert = PemUtils.parseCertificate(intermediateCa.certificate());
-        final X509Certificate tokenCert = PemUtils.parseCertificate(tokenSigningCert.certificate());
 
         // Root is self-signed
         rootCert.verify(rootCert.getPublicKey());
         // Intermediate is signed by root
         intermediateCert.verify(rootCert.getPublicKey());
-        // Token signing cert is signed by intermediate
-        tokenCert.verify(intermediateCert.getPublicKey());
 
         // Verify issuer chains
         assertThat(rootCa.issuerChain()).isEmpty();
         assertThat(intermediateCa.issuerChain()).containsExactly(rootCa.certificate());
-        assertThat(tokenSigningCert.issuerChain()).containsExactly(intermediateCa.certificate(), rootCa.certificate());
     }
 
     @Test
@@ -479,7 +470,4 @@ class CertificateBuilderTest {
 
         assertThatCode(() -> validator.validate(certPath, params)).doesNotThrowAnyException();
     }
-
-    // Note: CSR creation and signing tests will be added when the createCsr and signCsr
-    // methods are implemented in CertificateBuilder (Task 4: Add CSR signing to CertificateBuilder)
 }

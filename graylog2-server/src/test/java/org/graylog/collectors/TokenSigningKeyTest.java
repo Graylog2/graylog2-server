@@ -35,7 +35,7 @@ class TokenSigningKeyTest {
     @Test
     void serializationRoundtrip() throws Exception {
         final var createdAt = Instant.parse("2025-06-15T10:30:00.123Z");
-        final var original = new TokenSigningKey(createEncryptedValue(), "SHA256:abc", createdAt);
+        final var original = new TokenSigningKey(createEncryptedValue(), "pubkey", "SHA256:abc", createdAt);
 
         final var deserialized = serializeAndDeserialize(original);
 

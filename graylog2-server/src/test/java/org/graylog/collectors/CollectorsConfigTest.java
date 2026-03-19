@@ -33,7 +33,6 @@ class CollectorsConfigTest {
         final var config = CollectorsConfig.builder()
                 .caCertId("ca-cert-id")
                 .signingCertId("signing-cert-id")
-                .tokenSigningCertId("token-id")
                 .otlpServerCertId("otlp-server-id")
                 .http(http)
                 .build();
@@ -44,7 +43,7 @@ class CollectorsConfigTest {
         assertThat(deserialized).isEqualTo(config);
         assertThat(json).contains("\"ca_cert_id\"");
         assertThat(json).contains("\"signing_cert_id\"");
-        assertThat(json).contains("\"token_signing_cert_id\"");
+        assertThat(json).contains("\"token_signing_key\"");
         assertThat(json).contains("\"otlp_server_cert_id\"");
     }
 
@@ -65,8 +64,8 @@ class CollectorsConfigTest {
         final var config = CollectorsConfig.createDefaultBuilder("host")
                 .caCertId(null)
                 .signingCertId(null)
-                .tokenSigningCertId(null)
                 .otlpServerCertId(null)
+                .tokenSigningKey(null)
                 .build();
 
         final var json = objectMapper.writeValueAsString(config);
@@ -75,7 +74,6 @@ class CollectorsConfigTest {
         assertThat(deserialized).isEqualTo(config);
         assertThat(deserialized.caCertId()).isNull();
         assertThat(deserialized.signingCertId()).isNull();
-        assertThat(deserialized.tokenSigningCertId()).isNull();
         assertThat(deserialized.otlpServerCertId()).isNull();
     }
 

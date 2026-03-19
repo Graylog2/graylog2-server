@@ -16,6 +16,7 @@
  */
 package org.graylog.collectors.rest;
 
+import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import org.apache.shiro.subject.Subject;
@@ -26,12 +27,15 @@ import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.FleetTransactionLogService;
+import org.graylog.collectors.TokenSigningKey;
 import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
 import org.graylog.collectors.opamp.OpAmpCaService;
+import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.validators.ValidationResult;
+import org.graylog2.security.encryption.EncryptedValue;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,7 +44,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.net.URI;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 
@@ -69,6 +75,8 @@ class CollectorsConfigResourceTest {
     @Mock
     private OpAmpCaService opAmpCaService;
     @Mock
+    private EnrollmentTokenService enrollmentTokenService;
+    @Mock
     private ContainerRequestContext requestContext;
     @Mock
     private FleetService fleetService;
@@ -87,6 +95,7 @@ class CollectorsConfigResourceTest {
                 httpConfiguration,
                 fleetService,
                 fleetTransactionLogService,
+                enrollmentTokenService,
                 opAmpCaService
         );
 
@@ -289,11 +298,70 @@ class CollectorsConfigResourceTest {
                 });
     }
 
+    @Test
+    void putCreatesNewTokenSigningKeyWhenNoExistingConfig() throws Exception {
+        final var expectedKey = new TokenSigningKey(EncryptedValue.createUnset(), "pubkey", "fingerprint-1", Instant.now());
+        when(enrollmentTokenService.createTokenSigningKey()).thenReturn(expectedKey);
+        stubCaService();
+
+        final var request = new CollectorsConfigRequest(
+                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
+                null, null, null
+        );
+
+        final var result = resource.put(request);
+
+        verify(enrollmentTokenService).createTokenSigningKey();
+        assertThat(result.tokenSigningKey()).isEqualTo(expectedKey);
+    }
+
+    @Test
+    void putReusesTokenSigningKeyFromExistingConfig() throws Exception {
+        final var existingKey = new TokenSigningKey(EncryptedValue.createUnset(), "pubkey", "existing-fingerprint", Instant.now());
+        final var existingConfig = CollectorsConfig.builder()
+                .caCertId("ca-id")
+                .otlpServerCertId("otlp-id")
+                .tokenSigningKey(existingKey)
+                .http(new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401).toConfig(null))
+                .collectorOfflineThreshold(CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD)
+                .collectorDefaultVisibilityThreshold(CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD)
+                .collectorExpirationThreshold(CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD)
+                .build();
+
+        when(collectorsConfigService.get()).thenReturn(Optional.of(existingConfig));
+        when(opAmpCaService.getCaCertId()).thenReturn("ca-id");
+        when(opAmpCaService.getSigningCertId()).thenReturn("signing-cert-id");
+        when(opAmpCaService.getOtlpServerCertId()).thenReturn("otlp-id");
+
+        final var request = new CollectorsConfigRequest(
+                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
+                null, null, null
+        );
+
+        final var result = resource.put(request);
+
+        assertThat(result.tokenSigningKey()).isEqualTo(existingKey);
+    }
+
+    @Test
+    void putThrowsInternalServerErrorWhenTokenSigningKeyCreationFails() throws Exception {
+        when(collectorsConfigService.get()).thenReturn(Optional.empty());
+        when(enrollmentTokenService.createTokenSigningKey()).thenThrow(new NoSuchAlgorithmException("test error"));
+
+        final var request = new CollectorsConfigRequest(
+                new CollectorsConfigRequest.IngestEndpointRequest(false, "host", 14401),
+                null, null, null
+        );
+
+        assertThatThrownBy(() -> resource.put(request))
+                .isInstanceOf(InternalServerErrorException.class)
+                .hasMessageContaining("Could not create token signing key");
+    }
+
     private void stubCaService() {
         when(collectorsConfigService.get()).thenReturn(Optional.empty());
         when(opAmpCaService.getCaCertId()).thenReturn("ca-id");
         when(opAmpCaService.getSigningCertId()).thenReturn("signing-cert-id");
-        when(opAmpCaService.getTokenSigningCertId()).thenReturn("token-id");
         when(opAmpCaService.getOtlpServerCertId()).thenReturn("otlp-id");
     }
 }

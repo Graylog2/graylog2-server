@@ -17,6 +17,7 @@
 package org.graylog.collectors.db;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoBuilder;
 import jakarta.annotation.Nullable;
 import org.graylog2.database.MongoEntity;
 import org.mongojack.Id;
@@ -43,4 +44,31 @@ public record EnrollmentTokenDTO(
     public static final String FIELD_EXPIRES_AT = "expires_at";
     public static final String FIELD_USAGE_COUNT = "usage_count";
     public static final String FIELD_LAST_USED_AT = "last_used_at";
+
+    public static Builder builder() {
+        return new AutoBuilder_EnrollmentTokenDTO_Builder().usageCount(0);
+    }
+
+    @AutoBuilder
+    public interface Builder {
+        Builder id(@Nullable String id);
+
+        Builder jti(String jti);
+
+        Builder kid(String kid);
+
+        Builder fleetId(String fleetId);
+
+        Builder createdBy(EnrollmentTokenCreator createdBy);
+
+        Builder createdAt(Instant createdAt);
+
+        Builder expiresAt(@Nullable Instant expiresAt);
+
+        Builder usageCount(int usageCount);
+
+        Builder lastUsedAt(@Nullable Instant lastUsedAt);
+
+        EnrollmentTokenDTO build();
+    }
 }

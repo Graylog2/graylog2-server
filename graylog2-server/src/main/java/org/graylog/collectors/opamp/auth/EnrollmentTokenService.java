@@ -16,7 +16,6 @@
  */
 package org.graylog.collectors.opamp.auth;
 
-import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexModel;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
@@ -29,15 +28,14 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.TokenSigningKey;
 import org.graylog.collectors.db.EnrollmentTokenCreator;
 import org.graylog.collectors.db.EnrollmentTokenDTO;
-import org.graylog.collectors.opamp.OpAmpCaService;
 import org.graylog.collectors.opamp.rest.CreateEnrollmentTokenRequest;
 import org.graylog.collectors.opamp.rest.EnrollmentTokenResponse;
 import org.graylog.security.pki.Algorithm;
-import org.graylog.security.pki.CertificateEntry;
-import org.graylog.security.pki.CertificateService;
 import org.graylog.security.pki.KeyUtils;
 import org.graylog.security.pki.PemUtils;
 import org.graylog2.database.MongoCollections;
@@ -52,7 +50,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Date;
@@ -60,13 +57,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.graylog2.shared.utilities.StringUtils.f;
+import static com.mongodb.client.model.Filters.eq;
 
 /**
- * Service for accessing enrollment certificates.
- * <p>
- * The CA hierarchy is created on-demand when the first enrollment token is requested.
- * This avoids creating certificates for deployments that don't use OpAMP enrollment.
+ * Service for accessing enrollment tokens.
  */
 @Singleton
 public class EnrollmentTokenService {
@@ -77,55 +71,31 @@ public class EnrollmentTokenService {
 
     public static final String COLLECTION_NAME = "collector_enrollment_tokens";
 
-    private final CertificateService certificateService;
     private final ClusterIdService clusterIdService;
-    private final OpAmpCaService opAmpCaService;
     private final Clock clock;
     private final EncryptedValueService encryptedValueService;
+    private final CollectorsConfigService collectorsConfigService;
     private final org.graylog2.database.MongoCollection<EnrollmentTokenDTO> tokenCollection;
     private final MongoPaginationHelper<EnrollmentTokenDTO> paginationHelper;
 
     @Inject
-    public EnrollmentTokenService(CertificateService certificateService,
-                                  ClusterIdService clusterIdService,
-                                  OpAmpCaService opAmpCaService,
+    public EnrollmentTokenService(ClusterIdService clusterIdService,
                                   Clock clock,
                                   EncryptedValueService encryptedValueService,
+                                  CollectorsConfigService collectorsConfigService,
                                   MongoCollections mongoCollections) {
-        this.certificateService = certificateService;
         this.clusterIdService = clusterIdService;
-        this.opAmpCaService = opAmpCaService;
         this.clock = clock;
         this.encryptedValueService = encryptedValueService;
+        this.collectorsConfigService = collectorsConfigService;
         this.tokenCollection = mongoCollections.collection(COLLECTION_NAME, EnrollmentTokenDTO.class);
         this.paginationHelper = mongoCollections.paginationHelper(tokenCollection);
+
         tokenCollection.createIndexes(List.of(
                 new IndexModel(Indexes.ascending(EnrollmentTokenDTO.FIELD_JTI), new IndexOptions().unique(true)),
                 new IndexModel(Indexes.ascending(EnrollmentTokenDTO.FIELD_FLEET_ID)),
                 new IndexModel(Indexes.ascending(EnrollmentTokenDTO.FIELD_EXPIRES_AT))
         ));
-    }
-
-    /**
-     * Returns the token signing certificate for signing enrollment JWTs.
-     * <p>
-     * Delegates to {@link OpAmpCaService} which creates the CA hierarchy on first call if it doesn't exist.
-     *
-     * @return the token signing certificate entry
-     */
-    public CertificateEntry getTokenSigningCert() {
-        return opAmpCaService.getTokenSigningCert();
-    }
-
-    /**
-     * Returns the certificate for signing agent enrollment CSRs.
-     * <p>
-     * Delegates to {@link OpAmpCaService} which creates the CA hierarchy on first call if it doesn't exist.
-     *
-     * @return the enrollment CA certificate entry
-     */
-    public CertificateEntry getEnrollmentSigningCert() {
-        return opAmpCaService.getSigningCert();
     }
 
     /**
@@ -136,9 +106,11 @@ public class EnrollmentTokenService {
     public TokenSigningKey createTokenSigningKey() throws NoSuchAlgorithmException, NoSuchProviderException, IOException {
         final var keyPair = KeyUtils.generateKeyPair(Algorithm.ED25519);
         final var privateKeyPem = PemUtils.toPem(keyPair.getPrivate());
+        final var publicKeyPem = PemUtils.toPem(keyPair.getPublic());
 
         return new TokenSigningKey(
                 encryptedValueService.encrypt(privateKeyPem),
+                publicKeyPem,
                 KeyUtils.sha256Fingerprint(keyPair),
                 Instant.now(clock)
         );
@@ -147,10 +119,10 @@ public class EnrollmentTokenService {
     /**
      * Creates a new enrollment token for OpAMP agents.
      * <p>
-     * The token is a JWT signed with the token signing certificate's private key.
+     * The token is a JWT signed with the token signing private key.
      * The JWT contains:
      * <ul>
-     *   <li>{@code kid} header: fingerprint of the signing certificate</li>
+     *   <li>{@code kid} header: fingerprint of the signing key</li>
      *   <li>{@code iss}: cluster ID (informational, not validated)</li>
      *   <li>{@code aud}: {@code {cluster_id}:opamp} (validated on receipt)</li>
      *   <li>{@code iat}: current timestamp</li>
@@ -161,28 +133,23 @@ public class EnrollmentTokenService {
      * @param request the token creation request
      * @param creator the user who created the token
      * @return the created token and its expiration time
-     * @throws IllegalArgumentException if the requested expiry exceeds the signing certificate's validity
      */
     public EnrollmentTokenResponse createToken(CreateEnrollmentTokenRequest request, EnrollmentTokenCreator creator) {
-        final CertificateEntry signingCert = opAmpCaService.getTokenSigningCert();
-
+        final var tokenSigningKey = getTokenSigningKey();
         final Instant now = Instant.now(clock);
         final @Nullable Instant expiresAt = request.expiresIn() != null ? now.plus(request.expiresIn()) : null;
 
-        // Validate against cert expiry only when token has an expiry
-        if (expiresAt != null) {
-            final Instant certExpiry = signingCert.notAfter();
-            if (expiresAt.isAfter(certExpiry)) {
-                throw new IllegalArgumentException(
-                        f("Token expiry %s exceeds signing certificate expiry %s", expiresAt, certExpiry));
-            }
-        }
-
         final String jti = UUID.randomUUID().toString();
-        final String token = buildJwt(signingCert, jti, now, expiresAt);
+        final String token = buildJwt(tokenSigningKey, jti, now, expiresAt);
 
-        tokenCollection.insertOne(new EnrollmentTokenDTO(null, jti, signingCert.fingerprint(),
-                request.fleetId(), creator, now, expiresAt, 0, null));
+        tokenCollection.insertOne(EnrollmentTokenDTO.builder()
+                .jti(jti)
+                .kid(tokenSigningKey.fingerprint())
+                .fleetId(request.fleetId())
+                .createdBy(creator)
+                .createdAt(now)
+                .expiresAt(expiresAt)
+                .build());
 
         return new EnrollmentTokenResponse(token, expiresAt);
     }
@@ -192,7 +159,7 @@ public class EnrollmentTokenService {
      * <p>
      * Validation includes:
      * <ul>
-     *   <li>Signature verification using the cert identified by {@code kid} header</li>
+     *   <li>Signature verification using the key identified by {@code kid} header</li>
      *   <li>Expiration check (handled automatically by JJWT)</li>
      *   <li>Audience validation (must be {@code {cluster_id}:opamp})</li>
      *   <li>JTI lookup against persisted metadata (token must not be deleted)</li>
@@ -212,15 +179,17 @@ public class EnrollmentTokenService {
                         if (kid == null) {
                             throw new SecurityException("Missing kid header");
                         }
-                        return certificateService.findByFingerprint(kid)
-                                .map(cert -> {
-                                    try {
-                                        return PemUtils.parseCertificate(cert.certificate()).getPublicKey();
-                                    } catch (Exception e) {
-                                        throw new SecurityException("Failed to parse certificate", e);
-                                    }
-                                })
-                                .orElseThrow(() -> new SecurityException("Unknown kid: " + kid));
+                        final var tokenSigningKey = getTokenSigningKey();
+
+                        if (!tokenSigningKey.fingerprint().equals(kid)) {
+                            throw new SecurityException("Unknown kid: " + kid);
+                        }
+
+                        try {
+                            return PemUtils.parsePublicKey(tokenSigningKey.publicKey());
+                        } catch (IOException e) {
+                            throw new SecurityException("Failed to parse token signing key", e);
+                        }
                     })
                     .requireAudience(expectedAudience)
                     .build()
@@ -232,8 +201,7 @@ public class EnrollmentTokenService {
                 return Optional.empty();
             }
 
-            final EnrollmentTokenDTO metadata = tokenCollection.find(
-                    Filters.eq(EnrollmentTokenDTO.FIELD_JTI, jti)).first();
+            final EnrollmentTokenDTO metadata = tokenCollection.find(eq(EnrollmentTokenDTO.FIELD_JTI, jti)).first();
             if (metadata == null) {
                 LOG.warn("Enrollment token validation failed: token metadata not found (deleted?)");
                 return Optional.empty();
@@ -247,16 +215,16 @@ public class EnrollmentTokenService {
     }
 
     public boolean delete(String id) {
-        return tokenCollection.deleteOne(Filters.eq("_id", new ObjectId(id))).getDeletedCount() > 0;
+        return tokenCollection.deleteOne(eq("_id", new ObjectId(id))).getDeletedCount() > 0;
     }
 
     public void deleteAllByFleet(String fleetId) {
-        tokenCollection.deleteMany(Filters.eq(EnrollmentTokenDTO.FIELD_FLEET_ID, fleetId));
+        tokenCollection.deleteMany(eq(EnrollmentTokenDTO.FIELD_FLEET_ID, fleetId));
     }
 
     public void incrementUsage(String id) {
         tokenCollection.updateOne(
-                Filters.eq("_id", new ObjectId(id)),
+                eq("_id", new ObjectId(id)),
                 Updates.combine(
                         Updates.inc(EnrollmentTokenDTO.FIELD_USAGE_COUNT, 1),
                         Updates.set(EnrollmentTokenDTO.FIELD_LAST_USED_AT, Date.from(Instant.now(clock)))
@@ -276,12 +244,9 @@ public class EnrollmentTokenService {
                 .page(page);
     }
 
-    private String buildJwt(CertificateEntry signingCert, String jti,
-                            Instant issuedAt, @Nullable Instant expiresAt) {
+    private String buildJwt(TokenSigningKey tokenSigningKey, String jti, Instant issuedAt, @Nullable Instant expiresAt) {
         try {
-            final String privateKeyPem = certificateService.encryptedValueService()
-                    .decrypt(signingCert.privateKey());
-            final PrivateKey privateKey = PemUtils.parsePrivateKey(privateKeyPem);
+            final var privateKey = PemUtils.parsePrivateKey(encryptedValueService.decrypt(tokenSigningKey.privateKey()));
 
             final String clusterId = clusterIdService.getString();
             final String audience = clusterId + AUDIENCE_SUFFIX;
@@ -289,11 +254,12 @@ public class EnrollmentTokenService {
             var builder = Jwts.builder()
                     .header()
                     .add("ctt", "enrollment")
-                    .add("kid", signingCert.fingerprint())
+                    .add("kid", tokenSigningKey.fingerprint())
                     .and()
                     .id(jti)
                     .issuer(clusterId)
-                    .audience().add(audience).and()
+                    .audience().add(audience)
+                    .and()
                     .issuedAt(Date.from(issuedAt));
 
             if (expiresAt != null) {
@@ -306,4 +272,9 @@ public class EnrollmentTokenService {
         }
     }
 
+    private TokenSigningKey getTokenSigningKey() {
+        return collectorsConfigService.get()
+                .map(CollectorsConfig::tokenSigningKey)
+                .orElseThrow(() -> new IllegalStateException("Token signing key not found"));
+    }
 }

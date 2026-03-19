@@ -62,12 +62,10 @@ public class OpAmpCaService {
 
     static final Duration CA_CERT_VALIDITY = Duration.ofDays(30 * 365);
     static final Duration SIGNING_CERT_VALIDITY = Duration.ofDays(5 * 365);
-    static final Duration TOKEN_SIGNING_VALIDITY = Duration.ofDays(2 * 365);
     static final Duration OTLP_SERVER_CERT_VALIDITY = Duration.ofDays(2 * 365);
 
     static final String CA_CERT_CN = "Collectors CA";
     static final String SIGNING_CERT_CN = "Collectors Signing";
-    static final String TOKEN_SIGNING_CN = "Collectors Token Signing";
     static final String OTLP_SERVER_CERT_CN = "Collectors OTLP Server";
 
     private final CertificateService certificateService;
@@ -104,15 +102,6 @@ public class OpAmpCaService {
     }
 
     /**
-     * Returns the token signing certificate for signing enrollment JWTs.
-     *
-     * @return the token signing certificate entry
-     */
-    public CertificateEntry getTokenSigningCert() {
-        return ensureInitialized().tokenSigningCert();
-    }
-
-    /**
      * Returns the OTLP server certificate for TLS on the OTLP ingest endpoint.
      *
      * @return the OTLP server certificate entry
@@ -127,10 +116,6 @@ public class OpAmpCaService {
 
     public String getSigningCertId() {
         return ensureInitialized().signingCert().id();
-    }
-
-    public String getTokenSigningCertId() {
-        return ensureInitialized().tokenSigningCert().id();
     }
 
     public String getOtlpServerCertId() {
@@ -212,15 +197,17 @@ public class OpAmpCaService {
                     builder.createRootCa(CA_CERT_CN, Algorithm.ED25519, CA_CERT_VALIDITY));
             final CertificateEntry signingCert = certificateService.save(
                     builder.createIntermediateCa(SIGNING_CERT_CN, caCert, SIGNING_CERT_VALIDITY));
-            final CertificateEntry tokenSigningCert = certificateService.save(
-                    builder.createEndEntityCert(TOKEN_SIGNING_CN, signingCert, KeyUsage.digitalSignature, TOKEN_SIGNING_VALIDITY));
-            final List<String> otlpSans = List.of(clusterIdService.getString());
             final CertificateEntry otlpServerCert = certificateService.save(
-                    builder.createEndEntityCert(OTLP_SERVER_CERT_CN, signingCert,
+                    builder.createEndEntityCert(
+                            OTLP_SERVER_CERT_CN,
+                            signingCert,
                             KeyUsage.digitalSignature | KeyUsage.keyEncipherment,
-                            KeyPurposeId.id_kp_serverAuth, OTLP_SERVER_CERT_VALIDITY, otlpSans));
+                            KeyPurposeId.id_kp_serverAuth,
+                            OTLP_SERVER_CERT_VALIDITY,
+                            List.of(clusterIdService.getString())
+                    ));
 
-            cachedHierarchy = new CaHierarchy(caCert, signingCert, tokenSigningCert, otlpServerCert);
+            cachedHierarchy = new CaHierarchy(caCert, signingCert, otlpServerCert);
             return cachedHierarchy;
         } catch (Exception e) {
             throw new RuntimeException("Failed to create Collectors CA hierarchy", e);
@@ -232,15 +219,12 @@ public class OpAmpCaService {
                 .orElseThrow(() -> new IllegalStateException("CA cert not found: " + config.caCertId()));
         final CertificateEntry signingCert = certificateService.findById(config.signingCertId())
                 .orElseThrow(() -> new IllegalStateException("Signing cert not found: " + config.signingCertId()));
-        final CertificateEntry tokenSigningCert = certificateService.findById(config.tokenSigningCertId())
-                .orElseThrow(() -> new IllegalStateException("Token signing cert not found: " + config.tokenSigningCertId()));
         final CertificateEntry otlpServerCert = certificateService.findById(config.otlpServerCertId())
                 .orElseThrow(() -> new IllegalStateException("OTLP server cert not found: " + config.otlpServerCertId()));
-        return new CaHierarchy(caCert, signingCert, tokenSigningCert, otlpServerCert);
+        return new CaHierarchy(caCert, signingCert, otlpServerCert);
     }
 
     public record CaHierarchy(CertificateEntry caCert,
                               CertificateEntry signingCert,
-                              CertificateEntry tokenSigningCert,
                               CertificateEntry otlpServerCert) {}
 }

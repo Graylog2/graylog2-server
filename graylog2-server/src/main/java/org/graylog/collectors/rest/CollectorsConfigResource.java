@@ -24,6 +24,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -38,9 +39,11 @@ import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.FleetService;
 import org.graylog.collectors.FleetTransactionLogService;
+import org.graylog.collectors.TokenSigningKey;
 import org.graylog.collectors.db.MarkerType;
 import org.graylog.collectors.input.CollectorIngestHttpInput;
 import org.graylog.collectors.opamp.OpAmpCaService;
+import org.graylog.collectors.opamp.auth.EnrollmentTokenService;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.database.ValidationException;
@@ -69,6 +72,7 @@ public class CollectorsConfigResource extends RestResource {
     private final URI httpExternalUri;
     private final FleetService fleetService;
     private final FleetTransactionLogService fleetTransactionLogService;
+    private final EnrollmentTokenService enrollmentTokenService;
     private final OpAmpCaService opAmpCaService;
 
     @Inject
@@ -78,6 +82,7 @@ public class CollectorsConfigResource extends RestResource {
                                     HttpConfiguration httpConfiguration,
                                     FleetService fleetService,
                                     FleetTransactionLogService fleetTransactionLogService,
+                                    EnrollmentTokenService enrollmentTokenService,
                                     OpAmpCaService opAmpCaService) {
         this.collectorsConfigService = collectorsConfigService;
         this.collectorInputService = collectorInputService;
@@ -85,6 +90,7 @@ public class CollectorsConfigResource extends RestResource {
         this.httpExternalUri = httpConfiguration.getHttpExternalUri();
         this.fleetService = fleetService;
         this.fleetTransactionLogService = fleetTransactionLogService;
+        this.enrollmentTokenService = enrollmentTokenService;
         this.opAmpCaService = opAmpCaService;
     }
 
@@ -121,10 +127,21 @@ public class CollectorsConfigResource extends RestResource {
         final Duration effectiveExpiration = request.collectorExpirationThreshold() != null
                 ? request.collectorExpirationThreshold() : CollectorsConfig.DEFAULT_EXPIRATION_THRESHOLD;
 
+        final TokenSigningKey tokenSigningKey;
+        if (existing.isPresent()) {
+            tokenSigningKey = existing.get().tokenSigningKey();
+        } else {
+            try {
+                tokenSigningKey = enrollmentTokenService.createTokenSigningKey();
+            } catch (Exception e) {
+                throw new InternalServerErrorException("Could not create token signing key", e);
+            }
+        }
+
         final var config = CollectorsConfig.builder()
                 .caCertId(opAmpCaService.getCaCertId())
                 .signingCertId(opAmpCaService.getSigningCertId())
-                .tokenSigningCertId(opAmpCaService.getTokenSigningCertId())
+                .tokenSigningKey(tokenSigningKey)
                 .otlpServerCertId(opAmpCaService.getOtlpServerCertId())
                 .http(request.http().toConfig(httpInputId))
                 .collectorOfflineThreshold(effectiveOffline)

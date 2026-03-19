@@ -98,20 +98,20 @@ class OpAmpCaServiceTest {
 
         final OpAmpCaService.CaHierarchy hierarchy = opAmpCaService.ensureInitialized();
 
+        assertThat(hierarchy.caCert()).isNotNull();
+        assertThat(hierarchy.caCert().id()).isNotNull();
+        assertThat(hierarchy.caCert().fingerprint()).startsWith("sha256:");
+
         assertThat(hierarchy.signingCert()).isNotNull();
         assertThat(hierarchy.signingCert().id()).isNotNull();
         assertThat(hierarchy.signingCert().fingerprint()).startsWith("sha256:");
-
-        assertThat(hierarchy.tokenSigningCert()).isNotNull();
-        assertThat(hierarchy.tokenSigningCert().id()).isNotNull();
-        assertThat(hierarchy.tokenSigningCert().fingerprint()).startsWith("sha256:");
 
         assertThat(hierarchy.otlpServerCert()).isNotNull();
         assertThat(hierarchy.otlpServerCert().id()).isNotNull();
         assertThat(hierarchy.otlpServerCert().fingerprint()).startsWith("sha256:");
 
-        // Verify all four certs were saved (root CA + opAmpCa + tokenSigning + otlpServer)
-        assertThat(certificateService.findAll()).hasSize(4);
+        // Verify all four certs were saved (root CA + opAmpCa + otlpServer)
+        assertThat(certificateService.findAll()).hasSize(3);
     }
 
     @Test
@@ -121,12 +121,12 @@ class OpAmpCaServiceTest {
         final OpAmpCaService.CaHierarchy first = opAmpCaService.ensureInitialized();
         final OpAmpCaService.CaHierarchy second = opAmpCaService.ensureInitialized();
 
+        assertThat(second.caCert().id()).isEqualTo(first.caCert().id());
         assertThat(second.signingCert().id()).isEqualTo(first.signingCert().id());
-        assertThat(second.tokenSigningCert().id()).isEqualTo(first.tokenSigningCert().id());
         assertThat(second.otlpServerCert().id()).isEqualTo(first.otlpServerCert().id());
 
-        // Verify all four certs were saved only once (root CA + opAmpCa + tokenSigning + otlpServer)
-        assertThat(certificateService.findAll()).hasSize(4);
+        // Verify all four certs were saved only once (root CA + opAmpCa + otlpServer)
+        assertThat(certificateService.findAll()).hasSize(3);
     }
 
     private String getCN(CertificateEntry entry) throws Exception {

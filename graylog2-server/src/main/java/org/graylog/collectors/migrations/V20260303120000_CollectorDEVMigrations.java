@@ -25,10 +25,15 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.collectors.CollectorsConfig;
+import org.graylog.collectors.TokenSigningKey;
 import org.graylog.collectors.input.CollectorIngestCodec;
+import org.graylog.security.pki.Algorithm;
+import org.graylog.security.pki.KeyUtils;
+import org.graylog.security.pki.PemUtils;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.streams.StreamRuleImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,15 +59,19 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20260303120000_CollectorDEVMigrations.class);
     private static final String CLUSTER_CONFIG_COLLECTION = "cluster_config";
     private static final String INSTANCES_COLLECTION = "collector_instances";
+    private static final String CERTIFICATES_COLLECTION = "pki_certificates";
+    private static final String ENROLLMENT_TOKENS_COLLECTION = "collector_enrollment_tokens";
     private static final String INPUTS_COLLECTION = "inputs";
     private static final String CONFIG_TYPE = "org.graylog.collectors.CollectorsConfig";
     private static final String GRPC_INPUT_TYPE = "org.graylog.collectors.input.CollectorIngestGrpcInput";
 
     private final MongoConnection mongoConnection;
+    private final EncryptedValueService encryptedValueService;
 
     @Inject
-    public V20260303120000_CollectorDEVMigrations(MongoConnection mongoConnection) {
+    public V20260303120000_CollectorDEVMigrations(MongoConnection mongoConnection, EncryptedValueService encryptedValueService) {
         this.mongoConnection = mongoConnection;
+        this.encryptedValueService = encryptedValueService;
     }
 
     @Override
@@ -88,6 +97,7 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
         deletePersistedGrpcInputs(db);
         removeGrpcConfig(db);
         deleteMacOSUnifiedLoggingSources(db);
+        replaceTokenSigningCertWithSigningKey(db, encryptedValueService);
     }
 
     private void convertObjectIdFields(MongoDatabase db) {
@@ -179,7 +189,7 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
         if (payload.isPresent() && isBlank(payload.get().getString(newField))) {
             final var signingCertId = payload.get().getString("signing_cert_id");
 
-            final var signingCert = db.getCollection("pki_certificates")
+            final var signingCert = db.getCollection(CERTIFICATES_COLLECTION)
                     .find(Filters.eq("_id", new ObjectId(signingCertId)))
                     .first();
 
@@ -323,6 +333,73 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
         ).getModifiedCount();
         if (updated > 0) {
             LOG.info("Removed gRPC settings from collectors config.");
+        }
+    }
+
+    private static void replaceTokenSigningCertWithSigningKey(MongoDatabase db, EncryptedValueService encryptedValueService) {
+        final var oldField = "token_signing_cert_id";
+        final var newField = "token_signing_key";
+
+        final var clusterConfigCollection = db.getCollection(CLUSTER_CONFIG_COLLECTION);
+        final Document config = clusterConfigCollection.find(Filters.eq("type", CONFIG_TYPE)).first();
+        if (config == null) {
+            return;
+        }
+
+        final Document payload = config.get("payload", Document.class);
+
+        if (payload != null && payload.containsKey(oldField)) {
+            final var signingCertId = payload.getString(oldField);
+            final var certificatesCollection = db.getCollection(CERTIFICATES_COLLECTION);
+
+            final var certDeleteResult = certificatesCollection.deleteOne(Filters.eq("_id", new ObjectId(signingCertId)));
+            if (certDeleteResult.getDeletedCount() != 1) {
+                LOG.warn("Could not delete certificate with signing cert id {}", signingCertId);
+            }
+            final var result = clusterConfigCollection.updateOne(
+                    Filters.eq("type", CONFIG_TYPE),
+                    Updates.unset("payload." + oldField)
+            );
+            if (result.getModifiedCount() != 1) {
+                LOG.warn("Could not update Collectors cluster config to remove field: {}", oldField);
+            }
+        }
+
+        if (payload == null || payload.containsKey(newField)) {
+            return;
+        }
+
+        try {
+            final var keyPair = KeyUtils.generateKeyPair(Algorithm.ED25519);
+
+            final var tsk = new TokenSigningKey(
+                    encryptedValueService.encrypt(PemUtils.toPem(keyPair.getPrivate())),
+                    PemUtils.toPem(keyPair.getPublic()),
+                    KeyUtils.sha256Fingerprint(keyPair),
+                    Instant.now()
+            );
+
+            final var tskDoc = new Document();
+
+            tskDoc.put("private_key", new Document(Map.of(
+                    "encrypted_value", tsk.privateKey().value(),
+                    "salt", tsk.privateKey().salt()
+            )));
+            tskDoc.put("public_key", tsk.publicKey());
+            tskDoc.put("fingerprint", tsk.fingerprint());
+            tskDoc.put("created_at", Date.from(Instant.now()));
+
+            final var result = clusterConfigCollection.updateOne(
+                    Filters.eq("type", CONFIG_TYPE),
+                    Updates.set("payload." + newField, tskDoc)
+            );
+            if (result.getModifiedCount() != 1) {
+                LOG.warn("Could not update Collectors cluster config to add new field: {}", newField);
+            }
+
+            db.getCollection(ENROLLMENT_TOKENS_COLLECTION).deleteMany(Filters.empty());
+        } catch (Exception e) {
+            LOG.error("Could not generate token signing key.", e);
         }
     }
 }

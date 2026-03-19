@@ -36,6 +36,8 @@ import java.time.Instant;
 public record TokenSigningKey(
         @JsonProperty("private_key")
         EncryptedValue privateKey,
+        @JsonProperty("public_key")
+        String publicKey,
         @JsonProperty("fingerprint") String fingerprint,
         @JsonSerialize(using = MongoInstantSerializer.class)
         @JsonDeserialize(using = MongoInstantDeserializer.class)

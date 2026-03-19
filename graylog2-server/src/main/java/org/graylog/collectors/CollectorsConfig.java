@@ -27,7 +27,7 @@ import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 public record CollectorsConfig(
         @JsonProperty("ca_cert_id") @Nullable String caCertId,
         @JsonProperty("signing_cert_id") @Nullable String signingCertId,
-        @JsonProperty("token_signing_cert_id") @Nullable String tokenSigningCertId,
+        @JsonProperty("token_signing_key") @Nullable TokenSigningKey tokenSigningKey,
         @JsonProperty("otlp_server_cert_id") @Nullable String otlpServerCertId,
         @JsonProperty("http") IngestEndpointConfig http,
         @JsonProperty("collector_offline_threshold") Duration collectorOfflineThreshold,
@@ -64,7 +64,7 @@ public record CollectorsConfig(
 
         Builder signingCertId(String signingCertId);
 
-        Builder tokenSigningCertId(String tokenSigningCertId);
+        Builder tokenSigningKey(TokenSigningKey tokenSigningKey);
 
         Builder otlpServerCertId(String otlpServerCertId);
 

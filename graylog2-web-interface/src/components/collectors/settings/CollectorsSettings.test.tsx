@@ -36,7 +36,7 @@ const updateConfig = jest.fn();
 const config = {
   ca_cert_id: 'ca-id',
   signing_cert_id: 'signing-id',
-  token_signing_cert_id: 'token-id',
+  token_signing_key: { is_set: true },
   otlp_server_cert_id: 'otlp-id',
   http: {
     enabled: true,

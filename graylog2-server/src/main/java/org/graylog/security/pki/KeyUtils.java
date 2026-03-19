@@ -29,6 +29,7 @@ import java.util.Base64;
  * Utilities for cryptographic key pairs.
  */
 public final class KeyUtils {
+    private static final String SHA256_PREFIX = "SHA256:";
     private static final String BOUNCY_CASTLE_PROVIDER = "BC";
 
     static {
@@ -66,6 +67,6 @@ public final class KeyUtils {
         final MessageDigest digest = MessageDigest.getInstance("SHA-256");
         final byte[] hash = digest.digest(keyPair.getPublic().getEncoded());
         final String encoded = Base64.getEncoder().withoutPadding().encodeToString(hash);
-        return "SHA256:" + encoded;
+        return SHA256_PREFIX + encoded;
     }
 }
