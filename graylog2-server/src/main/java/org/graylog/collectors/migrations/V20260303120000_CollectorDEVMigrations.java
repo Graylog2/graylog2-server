@@ -87,6 +87,7 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
         backfillEnrollmentTokenId(db);
         deletePersistedGrpcInputs(db);
         removeGrpcConfig(db);
+        deleteMacOSUnifiedLoggingSources(db);
     }
 
     private void convertObjectIdFields(MongoDatabase db) {
@@ -292,6 +293,15 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
         final long deleted = collection.deleteMany(Filters.eq("type", GRPC_INPUT_TYPE)).getDeletedCount();
         if (deleted > 0) {
             LOG.info("Deleted {} persisted collector gRPC input(s).", deleted);
+        }
+    }
+
+    private static void deleteMacOSUnifiedLoggingSources(MongoDatabase db) {
+        final MongoCollection<Document> collection = db.getCollection("collector_fleet_sources");
+
+        final long deleted = collection.deleteMany(Filters.eq("config.type", "macos_unified_logging")).getDeletedCount();
+        if (deleted > 0) {
+            LOG.info("Deleted {} macOS unified logging source(s).", deleted);
         }
     }
 

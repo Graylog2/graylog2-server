@@ -35,8 +35,7 @@ class SourceDTOTest {
         objectMapper.registerSubtypes(
                 new NamedType(FileSourceConfig.class, FileSourceConfig.TYPE_NAME),
                 new NamedType(JournaldSourceConfig.class, JournaldSourceConfig.TYPE_NAME),
-                new NamedType(WindowsEventLogSourceConfig.class, WindowsEventLogSourceConfig.TYPE_NAME),
-                new NamedType(MacOSUnifiedLoggingSourceConfig.class, MacOSUnifiedLoggingSourceConfig.TYPE_NAME)
+                new NamedType(WindowsEventLogSourceConfig.class, WindowsEventLogSourceConfig.TYPE_NAME)
         );
     }
 

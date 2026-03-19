@@ -18,7 +18,6 @@ package org.graylog.collectors.db;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
-import org.graylog.collectors.config.receiver.MacOSUnifiedLoggingReceiverConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +36,6 @@ class SourceConfigTest {
         objectMapper.registerSubtypes(
                 new NamedType(FileSourceConfig.class, FileSourceConfig.TYPE_NAME),
                 new NamedType(JournaldSourceConfig.class, JournaldSourceConfig.TYPE_NAME),
-                new NamedType(MacOSUnifiedLoggingSourceConfig.class, MacOSUnifiedLoggingSourceConfig.TYPE_NAME),
                 new NamedType(WindowsEventLogSourceConfig.class, WindowsEventLogSourceConfig.TYPE_NAME)
         );
     }
@@ -119,65 +117,6 @@ class SourceConfigTest {
 
         assertThat(tree.has("type")).isTrue();
         assertThat(tree.get("type").asText()).isEqualTo("file");
-    }
-
-    @Test
-    void deserializeMacOSUnifiedLoggingSource() throws Exception {
-        final var json = """
-                {
-                    "type": "macos_unified_logging",
-                    "predicate": "subsystem == 'com.apple.example'"
-                }
-                """;
-
-        final var config = objectMapper.readValue(json, SourceConfig.class);
-
-        assertThat(config).isInstanceOf(MacOSUnifiedLoggingSourceConfig.class);
-        final var macConfig = (MacOSUnifiedLoggingSourceConfig) config;
-        assertThat(macConfig.type()).isEqualTo("macos_unified_logging");
-        assertThat(macConfig.predicate()).isEqualTo("subsystem == 'com.apple.example'");
-    }
-
-    @Test
-    void deserializeMacOSUnifiedLoggingSourceWithoutPredicate() throws Exception {
-        final var json = """
-                {
-                    "type": "macos_unified_logging"
-                }
-                """;
-
-        final var config = objectMapper.readValue(json, SourceConfig.class);
-
-        assertThat(config).isInstanceOf(MacOSUnifiedLoggingSourceConfig.class);
-        final var macConfig = (MacOSUnifiedLoggingSourceConfig) config;
-        assertThat(macConfig.predicate()).isNull();
-    }
-
-    @Test
-    void macOSUnifiedLoggingToReceiverConfig() {
-        final var config = MacOSUnifiedLoggingSourceConfig.builder()
-                .predicate("subsystem == 'com.apple.example'")
-                .build();
-
-        final var receiverConfig = config.toReceiverConfig("test-id");
-
-        assertThat(receiverConfig).isPresent();
-        final var receiver = (MacOSUnifiedLoggingReceiverConfig) receiverConfig.get();
-        assertThat(receiver.name()).isEqualTo("macosunifiedlogging/test-id");
-        assertThat(receiver.predicate()).isEqualTo("subsystem == 'com.apple.example'");
-        assertThat(receiver.format()).isEqualTo("ndjson");
-    }
-
-    @Test
-    void macOSUnifiedLoggingJsonRoundTrip() throws Exception {
-        final var original = MacOSUnifiedLoggingSourceConfig.builder()
-                .predicate("subsystem == 'com.apple.example'")
-                .build();
-
-        final var json = objectMapper.writeValueAsString(original);
-        final var deserialized = objectMapper.readValue(json, SourceConfig.class);
-
-        assertThat(deserialized).isEqualTo(original);
     }
 
 }

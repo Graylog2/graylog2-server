@@ -82,16 +82,16 @@ class CollectorJournalRecordFactoryTest {
                         .setResource(Resource.newBuilder()
                                 .addAttributes(KeyValue.newBuilder()
                                         .setKey(CollectorAttributes.COLLECTOR_RECEIVER_TYPE)
-                                        .setValue(AnyValue.newBuilder().setStringValue("macosunifiedlogging"))))
+                                        .setValue(AnyValue.newBuilder().setStringValue("journald"))))
                         .addScopeLogs(ScopeLogs.newBuilder()
                                 .addLogRecords(LogRecord.newBuilder()
-                                        .setBody(AnyValue.newBuilder().setStringValue("macos log")))))
+                                        .setBody(AnyValue.newBuilder().setStringValue("journald log")))))
                 .build();
 
         final var records = CollectorJournalRecordFactory.createFromRequest(request, "agent-1");
 
         assertThat(records).hasSize(2);
         assertThat(records.get(0).getCollectorReceiverType()).isEqualTo("filelog");
-        assertThat(records.get(1).getCollectorReceiverType()).isEqualTo("macosunifiedlogging");
+        assertThat(records.get(1).getCollectorReceiverType()).isEqualTo("journald");
     }
 }

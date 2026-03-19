@@ -42,7 +42,7 @@ export type CollectorInstanceView = {
   status: 'online' | 'offline';
 };
 
-export type SourceType = 'file' | 'journald' | 'windows_event_log' | 'macos_unified_logging';
+export type SourceType = 'file' | 'journald' | 'windows_event_log';
 
 export type SourceBase = {
   id: string;
@@ -73,19 +73,10 @@ export type WindowsEventLogSourceConfig = {
   read_mode: 'beginning' | 'end';
 };
 
-export type MacOSUnifiedLoggingSourceConfig = {
-  predicate?: string;
-};
-
 export type FileSource = SourceBase & { type: 'file'; config: FileSourceConfig };
 export type JournaldSource = SourceBase & { type: 'journald'; config: JournaldSourceConfig };
 export type WindowsEventLogSource = SourceBase & { type: 'windows_event_log'; config: WindowsEventLogSourceConfig };
-export type MacOSUnifiedLoggingSource = SourceBase & {
-  type: 'macos_unified_logging';
-  config: MacOSUnifiedLoggingSourceConfig;
-};
-
-export type Source = FileSource | JournaldSource | WindowsEventLogSource | MacOSUnifiedLoggingSource;
+export type Source = FileSource | JournaldSource | WindowsEventLogSource;
 
 export type EnrollmentTokenCreator = {
   user_id: string;

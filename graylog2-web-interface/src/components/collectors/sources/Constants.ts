@@ -31,6 +31,5 @@ export const SOURCE_TYPE_LABELS: Record<SourceType, string> = {
   file: 'File',
   journald: 'Journald',
   windows_event_log: 'Windows Event Log',
-  macos_unified_logging: 'macOS Unified Logging',
 };
 

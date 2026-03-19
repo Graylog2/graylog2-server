@@ -26,7 +26,6 @@ import type {
   FileSourceConfig,
   JournaldSourceConfig,
   WindowsEventLogSourceConfig,
-  MacOSUnifiedLoggingSourceConfig,
   JournaldPriority
 } from '../types';
 
@@ -38,24 +37,15 @@ type Props = {
   isLoading?: boolean;
 };
 
-// TODO: Fetch the default predicate from the backend API instead of duplicating it here.
-//  The single source of truth is MacOSUnifiedLoggingReceiverConfig.DEFAULT_PREDICATE.
-const DEFAULT_MACOS_PREDICATE =
-  "subsystem IN {'com.apple.opendirectoryd','com.apple.authorization','com.apple.loginwindow'," +
-  "'com.apple.securityd','com.apple.TCC','com.apple.alf','com.apple.networkextension'," +
-  "'com.apple.DiskManagement','com.apple.CoreStorage','com.apple.endpointsecurity'," +
-  "'com.apple.syspolicyd','com.apple.launchd'} AND messageType >= error";
-
 import { SOURCE_TYPE_LABELS } from './Constants';
 
 const defaultConfigs: Record<
   SourceType,
-  FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig | MacOSUnifiedLoggingSourceConfig
+  FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig
 > = {
   file: { paths: [''], read_mode: 'end' },
   journald: { read_mode: 'end', priority: 'info' },
   windows_event_log: { channels: [], include_default_channels: true, read_mode: 'end',  },
-  macos_unified_logging: { predicate: DEFAULT_MACOS_PREDICATE },
 };
 
 const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoading = false }: Props) => {
@@ -92,9 +82,6 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
     setConfig((prev) => ({ ...prev, ...updates }));
   };
   const updateWindowsEventLogConfig = (updates: Partial<WindowsEventLogSourceConfig>) => {
-    setConfig((prev) => ({ ...prev, ...updates }));
-  };
-  const updateMacOSUnifiedLoggingConfig = (updates: Partial<MacOSUnifiedLoggingSourceConfig>) => {
     setConfig((prev) => ({ ...prev, ...updates }));
   };
 
@@ -215,24 +202,6 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
     );
   };
 
-  const renderMacOSUnifiedLoggingConfig = () => {
-    const macConfig = config as MacOSUnifiedLoggingSourceConfig;
-
-    return (
-      <>
-        <Input
-          id="macos-predicate"
-          type="textarea"
-          rows={5}
-          label="Predicate"
-          help="NSPredicate filter expression to select which log entries to collect."
-          value={macConfig.predicate || ''}
-          onChange={(e) => updateMacOSUnifiedLoggingConfig({ predicate: e.target.value || undefined })}
-        />
-      </>
-    );
-  };
-
   const renderConfigSection = () => {
     switch (sourceType) {
       case 'file':
@@ -241,8 +210,6 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
         return renderJournaldConfig();
       case 'windows_event_log':
         return renderWindowsEventLogConfig();
-      case 'macos_unified_logging':
-        return renderMacOSUnifiedLoggingConfig();
       default:
         return null;
     }
