@@ -38,11 +38,17 @@ type Props = {
 
 const ValueActionsDropdown = ({ value, field, onActionRun, setStep }: Props) => {
   const actionContext = useContext(ActionContext);
-  const { additionalHandlerArgs } = useFieldActionsContext();
+  const fieldActionsContext = useFieldActionsContext();
   const { overflowingComponents, setOverflowingComponents } = useOverflowingComponents();
 
   const type = fieldTypeFor(field, actionContext.fieldTypes);
-  const handlerArgs = { field, type, value, contexts: actionContext, ...additionalHandlerArgs };
+  const handlerArgs = {
+    field,
+    type,
+    value,
+    contexts: actionContext,
+    ...(fieldActionsContext?.additionalHandlerArgs ?? {}),
+  };
 
   const showMultipleValueHeader = hasMultipleValueForActions(actionContext);
 
