@@ -63,7 +63,8 @@ const ListCol = styled(Col)(
 
 const InputDiagnosisRulesTab = ({ inputId }: Props) => (
   <StyledSectionGrid $rows="1fr 1fr">
-    <Section title="Pipeline Rules">
+    <Section title="Input appears in Pipeline Rules">
+      <p>Pipeline rules detailed below contain a from_input or from_forwarder_input function which explicitly targets this Input.</p>
       <Row>
         <ListCol md={12}>
           <PaginatedEntityTable<InputPipelineRule>
@@ -81,7 +82,8 @@ const InputDiagnosisRulesTab = ({ inputId }: Props) => (
       </Row>
     </Section>
 
-    <Section title="Stream Rules">
+    <Section title="Input appears in Stream Rules">
+      <p>Stream rules detailed below contain a match input function which explicitly targets this Input. Note that Stream Rules which may capture messages from this Input without the explicit use of the match input function will not be listed.</p>
       <Row>
         <ListCol md={12}>
           <PaginatedEntityTable<InputStreamRule>
