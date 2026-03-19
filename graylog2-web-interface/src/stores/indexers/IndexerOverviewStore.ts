@@ -20,7 +20,14 @@ import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
-import type { IndexRange } from 'stores/indices/IndexRangesStore';
+
+export type IndexRange = {
+  index_name?: string;
+  begin: string;
+  end: string;
+  calculated_at: string;
+  took_ms: number;
+};
 
 type IndexerOverviewActionsType = {
   list: (indexSetId: string) => Promise<unknown>;

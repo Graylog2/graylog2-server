@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import numeral from 'numeral';
 import moment from 'moment';
 
@@ -22,76 +22,55 @@ import { Col, Row } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, Spinner, PageHeader, PaginatedList } from 'components/common';
 import { IndexerFailuresList } from 'components/indexers';
-import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
-import { IndexerFailuresStore } from 'stores/indexers/IndexerFailuresStore';
+import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
+import useIndexerFailuresCount from 'components/indexers/hooks/useIndexerFailuresCount';
+import useIndexerFailuresList from 'components/indexers/hooks/useIndexerFailuresList';
 
-type IndexerFailuresPageProps = {
-  paginationQueryParameter: any;
+const IndexerFailuresPage = () => {
+  const { page, pageSize, setPagination } = usePaginationQueryParameter();
+  const since = useMemo(() => moment().subtract(10, 'years').format('YYYY-MM-DDTHH:mm:ss.SSS'), []);
+  const { data: total, isLoading: isLoadingCount } = useIndexerFailuresCount(since);
+  const offset = (page - 1) * pageSize;
+  const { data: listData, isLoading: isLoadingList } = useIndexerFailuresList(pageSize, offset);
+
+  const onChangePaginatedList = useCallback(
+    (newPage: number, newSize: number) => {
+      setPagination({ page: newPage, pageSize: newSize });
+    },
+    [setPagination],
+  );
+
+  if (isLoadingCount || isLoadingList) {
+    return <Spinner />;
+  }
+
+  return (
+    <DocumentTitle title="Indexer failures">
+      <span>
+        <PageHeader
+          title="Indexer failures"
+          documentationLink={{
+            title: 'Indexer failures documentation',
+            path: DocsHelper.PAGES.INDEXER_FAILURES,
+          }}>
+          <span>
+            This is a list of message index attempts that failed. A failure means that a message was properly processed
+            but writing it to the indexer cluster failed. Note that the list is capped to a size of 50 MB so it will
+            contain a lot of failure logs but not necessarily all that ever occurred.
+            <br />
+            Collection containing a total of {numeral(total).format('0,0')} indexer failures.
+          </span>
+        </PageHeader>
+        <Row className="content">
+          <Col md={12}>
+            <PaginatedList totalItems={total} onChange={onChangePaginatedList}>
+              <IndexerFailuresList failures={(listData as any)?.failures} />
+            </PaginatedList>
+          </Col>
+        </Row>
+      </span>
+    </DocumentTitle>
+  );
 };
 
-class IndexerFailuresPage extends React.Component<
-  IndexerFailuresPageProps,
-  {
-    [key: string]: any;
-  }
-> {
-  constructor(props) {
-    super(props);
-
-    this.state = {};
-  }
-
-  componentDidMount() {
-    IndexerFailuresStore.count(moment().subtract(10, 'years')).then((response) => {
-      this.setState({ total: response.count });
-    });
-
-    this.loadData();
-  }
-
-  loadData = (page = this.props.paginationQueryParameter.page, size = this.props.paginationQueryParameter.pageSize) => {
-    IndexerFailuresStore.list(size, (page - 1) * size).then((response) => {
-      this.setState({ failures: response.failures });
-    });
-  };
-
-  _onChangePaginatedList = (page, size) => {
-    this.loadData(page, size);
-  };
-
-  render() {
-    if (this.state.total === undefined || !this.state.failures) {
-      return <Spinner />;
-    }
-
-    return (
-      <DocumentTitle title="Indexer failures">
-        <span>
-          <PageHeader
-            title="Indexer failures"
-            documentationLink={{
-              title: 'Indexer failures documentation',
-              path: DocsHelper.PAGES.INDEXER_FAILURES,
-            }}>
-            <span>
-              This is a list of message index attempts that failed. A failure means that a message was properly
-              processed but writing it to the indexer cluster failed. Note that the list is capped to a size of 50 MB so
-              it will contain a lot of failure logs but not necessarily all that ever occurred.
-              <br />
-              Collection containing a total of {numeral(this.state.total).format('0,0')} indexer failures.
-            </span>
-          </PageHeader>
-          <Row className="content">
-            <Col md={12}>
-              <PaginatedList totalItems={this.state.total} onChange={this._onChangePaginatedList}>
-                <IndexerFailuresList failures={this.state.failures} />
-              </PaginatedList>
-            </Col>
-          </Row>
-        </span>
-      </DocumentTitle>
-    );
-  }
-}
-
-export default withPaginationQueryParameter(IndexerFailuresPage);
+export default IndexerFailuresPage;

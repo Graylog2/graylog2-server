@@ -14,20 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import View from 'views/logic/views/View';
-
-import NewQueryActionHandler from './NewQueryActionHandler';
-
-jest.mock('@graylog/server-api', () => ({
-  SearchDecorators: {
-    get: () => Promise.resolve([]),
-  },
-}));
-
-describe('NewQueryActionHandler', () => {
-  it('does not add widgets for dashboard', () =>
-    NewQueryActionHandler(View.Type.Dashboard).then(([_query, state]) => expect(state.widgets.size).toBe(0)));
-
-  it('adds widgets for search', () =>
-    NewQueryActionHandler(View.Type.Search).then(([_query, state]) => expect(state.widgets.size).toBe(2)));
-});
+const SidebarEventDefinitionDetails = (id: string) =>
+  ({
+    id: 'event-definition-details',
+    title: 'Event Definition Details',
+    componentKey: 'replay-search-sidebar',
+    props: { alertId: undefined, definitionId: id },
+  }) as const;
+export default SidebarEventDefinitionDetails;
