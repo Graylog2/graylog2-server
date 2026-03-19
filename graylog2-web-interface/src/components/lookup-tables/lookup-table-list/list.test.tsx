@@ -68,7 +68,7 @@ jest.mock('hooks/useScopePermissions', () => ({
 
 jest.mock('components/lookup-tables/hooks/useLookupTablesAPI', () => ({
   __esModule: true,
-  fetchPaginatedLookupTables: (...args: any[]) => mockFetchPaginatedLookupTables(...args),
+  fetchPaginatedLookupTables: () => mockFetchPaginatedLookupTables(),
   lookupTablesKeyFn: (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams],
   useDeleteLookupTable: () => ({
     deleteLookupTable: mockDeleteLookupTable,
