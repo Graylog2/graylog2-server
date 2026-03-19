@@ -46,7 +46,7 @@ const TableWrapper = styled.div.withConfig({
   shouldForwardProp: (prop) => prop !== 'maxHeight',
 })<{ maxHeight?: string }>(
   ({ maxHeight }) => css`
-    margin-top: -6px;
+    margin-top: ${({ theme }) => `-${theme.spacings.px.xs}px`};
 
     ${maxHeight &&
     css`

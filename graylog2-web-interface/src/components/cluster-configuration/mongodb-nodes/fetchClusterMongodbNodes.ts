@@ -14,9 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { qualifyUrl } from 'util/URLUtils';
-import PaginationURL from 'util/PaginationURL';
-import fetch from 'logic/rest/FetchProvider';
+import { SystemMongodb } from '@graylog/server-api';
+
 import type { Attribute, PaginatedResponseType, SearchParams } from 'stores/PaginationTypes';
 
 export const MongodbRole = {
@@ -66,24 +65,26 @@ export const DEFAULT_MONGODB_NODES_SEARCH_PARAMS: SearchParams = {
 export const fetchMongodbNodes = async (
   params: SearchParams = DEFAULT_MONGODB_NODES_SEARCH_PARAMS,
 ): Promise<MongodbNodesResponse> => {
-  const url = PaginationURL('/system/cluster/mongodb', params.page, params.pageSize, params.query, {
-    sort: params.sort?.attributeId,
-    order: params.sort?.direction,
-  });
+  type MongodbNodesSort = Parameters<typeof SystemMongodb.listNodes>[0];
+  type MongodbNodesOrder = Parameters<typeof SystemMongodb.listNodes>[4];
+  type MongodbNodesApiResponse = Awaited<ReturnType<typeof SystemMongodb.listNodes>>;
 
-  return fetch('GET', qualifyUrl(url)).then(
+  const sort = (params.sort?.attributeId ?? 'name') as MongodbNodesSort;
+  const order = (params.sort?.direction ?? 'asc') as MongodbNodesOrder;
+
+  return SystemMongodb.listNodes(sort, params.page, params.pageSize, params.query, order).then(
     ({
       attributes,
       pagination,
       elements,
-    }: {
-      attributes: Array<Attribute>;
-      pagination: PaginatedResponseType;
-      elements: Array<MongodbNode>;
-    }) => ({
+      query,
+    }: MongodbNodesApiResponse) => ({
       attributes,
-      list: elements,
-      pagination,
+      list: elements as Array<MongodbNode>,
+      pagination: {
+        ...pagination,
+        query,
+      } as PaginatedResponseType,
     }),
   );
 };

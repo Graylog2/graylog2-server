@@ -27,7 +27,7 @@ const AlertContent = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: ${({ theme }) => theme.spacings.sm};
   flex-wrap: wrap;
 `;
 
@@ -40,7 +40,7 @@ const MessageBlock = styled.div`
   }
 
   p + p {
-    margin-top: 4px;
+    margin-top: ${({ theme }) => theme.spacings.xxs};
   }
 `;
 

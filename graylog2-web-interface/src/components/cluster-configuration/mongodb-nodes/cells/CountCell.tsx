@@ -15,21 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
 
-import ProfilingLevelCell from './ProfilingLevelCell';
-import { MongodbProfilingLevel } from '../fetchClusterMongodbNodes';
+import NumberUtils from 'util/NumberUtils';
 
-describe('<ProfilingLevelCell />', () => {
-  it('renders label for slow ops profiling level values', () => {
-    render(<ProfilingLevelCell profilingLevel={MongodbProfilingLevel.SLOW_OPS} />);
+import { SecondaryText } from '../../shared-components/NodeMetricsLayout';
 
-    expect(screen.getByText('Slow Ops')).toBeInTheDocument();
-  });
+type Props = {
+  count: number | undefined | null;
+};
 
-  it('renders label for off profiling level values', () => {
-    render(<ProfilingLevelCell profilingLevel={MongodbProfilingLevel.OFF} />);
+const CountCell = ({ count }: Props) => (
+  <SecondaryText>
+    <span>{count == null ? 'N/A' : NumberUtils.formatNumber(count)}</span>
+  </SecondaryText>
+);
 
-    expect(screen.getByText('Off')).toBeInTheDocument();
-  });
-});
+export default CountCell;

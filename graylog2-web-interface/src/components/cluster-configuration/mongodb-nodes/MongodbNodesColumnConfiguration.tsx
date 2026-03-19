@@ -17,9 +17,9 @@
 import React from 'react';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
-import NumberUtils from 'util/NumberUtils';
 
 import type { MongodbNode } from './fetchClusterMongodbNodes';
+import CountCell from './cells/CountCell';
 import PercentRatioCell from './cells/PercentRatioCell';
 import ProfilingLevelCell from './cells/ProfilingLevelCell';
 import ReplicationLagCell from './cells/ReplicationLagCell';
@@ -86,15 +86,7 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
       staticWidth: 'matchHeader',
     },
     slow_query_count: {
-      renderCell: (_value, entity) => {
-        const count = entity.slow_query_count;
-
-        if (count == null) {
-          return <SecondaryText><span>N/A</span></SecondaryText>;
-        }
-
-        return <SecondaryText><span>{NumberUtils.formatNumber(count)}</span></SecondaryText>;
-      },
+      renderCell: (_value, entity) => <CountCell count={entity.slow_query_count} />,
       staticWidth: 'matchHeader',
     },
     storage_used_percent: {
@@ -108,27 +100,11 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
       staticWidth: 'matchHeader',
     },
     available_connections: {
-      renderCell: (_value, entity) => {
-        const count = entity.available_connections;
-
-        if (count == null) {
-          return <SecondaryText><span>N/A</span></SecondaryText>;
-        }
-
-        return <SecondaryText><span>{NumberUtils.formatNumber(count)}</span></SecondaryText>;
-      },
+      renderCell: (_value, entity) => <CountCell count={entity.available_connections} />,
       staticWidth: 'matchHeader',
     },
     current_connections: {
-      renderCell: (_value, entity) => {
-        const count = entity.current_connections;
-
-        if (count == null) {
-          return <SecondaryText><span>N/A</span></SecondaryText>;
-        }
-
-        return <SecondaryText><span>{NumberUtils.formatNumber(count)}</span></SecondaryText>;
-      },
+      renderCell: (_value, entity) => <CountCell count={entity.current_connections} />,
       staticWidth: 'matchHeader',
     },
     connections_used_percent: {

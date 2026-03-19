@@ -16,9 +16,9 @@
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
+import { SystemMongodb } from '@graylog/server-api';
+
 import UserNotification from 'util/UserNotification';
-import { qualifyUrl } from 'util/URLUtils';
 
 export const MONGODB_NODES_QUERY_KEY_PREFIX = ['mongodbNodes'] as const;
 export const MONGODB_PROFILING_STATUS_QUERY_KEY = [...MONGODB_NODES_QUERY_KEY_PREFIX, 'profilingStatus'] as const;
@@ -48,11 +48,10 @@ export type MongodbProfilingToggleReadyResult = MongodbProfilingToggleCommonResu
 
 export type MongodbProfilingToggleResult = MongodbProfilingToggleNotReadyResult | MongodbProfilingToggleReadyResult;
 
-const fetchMongodbProfilingStatus = () =>
-  fetch('GET', qualifyUrl('/system/cluster/mongodb/profiling/status')) as Promise<MongodbProfilingStatusByLevel>;
+const fetchMongodbProfilingStatus = () => SystemMongodb.profilingStatus() as Promise<MongodbProfilingStatusByLevel>;
 
-const enableMongodbProfiling = () => fetch('PUT', qualifyUrl('/system/cluster/mongodb/profiling/SLOW_OPS'));
-const disableMongodbProfiling = () => fetch('PUT', qualifyUrl('/system/cluster/mongodb/profiling/OFF'));
+const enableMongodbProfiling = () => SystemMongodb.changeProfiling('SLOW_OPS');
+const disableMongodbProfiling = () => SystemMongodb.changeProfiling('OFF');
 
 export const getClusterProfilingState = (statusByLevel?: MongodbProfilingStatusByLevel): MongodbProfilingState => {
   if (!statusByLevel) {
