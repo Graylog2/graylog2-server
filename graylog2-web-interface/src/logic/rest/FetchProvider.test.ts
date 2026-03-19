@@ -37,11 +37,9 @@ jest.mock('stores/sessions/SessionStore', () => ({
   },
 }));
 
-jest.mock('stores/sessions/ServerAvailabilityStore', () => ({
-  ServerAvailabilityActions: {
-    reportSuccess: jest.fn(),
-    reportError: jest.fn(),
-  },
+jest.mock('api/server-availability', () => ({
+  reportSuccess: jest.fn(),
+  reportError: jest.fn(),
 }));
 
 jest.mock('actions/errors/ErrorsActions', () => ({

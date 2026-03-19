@@ -14,10 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext } from 'react';
+import { createContext } from 'react';
 
-import ServerAvailabilityContext from 'contexts/ServerAvailabilityContext';
+export type ServerError = {
+  message: string;
+  originalError: {
+    method: string;
+    url: string;
+    status: number;
+  };
+};
 
-const useServerVersion = () => useContext(ServerAvailabilityContext)?.version;
+export type ServerAvailabilityContextType = {
+  server: { up: true } | { up: false; error: ServerError };
+  version: string | undefined;
+  ping: () => Promise<void>;
+};
 
-export default useServerVersion;
+const ServerAvailabilityContext = createContext<ServerAvailabilityContextType | undefined>(undefined);
+
+export default ServerAvailabilityContext;
