@@ -19,32 +19,26 @@ import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { createSimpleExternalValueAction } from 'fixtures/externalValueActions';
-import type { ActionContexts, RootState } from 'views/types';
+import type { ActionContexts } from 'views/types';
 import asMock from 'helpers/mocking/AsMock';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import useViewsDispatch from 'views/stores/useViewsDispatch';
-import mockDispatch from 'views/test/mockDispatch';
-import { createSearch } from 'fixtures/searches';
 import useExternalValueActions from 'views/hooks/useExternalValueActions';
-import FieldActionsContext, { type FieldActionsContextValue } from 'views/components/actions/FieldActionsContext';
+import useFieldActionsContext from 'views/components/actions/useFieldActionsContext';
 
 import Action from './Action';
 
-jest.mock('views/stores/useViewsDispatch');
-
 jest.mock('views/hooks/useExternalValueActions');
+jest.mock('views/components/actions/useFieldActionsContext');
 
 describe('Action', () => {
   beforeEach(() => {
-    const view = createSearch();
-    const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
-    asMock(useViewsDispatch).mockReturnValue(dispatch);
-
     asMock(useExternalValueActions).mockReturnValue({
       isLoading: false,
       externalValueActions: [],
       isError: false,
     });
+
+    asMock(useFieldActionsContext).mockReturnValue(actionConfig);
   });
 
   afterEach(() => {
@@ -52,24 +46,27 @@ describe('Action', () => {
   });
 
   const exampleHandlerArgs = {
-    queryId: 'query-id',
     field: 'field1',
     value: 'field-value',
     type: new FieldType('string', [], []),
     contexts: {} as ActionContexts,
   };
 
-  const actionsContextValue = {
-    evaluateCondition: () => true,
+  const actionConfig = {
+    evaluateCondition: (condition, args, fallbackValue) => {
+      if (!condition) {
+        return fallbackValue;
+      }
+
+      return condition(args);
+    },
     executeThunkAction: () => Promise.resolve(),
     additionalHandlerArgs: {},
     valueActions: [],
     fieldActions: [],
   };
 
-  type Props = Partial<React.ComponentProps<typeof Action>> & {
-    actionConfig?: FieldActionsContextValue;
-  };
+  type Props = Partial<React.ComponentProps<typeof Action>>;
 
   const OpenActionsMenu = () => <div>Open Actions Menu</div>;
 
@@ -78,13 +75,10 @@ describe('Action', () => {
     handlerArgs = exampleHandlerArgs,
     menuContainer = undefined,
     type = 'field',
-    actionConfig = actionsContextValue,
   }: Props) => (
-    <FieldActionsContext.Provider value={actionConfig}>
-      <Action element={OpenActionsMenu} handlerArgs={handlerArgs} menuContainer={menuContainer} type={type}>
-        {children}
-      </Action>
-    </FieldActionsContext.Provider>
+    <Action element={OpenActionsMenu} handlerArgs={handlerArgs} menuContainer={menuContainer} type={type}>
+      {children}
+    </Action>
   );
 
   const openDropdown = async (headerTitle = 'The dropdown header') => {
@@ -112,7 +106,9 @@ describe('Action', () => {
       },
     ];
 
-    render(<SimpleAction type="field" actionConfig={{ ...actionsContextValue, fieldActions }} />);
+    asMock(useFieldActionsContext).mockReturnValue({ ...actionConfig, fieldActions });
+
+    render(<SimpleAction type="field" />);
 
     await openDropdown();
 
