@@ -22,6 +22,10 @@ import type { Stream } from 'stores/streams/StreamsStore';
 import useStreamOutputs from 'hooks/useStreamOutputs';
 import type { AvailableOutputSummary } from 'components/streams/useAvailableOutputTypes';
 import useAvailableOutputTypes from 'components/streams/useAvailableOutputTypes';
+import {
+  getOutputTypeDefinition,
+  getRequestedOutputConfiguration,
+} from 'components/streams/useAvailableOutputTypes';
 import SectionCountLabel from 'components/streams/StreamDetails/SectionCountLabel';
 import AddOutputButton from 'components/streams/StreamDetails/routing-destination/AddOutputButton';
 import OutputsList from 'components/streams/StreamDetails/routing-destination/OutputsList';
@@ -37,13 +41,13 @@ const DestinationOutputs = ({ stream }: Props) => {
   const { data: availableOutputTypes, isInitialLoading: isLoadingOutputTypes } = useAvailableOutputTypes();
 
   const getTypeDefinition = (type: string, callback?: (available: AvailableOutputSummary) => void) => {
-    const definitition = availableOutputTypes.types[type];
+    const definition = getOutputTypeDefinition(availableOutputTypes, type);
 
-    if (callback && definitition) {
-      callback(definitition);
+    if (callback && definition) {
+      callback(definition);
     }
 
-    return definitition?.requested_configuration;
+    return getRequestedOutputConfiguration(availableOutputTypes, type);
   };
 
   if (isInitialLoading || isLoadingOutput || isLoadingOutputTypes) {
