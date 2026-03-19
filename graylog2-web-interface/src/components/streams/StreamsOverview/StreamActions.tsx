@@ -22,7 +22,7 @@ import { Button, ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/boot
 import type { Stream } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import Routes from 'routing/Routes';
-import { StartpageStore } from 'stores/users/StartpageStore';
+import { setStartpage } from 'api/startpage';
 import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -53,9 +53,9 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
   const [showCloneModal, setShowCloneModal] = useState(false);
   const [changingStatus, setChangingStatus] = useState(false);
   const sendTelemetry = useSendTelemetry();
-  const setStartpage = useCallback(
-    () => StartpageStore.set(currentUser.id, 'stream', stream.id),
-    [stream.id, currentUser.id],
+  const handleSetStartpage = useCallback(
+    () => setStartpage(currentUser.id, 'stream', stream.id),
+    [currentUser.id, stream.id],
   );
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEntitySharedActions<Stream>(
     stream,
@@ -226,7 +226,7 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
           <MenuItem divider />
         </IfPermitted>
 
-        <MenuItem onSelect={setStartpage} disabled={currentUser.readOnly}>
+        <MenuItem onSelect={handleSetStartpage} disabled={currentUser.readOnly}>
           Set as startpage
         </MenuItem>
 
