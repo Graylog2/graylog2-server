@@ -33,7 +33,9 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MockitoExtension.class)
@@ -49,6 +51,7 @@ class MongoEntitySuggestionServiceTest {
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
         this.toTest = new MongoEntitySuggestionService(mongodb.mongoConnection(), entityPermissionsUtils);
+        lenient().doReturn(true).when(entityPermissionsUtils).isCatalogCollection(anyString());
     }
 
     @Test
@@ -244,5 +247,26 @@ class MongoEntitySuggestionServiceTest {
         assertThat(suggestions).allMatch(s -> s.targetId() != null && !s.targetId().isEmpty());
         assertThat(suggestions.stream().map(EntitySuggestion::targetId).toList())
                 .containsExactlyInAnyOrder("node-uuid-123", "node-uuid-456", "node-uuid-789", "node-uuid-abc");
+    }
+
+    @Test
+    @MongoDBFixtures("composite-display-fixtures.json")
+    void testReturnsNoSuggestionsOnNonCatalogCollection() {
+        doReturn(false).when(entityPermissionsUtils).isCatalogCollection("nodes");
+
+        final var result = toTest.suggest(
+                "nodes",
+                "node_id",
+                "hostname",
+                List.of("node_id", "hostname"),
+                "{node_id} ({hostname})",
+                "",
+                1,
+                10,
+                subject
+        );
+
+        final var suggestions = result.suggestions();
+        assertThat(suggestions).isEmpty();
     }
 }

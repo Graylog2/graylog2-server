@@ -90,6 +90,9 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                                             final int page,
                                             final int perPage,
                                             final Subject subject) {
+        if (!permissionsUtils.isCatalogCollection(collection)) {
+            return new EntitySuggestionResponse(List.of(), PaginatedList.PaginationInfo.create(0, 0, page, perPage));
+        }
         final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collection);
         final boolean filterIsEmpty = Strings.isNullOrEmpty(query);
         final boolean isSpecialCollection = addAdminToSuggestions(collection, valueColumn, filterIsEmpty, query);

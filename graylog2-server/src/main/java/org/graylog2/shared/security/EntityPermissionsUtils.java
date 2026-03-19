@@ -57,7 +57,15 @@ public class EntityPermissionsUtils {
     }
 
     public Optional<String> readPermissionForCollection(final String collection) {
-        return catalog.getByCollectionName(collection)
+        return collectionFromCatalog(collection)
                 .map(DbEntityCatalogEntry::readPermission);
+    }
+
+    public boolean isCatalogCollection(final String collection) {
+        return collectionFromCatalog(collection).isPresent();
+    }
+
+    private Optional<DbEntityCatalogEntry> collectionFromCatalog(final String collection) {
+        return catalog.getByCollectionName(collection);
     }
 }
