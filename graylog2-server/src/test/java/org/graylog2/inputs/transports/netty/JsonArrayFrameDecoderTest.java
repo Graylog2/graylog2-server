@@ -18,6 +18,7 @@ package org.graylog2.inputs.transports.netty;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.embedded.EmbeddedChannel;
+import io.netty.handler.codec.TooLongFrameException;
 import io.netty.util.CharsetUtil;
 import org.junit.jupiter.api.Test;
 
@@ -25,12 +26,13 @@ import static io.netty.buffer.Unpooled.copiedBuffer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class JsonArrayFrameDecoderTest {
 
     @Test
-    public void testSimpleJsonArray() throws Exception {
+    public void testSimpleJsonArray() {
         EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(8192));
 
         ch.writeInbound(copiedBuffer("[{\"message\":\"log1\"},{\"message\":\"log2\"}]", CharsetUtil.UTF_8));
@@ -50,7 +52,7 @@ public class JsonArrayFrameDecoderTest {
     }
 
     @Test
-    public void testJsonArrayWithWhitespace() throws Exception {
+    public void testJsonArrayWithWhitespace() {
         EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(8192));
 
         ch.writeInbound(copiedBuffer("[ {\"message\":\"log1\"} , {\"message\":\"log2\"} ]", CharsetUtil.UTF_8));
@@ -70,7 +72,7 @@ public class JsonArrayFrameDecoderTest {
     }
 
     @Test
-    public void testNestedJsonObjects() throws Exception {
+    public void testNestedJsonObjects() {
         EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(8192));
 
         ch.writeInbound(copiedBuffer("[{\"nested\":{\"key\":\"value\"}},{\"array\":[1,2,3]}]", CharsetUtil.UTF_8));
@@ -90,7 +92,7 @@ public class JsonArrayFrameDecoderTest {
     }
 
     @Test
-    public void testJsonWithEscapedQuotes() throws Exception {
+    public void testJsonWithEscapedQuotes() {
         EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(8192));
 
         ch.writeInbound(copiedBuffer("[{\"message\":\"Hello \\\"World\\\"\"},{\"data\":\"test\"}]", CharsetUtil.UTF_8));
@@ -110,7 +112,7 @@ public class JsonArrayFrameDecoderTest {
     }
 
     @Test
-    public void testFragmentedJsonArray() throws Exception {
+    public void testFragmentedJsonArray() {
         EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(8192));
 
         // Send array opening
@@ -138,7 +140,7 @@ public class JsonArrayFrameDecoderTest {
     }
 
     @Test
-    public void testSingleJsonObject() throws Exception {
+    public void testSingleJsonObject() {
         EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(8192));
 
         // Not in an array, just a single object
@@ -154,7 +156,7 @@ public class JsonArrayFrameDecoderTest {
     }
 
     @Test
-    public void testEmptyArray() throws Exception {
+    public void testEmptyArray() {
         EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(8192));
 
         ch.writeInbound(copiedBuffer("[]", CharsetUtil.UTF_8));
@@ -164,7 +166,7 @@ public class JsonArrayFrameDecoderTest {
     }
 
     @Test
-    public void testArrayWithNewlines() throws Exception {
+    public void testArrayWithNewlines() {
         EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(8192));
 
         String input = "[\n  {\"message\":\"log1\"},\n  {\"message\":\"log2\"}\n]";
@@ -185,58 +187,65 @@ public class JsonArrayFrameDecoderTest {
     }
 
     @Test
-    public void testTooLongJsonObjectFailFast() {
-        EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(20, true));
+    public void testOversizedObjectFiresExceptionAndIsSkipped() {
+        // EmbeddedChannel re-throws the TooLongFrameException at the end of writeInbound.
+        // The oversized object must not be emitted as a frame.
+        EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(20));
 
-        boolean exceptionCaught = false;
-        try {
-            ch.writeInbound(copiedBuffer("[{\"message\":\"this is a very long message that exceeds the limit\"}]",
-                    CharsetUtil.UTF_8));
-        } catch (Exception e) {
-            exceptionCaught = true;
-        }
+        assertThrows(TooLongFrameException.class, () ->
+                ch.writeInbound(copiedBuffer("[{\"message\":\"this is a very long message that exceeds the limit\"}]",
+                        CharsetUtil.UTF_8)));
 
-        // Try to read any output and release
-        Object msg = ch.readInbound();
-        while (msg != null) {
-            if (msg instanceof ByteBuf) {
-                ((ByteBuf) msg).release();
-            }
-            msg = ch.readInbound();
-        }
-
-        assertTrue(exceptionCaught, "Expected TooLongFrameException to be thrown");
+        assertNull(ch.readInbound(), "Oversized object should not be emitted as a frame");
         ch.finishAndReleaseAll();
     }
 
     @Test
-    public void testTooLongJsonObjectNotFailFast() {
-        EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(20, false));
+    public void testValidObjectsAreEmittedBeforeOversized() {
+        // The decode loop runs to completion before EmbeddedChannel re-throws the exception,
+        // so objects decoded before the oversized one are already queued and readable.
+        EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(20));
 
-        boolean exceptionCaught = false;
-        try {
-            ch.writeInbound(copiedBuffer("[{\"message\":\"this is a very long message that exceeds the limit\"}]",
-                    CharsetUtil.UTF_8));
-        } catch (Exception e) {
-            exceptionCaught = true;
-        }
+        assertThrows(TooLongFrameException.class, () ->
+                ch.writeInbound(copiedBuffer("[{\"id\":1},{\"message\":\"this is a very long message that exceeds the limit\"}]",
+                        CharsetUtil.UTF_8)));
 
-        // Should discard the object but continue processing
-        // No output expected for the oversized object
-        Object msg = ch.readInbound();
-        while (msg != null) {
-            if (msg instanceof ByteBuf) {
-                ((ByteBuf) msg).release();
-            }
-            msg = ch.readInbound();
-        }
+        ByteBuf buf = ch.readInbound();
+        assertNotNull(buf, "Valid object before oversized one should be emitted");
+        assertEquals("{\"id\":1}", buf.toString(CharsetUtil.UTF_8));
+        buf.release();
 
-        assertTrue(exceptionCaught, "Expected TooLongFrameException to be thrown");
+        assertNull(ch.readInbound(), "Oversized object should not be emitted as a frame");
         ch.finishAndReleaseAll();
     }
 
     @Test
-    public void testMultipleArrays() throws Exception {
+    public void testValidObjectsAreEmittedAfterOversized() {
+        // Because the buffer is advanced past the oversized object before the exception is fired,
+        // the decode loop continues and subsequent valid objects are decoded and queued before
+        // EmbeddedChannel re-throws the exception at the end of writeInbound.
+        EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(10));
+
+        assertThrows(TooLongFrameException.class, () ->
+                ch.writeInbound(copiedBuffer("[{\"message\":\"exceeds limit\"},{\"id\":1}]", CharsetUtil.UTF_8)));
+
+        ByteBuf buf = ch.readInbound();
+        assertNotNull(buf, "Valid object after oversized one should be emitted");
+        assertEquals("{\"id\":1}", buf.toString(CharsetUtil.UTF_8));
+        buf.release();
+
+        assertNull(ch.readInbound());
+        ch.finishAndReleaseAll();
+    }
+
+    @Test
+    public void testConstructorRejectsNonPositiveMaxObjectLength() {
+        assertThrows(IllegalArgumentException.class, () -> new JsonArrayFrameDecoder(0));
+        assertThrows(IllegalArgumentException.class, () -> new JsonArrayFrameDecoder(-1));
+    }
+
+    @Test
+    public void testMultipleArrays() {
         EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(8192));
 
         // First array
@@ -265,7 +274,7 @@ public class JsonArrayFrameDecoderTest {
     }
 
     @Test
-    public void testComplexNestedStructure() throws Exception {
+    public void testComplexNestedStructure() {
         EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(8192));
 
         String input = "[{\"user\":{\"name\":\"John\",\"roles\":[\"admin\",\"user\"]},\"timestamp\":123456}," +
@@ -289,7 +298,7 @@ public class JsonArrayFrameDecoderTest {
     }
 
     @Test
-    public void testJsonObjectsWithBracketsInStrings() throws Exception {
+    public void testJsonObjectsWithBracketsInStrings() {
         EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(8192));
 
         ch.writeInbound(copiedBuffer("[{\"message\":\"[test]\"},{\"data\":\"value\"}]", CharsetUtil.UTF_8));
@@ -309,7 +318,7 @@ public class JsonArrayFrameDecoderTest {
     }
 
     @Test
-    public void testJsonObjectsWithBracesInStrings() throws Exception {
+    public void testJsonObjectsWithBracesInStrings() {
         EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(8192));
 
         ch.writeInbound(copiedBuffer("[{\"message\":\"{test}\"},{\"data\":\"}\"}\"]", CharsetUtil.UTF_8));
@@ -329,7 +338,7 @@ public class JsonArrayFrameDecoderTest {
     }
 
     @Test
-    public void testOpenShiftStyleLogArray() throws Exception {
+    public void testOpenShiftStyleLogArray() {
         // This test simulates the actual use case from OpenShift
         EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(8192));
 
@@ -357,7 +366,7 @@ public class JsonArrayFrameDecoderTest {
     }
 
     @Test
-    public void testFragmentedJsonObjectInArray() throws Exception {
+    public void testFragmentedJsonObjectInArray() {
         EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(8192));
 
         // Send array and partial first object
@@ -384,7 +393,7 @@ public class JsonArrayFrameDecoderTest {
     }
 
     @Test
-    public void testUnicodeInJson() throws Exception {
+    public void testUnicodeInJson() {
         EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(8192));
 
         ch.writeInbound(copiedBuffer("[{\"message\":\"Hello 世界\"},{\"text\":\"café\"}]", CharsetUtil.UTF_8));
@@ -404,7 +413,7 @@ public class JsonArrayFrameDecoderTest {
     }
 
     @Test
-    public void testMultipleFragments() throws Exception {
+    public void testMultipleFragments() {
         EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(8192));
 
         // Send one byte at a time for the array opening
@@ -436,7 +445,7 @@ public class JsonArrayFrameDecoderTest {
     }
 
     @Test
-    public void testBackslashEscapedBackslash() throws Exception {
+    public void testBackslashEscapedBackslash() {
         EmbeddedChannel ch = new EmbeddedChannel(new JsonArrayFrameDecoder(8192));
 
         ch.writeInbound(copiedBuffer("[{\"path\":\"C:\\\\Users\\\\test\"}]", CharsetUtil.UTF_8));

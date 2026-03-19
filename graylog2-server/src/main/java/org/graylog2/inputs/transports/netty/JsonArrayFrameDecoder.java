@@ -20,11 +20,12 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.TooLongFrameException;
 
-import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -46,59 +47,22 @@ public class JsonArrayFrameDecoder extends ByteToMessageDecoder {
     private final int maxObjectLength;
 
     /**
-     * Whether or not to throw an exception as soon as we exceed maxObjectLength.
-     */
-    private final boolean failFast;
-
-    /**
      * True if we're currently inside a JSON array.
      */
     private boolean insideArray = false;
 
     /**
-     * True if we're discarding input because we're already over maxObjectLength.
-     */
-    private boolean discarding = false;
-
-    /**
-     * Number of bytes discarded.
-     */
-    private int discardedBytes = 0;
-
-    /**
      * Creates a new decoder.
      *
      * @param maxObjectLength the maximum length of a single JSON object.
      *                        A {@link TooLongFrameException} is thrown if
      *                        the length of a JSON object exceeds this value.
-     *                        <p>
-     *                        By default, {@code failFast} is set to {@code true}, meaning a {@link TooLongFrameException}
-     *                        will be thrown as soon as the decoder notices the length of a JSON object will exceed {@code maxObjectLength}.
      */
     public JsonArrayFrameDecoder(final int maxObjectLength) {
-        this(maxObjectLength, true);
-    }
-
-    /**
-     * Creates a new decoder.
-     *
-     * @param maxObjectLength the maximum length of a single JSON object.
-     *                        A {@link TooLongFrameException} is thrown if
-     *                        the length of a JSON object exceeds this value.
-     * @param failFast        If <tt>true</tt>, a {@link TooLongFrameException} is
-     *                        thrown as soon as the decoder notices the length of
-     *                        the object will exceed <tt>maxObjectLength</tt> regardless
-     *                        of whether the entire object has been read.
-     *                        If <tt>false</tt>, a {@link TooLongFrameException} is
-     *                        thrown after the entire object that exceeds
-     *                        <tt>maxObjectLength</tt> has been read.
-     */
-    public JsonArrayFrameDecoder(final int maxObjectLength, final boolean failFast) {
         if (maxObjectLength <= 0) {
             throw new IllegalArgumentException("maxObjectLength must be a positive integer: " + maxObjectLength);
         }
         this.maxObjectLength = maxObjectLength;
-        this.failFast = failFast;
     }
 
     @Override
@@ -119,11 +83,6 @@ public class JsonArrayFrameDecoder extends ByteToMessageDecoder {
      * if no frame could be created.
      */
     protected Object decode(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
-        if (discarding) {
-            handleDiscarding(buffer);
-            return null;
-        }
-
         if (buffer.readableBytes() == 0) {
             return null;
         }
@@ -155,15 +114,9 @@ public class JsonArrayFrameDecoder extends ByteToMessageDecoder {
             return null;
         }
 
-        // Try to extract a JSON object
+        // Try to extract a JSON object (also supports standalone objects outside an array)
         if (firstByte == '{') {
             return extractJsonObject(ctx, buffer);
-        }
-
-        // Skip unexpected characters (like commas between array elements)
-        if (firstByte == ',') {
-            buffer.skipBytes(1);
-            return null;
         }
 
         // Unknown character, skip it
@@ -174,64 +127,53 @@ public class JsonArrayFrameDecoder extends ByteToMessageDecoder {
     /**
      * Extract a complete JSON object from the buffer.
      */
-    private ByteBuf extractJsonObject(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
-        int startPos = buffer.readerIndex();
+    private ByteBuf extractJsonObject(ChannelHandlerContext ctx, ByteBuf buffer) {
+        final int startPos = buffer.readerIndex();
 
-        try {
-            // Create a byte array from the readable bytes to parse
-            int readableBytes = buffer.readableBytes();
-            byte[] data = new byte[readableBytes];
-            buffer.getBytes(startPos, data);
+        try (ByteBufInputStream in = new ByteBufInputStream(buffer);
+             JsonParser parser = JSON_FACTORY.createParser((InputStream) in)) {
 
-            try (JsonParser parser = JSON_FACTORY.createParser(data)) {
-                JsonToken token = parser.nextToken();
-
-                if (token != JsonToken.START_OBJECT) {
-                    return null; // Not a JSON object
-                }
-
-                // Track depth to handle nested objects
-                int depth = 1;
-                while (depth > 0 && parser.nextToken() != null) {
-                    token = parser.currentToken();
-                    if (token == JsonToken.START_OBJECT || token == JsonToken.START_ARRAY) {
-                        depth++;
-                    } else if (token == JsonToken.END_OBJECT || token == JsonToken.END_ARRAY) {
-                        depth--;
-                    }
-                }
-
-                if (depth != 0) {
-                    // Incomplete JSON object, need more data
-                    return null;
-                }
-
-                // Get the byte offset of where we finished parsing
-                long endOffset = parser.currentLocation().getByteOffset();
-                int objectLength = (int) endOffset;
-
-                // Check max length
-                if (objectLength > maxObjectLength) {
-                    buffer.readerIndex(startPos + objectLength);
-                    fail(ctx, objectLength);
-                    return null;
-                }
-
-                // Extract the complete JSON object
-                ByteBuf frame = buffer.readRetainedSlice(objectLength);
-
-                return frame;
-
-            } catch (IOException e) {
-                // Incomplete JSON, need more data
+            final JsonToken token = parser.nextToken();
+            if (token != JsonToken.START_OBJECT) {
+                buffer.readerIndex(startPos);
                 return null;
             }
 
-        } catch (Exception e) {
-            // If we can't parse, might be incomplete data
-            if (buffer.readableBytes() > maxObjectLength) {
-                fail(ctx, buffer.readableBytes());
+            // Track depth to handle nested objects
+            int depth = 1;
+            while (depth > 0 && parser.nextToken() != null) {
+                final JsonToken t = parser.currentToken();
+                if (t == JsonToken.START_OBJECT || t == JsonToken.START_ARRAY) {
+                    depth++;
+                } else if (t == JsonToken.END_OBJECT || t == JsonToken.END_ARRAY) {
+                    depth--;
+                }
             }
+
+            if (depth != 0) {
+                // Incomplete JSON object, need more data
+                buffer.readerIndex(startPos);
+                return null;
+            }
+
+            final int objectLength = (int) parser.currentLocation().getByteOffset();
+
+            // Check max length. Advance past the oversized object and fire the exception
+            // non-fatally so the decoder continues processing subsequent objects.
+            if (objectLength > maxObjectLength) {
+                buffer.readerIndex(startPos + objectLength);
+                ctx.fireExceptionCaught(new TooLongFrameException(
+                        "JSON object length (" + objectLength + ") exceeds the allowed maximum (" + maxObjectLength + ")"));
+                return null;
+            }
+
+            // Extract the complete JSON object
+            buffer.readerIndex(startPos);
+            return buffer.readRetainedSlice(objectLength);
+
+        } catch (Exception e) {
+            // Incomplete or unparseable JSON — wait for more data
+            buffer.readerIndex(startPos);
             return null;
         }
     }
@@ -247,90 +189,6 @@ public class JsonArrayFrameDecoder extends ByteToMessageDecoder {
             } else {
                 break;
             }
-        }
-    }
-
-    /**
-     * Handle discarding mode when a JSON object is too long.
-     */
-    private void handleDiscarding(ByteBuf buffer) throws TooLongFrameException {
-        int startPos = buffer.readerIndex();
-        int readableBytes = buffer.readableBytes();
-
-        try {
-            byte[] data = new byte[readableBytes];
-            buffer.getBytes(startPos, data);
-
-            try (JsonParser parser = JSON_FACTORY.createParser(data)) {
-                JsonToken token = parser.nextToken();
-                if (token == null) {
-                    discardedBytes += readableBytes;
-                    buffer.skipBytes(readableBytes);
-                    return;
-                }
-
-                int depth = 0;
-                if (token == JsonToken.START_OBJECT || token == JsonToken.START_ARRAY) {
-                    depth = 1;
-                }
-
-                while (depth > 0 && parser.nextToken() != null) {
-                    token = parser.currentToken();
-                    if (token == JsonToken.START_OBJECT || token == JsonToken.START_ARRAY) {
-                        depth++;
-                    } else if (token == JsonToken.END_OBJECT || token == JsonToken.END_ARRAY) {
-                        depth--;
-                    }
-                }
-
-                if (depth == 0) {
-                    // Found the end of the structure
-                    long endOffset = parser.currentLocation().getByteOffset();
-                    int discardLength = (int) endOffset;
-                    discardedBytes += discardLength;
-                    buffer.skipBytes(discardLength);
-
-                    int totalDiscarded = discardedBytes;
-                    discardedBytes = 0;
-                    discarding = false;
-
-                    if (!failFast) {
-                        fail(null, totalDiscarded);
-                    }
-                } else {
-                    // Haven't found the end yet
-                    discardedBytes += readableBytes;
-                    buffer.skipBytes(readableBytes);
-                }
-
-            } catch (IOException e) {
-                // Can't parse, discard everything
-                discardedBytes += readableBytes;
-                buffer.skipBytes(readableBytes);
-            }
-
-        } catch (Exception e) {
-            // On error, discard everything
-            discardedBytes += readableBytes;
-            buffer.skipBytes(readableBytes);
-        }
-    }
-
-    /**
-     * Throw a TooLongFrameException.
-     */
-    private void fail(ChannelHandlerContext ctx, int length) throws TooLongFrameException {
-        TooLongFrameException exception = new TooLongFrameException(
-                "JSON object length (" + length + ") exceeds the allowed maximum (" + maxObjectLength + ")");
-
-        if (ctx != null) {
-            ctx.fireExceptionCaught(exception);
-        } else {
-            throw exception;
-        }
-
-        if (failFast) {
-            discarding = true;
         }
     }
 }
