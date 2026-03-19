@@ -43,7 +43,6 @@ public abstract class TeamsEventNotificationConfigV2 implements EventNotificatio
 
     public static final long DEFAULT_BACKLOG_SIZE = 0;
     private static final String WEBHOOK_URL = "https://server.region.logic.azure.com:443/workflows/xxxxxxx";
-    private static final DateTimeZone DEFAULT_TIME_ZONE = DateTimeZone.UTC;
     public static final String DEFAULT_ADAPTIVE_CARD = "{\n" +
             "  \"contentType\": \"application/vnd.microsoft.card.adaptive\",\n" +
             "  \"content\": {\n" +
@@ -93,13 +92,6 @@ public abstract class TeamsEventNotificationConfigV2 implements EventNotificatio
     @JsonProperty(FIELD_ADAPTIVE_CARD)
     public abstract String adaptiveCard();
 
-    /**
-     * @deprecated No longer used. Timestamps are always sent in UTC and displayed in the
-     * viewer's local Teams timezone via the Adaptive Cards DATE() function.
-     */
-    @Deprecated
-    @JsonProperty(FIELD_TIME_ZONE)
-    public abstract DateTimeZone timeZone();
 
     @Override
     @JsonIgnore
@@ -145,8 +137,7 @@ public abstract class TeamsEventNotificationConfigV2 implements EventNotificatio
                     .type(TYPE_NAME)
                     .webhookUrl(WEBHOOK_URL)
                     .adaptiveCard(DEFAULT_ADAPTIVE_CARD)
-                    .backlogSize(DEFAULT_BACKLOG_SIZE)
-                    .timeZone(DEFAULT_TIME_ZONE);
+                    .backlogSize(DEFAULT_BACKLOG_SIZE);
         }
 
         @JsonProperty(FIELD_BACKLOG_SIZE)
@@ -158,13 +149,11 @@ public abstract class TeamsEventNotificationConfigV2 implements EventNotificatio
         @JsonProperty(FIELD_ADAPTIVE_CARD)
         public abstract Builder adaptiveCard(String adaptiveCard);
 
-        /**
-         * @see TeamsEventNotificationConfigV2#FIELD_TIME_ZONE
-         * @deprecated Retained for backward-compatible deserialization only.
-         */
-        @Deprecated
+        // Absorbs the deprecated time_zone field from old persisted documents.
         @JsonProperty(FIELD_TIME_ZONE)
-        public abstract Builder timeZone(DateTimeZone timeZone);
+        public Builder timeZone(DateTimeZone timeZone) {
+            return this;
+        }
 
         public abstract TeamsEventNotificationConfigV2 build();
     }

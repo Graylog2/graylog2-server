@@ -212,7 +212,6 @@ public class TeamsEventNotificationV2Test {
         TeamsEventNotificationConfigV2 config = TeamsEventNotificationConfigV2.builder()
                 .adaptiveCard(defaultTemplate)
                 .backlogSize(5)
-                .timeZone(DateTimeZone.UTC)
                 .webhookUrl("http://localhost:12345")
                 .build();
         String body = teamsEventNotification.generateBody(eventNotificationContext, config);
@@ -290,7 +289,6 @@ public class TeamsEventNotificationV2Test {
         TeamsEventNotificationConfigV2 config = TeamsEventNotificationConfigV2.builder()
                 .adaptiveCard(TeamsEventNotificationConfigV2.DEFAULT_ADAPTIVE_CARD)
                 .backlogSize(0)
-                .timeZone(DateTimeZone.UTC)
                 .webhookUrl("http://localhost:12345")
                 .build();
         String body = teamsEventNotification.generateBody(eventNotificationContext, config);
@@ -306,7 +304,6 @@ public class TeamsEventNotificationV2Test {
         TeamsEventNotificationConfigV2 config = TeamsEventNotificationConfigV2.builder()
                 .adaptiveCard(defaultTemplate)
                 .backlogSize(0)
-                .timeZone(DateTimeZone.UTC)
                 .webhookUrl("http://localhost:12345")
                 .build();
         String body = teamsEventNotification.generateBody(eventNotificationContext, config);

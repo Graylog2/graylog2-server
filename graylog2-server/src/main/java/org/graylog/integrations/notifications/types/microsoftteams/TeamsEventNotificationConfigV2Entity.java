@@ -46,15 +46,6 @@ public abstract class TeamsEventNotificationConfigV2Entity implements EventNotif
     @JsonProperty(FIELD_ADAPTIVE_CARD)
     public abstract ValueReference adaptiveCard();
 
-    /**
-     * @deprecated Retained for backward-compatible deserialization
-     * of existing content packs only.
-     * Timestamps are now always sent in UTC and displayed in the
-     * viewer's local Teams timezone
-     * via the Adaptive Cards DATE() function.
-     */
-    @Deprecated
-    public abstract ValueReference timeZone();
 
     public static Builder builder() {
         return Builder.create();
@@ -69,8 +60,7 @@ public abstract class TeamsEventNotificationConfigV2Entity implements EventNotif
         public static Builder create() {
             return new AutoValue_TeamsEventNotificationConfigV2Entity.Builder()
                     .type(TYPE_NAME)
-                    .adaptiveCard(ValueReference.of(DEFAULT_ADAPTIVE_CARD))
-                    .timeZone(ValueReference.of("UTC"));
+                    .adaptiveCard(ValueReference.of(DEFAULT_ADAPTIVE_CARD));
         }
 
         @JsonProperty(FIELD_WEBHOOK_URL)
@@ -79,8 +69,11 @@ public abstract class TeamsEventNotificationConfigV2Entity implements EventNotif
         @JsonProperty(FIELD_ADAPTIVE_CARD)
         public abstract Builder adaptiveCard(ValueReference customMessage);
 
-        @Deprecated
-        public abstract Builder timeZone(ValueReference timeZone);
+        // Absorbs the deprecated time_zone field from old persisted content packs.
+        @JsonProperty("time_zone")
+        public Builder timeZone(ValueReference timeZone) {
+            return this;
+        }
 
         public abstract TeamsEventNotificationConfigV2Entity build();
     }
