@@ -16,21 +16,33 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { ClusterJobs } from '@graylog/server-api';
+import { IndexerFailures } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
 
-export const SYSTEM_JOBS_QUERY_KEY = ['system', 'jobs'];
+const INDEXER_FAILURES_LIST_QUERY_KEY = 'indexer_failures_list';
 
-const useSystemJobs = () => {
-  const { data: jobs } = useQuery({
-    queryKey: SYSTEM_JOBS_QUERY_KEY,
+const useIndexerFailuresList = (
+  limit: number,
+  offset: number,
+): {
+  data: unknown;
+  isLoading: boolean;
+} => {
+  const { data, isLoading } = useQuery({
+    queryKey: [INDEXER_FAILURES_LIST_QUERY_KEY, limit, offset],
     queryFn: () =>
-      defaultOnError(ClusterJobs.list(), 'Loading system jobs failed with status', 'Could not load system jobs'),
-    refetchInterval: 2000,
+      defaultOnError(
+        IndexerFailures.single(limit, offset),
+        'Loading indexer failures list failed with status',
+        'Could not load indexer failures list',
+      ),
   });
 
-  return jobs;
+  return {
+    data,
+    isLoading,
+  };
 };
 
-export default useSystemJobs;
+export default useIndexerFailuresList;

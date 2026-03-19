@@ -17,12 +17,11 @@
 
 import styled, { css } from 'styled-components';
 import moment from 'moment';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Formik, Form, Field } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import cloneDeep from 'lodash/cloneDeep';
 
-import { useStore } from 'stores/connect';
 import type {
   RotationStrategyConfig,
   RetentionStrategyConfig,
@@ -32,7 +31,6 @@ import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/ho
 import type { IndexSetTemplateFormValues, IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
 import { Col, Row, SegmentedControl } from 'components/bootstrap';
 import { FormikInput, FormSubmit, InputOptionalInfo, Section, Spinner, TimeUnitInput } from 'components/common';
-import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import IndexRetentionProvider from 'components/indices/contexts/IndexRetentionProvider';
 import {
@@ -41,6 +39,7 @@ import {
   DataTieringConfiguration,
 } from 'components/indices/data-tiering';
 import useProductName from 'brand-customization/useProductName';
+import useIndicesConfiguration from 'hooks/useIndicesConfiguration';
 
 type Props = {
   initialValues?: IndexSetTemplate;
@@ -221,17 +220,9 @@ const TemplateForm = ({
     useState<RetentionConfigSegment>(initialSelectedSegment);
   const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
 
-  useEffect(() => {
-    if (selectedRetentionSegment === 'legacy') {
-      IndicesConfigurationActions.loadRotationStrategies();
-      IndicesConfigurationActions.loadRetentionStrategies();
-    }
-  }, [selectedRetentionSegment]);
-
-  const { rotationStrategies, retentionStrategies, retentionStrategiesContext } = useStore(
-    IndicesConfigurationStore,
-    (state) => state,
-  );
+  const { rotationStrategies, retentionStrategies, retentionStrategiesContext } = useIndicesConfiguration({
+    enabled: selectedRetentionSegment === 'legacy',
+  });
 
   const handleSubmit = (values: IndexSetTemplateFormValues) => {
     let template = {};
