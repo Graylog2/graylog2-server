@@ -84,11 +84,11 @@ describe('ABSGeoIpFormGroup', () => {
       expect(screen.getByText(/Azure DefaultAzureCredential Documentation/)).toBeInTheDocument();
     });
 
-    it('hides account name and key fields when automatic is selected', async () => {
+    it('shows account name but hides key field when automatic is selected', async () => {
       renderComponent();
 
       await waitFor(() => {
-        expect(screen.queryByLabelText(/azure account name/i)).not.toBeInTheDocument();
+        expect(screen.getByLabelText(/azure account name/i)).toBeInTheDocument();
         expect(screen.queryByTestId('azure-account-key-input')).not.toBeInTheDocument();
       });
     });
@@ -110,18 +110,41 @@ describe('ABSGeoIpFormGroup', () => {
 
       await waitFor(() => {
         expect(screen.queryByText(/Automatic authentication will attempt each of the following/)).not.toBeInTheDocument();
-        expect(screen.getByLabelText(/azure account name/i)).toBeInTheDocument();
         expect(screen.getByTestId('azure-account-key-input')).toBeInTheDocument();
       });
     });
   });
 
   describe('Common Fields', () => {
-    it('always shows container name and endpoint URL fields', async () => {
+    it('always shows container name, endpoint URL, and account name fields', async () => {
       renderComponent();
 
       expect(await screen.findByLabelText(/azure blob container name/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/azure blob endpoint url/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/azure account name/i)).toBeInTheDocument();
+    });
+
+    it('does not clear azure_account when switching to automatic', async () => {
+      render(
+        <Formik initialValues={newKeySecretConfig as GeoIpConfigType} onSubmit={jest.fn()}>
+          {({ values }) => (
+            <>
+              <ABSGeoIpFormGroup />
+              <div data-testid="account-value">{values.azure_account}</div>
+            </>
+          )}
+        </Formik>,
+      );
+
+      const accountInput = await screen.findByLabelText(/azure account name/i);
+      await userEvent.type(accountInput, 'my-account');
+
+      const authTypeSelect = await selectEvent.findSelectInput('Select Authentication Type');
+      await selectEvent.select(authTypeSelect, 'Automatic');
+
+      await waitFor(() => {
+        expect(screen.getByTestId('account-value')).toHaveTextContent('my-account');
+      });
     });
   });
 

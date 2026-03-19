@@ -67,7 +67,6 @@ const ABSGeoIpFormGroup = () => {
       setFieldValue('azure_auth_type', newAuthType);
 
       if (newAuthType === 'automatic') {
-        setFieldValue('azure_account', undefined);
         setFieldValue('azure_account_key', undefined);
       }
     },
@@ -93,6 +92,16 @@ const ABSGeoIpFormGroup = () => {
         labelClassName=""
         wrapperClassName=""
       />
+      <FormikFormGroup
+        name="azure_account"
+        type="text"
+        label="Azure account name"
+        placeholder="your-account-name"
+        help="The name of your Azure storage account."
+        required
+        labelClassName=""
+        wrapperClassName=""
+      />
       <Field>
         {() => (
           <Input id="azure-auth-type-select" label="Azure Authentication Type">
@@ -111,16 +120,6 @@ const ABSGeoIpFormGroup = () => {
       {authType === 'automatic' && <ABSAutomaticAuthInfo />}
       {authType === 'keysecret' && (
         <>
-          <FormikFormGroup
-            name="azure_account"
-            type="text"
-            label="Azure account name"
-            placeholder="your-account-name"
-            help="The name of your Azure storage account."
-            required
-            labelClassName=""
-            wrapperClassName=""
-          />
           {showResetPasswordButton ? (
             <Input id="azure_account_reset" label="Azure Account Key" labelClassName="col-sm-3" wrapperClassName="col-sm-9">
               <Button onClick={toggleAccountKeyReset}>Reset password</Button>
