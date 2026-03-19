@@ -16,6 +16,7 @@
  */
 
 import CopyFieldToClipboard from 'views/logic/fieldactions/CopyFieldToClipboard';
+import ToggleFavoriteField from 'views/logic/fieldactions/ToggleFavoriteField';
 
 export const CopyToClipboardFieldActionPlugin = {
   type: 'copy-field-to-clipboard',
@@ -23,4 +24,22 @@ export const CopyToClipboardFieldActionPlugin = {
   handler: CopyFieldToClipboard,
   isEnabled: () => true,
   resetFocus: false,
+};
+
+export const AddFavoriteFieldActionPlugin = {
+  type: 'add-field-to-favorite',
+  title: 'Add field to favorites',
+  handler: ToggleFavoriteField,
+  isEnabled: () => true,
+  resetFocus: false,
+  isHidden: (props) => ToggleFavoriteField.isHidden(true, props),
+};
+
+export const RemoveFavoriteFieldActionPlugin = {
+  type: 'remove-field-to-favorite',
+  title: 'Remove field from favorites',
+  handler: ToggleFavoriteField,
+  isEnabled: () => true,
+  resetFocus: false,
+  isHidden: (props) => ToggleFavoriteField.isHidden(false, props),
 };

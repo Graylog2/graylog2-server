@@ -120,9 +120,12 @@ import TextWidget from 'views/logic/widgets/TextWidget';
 import TextVisualization from 'views/components/widgets/text/TextVisualization';
 import TextWidgetEdit from 'views/components/widgets/text/TextWidgetEdit';
 import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
-import ToggleFavoriteField from 'views/logic/fieldactions/ToggleFavoriteField';
 import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
-import { CopyToClipboardFieldActionPlugin } from 'views/actions/FieldActionPlugins';
+import {
+  CopyToClipboardFieldActionPlugin,
+  AddFavoriteFieldActionPlugin,
+  RemoveFavoriteFieldActionPlugin,
+} from 'views/actions/FieldActionPlugins';
 import { CopyToClipBoardValueActionPlugin } from 'views/actions/ValueActionPlugins';
 
 import type { ActionDefinition } from './components/actions/ActionHandler';
@@ -351,22 +354,8 @@ const exports: PluginExports = {
       component: ChangeFieldType,
       help: ChangeFieldTypeHelp,
     },
-    {
-      type: 'add-field-to-favorite',
-      title: 'Add field to favorites',
-      handler: ToggleFavoriteField,
-      isEnabled: () => true,
-      resetFocus: false,
-      isHidden: (props) => ToggleFavoriteField.isHidden(true, props),
-    },
-    {
-      type: 'remove-field-to-favorite',
-      title: 'Remove field from favorites',
-      handler: ToggleFavoriteField,
-      isEnabled: () => true,
-      resetFocus: false,
-      isHidden: (props) => ToggleFavoriteField.isHidden(false, props),
-    },
+    AddFavoriteFieldActionPlugin,
+    RemoveFavoriteFieldActionPlugin,
   ],
   valueActions: filterCloudValueActions(
     [
