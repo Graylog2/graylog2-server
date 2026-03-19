@@ -26,8 +26,12 @@ import BulkActions from './BulkActions';
 jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
 jest.mock('./ReassignFleetModal', () => (props: { onClose: () => void; onSuccess: () => void }) => (
   <div data-testid="reassign-modal">
-    <button type="button" onClick={props.onClose}>Close</button>
-    <button type="button" onClick={props.onSuccess}>Succeed</button>
+    <button type="button" onClick={props.onClose}>
+      Close
+    </button>
+    <button type="button" onClick={props.onSuccess}>
+      Succeed
+    </button>
   </div>
 ));
 

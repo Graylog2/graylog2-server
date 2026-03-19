@@ -58,17 +58,13 @@ const ExpiresCell = ({ expiresAt }: { expiresAt: string | null }) => {
 // TODO: Use useBasicUser to resolve the full name and link to the user profile.
 //       Currently useBasicUser shows an error toast when the user doesn't exist (deleted).
 //       It should gracefully fall back to displaying the username instead.
-const CreatedByCell = ({ username }: { username: string }) => (
-  <span>{username}</span>
-);
+const CreatedByCell = ({ username }: { username: string }) => <span>{username}</span>;
 
 const customColumnRenderers = (fleetNames: Record<string, string>): ColumnRenderers<EnrollmentTokenMetadata> => ({
   attributes: {
     fleet_id: {
       renderCell: (_fleetId: string, token: EnrollmentTokenMetadata) => (
-        <Link to={Routes.SYSTEM.COLLECTORS.FLEET(token.fleet_id)}>
-          {fleetNames[token.fleet_id] || token.fleet_id}
-        </Link>
+        <Link to={Routes.SYSTEM.COLLECTORS.FLEET(token.fleet_id)}>{fleetNames[token.fleet_id] || token.fleet_id}</Link>
       ),
       width: 0.2,
     },
@@ -79,9 +75,7 @@ const customColumnRenderers = (fleetNames: Record<string, string>): ColumnRender
       width: 0.15,
     },
     created_at: {
-      renderCell: (_createdAt: string, token: EnrollmentTokenMetadata) => (
-        <RelativeTime dateTime={token.created_at} />
-      ),
+      renderCell: (_createdAt: string, token: EnrollmentTokenMetadata) => <RelativeTime dateTime={token.created_at} />,
       width: 0.15,
     },
     expires_at: {
@@ -95,9 +89,8 @@ const customColumnRenderers = (fleetNames: Record<string, string>): ColumnRender
       staticWidth: 80,
     },
     last_used_at: {
-      renderCell: (_lastUsedAt: string | null, token: EnrollmentTokenMetadata) => (
-        token.last_used_at ? <RelativeTime dateTime={token.last_used_at} /> : <span>Never</span>
-      ),
+      renderCell: (_lastUsedAt: string | null, token: EnrollmentTokenMetadata) =>
+        token.last_used_at ? <RelativeTime dateTime={token.last_used_at} /> : <span>Never</span>,
       width: 0.15,
     },
   },
@@ -111,7 +104,9 @@ const EnrollmentTokenList = () => {
   const fleetNames = useMemo(() => {
     const map: Record<string, string> = {};
 
-    (fleets ?? []).forEach((f) => { map[f.id] = f.name; });
+    (fleets ?? []).forEach((f) => {
+      map[f.id] = f.name;
+    });
 
     return map;
   }, [fleets]);
@@ -151,8 +146,8 @@ const EnrollmentTokenList = () => {
           show
           onConfirm={handleConfirmDelete}
           onCancel={() => setDeletingToken(null)}>
-          Are you sure you want to delete this enrollment token?
-          Collectors using this token will not be able to re-enroll.
+          Are you sure you want to delete this enrollment token? Collectors using this token will not be able to
+          re-enroll.
         </ConfirmDialog>
       )}
     </>

@@ -105,9 +105,15 @@ const CollectorsSettings = () => {
   const handleSave = async () => {
     const request: CollectorsConfigRequest = {
       http: { enabled: http.enabled, hostname: http.hostname, port: http.port },
-      collector_offline_threshold: moment.duration(offlineValue, offlineUnit as moment.unitOfTime.DurationConstructor).toISOString(),
-      collector_default_visibility_threshold: moment.duration(visibilityValue, visibilityUnit as moment.unitOfTime.DurationConstructor).toISOString(),
-      collector_expiration_threshold: moment.duration(expirationValue, expirationUnit as moment.unitOfTime.DurationConstructor).toISOString(),
+      collector_offline_threshold: moment
+        .duration(offlineValue, offlineUnit as moment.unitOfTime.DurationConstructor)
+        .toISOString(),
+      collector_default_visibility_threshold: moment
+        .duration(visibilityValue, visibilityUnit as moment.unitOfTime.DurationConstructor)
+        .toISOString(),
+      collector_expiration_threshold: moment
+        .duration(expirationValue, expirationUnit as moment.unitOfTime.DurationConstructor)
+        .toISOString(),
     };
 
     setFieldErrors({});
@@ -116,8 +122,9 @@ const CollectorsSettings = () => {
       await updateConfig(request);
       setInitialized(false);
     } catch (error: unknown) {
-      const validationErrors = (error as { additional?: { body?: { validation_errors?: Record<string, Array<{ error: string }>> } } })
-        ?.additional?.body?.validation_errors;
+      const validationErrors = (
+        error as { additional?: { body?: { validation_errors?: Record<string, Array<{ error: string }>> } } }
+      )?.additional?.body?.validation_errors;
 
       if (validationErrors) {
         const extracted: Record<string, string> = {};
@@ -154,24 +161,30 @@ const CollectorsSettings = () => {
           <h2>Ingest Endpoints</h2>
 
           <h3>HTTP</h3>
-          <Input id="http-enabled"
-                 type="checkbox"
-                 label="Enabled"
-                 checked={http.enabled}
-                 onChange={(e) => setHttp({ ...http, enabled: (e.target as HTMLInputElement).checked })} />
-          <Input id="http-hostname"
-                 type="text"
-                 label="Hostname"
-                 value={http.hostname}
-                 placeholder="e.g. otlp.example.com"
-                 onChange={(e) => setHttp({ ...http, hostname: (e.target as HTMLInputElement).value })}
-                 disabled={!http.enabled} />
-          <Input id="http-port"
-                 type="number"
-                 label="Port"
-                 value={http.port}
-                 onChange={(e) => setHttp({ ...http, port: Number((e.target as HTMLInputElement).value) })}
-                 disabled={!http.enabled} />
+          <Input
+            id="http-enabled"
+            type="checkbox"
+            label="Enabled"
+            checked={http.enabled}
+            onChange={(e) => setHttp({ ...http, enabled: (e.target as HTMLInputElement).checked })}
+          />
+          <Input
+            id="http-hostname"
+            type="text"
+            label="Hostname"
+            value={http.hostname}
+            placeholder="e.g. otlp.example.com"
+            onChange={(e) => setHttp({ ...http, hostname: (e.target as HTMLInputElement).value })}
+            disabled={!http.enabled}
+          />
+          <Input
+            id="http-port"
+            type="number"
+            label="Port"
+            value={http.port}
+            onChange={(e) => setHttp({ ...http, port: Number((e.target as HTMLInputElement).value) })}
+            disabled={!http.enabled}
+          />
 
           <h2>Collector Lifecycle</h2>
 
@@ -183,9 +196,14 @@ const CollectorsSettings = () => {
             units={THRESHOLD_UNITS}
             required
             hideCheckbox
-            help={offlineError
-              ? <span className="text-danger">{offlineError}</span>
-              : 'Collectors that haven\'t reported within this time are shown as offline.'} />
+            help={
+              offlineError ? (
+                <span className="text-danger">{offlineError}</span>
+              ) : (
+                "Collectors that haven't reported within this time are shown as offline."
+              )
+            }
+          />
 
           <TimeUnitInput
             label="Default visibility"
@@ -195,9 +213,14 @@ const CollectorsSettings = () => {
             units={THRESHOLD_UNITS}
             required
             hideCheckbox
-            help={visibilityError
-              ? <span className="text-danger">{visibilityError}</span>
-              : 'Collectors that haven\'t reported within this time are hidden from the default view. Users can adjust or remove this filter in the instances table.'} />
+            help={
+              visibilityError ? (
+                <span className="text-danger">{visibilityError}</span>
+              ) : (
+                "Collectors that haven't reported within this time are hidden from the default view. Users can adjust or remove this filter in the instances table."
+              )
+            }
+          />
 
           <TimeUnitInput
             label="Expiration threshold"
@@ -207,13 +230,16 @@ const CollectorsSettings = () => {
             units={THRESHOLD_UNITS}
             required
             hideCheckbox
-            help={expirationError
-              ? <span className="text-danger">{expirationError}</span>
-              : 'Collectors that haven\'t reported within this time are permanently removed.'} />
+            help={
+              expirationError ? (
+                <span className="text-danger">{expirationError}</span>
+              ) : (
+                "Collectors that haven't reported within this time are permanently removed."
+              )
+            }
+          />
 
-          <Button bsStyle="primary"
-                  onClick={handleSave}
-                  disabled={isUpdatingConfig}>
+          <Button bsStyle="primary" onClick={handleSave} disabled={isUpdatingConfig}>
             {isUpdatingConfig ? 'Saving...' : 'Save'}
           </Button>
         </Col>
@@ -225,14 +251,11 @@ const CollectorsSettings = () => {
             <h2>Ingest Endpoint Status</h2>
             {httpInput && (
               <p>
-                <strong>HTTP:</strong>{' '}
-                <InputStateBadge input={httpInput} inputStates={inputStates} />{' '}
+                <strong>HTTP:</strong> <InputStateBadge input={httpInput} inputStates={inputStates} />{' '}
                 <Link to={Routes.SYSTEM.INPUT_DIAGNOSIS(httpInput.id)}>View Diagnostics</Link>
               </p>
             )}
-            {!httpInput && (
-              <p>No ingest endpoints are running.</p>
-            )}
+            {!httpInput && <p>No ingest endpoints are running.</p>}
           </Col>
         </Row>
       )}

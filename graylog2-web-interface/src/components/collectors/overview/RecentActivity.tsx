@@ -134,11 +134,7 @@ const renderDescription = (entry: ActivityEntry) => {
       return (
         <span>
           Collector {targetLink(target)} reassigned to fleet{' '}
-          {newFleetId ? (
-            <Link to={Routes.SYSTEM.COLLECTORS.FLEET(newFleetId)}>{newFleetName}</Link>
-          ) : (
-            'unknown'
-          )}
+          {newFleetId ? <Link to={Routes.SYSTEM.COLLECTORS.FLEET(newFleetId)}>{newFleetName}</Link> : 'unknown'}
         </span>
       );
     }
@@ -158,9 +154,7 @@ const RecentActivity = () => {
 
       {isLoading && <Spinner />}
 
-      {!isLoading && (!data?.activities || data.activities.length === 0) && (
-        <EmptyState>No recent activity</EmptyState>
-      )}
+      {!isLoading && (!data?.activities || data.activities.length === 0) && <EmptyState>No recent activity</EmptyState>}
 
       {!isLoading && data?.activities && data.activities.length > 0 && (
         <ActivityList>
@@ -168,9 +162,7 @@ const RecentActivity = () => {
             <ActivityRow key={entry.seq}>
               <Icon name={ICON_MAP[entry.type] ?? 'info'} />
               <Description>{renderDescription(entry)}</Description>
-              <MutedText>
-                {entry.actor ? `by ${entry.actor.full_name}` : 'by System'}
-              </MutedText>
+              <MutedText>{entry.actor ? `by ${entry.actor.full_name}` : 'by System'}</MutedText>
               {entry.timestamp && (
                 <MutedText>
                   <RelativeTime dateTime={entry.timestamp} />

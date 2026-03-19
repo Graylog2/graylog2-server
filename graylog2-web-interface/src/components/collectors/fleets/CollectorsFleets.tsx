@@ -42,10 +42,7 @@ const CollectorsFleets = () => {
 
   const columnRenderers = useMemo(() => customColumnRenderers(), []);
 
-  const fetchEntities = useCallback(
-    (searchParams: SearchParams) => fetchPaginatedFleets(searchParams),
-    [],
-  );
+  const fetchEntities = useCallback((searchParams: SearchParams) => fetchPaginatedFleets(searchParams), []);
 
   const closeCreateModal = useCallback(() => {
     history.push(Routes.SYSTEM.COLLECTORS.FLEETS);
@@ -69,11 +66,7 @@ const CollectorsFleets = () => {
       />
 
       {showFleetModal && (
-        <FleetFormModal
-          onClose={closeCreateModal}
-          onSave={handleSaveFleet}
-          isLoading={isCreatingFleet}
-        />
+        <FleetFormModal onClose={closeCreateModal} onSave={handleSaveFleet} isLoading={isCreatingFleet} />
       )}
     </>
   );

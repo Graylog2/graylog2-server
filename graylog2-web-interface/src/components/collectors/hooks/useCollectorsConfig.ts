@@ -27,5 +27,10 @@ export const CONFIG_KEY_PREFIX = ['collectors', 'config'];
 export const useCollectorsConfig = () =>
   useQuery<CollectorsConfig>({
     queryKey: CONFIG_KEY_PREFIX,
-    queryFn: () => defaultOnError(CollectorsConfigApi.get(), 'Loading collectors config failed with status', 'Could not load collectors config.'),
+    queryFn: () =>
+      defaultOnError(
+        CollectorsConfigApi.get(),
+        'Loading collectors config failed with status',
+        'Could not load collectors config.',
+      ),
   });

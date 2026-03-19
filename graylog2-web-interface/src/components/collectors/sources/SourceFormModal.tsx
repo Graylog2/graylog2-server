@@ -26,7 +26,7 @@ import type {
   FileSourceConfig,
   JournaldSourceConfig,
   WindowsEventLogSourceConfig,
-  JournaldPriority
+  JournaldPriority,
 } from '../types';
 
 type Props = {
@@ -39,13 +39,10 @@ type Props = {
 
 import { SOURCE_TYPE_LABELS } from './Constants';
 
-const defaultConfigs: Record<
-  SourceType,
-  FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig
-> = {
+const defaultConfigs: Record<SourceType, FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig> = {
   file: { paths: [''], read_mode: 'end' },
   journald: { read_mode: 'end', priority: 'info' },
-  windows_event_log: { channels: [], include_default_channels: true, read_mode: 'end',  },
+  windows_event_log: { channels: [], include_default_channels: true, read_mode: 'end' },
 };
 
 const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoading = false }: Props) => {
@@ -185,7 +182,9 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave, isLoadi
           type="checkbox"
           label="Include default channels"
           checked={winConfig.include_default_channels}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateWindowsEventLogConfig({ include_default_channels: e.target.checked})}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            updateWindowsEventLogConfig({ include_default_channels: e.target.checked })
+          }
         />
         <div>
           <label htmlFor="win-read-mode">Read Mode</label>

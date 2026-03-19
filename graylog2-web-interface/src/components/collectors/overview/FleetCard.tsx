@@ -56,24 +56,22 @@ const FleetName = styled.span(
   `,
 );
 
-const HealthDot = styled.span<{ $status: HealthStatus }>(
-  ({ theme, $status }) => {
-    const colorMap: Record<HealthStatus, string> = {
-      healthy: theme.colors.variant.success,
-      degraded: theme.colors.variant.warning,
-      down: theme.colors.variant.danger,
-      empty: theme.colors.gray[60],
-    };
+const HealthDot = styled.span<{ $status: HealthStatus }>(({ theme, $status }) => {
+  const colorMap: Record<HealthStatus, string> = {
+    healthy: theme.colors.variant.success,
+    degraded: theme.colors.variant.warning,
+    down: theme.colors.variant.danger,
+    empty: theme.colors.gray[60],
+  };
 
-    return css`
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: ${colorMap[$status]};
-    `;
-  },
-);
+  return css`
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: ${colorMap[$status]};
+  `;
+});
 
 const HeroNumber = styled.div(
   ({ theme }) => css`
@@ -138,12 +136,8 @@ const FleetCard = ({ stats, onClick }: Props) => {
       <HeroNumber>{stats.total_instances}</HeroNumber>
       <SubLabel>instances</SubLabel>
       <Breakdown>
-        {stats.online_instances > 0 && (
-          <OnlineCount>● {stats.online_instances} online</OnlineCount>
-        )}
-        {stats.offline_instances > 0 && (
-          <OfflineCount>● {stats.offline_instances} offline</OfflineCount>
-        )}
+        {stats.online_instances > 0 && <OnlineCount>● {stats.online_instances} online</OnlineCount>}
+        {stats.offline_instances > 0 && <OfflineCount>● {stats.offline_instances} offline</OfflineCount>}
       </Breakdown>
       <SourceFooter>
         {stats.total_sources} {stats.total_sources === 1 ? 'source' : 'sources'}

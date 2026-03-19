@@ -39,10 +39,7 @@ const CollectorsFleetsPage = () => {
   return (
     <DocumentTitle title="Collector Fleets">
       <CollectorsPageNavigation />
-      <PageHeader
-        title="Fleets"
-        actions={<CreateButton entityKey={"Fleet"} />}
-      >
+      <PageHeader title="Fleets" actions={<CreateButton entityKey={'Fleet'} />}>
         <span>Manage collector fleets and their configurations.</span>
       </PageHeader>
 

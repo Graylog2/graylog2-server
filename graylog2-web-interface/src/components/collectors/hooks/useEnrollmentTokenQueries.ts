@@ -24,7 +24,11 @@ import { OpAMPEnrollment } from '@graylog/server-api';
 import type { EnrollmentTokenMetadata } from '../types';
 
 export const ENROLLMENT_TOKENS_KEY_PREFIX = ['collectors', 'enrollment-tokens'];
-export const enrollmentTokensKeyFn = (searchParams: SearchParams) => [...ENROLLMENT_TOKENS_KEY_PREFIX, 'paginated', searchParams];
+export const enrollmentTokensKeyFn = (searchParams: SearchParams) => [
+  ...ENROLLMENT_TOKENS_KEY_PREFIX,
+  'paginated',
+  searchParams,
+];
 
 export const fetchPaginatedEnrollmentTokens = async (
   searchParams: SearchParams,

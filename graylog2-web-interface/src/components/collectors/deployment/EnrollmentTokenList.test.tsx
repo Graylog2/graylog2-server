@@ -34,8 +34,20 @@ jest.mock('../hooks/useEnrollmentTokenQueries', () => ({
 }));
 
 const mockFleets: Fleet[] = [
-  { id: 'fleet-1', name: 'Production', created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z', target_version: '' },
-  { id: 'fleet-2', name: 'Staging', created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z', target_version: '' },
+  {
+    id: 'fleet-1',
+    name: 'Production',
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+    target_version: '',
+  },
+  {
+    id: 'fleet-2',
+    name: 'Staging',
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+    target_version: '',
+  },
 ];
 
 const futureDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
@@ -82,9 +94,7 @@ describe('EnrollmentTokenList', () => {
       deleteEnrollmentToken: deleteEnrollmentTokenMock,
     } as unknown as ReturnType<typeof useCollectorsMutations>);
 
-    asMock(fetchPaginatedEnrollmentTokens).mockResolvedValue(
-      mockPaginatedResponse([mockToken()]),
-    );
+    asMock(fetchPaginatedEnrollmentTokens).mockResolvedValue(mockPaginatedResponse([mockToken()]));
   });
 
   it('renders the enrollment tokens table', async () => {

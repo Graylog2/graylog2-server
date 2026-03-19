@@ -25,4 +25,3 @@ export const DEFAULT_LAYOUT = {
   defaultDisplayedAttributes: ['name', 'description', 'target_version', 'created_at'],
   defaultColumnOrder: ['name', 'description', 'target_version', 'created_at'],
 };
-

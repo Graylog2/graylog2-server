@@ -46,17 +46,13 @@ const InstanceActions = ({ instance, onDetailsClick }: Props) => {
     <>
       <ButtonToolbar>
         <LinkContainer to={collectorLogsUrl(instance.instance_uid)}>
-          <Button bsSize="xsmall">
-            View Logs
-          </Button>
+          <Button bsSize="xsmall">View Logs</Button>
         </LinkContainer>
         <Button bsSize="xsmall" onClick={() => onDetailsClick(instance)}>
           Details
         </Button>
         <MoreActions>
-          <MenuItem onSelect={() => setShowReassignModal(true)}>
-            Reassign to fleet
-          </MenuItem>
+          <MenuItem onSelect={() => setShowReassignModal(true)}>Reassign to fleet</MenuItem>
           <MenuItem divider />
           <DeleteMenuItem onSelect={() => setShowDeleteConfirm(true)} />
         </MoreActions>

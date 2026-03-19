@@ -198,11 +198,7 @@ const DeploymentForm = () => {
       </Section>
 
       <Section>
-        <Button
-          bsStyle="primary"
-          onClick={handleGenerate}
-          disabled={!fleetId || isCreatingEnrollmentToken}
-        >
+        <Button bsStyle="primary" onClick={handleGenerate} disabled={!fleetId || isCreatingEnrollmentToken}>
           {isCreatingEnrollmentToken ? 'Generating...' : 'Generate Enrollment Token'}
         </Button>
       </Section>
@@ -234,7 +230,6 @@ const DeploymentForm = () => {
           </SectionGrid>
         </ResultsContainer>
       )}
-
     </div>
   );
 };

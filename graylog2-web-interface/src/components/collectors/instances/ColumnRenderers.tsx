@@ -52,9 +52,7 @@ const customColumnRenderers = ({ fleetNames }: Props): ColumnRenderers<Collector
       width: 0.3,
     },
     os: {
-      renderCell: (_os: string, instance: CollectorInstanceView) => (
-        <OsIcon os={instance.os} />
-      ),
+      renderCell: (_os: string, instance: CollectorInstanceView) => <OsIcon os={instance.os} />,
       staticWidth: 60,
     },
     fleet_id: {

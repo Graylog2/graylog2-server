@@ -34,7 +34,7 @@ type ApiInstanceResponse = Awaited<ReturnType<typeof Collectors.findInstances>>[
 const toView = (dto: ApiInstanceResponse): CollectorInstanceView => {
   const allAttributes = { ...dto.identifying_attributes, ...dto.non_identifying_attributes };
 
-  return ({
+  return {
     id: dto.instance_uid,
     instance_uid: dto.instance_uid,
     fleet_id: dto.fleet_id,
@@ -48,7 +48,7 @@ const toView = (dto: ApiInstanceResponse): CollectorInstanceView => {
     hostname: (allAttributes?.['host.name'] as string) ?? null,
     os: (allAttributes?.['os.type'] as string) ?? null,
     version: (allAttributes?.['service.version'] as string) ?? null,
-  });
+  };
 };
 
 export const fetchPaginatedInstances = async (
@@ -78,8 +78,7 @@ export const useInstances = (fleetId?: string) =>
       const filters = fleetId ? [`fleet_id:${fleetId}`] : undefined;
 
       return defaultOnError(
-        Collectors.findInstances(1, 0, undefined, filters)
-          .then((response) => response.elements.map(toView)),
+        Collectors.findInstances(1, 0, undefined, filters).then((response) => response.elements.map(toView)),
         'Loading collector instances failed with status',
         'Could not load collector instances',
       );

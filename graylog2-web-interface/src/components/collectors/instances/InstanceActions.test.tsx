@@ -28,7 +28,9 @@ import type { CollectorInstanceView } from '../types';
 jest.mock('../hooks/useCollectorsMutations');
 jest.mock('./ReassignFleetModal', () => (props: { onClose: () => void }) => (
   <div data-testid="reassign-modal">
-    <button type="button" onClick={props.onClose}>Close modal</button>
+    <button type="button" onClick={props.onClose}>
+      Close modal
+    </button>
   </div>
 ));
 

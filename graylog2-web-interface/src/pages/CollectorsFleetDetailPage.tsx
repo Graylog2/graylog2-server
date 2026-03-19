@@ -40,9 +40,7 @@ const CollectorsFleetDetailPage = () => {
     <DocumentTitle title="Fleet Detail">
       <CollectorsPageNavigation />
       <Row className="content">
-        <Col md={12}>
-          {fleetId && <FleetDetail fleetId={fleetId} />}
-        </Col>
+        <Col md={12}>{fleetId && <FleetDetail fleetId={fleetId} />}</Col>
       </Row>
     </DocumentTitle>
   );

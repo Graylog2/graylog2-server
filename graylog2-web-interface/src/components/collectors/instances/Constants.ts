@@ -25,4 +25,3 @@ export const DEFAULT_LAYOUT = {
   defaultDisplayedAttributes: ['status', 'hostname', 'os', 'fleet_id', 'last_seen', 'version'],
   defaultColumnOrder: ['status', 'hostname', 'os', 'fleet_id', 'last_seen', 'version'],
 };
-

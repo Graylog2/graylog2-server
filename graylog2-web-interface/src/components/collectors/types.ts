@@ -59,7 +59,7 @@ export type FileSourceConfig = {
   multiline?: { pattern: string; negate: boolean };
 };
 
-export type JournaldPriority = 'emerg' | 'alert' | 'crit' | 'err' | 'warning' | 'notice' | 'info' | 'debug'
+export type JournaldPriority = 'emerg' | 'alert' | 'crit' | 'err' | 'warning' | 'notice' | 'info' | 'debug';
 
 export type JournaldSourceConfig = {
   priority: JournaldPriority;
@@ -168,5 +168,3 @@ export type ActivityEntry = {
 export type RecentActivityResponse = {
   activities: ActivityEntry[];
 };
-
-

@@ -77,8 +77,9 @@ const FleetFormModal = ({ fleet = undefined, onClose, onSave, isLoading = false 
         />
       </Modal.Body>
       <Modal.Footer>
-        <Button bsStyle="default" onClick={onClose}>Cancel</Button>
-        {' '}
+        <Button bsStyle="default" onClick={onClose}>
+          Cancel
+        </Button>{' '}
         <Button bsStyle="primary" onClick={handleSave} disabled={!name || isLoading}>
           {isEdit ? 'Save Changes' : 'Create Fleet'}
         </Button>

@@ -20,7 +20,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
 import URI from 'urijs';
 
-import {Button, ButtonToolbar, DeleteMenuItem, Label, SegmentedControl} from 'components/bootstrap';
+import { Button, ButtonToolbar, DeleteMenuItem, Label, SegmentedControl } from 'components/bootstrap';
 import { ConfirmDialog, Spinner } from 'components/common';
 import { MoreActions } from 'components/common/EntityDataTable';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
@@ -31,7 +31,17 @@ import type { SearchParams } from 'stores/PaginationTypes';
 
 import FleetSettings from './FleetSettings';
 
-import { useFleet, useFleetStats, useSources, fetchPaginatedSources, sourcesKeyFn, fetchPaginatedInstances, instancesKeyFn, useCollectorsMutations, useDefaultInstanceFilters } from '../hooks';
+import {
+  useFleet,
+  useFleetStats,
+  useSources,
+  fetchPaginatedSources,
+  sourcesKeyFn,
+  fetchPaginatedInstances,
+  instancesKeyFn,
+  useCollectorsMutations,
+  useDefaultInstanceFilters,
+} from '../hooks';
 import StatCard from '../common/StatCard';
 import { InstanceDetailDrawer } from '../instances';
 import BulkActions from '../instances/BulkActions';
@@ -88,7 +98,17 @@ const FleetDetail = ({ fleetId }: Props) => {
   const { data: stats, isLoading: statsLoading } = useFleetStats(fleetId);
   const defaultInstanceFilters = useDefaultInstanceFilters();
   const { data: sources } = useSources(fleetId);
-  const { createSource, isCreatingSource, updateSource, isUpdatingSource, deleteSource, updateFleet, isUpdatingFleet, deleteFleet, isDeletingFleet } = useCollectorsMutations();
+  const {
+    createSource,
+    isCreatingSource,
+    updateSource,
+    isUpdatingSource,
+    deleteSource,
+    updateFleet,
+    isUpdatingFleet,
+    deleteFleet,
+    isDeletingFleet,
+  } = useCollectorsMutations();
   const [showSourceModal, setShowSourceModal] = useState(false);
   const [editingSource, setEditingSource] = useState<Source | null>(null);
   const [deletingSource, setDeletingSource] = useState<Source | null>(null);
@@ -99,43 +119,46 @@ const FleetDetail = ({ fleetId }: Props) => {
   const initialTab: FleetTab = VALID_TABS.includes(tabParam as FleetTab) ? (tabParam as FleetTab) : DEFAULT_TAB;
   const [activeTab, setActiveTab] = useState<FleetTab>(initialTab);
 
-  const navigateToTab = useCallback((nextTab: FleetTab, filters?: Array<string>) => {
-    setActiveTab(nextTab);
+  const navigateToTab = useCallback(
+    (nextTab: FleetTab, filters?: Array<string>) => {
+      setActiveTab(nextTab);
 
-    let newUrl = new URI(window.location.href)
-      .removeSearch('tab')
-      .removeSearch('page')
-      .removeSearch('pageSize')
-      .removeSearch('query')
-      .removeSearch('filters')
-      .addSearch('tab', nextTab);
+      let newUrl = new URI(window.location.href)
+        .removeSearch('tab')
+        .removeSearch('page')
+        .removeSearch('pageSize')
+        .removeSearch('query')
+        .removeSearch('filters')
+        .addSearch('tab', nextTab);
 
-    if (filters?.length) {
-      filters.forEach((f) => { newUrl = newUrl.addSearch('filters', f); });
-    }
+      if (filters?.length) {
+        filters.forEach((f) => {
+          newUrl = newUrl.addSearch('filters', f);
+        });
+      }
 
-    history.replace(newUrl.resource());
-  }, [history]);
+      history.replace(newUrl.resource());
+    },
+    [history],
+  );
 
-  const onTabChange = useCallback((nextTab: FleetTab) => {
-    navigateToTab(nextTab);
-  }, [navigateToTab]);
+  const onTabChange = useCallback(
+    (nextTab: FleetTab) => {
+      navigateToTab(nextTab);
+    },
+    [navigateToTab],
+  );
 
   const fleetNames = useMemo(() => (fleet ? { [fleet.id]: fleet.name } : {}), [fleet]);
 
-  const instanceRenderers = useMemo(
-    () => instanceColumnRenderers({ fleetNames }),
-    [fleetNames],
-  );
+  const instanceRenderers = useMemo(() => instanceColumnRenderers({ fleetNames }), [fleetNames]);
 
   const sourceRenderers = useMemo(() => sourceColumnRenderers(), []);
 
   const fetchInstances = useCallback(
     (searchParams: SearchParams) => {
       const fleetQuery = `fleet_id:${fleetId}`;
-      const query = searchParams.query
-        ? `${fleetQuery} ${searchParams.query}`
-        : fleetQuery;
+      const query = searchParams.query ? `${fleetQuery} ${searchParams.query}` : fleetQuery;
 
       return fetchPaginatedInstances({ ...searchParams, query });
     },
@@ -148,9 +171,7 @@ const FleetDetail = ({ fleetId }: Props) => {
   );
 
   const instanceActions = useCallback(
-    (instance: CollectorInstanceView) => (
-      <InstanceActions instance={instance} onDetailsClick={setSelectedInstance} />
-    ),
+    (instance: CollectorInstanceView) => <InstanceActions instance={instance} onDetailsClick={setSelectedInstance} />,
     [],
   );
 
@@ -204,26 +225,30 @@ const FleetDetail = ({ fleetId }: Props) => {
       </Header>
 
       <StatsRow>
-        <StatCard value={stats?.total_instances ?? 0} label="Instances"
-                  onClick={() => navigateToTab('instances')} />
-        <StatCard value={stats?.online_instances ?? 0} label="Online" variant="success"
-                  onClick={() => navigateToTab('instances', ['status=online'])} />
-        <StatCard value={stats?.offline_instances ?? 0} label="Offline" variant="warning"
-                  onClick={() => navigateToTab('instances', ['status=offline'])} />
-        <StatCard value={stats?.total_sources ?? 0} label="Sources"
-                  onClick={() => navigateToTab('sources')} />
+        <StatCard value={stats?.total_instances ?? 0} label="Instances" onClick={() => navigateToTab('instances')} />
+        <StatCard
+          value={stats?.online_instances ?? 0}
+          label="Online"
+          variant="success"
+          onClick={() => navigateToTab('instances', ['status=online'])}
+        />
+        <StatCard
+          value={stats?.offline_instances ?? 0}
+          label="Offline"
+          variant="warning"
+          onClick={() => navigateToTab('instances', ['status=offline'])}
+        />
+        <StatCard value={stats?.total_sources ?? 0} label="Sources" onClick={() => navigateToTab('sources')} />
       </StatsRow>
 
-      <SegmentedControl<FleetTab>
-        data={SEGMENTS}
-        value={activeTab}
-        onChange={onTabChange}
-      />
+      <SegmentedControl<FleetTab> data={SEGMENTS} value={activeTab} onChange={onTabChange} />
 
       {activeTab === 'sources' && (
         <>
           <ActionsRow>
-            <Button bsStyle="success" onClick={() => setShowSourceModal(true)}>Add Source</Button>
+            <Button bsStyle="success" onClick={() => setShowSourceModal(true)}>
+              Add Source
+            </Button>
           </ActionsRow>
           <PaginatedEntityTable<Source>
             humanName="sources"

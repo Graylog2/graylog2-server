@@ -141,7 +141,9 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
             ))}
             <tr>
               <td>enrolled_at</td>
-              <td><RelativeTime dateTime={instance.enrolled_at} /></td>
+              <td>
+                <RelativeTime dateTime={instance.enrolled_at} />
+              </td>
             </tr>
           </tbody>
         </Table>

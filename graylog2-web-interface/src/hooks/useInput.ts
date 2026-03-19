@@ -14,19 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import {useQuery, skipToken} from '@tanstack/react-query';
-import {SystemInputs} from '@graylog/server-api';
-import {defaultOnError} from 'util/conditional/onError';
+import { useQuery, skipToken } from '@tanstack/react-query';
+import { SystemInputs } from '@graylog/server-api';
+import { defaultOnError } from 'util/conditional/onError';
 
 const useInput = (inputId: string | null) =>
   useQuery({
     queryKey: ['inputs', inputId],
     queryFn: inputId
-      ? () => defaultOnError(
-        SystemInputs.get(inputId),
-        'Loading input failed with status',
-        'Could not load input',
-      )
+      ? () => defaultOnError(SystemInputs.get(inputId), 'Loading input failed with status', 'Could not load input')
       : skipToken,
   });
 

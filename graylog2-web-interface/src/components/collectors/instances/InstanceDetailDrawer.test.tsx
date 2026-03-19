@@ -21,7 +21,6 @@ import InstanceDetailDrawer from './InstanceDetailDrawer';
 
 import type { CollectorInstanceView, Source } from '../types';
 
-
 const mockInstance: CollectorInstanceView = {
   id: 'inst-1',
   instance_uid: 'uid-1',
@@ -53,12 +52,7 @@ const mockSources: Source[] = [
 describe('InstanceDetailDrawer', () => {
   it('renders instance hostname as title', async () => {
     render(
-      <InstanceDetailDrawer
-        instance={mockInstance}
-        sources={mockSources}
-        fleetName="production"
-        onClose={jest.fn()}
-      />,
+      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
     );
 
     await screen.findByRole('dialog', { name: /prod-web-01/i });
@@ -66,12 +60,7 @@ describe('InstanceDetailDrawer', () => {
 
   it('renders status badge', async () => {
     render(
-      <InstanceDetailDrawer
-        instance={mockInstance}
-        sources={mockSources}
-        fleetName="production"
-        onClose={jest.fn()}
-      />,
+      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
     );
 
     await screen.findByText('Online');
@@ -79,12 +68,7 @@ describe('InstanceDetailDrawer', () => {
 
   it('renders active sources count', async () => {
     render(
-      <InstanceDetailDrawer
-        instance={mockInstance}
-        sources={mockSources}
-        fleetName="production"
-        onClose={jest.fn()}
-      />,
+      <InstanceDetailDrawer instance={mockInstance} sources={mockSources} fleetName="production" onClose={jest.fn()} />,
     );
 
     await screen.findByText(/Active Sources.*1/i);

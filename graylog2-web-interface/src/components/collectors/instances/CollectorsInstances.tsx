@@ -19,13 +19,7 @@ import { useState, useMemo, useCallback } from 'react';
 
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 
-import {
-  fetchPaginatedInstances,
-  instancesKeyFn,
-  useFleets,
-  useSources,
-  useDefaultInstanceFilters,
-} from '../hooks';
+import { fetchPaginatedInstances, instancesKeyFn, useFleets, useSources, useDefaultInstanceFilters } from '../hooks';
 import type { CollectorInstanceView } from '../types';
 
 import customColumnRenderers from './ColumnRenderers';
@@ -41,23 +35,14 @@ const CollectorsInstances = () => {
   const defaultFilters = useDefaultInstanceFilters();
 
   const fleetNames = useMemo(
-    () =>
-      (fleets ?? []).reduce(
-        (acc, fleet) => ({ ...acc, [fleet.id]: fleet.name }),
-        {} as Record<string, string>,
-      ),
+    () => (fleets ?? []).reduce((acc, fleet) => ({ ...acc, [fleet.id]: fleet.name }), {} as Record<string, string>),
     [fleets],
   );
 
-  const columnRenderers = useMemo(
-    () => customColumnRenderers({ fleetNames }),
-    [fleetNames],
-  );
+  const columnRenderers = useMemo(() => customColumnRenderers({ fleetNames }), [fleetNames]);
 
   const entityActions = useCallback(
-    (instance: CollectorInstanceView) => (
-      <InstanceActions instance={instance} onDetailsClick={setSelectedInstance} />
-    ),
+    (instance: CollectorInstanceView) => <InstanceActions instance={instance} onDetailsClick={setSelectedInstance} />,
     [],
   );
 

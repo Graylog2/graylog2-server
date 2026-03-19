@@ -30,18 +30,12 @@ const customColumnRenderers = (): ColumnRenderers<Source> => ({
       width: 0.25,
     },
     type: {
-      renderCell: (type: string) => (
-        <Label bsStyle="info">
-          {SOURCE_TYPE_LABELS[type] ?? type}
-        </Label>
-      ),
+      renderCell: (type: string) => <Label bsStyle="info">{SOURCE_TYPE_LABELS[type] ?? type}</Label>,
       staticWidth: 140,
     },
     enabled: {
       renderCell: (_enabled: boolean, source: Source) => (
-        <Label bsStyle={source.enabled ? 'success' : 'default'}>
-          {source.enabled ? 'Enabled' : 'Disabled'}
-        </Label>
+        <Label bsStyle={source.enabled ? 'success' : 'default'}>{source.enabled ? 'Enabled' : 'Disabled'}</Label>
       ),
       staticWidth: 100,
     },

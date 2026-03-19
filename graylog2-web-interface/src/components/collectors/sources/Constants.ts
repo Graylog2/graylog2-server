@@ -32,4 +32,3 @@ export const SOURCE_TYPE_LABELS: Record<SourceType, string> = {
   journald: 'Journald',
   windows_event_log: 'Windows Event Log',
 };
-

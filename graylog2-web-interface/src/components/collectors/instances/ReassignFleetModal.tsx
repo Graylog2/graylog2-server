@@ -36,9 +36,7 @@ const ReassignFleetModal = ({ instanceUids, currentFleetId, onClose, onSuccess }
   const { reassignInstances, isReassigningInstances } = useCollectorsMutations();
   const [selectedFleetId, setSelectedFleetId] = useState<string | undefined>(undefined);
 
-  const availableFleets = (fleets || []).filter(
-    (fleet: Fleet) => fleet.id !== currentFleetId,
-  );
+  const availableFleets = (fleets || []).filter((fleet: Fleet) => fleet.id !== currentFleetId);
 
   const fleetOptions = availableFleets.map((fleet: Fleet) => ({
     label: fleet.name,
@@ -59,7 +57,9 @@ const ReassignFleetModal = ({ instanceUids, currentFleetId, onClose, onSuccess }
   return (
     <Modal onHide={onClose} show>
       <Modal.Header showCloseButton>
-        <Modal.Title>Reassign {instanceCount} {descriptor} to fleet</Modal.Title>
+        <Modal.Title>
+          Reassign {instanceCount} {descriptor} to fleet
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {fleetsLoading ? (

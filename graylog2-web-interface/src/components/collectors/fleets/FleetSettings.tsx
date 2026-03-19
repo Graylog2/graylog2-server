@@ -163,7 +163,9 @@ const FleetSettings = ({ fleet, onSave, onDelete = undefined, isLoading = false 
         <WarningText>
           Deleting a fleet will remove all configuration. Instances will need to be re-enrolled.
         </WarningText>
-        <Button bsStyle="danger" onClick={() => setShowDeleteConfirm(true)} disabled={!onDelete}>Delete Fleet</Button>
+        <Button bsStyle="danger" onClick={() => setShowDeleteConfirm(true)} disabled={!onDelete}>
+          Delete Fleet
+        </Button>
       </Section>
 
       {showDeleteConfirm && (
@@ -172,8 +174,8 @@ const FleetSettings = ({ fleet, onSave, onDelete = undefined, isLoading = false 
           show
           onConfirm={handleConfirmDelete}
           onCancel={() => setShowDeleteConfirm(false)}>
-          Are you sure you want to delete fleet <strong>{fleet.name}</strong>?
-          All configuration will be removed and instances will need to be re-enrolled.
+          Are you sure you want to delete fleet <strong>{fleet.name}</strong>? All configuration will be removed and
+          instances will need to be re-enrolled.
         </ConfirmDialog>
       )}
     </div>

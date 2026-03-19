@@ -14,13 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import {useMutation, useQueryClient} from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { Collectors, CollectorsFleets, CollectorsSources, CollectorsConfig as CollectorsConfigApi, OpAMPEnrollment } from '@graylog/server-api';
+import {
+  Collectors,
+  CollectorsFleets,
+  CollectorsSources,
+  CollectorsConfig as CollectorsConfigApi,
+  OpAMPEnrollment,
+} from '@graylog/server-api';
 
 import UserNotification from 'util/UserNotification';
 
-import type {CollectorsConfigRequest, Fleet, Source} from '../types';
+import type { CollectorsConfigRequest, Fleet, Source } from '../types';
 
 type CreateSourceInput = {
   fleetId: string;
@@ -45,15 +51,18 @@ const onMutationSuccess = (message: string, invalidate: () => Promise<void>) => 
 const useCollectorsMutations = () => {
   const queryClient = useQueryClient();
 
-  const invalidateCollectorsQueries = () =>
-    queryClient.invalidateQueries({ queryKey: ['collectors'] });
+  const invalidateCollectorsQueries = () => queryClient.invalidateQueries({ queryKey: ['collectors'] });
 
   const onSuccess = (message: string) => onMutationSuccess(message, invalidateCollectorsQueries);
 
   // Fleet mutations
   const createFleetMutation = useMutation({
     mutationFn: (input: { name: string; description?: string; target_version?: string | null }) =>
-      CollectorsFleets.create({ name: input.name, description: input.description, target_version: input.target_version ?? null }),
+      CollectorsFleets.create({
+        name: input.name,
+        description: input.description,
+        target_version: input.target_version ?? null,
+      }),
     onError: onMutationError('Creating fleet'),
     onSuccess: (fleet) => {
       UserNotification.success(`Fleet "${fleet.name}" has been created.`, 'Success!');
@@ -164,7 +173,9 @@ const useCollectorsMutations = () => {
   // Config mutation
   const updateConfigMutation = useMutation({
     mutationFn: (config: CollectorsConfigRequest) => CollectorsConfigApi.put(config),
-    onError: (errorThrown: { additional?: { body?: { validation_errors?: Record<string, Array<{ error: string }>> } } }) => {
+    onError: (errorThrown: {
+      additional?: { body?: { validation_errors?: Record<string, Array<{ error: string }>> } };
+    }) => {
       const validationErrors = errorThrown?.additional?.body?.validation_errors;
 
       if (validationErrors) {
@@ -172,10 +183,7 @@ const useCollectorsMutations = () => {
         return;
       }
 
-      UserNotification.error(
-        `Saving collectors config failed: ${errorThrown}`,
-        'Could not save config',
-      );
+      UserNotification.error(`Saving collectors config failed: ${errorThrown}`, 'Could not save config');
     },
     onSuccess: onSuccess('Collectors config saved.'),
   });

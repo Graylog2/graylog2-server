@@ -43,11 +43,7 @@ export const useFleet = (fleetId: string) =>
   useQuery<Fleet>({
     queryKey: [...FLEETS_KEY_PREFIX, fleetId],
     queryFn: () =>
-      defaultOnError(
-        CollectorsFleets.get(fleetId),
-        'Loading fleet failed with status',
-        'Could not load Fleet',
-      ),
+      defaultOnError(CollectorsFleets.get(fleetId), 'Loading fleet failed with status', 'Could not load Fleet'),
     enabled: !!fleetId,
   });
 
@@ -65,23 +61,16 @@ export const useFleetStats = (fleetId: string) =>
 
 export const FLEETS_BULK_STATS_KEY = ['collectors', 'fleets', 'stats'];
 
-const fetchBulkFleetStats = (): Promise<BulkFleetStatsResponse> =>
-  CollectorsFleets.bulkStats();
+const fetchBulkFleetStats = (): Promise<BulkFleetStatsResponse> => CollectorsFleets.bulkStats();
 
 export const useFleetsBulkStats = () =>
   useQuery<BulkFleetStatsResponse>({
     queryKey: FLEETS_BULK_STATS_KEY,
     queryFn: () =>
-      defaultOnError(
-        fetchBulkFleetStats(),
-        'Loading fleet stats failed with status',
-        'Could not load Fleet Stats',
-      ),
+      defaultOnError(fetchBulkFleetStats(), 'Loading fleet stats failed with status', 'Could not load Fleet Stats'),
   });
 
-export const fetchPaginatedFleets = async (
-  searchParams: SearchParams,
-): Promise<PaginatedResponse<Fleet>> =>
+export const fetchPaginatedFleets = async (searchParams: SearchParams): Promise<PaginatedResponse<Fleet>> =>
   defaultOnError(
     CollectorsFleets.list(
       searchParams.page,

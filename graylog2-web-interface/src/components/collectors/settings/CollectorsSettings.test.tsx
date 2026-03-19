@@ -95,16 +95,18 @@ describe('CollectorsSettings', () => {
     await user.type(portInput, '14411');
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
-    await waitFor(() => expect(updateConfig).toHaveBeenCalledWith({
-      http: {
-        enabled: true,
-        hostname: 'ingest.example.com',
-        port: 14411,
-      },
-      collector_offline_threshold: 'PT5M',
-      collector_default_visibility_threshold: 'P1D',
-      collector_expiration_threshold: 'P7D',
-    }));
+    await waitFor(() =>
+      expect(updateConfig).toHaveBeenCalledWith({
+        http: {
+          enabled: true,
+          hostname: 'ingest.example.com',
+          port: 14411,
+        },
+        collector_offline_threshold: 'PT5M',
+        collector_default_visibility_threshold: 'P1D',
+        collector_expiration_threshold: 'P7D',
+      }),
+    );
 
     expect(updateConfig).not.toHaveBeenCalledWith(expect.objectContaining({ grpc: expect.anything() }));
   });

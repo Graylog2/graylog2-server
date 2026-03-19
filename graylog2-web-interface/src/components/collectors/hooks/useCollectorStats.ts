@@ -27,5 +27,10 @@ export const STATS_KEY_PREFIX = ['collectors', 'stats'];
 export const useCollectorStats = () =>
   useQuery<CollectorStats>({
     queryKey: STATS_KEY_PREFIX,
-    queryFn: () => defaultOnError(Collectors.stats(), 'Loading collector stats failed with status', 'Could not load collector stats.'),
+    queryFn: () =>
+      defaultOnError(
+        Collectors.stats(),
+        'Loading collector stats failed with status',
+        'Could not load collector stats.',
+      ),
   });

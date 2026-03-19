@@ -24,19 +24,9 @@ export {
   FLEETS_KEY_PREFIX,
 } from './useFleetQueries';
 
-export {
-  useInstances,
-  fetchPaginatedInstances,
-  instancesKeyFn,
-  INSTANCES_KEY_PREFIX,
-} from './useInstanceQueries';
+export { useInstances, fetchPaginatedInstances, instancesKeyFn, INSTANCES_KEY_PREFIX } from './useInstanceQueries';
 
-export {
-  useSources,
-  fetchPaginatedSources,
-  sourcesKeyFn,
-  SOURCES_KEY_PREFIX,
-} from './useSourceQueries';
+export { useSources, fetchPaginatedSources, sourcesKeyFn, SOURCES_KEY_PREFIX } from './useSourceQueries';
 
 export { useCollectorStats } from './useCollectorStats';
 export { useCollectorsConfig } from './useCollectorsConfig';
@@ -50,7 +40,4 @@ export {
 export { default as useCollectorsMutations } from './useCollectorsMutations';
 export { default as useDefaultInstanceFilters } from './useDefaultInstanceFilters';
 
-export {
-  useRecentActivity,
-  ACTIVITY_KEY,
-} from './useActivityQueries';
+export { useRecentActivity, ACTIVITY_KEY } from './useActivityQueries';
