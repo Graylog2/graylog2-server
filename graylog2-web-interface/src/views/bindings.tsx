@@ -94,7 +94,6 @@ import visualizationBindings from 'views/components/visualizations/bindings';
 import { AggregationWizard } from 'views/components/aggregationwizard';
 import { filterCloudValueActions } from 'util/conditional/filterValueActions';
 import CopyValueToClipboard from 'views/logic/valueactions/CopyValueToClipboard';
-import CopyFieldToClipboard from 'views/logic/fieldactions/CopyFieldToClipboard';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import ViewHeader from 'views/components/views/ViewHeader';
 import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/ScatterVisualizationConfig';
@@ -123,6 +122,7 @@ import TextVisualization from 'views/components/widgets/text/TextVisualization';
 import TextWidgetEdit from 'views/components/widgets/text/TextWidgetEdit';
 import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
 import ToggleFavoriteField from 'views/logic/fieldactions/ToggleFavoriteField';
+import { CopyToClipBoardFieldActionPlugin } from 'views/actions/FieldActionPlugins';
 
 import type { ActionDefinition } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -341,13 +341,7 @@ const exports: PluginExports = {
       isEnabled: ({ field, type }) => !isFunction(field) && !type.isDecorated(),
       resetFocus: false,
     },
-    {
-      type: 'copy-field-to-clipboard',
-      title: 'Copy field name to clipboard',
-      handler: CopyFieldToClipboard,
-      isEnabled: () => true,
-      resetFocus: false,
-    },
+    CopyToClipBoardFieldActionPlugin,
     {
       type: 'change-field-type',
       title: 'Change field type',

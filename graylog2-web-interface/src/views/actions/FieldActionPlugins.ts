@@ -14,10 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext } from 'react';
 
-import FieldActionsContext, { type FieldActionsContextValue } from './FieldActionsContext';
+import CopyFieldToClipboard from 'views/logic/fieldactions/CopyFieldToClipboard';
 
-const useFieldActionsContext = (): FieldActionsContextValue => useContext(FieldActionsContext);
-
-export default useFieldActionsContext;
+export const CopyToClipBoardFieldActionPlugin = {
+  type: 'copy-field-to-clipboard',
+  title: 'Copy field name to clipboard',
+  handler: CopyFieldToClipboard,
+  isEnabled: () => true,
+  resetFocus: false,
+};

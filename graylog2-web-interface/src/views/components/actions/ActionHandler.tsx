@@ -47,7 +47,7 @@ export type SetActionComponents = (fn: (component: ActionComponents) => ActionCo
 export type ActionHandler<T extends object = object> = (args: ResolvedActionHandlerArguments<T>) => Promise<unknown>;
 export type ActionHandlerCondition<T extends object = object> = (
   args: ResolvedActionHandlerArguments<T>,
-  getState: GetState,
+  getState?: GetState,
 ) => boolean;
 
 export type ActionConditions<T extends object = object> = {
