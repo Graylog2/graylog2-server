@@ -79,6 +79,12 @@ const FieldsRow = styled.tr`
   }
 `;
 
+const ActionsCell = styled(TableDataCell)`
+  width: 1%;
+  white-space: nowrap;
+  text-align: right;
+`;
+
 const MessageDetailRow = styled.tr`
   td {
     padding-top: 5px;
@@ -101,6 +107,7 @@ type Props = {
   expanded: boolean;
   fields: FieldTypeMappingsList;
   message: Message;
+  rowActions?: React.ReactNode;
   selectedFields?: Immutable.OrderedSet<string>;
   showMessageRow?: boolean;
   toggleDetail: (messageId: string) => void;
@@ -125,6 +132,7 @@ const MessageTableEntry = ({
   expanded,
   fields,
   message,
+  rowActions = undefined,
   showMessageRow = false,
   selectedFields = Immutable.OrderedSet<string>(),
   toggleDetail,
@@ -157,7 +165,7 @@ const MessageTableEntry = ({
     }
   }, [message.id, message.index, sendTelemetry, toggleDetail]);
 
-  const colSpanFixup = selectedFields.size + 1;
+  const colSpanFixup = selectedFields.size + 1 + (rowActions ? 1 : 0);
 
   const selectedFieldsList = useMemo(
     () =>
@@ -193,6 +201,7 @@ const MessageTableEntry = ({
       <TableBody $expanded={expanded} $highlighted={message.id === highlightMessageId}>
         <FieldsRow onClick={_toggleDetail} className="table-data-row">
           {selectedFieldsList}
+          {rowActions && <ActionsCell $isNumeric={false}>{rowActions}</ActionsCell>}
         </FieldsRow>
 
         <MessagePreview

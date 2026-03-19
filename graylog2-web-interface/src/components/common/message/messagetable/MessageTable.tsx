@@ -92,6 +92,7 @@ type Props = {
   fields: Immutable.List<FieldTypeMapping>;
   messages: Array<BackendMessage>;
   onSortChange?: (newSortConfig: SortConfig[]) => Promise<void>;
+  renderRowActions?: (message: Message) => React.ReactNode;
   scrollContainerRef: React.MutableRefObject<HTMLDivElement>;
   setLoadingState: (loading: boolean) => void;
 };
@@ -127,7 +128,15 @@ const _toggleMessageDetail = (
   setExpandedMessages(newSet);
 };
 
-const MessageTable = ({ fields, messages, config, onSortChange, setLoadingState, scrollContainerRef }: Props) => {
+const MessageTable = ({
+  fields,
+  messages,
+  config,
+  onSortChange,
+  renderRowActions = undefined,
+  setLoadingState,
+  scrollContainerRef,
+}: Props) => {
   const { stopAutoRefresh } = useAutoRefresh();
   const [expandedMessages, setExpandedMessages] = useState(Immutable.Set<string>());
   const formattedMessages = useMemo(() => _getFormattedMessages(messages), [messages]);
@@ -170,6 +179,7 @@ const MessageTable = ({ fields, messages, config, onSortChange, setLoadingState,
                   );
                 })
                 .toArray()}
+              {renderRowActions && <TableHeaderCell />}
             </tr>
           </TableHead>
           {formattedMessages.map((message) => {
@@ -183,6 +193,7 @@ const MessageTable = ({ fields, messages, config, onSortChange, setLoadingState,
                 config={config}
                 showMessageRow={config?.showMessageRow}
                 selectedFields={selectedFields}
+                rowActions={renderRowActions?.(message)}
                 expanded={expandedMessages.contains(messageKey)}
                 toggleDetail={toggleDetail}
                 expandAllRenderAsync={false}
