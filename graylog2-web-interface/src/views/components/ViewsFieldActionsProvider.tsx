@@ -15,14 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo, useContext } from 'react';
+import { useContext } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import type { AdditionalViewsActionHandlerArguments } from 'views/types';
 import FieldActionsContext, { type FieldActionsContextValue } from 'views/components/actions/FieldActionsContext';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
-import type { ActionHandlerCondition, ResolvedActionHandlerArguments } from 'views/components/actions/ActionHandler';
+import type {
+  ActionHandlerCondition,
+  ExecuteThunkAction,
+  ResolvedActionHandlerArguments,
+} from 'views/components/actions/ActionHandler';
 import { Button } from 'components/bootstrap';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import AddToQueryHandler from 'views/logic/valueactions/AddToQueryHandler';
@@ -47,33 +51,27 @@ const ViewsFieldActionsProvider = ({ children }: React.PropsWithChildren) => {
   const queryId = useActiveQueryId();
   const valueActions = usePluginEntities('valueActions');
   const fieldActions = usePluginEntities('fieldActions');
-  const additionalHandlerArgs = useMemo(() => ({ queryId }), [queryId]);
-  const evaluateCondition = useCallback(
-    (
-      condition: ActionHandlerCondition<AdditionalViewsActionHandlerArguments>,
-      args: ResolvedActionHandlerArguments<AdditionalViewsActionHandlerArguments>,
-      fallbackValue: boolean,
-    ) => {
-      if (!condition) {
-        return fallbackValue;
-      }
+  const additionalHandlerArgs = { queryId };
+  const evaluateCondition = (
+    condition: ActionHandlerCondition<AdditionalViewsActionHandlerArguments>,
+    args: ResolvedActionHandlerArguments<AdditionalViewsActionHandlerArguments>,
+    fallbackValue: boolean,
+  ) => {
+    if (!condition) {
+      return fallbackValue;
+    }
 
-      return dispatch((_dispatch, stateGetter) => condition(args, stateGetter));
-    },
-    [dispatch],
-  );
-  const executeThunkAction = useCallback((thunk, args) => Promise.resolve(dispatch(thunk(args))), [dispatch]);
-  const actionConfig = useMemo(
-    (): FieldActionsContextValue<AdditionalViewsActionHandlerArguments> => ({
-      evaluateCondition,
-      executeThunkAction,
-      additionalHandlerArgs,
-      valueActions,
-      fieldActions,
-      assetDetailsActions: AssetDetailsActions,
-    }),
-    [evaluateCondition, executeThunkAction, additionalHandlerArgs, fieldActions, valueActions],
-  );
+    return dispatch((_dispatch, stateGetter) => condition(args, stateGetter));
+  };
+  const executeThunkAction: ExecuteThunkAction = (thunk, args) => Promise.resolve(dispatch(thunk(args)));
+  const actionConfig: FieldActionsContextValue<AdditionalViewsActionHandlerArguments> = {
+    evaluateCondition,
+    executeThunkAction,
+    additionalHandlerArgs,
+    valueActions,
+    fieldActions,
+    assetDetailsActions: AssetDetailsActions,
+  };
 
   return <FieldActionsContext.Provider value={actionConfig}>{children}</FieldActionsContext.Provider>;
 };
