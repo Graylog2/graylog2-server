@@ -28,6 +28,7 @@ import useFeature from 'hooks/useFeature';
 import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
 import sidebarSections, { type SidebarSection } from 'views/components/sidebar/sidebarSections';
 import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
+import SidebarEventDetails from 'components/events/SidebarEventDetails';
 
 const ReplaySearchSidebarSection = () => {
   const { alertId, definitionId } = useReplaySearchContext();
@@ -91,12 +92,7 @@ const EventReplaySearch = ({ eventDefinitionMappedData, eventData, searchPageLay
 
   useEffect(() => {
     if (isRightSidebarEnabled) {
-      openSidebar({
-        id: 'replay-search-sidebar',
-        title: 'Replay Details',
-        component: ReplaySearchSidebar,
-        props: { alertId: eventData?.id, definitionId: eventDefinition?.id },
-      });
+      openSidebar(SidebarEventDetails(eventData?.id, eventDefinition?.id));
     }
   }, [isRightSidebarEnabled, openSidebar, eventData?.id, eventDefinition?.id]);
 

@@ -18,7 +18,6 @@ import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 import EventDetailsTable from 'components/events/events/EventDetailsTable';
-import RemediationSteps from 'components/events/ReplaySearchSidebar/RemediationSteps';
 import { eventTypeAttribute } from 'components/events/events/ColumnRenderers';
 import type { EventReplaySideBarDetailsProps } from 'views/types';
 import useEventsAdditionalData from 'components/events/ReplaySearchSidebar/hooks/useEventsAdditionalData';
@@ -60,7 +59,7 @@ const attributesRenderers = {
 const GeneralEventSideBar = ({ alertId, definitionId }: EventReplaySideBarDetailsProps) => {
   const { data: eventData, isLoading: isLoadingEvent } = useEventById(alertId);
   const resolvedDefinitionId = definitionId ?? eventData?.event_definition_id;
-  const { meta, eventDefinitionEventProcedureId, isLoadingEventDefinition } = useEventsAdditionalData({
+  const { meta, isLoadingEventDefinition } = useEventsAdditionalData({
     eventData,
     definitionId: resolvedDefinitionId,
   });
@@ -94,15 +93,6 @@ const GeneralEventSideBar = ({ alertId, definitionId }: EventReplaySideBarDetail
             <EventDefinitionInfoTable />
           </ExpandableSection>
         </ReplaySearchContext.Provider>
-      )}
-      {alertId && (
-        <ExpandableSection title="Event Procedure Summary">
-          <RemediationSteps
-            event={eventData}
-            meta={meta}
-            eventDefinitionEventProcedureId={eventDefinitionEventProcedureId}
-          />
-        </ExpandableSection>
       )}
     </div>
   );
