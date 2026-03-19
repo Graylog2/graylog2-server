@@ -22,35 +22,20 @@ import jakarta.inject.Inject;
 import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
-import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
-import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiService;
-import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedException;
-import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
-import org.graylog.plugins.views.search.rest.scriptingapi.request.Grouping;
-import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.graylog2.rest.resources.entities.Slice;
-import org.graylog2.rest.resources.entities.Slices;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.graylog.events.event.EventDto.FIELD_ALERT;
-import static org.graylog.events.event.EventDto.FIELD_PRIORITY;
-import static org.graylog.events.event.EventDto.FIELD_SCORES;
-import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
+import static org.graylog.events.search.EventsSearchFilter.NULL_VALUE;
 
 public class EventsSearchService extends AbstractEventsSearchService {
     private final MoreSearch moreSearch;
@@ -73,10 +58,31 @@ public class EventsSearchService extends AbstractEventsSearchService {
         }
 
         final var filter = buildFilter(parameters);
+        final var cleanedParameters = hasAssociatedAssetsForNullFilter(parameters) ? removeAssociatedAssetsForNullFilter(parameters) : parameters;
 
-        final MoreSearch.Result result = moreSearch.eventSearch(parameters, filter, eventStreams, forbiddenSourceStreams(subject));
+        final MoreSearch.Result result = moreSearch.eventSearch(cleanedParameters, filter, eventStreams, forbiddenSourceStreams(subject));
 
         return buildResultForSubject(parameters, result, subject);
+    }
+
+    EventsSearchParameters removeAssociatedAssetsForNullFilter(EventsSearchParameters parameters) {
+        final var extraFilters = parameters
+                .filter()
+                .extraFilters()
+                .entrySet()
+                .stream()
+                .filter(e -> !(e.getKey().equals(EventDto.FIELD_ASSOCIATED_ASSETS) && e.getValue().contains(NULL_VALUE)))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        final var filter = parameters.filter().toBuilder().extraFilters(extraFilters).build();
+        final var cleanedParameters = parameters.toBuilder().filter(filter).build();
+        return cleanedParameters;
+    }
+
+    boolean hasAssociatedAssetsForNullFilter(EventsSearchParameters parameters) {
+        final var filter = parameters.filter().extraFilters();
+        return filter.containsKey(EventDto.FIELD_ASSOCIATED_ASSETS)
+                && !filter.get(EventDto.FIELD_ASSOCIATED_ASSETS).isEmpty()
+                && filter.get(EventDto.FIELD_ASSOCIATED_ASSETS).contains(NULL_VALUE);
     }
 
     public EventsHistogramResult histogram(EventsSearchParameters parameters, Subject subject, ZoneId timeZone) {
