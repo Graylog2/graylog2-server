@@ -18,6 +18,7 @@ import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import ProfilingLevelCell from './ProfilingLevelCell';
+
 import { MongodbProfilingLevel } from '../fetchClusterMongodbNodes';
 
 describe('<ProfilingLevelCell />', () => {
