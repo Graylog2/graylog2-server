@@ -19,14 +19,15 @@ import { useState, useMemo, useCallback } from 'react';
 
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 
-import { fetchPaginatedInstances, instancesKeyFn, useFleets, useSources, useDefaultInstanceFilters } from '../hooks';
-import type { CollectorInstanceView } from '../types';
 
 import customColumnRenderers from './ColumnRenderers';
 import InstanceActions from './InstanceActions';
 import BulkActions from './BulkActions';
 import { DEFAULT_LAYOUT } from './Constants';
 import { InstanceDetailDrawer } from './index';
+
+import type { CollectorInstanceView } from '../types';
+import { fetchPaginatedInstances, instancesKeyFn, useFleets, useSources, useDefaultInstanceFilters } from '../hooks';
 
 const CollectorsInstances = () => {
   const [selectedInstance, setSelectedInstance] = useState<CollectorInstanceView | null>(null);

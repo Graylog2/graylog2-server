@@ -25,6 +25,7 @@ const getHealthStatus = (stats: FleetStatsSummary): HealthStatus => {
   if (stats.total_instances === 0) return 'empty';
   if (stats.online_instances === stats.total_instances) return 'healthy';
   if (stats.online_instances === 0) return 'down';
+
   return 'degraded';
 };
 

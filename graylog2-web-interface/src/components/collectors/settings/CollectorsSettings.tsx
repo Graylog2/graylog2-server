@@ -140,9 +140,9 @@ const CollectorsSettings = () => {
     }
   };
 
-  const offlineError = fieldErrors['collector_offline_threshold'];
-  const visibilityError = fieldErrors['collector_default_visibility_threshold'];
-  const expirationError = fieldErrors['collector_expiration_threshold'];
+  const offlineError = fieldErrors.collector_offline_threshold;
+  const visibilityError = fieldErrors.collector_default_visibility_threshold;
+  const expirationError = fieldErrors.collector_expiration_threshold;
 
   return (
     <>

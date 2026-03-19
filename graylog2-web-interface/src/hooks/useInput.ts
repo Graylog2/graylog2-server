@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useQuery, skipToken } from '@tanstack/react-query';
+
 import { SystemInputs } from '@graylog/server-api';
+
 import { defaultOnError } from 'util/conditional/onError';
 
 const useInput = (inputId: string | null) =>

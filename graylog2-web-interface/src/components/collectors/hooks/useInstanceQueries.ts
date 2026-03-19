@@ -21,7 +21,6 @@ import { Collectors } from '@graylog/server-api';
 import type { SearchParams } from 'stores/PaginationTypes';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 import { defaultOnError } from 'util/conditional/onError';
-
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
 import type { CollectorInstanceView } from '../types';

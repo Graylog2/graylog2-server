@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { Sort } from 'stores/PaginationTypes';
+
 import type { SourceType } from '../types';
 
 export const ENTITY_TABLE_ID = 'collectors-sources';

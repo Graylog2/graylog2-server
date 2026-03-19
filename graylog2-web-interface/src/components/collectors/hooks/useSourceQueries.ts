@@ -20,7 +20,6 @@ import { CollectorsSources } from '@graylog/server-api';
 
 import type { SearchParams } from 'stores/PaginationTypes';
 import { defaultOnError } from 'util/conditional/onError';
-
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
 import type { Source } from '../types';

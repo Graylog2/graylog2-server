@@ -53,6 +53,7 @@ const FleetCardsGrid = ({ fleets, filter }: Props) => {
   const filtered = useMemo(() => {
     if (!filter) return fleets;
     const lower = filter.toLowerCase();
+
     return fleets.filter((f) => f.fleet_name.toLowerCase().includes(lower));
   }, [fleets, filter]);
 

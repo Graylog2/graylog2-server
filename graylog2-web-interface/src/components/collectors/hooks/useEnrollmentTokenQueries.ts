@@ -14,12 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { OpAMPEnrollment } from '@graylog/server-api';
+
 import type { SearchParams } from 'stores/PaginationTypes';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 import { defaultOnError } from 'util/conditional/onError';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
-import { OpAMPEnrollment } from '@graylog/server-api';
 
 import type { EnrollmentTokenMetadata } from '../types';
 

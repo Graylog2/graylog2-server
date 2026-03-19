@@ -19,9 +19,10 @@ import * as React from 'react';
 import { Label } from 'components/bootstrap';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 
+import { SOURCE_TYPE_LABELS } from './Constants';
+
 import type { Source } from '../types';
 
-import { SOURCE_TYPE_LABELS } from './Constants';
 
 const customColumnRenderers = (): ColumnRenderers<Source> => ({
   attributes: {

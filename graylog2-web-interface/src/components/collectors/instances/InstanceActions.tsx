@@ -21,11 +21,12 @@ import { Button, ButtonToolbar, DeleteMenuItem, MenuItem } from 'components/boot
 import { ConfirmDialog, LinkContainer } from 'components/common';
 import { MoreActions } from 'components/common/EntityDataTable';
 
+import ReassignFleetModal from './ReassignFleetModal';
+
 import collectorLogsUrl from '../common/collectorLogsUrl';
 import { useCollectorsMutations } from '../hooks';
 import type { CollectorInstanceView } from '../types';
 
-import ReassignFleetModal from './ReassignFleetModal';
 
 type Props = {
   instance: CollectorInstanceView;
