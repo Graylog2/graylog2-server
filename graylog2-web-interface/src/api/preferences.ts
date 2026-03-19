@@ -53,8 +53,7 @@ const convertPreferences = (preferences: PreferencesUpdateMap): PreferencesMap =
     }
   });
 
-  // @ts-ignore
-  return convertedPreferences;
+  return convertedPreferences as PreferencesMap;
 };
 
 export const saveUserPreferences = (

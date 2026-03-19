@@ -26,10 +26,6 @@ export type UserTelemetrySettings = {
   telemetry_enabled: boolean;
 };
 
-export type TelemetrySettingsStoreState = {
-  telemetrySetting: UserTelemetrySettings;
-};
-
 const TELEMETRY_SETTINGS_QUERY_KEY = ['telemetry', 'settings'] as const;
 
 const settingsUrl = () => qualifyUrl(ApiRoutes.TelemetryApiController.setting().url);
