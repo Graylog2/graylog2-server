@@ -14,7 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+
+import { SystemCatalog } from '@graylog/server-api';
 
 import { LinkContainer, DocumentTitle, PageHeader } from 'components/common';
 import Routes from 'routing/Routes';
@@ -23,27 +25,23 @@ import UserNotification from 'util/UserNotification';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
 import ContentPack from 'logic/content-packs/ContentPack';
 import Entity from 'logic/content-packs/Entity';
-import { CatalogStore, CatalogActions } from 'stores/content-packs/CatalogStore';
+import EntityIndex from 'logic/content-packs/EntityIndex';
 import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
 import useHistory from 'routing/useHistory';
-import { useStore } from 'stores/connect';
 import useProductName from 'brand-customization/useProductName';
 import MarketplaceLink from 'components/support/MarketplaceLink';
+import useEntityIndex from 'components/content-packs/hooks/useEntityIndex';
 
 const CreateContentPackPage = () => {
   const productName = useProductName();
   const history = useHistory();
-  const { entityIndex } = useStore(CatalogStore);
+  const { entityIndex } = useEntityIndex();
   const [contentPackState, setContentPackState] = useState({
     contentPack: ContentPack.builder().build(),
     appliedParameter: {},
     selectedEntities: {},
     fetchedEntities: undefined,
   });
-
-  useEffect(() => {
-    CatalogActions.showEntityIndex();
-  }, []);
 
   const _onStateChanged = (newState: {
     contentPack: ContentPack;
@@ -84,8 +82,12 @@ const CreateContentPackPage = () => {
 
   const _getEntities = (selectedEntities) => {
     const { contentPack } = contentPackState;
+    const payload = Object.keys(selectedEntities)
+      .reduce((acc, entityType) => acc.concat(selectedEntities[entityType]), [])
+      .filter((e) => e instanceof EntityIndex)
+      .map((entity) => entity.toJSON());
 
-    CatalogActions.getSelectedEntities(selectedEntities).then((result: any) => {
+    SystemCatalog.resolveEntities({ entities: payload as any }).then((result: any) => {
       const newContentPack = contentPack
         .toBuilder()
         /* Mark entities from server */
