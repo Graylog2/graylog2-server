@@ -32,6 +32,7 @@ import { StaticColor } from 'views/logic/views/formatting/highlighting/Highlight
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import type { AlertType } from 'components/event-definitions/types';
 import ReplaySearchContext from 'components/event-definitions/replay-search/ReplaySearchContext';
+import RightSidebarProvider from 'contexts/RightSidebarProvider';
 
 import useAlertAndEventDefinitionData from './hooks/useAlertAndEventDefinitionData';
 
@@ -84,14 +85,16 @@ jest.mock('views/logic/slices/highlightSelectors', () => ({
 describe('<EventDefinitionInfoTable />', () => {
   const EventInfoComponent = ({ type }: { type: AlertType }) => (
     <TestStoreProvider>
-      <ReplaySearchContext.Provider
-        value={{
-          type,
-          definitionId: '',
-          alertId: '',
-        }}>
-        <EventDefinitionInfoTable />
-      </ReplaySearchContext.Provider>
+      <RightSidebarProvider>
+        <ReplaySearchContext.Provider
+          value={{
+            type,
+            definitionId: '',
+            alertId: '',
+          }}>
+          <EventDefinitionInfoTable />
+        </ReplaySearchContext.Provider>
+      </RightSidebarProvider>
     </TestStoreProvider>
   );
 
@@ -134,10 +137,9 @@ describe('<EventDefinitionInfoTable />', () => {
   it('Shows event definition link for event', async () => {
     render(<EventInfoComponent type="event" />);
 
-    const eventDefinition = await screen.findByRole('link', { name: /event definition/i });
+    const eventDefinition = await screen.findByRole('button', { name: /event definition/i });
 
     expect(eventDefinition).toHaveTextContent('Event Definition Title');
-    expect(eventDefinition).toHaveAttribute('href', '/alerts/definitions/event-definition-id-1');
   });
 
   it("Didn't Shows Event definition updated at for event definition which was updated before event", async () => {

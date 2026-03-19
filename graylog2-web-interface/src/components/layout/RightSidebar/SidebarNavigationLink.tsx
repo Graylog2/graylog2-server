@@ -31,7 +31,6 @@ const StyledButton = styled.button(
     border: none;
     padding: 0;
     color: ${theme.colors.variant.primary};
-    text-decoration: underline;
     cursor: pointer;
     font-size: inherit;
     font-family: inherit;

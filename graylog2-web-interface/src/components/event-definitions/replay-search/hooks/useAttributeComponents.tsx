@@ -22,10 +22,11 @@ import upperFirst from 'lodash/upperFirst';
 import { TIME_UNITS } from 'components/event-definitions/event-definition-types/FilterForm';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
-import { Timestamp, HoverForHelp, Link } from 'components/common';
-import Routes from 'routing/Routes';
+import { Timestamp, HoverForHelp } from 'components/common';
 import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
 import useFeature from 'hooks/useFeature';
+import SidebarNavigationLink from 'components/layout/RightSidebar/SidebarNavigationLink';
+import SidebarEventDefinitionDetails from 'components/event-definitions/SidebarEventDefinitionDetails';
 
 import useAlertAndEventDefinitionData from './useAlertAndEventDefinitionData';
 
@@ -76,7 +77,11 @@ const useAttributeComponents = () => {
       },
       {
         title: 'Event definition',
-        content: <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>{eventDefinition.title}</Link>,
+        content: (
+          <SidebarNavigationLink content={SidebarEventDefinitionDetails(eventDefinition.id)}>
+            {eventDefinition.title}
+          </SidebarNavigationLink>
+        ),
         show: !isEventDefinition,
       },
       {
