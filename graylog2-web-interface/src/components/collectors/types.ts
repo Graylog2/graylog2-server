@@ -110,10 +110,17 @@ export type IngestEndpointConfig = {
   input_id: string | null;
 };
 
+export type TokenSigningKey = {
+  public_key: string;
+  private_key: unknown;
+  fingerprint: string;
+  created_at: string;
+};
+
 export type CollectorsConfig = {
   ca_cert_id: string | null;
   signing_cert_id: string | null;
-  token_signing_key: { is_set: boolean } | null;
+  token_signing_key: TokenSigningKey | null;
   otlp_server_cert_id: string | null;
   http: IngestEndpointConfig;
   collector_offline_threshold: string;
