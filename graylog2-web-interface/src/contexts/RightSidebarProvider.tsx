@@ -182,12 +182,9 @@ const RightSidebarProvider = ({ children }: Props) => {
   const canGoBack = state.currentIndex > 0;
   const canGoForward = state.currentIndex < state.contentHistory.length - 1;
 
-  const openSidebar = useCallback(
-    <T = Record<string, unknown>,>(newContent: RightSidebarContent<T>) => {
-      dispatch({ type: 'OPEN_SIDEBAR', content: newContent as RightSidebarContent<any> });
-    },
-    [],
-  );
+  const openSidebar = useCallback(<T = Record<string, unknown>,>(newContent: RightSidebarContent<T>) => {
+    dispatch({ type: 'OPEN_SIDEBAR', content: newContent as RightSidebarContent<any> });
+  }, []);
 
   const closeSidebar = useCallback(() => {
     dispatch({ type: 'CLOSE_SIDEBAR' });
@@ -234,7 +231,22 @@ const RightSidebarProvider = ({ children }: Props) => {
       canGoBack,
       canGoForward,
     }),
-    [state.isOpen, state.isCollapsed, content, state.width, openSidebar, closeSidebar, collapseSidebar, expandSidebar, updateContent, setWidth, goBack, goForward, canGoBack, canGoForward],
+    [
+      state.isOpen,
+      state.isCollapsed,
+      content,
+      state.width,
+      openSidebar,
+      closeSidebar,
+      collapseSidebar,
+      expandSidebar,
+      updateContent,
+      setWidth,
+      goBack,
+      goForward,
+      canGoBack,
+      canGoForward,
+    ],
   );
 
   return <RightSidebarContext.Provider value={contextValue}>{children}</RightSidebarContext.Provider>;

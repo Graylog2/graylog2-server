@@ -26,7 +26,22 @@ const TestComponent = () => <div>Test Content</div>;
 const TestComponent2 = () => <div>Test Content 2</div>;
 
 const TestConsumer = () => {
-  const { isOpen, isCollapsed, content, width, openSidebar, closeSidebar, collapseSidebar, expandSidebar, setWidth, updateContent, goBack, goForward, canGoBack, canGoForward } = useRightSidebar();
+  const {
+    isOpen,
+    isCollapsed,
+    content,
+    width,
+    openSidebar,
+    closeSidebar,
+    collapseSidebar,
+    expandSidebar,
+    setWidth,
+    updateContent,
+    goBack,
+    goForward,
+    canGoBack,
+    canGoForward,
+  } = useRightSidebar();
 
   return (
     <div>

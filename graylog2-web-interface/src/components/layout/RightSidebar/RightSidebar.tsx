@@ -181,7 +181,18 @@ const StyledRow = styled(Row)`
 `;
 
 const RightSidebar = () => {
-  const { content, width, isCollapsed, closeSidebar, collapseSidebar, expandSidebar, goBack, goForward, canGoBack, canGoForward } = useRightSidebar();
+  const {
+    content,
+    width,
+    isCollapsed,
+    closeSidebar,
+    collapseSidebar,
+    expandSidebar,
+    goBack,
+    goForward,
+    canGoBack,
+    canGoForward,
+  } = useRightSidebar();
   const sidebarComponents = usePluginEntities('sidebar.components');
 
   if (!content) {
@@ -190,9 +201,7 @@ const RightSidebar = () => {
 
   if (isCollapsed) {
     return (
-      <CollapsedContainer
-        role="complementary"
-        aria-label={`${content.title} sidebar (collapsed)`}>
+      <CollapsedContainer role="complementary" aria-label={`${content.title} sidebar (collapsed)`}>
         <IconButton name="close" title="Close sidebar" onClick={closeSidebar} aria-label="Close sidebar" />
         <CollapsedTitleArea onClick={expandSidebar} title="Expand sidebar">
           <CollapsedTitle>{content.title}</CollapsedTitle>
@@ -201,8 +210,8 @@ const RightSidebar = () => {
     );
   }
 
-  const ContentComponent = content.component
-    ?? sidebarComponents.find((c) => c.key === content.componentKey)?.component;
+  const ContentComponent =
+    content.component ?? sidebarComponents.find((c) => c.key === content.componentKey)?.component;
 
   if (!ContentComponent) {
     return null;
@@ -230,7 +239,11 @@ const RightSidebar = () => {
           </NavigationButtons>
           <Title id="sidebar-title">{content.title}</Title>
           <HeaderActions>
-            <CollapseButton type="button" title="Collapse sidebar" onClick={collapseSidebar} aria-label="Collapse sidebar">
+            <CollapseButton
+              type="button"
+              title="Collapse sidebar"
+              onClick={collapseSidebar}
+              aria-label="Collapse sidebar">
               <Icon name="collapse_content" />
             </CollapseButton>
             <IconButton name="close" title="Close sidebar" onClick={closeSidebar} aria-label="Close sidebar" />
