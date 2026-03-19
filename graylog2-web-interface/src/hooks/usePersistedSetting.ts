@@ -18,7 +18,7 @@ import { useCallback, useContext, useMemo } from 'react';
 
 import type { UserPreferences } from 'contexts/UserPreferencesContext';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
-import { PreferencesStore } from 'stores/users/PreferencesStore';
+import { saveUserPreferences } from 'api/preferences';
 import Store from 'logic/local-storage/Store';
 import useCurrentUser from 'hooks/useCurrentUser';
 
@@ -44,7 +44,7 @@ const usePersistedSetting = <T extends keyof UserPreferences>(
 
       const nextPreferences = { ...userPreferences, [settingKey]: newSetting };
 
-      return PreferencesStore.saveUserPreferences(username, nextPreferences);
+      return saveUserPreferences(username, nextPreferences);
     },
     [settingKey, userIsReadOnly, userPreferences, username],
   );
