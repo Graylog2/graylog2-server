@@ -45,6 +45,7 @@ import org.graylog.integrations.ipfix.codecs.IpfixCodec;
 import org.graylog.integrations.ipfix.inputs.IpfixUdpInput;
 import org.graylog.integrations.ipfix.transports.IpfixUdpTransport;
 import org.graylog.integrations.migrations.V20220622071600_MigratePagerDutyV1;
+import org.graylog.integrations.migrations.V20260313163300_MigrateTeamsNotificationV2;
 import org.graylog.integrations.notifications.types.SlackEventNotification;
 import org.graylog.integrations.notifications.types.SlackEventNotificationConfig;
 import org.graylog.integrations.notifications.types.SlackEventNotificationConfigEntity;
@@ -140,6 +141,9 @@ public class IntegrationsModule extends PluginModule {
                     TeamsEventNotificationV2.Factory.class,
                     TeamsEventNotificationConfigV2Entity.TYPE_NAME,
                     TeamsEventNotificationConfigV2Entity.class);
+
+            // Teams Notification V2 timestamp fix
+            addMigration(V20260313163300_MigrateTeamsNotificationV2.class);
 
             // Pager Duty Notification
             addNotificationType(PagerDutyNotificationConfig.TYPE_NAME,
