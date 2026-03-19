@@ -14,23 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import { useQuery } from '@tanstack/react-query';
 
-import { ClusterJobs } from '@graylog/server-api';
-
+import ApiRoutes from 'routing/ApiRoutes';
+import fetch from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
 import { defaultOnError } from 'util/conditional/onError';
 
-export const SYSTEM_JOBS_QUERY_KEY = ['system', 'jobs'];
+import type { CodecTypes } from './Types';
 
-const useSystemJobs = () => {
-  const { data: jobs } = useQuery({
-    queryKey: SYSTEM_JOBS_QUERY_KEY,
+const useCodecTypes = () => {
+  const { data, isInitialLoading } = useQuery<CodecTypes>({
+    queryKey: ['system', 'codecs', 'types'],
     queryFn: () =>
-      defaultOnError(ClusterJobs.list(), 'Loading system jobs failed with status', 'Could not load system jobs'),
-    refetchInterval: 2000,
+      defaultOnError(
+        fetch('GET', qualifyUrl(ApiRoutes.CodecTypesController.list().url)),
+        'Fetching codec types failed with status',
+        'Could not retrieve codec types',
+      ),
   });
 
-  return jobs;
+  return { data, isInitialLoading };
 };
 
-export default useSystemJobs;
+export default useCodecTypes;

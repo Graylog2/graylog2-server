@@ -30,8 +30,11 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
   },
 }));
 
-jest.mock('stores/decorators/DecoratorsStore', () => ({
-  DecoratorsStore: MockStore(),
+jest.mock('@graylog/server-api', () => ({
+  SearchDecorators: {
+    get: jest.fn(() => Promise.resolve([])),
+    getAvailable: jest.fn(() => Promise.resolve({})),
+  },
 }));
 
 describe('Views bindings value actions', () => {
