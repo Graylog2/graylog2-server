@@ -20,6 +20,8 @@ import { useState } from 'react';
 import { Button, Input, SegmentedControl } from 'components/bootstrap';
 import Modal from 'components/bootstrap/Modal';
 
+import { SOURCE_TYPE_LABELS } from './Constants';
+
 import type {
   Source,
   SourceType,
@@ -36,8 +38,6 @@ type Props = {
   onSave: (source: Omit<Source, 'id'>) => void;
   isLoading?: boolean;
 };
-
-import { SOURCE_TYPE_LABELS } from './Constants';
 
 const defaultConfigs: Record<SourceType, FileSourceConfig | JournaldSourceConfig | WindowsEventLogSourceConfig> = {
   file: { paths: [''], read_mode: 'end' },

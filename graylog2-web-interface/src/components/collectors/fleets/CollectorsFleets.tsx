@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
 
+import useLocation from 'routing/useLocation';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import type { SearchParams } from 'stores/PaginationTypes';
 import Routes from 'routing/Routes';
