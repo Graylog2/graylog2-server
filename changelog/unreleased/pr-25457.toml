@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix an incorrect ISO 8601 duration example in the token invalidation help text."
+
+issues = [""]
+pulls = ["25457"]
