@@ -21,17 +21,10 @@ import useRightSidebar from 'hooks/useRightSidebar';
 import usePluginEntities from 'hooks/usePluginEntities';
 import Icon from 'components/common/Icon';
 import IconButton from 'components/common/IconButton';
-import Row from 'components/bootstrap/Row';
+
+import { ANIMATION_DURATION, SidebarContainer, SidebarRow, SidebarContentArea, SidebarHeader, SidebarTitle } from './SidebarStyles';
 
 const COLLAPSED_WIDTH = 36;
-const ANIMATION_DURATION = '0.3s';
-
-const slide = keyframes`
-  from {
-    width: 0;
-    min-width: 0;
-  }
-`;
 
 const fade = keyframes`
   from {
@@ -39,24 +32,10 @@ const fade = keyframes`
   }
 `;
 
-const Container = styled.div<{ $width: number }>(
-  ({ $width }) => css`
-    width: ${$width}px;
-    min-width: ${$width}px;
-    flex-shrink: 0;
-    align-self: stretch;
-    position: sticky;
-    top: 0;
-    display: flex;
-    flex-direction: column;
-    padding: 5px;
-    animation: ${slide} ${ANIMATION_DURATION} ease-in-out;
-
-    @media (prefers-reduced-motion: reduce) {
-      animation: none;
-    }
-  `,
-);
+const Container = styled(SidebarContainer)`
+  position: sticky;
+  top: 0;
+`;
 
 const CollapsedContainer = styled.div(
   ({ theme }) => css`
@@ -110,14 +89,6 @@ const CollapsedTitle = styled.span(
   `,
 );
 
-const Header = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-left: 15px;
-  padding-right: 15px;
-`;
-
 const NavigationButtons = styled.div`
   display: flex;
   gap: 4px;
@@ -145,40 +116,6 @@ const CollapseButton = styled.button(
     }
   `,
 );
-
-const Title = styled.h4(
-  ({ theme }) => css`
-    margin: 0;
-    font-size: ${theme.fonts.size.h1};
-    font-weight: normal;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    flex: 1;
-  `,
-);
-
-const ContentArea = styled.div`
-  flex: 1;
-  overflow: hidden auto;
-  padding: 15px;
-  min-height: 0;
-
-  animation: ${fade} ${ANIMATION_DURATION} cubic-bezier(1, 0, 1, 0.3);
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-`;
-
-const StyledRow = styled(Row)`
-  margin-left: 0;
-  margin-right: 0;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-`;
 
 const RightSidebar = () => {
   const {
@@ -219,8 +156,8 @@ const RightSidebar = () => {
 
   return (
     <Container $width={width} role="complementary" aria-label={`${content.title} sidebar`}>
-      <StyledRow className="content">
-        <Header>
+      <SidebarRow className="content">
+        <SidebarHeader>
           <NavigationButtons>
             <IconButton
               name="arrow_back"
@@ -237,7 +174,7 @@ const RightSidebar = () => {
               aria-label="Go forward to next content"
             />
           </NavigationButtons>
-          <Title id="sidebar-title">{content.title}</Title>
+          <SidebarTitle id="sidebar-title">{content.title}</SidebarTitle>
           <HeaderActions>
             <CollapseButton
               type="button"
@@ -248,11 +185,11 @@ const RightSidebar = () => {
             </CollapseButton>
             <IconButton name="close" title="Close sidebar" onClick={closeSidebar} aria-label="Close sidebar" />
           </HeaderActions>
-        </Header>
-        <ContentArea aria-labelledby="sidebar-title">
+        </SidebarHeader>
+        <SidebarContentArea aria-labelledby="sidebar-title">
           <ContentComponent {...(content.props || {})} />
-        </ContentArea>
-      </StyledRow>
+        </SidebarContentArea>
+      </SidebarRow>
     </Container>
   );
 };
