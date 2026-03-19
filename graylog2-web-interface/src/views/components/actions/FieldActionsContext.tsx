@@ -32,8 +32,9 @@ export type EvaluateActionCondition<T extends object = object> = (
 ) => boolean;
 
 export type FieldActionsContextValue<TAdditional extends object = object> = {
+  // function to evaluate isHidden and isEnabled action attribute
   evaluateCondition: EvaluateActionCondition<TAdditional>;
-  executeThunkAction: ExecuteThunkAction;
+  executeThunkAction?: ExecuteThunkAction;
   additionalHandlerArgs: TAdditional;
   valueActions?: Array<ActionDefinition<TAdditional>>;
   fieldActions?: Array<ActionDefinition<TAdditional>>;

@@ -101,7 +101,7 @@ export function isExternalLinkAction<T extends object>(action: ActionDefinition<
 }
 
 export function createHandlerFor<T extends object = object>(
-  executeThunkAction: ExecuteThunkAction,
+  executeThunkAction: ExecuteThunkAction | undefined,
   action: ActionDefinitionBase<T> & HandlerAction<T>,
   setActionComponents: SetActionComponents,
 ): ActionHandler<T> {
@@ -110,6 +110,10 @@ export function createHandlerFor<T extends object = object>(
   }
 
   if ('thunk' in action) {
+    if (!executeThunkAction) {
+      throw new Error(`Invalid binding for action: ${action.title} - thunk actions require 'executeThunkAction'.`);
+    }
+
     return async (args: ResolvedActionHandlerArguments<T>) => executeThunkAction(action.thunk, args);
   }
 

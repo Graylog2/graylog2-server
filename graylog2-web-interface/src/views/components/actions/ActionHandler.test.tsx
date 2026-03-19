@@ -83,6 +83,19 @@ describe('ActionHandler', () => {
     expect(localExecuteThunkAction).toHaveBeenCalledWith(thunk, args);
   });
 
+  it('throws for thunk-based definitions when no executeThunkAction is provided', () => {
+    const actionDefinition: ActionDefinition = {
+      type: 'dummy-action',
+      title: 'A Dummy Action',
+      thunk: jest.fn(() => () => Promise.resolve('done')),
+      resetFocus: false,
+    };
+
+    expect(() => createHandlerFor(undefined, actionDefinition, jest.fn())).toThrow(
+      "Invalid binding for action: A Dummy Action - thunk actions require 'executeThunkAction'.",
+    );
+  });
+
   it('supplied onClose removes component from state', () => {
     const setState = jest.fn();
     const setActionComponents = jest.fn((fn) => setState(fn({})));
