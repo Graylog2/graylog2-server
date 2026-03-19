@@ -21,7 +21,7 @@ import { LinkContainer, DropdownSubmenu, IfPermitted } from 'components/common';
 import { Button, DropdownButton, MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import { SystemLoadBalancerStore } from 'stores/load-balancer/SystemLoadBalancerStore';
+import { overrideLoadBalancerStatus } from 'api/system-load-balancer';
 import { SystemProcessingStore } from 'stores/system-processing/SystemProcessingStore';
 
 type NodesActionsProps = {
@@ -56,7 +56,7 @@ class NodesActions extends React.Component<
     // eslint-disable-next-line no-alert
     if (window.confirm(`You are about to change the load balancer status for this node to ${status}. Are you sure?`)) {
       const { node } = this.props;
-      SystemLoadBalancerStore.override(node.node_id, status);
+      overrideLoadBalancerStatus(node.node_id, status);
     }
   };
 

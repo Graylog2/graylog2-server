@@ -21,7 +21,6 @@ import UserNotification from 'util/UserNotification';
 import fetch, { fetchPeriodically, fetchStreamingPlainText } from 'logic/rest/FetchProvider';
 import { singletonStore } from 'logic/singleton';
 import { NodesStore } from 'stores/nodes/NodesStore';
-import { SystemLoadBalancerStore } from 'stores/load-balancer/SystemLoadBalancerStore';
 import { SystemProcessingStore } from 'stores/system-processing/SystemProcessingStore';
 import type { SystemOverview } from 'stores/cluster/types';
 
@@ -33,7 +32,6 @@ export const ClusterOverviewStore = singletonStore('core.ClusterOverview', () =>
     init() {
       this.cluster();
       this.listenTo(SystemProcessingStore, this.cluster);
-      this.listenTo(SystemLoadBalancerStore, this.cluster);
       this.listenTo(NodesStore, this.cluster);
     },
 
