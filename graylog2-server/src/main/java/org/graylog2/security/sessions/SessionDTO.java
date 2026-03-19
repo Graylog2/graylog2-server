@@ -17,6 +17,7 @@
 package org.graylog2.security.sessions;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -30,6 +31,12 @@ import java.util.Optional;
 @AutoValue
 @JsonDeserialize(builder = SessionDTO.Builder.class)
 public abstract class SessionDTO implements BuildableMongoEntity<SessionDTO, SessionDTO.Builder> {
+
+    @Override
+    @Nullable
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public abstract String id();
+
     public static final String FIELD_SESSION_ID = "session_id";
     public static final String FIELD_TIMEOUT = "timeout";
     public static final String FIELD_START_TIMESTAMP = "start_timestamp";
@@ -124,8 +131,8 @@ public abstract class SessionDTO implements BuildableMongoEntity<SessionDTO, Ses
         }
     }
 
-    public static SessionDTO fromSimpleSession(SimpleSession simpleSession) {
-        return SessionConverter.simpleSessionToSessionDTO(simpleSession);
+    public static Builder builderFromSimpleSession(SimpleSession simpleSession) {
+        return SessionConverter.simpleSessionToSessionDTOBuilder(simpleSession);
     }
 
     public SimpleSession toSimpleSession() {
