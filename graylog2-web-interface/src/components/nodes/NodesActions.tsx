@@ -22,7 +22,7 @@ import { Button, DropdownButton, MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { overrideLoadBalancerStatus } from 'api/system-load-balancer';
-import { SystemProcessingStore } from 'stores/system-processing/SystemProcessingStore';
+import { pauseProcessing, resumeProcessing } from 'api/system-processing';
 
 type NodesActionsProps = {
   node: any;
@@ -45,9 +45,9 @@ class NodesActions extends React.Component<
       )
     ) {
       if (systemOverview.is_processing) {
-        SystemProcessingStore.pause(node.node_id);
+        pauseProcessing(node.node_id);
       } else {
-        SystemProcessingStore.resume(node.node_id);
+        resumeProcessing(node.node_id);
       }
     }
   };
