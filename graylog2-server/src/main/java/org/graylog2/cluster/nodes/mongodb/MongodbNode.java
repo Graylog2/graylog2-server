@@ -21,18 +21,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.utilities.lucene.InMemorySearchableEntity;
 import org.graylog2.utilities.lucene.LuceneDocBuilder;
 
+import java.util.Optional;
+
 public record MongodbNode(
         @JsonProperty(FIELD_ID) String id,
         @JsonProperty(FIELD_NAME) String name,
         @JsonProperty(FIELD_ROLE) String role,
         @JsonProperty(FIELD_VERSION) String version,
         @JsonProperty(FIELD_PROFILING_LEVEL) ProfilingLevel profilingLevel,
-        @JsonProperty(FIELD_REPLICATION_LAG) long replicationLag,
+        @JsonProperty(FIELD_REPLICATION_LAG) Long replicationLag,
         @JsonProperty(FIELD_SLOW_QUERY_COUNT) Long slowQueryCount,
-        @JsonProperty(FIELD_STORAGE_USED_PERCENT) double storageUsedPercent,
+        @JsonProperty(FIELD_STORAGE_USED_PERCENT) Double storageUsedPercent,
         @JsonProperty(FIELD_AVAILABLE_CONNECTIONS) Integer availableConnections,
         @JsonProperty(FIELD_CURRENT_CONNECTIONS) Integer currentConnections,
-        @JsonProperty(FIELD_CONNECTIONS_USED_PERCENT) double connectionsUsedPercent
+        @JsonProperty(FIELD_CONNECTIONS_USED_PERCENT) Double connectionsUsedPercent
 ) implements InMemorySearchableEntity {
 
     public static final String FIELD_ID = "id";
@@ -47,13 +49,17 @@ public record MongodbNode(
     public static final String FIELD_CONNECTIONS_USED_PERCENT = "connections_used_percent";
     public static final String FIELD_VERSION = "version";
 
+    public MongodbNode(String name, String role) {
+        this("0", name, role, "", null, 0L, 0L, 0.0, 0, 0, 0.0);
+    }
+
     @JsonIgnore
     @Override
     public void buildLuceneDoc(LuceneDocBuilder builder) {
         builder.stringVal(FIELD_ID, id);
         builder.stringVal(FIELD_NAME, name);
         builder.stringVal(FIELD_ROLE, role);
-        builder.stringVal(FIELD_PROFILING_LEVEL, profilingLevel.name());
+        builder.stringVal(FIELD_PROFILING_LEVEL, Optional.ofNullable(profilingLevel).map(Enum::name).orElse(null));
         builder.stringVal(FIELD_VERSION, version);
         builder.longVal(FIELD_REPLICATION_LAG, replicationLag);
         builder.longVal(FIELD_SLOW_QUERY_COUNT, slowQueryCount);

@@ -17,19 +17,28 @@
 package org.graylog2.cluster.nodes.mongodb;
 
 
+import com.mongodb.MongoClient;
+import com.mongodb.connection.ClusterDescription;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
+import org.graylog2.database.MongoConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Set;
 
 public class MongodbNodesProvider implements Provider<List<MongodbNode>> {
 
+    private static final Logger LOG = LoggerFactory.getLogger(MongodbNodeUtils.class);
+
     private final MongodbNodesService activeService;
+    private final MongoClient mongoClient;
 
     @Inject
-    public MongodbNodesProvider(Set<MongodbNodesService> services) {
-
+    public MongodbNodesProvider(MongoConnection mongoConnection, Set<MongodbNodesService> services) {
+        this.mongoClient = mongoConnection.connect();
         activeService = services.stream()
                 .filter(MongodbNodesService::available)
                 .findFirst()
@@ -38,6 +47,23 @@ public class MongodbNodesProvider implements Provider<List<MongodbNode>> {
 
     @Override
     public List<MongodbNode> get() {
-        return activeService.allNodes();
+        try {
+            return activeService.allNodes();
+        } catch (Exception e) {
+            LOG.warn("Could not get MongodbNodes, returning fallback. Reason: {}", e.getMessage());
+            return getFallbackResponse();
+        }
+    }
+
+    /**
+     * This isn't touching any commands and isn't triggering any requests. It just returns what the current
+     * mongodb client sees in the cluster description - usually at least one server address and its type.
+     */
+    @Nonnull
+    private List<MongodbNode> getFallbackResponse() {
+        final ClusterDescription clusterDescription = mongoClient.getClusterDescription();
+        return clusterDescription.getServerDescriptions().stream()
+                .map(serverDescription -> new MongodbNode(serverDescription.getAddress().toString(), serverDescription.getType().toString()))
+                .toList();
     }
 }
