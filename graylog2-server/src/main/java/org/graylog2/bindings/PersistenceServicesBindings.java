@@ -18,15 +18,23 @@ package org.graylog2.bindings;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.cluster.nodes.DataNodeClusterService;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodePaginatedService;
-import org.graylog2.cluster.nodes.ServerNodePaginatedService;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.nodes.ServerNodeClusterService;
 import org.graylog2.cluster.nodes.ServerNodeDto;
+import org.graylog2.cluster.nodes.ServerNodePaginatedService;
+import org.graylog2.cluster.nodes.mongodb.DefaultMongodbConnectionResolver;
+import org.graylog2.cluster.nodes.mongodb.MongodbConnectionResolver;
+import org.graylog2.cluster.nodes.mongodb.MongodbNode;
+import org.graylog2.cluster.nodes.mongodb.MongodbNodesProvider;
+import org.graylog2.cluster.nodes.mongodb.MongodbNodesService;
+import org.graylog2.cluster.nodes.mongodb.ReplicaSetMongodbNodes;
+import org.graylog2.cluster.nodes.mongodb.StandaloneNodeMongodbNodes;
 import org.graylog2.database.suggestions.EntitySuggestionService;
 import org.graylog2.database.suggestions.MongoEntitySuggestionService;
 import org.graylog2.indexer.IndexFailureService;
@@ -59,6 +67,8 @@ import org.graylog2.tokenusage.TokenUsageServiceImpl;
 import org.graylog2.users.UserManagementServiceImpl;
 import org.graylog2.users.UserServiceImpl;
 
+import java.util.List;
+
 public class PersistenceServicesBindings extends AbstractModule {
     @Override
     protected void configure() {
@@ -70,6 +80,13 @@ public class PersistenceServicesBindings extends AbstractModule {
         bind(new TypeLiteral<NodeService<ServerNodeDto>>() {}).to(ServerNodeClusterService.class);
         bind(new TypeLiteral<NodeService<DataNodeDto>>() {}).to(DataNodeClusterService.class);
         bind(DataNodePaginatedService.class).asEagerSingleton();
+
+        bind(MongodbConnectionResolver.class).to(DefaultMongodbConnectionResolver.class);
+        Multibinder<MongodbNodesService> mongodbNodesServices = Multibinder.newSetBinder(binder(), MongodbNodesService.class);
+        mongodbNodesServices.addBinding().to(ReplicaSetMongodbNodes.class);
+        mongodbNodesServices.addBinding().to(StandaloneNodeMongodbNodes.class);
+        bind(new TypeLiteral<List<MongodbNode>>() {}).toProvider(MongodbNodesProvider.class).asEagerSingleton();
+
         bind(ServerNodePaginatedService.class).asEagerSingleton();
         bind(IndexRangeService.class).to(MongoIndexRangeService.class).asEagerSingleton();
         bind(InputService.class).to(InputServiceImpl.class);
