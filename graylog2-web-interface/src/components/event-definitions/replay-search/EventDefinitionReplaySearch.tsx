@@ -23,11 +23,11 @@ import type { ReplaySearchContextType } from 'components/event-definitions/repla
 import ReplaySearchContext from 'components/event-definitions/replay-search/ReplaySearchContext';
 import useCreateSearch from 'views/hooks/useCreateSearch';
 import useRightSidebar from 'hooks/useRightSidebar';
-import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
 import useFeature from 'hooks/useFeature';
 import sidebarSections, { type SidebarSection } from 'views/components/sidebar/sidebarSections';
 import EventDefinitionSideBar from 'components/event-definitions/replay-search/EventDefinitionSideBar';
 import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
+import SidebarEventDefinitionDetails from 'components/event-definitions/SidebarEventDefinitionDetails';
 
 type Props = {
   eventDefinitionMappedData: EventDefinitionMappedData;
@@ -72,12 +72,7 @@ const EventDefinitionReplaySearch = ({ eventDefinitionMappedData }: Props) => {
 
   useEffect(() => {
     if (isRightSidebarEnabled) {
-      openSidebar({
-        id: 'replay-search-sidebar',
-        title: 'Replay Details',
-        component: ReplaySearchSidebar,
-        props: { alertId: undefined, definitionId: eventDefinition.id },
-      });
+      openSidebar(SidebarEventDefinitionDetails(eventDefinition.id));
     }
   }, [isRightSidebarEnabled, openSidebar, eventDefinition.id]);
 
