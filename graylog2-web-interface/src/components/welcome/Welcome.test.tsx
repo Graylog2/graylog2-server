@@ -105,7 +105,11 @@ describe('Welcome', () => {
 
   describe('Page header', () => {
     it('Shows link to edit profile in case user is not readOnly and has no defined starting page', async () => {
-      render(<RightSidebarProvider><Welcome /></RightSidebarProvider>);
+      render(
+        <RightSidebarProvider>
+          <Welcome />
+        </RightSidebarProvider>,
+      );
 
       await screen.findByText(
         'This is your personal start page, allowing easy access to the content most relevant for you.',
@@ -117,20 +121,32 @@ describe('Welcome', () => {
 
     it('Shows appropriate message without link for readOnly users', async () => {
       asMock(useCurrentUser).mockReturnValue(sam);
-      render(<RightSidebarProvider><Welcome /></RightSidebarProvider>);
+      render(
+        <RightSidebarProvider>
+          <Welcome />
+        </RightSidebarProvider>,
+      );
       await screen.findByText('This is your personal page, allowing easy access to the content most relevant for you.');
     });
 
     it('Shows appropriate message without link for users with defined starting page', async () => {
       asMock(useCurrentUser).mockReturnValue(carol);
-      render(<RightSidebarProvider><Welcome /></RightSidebarProvider>);
+      render(
+        <RightSidebarProvider>
+          <Welcome />
+        </RightSidebarProvider>,
+      );
       await screen.findByText('This is your personal page, allowing easy access to the content most relevant for you.');
     });
   });
 
   describe('Last opened list', () => {
     it('Show items', async () => {
-      render(<RightSidebarProvider><Welcome /></RightSidebarProvider>);
+      render(
+        <RightSidebarProvider>
+          <Welcome />
+        </RightSidebarProvider>,
+      );
 
       await screen.findByRole('link', {
         name: /Title 1/i,
@@ -147,14 +163,22 @@ describe('Welcome', () => {
         isFetching: false,
       }));
 
-      render(<RightSidebarProvider><Welcome /></RightSidebarProvider>);
+      render(
+        <RightSidebarProvider>
+          <Welcome />
+        </RightSidebarProvider>,
+      );
       await screen.findByText(/You have not opened any searches\/dashboards yet/i);
     });
   });
 
   describe('Favorite items list', () => {
     it('Show items', async () => {
-      render(<RightSidebarProvider><Welcome /></RightSidebarProvider>);
+      render(
+        <RightSidebarProvider>
+          <Welcome />
+        </RightSidebarProvider>,
+      );
 
       await screen.findByRole('link', {
         name: /Title 3/i,
@@ -177,14 +201,22 @@ describe('Welcome', () => {
         isFetching: false,
       }));
 
-      render(<RightSidebarProvider><Welcome /></RightSidebarProvider>);
+      render(
+        <RightSidebarProvider>
+          <Welcome />
+        </RightSidebarProvider>,
+      );
       await screen.findByText(/You do not have any favorite items yet./i);
     });
   });
 
   describe('Recent activity list', () => {
     it('Show items', async () => {
-      render(<RightSidebarProvider><Welcome /></RightSidebarProvider>);
+      render(
+        <RightSidebarProvider>
+          <Welcome />
+        </RightSidebarProvider>,
+      );
 
       await screen.findByRole('link', {
         name: /Title 5/i,
@@ -207,7 +239,11 @@ describe('Welcome', () => {
         isFetching: false,
       }));
 
-      render(<RightSidebarProvider><Welcome /></RightSidebarProvider>);
+      render(
+        <RightSidebarProvider>
+          <Welcome />
+        </RightSidebarProvider>,
+      );
       await screen.findByText(/There is no recent activity/i);
     });
   });
