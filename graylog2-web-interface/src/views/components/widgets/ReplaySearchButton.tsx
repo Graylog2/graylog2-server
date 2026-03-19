@@ -22,6 +22,7 @@ import URI from 'urijs';
 
 import IconButton from 'components/common/IconButton';
 import Icon from 'components/common/Icon';
+import { LinkContainer } from 'components/common';
 import SearchLink from 'views/logic/search/SearchLink';
 import Store from 'logic/local-storage/Store';
 import type { TimeRange } from 'views/logic/queries/Query';
@@ -96,15 +97,17 @@ export const ReplaySearchButtonComponent = ({
   const title = 'Replay search';
 
   return (
-    <Component href={searchLink} target="_blank" rel="noopener noreferrer" title={title} onClick={onClick}>
-      {children ? (
-        <>
-          {children} <StyledIcon name={iconName} />
-        </>
-      ) : (
-        <IconButton name={iconName} focusable={false} title={title} />
-      )}
-    </Component>
+    <LinkContainer to={searchLink}>
+      <Component title={title} onClick={onClick}>
+        {children ? (
+          <>
+            {children} <StyledIcon name={iconName} />
+          </>
+        ) : (
+          <IconButton name={iconName} focusable={false} title={title} />
+        )}
+      </Component>
+    </LinkContainer>
   );
 };
 
