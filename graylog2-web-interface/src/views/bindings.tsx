@@ -521,7 +521,9 @@ const exports: PluginExports = {
   ],
   'views.components.widgets.events.filterComponents': eventsFilterComponents,
   'views.components.widgets.events.attributes': eventsAttributes,
-  'sidebar.components': [{ key: 'replay-search-sidebar', component: ReplaySearchSidebar }],
+  'sidebar.components': [
+    { key: 'replay-search-sidebar', component: ReplaySearchSidebar },
+  ],
   'views.reducers': viewsReducers,
   'views.elements.validationErrorExplanation': [WarmTierQueryValidation],
   'views.widgets.actions': [ExportMessageWidgetAction, ExportWidgetAction],
