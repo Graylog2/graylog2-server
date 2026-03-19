@@ -22,7 +22,7 @@ import { MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { overrideLoadBalancerStatus } from 'api/system-load-balancer';
-import { SystemProcessingStore } from 'stores/system-processing/SystemProcessingStore';
+import { pauseProcessing, resumeProcessing } from 'api/system-processing';
 
 import { LOAD_BALANCER_STATUS } from './fetchClusterGraylogNodes';
 import type { ClusterGraylogNode as GraylogNode, LoadBalancerStatus } from './fetchClusterGraylogNodes';
@@ -41,9 +41,9 @@ const GraylogNodeActions = ({ node }: Props) => {
 
   const toggleMessageProcessing = () => {
     if (node.is_processing) {
-      SystemProcessingStore.pause(node.node_id);
+      pauseProcessing(node.node_id);
     } else {
-      SystemProcessingStore.resume(node.node_id);
+      resumeProcessing(node.node_id);
     }
     setShowMessageProcessingModal(false);
   };
