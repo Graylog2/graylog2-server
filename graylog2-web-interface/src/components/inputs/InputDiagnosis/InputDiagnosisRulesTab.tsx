@@ -64,7 +64,7 @@ const ListCol = styled(Col)(
 const InputDiagnosisRulesTab = ({ inputId }: Props) => (
   <StyledSectionGrid $rows="1fr 1fr">
     <Section title="Input appears in Pipeline Rules">
-      <p>Pipeline rules detailed below contain a from_input or from_forwarder_input function which explicitly targets this Input.</p>
+      <p>Pipeline rules detailed below explicitly reference this Input (e.g. via from_input, from_forwarder_input, or a match on gl2_source_input/gl2_forwarder_input).</p>
       <Row>
         <ListCol md={12}>
           <PaginatedEntityTable<InputPipelineRule>
