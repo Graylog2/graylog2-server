@@ -29,6 +29,7 @@ import RawMessageLoader from './RawMessageLoader';
 
 jest.mock('stores/system/SystemStore', () => ({ SystemStore: MockStore() }));
 jest.mock('stores/nodes/NodesStore', () => ({ NodesStore: MockStore() }));
+jest.mock('./useCodecTypes', () => jest.fn(() => ({})));
 
 jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
@@ -44,7 +45,7 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 
 describe('<RawMessageLoader.test>', () => {
   it('shows server input select when no forwarder plugin is installed', () => {
-    render(<RawMessageLoader inputs={inputs} onMessageLoaded={jest.fn()} codecTypes={{}} inputIdSelector />);
+    render(<RawMessageLoader inputs={inputs} onMessageLoaded={jest.fn()} inputIdSelector />);
 
     expect(screen.getByRole('textbox', { name: /raw message/i })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /source ip address \(optional\)/i })).toBeInTheDocument();
@@ -72,7 +73,7 @@ describe('<RawMessageLoader.test>', () => {
     it('allows user to select between server and forwarder input on premise', async () => {
       asMock(AppConfig.isCloud).mockImplementation(() => false);
 
-      render(<RawMessageLoader inputs={inputs} onMessageLoaded={jest.fn()} codecTypes={{}} inputIdSelector />);
+      render(<RawMessageLoader inputs={inputs} onMessageLoaded={jest.fn()} inputIdSelector />);
 
       const inputTypeSelect = screen.getByRole('combobox', { name: /select an input type \(optional\)/i });
 
@@ -94,7 +95,7 @@ describe('<RawMessageLoader.test>', () => {
     it('shows only forwarder input select on cloud', () => {
       asMock(AppConfig.isCloud).mockImplementation(() => true);
 
-      render(<RawMessageLoader inputs={inputs} onMessageLoaded={jest.fn()} codecTypes={{}} inputIdSelector />);
+      render(<RawMessageLoader inputs={inputs} onMessageLoaded={jest.fn()} inputIdSelector />);
 
       expect(screen.getByText(/forwarder inputs/i)).toBeInTheDocument();
     });
