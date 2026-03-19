@@ -67,15 +67,12 @@ type Props = {
   searchPageLayout?: Partial<LayoutState>;
 };
 
-const EventReplaySearch = ({
-  eventDefinitionMappedData,
-  eventData,
-  searchPageLayout = undefined,
-}: Props) => {
+const EventReplaySearch = ({ eventDefinitionMappedData, eventData, searchPageLayout = undefined }: Props) => {
   const { eventDefinition, aggregations } = eventDefinitionMappedData;
   const { openSidebar } = useRightSidebar();
   const isRightSidebarEnabled = useFeature('replay_search_right_sidebar');
-  const effectiveLayout = searchPageLayout ?? (isRightSidebarEnabled ? defaultSearchPageLayout : legacySearchPageLayout);
+  const effectiveLayout =
+    searchPageLayout ?? (isRightSidebarEnabled ? defaultSearchPageLayout : legacySearchPageLayout);
 
   const view = useCreateViewForEvent({
     eventData,
@@ -110,11 +107,7 @@ const EventReplaySearch = ({
   );
 };
 
-const WithLoadingBarrier = ({
-  eventDefinitionMappedData,
-  eventData,
-  searchPageLayout = undefined,
-}: Props) => (
+const WithLoadingBarrier = ({ eventDefinitionMappedData, eventData, searchPageLayout = undefined }: Props) => (
   <LoadingBarrier eventDefinition={eventDefinitionMappedData.eventDefinition}>
     <EventReplaySearch
       eventDefinitionMappedData={eventDefinitionMappedData}

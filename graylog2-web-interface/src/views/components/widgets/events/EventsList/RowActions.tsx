@@ -64,9 +64,7 @@ const RowActions = ({ eventId, hasReplayInfo, eventDefinitionId }: Props) => {
   const moreActions = [
     hasReplayInfo && isPermitted(user.permissions, `eventdefinitions:read:${eventDefinitionId}`) ? (
       <LinkContainer to={Routes.ALERTS.replay_search(eventId)} key="replay-search">
-        <MenuItem>
-          Replay search
-        </MenuItem>
+        <MenuItem>Replay search</MenuItem>
       </LinkContainer>
     ) : null,
     pluggableActions.length ? pluggableActions : null,
