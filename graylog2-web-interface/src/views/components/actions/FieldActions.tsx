@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { ActionContext } from 'views/logic/ActionContext';
 import Action from 'views/components/actions/Action';
-import useFieldActionsContext from 'views/components/actions/useFieldActionsContext';
+import useFieldActions from 'views/components/actions/useFieldActions';
 
 type Props = {
   children: React.ReactNode;
@@ -48,7 +48,7 @@ const FieldElement = styled.span.attrs({
 
 const FieldActions = ({ children, disabled, element, menuContainer, name, type }: Props) => {
   const actionContext = useContext(ActionContext);
-  const fieldActionsContext = useFieldActionsContext();
+  const fieldActionsContext = useFieldActions();
   const wrappedElement = ({ active }: { active: boolean }) => (
     <FieldElement $active={active} $disabled={disabled}>
       {element}

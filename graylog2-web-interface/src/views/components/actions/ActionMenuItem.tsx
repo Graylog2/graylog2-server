@@ -34,7 +34,7 @@ import { createHandlerFor, isExternalLinkAction } from 'views/components/actions
 import HoverForHelp from 'components/common/HoverForHelp';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import useFieldActionsContext from 'views/components/actions/useFieldActionsContext';
+import useFieldActions from 'views/components/actions/useFieldActions';
 
 const StyledMenuItem: typeof MenuItem = styled(MenuItem)`
   && > a {
@@ -136,7 +136,7 @@ const ActionHandlerItem = ({
   onMenuToggle,
 }: ActionHandlerItemProps) => {
   const { unsetWidgetFocusing } = useContext(WidgetFocusContext);
-  const { executeThunkAction } = useFieldActionsContext();
+  const { executeThunkAction } = useFieldActions();
   const sendTelemetry = useSendTelemetry();
 
   const setActionComponents: SetActionComponents = useCallback(
@@ -186,7 +186,7 @@ const ActionMenuItem = ({
   onMenuToggle,
 }: Props) => {
   const { isEnabled = () => true } = action;
-  const { evaluateCondition } = useFieldActionsContext();
+  const { evaluateCondition } = useFieldActions();
   const actionEnabled = evaluateCondition(isEnabled, handlerArgs, true);
   const actionDisabled = !actionEnabled;
   const { field } = handlerArgs;

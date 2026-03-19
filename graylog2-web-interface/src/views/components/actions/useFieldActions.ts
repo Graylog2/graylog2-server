@@ -18,6 +18,6 @@ import { useContext } from 'react';
 
 import FieldActionsContext, { type FieldActionsContextValue } from './FieldActionsContext';
 
-const useFieldActionsContext = (): FieldActionsContextValue | undefined => useContext(FieldActionsContext);
+const useFieldActions = (): FieldActionsContextValue | undefined => useContext(FieldActionsContext);
 
-export default useFieldActionsContext;
+export default useFieldActions;

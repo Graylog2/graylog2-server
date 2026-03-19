@@ -27,7 +27,7 @@ import Popover from 'components/common/Popover';
 import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
 import { humanSeparator } from 'views/Constants';
 import PopoverTitle from 'views/components/visualizations/OnClickPopover/PopoverTitle';
-import useFieldActionsContext from 'views/components/actions/useFieldActionsContext';
+import useFieldActions from 'views/components/actions/useFieldActions';
 
 type Props = {
   onActionRun: () => void;
@@ -38,7 +38,7 @@ type Props = {
 
 const ValueActionsDropdown = ({ value, field, onActionRun, setStep }: Props) => {
   const actionContext = useContext(ActionContext);
-  const fieldActionsContext = useFieldActionsContext();
+  const fieldActionsContext = useFieldActions();
   const { overflowingComponents, setOverflowingComponents } = useOverflowingComponents();
 
   const type = fieldTypeFor(field, actionContext.fieldTypes);

@@ -27,7 +27,7 @@ import type {
 import { Spinner } from 'components/common';
 import useExternalValueActions from 'views/hooks/useExternalValueActions';
 import { type EvaluateActionCondition } from 'views/components/actions/FieldActionsContext';
-import useFieldActionsContext from 'views/components/actions/useFieldActionsContext';
+import useFieldActions from 'views/components/actions/useFieldActions';
 
 const DropdownHeader = styled.span`
   padding-left: 10px;
@@ -55,7 +55,7 @@ const filterVisibleActions = (
   });
 
 const useInternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
-  const { evaluateCondition, valueActions, fieldActions } = useFieldActionsContext();
+  const { evaluateCondition, valueActions, fieldActions } = useFieldActions();
   const actions = type === 'value' ? valueActions : fieldActions;
 
   if (type === 'value') {
@@ -71,7 +71,7 @@ const useInternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs
 
 const useExternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs']) => {
   const { isLoading, isError, externalValueActions } = useExternalValueActions();
-  const { evaluateCondition } = useFieldActionsContext();
+  const { evaluateCondition } = useFieldActions();
 
   if (type !== 'value') {
     return { isLoading, isError, externalActions: [] };

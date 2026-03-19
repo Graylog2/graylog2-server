@@ -23,12 +23,12 @@ import type { ActionContexts } from 'views/types';
 import asMock from 'helpers/mocking/AsMock';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import useExternalValueActions from 'views/hooks/useExternalValueActions';
-import useFieldActionsContext from 'views/components/actions/useFieldActionsContext';
+import useFieldActions from 'views/components/actions/useFieldActions';
 
 import Action from './Action';
 
 jest.mock('views/hooks/useExternalValueActions');
-jest.mock('views/components/actions/useFieldActionsContext');
+jest.mock('views/components/actions/useFieldActions');
 
 describe('Action', () => {
   beforeEach(() => {
@@ -38,7 +38,7 @@ describe('Action', () => {
       isError: false,
     });
 
-    asMock(useFieldActionsContext).mockReturnValue(actionConfig);
+    asMock(useFieldActions).mockReturnValue(actionConfig);
   });
 
   afterEach(() => {
@@ -106,7 +106,7 @@ describe('Action', () => {
       },
     ];
 
-    asMock(useFieldActionsContext).mockReturnValue({ ...actionConfig, fieldActions });
+    asMock(useFieldActions).mockReturnValue({ ...actionConfig, fieldActions });
 
     render(<SimpleAction type="field" />);
 

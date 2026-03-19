@@ -20,7 +20,7 @@ import { useContext } from 'react';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import Action from 'views/components/actions/Action';
 import { ActionContext } from 'views/logic/ActionContext';
-import useFieldActionsContext from 'views/components/actions/useFieldActionsContext';
+import useFieldActions from 'views/components/actions/useFieldActions';
 
 type Props = {
   children: React.ReactNode;
@@ -40,7 +40,7 @@ const ValueActions = ({
   value,
 }: Props) => {
   const actionContext = useContext(ActionContext);
-  const fieldActionsContext = useFieldActionsContext();
+  const fieldActionsContext = useFieldActions();
   const handlerArgs = {
     field,
     type,
