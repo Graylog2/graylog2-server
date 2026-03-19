@@ -29,6 +29,4 @@ const EventDefinitionPriorityEnum = {
   },
 } as const;
 
-export const EXCLUDE_INFO_FILTER = '!0';
-
 export default EventDefinitionPriorityEnum;

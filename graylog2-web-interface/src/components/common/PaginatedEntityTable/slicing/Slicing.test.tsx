@@ -17,20 +17,30 @@
 import * as React from 'react';
 import { screen, render, waitFor, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import { defaultUser } from 'defaultMockValues';
 
+import { asMock } from 'helpers/mocking';
 import type { SearchParams } from 'stores/PaginationTypes';
 import TableFetchContext, { type ContextValue } from 'components/common/PaginatedEntityTable/TableFetchContext';
+import type { ColumnSchema } from 'components/common/EntityDataTable/types';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import Slicing from './index';
 
 jest.mock('logic/telemetry/useSendTelemetry', () => () => jest.fn());
+jest.mock('hooks/useCurrentUser');
 
 describe('Slicing', () => {
-  const columnSchemas = [
+  const columnSchemas: Array<ColumnSchema> = [
     { id: 'title', title: 'Title', type: 'STRING' as const, sliceable: true },
-    { id: 'status', title: 'Status', type: 'STRING' as const, sliceable: true },
+    { id: 'status', title: 'Status', type: 'STRING' as const, sliceable: true, permissions: ['streams:read'] },
+    { id: 'owner', title: 'Owner', type: 'STRING' as const, sliceable: true, permissions: ['roles:read'] },
     { id: 'description', title: 'Description', type: 'STRING' as const, sliceable: false },
   ];
+
+  beforeEach(() => {
+    asMock(useCurrentUser).mockReturnValue(defaultUser);
+  });
 
   const renderSUT = (
     props: Partial<React.ComponentProps<typeof Slicing>> = {},
@@ -73,8 +83,22 @@ describe('Slicing', () => {
     await userEvent.click(button);
 
     await screen.findByRole('menuitem', { name: /title/i });
+    await screen.findByRole('menuitem', { name: /owner/i });
     await screen.findByRole('menuitem', { name: /status/i });
     expect(screen.queryByRole('menuitem', { name: /description/i })).not.toBeInTheDocument();
+  });
+
+  it('hides slice options for columns without the required permissions', async () => {
+    asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(['streams:read']).build());
+
+    renderSUT();
+
+    const button = await screen.findByRole('button', { name: /status/i });
+    await userEvent.click(button);
+
+    await screen.findByRole('menuitem', { name: /title/i });
+    await screen.findByRole('menuitem', { name: /status/i });
+    expect(screen.queryByRole('menuitem', { name: /owner/i })).not.toBeInTheDocument();
   });
 
   it('selects a slice', async () => {

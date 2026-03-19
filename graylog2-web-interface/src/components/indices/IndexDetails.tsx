@@ -16,14 +16,16 @@
  */
 import React, { useCallback, useEffect, useMemo } from 'react';
 
+import { SystemIndexRanges } from '@graylog/server-api';
+
 import HideOnCloud from 'util/conditional/HideOnCloud';
+import { defaultOnError } from 'util/conditional/onError';
 import NumberUtils from 'util/NumberUtils';
 import { Col, Row, Button } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import { IndexRangeSummary, ShardMeter, ShardRoutingOverview } from 'components/indices';
 import type { IndexInfo } from 'stores/indices/IndicesStore';
-import type { IndexRange } from 'stores/indices/IndexRangesStore';
-import { IndexRangesActions } from 'stores/indices/IndexRangesStore';
+import type { IndexRange } from 'stores/indexers/IndexerOverviewStore';
 import { IndicesActions } from 'stores/indices/IndicesStore';
 
 type Props = {
@@ -46,7 +48,11 @@ const IndexDetails = ({ index, indexName, indexRange = undefined, indexSetId = u
   const _onRecalculateIndex = useCallback(() => {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Really recalculate the index ranges for index ${indexName}?`)) {
-      IndexRangesActions.recalculateIndex(indexName).then(() => {
+      defaultOnError(
+        SystemIndexRanges.rebuildIndex(indexName),
+        `Could not create a job to start index ranges recalculation for ${indexName}`,
+        `Error starting index ranges recalculation for ${indexName}`,
+      ).then(() => {
         if (indexSetId) {
           IndicesActions.list(indexSetId);
         }

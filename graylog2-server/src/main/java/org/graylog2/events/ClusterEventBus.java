@@ -45,8 +45,19 @@ public class ClusterEventBus extends AsyncEventBus {
     }
 
     /**
-     * Only use this if you maintain the cluster event bus! Use regular EventBus to receive cluster event updates.
-     * @param object
+     * Registers a subscriber for cluster events posted locally on this node.
+     *
+     * <p>Subscribers registered here receive events directly from this node's
+     * {@code ClusterEventBus}, before they are persisted and replicated to other nodes.
+     *
+     * <p>Use this method if you need to react to locally posted cluster events. To receive cluster
+     * event updates replicated from across the cluster, subscribe to the regular {@code EventBus}
+     * instead.
+     *
+     * <p>{@link ClusterEventPeriodical} is also a subscriber on this bus. It listens for locally
+     * posted cluster events and persists and replicates them via the regular {@code EventBus}.
+     *
+     * @param object the subscriber to register
      */
     public void registerClusterEventSubscriber(Object object) {
         super.register(object);
