@@ -21,11 +21,8 @@ import loadAsync from 'routing/loadAsync';
 import ServerUnavailablePage from 'pages/ServerUnavailablePage';
 import { useStore } from 'stores/connect';
 import 'bootstrap/less/bootstrap.less';
-import type { Store } from 'stores/StoreTypes';
-import type { CurrentUserStoreState } from 'stores/users/CurrentUserStore';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { ServerAvailabilityStore } from 'stores/sessions/ServerAvailabilityStore';
-import type { SessionStoreState } from 'stores/sessions/SessionStore';
 import { SessionStore } from 'stores/sessions/SessionStore';
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 import GlobalThemeStyles from 'theme/GlobalThemeStyles';
@@ -46,9 +43,9 @@ const LoggedOutThemeProvider = ({ children }: React.PropsWithChildren) => (
 );
 
 const AppFacade = () => {
-  const currentUser = useStore(CurrentUserStore as Store<CurrentUserStoreState>, (state) => state?.currentUser);
+  const currentUser = useStore(CurrentUserStore, (state) => state?.currentUser);
   const server = useStore(ServerAvailabilityStore, (state) => state?.server);
-  const username = useStore(SessionStore as Store<SessionStoreState>, (state) => state?.username ?? '');
+  const username = useStore(SessionStore, (state) => state?.username ?? '');
 
   useEffect(() => {
     const interval = setInterval(ServerAvailabilityStore.ping, SERVER_PING_TIMEOUT);
