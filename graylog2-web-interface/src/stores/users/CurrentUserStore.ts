@@ -21,7 +21,6 @@ import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import type { UserJSON } from 'logic/users/User';
 import { singletonStore } from 'logic/singleton';
-import { PreferencesActions } from 'stores/users/PreferencesStore';
 import { SessionActions, SessionStore } from 'stores/sessions/SessionStore';
 
 export type CurrentUserStoreState = {
@@ -35,7 +34,6 @@ export const CurrentUserStore = singletonStore('core.CurrentUser', () =>
 
     init() {
       this.listenTo(SessionStore, this.sessionUpdate, this.sessionUpdate);
-      PreferencesActions.saveUserPreferences.completed.listen(this.reload);
     },
 
     getInitialState() {
