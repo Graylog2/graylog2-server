@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useMemo } from 'react';
+import { useContext, useEffect, useMemo } from 'react';
 
 import loadAsync from 'routing/loadAsync';
 import ServerUnavailablePage from 'pages/ServerUnavailablePage';
@@ -24,7 +24,7 @@ import 'bootstrap/less/bootstrap.less';
 import type { Store } from 'stores/StoreTypes';
 import type { CurrentUserStoreState } from 'stores/users/CurrentUserStore';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
-import { ServerAvailabilityStore } from 'stores/sessions/ServerAvailabilityStore';
+import ServerAvailabilityContext from 'contexts/ServerAvailabilityContext';
 import type { SessionStoreState } from 'stores/sessions/SessionStore';
 import { SessionStore } from 'stores/sessions/SessionStore';
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
@@ -47,14 +47,14 @@ const LoggedOutThemeProvider = ({ children }: React.PropsWithChildren) => (
 
 const AppFacade = () => {
   const currentUser = useStore(CurrentUserStore as Store<CurrentUserStoreState>, (state) => state?.currentUser);
-  const server = useStore(ServerAvailabilityStore, (state) => state?.server);
+  const { server, ping } = useContext(ServerAvailabilityContext);
   const username = useStore(SessionStore as Store<SessionStoreState>, (state) => state?.username ?? '');
 
   useEffect(() => {
-    const interval = setInterval(ServerAvailabilityStore.ping, SERVER_PING_TIMEOUT);
+    const interval = setInterval(ping, SERVER_PING_TIMEOUT);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [ping]);
 
   const ThemeProvider = useMemo(
     () => (server.up && username && currentUser ? React.Fragment : LoggedOutThemeProvider),

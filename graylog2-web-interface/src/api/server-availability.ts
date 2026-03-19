@@ -14,10 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext } from 'react';
 
-import ServerAvailabilityContext from 'contexts/ServerAvailabilityContext';
+type ErrorCallback = (error: unknown) => void;
+type SuccessCallback = () => void;
 
-const useServerVersion = () => useContext(ServerAvailabilityContext)?.version;
+let _onError: ErrorCallback | null = null;
+let _onSuccess: SuccessCallback | null = null;
 
-export default useServerVersion;
+export const registerCallbacks = (onError: ErrorCallback | null, onSuccess: SuccessCallback | null) => {
+  _onError = onError;
+  _onSuccess = onSuccess;
+};
+
+export const reportError = (error: unknown) => {
+  _onError?.(error);
+};
+
+export const reportSuccess = () => {
+  _onSuccess?.();
+};
