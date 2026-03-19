@@ -35,6 +35,7 @@ import org.graylog2.database.utils.CompositeDisplayFormatter;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.security.EntityPermissionsUtils;
+import org.graylog2.users.UserImpl;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
@@ -91,6 +92,9 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                                             final int perPage,
                                             final Subject subject) {
         if (!permissionsUtils.isCatalogCollection(collection)) {
+            return new EntitySuggestionResponse(List.of(), PaginatedList.PaginationInfo.create(0, 0, page, perPage));
+        }
+        if (COLLECTION_NAME.equals(collection) && UserImpl.PASSWORD.equals(valueColumn)) {
             return new EntitySuggestionResponse(List.of(), PaginatedList.PaginationInfo.create(0, 0, page, perPage));
         }
         final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collection);
