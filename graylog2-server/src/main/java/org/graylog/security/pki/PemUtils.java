@@ -31,6 +31,7 @@ import java.io.StringWriter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.Security;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -89,11 +90,26 @@ public final class PemUtils {
     }
 
     /**
+     * Encodes a public key as PEM.
+     *
+     * @param publicKey the public key to encode
+     * @return the PEM-encoded public key
+     * @throws IOException if encoding fails
+     */
+    public static String toPem(PublicKey publicKey) throws IOException {
+        final StringWriter writer = new StringWriter();
+        try (JcaPEMWriter pemWriter = new JcaPEMWriter(writer)) {
+            pemWriter.writeObject(publicKey);
+        }
+        return writer.toString();
+    }
+
+    /**
      * Parses a PEM-encoded X.509 certificate.
      *
      * @param pem the PEM-encoded certificate
      * @return the parsed X509Certificate
-     * @throws IOException if parsing fails
+     * @throws IOException          if parsing fails
      * @throws CertificateException if the certificate is invalid
      */
     public static X509Certificate parseCertificate(String pem) throws IOException, CertificateException {
@@ -122,8 +138,30 @@ public final class PemUtils {
                 return converter.getPrivateKey(privateKeyInfo);
             } else if (object instanceof PEMKeyPair pemKeyPair) {
                 return converter.getPrivateKey(pemKeyPair.getPrivateKeyInfo());
+            } else if (object == null) {
+                throw new IOException("PEM does not contain a valid private key");
             }
-            throw new IOException("PEM does not contain a valid private key");
+            throw new IOException("PEM does not contain a valid private key: " + object.getClass().getName());
+        }
+    }
+
+    /**
+     * Parses a PEM-encoded public key.
+     *
+     * @param pem the PEM-encoded private key
+     * @return the parsed PrivateKey
+     * @throws IOException if parsing fails or the PEM doesn't contain a valid private key
+     */
+    public static PublicKey parsePublicKey(String pem) throws IOException {
+        try (PEMParser pemParser = new PEMParser(new StringReader(pem))) {
+            final Object object = pemParser.readObject();
+            final JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
+            if (object instanceof org.bouncycastle.asn1.x509.SubjectPublicKeyInfo privateKeyInfo) {
+                return converter.getPublicKey(privateKeyInfo);
+            } else if (object == null) {
+                throw new IOException("PEM does not contain a valid public key");
+            }
+            throw new IOException("PEM does not contain a valid public key: " + object.getClass().getName());
         }
     }
 
@@ -133,7 +171,7 @@ public final class PemUtils {
      * @param certificate the certificate to compute the fingerprint for
      * @return the fingerprint in format "sha256:hexstring"
      * @throws CertificateEncodingException if the certificate cannot be encoded
-     * @throws NoSuchAlgorithmException if SHA-256 is not available
+     * @throws NoSuchAlgorithmException     if SHA-256 is not available
      */
     public static String computeFingerprint(X509Certificate certificate)
             throws CertificateEncodingException, NoSuchAlgorithmException {

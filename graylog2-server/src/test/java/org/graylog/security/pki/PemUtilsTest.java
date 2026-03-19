@@ -21,9 +21,11 @@ import org.graylog2.security.encryption.EncryptedValueService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 
@@ -69,6 +71,18 @@ class PemUtilsTest {
         assertThat(pem).endsWith("-----END PRIVATE KEY-----\n");
     }
 
+    // toPem(PublicKey) tests
+
+    @Test
+    void toPemPublicKeyProducesValidPem() throws Exception {
+        final KeyPair keyPair = KeyUtils.generateKeyPair(Algorithm.ED25519);
+
+        final String pem = PemUtils.toPem(keyPair.getPublic());
+
+        assertThat(pem).startsWith("-----BEGIN PUBLIC KEY-----");
+        assertThat(pem).endsWith("-----END PUBLIC KEY-----\n");
+    }
+
     // parseCertificate tests
 
     @Test
@@ -105,10 +119,13 @@ class PemUtilsTest {
         final var sig = java.security.Signature.getInstance("Ed25519");
         sig.initSign(parsedKey);
         sig.update("test".getBytes(StandardCharsets.UTF_8));
+
         final byte[] signature = sig.sign();
-        sig.initVerify(keyPair.getPublic());
-        sig.update("test".getBytes(StandardCharsets.UTF_8));
-        assertThat(sig.verify(signature)).isTrue();
+
+        final var vrf = java.security.Signature.getInstance("Ed25519");
+        vrf.initVerify(keyPair.getPublic());
+        vrf.update("test".getBytes(StandardCharsets.UTF_8));
+        assertThat(vrf.verify(signature)).isTrue();
     }
 
     @Test
@@ -124,7 +141,48 @@ class PemUtilsTest {
     @Test
     void parsePrivateKeyThrowsForInvalidPem() {
         assertThatThrownBy(() -> PemUtils.parsePrivateKey("not a private key"))
-                .isInstanceOf(Exception.class);
+                .isInstanceOf(IOException.class);
+    }
+
+    // parsePublicKey tests
+
+    @Test
+    void parsePublicKeyRoundTrips() throws Exception {
+        final KeyPair keyPair = KeyUtils.generateKeyPair(Algorithm.ED25519);
+
+        final String pem = PemUtils.toPem(keyPair.getPublic());
+        final PublicKey parsedKey = PemUtils.parsePublicKey(pem);
+
+        assertThat(parsedKey.getAlgorithm()).isIn("Ed25519", "EdDSA");
+        // Verify functional equivalence: sign with the private key and verify with the parsed public key.
+        // We cannot compare getEncoded() directly because BC and JDK use different PKCS#8 variants
+        // (BC includes the public key, JDK does not).
+        final var sig = java.security.Signature.getInstance("Ed25519");
+        sig.initSign(keyPair.getPrivate());
+        sig.update("test".getBytes(StandardCharsets.UTF_8));
+
+        final byte[] signature = sig.sign();
+
+        final var vrf = java.security.Signature.getInstance("Ed25519");
+        vrf.initVerify(parsedKey);
+        vrf.update("test".getBytes(StandardCharsets.UTF_8));
+        assertThat(vrf.verify(signature)).isTrue();
+    }
+
+    @Test
+    void parsePublicKeyWorksWithRsa() throws Exception {
+        final KeyPair keyPair = KeyUtils.generateKeyPair(Algorithm.RSA_4096);
+
+        final String pem = PemUtils.toPem(keyPair.getPublic());
+        final PublicKey parsedKey = PemUtils.parsePublicKey(pem);
+
+        assertThat(parsedKey.getAlgorithm()).isEqualTo("RSA");
+    }
+
+    @Test
+    void parsePublicKeyThrowsForInvalidPem() {
+        assertThatThrownBy(() -> PemUtils.parsePublicKey("not a public key"))
+                .isInstanceOf(IOException.class);
     }
 
     // computeFingerprint tests
