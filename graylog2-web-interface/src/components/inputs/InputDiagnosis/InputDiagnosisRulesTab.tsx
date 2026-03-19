@@ -19,6 +19,7 @@ import styled, { css } from 'styled-components';
 
 import { Col, Row } from 'components/bootstrap';
 import { Section, PaginatedEntityTable } from 'components/common';
+import SectionGrid from 'components/common/Section/SectionGrid';
 import type { Sort } from 'stores/PaginationTypes';
 
 import { fetchInputPipelineRules, keyFn as pipelineRulesKeyFn } from './hooks/useInputPipelineRules';
@@ -46,6 +47,14 @@ const STREAM_RULES_LAYOUT = {
   defaultColumnOrder: ['stream', 'rule'],
 };
 
+const StyledSectionGrid = styled(SectionGrid)<{ $rows?: string }>(
+  ({ $rows, theme }) => css`
+    grid-template-columns: 1fr;
+    grid-template-rows: ${$rows || '1fr'};
+    gap: ${theme.spacings.xs};
+  `,
+);
+
 const ListCol = styled(Col)(
   ({ theme }) => css`
     padding-top: ${theme.spacings.lg};
@@ -53,7 +62,7 @@ const ListCol = styled(Col)(
 );
 
 const InputDiagnosisRulesTab = ({ inputId }: Props) => (
-  <>
+  <StyledSectionGrid $rows="1fr 1fr">
     <Section title="Pipeline Rules">
       <Row>
         <ListCol md={12}>
@@ -65,6 +74,7 @@ const InputDiagnosisRulesTab = ({ inputId }: Props) => (
             entityAttributesAreCamelCase={false}
             searchPlaceholder="Search for pipeline rule"
             columnRenderers={pipelineRulesColumnRenderers}
+            fetchOptions={{ refetchInterval: 5000 }}
             withoutURLParams
           />
         </ListCol>
@@ -82,12 +92,13 @@ const InputDiagnosisRulesTab = ({ inputId }: Props) => (
             entityAttributesAreCamelCase={false}
             searchPlaceholder="Search for stream rule"
             columnRenderers={streamRulesColumnRenderers}
+            fetchOptions={{ refetchInterval: 5000 }}
             withoutURLParams
           />
         </ListCol>
       </Row>
     </Section>
-  </>
+  </StyledSectionGrid>
 );
 
 export default InputDiagnosisRulesTab;
