@@ -49,7 +49,7 @@ const Container = styled.div<{ $width: number }>(
     top: 0;
     display: flex;
     flex-direction: column;
-    padding: 10px;
+    padding: 5px;
     animation: ${slide} ${ANIMATION_DURATION} ease-in-out;
 
     @media (prefers-reduced-motion: reduce) {
