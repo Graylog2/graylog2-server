@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 import numeral from 'numeral';
 import moment from 'moment';
 import styled from 'styled-components';
@@ -24,7 +24,7 @@ import { Alert, Col, Row, Button } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import { DocumentationLink } from 'components/support';
-import { IndexerFailuresStore } from 'stores/indexers/IndexerFailuresStore';
+import useIndexerFailuresCount from 'components/indexers/hooks/useIndexerFailuresCount';
 
 const Header = styled.div`
   display: flex;
@@ -39,65 +39,41 @@ const formatTextForFailureCount = (count: number) => {
   return <strong>There were {numeral(count).format('0,0')} failed indexing attempts in the last 24 hours.</strong>;
 };
 
-type State = {
-  total: number | undefined;
-};
+const IndexerFailuresComponent = () => {
+  const since = useMemo(() => moment().subtract(24, 'hours').format('YYYY-MM-DDTHH:mm:ss.SSS'), []);
+  const { data: total, isLoading } = useIndexerFailuresCount(since);
 
-class IndexerFailuresComponent extends React.Component<{}, State> {
-  constructor(props: {}) {
-    super(props);
+  const failuresSummary =
+    total !== undefined ? (
+      <Alert bsStyle={total === 0 ? 'success' : 'danger'}>
+        {formatTextForFailureCount(total)}
 
-    this.state = { total: undefined };
-  }
+        <LinkContainer to={Routes.SYSTEM.INDICES.FAILURES}>
+          <Button bsStyle="info" bsSize="xs" className="pull-right">
+            Show errors
+          </Button>
+        </LinkContainer>
+      </Alert>
+    ) : null;
 
-  componentDidMount() {
-    const since = moment().subtract(24, 'hours');
-
-    IndexerFailuresStore.count(since).then((response) => {
-      this.setState({ total: response.count });
-    });
-  }
-
-  _formatFailuresSummary = () => (
-    <Alert bsStyle={this.state.total === 0 ? 'success' : 'danger'}>
-      {formatTextForFailureCount(this.state.total)}
-
-      <LinkContainer to={Routes.SYSTEM.INDICES.FAILURES}>
-        <Button bsStyle="info" bsSize="xs" className="pull-right">
-          Show errors
-        </Button>
-      </LinkContainer>
-    </Alert>
+  return (
+    <Row className="content">
+      <Col md={12}>
+        <Header>
+          <h2>Indexer failures</h2>
+          <DocumentationLink
+            page={DocsHelper.PAGES.INDEXER_FAILURES}
+            text="Indexer failures documentation"
+            displayIcon
+          />
+        </Header>
+        <p className="description">
+          Every message that was not successfully indexed will be logged as an indexer failure.
+        </p>
+        {isLoading ? <Spinner /> : failuresSummary}
+      </Col>
+    </Row>
   );
-
-  render() {
-    let content: React.ReactNode;
-
-    if (this.state.total === undefined) {
-      content = <Spinner />;
-    } else {
-      content = this._formatFailuresSummary();
-    }
-
-    return (
-      <Row className="content">
-        <Col md={12}>
-          <Header>
-            <h2>Indexer failures</h2>
-            <DocumentationLink
-              page={DocsHelper.PAGES.INDEXER_FAILURES}
-              text="Indexer failures documentation"
-              displayIcon
-            />
-          </Header>
-          <p className="description">
-            Every message that was not successfully indexed will be logged as an indexer failure.
-          </p>
-          {content}
-        </Col>
-      </Row>
-    );
-  }
-}
+};
 
 export default IndexerFailuresComponent;

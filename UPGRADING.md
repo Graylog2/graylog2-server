@@ -6,6 +6,18 @@ Upgrading to Graylog 7.1.x
 All user sessions will be terminated when upgrading because the internal storage format for sessions has been changed.
 Users will have to log in again.
 
+## Teams Notification V2: Timezone Handling Change
+
+Previously, timestamps in Teams Notification V2 were always displayed in UTC regardless of the configured time zone.
+The **Time Zone** configuration field has been removed and the timestamp is now displayed in the viewer's local timezone
+using Microsoft Teams' native Adaptive Card `DATE()` and `TIME()` functions.
+For example, a timestamp will render as: **Thu, Mar 19, 2026 at 10:33 AM** (adjusted to the viewer's local timezone automatically).
+
+A migration automatically updates notifications that use the default adaptive card template. If you use a custom
+template, you will need to manually update it to use the `DATE()`/`TIME()` functions for timestamp fields.
+For example: `{{DATE(${event.timestamp_processing},SHORT)}} at {{TIME(${event.timestamp_processing})}}`.
+See the [Adaptive Card documentation](https://adaptivecards.io/explorer/TextBlock.html) for details on date/time formatting.
+
 ## Breaking Changes
 
 ### Plugins: Removal of Perspective Plugin API
@@ -47,6 +59,22 @@ escaped if they were used directly in Notification templates, e.g. `${aggregatio
 underscores instead, e.g. `${aggregation_conditions.count}`, `${aggregation_conditions.sum_fieldname}`. Any
 existing notifications using the escaping of parentheses in explicit `aggregation_conditions` key names will need to
 be modified to instead use the underscore format.
+
+### OpenSearch-Based Anomaly Detection Removed
+
+Anomaly detection now runs natively within Graylog, removing the dependency on OpenSearch's Anomaly Detection plugin. 
+This provides a more integrated experience with Alerts and Events, and does not require OpenSearch-specific
+configuration.
+
+As part of this change, existing OpenSearch-based anomaly detectors are no longer supported and will be
+automatically disabled during the upgrade to Graylog 7.1. A software migration will stop and remove all
+OpenSearch anomaly detectors and delete their associated event definitions.
+
+After the upgrade, previously configured detectors will remain visible in the Anomaly Detection Configuration page 
+for reference, showing their name and whether they were previously enabled. However, the full detector
+configuration (indices, feature fields, intervals, etc.) will not be displayed and detectors can no longer be
+edited or re-enabled. **Note: If you have custom anomaly detectors, you should note down their configuration 
+before upgrading.**
 
 ## Configuration File Changes
 

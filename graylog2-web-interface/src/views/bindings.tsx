@@ -123,6 +123,7 @@ import TextVisualization from 'views/components/widgets/text/TextVisualization';
 import TextWidgetEdit from 'views/components/widgets/text/TextWidgetEdit';
 import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
 import ToggleFavoriteField from 'views/logic/fieldactions/ToggleFavoriteField';
+import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -520,6 +521,7 @@ const exports: PluginExports = {
   ],
   'views.components.widgets.events.filterComponents': eventsFilterComponents,
   'views.components.widgets.events.attributes': eventsAttributes,
+  'sidebar.components': [{ key: 'replay-search-sidebar', component: ReplaySearchSidebar }],
   'views.reducers': viewsReducers,
   'views.elements.validationErrorExplanation': [WarmTierQueryValidation],
   'views.widgets.actions': [ExportMessageWidgetAction, ExportWidgetAction],

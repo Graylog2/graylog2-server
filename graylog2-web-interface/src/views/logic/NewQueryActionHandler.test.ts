@@ -18,9 +18,9 @@ import View from 'views/logic/views/View';
 
 import NewQueryActionHandler from './NewQueryActionHandler';
 
-jest.mock('stores/decorators/DecoratorsStore', () => ({
-  DecoratorsActions: {
-    list: () => Promise.resolve([]),
+jest.mock('@graylog/server-api', () => ({
+  SearchDecorators: {
+    get: () => Promise.resolve([]),
   },
 }));
 

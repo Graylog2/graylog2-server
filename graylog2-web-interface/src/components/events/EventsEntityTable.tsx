@@ -34,13 +34,16 @@ import QueryHelper from 'components/common/QueryHelper';
 import EventsWidgets from 'components/events/EventsWidgets';
 import EventsRefreshProvider from 'components/events/EventsRefreshProvider';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
-import { EXCLUDE_INFO_FILTER } from 'logic/alerts/EventDefinitionPriorityEnum';
+import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 
 const additionalSearchFields = {
   key: 'The key of the event',
 };
 
-const defaultFilters = OrderedMap({ priority: [EXCLUDE_INFO_FILTER] });
+const nonInfoPriorities = Object.keys(EventDefinitionPriorityEnum.properties)
+  .reverse()
+  .filter((key) => key !== String(EventDefinitionPriorityEnum.INFO));
+const defaultFilters = OrderedMap({ priority: nonInfoPriorities });
 
 const EventsEntityTable = () => {
   const { stream_id: streamId } = useQuery();
