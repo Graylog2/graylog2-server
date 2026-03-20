@@ -32,7 +32,7 @@ export type Slice = {
   count: number;
   title?: string;
   type?: unknown;
-  meta?: Record<string, string | number | boolean | null | undefined>;
+  meta?: unknown;
 };
 export type SliceRenderer = {
   extendSlices?: (slices: Array<Slice>) => Array<Slice>;
