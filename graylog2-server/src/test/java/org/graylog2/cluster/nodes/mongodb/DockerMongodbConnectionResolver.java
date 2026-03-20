@@ -16,6 +16,7 @@
  */
 package org.graylog2.cluster.nodes.mongodb;
 
+import com.google.common.net.HostAndPort;
 import com.mongodb.MongoClient;
 import jakarta.annotation.Nonnull;
 import org.testcontainers.DockerClientFactory;
@@ -45,9 +46,8 @@ public class DockerMongodbConnectionResolver implements MongodbConnectionResolve
 
     @Nonnull
     private MongoClient createClient(String nodeName) {
-        final String[] hostPort = nodeName.split(":");
-        final int port = Integer.parseInt(hostPort[1]);
-        final Integer mappedPort = mongoDBContainer.getMappedPort(port);
+        final HostAndPort hostAndPort = HostAndPort.fromString(nodeName);
+        final Integer mappedPort = mongoDBContainer.getMappedPort(hostAndPort.getPort());
         final String dockerHost = DockerClientFactory.instance().dockerHostIpAddress();
         return new MongoClient("mongodb://" + dockerHost + ":" + mappedPort + "/?directConnection=true");
     }

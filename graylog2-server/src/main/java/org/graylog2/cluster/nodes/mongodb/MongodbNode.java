@@ -49,8 +49,8 @@ public record MongodbNode(
     public static final String FIELD_CONNECTIONS_USED_PERCENT = "connections_used_percent";
     public static final String FIELD_VERSION = "version";
 
-    public MongodbNode(String name, String role) {
-        this("0", name, role, "", null, 0L, 0L, 0.0, 0, 0, 0.0);
+    public MongodbNode(String id, String name, String role) {
+        this(id, name, role, "", null, 0L, 0L, 0.0, 0, 0, 0.0);
     }
 
     @JsonIgnore

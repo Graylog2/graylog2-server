@@ -28,10 +28,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MongodbNodesProvider implements Provider<List<MongodbNode>> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MongodbNodeUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MongodbNodesProvider.class);
 
     private final MongodbNodesService activeService;
     private final MongoClient mongoClient;
@@ -50,7 +51,11 @@ public class MongodbNodesProvider implements Provider<List<MongodbNode>> {
         try {
             return activeService.allNodes();
         } catch (Exception e) {
-            LOG.warn("Could not get MongodbNodes, returning fallback. Reason: {}", e.getMessage());
+            if (LOG.isDebugEnabled()) {
+                LOG.warn("Could not get MongodbNodes, returning fallback", e);
+            } else {
+                LOG.debug("Could not get MongodbNodes, returning fallback. Reason: {}", e.getMessage());
+            }
             return getFallbackResponse();
         }
     }
@@ -62,8 +67,9 @@ public class MongodbNodesProvider implements Provider<List<MongodbNode>> {
     @Nonnull
     private List<MongodbNode> getFallbackResponse() {
         final ClusterDescription clusterDescription = mongoClient.getClusterDescription();
+        AtomicInteger id = new AtomicInteger(0);
         return clusterDescription.getServerDescriptions().stream()
-                .map(serverDescription -> new MongodbNode(serverDescription.getAddress().toString(), serverDescription.getType().toString()))
+                .map(serverDescription -> new MongodbNode("" + id.incrementAndGet(), serverDescription.getAddress().toString(), serverDescription.getType().toString()))
                 .toList();
     }
 }

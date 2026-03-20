@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class TestShutdownService extends GracefulShutdownService {
-    Set<GracefulShutdownHook> shutdownHookSet = new HashSet<>();
+    private final Set<GracefulShutdownHook> shutdownHookSet = new HashSet<>();
 
     @Override
     public void register(GracefulShutdownHook shutdownHook) {

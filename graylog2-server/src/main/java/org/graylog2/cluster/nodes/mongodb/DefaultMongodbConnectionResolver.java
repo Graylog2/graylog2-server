@@ -44,7 +44,7 @@ public class DefaultMongodbConnectionResolver implements MongodbConnectionResolv
     private static final Logger LOG = LoggerFactory.getLogger(DefaultMongodbConnectionResolver.class);
 
     private final MongoClientURI mongoClientURI;
-    private final Map<String, MongoClient> mongoClients = new ConcurrentHashMap<>() {};
+    private final Map<String, MongoClient> mongoClients = new ConcurrentHashMap<>();
 
 
     @Inject

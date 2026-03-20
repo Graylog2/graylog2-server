@@ -62,7 +62,7 @@ class ReplicaSetMongodbNodesIT {
                 .hasSize(1)
                 .anySatisfy(node -> {
                     Assertions.assertThat(node.role()).isEqualTo("PRIMARY");
-                    Assertions.assertThat(node.replicationLag()).isEqualTo(0); // primary can't have replication lag
+                    Assertions.assertThat(node.replicationLag()).isEqualTo(0L); // primary can't have replication lag
                 });
 
     }
