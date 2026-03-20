@@ -14,15 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.nodes.mongodb;
+package org.graylog2.rest.resources.system.inputs.responses;
 
-import com.mongodb.MongoClient;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public interface MongodbConnectionResolver {
-
-    /**
-     * This will provide a client for the requested host and port. The client may be cached and reused. Do not
-     * close the client, it will be closed automatically - it's lifecycle is managed by the resolver itself.
-     */
-    MongoClient resolve(String nodeName);
-}
+public record InputStreamRulesResponse(
+        @JsonProperty("id") String id,
+        @JsonProperty("stream_id") String streamId,
+        @JsonProperty("stream") String stream,
+        @JsonProperty("rule_field") String ruleField,
+        @JsonProperty("rule_type") int ruleType,
+        @JsonProperty("rule_value") String ruleValue,
+        @JsonProperty("inverted") boolean inverted,
+        @JsonProperty("description") String description
+) {}

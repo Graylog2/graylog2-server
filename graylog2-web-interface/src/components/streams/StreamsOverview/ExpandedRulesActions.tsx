@@ -56,7 +56,7 @@ const RulesSectionActions = ({ stream }: Props) => {
       </IfPermitted>
       <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
         <Button bsStyle="info" bsSize="xsmall" disabled={isDefaultStream || isNotEditable} onClick={toggleAddRuleModal}>
-          Quick add rule
+          Quick Add Rule
         </Button>
       </IfPermitted>
       {showAddRuleModal && (

@@ -14,15 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.nodes.mongodb;
+export type InputPipelineRule = {
+  id: string;
+  pipeline: string;
+  pipeline_id: string;
+  rule: string;
+  rule_id: string;
+  connected_streams: Array<{ id: string; title: string }>;
+};
 
-import com.mongodb.MongoClient;
-
-public interface MongodbConnectionResolver {
-
-    /**
-     * This will provide a client for the requested host and port. The client may be cached and reused. Do not
-     * close the client, it will be closed automatically - it's lifecycle is managed by the resolver itself.
-     */
-    MongoClient resolve(String nodeName);
-}
+export type InputStreamRule = {
+  id: string;
+  stream_id: string;
+  stream: string;
+  rule_field: string;
+  rule_type: number;
+  rule_value: string;
+  inverted: boolean;
+  description: string;
+};
