@@ -17,7 +17,7 @@
 import React from 'react';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
-import type { WidgetComponentProps } from 'views/types';
+import type { WidgetComponentProps, AdditionalViewsActionHandlerArguments } from 'views/types';
 import Routes from 'routing/Routes';
 import App from 'routing/App';
 import { MessageListHandler } from 'views/logic/searchtypes/messages';
@@ -93,8 +93,6 @@ import HeatmapVisualizationConfig from 'views/logic/aggregationbuilder/visualiza
 import visualizationBindings from 'views/components/visualizations/bindings';
 import { AggregationWizard } from 'views/components/aggregationwizard';
 import { filterCloudValueActions } from 'util/conditional/filterValueActions';
-import CopyValueToClipboard from 'views/logic/valueactions/CopyValueToClipboard';
-import CopyFieldToClipboard from 'views/logic/fieldactions/CopyFieldToClipboard';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import ViewHeader from 'views/components/views/ViewHeader';
 import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/ScatterVisualizationConfig';
@@ -122,10 +120,15 @@ import TextWidget from 'views/logic/widgets/TextWidget';
 import TextVisualization from 'views/components/widgets/text/TextVisualization';
 import TextWidgetEdit from 'views/components/widgets/text/TextWidgetEdit';
 import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
-import ToggleFavoriteField from 'views/logic/fieldactions/ToggleFavoriteField';
 import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
+import {
+  CopyToClipboardFieldActionPlugin,
+  AddFavoriteFieldActionPlugin,
+  RemoveFavoriteFieldActionPlugin,
+} from 'views/actions/FieldActionPlugins';
+import { CopyToClipBoardValueActionPlugin } from 'views/actions/ValueActionPlugins';
 
-import type { ActionHandlerArguments } from './components/actions/ActionHandler';
+import type { ActionDefinition } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import AreaVisualization from './components/visualizations/area/AreaVisualization';
 import LineVisualizationConfig from './logic/aggregationbuilder/visualizations/LineVisualizationConfig';
@@ -342,13 +345,7 @@ const exports: PluginExports = {
       isEnabled: ({ field, type }) => !isFunction(field) && !type.isDecorated(),
       resetFocus: false,
     },
-    {
-      type: 'copy-field-to-clipboard',
-      title: 'Copy field name to clipboard',
-      handler: CopyFieldToClipboard,
-      isEnabled: () => true,
-      resetFocus: false,
-    },
+    CopyToClipboardFieldActionPlugin,
     {
       type: 'change-field-type',
       title: 'Change field type',
@@ -357,22 +354,8 @@ const exports: PluginExports = {
       component: ChangeFieldType,
       help: ChangeFieldTypeHelp,
     },
-    {
-      type: 'add-field-to-favorite',
-      title: 'Add field to favorites',
-      handler: ToggleFavoriteField,
-      isEnabled: () => true,
-      resetFocus: false,
-      isHidden: (props) => ToggleFavoriteField.isHidden(true, props),
-    },
-    {
-      type: 'remove-field-to-favorite',
-      title: 'Remove field from favorites',
-      handler: ToggleFavoriteField,
-      isEnabled: () => true,
-      resetFocus: false,
-      isHidden: (props) => ToggleFavoriteField.isHidden(false, props),
-    },
+    AddFavoriteFieldActionPlugin,
+    RemoveFavoriteFieldActionPlugin,
   ],
   valueActions: filterCloudValueActions(
     [
@@ -380,7 +363,7 @@ const exports: PluginExports = {
         type: 'exclude',
         title: 'Exclude from results',
         thunk: ExcludeFromQueryHandler,
-        isEnabled: ({ field, type, contexts }: ActionHandlerArguments) =>
+        isEnabled: ({ field, type, contexts }) =>
           (!isFunction(field) || hasMultipleValueForActions(contexts)) && !type.isDecorated(),
         resetFocus: false,
       },
@@ -388,7 +371,7 @@ const exports: PluginExports = {
         type: 'add-to-query',
         title: 'Add to query',
         thunk: AddToQueryHandler,
-        isEnabled: ({ field, type, contexts }: ActionHandlerArguments) =>
+        isEnabled: ({ field, type, contexts }) =>
           (!isFunction(field) || hasMultipleValueForActions(contexts)) && !type.isDecorated(),
         resetFocus: false,
       },
@@ -398,7 +381,7 @@ const exports: PluginExports = {
         thunk: ShowDocumentsHandler,
         isEnabled: ShowDocumentsHandler.isEnabled,
         resetFocus: true,
-      },
+      } as ActionDefinition<AdditionalViewsActionHandlerArguments>,
       {
         type: 'create-extractor',
         title: 'Create extractor',
@@ -413,13 +396,7 @@ const exports: PluginExports = {
         isEnabled: HighlightValueHandler.isEnabled,
         resetFocus: false,
       },
-      {
-        type: 'copy-value-to-clipboard',
-        title: 'Copy value to clipboard',
-        handler: CopyValueToClipboard,
-        isEnabled: CopyValueToClipboard.isEnabled,
-        resetFocus: false,
-      },
+      CopyToClipBoardValueActionPlugin,
       {
         type: 'create-event-definition-from-value',
         title: 'Create event definition',

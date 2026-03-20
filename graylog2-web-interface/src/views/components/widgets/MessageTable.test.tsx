@@ -51,11 +51,9 @@ const messages = [
 ];
 const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
 const config = MessagesWidgetConfig.builder().fields(['file_name']).build();
-const activeQueryId = 'some-query-id';
 
 const SimpleMessageTable = (props: Partial<Pick<React.ComponentProps<typeof MessageTable>, 'config' | 'fields'>>) => (
   <MessageTable
-    activeQueryId={activeQueryId}
     config={config}
     fields={Immutable.List(fields)}
     messages={messages}

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useContext, useCallback } from 'react';
+import { useState } from 'react';
 import Immutable from 'immutable';
 import styled from 'styled-components';
 
@@ -31,8 +31,6 @@ import type { Input } from 'components/messageloaders/Types';
 import type { Stream } from 'views/stores/StreamsStore';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import useIsLocalNode from 'views/hooks/useIsLocalNode';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useFeature from 'hooks/useFeature';
 
 import MessageFavoriteFieldsProvider from './context/MessageFavoriteFieldsProvider';
@@ -91,18 +89,14 @@ const MessageDetail = ({
   allStreams = Immutable.List(),
 }: Props) => {
   const isFavoriteFieldsEnabled = useFeature('message_table_favorite_fields');
-  const { config: searchesClusterConfig } = useSearchConfiguration();
   const [showOriginal, setShowOriginal] = useState(false);
   const { fields, index, id, decoration_stats: decorationStats } = message;
   const { gl2_source_node, gl2_source_input, associated_assets } = fields;
   const { isLocalNode } = useIsLocalNode(gl2_source_node);
-  const { all } = useContext(FieldTypesContext);
 
   const _toggleShowOriginal = () => {
     setShowOriginal(!showOriginal);
   };
-
-  const findFieldType = useCallback((field) => all.find((f) => f.name === field), [all]);
 
   // Short circuit when all messages are being expanded at the same time
   if (expandAllRenderAsync) {
@@ -162,7 +156,6 @@ const MessageDetail = ({
                     disableTestAgainstStream={disableTestAgainstStream}
                     showOriginal={showOriginal}
                     toggleShowOriginal={_toggleShowOriginal}
-                    searchConfig={searchesClusterConfig}
                     streams={allStreams}
                   />
                 </Header>
@@ -182,16 +175,7 @@ const MessageDetail = ({
                     />
                   }
                   streams={messageStreams}
-                  assets={
-                    associated_assets ? (
-                      <FormatAssetList
-                        associated_assets={associated_assets}
-                        fieldType={findFieldType('associated_assets')?.type}
-                      />
-                    ) : (
-                      <div />
-                    )
-                  }
+                  assets={associated_assets ? <FormatAssetList associated_assets={associated_assets} /> : <div />}
                 />
                 <MessageAugmentations message={message} />
               </Col>
