@@ -23,6 +23,8 @@ import javax.annotation.Nullable;
 import java.time.Duration;
 
 public record CreateEnrollmentTokenRequest(
+        @JsonProperty("name") @NotBlank String name,
         @JsonProperty("fleet_id") @NotBlank String fleetId,
         @JsonProperty("expires_in") @Nullable Duration expiresIn
-) {}
+) {
+}

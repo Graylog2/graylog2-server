@@ -26,6 +26,7 @@ import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.TokenSigningKey;
+import org.graylog.collectors.db.EnrollmentTokenDTO;
 import org.graylog.collectors.input.CollectorIngestCodec;
 import org.graylog.security.pki.Algorithm;
 import org.graylog.security.pki.KeyUtils;
@@ -98,6 +99,7 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
         removeGrpcConfig(db);
         deleteMacOSUnifiedLoggingSources(db);
         replaceTokenSigningCertWithSigningKey(db, encryptedValueService);
+        addNamesToEnrollmentTokens(db);
     }
 
     private void convertObjectIdFields(MongoDatabase db) {
@@ -401,5 +403,13 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
         } catch (Exception e) {
             LOG.error("Could not generate token signing key.", e);
         }
+    }
+
+    private void addNamesToEnrollmentTokens(MongoDatabase db) {
+        final var collection = db.getCollection(ENROLLMENT_TOKENS_COLLECTION);
+        collection.updateMany(
+                Filters.not(Filters.exists(EnrollmentTokenDTO.FIELD_NAME)),
+                Updates.set(EnrollmentTokenDTO.FIELD_NAME, "Unnamed token")
+        );
     }
 }

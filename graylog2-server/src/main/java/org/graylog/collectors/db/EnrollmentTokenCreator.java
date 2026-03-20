@@ -19,6 +19,9 @@ package org.graylog.collectors.db;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record EnrollmentTokenCreator(
-        @JsonProperty("user_id") String userId,
-        @JsonProperty("username") String username
-) {}
+        @JsonProperty(FIELD_USER_ID) String userId,
+        @JsonProperty(FIELD_USERNAME) String username
+) {
+    public static final String FIELD_USER_ID = "user_id";
+    public static final String FIELD_USERNAME = "username";
+}

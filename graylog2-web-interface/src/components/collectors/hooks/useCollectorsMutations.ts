@@ -140,8 +140,9 @@ const useCollectorsMutations = () => {
 
   // Enrollment token mutations
   const createEnrollmentTokenMutation = useMutation({
-    mutationFn: (input: { fleetId: string; expiresIn: string | null }) =>
+    mutationFn: (input: { name: string, fleetId: string; expiresIn: string | null }) =>
       OpAMPEnrollment.createToken({
+        name: input.name,
         fleet_id: input.fleetId,
         expires_in: input.expiresIn,
       }),

@@ -27,6 +27,7 @@ import java.time.Instant;
 
 public record EnrollmentTokenDTO(
         @ObjectId @Id @Nullable @JsonProperty(MongoEntity.FIELD_ID) String id,
+        @JsonProperty(FIELD_NAME) String name,
         @JsonProperty(FIELD_JTI) String jti,
         @JsonProperty(FIELD_KID) String kid,
         @JsonProperty(FIELD_FLEET_ID) String fleetId,
@@ -36,6 +37,7 @@ public record EnrollmentTokenDTO(
         @JsonProperty(FIELD_USAGE_COUNT) int usageCount,
         @Nullable @JsonProperty(FIELD_LAST_USED_AT) Instant lastUsedAt
 ) implements MongoEntity {
+    public static final String FIELD_NAME = "name";
     public static final String FIELD_JTI = "jti";
     public static final String FIELD_KID = "kid";
     public static final String FIELD_FLEET_ID = "fleet_id";
@@ -52,6 +54,8 @@ public record EnrollmentTokenDTO(
     @AutoBuilder
     public interface Builder {
         Builder id(@Nullable String id);
+
+        Builder name(String name);
 
         Builder jti(String jti);
 

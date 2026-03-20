@@ -72,8 +72,12 @@ public class EnrollmentTokenResource extends RestResource {
     private static final String DEFAULT_SORT_DIRECTION = "desc";
 
     private static final List<EntityAttribute> ATTRIBUTES = List.of(
+            EntityAttribute.builder().id(EnrollmentTokenDTO.FIELD_NAME).title("Name").sortable(true).searchable(true)
+                    .filterable(true).build(),
             // See CollectorInstancesResource for explanation of the type(OBJECT_ID) + bsonFilterCreator workaround.
-            EntityAttribute.builder().id(EnrollmentTokenDTO.FIELD_FLEET_ID).title("Fleet")
+            EntityAttribute.builder()
+                    .id(EnrollmentTokenDTO.FIELD_FLEET_ID)
+                    .title("Fleet")
                     .relatedCollection(FleetService.COLLECTION_NAME)
                     .relatedIdentifier("_id")
                     .relatedDisplayFields(List.of(FleetDTO.FIELD_NAME))
@@ -81,10 +85,20 @@ public class EnrollmentTokenResource extends RestResource {
                     .type(SearchQueryField.Type.OBJECT_ID)
                     .bsonFilterCreator((name, value) -> Filters.eq(name, value.getValue().toString()))
                     .sortable(false)
-                    .searchable(true)
+                    .searchable(false)
                     .filterable(true)
                     .build(),
-            EntityAttribute.builder().id(EnrollmentTokenDTO.FIELD_CREATED_BY).title("Created By").sortable(false).build(),
+            EntityAttribute.builder()
+                    .id(EnrollmentTokenDTO.FIELD_CREATED_BY)
+                    .title("Created By")
+                    .dbField(EnrollmentTokenDTO.FIELD_CREATED_BY + "." + EnrollmentTokenCreator.FIELD_USERNAME)
+                    .bsonFilterCreator((name, value) -> Filters.eq(
+                            EnrollmentTokenDTO.FIELD_CREATED_BY + "." + EnrollmentTokenCreator.FIELD_USERNAME,
+                            value.getValue().toString()))
+                    .sortable(true)
+                    .searchable(false)
+                    .filterable(true)
+                    .build(),
             EntityAttribute.builder().id(EnrollmentTokenDTO.FIELD_CREATED_AT).title("Created At").sortable(true).build(),
             EntityAttribute.builder().id(EnrollmentTokenDTO.FIELD_EXPIRES_AT).title("Expires").sortable(true).build(),
             EntityAttribute.builder().id(EnrollmentTokenDTO.FIELD_USAGE_COUNT).title("Usages").sortable(true).build(),
@@ -108,7 +122,7 @@ public class EnrollmentTokenResource extends RestResource {
         this.enrollmentTokenService = enrollmentTokenService;
         this.collectorsConfigService = collectorsConfigService;
         this.fleetService = fleetService;
-        this.dbQueryCreator = new DbQueryCreator(EnrollmentTokenDTO.FIELD_FLEET_ID, ATTRIBUTES, computedFieldRegistry);
+        this.dbQueryCreator = new DbQueryCreator(EnrollmentTokenDTO.FIELD_NAME, ATTRIBUTES, computedFieldRegistry);
     }
 
     // TODO: Add @AuditEvent for security audit logging of token creation
@@ -143,7 +157,10 @@ public class EnrollmentTokenResource extends RestResource {
             @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
             @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
             @Parameter(name = "sort", description = "The field to sort the result on",
-                       schema = @Schema(allowableValues = {"created_at", "expires_at", "usage_count", "last_used_at"}))
+                       schema = @Schema(allowableValues = {EnrollmentTokenDTO.FIELD_NAME,
+                               EnrollmentTokenDTO.FIELD_CREATED_BY, EnrollmentTokenDTO.FIELD_CREATED_AT,
+                               EnrollmentTokenDTO.FIELD_EXPIRES_AT, EnrollmentTokenDTO.FIELD_USAGE_COUNT,
+                               EnrollmentTokenDTO.FIELD_LAST_USED_AT}))
             @QueryParam("sort") @DefaultValue(DEFAULT_SORT_FIELD) String sort,
             @Parameter(name = "order", description = "The sort direction",
                        schema = @Schema(allowableValues = {"asc", "desc"}))

@@ -85,6 +85,7 @@ export type EnrollmentTokenCreator = {
 
 export type EnrollmentTokenMetadata = {
   id: string;
+  name: string;
   jti: string;
   kid: string;
   fleet_id: string;

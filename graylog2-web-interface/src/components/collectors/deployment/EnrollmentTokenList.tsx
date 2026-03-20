@@ -33,8 +33,8 @@ const DEFAULT_LAYOUT = {
   entityTableId: 'enrollment-tokens',
   defaultPageSize: 20,
   defaultSort: { attributeId: 'created_at', direction: 'desc' } as Sort,
-  defaultDisplayedAttributes: ['fleet_id', 'created_by', 'created_at', 'expires_at', 'usage_count', 'last_used_at'],
-  defaultColumnOrder: ['fleet_id', 'created_by', 'created_at', 'expires_at', 'usage_count', 'last_used_at'],
+  defaultDisplayedAttributes: ['name', 'fleet_id', 'created_by', 'created_at', 'expires_at', 'usage_count', 'last_used_at'],
+  defaultColumnOrder: ['name', 'fleet_id', 'created_by', 'created_at', 'expires_at', 'usage_count', 'last_used_at'],
 };
 
 const ExpiredText = styled.span`
@@ -62,6 +62,10 @@ const CreatedByCell = ({ username }: { username: string }) => <span>{username}</
 
 const customColumnRenderers = (fleetNames: Record<string, string>): ColumnRenderers<EnrollmentTokenMetadata> => ({
   attributes: {
+    name: {
+      renderCell: (name: string) => <span>{name}</span>,
+      width: 0.3,
+    },
     fleet_id: {
       renderCell: (_fleetId: string, token: EnrollmentTokenMetadata) => (
         <Link to={Routes.SYSTEM.COLLECTORS.FLEET(token.fleet_id)}>{fleetNames[token.fleet_id] || token.fleet_id}</Link>

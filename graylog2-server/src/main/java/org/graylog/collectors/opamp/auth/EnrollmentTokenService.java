@@ -27,7 +27,6 @@ import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bson.conversions.Bson;
-import org.bson.types.ObjectId;
 import org.graylog.collectors.CollectorsConfig;
 import org.graylog.collectors.CollectorsConfigService;
 import org.graylog.collectors.TokenSigningKey;
@@ -58,6 +57,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.mongodb.client.model.Filters.eq;
+import static org.graylog2.database.utils.MongoUtils.idEq;
 
 /**
  * Service for accessing enrollment tokens.
@@ -143,6 +143,7 @@ public class EnrollmentTokenService {
         final String token = buildJwt(tokenSigningKey, jti, now, expiresAt);
 
         tokenCollection.insertOne(EnrollmentTokenDTO.builder()
+                .name(request.name())
                 .jti(jti)
                 .kid(tokenSigningKey.fingerprint())
                 .fleetId(request.fleetId())
@@ -215,7 +216,7 @@ public class EnrollmentTokenService {
     }
 
     public boolean delete(String id) {
-        return tokenCollection.deleteOne(eq("_id", new ObjectId(id))).getDeletedCount() > 0;
+        return tokenCollection.deleteOne(idEq(id)).getDeletedCount() > 0;
     }
 
     public void deleteAllByFleet(String fleetId) {
@@ -224,7 +225,7 @@ public class EnrollmentTokenService {
 
     public void incrementUsage(String id) {
         tokenCollection.updateOne(
-                eq("_id", new ObjectId(id)),
+                idEq(id),
                 Updates.combine(
                         Updates.inc(EnrollmentTokenDTO.FIELD_USAGE_COUNT, 1),
                         Updates.set(EnrollmentTokenDTO.FIELD_LAST_USED_AT, Date.from(Instant.now(clock)))

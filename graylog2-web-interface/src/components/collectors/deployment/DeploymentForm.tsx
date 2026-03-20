@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Button, SegmentedControl } from 'components/bootstrap';
+import { Button, Input, SegmentedControl } from 'components/bootstrap';
 import { ClipboardButton, Select } from 'components/common';
 import SectionGrid from 'components/common/Section/SectionGrid';
 
@@ -112,6 +112,7 @@ const DeploymentForm = () => {
   const { createEnrollmentToken, isCreatingEnrollmentToken } = useCollectorsMutations();
   const [platform, setPlatform] = useState<Platform>('linux');
   const [fleetId, setFleetId] = useState<string | null>(null);
+  const [name, setName] = useState<string>('');
   const [expiry, setExpiry] = useState<TokenExpiry>('P7D');
   const [tokenResponse, setTokenResponse] = useState<TokenResponse | null>(null);
 
@@ -122,6 +123,7 @@ const DeploymentForm = () => {
 
     try {
       const response = await createEnrollmentToken({
+        name,
         fleetId,
         expiresIn: expiry === 'never' ? null : expiry,
       });
@@ -184,6 +186,18 @@ const DeploymentForm = () => {
       </Section>
 
       <Section>
+        <Input
+          id="enrollment-token-name"
+          type="text"
+          label="Name *"
+          placeholder="e.g. Initial Fleet Enrollment"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+      </Section>
+
+      <Section>
         <Label>Token Expiry</Label>
         <SegmentedControl
           value={expiry}
@@ -198,7 +212,7 @@ const DeploymentForm = () => {
       </Section>
 
       <Section>
-        <Button bsStyle="primary" onClick={handleGenerate} disabled={!fleetId || isCreatingEnrollmentToken}>
+        <Button bsStyle="primary" onClick={handleGenerate} disabled={!name.trim() || !fleetId || isCreatingEnrollmentToken}>
           {isCreatingEnrollmentToken ? 'Generating...' : 'Generate Enrollment Token'}
         </Button>
       </Section>
