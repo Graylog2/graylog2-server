@@ -57,6 +57,7 @@ const TableWrapper = styled.div`
   display: flex;
   flex-direction: column;
   overflow-x: auto;
+  min-width: 0;
   width: 100%;
 `;
 
