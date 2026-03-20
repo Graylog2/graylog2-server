@@ -73,12 +73,6 @@ public class RawMessage implements Serializable {
     private int sequenceNr;
     private Configuration codecConfig;
 
-    // Not serialized to the journal. When set (> 0), represents the proportional
-    // share of the original network request size for this message. Codecs that need
-    // this value to survive journal round-trips must persist it in their own payload
-    // (e.g. OTelJournal.Record.input_message_size) and restore it during decoding.
-    private int inputMessageSize;
-
     public RawMessage(@Nonnull byte[] payload) {
         this(payload, (ResolvableInetSocketAddress) null);
     }
@@ -204,18 +198,18 @@ public class RawMessage implements Serializable {
     }
 
     /**
-     * Returns the payload size without copying the underlying byte array.
+     * Returns the input message size if set, otherwise the payload size.
      */
+    public int getInputMessageSize() {
+        return msgBuilder.hasInputMessageSize() ? msgBuilder.getInputMessageSize() : getPayloadSize();
+    }
+
     public int getPayloadSize() {
         return msgBuilder.getPayload().size();
     }
 
-    public int getInputMessageSize() {
-        return inputMessageSize;
-    }
-
     public void setInputMessageSize(int inputMessageSize) {
-        this.inputMessageSize = inputMessageSize;
+        msgBuilder.setInputMessageSize(inputMessageSize);
     }
 
     public UUID getId() {
@@ -319,7 +313,7 @@ public class RawMessage implements Serializable {
         helper.add("id", getId())
                 .add("messageQueueId", getMessageQueueId())
                 .add("codec", getCodecName())
-                .add("payloadSize", getPayload().length)
+                .add("payloadSize", getPayloadSize())
                 .add("timestamp", getTimestamp())
                 .add("seqenceNr", getSequenceNr());
         if (getRemoteAddress() != null) {

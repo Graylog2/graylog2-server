@@ -172,7 +172,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         }
 
         if (message.isPresent()) {
-            event.setMessage(postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, message.get(), decodeTime, getEffectiveInputMessageSize(raw)));
+            event.setMessage(postProcessMessage(raw, codec, inputIdOnCurrentNode, baseMetricName, message.get(), decodeTime, raw.getInputMessageSize()));
         } else if (messages != null && !messages.isEmpty()) {
             event.setMessages(postProcessMultipleMessages(raw, codec, inputIdOnCurrentNode, baseMetricName, messages, decodeTime));
         }
@@ -192,7 +192,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             }
         }
 
-        distributePayloadSize(processedMessages, getEffectiveInputMessageSize(raw));
+        distributePayloadSize(processedMessages, raw.getInputMessageSize());
         return processedMessages;
     }
 
@@ -224,11 +224,6 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             assignedSize += inputSize;
             msg.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, inputSize);
         }
-    }
-
-    private int getEffectiveInputMessageSize(RawMessage raw) {
-        final int inputMessageSize = raw.getInputMessageSize();
-        return inputMessageSize > 0 ? inputMessageSize : raw.getPayloadSize();
     }
 
     @Nullable

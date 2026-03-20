@@ -13,9 +13,6 @@ message Record {
   oneof payload {
     Log log = 1;
   }
-  // Proportional share of the original network request size for this record.
-  // Used for accurate traffic/license accounting.
-  int32 input_message_size = 2;
 }
 
 message Log {
