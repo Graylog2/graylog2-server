@@ -40,13 +40,13 @@ const ValueActions = ({
   value,
 }: Props) => {
   const actionContext = useContext(ActionContext);
-  const fieldActionsContext = useFieldActions();
+  const { additionalHandlerArgs } = useFieldActions();
   const handlerArgs = {
     field,
     type,
     value,
     contexts: actionContext,
-    ...(fieldActionsContext?.additionalHandlerArgs ?? {}),
+    ...additionalHandlerArgs,
   };
   const elementWithStatus = (() => element) as React.ComponentType<{ active: boolean }>;
 
