@@ -20,17 +20,25 @@ import styled, { css } from 'styled-components';
 
 import { DropdownButton } from 'components/bootstrap';
 import MenuItem from 'components/bootstrap/menuitem/MenuItem';
-import { Icon } from 'components/common';
+import { IconButton } from 'components/common';
 import SearchForm from 'components/common/SearchForm';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-export type SortMode = 'alphabetical' | 'count';
+export const ALPHABETICAL_SORT = 'alphabetical';
+export const COUNT_SORT = 'count';
 
-const SORT_OPTIONS: Array<{ value: SortMode; label: string }> = [
-  { value: 'alphabetical', label: 'Alphabetical' },
-  { value: 'count', label: 'Count' },
+export type SortMode = string;
+export type SortDirection = 'asc' | 'desc';
+export type SortOption = { value: SortMode; label: string };
+
+export const DEFAULT_SORT_OPTIONS: Array<SortOption> = [
+  { value: ALPHABETICAL_SORT, label: 'Alphabetical' },
+  { value: COUNT_SORT, label: 'Count' },
 ];
+
+export const defaultSortDirectionForMode = (mode: SortMode): SortDirection =>
+  mode === ALPHABETICAL_SORT ? 'asc' : 'desc';
 
 const Controls = styled.div(
   ({ theme }) => css`
@@ -62,14 +70,6 @@ const StyledSearchForm = styled(SearchForm)`
   }
 `;
 
-const SortTrigger = styled.span(
-  ({ theme }) => css`
-    display: inline-flex;
-    align-items: center;
-    gap: ${theme.spacings.xxs};
-  `,
-);
-
 type Props = {
   appSection: string;
   activeColumnTitle: string | undefined;
@@ -77,8 +77,11 @@ type Props = {
   searchQuery: string;
   onSearchQueryChange: (value: string) => void;
   onSearchReset: () => void;
+  sortOptions: Array<SortOption>;
   sortMode: SortMode;
   onSortModeChange: (mode: SortMode) => void;
+  sortDirection: SortDirection;
+  onSortDirectionChange: (direction: SortDirection) => void;
 };
 
 const SliceFilters = ({
@@ -88,12 +91,15 @@ const SliceFilters = ({
   searchQuery,
   onSearchQueryChange,
   onSearchReset,
+  sortOptions,
   sortMode,
   onSortModeChange,
+  sortDirection,
+  onSortDirectionChange,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const sortLabel = sortMode === 'count' ? 'Count' : 'A-Z';
-  const sortIconName = sortMode === 'count' ? 'arrow_downward' : 'arrow_upward';
+  const selectedSortOption = sortOptions.find((option) => option.value === sortMode) ?? DEFAULT_SORT_OPTIONS[0];
+
   const handleSearchChange = (value: string) => {
     onSearchQueryChange(value);
     sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_SEARCH_CHANGED, {
@@ -125,6 +131,20 @@ const SliceFilters = ({
       event_details: {
         attribute_id: sliceCol,
         sort_mode: mode,
+        sort_direction: defaultSortDirectionForMode(mode),
+      },
+    });
+  };
+  const handleSortDirectionChange = () => {
+    const nextDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+
+    onSortDirectionChange(nextDirection);
+    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_SORT_CHANGED, {
+      app_section: appSection,
+      event_details: {
+        attribute_id: sliceCol,
+        sort_mode: sortMode,
+        sort_direction: nextDirection,
       },
     });
   };
@@ -133,14 +153,9 @@ const SliceFilters = ({
     <DropdownButton
       bsSize="small"
       id="slicing-sort-dropdown"
-      title={
-        <SortTrigger>
-          <Icon name={sortIconName} title={`Sort by ${sortLabel}`} />
-          {sortLabel}
-        </SortTrigger>
-      }
-      buttonTitle={`Sort by ${sortLabel}`}>
-      {SORT_OPTIONS.map((option) => (
+      title={selectedSortOption.label}
+      buttonTitle={`Sort by ${selectedSortOption.label}`}>
+      {sortOptions.map((option) => (
         <MenuItem key={option.value} onClick={() => handleSortChange(option.value)} active={sortMode === option.value}>
           {option.label}
         </MenuItem>
@@ -160,6 +175,10 @@ const SliceFilters = ({
           buttonLeftMargin={0}
         />
         {sortControl}
+        <IconButton
+          name={sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward'}
+          title={`Sort ${sortDirection === 'asc' ? 'ascending' : 'descending'}`}
+          onClick={handleSortDirectionChange} />
       </ControlsRow>
     </Controls>
   );
