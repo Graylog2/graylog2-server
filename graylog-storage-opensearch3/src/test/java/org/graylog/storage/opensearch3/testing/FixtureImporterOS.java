@@ -18,15 +18,18 @@ package org.graylog.storage.opensearch3.testing;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog.shaded.opensearch2.org.opensearch.action.bulk.BulkRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.bulk.BulkResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.support.ActiveShardCount;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequest;
-import org.graylog.storage.opensearch3.OpenSearchClient;
+import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog2.jackson.TypeReferences;
+import org.opensearch.client.opensearch._types.ErrorCause;
+import org.opensearch.client.opensearch._types.WaitForActiveShards;
+import org.opensearch.client.opensearch.core.BulkRequest;
+import org.opensearch.client.opensearch.core.BulkResponse;
+import org.opensearch.client.opensearch.core.bulk.BulkOperation;
+import org.opensearch.client.opensearch.core.bulk.BulkResponseItem;
+import org.opensearch.client.opensearch.core.bulk.IndexOperation;
+import org.opensearch.client.opensearch.indices.CreateIndexRequest;
+import org.opensearch.client.opensearch.indices.ExistsRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,14 +41,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-public class FixtureImporterOS2 implements FixtureImporter {
+public class FixtureImporterOS implements FixtureImporter {
     private static final Logger LOG = LoggerFactory.getLogger(FixtureImporter.class);
-    private final OpenSearchClient client;
+    private final OfficialOpensearchClient client;
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    public FixtureImporterOS2(OpenSearchClient client) {
+    public FixtureImporterOS(OfficialOpensearchClient client) {
         this.client = client;
     }
 
@@ -85,7 +90,7 @@ public class FixtureImporterOS2 implements FixtureImporter {
          *    ]
          *  }
          */
-        final BulkRequest bulkRequest = new BulkRequest();
+        final BulkRequest.Builder bulkRequest = new BulkRequest.Builder();
 
         final Set<String> targetIndices = new HashSet<>();
         for (final JsonNode document : root.path("documents")) {
@@ -101,7 +106,8 @@ public class FixtureImporterOS2 implements FixtureImporter {
             }
 
             for (final JsonNode index : indexes) {
-                final IndexRequest indexRequest = new IndexRequest().source(data);
+                IndexOperation.Builder indexRequest = new IndexOperation.Builder();
+                indexRequest.document(data);
 
                 final String indexName = index.path("indexName").asText(null);
                 if (indexName == null) {
@@ -116,7 +122,7 @@ public class FixtureImporterOS2 implements FixtureImporter {
                     indexRequest.id(index.path("indexId").asText());
                 }
 
-                bulkRequest.add(indexRequest);
+                bulkRequest.operations(BulkOperation.of(b -> b.index(indexRequest.build())));
             }
         }
 
@@ -126,21 +132,27 @@ public class FixtureImporterOS2 implements FixtureImporter {
             }
         }
 
-        final BulkResponse result = client.execute((c, requestOptions) -> c.bulk(bulkRequest, requestOptions),
-                "Unable to import fixtures.");
-        if (result.hasFailures()) {
-            throw new IllegalStateException("Error while bulk indexing documents: " + result.buildFailureMessage());
+        final BulkResponse result = client.sync(c -> c.bulk(bulkRequest.build()), "Unable to import fixtures.");
+        if (result.errors()) {
+            throw new IllegalStateException("Error while bulk indexing documents: " + result.items().stream()
+                    .map(BulkResponseItem::error)
+                    .filter(Objects::nonNull)
+                    .map(ErrorCause::reason)
+                    .collect(Collectors.joining(","))
+            );
         }
     }
 
     private void createIndex(String indexName) {
-        final CreateIndexRequest createIndexRequest = new CreateIndexRequest(indexName)
-                .waitForActiveShards(ActiveShardCount.ONE);
-        client.execute((c, requestOptions) -> c.indices().create(createIndexRequest, requestOptions));
+        final CreateIndexRequest createIndexRequest = CreateIndexRequest.of(r -> r
+                .index(indexName)
+                .waitForActiveShards(WaitForActiveShards.of(s -> s.count(1)))
+        );
+        client.sync(c -> c.indices().create(createIndexRequest), "Error creating index " + indexName);
     }
 
     private boolean indexExists(String indexName) {
-        final GetIndexRequest indexExistsRequest = new GetIndexRequest(indexName);
-        return client.execute((c, requestOptions) -> c.indices().exists(indexExistsRequest, requestOptions));
+        final ExistsRequest indexExistsRequest = ExistsRequest.of(r -> r.index(indexName));
+        return client.sync(c -> c.indices().exists(indexExistsRequest), "Error getting index").value();
     }
 }

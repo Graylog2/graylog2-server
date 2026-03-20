@@ -26,20 +26,8 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.collect.ImmutableList;
 import jakarta.annotation.Nullable;
-import org.graylog.shaded.opensearch2.org.apache.http.auth.AuthScope;
-import org.graylog.shaded.opensearch2.org.apache.http.auth.UsernamePasswordCredentials;
-import org.graylog.shaded.opensearch2.org.apache.http.impl.client.BasicCredentialsProvider;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexResponse;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog.storage.opensearch3.OfficialOpensearchClientProvider;
-import org.graylog.storage.opensearch3.OpenSearchClient;
-import org.graylog.storage.opensearch3.RestClientProvider;
 import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.ContainerCacheKey;
@@ -51,19 +39,20 @@ import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
-import org.graylog2.system.shutdown.GracefulShutdownService;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.ExpandWildcard;
+import org.opensearch.client.opensearch.indices.GetIndexResponse;
 import org.opensearch.testcontainers.OpenSearchContainer;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.utility.DockerImageName;
 
+import java.io.IOException;
 import java.net.URI;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -77,14 +66,11 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
 
     private final OpensearchSecurity security;
 
-    @Deprecated
-    private OpenSearchClient openSearchClient;
     private OfficialOpensearchClient officialOpensearchClient;
     private Client client;
     private FixtureImporter fixtureImporter;
     private Adapters adapters;
     private List<String> featureFlags;
-    private static Map<ContainerCacheKey, OpenSearchClient> openSearchClients = new HashMap<>();
     private static Map<ContainerCacheKey, OfficialOpensearchClient> officialOpensearchClients = new HashMap<>();
 
     public OpenSearchInstance(final boolean cachedInstance, final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
@@ -101,22 +87,18 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     public OpenSearchInstance init() {
         super.init();
         if (Objects.nonNull(cacheKey)) {
-            if (openSearchClients.containsKey(cacheKey)) {
-                this.openSearchClient = openSearchClients.get(cacheKey);
+            if (officialOpensearchClients.containsKey(cacheKey)) {
                 this.officialOpensearchClient = officialOpensearchClients.get(cacheKey);
             } else {
-                this.openSearchClient = buildClient();
                 this.officialOpensearchClient = buildOfficialClient();
-                openSearchClients.put(cacheKey, openSearchClient);
                 officialOpensearchClients.put(cacheKey, officialOpensearchClient);
             }
         } else {
-            this.openSearchClient = buildClient();
             this.officialOpensearchClient = buildOfficialClient();
         }
         this.client = new ClientOS(officialOpensearchClient, featureFlags);
-        this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
-        adapters = new AdaptersOS(openSearchClient, officialOpensearchClient, featureFlags);
+        this.fixtureImporter = new FixtureImporterOS(this.officialOpensearchClient);
+        adapters = new AdaptersOS(officialOpensearchClient, featureFlags);
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
         if (isFirstContainerStart) {
             afterContainerCreated();
@@ -130,13 +112,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         if (officialOpensearchClient != null) {
             officialOpensearchClient.close();
         }
-        openSearchClients.remove(cacheKey);
         officialOpensearchClients.remove(cacheKey);
-    }
-
-    private OpenSearchClient buildClient() {
-        RestHighLevelClient restHighLevelClient = buildRestClient();
-        return new OpenSearchClient(restHighLevelClient, new ObjectMapperProvider().get());
     }
 
     private OfficialOpensearchClient buildOfficialClient() {
@@ -159,30 +135,6 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
             credentialsProvider.setCredentials(anyScope, new org.apache.hc.client5.http.auth.UsernamePasswordCredentials("admin", DEFAULT_INITIAL_PASSWORD.toCharArray()));
         }
         return credentialsProvider;
-    }
-
-    @Deprecated
-    private RestHighLevelClient buildRestClient() {
-
-        final ElasticsearchClientConfiguration config = getElasticsearchClientConfiguration();
-
-        final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-
-        if (isSecuredInstance()) {
-            credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("admin", DEFAULT_INITIAL_PASSWORD));
-        }
-
-        final String protocol = isSecuredInstance() ? "https://" : "http://";
-
-        final TrustManagerAndSocketFactoryProvider trustFactory = getTrustManagerAndSocketFactoryProvider();
-        return new RestClientProvider(
-                new GracefulShutdownService(),
-                ImmutableList.of(URI.create(protocol + this.getHttpHostAddress())),
-                config,
-                credentialsProvider,
-                trustFactory,
-                IndexerJwtAuthToken.disabled())
-                .get();
     }
 
     private boolean isSecuredInstance() {
@@ -246,11 +198,13 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     private void fixDefaultNumberOfReplicasForIsmConfigs() {
         // changes default number of replicas for some system managed indices in 2.19
         // (see http://github.com/opensearch-project/OpenSearch/issues/9438)
-        openSearchClient().execute((client, requestOptions) -> {
-            final ClusterUpdateSettingsRequest req = new ClusterUpdateSettingsRequest();
-            req.persistentSettings(Map.of("cluster.default_number_of_replicas", "0"));
-            return client.cluster().putSettings(req, requestOptions);
-        });
+        try {
+            officialOpensearchClient.syncWithoutErrorMapping().cluster().putSettings(r -> r
+                    .persistent("cluster.default_number_of_replicas", JsonData.of("0"))
+            );
+        } catch (IOException e) {
+            // silently ignore error on versions where this cannot be set
+        }
     }
 
     /**
@@ -263,29 +217,36 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
      * after the indices are created and before the tests can start.
      */
     private void fixNumberOfReplicaForMlPlugin() {
-        openSearchClient().execute((client, requestOptions) -> {
             try {
-                waitForIndices(client, requestOptions, ".plugins-ml-config");
+                waitForIndices(".plugins-ml-config");
             } catch (ExecutionException | RetryException e) {
                 throw new RuntimeException("Failed to wait for indices", e);
             }
 
-            final UpdateSettingsRequest req = new UpdateSettingsRequest().indices(".plugins-ml-config", ".opensearch-sap-pre-packaged-rules-config", ".opensearch-sap-log-types-config");
-            req.settings(Map.of("number_of_replicas", "0"));
-            return client.indices().putSettings(req, requestOptions);
-        });
+        try {
+            officialOpensearchClient.syncWithoutErrorMapping().indices().putSettings(r -> r
+                    .index(".plugins-ml-config", ".opensearch-sap-pre-packaged-rules-config", ".opensearch-sap-log-types-config")
+                    .settings(s -> s.numberOfReplicas(0))
+            );
+        } catch (IOException e) {
+            // silently ignore error on versions where this cannot be set
+        }
+
     }
 
-    private GetIndexResponse waitForIndices(RestHighLevelClient client, RequestOptions requestOptions, String... indices) throws ExecutionException, RetryException {
+    private GetIndexResponse waitForIndices(String... indices) throws ExecutionException, RetryException {
         return RetryerBuilder.<GetIndexResponse>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(30))
-                .retryIfResult(input -> !new HashSet<>(Arrays.asList(input.getIndices())).containsAll(Arrays.asList(indices)))
+                .retryIfResult(input -> !input.result().keySet().containsAll(Arrays.asList(indices)))
                 .build()
                 .call(() -> {
-                    final GetIndexRequest request = new GetIndexRequest("*");
-                    request.indicesOptions(IndicesOptions.lenientExpandOpen());
-                    return client.indices().get(request, requestOptions);
+                    return officialOpensearchClient.syncWithoutErrorMapping().indices().get(r -> r
+                            .ignoreUnavailable(true)
+                            .allowNoIndices(true)
+                            .expandWildcards(ExpandWildcard.Open)
+                            .index("*")
+                    );
                 });
     }
 
@@ -302,11 +263,6 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     @Override
     public FixtureImporter fixtureImporter() {
         return this.fixtureImporter;
-    }
-
-    @Deprecated
-    public OpenSearchClient openSearchClient() {
-        return this.openSearchClient;
     }
 
     public OfficialOpensearchClient getOfficialOpensearchClient() {

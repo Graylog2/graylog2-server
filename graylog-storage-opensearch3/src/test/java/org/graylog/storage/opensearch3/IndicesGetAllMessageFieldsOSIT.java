@@ -21,7 +21,7 @@ import org.graylog.testing.elasticsearch.SearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.indices.IndicesGetAllMessageFieldsIT;
 
-public class IndicesGetAllMessageFieldsOS2IT extends IndicesGetAllMessageFieldsIT {
+public class IndicesGetAllMessageFieldsOSIT extends IndicesGetAllMessageFieldsIT {
     @SearchInstance
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
