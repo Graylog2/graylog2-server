@@ -60,6 +60,7 @@ const SlicesLists = styled.div`
 `;
 
 const SLICES_PAGE_SIZE = 10;
+const SHOW_EMPTY_SLICES_SECTION = false;
 
 const paginatedSlices = (slices: Slices, page: number, pageSize: number) => {
   const from = (page - 1) * pageSize;
@@ -236,41 +237,45 @@ const SlicesOverview = ({
             listTestId="slices-list"
           />
         </PaginatedList>
-        <EmptySlicesHeader>
-          {hasEmptySlices ? (
-            <Button
-              bsStyle="link"
-              bsSize="sm"
-              onClick={onToggleEmptySlices}
-              title={showEmptySlices ? 'Hide empty slices' : 'Show empty slices'}>
-              {showEmptySlices ? 'Hide empty slices' : 'Show empty slices'} ({emptySliceCount})
-            </Button>
-          ) : (
-            <EmptySlicesLabel>Empty slices (0)</EmptySlicesLabel>
-          )}
-        </EmptySlicesHeader>
-        {showEmptySlices && visibleEmptySlices.length > 0 && (
-          <PaginatedList
-            activePage={emptyPage}
-            hideFirstAndLastPageLinks
-            pageSize={SLICES_PAGE_SIZE}
-            totalItems={visibleEmptySlices.length}
-            showPageSizeSelect={false}
-            useQueryParameter={false}
-            onChange={(newPage, pageSize) => {
-              void pageSize;
-              setEmptyPage(newPage);
-            }}>
-            <SliceList
-              slices={currentEmptySlices}
-              activeSlice={activeSlice}
-              sliceCol={sliceCol}
-              onChangeSlicing={onSliceSelection}
-              sliceRenderers={sliceRenderers}
-              keyPrefix="empty-"
-              listTestId="empty-slices-list"
-            />
-          </PaginatedList>
+        {SHOW_EMPTY_SLICES_SECTION && (
+          <>
+            <EmptySlicesHeader>
+              {hasEmptySlices ? (
+                <Button
+                  bsStyle="link"
+                  bsSize="sm"
+                  onClick={onToggleEmptySlices}
+                  title={showEmptySlices ? 'Hide empty slices' : 'Show empty slices'}>
+                  {showEmptySlices ? 'Hide empty slices' : 'Show empty slices'} ({emptySliceCount})
+                </Button>
+              ) : (
+                <EmptySlicesLabel>Empty slices (0)</EmptySlicesLabel>
+              )}
+            </EmptySlicesHeader>
+            {showEmptySlices && visibleEmptySlices.length > 0 && (
+              <PaginatedList
+                activePage={emptyPage}
+                hideFirstAndLastPageLinks
+                pageSize={SLICES_PAGE_SIZE}
+                totalItems={visibleEmptySlices.length}
+                showPageSizeSelect={false}
+                useQueryParameter={false}
+                onChange={(newPage, pageSize) => {
+                  void pageSize;
+                  setEmptyPage(newPage);
+                }}>
+                <SliceList
+                  slices={currentEmptySlices}
+                  activeSlice={activeSlice}
+                  sliceCol={sliceCol}
+                  onChangeSlicing={onSliceSelection}
+                  sliceRenderers={sliceRenderers}
+                  keyPrefix="empty-"
+                  listTestId="empty-slices-list"
+                />
+              </PaginatedList>
+            )}
+          </>
         )}
       </SlicesLists>
     </>

@@ -274,55 +274,7 @@ describe('Slicing', () => {
     expect(within(screen.getByTestId('slices-list')).queryByText('Slice-01')).not.toBeInTheDocument();
   });
 
-  it('paginates empty slices', async () => {
-    renderSUT({
-      fetchSlices: () =>
-        Promise.resolve({
-          slices: [
-            { value: 'Alpha', count: 1 },
-            ...Array.from({ length: 11 }, (_, index) => ({
-              value: `Empty-${String(index + 1).padStart(2, '0')}`,
-              count: 0,
-            })),
-          ],
-        }),
-    });
-
-    await screen.findByText('Alpha');
-    await userEvent.click(screen.getByRole('button', { name: /show empty slices/i }));
-
-    expect(within(screen.getByTestId('empty-slices-list')).getByText('Empty-01')).toBeInTheDocument();
-    expect(within(screen.getByTestId('empty-slices-list')).queryByText('Empty-11')).not.toBeInTheDocument();
-
-    await userEvent.click(screen.getByRole('button', { name: /open page 2/i }));
-
-    await waitFor(() =>
-      expect(within(screen.getByTestId('empty-slices-list')).getByText('Empty-11')).toBeInTheDocument(),
-    );
-    expect(within(screen.getByTestId('empty-slices-list')).queryByText('Empty-01')).not.toBeInTheDocument();
-  });
-
-  it('shows empty slices when toggled', async () => {
-    renderSUT({
-      fetchSlices: () =>
-        Promise.resolve({
-          slices: [
-            { value: 'Alpha', count: 1 },
-            { value: 'Gamma', count: 0 },
-          ],
-        }),
-    });
-
-    await screen.findByText('Alpha');
-
-    expect(screen.queryByText('Gamma')).not.toBeInTheDocument();
-
-    await userEvent.click(screen.getByRole('button', { name: /show empty slices/i }));
-
-    expect(await screen.findByText('Gamma')).toBeInTheDocument();
-  });
-
-  it('auto-expands empty slices when active slice becomes empty', async () => {
+  it('hides the empty slices section for now', async () => {
     renderSUT(
       {
         fetchSlices: () =>
@@ -338,50 +290,10 @@ describe('Slicing', () => {
 
     await screen.findByText('Alpha');
 
-    expect(screen.getByRole('button', { name: /hide empty slices/i })).toBeInTheDocument();
-    expect(within(screen.getByTestId('empty-slices-list')).getByText('Gamma')).toBeInTheDocument();
-
-    await userEvent.click(screen.getByRole('button', { name: /hide empty slices/i }));
-
-    expect(screen.getByRole('button', { name: /show empty slices/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /show empty slices/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /hide empty slices/i })).not.toBeInTheDocument();
     expect(screen.queryByTestId('empty-slices-list')).not.toBeInTheDocument();
-  });
-
-  it('shows selected slice in empty list when backend does not return it', async () => {
-    renderSUT(
-      {
-        fetchSlices: () =>
-          Promise.resolve({
-            slices: [{ value: 'Alpha', count: 1 }],
-          }),
-      },
-      { searchParams: { slice: 'Missing-Slice' } },
-    );
-
-    await screen.findByText('Alpha');
-
-    expect(screen.getByRole('button', { name: /hide empty slices/i })).toBeInTheDocument();
-    expect(within(screen.getByTestId('empty-slices-list')).getByText('Missing-Slice')).toBeInTheDocument();
-  });
-
-  it('does not show selected slice when it does not match active filter', async () => {
-    renderSUT(
-      {
-        fetchSlices: () =>
-          Promise.resolve({
-            slices: [{ value: 'Alpha', count: 1 }],
-          }),
-      },
-      { searchParams: { slice: 'Missing-Slice' } },
-    );
-
-    await screen.findByText('Alpha');
-    expect(within(screen.getByTestId('empty-slices-list')).getByText('Missing-Slice')).toBeInTheDocument();
-
-    await userEvent.type(screen.getByPlaceholderText(/filter/i), 'alp');
-
-    await waitFor(() => expect(screen.queryByText('Missing-Slice')).not.toBeInTheDocument());
-    expect(screen.getByText('Empty slices (0)')).toBeInTheDocument();
+    expect(screen.queryByText('Gamma')).not.toBeInTheDocument();
   });
 
   it('refetches slices when selecting a slice', async () => {
