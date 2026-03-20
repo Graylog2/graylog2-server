@@ -91,11 +91,11 @@ const TableWrapper = styled.div(
 );
 
 type Props = {
-  activeQueryId: string;
   config: MessagesWidgetConfig;
   fields: Immutable.List<FieldTypeMapping>;
   messages: Array<BackendMessage>;
-  onSortChange: (newSortConfig: SortConfig[]) => Promise<void>;
+  onSortChange?: (newSortConfig: SortConfig[]) => Promise<void>;
+  renderRowActions?: (message: Message) => React.ReactNode;
   scrollContainerRef: React.MutableRefObject<HTMLDivElement>;
   setLoadingState: (loading: boolean) => void;
   displayBulkSelectCol?: boolean;
@@ -135,10 +135,10 @@ const _toggleMessageDetail = (
 
 const MessageTable = ({
   fields,
-  activeQueryId,
   messages,
   config,
   onSortChange,
+  renderRowActions = undefined,
   setLoadingState,
   scrollContainerRef,
   displayBulkSelectCol = false,
@@ -177,7 +177,7 @@ const MessageTable = ({
 
                   return (
                     <TableHeaderCell key={selectedFieldName} $isNumeric={type.isNumeric()}>
-                      <Field type={type} name={selectedFieldName} queryId={activeQueryId}>
+                      <Field type={type} name={selectedFieldName}>
                         {selectedFieldName}
                       </Field>
                       {interactive && !isCompound && (
@@ -192,6 +192,7 @@ const MessageTable = ({
                   );
                 })
                 .toArray()}
+              {renderRowActions && <TableHeaderCell />}
             </tr>
           </TableHead>
           {formattedMessages.map((message) => {
@@ -205,6 +206,7 @@ const MessageTable = ({
                 config={config}
                 showMessageRow={config?.showMessageRow}
                 selectedFields={selectedFields}
+                rowActions={renderRowActions?.(message)}
                 expanded={expandedMessages.contains(messageKey)}
                 toggleDetail={toggleDetail}
                 expandAllRenderAsync={false}

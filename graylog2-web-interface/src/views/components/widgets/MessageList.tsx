@@ -30,7 +30,6 @@ import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type { BackendMessage } from 'views/components/messagelist/Types';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
 import { InputsActions } from 'stores/inputs/InputsStore';
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useCurrentSearchTypesResults from 'views/components/widgets/useCurrentSearchTypesResults';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes';
@@ -147,7 +146,6 @@ const MessageList = ({
   const { stopAutoRefresh } = useAutoRefresh();
 
   const pageErrors = usePageErrors(searchTypeId);
-  const activeQueryId = useActiveQueryId();
   const searchTypes = useCurrentSearchTypesResults();
   const scrollContainerRef = useResetScrollPositionOnPageChange(currentPage);
   const dispatch = useViewsDispatch();
@@ -212,7 +210,7 @@ const MessageList = ({
           <ErrorWidget errors={pageErrors} />
         ) : (
           <MessageTable
-            activeQueryId={activeQueryId}
+
             config={config}
             scrollContainerRef={scrollContainerRef}
             fields={fields}

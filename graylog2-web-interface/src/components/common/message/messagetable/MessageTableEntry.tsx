@@ -83,6 +83,12 @@ const FieldsRow = styled.tr`
   }
 `;
 
+const ActionsCell = styled(TableDataCell)`
+  width: 1%;
+  white-space: nowrap;
+  text-align: right;
+`;
+
 const MessageDetailRow = styled.tr`
   td {
     padding-top: 5px;
@@ -105,6 +111,7 @@ type Props = {
   expanded: boolean;
   fields: FieldTypeMappingsList;
   message: Message;
+  rowActions?: React.ReactNode;
   selectedFields?: Immutable.OrderedSet<string>;
   showMessageRow?: boolean;
   toggleDetail: (messageId: string) => void;
@@ -131,6 +138,7 @@ const MessageTableEntry = ({
   expanded,
   fields,
   message,
+  rowActions = undefined,
   showMessageRow = false,
   selectedFields = Immutable.OrderedSet<string>(),
   toggleDetail,
@@ -169,7 +177,7 @@ const MessageTableEntry = ({
   const isSelected = isEntitySelected(message.index, message.id);
   const checkboxTitle = `${isSelected ? 'Deselect' : 'Select'} message`;
   const isSelectDisabled = !displayBulkSelectCol || !isEntitySelectable(toSelectableMessageTableEntry(message));
-  const colSpanFixup = selectedFields.size + 1 + Number(displayBulkSelectCol);
+  const colSpanFixup = selectedFields.size + 1 + (rowActions ? 1 : 0) + (displayBulkSelectCol ? 1 : 0);
 
   const selectedFieldsList = useMemo(
     () =>
@@ -216,6 +224,7 @@ const MessageTableEntry = ({
             </BulkSelectCell>
           )}
           {selectedFieldsList}
+          {rowActions && <ActionsCell $isNumeric={false}>{rowActions}</ActionsCell>}
         </FieldsRow>
 
         <MessagePreview

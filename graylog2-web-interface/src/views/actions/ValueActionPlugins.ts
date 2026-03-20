@@ -15,18 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { ActionDefinition, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
+import CopyValueToClipboard from 'views/logic/valueactions/CopyValueToClipboard';
+import SelectExtractorType from 'views/logic/valueactions/SelectExtractorType';
 
-// eslint-disable-next-line import/prefer-default-export
-type ExternalActionArgs = ActionHandlerArguments;
-
-export const createSimpleExternalValueAction = (
-  overrides: Partial<ActionDefinition<ExternalActionArgs>> = {},
-): ActionDefinition<ExternalActionArgs> => ({
-  type: 'http-get',
-  title: 'Pivot to example.org',
-  isHidden: ({ field }) => !['field1'].includes(field),
-  linkTarget: () => 'the-link',
+export const CopyToClipBoardValueActionPlugin = {
+  type: 'copy-value-to-clipboard',
+  title: 'Copy value to clipboard',
+  handler: CopyValueToClipboard,
+  isEnabled: CopyValueToClipboard.isEnabled,
   resetFocus: false,
-  ...overrides,
-});
+};
+
+export const CreateExtractorValueActionPlugin = {
+  type: 'create-extractor',
+  title: 'Create extractor',
+  isEnabled: ({ type, contexts }) => !!contexts.message && !type.isDecorated() && !!contexts.isLocalNode,
+  component: SelectExtractorType,
+  resetFocus: false,
+};

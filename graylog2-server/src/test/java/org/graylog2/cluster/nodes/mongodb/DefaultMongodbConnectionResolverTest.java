@@ -26,6 +26,7 @@ import com.mongodb.ServerAddress;
 import com.mongodb.connection.ServerDescription;
 import org.assertj.core.api.Assertions;
 import org.graylog2.configuration.MongoDbConfiguration;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.function.Consumer;
@@ -35,10 +36,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class DefaultMongodbConnectionResolverTest {
 
+    TestShutdownService shutdownService = new TestShutdownService();
+
+    @AfterEach
+    void tearDown() {
+        shutdownService.shutDown();
+    }
+
     @Test
     void testResolveWithoutAuthentication() throws Exception {
         MongoDbConfiguration config = createConfiguration("mongodb://localhost:27017/graylog");
-        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config);
+        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config, shutdownService);
 
         assertThat(resolver.resolve("host1:27017"))
                 .isNotNull()
@@ -50,7 +58,7 @@ class DefaultMongodbConnectionResolverTest {
     @Test
     void testResolveWithAuthentication() throws Exception {
         MongoDbConfiguration config = createConfiguration("mongodb://testuser:testpass@localhost:27017/graylog");
-        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config);
+        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config, shutdownService);
 
         assertThat(resolver.resolve("host1:27017"))
                 .isNotNull()
@@ -63,7 +71,7 @@ class DefaultMongodbConnectionResolverTest {
     void testResolveWithSpecialCharactersInPassword() throws Exception {
         // Password contains special characters that need URL encoding: @, +, =
         MongoDbConfiguration config = createConfiguration("mongodb://user:p%40ss%2Bw%3Drd@localhost:27017/graylog");
-        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config);
+        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config, shutdownService);
 
         assertThat(resolver.resolve("host1:27017"))
                 .isNotNull()
@@ -75,7 +83,7 @@ class DefaultMongodbConnectionResolverTest {
     void testResolveWithSpecialCharactersInUsername() throws Exception {
         // Username contains special characters that need URL encoding
         MongoDbConfiguration config = createConfiguration("mongodb://user%40domain:password@localhost:27017/graylog");
-        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config);
+        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config, shutdownService);
 
         assertThat(resolver.resolve("host1:27017"))
                 .isNotNull()
@@ -86,7 +94,7 @@ class DefaultMongodbConnectionResolverTest {
     @Test
     void testResolveWithDifferentHosts() throws Exception {
         MongoDbConfiguration config = createConfiguration("mongodb://user:pass@localhost:27017/graylog");
-        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config);
+        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config, shutdownService);
 
         // Test with different host formats
         assertThat(resolver.resolve("host1:27017"))
@@ -108,7 +116,7 @@ class DefaultMongodbConnectionResolverTest {
     @Test
     void testResolveWithIPv6Host() throws Exception {
         MongoDbConfiguration config = createConfiguration("mongodb://user:pass@localhost:27017/graylog");
-        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config);
+        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config, shutdownService);
 
         assertThat(resolver.resolve("[2001:db8::1]:27017"))
                 .isNotNull()
@@ -120,7 +128,7 @@ class DefaultMongodbConnectionResolverTest {
     void testResolveUsesSameDatabaseAsOriginalConnection() throws Exception {
         // Original connection uses "testdb" as the database
         MongoDbConfiguration config = createConfiguration("mongodb://user:pass@localhost:27017/testdb");
-        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config);
+        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config, shutdownService);
 
         assertThat(resolver.resolve("host1:27017"))
                 .isNotNull()
@@ -132,7 +140,7 @@ class DefaultMongodbConnectionResolverTest {
     void testResolveWithEmptyPassword() throws Exception {
         // Username with empty password
         MongoDbConfiguration config = createConfiguration("mongodb://user:@localhost:27017/graylog");
-        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config);
+        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config, shutdownService);
 
         assertThat(resolver.resolve("host1:27017"))
                 .isNotNull()
@@ -144,7 +152,7 @@ class DefaultMongodbConnectionResolverTest {
     void testResolvePreservesQueryParameters() throws Exception {
         // Original connection string has query parameters
         MongoDbConfiguration config = createConfiguration("mongodb://user:pass@localhost:27017/graylog?ssl=true&authSource=admin&maxPoolSize=50");
-        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config);
+        MongodbConnectionResolver resolver = new DefaultMongodbConnectionResolver(config, shutdownService);
 
         MongoClient client = resolver.resolve("host1:27017");
         assertThat(client).isNotNull();

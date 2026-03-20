@@ -287,6 +287,10 @@ export interface ActionContexts {
   favoriteFields?: Array<string>;
 }
 
+export type AdditionalViewsActionHandlerArguments = {
+  queryId: QueryId;
+};
+
 export type SearchTypeResult = SearchTypeResultTypes[keyof SearchTypeResultTypes];
 export type SearchTypeResults = { [id: string]: SearchTypeResult };
 
@@ -644,7 +648,7 @@ declare module 'graylog-web-plugin/plugin' {
     creators?: Array<Creator>;
     enterpriseWidgets?: Array<WidgetExport>;
     useExternalActions?: Array<() => ExternalActionsHookData>;
-    fieldActions?: Array<ActionDefinition>;
+    fieldActions?: Array<ActionDefinition<AdditionalViewsActionHandlerArguments>>;
     fieldTypeValueRenderer?: Array<{
       type: string;
       render: (value: unknown, field: string, render: React.ComponentType<ValueRendererProps>) => React.ReactNode;
@@ -653,7 +657,7 @@ declare module 'graylog-web-plugin/plugin' {
     searchTypes?: Array<SearchType<any, any>>;
     coreSystemConfigurations?: Array<CoreSystemConfiguration>;
     systemConfigurations?: Array<SystemConfiguration>;
-    valueActions?: Array<ActionDefinition>;
+    valueActions?: Array<ActionDefinition<AdditionalViewsActionHandlerArguments>>;
     'views.completers'?: Array<Completer>;
     'views.components.assetInformationActions'?: Array<AssetInformation>;
     'views.components.eventProcedureForm'?: Array<EventProcedureForm>;

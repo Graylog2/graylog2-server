@@ -216,10 +216,10 @@ class MongodbClusterResourceIntegrationIT {
     }
 
     private MongodbClusterResource createResource(MongoConnection mongoConnection,
-                                                   String username,
-                                                   String password,
-                                                   String authDatabase) {
-        MongodbNodesProvider nodesProvider = new MongodbNodesProvider(Set.of(new MongodbNodesService() {
+                                                  String username,
+                                                  String password,
+                                                  String authDatabase) {
+        MongodbNodesProvider nodesProvider = new MongodbNodesProvider(mongoConnection, Set.of(new MongodbNodesService() {
             @Override
             public List<MongodbNode> allNodes() {
                 return List.of();
