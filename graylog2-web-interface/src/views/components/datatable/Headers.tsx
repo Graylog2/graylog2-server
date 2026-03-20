@@ -32,7 +32,6 @@ import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { Icon } from 'components/common';
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 
 import FieldSortIcon from './FieldSortIcon';
@@ -60,7 +59,6 @@ const PinIcon = styled.button(
 );
 
 type HeaderFilterProps = {
-  activeQuery: string;
   borderedHeader: boolean;
   fields: FieldTypeMappingsList | Array<FieldTypeMapping>;
   field: string;
@@ -79,7 +77,6 @@ type HeaderFilterProps = {
 };
 
 const HeaderField = ({
-  activeQuery,
   borderedHeader,
   fields,
   field,
@@ -103,7 +100,7 @@ const HeaderField = ({
     if (onSetColumnsWidth && thRef?.current?.offsetWidth) {
       onSetColumnsWidth({ field: `${prefix}${field}`, offsetWidth: thRef.current.offsetWidth });
     }
-  }, [onSetColumnsWidth, field, prefix, thRef?.current?.offsetWidth]);
+  }, [onSetColumnsWidth, field, prefix]);
 
   const _togglePin = useCallback(() => {
     togglePin(`${prefix}${field}`);
@@ -116,7 +113,7 @@ const HeaderField = ({
       colSpan={span}
       $isNumeric={type.isNumeric()}
       $borderedHeader={borderedHeader}>
-      <Field name={field} queryId={activeQuery} type={type}>
+      <Field name={field} type={type}>
         {title}
       </Field>
       {showPinIcon && (
@@ -266,7 +263,6 @@ const Headers = ({
   setLoadingState,
   showRowNumbers = true,
 }: Props) => {
-  const activeQuery = useActiveQueryId();
   const rowFieldNames = rowPivots.flatMap((pivot) => pivot.fields);
   const columnFieldNames = columnPivots.flatMap((pivot) => pivot.fields);
   const interactive = useContext(InteractiveContext);
@@ -281,7 +277,6 @@ const Headers = ({
     showPinIcon = false,
   }) => (
     <HeaderField
-      activeQuery={activeQuery}
       borderedHeader={borderedHeader}
       key={`${prefix}${field}`}
       fields={fields}

@@ -20,11 +20,11 @@ import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget'
 import Series from 'views/logic/aggregationbuilder/Series';
 import TitleTypes from 'views/stores/TitleTypes';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
-import type { GetState } from 'views/types';
+import type { GetState, AdditionalViewsActionHandlerArguments } from 'views/types';
 import { addWidget } from 'views/logic/slices/widgetActions';
 import { setTitle } from 'views/logic/slices/titlesActions';
 import { selectActiveQuery } from 'views/logic/slices/viewSelectors';
-import type { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
+import type { ResolvedActionHandlerArguments } from 'views/components/actions/ActionHandler';
 
 import duplicateCommonWidgetSettings from './DuplicateCommonWidgetSettings';
 
@@ -32,7 +32,11 @@ const NUMERIC_FIELD_SERIES = ['count', 'sum', 'avg', 'min', 'max', 'stddev', 'va
 const NONNUMERIC_FIELD_SERIES = ['count', 'card'];
 
 const handler =
-  ({ field, type, contexts: { widget: origWidget = Widget.empty() } }: ActionHandlerArguments<{ widget?: Widget }>) =>
+  ({
+    field,
+    type,
+    contexts: { widget: origWidget = Widget.empty() },
+  }: ResolvedActionHandlerArguments<AdditionalViewsActionHandlerArguments>) =>
   (dispatch: ViewsDispatch, getState: GetState) => {
     const activeQuery = selectActiveQuery(getState());
     const series = (type && type.isNumeric() ? NUMERIC_FIELD_SERIES : NONNUMERIC_FIELD_SERIES)
