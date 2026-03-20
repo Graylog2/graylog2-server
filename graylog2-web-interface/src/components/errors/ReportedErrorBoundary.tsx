@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useCallback, useState, useEffect } from 'react';
 
 import useLocation from 'routing/useLocation';
+import useRightSidebar from 'hooks/useRightSidebar';
 import ErrorPage from 'components/errors/ErrorPage';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import type { ReportedError } from 'logic/errors/ReportedErrors';
@@ -71,8 +72,12 @@ type Props = {
 
 const ReportedErrorBoundary = ({ children }: Props) => {
   const [reportedError, setReportedError] = useState<ReportedError | undefined>();
+  const { closeSidebar } = useRightSidebar();
 
-  const report = useCallback((newError: ReportedError) => setReportedError(newError), []);
+  const report = useCallback((newError: ReportedError) => {
+    setReportedError(newError);
+    closeSidebar();
+  }, [closeSidebar]);
 
   useEffect(() => ErrorsActions.report.listen(report), [report]);
 
