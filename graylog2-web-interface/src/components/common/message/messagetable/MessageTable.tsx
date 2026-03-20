@@ -137,7 +137,7 @@ const MessageTable = ({
   fields,
   messages,
   config,
-  onSortChange,
+  onSortChange = undefined,
   renderRowActions = undefined,
   setLoadingState,
   scrollContainerRef,
