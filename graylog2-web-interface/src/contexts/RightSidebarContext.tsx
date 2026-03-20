@@ -24,10 +24,8 @@ type RightSidebarContentBase<T = Record<string, unknown>> = {
   props?: T;
 };
 
-export type RightSidebarContent<T = Record<string, unknown>> = RightSidebarContentBase<T> & (
-  | { component: React.ComponentType<T>; componentKey?: never }
-  | { componentKey: string; component?: never }
-);
+export type RightSidebarContent<T = Record<string, unknown>> = RightSidebarContentBase<T> &
+  ({ component: React.ComponentType<T>; componentKey?: never } | { componentKey: string; component?: never });
 
 export type RightSidebarContextType = {
   isOpen: boolean;

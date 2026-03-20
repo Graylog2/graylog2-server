@@ -14,19 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3.sniffer;
-
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
-import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.NodesSniffer;
-
-public interface SnifferBuilder {
-    /**
-     * @return true if the configuration of this node allows that type of sniffer
-     */
-    boolean enabled();
-
-    /**
-     * @return Always a new instance of a sniffer.
-     */
-    NodesSniffer create(RestClient restClient);
-}
+const SidebarEventDefinitionDetails = (id: string) =>
+  ({
+    id: 'event-definition-details',
+    title: 'Event Definition Details',
+    componentKey: 'replay-search-sidebar',
+    props: { alertId: undefined, definitionId: id },
+  }) as const;
+export default SidebarEventDefinitionDetails;

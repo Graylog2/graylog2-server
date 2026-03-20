@@ -28,6 +28,7 @@ import useFeature from 'hooks/useFeature';
 import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
 import sidebarSections, { type SidebarSection } from 'views/components/sidebar/sidebarSections';
 import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
+import SidebarEventDetails from 'components/events/SidebarEventDetails';
 
 const ReplaySearchSidebarSection = () => {
   const { alertId, definitionId } = useReplaySearchContext();
@@ -67,15 +68,12 @@ type Props = {
   searchPageLayout?: Partial<LayoutState>;
 };
 
-const EventReplaySearch = ({
-  eventDefinitionMappedData,
-  eventData,
-  searchPageLayout = undefined,
-}: Props) => {
+const EventReplaySearch = ({ eventDefinitionMappedData, eventData, searchPageLayout = undefined }: Props) => {
   const { eventDefinition, aggregations } = eventDefinitionMappedData;
   const { openSidebar } = useRightSidebar();
   const isRightSidebarEnabled = useFeature('replay_search_right_sidebar');
-  const effectiveLayout = searchPageLayout ?? (isRightSidebarEnabled ? defaultSearchPageLayout : legacySearchPageLayout);
+  const effectiveLayout =
+    searchPageLayout ?? (isRightSidebarEnabled ? defaultSearchPageLayout : legacySearchPageLayout);
 
   const view = useCreateViewForEvent({
     eventData,
@@ -94,12 +92,7 @@ const EventReplaySearch = ({
 
   useEffect(() => {
     if (isRightSidebarEnabled) {
-      openSidebar({
-        id: 'replay-search-sidebar',
-        title: 'Replay Details',
-        component: ReplaySearchSidebar,
-        props: { alertId: eventData?.id, definitionId: eventDefinition?.id },
-      });
+      openSidebar(SidebarEventDetails(eventData?.id, eventDefinition?.id));
     }
   }, [isRightSidebarEnabled, openSidebar, eventData?.id, eventDefinition?.id]);
 
@@ -110,11 +103,7 @@ const EventReplaySearch = ({
   );
 };
 
-const WithLoadingBarrier = ({
-  eventDefinitionMappedData,
-  eventData,
-  searchPageLayout = undefined,
-}: Props) => (
+const WithLoadingBarrier = ({ eventDefinitionMappedData, eventData, searchPageLayout = undefined }: Props) => (
   <LoadingBarrier eventDefinition={eventDefinitionMappedData.eventDefinition}>
     <EventReplaySearch
       eventDefinitionMappedData={eventDefinitionMappedData}

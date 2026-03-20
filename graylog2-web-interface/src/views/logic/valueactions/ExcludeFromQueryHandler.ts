@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import uniq from 'lodash/uniq';
-import type { Datum } from 'plotly.js';
 
 import { escape, addToQuery, predicate, not } from 'views/logic/queries/QueryHelper';
 import recordQueryStringUsage from 'views/logic/queries/recordQueryStringUsage';
@@ -24,6 +23,8 @@ import type { RootState } from 'views/types';
 import { updateQueryString } from 'views/logic/slices/viewSlice';
 import { selectQueryString } from 'views/logic/slices/viewSelectors';
 import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
+import type { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
+import type Widget from 'views/logic/widgets/Widget';
 
 const formatNewQuery = (oldQuery: string, field: string, value: any) => {
   const fieldPredicate = not(predicate(field, escape(value)));
@@ -35,7 +36,7 @@ type Args = {
   queryId: string;
   field: string;
   value?: string;
-  contexts?: { valuePath: Array<{ [key: string]: Datum }> } | null;
+  contexts?: { valuePath?: ValuePath; widget?: Widget } | null;
 };
 
 const ExcludeFromQueryHandler =
