@@ -22,7 +22,14 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import Icon from 'components/common/Icon';
 import IconButton from 'components/common/IconButton';
 
-import { ANIMATION_DURATION, SidebarContainer, SidebarRow, SidebarContentArea, SidebarHeader, SidebarTitle } from './SidebarStyles';
+import {
+  ANIMATION_DURATION,
+  SidebarContainer,
+  SidebarRow,
+  SidebarContentArea,
+  SidebarHeader,
+  SidebarTitle,
+} from './SidebarStyles';
 
 const COLLAPSED_WIDTH = 36;
 
