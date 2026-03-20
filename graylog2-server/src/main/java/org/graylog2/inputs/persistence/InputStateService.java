@@ -57,13 +57,11 @@ public class InputStateService {
     private static final String COLLECTION_NAME = "input_runtime_states";
 
     private final MongoCollection<InputStateDto> collection;
-    private final MongoUtils<InputStateDto> mongoUtils;
     private final String thisNodeId;
 
     @Inject
     public InputStateService(MongoCollections mongoCollections, NodeId nodeId) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, InputStateDto.class);
-        this.mongoUtils = mongoCollections.utils(collection);
         this.thisNodeId = nodeId.getNodeId();
 
         collection.createIndex(
@@ -117,7 +115,7 @@ public class InputStateService {
     public void removeAllForNode(String nodeId) {
         final long deleted = collection.deleteMany(Filters.eq(FIELD_NODE_ID, nodeId)).getDeletedCount();
         if (deleted > 0) {
-            LOG.info("Removed {} stale runtime state documents for node {}", deleted, nodeId);
+            LOG.debug("Removed {} stale runtime state documents for node {}", deleted, nodeId);
         }
     }
 
