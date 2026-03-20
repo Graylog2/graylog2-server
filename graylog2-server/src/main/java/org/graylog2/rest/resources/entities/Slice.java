@@ -23,4 +23,12 @@ public record Slice(@JsonProperty(FIELD_ID) String value, @JsonProperty(FIELD_TI
     private static final String FIELD_TITLE = "title";
     private static final String FIELD_TYPE = "type";
     private static final String FIELD_COUNT = "count";
+
+    public static Slice create(final String value, final String type, final Integer count) {
+        return new Slice(value, null, type, count);
+    }
+
+    public static Slice create(final String value, final Integer count) {
+        return new Slice(value, null, null, count);
+    }
 }

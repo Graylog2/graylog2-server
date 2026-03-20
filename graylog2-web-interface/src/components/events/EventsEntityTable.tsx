@@ -56,7 +56,6 @@ const EventsEntityTable = () => {
     const { filter, timerange } = parseFilters(filters);
 
     return Events.slices({
-      include_all: true,
       slice_column: column,
       query: getConcatenatedQuery(query, streamId as string),
       filter,

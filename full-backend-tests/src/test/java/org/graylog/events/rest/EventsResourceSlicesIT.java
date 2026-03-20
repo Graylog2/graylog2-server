@@ -54,7 +54,7 @@ public class EventsResourceSlicesIT {
 
     @FullBackendTest
     void testSlicesByPriority() {
-        final var slices = requestSlices("priority", "", Map.of(), false);
+        final var slices = requestSlices("priority", "", Map.of());
         assertSlice(slices, "1", 6);
         assertSlice(slices, "2", 7);
         assertSlice(slices, "3", 8);
@@ -63,7 +63,7 @@ public class EventsResourceSlicesIT {
 
     @FullBackendTest
     void testSlicesByAlert() {
-        final var slices = requestSlices("alert", "", Map.of(), false);
+        final var slices = requestSlices("alert", "", Map.of());
         assertSlice(slices, "true", 14);
         assertSlice(slices, "false", 12);
     }
@@ -73,7 +73,7 @@ public class EventsResourceSlicesIT {
     @FullBackendTest
     void testSlicesByPriorityWithDefinitionFilter() {
         final var slices = requestSlices("priority", "",
-                Map.of("event_definitions", Set.of("def-filter-001")), false);
+                Map.of("event_definitions", Set.of("def-filter-001")));
         assertSlice(slices, "1", 2);
         assertSlice(slices, "2", 1);
     }
@@ -81,15 +81,15 @@ public class EventsResourceSlicesIT {
     @FullBackendTest
     void testSlicesByAlertWithPriorityFilter() {
         final var slices = requestSlices("alert", "",
-                Map.of("priority", Set.of("1")), false);
+                Map.of("priority", Set.of("1")));
         assertSlice(slices, "true", 5);
         assertSlice(slices, "false", 1);
     }
 
     @FullBackendTest
     void testSlicesWithQuery() {
-        final var slicesAll = requestSlices("priority", "", Map.of(), false);
-        final var slicesFiltered = requestSlices("priority", "message:\"does-not-exist-xyz\"", Map.of(), false);
+        final var slicesAll = requestSlices("priority", "", Map.of());
+        final var slicesFiltered = requestSlices("priority", "message:\"does-not-exist-xyz\"", Map.of());
 
         final int totalAll = slicesAll.stream()
                 .mapToInt(s -> ((Number) ((Map<?, ?>) s).get("count")).intValue())
@@ -102,8 +102,8 @@ public class EventsResourceSlicesIT {
 
     // --- Helper methods ---
 
-    private List<Object> requestSlices(String sliceColumn, String query, Map<String, Object> filter, boolean includeAll) {
-        final var requestBody = createRequest(sliceColumn, query, filter, includeAll);
+    private List<Object> requestSlices(String sliceColumn, String query, Map<String, Object> filter) {
+        final var requestBody = createRequest(sliceColumn, query, filter);
         return given()
                 .config(api.withGraylogBackendFailureConfig())
                 .spec(api.requestSpecification())
@@ -119,11 +119,10 @@ public class EventsResourceSlicesIT {
                 .getList("slices");
     }
 
-    private Map<String, Object> createRequest(String sliceColumn, String query, Map<String, Object> filter, boolean includeAll) {
+    private Map<String, Object> createRequest(String sliceColumn, String query, Map<String, Object> filter) {
         final var request = new HashMap<String, Object>();
         request.put("query", query);
         request.put("slice_column", sliceColumn);
-        request.put("include_all", includeAll);
         request.put("timerange", Map.of(
                 "type", "absolute",
                 "from", "2025-01-15T00:00:00.000Z",

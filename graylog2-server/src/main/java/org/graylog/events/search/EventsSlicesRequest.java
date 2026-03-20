@@ -33,7 +33,6 @@ public abstract class EventsSlicesRequest {
     private static final String FIELD_FILTER = "filter";
     private static final String FIELD_TIMERANGE = "timerange";
     private static final String FIELD_SLICE_COLUMN = "slice_column";
-    private static final String FIELD_INCLUDE_ALL = "include_all";
 
     @JsonProperty(FIELD_QUERY)
     public abstract String query();
@@ -46,9 +45,6 @@ public abstract class EventsSlicesRequest {
 
     @JsonProperty(FIELD_SLICE_COLUMN)
     public abstract String sliceColumn();
-
-    @JsonProperty(FIELD_INCLUDE_ALL)
-    public abstract boolean includeAll();
 
     public static Builder builder() {
         return Builder.create();
@@ -74,8 +70,7 @@ public abstract class EventsSlicesRequest {
                     .sliceColumn("")
                     .query("")
                     .filter(EventsSearchFilter.empty())
-                    .timerange(timerange)
-                    .includeAll(false);
+                    .timerange(timerange);
         }
 
         @JsonProperty(FIELD_QUERY)
@@ -89,9 +84,6 @@ public abstract class EventsSlicesRequest {
 
         @JsonProperty(FIELD_SLICE_COLUMN)
         public abstract Builder sliceColumn(String sliceColumn);
-
-        @JsonProperty(FIELD_INCLUDE_ALL)
-        public abstract Builder includeAll(boolean includeAll);
 
         public abstract EventsSlicesRequest build();
     }
