@@ -61,7 +61,6 @@ public class DefaultMongodbConnectionResolver implements MongodbConnectionResolv
     @Nonnull
     private MongoClient createClient(String nodeName) {
         LOG.info("Creating mongo client for {}", nodeName);
-        // TODO: should we configure the client somehow limited? With only a handful of connections?
         return new MongoClient(new MongoClientURI(buildConnectionString(nodeName)));
     }
 
@@ -86,6 +85,8 @@ public class DefaultMongodbConnectionResolver implements MongodbConnectionResolv
             final Map<String, String> configParams = new LinkedHashMap<>(configParamsFromQuery());
             configParams.put("directConnection", "true");
             configParams.forEach(builder::addParameter);
+            configParams.remove("replicaSet");
+            configParams.put("maxPoolSize", "5");
 
             return builder.build().toString();
         } catch (URISyntaxException e) {
