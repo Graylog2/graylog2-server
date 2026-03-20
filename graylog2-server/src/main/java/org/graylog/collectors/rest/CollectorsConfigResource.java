@@ -58,6 +58,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.commons.lang3.time.DurationFormatUtils.formatDurationWords;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Tag(name = "Collectors/Config", description = "Managed collector configuration")
@@ -160,19 +161,6 @@ public class CollectorsConfigResource extends RestResource {
         return config;
     }
 
-    private static String formatDuration(Duration duration) {
-        final long hours = duration.toHours();
-        if (hours > 0 && hours % 24 == 0) {
-            final long days = hours / 24;
-            return days == 1 ? "1 day" : f("%d days", days);
-        }
-        if (hours > 0) {
-            return hours == 1 ? "1 hour" : f("%d hours", hours);
-        }
-        final long minutes = duration.toMinutes();
-        return minutes == 1 ? "1 minute" : f("%d minutes", minutes);
-    }
-
     private void validateThresholds(CollectorsConfigRequest request) throws ValidationException {
         final Duration offlineThreshold = request.collectorOfflineThreshold();
         final Duration visibilityThreshold = request.collectorDefaultVisibilityThreshold();
@@ -192,6 +180,10 @@ public class CollectorsConfigResource extends RestResource {
                     .add(new ValidationResult.ValidationFailed("Must be a positive duration"));
         }
 
+        if (!errors.isEmpty()) {
+            throw new ValidationException(errors);
+        }
+
         final Duration effectiveOffline = offlineThreshold != null
                 ? offlineThreshold : CollectorsConfig.DEFAULT_OFFLINE_THRESHOLD;
         if (effectiveOffline.toMinutes() < 1) {
@@ -203,8 +195,8 @@ public class CollectorsConfigResource extends RestResource {
                 ? visibilityThreshold : CollectorsConfig.DEFAULT_VISIBILITY_THRESHOLD;
         if (!effectiveVisibility.minus(effectiveOffline).isPositive()) {
             errors.computeIfAbsent("collector_default_visibility_threshold", k -> new ArrayList<>())
-                    .add(new ValidationResult.ValidationFailed(
-                            f("Must be greater than the offline threshold (%s)", formatDuration(effectiveOffline))));
+                    .add(new ValidationResult.ValidationFailed(f("Must be greater than the offline threshold (%s)",
+                            formatDurationWords(effectiveOffline.toMillis(), true, true))));
         }
 
         final Duration effectiveExpiration = expirationThreshold != null
@@ -212,7 +204,8 @@ public class CollectorsConfigResource extends RestResource {
         if (!effectiveExpiration.minus(effectiveVisibility).isPositive()) {
             errors.computeIfAbsent("collector_expiration_threshold", k -> new ArrayList<>())
                     .add(new ValidationResult.ValidationFailed(
-                            f("Must be greater than the visibility threshold (%s)", formatDuration(effectiveVisibility))));
+                            f("Must be greater than the visibility threshold (%s)",
+                                    formatDurationWords(effectiveVisibility.toMillis(), true, true))));
         }
 
         if (!errors.isEmpty()) {
