@@ -119,6 +119,7 @@ class EnrollmentTokenResourceTest {
         when(fleetService.get("test-fleet")).thenReturn(java.util.Optional.of(mock(FleetDTO.class)));
 
         final var request = new CreateEnrollmentTokenRequest(
+                "test-token",
                 "test-fleet",
                 Duration.ofDays(1)
         );
@@ -141,6 +142,7 @@ class EnrollmentTokenResourceTest {
         when(collectorsConfigService.get()).thenReturn(Optional.empty());
 
         final var request = new CreateEnrollmentTokenRequest(
+                "test-token",
                 "test-fleet",
                 Duration.ofDays(1)
         );
@@ -160,7 +162,7 @@ class EnrollmentTokenResourceTest {
                         .build()));
         when(fleetService.get("nonexistent-fleet")).thenReturn(java.util.Optional.empty());
 
-        final var request = new CreateEnrollmentTokenRequest("nonexistent-fleet", Duration.ofDays(1));
+        final var request = new CreateEnrollmentTokenRequest("test-token", "nonexistent-fleet", Duration.ofDays(1));
 
         assertThatThrownBy(() -> resource.createToken(request))
                 .isInstanceOf(BadRequestException.class)
@@ -177,7 +179,7 @@ class EnrollmentTokenResourceTest {
     @Test
     void listReturnsPaginatedTokens() {
         final var token = new EnrollmentTokenDTO(
-                "token-id", "jti-1", "kid-1", "fleet-1",
+                "token-id", "test-token", "jti-1", "kid-1", "fleet-1",
                 new EnrollmentTokenCreator("test-user-id", "testuser"),
                 Instant.now(), Instant.now().plusSeconds(86400), 0, null);
 

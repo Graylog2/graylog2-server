@@ -33,6 +33,7 @@ class EnrollmentTokenDTOTest {
         final var creator = new EnrollmentTokenCreator("user-1", "alice");
         final var dto = new EnrollmentTokenDTO(
                 "token-id-1",
+                "token-name-1",
                 "jti-abc",
                 "kid-abc",
                 "fleet-1",
@@ -48,6 +49,7 @@ class EnrollmentTokenDTOTest {
 
         assertThat(deserialized).isEqualTo(dto);
         assertThat(deserialized.id()).isEqualTo("token-id-1");
+        assertThat(deserialized.name()).isEqualTo("token-name-1");
         assertThat(deserialized.jti()).isEqualTo("jti-abc");
         assertThat(deserialized.kid()).isEqualTo("kid-abc");
         assertThat(deserialized.fleetId()).isEqualTo("fleet-1");
@@ -65,6 +67,7 @@ class EnrollmentTokenDTOTest {
         final var creator = new EnrollmentTokenCreator("user-2", "bob");
         final var dto = new EnrollmentTokenDTO(
                 "token-id-2",
+                "token-name-2",
                 "jti-xyz",
                 "kid-xyz",
                 "fleet-2",
@@ -90,6 +93,7 @@ class EnrollmentTokenDTOTest {
         final var creator = new EnrollmentTokenCreator("user-3", "carol");
         final var dto = new EnrollmentTokenDTO(
                 "token-id-3",
+                "token-name-3",
                 "jti-def",
                 "kid-def",
                 "fleet-3",
@@ -104,6 +108,7 @@ class EnrollmentTokenDTOTest {
 
         assertThat(json).contains("\"jti\"");
         assertThat(json).contains("\"kid\"");
+        assertThat(json).contains("\"name\"");
         assertThat(json).contains("\"fleet_id\"");
         assertThat(json).contains("\"created_by\"");
         assertThat(json).contains("\"created_at\"");

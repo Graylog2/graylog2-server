@@ -65,6 +65,7 @@ import static org.mockito.Mockito.when;
 class EnrollmentTokenServiceTest {
 
     private static final String TEST_CLUSTER_ID = "test-cluster-id-12345";
+    private static final String TEST_TOKEN_NAME = "test-token";
     private static final EnrollmentTokenCreator TEST_CREATOR = new EnrollmentTokenCreator("test-user-id", "testuser");
 
     private EnrollmentTokenService enrollmentTokenService;
@@ -108,6 +109,7 @@ class EnrollmentTokenServiceTest {
     @Test
     void createTokenReturnsValidJwt() throws Exception {
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
+                TEST_TOKEN_NAME,
                 "test-fleet",
                 Duration.ofDays(1)
         );
@@ -137,7 +139,7 @@ class EnrollmentTokenServiceTest {
 
     @Test
     void createTokenWithNullExpiryProducesNonExpiringJwt() throws Exception {
-        final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest("default-fleet", null);
+        final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(TEST_TOKEN_NAME, "default-fleet", null);
 
         final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_CREATOR);
 
@@ -158,6 +160,7 @@ class EnrollmentTokenServiceTest {
     @Test
     void validateTokenReturnsEnrollmentForValidToken() {
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
+                TEST_TOKEN_NAME,
                 "test-fleet",
                 Duration.ofDays(1)
         );
@@ -174,6 +177,7 @@ class EnrollmentTokenServiceTest {
     void validateTokenReturnsEmptyForExpiredToken() throws Exception {
         // Create token that expires in 1 second
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
+                TEST_TOKEN_NAME,
                 "test-fleet",
                 Duration.ofSeconds(1)
         );
@@ -190,6 +194,7 @@ class EnrollmentTokenServiceTest {
     @Test
     void validateTokenReturnsEmptyForWrongClusterId() {
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
+                TEST_TOKEN_NAME,
                 "test-fleet",
                 Duration.ofDays(1)
         );
@@ -206,6 +211,7 @@ class EnrollmentTokenServiceTest {
     @Test
     void validateTokenReturnsEmptyForInvalidSignature() {
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
+                TEST_TOKEN_NAME,
                 "test-fleet",
                 Duration.ofDays(1)
         );
@@ -221,7 +227,7 @@ class EnrollmentTokenServiceTest {
 
     @Test
     void createTokenIncludesCttHeader() {
-        final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest("test-fleet", Duration.ofDays(1));
+        final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(TEST_TOKEN_NAME, "test-fleet", Duration.ofDays(1));
         final EnrollmentTokenResponse response = enrollmentTokenService.createToken(request, TEST_CREATOR);
 
         // Decode header without verification
@@ -245,6 +251,7 @@ class EnrollmentTokenServiceTest {
     @Test
     void createTokenPersistsMetadata() {
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
+                TEST_TOKEN_NAME,
                 "persist-fleet",
                 Duration.ofDays(1)
         );
@@ -255,6 +262,7 @@ class EnrollmentTokenServiceTest {
 
         assertThat(result).isPresent();
         final EnrollmentTokenDTO dto = result.get();
+        assertThat(dto.name()).isEqualTo(TEST_TOKEN_NAME);
         assertThat(dto.fleetId()).isEqualTo("persist-fleet");
         assertThat(dto.createdBy()).isEqualTo(TEST_CREATOR);
         assertThat(dto.jti()).isNotNull();
@@ -267,6 +275,7 @@ class EnrollmentTokenServiceTest {
     @Test
     void validateTokenRejectsDeletedToken() {
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
+                TEST_TOKEN_NAME,
                 "delete-fleet",
                 Duration.ofDays(1)
         );
@@ -322,6 +331,7 @@ class EnrollmentTokenServiceTest {
     @Test
     void incrementUsageUpdatesCountAndLastUsed() {
         final CreateEnrollmentTokenRequest request = new CreateEnrollmentTokenRequest(
+                TEST_TOKEN_NAME,
                 "usage-fleet",
                 Duration.ofDays(1)
         );

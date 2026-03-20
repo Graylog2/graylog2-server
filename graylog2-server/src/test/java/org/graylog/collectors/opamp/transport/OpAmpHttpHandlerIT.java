@@ -55,7 +55,7 @@ class OpAmpHttpHandlerIT {
     private static final MediaType PROTOBUF = MediaType.parse("application/x-protobuf");
     private static final int TEST_MAX_MESSAGE_SIZE = 1024; // 1 KB for tests
     private static final EnrollmentTokenDTO TEST_TOKEN_DTO = new EnrollmentTokenDTO(
-            "token-id", "jti-1", "kid-1", "test-fleet",
+            "token-id", "test-token", "jti-1", "kid-1", "test-fleet",
             new EnrollmentTokenCreator("user-id", "admin"), Instant.now(), null, 0, null);
 
     private HttpServer httpServer;

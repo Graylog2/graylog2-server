@@ -96,7 +96,7 @@ class OpAmpServiceTest {
         // Create a token with ctt: enrollment
         final String token = createTokenWithCtt("enrollment");
         final String authHeader = "Bearer " + token;
-        final EnrollmentTokenDTO tokenDto = new EnrollmentTokenDTO("token-id", "jti-1", "kid-1", "test-fleet",
+        final EnrollmentTokenDTO tokenDto = new EnrollmentTokenDTO("token-id", "test-token", "jti-1", "kid-1", "test-fleet",
                 new EnrollmentTokenCreator("user-id", "admin"), Instant.now(), null, 0, null);
 
         when(enrollmentTokenService.validateToken(eq(token)))
