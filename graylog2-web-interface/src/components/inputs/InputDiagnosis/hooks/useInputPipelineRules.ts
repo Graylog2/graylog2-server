@@ -18,7 +18,6 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { SystemInputs } from '@graylog/server-api';
 
-import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 import { defaultOnError } from 'util/conditional/onError';
@@ -56,7 +55,6 @@ export const fetchInputPipelineRules = async (
     searchParams.page,
     searchParams.pageSize,
     searchParams.query,
-    FiltersForQueryParams(searchParams.filters),
     searchParams.sort.direction,
   ).then(({ elements, query, attributes, pagination: { count, total, page, per_page: perPage } }) => ({
     list: elements,
