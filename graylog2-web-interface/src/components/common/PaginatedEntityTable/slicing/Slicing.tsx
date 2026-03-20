@@ -28,7 +28,7 @@ import SlicesOverview from './SlicesOverview';
 import type { FetchSlices } from './useFetchSlices';
 
 export type Slice = {
-  value: string | number;
+  value: string | number | null;
   count: number;
   title?: string;
   type?: unknown;

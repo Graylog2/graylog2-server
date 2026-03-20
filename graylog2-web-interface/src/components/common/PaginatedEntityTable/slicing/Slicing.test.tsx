@@ -216,6 +216,42 @@ describe('Slicing', () => {
     });
   });
 
+  it('keeps null-value slices at the top regardless of slice sort', async () => {
+    renderSUT({
+      fetchSlices: () =>
+        Promise.resolve({
+          slices: [
+            { value: 'Alpha', count: 2, meta: { risk_score: 1 } },
+            { value: null, title: '(Empty Value)', count: 1, meta: { risk_score: 100 } },
+            { value: 'Beta', count: 3, meta: { risk_score: 10 } },
+          ],
+        }),
+    });
+
+    await screen.findByText('(Empty Value)');
+
+    const getItems = () => within(screen.getByTestId('slices-list')).getAllByRole('button');
+
+    expect(getItems()[0]).toHaveTextContent('(Empty Value)');
+
+    await userEvent.click(screen.getByRole('button', { name: /alphabetical/i }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /risk score/i }));
+
+    await waitFor(() => {
+      expect(getItems()[0]).toHaveTextContent('(Empty Value)');
+      expect(getItems()[1]).toHaveTextContent('Beta');
+      expect(getItems()[2]).toHaveTextContent('Alpha');
+    });
+
+    await userEvent.click(screen.getByRole('button', { name: /sort descending/i }));
+
+    await waitFor(() => {
+      expect(getItems()[0]).toHaveTextContent('(Empty Value)');
+      expect(getItems()[1]).toHaveTextContent('Alpha');
+      expect(getItems()[2]).toHaveTextContent('Beta');
+    });
+  });
+
   it('paginates non-empty slices', async () => {
     renderSUT({
       fetchSlices: () =>

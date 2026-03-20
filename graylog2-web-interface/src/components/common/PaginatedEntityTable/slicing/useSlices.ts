@@ -23,6 +23,18 @@ import useFetchSlices, { type FetchSlices } from './useFetchSlices';
 
 type Slice = Slices[number];
 
+const compareNullSlices = (left: Slice, right: Slice) => {
+  if (left.value === null && right.value !== null) {
+    return -1;
+  }
+
+  if (left.value !== null && right.value === null) {
+    return 1;
+  }
+
+  return 0;
+};
+
 const compareNullableValues = (
   left: string | number | boolean | null | undefined,
   right: string | number | boolean | null | undefined,
@@ -53,6 +65,12 @@ const sortSlices = (
   getSliceLabel: (slice: Slice) => string,
 ) =>
   [...items].sort((left, right) => {
+    const nullSliceComparison = compareNullSlices(left, right);
+
+    if (nullSliceComparison !== 0) {
+      return nullSliceComparison;
+    }
+
     let comparison = 0;
 
     if (sortMode === ALPHABETICAL_SORT) {
