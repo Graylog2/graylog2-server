@@ -33,12 +33,12 @@ import java.util.stream.Collectors;
 
 import static org.graylog2.plugin.Message.FIELD_GL2_MESSAGE_ID;
 
-public class V20200730000000_AddGl2MessageIdFieldAliasForEventsOS2 implements V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter {
+public class V20200730000000_AddGl2MessageIdFieldAliasForEventsOS implements V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter {
 
     private final OfficialOpensearchClient client;
 
     @Inject
-    public V20200730000000_AddGl2MessageIdFieldAliasForEventsOS2(OfficialOpensearchClient client) {
+    public V20200730000000_AddGl2MessageIdFieldAliasForEventsOS(OfficialOpensearchClient client) {
         this.client = client;
     }
 

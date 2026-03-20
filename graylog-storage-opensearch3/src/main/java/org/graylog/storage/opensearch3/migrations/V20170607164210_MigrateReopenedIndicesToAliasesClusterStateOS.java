@@ -25,11 +25,11 @@ import org.opensearch.client.opensearch.generic.Requests;
 
 import java.util.Collection;
 
-public class V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS2 implements V20170607164210_MigrateReopenedIndicesToAliases.ClusterState {
+public class V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS implements V20170607164210_MigrateReopenedIndicesToAliases.ClusterState {
     private final OfficialOpensearchClient client;
 
     @Inject
-    public V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS2(OfficialOpensearchClient client) {
+    public V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS(OfficialOpensearchClient client) {
         this.client = client;
     }
 
