@@ -22,9 +22,7 @@ import isNumber from 'lodash/isNumber';
 import type Immutable from 'immutable';
 
 import type { MappedData } from 'views/logic/valueactions/createEventDefinition/types';
-import type { ActionContexts } from 'views/types';
 import type { RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
-import type { ActionComponentProps } from 'views/components/actions/ActionHandler';
 import {
   getAggregationHandler,
   getLutParameters,
@@ -35,11 +33,18 @@ import {
 } from 'views/logic/valueactions/createEventDefinition/hooks/hookHelpers';
 import type ValueParameter from 'views/logic/parameters/ValueParameter';
 import type LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
+import type { FieldValue, FieldName } from 'views/logic/fieldtypes/FieldType';
+import type { ActionContexts } from 'views/types';
 
-type HookProps = Pick<ActionComponentProps, 'field' | 'queryId' | 'value'> & { contexts: ActionContexts };
+type HookProps = {
+  contexts: ActionContexts;
+  field: FieldName;
+  queryId: string;
+  value: FieldValue;
+};
 const useMappedData = ({ contexts, field, queryId, value }: HookProps) =>
   useMemo<MappedData>(() => {
-    const aggregationHandler = getAggregationHandler({ widget: contexts.widget, field: field });
+    const aggregationHandler = getAggregationHandler({ widget: contexts.widget, field });
     const curQuery = contexts.view.search.queries.find((query) => query.id === queryId);
     const { parameters, parameterBindings } = contexts;
     const searchWithinMs =
@@ -56,7 +61,7 @@ const useMappedData = ({ contexts, field, queryId, value }: HookProps) =>
     });
     const streams = getStreams(curQuery.filter);
     const { ...aggregationVales } = aggregationHandler({
-      valuePath: contexts.valuePath,
+      valuePath: contexts.valuePath as Array<Record<string, string>>,
       widget: contexts.widget,
       value: value,
       field: field,
