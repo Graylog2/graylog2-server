@@ -105,6 +105,16 @@ public class DefaultMongodbConnectionResolver implements MongodbConnectionResolv
 
     @Override
     public void doGracefulShutdown() throws Exception {
-        mongoClients.entrySet().stream().peek(e -> LOG.info("Closing mongo client for " + e.getKey())).map(Map.Entry::getValue).forEach(MongoClient::close);
+        for (Map.Entry<String, MongoClient> entry : mongoClients.entrySet()) {
+            final String nodeName = entry.getKey();
+            final MongoClient client = entry.getValue();
+            LOG.info("Closing mongo client for {}", nodeName);
+            try {
+                client.close();
+            } catch (Exception e) {
+                LOG.warn("Error while closing mongo client for {}", nodeName, e);
+            }
+        }
+        mongoClients.clear();
     }
 }
