@@ -79,13 +79,13 @@ import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDiagnostics;
 import org.graylog2.rest.models.system.inputs.responses.InputSummary;
 import org.graylog2.rest.models.system.inputs.responses.InputsList;
-import org.graylog2.rest.resources.streams.responses.StreamPipelineRulesResponse;
-import org.graylog2.rest.resources.system.inputs.responses.InputStreamRulesResponse;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.FilterOption;
 import org.graylog2.rest.resources.entities.Sorting;
+import org.graylog2.rest.resources.streams.responses.StreamPipelineRulesResponse;
+import org.graylog2.rest.resources.system.inputs.responses.InputStreamRulesResponse;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
@@ -306,11 +306,10 @@ public class InputsResource extends AbstractInputsResource {
             @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
             @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
             @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
-            @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
             @Parameter(name = "sort",
                        description = "The field to sort the result on",
                        required = true,
-                       schema = @Schema(allowableValues = {"rule", "pipeline", "stage", "connected_streams"}))
+                       schema = @Schema(allowableValues = {"rule", "pipeline", "connected_streams"}))
             @DefaultValue("rule") @QueryParam("sort") String sort,
             @Parameter(name = "order", description = "The sort direction",
                        schema = @Schema(allowableValues = {"asc", "desc"}))
@@ -334,7 +333,6 @@ public class InputsResource extends AbstractInputsResource {
             @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
             @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
             @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
-            @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
             @Parameter(name = "sort",
                        description = "The field to sort the result on",
                        required = true,

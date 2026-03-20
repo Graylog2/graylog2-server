@@ -26,6 +26,5 @@ public record StreamPipelineRulesResponse(
         @JsonProperty("pipeline") String pipeline,
         @JsonProperty("rule_id") String ruleId,
         @JsonProperty("rule") String rule,
-        @JsonProperty("stage") int stage,
         @JsonProperty("connected_streams") List<StreamReference> connectedStreams
 ) {}

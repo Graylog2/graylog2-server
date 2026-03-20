@@ -35,8 +35,8 @@ const PIPELINE_RULES_LAYOUT = {
   entityTableId: 'input-pipeline-rules',
   defaultPageSize: 20,
   defaultSort: { attributeId: 'rule', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: ['rule', 'pipeline', 'stage', 'connected_streams'],
-  defaultColumnOrder: ['rule', 'pipeline', 'stage', 'connected_streams'],
+  defaultDisplayedAttributes: ['rule', 'pipeline', 'connected_streams'],
+  defaultColumnOrder: ['rule', 'pipeline', 'connected_streams'],
 };
 
 const STREAM_RULES_LAYOUT = {

@@ -30,7 +30,7 @@ const INITIAL_DATA = {
   attributes: [],
 };
 
-type SortType = 'rule' | 'pipeline' | 'stage' | 'connected_streams';
+type SortType = 'rule' | 'pipeline' | 'connected_streams';
 
 export const INPUT_PIPELINE_RULES_QUERY_KEY = 'input_pipeline_rules';
 

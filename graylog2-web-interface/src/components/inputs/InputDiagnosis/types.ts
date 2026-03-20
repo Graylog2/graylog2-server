@@ -20,7 +20,6 @@ export type InputPipelineRule = {
   pipeline_id: string;
   rule: string;
   rule_id: string;
-  stage: number;
   connected_streams: Array<{ id: string; title: string }>;
 };
 

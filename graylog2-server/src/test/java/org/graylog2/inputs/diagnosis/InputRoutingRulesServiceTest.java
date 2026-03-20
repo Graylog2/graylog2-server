@@ -22,7 +22,6 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbInputsMetadataService;
-import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
 import org.graylog2.rest.models.SortOrder;
@@ -54,9 +53,6 @@ class InputRoutingRulesServiceTest {
     private PipelineService pipelineService;
 
     @Mock
-    private PipelineRuleParser pipelineRuleParser;
-
-    @Mock
     private RuleService ruleService;
 
     @Mock
@@ -72,7 +68,6 @@ class InputRoutingRulesServiceTest {
         inputRoutingRulesService = new InputRoutingRulesService(
                 metadataService,
                 pipelineService,
-                pipelineRuleParser,
                 ruleService,
                 streamRuleService,
                 streamService);
@@ -101,9 +96,6 @@ class InputRoutingRulesServiceTest {
                 .title("Rule A")
                 .source("rule \"Rule A\"")
                 .build());
-        when(pipelineRuleParser.parsePipeline(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString()))
-                .thenThrow(new RuntimeException("parser not needed for this test"));
-
         PageListResponse<StreamPipelineRulesResponse> response = inputRoutingRulesService.getPipelineRulesPage(
                 "input-id",
                 pipelineId -> true,
