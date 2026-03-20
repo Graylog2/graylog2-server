@@ -85,7 +85,6 @@ public class PersistenceServicesBindings extends AbstractModule {
         Multibinder<MongodbNodesService> mongodbNodesServices = Multibinder.newSetBinder(binder(), MongodbNodesService.class);
         mongodbNodesServices.addBinding().to(ReplicaSetMongodbNodes.class);
         mongodbNodesServices.addBinding().to(StandaloneNodeMongodbNodes.class);
-        bind(new TypeLiteral<List<MongodbNode>>() {}).toProvider(MongodbNodesProvider.class).asEagerSingleton();
 
         bind(ServerNodePaginatedService.class).asEagerSingleton();
         bind(IndexRangeService.class).to(MongoIndexRangeService.class).asEagerSingleton();

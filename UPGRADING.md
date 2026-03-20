@@ -6,6 +6,18 @@ Upgrading to Graylog 7.1.x
 All user sessions will be terminated when upgrading because the internal storage format for sessions has been changed.
 Users will have to log in again.
 
+## Teams Notification V2: Timezone Handling Change
+
+Previously, timestamps in Teams Notification V2 were always displayed in UTC regardless of the configured time zone.
+The **Time Zone** configuration field has been removed and the timestamp is now displayed in the viewer's local timezone
+using Microsoft Teams' native Adaptive Card `DATE()` and `TIME()` functions.
+For example, a timestamp will render as: **Thu, Mar 19, 2026 at 10:33 AM** (adjusted to the viewer's local timezone automatically).
+
+A migration automatically updates notifications that use the default adaptive card template. If you use a custom
+template, you will need to manually update it to use the `DATE()`/`TIME()` functions for timestamp fields.
+For example: `{{DATE(${event.timestamp_processing},SHORT)}} at {{TIME(${event.timestamp_processing})}}`.
+See the [Adaptive Card documentation](https://adaptivecards.io/explorer/TextBlock.html) for details on date/time formatting.
+
 ## Breaking Changes
 
 ### Plugins: Removal of Perspective Plugin API

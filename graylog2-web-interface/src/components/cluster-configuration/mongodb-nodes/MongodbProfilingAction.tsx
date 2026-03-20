@@ -51,22 +51,10 @@ const ActionBlock = styled.div`
 
 const MongodbProfilingAction = () => {
   const [showProfilingDialog, setShowProfilingDialog] = useState(false);
-  const {
-    action,
-    state,
-    profilingStatusByLevel,
-    isStatusReady,
-    isTogglingProfiling,
-    runToggleAction,
-  } = useMongodbProfilingToggle();
+  const { action, state, profilingStatusByLevel, isStatusReady, isTogglingProfiling, runToggleAction } =
+    useMongodbProfilingToggle();
 
-  const {
-    actionLabel,
-    actionTitle,
-    buttonLabel,
-    enablingProfiling,
-    statusSummary,
-  } = buildMongodbProfilingActionView({
+  const { actionLabel, actionTitle, buttonLabel, enablingProfiling, statusSummary } = buildMongodbProfilingActionView({
     action,
     state,
     profilingStatusByLevel,
@@ -101,7 +89,9 @@ const MongodbProfilingAction = () => {
       <Alert bsStyle="info">
         <AlertContent>
           <MessageBlock>
-            <p>MongoDB profiling helps identify slow queries and troubleshoot performance issues across cluster nodes.</p>
+            <p>
+              MongoDB profiling helps identify slow queries and troubleshoot performance issues across cluster nodes.
+            </p>
             <p>{statusSummary}</p>
           </MessageBlock>
           <ActionBlock>
