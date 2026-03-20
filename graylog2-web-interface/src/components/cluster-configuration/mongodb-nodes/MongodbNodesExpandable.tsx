@@ -19,10 +19,7 @@ import React, { useState } from 'react';
 import { IfPermitted, PaginatedEntityTable } from 'components/common';
 import type { FetchOptions } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
-import {
-  createColumnRenderers,
-  DEFAULT_VISIBLE_COLUMNS,
-} from './MongodbNodesColumnConfiguration';
+import { createColumnRenderers, DEFAULT_VISIBLE_COLUMNS } from './MongodbNodesColumnConfiguration';
 import type { MongodbNode, MongodbNodesResponse } from './fetchClusterMongodbNodes';
 import { clusterMongodbNodesKeyFn, fetchMongodbNodes } from './fetchClusterMongodbNodes';
 import MongodbProfilingAction from './MongodbProfilingAction';
@@ -82,7 +79,8 @@ const MongodbNodesExpandable = ({
         fetchOptions={fetchOptions}
         onDataLoaded={handleDataLoaded}
         withoutURLParams
-        entityAttributesAreCamelCase={false} />
+        entityAttributesAreCamelCase={false}
+      />
     </ClusterNodesSectionWrapper>
   );
 };

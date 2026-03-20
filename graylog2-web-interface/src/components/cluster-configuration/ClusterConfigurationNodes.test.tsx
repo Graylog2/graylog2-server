@@ -94,9 +94,7 @@ describe('<ClusterConfigurationNodes />', () => {
     render(<ClusterConfigurationNodes />);
 
     const calls = mockPaginatedEntityTable.mock.calls as Array<[MockPaginatedEntityTableProps]>;
-    const dataNodesTableProps = calls
-      .map(([props]) => props)
-      .find((props) => props?.humanName === 'Data Nodes');
+    const dataNodesTableProps = calls.map(([props]) => props).find((props) => props?.humanName === 'Data Nodes');
 
     expect(dataNodesTableProps?.onDataLoaded).toBeDefined();
 
