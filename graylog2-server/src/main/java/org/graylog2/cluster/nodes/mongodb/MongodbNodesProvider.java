@@ -52,9 +52,9 @@ public class MongodbNodesProvider implements Provider<List<MongodbNode>> {
             return activeService.allNodes();
         } catch (Exception e) {
             if (LOG.isDebugEnabled()) {
-                LOG.warn("Could not get MongodbNodes, returning fallback", e);
-            } else {
                 LOG.debug("Could not get MongodbNodes, returning fallback. Reason: {}", e.getMessage());
+            } else {
+                LOG.warn("Could not get MongodbNodes, returning fallback", e);
             }
             return getFallbackResponse();
         }
