@@ -16,9 +16,10 @@
  */
 package org.graylog.storage.opensearch3.sniffer;
 
+import java.io.IOException;
 import java.util.List;
 
-public interface SnifferFilter {
-    boolean enabled();
-    List<DiscoveredNode> filterNodes(List<DiscoveredNode> nodes);
+public interface NodesSniffer {
+    default boolean enabled() { return true; }
+    List<DiscoveredNode> sniff() throws IOException;
 }
