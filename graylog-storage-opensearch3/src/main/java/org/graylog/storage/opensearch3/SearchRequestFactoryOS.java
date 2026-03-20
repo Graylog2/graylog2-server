@@ -36,9 +36,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Opensearch 3 version of {@link SearchRequestFactory}, that will eventually replace its deprecated predecessor.
- */
 public class SearchRequestFactoryOS {
 
     private static final Sorting DEFAULT_SORTING = new Sorting("_doc", Sorting.Direction.ASC);

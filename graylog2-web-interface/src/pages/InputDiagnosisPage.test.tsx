@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import useInputDiagnosis from 'components/inputs/InputDiagnosis/useInputDiagnosis';
@@ -29,6 +30,7 @@ jest.mock('routing/useParams', () =>
 );
 
 jest.mock('components/inputs/InputDiagnosis/useInputDiagnosis');
+jest.mock('components/inputs/InputDiagnosis/InputDiagnosisRulesTab', () => () => <div>Rules Tab Content</div>);
 
 const input = {
   id: 'test-input-id',
@@ -187,5 +189,21 @@ describe('Input Diagnosis Page', () => {
     render(<InputDiagnosisPage />);
 
     expect(await screen.findByText(/TCP Traffic\./i)).toBeInTheDocument();
+  });
+
+  it('defaults to Overview tab', async () => {
+    render(<InputDiagnosisPage />);
+
+    expect(await screen.findByText(/inputTitle/)).toBeInTheDocument();
+    expect(screen.queryByText('Rules Tab Content')).not.toBeInTheDocument();
+  });
+
+  it('switches to Rules tab when clicked', async () => {
+    render(<InputDiagnosisPage />);
+
+    const rulesTab = screen.getByText('Rules');
+    await userEvent.click(rulesTab);
+
+    expect(await screen.findByText('Rules Tab Content')).toBeInTheDocument();
   });
 });

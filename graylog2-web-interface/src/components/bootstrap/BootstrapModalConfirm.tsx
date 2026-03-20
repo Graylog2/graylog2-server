@@ -51,11 +51,12 @@ const BootstrapModalConfirm = ({
   onCancel,
   onConfirm,
   showModal,
+  size = undefined,
   submitLoadingText = undefined,
   title,
   ...restProps
 }: Props) => (
-  <BootstrapModalWrapper showModal={showModal} onHide={onCancel} {...restProps}>
+  <BootstrapModalWrapper showModal={showModal} onHide={onCancel} bsSize={size} {...restProps}>
     <Modal.Header>
       <Modal.Title>{title}</Modal.Title>
     </Modal.Header>

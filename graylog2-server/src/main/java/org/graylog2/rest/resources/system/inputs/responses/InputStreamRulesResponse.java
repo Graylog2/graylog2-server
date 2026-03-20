@@ -14,19 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3;
+package org.graylog2.rest.resources.system.inputs.responses;
 
-import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
-import org.graylog.testing.elasticsearch.SearchInstance;
-import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog2.indexer.indices.IndicesGetAllMessageFieldsIT;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class IndicesGetAllMessageFieldsOS2IT extends IndicesGetAllMessageFieldsIT {
-    @SearchInstance
-    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
-
-    @Override
-    protected SearchServerInstance searchServer() {
-        return openSearchInstance;
-    }
-}
+public record InputStreamRulesResponse(
+        @JsonProperty("id") String id,
+        @JsonProperty("stream_id") String streamId,
+        @JsonProperty("stream") String stream,
+        @JsonProperty("rule_field") String ruleField,
+        @JsonProperty("rule_type") int ruleType,
+        @JsonProperty("rule_value") String ruleValue,
+        @JsonProperty("inverted") boolean inverted,
+        @JsonProperty("description") String description
+) {}
