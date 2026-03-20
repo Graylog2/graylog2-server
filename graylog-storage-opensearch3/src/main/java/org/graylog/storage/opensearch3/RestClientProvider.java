@@ -26,11 +26,6 @@ import org.graylog.shaded.opensearch2.org.apache.http.HttpRequestInterceptor;
 import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
-import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.NodesSniffer;
-import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.Sniffer;
-import org.graylog.storage.opensearch3.sniffer.SnifferAggregator;
-import org.graylog.storage.opensearch3.sniffer.SnifferBuilder;
-import org.graylog.storage.opensearch3.sniffer.SnifferFilter;
 import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
@@ -39,10 +34,9 @@ import org.graylog2.system.shutdown.GracefulShutdownService;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Supplier;
 
- @Deprecated
+@Deprecated
 @Singleton
 public class RestClientProvider implements Provider<RestHighLevelClient> {
     private final Supplier<RestHighLevelClient> clientSupplier;
@@ -51,8 +45,6 @@ public class RestClientProvider implements Provider<RestHighLevelClient> {
     private final CredentialsProvider credentialsProvider;
     private final TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider;
     private final IndexerJwtAuthToken indexerJwtAuthToken;
-    private final Set<SnifferBuilder> snifferBuilders;
-    private final Set<SnifferFilter> snifferFilters;
 
     @Inject
     public RestClientProvider(
@@ -61,44 +53,19 @@ public class RestClientProvider implements Provider<RestHighLevelClient> {
             ElasticsearchClientConfiguration configuration,
             CredentialsProvider credentialsProvider,
             TrustManagerAndSocketFactoryProvider trustManagerAndSocketFactoryProvider,
-            IndexerJwtAuthToken indexerJwtAuthToken,
-            Set<SnifferBuilder> snifferBuilders,
-            Set<SnifferFilter> snifferFilters) {
+            IndexerJwtAuthToken indexerJwtAuthToken) {
         this.shutdownService = shutdownService;
         this.configuration = configuration;
         this.credentialsProvider = credentialsProvider;
         this.trustManagerAndSocketFactoryProvider = trustManagerAndSocketFactoryProvider;
         this.indexerJwtAuthToken = indexerJwtAuthToken;
         this.clientSupplier = Suppliers.memoize(() -> createClient(hosts));
-        this.snifferBuilders = snifferBuilders;
-        this.snifferFilters = snifferFilters;
     }
 
 
     @Nonnull
     private RestHighLevelClient createClient(List<URI> hosts) {
-        final RestHighLevelClient client = buildBasicRestClient(hosts);
-        registerSniffers(client);
-        return client;
-    }
-
-    private void registerSniffers(RestHighLevelClient client) {
-        final List<NodesSniffer> sniffers = snifferBuilders.stream()
-                .filter(SnifferBuilder::enabled)
-                .map(b -> b.create(client.getLowLevelClient()))
-                .toList();
-
-        if (!sniffers.isEmpty()) {
-            final List<SnifferFilter> filters = snifferFilters.stream().filter(SnifferFilter::enabled).toList();
-            final SnifferAggregator snifferAggregator = new SnifferAggregator(sniffers, filters);
-
-            final Sniffer sniffer = Sniffer.builder(client.getLowLevelClient())
-                    .setSniffIntervalMillis(Math.toIntExact(configuration.discoveryFrequency().toMilliseconds()))
-                    .setNodesSniffer(snifferAggregator)
-                    .build();
-
-            shutdownService.register(sniffer::close);
-        }
+        return buildBasicRestClient(hosts);
     }
 
     @Override

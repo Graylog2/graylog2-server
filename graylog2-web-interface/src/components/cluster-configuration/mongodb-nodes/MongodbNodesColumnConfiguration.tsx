@@ -55,7 +55,11 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
         const role = entity.role?.toUpperCase();
 
         if (!role) {
-          return <SecondaryText><span>N/A</span></SecondaryText>;
+          return (
+            <SecondaryText>
+              <span>N/A</span>
+            </SecondaryText>
+          );
         }
 
         return <RoleLabel bsSize="xs">{role}</RoleLabel>;
@@ -64,7 +68,9 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
     },
     version: {
       renderCell: (_value, entity) => (
-        <SecondaryText><span>{entity.version ?? 'N/A'}</span></SecondaryText>
+        <SecondaryText>
+          <span>{entity.version ?? 'N/A'}</span>
+        </SecondaryText>
       ),
       minWidth: 120,
     },
@@ -80,9 +86,7 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
       staticWidth: 'matchHeader',
     },
     profiling_level: {
-      renderCell: (_value, entity) => (
-        <ProfilingLevelCell profilingLevel={entity.profiling_level} />
-      ),
+      renderCell: (_value, entity) => <ProfilingLevelCell profilingLevel={entity.profiling_level} />,
       staticWidth: 'matchHeader',
     },
     slow_query_count: {
