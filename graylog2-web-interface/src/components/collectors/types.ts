@@ -33,7 +33,10 @@ export type CollectorInstanceView = {
   capabilities: number;
   enrolled_at: string;
   last_seen: string;
-  certificate_fingerprint: string;
+  active_certificate_fingerprint: string;
+  active_certificate_expires_at: string;
+  next_certificate_fingerprint: string | null;
+  next_certificate_expires_at: string | null;
   identifying_attributes: Record<string, unknown>;
   non_identifying_attributes: Record<string, unknown>;
   hostname: string | null;

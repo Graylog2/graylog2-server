@@ -17,6 +17,7 @@
 package org.graylog.collectors.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nullable;
 
 import java.time.Instant;
 import java.util.Map;
@@ -28,7 +29,10 @@ public record CollectorInstanceResponse(
         @JsonProperty("capabilities") long capabilities,
         @JsonProperty("enrolled_at") Instant enrolledAt,
         @JsonProperty("last_seen") Instant lastSeen,
-        @JsonProperty("certificate_fingerprint") String certificateFingerprint,
+        @JsonProperty("active_certificate_fingerprint") String activeCertificateFingerprint,
+        @JsonProperty("active_certificate_expires_at") Instant activeCertificateExpiresAt,
+        @JsonProperty("next_certificate_fingerprint") @Nullable String nextCertificateFingerprint,
+        @JsonProperty("next_certificate_expires_at") @Nullable Instant nextCertificateExpiresAt,
         @JsonProperty("identifying_attributes") Map<String, Object> identifyingAttributes,
         @JsonProperty("non_identifying_attributes") Map<String, Object> nonIdentifyingAttributes) {
 }

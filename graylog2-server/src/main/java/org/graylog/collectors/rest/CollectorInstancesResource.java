@@ -240,7 +240,10 @@ public class CollectorInstancesResource extends RestResource {
                         dto.capabilities(),
                         dto.enrolledAt(),
                         dto.lastSeen(),
-                        dto.certificateFingerprint(),
+                        dto.activeCertificateFingerprint(),
+                        dto.activeCertificateExpiresAt(),
+                        dto.nextCertificateFingerprint().orElse(null),
+                        dto.nextCertificateExpiresAt().orElse(null),
                         attributesToMap(dto.identifyingAttributes()),
                         attributesToMap(dto.nonIdentifyingAttributes())
                 )).toList(),

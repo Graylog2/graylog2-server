@@ -122,6 +122,7 @@ class AgentTokenServiceTest {
                 "507f1f77bcf86cd799439012", // Valid 24-char hex ObjectId
                 certFingerprint,
                 certPem,
+                signedCert.getNotAfter(),
                 enrollmentCa.id(),
                 Instant.now(clock),
                 "000000000000000000000000"
@@ -223,6 +224,7 @@ class AgentTokenServiceTest {
                 "507f1f77bcf86cd799439012", // Valid 24-char hex ObjectId
                 certFingerprint,
                 certPem,
+                signedCert.getNotAfter(),
                 enrollmentCa.id(),
                 Instant.now(),
                 "000000000000000000000000"

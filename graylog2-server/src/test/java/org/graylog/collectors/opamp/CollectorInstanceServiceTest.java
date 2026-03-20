@@ -34,6 +34,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -72,7 +73,8 @@ class CollectorInstanceServiceTest {
 
         assertThat(collector.id()).isNotNull();
         assertThat(collector.instanceUid()).isEqualTo("instance-uid-1");
-        assertThat(collector.certificateFingerprint()).isEqualTo("sha256:fingerprint1");
+        assertThat(collector.activeCertificateFingerprint()).isEqualTo("sha256:fingerprint1");
+        assertThat(collector.activeCertificateExpiresAt()).isEqualTo(Instant.ofEpochMilli(0).plus(Duration.ofDays(7)));
     }
 
     @Test
@@ -83,7 +85,8 @@ class CollectorInstanceServiceTest {
 
         assertThat(found).isPresent();
         assertThat(found.get().instanceUid()).isEqualTo("instance-uid-2");
-        assertThat(found.get().certificateFingerprint()).isEqualTo("sha256:fingerprint2");
+        assertThat(found.get().activeCertificateFingerprint()).isEqualTo("sha256:fingerprint2");
+        assertThat(found.get().activeCertificateExpiresAt()).isEqualTo(Instant.ofEpochMilli(0).plus(Duration.ofDays(7)));
     }
 
     @Test
@@ -213,6 +216,7 @@ class CollectorInstanceServiceTest {
                 "507f1f77bcf86cd799439012", // Valid 24-char hex ObjectId
                 fingerprint,
                 "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----",
+                Date.from(Instant.ofEpochMilli(0).plus(Duration.ofDays(7))),
                 "507f1f77bcf86cd799439011", // Valid 24-char hex ObjectId
                 Instant.now(),
                 "000000000000000000000000"
@@ -220,13 +224,14 @@ class CollectorInstanceServiceTest {
     }
 
     private static CollectorInstanceDTO enrollWithFleetAndLastSeen(CollectorInstanceService service,
-                                                                    String instanceUid, String fingerprint,
-                                                                    String fleetId, Instant lastSeen) {
+                                                                   String instanceUid, String fingerprint,
+                                                                   String fleetId, Instant lastSeen) {
         return service.enroll(
                 instanceUid,
                 fleetId,
                 fingerprint,
                 "-----BEGIN CERTIFICATE-----\ntest\n-----END CERTIFICATE-----",
+                Date.from(Instant.ofEpochMilli(0).plus(Duration.ofDays(7))),
                 "507f1f77bcf86cd799439011",
                 lastSeen,
                 "000000000000000000000000"

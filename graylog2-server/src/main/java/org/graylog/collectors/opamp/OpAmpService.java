@@ -239,7 +239,7 @@ public class OpAmpService {
             final String fingerprint = PemUtils.computeFingerprint(agentCert);
             final String certPem = PemUtils.toPem(agentCert);
 
-            final CollectorInstanceDTO enroll = collectorInstanceService.enroll(instanceUid, auth.token().fleetId(), fingerprint, certPem, issuerCert.id(), Instant.now(), auth.token().id());
+            final CollectorInstanceDTO enroll = collectorInstanceService.enroll(instanceUid, auth.token().fleetId(), fingerprint, certPem, agentCert.getNotAfter(), issuerCert.id(), Instant.now(), auth.token().id());
             LOG.info("[{}/{}] Enrolled collector in fleet {}", enroll.instanceUid(), enroll.messageSeqNum(), enroll.fleetId());
             enrollmentTokenService.incrementUsage(auth.token().id());
 

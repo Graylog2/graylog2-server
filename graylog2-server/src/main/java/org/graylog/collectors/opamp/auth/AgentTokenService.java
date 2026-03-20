@@ -91,7 +91,7 @@ public class AgentTokenService {
                                 .orElseThrow(() -> new SecurityException("Unknown collector fingerprint"));
                         collectorRef.set(collector);
                         try {
-                            final X509Certificate cert = PemUtils.parseCertificate(collector.certificatePem());
+                            final X509Certificate cert = PemUtils.parseCertificate(collector.activeCertificatePem());
                             cert.checkValidity(now);
                             return cert.getPublicKey();
                         } catch (Exception e) {

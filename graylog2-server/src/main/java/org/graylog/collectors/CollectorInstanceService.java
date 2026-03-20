@@ -59,8 +59,8 @@ import java.util.stream.StreamSupport;
 import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
 import static com.mongodb.client.model.Updates.setOnInsert;
+import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_ACTIVE_CERTIFICATE_FINGERPRINT;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_CAPABILITIES;
-import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_CERTIFICATE_FINGERPRINT;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_FLEET_ID;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_IDENTIFYING_ATTRIBUTES;
 import static org.graylog.collectors.db.CollectorInstanceDTO.FIELD_INSTANCE_UID;
@@ -90,7 +90,7 @@ public class CollectorInstanceService {
                         FIELD_IDENTIFYING_ATTRIBUTES + ".value")),
                 new IndexModel(Indexes.ascending(FIELD_NON_IDENTIFYING_ATTRIBUTES + ".key",
                         FIELD_NON_IDENTIFYING_ATTRIBUTES + ".value")),
-                new IndexModel(Indexes.ascending(FIELD_CERTIFICATE_FINGERPRINT), new IndexOptions().unique(true)),
+                new IndexModel(Indexes.ascending(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT), new IndexOptions().unique(true)),
                 new IndexModel(Indexes.ascending(FIELD_LAST_SEEN))
         ));
     }
@@ -136,7 +136,7 @@ public class CollectorInstanceService {
      * Updates an existing collector instance to a new fleet id.
      *
      * @param instanceUid the instance to update
-     * @param newFleetId the new fleet id to save
+     * @param newFleetId  the new fleet id to save
      */
     public void updateCurrentFleet(@Nonnull String instanceUid, @Nonnull String newFleetId) {
         collection.updateOne(Filters.eq(FIELD_INSTANCE_UID, instanceUid), set(FIELD_FLEET_ID, newFleetId));
@@ -146,15 +146,23 @@ public class CollectorInstanceService {
         return collection.countDocuments(Filters.eq(FIELD_INSTANCE_UID, instanceUid)) == 1L;
     }
 
-    public CollectorInstanceDTO enroll(String instanceUid, String fleetId, String fingerprint, String certPem, String caId, Instant enrolledAt, String enrollmentTokenId) {
+    public CollectorInstanceDTO enroll(String instanceUid,
+                                       String fleetId,
+                                       String fingerprint,
+                                       String certPem,
+                                       Date notAfter,
+                                       String caId,
+                                       Instant enrolledAt,
+                                       String enrollmentTokenId) {
         final CollectorInstanceDTO dto = CollectorInstanceDTO.builder()
                 .instanceUid(instanceUid)
                 .lastSeen(enrolledAt)
                 .messageSeqNum(0L) // set to 0 explicitly for clarity, this will cause full resync later in the connection
                 .capabilities(0L) // capabilities are unspecified at this point
                 .fleetId(fleetId)
-                .certificateFingerprint(fingerprint)
-                .certificatePem(certPem)
+                .activeCertificateFingerprint(fingerprint)
+                .activeCertificatePem(certPem)
+                .activeCertificateExpiresAt(notAfter.toInstant())
                 .issuingCaId(caId)
                 .enrolledAt(enrolledAt)
                 .enrollmentTokenId(enrollmentTokenId)
@@ -167,7 +175,7 @@ public class CollectorInstanceService {
 
     public Optional<CollectorInstanceDTO> findByFingerprint(String fingerprint) {
         return Optional.ofNullable(
-                collection.find(Filters.eq(FIELD_CERTIFICATE_FINGERPRINT, fingerprint)).first()
+                collection.find(Filters.eq(FIELD_ACTIVE_CERTIFICATE_FINGERPRINT, fingerprint)).first()
         );
     }
 

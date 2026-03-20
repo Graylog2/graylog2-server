@@ -39,6 +39,8 @@ import org.graylog2.streams.StreamRuleImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.security.cert.CertificateException;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -100,6 +102,7 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
         deleteMacOSUnifiedLoggingSources(db);
         replaceTokenSigningCertWithSigningKey(db, encryptedValueService);
         addNamesToEnrollmentTokens(db);
+        extendCollectorInstancesForCertRenewal(db);
     }
 
     private void convertObjectIdFields(MongoDatabase db) {
@@ -411,5 +414,53 @@ public class V20260303120000_CollectorDEVMigrations extends Migration {
                 Filters.not(Filters.exists(EnrollmentTokenDTO.FIELD_NAME)),
                 Updates.set(EnrollmentTokenDTO.FIELD_NAME, "Unnamed token")
         );
+    }
+
+    private static void extendCollectorInstancesForCertRenewal(MongoDatabase db) {
+        final var collection = db.getCollection(INSTANCES_COLLECTION);
+
+        final var enrolledAtField = "enrolled_at";
+        final var certificatePemField = "certificate_pem";
+        final var certificateFingerprintField = "certificate_fingerprint";
+
+        final var activeCertificatePemField = "active_certificate_pem";
+        final var activeCertificateFingerprintField = "active_certificate_fingerprint";
+        final var activeCertificateExpiresAt = "active_certificate_expires_at";
+
+        var converted = 0L;
+
+        try {
+            for (final var doc : collection.find(Filters.exists(certificatePemField))) {
+                final var enrolledAt = doc.getString(enrolledAtField);
+                final var activeCertificatePem = doc.getString(certificatePemField);
+                final var activeCertificateFingerprint = doc.getString(certificateFingerprintField);
+                final var cert = PemUtils.parseCertificate(activeCertificatePem);
+
+                collection.updateOne(
+                        Filters.eq("_id", doc.getObjectId("_id")),
+                        Updates.combine(
+                                Updates.unset(certificatePemField),
+                                Updates.unset(certificateFingerprintField),
+                                Updates.set(activeCertificatePemField, activeCertificatePem),
+                                Updates.set(activeCertificateFingerprintField, activeCertificateFingerprint),
+                                Updates.set(activeCertificateExpiresAt, cert.getNotAfter()),
+                                Updates.set(enrolledAtField, Date.from(Instant.parse(enrolledAt)))
+                        )
+                );
+                converted++;
+            }
+        } catch (CertificateException | IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (converted > 0) {
+            LOG.info("Converted {} collector instance document(s) to new certificate fields.", converted);
+
+            for (final var index : collection.listIndexes()) {
+                if (index.get("key", Document.class).containsKey(certificateFingerprintField)) {
+                    collection.dropIndex(certificateFingerprintField);
+                }
+            }
+        }
     }
 }
