@@ -77,10 +77,10 @@ const App = () => (
                 <>
                   <AppLayout>
                     <Navigation />
-                    <ContentRow>
-                      <MainContentColumn>
-                        <Scratchpad />
-                        <ReportedErrorBoundary>
+                    <ReportedErrorBoundary>
+                      <ContentRow>
+                        <MainContentColumn>
+                          <Scratchpad />
                           <RuntimeErrorBoundary>
                             <PageContextProviders>
                               <PageContent>
@@ -88,12 +88,12 @@ const App = () => (
                               </PageContent>
                             </PageContextProviders>
                           </RuntimeErrorBoundary>
-                        </ReportedErrorBoundary>
-                      </MainContentColumn>
-                      <RightSidebarContext.Consumer>
-                        {({ isOpen }) => isOpen && <RightSidebar />}
-                      </RightSidebarContext.Consumer>
-                    </ContentRow>
+                        </MainContentColumn>
+                        <RightSidebarContext.Consumer>
+                          {({ isOpen }) => isOpen && <RightSidebar />}
+                        </RightSidebarContext.Consumer>
+                      </ContentRow>
+                    </ReportedErrorBoundary>
                   </AppLayout>
                   <HotkeysModalContainer />
                 </>
