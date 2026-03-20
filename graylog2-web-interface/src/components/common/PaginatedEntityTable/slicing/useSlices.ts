@@ -18,7 +18,7 @@
 import { defaultCompare } from 'logic/DefaultCompare';
 import type { Slices, SliceRenderers } from 'components/common/PaginatedEntityTable/slicing/Slicing';
 
-import { ALPHABETICAL_SORT, COUNT_SORT, type SortDirection, type SortMode } from './SliceFilters';
+import { ALPHABETICAL_SORT, type SortDirection, type SortMode } from './SliceFilters';
 import useFetchSlices, { type FetchSlices } from './useFetchSlices';
 
 type Slice = Slices[number];
@@ -55,9 +55,7 @@ const sortSlices = (
   [...items].sort((left, right) => {
     let comparison = 0;
 
-    if (sortMode === COUNT_SORT) {
-      comparison = left.count - right.count;
-    } else if (sortMode === ALPHABETICAL_SORT) {
+    if (sortMode === ALPHABETICAL_SORT) {
       comparison = defaultCompare(getSliceLabel(left), getSliceLabel(right));
     } else {
       comparison = compareNullableValues(left.meta?.[sortMode], right.meta?.[sortMode]);

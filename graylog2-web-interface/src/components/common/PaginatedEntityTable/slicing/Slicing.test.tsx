@@ -150,31 +150,12 @@ describe('Slicing', () => {
     expect(screen.queryByText('Beta')).not.toBeInTheDocument();
   });
 
-  it('sorts slices by count', async () => {
-    renderSUT({
-      fetchSlices: () =>
-        Promise.resolve({
-          slices: [
-            { value: 'Alpha', count: 1 },
-            { value: 'Beta', count: 3 },
-          ],
-        }),
-    });
+  it('does not display count as a slice sort option', async () => {
+    renderSUT();
 
-    await screen.findByText('Alpha');
+    await userEvent.click(await screen.findByRole('button', { name: /alphabetical/i }));
 
-    const getItems = () => within(screen.getByTestId('slices-list')).getAllByRole('button');
-
-    expect(getItems()[0]).toHaveTextContent('Alpha');
-    expect(getItems()[1]).toHaveTextContent('Beta');
-
-    await userEvent.click(screen.getByRole('button', { name: /alphabetical/i }));
-    await userEvent.click(await screen.findByRole('menuitem', { name: /count/i }));
-
-    await waitFor(() => {
-      expect(getItems()[0]).toHaveTextContent('Beta');
-      expect(getItems()[1]).toHaveTextContent('Alpha');
-    });
+    expect(screen.queryByRole('menuitem', { name: /count/i })).not.toBeInTheDocument();
   });
 
   it('displays additional slice sort options from the active column schema', async () => {

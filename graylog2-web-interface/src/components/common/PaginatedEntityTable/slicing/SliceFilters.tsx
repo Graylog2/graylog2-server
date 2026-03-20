@@ -26,7 +26,6 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 export const ALPHABETICAL_SORT = 'alphabetical';
-export const COUNT_SORT = 'count';
 
 export type SortMode = string;
 export type SortDirection = 'asc' | 'desc';
@@ -34,7 +33,6 @@ export type SortOption = { value: SortMode; label: string };
 
 export const DEFAULT_SORT_OPTIONS: Array<SortOption> = [
   { value: ALPHABETICAL_SORT, label: 'Alphabetical' },
-  { value: COUNT_SORT, label: 'Count' },
 ];
 
 export const defaultSortDirectionForMode = (mode: SortMode): SortDirection =>
