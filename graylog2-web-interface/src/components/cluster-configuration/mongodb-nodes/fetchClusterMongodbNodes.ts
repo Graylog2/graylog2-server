@@ -25,7 +25,7 @@ export const MongodbRole = {
   STANDALONE: 'STANDALONE',
 } as const;
 
-export type MongodbRoleType = typeof MongodbRole[keyof typeof MongodbRole];
+export type MongodbRoleType = (typeof MongodbRole)[keyof typeof MongodbRole];
 
 export const MongodbProfilingLevel = {
   OFF: 'OFF',
@@ -33,7 +33,7 @@ export const MongodbProfilingLevel = {
   ALL: 'ALL',
 } as const;
 
-export type MongodbProfilingLevelType = typeof MongodbProfilingLevel[keyof typeof MongodbProfilingLevel];
+export type MongodbProfilingLevelType = (typeof MongodbProfilingLevel)[keyof typeof MongodbProfilingLevel];
 
 export type MongodbNode = {
   id: string;
@@ -73,12 +73,7 @@ export const fetchMongodbNodes = async (
   const order = (params.sort?.direction ?? 'asc') as MongodbNodesOrder;
 
   return SystemMongodb.listNodes(sort, params.page, params.pageSize, params.query, order).then(
-    ({
-      attributes,
-      pagination,
-      elements,
-      query,
-    }: MongodbNodesApiResponse) => ({
+    ({ attributes, pagination, elements, query }: MongodbNodesApiResponse) => ({
       attributes,
       list: elements as Array<MongodbNode>,
       pagination: {
