@@ -85,6 +85,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
@@ -317,7 +318,7 @@ public class OpAmpService {
         final long sequenceNum = message.getSequenceNum();
         LOG.debug("[{}/{}] Handling OpAMP message from collector: {}", instanceUid, sequenceNum, message);
 
-
+        var appliedTxnSeq = OptionalLong.empty();
         final CollectorInstanceReport.Builder updateBuilder = CollectorInstanceReport.builder().instanceUid(instanceUid).messageSeqNum(sequenceNum).capabilities(message.getCapabilities());
 
         final EnumSet<Opamp.AgentCapabilities> agentCapabilities = fromBitmask(message.getCapabilities());
@@ -352,7 +353,7 @@ public class OpAmpService {
                     // TODO determine whether applicable config has changed for this collector and include updated config in our response
                 }
                 case AgentCapabilities_ReportsRemoteConfig ->
-                        handleRemoteConfig(instanceUid, sequenceNum, message, updateBuilder);
+                        appliedTxnSeq = handleRemoteConfig(instanceUid, sequenceNum, message, updateBuilder);
                 default -> LOG.debug("[{}/{}] Ignoring capability of {}", instanceUid, sequenceNum, cap);
             }
         }
@@ -367,15 +368,19 @@ public class OpAmpService {
         // determine our response
         final ServerToAgent.Builder responseBuilder = serverToAgentBuilder(message);
 
-        LOG.debug("[{}/{}] previously seen state {} - consecutive: {}", instanceUid, sequenceNum, previousState, seqConsecutive);
+        LOG.debug("[{}/{}] Previously seen state {} - consecutive: {}", instanceUid, sequenceNum, previousState, seqConsecutive);
         if (!seqConsecutive) {
-            // either we haven't seen messages from this agent before (which means we've just started)
+            // either we haven't seen messages from this collector before (which means we've just started)
             // or the sequence numbers aren't consecutive, which means we have missed one or more messages.
             // in either case we need to request a full state report
             responseBuilder.setFlags(Opamp.ServerToAgentFlags.ServerToAgentFlags_ReportFullState_VALUE);
-            LOG.debug("[{}/{}] Non-consecutive sequence detected, requesting full state report from this agent.", instanceUid, sequenceNum);
+            LOG.debug("[{}/{}] Non-consecutive sequence detected, requesting full state report from this collector.", instanceUid, sequenceNum);
         } else {
-            long lastProcessedTxnSeq = previousState.map(CollectorInstanceService.MinimalCollectorInstanceDTO::lastProcessTxnSeq).orElse(0L);
+            // If we would only look at the applied transaction sequence from the previousState, we would reply
+            // with a config update for a remote config status APPLIED request.
+            final var lastProcessedTxnSeq = requireNonNull(appliedTxnSeq, "appliedTxnSeq is null")
+                    .orElse(previousState.map(CollectorInstanceService.MinimalCollectorInstanceDTO::lastProcessTxnSeq).orElse(0L));
+
             final String fleetId = previousState.map(CollectorInstanceService.MinimalCollectorInstanceDTO::fleetId).orElse(null);
 
             final List<TransactionMarker> unprocessedMarkers = txnLogService.getUnprocessedMarkers(fleetId, instanceUid, lastProcessedTxnSeq);
@@ -475,12 +480,12 @@ public class OpAmpService {
     }
 
     @WithSpan
-    private void handleRemoteConfig(String instanceUid,
-                                    long sequenceNum,
-                                    AgentToServer message,
-                                    CollectorInstanceReport.Builder updateBuilder) {
+    private OptionalLong handleRemoteConfig(String instanceUid,
+                                            long sequenceNum,
+                                            AgentToServer message,
+                                            CollectorInstanceReport.Builder updateBuilder) {
         if (!message.hasRemoteConfigStatus()) {
-            return;
+            return OptionalLong.empty();
         }
 
         final var logEvent = LOG.atDebug()
@@ -498,6 +503,7 @@ public class OpAmpService {
                         final var txnSeq = Longs.tryParse(hashString);
                         if (txnSeq != null) {
                             updateBuilder.lastProcessedTxnSeq(txnSeq);
+                            return OptionalLong.of(txnSeq);
                         }
                     }
                 } catch (Exception e) {
@@ -515,6 +521,8 @@ public class OpAmpService {
                 logEvent.addArgument("UNSET").addArgument(() -> toProtoString(status)).log();
             }
         }
+
+        return OptionalLong.empty();
     }
 
     @Nonnull
