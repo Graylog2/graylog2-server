@@ -18,9 +18,20 @@ package org.graylog2.rest.resources.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record Slice(@JsonProperty(FIELD_ID) String value, @JsonProperty(FIELD_TITLE) String title, @JsonProperty(FIELD_TYPE) String type, @JsonProperty(FIELD_COUNT) Integer count) {
+import java.util.Map;
+
+public record Slice(@JsonProperty(FIELD_ID) String value,
+                    @JsonProperty(FIELD_TITLE) String title,
+                    @JsonProperty(FIELD_TYPE) String type,
+                    @JsonProperty(FIELD_COUNT) Integer count,
+                    @JsonProperty(FIELD_META) Map<String, Object> meta) {
     private static final String FIELD_ID = "value";
     private static final String FIELD_TITLE = "title";
     private static final String FIELD_TYPE = "type";
     private static final String FIELD_COUNT = "count";
+    private static final String FIELD_META = "meta";
+
+    public Slice(String value, String title, String type, Integer count) {
+        this(value, title, type, count, Map.of());
+    }
 }
