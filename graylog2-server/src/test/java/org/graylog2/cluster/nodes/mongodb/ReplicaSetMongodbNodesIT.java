@@ -36,32 +36,21 @@ class ReplicaSetMongodbNodesIT {
     private MongoDBContainer mongoDBContainer;
     private ReplicaSetMongodbNodes replicaSetNodes;
 
+    private DockerMongodbConnectionResolver dockerMongodbConnectionResolver;
+
     @BeforeEach
     void setUp() {
         mongoDBContainer = new MongoDBContainer("mongo:" + MongoDBVersion.DEFAULT.version())
                 .withReplicaSet();
         mongoDBContainer.start();
         final MongoConnection mongoConnection = createMongoConnection();
-        replicaSetNodes = new ReplicaSetMongodbNodes(mongoConnection, new MongodbClusterCommand(mongoConnection, dockerConnectionResolver()));
-    }
-
-    /**
-     * The nodeName is the internal representation of host:port inside the docker network. We'll be
-     * accessing that from this integration test, from outside of the docker network, so we need to
-     * map both host and port to something accessible from outside.
-     */
-    private MongodbConnectionResolver dockerConnectionResolver() {
-        return nodeName -> {
-            final String[] hostPort = nodeName.split(":");
-            final int port = Integer.parseInt(hostPort[1]);
-            final Integer mappedPort = mongoDBContainer.getMappedPort(port);
-            final String dockerHost = DockerClientFactory.instance().dockerHostIpAddress();
-            return new MongoClient("mongodb://" + dockerHost + ":" + mappedPort + "/?directConnection=true");
-        };
+        this.dockerMongodbConnectionResolver = new DockerMongodbConnectionResolver(mongoDBContainer);
+        replicaSetNodes = new ReplicaSetMongodbNodes(mongoConnection, new MongodbClusterCommand(mongoConnection, this.dockerMongodbConnectionResolver));
     }
 
     @AfterEach
     void tearDown() {
+        dockerMongodbConnectionResolver.close();
         mongoDBContainer.stop();
     }
 

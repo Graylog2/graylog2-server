@@ -124,8 +124,9 @@ public class MongodbClusterCommand {
     }
 
     private <T> T runCommand(String host, BiFunction<String, MongoClient, T> call) {
-        try (final MongoClient client = mongodbConnectionResolver.resolve(host)) {
-            return call.apply(host, client);
+        try  {
+            // Do not close the client, its lifecycle is managed by the resolver itself!
+            return call.apply(host,  mongodbConnectionResolver.resolve(host));
         } catch (MongoCommandException e) {
             // Error code 13 is "Unauthorized" in MongoDB
             if (e.getErrorCode() == 13) {

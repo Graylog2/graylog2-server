@@ -24,6 +24,10 @@ import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.apache.http.client.utils.URIBuilder;
 import org.graylog2.configuration.MongoDbConfiguration;
+import org.graylog2.system.shutdown.GracefulShutdownHook;
+import org.graylog2.system.shutdown.GracefulShutdownService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -31,20 +35,33 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
-public class DefaultMongodbConnectionResolver implements MongodbConnectionResolver {
+public class DefaultMongodbConnectionResolver implements MongodbConnectionResolver, GracefulShutdownHook {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultMongodbConnectionResolver.class);
 
     private final MongoClientURI mongoClientURI;
+    private final Map<String, MongoClient> mongoClients = new ConcurrentHashMap<>() {};
+
 
     @Inject
-    public DefaultMongodbConnectionResolver(MongoDbConfiguration configuration) {
+    public DefaultMongodbConnectionResolver(MongoDbConfiguration configuration, GracefulShutdownService shutdownService) {
         this.mongoClientURI = configuration.getMongoClientURI();
+        shutdownService.register(DefaultMongodbConnectionResolver.this);
     }
 
     @Override
     public MongoClient resolve(String nodeName) {
+        return mongoClients.computeIfAbsent(nodeName, k -> createClient(nodeName));
+    }
+
+    @Nonnull
+    private MongoClient createClient(String nodeName) {
+        LOG.info("Creating mongo client for {}", nodeName);
+        // TODO: should we configure the client somehow limited? With only a handful of connections?
         return new MongoClient(new MongoClientURI(buildConnectionString(nodeName)));
     }
 
@@ -84,5 +101,10 @@ public class DefaultMongodbConnectionResolver implements MongodbConnectionResolv
                         .withKeyValueSeparator('=')
                         .split(query))
                 .orElseGet(Collections::emptyMap);
+    }
+
+    @Override
+    public void doGracefulShutdown() throws Exception {
+        mongoClients.entrySet().stream().peek(e -> LOG.info("Closing mongo client for " + e.getKey())).map(Map.Entry::getValue).forEach(MongoClient::close);
     }
 }
