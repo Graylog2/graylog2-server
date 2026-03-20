@@ -55,6 +55,7 @@ const pastDate = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
 const mockToken = (overrides?: Partial<EnrollmentTokenMetadata>): EnrollmentTokenMetadata => ({
   id: 'token-1',
+  name: 'Test token',
   jti: 'jti-1',
   kid: 'kid-1',
   fleet_id: 'fleet-1',
@@ -72,6 +73,7 @@ const mockPaginatedResponse = (tokens: EnrollmentTokenMetadata[]) => ({
   list: tokens,
   pagination: { total: tokens.length },
   attributes: [
+    { id: 'name', title: 'Name', sortable: true, filterable: true, searchable: true },
     { id: 'fleet_id', title: 'Fleet', sortable: false, filterable: true },
     { id: 'created_by', title: 'Created By', sortable: false },
     { id: 'created_at', title: 'Created At', sortable: true },
@@ -101,6 +103,12 @@ describe('EnrollmentTokenList', () => {
     render(<EnrollmentTokenList />);
 
     await screen.findByText('admin');
+  });
+
+  it('renders the token name', async () => {
+    render(<EnrollmentTokenList />);
+
+    await screen.findByText('Test token');
   });
 
   it('resolves fleet name from fleet_id', async () => {
