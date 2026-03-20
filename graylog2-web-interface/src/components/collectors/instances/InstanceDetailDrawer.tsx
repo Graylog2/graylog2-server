@@ -114,6 +114,11 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
         </DetailRow>
 
         <DetailRow>
+          <Title>Enrolled:</Title>
+          <RelativeTime dateTime={instance.enrolled_at} />
+        </DetailRow>
+
+        <DetailRow>
           <Title>Version:</Title>
           <span>{instance.version || 'Unknown'}</span>
         </DetailRow>
@@ -140,12 +145,6 @@ const InstanceDetailDrawer = ({ instance, sources, fleetName, onClose }: Props) 
                 <td>{String(value)}</td>
               </tr>
             ))}
-            <tr>
-              <td>enrolled_at</td>
-              <td>
-                <RelativeTime dateTime={instance.enrolled_at} />
-              </td>
-            </tr>
           </tbody>
         </Table>
       </Section>
