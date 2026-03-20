@@ -26,8 +26,6 @@ import org.graylog.storage.opensearch3.IndicesAdapterOS;
 import org.graylog.storage.opensearch3.MessagesAdapterOS;
 import org.graylog.storage.opensearch3.NodeAdapterOS;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
-import org.graylog.storage.opensearch3.OpenSearchClient;
-import org.graylog.storage.opensearch3.PlainJsonApi;
 import org.graylog.storage.opensearch3.Scroll;
 import org.graylog.storage.opensearch3.ScrollResultOS;
 import org.graylog.storage.opensearch3.SearchRequestFactoryOS;
@@ -58,16 +56,13 @@ import static org.graylog2.indexer.Constants.COMPOSABLE_INDEX_TEMPLATES_FEATURE;
 
 public class AdaptersOS implements Adapters {
 
-    @Deprecated
-    private final OpenSearchClient client;
     private final OfficialOpensearchClient officialOpensearchClient;
     private final List<String> featureFlags;
     private final ObjectMapper objectMapper;
     private final ResultMessageFactory resultMessageFactory = new TestResultMessageFactory();
     private final SearchRequestFactoryOS searchRequestFactory;
 
-    public AdaptersOS(@Deprecated OpenSearchClient client, OfficialOpensearchClient officialOpensearchClient, List<String> featureFlags) {
-        this.client = client;
+    public AdaptersOS(OfficialOpensearchClient officialOpensearchClient, List<String> featureFlags) {
         this.officialOpensearchClient = officialOpensearchClient;
         this.featureFlags = featureFlags;
         this.objectMapper = new ObjectMapperProvider().get();
@@ -88,8 +83,7 @@ public class AdaptersOS implements Adapters {
                 new org.graylog.storage.opensearch3.cluster.ClusterStateApi(officialOpensearchClient),
                 indexTemplateAdapter(),
                 new IndexStatisticsBuilder(),
-                objectMapper,
-                new PlainJsonApi(objectMapper, client, officialOpensearchClient)
+                objectMapper
         );
     }
 
